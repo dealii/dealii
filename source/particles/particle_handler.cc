@@ -1310,17 +1310,27 @@ namespace Particles
 
       std::vector<unsigned int> neighbor_permutation;
 
+      // Reuse these vectors below, but only with a single element.
+      // Avoid resizing for every particle.
+      Point<dim>      invalid_reference_point;
+      Point<spacedim> invalid_point;
+      invalid_reference_point[0] = std::numeric_limits<double>::infinity();
+      invalid_point[0]           = std::numeric_limits<double>::infinity();
+      reference_locations.resize(1, invalid_reference_point);
+      real_locations.resize(1, invalid_point);
+
       // Find the cells that the particles moved to.
       for (auto &out_particle : particles_out_of_cell)
         {
           // make a copy of the current cell, since we will modify the
-          // variable current_cell in the following but we need the original in
+          // variable current_cell below, but we need the original in
           // the case the particle is not found
           auto current_cell = out_particle->get_surrounding_cell();
 
-          // The cell the particle is in
-          Point<dim> current_reference_position;
-          bool       found_cell = false;
+          real_locations[0] = out_particle->get_location();
+
+          // Record if the new cell was found
+          bool found_cell = false;
 
           // Check if the particle is in one of the old cell's neighbors
           // that are adjacent to the closest vertex
@@ -1356,26 +1366,22 @@ namespace Particles
           // previous cell Most likely we will find the particle in them.
           for (unsigned int i = 0; i < n_neighbor_cells; ++i)
             {
-              try
-                {
-                  typename std::set<typename Triangulation<dim, spacedim>::
-                                      active_cell_iterator>::const_iterator
-                    cell = vertex_to_cells[closest_vertex_index].begin();
+              typename std::set<typename Triangulation<dim, spacedim>::
+                                  active_cell_iterator>::const_iterator cell =
+                vertex_to_cells[closest_vertex_index].begin();
 
-                  std::advance(cell, neighbor_permutation[i]);
-                  const Point<dim> p_unit =
-                    mapping->transform_real_to_unit_cell(
-                      *cell, out_particle->get_location());
-                  if (GeometryInfo<dim>::is_inside_unit_cell(p_unit))
-                    {
-                      current_cell               = *cell;
-                      current_reference_position = p_unit;
-                      found_cell                 = true;
-                      break;
-                    }
+              std::advance(cell, neighbor_permutation[i]);
+              mapping->transform_points_real_to_unit_cell(*cell,
+                                                          real_locations,
+                                                          reference_locations);
+
+              if (GeometryInfo<dim>::is_inside_unit_cell(
+                    reference_locations[0]))
+                {
+                  current_cell = *cell;
+                  found_cell   = true;
+                  break;
                 }
-              catch (typename Mapping<dim>::ExcTransformationFailed &)
-                {}
             }
 
           if (!found_cell)
@@ -1383,29 +1389,49 @@ namespace Particles
               // The particle is not in a neighbor of the old cell.
               // Look for the new cell in the whole local domain.
               // This case is rare.
-              const std::pair<const typename Triangulation<dim, spacedim>::
-                                active_cell_iterator,
-                              Point<dim>>
-                current_cell_and_position =
-                  GridTools::find_active_cell_around_point<>(
-                    *triangulation_cache, out_particle->get_location());
-              current_cell               = current_cell_and_position.first;
-              current_reference_position = current_cell_and_position.second;
+              std::vector<std::pair<Point<spacedim>, unsigned int>>
+                closest_vertex_in_domain;
+              triangulation_cache->get_used_vertices_rtree().query(
+                boost::geometry::index::nearest(out_particle->get_location(),
+                                                1),
+                std::back_inserter(closest_vertex_in_domain));
 
-              if (current_cell.state() != IteratorState::valid)
+              // We should have one and only one result
+              AssertDimension(closest_vertex_in_domain.size(), 1);
+              const unsigned int closest_vertex_index_in_domain =
+                closest_vertex_in_domain[0].second;
+
+              // Search all of the cells adjacent to the closest vertex of the
+              // domain. Most likely we will find the particle in them.
+              for (const auto &cell :
+                   vertex_to_cells[closest_vertex_index_in_domain])
                 {
-                  // We can find no cell for this particle. It has left the
-                  // domain due to an integration error or an open boundary.
-                  // Signal the loss and move on.
-                  signals.particle_lost(out_particle,
-                                        out_particle->get_surrounding_cell());
-                  continue;
+                  mapping->transform_points_real_to_unit_cell(
+                    cell, real_locations, reference_locations);
+
+                  if (GeometryInfo<dim>::is_inside_unit_cell(
+                        reference_locations[0]))
+                    {
+                      current_cell = cell;
+                      found_cell   = true;
+                      break;
+                    }
                 }
+            }
+
+          if (!found_cell)
+            {
+              // We can find no cell for this particle. It has left the
+              // domain due to an integration error or an open boundary.
+              // Signal the loss and move on.
+              signals.particle_lost(out_particle,
+                                    out_particle->get_surrounding_cell());
+              continue;
             }
 
           // If we are here, we found a cell and reference position for this
           // particle
-          out_particle->set_reference_location(current_reference_position);
+          out_particle->set_reference_location(reference_locations[0]);
 
           // Reinsert the particle into our domain if we own its cell.
           // Mark it for MPI transfer otherwise
