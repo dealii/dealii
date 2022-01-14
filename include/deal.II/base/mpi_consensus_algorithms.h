@@ -446,11 +446,6 @@ namespace Utilities
          */
         std::vector<unsigned int> targets;
 
-        /**
-         * List of ranks of processes wanting to send a request to this process.
-         */
-        std::vector<unsigned int> sources;
-
         // data structures to send and receive requests
 
         /**

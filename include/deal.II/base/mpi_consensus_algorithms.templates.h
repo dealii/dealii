@@ -479,13 +479,11 @@ namespace Utilities
                ExcMessage("The consensus algorithms expect that each process "
                           "only sends a single message to another process, "
                           "but the targets provided include duplicates."));
+        const unsigned int n_targets = targets.size();
 
         // 2) determine who wants to communicate with this process
-        sources =
-          compute_point_to_point_communication_pattern(this->comm, targets);
-
-        const unsigned int n_targets = targets.size();
-        const unsigned int n_sources = sources.size();
+        const unsigned int n_sources =
+          compute_n_point_to_point_communications(this->comm, targets);
 
         // 2) allocate memory
         recv_buffers.resize(n_targets);
@@ -529,7 +527,7 @@ namespace Utilities
             AssertThrowMPI(ierr);
           }
 
-        return sources.size();
+        return n_sources;
 #else
         return 0;
 #endif
@@ -548,17 +546,13 @@ namespace Utilities
           consensus_algorithm_pex_process_deliver;
 
         // Wait until we have a message ready for retrieval, though we don't
-        // care which process it is from. We know that the source must be
-        // listed in the 'sources' array, though.
+        // care which process it is from.
         MPI_Status status;
         int ierr = MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
         AssertThrowMPI(ierr);
 
         // Get rank of incoming message and verify that it makes sense
         const unsigned int other_rank = status.MPI_SOURCE;
-        Assert(std::find(sources.begin(), sources.end(), other_rank) !=
-                 sources.end(),
-               ExcInternalError());
 
         Assert(requesting_processes.find(other_rank) ==
                  requesting_processes.end(),
