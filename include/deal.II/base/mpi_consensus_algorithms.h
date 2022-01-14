@@ -407,10 +407,12 @@ namespace Utilities
        *   i.e. when this process can stop waiting for requests, no IBarrier is
        *   needed.
        *
-       * @note The function
-       *   Utilities::MPI::compute_point_to_point_communication_pattern() is
-       *   used to determine the source processes, which implements a
-       *   PEX-algorithm from @cite hoefler2010scalable.
+       * @note Under the hood, this function uses
+       *   Utilities::MPI::compute_point_to_point_communication_pattern()
+       *   to determine the source processes, which itself is based on the
+       *   NBX-algorithm from @cite hoefler2010scalable that is implemented
+       *   in the ConsensusAlgorithms::NBX class (a sister class to the
+       *   current one).
        *
        * @tparam T1 The type of the elements of the vector to be sent.
        * @tparam T2 The type of the elements of the vector to be received.
@@ -503,6 +505,8 @@ namespace Utilities
         void
         clean_up_and_end_communication();
       };
+
+
 
       /**
        * A serial fall back for the above classes to allow programming
