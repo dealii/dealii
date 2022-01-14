@@ -131,8 +131,8 @@ We will use approximations of the inverse operations in $P^{-1}$ that are
 (nearly) independent of $h$. In this situation, one can again show, that the
 eigenvalues are independent of $h$. For the Krylov method we choose MINRES,
 which is attractive for the analysis (iteration count is proven to be
-independent of $h$, see the remainder of the chapter 6.2.1 in the book
-mentioned above), great from the computational standpoint (simpler and cheaper
+independent of $h$, see the remainder of the chapter 6.2.1 in @cite elman2005),
+great from the computational standpoint (simpler and cheaper
 than GMRES for example), and applicable (matrix and preconditioner are
 symmetric).
 
