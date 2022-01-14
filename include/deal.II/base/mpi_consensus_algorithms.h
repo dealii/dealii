@@ -185,9 +185,8 @@ namespace Utilities
        * requester. (Each message can be queried for its sender.)
        *
        * As mentioned in the first paragraph, the algorithms we are interested
-       * in are what are call "dynamic-sparse". Dynamic-sparse in this context
-       * means the following:
-       * - Dynamic: By the time tha algorithm is called, the other processes do
+       * in are "dynamic-sparse":
+       * - Dynamic: By the time the algorithm is called, the other processes do
        *   not know yet that they have to answer requests.
        * - Sparse: Each process only has to communicate with a small subset of
        *   processes of the MPI communicator.
