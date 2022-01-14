@@ -407,15 +407,22 @@ namespace Utilities
 #  if DEAL_II_MPI_VERSION_GTE(3, 0)
 
       // Have a little function that checks if destinations provided
-      // to the current process are unique:
+      // to the current process are unique. The way it does this is
+      // to create a sorted list of destinations and then walk through
+      // the list and look at successive elements -- if we find the
+      // same number twice, we know that the destinations were not
+      // unique
       const bool my_destinations_are_unique = [destinations]() {
-        std::vector<unsigned int> my_destinations = destinations;
-        const unsigned int        n_destinations  = my_destinations.size();
-        std::sort(my_destinations.begin(), my_destinations.end());
-        my_destinations.erase(std::unique(my_destinations.begin(),
-                                          my_destinations.end()),
-                              my_destinations.end());
-        return (my_destinations.size() == n_destinations);
+        if (destinations.size() == 0)
+          return true;
+        else
+          {
+            std::vector<unsigned int> my_destinations = destinations;
+            std::sort(my_destinations.begin(), my_destinations.end());
+            return (std::adjacent_find(my_destinations.begin(),
+                                       my_destinations.end()) ==
+                    my_destinations.end());
+          }
       }();
 
       // If all processes report that they have unique destinations,
