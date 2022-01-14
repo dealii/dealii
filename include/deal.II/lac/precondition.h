@@ -408,7 +408,7 @@ public:
   /**
    * Declare type for container size.
    */
-  using size_type = typename MatrixType::size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Class for parameters.
@@ -527,6 +527,27 @@ namespace internal
 {
   namespace PreconditionRelaxation
   {
+    template <typename T, typename VectorType>
+    struct has_Tvmult
+    {
+    private:
+      static bool
+      detect(...);
+
+      template <typename U>
+      static decltype(
+        std::declval<U const>().Tvmult(std::declval<VectorType &>(),
+                                       std::declval<const VectorType &>()))
+      detect(const U &);
+
+    public:
+      static const bool value =
+        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+    };
+
+    template <typename T, typename VectorType>
+    const bool has_Tvmult<T, VectorType>::value;
+
     template <typename T, typename VectorType>
     struct has_step
     {
@@ -971,6 +992,28 @@ namespace internal
       preconditioner.Tstep(dst, src);
     }
 
+    template <typename MatrixType,
+              typename VectorType,
+              typename std::enable_if<has_Tvmult<MatrixType, VectorType>::value,
+                                      MatrixType>::type * = nullptr>
+    void
+    Tvmult(const MatrixType &A, VectorType &dst, const VectorType &src)
+    {
+      A.Tvmult(dst, src);
+    }
+
+    template <
+      typename MatrixType,
+      typename VectorType,
+      typename std::enable_if<!has_Tvmult<MatrixType, VectorType>::value,
+                              MatrixType>::type * = nullptr>
+    void
+    Tvmult(const MatrixType &, VectorType &, const VectorType &)
+    {
+      Assert(false,
+             ExcMessage("Matrix A does not provide a Tvmult() function!"));
+    }
+
     template <
       typename MatrixType,
       typename PreconditionerType,
@@ -989,10 +1032,10 @@ namespace internal
       residual.reinit(dst, true);
       tmp.reinit(dst, true);
 
-      A.Tvmult(residual, dst);
+      Tvmult(A, residual, dst);
       residual.sadd(-1.0, 1.0, src);
 
-      preconditioner.Tvmult(tmp, residual);
+      Tvmult(preconditioner, tmp, residual);
       dst.add(relaxation, tmp);
     }
 
@@ -1013,7 +1056,7 @@ namespace internal
       if (i == 0)
         {
           if (transposed)
-            preconditioner.Tvmult(dst, src);
+            Tvmult(preconditioner, dst, src);
           else
             preconditioner.vmult(dst, src);
 
