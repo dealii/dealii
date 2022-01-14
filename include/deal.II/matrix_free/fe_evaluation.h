@@ -3270,17 +3270,35 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
 namespace internal
 {
+  // given a block vector return the underlying vector type
+  // including constness (specified by bool)
+  template <typename VectorType, bool>
+  struct ConstBlockVectorSelector;
+
+  template <typename VectorType>
+  struct ConstBlockVectorSelector<VectorType, true>
+  {
+    using BaseVectorType = const typename VectorType::BlockType;
+  };
+
+  template <typename VectorType>
+  struct ConstBlockVectorSelector<VectorType, false>
+  {
+    using BaseVectorType = typename VectorType::BlockType;
+  };
+
   // allows to select between block vectors and non-block vectors, which
   // allows to use a unified interface for extracting blocks on block vectors
   // and doing nothing on usual vectors
   template <typename VectorType, bool>
-  struct BlockVectorSelector
-  {};
+  struct BlockVectorSelector;
 
   template <typename VectorType>
   struct BlockVectorSelector<VectorType, true>
   {
-    using BaseVectorType = typename VectorType::BlockType;
+    using BaseVectorType = typename ConstBlockVectorSelector<
+      VectorType,
+      std::is_const<VectorType>::value>::BaseVectorType;
 
     static BaseVectorType *
     get_vector_component(VectorType &vec, const unsigned int component)
@@ -3330,6 +3348,20 @@ namespace internal
   };
 
   template <typename VectorType>
+  struct BlockVectorSelector<const std::vector<VectorType>, false>
+  {
+    using BaseVectorType = const VectorType;
+
+    static const BaseVectorType *
+    get_vector_component(const std::vector<VectorType> &vec,
+                         const unsigned int             component)
+    {
+      AssertIndexRange(component, vec.size());
+      return &vec[component];
+    }
+  };
+
+  template <typename VectorType>
   struct BlockVectorSelector<std::vector<VectorType *>, false>
   {
     using BaseVectorType = VectorType;
@@ -3337,6 +3369,20 @@ namespace internal
     static BaseVectorType *
     get_vector_component(std::vector<VectorType *> &vec,
                          const unsigned int         component)
+    {
+      AssertIndexRange(component, vec.size());
+      return vec[component];
+    }
+  };
+
+  template <typename VectorType>
+  struct BlockVectorSelector<const std::vector<VectorType *>, false>
+  {
+    using BaseVectorType = const VectorType;
+
+    static const BaseVectorType *
+    get_vector_component(const std::vector<VectorType *> &vec,
+                         const unsigned int               component)
     {
       AssertIndexRange(component, vec.size());
       return vec[component];
@@ -4183,15 +4229,13 @@ namespace internal
   template <int n_components, typename VectorType>
   std::pair<
     std::array<typename internal::BlockVectorSelector<
-                 typename std::remove_const<VectorType>::type,
-                 IsBlockVector<typename std::remove_const<VectorType>::type>::
-                   value>::BaseVectorType *,
+                 VectorType,
+                 IsBlockVector<VectorType>::value>::BaseVectorType *,
                n_components>,
     std::array<
       const std::vector<ArrayView<const typename internal::BlockVectorSelector<
-        typename std::remove_const<VectorType>::type,
-        IsBlockVector<typename std::remove_const<VectorType>::type>::value>::
-                                    BaseVectorType::value_type>> *,
+        VectorType,
+        IsBlockVector<VectorType>::value>::BaseVectorType::value_type>> *,
       n_components>>
   get_vector_data(VectorType &       src,
                   const unsigned int first_index,
@@ -4203,32 +4247,33 @@ namespace internal
     // of components is checked in the internal data
     std::pair<
       std::array<typename internal::BlockVectorSelector<
-                   typename std::remove_const<VectorType>::type,
-                   IsBlockVector<typename std::remove_const<VectorType>::type>::
-                     value>::BaseVectorType *,
+                   VectorType,
+                   IsBlockVector<VectorType>::value>::BaseVectorType *,
                  n_components>,
       std::array<
         const std::vector<
           ArrayView<const typename internal::BlockVectorSelector<
-            typename std::remove_const<VectorType>::type,
-            IsBlockVector<typename std::remove_const<VectorType>::type>::
-              value>::BaseVectorType::value_type>> *,
+            VectorType,
+            IsBlockVector<VectorType>::value>::BaseVectorType::value_type>> *,
         n_components>>
       src_data;
 
     for (unsigned int d = 0; d < n_components; ++d)
       src_data.first[d] = internal::BlockVectorSelector<
-        typename std::remove_const<VectorType>::type,
-        IsBlockVector<typename std::remove_const<VectorType>::type>::value>::
-        get_vector_component(
-          const_cast<typename std::remove_const<VectorType>::type &>(src),
-          d + first_index);
+        VectorType,
+        IsBlockVector<VectorType>::value>::get_vector_component(src,
+                                                                d +
+                                                                  first_index);
 
     for (unsigned int d = 0; d < n_components; ++d)
-      src_data.second[d] = get_shared_vector_data(*src_data.first[d],
-                                                  is_valid_mode_for_sm,
-                                                  active_fe_index,
-                                                  dof_info);
+      src_data.second[d] = get_shared_vector_data(
+        const_cast<typename internal::BlockVectorSelector<
+          typename std::remove_const<VectorType>::type,
+          IsBlockVector<typename std::remove_const<VectorType>::type>::value>::
+                     BaseVectorType &>(*src_data.first[d]),
+        is_valid_mode_for_sm,
+        active_fe_index,
+        dof_info);
 
     return src_data;
   }

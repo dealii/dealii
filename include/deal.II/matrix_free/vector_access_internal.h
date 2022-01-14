@@ -247,10 +247,20 @@ namespace internal
                             VectorizedArrayType *dof_values,
                             std::integral_constant<bool, true>) const
     {
+#ifdef DEBUG
+      // in debug mode, run non-vectorized version because this path
+      // has additional checks (e.g., regarding ghosting)
+      process_dofs_vectorized(dofs_per_cell,
+                              dof_index,
+                              vec,
+                              dof_values,
+                              std::integral_constant<bool, false>());
+#else
       const Number *vec_ptr = vec.begin() + dof_index;
       for (unsigned int i = 0; i < dofs_per_cell;
            ++i, vec_ptr += VectorizedArrayType::size())
         dof_values[i].load(vec_ptr);
+#endif
     }
 
 
@@ -340,7 +350,17 @@ namespace internal
                        VectorizedArrayType &res,
                        std::integral_constant<bool, true>) const
     {
+#ifdef DEBUG
+      // in debug mode, run non-vectorized version because this path
+      // has additional checks (e.g., regarding ghosting)
+      process_dof_gather(indices,
+                         vec,
+                         constant_offset,
+                         res,
+                         std::integral_constant<bool, false>());
+#else
       res.gather(vec.begin() + constant_offset, indices);
+#endif
     }
 
 
