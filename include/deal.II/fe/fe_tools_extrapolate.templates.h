@@ -1258,8 +1258,8 @@ namespace FETools
                    prepare_buffer_for_answer,
                    read_answer);
 
-      Utilities::MPI::ConsensusAlgorithms::NBX<char, char>(operations,
-                                                           communicator)
+      Utilities::MPI::ConsensusAlgorithms::Selector<char, char>(operations,
+                                                                communicator)
         .run();
     }
 
