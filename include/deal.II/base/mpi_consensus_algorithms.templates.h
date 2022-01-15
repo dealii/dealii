@@ -405,80 +405,20 @@ namespace Utilities
         static CollectiveMutex      mutex;
         CollectiveMutex::ScopedLock lock(mutex, this->comm);
 
-        // 1) send requests and start receiving the answers
-        //    especially determine how many requests are expected
+        // 1) Send requests and start receiving the answers.
+        //    In particular, determine how many requests we should expect
+        //    on the current process.
         const unsigned int n_requests = start_communication();
 
-        // 2) answer requests
+        // 2) Answer requests:
         for (unsigned int request = 0; request < n_requests; ++request)
-          answer_requests(request);
+          answer_one_request(request);
 
-        // 3) process answers
+        // 3) Process answers:
         clean_up_and_end_communication();
 
         return std::vector<unsigned int>(requesting_processes.begin(),
                                          requesting_processes.end());
-      }
-
-
-
-      template <typename T1, typename T2>
-      void
-      PEX<T1, T2>::answer_requests(int index)
-      {
-#ifdef DEAL_II_WITH_MPI
-        const int tag_request = Utilities::MPI::internal::Tags::
-          consensus_algorithm_pex_answer_request;
-        const int tag_deliver = Utilities::MPI::internal::Tags::
-          consensus_algorithm_pex_process_deliver;
-
-        MPI_Status status;
-        auto ierr = MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
-        AssertThrowMPI(ierr);
-
-        // get rank of incoming message
-        const auto other_rank = status.MPI_SOURCE;
-
-        Assert(requesting_processes.find(other_rank) ==
-                 requesting_processes.end(),
-               ExcMessage("Process is requesting a second time!"));
-        requesting_processes.insert(other_rank);
-
-        std::vector<T1> buffer_recv;
-
-        // get size of incoming message
-        int number_amount;
-        ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
-        AssertThrowMPI(ierr);
-
-        // allocate memory for incoming message
-        Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
-        buffer_recv.resize(number_amount / sizeof(T1));
-        ierr = MPI_Recv(buffer_recv.data(),
-                        number_amount,
-                        MPI_BYTE,
-                        other_rank,
-                        tag_request,
-                        this->comm,
-                        &status);
-        AssertThrowMPI(ierr);
-
-        // process request
-        auto &request_buffer = requests_buffers[index];
-        this->process.answer_request(other_rank, buffer_recv, request_buffer);
-
-        // start to send answer back
-        ierr = MPI_Isend(request_buffer.data(),
-                         request_buffer.size() * sizeof(T2),
-                         MPI_BYTE,
-                         other_rank,
-                         tag_deliver,
-                         this->comm,
-                         &requests_answers[index]);
-        AssertThrowMPI(ierr);
-#else
-        (void)index;
-#endif
       }
 
 
@@ -500,15 +440,15 @@ namespace Utilities
         sources =
           compute_point_to_point_communication_pattern(this->comm, targets);
 
-        const auto n_targets = targets.size();
-        const auto n_sources = sources.size();
+        const unsigned int n_targets = targets.size();
+        const unsigned int n_sources = sources.size();
 
         // 2) allocate memory
         recv_buffers.resize(n_targets);
         send_buffers.resize(n_targets);
-        send_and_recv_buffers.resize(2 * n_targets);
+        send_request_and_recv_answer_requests.resize(2 * n_targets);
 
-        requests_answers.resize(n_sources);
+        send_answer_requests.resize(n_sources);
         requests_buffers.resize(n_sources);
 
         // 4) send and receive
@@ -522,16 +462,17 @@ namespace Utilities
             this->process.create_request(rank, send_buffer);
 
             // start to send data
-            auto ierr = MPI_Isend(send_buffer.data(),
-                                  send_buffer.size() * sizeof(T1),
-                                  MPI_BYTE,
-                                  rank,
-                                  tag_request,
-                                  this->comm,
-                                  &send_and_recv_buffers[n_targets + i]);
+            auto ierr =
+              MPI_Isend(send_buffer.data(),
+                        send_buffer.size() * sizeof(T1),
+                        MPI_BYTE,
+                        rank,
+                        tag_request,
+                        this->comm,
+                        &send_request_and_recv_answer_requests[n_targets + i]);
             AssertThrowMPI(ierr);
 
-            // start to receive data
+            // Post the operation that receives the answers
             auto &recv_buffer = recv_buffers[i];
             this->process.prepare_buffer_for_answer(rank, recv_buffer);
             ierr = MPI_Irecv(recv_buffer.data(),
@@ -540,7 +481,7 @@ namespace Utilities
                              rank,
                              tag_deliver,
                              this->comm,
-                             &send_and_recv_buffers[i]);
+                             &send_request_and_recv_answer_requests[i]);
             AssertThrowMPI(ierr);
           }
 
@@ -554,27 +495,101 @@ namespace Utilities
 
       template <typename T1, typename T2>
       void
+      PEX<T1, T2>::answer_one_request(const unsigned int index)
+      {
+#ifdef DEAL_II_WITH_MPI
+        const int tag_request = Utilities::MPI::internal::Tags::
+          consensus_algorithm_pex_answer_request;
+        const int tag_deliver = Utilities::MPI::internal::Tags::
+          consensus_algorithm_pex_process_deliver;
+
+        // Wait until we have a message ready for retrieval, though we don't
+        // care which process it is from. We know that the source must be
+        // listed in the 'sources' array, though.
+        MPI_Status status;
+        int ierr = MPI_Probe(MPI_ANY_SOURCE, tag_request, this->comm, &status);
+        AssertThrowMPI(ierr);
+
+        // Get rank of incoming message and verify that it makes sense
+        const unsigned int other_rank = status.MPI_SOURCE;
+        Assert(std::find(sources.begin(), sources.end(), other_rank) !=
+                 sources.end(),
+               ExcInternalError());
+
+        Assert(requesting_processes.find(other_rank) ==
+                 requesting_processes.end(),
+               ExcMessage(
+                 "A process is sending a request after a request from "
+                 "the same process has previously already been "
+                 "received. This algorithm does not expect this to happen."));
+        requesting_processes.insert(other_rank);
+
+        std::vector<T1> buffer_recv;
+
+        // Actually get the incoming message:
+        int number_amount;
+        ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
+        AssertThrowMPI(ierr);
+        Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
+
+        buffer_recv.resize(number_amount / sizeof(T1));
+        ierr = MPI_Recv(buffer_recv.data(),
+                        number_amount,
+                        MPI_BYTE,
+                        other_rank,
+                        tag_request,
+                        this->comm,
+                        &status);
+        AssertThrowMPI(ierr);
+
+        // Process request by asking the user-provided function for
+        // the answer and post a send for it.
+        auto &request_buffer = requests_buffers[index];
+        this->process.answer_request(other_rank, buffer_recv, request_buffer);
+
+        ierr = MPI_Isend(request_buffer.data(),
+                         request_buffer.size() * sizeof(T2),
+                         MPI_BYTE,
+                         other_rank,
+                         tag_deliver,
+                         this->comm,
+                         &send_answer_requests[index]);
+        AssertThrowMPI(ierr);
+#else
+        (void)index;
+#endif
+      }
+
+
+
+      template <typename T1, typename T2>
+      void
       PEX<T1, T2>::clean_up_and_end_communication()
       {
 #ifdef DEAL_II_WITH_MPI
-        // finalize all MPI_Requests
-        if (send_and_recv_buffers.size() > 0)
+        // Finalize all MPI_Request objects for both the
+        // send-request and receive-answer operations.
+        if (send_request_and_recv_answer_requests.size() > 0)
           {
-            auto ierr = MPI_Waitall(send_and_recv_buffers.size(),
-                                    send_and_recv_buffers.data(),
-                                    MPI_STATUSES_IGNORE);
+            const int ierr =
+              MPI_Waitall(send_request_and_recv_answer_requests.size(),
+                          send_request_and_recv_answer_requests.data(),
+                          MPI_STATUSES_IGNORE);
             AssertThrowMPI(ierr);
           }
 
-        if (requests_answers.size() > 0)
+        // Then also check the send-answer requests.
+        if (send_answer_requests.size() > 0)
           {
-            auto ierr = MPI_Waitall(requests_answers.size(),
-                                    requests_answers.data(),
-                                    MPI_STATUSES_IGNORE);
+            const int ierr = MPI_Waitall(send_answer_requests.size(),
+                                         send_answer_requests.data(),
+                                         MPI_STATUSES_IGNORE);
             AssertThrowMPI(ierr);
           }
 
-        // unpack received data
+        // We now know that all answers to the requests we have sent
+        // have been received and put in their respective buffers.
+        // Pass them on to the user-provided functions:
         for (unsigned int i = 0; i < targets.size(); ++i)
           this->process.read_answer(targets[i], recv_buffers[i]);
 #endif
@@ -595,10 +610,19 @@ namespace Utilities
       {
         const auto targets = this->process.compute_targets();
 
+        // The only valid target for a serial program is itself.
         if (targets.size() != 0)
           {
+            Assert(targets.size() == 1,
+                   ExcMessage(
+                     "On a single process, the only valid target "
+                     "is process zero (the process itself), which can only be "
+                     "listed once."));
             AssertDimension(targets[0], 0);
 
+            // Since the caller indicates that there is a target, and since we
+            // know that it is the current process, let the process send
+            // something to itself.
             std::vector<T1> send_buffer;
             std::vector<T2> recv_buffer;
             std::vector<T2> request_buffer;
