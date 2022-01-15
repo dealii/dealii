@@ -39,6 +39,39 @@ namespace Utilities
   {
     namespace ConsensusAlgorithms
     {
+      namespace
+      {
+        /**
+         * Return whether a vector of targets (MPI ranks) has only unique
+         * elements.
+         *
+         * This function is only used within assertions, which causes GCC
+         * to issue a warning in release mode that due to -Werror then causes an
+         * error. We suppress this by using the [[gnu::unused]] error (because
+         * the
+         * [[maybe_unused]] attribute is only supported from C++17 forward).
+         *
+         * Unfortunately, in contrast to what the standard says, the Microsoft
+         * compiler does not ignore the gnu::unused attribute as it should,
+         * and then produces an error of its own. So we disable the attribute
+         * for that compiler.
+         */
+#ifndef DEAL_II_MSVC
+        [[gnu::unused]]
+#endif
+        bool
+        has_unique_elements(const std::vector<unsigned int> &targets)
+        {
+          std::vector<unsigned int> my_destinations = targets;
+          std::sort(my_destinations.begin(), my_destinations.end());
+          return (std::adjacent_find(my_destinations.begin(),
+                                     my_destinations.end()) ==
+                  my_destinations.end());
+        }
+      } // namespace
+
+
+
       template <typename T1, typename T2>
       void
       Process<T1, T2>::answer_request(const unsigned int,
@@ -151,19 +184,10 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
         // 1)
         targets = this->process.compute_targets();
-        Assert(
-          [this]() {
-            std::vector<unsigned int> my_destinations = this->targets;
-            const unsigned int        n_destinations  = my_destinations.size();
-            std::sort(my_destinations.begin(), my_destinations.end());
-            my_destinations.erase(std::unique(my_destinations.begin(),
-                                              my_destinations.end()),
-                                  my_destinations.end());
-            return (my_destinations.size() == n_destinations);
-          }(),
-          ExcMessage("The consensus algorithms expect that each process "
-                     "only sends a single message to another process, "
-                     "but the targets provided include duplicates."));
+        Assert(has_unique_elements(targets),
+               ExcMessage("The consensus algorithms expect that each process "
+                          "only sends a single message to another process, "
+                          "but the targets provided include duplicates."));
 
         const auto n_targets = targets.size();
 
@@ -451,19 +475,10 @@ namespace Utilities
         // 1) determine with which processes this process wants to communicate
         // with
         targets = this->process.compute_targets();
-        Assert(
-          [this]() {
-            std::vector<unsigned int> my_destinations = this->targets;
-            const unsigned int        n_destinations  = my_destinations.size();
-            std::sort(my_destinations.begin(), my_destinations.end());
-            my_destinations.erase(std::unique(my_destinations.begin(),
-                                              my_destinations.end()),
-                                  my_destinations.end());
-            return (my_destinations.size() == n_destinations);
-          }(),
-          ExcMessage("The consensus algorithms expect that each process "
-                     "only sends a single message to another process, "
-                     "but the targets provided include duplicates."));
+        Assert(has_unique_elements(targets),
+               ExcMessage("The consensus algorithms expect that each process "
+                          "only sends a single message to another process, "
+                          "but the targets provided include duplicates."));
 
         // 2) determine who wants to communicate with this process
         sources =
