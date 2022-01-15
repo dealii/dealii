@@ -459,12 +459,9 @@ namespace Utilities
         std::vector<std::vector<T2>> recv_buffers;
 
         /**
-         * Requests for sending requests and receiving answers to requests.
-         * The first half of the array is used for the receive-answer
-         * requests objects, the second half for the send-request request
-         * objects.
+         * MPI request objects for sending request messages.
          */
-        std::vector<MPI_Request> send_request_and_recv_answer_requests;
+        std::vector<MPI_Request> send_request_requests;
 
         /**
          * Buffers for sending answers to requests.

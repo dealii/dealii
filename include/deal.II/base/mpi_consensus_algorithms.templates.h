@@ -488,7 +488,7 @@ namespace Utilities
         // 2) allocate memory
         recv_buffers.resize(n_targets);
         send_buffers.resize(n_targets);
-        send_request_and_recv_answer_requests.resize(n_targets);
+        send_request_requests.resize(n_targets);
 
         send_answer_requests.resize(n_sources);
         requests_buffers.resize(n_sources);
@@ -510,7 +510,7 @@ namespace Utilities
                                   rank,
                                   tag_request,
                                   this->comm,
-                                  &send_request_and_recv_answer_requests[i]);
+                                  &send_request_requests[i]);
             AssertThrowMPI(ierr);
           }
 
@@ -646,12 +646,11 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
         // Finalize all MPI_Request objects for both the
         // send-request and receive-answer operations.
-        if (send_request_and_recv_answer_requests.size() > 0)
+        if (send_request_requests.size() > 0)
           {
-            const int ierr =
-              MPI_Waitall(send_request_and_recv_answer_requests.size(),
-                          send_request_and_recv_answer_requests.data(),
-                          MPI_STATUSES_IGNORE);
+            const int ierr = MPI_Waitall(send_request_requests.size(),
+                                         send_request_requests.data(),
+                                         MPI_STATUSES_IGNORE);
             AssertThrowMPI(ierr);
           }
 
