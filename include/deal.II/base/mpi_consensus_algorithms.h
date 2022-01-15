@@ -496,6 +496,13 @@ namespace Utilities
         answer_one_request(const unsigned int index);
 
         /**
+         * Receive and process all of the incoming responses to the
+         * requests we sent.
+         */
+        void
+        process_incoming_answers();
+
+        /**
          * After all answers have been exchanged, the MPI data structures can be
          * freed and the received answers can be processed.
          */

@@ -453,6 +453,9 @@ namespace Utilities
           answer_one_request(request);
 
         // 3) Process answers:
+        process_incoming_answers();
+
+        // 4) Make sure all sends have successfully terminated:
         clean_up_and_end_communication();
 
         return std::vector<unsigned int>(requesting_processes.begin(),
@@ -468,9 +471,6 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
         const int tag_request = Utilities::MPI::internal::Tags::
           consensus_algorithm_pex_answer_request;
-        const int tag_deliver = Utilities::MPI::internal::Tags::
-          consensus_algorithm_pex_process_deliver;
-
 
         // 1) determine with which processes this process wants to communicate
         // with
@@ -488,7 +488,7 @@ namespace Utilities
         // 2) allocate memory
         recv_buffers.resize(n_targets);
         send_buffers.resize(n_targets);
-        send_request_and_recv_answer_requests.resize(2 * n_targets);
+        send_request_and_recv_answer_requests.resize(n_targets);
 
         send_answer_requests.resize(n_sources);
         requests_buffers.resize(n_sources);
@@ -504,26 +504,13 @@ namespace Utilities
             this->process.create_request(rank, send_buffer);
 
             // start to send data
-            auto ierr =
-              MPI_Isend(send_buffer.data(),
-                        send_buffer.size() * sizeof(T1),
-                        MPI_BYTE,
-                        rank,
-                        tag_request,
-                        this->comm,
-                        &send_request_and_recv_answer_requests[n_targets + i]);
-            AssertThrowMPI(ierr);
-
-            // Post the operation that receives the answers
-            auto &recv_buffer = recv_buffers[i];
-            this->process.prepare_buffer_for_answer(rank, recv_buffer);
-            ierr = MPI_Irecv(recv_buffer.data(),
-                             recv_buffer.size() * sizeof(T2),
-                             MPI_BYTE,
-                             rank,
-                             tag_deliver,
-                             this->comm,
-                             &send_request_and_recv_answer_requests[i]);
+            auto ierr = MPI_Isend(send_buffer.data(),
+                                  send_buffer.size() * sizeof(T1),
+                                  MPI_BYTE,
+                                  rank,
+                                  tag_request,
+                                  this->comm,
+                                  &send_request_and_recv_answer_requests[i]);
             AssertThrowMPI(ierr);
           }
 
@@ -602,6 +589,58 @@ namespace Utilities
 
       template <typename T1, typename T2>
       void
+      PEX<T1, T2>::process_incoming_answers()
+      {
+#ifdef DEAL_II_WITH_MPI
+        const int tag_deliver = Utilities::MPI::internal::Tags::
+          consensus_algorithm_pex_process_deliver;
+
+        // We know how many targets we have sent requests to. These
+        // targets will all eventually send us their responses, but
+        // we need not process them in order -- rather, just see what
+        // comes in and then look at message originators' ranks and
+        // message sizes
+        for (unsigned int i = 0; i < targets.size(); ++i)
+          {
+            MPI_Status status;
+            {
+              const int ierr =
+                MPI_Probe(MPI_ANY_SOURCE, tag_deliver, this->comm, &status);
+              AssertThrowMPI(ierr);
+            }
+
+            const auto other_rank = status.MPI_SOURCE;
+            int        message_size;
+            {
+              const int ierr = MPI_Get_count(&status, MPI_BYTE, &message_size);
+              AssertThrowMPI(ierr);
+            }
+            Assert(message_size % sizeof(T2) == 0, ExcInternalError());
+            std::vector<T2> recv_buffer(message_size / sizeof(T2));
+
+            // Now actually receive the answer. Because the MPI_Probe
+            // above blocks until we have a message, we know that the
+            // following MPI_Recv call will immediately succeed.
+            {
+              const int ierr = MPI_Recv(recv_buffer.data(),
+                                        recv_buffer.size() * sizeof(T2),
+                                        MPI_BYTE,
+                                        other_rank,
+                                        tag_deliver,
+                                        this->comm,
+                                        MPI_STATUS_IGNORE);
+              AssertThrowMPI(ierr);
+            }
+
+            this->process.read_answer(other_rank, recv_buffer);
+          }
+#endif
+      }
+
+
+
+      template <typename T1, typename T2>
+      void
       PEX<T1, T2>::clean_up_and_end_communication()
       {
 #ifdef DEAL_II_WITH_MPI
@@ -624,12 +663,6 @@ namespace Utilities
                                          MPI_STATUSES_IGNORE);
             AssertThrowMPI(ierr);
           }
-
-        // We now know that all answers to the requests we have sent
-        // have been received and put in their respective buffers.
-        // Pass them on to the user-provided functions:
-        for (unsigned int i = 0; i < targets.size(); ++i)
-          this->process.read_answer(targets[i], recv_buffers[i]);
 #endif
       }
 
