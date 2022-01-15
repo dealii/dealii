@@ -45,8 +45,6 @@
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/numerics/vector_tools.h>
-
 #include <algorithm>
 #include <numeric>
 
