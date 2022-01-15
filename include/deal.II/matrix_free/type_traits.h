@@ -199,7 +199,8 @@ namespace internal
   {
     static const bool value =
       has_begin<T>::value &&
-      (has_local_element<T>::value || is_serial_vector<T>::value) &&
+      (has_local_element<T>::value ||
+       is_serial_vector<typename std::remove_const<T>::type>::value) &&
       std::is_same<typename T::value_type, Number>::value;
   };
 
