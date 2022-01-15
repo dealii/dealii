@@ -366,44 +366,86 @@ namespace internal
     get_polynomial_space(const FiniteElement<dim, spacedim> &fe);
 
     /**
-     * Compute the mapping related data for the given @p mapping,
-     * @p cell and @p unit_points that is required by the FEPointEvaluation
-     * class.
+     * Data structure that allows the computation of the mapping related data
+     * for the given @p mapping, @p cell and @p unit_points that us used by
+     * the FEPointEvaluation class. This data structure is designed to be used
+     * in the form of an std::shared_ptr that allows sharing the data
+     * structure between different `FEPointEvaluation` objects.
      */
     template <int dim, int spacedim>
+    struct MappingData
+    {
+      /**
+       * Set up the data on the current cell if necessary, i.e., if the cell
+       * has changed compared to the one already stored in this class, or if
+       * the given points differ from the stored ones.
+       */
+      void
+      compute(const Mapping<dim> &mapping,
+              const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+              const ArrayView<const Point<dim>> &unit_points,
+              const UpdateFlags                  update_flags);
+
+      /**
+       * The points for which the evaluation has been invoked by the last call
+       * to compute().
+       */
+      std::vector<Point<dim>> unit_points;
+
+      /**
+       *  The cell on which the evaluation has been invoked by the last call
+       * to compute().
+       */
+      const typename Triangulation<dim, spacedim>::cell_iterator cell;
+
+      /**
+       * The data computed by this data structure.
+       */
+      internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> data;
+    };
+
+
+
+    template <int dim, int spacedim>
     void
-    compute_mapping_data_for_generic_points(
+    MappingData<dim, spacedim>::compute(
       const Mapping<dim> &                                        mapping,
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
       const ArrayView<const Point<dim>> &                         unit_points,
-      const UpdateFlags                                           update_flags,
-      internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-        &mapping_data)
+      const UpdateFlags                                           update_flags)
     {
-      UpdateFlags update_flags_mapping = update_default;
-      // translate update flags
-      if (update_flags & update_jacobians)
-        update_flags_mapping |= update_jacobians;
-      if (update_flags & update_gradients ||
-          update_flags & update_inverse_jacobians)
-        update_flags_mapping |= update_inverse_jacobians;
-      if (update_flags & update_quadrature_points)
-        update_flags_mapping |= update_quadrature_points;
+      bool needs_update =
+        (cell != this->cell) || unit_points.size() != this->unit_points.size();
+      // expensive check: make sure all points are really the same
+      if (!needs_update)
+        for (unsigned int i = 0; i < unit_points.size(); ++i)
+          if (unit_points[i].distance_square(this->unit_points[i]) > 1e-12)
+            {
+              needs_update = true;
+              break;
+            }
 
-      if (const MappingQ<dim, spacedim> *mapping_q =
-            dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
+      if (needs_update)
         {
-          mapping_q->fill_mapping_data_for_generic_points(cell,
-                                                          unit_points,
-                                                          update_flags_mapping,
-                                                          mapping_data);
-        }
-      else if (const MappingCartesian<dim, spacedim> *mapping_cartesian =
-                 dynamic_cast<const MappingCartesian<dim, spacedim> *>(
-                   &mapping))
-        {
-          mapping_cartesian->fill_mapping_data_for_generic_points(
-            cell, unit_points, update_flags_mapping, mapping_data);
+          this->unit_points.resize(unit_points.size());
+          std::copy(unit_points.begin(),
+                    unit_points.end(),
+                    this->unit_points.begin());
+          if (const MappingQ<dim, spacedim> *mapping_q =
+                dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
+            {
+              mapping_q->fill_mapping_data_for_generic_points(cell,
+                                                              this->unit_points,
+                                                              update_flags,
+                                                              data);
+            }
+          else if (const MappingCartesian<dim, spacedim> *mapping_cartesian =
+                     dynamic_cast<const MappingCartesian<dim, spacedim> *>(
+                       &mapping))
+            {
+              mapping_cartesian->fill_mapping_data_for_generic_points(
+                cell, this->unit_points, update_flags, data);
+            }
         }
     }
   } // namespace FEPointEvaluation
@@ -509,10 +551,11 @@ public:
    * for the given cell and positions.
    */
   void
-  reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-         const ArrayView<const Point<dim>> &unit_points,
-         const dealii::internal::FEValuesImplementation::
-           MappingRelatedData<dim, spacedim> &mapping_data);
+  reinit(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const ArrayView<const Point<dim>> &                         unit_points,
+    const std::shared_ptr<
+      internal::FEPointEvaluation::MappingData<dim, spacedim>> &mapping_data);
 
   /**
    * Returns the mapping data that was computed during the last call to
@@ -522,8 +565,7 @@ public:
    * passed to the other objects, avoiding the need to recompute the mapping
    * data.
    */
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                     spacedim> &
+  std::shared_ptr<internal::FEPointEvaluation::MappingData<dim, spacedim>>
   get_mapping_data() const;
 
   /**
@@ -752,16 +794,11 @@ private:
   std::shared_ptr<FEValues<dim, spacedim>> fe_values;
 
   /**
-   * Array to store temporary data computed by the mapping for the fast
-   * evaluation path.
+   * Mapping information, such as Jacobian transformations, computed by the
+   * mapping.
    */
-  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+  std::shared_ptr<internal::FEPointEvaluation::MappingData<dim, spacedim>>
     mapping_data;
-
-  /**
-   * The reference points specified at reinit().
-   */
-  std::vector<Point<dim>> unit_points;
 };
 
 // ----------------------- template and inline function ----------------------
@@ -777,6 +814,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   , fe(&fe)
   , update_flags(update_flags)
   , update_flags_mapping(update_default)
+  , mapping_data(std::make_shared<
+                 internal::FEPointEvaluation::MappingData<dim, spacedim>>())
 {
   AssertIndexRange(first_selected_component + n_components,
                    fe.n_components() + 1);
@@ -855,8 +894,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
 {
   // If using the fast path, we need to precompute the mapping data.
   if (!poly.empty())
-    internal::FEPointEvaluation::compute_mapping_data_for_generic_points(
-      *mapping, cell, unit_points, update_flags_mapping, mapping_data);
+    mapping_data->compute(*mapping, cell, unit_points, update_flags_mapping);
 
   // then call the other version of this function with the precomputed data
   reinit(cell, unit_points, mapping_data);
@@ -869,35 +907,18 @@ void
 FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<dim>> &                         unit_points,
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                     spacedim>
+  const std::shared_ptr<internal::FEPointEvaluation::MappingData<dim, spacedim>>
     &precomputed_mapping_data)
 {
-  this->unit_points.resize(unit_points.size());
-  std::copy(unit_points.begin(), unit_points.end(), this->unit_points.begin());
-
   if (!poly.empty())
     {
-      // Check the mapping data for consistency.
-      if (update_flags_mapping & update_jacobians)
-        Assert(precomputed_mapping_data.jacobians.size() == unit_points.size(),
-               ExcDimensionMismatch(precomputed_mapping_data.jacobians.size(),
-                                    unit_points.size()));
-      if (update_flags_mapping & update_inverse_jacobians)
-        Assert(precomputed_mapping_data.inverse_jacobians.size() ==
-                 unit_points.size(),
-               ExcDimensionMismatch(
-                 precomputed_mapping_data.inverse_jacobians.size(),
-                 unit_points.size()));
-
-      if (update_flags_mapping & update_quadrature_points)
-        Assert(precomputed_mapping_data.inverse_jacobians.size() ==
-                 unit_points.size(),
-               ExcDimensionMismatch(
-                 precomputed_mapping_data.quadrature_points.size(),
-                 unit_points.size()));
-
       mapping_data = precomputed_mapping_data;
+
+      // As we got the data from the other field, we will typically not need
+      // to perform any operation, unless the user provided us with a
+      // `precomputed_mapping_data` that is not initialized to the present
+      // context.
+      mapping_data->compute(*mapping, cell, unit_points, update_flags_mapping);
     }
   else
     {
@@ -907,17 +928,25 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
         Quadrature<dim>(
           std::vector<Point<dim>>(unit_points.begin(), unit_points.end())),
         update_flags | update_flags_mapping);
+
       fe_values->reinit(cell);
-      mapping_data.initialize(unit_points.size(), update_flags_mapping);
+      mapping_data->unit_points.clear();
+      mapping_data->unit_points.insert(mapping_data->unit_points.end(),
+                                       unit_points.begin(),
+                                       unit_points.end());
+
+      mapping_data->data.initialize(unit_points.size(), update_flags_mapping);
       if ((update_flags_mapping & update_jacobians) != 0)
         for (unsigned int q = 0; q < unit_points.size(); ++q)
-          mapping_data.jacobians[q] = fe_values->jacobian(q);
+          mapping_data->data.jacobians[q] = fe_values->jacobian(q);
       if ((update_flags_mapping & update_inverse_jacobians) != 0)
         for (unsigned int q = 0; q < unit_points.size(); ++q)
-          mapping_data.inverse_jacobians[q] = fe_values->inverse_jacobian(q);
+          mapping_data->data.inverse_jacobians[q] =
+            fe_values->inverse_jacobian(q);
       if ((update_flags_mapping & update_quadrature_points) != 0)
         for (unsigned int q = 0; q < unit_points.size(); ++q)
-          mapping_data.quadrature_points[q] = fe_values->quadrature_point(q);
+          mapping_data->data.quadrature_points[q] =
+            fe_values->quadrature_point(q);
     }
 
   if ((update_flags & update_values) != 0)
@@ -930,8 +959,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
 
 
 template <int n_components, int dim, int spacedim, typename Number>
-const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                   spacedim> &
+std::shared_ptr<internal::FEPointEvaluation::MappingData<dim, spacedim>>
 FEPointEvaluation<n_components, dim, spacedim, Number>::get_mapping_data() const
 {
   return mapping_data;
@@ -945,6 +973,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
   const ArrayView<const Number> &         solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flag)
 {
+  const std::vector<Point<dim>> &unit_points = mapping_data->unit_points;
+
   if (unit_points.empty())
     return;
 
@@ -1014,7 +1044,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
                     typename internal::FEPointEvaluation::
                       EvaluatorTypeTraits<dim, n_components, double>::
                         gradient_type>(apply_transformation(
-                    mapping_data.inverse_jacobians[i + j].transpose(),
+                    mapping_data->data.inverse_jacobians[i + j].transpose(),
                     unit_gradients[i + j]));
                 }
             }
@@ -1084,6 +1114,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
   const ArrayView<Number> &               solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
+  const std::vector<Point<dim>> &unit_points = mapping_data->unit_points;
+
   if (unit_points.size() == 0) // no evaluation points provided
     {
       std::fill(solution_values.begin(), solution_values.end(), 0.0);
@@ -1144,9 +1176,9 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
                 gradients[i + j] =
                   static_cast<typename internal::FEPointEvaluation::
                                 EvaluatorTypeTraits<dim, n_components, double>::
-                                  gradient_type>(
-                    apply_transformation(mapping_data.inverse_jacobians[i + j],
-                                         gradients[i + j]));
+                                  gradient_type>(apply_transformation(
+                    mapping_data->data.inverse_jacobians[i + j],
+                    gradients[i + j]));
                 internal::FEPointEvaluation::
                   EvaluatorTypeTraits<dim, n_components, Number>::get_gradient(
                     gradient, j, gradients[i + j]);
@@ -1285,7 +1317,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::submit_value(
   const value_type & value,
   const unsigned int point_index)
 {
-  AssertIndexRange(point_index, unit_points.size());
+  AssertIndexRange(point_index, mapping_data->unit_points.size());
   values[point_index] = value;
 }
 
@@ -1297,7 +1329,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::submit_gradient(
   const gradient_type &gradient,
   const unsigned int   point_index)
 {
-  AssertIndexRange(point_index, unit_points.size());
+  AssertIndexRange(point_index, mapping_data->unit_points.size());
   gradients[point_index] = gradient;
 }
 
@@ -1309,8 +1341,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::jacobian(
   const unsigned int point_index) const
 {
   Assert(update_flags_mapping & update_jacobians, ExcNotInitialized());
-  AssertIndexRange(point_index, mapping_data.jacobians.size());
-  return mapping_data.jacobians[point_index];
+  AssertIndexRange(point_index, mapping_data->data.jacobians.size());
+  return mapping_data->data.jacobians[point_index];
 }
 
 
@@ -1323,8 +1355,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::inverse_jacobian(
   Assert(update_flags_mapping & update_inverse_jacobians ||
            update_flags_mapping & update_gradients,
          ExcNotInitialized());
-  AssertIndexRange(point_index, mapping_data.inverse_jacobians.size());
-  return mapping_data.inverse_jacobians[point_index];
+  AssertIndexRange(point_index, mapping_data->data.inverse_jacobians.size());
+  return mapping_data->data.inverse_jacobians[point_index];
 }
 
 
@@ -1335,8 +1367,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::real_point(
   const unsigned int point_index) const
 {
   Assert(update_flags_mapping & update_quadrature_points, ExcNotInitialized());
-  AssertIndexRange(point_index, mapping_data.quadrature_points.size());
-  return mapping_data.quadrature_points[point_index];
+  AssertIndexRange(point_index, mapping_data->data.quadrature_points.size());
+  return mapping_data->data.quadrature_points[point_index];
 }
 
 
@@ -1346,8 +1378,8 @@ inline Point<dim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::unit_point(
   const unsigned int point_index) const
 {
-  AssertIndexRange(point_index, unit_points.size());
-  return unit_points[point_index];
+  AssertIndexRange(point_index, mapping_data->unit_points.size());
+  return mapping_data->unit_points[point_index];
 }
 
 DEAL_II_NAMESPACE_CLOSE
