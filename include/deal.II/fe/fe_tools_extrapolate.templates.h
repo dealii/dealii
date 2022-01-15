@@ -1182,19 +1182,19 @@ namespace FETools
       // in the input argument to this function might be destined for
       // the same process, so we have to only look at the unique set of
       // destinations:
-      std::set<types::subdomain_id> destinations;
+      std::vector<types::subdomain_id> destinations;
       for (const auto &cell : cells_to_send)
-        destinations.insert(cell.receiver);
+        destinations.emplace_back(cell.receiver);
+      std::sort(destinations.begin(), destinations.end());
+      destinations.erase(std::unique(destinations.begin(), destinations.end()),
+                         destinations.end());
 
       // Then set up the send/receive operation. This is best done through
       // the 'consensus algorithm' setup that is used for point-to-point
       // communication of information in cases where we do not know up
       // front which processes (and from how many processes) we have to
       // expect information from.
-      const auto get_destinations = [&destinations]() {
-        return std::vector<unsigned int>(destinations.begin(),
-                                         destinations.end());
-      };
+      const auto get_destinations = [&destinations]() { return destinations; };
 
       const auto create_request =
         [&cells_to_send](const types::subdomain_id other_rank,
