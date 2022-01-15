@@ -21,6 +21,8 @@ for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
     template bool internal::FEPointEvaluation::is_fast_path_supported(
       const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
       const unsigned int);
+    template bool internal::FEPointEvaluation::is_fast_path_supported(
+      const Mapping<deal_II_dimension, deal_II_space_dimension> &);
     template std::vector<Polynomials::Polynomial<double>>
     internal::FEPointEvaluation::get_polynomial_space(
       const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
