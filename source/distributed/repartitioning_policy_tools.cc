@@ -206,10 +206,11 @@ namespace RepartitioningPolicyTools
 
     // step 1) check if all processes have enough cells
 
-    const auto locally_owned_cells =
-      tria_in.active_cell_iterators() | IteratorFilters::LocallyOwnedCell();
     const unsigned int n_locally_owned_active_cells =
-      std::distance(locally_owned_cells.begin(), locally_owned_cells.end());
+      std::count_if(tria_in.begin_active(),
+                    typename Triangulation<dim, spacedim>::active_cell_iterator(
+                      tria_in.end()),
+                    [](const auto &cell) { return cell.is_locally_owned(); });
 
     const auto comm = tria_in.get_communicator();
 
