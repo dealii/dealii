@@ -2878,18 +2878,19 @@ inline FEEvaluationBase<dim,
                         Number,
                         is_face,
                         VectorizedArrayType>::
-  FEEvaluationBase(const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
-                   const unsigned int                                  dof_no,
-                   const unsigned int first_selected_component,
-                   const unsigned int quad_no,
-                   const unsigned int fe_degree,
-                   const unsigned int n_q_points,
-                   const bool         is_interior_face,
-                   const unsigned int active_fe_index,
-                   const unsigned int active_quad_index,
-                   const unsigned int face_type)
+  FEEvaluationBase(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const unsigned int                                  dof_no,
+    const unsigned int first_selected_component,
+    const unsigned int quad_no,
+    const unsigned int fe_degree,
+    const unsigned int n_q_points,
+    const bool         is_interior_face,
+    const unsigned int active_fe_index,
+    const unsigned int active_quad_index,
+    const unsigned int face_type)
   : FEEvaluationData<dim, VectorizedArrayType, is_face>(
-      internal::extract_initialization_data<is_face>(data_in,
+      internal::extract_initialization_data<is_face>(matrix_free,
                                                      dof_no,
                                                      first_selected_component,
                                                      quad_no,
@@ -2901,8 +2902,8 @@ inline FEEvaluationBase<dim,
       is_interior_face,
       quad_no,
       first_selected_component)
-  , scratch_data_array(data_in.acquire_scratch_data())
-  , matrix_free(&data_in)
+  , scratch_data_array(matrix_free.acquire_scratch_data())
+  , matrix_free(&matrix_free)
 {
   this->set_data_pointers(scratch_data_array, n_components_);
   Assert(
@@ -5338,7 +5339,7 @@ inline FEEvaluationAccess<dim,
                           is_face,
                           VectorizedArrayType>::
   FEEvaluationAccess(
-    const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const unsigned int                                  dof_no,
     const unsigned int first_selected_component,
     const unsigned int quad_no,
@@ -5349,7 +5350,7 @@ inline FEEvaluationAccess<dim,
     const unsigned int active_quad_index,
     const unsigned int face_type)
   : FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>(
-      data_in,
+      matrix_free,
       dof_no,
       first_selected_component,
       quad_no,
@@ -5445,7 +5446,7 @@ operator=(const FEEvaluationAccess<dim,
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
   FEEvaluationAccess(
-    const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const unsigned int                                  dof_no,
     const unsigned int first_selected_component,
     const unsigned int quad_no,
@@ -5456,7 +5457,7 @@ inline FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
     const unsigned int active_quad_index,
     const unsigned int face_type)
   : FEEvaluationBase<dim, 1, Number, is_face, VectorizedArrayType>(
-      data_in,
+      matrix_free,
       dof_no,
       first_selected_component,
       quad_no,
@@ -5771,7 +5772,7 @@ FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   FEEvaluationAccess(
-    const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const unsigned int                                  dof_no,
     const unsigned int first_selected_component,
     const unsigned int quad_no,
@@ -5782,7 +5783,7 @@ inline FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
     const unsigned int active_quad_index,
     const unsigned int face_type)
   : FEEvaluationBase<dim, dim, Number, is_face, VectorizedArrayType>(
-      data_in,
+      matrix_free,
       dof_no,
       first_selected_component,
       quad_no,
@@ -6181,18 +6182,19 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::submit_curl(
 
 template <typename Number, bool is_face, typename VectorizedArrayType>
 inline FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::
-  FEEvaluationAccess(const MatrixFree<1, Number, VectorizedArrayType> &data_in,
-                     const unsigned int                                dof_no,
-                     const unsigned int first_selected_component,
-                     const unsigned int quad_no,
-                     const unsigned int fe_degree,
-                     const unsigned int n_q_points,
-                     const bool         is_interior_face,
-                     const unsigned int active_fe_index,
-                     const unsigned int active_quad_index,
-                     const unsigned int face_type)
+  FEEvaluationAccess(
+    const MatrixFree<1, Number, VectorizedArrayType> &matrix_free,
+    const unsigned int                                dof_no,
+    const unsigned int                                first_selected_component,
+    const unsigned int                                quad_no,
+    const unsigned int                                fe_degree,
+    const unsigned int                                n_q_points,
+    const bool                                        is_interior_face,
+    const unsigned int                                active_fe_index,
+    const unsigned int                                active_quad_index,
+    const unsigned int                                face_type)
   : FEEvaluationBase<1, 1, Number, is_face, VectorizedArrayType>(
-      data_in,
+      matrix_free,
       dof_no,
       first_selected_component,
       quad_no,
@@ -6510,13 +6512,13 @@ inline FEEvaluation<dim,
                     n_components_,
                     Number,
                     VectorizedArrayType>::
-  FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &data_in,
+  FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
                const unsigned int                                  fe_no,
                const unsigned int                                  quad_no,
                const unsigned int first_selected_component,
                const unsigned int active_fe_index,
                const unsigned int active_quad_index)
-  : BaseClass(data_in,
+  : BaseClass(matrix_free,
               fe_no,
               first_selected_component,
               quad_no,
