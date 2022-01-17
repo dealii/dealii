@@ -308,10 +308,8 @@ namespace GridRefinement
    * above.
    *
    * @note This function was originally implemented by Thomas Richter. It
-   * follows a strategy described in T. Richter, "Parallel Multigrid Method
-   * for Adaptive Finite Elements with Application to 3D Flow Problems", PhD
-   * thesis, University of Heidelberg, 2005. See in particular Section 4.3,
-   * pp. 42-43.
+   * follows a strategy described in @cite Richter2005. See in particular
+   * Section 4.3, pp. 42-43.
    */
   template <int dim, typename Number, int spacedim>
   void
