@@ -277,8 +277,58 @@ namespace Utilities
               }
             else
               {
-                // We can record that we have received an answer
-                // from this process. We would like to just remove this
+                // OK, so we have gotten a reply to our answer from
+                // this particular rank. Let us process it:
+                {
+                  const int tag_deliver = Utilities::MPI::internal::Tags::
+                    consensus_algorithm_nbx_process_deliver;
+
+                  // Just to be sure, double check that the message really
+                  // is already here -- in other words, that the following
+                  // MPI_Recv is going to return immediately. But as part of
+                  // this, we also use the status object to query the size
+                  // of the message so that we can resize the receive buffer.
+                  int        request_is_pending;
+                  MPI_Status status;
+                  {
+                    const int ierr = MPI_Iprobe(target,
+                                                tag_deliver,
+                                                this->comm,
+                                                &request_is_pending,
+                                                &status);
+                    AssertThrowMPI(ierr);
+                  }
+
+                  (void)request_is_pending;
+                  Assert(request_is_pending, ExcInternalError());
+
+                  // OK, so yes, a message is here. Receive it.
+                  int message_size;
+                  {
+                    const int ierr =
+                      MPI_Get_count(&status, MPI_BYTE, &message_size);
+                    AssertThrowMPI(ierr);
+                  }
+                  Assert(message_size % sizeof(T2) == 0, ExcInternalError());
+                  std::vector<T2> recv_buffer(message_size / sizeof(T2));
+
+                  {
+                    const int ierr = MPI_Recv(recv_buffer.data(),
+                                              recv_buffer.size() * sizeof(T2),
+                                              MPI_BYTE,
+                                              target,
+                                              tag_deliver,
+                                              this->comm,
+                                              MPI_STATUS_IGNORE);
+                    AssertThrowMPI(ierr);
+                  }
+
+                  this->process.read_answer(target, recv_buffer);
+                }
+
+                // We must also record that we have received an answer
+                // from this process, so that we don't query that target
+                // again. We would like to just remove this
                 // rank from 'outstanding_answers' then, but that would
                 // break the loop we are currently in, so just keep
                 // track of that and remove these ranks after we are
@@ -292,6 +342,7 @@ namespace Utilities
         // from everyone and can return true:
         Assert(received_answers == outstanding_answers, ExcInternalError());
         outstanding_answers.clear();
+
         return true;
 
 #else
@@ -447,59 +498,6 @@ namespace Utilities
           ierr = MPI_Barrier(this->comm);
           AssertThrowMPI(ierr);
 #  endif
-        }
-
-        // We know from the various calls to MPI_Iprobe that all of our
-        // requests have received answers, but we have not actually
-        // gotten the data from MPI. Do so and unpack the data.
-        {
-          for (const unsigned int target : targets)
-            {
-              const int tag_deliver = Utilities::MPI::internal::Tags::
-                consensus_algorithm_nbx_process_deliver;
-
-              // Just to be sure, double check that the message really
-              // is already here -- in other words, that the following
-              // MPI_Recv is going to return immediately. But as part of
-              // this, we also use the status object to query the size
-              // of the message so that we can resize the receive buffer.
-              int        request_is_pending;
-              MPI_Status status;
-              {
-                const int ierr = MPI_Iprobe(target,
-                                            tag_deliver,
-                                            this->comm,
-                                            &request_is_pending,
-                                            &status);
-                AssertThrowMPI(ierr);
-              }
-
-              (void)request_is_pending;
-              Assert(request_is_pending, ExcInternalError());
-
-              // OK, so yes, a message is here. Receive it.
-              int message_size;
-              {
-                const int ierr =
-                  MPI_Get_count(&status, MPI_BYTE, &message_size);
-                AssertThrowMPI(ierr);
-              }
-              Assert(message_size % sizeof(T2) == 0, ExcInternalError());
-              std::vector<T2> recv_buffer(message_size / sizeof(T2));
-
-              {
-                const int ierr = MPI_Recv(recv_buffer.data(),
-                                          recv_buffer.size() * sizeof(T2),
-                                          MPI_BYTE,
-                                          target,
-                                          tag_deliver,
-                                          this->comm,
-                                          MPI_STATUS_IGNORE);
-                AssertThrowMPI(ierr);
-              }
-
-              this->process.read_answer(target, recv_buffer);
-            }
         }
 #endif
       }
