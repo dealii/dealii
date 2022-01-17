@@ -437,7 +437,7 @@ public:
   /**
    * Declare parameter call back. This signal is triggered right after
    * declare_parameters() has been called, to allow users to prepare their
-   * variables right after parameters have been decalred. The default
+   * variables right after parameters have been declared. The default
    * implementation is empty.
    */
   boost::signals2::signal<void()> declare_parameters_call_back;
