@@ -197,7 +197,6 @@ namespace Utilities
         // 2) allocate memory
         send_requests.resize(n_targets);
         send_buffers.resize(n_targets);
-        outstanding_answers.clear();
 
         {
           // 4) send and receive
@@ -219,9 +218,11 @@ namespace Utilities
                                     this->comm,
                                     &send_requests[index]);
               AssertThrowMPI(ierr);
-
-              outstanding_answers.insert(rank);
             }
+
+          // Also record that we expect an answer from each target we sent
+          // a request to:
+          n_outstanding_answers = n_targets;
         }
 #endif
       }
@@ -240,7 +241,7 @@ namespace Utilities
         // immediately with a return code that indicates whether
         // it has found a message from any process with a given
         // tag.
-        if (outstanding_answers.size() == 0)
+        if (n_outstanding_answers == 0)
           return true;
         else
           {
@@ -267,15 +268,6 @@ namespace Utilities
                 // one rank. Let us process it, after double checking
                 // that it is indeed one we were still expecting:
                 const auto target = status.MPI_SOURCE;
-                Assert(outstanding_answers.find(target) !=
-                         outstanding_answers.end(),
-                       ExcMessage(
-                         "We were expecting a message from an MPI rank "
-                         "for which we know that messages are outstanding. But "
-                         "we got one from an unexpected source."));
-
-                const int tag_deliver = Utilities::MPI::internal::Tags::
-                  consensus_algorithm_nbx_process_deliver;
 
                 // Then query the size of the message, allocate enough memory,
                 // receive the data, and process it.
@@ -289,6 +281,9 @@ namespace Utilities
                 std::vector<T2> recv_buffer(message_size / sizeof(T2));
 
                 {
+                  const int tag_deliver = Utilities::MPI::internal::Tags::
+                    consensus_algorithm_nbx_process_deliver;
+
                   const int ierr = MPI_Recv(recv_buffer.data(),
                                             recv_buffer.size() * sizeof(T2),
                                             MPI_BYTE,
@@ -303,7 +298,7 @@ namespace Utilities
 
                 // Finally, remove this rank from the list of outstanding
                 // targets:
-                outstanding_answers.erase(target);
+                --n_outstanding_answers;
 
                 // We could do another go-around from the top of this
                 // else-branch to see whether there are actually other messages
@@ -313,7 +308,7 @@ namespace Utilities
                 // places. So let it be enough for now. If there are outstanding
                 // answers, we will get back to this function before long and
                 // can take care of them then.
-                return (outstanding_answers.size() == 0);
+                return (n_outstanding_answers == 0);
               }
           }
 
