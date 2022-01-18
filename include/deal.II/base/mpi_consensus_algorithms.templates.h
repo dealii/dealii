@@ -234,115 +234,85 @@ namespace Utilities
       {
 #ifdef DEAL_II_WITH_MPI
         // We know that all requests have come in when we have pending
-        // messages from all targets with the right tag. We can check
-        // for pending messages with MPI_IProbe, which returns
+        // messages from all targets with the right tag (some of which we may
+        // have already taken care of below, after discovering their existence).
+        // We can check for pending messages with MPI_IProbe, which returns
         // immediately with a return code that indicates whether
-        // it has found a message from a given process with a given
-        // tag
-        std::set<unsigned int> received_answers;
-        for (const unsigned int target : outstanding_answers)
+        // it has found a message from any process with a given
+        // tag.
+        while (outstanding_answers.size() > 0)
           {
             const int tag_deliver = Utilities::MPI::internal::Tags::
               consensus_algorithm_nbx_process_deliver;
 
             int        request_is_pending;
-            const auto ierr = MPI_Iprobe(target,
+            MPI_Status status;
+            const auto ierr = MPI_Iprobe(MPI_ANY_SOURCE,
                                          tag_deliver,
                                          this->comm,
                                          &request_is_pending,
-                                         MPI_STATUS_IGNORE);
+                                         &status);
             AssertThrowMPI(ierr);
 
-            // If there is no pending message from that process,
+            // If there is no pending message with this tag,
             // then we are clearly not done receiving everything
             // yet -- so return false.
-            //
-            // Before doing so, remove the ranks for which we have
-            // (in previous loop iterations) found answers from the
-            // list of outstanding answers.
-            //
-            // Note that it is possible that we have indeed received
-            // more messages, just from ranks that we would consider
-            // *after* the current one. We could keep checking for
-            // those as well, but we don't need to: We will eventually
-            // get to those once the message from the rank we are
-            // currently processing has arrived, at which point we
-            // will run the current loop beyong the current 'target'
-            // rank.
             if (request_is_pending == 0)
-              {
-                for (const unsigned int r : received_answers)
-                  outstanding_answers.erase(r);
-                return false;
-              }
+              return false;
             else
               {
                 // OK, so we have gotten a reply to our answer from
-                // this particular rank. Let us process it:
+                // one rank. Let us process it, after double checking
+                // that it is indeed one we were still expecting:
+                const auto target = status.MPI_SOURCE;
+                Assert(outstanding_answers.find(target) !=
+                         outstanding_answers.end(),
+                       ExcMessage(
+                         "We were expecting a message from an MPI rank "
+                         "for which we know that messages are outstanding. But "
+                         "we got one from an unexpected source."));
+
+                const int tag_deliver = Utilities::MPI::internal::Tags::
+                  consensus_algorithm_nbx_process_deliver;
+
+                // Then query the size of the message, allocate enough memory,
+                // receive the data, and process it.
+                int message_size;
                 {
-                  const int tag_deliver = Utilities::MPI::internal::Tags::
-                    consensus_algorithm_nbx_process_deliver;
+                  const int ierr =
+                    MPI_Get_count(&status, MPI_BYTE, &message_size);
+                  AssertThrowMPI(ierr);
+                }
+                Assert(message_size % sizeof(T2) == 0, ExcInternalError());
+                std::vector<T2> recv_buffer(message_size / sizeof(T2));
 
-                  // Just to be sure, double check that the message really
-                  // is already here -- in other words, that the following
-                  // MPI_Recv is going to return immediately. But as part of
-                  // this, we also use the status object to query the size
-                  // of the message so that we can resize the receive buffer.
-                  int        request_is_pending;
-                  MPI_Status status;
-                  {
-                    const int ierr = MPI_Iprobe(target,
-                                                tag_deliver,
-                                                this->comm,
-                                                &request_is_pending,
-                                                &status);
-                    AssertThrowMPI(ierr);
-                  }
-
-                  (void)request_is_pending;
-                  Assert(request_is_pending, ExcInternalError());
-
-                  // OK, so yes, a message is here. Receive it.
-                  int message_size;
-                  {
-                    const int ierr =
-                      MPI_Get_count(&status, MPI_BYTE, &message_size);
-                    AssertThrowMPI(ierr);
-                  }
-                  Assert(message_size % sizeof(T2) == 0, ExcInternalError());
-                  std::vector<T2> recv_buffer(message_size / sizeof(T2));
-
-                  {
-                    const int ierr = MPI_Recv(recv_buffer.data(),
-                                              recv_buffer.size() * sizeof(T2),
-                                              MPI_BYTE,
-                                              target,
-                                              tag_deliver,
-                                              this->comm,
-                                              MPI_STATUS_IGNORE);
-                    AssertThrowMPI(ierr);
-                  }
-
-                  this->process.read_answer(target, recv_buffer);
+                {
+                  const int ierr = MPI_Recv(recv_buffer.data(),
+                                            recv_buffer.size() * sizeof(T2),
+                                            MPI_BYTE,
+                                            target,
+                                            tag_deliver,
+                                            this->comm,
+                                            MPI_STATUS_IGNORE);
+                  AssertThrowMPI(ierr);
                 }
 
-                // We must also record that we have received an answer
-                // from this process, so that we don't query that target
-                // again. We would like to just remove this
-                // rank from 'outstanding_answers' then, but that would
-                // break the loop we are currently in, so just keep
-                // track of that and remove these ranks after we are
-                // done with the loop (either by completing the loop
-                // or via the 'if' above).
-                received_answers.insert(target);
+                this->process.read_answer(target, recv_buffer);
+
+                // Finally, remove this rank from the list of outstanding
+                // targets:
+                outstanding_answers.erase(target);
               }
+
+            // Do another round of the 'while' loop above. It will either
+            // terminate because there are no outstanding answers left,
+            // or its body will return false because there are no other
+            // pending messages, or there is another pending message and
+            // we can process that too.
           }
 
         // If we have made it here, then we have received an answer
         // from everyone and can return true:
-        Assert(received_answers == outstanding_answers, ExcInternalError());
-        outstanding_answers.clear();
-
         return true;
 
 #else
