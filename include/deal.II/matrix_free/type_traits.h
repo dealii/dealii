@@ -273,8 +273,9 @@ namespace internal
   template <typename T>
   struct has_exchange_on_subset
   {
-    static const bool value =
-      has_begin<T>::value && has_local_element<T>::value;
+    static const bool value = has_begin<T>::value &&
+                              has_local_element<T>::value &&
+                              has_partitioners_are_compatible<T>::value;
   };
 
   // We need to have a separate declaration for static const members
