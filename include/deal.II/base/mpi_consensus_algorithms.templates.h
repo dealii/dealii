@@ -240,7 +240,9 @@ namespace Utilities
         // immediately with a return code that indicates whether
         // it has found a message from any process with a given
         // tag.
-        while (outstanding_answers.size() > 0)
+        if (outstanding_answers.size() == 0)
+          return true;
+        else
           {
             const int tag_deliver = Utilities::MPI::internal::Tags::
               consensus_algorithm_nbx_process_deliver;
@@ -302,18 +304,18 @@ namespace Utilities
                 // Finally, remove this rank from the list of outstanding
                 // targets:
                 outstanding_answers.erase(target);
+
+                // We could do another go-around from the top of this
+                // else-branch to see whether there are actually other messages
+                // that are currently pending. But that would mean spending
+                // substantial time in receiving answers while we should also be
+                // sending answers to requests we have received from other
+                // places. So let it be enough for now. If there are outstanding
+                // answers, we will get back to this function before long and
+                // can take care of them then.
+                return (outstanding_answers.size() == 0);
               }
-
-            // Do another round of the 'while' loop above. It will either
-            // terminate because there are no outstanding answers left,
-            // or its body will return false because there are no other
-            // pending messages, or there is another pending message and
-            // we can process that too.
           }
-
-        // If we have made it here, then we have received an answer
-        // from everyone and can return true:
-        return true;
 
 #else
         return true;
