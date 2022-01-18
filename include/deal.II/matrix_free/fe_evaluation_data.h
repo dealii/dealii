@@ -615,6 +615,13 @@ protected:
   const Tensor<2, dim, Number> *jacobian;
 
   /**
+   * A pointer to the gradients of the inverse Jacobian transformation of the
+   * present cell.
+   */
+  const Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, Number>>
+    *jacobian_gradients;
+
+  /**
    * A pointer to the Jacobian determinant of the present cell. If on a
    * Cartesian cell or on a cell with constant Jacobian, this is just the
    * Jacobian determinant, otherwise the Jacobian determinant times the

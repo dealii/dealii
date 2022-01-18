@@ -4782,10 +4782,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // cell with general Jacobian
   else
     {
-      const auto &jac_grad =
-        this->mapping_data->jacobian_gradients
-          [1 - this->is_interior_face]
-          [this->mapping_data->data_index_offsets[this->cell] + q_point];
+      const auto &jac_grad = this->jacobian_gradients[q_point];
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           VectorizedArrayType tmp[dim][dim];
@@ -4886,10 +4883,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // cell with general Jacobian
   else
     {
-      const Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, VectorizedArrayType>>
-        &jac_grad =
-          this->mapping_data->jacobian_gradients
-            [0][this->mapping_data->data_index_offsets[this->cell] + q_point];
+      const auto &jac_grad = this->jacobian_gradients[q_point];
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           // compute laplacian before the gradient because it needs to access
@@ -5215,10 +5209,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     {
       const Tensor<2, dim, VectorizedArrayType> jac = this->jacobian[q_point];
       const VectorizedArrayType                 JxW = this->J_value[q_point];
-      const auto &                              jac_grad =
-        this->mapping_data->jacobian_gradients
-          [1 - this->is_interior_face]
-          [this->mapping_data->data_index_offsets[this->cell] + q_point];
+      const auto &jac_grad = this->jacobian_gradients[q_point];
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           // 1. tmp = hessian_in(u) * J
@@ -6873,6 +6864,8 @@ FEEvaluation<dim,
     this->mapping_data->data_index_offsets[cell_index];
   this->jacobian = &this->mapping_data->jacobians[0][offsets];
   this->J_value  = &this->mapping_data->JxW_values[offsets];
+  this->jacobian_gradients =
+    this->mapping_data->jacobian_gradients[0].data() + offsets;
 
   for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     this->cell_ids[i] = cell_index * VectorizedArrayType::size() + i;
@@ -7618,6 +7611,9 @@ FEFaceEvaluation<dim,
   this->normal_x_jacobian =
     &this->mapping_data
        ->normals_times_jacobians[!this->is_interior_face][offsets];
+  this->jacobian_gradients =
+    this->mapping_data->jacobian_gradients[!this->is_interior_face].data() +
+    offsets;
 
 #  ifdef DEBUG
   this->is_reinitialized           = true;
@@ -7755,6 +7751,9 @@ FEFaceEvaluation<dim,
     &this->matrix_free->get_mapping_info()
        .face_data_by_cells[this->quad_no]
        .normals_times_jacobians[!this->is_interior_face][offsets];
+  this->jacobian_gradients =
+    this->mapping_data->jacobian_gradients[!this->is_interior_face].data() +
+    offsets;
 
 #  ifdef DEBUG
   this->is_reinitialized           = true;
