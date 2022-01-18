@@ -472,7 +472,7 @@ public:
   get_cell_ids() const
   {
     // implemented inline to avoid compilation problems on Windows
-    Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+    Assert(is_reinitialized, ExcNotInitialized());
     return cell_ids;
   }
 
@@ -484,7 +484,7 @@ public:
   get_cell_or_face_batch_id() const
   {
     // implemented inline to avoid compilation problems on Windows
-    Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+    Assert(is_reinitialized, ExcNotInitialized());
     return cell;
   }
 
@@ -496,7 +496,7 @@ public:
   get_cell_or_face_ids() const
   {
     // implemented inline to avoid compilation problems on Windows
-    Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+    Assert(is_reinitialized, ExcNotInitialized());
     if (!is_face || dof_access_index ==
                       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
       return cell_ids;
@@ -706,6 +706,12 @@ protected:
   Number *hessians_quad;
 
   /**
+   * Debug information to track whether the reinit() function of derived classes
+   * was called.
+   */
+  bool is_reinitialized;
+
+  /**
    * Debug information to track whether dof values have been initialized
    * before accessed. Used to control exceptions when uninitialized data is
    * used.
@@ -895,6 +901,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , quadrature_weights(
       descriptor != nullptr ? descriptor->quadrature_weights.begin() : nullptr)
 #  ifdef DEBUG
+  , is_reinitialized(false)
   , dof_values_initialized(false)
   , values_quad_initialized(false)
   , gradients_quad_initialized(false)
@@ -944,6 +951,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , is_interior_face(true)
   , dof_access_index(internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
   , mapped_geometry(mapped_geometry)
+  , is_reinitialized(false)
 {
   mapping_data = &mapped_geometry->get_data_storage();
   jacobian     = mapped_geometry->get_data_storage().jacobians[0].begin();
@@ -974,6 +982,7 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
   quadrature_weights = other.quadrature_weights;
 
 #  ifdef DEBUG
+  is_reinitialized           = false;
   dof_values_initialized     = false;
   values_quad_initialized    = false;
   gradients_quad_initialized = false;
@@ -1242,7 +1251,7 @@ template <int dim, typename Number, bool is_face>
 inline internal::MatrixFreeFunctions::GeometryType
 FEEvaluationData<dim, Number, is_face>::get_cell_type() const
 {
-  Assert(cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+  Assert(is_reinitialized, ExcNotInitialized());
   return cell_type;
 }
 
