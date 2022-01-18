@@ -879,18 +879,18 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   if (!poly.empty())
     {
       // Check the mapping data for consistency.
-      if (update_flags_mapping & update_jacobians)
+      if ((update_flags_mapping & update_jacobians) != 0u)
         Assert(precomputed_mapping_data.jacobians.size() == unit_points.size(),
                ExcDimensionMismatch(precomputed_mapping_data.jacobians.size(),
                                     unit_points.size()));
-      if (update_flags_mapping & update_inverse_jacobians)
+      if ((update_flags_mapping & update_inverse_jacobians) != 0u)
         Assert(precomputed_mapping_data.inverse_jacobians.size() ==
                  unit_points.size(),
                ExcDimensionMismatch(
                  precomputed_mapping_data.inverse_jacobians.size(),
                  unit_points.size()));
 
-      if (update_flags_mapping & update_quadrature_points)
+      if ((update_flags_mapping & update_quadrature_points) != 0u)
         Assert(precomputed_mapping_data.inverse_jacobians.size() ==
                  unit_points.size(),
                ExcDimensionMismatch(
