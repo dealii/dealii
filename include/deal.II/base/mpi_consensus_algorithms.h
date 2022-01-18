@@ -328,7 +328,11 @@ namespace Utilities
         std::vector<MPI_Request> recv_requests;
 
         /**
-         * Buffers for sending answers to requests.
+         * Buffers for sending answers to requests. We use a vector of
+         * pointers because that guarantees that the buffers themselves
+         * are newer moved around in memory, even if the vector is
+         * resized and consequently its elements (the pointers) are moved
+         * around.
          */
         std::vector<std::unique_ptr<std::vector<T2>>> request_buffers;
 

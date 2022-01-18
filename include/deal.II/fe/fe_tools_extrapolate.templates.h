@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mpi_consensus_algorithms.h>
+
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria.h>
 
@@ -68,9 +70,13 @@ namespace FETools
         Assert(false, ExcNotImplemented())
       }
     };
+
 #else
-    // Implementation of the @p extrapolate function
-    // on parallel distributed grids.
+
+    /**
+     * Implementation of the FETools::extrapolate() function
+     * on parallel distributed grids.
+     */
     template <int dim, int spacedim, class OutVector>
     class ExtrapolateImplementation
     {
@@ -84,11 +90,15 @@ namespace FETools
                            OutVector &                      u2);
 
     private:
-      // A shortcut for the type of the OutVector
+      /**
+       *  A shortcut for the type of the OutVector.
+       */
       using value_type = typename OutVector::value_type;
 
-      // A structure holding all data to
-      // set dofs recursively on cells of arbitrary level
+      /**
+       * A structure holding all data to set dofs recursively on cells of
+       * arbitrary level.
+       */
       struct WorkPackage
       {
         const typename dealii::internal::p4est::types<dim>::forest forest;
@@ -146,7 +156,7 @@ namespace FETools
         unsigned int                                           tree_index;
         typename dealii::internal::p4est::types<dim>::quadrant quadrant;
 
-        int receiver;
+        types::subdomain_id receiver;
       };
 
       // Problem: The function extrapolates a polynomial
@@ -318,8 +328,8 @@ namespace FETools
       // cells_to_send to their receivers
       // and receives a vector of cell_data
       void
-      send_cells(const std::vector<CellData> &cells_to_send,
-                 std::vector<CellData> &      received_cells) const;
+      exchange_data_on_cells(const std::vector<CellData> &cells_to_send,
+                             std::vector<CellData> &      received_cells) const;
 
       // add new cell_data to
       // the ordered list new_needs
@@ -1164,94 +1174,93 @@ namespace FETools
 
     template <int dim, int spacedim, class OutVector>
     void
-    ExtrapolateImplementation<dim, spacedim, OutVector>::send_cells(
+    ExtrapolateImplementation<dim, spacedim, OutVector>::exchange_data_on_cells(
       const std::vector<CellData> &cells_to_send,
       std::vector<CellData> &      received_cells) const
     {
-      std::vector<std::vector<char>> sendbuffers(cells_to_send.size());
-      std::vector<MPI_Request>       requests(cells_to_send.size());
-      std::vector<unsigned int>      destinations;
+      // First figure out where we need to send stuff. Some of the cells
+      // in the input argument to this function might be destined for
+      // the same process, so we have to only look at the unique set of
+      // destinations:
+      std::vector<types::subdomain_id> destinations;
+      for (const auto &cell : cells_to_send)
+        destinations.emplace_back(cell.receiver);
+      std::sort(destinations.begin(), destinations.end());
+      destinations.erase(std::unique(destinations.begin(), destinations.end()),
+                         destinations.end());
 
-      // Protect the communication below:
-      static Utilities::MPI::CollectiveMutex      mutex;
-      Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex, communicator);
+      // Then set up the send/receive operation. This is best done through
+      // the 'consensus algorithm' setup that is used for point-to-point
+      // communication of information in cases where we do not know up
+      // front which processes (and from how many processes) we have to
+      // expect information from.
+      const auto get_destinations = [&destinations]() { return destinations; };
 
-      // We pick a new tag in each round. Wrap around after 10 rounds:
-      const int mpi_tag =
-        Utilities::MPI::internal::Tags::fe_tools_extrapolate + round % 10;
+      const auto create_request =
+        [&cells_to_send](const types::subdomain_id other_rank,
+                         std::vector<char> &       send_buffer) {
+          // We have to create a single std::vector<char> that encodes the
+          // information from all cells that are to be sent to 'other_rank'.
+          // Each of the objects we want to send has a 'pack_data()'
+          // function, so we can just create a vector of std::vector<char>
+          // into which we put these strings, and then use the serialization
+          // framework to get it all into one string.
+          std::vector<std::vector<char>> array_of_strings;
+          for (const auto &cell : cells_to_send)
+            if (cell.receiver == other_rank)
+              array_of_strings.emplace_back(cell.pack_data());
 
-      // send data
-      std::vector<std::vector<char>>::iterator buffer = sendbuffers.begin();
-      unsigned int                             idx    = 0;
-      for (typename std::vector<CellData>::const_iterator it =
-             cells_to_send.begin();
-           it != cells_to_send.end();
-           ++it, ++idx)
-        {
-          destinations.push_back(it->receiver);
+          send_buffer = Utilities::pack(array_of_strings, false);
+        };
 
-          *buffer        = it->pack_data();
-          const int ierr = MPI_Isend(buffer->data(),
-                                     buffer->size(),
-                                     MPI_BYTE,
-                                     it->receiver,
-                                     mpi_tag,
-                                     communicator,
-                                     &requests[idx]);
-          AssertThrowMPI(ierr);
+      const auto prepare_buffer_for_answer =
+        [](const unsigned int /*other_rank*/, std::vector<char> &recv_buffer) {
+          // Nothing to do here, we don't actually want to send an answer
+          recv_buffer.clear();
+        };
 
-          ++buffer;
-        }
+      const auto answer_request =
+        [&received_cells](const unsigned int       other_rank,
+                          const std::vector<char> &buffer_recv,
+                          std::vector<char> &      request_buffer) {
+          // We got a message from 'other_rank', so let us decode the
+          // message in the same way as we have assembled it above
+          const std::vector<std::vector<char>> array_of_strings =
+            Utilities::unpack<std::vector<std::vector<char>>>(buffer_recv,
+                                                              false);
 
-      Assert(destinations.size() == cells_to_send.size(), ExcInternalError());
+          for (const auto &s : array_of_strings)
+            {
+              CellData cell_data;
+              cell_data.unpack_data(s);
+              cell_data.receiver = other_rank;
 
-      const unsigned int n_senders =
-        Utilities::MPI::compute_n_point_to_point_communications(communicator,
-                                                                destinations);
+              received_cells.emplace_back(std::move(cell_data));
+            }
 
-      // receive data
-      std::vector<char> receive;
-      CellData          cell_data;
-      for (unsigned int index = 0; index < n_senders; ++index)
-        {
-          MPI_Status status;
-          int ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, communicator, &status);
-          AssertThrowMPI(ierr);
+          // Nothing left to do here, we don't actually need to provide an
+          // answer:
+          request_buffer.clear();
+        };
 
-          int len;
-          ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-          AssertThrowMPI(ierr);
-          receive.resize(len);
+      const auto read_answer = [](const unsigned int /*other_rank*/,
+                                  const std::vector<char> &recv_buffer) {
+        // We don't put anything into the answers, so nothing should
+        // have been coming out at this end either:
+        (void)recv_buffer;
+        Assert(recv_buffer.size() == 0, ExcInternalError());
+      };
 
-          char *buf = receive.data();
-          ierr      = MPI_Recv(buf,
-                          len,
-                          MPI_BYTE,
-                          status.MPI_SOURCE,
-                          status.MPI_TAG,
-                          communicator,
-                          &status);
-          AssertThrowMPI(ierr);
+      Utilities::MPI::ConsensusAlgorithms::AnonymousProcess<char, char>
+        operations(get_destinations,
+                   create_request,
+                   answer_request,
+                   prepare_buffer_for_answer,
+                   read_answer);
 
-          cell_data.unpack_data(receive);
-
-          // this process has to send this
-          // cell back to the sender
-          // the receiver is the old sender
-          cell_data.receiver = status.MPI_SOURCE;
-
-          received_cells.push_back(cell_data);
-        }
-
-      if (requests.size() > 0)
-        {
-          const int ierr =
-            MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
-        }
-
-      // finally sort the list of cells
-      std::sort(received_cells.begin(), received_cells.end());
+      Utilities::MPI::ConsensusAlgorithms::Selector<char, char>(operations,
+                                                                communicator)
+        .run();
     }
 
 
@@ -1335,7 +1344,7 @@ namespace FETools
 
       // Send the cells needed to their owners and receive
       // a list of cells other processes need from us.
-      send_cells(cells_we_need, received_needs);
+      exchange_data_on_cells(cells_we_need, received_needs);
 
       // The list of received needs can contain some cells more than once
       // because different processes may need data from the same cell.
@@ -1389,7 +1398,7 @@ namespace FETools
           // and receive data from the correct call
           ++round;
 
-          send_cells(cells_to_send, received_cells);
+          exchange_data_on_cells(cells_to_send, received_cells);
 
           // store received cell_data
           for (const auto &recv : received_cells)
@@ -1402,7 +1411,7 @@ namespace FETools
           ++round;
 
           // finally send and receive new needs and start a new round
-          send_cells(new_needs, received_needs);
+          exchange_data_on_cells(new_needs, received_needs);
         }
       while (ready != 0);
     }
@@ -1725,6 +1734,10 @@ namespace FETools
 
 
 
+    /**
+     * Perform the extrapolation of a finite element field to patch-based
+     * values for serial triangulations.
+     */
     template <int dim, class InVector, class OutVector, int spacedim>
     void
     extrapolate_serial(const InVector &                 u3,
@@ -1742,9 +1755,7 @@ namespace FETools
           for (const auto &cell : dof2.cell_iterators_on_level(level))
             if (cell->has_children())
               {
-                // check whether this
-                // cell has active
-                // children
+                // Check whether this cell has active children
                 bool active_children = false;
                 for (unsigned int child_n = 0; child_n < cell->n_children();
                      ++child_n)
@@ -1754,13 +1765,13 @@ namespace FETools
                       break;
                     }
 
-                // if there are active
-                // children, this process
-                // has to work on this
-                // cell. get the data
-                // from the one vector
-                // and set it on the
-                // other
+                // If there are active children, this process
+                // has to work on this cell. Get the values from the input
+                // vector on this cell and interpolate it from the current
+                // cell to its children in the other vector. If any of the
+                // children have children themselves, then we will visit it
+                // later in the outer loop here and overwrite the results in
+                // u2.
                 if (active_children)
                   {
                     cell->get_interpolated_dof_values(u3, dof_values);
@@ -1771,6 +1782,8 @@ namespace FETools
     }
   } // namespace internal
 
+
+
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   extrapolate(const DoFHandler<dim, spacedim> &dof1,
@@ -1778,6 +1791,8 @@ namespace FETools
               const DoFHandler<dim, spacedim> &dof2,
               OutVector &                      u2)
   {
+    // Forward to the other function using an empty set of
+    // constraints.
     AffineConstraints<typename OutVector::value_type> dummy;
     dummy.close();
     extrapolate(dof1, u1, dof2, dummy, u2);
