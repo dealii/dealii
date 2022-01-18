@@ -132,17 +132,11 @@ namespace FETools
         operator<(const CellData &rhs) const;
 
         /**
-         * Pack the data of this object into a buffer.
+         * Pack or unpack the data of this object into a buffer.
          */
-        std::vector<char>
-        pack_data() const;
-
-        /**
-         * Unpack the data of the given buffer into the members of this object.
-         */
+        template <class Archive>
         void
-        unpack_data(const std::vector<char> &buffer);
-
+        serialize(Archive &ar, const unsigned int);
 
         /**
          * The values of degrees of freedom associated with the current cell.
@@ -468,69 +462,20 @@ namespace FETools
 
 
     template <int dim, int spacedim, class OutVector>
-    std::vector<char>
-    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::pack_data()
-      const
-    {
-      // Compute how much memory we need to pack the data of this
-      // structure into a char[] buffer.
-      const unsigned int bytes_for_buffer =
-        (sizeof(unsigned int) +                   // dofs_per_cell
-         dof_values.size() * sizeof(value_type) + // dof_values
-         sizeof(unsigned int) +                   // tree_index
-         sizeof(
-           typename dealii::internal::p4est::types<dim>::quadrant)); // quadrant
-      std::vector<char> buffer(bytes_for_buffer);
-
-      char *ptr = buffer.data();
-
-      unsigned int n_dofs = dof_values.size();
-      std::memcpy(ptr, &n_dofs, sizeof(unsigned int));
-      ptr += sizeof(unsigned int);
-
-      std::memcpy(ptr, dof_values.begin(), n_dofs * sizeof(value_type));
-      ptr += n_dofs * sizeof(value_type);
-
-      std::memcpy(ptr, &tree_index, sizeof(unsigned int));
-      ptr += sizeof(unsigned int);
-
-      std::memcpy(ptr,
-                  &quadrant,
-                  sizeof(
-                    typename dealii::internal::p4est::types<dim>::quadrant));
-      ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
-
-      Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
-
-      return buffer;
-    }
-
-
-
-    template <int dim, int spacedim, class OutVector>
+    template <class Archive>
     void
-    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::unpack_data(
-      const std::vector<char> &buffer)
+    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::serialize(
+      Archive &ar,
+      const unsigned int)
     {
-      const char * ptr = buffer.data();
-      unsigned int n_dofs;
-      memcpy(&n_dofs, ptr, sizeof(unsigned int));
-      ptr += sizeof(unsigned int);
+      // Serialize those data types for which there are overloads:
+      ar &dof_values &tree_index;
 
-      dof_values.reinit(n_dofs);
-      std::memcpy(dof_values.begin(), ptr, n_dofs * sizeof(value_type));
-      ptr += n_dofs * sizeof(value_type);
-
-      std::memcpy(&tree_index, ptr, sizeof(unsigned int));
-      ptr += sizeof(unsigned int);
-
-      std::memcpy(&quadrant,
-                  ptr,
-                  sizeof(
-                    typename dealii::internal::p4est::types<dim>::quadrant));
-      ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
-
-      Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
+      // Then also serialize the 'quadrant' variable for which there
+      // isn't an overload. Do so by simply copying the individual
+      // bytes
+      ar &boost::serialization::make_array(reinterpret_cast<char *>(&quadrant),
+                                           sizeof(quadrant));
     }
 
 
@@ -1199,18 +1144,12 @@ namespace FETools
       const auto create_request =
         [&cells_to_send](const types::subdomain_id other_rank,
                          std::vector<char> &       send_buffer) {
-          // We have to create a single std::vector<char> that encodes the
-          // information from all cells that are to be sent to 'other_rank'.
-          // Each of the objects we want to send has a 'pack_data()'
-          // function, so we can just create a vector of std::vector<char>
-          // into which we put these strings, and then use the serialization
-          // framework to get it all into one string.
-          std::vector<std::vector<char>> array_of_strings;
+          std::vector<CellData> cells_for_this_destination;
           for (const auto &cell : cells_to_send)
             if (cell.receiver == other_rank)
-              array_of_strings.emplace_back(cell.pack_data());
+              cells_for_this_destination.emplace_back(cell);
 
-          send_buffer = Utilities::pack(array_of_strings, false);
+          send_buffer = Utilities::pack(cells_for_this_destination, false);
         };
 
       const auto prepare_buffer_for_answer =
@@ -1224,17 +1163,14 @@ namespace FETools
                           const std::vector<char> &buffer_recv,
                           std::vector<char> &      request_buffer) {
           // We got a message from 'other_rank', so let us decode the
-          // message in the same way as we have assembled it above
-          const std::vector<std::vector<char>> array_of_strings =
-            Utilities::unpack<std::vector<std::vector<char>>>(buffer_recv,
-                                                              false);
-
-          for (const auto &s : array_of_strings)
+          // message in the same way as we have assembled it above.
+          // Note that the cells just received do not contain
+          // information where they came from, and we have to add that
+          // ourselves for later use.
+          for (CellData &cell_data :
+               Utilities::unpack<std::vector<CellData>>(buffer_recv, false))
             {
-              CellData cell_data;
-              cell_data.unpack_data(s);
               cell_data.receiver = other_rank;
-
               received_cells.emplace_back(std::move(cell_data));
             }
 
