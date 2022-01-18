@@ -650,7 +650,7 @@
  *
  *   <tr valign="top">
  *       <td>step-78</td>
- *       <td> Solves the Black-Scholes equation for options pricing in 1-D.
+ *       <td> Solving the Black-Scholes equation for options pricing in 1d.
  *       </td></tr>
  *
  *   <tr valign="top">
