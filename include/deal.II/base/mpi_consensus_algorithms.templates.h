@@ -116,9 +116,6 @@ namespace Utilities
                                    const MPI_Comm & comm)
         : process(process)
         , comm(comm)
-        , job_supports_mpi(Utilities::MPI::job_supports_mpi())
-        , my_rank(job_supports_mpi ? this_mpi_process(comm) : 0)
-        , n_procs(job_supports_mpi ? n_mpi_processes(comm) : 1)
       {}
 
 
@@ -692,18 +689,22 @@ namespace Utilities
         // able to test also the non-blocking implementation. This feature
         // is tested by:
         // tests/multigrid/transfer_matrix_free_06.with_mpi=true.with_p4est=true.with_trilinos=true.mpirun=10.output
+
+        const unsigned int n_procs = (Utilities::MPI::job_supports_mpi() ?
+                                        Utilities::MPI::n_mpi_processes(comm) :
+                                        1);
 #ifdef DEAL_II_WITH_MPI
 #  if DEAL_II_MPI_VERSION_GTE(3, 0)
 #    ifdef DEBUG
-        if (this->n_procs > 10)
+        if (n_procs > 10)
 #    else
-        if (this->n_procs > 99)
+        if (n_procs > 99)
 #    endif
           consensus_algo.reset(new NBX<T1, T2>(process, comm));
         else
 #  endif
 #endif
-          if (this->n_procs > 1)
+          if (n_procs > 1)
           consensus_algo.reset(new PEX<T1, T2>(process, comm));
         else
           consensus_algo.reset(new Serial<T1, T2>(process, comm));
