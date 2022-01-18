@@ -3465,6 +3465,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     this->dof_info
       ->n_vectorization_lanes_filled[this->dof_access_index][this->cell];
 
+  const std::array<unsigned int, VectorizedArrayType::size()> &cells =
+    this->get_cell_ids();
+
   bool has_hn_constraints = false;
 
   if (is_face == false)
@@ -3472,7 +3475,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       for (unsigned int v = 0; v < n_vectorization_actual; ++v)
         if (this->dof_info->hanging_node_constraint_masks.size() > 0 &&
             this->dof_info->hanging_node_constraint_masks
-                [(this->cell * n_lanes + v) * this->n_fe_components +
+                [cells[v] * this->n_fe_components +
                  this->first_selected_component] !=
               internal::MatrixFreeFunctions::ConstraintKinds::unconstrained)
           has_hn_constraints = true;
@@ -3528,25 +3531,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   // Assign the appropriate cell ids for face/cell case and get the pointers
   // to the dof indices of the cells on all lanes
-  unsigned int        cells_copied[n_lanes];
-  const unsigned int *cells;
-  bool                has_constraints = false;
-  const unsigned int  n_components_read =
+
+  bool               has_constraints = false;
+  const unsigned int n_components_read =
     this->n_fe_components > 1 ? n_components : 1;
 
   if (is_face)
     {
-      if (this->dof_access_index ==
-          internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
-        for (unsigned int v = 0; v < n_vectorization_actual; ++v)
-          cells_copied[v] = this->cell * VectorizedArrayType::size() + v;
-      cells =
-        this->dof_access_index ==
-            internal::MatrixFreeFunctions::DoFInfo::dof_access_cell ?
-          &cells_copied[0] :
-          (this->is_interior_face ?
-             &this->matrix_free->get_face_info(this->cell).cells_interior[0] :
-             &this->matrix_free->get_face_info(this->cell).cells_exterior[0]);
       for (unsigned int v = 0; v < n_vectorization_actual; ++v)
         {
           Assert(cells[v] < this->dof_info->row_starts.size() - 1,
@@ -3568,21 +3559,18 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     }
   else
     {
-      AssertIndexRange((this->cell + 1) * n_lanes * this->n_fe_components,
-                       this->dof_info->row_starts.size());
       for (unsigned int v = 0; v < n_vectorization_actual; ++v)
         {
           const std::pair<unsigned int, unsigned int> *my_index_start =
-            &this->dof_info
-               ->row_starts[(this->cell * n_lanes + v) * this->n_fe_components +
-                            this->first_selected_component];
+            &this->dof_info->row_starts[cells[v] * this->n_fe_components +
+                                        this->first_selected_component];
           if (my_index_start[n_components_read].second !=
               my_index_start[0].second)
             has_constraints = true;
 
           if (this->dof_info->hanging_node_constraint_masks.size() > 0 &&
               this->dof_info->hanging_node_constraint_masks
-                  [(this->cell * n_lanes + v) * this->n_fe_components +
+                  [cells[v] * this->n_fe_components +
                    this->first_selected_component] !=
                 internal::MatrixFreeFunctions::ConstraintKinds::unconstrained)
             has_hn_constraints = true;
@@ -3639,8 +3627,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         operation.process_empty(values_dofs[comp][i]);
   for (unsigned int v = 0; v < n_vectorization_actual; ++v)
     {
-      const unsigned int cell_index =
-        is_face ? cells[v] : this->cell * n_lanes + v;
+      const unsigned int cell_index = cells[v];
       const unsigned int cell_dof_index =
         cell_index * this->n_fe_components + this->first_selected_component;
       const unsigned int n_components_read =
@@ -4305,28 +4292,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   bool hn_available = false;
 
-  unsigned int        cells_copied[n_lanes];
-  const unsigned int *cells;
-
-  if (is_face)
-    {
-      if (this->dof_access_index ==
-          internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
-        for (unsigned int v = 0; v < n_vectorization_actual; ++v)
-          cells_copied[v] = this->cell * VectorizedArrayType::size() + v;
-      cells =
-        this->dof_access_index ==
-            internal::MatrixFreeFunctions::DoFInfo::dof_access_cell ?
-          &cells_copied[0] :
-          (this->is_interior_face ?
-             &this->matrix_free->get_face_info(this->cell).cells_interior[0] :
-             &this->matrix_free->get_face_info(this->cell).cells_exterior[0]);
-    }
+  const std::array<unsigned int, VectorizedArrayType::size()> &cells =
+    this->get_cell_ids();
 
   for (unsigned int v = 0; v < n_vectorization_actual; ++v)
     {
-      const unsigned int cell_index =
-        is_face ? cells[v] : this->cell * n_lanes + v;
+      const unsigned int cell_index = cells[v];
       const unsigned int cell_dof_index =
         cell_index * this->n_fe_components + this->first_selected_component;
 
