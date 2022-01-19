@@ -5998,18 +5998,6 @@ namespace GridTools
           if (perform_handshake)
             request_buffer = Utilities::pack(request_buffer_temp, false);
         },
-        [&](const unsigned int other_rank, std::vector<char> &recv_buffer) {
-          if (perform_handshake)
-            {
-              const auto other_rank_index = translate(other_rank);
-
-              recv_buffer =
-                Utilities::pack(std::vector<unsigned int>(
-                                  potential_owners_ptrs[other_rank_index + 1] -
-                                  potential_owners_ptrs[other_rank_index]),
-                                false);
-            }
-        },
         [&](const unsigned int       other_rank,
             const std::vector<char> &recv_buffer) {
           if (perform_handshake)

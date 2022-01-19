@@ -768,24 +768,14 @@ namespace Utilities
 
           /**
            * Implementation of
-           * Utilities::MPI::ConsensusAlgorithms::Process::prepare_buffer_for_answer().
-           */
-          virtual void
-          prepare_buffer_for_answer(
-            const unsigned int         other_rank,
-            std::vector<unsigned int> &recv_buffer) override
-          {
-            recv_buffer.resize(recv_indices[other_rank].size());
-          }
-
-          /**
-           * Implementation of
            * Utilities::MPI::ConsensusAlgorithms::Process::read_answer().
            */
           virtual void
           read_answer(const unsigned int               other_rank,
                       const std::vector<unsigned int> &recv_buffer) override
           {
+            Assert(recv_buffer.size() == recv_indices[other_rank].size(),
+                   ExcInternalError());
             Assert(recv_indices[other_rank].size() == recv_buffer.size(),
                    ExcMessage("Sizes do not match!"));
 

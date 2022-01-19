@@ -1152,12 +1152,6 @@ namespace FETools
           send_buffer = Utilities::pack(cells_for_this_destination, false);
         };
 
-      const auto prepare_buffer_for_answer =
-        [](const unsigned int /*other_rank*/, std::vector<char> &recv_buffer) {
-          // Nothing to do here, we don't actually want to send an answer
-          recv_buffer.clear();
-        };
-
       const auto answer_request =
         [&received_cells](const unsigned int       other_rank,
                           const std::vector<char> &buffer_recv,
@@ -1191,7 +1185,6 @@ namespace FETools
         operations(get_destinations,
                    create_request,
                    answer_request,
-                   prepare_buffer_for_answer,
                    read_answer);
 
       Utilities::MPI::ConsensusAlgorithms::Selector<char, char>(operations,
