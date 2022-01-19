@@ -7490,6 +7490,8 @@ namespace GridGenerator
     triangulation.set_manifold(0, CylindricalManifold<3>(2));
   }
 
+
+
   template <int dim, int spacedim1, int spacedim2>
   void
   flatten_triangulation(const Triangulation<dim, spacedim1> &in_tria,
@@ -7539,40 +7541,186 @@ namespace GridGenerator
 
         case 2:
           {
-            for (const auto &face : in_tria.active_face_iterators() |
-                                      IteratorFilters::AtBoundary())
+            std::vector<bool> user_flags_line;
+            in_tria.save_user_flags_line(user_flags_line);
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .clear_user_flags_line();
+
+            // Loop over all the faces of the triangulation and create
+            // objects that describe their boundary and manifold ids.
+            for (const auto &face : in_tria.active_face_iterators())
               {
-                CellData<1> boundary_line;
+                if (face->at_boundary())
+                  {
+                    CellData<1> boundary_line;
 
-                boundary_line.vertices.resize(face->n_vertices());
-                for (const auto i : face->vertex_indices())
-                  boundary_line.vertices[i] = face->vertex_index(i);
-                boundary_line.boundary_id = face->boundary_id();
-                boundary_line.manifold_id = face->manifold_id();
+                    boundary_line.vertices.resize(face->n_vertices());
+                    for (const auto i : face->vertex_indices())
+                      boundary_line.vertices[i] = face->vertex_index(i);
+                    boundary_line.boundary_id = face->boundary_id();
+                    boundary_line.manifold_id = face->manifold_id();
 
-                subcelldata.boundary_lines.emplace_back(
-                  std::move(boundary_line));
+                    subcelldata.boundary_lines.emplace_back(
+                      std::move(boundary_line));
+                  }
+                else
+                  // The face is not at the boundary. We won't have to set
+                  // boundary_ids (that is not possible for interior faces), but
+                  // we need to do something if the manifold-id is not the
+                  // default.
+                  //
+                  // We keep track via the user flags whether we have already
+                  // dealt with a face or not. (We need to do that here because
+                  // we will return to interior faces twice, once for each
+                  // neighbor, whereas we only touch each of the boundary faces
+                  // above once.)
+                  if ((face->user_flag_set() == false) &&
+                      (face->manifold_id() != numbers::flat_manifold_id))
+                  {
+                    CellData<1> boundary_line;
+
+                    boundary_line.vertices.resize(face->n_vertices());
+                    for (const auto i : face->vertex_indices())
+                      boundary_line.vertices[i] = face->vertex_index(i);
+                    boundary_line.boundary_id =
+                      numbers::internal_face_boundary_id;
+                    boundary_line.manifold_id = face->manifold_id();
+
+                    subcelldata.boundary_lines.emplace_back(
+                      std::move(boundary_line));
+
+                    face->set_user_flag();
+                  }
               }
+
+            // Reset the user flags to their previous values:
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .load_user_flags_line(user_flags_line);
 
             break;
           }
 
         case 3:
           {
-            for (const auto &face : in_tria.active_face_iterators() |
-                                      IteratorFilters::AtBoundary())
+            std::vector<bool> user_flags_line;
+            in_tria.save_user_flags_line(user_flags_line);
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .clear_user_flags_line();
+
+            std::vector<bool> user_flags_quad;
+            in_tria.save_user_flags_quad(user_flags_quad);
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .clear_user_flags_quad();
+
+            // Loop over all the faces of the triangulation and create
+            // objects that describe their boundary and manifold ids.
+            for (const auto &face : in_tria.active_face_iterators())
               {
-                CellData<2> boundary_face;
+                if (face->at_boundary())
+                  {
+                    CellData<2> boundary_face;
 
-                boundary_face.vertices.resize(face->n_vertices());
-                for (const auto i : face->vertex_indices())
-                  boundary_face.vertices[i] = face->vertex_index(i);
-                boundary_face.boundary_id = face->boundary_id();
-                boundary_face.manifold_id = face->manifold_id();
+                    boundary_face.vertices.resize(face->n_vertices());
+                    for (const auto i : face->vertex_indices())
+                      boundary_face.vertices[i] = face->vertex_index(i);
+                    boundary_face.boundary_id = face->boundary_id();
+                    boundary_face.manifold_id = face->manifold_id();
 
-                subcelldata.boundary_quads.emplace_back(
-                  std::move(boundary_face));
+                    subcelldata.boundary_quads.emplace_back(
+                      std::move(boundary_face));
+
+                    // Then also loop over the edges and do the same. We would
+                    // accidentally create duplicates for edges that are part of
+                    // two boundary faces. To avoid this, use the user_flag on
+                    // edges to mark those that we have already visited. (Note
+                    // how we save and restore those above and below.)
+                    for (unsigned int e = 0; e < face->n_lines(); ++e)
+                      if (face->line(e)->user_flag_set() == false)
+                        {
+                          const typename Triangulation<dim,
+                                                       spacedim1>::line_iterator
+                                      edge = face->line(e);
+                          CellData<1> boundary_edge;
+
+                          boundary_edge.vertices.resize(edge->n_vertices());
+                          for (const auto i : edge->vertex_indices())
+                            boundary_edge.vertices[i] = edge->vertex_index(i);
+                          boundary_edge.boundary_id = edge->boundary_id();
+                          boundary_edge.manifold_id = edge->manifold_id();
+
+                          subcelldata.boundary_lines.emplace_back(
+                            std::move(boundary_edge));
+
+                          edge->set_user_flag();
+                        }
+                  }
+                else
+                  // The face is not at the boundary. We won't have to set
+                  // boundary_ids (that is not possible for interior faces), but
+                  // we need to do something if the manifold-id is not the
+                  // default.
+                  //
+                  // We keep track via the user flags whether we have already
+                  // dealt with a face or not. (We need to do that here because
+                  // we will return to interior faces twice, once for each
+                  // neighbor, whereas we only touch each of the boundary faces
+                  // above once.)
+                  //
+                  // Note that if we have already dealt with a face, then we
+                  // have also already dealt with the edges and don't have
+                  // to worry about that any more separately.
+                  if (face->user_flag_set() == false)
+                  {
+                    if (face->manifold_id() != numbers::flat_manifold_id)
+                      {
+                        CellData<2> boundary_face;
+
+                        boundary_face.vertices.resize(face->n_vertices());
+                        for (const auto i : face->vertex_indices())
+                          boundary_face.vertices[i] = face->vertex_index(i);
+                        boundary_face.boundary_id =
+                          numbers::internal_face_boundary_id;
+                        boundary_face.manifold_id = face->manifold_id();
+
+                        subcelldata.boundary_quads.emplace_back(
+                          std::move(boundary_face));
+
+                        face->set_user_flag();
+                      }
+
+                    // Then also loop over the edges of this face. Because every
+                    // boundary edge must also be a part of a boundary face, we
+                    // can ignore these. But it is possible that we have already
+                    // encountered an interior edge through a previous face, and
+                    // in that case we have to just ignore it
+                    for (unsigned int e = 0; e < face->n_lines(); ++e)
+                      if (face->line(e)->at_boundary() == false)
+                        if (face->line(e)->user_flag_set() == false)
+                          {
+                            const typename Triangulation<dim, spacedim1>::
+                              line_iterator edge = face->line(e);
+                            CellData<1>     boundary_edge;
+
+                            boundary_edge.vertices.resize(edge->n_vertices());
+                            for (const auto i : edge->vertex_indices())
+                              boundary_edge.vertices[i] = edge->vertex_index(i);
+                            boundary_edge.boundary_id =
+                              numbers::internal_face_boundary_id;
+                            boundary_edge.manifold_id = edge->manifold_id();
+
+                            subcelldata.boundary_lines.emplace_back(
+                              std::move(boundary_edge));
+
+                            edge->set_user_flag();
+                          }
+                  }
               }
+
+            // Reset the user flags to their previous values:
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .load_user_flags_line(user_flags_line);
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .load_user_flags_quad(user_flags_quad);
 
             break;
           }
@@ -7872,6 +8020,7 @@ namespace GridGenerator
             {
               Assert(index_vertices.size() == 2, ExcInternalError());
               CellData<1> boundary_line(2);
+              boundary_line.boundary_id = material_or_boundary_id;
               boundary_line.manifold_id = manifold_id;
               for (unsigned int i = 0; i < index_vertices.size(); ++i)
                 {

@@ -1,0 +1,199 @@
+
+DEAL::2d
+DEAL::Face 5
+DEAL::  center = 0.500000 0.250000
+DEAL::  manifold id = 102
+DEAL::Face 7
+DEAL::  center = 0.250000 0.500000
+DEAL::  manifold id = 102
+DEAL::Face 5
+DEAL::  center = 0.500000 0.250000
+DEAL::  manifold id = 102
+DEAL::Face 10
+DEAL::  center = 0.750000 0.500000
+DEAL::  manifold id = 102
+DEAL::Face 11
+DEAL::  center = 0.500000 0.750000
+DEAL::  manifold id = 102
+DEAL::Face 7
+DEAL::  center = 0.250000 0.500000
+DEAL::  manifold id = 102
+DEAL::Face 11
+DEAL::  center = 0.500000 0.750000
+DEAL::  manifold id = 102
+DEAL::Face 10
+DEAL::  center = 0.750000 0.500000
+DEAL::  manifold id = 102
+DEAL::
+DEAL::
+DEAL::3d
+DEAL::Face 7
+DEAL::  center = 0.500000 0.250000 0.250000
+DEAL::  manifold id = 102
+DEAL::  Edge 41
+DEAL::    manifold id = 202
+DEAL::  Edge 38
+DEAL::    manifold id = 202
+DEAL::Face 10
+DEAL::  center = 0.250000 0.500000 0.250000
+DEAL::  manifold id = 102
+DEAL::  Edge 44
+DEAL::    manifold id = 202
+DEAL::  Edge 41
+DEAL::    manifold id = 202
+DEAL::Face 14
+DEAL::  center = 0.250000 0.250000 0.500000
+DEAL::  manifold id = 102
+DEAL::  Edge 38
+DEAL::    manifold id = 202
+DEAL::  Edge 44
+DEAL::    manifold id = 202
+DEAL::Face 7
+DEAL::  center = 0.500000 0.250000 0.250000
+DEAL::  manifold id = 102
+DEAL::  Edge 41
+DEAL::    manifold id = 202
+DEAL::  Edge 38
+DEAL::    manifold id = 202
+DEAL::Face 24
+DEAL::  center = 0.750000 0.500000 0.250000
+DEAL::  manifold id = 102
+DEAL::  Edge 51
+DEAL::    manifold id = 202
+DEAL::  Edge 41
+DEAL::    manifold id = 202
+DEAL::Face 23
+DEAL::  center = 0.750000 0.250000 0.500000
+DEAL::  manifold id = 102
+DEAL::  Edge 38
+DEAL::    manifold id = 202
+DEAL::  Edge 51
+DEAL::    manifold id = 202
+DEAL::Face 26
+DEAL::  center = 0.500000 0.750000 0.250000
+DEAL::  manifold id = 102
+DEAL::  Edge 41
+DEAL::    manifold id = 202
+DEAL::  Edge 52
+DEAL::    manifold id = 202
+DEAL::Face 10
+DEAL::  center = 0.250000 0.500000 0.250000
+DEAL::  manifold id = 102
+DEAL::  Edge 44
+DEAL::    manifold id = 202
+DEAL::  Edge 41
+DEAL::    manifold id = 202
+DEAL::Face 27
+DEAL::  center = 0.250000 0.750000 0.500000
+DEAL::  manifold id = 102
+DEAL::  Edge 52
+DEAL::    manifold id = 202
+DEAL::  Edge 44
+DEAL::    manifold id = 202
+DEAL::Face 26
+DEAL::  center = 0.500000 0.750000 0.250000
+DEAL::  manifold id = 102
+DEAL::  Edge 41
+DEAL::    manifold id = 202
+DEAL::  Edge 52
+DEAL::    manifold id = 202
+DEAL::Face 24
+DEAL::  center = 0.750000 0.500000 0.250000
+DEAL::  manifold id = 102
+DEAL::  Edge 51
+DEAL::    manifold id = 202
+DEAL::  Edge 41
+DEAL::    manifold id = 202
+DEAL::Face 34
+DEAL::  center = 0.750000 0.750000 0.500000
+DEAL::  manifold id = 102
+DEAL::  Edge 52
+DEAL::    manifold id = 202
+DEAL::  Edge 51
+DEAL::    manifold id = 202
+DEAL::Face 22
+DEAL::  center = 0.500000 0.250000 0.750000
+DEAL::  manifold id = 102
+DEAL::  Edge 53
+DEAL::    manifold id = 202
+DEAL::  Edge 38
+DEAL::    manifold id = 202
+DEAL::Face 29
+DEAL::  center = 0.250000 0.500000 0.750000
+DEAL::  manifold id = 102
+DEAL::  Edge 44
+DEAL::    manifold id = 202
+DEAL::  Edge 53
+DEAL::    manifold id = 202
+DEAL::Face 14
+DEAL::  center = 0.250000 0.250000 0.500000
+DEAL::  manifold id = 102
+DEAL::  Edge 38
+DEAL::    manifold id = 202
+DEAL::  Edge 44
+DEAL::    manifold id = 202
+DEAL::Face 22
+DEAL::  center = 0.500000 0.250000 0.750000
+DEAL::  manifold id = 102
+DEAL::  Edge 53
+DEAL::    manifold id = 202
+DEAL::  Edge 38
+DEAL::    manifold id = 202
+DEAL::Face 33
+DEAL::  center = 0.750000 0.500000 0.750000
+DEAL::  manifold id = 102
+DEAL::  Edge 51
+DEAL::    manifold id = 202
+DEAL::  Edge 53
+DEAL::    manifold id = 202
+DEAL::Face 23
+DEAL::  center = 0.750000 0.250000 0.500000
+DEAL::  manifold id = 102
+DEAL::  Edge 38
+DEAL::    manifold id = 202
+DEAL::  Edge 51
+DEAL::    manifold id = 202
+DEAL::Face 35
+DEAL::  center = 0.500000 0.750000 0.750000
+DEAL::  manifold id = 102
+DEAL::  Edge 53
+DEAL::    manifold id = 202
+DEAL::  Edge 52
+DEAL::    manifold id = 202
+DEAL::Face 29
+DEAL::  center = 0.250000 0.500000 0.750000
+DEAL::  manifold id = 102
+DEAL::  Edge 44
+DEAL::    manifold id = 202
+DEAL::  Edge 53
+DEAL::    manifold id = 202
+DEAL::Face 27
+DEAL::  center = 0.250000 0.750000 0.500000
+DEAL::  manifold id = 102
+DEAL::  Edge 52
+DEAL::    manifold id = 202
+DEAL::  Edge 44
+DEAL::    manifold id = 202
+DEAL::Face 35
+DEAL::  center = 0.500000 0.750000 0.750000
+DEAL::  manifold id = 102
+DEAL::  Edge 53
+DEAL::    manifold id = 202
+DEAL::  Edge 52
+DEAL::    manifold id = 202
+DEAL::Face 33
+DEAL::  center = 0.750000 0.500000 0.750000
+DEAL::  manifold id = 102
+DEAL::  Edge 51
+DEAL::    manifold id = 202
+DEAL::  Edge 53
+DEAL::    manifold id = 202
+DEAL::Face 34
+DEAL::  center = 0.750000 0.750000 0.500000
+DEAL::  manifold id = 102
+DEAL::  Edge 52
+DEAL::    manifold id = 202
+DEAL::  Edge 51
+DEAL::    manifold id = 202
+DEAL::
+DEAL::
