@@ -244,21 +244,6 @@ namespace Utilities
          * MPI communicator.
          */
         const MPI_Comm &comm;
-
-        /**
-         * Cache if job supports MPI.
-         */
-        const bool job_supports_mpi;
-
-        /**
-         * Rank of this process.
-         */
-        const unsigned int my_rank;
-
-        /**
-         * Number of processes in the communicator.
-         */
-        const unsigned int n_procs;
       };
 
 
