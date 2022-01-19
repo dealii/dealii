@@ -50,60 +50,73 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <deal.II/particles/particle_handler.h>
-
-#include <deal.II/particles/generators.h>
-
 #include <deal.II/particles/data_out.h>
+#include <deal.II/particles/generators.h>
+#include <deal.II/particles/particle_handler.h>
 
 #include "../tests.h"
 
 using namespace dealii;
 
-template <int dim> class VelocityField : public Function<dim> {
+template <int dim>
+class VelocityField : public Function<dim>
+{
 public:
-  VelocityField() : Function<dim>(dim) {}
+  VelocityField()
+    : Function<dim>(dim)
+  {}
 
-  virtual void vector_value(const Point<dim> &point,
-                            Vector<double> &values) const override;
+  virtual void
+  vector_value(const Point<dim> &point, Vector<double> &values) const override;
 };
 
 template <int dim>
-void VelocityField<dim>::vector_value(const Point<dim> & /*point*/,
-                                      Vector<double> &values) const {
+void
+VelocityField<dim>::vector_value(const Point<dim> & /*point*/,
+                                 Vector<double> &values) const
+{
   values[0] = 0;
   values[1] = -1;
   if (dim > 2)
     values[2] = 0;
 }
 
-template <int dim> class ParticleTracking {
+template <int dim>
+class ParticleTracking
+{
 public:
   ParticleTracking();
-  void run();
+  void
+  run();
 
 private:
-  void generate_particles();
+  void
+  generate_particles();
 
-  void euler_step_analytical(const double dt);
+  void
+  euler_step_analytical(const double dt);
 
-  MPI_Comm mpi_communicator;
+  MPI_Comm                                  mpi_communicator;
   parallel::distributed::Triangulation<dim> background_triangulation;
-  Particles::ParticleHandler<dim> particle_handler;
+  Particles::ParticleHandler<dim>           particle_handler;
 
-  MappingQ1<dim> mapping;
+  MappingQ1<dim>     mapping;
   VelocityField<dim> velocity;
 };
 
 template <int dim>
 ParticleTracking<dim>::ParticleTracking()
-    : mpi_communicator(MPI_COMM_WORLD),
-      background_triangulation(mpi_communicator) {}
+  : mpi_communicator(MPI_COMM_WORLD)
+  , background_triangulation(mpi_communicator)
+{}
 
 // This function generates the tracer particles and the background
 // triangulation on which these particles evolve.
 
-template <int dim> void ParticleTracking<dim>::generate_particles() {
+template <int dim>
+void
+ParticleTracking<dim>::generate_particles()
+{
   // We create an hyper ball triangulation which we globally refine. The bug
   // that this test tries to reproduce only occured in curevd geometry.
   Point<dim> center_of_triangulation;
@@ -112,7 +125,8 @@ template <int dim> void ParticleTracking<dim>::generate_particles() {
   if (dim == 3)
     center_of_triangulation[2] = 0.;
 
-  GridGenerator::hyper_ball(background_triangulation, center_of_triangulation,
+  GridGenerator::hyper_ball(background_triangulation,
+                            center_of_triangulation,
                             1);
   background_triangulation.refine_global(3);
 
@@ -136,32 +150,35 @@ template <int dim> void ParticleTracking<dim>::generate_particles() {
   const double inner_radius = 0.01;
 
   parallel::distributed::Triangulation<dim> particle_triangulation(
-      mpi_communicator);
+    mpi_communicator);
 
-  GridGenerator::hyper_shell(particle_triangulation, center_of_particles,
-                             inner_radius, outer_radius, 6);
+  GridGenerator::hyper_shell(
+    particle_triangulation, center_of_particles, inner_radius, outer_radius, 6);
   particle_triangulation.refine_global(1);
 
   // We generate the necessary bounding boxes for the particles generator.
   // These bounding boxes are required to quickly identify in which
   // process's subdomain the inserted particle lies, and which cell owns it.
   const auto my_bounding_box = GridTools::compute_mesh_predicate_bounding_box(
-      background_triangulation, IteratorFilters::LocallyOwnedCell());
+    background_triangulation, IteratorFilters::LocallyOwnedCell());
   const auto global_bounding_boxes =
-      Utilities::MPI::all_gather(mpi_communicator, my_bounding_box);
+    Utilities::MPI::all_gather(mpi_communicator, my_bounding_box);
 
   // We generate an empty vector of properties. We will attribute the
   // properties to the particles once they are generated.
   std::vector<std::vector<double>> properties(
-      particle_triangulation.n_locally_owned_active_cells(),
-      std::vector<double>(dim + 1, 0.));
+    particle_triangulation.n_locally_owned_active_cells(),
+    std::vector<double>(dim + 1, 0.));
 
   // We generate the particles at the position of a single
   // point quadrature. Consequently, one particle will be generated
   // at the centroid of each cell.
-  Particles::Generators::quadrature_points(
-      particle_triangulation, QMidpoint<dim>(), global_bounding_boxes,
-      particle_handler, mapping, properties);
+  Particles::Generators::quadrature_points(particle_triangulation,
+                                           QMidpoint<dim>(),
+                                           global_bounding_boxes,
+                                           particle_handler,
+                                           mapping,
+                                           properties);
 
   deallog << "Number of particles inserted: "
           << particle_handler.n_global_particles() << std::endl;
@@ -170,58 +187,67 @@ template <int dim> void ParticleTracking<dim>::generate_particles() {
 // We integrate the particle trajectories using a first order explicit Euler
 // scheme.
 template <int dim>
-void ParticleTracking<dim>::euler_step_analytical(const double dt) {
+void
+ParticleTracking<dim>::euler_step_analytical(const double dt)
+{
   const unsigned int this_mpi_rank =
-      Utilities::MPI::this_mpi_process(mpi_communicator);
+    Utilities::MPI::this_mpi_process(mpi_communicator);
   Vector<double> particle_velocity(dim);
 
   // Looping over all particles in the domain using a
   // particle iterator
-  for (auto &particle : particle_handler) {
-    // We calculate the velocity of the particles using their current
-    // location.
-    Point<dim> particle_location = particle.get_location();
-    velocity.vector_value(particle_location, particle_velocity);
+  for (auto &particle : particle_handler)
+    {
+      // We calculate the velocity of the particles using their current
+      // location.
+      Point<dim> particle_location = particle.get_location();
+      velocity.vector_value(particle_location, particle_velocity);
 
-    // This updates the position of the particles and sets the old position
-    // equal to the new position of the particle.
-    for (int d = 0; d < dim; ++d)
-      particle_location[d] += particle_velocity[d] * dt;
+      // This updates the position of the particles and sets the old position
+      // equal to the new position of the particle.
+      for (int d = 0; d < dim; ++d)
+        particle_location[d] += particle_velocity[d] * dt;
 
-    particle.set_location(particle_location);
+      particle.set_location(particle_location);
 
-    // We store the processor id (a scalar) and the particle velocity (a
-    // vector) in the particle properties.
-    ArrayView<double> properties = particle.get_properties();
-    for (int d = 0; d < dim; ++d)
-      properties[d] = particle_velocity[d];
-    properties[dim] = this_mpi_rank;
-  }
+      // We store the processor id (a scalar) and the particle velocity (a
+      // vector) in the particle properties.
+      ArrayView<double> properties = particle.get_properties();
+      for (int d = 0; d < dim; ++d)
+        properties[d] = particle_velocity[d];
+      properties[dim] = this_mpi_rank;
+    }
 }
 
-template <int dim> void ParticleTracking<dim>::run() {
+template <int dim>
+void
+ParticleTracking<dim>::run()
+{
   DiscreteTime discrete_time(0, 0.015, 0.005);
 
   generate_particles();
 
   // The particles are advected by looping over time.
-  while (!discrete_time.is_at_end()) {
-    discrete_time.advance_time();
-    velocity.set_time(discrete_time.get_previous_time());
+  while (!discrete_time.is_at_end())
+    {
+      discrete_time.advance_time();
+      velocity.set_time(discrete_time.get_previous_time());
 
-    euler_step_analytical(discrete_time.get_previous_step_size());
+      euler_step_analytical(discrete_time.get_previous_step_size());
 
-    unsigned int n_part_before_sort = particle_handler.n_global_particles();
+      unsigned int n_part_before_sort = particle_handler.n_global_particles();
 
-    particle_handler.sort_particles_into_subdomains_and_cells();
-    unsigned int n_part_after_sort = particle_handler.n_global_particles();
+      particle_handler.sort_particles_into_subdomains_and_cells();
+      unsigned int n_part_after_sort = particle_handler.n_global_particles();
 
-    deallog << "Number of particles before sort : " << n_part_before_sort
-            << " After : " << n_part_after_sort << std::endl;
-  }
+      deallog << "Number of particles before sort : " << n_part_before_sort
+              << " After : " << n_part_after_sort << std::endl;
+    }
 }
 
-int main(int argc, char *argv[]) {
+int
+main(int argc, char *argv[])
+{
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   MPILogInitAll all;
