@@ -444,11 +444,6 @@ namespace Utilities
          */
         std::vector<unsigned int> targets;
 
-        /**
-         * List of ranks of processes wanting to send a request to this process.
-         */
-        std::vector<unsigned int> sources;
-
         // data structures to send and receive requests
 
         /**
@@ -462,12 +457,9 @@ namespace Utilities
         std::vector<std::vector<T2>> recv_buffers;
 
         /**
-         * Requests for sending requests and receiving answers to requests.
-         * The first half of the array is used for the receive-answer
-         * requests objects, the second half for the send-request request
-         * objects.
+         * MPI request objects for sending request messages.
          */
-        std::vector<MPI_Request> send_request_and_recv_answer_requests;
+        std::vector<MPI_Request> send_request_requests;
 
         /**
          * Buffers for sending answers to requests.
@@ -497,6 +489,13 @@ namespace Utilities
          */
         void
         answer_one_request(const unsigned int index);
+
+        /**
+         * Receive and process all of the incoming responses to the
+         * requests we sent.
+         */
+        void
+        process_incoming_answers();
 
         /**
          * After all answers have been exchanged, the MPI data structures can be
