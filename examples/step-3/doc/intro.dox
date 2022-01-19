@@ -138,7 +138,7 @@ tutorial where we have a non-symmetric bilinear form for which it makes a
 difference whether we multiply from the right or from the left.
 
 
-<h3> Computing the matrix and right hand side vector </h3>
+<h3> *Assembling* the matrix and right hand side vector </h3>
 
 Now we know what we need (namely: objects that hold the matrix and
 vectors, as well as ways to compute $A_{ij},F_i$), and we can look at what it
@@ -149,7 +149,7 @@ takes to make that happen:
   linear systems.
 - We need a way to form the integrals. In the finite element method, this is
   most commonly done using quadrature, i.e. the integrals are replaced by a
-  weighted sum over a set of points on each cell. That is, we first split the
+  weighted sum over a set of *quadrature points* on each cell. That is, we first split the
   integral over $\Omega$ into integrals over all cells,
   @f{align*}
     A_{ij} &= (\nabla\varphi_i, \nabla \varphi_j)
@@ -193,6 +193,13 @@ takes to make that happen:
   the shape functions on the real cell $K$ as well as all sorts of other
   information needed for integration, at the quadrature points located on $K$.
 
+The process of computing the matrix and right hand side as a sum over all
+cells (and then a sum over quadrature points) is usually called *assembling
+the linear system*, or *assembly* for short, using the meaning of the word
+related to [assembly line](https://en.wikipedia.org/wiki/Assembly_line),
+meaning ["the act of putting together a set of pieces, fragments, or
+elements"](https://en.wiktionary.org/wiki/assembly).
+
 FEValues really is the central class in the assembly process. One way you can
 view it is as follows: The FiniteElement and derived classes describe shape
 <i>functions</i>, i.e., infinite dimensional objects: functions have values at
@@ -229,6 +236,105 @@ grouped into a number of "modules" that cover the basic concepts just
 outlined. You can access these modules through the tab at the top of this
 page. An overview of the most fundamental groups of concepts is also available
 on the <a href="index.html">front page of the deal.II manual</a>.
+
+
+<h3> Solving the linear system </h3>
+
+For a finite element program, the linear system we end up with here is
+relatively small: The matrix has size $1089 \times 1089$, owing to the
+fact that the mesh we use is $32\times 32$ and so there are $33^2=1089$ vertices
+in the mesh. In many of the
+later tutorial programs, matrix sizes in the range of tens of thousands
+to hundreds of thousands will not be uncommon, and with codes such
+as [ASPECT](https://aspect.geodynamics.org) that build on deal.II, we
+regularly solve problems with more than a hundred million equations (albeit
+using parallel computers). In any case, even for the small system here, the
+matrix is much larger than what one typically encounters in an undergraduate
+or most graduate courses, and so the question arises how we can solve such
+linear systems.
+
+The first method one typically learns for solving linear systems is
+[Gaussian elimination](https://en.wikipedia.org/wiki/Gaussian_elimination).
+The problem with this method is that it requires a number of operations that
+is proportional to $N^3$, where $N$ is the number of equations or unknowns
+in the linear system -- more specifically, the number of operations is
+$\frac 23 N^3$, give or take a few. With $N=1089$, this means that we would
+have to do around $861$ million operations. This is a number that is quite
+feasible and it would take modern processors less than 0.1 seconds
+to do this. But it is clear that this isn't going to scale: If we have twenty times
+as many equations in the linear system (that is, twenty times as many unknowns),
+then it would already take 1000-10,000 seconds or on the order of an hour. Make
+the linear system another ten times larger, and it is clear that we can not solve
+it any more on a single computer.
+
+One can rescue the situation somewhat by realizing that only a relatively
+small number of entries in the matrix are nonzero -- that is, the matrix
+is [sparse](https://en.wikipedia.org/wiki/Sparse_matrix). Variations of
+Gaussian elimination can exploit this, making the process substantially
+faster; we will use one such method -- implemented in the SparseDirectUMFPACK
+class -- in step-29 for the first time, among several others than come after
+that. These variations of Gaussian elimination might get us to problem
+sizes on the order of 100,000 or 200,000, but not all that much beyond that.
+
+Instead, what we will do here is take up an idea from 1952: the
+[Conjugate Gradient method](https://en.wikipedia.org/wiki/Conjugate_gradient_method),
+or in short "CG". CG is an "iterative" solver in that it forms a sequence
+of vectors that *converge* to the exact solution; in fact, after $N$ such iterations
+in the absence of roundoff errors it finds the exact solution if the matrix is symmetric and positive definite.
+The method was originally developed as another way
+to solve a linear system exactly, like Gaussian elimination, but as such
+it had few advantages and was largely forgotten for a few decades. But,
+when computers became powerful enough to solve problems of a size where
+Gaussian elimination doesn't work well any more (sometime in the 1980s),
+CG was rediscovered as people realized that it is well suited for
+large and sparse systems like the ones we get from the finite element method.
+This is because (i) the vectors it computes *converge* to the exact solution,
+and consequently we do not actually have to do all $N$ iterations to
+find the exact solution as long as we're happy with reasonably good approximations;
+and (ii) it only ever requires matrix-vector products, which is very useful
+for sparse matrices because a sparse matrix has, by definition, only
+${\cal O}(N)$ entries and so a matrix-vector product can be done with
+${\cal O}(N)$ effort whereas it costs $N^2$ operations to do the same for
+dense matrices. As a consequence, we can hope to solve linear systems
+with at most ${\cal O}(N^2)$ operations, and in many cases substantially
+fewer.
+
+Finite element codes therefore almost always use iterative solvers such as
+CG for the solution of the linear systems, and we will
+do so in this code as well. (We note that the CG method is only usable
+for matrices that are symmetric and positive definite; for other equations,
+the matrix may not have these properties and we will have to use other
+variations of iterative solvers such as
+[BiCGStab](https://en.wikipedia.org/wiki/Biconjugate_gradient_stabilized_method)
+or [GMRES](https://en.wikipedia.org/wiki/Generalized_minimal_residual_method)
+that are applicable to more general matrices.)
+
+An important component of these iterative solvers is that we specify
+the *tolerance* with which we want to solve the linear system -- in essence,
+a statement about the error we are willing to accept in our approximate
+solution. The error in an approximate solution $\tilde x$ obtained to the
+exact solution $x$ of a linear system $Ax=b$ is defined as $\|x-\tilde x\|$,
+but this is a quantity we cannot compute because we don't know the
+exact solution $x$. Instead, we typically consider the *residual*, defined
+as $\|b-A\tilde x\|=\|A(x-\tilde x)\|$, as a computable measure. We then let
+the iterative solver compute more and more accurate solutions $\tilde x$,
+until $\|b-A\tilde x\|\le \tau$. A practical question is what value $\tau$
+should have. In most applications, setting
+@f{align*}{
+  \tau = 10^{-6} \|b\|
+@f}
+is a reasonable choice. The fact that we make $\tau$ proportional to the size
+(norm) of $b$ makes sure that our expectations of the accuracy in the solution
+are relative to the size of the solution. This makes sense: If we make the
+right hand side $b$ ten times larger, then the solution $x$ of $Ax=b$ will
+also be ten times larger, and so will $\tilde x$; we want the same number
+of accurate digits in $\tilde x$ as before, which means that we should also
+terminate when the residual $\|b-A\tilde x\|$ is ten times the original
+size -- which is exactly what we get if we make $\tau$ proportional to $\|b\|$.
+
+All of this will be implemented in the `Step3::solve()` function in this
+program. As you will see, it is quite simple to set up linear solvers with
+deal.II: The whole function will have only three lines.
 
 
 <h3>About the implementation</h3>
