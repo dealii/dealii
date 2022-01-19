@@ -25,6 +25,7 @@
 
 #  include <deal.II/distributed/grid_refinement.h>
 
+#  include <deal.II/grid/filtered_iterator.h>
 #  include <deal.II/grid/grid_refinement.h>
 #  include <deal.II/grid/tria.h>
 #  include <deal.II/grid/tria_accessor.h>
@@ -110,13 +111,13 @@ namespace
            ExcInternalError());
 
     unsigned int owned_index = 0;
-    for (const auto &cell : tria.active_cell_iterators())
-      if (cell->subdomain_id() == tria.locally_owned_subdomain())
-        {
-          locally_owned_indicators(owned_index) =
-            criteria(cell->active_cell_index());
-          ++owned_index;
-        }
+    for (const auto &cell :
+         tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+      {
+        locally_owned_indicators(owned_index) =
+          criteria(cell->active_cell_index());
+        ++owned_index;
+      }
     Assert(owned_index == tria.n_locally_owned_active_cells(),
            ExcInternalError());
   }

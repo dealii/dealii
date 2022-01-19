@@ -52,15 +52,15 @@ test()
 
   // set future_fe_indices
   unsigned int future_feidx = 0;
-  for (const auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        // check if cell is initialized correctly
-        Assert(cell->active_fe_index() == 0, ExcInternalError());
+  for (const auto &cell :
+       dh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      // check if cell is initialized correctly
+      Assert(cell->active_fe_index() == 0, ExcInternalError());
 
-        cell->set_future_fe_index(future_feidx);
-        future_feidx = ((future_feidx + 1) < fe.size()) ? future_feidx + 1 : 0;
-      }
+      cell->set_future_fe_index(future_feidx);
+      future_feidx = ((future_feidx + 1) < fe.size()) ? future_feidx + 1 : 0;
+    }
 
   dh.distribute_dofs(fe);
   tria.execute_coarsening_and_refinement();

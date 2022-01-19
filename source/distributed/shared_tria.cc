@@ -282,14 +282,11 @@ namespace parallel
 #  ifdef DEBUG
       {
         // Assert that each cell is owned by a processor
-        unsigned int n_my_cells = 0;
-        typename parallel::shared::Triangulation<dim,
-                                                 spacedim>::active_cell_iterator
-          cell = this->begin_active(),
-          endc = this->end();
-        for (; cell != endc; ++cell)
-          if (cell->is_locally_owned())
-            n_my_cells += 1;
+        const unsigned int n_my_cells = std::count_if(
+          this->begin_active(),
+          typename Triangulation<dim, spacedim>::active_cell_iterator(
+            this->end()),
+          [](const auto &i) { return (i.is_locally_owned()); });
 
         const unsigned int total_cells =
           Utilities::MPI::sum(n_my_cells, this->get_communicator());
@@ -301,13 +298,11 @@ namespace parallel
       // cell is owned by a processor
       if (settings & construct_multigrid_hierarchy)
         {
-          unsigned int n_my_cells = 0;
-          typename parallel::shared::Triangulation<dim, spacedim>::cell_iterator
-            cell = this->begin(),
-            endc = this->end();
-          for (; cell != endc; ++cell)
-            if (cell->is_locally_owned_on_level())
-              n_my_cells += 1;
+          const unsigned int n_my_cells =
+            std::count_if(this->begin(), this->end(), [](const auto &i) {
+              return (i.is_locally_owned_on_level());
+            });
+
 
           const unsigned int total_cells =
             Utilities::MPI::sum(n_my_cells, this->get_communicator());

@@ -80,9 +80,9 @@ do_test(const FiniteElement<dim> &fe_fine, const FiniteElement<dim> &fe_coarse)
 
   // setup dof-handlers
   DoFHandler<dim> dof_handler_fine(tria_fine);
-  for (const auto &cell : dof_handler_fine.active_cell_iterators())
-    if (cell->is_locally_owned())
-      cell->set_active_fe_index(0);
+  for (const auto &cell : dof_handler_fine.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
+    cell->set_active_fe_index(0);
   dof_handler_fine.distribute_dofs(fe);
 
   DoFHandler<dim> dof_handler_coarse(tria_coarse);

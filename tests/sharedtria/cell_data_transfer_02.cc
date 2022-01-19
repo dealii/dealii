@@ -63,14 +63,14 @@ test()
   // ----- gather -----
   // store parent id of all locally owned cells
   Vector<PetscScalar> cell_ids_pre(tria.n_active_cells());
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        const std::string  parent_cellid = cell->parent()->id().to_string();
-        const unsigned int parent_coarse_cell_id =
-          static_cast<unsigned int>(std::stoul(parent_cellid));
-        cell_ids_pre(cell->active_cell_index()) = parent_coarse_cell_id;
-      }
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      const std::string  parent_cellid = cell->parent()->id().to_string();
+      const unsigned int parent_coarse_cell_id =
+        static_cast<unsigned int>(std::stoul(parent_cellid));
+      cell_ids_pre(cell->active_cell_index()) = parent_coarse_cell_id;
+    }
 
   // distribute local vector (as presented in step-18)
   PETScWrappers::MPI::Vector distributed_cell_ids_pre(

@@ -3905,11 +3905,11 @@ namespace GridTools
         // In a first step, obtain the weights of the locally owned
         // cells. For all others, the weight remains at the zero the
         // vector was initialized with above.
-        for (const auto &cell : triangulation.active_cell_iterators())
-          if (cell->is_locally_owned())
-            cell_weights[cell->active_cell_index()] =
-              triangulation.signals.cell_weight(
-                cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
+        for (const auto &cell : triangulation.active_cell_iterators() |
+                                  IteratorFilters::LocallyOwnedCell())
+          cell_weights[cell->active_cell_index()] =
+            triangulation.signals.cell_weight(
+              cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
 
         // If this is a parallel triangulation, we then need to also
         // get the weights for all other cells. We have asserted above

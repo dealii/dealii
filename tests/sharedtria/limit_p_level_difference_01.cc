@@ -91,9 +91,9 @@ test(const unsigned int fes_size,
 
   // display number of cells for each FE index
   std::vector<unsigned int> count(fes.size(), 0);
-  for (const auto &cell : dofh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      count[cell->active_fe_index()]++;
+  for (const auto &cell :
+       dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    count[cell->active_fe_index()]++;
   Utilities::MPI::sum(count, tria.get_communicator(), count);
   deallog << "fe count:" << count << std::endl;
 

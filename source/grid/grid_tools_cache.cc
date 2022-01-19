@@ -156,10 +156,9 @@ namespace GridTools
           typename Triangulation<dim, spacedim>::active_cell_iterator>>
           boxes;
         boxes.reserve(tria->n_active_cells());
-        for (const auto &cell : tria->active_cell_iterators())
-          if (cell->is_locally_owned())
-            boxes.emplace_back(
-              std::make_pair(mapping->get_bounding_box(cell), cell));
+        for (const auto &cell : tria->active_cell_iterators() |
+                                  IteratorFilters::LocallyOwnedCell())
+          boxes.emplace_back(mapping->get_bounding_box(cell), cell);
 
         locally_owned_cell_bounding_boxes_rtree = pack_rtree(boxes);
         update_flags =

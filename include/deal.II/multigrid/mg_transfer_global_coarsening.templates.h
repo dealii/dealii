@@ -3246,9 +3246,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::reinit(
       IndexSet is_locally_owned_fine(cell_id_translator.size());
       IndexSet is_locally_owned_coarse(cell_id_translator.size());
 
-      for (const auto &cell : dof_handler_fine.active_cell_iterators())
-        if (cell->is_locally_owned())
-          is_locally_owned_fine.add_index(cell_id_translator.translate(cell));
+      for (const auto &cell : dof_handler_fine.active_cell_iterators() |
+                                IteratorFilters::LocallyOwnedCell())
+        is_locally_owned_fine.add_index(cell_id_translator.translate(cell));
 
       for (const auto &cell : dof_handler_coarse.active_cell_iterators() |
                                 IteratorFilters::LocallyOwnedCell())

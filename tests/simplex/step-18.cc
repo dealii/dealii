@@ -951,12 +951,12 @@ namespace Step18
                                     quadrature_formula.size());
 
     unsigned int history_index = 0;
-    for (auto &cell : triangulation.active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          cell->set_user_pointer(&quadrature_point_history[history_index]);
-          history_index += quadrature_formula.size();
-        }
+    for (auto &cell : triangulation.active_cell_iterators() |
+                        IteratorFilters::LocallyOwnedCell())
+      {
+        cell->set_user_pointer(&quadrature_point_history[history_index]);
+        history_index += quadrature_formula.size();
+      }
 
     Assert(history_index == quadrature_point_history.size(),
            ExcInternalError());

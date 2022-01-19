@@ -62,20 +62,20 @@ test()
   dofh.distribute_dofs(fe);
 
   deallog << "Before:" << std::endl;
-  for (const auto &cell : dofh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        deallog << "locally owned cell: " << cell << std::endl;
-        deallog << "       dof indices: ";
+  for (const auto &cell :
+       dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      deallog << "locally owned cell: " << cell << std::endl;
+      deallog << "       dof indices: ";
 
-        std::vector<types::global_dof_index> cell_dofs(
-          cell->get_fe().dofs_per_cell);
-        cell->get_dof_indices(cell_dofs);
+      std::vector<types::global_dof_index> cell_dofs(
+        cell->get_fe().dofs_per_cell);
+      cell->get_dof_indices(cell_dofs);
 
-        for (auto i : cell_dofs)
-          deallog << i << ' ';
-        deallog << std::endl;
-      }
+      for (auto i : cell_dofs)
+        deallog << i << ' ';
+      deallog << std::endl;
+    }
 
   std::set<types::global_dof_index> starting_indices;
   for (const auto &cell :

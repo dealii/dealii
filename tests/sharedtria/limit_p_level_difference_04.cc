@@ -96,10 +96,10 @@ test(const unsigned int max_difference, const bool allow_artificial_cells)
   Assert(fe_indices_changed, ExcInternalError());
 
   deallog << "future FE indices before adaptation:" << std::endl;
-  for (const auto &cell : dofh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      deallog << " " << cell->id().to_string() << " " << cell->future_fe_index()
-              << std::endl;
+  for (const auto &cell :
+       dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    deallog << " " << cell->id().to_string() << " " << cell->future_fe_index()
+            << std::endl;
 
   tria.execute_coarsening_and_refinement();
 
