@@ -193,12 +193,8 @@ namespace Utilities
 
         const int tag_request = Utilities::MPI::internal::Tags::
           consensus_algorithm_nbx_answer_request;
-        const int tag_deliver = Utilities::MPI::internal::Tags::
-          consensus_algorithm_nbx_process_deliver;
 
         // 2) allocate memory
-        recv_buffers.resize(n_targets);
-        recv_requests.resize(n_targets);
         send_requests.resize(n_targets);
         send_buffers.resize(n_targets);
 
@@ -222,20 +218,11 @@ namespace Utilities
                                     this->comm,
                                     &send_requests[index]);
               AssertThrowMPI(ierr);
-
-              // Post a request to receive data from the same
-              // process we sent information to above:
-              auto &recv_buffer = recv_buffers[index];
-              this->process.prepare_buffer_for_answer(rank, recv_buffer);
-              ierr = MPI_Irecv(recv_buffer.data(),
-                               recv_buffer.size() * sizeof(T2),
-                               MPI_BYTE,
-                               rank,
-                               tag_deliver,
-                               this->comm,
-                               &recv_requests[index]);
-              AssertThrowMPI(ierr);
             }
+
+          // Also record that we expect an answer from each target we sent
+          // a request to:
+          n_outstanding_answers = n_targets;
         }
 #endif
       }
@@ -247,14 +234,84 @@ namespace Utilities
       NBX<T1, T2>::all_locally_originated_receives_are_completed()
       {
 #ifdef DEAL_II_WITH_MPI
-        int        all_receive_requests_are_done;
-        const auto ierr = MPI_Testall(recv_requests.size(),
-                                      recv_requests.data(),
-                                      &all_receive_requests_are_done,
-                                      MPI_STATUSES_IGNORE);
-        AssertThrowMPI(ierr);
+        // We know that all requests have come in when we have pending
+        // messages from all targets with the right tag (some of which we may
+        // have already taken care of below, after discovering their existence).
+        // We can check for pending messages with MPI_IProbe, which returns
+        // immediately with a return code that indicates whether
+        // it has found a message from any process with a given
+        // tag.
+        if (n_outstanding_answers == 0)
+          return true;
+        else
+          {
+            const int tag_deliver = Utilities::MPI::internal::Tags::
+              consensus_algorithm_nbx_process_deliver;
 
-        return all_receive_requests_are_done != 0;
+            int        request_is_pending;
+            MPI_Status status;
+            const auto ierr = MPI_Iprobe(MPI_ANY_SOURCE,
+                                         tag_deliver,
+                                         this->comm,
+                                         &request_is_pending,
+                                         &status);
+            AssertThrowMPI(ierr);
+
+            // If there is no pending message with this tag,
+            // then we are clearly not done receiving everything
+            // yet -- so return false.
+            if (request_is_pending == 0)
+              return false;
+            else
+              {
+                // OK, so we have gotten a reply to our answer from
+                // one rank. Let us process it, after double checking
+                // that it is indeed one we were still expecting:
+                const auto target = status.MPI_SOURCE;
+
+                // Then query the size of the message, allocate enough memory,
+                // receive the data, and process it.
+                int message_size;
+                {
+                  const int ierr =
+                    MPI_Get_count(&status, MPI_BYTE, &message_size);
+                  AssertThrowMPI(ierr);
+                }
+                Assert(message_size % sizeof(T2) == 0, ExcInternalError());
+                std::vector<T2> recv_buffer(message_size / sizeof(T2));
+
+                {
+                  const int tag_deliver = Utilities::MPI::internal::Tags::
+                    consensus_algorithm_nbx_process_deliver;
+
+                  const int ierr = MPI_Recv(recv_buffer.data(),
+                                            recv_buffer.size() * sizeof(T2),
+                                            MPI_BYTE,
+                                            target,
+                                            tag_deliver,
+                                            this->comm,
+                                            MPI_STATUS_IGNORE);
+                  AssertThrowMPI(ierr);
+                }
+
+                this->process.read_answer(target, recv_buffer);
+
+                // Finally, remove this rank from the list of outstanding
+                // targets:
+                --n_outstanding_answers;
+
+                // We could do another go-around from the top of this
+                // else-branch to see whether there are actually other messages
+                // that are currently pending. But that would mean spending
+                // substantial time in receiving answers while we should also be
+                // sending answers to requests we have received from other
+                // places. So let it be enough for now. If there are outstanding
+                // answers, we will get back to this function before long and
+                // can take care of them then.
+                return (n_outstanding_answers == 0);
+              }
+          }
+
 #else
         return true;
 #endif
@@ -393,15 +450,6 @@ namespace Utilities
               AssertThrowMPI(ierr);
             }
 
-          if (recv_requests.size() > 0)
-            {
-              const int ierr = MPI_Waitall(recv_requests.size(),
-                                           recv_requests.data(),
-                                           MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
-            }
-
-
           int ierr = MPI_Wait(&barrier_request, MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
 
@@ -417,12 +465,6 @@ namespace Utilities
           ierr = MPI_Barrier(this->comm);
           AssertThrowMPI(ierr);
 #  endif
-        }
-
-        // unpack data
-        {
-          for (unsigned int i = 0; i < targets.size(); ++i)
-            this->process.read_answer(targets[i], recv_buffers[i]);
         }
 #endif
       }

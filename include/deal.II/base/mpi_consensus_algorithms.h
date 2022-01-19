@@ -317,17 +317,6 @@ namespace Utilities
         std::vector<MPI_Request> send_requests;
 
         /**
-         * Buffers for receiving answers to requests.
-         */
-        std::vector<std::vector<T2>> recv_buffers;
-
-
-        /**
-         * Requests for receiving answers to requests.
-         */
-        std::vector<MPI_Request> recv_requests;
-
-        /**
          * Buffers for sending answers to requests. We use a vector of
          * pointers because that guarantees that the buffers themselves
          * are newer moved around in memory, even if the vector is
@@ -340,6 +329,11 @@ namespace Utilities
          * Requests for sending answers to requests.
          */
         std::vector<std::unique_ptr<MPI_Request>> request_requests;
+
+        /**
+         * The number of processes from which we are still expecting answers.
+         */
+        unsigned int n_outstanding_answers;
 
         // request for barrier
         MPI_Request barrier_request;
