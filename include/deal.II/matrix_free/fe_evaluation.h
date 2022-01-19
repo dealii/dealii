@@ -2332,13 +2332,6 @@ public:
                     VectorType &output_vector);
 
   /**
-   * Return the q-th quadrature point in real coordinates stored in
-   * MappingInfo.
-   */
-  Point<dim, VectorizedArrayType>
-  quadrature_point(const unsigned int q_point) const;
-
-  /**
    * The number of degrees of freedom of a single component on the cell for
    * the underlying evaluation object. Usually close to
    * static_dofs_per_component, but the number depends on the actual element
@@ -2737,13 +2730,6 @@ public:
                     VectorType &output_vector);
 
   /**
-   * Returns the q-th quadrature point on the face in real coordinates stored
-   * in MappingInfo.
-   */
-  Point<dim, VectorizedArrayType>
-  quadrature_point(const unsigned int q_point) const;
-
-  /**
    * The number of degrees of freedom of a single component on the cell for
    * the underlying evaluation object. Usually close to
    * static_dofs_per_component, but the number depends on the actual element
@@ -3032,6 +3018,10 @@ inline FEEvaluationBase<dim,
         this->mapped_geometry->get_data_storage().jacobians[0].begin();
       this->J_value =
         this->mapped_geometry->get_data_storage().JxW_values.begin();
+      this->jacobian_gradients =
+        this->mapped_geometry->get_data_storage().jacobian_gradients[0].begin();
+      this->quadrature_points =
+        this->mapped_geometry->get_data_storage().quadrature_points.begin();
     }
 
   this->set_data_pointers(scratch_data_array, n_components_);
@@ -3092,6 +3082,10 @@ operator=(const FEEvaluationBase<dim,
         this->mapped_geometry->get_data_storage().jacobians[0].begin();
       this->J_value =
         this->mapped_geometry->get_data_storage().JxW_values.begin();
+      this->jacobian_gradients =
+        this->mapped_geometry->get_data_storage().jacobian_gradients[0].begin();
+      this->quadrature_points =
+        this->mapped_geometry->get_data_storage().quadrature_points.begin();
     }
   else
     {
@@ -6894,6 +6888,11 @@ FEEvaluation<dim,
   for (; i < VectorizedArrayType::size(); ++i)
     this->cell_ids[i] = numbers::invalid_unsigned_int;
 
+  if (this->mapping_data->quadrature_points.empty() == false)
+    this->quadrature_points =
+      &this->mapping_data->quadrature_points
+         [this->mapping_data->quadrature_point_offsets[this->cell]];
+
 #  ifdef DEBUG
   this->is_reinitialized           = true;
   this->dof_values_initialized     = false;
@@ -6968,66 +6967,6 @@ FEEvaluation<dim,
 #  ifdef DEBUG
   this->is_reinitialized = true;
 #  endif
-}
-
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number,
-          typename VectorizedArrayType>
-inline Point<dim, VectorizedArrayType>
-FEEvaluation<dim,
-             fe_degree,
-             n_q_points_1d,
-             n_components_,
-             Number,
-             VectorizedArrayType>::quadrature_point(const unsigned int q) const
-{
-  if (this->matrix_free == nullptr)
-    {
-      Assert((this->mapped_geometry->get_fe_values().get_update_flags() |
-              update_quadrature_points),
-             internal::ExcMatrixFreeAccessToUninitializedMappingField(
-               "update_quadrature_points"));
-    }
-  else
-    {
-      Assert(this->mapping_data->quadrature_point_offsets.empty() == false,
-             internal::ExcMatrixFreeAccessToUninitializedMappingField(
-               "update_quadrature_points"));
-    }
-
-  AssertIndexRange(q, n_q_points);
-
-  const Point<dim, VectorizedArrayType> *quadrature_points =
-    &this->mapping_data->quadrature_points
-       [this->mapping_data->quadrature_point_offsets[this->cell]];
-
-  // Cartesian/affine mesh: only first vertex of cell is stored, we must
-  // compute it through the Jacobian (which is stored in non-inverted and
-  // non-transposed form as index '1' in the jacobian field)
-  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
-    {
-      Assert(this->jacobian != nullptr, ExcNotInitialized());
-      Point<dim, VectorizedArrayType> point = quadrature_points[0];
-
-      const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
-      if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
-        for (unsigned int d = 0; d < dim; ++d)
-          point[d] += jac[d][d] * static_cast<Number>(
-                                    this->descriptor->quadrature.point(q)[d]);
-      else
-        for (unsigned int d = 0; d < dim; ++d)
-          for (unsigned int e = 0; e < dim; ++e)
-            point[d] += jac[d][e] * static_cast<Number>(
-                                      this->descriptor->quadrature.point(q)[e]);
-      return point;
-    }
-  else
-    return quadrature_points[q];
 }
 
 
@@ -7644,6 +7583,15 @@ FEFaceEvaluation<dim,
     this->mapping_data->jacobian_gradients[!this->is_interior_face].data() +
     offsets;
 
+  if (this->mapping_data->quadrature_point_offsets.empty() == false)
+    {
+      AssertIndexRange(this->cell,
+                       this->mapping_data->quadrature_point_offsets.size());
+      this->quadrature_points =
+        this->mapping_data->quadrature_points.data() +
+        this->mapping_data->quadrature_point_offsets[this->cell];
+    }
+
 #  ifdef DEBUG
   this->is_reinitialized           = true;
   this->dof_values_initialized     = false;
@@ -7783,6 +7731,24 @@ FEFaceEvaluation<dim,
   this->jacobian_gradients =
     this->mapping_data->jacobian_gradients[!this->is_interior_face].data() +
     offsets;
+
+  if (this->matrix_free->get_mapping_info()
+        .face_data_by_cells[this->quad_no]
+        .quadrature_point_offsets.empty() == false)
+    {
+      const unsigned int index =
+        this->cell * GeometryInfo<dim>::faces_per_cell + this->face_numbers[0];
+      AssertIndexRange(index,
+                       this->matrix_free->get_mapping_info()
+                         .face_data_by_cells[this->quad_no]
+                         .quadrature_point_offsets.size());
+      this->quadrature_points = this->matrix_free->get_mapping_info()
+                                  .face_data_by_cells[this->quad_no]
+                                  .quadrature_points.data() +
+                                this->matrix_free->get_mapping_info()
+                                  .face_data_by_cells[this->quad_no]
+                                  .quadrature_point_offsets[index];
+    }
 
 #  ifdef DEBUG
   this->is_reinitialized           = true;
@@ -8270,56 +8236,6 @@ FEFaceEvaluation<dim,
     {
       integrate(integration_flag);
       this->distribute_local_to_global(destination);
-    }
-}
-
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number,
-          typename VectorizedArrayType>
-inline Point<dim, VectorizedArrayType>
-FEFaceEvaluation<dim,
-                 fe_degree,
-                 n_q_points_1d,
-                 n_components_,
-                 Number,
-                 VectorizedArrayType>::quadrature_point(const unsigned int q)
-  const
-{
-  AssertIndexRange(q, n_q_points);
-  if (this->dof_access_index < 2)
-    {
-      Assert(this->mapping_data->quadrature_point_offsets.empty() == false,
-             internal::ExcMatrixFreeAccessToUninitializedMappingField(
-               "update_quadrature_points"));
-      AssertIndexRange(this->cell,
-                       this->mapping_data->quadrature_point_offsets.size());
-      return this->mapping_data->quadrature_points
-        [this->mapping_data->quadrature_point_offsets[this->cell] + q];
-    }
-  else
-    {
-      Assert(this->matrix_free->get_mapping_info()
-                 .face_data_by_cells[this->quad_no]
-                 .quadrature_point_offsets.empty() == false,
-             internal::ExcMatrixFreeAccessToUninitializedMappingField(
-               "update_quadrature_points"));
-      const unsigned int index =
-        this->cell * GeometryInfo<dim>::faces_per_cell + this->face_numbers[0];
-      AssertIndexRange(index,
-                       this->matrix_free->get_mapping_info()
-                         .face_data_by_cells[this->quad_no]
-                         .quadrature_point_offsets.size());
-      return this->matrix_free->get_mapping_info()
-        .face_data_by_cells[this->quad_no]
-        .quadrature_points[this->matrix_free->get_mapping_info()
-                             .face_data_by_cells[this->quad_no]
-                             .quadrature_point_offsets[index] +
-                           q];
     }
 }
 

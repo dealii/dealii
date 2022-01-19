@@ -186,6 +186,13 @@ public:
   JxW(const unsigned int q_point) const;
 
   /**
+   * Returns the q-th quadrature point on the face in real coordinates stored
+   * in MappingInfo.
+   */
+  Point<dim, Number>
+  quadrature_point(const unsigned int q) const;
+
+  /**
    * Return the inverse and transposed version $J^{-\mathrm T}$ of the
    * Jacobian of the mapping between the unit to the real cell defined as
    * $J_{ij} = d x_i / d\hat x_j$. The $(i,j)$ entry of the returned tensor
@@ -609,6 +616,12 @@ protected:
   const unsigned int n_quadrature_points;
 
   /**
+   * A pointer to the quadrature-point information of the present cell.
+   * Only set to a useful value if on a non-Cartesian cell.
+   */
+  const Point<dim, Number> *quadrature_points;
+
+  /**
    * A pointer to the Jacobian information of the present cell. Only set to a
    * useful value if on a non-Cartesian cell.
    */
@@ -901,7 +914,9 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , n_quadrature_points(descriptor == nullptr ?
                           (is_face ? data->n_q_points_face : data->n_q_points) :
                           descriptor->n_q_points)
+  , quadrature_points(nullptr)
   , jacobian(nullptr)
+  , jacobian_gradients(nullptr)
   , J_value(nullptr)
   , normal_vectors(nullptr)
   , normal_x_jacobian(nullptr)
@@ -948,7 +963,9 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , descriptor(nullptr)
   , n_quadrature_points(
       mapped_geometry->get_data_storage().descriptor[0].n_q_points)
+  , quadrature_points(nullptr)
   , jacobian(nullptr)
+  , jacobian_gradients(nullptr)
   , J_value(nullptr)
   , normal_vectors(nullptr)
   , normal_x_jacobian(nullptr)
@@ -963,6 +980,10 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   mapping_data = &mapped_geometry->get_data_storage();
   jacobian     = mapped_geometry->get_data_storage().jacobians[0].begin();
   J_value      = mapped_geometry->get_data_storage().JxW_values.begin();
+  jacobian_gradients =
+    mapped_geometry->get_data_storage().jacobian_gradients[0].begin();
+  quadrature_points =
+    mapped_geometry->get_data_storage().quadrature_points.begin();
 }
 
 
@@ -986,6 +1007,8 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
   J_value            = nullptr;
   normal_vectors     = nullptr;
   normal_x_jacobian  = nullptr;
+  jacobian_gradients = nullptr;
+  quadrature_points  = nullptr;
   quadrature_weights = other.quadrature_weights;
 
 #  ifdef DEBUG
@@ -1120,6 +1143,43 @@ FEEvaluationData<dim, Number, is_face>::JxW(const unsigned int q_point) const
     }
   else
     return J_value[q_point];
+}
+
+
+
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE Point<dim, Number>
+FEEvaluationData<dim, Number, is_face>::quadrature_point(
+  const unsigned int q) const
+{
+  AssertIndexRange(q, this->n_quadrature_points);
+  Assert(this->quadrature_points != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_quadrature_points"));
+
+  // Cartesian/affine mesh: only first vertex of cell is stored, we must
+  // compute it through the Jacobian (which is stored in non-inverted and
+  // non-transposed form as index '1' in the jacobian field)
+  if (is_face == false &&
+      this->cell_type <= internal::MatrixFreeFunctions::affine)
+    {
+      Assert(this->jacobian != nullptr, ExcNotInitialized());
+      Point<dim, Number> point = this->quadrature_points[0];
+
+      const Tensor<2, dim, Number> &jac = this->jacobian[1];
+      if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+        for (unsigned int d = 0; d < dim; ++d)
+          point[d] += jac[d][d] * static_cast<typename Number::value_type>(
+                                    this->descriptor->quadrature.point(q)[d]);
+      else
+        for (unsigned int d = 0; d < dim; ++d)
+          for (unsigned int e = 0; e < dim; ++e)
+            point[d] += jac[d][e] * static_cast<typename Number::value_type>(
+                                      this->descriptor->quadrature.point(q)[e]);
+      return point;
+    }
+  else
+    return this->quadrature_points[q];
 }
 
 
