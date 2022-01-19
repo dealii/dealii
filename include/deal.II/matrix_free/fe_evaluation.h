@@ -3441,17 +3441,20 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   // Case 2: contiguous indices which use reduced storage of indices and can
   // use vectorized load/store operations -> go to separate function
-  AssertIndexRange(
-    this->cell,
-    this->dof_info->index_storage_variants[this->dof_access_index].size());
-  if (this->dof_info->index_storage_variants
-        [is_face ? this->dof_access_index :
-                   internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
-        [this->cell] >=
-      internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous)
+  if (this->cell != numbers::invalid_unsigned_int)
     {
-      read_write_operation_contiguous(operation, src, src_sm, mask);
-      return;
+      AssertIndexRange(
+        this->cell,
+        this->dof_info->index_storage_variants[this->dof_access_index].size());
+      if (this->dof_info->index_storage_variants
+            [is_face ? this->dof_access_index :
+                       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+            [this->cell] >= internal::MatrixFreeFunctions::DoFInfo::
+                              IndexStorageVariants::contiguous)
+        {
+          read_write_operation_contiguous(operation, src, src_sm, mask);
+          return;
+        }
     }
 
   // Case 3: standard operation with one index per degree of freedom -> go on
@@ -3461,10 +3464,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
          ExcNotImplemented("Masking currently not implemented for "
                            "non-contiguous DoF storage"));
 
-  unsigned int n_vectorization_actual =
-    this->dof_info
-      ->n_vectorization_lanes_filled[this->dof_access_index][this->cell];
-
   const std::array<unsigned int, VectorizedArrayType::size()> &cells =
     this->get_cell_ids();
 
@@ -3472,8 +3471,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   if (is_face == false)
     {
-      for (unsigned int v = 0; v < n_vectorization_actual; ++v)
-        if (this->dof_info->hanging_node_constraint_masks.size() > 0 &&
+      for (unsigned int v = 0; v < n_lanes; ++v)
+        if (cells[v] != numbers::invalid_unsigned_int &&
+            this->dof_info->hanging_node_constraint_masks.size() > 0 &&
             this->dof_info->hanging_node_constraint_masks
                 [cells[v] * this->n_fe_components +
                  this->first_selected_component] !=
@@ -3538,8 +3538,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   if (is_face)
     {
-      for (unsigned int v = 0; v < n_vectorization_actual; ++v)
+      for (unsigned int v = 0; v < n_lanes; ++v)
         {
+          if (cells[v] == numbers::invalid_unsigned_int)
+            continue;
+
           Assert(cells[v] < this->dof_info->row_starts.size() - 1,
                  ExcInternalError());
           const std::pair<unsigned int, unsigned int> *my_index_start =
@@ -3559,8 +3562,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     }
   else
     {
-      for (unsigned int v = 0; v < n_vectorization_actual; ++v)
+      for (unsigned int v = 0; v < n_lanes; ++v)
         {
+          if (cells[v] == numbers::invalid_unsigned_int)
+            continue;
+
           const std::pair<unsigned int, unsigned int> *my_index_start =
             &this->dof_info->row_starts[cells[v] * this->n_fe_components +
                                         this->first_selected_component];
@@ -3586,32 +3592,45 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         }
     }
 
+  if (std::count_if(cells.begin(), cells.end(), [](const auto i) {
+        return i != numbers::invalid_unsigned_int;
+      }) < n_lanes)
+    for (unsigned int comp = 0; comp < n_components; ++comp)
+      for (unsigned int i = 0; i < dofs_per_component; ++i)
+        operation.process_empty(values_dofs[comp][i]);
+
   // Case where we have no constraints throughout the whole cell: Can go
   // through the list of DoFs directly
   if (!has_constraints && apply_constraints)
     {
-      if (n_vectorization_actual < n_lanes)
-        for (unsigned int comp = 0; comp < n_components; ++comp)
-          for (unsigned int i = 0; i < dofs_per_component; ++i)
-            operation.process_empty(values_dofs[comp][i]);
       if (n_components == 1 || this->n_fe_components == 1)
         {
-          for (unsigned int v = 0; v < n_vectorization_actual; ++v)
-            for (unsigned int i = 0; i < dofs_per_component; ++i)
-              for (unsigned int comp = 0; comp < n_components; ++comp)
-                operation.process_dof(dof_indices[v][i],
-                                      *src[comp],
-                                      values_dofs[comp][i][v]);
+          for (unsigned int v = 0; v < n_lanes; ++v)
+            {
+              if (cells[v] == numbers::invalid_unsigned_int)
+                continue;
+
+              for (unsigned int i = 0; i < dofs_per_component; ++i)
+                for (unsigned int comp = 0; comp < n_components; ++comp)
+                  operation.process_dof(dof_indices[v][i],
+                                        *src[comp],
+                                        values_dofs[comp][i][v]);
+            }
         }
       else
         {
           for (unsigned int comp = 0; comp < n_components; ++comp)
-            for (unsigned int v = 0; v < n_vectorization_actual; ++v)
-              for (unsigned int i = 0; i < dofs_per_component; ++i)
-                operation.process_dof(
-                  dof_indices[v][comp * dofs_per_component + i],
-                  *src[0],
-                  values_dofs[comp][i][v]);
+            for (unsigned int v = 0; v < n_lanes; ++v)
+              {
+                if (cells[v] == numbers::invalid_unsigned_int)
+                  continue;
+
+                for (unsigned int i = 0; i < dofs_per_component; ++i)
+                  operation.process_dof(
+                    dof_indices[v][comp * dofs_per_component + i],
+                    *src[0],
+                    values_dofs[comp][i][v]);
+              }
         }
       return;
     }
@@ -3621,12 +3640,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // holds local number on cell, index iterates over the elements of
   // index_local_to_global and dof_indices points to the global indices stored
   // in index_local_to_global
-  if (n_vectorization_actual < n_lanes)
-    for (unsigned int comp = 0; comp < n_components; ++comp)
-      for (unsigned int i = 0; i < dofs_per_component; ++i)
-        operation.process_empty(values_dofs[comp][i]);
-  for (unsigned int v = 0; v < n_vectorization_actual; ++v)
+
+  for (unsigned int v = 0; v < n_lanes; ++v)
     {
+      if (cells[v] == numbers::invalid_unsigned_int)
+        continue;
+
       const unsigned int cell_index = cells[v];
       const unsigned int cell_dof_index =
         cell_index * this->n_fe_components + this->first_selected_component;
@@ -3849,6 +3868,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   for (unsigned int c = 0; c < n_components; ++c)
     values_dofs[c] = const_cast<VectorizedArrayType *>(this->values_dofs) +
                      c * dofs_per_component;
+
+  Assert(this->cell != numbers::invalid_unsigned_int, ExcNotImplemented());
 
   // Simple case: We have contiguous storage, so we can simply copy out the
   // data
@@ -4282,10 +4303,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       this->dof_info->hanging_node_constraint_masks.size() == 0)
     return; // nothing to do with faces
 
-  const unsigned int n_vectorization_actual =
-    this->dof_info
-      ->n_vectorization_lanes_filled[this->dof_access_index][this->cell];
-
   constexpr unsigned int n_lanes = VectorizedArrayType::size();
   std::array<internal::MatrixFreeFunctions::ConstraintKinds, n_lanes>
     constraint_mask;
@@ -4295,8 +4312,15 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const std::array<unsigned int, VectorizedArrayType::size()> &cells =
     this->get_cell_ids();
 
-  for (unsigned int v = 0; v < n_vectorization_actual; ++v)
+  for (unsigned int v = 0; v < n_lanes; ++v)
     {
+      if (cells[v] == numbers::invalid_unsigned_int)
+        {
+          constraint_mask[v] =
+            internal::MatrixFreeFunctions::ConstraintKinds::unconstrained;
+          continue;
+        }
+
       const unsigned int cell_index = cells[v];
       const unsigned int cell_dof_index =
         cell_index * this->n_fe_components + this->first_selected_component;
@@ -4311,10 +4335,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   if (hn_available == false)
     return; // no hanging node on cell batch -> nothing to do
-
-  for (unsigned int v = n_vectorization_actual; v < n_lanes; ++v)
-    constraint_mask[v] =
-      internal::MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
   internal::FEEvaluationHangingNodesFactory<dim, Number, VectorizedArrayType>::
     apply(n_components,
@@ -6867,8 +6887,12 @@ FEEvaluation<dim,
   this->jacobian_gradients =
     this->mapping_data->jacobian_gradients[0].data() + offsets;
 
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
+  unsigned int i = 0;
+  for (; i < this->matrix_free->n_active_entries_per_cell_batch(this->cell);
+       ++i)
     this->cell_ids[i] = cell_index * VectorizedArrayType::size() + i;
+  for (; i < VectorizedArrayType::size(); ++i)
+    this->cell_ids[i] = numbers::invalid_unsigned_int;
 
 #  ifdef DEBUG
   this->is_reinitialized           = true;
@@ -7598,8 +7622,13 @@ FEFaceEvaluation<dim,
              "is_interior_face set to true. "));
 
   this->reinit_face(this->matrix_free->get_face_info(face_index));
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
+
+  unsigned int i = 0;
+  for (; i < this->matrix_free->n_active_entries_per_face_batch(this->cell);
+       ++i)
     this->cell_or_face_ids[i] = face_index * VectorizedArrayType::size() + i;
+  for (; i < VectorizedArrayType::size(); ++i)
+    this->cell_or_face_ids[i] = numbers::invalid_unsigned_int;
 
   this->cell_type = this->matrix_free->get_mapping_info().face_type[face_index];
   const unsigned int offsets =
