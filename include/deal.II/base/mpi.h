@@ -44,6 +44,9 @@ using MPI_Op       = int;
 #  ifndef MPI_COMM_SELF
 #    define MPI_COMM_SELF 0
 #  endif
+#  ifndef MPI_COMM_NULL
+#    define MPI_COMM_NULL 0
+#  endif
 #  ifndef MPI_REQUEST_NULL
 #    define MPI_REQUEST_NULL 0
 #  endif
