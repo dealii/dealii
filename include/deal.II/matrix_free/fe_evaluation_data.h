@@ -478,8 +478,10 @@ public:
   const std::array<unsigned int, n_lanes> &
   get_cell_ids() const
   {
-    // implemented inline to avoid compilation problems on Windows
+// implemented inline to avoid compilation problems on Windows
+#ifdef DEBUG
     Assert(is_reinitialized, ExcNotInitialized());
+#endif
     return cell_ids;
   }
 
@@ -490,8 +492,11 @@ public:
   unsigned int
   get_cell_or_face_batch_id() const
   {
-    // implemented inline to avoid compilation problems on Windows
+// implemented inline to avoid compilation problems on Windows
+#ifdef DEBUG
     Assert(is_reinitialized, ExcNotInitialized());
+#endif
+
     return cell;
   }
 
@@ -502,8 +507,11 @@ public:
   const std::array<unsigned int, n_lanes> &
   get_cell_or_face_ids() const
   {
-    // implemented inline to avoid compilation problems on Windows
+// implemented inline to avoid compilation problems on Windows
+#ifdef DEBUG
     Assert(is_reinitialized, ExcNotInitialized());
+#endif
+
     if (!is_face || dof_access_index ==
                       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
       return cell_ids;
@@ -1318,7 +1326,9 @@ template <int dim, typename Number, bool is_face>
 inline internal::MatrixFreeFunctions::GeometryType
 FEEvaluationData<dim, Number, is_face>::get_cell_type() const
 {
+#  ifdef DEBUG
   Assert(is_reinitialized, ExcNotInitialized());
+#  endif
   return cell_type;
 }
 
