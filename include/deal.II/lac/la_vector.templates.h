@@ -71,11 +71,7 @@ namespace LinearAlgebra
     Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
            ExcVectorTypeNotCompatible());
 
-    // Downcast V. If fails, throws an exception.
     const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-    Assert(down_V.size() == this->size(),
-           ExcMessage(
-             "Cannot add two vectors with different numbers of elements"));
 
     ReadWriteVector<Number>::reinit(down_V, omit_zeroing_entries);
   }
