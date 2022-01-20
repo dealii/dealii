@@ -250,13 +250,12 @@ namespace Utilities
       /**
        * This class implements a concrete algorithm for the
        * ConsensusAlgorithms::Interface base class, using only point-to-point
-       * communications and a single IBarrier.
+       * communications and a single IBarrier. This algorithm is suitable
+       * for very large process counts because it does not require the
+       * allocation of arrays with size proportional to the number of processes.
        *
-       * @note This class closely follows @cite hoefler2010scalable. Since the
-       *       algorithm shown there is not considering payloads, the algorithm
-       *       has been modified here in such a way that synchronous sends
-       *       (Issend) have been replaced by equivalent Isend/Irecv, where
-       *       Irecv receives the answer to a request (with payload).
+       * @note This class closely follows @cite hoefler2010scalable, but our
+       *   implementation also deals with payloads.
        *
        * @tparam T1 The type of the elements of the vector to be sent.
        * @tparam T2 The type of the elements of the vector to be received.
@@ -379,7 +378,8 @@ namespace Utilities
        * This class implements a concrete algorithm for the
        * ConsensusAlgorithms::Interface base class, using a two step approach.
        * In the first step the source ranks are determined and in the second
-       * step a static sparse data exchange is performed.
+       * step a static sparse data exchange is performed. This algorithm is most
+       * suitable for relatively small process counts -- say, less than 100.
        *
        * @note In contrast to NBX, this class splits the same
        *   task into two distinct steps. In the first step, all processes
@@ -515,12 +515,16 @@ namespace Utilities
         run() override;
       };
 
+
+
       /**
        * A class which delegates its task to other
        * ConsensusAlgorithms::Interface implementations depending on the number
        * of processes in the MPI communicator. For a small number of processes
        * it uses PEX and for a large number of processes NBX. The threshold
-       * depends if the program is compiled in debug or release mode.
+       * depends if the program is compiled in debug or release mode, but the
+       * goal is to always use the most efficient algorithm for however many
+       * processes participate in the communication.
        *
        * @tparam T1 The type of the elements of the vector to be sent.
        * @tparam T2 The type of the elements of the vector to be received.
@@ -554,6 +558,8 @@ namespace Utilities
         // Pointer to the actual ConsensusAlgorithms::Interface implementation.
         std::shared_ptr<Interface<T1, T2>> consensus_algo;
       };
+
+
 
       /**
        * This class implements Utilities::MPI::ConsensusAlgorithms::Process,
