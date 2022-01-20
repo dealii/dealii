@@ -527,36 +527,36 @@ void Step3::assemble_system()
 
 // @sect4{Step3::solve}
 
-// The following function simply solves the discretized equation. As the
-// system is quite a large one for direct solvers such as Gauss elimination or
-// LU decomposition, we use a Conjugate Gradient algorithm. You should
-// remember that the number of variables here (only 1089) is a very small
-// number for finite element computations, where 100.000 is a more usual
-// number.  For this number of variables, direct methods are no longer usable
-// and you are forced to use methods like CG.
+// The following function solves the discretized equation. As discussed in
+// the introduction, we want to use an iterative solver to do this,
+// specifically the Conjugate Gradient (CG) method.
+//
+// The way to do this in deal.II is a three-step process:
+// - First, we need to have an object that knows how to tell the CG algorithm
+//   when to stop. This is done by using a SolverControl object, and as
+//   stopping criterion we say: stop after a maximum of 1000 iterations (which
+//   is far more than is needed for 1089 variables; see the results section to
+//   find out how many were really used), and stop if the norm of the residual
+//   is below $\tau=10^{-6}\|\mathbf b\|$ where $\mathbf b$ is the right hand
+//   side vector. In practice, this latter criterion will be the one
+//   which stops the iteration.
+// - Then we need the solver itself. The template parameter to the SolverCG
+//   class is the type of the vectors we are using.
+// - The last step is to actually solve the system of equations. The CG solver
+//   takes as arguments the components of the linear system $Ax=b$ (in the
+//   order in which they appear in this equation), and a preconditioner
+//   as the fourth argument. We don't feel ready to delve into preconditioners
+//   yet, so we tell it to use the identity operation as preconditioner. Later
+//   tutorial programs will spend significant amount of time and space on
+//   constructing better preconditioners.
+//
+// At the end of this process, the `solution` variable contains the
+// nodal values of the solution function.
 void Step3::solve()
 {
-  // First, we need to have an object that knows how to tell the CG algorithm
-  // when to stop. This is done by using a SolverControl object, and as
-  // stopping criterion we say: stop after a maximum of 1000 iterations (which
-  // is far more than is needed for 1089 variables; see the results section to
-  // find out how many were really used), and stop if the norm of the residual
-  // is below $10^{-12}$. In practice, the latter criterion will be the one
-  // which stops the iteration:
-  SolverControl solver_control(1000, 1e-12);
-  // Then we need the solver itself. The template parameter to the SolverCG
-  // class is the type of the vectors, and leaving the empty angle brackets
-  // would indicate that we are taking the default argument (which is
-  // <code>Vector@<double@></code>). However, we explicitly mention the template
-  // argument:
+  SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
   SolverCG<Vector<double>> solver(solver_control);
-
-  // Now solve the system of equations. The CG solver takes a preconditioner
-  // as its fourth argument. We don't feel ready to delve into this yet, so we
-  // tell it to use the identity operation as preconditioner:
   solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
-  // Now that the solver has done its job, the solution variable contains the
-  // nodal values of the solution function.
 }
 
 
