@@ -378,6 +378,8 @@ namespace SUNDIALS
     set_functions_to_trigger_an_assert();
   }
 
+
+
   template <typename VectorType>
   ARKode<VectorType>::~ARKode()
   {
@@ -390,11 +392,7 @@ namespace SUNDIALS
 
 #  ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
-      {
-        const int ierr = MPI_Comm_free(&communicator);
-        (void)ierr;
-        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
-      }
+      Utilities::MPI::free_communicator(communicator);
 #  endif
   }
 

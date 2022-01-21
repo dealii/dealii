@@ -213,11 +213,7 @@ namespace SUNDIALS
       IDAFree(&ida_mem);
 #  ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
-      {
-        const int ierr = MPI_Comm_free(&communicator);
-        (void)ierr;
-        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
-      }
+      Utilities::MPI::free_communicator(communicator);
 #  endif
   }
 

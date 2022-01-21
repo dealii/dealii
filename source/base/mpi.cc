@@ -246,10 +246,8 @@ namespace Utilities
             }
           if (*new_comm != comm_old)
             {
-              ierr = MPI_Comm_free(&ic);
-              AssertThrowMPI(ierr);
-              ierr = MPI_Comm_free(&comm_old);
-              AssertThrowMPI(ierr);
+              Utilities::MPI::free_communicator(ic);
+              Utilities::MPI::free_communicator(comm_old);
             }
         }
 
