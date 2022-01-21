@@ -32,6 +32,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations:
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class FEValuesBase;
 template <int dim, int spacedim>
@@ -47,6 +49,7 @@ namespace NonMatching
 }
 template <int dim, int spacedim>
 class FESystem;
+#endif
 
 /**
  * This is the base class for finite elements in arbitrary dimensions. It
