@@ -1,0 +1,5 @@
+Fixed: MappingQ::transform_points_real_to_unit_cell has been made more robust,
+correcting an unsuitable initial guess for the Newton iteration to compute the
+inverse transformation in the case of bilinear/trilinear cells.
+<br>
+(Bruno Blais, Martin Kronbichler, 2022/01/22)

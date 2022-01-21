@@ -1,7 +1,7 @@
 
 DEAL::Testing 2D with point -0.1498310826 0.7854420410
 DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
-DEAL::Exact inverse:                   1.679734433 2.008122269
+DEAL::Exact inverse:                   1.679734433 2.008122260
 DEAL::Affine approximation:            1.294871897 6.963559088
 DEAL::Inverse quadratic approximation: 1.644896745 2.003800318
 DEAL::
@@ -26,7 +26,7 @@ DEAL::Affine approximation:            -0.1371549678 3.966937436
 DEAL::Inverse quadratic approximation: -0.2909091648 1.929190316
 DEAL::
 DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
-DEAL::Exact inverse:                   -1.321431976 2.123538334
+DEAL::Exact inverse:                   -1.321431986 2.123538296
 DEAL::Affine approximation:            -0.2948718968 13.03644091
 DEAL::Inverse quadratic approximation: -0.9655241914 2.275064795
 DEAL::
@@ -68,7 +68,7 @@ DEAL::Affine approximation:            -0.1769771533 3.589871026
 DEAL::Inverse quadratic approximation: -0.3233858788 1.488970865
 DEAL::
 DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
-DEAL::Exact inverse:                   -1.321431983 1.631260238
+DEAL::Exact inverse:                   -1.321431986 1.631260249
 DEAL::Affine approximation:            -0.3445513904 13.22621847
 DEAL::Inverse quadratic approximation: -1.067765287 1.852528354
 DEAL::
@@ -78,7 +78,7 @@ DEAL::Affine approximation:            -0.2566215243 2.589871026
 DEAL::Inverse quadratic approximation: -0.3901601371 0.5348403961
 DEAL::
 DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
-DEAL::Exact inverse:                   -1.321431983 0.6312603084
+DEAL::Exact inverse:                   -1.321431983 0.6312603085
 DEAL::Affine approximation:            -0.4439103775 12.22621847
 DEAL::Inverse quadratic approximation: -1.324499457 0.9907864881
 DEAL::
@@ -115,7 +115,7 @@ DEAL::Affine approximation:            -0.3942308840 13.41599603
 DEAL::Inverse quadratic approximation: -1.171258833 1.403869886
 DEAL::
 DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
-DEAL::Exact inverse:                   -0.3199797942 0.004618771511
+DEAL::Exact inverse:                   -0.3199797942 0.004618771512
 DEAL::Affine approximation:            -0.3011286728 2.212804616
 DEAL::Inverse quadratic approximation: -0.4188102773 0.01487792182
 DEAL::
@@ -137,7 +137,7 @@ DEAL::Affine approximation:            0.6872888532 -0.7700353780
 DEAL::Inverse quadratic approximation: 0.6735562329 0.5114552797
 DEAL::
 DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
-DEAL::Exact inverse:                   1.679734434 -0.4903548181
+DEAL::Exact inverse:                   1.679734434 -0.4903548182
 DEAL::Affine approximation:            1.554958657 5.394226417
 DEAL::Inverse quadratic approximation: 1.973382985 -0.4493850397
 DEAL::
@@ -162,14 +162,14 @@ DEAL::Affine approximation:            -0.3456358213 1.835738205
 DEAL::Inverse quadratic approximation: -0.4448257264 -0.5335632508
 DEAL::
 DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
-DEAL::Exact inverse:                   -1.321431982 -0.3532973076
+DEAL::Exact inverse:                   -1.321431983 -0.3532973076
 DEAL::Affine approximation:            -0.5549586572 12.60577358
-DEAL::Inverse quadratic approximation: -1.570577755 -0.03655836469
+DEAL::Inverse quadratic approximation: -1.570577755 -0.03655836468
 DEAL::
 DEAL::
 DEAL::Testing 2D with point -0.1872888532 0.9818025513
 DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
-DEAL::Exact inverse:                   1.679734435 0.01015282302
+DEAL::Exact inverse:                   1.679734435 0.01015282301
 DEAL::Affine approximation:            1.493589871 6.204448860
 DEAL::Inverse quadratic approximation: 1.881022893 0.08910626957
 DEAL::
@@ -179,14 +179,14 @@ DEAL::Affine approximation:            0.6971461613 -1.336879345
 DEAL::Inverse quadratic approximation: 0.6752680942 0.001010067356
 DEAL::
 DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
-DEAL::Exact inverse:                   1.679734433 -0.9898471766
+DEAL::Exact inverse:                   1.679734433 -0.9898471760
 DEAL::Affine approximation:            1.610482797 5.204448860
 DEAL::Inverse quadratic approximation: 2.034386667 -1.028496543
 DEAL::
 DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
 DEAL::Exact inverse:                   0.6800000317 -0.9950656588
 DEAL::Affine approximation:            0.7203398273 -2.336879345
-DEAL::Inverse quadratic approximation: 0.6740153620 -1.104288093
+DEAL::Inverse quadratic approximation: 0.8115480065 1.507109783
 DEAL::
 DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
 DEAL::Exact inverse:                   -0.3199797942 0.005131968346
@@ -199,12 +199,12 @@ DEAL::Affine approximation:            -0.4935898711 13.79555114
 DEAL::Inverse quadratic approximation: -1.382003278 0.4281868663
 DEAL::
 DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
-DEAL::Exact inverse:                   -0.3199797940 -0.9948680322
+DEAL::Exact inverse:                   -0.3199797941 -0.9948680324
 DEAL::Affine approximation:            -0.3901429698 1.458671795
-DEAL::Inverse quadratic approximation: -0.4682064843 -1.110483122
+DEAL::Inverse quadratic approximation: -0.4269023613 -0.4705876412
 DEAL::
 DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
-DEAL::Exact inverse:                   -1.321431978 -0.8455762513
+DEAL::Exact inverse:                   -1.321431974 -0.8455762606
 DEAL::Affine approximation:            -0.6104827971 12.79555114
 DEAL::Inverse quadratic approximation: -1.696098323 -0.5939421483
 DEAL::
@@ -295,7 +295,7 @@ DEAL::
 DEAL::
 DEAL::Testing 3D with point 0.05085652866 0.06999800658 0.8623369432
 DEAL::Testing on cell 0_0: with center -9.723960037e-18 -9.723960037e-18 -0.9000000000
-DEAL::Exact inverse:                   0.4633821073 0.4496318287 9.333474387
+DEAL::Exact inverse:                   0.4633821073 0.4496318287 9.333474388
 DEAL::Affine approximation:            0.5489367175 0.5673556132 12.46805699
 DEAL::Inverse quadratic approximation: 0.6217110739 0.6675209216 0.8911022773
 DEAL::
@@ -331,7 +331,7 @@ DEAL::
 DEAL::
 DEAL::Testing 3D with point 0.05672458966 0.07807469965 0.9618373598
 DEAL::Testing on cell 0_0: with center -9.723960037e-18 -9.723960037e-18 -0.9000000000
-DEAL::Exact inverse:                   0.4633821073 0.4496318287 9.833490663
+DEAL::Exact inverse:                   0.4633821073 0.4496318287 9.833490662
 DEAL::Affine approximation:            0.5545832618 0.5751274148 13.32975588
 DEAL::Inverse quadratic approximation: 0.6416309076 0.6949382206 0.4108019385
 DEAL::
