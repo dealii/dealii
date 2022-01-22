@@ -60,7 +60,8 @@ namespace NonMatching
      * Constructor. Gets cell-independent data from mapping and finite element
      * objects, matching the quadrature rule and update flags.
      *
-     * @note Currently this class is only implemented for MappingCartesian.
+     * @note Currently this class is only implemented for MappingCartesian and
+     * MappingQ.
      */
     FEImmersedSurfaceValues(const Mapping<dim> &                  mapping,
                             const FiniteElement<dim> &            element,
