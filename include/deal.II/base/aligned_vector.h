@@ -1141,8 +1141,7 @@ AlignedVector<T>::Deleter::MPISharedMemDeleterAction::delete_array(
   ierr = MPI_Win_free(&shmem_window);
   AssertThrowMPI(ierr);
 
-  ierr = MPI_Comm_free(&shmem_group_communicator);
-  AssertThrowMPI(ierr);
+  Utilities::MPI::free_communicator(shmem_group_communicator);
 }
 
 #  endif
@@ -1558,8 +1557,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
              ExcInternalError());
 
     // And get rid of the temporary communicator
-    ierr = MPI_Comm_free(&shmem_group_communicator_temp);
-    AssertThrowMPI(ierr);
+    Utilities::MPI::free_communicator(shmem_group_communicator_temp);
   }
   const bool is_shmem_root =
     Utilities::MPI::this_mpi_process(shmem_group_communicator) == 0;
@@ -1665,10 +1663,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
     }
 
   // We no longer need the shmem roots communicator, so get rid of it
-  {
-    const int ierr = MPI_Comm_free(&shmem_roots_communicator);
-    AssertThrowMPI(ierr);
-  }
+  Utilities::MPI::free_communicator(shmem_group_communicator);
 
 
   // **** Step 3 ****

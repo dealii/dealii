@@ -484,7 +484,7 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
   MPI_Group_free(&group_A);
   MPI_Group_free(&group_B);
   if (MPI_COMM_NULL != communicator_B)
-    MPI_Comm_free(&communicator_B);
+    Utilities::MPI::free_communicator(communicator_B);
 
   state = LAPACKSupport::matrix;
 }
@@ -654,7 +654,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
   MPI_Group_free(&group_A);
   MPI_Group_free(&group_B);
   if (MPI_COMM_NULL != communicator_B)
-    MPI_Comm_free(&communicator_B);
+    Utilities::MPI::free_communicator(communicator_B);
 }
 
 
@@ -954,10 +954,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
       Cblacs_gridexit(union_blacs_context);
 
       if (mpi_communicator_union != MPI_COMM_NULL)
-        {
-          ierr = MPI_Comm_free(&mpi_communicator_union);
-          AssertThrowMPI(ierr);
-        }
+        Utilities::MPI::free_communicator(mpi_communicator_union);
       ierr = MPI_Group_free(&group_source);
       AssertThrowMPI(ierr);
       ierr = MPI_Group_free(&group_dest);

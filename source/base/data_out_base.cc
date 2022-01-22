@@ -7841,8 +7841,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
       int ierr = MPI_Comm_split(mpi_communicator, color, rank, &comm_group);
       AssertThrowMPI(ierr);
       this->write_vtu_in_parallel(filename.c_str(), comm_group);
-      ierr = MPI_Comm_free(&comm_group);
-      AssertThrowMPI(ierr);
+      Utilities::MPI::free_communicator(comm_group);
 #else
       AssertThrow(false, ExcMessage("Logical error. Should not arrive here."));
 #endif

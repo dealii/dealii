@@ -235,7 +235,7 @@ namespace Utilities
         Cblacs_gridexit(blacs_context);
 
       if (mpi_communicator_inactive_with_root != MPI_COMM_NULL)
-        MPI_Comm_free(&mpi_communicator_inactive_with_root);
+        Utilities::MPI::free_communicator(mpi_communicator_inactive_with_root);
     }
 
 
