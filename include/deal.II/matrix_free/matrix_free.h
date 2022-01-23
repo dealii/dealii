@@ -1705,7 +1705,8 @@ public:
    * In order to apply different operators to different parts of the boundary,
    * this method can be used to query the boundary id of a given face in the
    * faces' own sorting by lanes in a VectorizedArray. Only valid for an index
-   * indicating a boundary face.
+   * indicating a boundary face. In all other cases,
+   * numbers::invalid_unsigned_int is returned.
    */
   types::boundary_id
   get_boundary_id(const unsigned int macro_face) const;
@@ -2359,11 +2360,7 @@ inline types::boundary_id
 MatrixFree<dim, Number, VectorizedArrayType>::get_boundary_id(
   const unsigned int macro_face) const
 {
-  Assert(macro_face >= task_info.boundary_partition_data[0] &&
-           macro_face < task_info.boundary_partition_data.back(),
-         ExcIndexRange(macro_face,
-                       task_info.boundary_partition_data[0],
-                       task_info.boundary_partition_data.back()));
+  AssertIndexRange(macro_face, face_info.faces.size());
   return types::boundary_id(face_info.faces[macro_face].exterior_face_no);
 }
 
