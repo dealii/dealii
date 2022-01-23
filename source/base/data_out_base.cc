@@ -6189,6 +6189,7 @@ namespace DataOutBase
           } // loop over nodes
 
         vtu_out << data;
+        out << "\n";
         out << "    </DataArray>\n";
 
       } // loop over ranges
@@ -6211,6 +6212,7 @@ namespace DataOutBase
           std::vector<float> data(data_vectors[data_set].begin(),
                                   data_vectors[data_set].end());
           vtu_out << data;
+          out << "\n";
           out << "    </DataArray>\n";
         }
 
