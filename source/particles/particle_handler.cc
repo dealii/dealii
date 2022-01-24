@@ -1250,18 +1250,11 @@ namespace Particles
                                                     reference_locations);
 
         auto particle = pic.begin();
-        for (unsigned int p = 0; p < reference_locations.size(); ++p)
+        for (const auto &p_unit : reference_locations)
           {
-            auto &p_unit = reference_locations[p];
             if (p_unit[0] == std::numeric_limits<double>::infinity() ||
-                !GeometryInfo<dim>::is_inside_unit_cell(reference_locations[p]))
-              {
-                // Try to find the reference location again for this particle
-                p_unit =
-                  mapping->transform_real_to_unit_cell(cell, real_locations[p]);
-                if (!GeometryInfo<dim>::is_inside_unit_cell(p_unit))
-                  particles_out_of_cell.push_back(particle);
-              }
+                !GeometryInfo<dim>::is_inside_unit_cell(p_unit))
+              particles_out_of_cell.push_back(particle);
             else
               particle->set_reference_location(p_unit);
 
