@@ -786,13 +786,13 @@ namespace MeshWorker
                                             const BlockInfo *block_info)
   {
     initialize_update_flags();
-    initialize_gauss_quadrature((contains_bits(cell_flags, update_values)) ?
+    initialize_gauss_quadrature((cell_flags.contains(update_values)) ?
                                   (el.tensor_degree() + 1) :
                                   el.tensor_degree(),
-                                (contains_bits(boundary_flags, update_values)) ?
+                                (boundary_flags.contains(update_values)) ?
                                   (el.tensor_degree() + 1) :
                                   el.tensor_degree(),
-                                (contains_bits(face_flags, update_values)) ?
+                                (face_flags.contains(update_values)) ?
                                   (el.tensor_degree() + 1) :
                                   el.tensor_degree(),
                                 false);

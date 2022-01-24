@@ -345,7 +345,7 @@ namespace MeshWorker
   )
   {
     Assert(
-      (!cell_worker) == !contains_bits(flags, work_on_cells),
+      (!cell_worker) == !flags.contains(work_on_cells),
       ExcMessage(
         "If you provide a cell worker function, you also need to request "
         "that work should be done on cells by setting the 'work_on_cells' flag. "
@@ -353,9 +353,9 @@ namespace MeshWorker
         "cannot set the 'work_on_cells' flag. One of these two "
         "conditions is not satisfied."));
 
-    Assert((!face_worker) == !contains_bits(flags,
-                                            (assemble_own_interior_faces_once |
-                                             assemble_own_interior_faces_both)),
+    Assert((!face_worker) ==
+             !flags.contains((assemble_own_interior_faces_once |
+                              assemble_own_interior_faces_both)),
            ExcMessage(
              "If you provide a face worker function, you also need to request "
              "that work should be done on interior faces by setting either the "
@@ -380,13 +380,13 @@ namespace MeshWorker
              "OR 'assemble_ghost_faces_both', but not both of these flags."));
 
     Assert(
-      !contains_bits(flags, cells_after_faces) ||
-        contains_bits(flags, (assemble_own_cells | assemble_ghost_cells)),
+      !flags.contains(cells_after_faces) ||
+        flags.contains((assemble_own_cells | assemble_ghost_cells)),
       ExcMessage(
         "The option 'cells_after_faces' only makes sense if you assemble on cells."));
 
     Assert(
-      (!face_worker) == !contains_bits(flags, work_on_faces),
+      (!face_worker) == !flags.contains(work_on_faces),
       ExcMessage(
         "If you provide a face worker function, you also need to request "
         "that work should be done on faces by setting the 'work_on_faces' flag. "
@@ -395,7 +395,7 @@ namespace MeshWorker
         "conditions is not satisfied."));
 
     Assert(
-      (!boundary_worker) == !contains_bits(flags, assemble_boundary_faces),
+      (!boundary_worker) == !flags.contains(assemble_boundary_faces),
       ExcMessage(
         "If you provide a boundary face worker function, you also need to request "
         "that work should be done on boundary faces by setting the 'assemble_boundary_faces' flag. "
@@ -430,19 +430,19 @@ namespace MeshWorker
           (current_subdomain_id == numbers::artificial_subdomain_id))
         return;
 
-      if (!contains_bits(flags, (cells_after_faces)) &&
-          ((contains_bits(flags, (assemble_own_cells)) && own_cell) ||
-           (contains_bits(flags, assemble_ghost_cells) && !own_cell)))
+      if (!flags.contains((cells_after_faces)) &&
+          ((flags.contains((assemble_own_cells)) && own_cell) ||
+           (flags.contains(assemble_ghost_cells) && !own_cell)))
         cell_worker(cell, scratch, copy);
 
-      if (contains_bits(flags, (work_on_faces | work_on_boundary)))
+      if (flags.contains((work_on_faces | work_on_boundary)))
         for (const unsigned int face_no : cell->face_indices())
           {
             if (cell->at_boundary(face_no) &&
                 !cell->has_periodic_neighbor(face_no))
               {
                 // only integrate boundary faces of own cells
-                if (contains_bits(flags, assemble_boundary_faces) && own_cell)
+                if (flags.contains(assemble_boundary_faces) && own_cell)
                   boundary_worker(cell, face_no, scratch, copy);
               }
             else
@@ -470,16 +470,14 @@ namespace MeshWorker
 
                 // skip if the user doesn't want faces between own cells
                 if (own_cell && own_neighbor &&
-                    !contains_bits(flags,
-                                   (assemble_own_interior_faces_both |
-                                    assemble_own_interior_faces_once)))
+                    !flags.contains((assemble_own_interior_faces_both |
+                                     assemble_own_interior_faces_once)))
                   continue;
 
                 // skip face to ghost
                 if (own_cell != own_neighbor &&
-                    !contains_bits(flags,
-                                   (assemble_ghost_faces_both |
-                                    assemble_ghost_faces_once)))
+                    !flags.contains(
+                      (assemble_ghost_faces_both | assemble_ghost_faces_once)))
                   continue;
 
                 // Deal with refinement edges from the refined side. Assuming
@@ -499,8 +497,7 @@ namespace MeshWorker
 
                     // skip if only one processor needs to assemble the face
                     // to a ghost cell and the fine cell is not ours.
-                    if (!own_cell &&
-                        contains_bits(flags, assemble_ghost_faces_once))
+                    if (!own_cell && flags.contains(assemble_ghost_faces_once))
                       continue;
 
                     const std::pair<unsigned int, unsigned int>
@@ -519,7 +516,7 @@ namespace MeshWorker
                                 scratch,
                                 copy);
 
-                    if (contains_bits(flags, assemble_own_interior_faces_both))
+                    if (flags.contains(assemble_own_interior_faces_both))
                       {
                         // If own faces are to be assembled from both sides,
                         // call the faceworker again with swapped arguments.
@@ -556,7 +553,7 @@ namespace MeshWorker
                                 scratch,
                                 copy);
 
-                    if (contains_bits(flags, assemble_own_interior_faces_both))
+                    if (flags.contains(assemble_own_interior_faces_both))
                       {
                         // If own faces are to be assembled from both sides,
                         // call the faceworker again with swapped arguments.
@@ -587,8 +584,7 @@ namespace MeshWorker
                     // AssembleFlags says otherwise). Here, we rely on cell
                     // comparison that will look at cell->index().
                     if (own_cell && own_neighbor &&
-                        contains_bits(flags,
-                                      assemble_own_interior_faces_once) &&
+                        flags.contains(assemble_own_interior_faces_once) &&
                         (neighbor < cell))
                       continue;
 
@@ -601,7 +597,7 @@ namespace MeshWorker
                     // the processor with the smaller (level-)subdomain id
                     // assemble the face.
                     if (own_cell && !own_neighbor &&
-                        contains_bits(flags, assemble_ghost_faces_once) &&
+                        flags.contains(assemble_ghost_faces_once) &&
                         (neighbor_subdomain_id < current_subdomain_id))
                       continue;
 
@@ -627,9 +623,9 @@ namespace MeshWorker
           } // faces
 
       // Execute the cell_worker if faces are handled before cells
-      if (contains_bits(flags, cells_after_faces) &&
-          ((contains_bits(flags, assemble_own_cells) && own_cell) ||
-           (contains_bits(flags, assemble_ghost_cells) && !own_cell)))
+      if (flags.contains(cells_after_faces) &&
+          ((flags.contains(assemble_own_cells) && own_cell) ||
+           (flags.contains(assemble_ghost_cells) && !own_cell)))
         cell_worker(cell, scratch, copy);
     };
 

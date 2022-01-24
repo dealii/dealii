@@ -193,19 +193,19 @@ FE_Poly<dim, spacedim>::requires_update_flags(const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
-  if (contains_bits(flags, update_values))
+  if (flags.contains(update_values))
     out |= update_values;
-  if (contains_bits(flags, update_gradients))
+  if (flags.contains(update_gradients))
     out |= update_gradients | update_covariant_transformation;
-  if (contains_bits(flags, update_hessians))
+  if (flags.contains(update_hessians))
     out |= update_hessians | update_covariant_transformation |
            update_gradients | update_jacobian_pushed_forward_grads;
-  if (contains_bits(flags, update_3rd_derivatives))
+  if (flags.contains(update_3rd_derivatives))
     out |= update_3rd_derivatives | update_covariant_transformation |
            update_hessians | update_gradients |
            update_jacobian_pushed_forward_grads |
            update_jacobian_pushed_forward_2nd_derivatives;
-  if (contains_bits(flags, update_normal_vectors))
+  if (flags.contains(update_normal_vectors))
     out |= update_normal_vectors | update_JxW_values;
 
   return out;
@@ -239,7 +239,7 @@ higher_derivatives_need_correcting(
 {
   // If higher derivatives weren't requested we don't need to correct them.
   const bool update_higher_derivatives =
-    contains_bits(update_flags, update_hessians | update_3rd_derivatives);
+    update_flags.contains(update_hessians | update_3rd_derivatives);
   if (!update_higher_derivatives)
     return false;
 
@@ -293,7 +293,7 @@ FE_Poly<dim, spacedim>::fill_fe_values(
   // transform gradients and higher derivatives. there is nothing to do
   // for values since we already emplaced them into output_data when
   // we were in get_data()
-  if (contains_bits(flags, update_gradients) &&
+  if (flags.contains(update_gradients) &&
       (cell_similarity != CellSimilarity::translation))
     for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
       mapping.transform(make_array_view(fe_data.shape_gradients, k),
@@ -301,7 +301,7 @@ FE_Poly<dim, spacedim>::fill_fe_values(
                         mapping_internal,
                         make_array_view(output_data.shape_gradients, k));
 
-  if (contains_bits(flags, update_hessians) &&
+  if (flags.contains(update_hessians) &&
       (cell_similarity != CellSimilarity::translation))
     {
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
@@ -314,7 +314,7 @@ FE_Poly<dim, spacedim>::fill_fe_values(
         correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
-  if (contains_bits(flags, update_3rd_derivatives) &&
+  if (flags.contains(update_3rd_derivatives) &&
       (cell_similarity != CellSimilarity::translation))
     {
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
@@ -381,12 +381,12 @@ FE_Poly<dim, spacedim>::fill_fe_face_values(
   // transform gradients and higher derivatives. we also have to copy
   // the values (unlike in the case of fill_fe_values()) since
   // we need to take into account the offsets
-  if (contains_bits(flags, update_values))
+  if (flags.contains(update_values))
     for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
       for (unsigned int i = 0; i < n_q_points; ++i)
         output_data.shape_values(k, i) = fe_data.shape_values[k][i + offset];
 
-  if (contains_bits(flags, update_gradients))
+  if (flags.contains(update_gradients))
     for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
       mapping.transform(
         make_array_view(fe_data.shape_gradients, k, offset, n_q_points),
@@ -394,7 +394,7 @@ FE_Poly<dim, spacedim>::fill_fe_face_values(
         mapping_internal,
         make_array_view(output_data.shape_gradients, k));
 
-  if (contains_bits(flags, update_hessians))
+  if (flags.contains(update_hessians))
     {
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(
@@ -407,7 +407,7 @@ FE_Poly<dim, spacedim>::fill_fe_face_values(
         correct_hessians(output_data, mapping_data, n_q_points);
     }
 
-  if (contains_bits(flags, update_3rd_derivatives))
+  if (flags.contains(update_3rd_derivatives))
     {
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(
@@ -473,12 +473,12 @@ FE_Poly<dim, spacedim>::fill_fe_subface_values(
   // transform gradients and higher derivatives. we also have to copy
   // the values (unlike in the case of fill_fe_values()) since
   // we need to take into account the offsets
-  if (contains_bits(flags, update_values))
+  if (flags.contains(update_values))
     for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
       for (unsigned int i = 0; i < quadrature.size(); ++i)
         output_data.shape_values(k, i) = fe_data.shape_values[k][i + offset];
 
-  if (contains_bits(flags, update_gradients))
+  if (flags.contains(update_gradients))
     for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
       mapping.transform(
         make_array_view(fe_data.shape_gradients, k, offset, quadrature.size()),
@@ -486,7 +486,7 @@ FE_Poly<dim, spacedim>::fill_fe_subface_values(
         mapping_internal,
         make_array_view(output_data.shape_gradients, k));
 
-  if (contains_bits(flags, update_hessians))
+  if (flags.contains(update_hessians))
     {
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(
@@ -499,7 +499,7 @@ FE_Poly<dim, spacedim>::fill_fe_subface_values(
         correct_hessians(output_data, mapping_data, quadrature.size());
     }
 
-  if (contains_bits(flags, update_3rd_derivatives))
+  if (flags.contains(update_3rd_derivatives))
     {
       for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         mapping.transform(make_array_view(fe_data.shape_3rd_derivatives,

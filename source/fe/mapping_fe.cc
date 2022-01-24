@@ -91,45 +91,43 @@ MappingFE<dim, spacedim>::InternalData::initialize(
 
   const unsigned int n_q_points = q.size();
 
-  if (contains_bits(this->update_each, update_covariant_transformation))
+  if (this->update_each.contains(update_covariant_transformation))
     covariant.resize(n_original_q_points);
 
-  if (contains_bits(this->update_each, update_contravariant_transformation))
+  if (this->update_each.contains(update_contravariant_transformation))
     contravariant.resize(n_original_q_points);
 
-  if (contains_bits(this->update_each, update_volume_elements))
+  if (this->update_each.contains(update_volume_elements))
     volume_elements.resize(n_original_q_points);
 
   // see if we need the (transformation) shape function values
   // and/or gradients and resize the necessary arrays
-  if (contains_bits(this->update_each, update_quadrature_points))
+  if (this->update_each.contains(update_quadrature_points))
     shape_values.resize(n_shape_functions * n_q_points);
 
-  if (contains_bits(
-        this->update_each,
-        (update_covariant_transformation | update_contravariant_transformation |
+  if (this->update_each.contains(
+        update_covariant_transformation | update_contravariant_transformation |
          update_JxW_values | update_boundary_forms | update_normal_vectors |
          update_jacobians | update_jacobian_grads | update_inverse_jacobians |
          update_jacobian_pushed_forward_grads |
          update_jacobian_2nd_derivatives |
          update_jacobian_pushed_forward_2nd_derivatives |
          update_jacobian_3rd_derivatives |
-         update_jacobian_pushed_forward_3rd_derivatives)))
+         update_jacobian_pushed_forward_3rd_derivatives))
     shape_derivatives.resize(n_shape_functions * n_q_points);
 
-  if (contains_bits(this->update_each,
-                    (update_jacobian_grads |
-                     update_jacobian_pushed_forward_grads)))
+  if (this->update_each.contains(
+        (update_jacobian_grads | update_jacobian_pushed_forward_grads)))
     shape_second_derivatives.resize(n_shape_functions * n_q_points);
 
-  if (contains_bits(this->update_each,
-                    (update_jacobian_2nd_derivatives |
-                     update_jacobian_pushed_forward_2nd_derivatives)))
+  if (this->update_each.contains(
+        (update_jacobian_2nd_derivatives |
+         update_jacobian_pushed_forward_2nd_derivatives)))
     shape_third_derivatives.resize(n_shape_functions * n_q_points);
 
-  if (contains_bits(this->update_each,
-                    (update_jacobian_3rd_derivatives |
-                     update_jacobian_pushed_forward_3rd_derivatives)))
+  if (this->update_each.contains(
+        (update_jacobian_3rd_derivatives |
+         update_jacobian_pushed_forward_3rd_derivatives)))
     shape_fourth_derivatives.resize(n_shape_functions * n_q_points);
 
   // now also fill the various fields with their correct values
@@ -150,10 +148,9 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
 {
   initialize(update_flags, q, n_original_q_points);
 
-  if (contains_bits(this->update_each,
-                    (update_boundary_forms | update_normal_vectors |
-                     update_jacobians | update_JxW_values |
-                     update_inverse_jacobians)))
+  if (this->update_each.contains(
+        (update_boundary_forms | update_normal_vectors | update_jacobians |
+         update_JxW_values | update_inverse_jacobians)))
     {
       aux.resize(dim - 1,
                  std::vector<Tensor<1, spacedim>>(n_original_q_points));
@@ -290,7 +287,7 @@ namespace internal
       {
         const UpdateFlags update_flags = data.update_each;
 
-        if (contains_bits(update_flags, update_quadrature_points))
+        if (update_flags.contains(update_quadrature_points))
           for (unsigned int point = 0; point < n_q_points; ++point)
             {
               const double *  shape = &data.shape(point + data_set, 0);
@@ -323,7 +320,7 @@ namespace internal
       {
         const UpdateFlags update_flags = data.update_each;
 
-        if (contains_bits(update_flags, update_contravariant_transformation))
+        if (update_flags.contains(update_contravariant_transformation))
           // if the current cell is just a
           // translation of the previous one, no
           // need to recompute jacobians...
@@ -363,7 +360,7 @@ namespace internal
                 }
             }
 
-        if (contains_bits(update_flags, update_covariant_transformation))
+        if (update_flags.contains(update_covariant_transformation))
           if (cell_similarity != CellSimilarity::translation)
             {
               for (unsigned int point = 0; point < n_q_points; ++point)
@@ -373,7 +370,7 @@ namespace internal
                 }
             }
 
-        if (contains_bits(update_flags, update_volume_elements))
+        if (update_flags.contains(update_volume_elements))
           if (cell_similarity != CellSimilarity::translation)
             {
               for (unsigned int point = 0; point < n_q_points; ++point)
@@ -398,7 +395,7 @@ namespace internal
         const unsigned int                             n_q_points)
       {
         const UpdateFlags update_flags = data.update_each;
-        if (contains_bits(update_flags, update_jacobian_grads))
+        if (update_flags.contains(update_jacobian_grads))
           {
             AssertIndexRange(n_q_points, jacobian_grads.size() + 1);
 
@@ -445,7 +442,7 @@ namespace internal
         const unsigned int                n_q_points)
       {
         const UpdateFlags update_flags = data.update_each;
-        if (contains_bits(update_flags, update_jacobian_pushed_forward_grads))
+        if (update_flags.contains(update_jacobian_pushed_forward_grads))
           {
             AssertIndexRange(n_q_points,
                              jacobian_pushed_forward_grads.size() + 1);
@@ -519,7 +516,7 @@ namespace internal
         const unsigned int                             n_q_points)
       {
         const UpdateFlags update_flags = data.update_each;
-        if (contains_bits(update_flags, update_jacobian_2nd_derivatives))
+        if (update_flags.contains(update_jacobian_2nd_derivatives))
           {
             AssertIndexRange(n_q_points, jacobian_2nd_derivatives.size() + 1);
 
@@ -575,8 +572,8 @@ namespace internal
         const unsigned int n_q_points)
       {
         const UpdateFlags update_flags = data.update_each;
-        if (contains_bits(update_flags,
-                          update_jacobian_pushed_forward_2nd_derivatives))
+        if (update_flags.contains(
+              update_jacobian_pushed_forward_2nd_derivatives))
           {
             AssertIndexRange(n_q_points,
                              jacobian_pushed_forward_2nd_derivatives.size() +
@@ -679,7 +676,7 @@ namespace internal
         const unsigned int                             n_q_points)
       {
         const UpdateFlags update_flags = data.update_each;
-        if (contains_bits(update_flags, update_jacobian_3rd_derivatives))
+        if (update_flags.contains(update_jacobian_3rd_derivatives))
           {
             AssertIndexRange(n_q_points, jacobian_3rd_derivatives.size() + 1);
 
@@ -738,8 +735,8 @@ namespace internal
         const unsigned int n_q_points)
       {
         const UpdateFlags update_flags = data.update_each;
-        if (contains_bits(update_flags,
-                          update_jacobian_pushed_forward_3rd_derivatives))
+        if (update_flags.contains(
+              update_jacobian_pushed_forward_3rd_derivatives))
           {
             AssertIndexRange(n_q_points,
                              jacobian_pushed_forward_3rd_derivatives.size() +
@@ -1030,20 +1027,18 @@ MappingFE<dim, spacedim>::requires_update_flags(const UpdateFlags in) const
       // update_boundary_forms is simply
       // ignored for the interior of a
       // cell.
-      if (contains_bits(out, (update_JxW_values | update_normal_vectors)))
+      if (out.contains((update_JxW_values | update_normal_vectors)))
         out |= update_boundary_forms;
 
-      if (contains_bits(out,
-                        (update_covariant_transformation | update_JxW_values |
-                         update_jacobians | update_jacobian_grads |
-                         update_boundary_forms | update_normal_vectors)))
+      if (out.contains((update_covariant_transformation | update_JxW_values |
+                        update_jacobians | update_jacobian_grads |
+                        update_boundary_forms | update_normal_vectors)))
         out |= update_contravariant_transformation;
 
-      if (contains_bits(out,
-                        (update_inverse_jacobians |
-                         update_jacobian_pushed_forward_grads |
-                         update_jacobian_pushed_forward_2nd_derivatives |
-                         update_jacobian_pushed_forward_3rd_derivatives)))
+      if (out.contains((update_inverse_jacobians |
+                        update_jacobian_pushed_forward_grads |
+                        update_jacobian_pushed_forward_2nd_derivatives |
+                        update_jacobian_pushed_forward_3rd_derivatives)))
         out |= update_covariant_transformation;
 
       // The contravariant transformation is used in the Piola
@@ -1052,12 +1047,12 @@ MappingFE<dim, spacedim>::requires_update_flags(const UpdateFlags in) const
       // knowing here whether the finite element wants to use the
       // contravariant or the Piola transforms, we add the JxW values
       // to the list of flags to be updated for each cell.
-      if (contains_bits(out, update_contravariant_transformation))
+      if (out.contains(update_contravariant_transformation))
         out |= update_volume_elements;
 
       // the same is true when computing normal vectors: they require
       // the determinant of the Jacobian
-      if (contains_bits(out, update_normal_vectors))
+      if (out.contains(update_normal_vectors))
         out |= update_volume_elements;
     }
 
@@ -1221,11 +1216,11 @@ MappingFE<dim, spacedim>::fill_fe_values(
   // Multiply quadrature weights by absolute value of Jacobian determinants or
   // the area element g=sqrt(DX^t DX) in case of codim > 0
 
-  if (contains_bits(update_flags, (update_normal_vectors | update_JxW_values)))
+  if (update_flags.contains((update_normal_vectors | update_JxW_values)))
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(!(contains_bits(update_flags, update_normal_vectors)) ||
+      Assert(!(update_flags.contains(update_normal_vectors)) ||
                (output_data.normal_vectors.size() == n_q_points),
              ExcDimensionMismatch(output_data.normal_vectors.size(),
                                   n_q_points));
@@ -1273,12 +1268,12 @@ MappingFE<dim, spacedim>::fill_fe_values(
                     CellSimilarity::inverted_translation)
                   {
                     // we only need to flip the normal
-                    if (contains_bits(update_flags, update_normal_vectors))
+                    if (update_flags.contains(update_normal_vectors))
                       output_data.normal_vectors[point] *= -1.;
                   }
                 else
                   {
-                    if (contains_bits(update_flags, update_normal_vectors))
+                    if (update_flags.contains(update_normal_vectors))
                       {
                         Assert(spacedim == dim + 1,
                                ExcMessage(
@@ -1311,7 +1306,7 @@ MappingFE<dim, spacedim>::fill_fe_values(
 
 
   // copy values from InternalData to vector given by reference
-  if (contains_bits(update_flags, update_jacobians))
+  if (update_flags.contains(update_jacobians))
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
       if (computed_cell_similarity != CellSimilarity::translation)
@@ -1320,7 +1315,7 @@ MappingFE<dim, spacedim>::fill_fe_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if (contains_bits(update_flags, update_inverse_jacobians))
+  if (update_flags.contains(update_inverse_jacobians))
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       if (computed_cell_similarity != CellSimilarity::translation)
@@ -1366,18 +1361,17 @@ namespace internal
       {
         const UpdateFlags update_flags = data.update_each;
 
-        if (contains_bits(update_flags,
-                          (update_boundary_forms | update_normal_vectors |
-                           update_jacobians | update_JxW_values |
-                           update_inverse_jacobians)))
+        if (update_flags.contains((
+              update_boundary_forms | update_normal_vectors | update_jacobians |
+              update_JxW_values | update_inverse_jacobians)))
           {
-            if (contains_bits(update_flags, update_boundary_forms))
+            if (update_flags.contains(update_boundary_forms))
               AssertIndexRange(n_q_points,
                                output_data.boundary_forms.size() + 1);
-            if (contains_bits(update_flags, update_normal_vectors))
+            if (update_flags.contains(update_normal_vectors))
               AssertIndexRange(n_q_points,
                                output_data.normal_vectors.size() + 1);
-            if (contains_bits(update_flags, update_JxW_values))
+            if (update_flags.contains(update_JxW_values))
               AssertIndexRange(n_q_points, output_data.JxW_values.size() + 1);
 
             Assert(data.aux.size() + 1 >= dim, ExcInternalError());
@@ -1406,7 +1400,7 @@ namespace internal
                   make_array_view(data.aux[d]));
               }
 
-            if (contains_bits(update_flags, update_boundary_forms))
+            if (update_flags.contains(update_boundary_forms))
               {
                 // if dim==spacedim, we can use the unit tangentials to
                 // compute the boundary form by simply taking the cross
@@ -1477,7 +1471,7 @@ namespace internal
                   }
               }
 
-            if (contains_bits(update_flags, update_JxW_values))
+            if (update_flags.contains(update_JxW_values))
               for (unsigned int i = 0; i < n_q_points; ++i)
                 {
                   output_data.JxW_values[i] =
@@ -1497,17 +1491,17 @@ namespace internal
                     }
                 }
 
-            if (contains_bits(update_flags, update_normal_vectors))
+            if (update_flags.contains(update_normal_vectors))
               for (unsigned int i = 0; i < n_q_points; ++i)
                 output_data.normal_vectors[i] =
                   Point<spacedim>(output_data.boundary_forms[i] /
                                   output_data.boundary_forms[i].norm());
 
-            if (contains_bits(update_flags, update_jacobians))
+            if (update_flags.contains(update_jacobians))
               for (unsigned int point = 0; point < n_q_points; ++point)
                 output_data.jacobians[point] = data.contravariant[point];
 
-            if (contains_bits(update_flags, update_inverse_jacobians))
+            if (update_flags.contains(update_inverse_jacobians))
               for (unsigned int point = 0; point < n_q_points; ++point)
                 output_data.inverse_jacobians[point] =
                   data.covariant[point].transpose();
@@ -1727,8 +1721,8 @@ namespace internal
             case mapping_contravariant:
               {
                 Assert(
-                  contains_bits(data.update_each,
-                                update_contravariant_transformation),
+                  data.update_each.contains(
+                    update_contravariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
 
@@ -1742,12 +1736,12 @@ namespace internal
             case mapping_piola:
               {
                 Assert(
-                  contains_bits(data.update_each,
-                                update_contravariant_transformation),
+                  data.update_each.contains(
+                    update_contravariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
                 Assert(
-                  contains_bits(data.update_each, update_volume_elements),
+                  data.update_each.contains(update_volume_elements),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
                 Assert(rank == 1, ExcMessage("Only for rank 1"));
@@ -1768,8 +1762,8 @@ namespace internal
             case mapping_covariant:
               {
                 Assert(
-                  contains_bits(data.update_each,
-                                update_contravariant_transformation),
+                  data.update_each.contains(
+                    update_contravariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
 
@@ -1809,13 +1803,12 @@ namespace internal
             case mapping_contravariant_gradient:
               {
                 Assert(
-                  contains_bits(data.update_each,
-                                update_covariant_transformation),
+                  data.update_each.contains(update_covariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
                 Assert(
-                  contains_bits(data.update_each,
-                                update_contravariant_transformation),
+                  data.update_each.contains(
+                    update_contravariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
                 Assert(rank == 2, ExcMessage("Only for rank 2"));
@@ -1835,8 +1828,7 @@ namespace internal
             case mapping_covariant_gradient:
               {
                 Assert(
-                  contains_bits(data.update_each,
-                                update_covariant_transformation),
+                  data.update_each.contains(update_covariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
                 Assert(rank == 2, ExcMessage("Only for rank 2"));
@@ -1856,17 +1848,16 @@ namespace internal
             case mapping_piola_gradient:
               {
                 Assert(
-                  contains_bits(data.update_each,
-                                update_covariant_transformation),
+                  data.update_each.contains(update_covariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
                 Assert(
-                  contains_bits(data.update_each,
-                                update_contravariant_transformation),
+                  data.update_each.contains(
+                    update_contravariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
                 Assert(
-                  contains_bits(data.update_each, update_volume_elements),
+                  data.update_each.contains(update_volume_elements),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
                 Assert(rank == 2, ExcMessage("Only for rank 2"));
@@ -1917,13 +1908,12 @@ namespace internal
             case mapping_contravariant_hessian:
               {
                 Assert(
-                  contains_bits(data.update_each,
-                                update_covariant_transformation),
+                  data.update_each.contains(update_covariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
                 Assert(
-                  contains_bits(data.update_each,
-                                update_contravariant_transformation),
+                  data.update_each.contains(
+                    update_contravariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
 
@@ -1965,8 +1955,7 @@ namespace internal
             case mapping_covariant_hessian:
               {
                 Assert(
-                  contains_bits(data.update_each,
-                                update_covariant_transformation),
+                  data.update_each.contains(update_covariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
 
@@ -2009,17 +1998,16 @@ namespace internal
             case mapping_piola_hessian:
               {
                 Assert(
-                  contains_bits(data.update_each,
-                                update_covariant_transformation),
+                  data.update_each.contains(update_covariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
                 Assert(
-                  contains_bits(data.update_each,
-                                update_contravariant_transformation),
+                  data.update_each.contains(
+                    update_contravariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
                 Assert(
-                  contains_bits(data.update_each, update_volume_elements),
+                  data.update_each.contains(update_volume_elements),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
 
@@ -2092,8 +2080,8 @@ namespace internal
             case mapping_covariant:
               {
                 Assert(
-                  contains_bits(data.update_each,
-                                update_contravariant_transformation),
+                  data.update_each.contains(
+                    update_contravariant_transformation),
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
 
@@ -2193,8 +2181,7 @@ MappingFE<dim, spacedim>::transform(
     {
       case mapping_covariant_gradient:
         {
-          Assert(contains_bits(data.update_each,
-                               update_contravariant_transformation),
+          Assert(data.update_each.contains(update_contravariant_transformation),
                  typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                    "update_covariant_transformation"));
 

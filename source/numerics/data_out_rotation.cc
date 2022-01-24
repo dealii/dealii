@@ -220,26 +220,26 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                       // at each point there is
                       // only one component of
                       // value, gradient etc.
-                      if (contains_bits(update_flags, update_values))
+                      if (update_flags.contains(update_values))
                         this->dof_data[dataset]->get_function_values(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_scalar.solution_values);
-                      if (contains_bits(update_flags, update_gradients))
+                      if (update_flags.contains(update_gradients))
                         this->dof_data[dataset]->get_function_gradients(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_scalar.solution_gradients);
-                      if (contains_bits(update_flags, update_hessians))
+                      if (update_flags.contains(update_hessians))
                         this->dof_data[dataset]->get_function_hessians(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_scalar.solution_hessians);
 
-                      if (contains_bits(update_flags, update_quadrature_points))
+                      if (update_flags.contains(update_quadrature_points))
                         data.patch_values_scalar.evaluation_points =
                           fe_patch_values.get_quadrature_points();
 
@@ -261,26 +261,26 @@ DataOutRotation<dim, spacedim>::build_one_patch(
 
                       // at each point there is a vector valued function and
                       // its derivative...
-                      if (contains_bits(update_flags, update_values))
+                      if (update_flags.contains(update_values))
                         this->dof_data[dataset]->get_function_values(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_system.solution_values);
-                      if (contains_bits(update_flags, update_gradients))
+                      if (update_flags.contains(update_gradients))
                         this->dof_data[dataset]->get_function_gradients(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_system.solution_gradients);
-                      if (contains_bits(update_flags, update_hessians))
+                      if (update_flags.contains(update_hessians))
                         this->dof_data[dataset]->get_function_hessians(
                           fe_patch_values,
                           internal::DataOutImplementation::ComponentExtractor::
                             real_part,
                           data.patch_values_system.solution_hessians);
 
-                      if (contains_bits(update_flags, update_quadrature_points))
+                      if (update_flags.contains(update_quadrature_points))
                         data.patch_values_system.evaluation_points =
                           fe_patch_values.get_quadrature_points();
 
@@ -482,7 +482,7 @@ DataOutRotation<dim, spacedim>::build_patches(
   // perhaps update_normal_vectors is present,
   // which would only be useful on faces, but
   // we may not use it here.
-  Assert(!contains_bits(update_flags, update_normal_vectors),
+  Assert(!update_flags.contains(update_normal_vectors),
          ExcMessage("The update of normal vectors may not be requested for "
                     "evaluation of data on cells via DataPostprocessor."));
 

@@ -37,7 +37,8 @@ class UpdateFlags;
 
 namespace internal
 {
-  constexpr UpdateFlags make_update_flags(int);
+  constexpr UpdateFlags
+  make_update_flags(int);
 }
 #endif
 
@@ -71,49 +72,55 @@ namespace internal
  */
 class UpdateFlags
 {
-	public:
+public:
+  constexpr UpdateFlags()
+    : field(0)
+  {}
 
-/**
- * Return an object in which all bits are set which are set in the current
- * object or in the input argument @p in.
- */
-constexpr UpdateFlags
-operator|(const UpdateFlags in) const;
+  /**
+   * Return an object in which all bits are set which are set in the current
+   * object or in the input argument @p in.
+   */
+  constexpr UpdateFlags
+  operator|(const UpdateFlags in) const;
 
-/**
- * Set the bits from the input argument @p in also in the current object.
- */
-constexpr UpdateFlags &
-operator|=(const UpdateFlags in);
+  /**
+   * Set the bits from the input argument @p in also in the current object.
+   */
+  constexpr UpdateFlags &
+  operator|=(const UpdateFlags in);
 
-/**
- * Return an object in which all bits are set which are set in the current
- * object as well as in the input argument @p in.
- */
-constexpr UpdateFlags
-operator&(const UpdateFlags in) const;
+  /**
+   * Return an object in which all bits are set which are set in the current
+   * object as well as in the input argument @p in.
+   */
+  constexpr UpdateFlags
+  operator&(const UpdateFlags in) const;
 
-/**
- * Clear all the bits in the current object if they are not also set in the
- * input argument @p in.
- */
-constexpr UpdateFlags &
-operator&=(const UpdateFlags in);
+  /**
+   * Clear all the bits in the current object if they are not also set in the
+   * input argument @p in.
+   */
+  constexpr UpdateFlags &
+  operator&=(const UpdateFlags in);
 
-/**
- * Check if the current object and the input argument @p in are equal.
- */ 
-    constexpr bool operator==(const UpdateFlags in) const;
+  /**
+   * Check if the current object and the input argument @p in are equal.
+   */
+  constexpr bool
+  operator==(const UpdateFlags in) const;
 
-/**
- * Check if the current object and the input argument @p in are not equal.
- */
-    constexpr bool operator!=(const UpdateFlags in) const;
+  /**
+   * Check if the current object and the input argument @p in are not equal.
+   */
+  constexpr bool
+  operator!=(const UpdateFlags in) const;
 
-/**
- *  Check if the current objects contains the flags given in the input argument @p in.
- */
-    constexpr bool contains(const UpdateFlags in) const;
+  /**
+   *  Check if the current objects contains the flags given in the input argument @p in.
+   */
+  constexpr bool
+  contains(const UpdateFlags in) const;
 
   //! No update
   static const UpdateFlags update_default;
@@ -183,13 +190,13 @@ operator&=(const UpdateFlags in);
    * codimension one. Setting this flag for any other object will raise an
    * error.
    */
-  static const UpdateFlags  update_normal_vectors;
+  static const UpdateFlags update_normal_vectors;
   //! Volume element
   /**
    * Compute the Jacobian of the transformation from the reference cell to the
    * real cell.
    */
-  static const UpdateFlags  update_jacobians;
+  static const UpdateFlags update_jacobians;
   //! Gradient of volume element
   /**
    * Compute the derivatives of the Jacobian of the transformation.
@@ -265,7 +272,7 @@ operator&=(const UpdateFlags in);
    */
   static const UpdateFlags update_mapping;
 
-	private:
+private:
   /**
    * An integer representing the flags.
    */
@@ -274,12 +281,14 @@ operator&=(const UpdateFlags in);
   /**
    * Private constructor only to be used internally.
    */
-  constexpr UpdateFlags(int i);
+  constexpr explicit UpdateFlags(int i);
 
   /**
-   * Friend declaration so that make_enum can call the private constructor.
+   * Friend declaration so that make_update_flags can call the private
+   * constructor.
    */
-  friend constexpr UpdateFlags make_enum(int);
+  friend constexpr UpdateFlags
+  internal::make_update_flags(int);
 };
 
 
@@ -336,49 +345,23 @@ operator<<(StreamType &s, const UpdateFlags u)
   return s;
 }
 
-// Import all flags into the global namespace.
-constexpr UpdateFlags update_default = internal::make_enum(0);
-constexpr UpdateFlags UpdateFlags::update_values = internal::make_enum(0x0001);
-constexpr UpdateFlags UpdateFlags::update_gradients = internal::make_enum(0x0002);
-constexpr UpdateFlags UpdateFlags::update_hessians = internal::make_enum(0x0004);
-constexpr UpdateFlags UpdateFlags::update_3rd_derivatives = internal::make_enum(0x0008);
-constexpr UpdateFlags UpdateFlags::update_boundary_forms = internal::make_enum(0x0010);
-constexpr UpdateFlags UpdateFlags::update_quadrature_points = internal::make_enum(0x0020);
-constexpr UpdateFlags UpdateFlags::update_JxW_values = internal::make_enum(0x0040);
-constexpr UpdateFlags UpdateFlags::update_normal_vectors = internal::make_enum(0x0080);
-constexpr UpdateFlags UpdateFlags::update_jacobians = internal::make_enum(0x01000);
-constexpr UpdateFlags UpdateFlags::update_jacobian_grads = internal::make_enum(0x02000:
-constexpr UpdateFlags UpdateFlags::update_inverse_jacobians = internal::make_enum(0x0400);
-constexpr UpdateFlags UpdateFlags::update_covariant_transformation = internal::make_enum(0x0800);
-constexpr UpdateFlags UpdateFlags::update_contravariant_transformation = internal::make_enum(0x1000);
-constexpr UpdateFlags UpdateFlags::update_transformation_values = internal::make_enum(0x2000);
-constexpr UpdateFlags UpdateFlags::update_transformation_gradients = internal::make_enum(0x4000);
-constexpr UpdateFlags UpdateFlags::update_volume_elements = internal::make_enum(0x10000);
-constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_grads = internal::make_enum(0x100000);
-constexpr UpdateFlags UpdateFlags::update_jacobian_2nd_derivatives = internal::make_enum(0x200000);
-constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_2nd_derivatives = internal::make_enum(0x400000);
-constexpr UpdateFlags UpdateFlags::update_jacobian_3rd_derivatives = internal::make_enum(0x800000);
-constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_3rd_derivatives = internal::make_enum(0x1000000);
-constexpr UpdateFlags UpdateFlags::update_piola = update_volume_elements | update_contravariant_transformation,
-constexpr UpdateFlags UpdateFlags::update_mapping =
-update_quadrature_points | update_JxW_values | update_jacobians |
-update_jacobian_grads | update_jacobian_pushed_forward_grads |
-update_jacobian_2nd_derivatives |
-update_jacobian_pushed_forward_2nd_derivatives |
-update_jacobian_3rd_derivatives |
-update_jacobian_pushed_forward_3rd_derivatives | update_inverse_jacobians |
-update_boundary_forms | update_normal_vectors |
-update_covariant_transformation | update_contravariant_transformation |
-update_transformation_values | update_transformation_gradients |
-update_volume_elements;
+namespace internal
+{
+  constexpr UpdateFlags
+  make_update_flags(int field)
+  {
+    return UpdateFlags(field);
+  }
+} // namespace internal
 
-
-// Class member definitions
+inline constexpr UpdateFlags::UpdateFlags(int i)
+  : field(i)
+{}
 
 inline constexpr UpdateFlags
 UpdateFlags::operator|(const UpdateFlags in) const
 {
-  return internal::make_enum(field | in.field);
+  return internal::make_update_flags(field | in.field);
 }
 
 
@@ -395,7 +378,7 @@ UpdateFlags::operator|=(const UpdateFlags in)
 inline constexpr UpdateFlags
 UpdateFlags::operator&(const UpdateFlags in) const
 {
-  return internal::make_enum(field & in.field);
+  return internal::make_update_flags(field & in.field);
 }
 
 
@@ -425,38 +408,123 @@ UpdateFlags::operator!=(const UpdateFlags in) const
 
 
 inline constexpr bool
-UpdateFlags::contains(const UpdateFlags in)
+UpdateFlags::contains(const UpdateFlags in) const
 {
-  return (field & in.field)!=0;
+  return (field & in.field) != 0;
 }
 
-constexpr UpdateFlags UpdateFlags::update_default = update_default;
-constexpr UpdateFlags UpdateFlags::update_values = update_values;
-constexpr UpdateFlags UpdateFlags::update_gradients = update_gradients;
-constexpr UpdateFlags UpdateFlags::update_hessians = update_hessians;
-constexpr UpdateFlags UpdateFlags::update_3rd_derivatives = update_3rd_derivatives;
-constexpr UpdateFlags UpdateFlags::update_boundary_forms = update_boundary_forms;
-constexpr UpdateFlags UpdateFlags::update_quadrature_points = iupdate_quadrature_points;
-constexpr UpdateFlags UpdateFlags::update_JxW_values = update_JxW_values;
-constexpr UpdateFlags UpdateFlags::update_normal_vectors = update_normal_vectors;
-constexpr UpdateFlags UpdateFlags::update_jacobians = update_jacobians;
-constexpr UpdateFlags UpdateFlags::update_jacobian_grads = update_jacobian_grads;
-constexpr UpdateFlags UpdateFlags::update_inverse_jacobians = update_inverses_jacobians;
-constexpr UpdateFlags UpdateFlags::update_covariant_transformation = update_covariant_transformation;
-constexpr UpdateFlags UpdateFlags::update_contravariant_transformation = update_contravariant_transformation;
-constexpr UpdateFlags UpdateFlags::update_transformation_values = update_transformation_values;
-constexpr UpdateFlags UpdateFlags::update_transformation_gradients = update_transformation_gradients;
-constexpr UpdateFlags UpdateFlags::update_volume_elements = update_volume_elements;
-constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_grads = update_jacobian_pushed_forward_grad;,
-constexpr UpdateFlags UpdateFlags::update_jacobian_2nd_derivatives = update_jacobian_2nd_derivatives;
-constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_2nd_derivatives = update_jacobian_pushed_forward_2nd_derivatives;
-constexpr UpdateFlags UpdateFlags::update_jacobian_3rd_derivatives = update_jacobian_3rd_derivatives;
-constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_3rd_derivatives = update_jacobian_pushed_forward_3rd_derivatives;
-constexpr UpdateFlags UpdateFlags::update_piola = update_piola;
-constexpr UpdateFlags UpdateFlags::update_mapping = update_mapping;
+// Import all flags into the global namespace.
+constexpr UpdateFlags update_default   = internal::make_update_flags(0);
+constexpr UpdateFlags update_values    = internal::make_update_flags(0x0001);
+constexpr UpdateFlags update_gradients = internal::make_update_flags(0x0002);
+constexpr UpdateFlags update_hessians  = internal::make_update_flags(0x0004);
+constexpr UpdateFlags update_3rd_derivatives =
+  internal::make_update_flags(0x0008);
+constexpr UpdateFlags update_boundary_forms =
+  internal::make_update_flags(0x0010);
+constexpr UpdateFlags update_quadrature_points =
+  internal::make_update_flags(0x0020);
+constexpr UpdateFlags update_JxW_values = internal::make_update_flags(0x0040);
+constexpr UpdateFlags update_normal_vectors =
+  internal::make_update_flags(0x0080);
+constexpr UpdateFlags update_jacobians = internal::make_update_flags(0x0100);
+constexpr UpdateFlags update_jacobian_grads =
+  internal::make_update_flags(0x0200);
+constexpr UpdateFlags update_inverse_jacobians =
+  internal::make_update_flags(0x0400);
+constexpr UpdateFlags update_covariant_transformation =
+  internal::make_update_flags(0x0800);
+constexpr UpdateFlags update_contravariant_transformation =
+  internal::make_update_flags(0x1000);
+constexpr UpdateFlags update_transformation_values =
+  internal::make_update_flags(0x2000);
+constexpr UpdateFlags update_transformation_gradients =
+  internal::make_update_flags(0x4000);
+constexpr UpdateFlags update_volume_elements =
+  internal::make_update_flags(0x10000);
+constexpr UpdateFlags update_jacobian_pushed_forward_grads =
+  internal::make_update_flags(0x100000);
+constexpr UpdateFlags update_jacobian_2nd_derivatives =
+  internal::make_update_flags(0x200000);
+constexpr UpdateFlags update_jacobian_pushed_forward_2nd_derivatives =
+  internal::make_update_flags(0x400000);
+constexpr UpdateFlags update_jacobian_3rd_derivatives =
+  internal::make_update_flags(0x800000);
+constexpr UpdateFlags update_jacobian_pushed_forward_3rd_derivatives =
+  internal::make_update_flags(0x1000000);
+constexpr UpdateFlags update_piola =
+  update_volume_elements | update_contravariant_transformation;
+constexpr UpdateFlags update_mapping =
+  update_quadrature_points | update_JxW_values | update_jacobians |
+  update_jacobian_grads | update_jacobian_pushed_forward_grads |
+  update_jacobian_2nd_derivatives |
+  update_jacobian_pushed_forward_2nd_derivatives |
+  update_jacobian_3rd_derivatives |
+  update_jacobian_pushed_forward_3rd_derivatives | update_inverse_jacobians |
+  update_boundary_forms | update_normal_vectors |
+  update_covariant_transformation | update_contravariant_transformation |
+  update_transformation_values | update_transformation_gradients |
+  update_volume_elements;
 
-inline constexpr UpdateFlags::UpdateFlags(int i) : field(in)
-{}
+constexpr UpdateFlags UpdateFlags::update_default =
+  internal::make_update_flags(0);
+constexpr UpdateFlags UpdateFlags::update_values =
+  internal::make_update_flags(0x0001);
+constexpr UpdateFlags UpdateFlags::update_gradients =
+  internal::make_update_flags(0x0002);
+constexpr UpdateFlags UpdateFlags::update_hessians =
+  internal::make_update_flags(0x0004);
+constexpr UpdateFlags UpdateFlags::update_3rd_derivatives =
+  internal::make_update_flags(0x0008);
+constexpr UpdateFlags UpdateFlags::update_boundary_forms =
+  internal::make_update_flags(0x0010);
+constexpr UpdateFlags UpdateFlags::update_quadrature_points =
+  internal::make_update_flags(0x0020);
+constexpr UpdateFlags UpdateFlags::update_JxW_values =
+  internal::make_update_flags(0x0040);
+constexpr UpdateFlags UpdateFlags::update_normal_vectors =
+  internal::make_update_flags(0x0080);
+constexpr UpdateFlags UpdateFlags::update_jacobians =
+  internal::make_update_flags(0x0100);
+constexpr UpdateFlags UpdateFlags::update_jacobian_grads =
+  internal::make_update_flags(0x0200);
+constexpr UpdateFlags UpdateFlags::update_inverse_jacobians =
+  internal::make_update_flags(0x0400);
+constexpr UpdateFlags UpdateFlags::update_covariant_transformation =
+  internal::make_update_flags(0x0800);
+constexpr UpdateFlags UpdateFlags::update_contravariant_transformation =
+  internal::make_update_flags(0x1000);
+constexpr UpdateFlags UpdateFlags::update_transformation_values =
+  internal::make_update_flags(0x2000);
+constexpr UpdateFlags UpdateFlags::update_transformation_gradients =
+  internal::make_update_flags(0x4000);
+constexpr UpdateFlags UpdateFlags::update_volume_elements =
+  internal::make_update_flags(0x10000);
+constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_grads =
+  internal::make_update_flags(0x100000);
+constexpr UpdateFlags UpdateFlags::update_jacobian_2nd_derivatives =
+  internal::make_update_flags(0x200000);
+constexpr UpdateFlags
+  UpdateFlags::update_jacobian_pushed_forward_2nd_derivatives =
+    internal::make_update_flags(0x400000);
+constexpr UpdateFlags UpdateFlags::update_jacobian_3rd_derivatives =
+  internal::make_update_flags(0x800000);
+constexpr UpdateFlags
+  UpdateFlags::update_jacobian_pushed_forward_3rd_derivatives =
+    internal::make_update_flags(0x1000000);
+constexpr UpdateFlags UpdateFlags::update_piola =
+  update_volume_elements | update_contravariant_transformation;
+constexpr UpdateFlags UpdateFlags::update_mapping =
+  update_quadrature_points | update_JxW_values | update_jacobians |
+  update_jacobian_grads | update_jacobian_pushed_forward_grads |
+  update_jacobian_2nd_derivatives |
+  update_jacobian_pushed_forward_2nd_derivatives |
+  update_jacobian_3rd_derivatives |
+  update_jacobian_pushed_forward_3rd_derivatives | update_inverse_jacobians |
+  update_boundary_forms | update_normal_vectors |
+  update_covariant_transformation | update_contravariant_transformation |
+  update_transformation_values | update_transformation_gradients |
+  update_volume_elements;
 
 /**
  * This enum definition is used for storing similarities of the current cell

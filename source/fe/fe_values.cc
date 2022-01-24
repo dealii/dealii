@@ -1549,7 +1549,7 @@ namespace FEValuesViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(contains_bits(fe_values->update_flags, update_values),
+    Assert(fe_values->update_flags.contains(update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1580,7 +1580,7 @@ namespace FEValuesViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(contains_bits(fe_values->update_flags, update_values),
+    Assert(fe_values->update_flags.contains(update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1604,7 +1604,7 @@ namespace FEValuesViews
     std::vector<solution_gradient_type<typename InputVector::value_type>>
       &gradients) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1634,7 +1634,7 @@ namespace FEValuesViews
     std::vector<solution_gradient_type<typename InputVector::value_type>>
       &gradients) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1658,7 +1658,7 @@ namespace FEValuesViews
     std::vector<solution_hessian_type<typename InputVector::value_type>>
       &hessians) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_hessians),
+    Assert(fe_values->update_flags.contains(update_hessians),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1688,7 +1688,7 @@ namespace FEValuesViews
     std::vector<solution_hessian_type<typename InputVector::value_type>>
       &hessians) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_hessians),
+    Assert(fe_values->update_flags.contains(update_hessians),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1712,7 +1712,7 @@ namespace FEValuesViews
     std::vector<solution_laplacian_type<typename InputVector::value_type>>
       &laplacians) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_hessians),
+    Assert(fe_values->update_flags.contains(update_hessians),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1742,7 +1742,7 @@ namespace FEValuesViews
     std::vector<solution_laplacian_type<typename InputVector::value_type>>
       &laplacians) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_hessians),
+    Assert(fe_values->update_flags.contains(update_hessians),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1767,7 +1767,7 @@ namespace FEValuesViews
       solution_third_derivative_type<typename InputVector::value_type>>
       &third_derivatives) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_3rd_derivatives),
+    Assert(fe_values->update_flags.contains(update_3rd_derivatives),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1798,7 +1798,7 @@ namespace FEValuesViews
       solution_third_derivative_type<typename InputVector::value_type>>
       &third_derivatives) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_3rd_derivatives),
+    Assert(fe_values->update_flags.contains(update_3rd_derivatives),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1822,7 +1822,7 @@ namespace FEValuesViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(contains_bits(fe_values->update_flags, update_values),
+    Assert(fe_values->update_flags.contains(update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1852,7 +1852,7 @@ namespace FEValuesViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(contains_bits(fe_values->update_flags, update_values),
+    Assert(fe_values->update_flags.contains(update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1876,7 +1876,7 @@ namespace FEValuesViews
     std::vector<solution_gradient_type<typename InputVector::value_type>>
       &gradients) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1906,7 +1906,7 @@ namespace FEValuesViews
     std::vector<solution_gradient_type<typename InputVector::value_type>>
       &gradients) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1931,7 +1931,7 @@ namespace FEValuesViews
       solution_symmetric_gradient_type<typename InputVector::value_type>>
       &symmetric_gradients) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1962,7 +1962,7 @@ namespace FEValuesViews
       solution_symmetric_gradient_type<typename InputVector::value_type>>
       &symmetric_gradients) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -1986,7 +1986,7 @@ namespace FEValuesViews
     std::vector<solution_divergence_type<typename InputVector::value_type>>
       &divergences) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2017,7 +2017,7 @@ namespace FEValuesViews
     std::vector<solution_divergence_type<typename InputVector::value_type>>
       &divergences) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2041,7 +2041,7 @@ namespace FEValuesViews
     std::vector<solution_curl_type<typename InputVector::value_type>> &curls)
     const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2071,7 +2071,7 @@ namespace FEValuesViews
     std::vector<solution_curl_type<typename InputVector::value_type>> &curls)
     const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2095,7 +2095,7 @@ namespace FEValuesViews
     std::vector<solution_hessian_type<typename InputVector::value_type>>
       &hessians) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_hessians),
+    Assert(fe_values->update_flags.contains(update_hessians),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2125,7 +2125,7 @@ namespace FEValuesViews
     std::vector<solution_hessian_type<typename InputVector::value_type>>
       &hessians) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_hessians),
+    Assert(fe_values->update_flags.contains(update_hessians),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2149,7 +2149,7 @@ namespace FEValuesViews
     std::vector<solution_value_type<typename InputVector::value_type>>
       &laplacians) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_hessians),
+    Assert(fe_values->update_flags.contains(update_hessians),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
     Assert(laplacians.size() == fe_values->n_quadrature_points,
@@ -2184,7 +2184,7 @@ namespace FEValuesViews
     std::vector<solution_laplacian_type<typename InputVector::value_type>>
       &laplacians) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_hessians),
+    Assert(fe_values->update_flags.contains(update_hessians),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_hessians")));
     Assert(laplacians.size() == fe_values->n_quadrature_points,
@@ -2212,7 +2212,7 @@ namespace FEValuesViews
       solution_third_derivative_type<typename InputVector::value_type>>
       &third_derivatives) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_3rd_derivatives),
+    Assert(fe_values->update_flags.contains(update_3rd_derivatives),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2243,7 +2243,7 @@ namespace FEValuesViews
       solution_third_derivative_type<typename InputVector::value_type>>
       &third_derivatives) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_3rd_derivatives),
+    Assert(fe_values->update_flags.contains(update_3rd_derivatives),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_3rd_derivatives")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2267,7 +2267,7 @@ namespace FEValuesViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(contains_bits(fe_values->update_flags, update_values),
+    Assert(fe_values->update_flags.contains(update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2297,7 +2297,7 @@ namespace FEValuesViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(contains_bits(fe_values->update_flags, update_values),
+    Assert(fe_values->update_flags.contains(update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2321,7 +2321,7 @@ namespace FEValuesViews
     std::vector<solution_divergence_type<typename InputVector::value_type>>
       &divergences) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2353,7 +2353,7 @@ namespace FEValuesViews
       std::vector<solution_divergence_type<typename InputVector::value_type>>
         &divergences) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2377,7 +2377,7 @@ namespace FEValuesViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(contains_bits(fe_values->update_flags, update_values),
+    Assert(fe_values->update_flags.contains(update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2407,7 +2407,7 @@ namespace FEValuesViews
     std::vector<solution_value_type<typename InputVector::value_type>> &values)
     const
   {
-    Assert(contains_bits(fe_values->update_flags, update_values),
+    Assert(fe_values->update_flags.contains(update_values),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_values")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2431,7 +2431,7 @@ namespace FEValuesViews
     std::vector<solution_divergence_type<typename InputVector::value_type>>
       &divergences) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2462,7 +2462,7 @@ namespace FEValuesViews
     std::vector<solution_divergence_type<typename InputVector::value_type>>
       &divergences) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2486,7 +2486,7 @@ namespace FEValuesViews
     std::vector<solution_gradient_type<typename InputVector::value_type>>
       &gradients) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2517,7 +2517,7 @@ namespace FEValuesViews
     std::vector<solution_gradient_type<typename InputVector::value_type>>
       &gradients) const
   {
-    Assert(contains_bits(fe_values->update_flags, update_gradients),
+    Assert(fe_values->update_flags.contains(update_gradients),
            (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
              "update_gradients")));
     Assert(fe_values->present_cell.is_initialized(),
@@ -2705,55 +2705,55 @@ namespace internal
       const unsigned int n_quadrature_points,
       const UpdateFlags  flags)
     {
-      if (contains_bits(flags, update_quadrature_points))
+      if (flags.contains(update_quadrature_points))
         this->quadrature_points.resize(
           n_quadrature_points,
           Point<spacedim>(numbers::signaling_nan<Tensor<1, spacedim>>()));
 
-      if (contains_bits(flags, update_JxW_values))
+      if (flags.contains(update_JxW_values))
         this->JxW_values.resize(n_quadrature_points,
                                 numbers::signaling_nan<double>());
 
-      if (contains_bits(flags, update_jacobians))
+      if (flags.contains(update_jacobians))
         this->jacobians.resize(
           n_quadrature_points,
           numbers::signaling_nan<DerivativeForm<1, dim, spacedim>>());
 
-      if (contains_bits(flags, update_jacobian_grads))
+      if (flags.contains(update_jacobian_grads))
         this->jacobian_grads.resize(
           n_quadrature_points,
           numbers::signaling_nan<DerivativeForm<2, dim, spacedim>>());
 
-      if (contains_bits(flags, update_jacobian_pushed_forward_grads))
+      if (flags.contains(update_jacobian_pushed_forward_grads))
         this->jacobian_pushed_forward_grads.resize(
           n_quadrature_points, numbers::signaling_nan<Tensor<3, spacedim>>());
 
-      if (contains_bits(flags, update_jacobian_2nd_derivatives))
+      if (flags.contains(update_jacobian_2nd_derivatives))
         this->jacobian_2nd_derivatives.resize(
           n_quadrature_points,
           numbers::signaling_nan<DerivativeForm<3, dim, spacedim>>());
 
-      if (contains_bits(flags, update_jacobian_pushed_forward_2nd_derivatives))
+      if (flags.contains(update_jacobian_pushed_forward_2nd_derivatives))
         this->jacobian_pushed_forward_2nd_derivatives.resize(
           n_quadrature_points, numbers::signaling_nan<Tensor<4, spacedim>>());
 
-      if (contains_bits(flags, update_jacobian_3rd_derivatives))
+      if (flags.contains(update_jacobian_3rd_derivatives))
         this->jacobian_3rd_derivatives.resize(n_quadrature_points);
 
-      if (contains_bits(flags, update_jacobian_pushed_forward_3rd_derivatives))
+      if (flags.contains(update_jacobian_pushed_forward_3rd_derivatives))
         this->jacobian_pushed_forward_3rd_derivatives.resize(
           n_quadrature_points, numbers::signaling_nan<Tensor<5, spacedim>>());
 
-      if (contains_bits(flags, update_inverse_jacobians))
+      if (flags.contains(update_inverse_jacobians))
         this->inverse_jacobians.resize(
           n_quadrature_points,
           numbers::signaling_nan<DerivativeForm<1, spacedim, dim>>());
 
-      if (contains_bits(flags, update_boundary_forms))
+      if (flags.contains(update_boundary_forms))
         this->boundary_forms.resize(
           n_quadrature_points, numbers::signaling_nan<Tensor<1, spacedim>>());
 
-      if (contains_bits(flags, update_normal_vectors))
+      if (flags.contains(update_normal_vectors))
         this->normal_vectors.resize(
           n_quadrature_points, numbers::signaling_nan<Tensor<1, spacedim>>());
     }
@@ -2806,14 +2806,14 @@ namespace internal
 
       // with the number of rows now known, initialize those fields
       // that we will need to their correct size
-      if (contains_bits(flags, update_values))
+      if (flags.contains(update_values))
         {
           this->shape_values.reinit(n_nonzero_shape_components,
                                     n_quadrature_points);
           this->shape_values.fill(numbers::signaling_nan<double>());
         }
 
-      if (contains_bits(flags, update_gradients))
+      if (flags.contains(update_gradients))
         {
           this->shape_gradients.reinit(n_nonzero_shape_components,
                                        n_quadrature_points);
@@ -2821,7 +2821,7 @@ namespace internal
             numbers::signaling_nan<Tensor<1, spacedim>>());
         }
 
-      if (contains_bits(flags, update_hessians))
+      if (flags.contains(update_hessians))
         {
           this->shape_hessians.reinit(n_nonzero_shape_components,
                                       n_quadrature_points);
@@ -2829,7 +2829,7 @@ namespace internal
             numbers::signaling_nan<Tensor<2, spacedim>>());
         }
 
-      if (contains_bits(flags, update_3rd_derivatives))
+      if (flags.contains(update_3rd_derivatives))
         {
           this->shape_3rd_derivatives.reinit(n_nonzero_shape_components,
                                              n_quadrature_points);
@@ -3358,7 +3358,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
   std::vector<typename InputVector::value_type> &values) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_values),
+  Assert(this->update_flags.contains(update_values),
          ExcAccessToUninitializedField("update_values"));
   AssertDimension(fe->n_components(), 1);
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -3383,7 +3383,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
   std::vector<typename InputVector::value_type> & values) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_values),
+  Assert(this->update_flags.contains(update_values),
          ExcAccessToUninitializedField("update_values"));
   AssertDimension(fe->n_components(), 1);
   AssertDimension(indices.size(), dofs_per_cell);
@@ -3408,7 +3408,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
   using Number = typename InputVector::value_type;
   Assert(present_cell.is_initialized(), ExcNotReinited());
 
-  Assert(contains_bits(this->update_flags, update_values),
+  Assert(this->update_flags.contains(update_values),
          ExcAccessToUninitializedField("update_values"));
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
@@ -3438,7 +3438,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
   // number of function values is generated in each point.
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
-  Assert(contains_bits(this->update_flags, update_values),
+  Assert(this->update_flags.contains(update_values),
          ExcAccessToUninitializedField("update_values"));
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
@@ -3466,7 +3466,7 @@ FEValuesBase<dim, spacedim>::get_function_values(
   const bool quadrature_points_fastest) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_values),
+  Assert(this->update_flags.contains(update_values),
          ExcAccessToUninitializedField("update_values"));
 
   // Size of indices must be a multiple of dofs_per_cell such that an integer
@@ -3498,7 +3498,7 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
   const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_gradients),
+  Assert(this->update_flags.contains(update_gradients),
          ExcAccessToUninitializedField("update_gradients"));
   AssertDimension(fe->n_components(), 1);
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -3524,7 +3524,7 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
   const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_gradients),
+  Assert(this->update_flags.contains(update_gradients),
          ExcAccessToUninitializedField("update_gradients"));
   AssertDimension(fe->n_components(), 1);
   AssertDimension(indices.size(), dofs_per_cell);
@@ -3549,7 +3549,7 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
     &gradients) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_gradients),
+  Assert(this->update_flags.contains(update_gradients),
          ExcAccessToUninitializedField("update_gradients"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
@@ -3582,7 +3582,7 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
   // number of function values is generated in each point.
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
-  Assert(contains_bits(this->update_flags, update_gradients),
+  Assert(this->update_flags.contains(update_gradients),
          ExcAccessToUninitializedField("update_gradients"));
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
@@ -3610,7 +3610,7 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
 {
   using Number = typename InputVector::value_type;
   AssertDimension(fe->n_components(), 1);
-  Assert(contains_bits(this->update_flags, update_hessians),
+  Assert(this->update_flags.contains(update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
@@ -3635,7 +3635,7 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
   const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_hessians),
+  Assert(this->update_flags.contains(update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
   AssertDimension(indices.size(), dofs_per_cell);
@@ -3661,7 +3661,7 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
   const bool quadrature_points_fastest) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_hessians),
+  Assert(this->update_flags.contains(update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
@@ -3691,7 +3691,7 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
   const bool quadrature_points_fastest) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_hessians),
+  Assert(this->update_flags.contains(update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
@@ -3719,7 +3719,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   std::vector<typename InputVector::value_type> &laplacians) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_hessians),
+  Assert(this->update_flags.contains(update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension(fe->n_components(), 1);
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -3744,7 +3744,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   std::vector<typename InputVector::value_type> & laplacians) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_hessians),
+  Assert(this->update_flags.contains(update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension(fe->n_components(), 1);
   AssertDimension(indices.size(), dofs_per_cell);
@@ -3768,7 +3768,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
 {
   using Number = typename InputVector::value_type;
   Assert(present_cell.is_initialized(), ExcNotReinited());
-  Assert(contains_bits(this->update_flags, update_hessians),
+  Assert(this->update_flags.contains(update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
@@ -3798,7 +3798,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   // number of function values is generated in each point.
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
-  Assert(contains_bits(this->update_flags, update_hessians),
+  Assert(this->update_flags.contains(update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
@@ -3828,7 +3828,7 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   using Number = typename InputVector::value_type;
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
-  Assert(contains_bits(this->update_flags, update_hessians),
+  Assert(this->update_flags.contains(update_hessians),
          ExcAccessToUninitializedField("update_hessians"));
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
@@ -3856,7 +3856,7 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
 {
   using Number = typename InputVector::value_type;
   AssertDimension(fe->n_components(), 1);
-  Assert(contains_bits(this->update_flags, update_3rd_derivatives),
+  Assert(this->update_flags.contains(update_3rd_derivatives),
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
@@ -3882,7 +3882,7 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
     &third_derivatives) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_3rd_derivatives),
+  Assert(this->update_flags.contains(update_3rd_derivatives),
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
   AssertDimension(indices.size(), dofs_per_cell);
@@ -3909,7 +3909,7 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
   const bool quadrature_points_fastest) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_3rd_derivatives),
+  Assert(this->update_flags.contains(update_3rd_derivatives),
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
@@ -3939,7 +3939,7 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
   const bool quadrature_points_fastest) const
 {
   using Number = typename InputVector::value_type;
-  Assert(contains_bits(this->update_flags, update_3rd_derivatives),
+  Assert(this->update_flags.contains(update_3rd_derivatives),
          ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert(indices.size() % dofs_per_cell == 0,
          ExcNotMultiple(indices.size(), dofs_per_cell));
@@ -3972,7 +3972,7 @@ template <int dim, int spacedim>
 const std::vector<Tensor<1, spacedim>> &
 FEValuesBase<dim, spacedim>::get_normal_vectors() const
 {
-  Assert(contains_bits(this->update_flags, update_normal_vectors),
+  Assert(this->update_flags.contains(update_normal_vectors),
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_normal_vectors")));
 
@@ -4225,7 +4225,7 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   // You can compute normal vectors to the cells only in the
   // codimension one case.
   if (dim != spacedim - 1)
-    Assert(contains_bits(update_flags, update_normal_vectors) == false,
+    Assert(update_flags.contains(update_normal_vectors) == false,
            ExcMessage("You can only pass the 'update_normal_vectors' "
                       "flag to FEFaceValues or FESubfaceValues objects, "
                       "but not to an FEValues object unless the "
@@ -4235,7 +4235,7 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   const UpdateFlags flags = this->compute_update_flags(update_flags);
 
   // initialize the base classes
-  if (contains_bits(flags, update_mapping))
+  if (flags.contains(update_mapping))
     this->mapping_output.initialize(this->max_n_quadrature_points, flags);
   this->finite_element_output.initialize(this->max_n_quadrature_points,
                                          *this->fe,
@@ -4255,7 +4255,7 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   Threads::Task<
     std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>>
     mapping_get_data;
-  if (contains_bits(flags, update_mapping))
+  if (flags.contains(update_mapping))
     mapping_get_data = Threads::new_task(
       [&]() { return this->mapping->get_data(flags, quadrature); });
 
@@ -4263,7 +4263,7 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
 
   // then collect answers from the two task above
   this->fe_data = std::move(fe_get_data.return_value());
-  if (contains_bits(flags, update_mapping))
+  if (flags.contains(update_mapping))
     this->mapping_data = std::move(mapping_get_data.return_value());
   else
     this->mapping_data =
@@ -4339,7 +4339,7 @@ FEValues<dim, spacedim>::do_reinit()
   // specific to the mapping. also let it inspect the
   // cell similarity flag and, if necessary, update
   // it
-  if (contains_bits(this->update_flags, update_mapping))
+  if (this->update_flags.contains(update_mapping))
     {
       this->cell_similarity =
         this->get_mapping().fill_fe_values(this->present_cell,
@@ -4419,7 +4419,7 @@ template <int dim, int spacedim>
 const std::vector<Tensor<1, spacedim>> &
 FEFaceValuesBase<dim, spacedim>::get_boundary_forms() const
 {
-  Assert(contains_bits(this->update_flags, update_boundary_forms),
+  Assert(this->update_flags.contains(update_boundary_forms),
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_boundary_forms")));
   return this->mapping_output.boundary_forms;
@@ -4515,7 +4515,7 @@ FEFaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   const UpdateFlags flags = this->compute_update_flags(update_flags);
 
   // initialize the base classes
-  if (contains_bits(flags, update_mapping))
+  if (flags.contains(update_mapping))
     this->mapping_output.initialize(this->max_n_quadrature_points, flags);
   this->finite_element_output.initialize(this->max_n_quadrature_points,
                                          *this->fe,
@@ -4550,7 +4550,7 @@ FEFaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   Threads::Task<
     std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>>
     mapping_get_data;
-  if (contains_bits(flags, update_mapping))
+  if (flags.contains(update_mapping))
     mapping_get_data = Threads::new_task(mapping_get_face_data,
                                          *this->mapping,
                                          flags,
@@ -4560,7 +4560,7 @@ FEFaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
 
   // then collect answers from the two task above
   this->fe_data = std::move(fe_get_data.return_value());
-  if (contains_bits(flags, update_mapping))
+  if (flags.contains(update_mapping))
     this->mapping_data = std::move(mapping_get_data.return_value());
   else
     this->mapping_data =
@@ -4651,7 +4651,7 @@ FEFaceValues<dim, spacedim>::do_reinit(const unsigned int face_no)
     this->present_cell;
   this->present_face_index = cell->face_index(face_no);
 
-  if (contains_bits(this->update_flags, update_mapping))
+  if (this->update_flags.contains(update_mapping))
     {
       this->get_mapping().fill_fe_face_values(this->present_cell,
                                               face_no,
@@ -4753,7 +4753,7 @@ FESubfaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   const UpdateFlags flags = this->compute_update_flags(update_flags);
 
   // initialize the base classes
-  if (contains_bits(flags, update_mapping))
+  if (flags.contains(update_mapping))
     this->mapping_output.initialize(this->max_n_quadrature_points, flags);
   this->finite_element_output.initialize(this->max_n_quadrature_points,
                                          *this->fe,
@@ -4774,7 +4774,7 @@ FESubfaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
   Threads::Task<
     std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>>
     mapping_get_data;
-  if (contains_bits(flags, update_mapping))
+  if (flags.contains(update_mapping))
     mapping_get_data =
       Threads::new_task(&Mapping<dim, spacedim>::get_subface_data,
                         *this->mapping,
@@ -4785,7 +4785,7 @@ FESubfaceValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
 
   // then collect answers from the two task above
   this->fe_data = std::move(fe_get_data.return_value());
-  if (contains_bits(flags, update_mapping))
+  if (flags.contains(update_mapping))
     this->mapping_data = std::move(mapping_get_data.return_value());
   else
     this->mapping_data =
@@ -4975,7 +4975,7 @@ FESubfaceValues<dim, spacedim>::do_reinit(const unsigned int face_no,
     }
 
   // now ask the mapping and the finite element to do the actual work
-  if (contains_bits(this->update_flags, update_mapping))
+  if (this->update_flags.contains(update_mapping))
     {
       this->get_mapping().fill_fe_subface_values(this->present_cell,
                                                  face_no,

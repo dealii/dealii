@@ -382,12 +382,11 @@ namespace internal
     {
       UpdateFlags update_flags_mapping = update_default;
       // translate update flags
-      if (update_flags & update_jacobians)
+      if (update_flags.contains(update_jacobians))
         update_flags_mapping |= update_jacobians;
-      if (update_flags & update_gradients ||
-          update_flags & update_inverse_jacobians)
+      if (update_flags.contains(update_gradients | update_inverse_jacobians))
         update_flags_mapping |= update_inverse_jacobians;
-      if (update_flags & update_quadrature_points)
+      if (update_flags.contains(update_quadrature_points))
         update_flags_mapping |= update_quadrature_points;
 
       if (const MappingQ<dim, spacedim> *mapping_q =
@@ -836,12 +835,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
     }
 
   // translate update flags
-  if (contains_bits(update_flags, update_jacobians))
+  if (update_flags.contains(update_jacobians))
     update_flags_mapping |= update_jacobians;
-  if ((contains_bits(update_flags, update_gradients)) ||
-      (contains_bits(update_flags, update_inverse_jacobians)))
+  if ((update_flags.contains(update_gradients)) ||
+      (update_flags.contains(update_inverse_jacobians)))
     update_flags_mapping |= update_inverse_jacobians;
-  if (contains_bits(update_flags, update_quadrature_points))
+  if (update_flags.contains(update_quadrature_points))
     update_flags_mapping |= update_quadrature_points;
 }
 
@@ -879,18 +878,18 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   if (!poly.empty())
     {
       // Check the mapping data for consistency.
-      if ((update_flags_mapping & update_jacobians) != 0u)
+      if (update_flags_mapping.contains(update_jacobians))
         Assert(precomputed_mapping_data.jacobians.size() == unit_points.size(),
                ExcDimensionMismatch(precomputed_mapping_data.jacobians.size(),
                                     unit_points.size()));
-      if ((update_flags_mapping & update_inverse_jacobians) != 0u)
+      if (update_flags_mapping.contains(update_inverse_jacobians))
         Assert(precomputed_mapping_data.inverse_jacobians.size() ==
                  unit_points.size(),
                ExcDimensionMismatch(
                  precomputed_mapping_data.inverse_jacobians.size(),
                  unit_points.size()));
 
-      if ((update_flags_mapping & update_quadrature_points) != 0u)
+      if (update_flags_mapping.contains(update_quadrature_points))
         Assert(precomputed_mapping_data.inverse_jacobians.size() ==
                  unit_points.size(),
                ExcDimensionMismatch(
@@ -909,20 +908,20 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
         update_flags | update_flags_mapping);
       fe_values->reinit(cell);
       mapping_data.initialize(unit_points.size(), update_flags_mapping);
-      if (contains_bits(update_flags_mapping, update_jacobians))
+      if (update_flags_mapping.contains(update_jacobians))
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           mapping_data.jacobians[q] = fe_values->jacobian(q);
-      if (contains_bits(update_flags_mapping, update_inverse_jacobians))
+      if (update_flags_mapping.contains(update_inverse_jacobians))
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           mapping_data.inverse_jacobians[q] = fe_values->inverse_jacobian(q);
-      if (contains_bits(update_flags_mapping, update_quadrature_points))
+      if (update_flags_mapping.contains(update_quadrature_points))
         for (unsigned int q = 0; q < unit_points.size(); ++q)
           mapping_data.quadrature_points[q] = fe_values->quadrature_point(q);
     }
 
-  if (contains_bits(update_flags, update_values))
+  if (update_flags.contains(update_values))
     values.resize(unit_points.size(), numbers::signaling_nan<value_type>());
-  if (contains_bits(update_flags, update_gradients))
+  if (update_flags.contains(update_gradients))
     gradients.resize(unit_points.size(),
                      numbers::signaling_nan<gradient_type>());
 }
@@ -949,8 +948,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
     return;
 
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
-  if (((contains_bits(evaluation_flag, EvaluationFlags::values)) ||
-       (contains_bits(evaluation_flag, EvaluationFlags::gradients))) &&
+  if ((contains_bits(evaluation_flag, EvaluationFlags::values) ||
+       contains_bits(evaluation_flag, EvaluationFlags::gradients)) &&
       !poly.empty())
     {
       // fast path with tensor product evaluation
@@ -997,13 +996,13 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
                   val_and_grad.first, j, values[i + j]);
           if (contains_bits(evaluation_flag, EvaluationFlags::gradients))
             {
-              Assert(contains_bits(update_flags,
-                                   update_gradients | update_inverse_jacobians),
+              Assert(update_flags.contains(update_gradients |
+                                           update_inverse_jacobians),
                      ExcNotInitialized());
               for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
                 {
-                  Assert(contains_bits(update_flags_mapping,
-                                       update_inverse_jacobians),
+                  Assert(update_flags_mapping.contains(
+                           update_inverse_jacobians),
                          ExcNotInitialized());
                   internal::FEPointEvaluation::EvaluatorTypeTraits<
                     dim,
@@ -1021,8 +1020,8 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
             }
         }
     }
-  else if ((contains_bits(evaluation_flag, EvaluationFlags::values)) ||
-           (contains_bits(evaluation_flag, EvaluationFlags::gradients)))
+  else if (contains_bits(evaluation_flag, EvaluationFlags::values) ||
+           contains_bits(evaluation_flag, EvaluationFlags::gradients))
     {
       // slow path with FEValues
       Assert(fe_values.get() != nullptr,
@@ -1140,8 +1139,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
           if ((integration_flags & EvaluationFlags::gradients) != 0u)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               {
-                Assert(contains_bits(update_flags_mapping,
-                                     update_inverse_jacobians),
+                Assert(update_flags_mapping.contains(update_inverse_jacobians),
                        ExcNotInitialized());
                 gradients[i + j] =
                   static_cast<typename internal::FEPointEvaluation::
@@ -1310,8 +1308,7 @@ inline DerivativeForm<1, dim, spacedim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::jacobian(
   const unsigned int point_index) const
 {
-  Assert(contains_bits(update_flags_mapping, update_jacobians),
-         ExcNotInitialized());
+  Assert(update_flags_mapping.contains(update_jacobians), ExcNotInitialized());
   AssertIndexRange(point_index, mapping_data.jacobians.size());
   return mapping_data.jacobians[point_index];
 }
@@ -1323,8 +1320,7 @@ inline DerivativeForm<1, spacedim, dim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::inverse_jacobian(
   const unsigned int point_index) const
 {
-  Assert(contains_bits(update_flags_mapping, update_inverse_jacobians) ||
-           update_flags_mapping & update_gradients,
+  Assert(update_flags_mapping.contains(update_inverse_jacobians | update_gradients),
          ExcNotInitialized());
   AssertIndexRange(point_index, mapping_data.inverse_jacobians.size());
   return mapping_data.inverse_jacobians[point_index];
@@ -1337,7 +1333,7 @@ inline Point<spacedim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::real_point(
   const unsigned int point_index) const
 {
-  Assert(contains_bits(update_flags_mapping, update_quadrature_points),
+  Assert(update_flags_mapping.contains(update_quadrature_points),
          ExcNotInitialized());
   AssertIndexRange(point_index, mapping_data.quadrature_points.size());
   return mapping_data.quadrature_points[point_index];

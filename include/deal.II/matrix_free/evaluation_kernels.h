@@ -308,8 +308,7 @@ namespace internal
               if (contains_bits(evaluation_flag, EvaluationFlags::hessians))
                 {
                   // grad xy
-                  if (!contains_bits(evaluation_flag,
-                                     EvaluationFlags::gradients))
+                  if (!contains_bits(evaluation_flag, EvaluationFlags::gradients))
                     eval0.template gradients<0, true, false>(values_dofs,
                                                              temp1);
                   eval1.template gradients<1, true, false>(temp1,
@@ -360,8 +359,7 @@ namespace internal
               if (contains_bits(evaluation_flag, EvaluationFlags::hessians))
                 {
                   // grad xz
-                  if (!contains_bits(evaluation_flag,
-                                     EvaluationFlags::gradients))
+                  if (!contains_bits(evaluation_flag, EvaluationFlags::gradients))
                     {
                       eval0.template gradients<0, true, false>(values_dofs,
                                                                temp1);
@@ -396,8 +394,7 @@ namespace internal
               if (contains_bits(evaluation_flag, EvaluationFlags::hessians))
                 {
                   // grad yz
-                  if (!contains_bits(evaluation_flag,
-                                     EvaluationFlags::gradients))
+                  if (!contains_bits(evaluation_flag, EvaluationFlags::gradients))
                     eval1.template gradients<1, true, false>(temp1, temp2);
                   eval2.template gradients<2, true, false>(temp2,
                                                            hessians_quad +
@@ -445,7 +442,7 @@ namespace internal
     // case additional dof for FE_Q_DG0: add values; gradients and second
     // derivatives evaluate to zero
     if (type == MatrixFreeFunctions::tensor_symmetric_plus_dg0 &&
-        (contains_bits(evaluation_flag, EvaluationFlags::values)))
+        contains_bits(evaluation_flag, EvaluationFlags::values))
       {
         values_quad -= n_components * n_q_points;
         values_dofs -= n_components * dofs_per_comp;
@@ -540,8 +537,7 @@ namespace internal
                 }
               if (contains_bits(integration_flag, EvaluationFlags::gradients))
                 {
-                  if ((contains_bits(integration_flag,
-                                     EvaluationFlags::values)) ||
+                  if (contains_bits(integration_flag, EvaluationFlags::values) ||
                       add_into_values_array == true)
                     eval0.template gradients<0, false, true>(gradients_quad,
                                                              values_dofs);
@@ -551,10 +547,8 @@ namespace internal
                 }
               if (contains_bits(integration_flag, EvaluationFlags::hessians))
                 {
-                  if (contains_bits(integration_flag,
-                                    EvaluationFlags::values) ||
-                      contains_bits(integration_flag,
-                                    EvaluationFlags::gradients) ||
+                  if (contains_bits(integration_flag, EvaluationFlags::values) ||
+                      contains_bits(integration_flag, EvaluationFlags::gradients) ||
                       add_into_values_array == true)
                     eval0.template hessians<0, false, true>(hessians_quad,
                                                             values_dofs);
@@ -574,9 +568,8 @@ namespace internal
         case 2:
           for (unsigned int c = 0; c < n_components; ++c)
             {
-              if ((contains_bits(integration_flag, EvaluationFlags::values)) &&
-                  (!contains_bits(integration_flag,
-                                  EvaluationFlags::gradients)))
+              if (contains_bits(integration_flag, EvaluationFlags::values) &&
+                  (!contains_bits(integration_flag, EvaluationFlags::gradients)))
                 {
                   eval1.template values<1, false, false>(values_quad, temp1);
                   if (add_into_values_array == false)
@@ -603,10 +596,8 @@ namespace internal
                   // grad xx
                   eval1.template values<1, false, false>(hessians_quad, temp1);
 
-                  if (contains_bits(integration_flag,
-                                    EvaluationFlags::values) ||
-                      contains_bits(integration_flag,
-                                    EvaluationFlags::gradients) ||
+                  if (contains_bits(integration_flag, EvaluationFlags::values) ||
+                      contains_bits(integration_flag, EvaluationFlags::gradients) ||
                       add_into_values_array == true)
                     eval0.template hessians<0, false, true>(temp1, values_dofs);
                   else
@@ -637,9 +628,8 @@ namespace internal
         case 3:
           for (unsigned int c = 0; c < n_components; ++c)
             {
-              if ((contains_bits(integration_flag, EvaluationFlags::values)) &&
-                  (!contains_bits(integration_flag,
-                                  EvaluationFlags::gradients)))
+              if (contains_bits(integration_flag, EvaluationFlags::values) &&
+                  (!contains_bits(integration_flag, EvaluationFlags::gradients)))
                 {
                   eval2.template values<2, false, false>(values_quad, temp1);
                   eval1.template values<1, false, false>(temp1, temp2);
@@ -674,10 +664,8 @@ namespace internal
                   eval2.template values<2, false, false>(hessians_quad, temp1);
                   eval1.template values<1, false, false>(temp1, temp2);
 
-                  if (contains_bits(integration_flag,
-                                    EvaluationFlags::values) ||
-                      contains_bits(integration_flag,
-                                    EvaluationFlags::gradients) ||
+                  if (contains_bits(integration_flag, EvaluationFlags::values) ||
+                      contains_bits(integration_flag, EvaluationFlags::gradients) ||
                       add_into_values_array == true)
                     eval0.template hessians<0, false, true>(temp2, values_dofs);
                   else
@@ -914,8 +902,7 @@ namespace internal
                           n_q_points);
 
                 if ((add_into_values_array == false &&
-                     !contains_bits(integration_flag,
-                                    EvaluationFlags::values)) &&
+                     !contains_bits(integration_flag, EvaluationFlags::values)) &&
                     d == 0)
                   eval.template gradients<0, false, false>(
                     gradients_quad_ptr, values_dofs_actual_ptr);
@@ -1428,7 +1415,7 @@ namespace internal
            shape.shape_gradients_collocation_eo,
            shape.shape_hessians_collocation_eo);
     if (contains_bits(evaluation_flag,
-                      (EvaluationFlags::gradients | EvaluationFlags::hessians)))
+          (EvaluationFlags::gradients | EvaluationFlags::hessians)))
       {
         eval.template gradients<0, true, false>(values_dofs, gradients_quad);
         if (dim > 1)
@@ -1492,14 +1479,14 @@ namespace internal
                   fe_eval.begin_values()[n_points * c + i];
           }
 
-        do_integrate(
-          fe_eval.get_shape_info().data.front(),
-          integration_flag,
-          values_dofs + c * n_points,
-          fe_eval.begin_gradients() + c * dim * n_points,
-          fe_eval.begin_hessians() + c * dim * (dim + 1) / 2 * n_points,
-          add_into_values_array ||
-            (contains_bits(integration_flag, EvaluationFlags::values)));
+        do_integrate(fe_eval.get_shape_info().data.front(),
+                     integration_flag,
+                     values_dofs + c * n_points,
+                     fe_eval.begin_gradients() + c * dim * n_points,
+                     fe_eval.begin_hessians() +
+                       c * dim * (dim + 1) / 2 * n_points,
+                     add_into_values_array ||
+                       contains_bits(integration_flag, EvaluationFlags::values));
       }
   }
 
@@ -1592,7 +1579,7 @@ namespace internal
       }
 
     if (contains_bits(integration_flag,
-                      (EvaluationFlags::gradients | EvaluationFlags::hessians)))
+          (EvaluationFlags::gradients | EvaluationFlags::hessians)))
       {
         if (add_into_values_array ||
             contains_bits(integration_flag, EvaluationFlags::hessians))
@@ -1676,8 +1663,7 @@ namespace internal
 
         // apply derivatives in the collocation space
         if (contains_bits(evaluation_flag,
-                          (EvaluationFlags::gradients |
-                           EvaluationFlags::hessians)))
+              (EvaluationFlags::gradients | EvaluationFlags::hessians)))
           FEEvaluationImplCollocation<dim, n_q_points_1d - 1, Number>::
             do_evaluate(shape_data,
                         evaluation_flag & (EvaluationFlags::gradients |
@@ -1716,18 +1702,17 @@ namespace internal
       {
         // apply derivatives in collocation space
         if (contains_bits(integration_flag,
-                          (EvaluationFlags::gradients |
-                           EvaluationFlags::hessians)))
+              (EvaluationFlags::gradients | EvaluationFlags::hessians)))
           FEEvaluationImplCollocation<dim, n_q_points_1d - 1, Number>::
-            do_integrate(
-              shape_data,
-              integration_flag &
-                (EvaluationFlags::gradients | EvaluationFlags::hessians),
-              fe_eval.begin_values() + c * n_q_points,
-              fe_eval.begin_gradients() + c * dim * n_q_points,
-              fe_eval.begin_hessians() + c * dim * (dim + 1) / 2 * n_q_points,
-              /*add_into_values_array=*/
-              contains_bits(integration_flag, EvaluationFlags::values));
+            do_integrate(shape_data,
+                         integration_flag & (EvaluationFlags::gradients |
+                                             EvaluationFlags::hessians),
+                         fe_eval.begin_values() + c * n_q_points,
+                         fe_eval.begin_gradients() + c * dim * n_q_points,
+                         fe_eval.begin_hessians() +
+                           c * dim * (dim + 1) / 2 * n_q_points,
+                         /*add_into_values_array=*/
+                         contains_bits(integration_flag, EvaluationFlags::values));
 
         // transform back to the original space
         FEEvaluationImplBasisChange<
@@ -2082,7 +2067,7 @@ namespace internal
       Number *values_dofs_ptr = values_dofs;
 
       if (contains_bits(evaluation_flag, EvaluationFlags::values) &&
-          (!contains_bits(evaluation_flag, EvaluationFlags::gradients)))
+          !contains_bits(evaluation_flag, EvaluationFlags::gradients))
         for (unsigned int c = 0; c < n_components; ++c)
           {
             switch (dim)
@@ -2149,8 +2134,7 @@ namespace internal
                                                                gradients_quad +
                                                                  n_q_points);
 
-                      if (contains_bits(evaluation_flag,
-                                        EvaluationFlags::values))
+                      if (contains_bits(evaluation_flag, EvaluationFlags::values))
                         eval1.template values<1, true, false>(scratch_data,
                                                               values_quad);
                     }
@@ -2334,8 +2318,7 @@ namespace internal
                         eval_grad(AlignedVector<Number>(),
                                   data.shape_gradients_collocation_eo,
                                   AlignedVector<Number>());
-                      if (contains_bits(integration_flag,
-                                        EvaluationFlags::values))
+                      if (contains_bits(integration_flag, EvaluationFlags::values))
                         eval_grad.template gradients<1, false, true>(
                           gradients_quad + n_q_points, values_quad);
                       else
@@ -2350,8 +2333,7 @@ namespace internal
                     }
                   else
                     {
-                      if (contains_bits(integration_flag,
-                                        EvaluationFlags::values))
+                      if (contains_bits(integration_flag, EvaluationFlags::values))
                         {
                           eval1.template values<1, false, false>(values_quad,
                                                                  scratch_data);
@@ -2406,9 +2388,8 @@ namespace internal
                     // grad xx
                     eval1.template values<1, false, false>(hessians_quad,
                                                            scratch_data);
-                    if (contains_bits(integration_flag,
-                                      (EvaluationFlags::values |
-                                       EvaluationFlags::gradients)))
+                    if (contains_bits(integration_flag, (EvaluationFlags::values |
+                                                   EvaluationFlags::gradients)))
                       eval0.template hessians<0, false, true>(scratch_data,
                                                               values_dofs);
                     else
@@ -2441,8 +2422,7 @@ namespace internal
                     eval1.template values<1, false, false>(hessians_quad +
                                                              4 * n_q_points,
                                                            scratch_data);
-                    if (contains_bits(integration_flag,
-                                      EvaluationFlags::gradients))
+                    if (contains_bits(integration_flag, EvaluationFlags::gradients))
                       eval0.template gradients<0, false, true>(scratch_data,
                                                                values_dofs +
                                                                  n_dofs);
@@ -2461,9 +2441,8 @@ namespace internal
                     break;
                   case 2:
                     // grad xx
-                    if (contains_bits(integration_flag,
-                                      (EvaluationFlags::values |
-                                       EvaluationFlags::gradients)))
+                    if (contains_bits(integration_flag, (EvaluationFlags::values |
+                                                   EvaluationFlags::gradients)))
                       eval0.template hessians<0, false, true>(hessians_quad,
                                                               values_dofs);
                     else
@@ -2474,8 +2453,7 @@ namespace internal
                     eval0.template values<0, false, false>(
                       hessians_quad + n_q_points, values_dofs + 2 * n_dofs);
                     // grad xy
-                    if (contains_bits(integration_flag,
-                                      EvaluationFlags::gradients))
+                    if (contains_bits(integration_flag, EvaluationFlags::gradients))
                       eval0.template gradients<0, false, true>(
                         hessians_quad + 2 * n_q_points, values_dofs + n_dofs);
                     else
@@ -2484,11 +2462,9 @@ namespace internal
                     break;
                   case 1:
                     values_dofs[2] = hessians_quad[0];
-                    if (!contains_bits(integration_flag,
-                                       EvaluationFlags::values))
+                    if (!contains_bits(integration_flag, EvaluationFlags::values))
                       values_dofs[0] = 0;
-                    if (!contains_bits(integration_flag,
-                                       EvaluationFlags::gradients))
+                    if (!contains_bits(integration_flag, EvaluationFlags::gradients))
                       values_dofs[1] = 0;
                     break;
                   default:
@@ -2946,7 +2922,7 @@ namespace internal
                 }
             }
 
-          Assert(!(contains_bits(evaluation_flag, EvaluationFlags::hessians)),
+          Assert(!contains_bits(evaluation_flag, EvaluationFlags::hessians),
                  ExcNotImplemented());
 
           return true;
@@ -3087,8 +3063,8 @@ namespace internal
                                 n_dofs,
                                 n_q_points);
 
-                      if (!(contains_bits(integration_flag,
-                                          EvaluationFlags::values)) &&
+                      if (!contains_bits(integration_flag,
+                            EvaluationFlags::values) &&
                           d == 0)
                         eval.template gradients<0, false, false>(
                           gradients_quad_ptr, values_dofs_actual_ptr);
@@ -3102,7 +3078,7 @@ namespace internal
                 }
             }
 
-          Assert(!(contains_bits(integration_flag, EvaluationFlags::hessians)),
+          Assert(!contains_bits(integration_flag, EvaluationFlags::hessians),
                  ExcNotImplemented());
 
           return true;
@@ -3299,7 +3275,7 @@ namespace internal
     std::array<const unsigned int *, n_face_orientations> index_array_hermite =
       {};
     if (fe_degree > 1 &&
-        (contains_bits(evaluation_flag, EvaluationFlags::gradients)))
+        contains_bits(evaluation_flag, EvaluationFlags::gradients))
       {
         if (n_face_orientations == 1)
           index_array_hermite[0] =
@@ -3381,7 +3357,7 @@ namespace internal
               global_vector_ptr + dof_indices[0] + index_offset * n_lanes;
 
             if (fe_degree > 1 &&
-                (contains_bits(evaluation_flag, EvaluationFlags::gradients)))
+                contains_bits(evaluation_flag, EvaluationFlags::gradients))
               {
                 for (unsigned int i = 0; i < dofs_per_face; ++i)
                   {
@@ -3422,7 +3398,7 @@ namespace internal
               n_lanes);
             Number2_ *vector_ptr = global_vector_ptr + index_offset * n_lanes;
             if (fe_degree > 1 &&
-                (contains_bits(evaluation_flag, EvaluationFlags::gradients)))
+                contains_bits(evaluation_flag, EvaluationFlags::gradients))
               {
                 for (unsigned int i = 0; i < dofs_per_face; ++i)
                   {
@@ -3474,7 +3450,7 @@ namespace internal
               dof_info.n_vectorization_lanes_filled[dof_access_index][cell];
 
             if (fe_degree > 1 &&
-                (contains_bits(evaluation_flag, EvaluationFlags::gradients)))
+                contains_bits(evaluation_flag, EvaluationFlags::gradients))
               {
                 if (n_filled_lanes == n_lanes)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
@@ -3644,7 +3620,7 @@ namespace internal
               }
 
             if (fe_degree > 1 &&
-                (contains_bits(evaluation_flag, EvaluationFlags::gradients)))
+                contains_bits(evaluation_flag, EvaluationFlags::gradients))
               {
                 if (vectorization_possible)
                   for (unsigned int i = 0; i < dofs_per_face; ++i)
@@ -3882,7 +3858,7 @@ namespace internal
            (fe_degree < 2 ||
             shape_info.data.front().element_type !=
               MatrixFreeFunctions::tensor_symmetric_hermite)) ||
-          (contains_bits(evaluation_flag, EvaluationFlags::hessians)) ||
+          contains_bits(evaluation_flag, EvaluationFlags::hessians) ||
           vector_ptr == nullptr ||
           shape_info.data.front().element_type >
             MatrixFreeFunctions::tensor_symmetric ||

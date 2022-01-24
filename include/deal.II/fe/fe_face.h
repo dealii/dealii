@@ -372,8 +372,7 @@ protected:
     (void)n_q_points;
 
     // No derivatives of this element are implemented.
-    if (contains_bits(data_ptr->update_each,
-                      update_gradients | update_hessians))
+    if (data_ptr->update_each.contains(update_gradients | update_hessians))
       {
         Assert(false, ExcNotImplemented());
       }

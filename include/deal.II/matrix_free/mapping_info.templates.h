@@ -88,11 +88,11 @@ namespace internal
           update_flags_cells, quad);
 
       this->update_flags_boundary_faces =
-        (contains_bits(update_flags_inner_faces | update_flags_boundary_faces,
+        ((update_flags_inner_faces | update_flags_boundary_faces).contains(
                        update_quadrature_points) ?
            update_quadrature_points :
            update_default) |
-        (contains_bits(update_flags_inner_faces | update_flags_boundary_faces,
+        ((update_flags_inner_faces | update_flags_boundary_faces).contains(
                        update_jacobian_grads | update_hessians) ?
            update_jacobian_grads :
            update_default) |
@@ -429,7 +429,7 @@ namespace internal
 
             // extract quadrature points and store them temporarily. if we have
             // Cartesian cells, we can compress the indices
-            if (contains_bits(update_flags, update_quadrature_points))
+            if (update_flags.contains(update_quadrature_points))
               for (unsigned int q = 0; q < n_q_points; ++q)
                 {
                   const Point<dim> &point = fe_val.quadrature_point(q);
@@ -498,7 +498,7 @@ namespace internal
                     // for the second, third quadrature formula). in any case,
                     // the flag update_jacobian_grads will be set in that case
                     if (cell_cartesian == false && n_q_points == 1 &&
-                        contains_bits(update_flags, update_jacobian_grads))
+                        update_flags.contains(update_jacobian_grads))
                       {
                         const DerivativeForm<1, dim, dim> &jac =
                           fe_val.jacobian(0);
@@ -571,7 +571,7 @@ namespace internal
                 // Jacobian which is needed in user code. however, we would like
                 // to perform that on vectorized data types instead of doubles
                 // or floats. to this end, copy the gradients first
-                if (contains_bits(update_flags, update_jacobian_grads))
+                if (update_flags.contains(update_jacobian_grads))
                   {
                     const DerivativeForm<2, dim, dim> &jacobian_grad =
                       fe_val.jacobian_grad(q);
@@ -644,12 +644,12 @@ namespace internal
           fe_values[i].resize(max_active_fe_index + 1);
         const UpdateFlags update_flags = mapping_info.update_flags_cells;
         const UpdateFlags update_flags_feval =
-          (contains_bits(update_flags, update_jacobians) ? update_jacobians :
-                                                           update_default) |
-          (contains_bits(update_flags, update_jacobian_grads) ?
+          (update_flags.contains(update_jacobians) ? update_jacobians :
+                                                     update_default) |
+          (update_flags.contains(update_jacobian_grads) ?
              update_jacobian_grads :
              update_default) |
-          (contains_bits(update_flags, update_quadrature_points) ?
+          (update_flags.contains(update_quadrature_points) ?
              update_quadrature_points :
              update_default);
 
@@ -793,7 +793,7 @@ namespace internal
                         transpose(invert(jac));
                       data.first[my_q].jacobians[0].push_back(inv_jac);
 
-                      if (contains_bits(update_flags, update_jacobian_grads))
+                      if (update_flags.contains(update_jacobian_grads))
                         data.first[my_q].jacobian_gradients[0].push_back(
                           process_jacobian_gradient(inv_jac,
                                                     inv_jac,
@@ -801,7 +801,7 @@ namespace internal
                     }
                 }
 
-              if (contains_bits(update_flags, update_quadrature_points))
+              if (update_flags.contains(update_quadrature_points))
                 {
                   // eventually we turn to the quadrature points that we can
                   // compress in case we have affine cells. we also need to
@@ -1153,14 +1153,13 @@ namespace internal
                   FEEvaluationFactory<dim, VectorizedDouble>::evaluate(
                     dim,
                     EvaluationFlags::values | EvaluationFlags::gradients |
-                      (contains_bits(update_flags_cells,
-                                     update_jacobian_grads) ?
+                      (update_flags_cells.contains(update_jacobian_grads) ?
                          EvaluationFlags::hessians :
                          EvaluationFlags::nothing),
                     eval.begin_dof_values(),
                     eval);
                 }
-              if (contains_bits(update_flags_cells, update_quadrature_points))
+              if (update_flags_cells.contains(update_quadrature_points))
                 {
                   Point<dim, VectorizedArrayType> *quadrature_points =
                     my_data.quadrature_points.data() +
@@ -1233,8 +1232,7 @@ namespace internal
                                                vv,
                                                my_data.jacobians[0][idx][d][e]);
 
-                    if (contains_bits(update_flags_cells,
-                                      update_jacobian_grads) &&
+                    if (update_flags_cells.contains(update_jacobian_grads) &&
                         cell_type[cell] > affine)
                       {
                         Tensor<3, dim, VectorizedDouble> jac_grad;
@@ -1363,10 +1361,10 @@ namespace internal
             data_cells_local.back().first[my_q].JxW_values.size());
           cell_data[my_q].jacobians[0].resize_fast(
             cell_data[my_q].JxW_values.size());
-          if (contains_bits(update_flags_cells, update_jacobian_grads))
+          if (update_flags_cells.contains(update_jacobian_grads))
             cell_data[my_q].jacobian_gradients[0].resize_fast(
               cell_data[my_q].JxW_values.size());
-          if (contains_bits(update_flags_cells, update_quadrature_points))
+          if (update_flags_cells.contains(update_quadrature_points))
             {
               cell_data[my_q].quadrature_point_offsets.resize(cell_type.size());
               cell_data[my_q].quadrature_points.resize_fast(
@@ -1717,8 +1715,8 @@ namespace internal
                                       compare_norm_jac)
                                 cell_is_cartesian = false;
 
-                          if (contains_bits(fe_face_values.get_update_flags(),
-                                            update_quadrature_points))
+                          if (fe_face_values.get_update_flags().contains(
+                                update_quadrature_points))
                             for (unsigned int d = 0; d < dim; ++d)
                               face_data.quadrature_points[q][d][v] =
                                 fe_face_values.quadrature_point(q)[d];
@@ -1740,8 +1738,8 @@ namespace internal
                                 face_data.normal_vectors[q][d][v] =
                                   face_data.normal_vectors[q][d][0];
                               }
-                          if (contains_bits(fe_face_values.get_update_flags(),
-                                            update_quadrature_points))
+                          if (fe_face_values.get_update_flags().contains(
+                                update_quadrature_points))
                             for (unsigned int d = 0; d < dim; ++d)
                               face_data.quadrature_points[q][d][v] =
                                 face_data.quadrature_points[q][d][0];
@@ -1886,13 +1884,13 @@ namespace internal
                 }
 
               // Fill in quadrature points
-              if (contains_bits(fe_face_values.get_update_flags(),
-                                update_quadrature_points))
+              if (fe_face_values.get_update_flags().contains(
+                    update_quadrature_points))
                 {
                   data.first[my_q].quadrature_point_offsets.push_back(
                     data.first[my_q].quadrature_points.size());
-                  if (contains_bits(fe_face_values.get_update_flags(),
-                                    update_quadrature_points))
+                  if (fe_face_values.get_update_flags().contains(
+                        update_quadrature_points))
                     for (unsigned int q = 0; q < n_q_points; ++q)
                       data.first[my_q].quadrature_points.push_back(
                         face_data.quadrature_points[q]);
@@ -2082,13 +2080,13 @@ namespace internal
               FEFaceEvaluationFactory<dim, VectorizedDouble>::evaluate(
                 dim,
                 EvaluationFlags::values | EvaluationFlags::gradients |
-                  (contains_bits(update_flags_faces, update_jacobian_grads) ?
+                  (update_flags_faces.contains(update_jacobian_grads) ?
                      EvaluationFlags::hessians :
                      EvaluationFlags::nothing),
                 eval_int.begin_dof_values(),
                 eval_int);
 
-              if (contains_bits(update_flags_faces, update_quadrature_points))
+              if (update_flags_faces.contains(update_quadrature_points))
                 for (unsigned int q = 0; q < n_q_points; ++q)
                   for (unsigned int d = 0; d < dim; ++d)
                     store_vectorized_array(
@@ -2183,7 +2181,7 @@ namespace internal
                           my_data.jacobians[0][offset + q][d][e]);
                     }
 
-                  if (contains_bits(update_flags_faces, update_jacobian_grads))
+                  if (update_flags_faces.contains(update_jacobian_grads))
                     {
                       compute_jacobian_grad(
                         interior_face_no, 0, q, inv_jac, eval_int);
@@ -2252,8 +2250,7 @@ namespace internal
                   FEFaceEvaluationFactory<dim, VectorizedDouble>::evaluate(
                     dim,
                     EvaluationFlags::values | EvaluationFlags::gradients |
-                      (contains_bits(update_flags_faces,
-                                     update_jacobian_grads) ?
+                      (update_flags_faces.contains(update_jacobian_grads) ?
                          EvaluationFlags::hessians :
                          EvaluationFlags::nothing),
                     eval_ext.begin_dof_values(),
@@ -2288,8 +2285,7 @@ namespace internal
                               my_data.jacobians[1][offset + q][d][e]);
                         }
 
-                      if (contains_bits(update_flags_faces,
-                                        update_jacobian_grads))
+                      if (update_flags_faces.contains(update_jacobian_grads))
                         {
                           compute_jacobian_grad(
                             exterior_face_no, 1, q, inv_jac, eval_ext);
@@ -2409,7 +2405,7 @@ namespace internal
             face_data[my_q].JxW_values.size());
           face_data[my_q].jacobians[1].resize_fast(
             face_data[my_q].JxW_values.size());
-          if (contains_bits(update_flags_common, update_jacobian_grads))
+          if (update_flags_common.contains(update_jacobian_grads))
             {
               face_data[my_q].jacobian_gradients[0].resize_fast(
                 face_data[my_q].JxW_values.size());
@@ -2420,7 +2416,7 @@ namespace internal
             face_data[my_q].JxW_values.size());
           face_data[my_q].normals_times_jacobians[1].resize_fast(
             face_data[my_q].JxW_values.size());
-          if (contains_bits(update_flags_common, update_quadrature_points))
+          if (update_flags_common.contains(update_quadrature_points))
             {
               face_data[my_q].quadrature_point_offsets.resize(face_type.size());
               face_data[my_q].quadrature_points.resize_fast(
@@ -2652,10 +2648,10 @@ namespace internal
 
           my_data.JxW_values.resize_fast(max_size);
           my_data.jacobians[0].resize_fast(max_size);
-          if (contains_bits(update_flags_cells, update_jacobian_grads))
+          if (update_flags_cells.contains(update_jacobian_grads))
             my_data.jacobian_gradients[0].resize_fast(max_size);
 
-          if (contains_bits(update_flags_cells, update_quadrature_points))
+          if (update_flags_cells.contains(update_quadrature_points))
             {
               my_data.quadrature_point_offsets.resize(cell_type.size());
               for (unsigned int cell = 1; cell < cell_type.size(); ++cell)
@@ -2779,7 +2775,7 @@ namespace internal
           my_data.normal_vectors.resize_fast(max_size);
           my_data.jacobians[0].resize_fast(max_size);
           my_data.jacobians[1].resize_fast(max_size);
-          if (contains_bits(update_flags_common, update_jacobian_grads))
+          if (update_flags_common.contains(update_jacobian_grads))
             {
               my_data.jacobian_gradients[0].resize_fast(max_size);
               my_data.jacobian_gradients[1].resize_fast(max_size);
@@ -2787,7 +2783,7 @@ namespace internal
           my_data.normals_times_jacobians[0].resize_fast(max_size);
           my_data.normals_times_jacobians[1].resize_fast(max_size);
 
-          if (contains_bits(update_flags_common, update_quadrature_points))
+          if (update_flags_common.contains(update_quadrature_points))
             {
               my_data.quadrature_point_offsets.resize(face_type.size());
               my_data.quadrature_point_offsets[0] = 0;
@@ -2883,7 +2879,7 @@ namespace internal
       const unsigned int n_quads = face_data_by_cells.size();
       const unsigned int n_lanes = VectorizedArrayType::size();
       UpdateFlags        update_flags =
-        (contains_bits(update_flags_faces_by_cells, update_quadrature_points) ?
+        (update_flags_faces_by_cells.contains(update_quadrature_points) ?
            update_quadrature_points :
            update_default) |
         update_normal_vectors | update_JxW_values | update_jacobians;
@@ -2896,7 +2892,7 @@ namespace internal
           AssertDimension(cell_type.size(), cells.size() / n_lanes);
           face_data_by_cells[my_q].data_index_offsets.resize(
             cell_type.size() * GeometryInfo<dim>::faces_per_cell);
-          if (contains_bits(update_flags, update_quadrature_points))
+          if (update_flags.contains(update_quadrature_points))
             face_data_by_cells[my_q].quadrature_point_offsets.resize(
               cell_type.size() * GeometryInfo<dim>::faces_per_cell);
           std::size_t storage_length = 0;
@@ -2918,7 +2914,7 @@ namespace internal
                     storage_length +=
                       face_data_by_cells[my_q].descriptor[0].n_q_points;
                   }
-                if (contains_bits(update_flags, update_quadrature_points))
+                if (update_flags.contains(update_quadrature_points))
                   face_data_by_cells[my_q].quadrature_point_offsets
                     [i * GeometryInfo<dim>::faces_per_cell + face] =
                     (i * GeometryInfo<dim>::faces_per_cell + face) *
@@ -2930,22 +2926,22 @@ namespace internal
             storage_length * GeometryInfo<dim>::faces_per_cell);
           face_data_by_cells[my_q].jacobians[1].resize_fast(
             storage_length * GeometryInfo<dim>::faces_per_cell);
-          if (contains_bits(update_flags, update_normal_vectors))
+          if (update_flags.contains(update_normal_vectors))
             face_data_by_cells[my_q].normal_vectors.resize_fast(
               storage_length * GeometryInfo<dim>::faces_per_cell);
-          if ((contains_bits(update_flags, update_normal_vectors)) &&
-              (contains_bits(update_flags, update_jacobians)))
+          if ((update_flags.contains(update_normal_vectors)) &&
+              (update_flags.contains(update_jacobians)))
             face_data_by_cells[my_q].normals_times_jacobians[0].resize_fast(
               storage_length * GeometryInfo<dim>::faces_per_cell);
-          if ((contains_bits(update_flags, update_normal_vectors)) &&
-              (contains_bits(update_flags, update_jacobians)))
+          if ((update_flags.contains(update_normal_vectors)) &&
+              (update_flags.contains(update_jacobians)))
             face_data_by_cells[my_q].normals_times_jacobians[1].resize_fast(
               storage_length * GeometryInfo<dim>::faces_per_cell);
-          if (contains_bits(update_flags, update_jacobian_grads))
+          if (update_flags.contains(update_jacobian_grads))
             face_data_by_cells[my_q].jacobian_gradients[0].resize_fast(
               storage_length * GeometryInfo<dim>::faces_per_cell);
 
-          if (contains_bits(update_flags, update_quadrature_points))
+          if (update_flags.contains(update_quadrature_points))
             face_data_by_cells[my_q].quadrature_points.resize_fast(
               cell_type.size() * GeometryInfo<dim>::faces_per_cell *
               face_data_by_cells[my_q].descriptor[0].n_q_points);
@@ -3019,10 +3015,10 @@ namespace internal
                   // copy data for affine data type
                   if (cell_type[cell] <= affine)
                     {
-                      if (contains_bits(update_flags, update_JxW_values))
+                      if (update_flags.contains(update_JxW_values))
                         face_data_by_cells[my_q].JxW_values[offset][v] =
                           fe_val.JxW(0) / fe_val.get_quadrature().weight(0);
-                      if (contains_bits(update_flags, update_jacobians))
+                      if (update_flags.contains(update_jacobians))
                         {
                           DerivativeForm<1, dim, dim> inv_jac =
                             fe_val.jacobian(0).covariant_form();
@@ -3036,8 +3032,7 @@ namespace internal
                                   inv_jac[d][ee];
                               }
                         }
-                      if (is_local &&
-                          (contains_bits(update_flags, update_jacobians)))
+                      if (is_local && (update_flags.contains(update_jacobians)))
                         for (unsigned int q = 0; q < fe_val.n_quadrature_points;
                              ++q)
                           {
@@ -3054,11 +3049,11 @@ namespace internal
                                     inv_jac[d][ee];
                                 }
                           }
-                      if (contains_bits(update_flags, update_jacobian_grads))
+                      if (update_flags.contains(update_jacobian_grads))
                         {
                           Assert(false, ExcNotImplemented());
                         }
-                      if (contains_bits(update_flags, update_normal_vectors))
+                      if (update_flags.contains(update_normal_vectors))
                         for (unsigned int d = 0; d < dim; ++d)
                           face_data_by_cells[my_q]
                             .normal_vectors[offset][d][v] =
@@ -3067,12 +3062,12 @@ namespace internal
                   // copy data for general data type
                   else
                     {
-                      if (contains_bits(update_flags, update_JxW_values))
+                      if (update_flags.contains(update_JxW_values))
                         for (unsigned int q = 0; q < fe_val.n_quadrature_points;
                              ++q)
                           face_data_by_cells[my_q].JxW_values[offset + q][v] =
                             fe_val.JxW(q);
-                      if (contains_bits(update_flags, update_jacobians))
+                      if (update_flags.contains(update_jacobians))
                         for (unsigned int q = 0; q < fe_val.n_quadrature_points;
                              ++q)
                           {
@@ -3089,11 +3084,11 @@ namespace internal
                                     inv_jac[d][ee];
                                 }
                           }
-                      if (contains_bits(update_flags, update_jacobian_grads))
+                      if (update_flags.contains(update_jacobian_grads))
                         {
                           Assert(false, ExcNotImplemented());
                         }
-                      if (contains_bits(update_flags, update_normal_vectors))
+                      if (update_flags.contains(update_normal_vectors))
                         for (unsigned int q = 0; q < fe_val.n_quadrature_points;
                              ++q)
                           for (unsigned int d = 0; d < dim; ++d)
@@ -3101,7 +3096,7 @@ namespace internal
                               .normal_vectors[offset + q][d][v] =
                               fe_val.normal_vector(q)[d];
                     }
-                  if (contains_bits(update_flags, update_quadrature_points))
+                  if (update_flags.contains(update_quadrature_points))
                     for (unsigned int q = 0; q < fe_val.n_quadrature_points;
                          ++q)
                       for (unsigned int d = 0; d < dim; ++d)
@@ -3110,8 +3105,8 @@ namespace internal
                              [cell * GeometryInfo<dim>::faces_per_cell + face] +
                            q][d][v] = fe_val.quadrature_point(q)[d];
                 }
-              if ((contains_bits(update_flags, update_normal_vectors)) &&
-                  (contains_bits(update_flags, update_jacobians)))
+              if ((update_flags.contains(update_normal_vectors)) &&
+                  (update_flags.contains(update_jacobians)))
                 for (unsigned int q = 0; q < (cell_type[cell] <= affine ?
                                                 1 :
                                                 fe_val.n_quadrature_points);
@@ -3120,8 +3115,8 @@ namespace internal
                     .normals_times_jacobians[0][offset + q] =
                     face_data_by_cells[my_q].normal_vectors[offset + q] *
                     face_data_by_cells[my_q].jacobians[0][offset + q];
-              if ((contains_bits(update_flags, update_normal_vectors)) &&
-                  (contains_bits(update_flags, update_jacobians)))
+              if ((update_flags.contains(update_normal_vectors)) &&
+                  (update_flags.contains(update_jacobians)))
                 for (unsigned int q = 0; q < (cell_type[cell] <= affine ?
                                                 1 :
                                                 fe_val.n_quadrature_points);

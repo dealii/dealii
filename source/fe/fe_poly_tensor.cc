@@ -454,11 +454,11 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
 
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(!contains_bits(fe_data.update_each, update_values) ||
+  Assert(!fe_data.update_each.contains(update_values) ||
            fe_data.shape_values.size()[0] == this->n_dofs_per_cell(),
          ExcDimensionMismatch(fe_data.shape_values.size()[0],
                               this->n_dofs_per_cell()));
-  Assert(!contains_bits(fe_data.update_each, update_values) ||
+  Assert(!fe_data.update_each.contains(update_values) ||
            fe_data.shape_values.size()[1] == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values.size()[1], n_q_points));
 
@@ -513,7 +513,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
       // fe_poly_tensor.h.
       double dof_sign = 1.0;
       // under some circumstances fe_data.dof_sign_change is not allocated
-      if (contains_bits(fe_data.update_each, update_values))
+      if (fe_data.update_each.contains(update_values))
         dof_sign = fe_data.dof_sign_change[dof_index];
 
       if (is_quad_dof)
@@ -550,7 +550,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
       // the previous one; or, even if it is a translation, if we use
       // mappings other than the standard mappings that require us to
       // recompute values and derivatives because of possible sign changes
-      if (contains_bits(fe_data.update_each, update_values) &&
+      if (fe_data.update_each.contains(update_values) &&
           ((cell_similarity != CellSimilarity::translation) ||
            ((mapping_kind == mapping_piola) ||
             (mapping_kind == mapping_raviart_thomas) ||
@@ -621,7 +621,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         }
 
       // update gradients. apply the same logic as above
-      if (contains_bits(fe_data.update_each, update_gradients) &&
+      if (fe_data.update_each.contains(update_gradients) &&
           ((cell_similarity != CellSimilarity::translation) ||
            ((mapping_kind == mapping_piola) ||
             (mapping_kind == mapping_raviart_thomas) ||
@@ -764,7 +764,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         }
 
       // update hessians. apply the same logic as above
-      if (contains_bits(fe_data.update_each, update_hessians) &&
+      if (fe_data.update_each.contains(update_hessians) &&
           ((cell_similarity != CellSimilarity::translation) ||
            ((mapping_kind == mapping_piola) ||
             (mapping_kind == mapping_raviart_thomas) ||
@@ -1038,7 +1038,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         }
 
       // third derivatives are not implemented
-      if (contains_bits(fe_data.update_each, update_3rd_derivatives) &&
+      if (fe_data.update_each.contains(update_3rd_derivatives) &&
           ((cell_similarity != CellSimilarity::translation) ||
            ((mapping_kind == mapping_piola) ||
             (mapping_kind == mapping_raviart_thomas) ||
@@ -1143,7 +1143,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
       // fe_poly_tensor.h.
       double dof_sign = 1.0;
       // under some circumstances fe_data.dof_sign_change is not allocated
-      if (contains_bits(fe_data.update_each, update_values))
+      if (fe_data.update_each.contains(update_values))
         dof_sign = fe_data.dof_sign_change[dof_index];
 
       if (is_quad_dof)
@@ -1174,7 +1174,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
           [dof_index * this->n_components() +
            this->get_nonzero_components(dof_index).first_selected_component()];
 
-      if (contains_bits(fe_data.update_each, update_values))
+      if (fe_data.update_each.contains(update_values))
         {
           switch (mapping_kind)
             {
@@ -1260,7 +1260,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
             }
         }
 
-      if (contains_bits(fe_data.update_each, update_gradients))
+      if (fe_data.update_each.contains(update_gradients))
         {
           switch (mapping_kind)
             {
@@ -1428,7 +1428,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
             }
         }
 
-      if (contains_bits(fe_data.update_each, update_hessians))
+      if (fe_data.update_each.contains(update_hessians))
         {
           switch (mapping_kind)
             {
@@ -1727,7 +1727,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
         }
 
       // third derivatives are not implemented
-      if (contains_bits(fe_data.update_each, update_3rd_derivatives))
+      if (fe_data.update_each.contains(update_3rd_derivatives))
         {
           Assert(false, ExcNotImplemented())
         }
@@ -1829,7 +1829,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
       // fe_poly_tensor.h.
       double dof_sign = 1.0;
       // under some circumstances fe_data.dof_sign_change is not allocated
-      if (contains_bits(fe_data.update_each, update_values))
+      if (fe_data.update_each.contains(update_values))
         dof_sign = fe_data.dof_sign_change[dof_index];
 
       if (is_quad_dof)
@@ -1860,7 +1860,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
           [dof_index * this->n_components() +
            this->get_nonzero_components(dof_index).first_selected_component()];
 
-      if (contains_bits(fe_data.update_each, update_values))
+      if (fe_data.update_each.contains(update_values))
         {
           switch (mapping_kind)
             {
@@ -1949,7 +1949,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
             }
         }
 
-      if (contains_bits(fe_data.update_each, update_gradients))
+      if (fe_data.update_each.contains(update_gradients))
         {
           const ArrayView<Tensor<2, spacedim>> transformed_shape_grads =
             make_array_view(fe_data.transformed_shape_grads,
@@ -2103,7 +2103,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
             }
         }
 
-      if (contains_bits(fe_data.update_each, update_hessians))
+      if (fe_data.update_each.contains(update_hessians))
         {
           switch (mapping_kind)
             {
@@ -2401,7 +2401,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
         }
 
       // third derivatives are not implemented
-      if (contains_bits(fe_data.update_each, update_3rd_derivatives))
+      if (fe_data.update_each.contains(update_3rd_derivatives))
         {
           Assert(false, ExcNotImplemented())
         }
@@ -2425,14 +2425,14 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
         {
           case mapping_none:
             {
-              if (contains_bits(flags, update_values))
+              if (flags.contains(update_values))
                 out |= update_values;
 
-              if (contains_bits(flags, update_gradients))
+              if (flags.contains(update_gradients))
                 out |= update_gradients | update_values |
                        update_jacobian_pushed_forward_grads;
 
-              if (contains_bits(flags, update_hessians))
+              if (flags.contains(update_hessians))
                 out |= update_hessians | update_values | update_gradients |
                        update_jacobian_pushed_forward_grads |
                        update_jacobian_pushed_forward_2nd_derivatives;
@@ -2441,16 +2441,16 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
           case mapping_raviart_thomas:
           case mapping_piola:
             {
-              if (contains_bits(flags, update_values))
+              if (flags.contains(update_values))
                 out |= update_values | update_piola;
 
-              if (contains_bits(flags, update_gradients))
+              if (flags.contains(update_gradients))
                 out |= update_gradients | update_values | update_piola |
                        update_jacobian_pushed_forward_grads |
                        update_covariant_transformation |
                        update_contravariant_transformation;
 
-              if (contains_bits(flags, update_hessians))
+              if (flags.contains(update_hessians))
                 out |= update_hessians | update_piola | update_values |
                        update_gradients | update_jacobian_pushed_forward_grads |
                        update_jacobian_pushed_forward_2nd_derivatives |
@@ -2462,16 +2462,16 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
 
           case mapping_contravariant:
             {
-              if (contains_bits(flags, update_values))
+              if (flags.contains(update_values))
                 out |= update_values | update_piola;
 
-              if (contains_bits(flags, update_gradients))
+              if (flags.contains(update_gradients))
                 out |= update_gradients | update_values |
                        update_jacobian_pushed_forward_grads |
                        update_covariant_transformation |
                        update_contravariant_transformation;
 
-              if (contains_bits(flags, update_hessians))
+              if (flags.contains(update_hessians))
                 out |= update_hessians | update_piola | update_values |
                        update_gradients | update_jacobian_pushed_forward_grads |
                        update_jacobian_pushed_forward_2nd_derivatives |
@@ -2483,15 +2483,15 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
           case mapping_nedelec:
           case mapping_covariant:
             {
-              if (contains_bits(flags, update_values))
+              if (flags.contains(update_values))
                 out |= update_values | update_covariant_transformation;
 
-              if (contains_bits(flags, update_gradients))
+              if (flags.contains(update_gradients))
                 out |= update_gradients | update_values |
                        update_jacobian_pushed_forward_grads |
                        update_covariant_transformation;
 
-              if (contains_bits(flags, update_hessians))
+              if (flags.contains(update_hessians))
                 out |= update_hessians | update_values | update_gradients |
                        update_jacobian_pushed_forward_grads |
                        update_jacobian_pushed_forward_2nd_derivatives |
