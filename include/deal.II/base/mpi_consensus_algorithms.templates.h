@@ -94,16 +94,6 @@ namespace Utilities
 
       template <typename T1, typename T2>
       void
-      Process<T1, T2>::prepare_buffer_for_answer(const unsigned int,
-                                                 std::vector<T2> &)
-      {
-        // nothing to do
-      }
-
-
-
-      template <typename T1, typename T2>
-      void
       Process<T1, T2>::read_answer(const unsigned int, const std::vector<T2> &)
       {
         // nothing to do
@@ -737,7 +727,6 @@ namespace Utilities
             std::vector<T2> request_buffer;
 
             this->process.create_request(0, send_buffer);
-            this->process.prepare_buffer_for_answer(0, recv_buffer);
             this->process.answer_request(0, send_buffer, request_buffer);
             recv_buffer = request_buffer;
             this->process.read_answer(0, recv_buffer);

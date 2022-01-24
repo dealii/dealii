@@ -2138,10 +2138,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
 
                   AssertDimension(request_buffer.size(), buffer_recv.size());
                 },
-                [&](const auto other_rank, auto &recv_buffer) {
-                  recv_buffer.resize(cells_shared_ghosts[other_rank].size());
-                },
                 [&](const auto other_rank, const auto &recv_buffer) {
+                  Assert(recv_buffer.size() ==
+                           cells_shared_ghosts[other_rank].size(),
+                         ExcInternalError());
                   for (unsigned int i = 0; i < recv_buffer.size(); ++i)
                     {
                       cells[cells_shared_ghosts[other_rank][i].first] = {

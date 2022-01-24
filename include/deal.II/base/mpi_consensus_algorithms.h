@@ -94,20 +94,6 @@ namespace Utilities
 
         /**
          * Prepare the buffer where the payload of the answer of the request to
-         * the process with the specified rank is saved in. The most obvious
-         * task is to resize the buffer, since it is empty when the function is
-         * called.
-         *
-         * @param[in]  other_rank Rank of the process.
-         * @param[out] recv_buffer Data to be sent as part of the request
-         * (optional).
-         */
-        virtual void
-        prepare_buffer_for_answer(const unsigned int other_rank,
-                                  std::vector<T2> &  recv_buffer);
-
-        /**
-         * Prepare the buffer where the payload of the answer of the request to
          * the process with the specified rank is saved in.
          *
          * @param[in]  other_rank Rank of the process.
@@ -578,8 +564,6 @@ namespace Utilities
          * @param function_compute_targets called during `compute_targets`.
          * @param function_create_request called during `create_request`.
          * @param function_answer_request called during `answer_request`.
-         * @param function_prepare_buffer_for_answer called during
-         *   `prepare_buffer_for_answer`.
          * @param function_read_answer called during `read_answer`.
          */
         AnonymousProcess(
@@ -591,8 +575,6 @@ namespace Utilities
                                    const std::vector<T1> &,
                                    std::vector<T2> &)>
             &function_answer_request = {},
-          const std::function<void(const unsigned int, std::vector<T2> &)>
-            &function_prepare_buffer_for_answer = {},
           const std::function<void(const unsigned int, const std::vector<T2> &)>
             &function_read_answer = {});
 
@@ -618,13 +600,6 @@ namespace Utilities
                        std::vector<T2> &      request_buffer) override;
 
         /**
-         * @copydoc Process::prepare_buffer_for_answer()
-         */
-        void
-        prepare_buffer_for_answer(const unsigned int other_rank,
-                                  std::vector<T2> &  recv_buffer) override;
-
-        /**
          * @copydoc Process::read_answer()
          */
         void
@@ -639,8 +614,6 @@ namespace Utilities
         const std::function<
           void(const unsigned int, const std::vector<T1> &, std::vector<T2> &)>
           function_answer_request;
-        const std::function<void(const int, std::vector<T2> &)>
-          function_prepare_buffer_for_answer;
         const std::function<void(const int, const std::vector<T2> &)>
           function_read_answer;
       };
@@ -656,14 +629,11 @@ namespace Utilities
         const std::function<void(const unsigned int,
                                  const std::vector<T1> &,
                                  std::vector<T2> &)> &function_answer_request,
-        const std::function<void(const unsigned int, std::vector<T2> &)>
-          &function_prepare_buffer_for_answer,
         const std::function<void(const unsigned int, const std::vector<T2> &)>
           &function_read_answer)
         : function_compute_targets(function_compute_targets)
         , function_create_request(function_create_request)
         , function_answer_request(function_answer_request)
-        , function_prepare_buffer_for_answer(function_prepare_buffer_for_answer)
         , function_read_answer(function_read_answer)
       {}
 
@@ -698,18 +668,6 @@ namespace Utilities
       {
         if (function_answer_request)
           function_answer_request(other_rank, buffer_recv, request_buffer);
-      }
-
-
-
-      template <typename T1, typename T2>
-      void
-      AnonymousProcess<T1, T2>::prepare_buffer_for_answer(
-        const unsigned int other_rank,
-        std::vector<T2> &  recv_buffer)
-      {
-        if (function_prepare_buffer_for_answer)
-          function_prepare_buffer_for_answer(other_rank, recv_buffer);
       }
 
 
