@@ -1398,7 +1398,7 @@ template <typename somenumber>
 void
 SparseMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
                                           const Vector<somenumber> &src,
-                                          const number              om) const
+                                          const number              omega) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1424,9 +1424,9 @@ SparseMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
   // in each row, i.e. at index
   // rowstart[i]. and we do have a
   // square matrix by above assertion
-  if (om != number(1.))
+  if (omega != number(1.))
     for (size_type i = 0; i < n; ++i, ++dst_ptr, ++src_ptr, ++rowstart_ptr)
-      *dst_ptr = somenumber(om) * *src_ptr / somenumber(val[*rowstart_ptr]);
+      *dst_ptr = somenumber(omega) * *src_ptr / somenumber(val[*rowstart_ptr]);
   else
     for (size_type i = 0; i < n; ++i, ++dst_ptr, ++src_ptr, ++rowstart_ptr)
       *dst_ptr = *src_ptr / somenumber(val[*rowstart_ptr]);
@@ -1440,7 +1440,7 @@ void
 SparseMatrix<number>::precondition_SSOR(
   Vector<somenumber> &            dst,
   const Vector<somenumber> &      src,
-  const number                    om,
+  const number                    omega,
   const std::vector<std::size_t> &pos_right_of_diagonal) const
 {
   // to understand how this function works
@@ -1482,15 +1482,15 @@ SparseMatrix<number>::precondition_SSOR(
             s += val[j] * number(dst(cols->colnums[j]));
 
           // divide by diagonal element
-          *dst_ptr -= s * om;
+          *dst_ptr -= s * omega;
           *dst_ptr /= val[*rowstart_ptr];
         }
 
       rowstart_ptr = cols->rowstart.get();
       dst_ptr      = &dst(0);
       for (; rowstart_ptr != &cols->rowstart[n]; ++rowstart_ptr, ++dst_ptr)
-        *dst_ptr *=
-          somenumber(om * (number(2.) - om)) * somenumber(val[*rowstart_ptr]);
+        *dst_ptr *= somenumber(omega * (number(2.) - omega)) *
+                    somenumber(val[*rowstart_ptr]);
 
       // backward sweep
       rowstart_ptr = &cols->rowstart[n - 1];
@@ -1504,7 +1504,7 @@ SparseMatrix<number>::precondition_SSOR(
           for (size_type j = first_right_of_diagonal_index; j < end_row; ++j)
             s += val[j] * number(dst(cols->colnums[j]));
 
-          *dst_ptr -= s * om;
+          *dst_ptr -= s * omega;
           *dst_ptr /= val[*rowstart_ptr];
         };
       return;
@@ -1536,7 +1536,7 @@ SparseMatrix<number>::precondition_SSOR(
         s += val[j] * number(dst(cols->colnums[j]));
 
       // divide by diagonal element
-      *dst_ptr -= s * om;
+      *dst_ptr -= s * omega;
       Assert(val[*rowstart_ptr] != number(), ExcDivideByZero());
       *dst_ptr /= val[*rowstart_ptr];
     };
@@ -1544,7 +1544,8 @@ SparseMatrix<number>::precondition_SSOR(
   rowstart_ptr = cols->rowstart.get();
   dst_ptr      = &dst(0);
   for (size_type row = 0; row < n; ++row, ++rowstart_ptr, ++dst_ptr)
-    *dst_ptr *= somenumber((number(2.) - om)) * somenumber(val[*rowstart_ptr]);
+    *dst_ptr *=
+      somenumber((number(2.) - omega)) * somenumber(val[*rowstart_ptr]);
 
   // backward sweep
   rowstart_ptr = &cols->rowstart[n - 1];
@@ -1560,7 +1561,7 @@ SparseMatrix<number>::precondition_SSOR(
       number s = 0;
       for (size_type j = first_right_of_diagonal_index; j < end_row; ++j)
         s += val[j] * number(dst(cols->colnums[j]));
-      *dst_ptr -= s * om;
+      *dst_ptr -= s * omega;
       Assert(val[*rowstart_ptr] != number(), ExcDivideByZero());
       *dst_ptr /= val[*rowstart_ptr];
     };
@@ -1572,13 +1573,13 @@ template <typename somenumber>
 void
 SparseMatrix<number>::precondition_SOR(Vector<somenumber> &      dst,
                                        const Vector<somenumber> &src,
-                                       const number              om) const
+                                       const number              omega) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   dst = src;
-  SOR(dst, om);
+  SOR(dst, omega);
 }
 
 
@@ -1587,20 +1588,20 @@ template <typename somenumber>
 void
 SparseMatrix<number>::precondition_TSOR(Vector<somenumber> &      dst,
                                         const Vector<somenumber> &src,
-                                        const number              om) const
+                                        const number              omega) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   dst = src;
-  TSOR(dst, om);
+  TSOR(dst, omega);
 }
 
 
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::SOR(Vector<somenumber> &dst, const number om) const
+SparseMatrix<number>::SOR(Vector<somenumber> &dst, const number omega) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1619,7 +1620,7 @@ SparseMatrix<number>::SOR(Vector<somenumber> &dst, const number om) const
             s -= somenumber(val[j]) * dst(col);
         }
 
-      dst(row) = s * somenumber(om) / somenumber(val[cols->rowstart[row]]);
+      dst(row) = s * somenumber(omega) / somenumber(val[cols->rowstart[row]]);
     }
 }
 
@@ -1627,7 +1628,7 @@ SparseMatrix<number>::SOR(Vector<somenumber> &dst, const number om) const
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::TSOR(Vector<somenumber> &dst, const number om) const
+SparseMatrix<number>::TSOR(Vector<somenumber> &dst, const number omega) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1644,7 +1645,7 @@ SparseMatrix<number>::TSOR(Vector<somenumber> &dst, const number om) const
         if (cols->colnums[j] > row)
           s -= somenumber(val[j]) * dst(cols->colnums[j]);
 
-      dst(row) = s * somenumber(om) / somenumber(val[cols->rowstart[row]]);
+      dst(row) = s * somenumber(omega) / somenumber(val[cols->rowstart[row]]);
 
       if (row == 0)
         break;
@@ -1660,7 +1661,7 @@ void
 SparseMatrix<number>::PSOR(Vector<somenumber> &          dst,
                            const std::vector<size_type> &permutation,
                            const std::vector<size_type> &inverse_permutation,
-                           const number                  om) const
+                           const number                  omega) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1688,7 +1689,7 @@ SparseMatrix<number>::PSOR(Vector<somenumber> &          dst,
             }
         }
 
-      dst(row) = s * somenumber(om) / somenumber(val[cols->rowstart[row]]);
+      dst(row) = s * somenumber(omega) / somenumber(val[cols->rowstart[row]]);
     }
 }
 
@@ -1699,7 +1700,7 @@ void
 SparseMatrix<number>::TPSOR(Vector<somenumber> &          dst,
                             const std::vector<size_type> &permutation,
                             const std::vector<size_type> &inverse_permutation,
-                            const number                  om) const
+                            const number                  omega) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1725,7 +1726,7 @@ SparseMatrix<number>::TPSOR(Vector<somenumber> &          dst,
             s -= somenumber(val[j]) * dst(col);
         }
 
-      dst(row) = s * somenumber(om) / somenumber(val[cols->rowstart[row]]);
+      dst(row) = s * somenumber(omega) / somenumber(val[cols->rowstart[row]]);
     }
 }
 
@@ -1736,7 +1737,7 @@ template <typename somenumber>
 void
 SparseMatrix<number>::Jacobi_step(Vector<somenumber> &      v,
                                   const Vector<somenumber> &b,
-                                  const number              om) const
+                                  const number              omega) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1756,7 +1757,7 @@ SparseMatrix<number>::Jacobi_step(Vector<somenumber> &      v,
     }
   else
     w->equ(-1., b);
-  precondition_Jacobi(*w, *w, om);
+  precondition_Jacobi(*w, *w, omega);
   v -= *w;
 }
 
@@ -1767,7 +1768,7 @@ template <typename somenumber>
 void
 SparseMatrix<number>::SOR_step(Vector<somenumber> &      v,
                                const Vector<somenumber> &b,
-                               const number              om) const
+                               const number              omega) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1784,7 +1785,7 @@ SparseMatrix<number>::SOR_step(Vector<somenumber> &      v,
         {
           s -= somenumber(val[j]) * v(cols->colnums[j]);
         }
-      v(row) += s * somenumber(om) / somenumber(val[cols->rowstart[row]]);
+      v(row) += s * somenumber(omega) / somenumber(val[cols->rowstart[row]]);
     }
 }
 
@@ -1795,7 +1796,7 @@ template <typename somenumber>
 void
 SparseMatrix<number>::TSOR_step(Vector<somenumber> &      v,
                                 const Vector<somenumber> &b,
-                                const number              om) const
+                                const number              omega) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1812,7 +1813,7 @@ SparseMatrix<number>::TSOR_step(Vector<somenumber> &      v,
         {
           s -= somenumber(val[j]) * v(cols->colnums[j]);
         }
-      v(row) += s * somenumber(om) / somenumber(val[cols->rowstart[row]]);
+      v(row) += s * somenumber(omega) / somenumber(val[cols->rowstart[row]]);
     }
 }
 
@@ -1823,10 +1824,10 @@ template <typename somenumber>
 void
 SparseMatrix<number>::SSOR_step(Vector<somenumber> &      v,
                                 const Vector<somenumber> &b,
-                                const number              om) const
+                                const number              omega) const
 {
-  SOR_step(v, b, om);
-  TSOR_step(v, b, om);
+  SOR_step(v, b, omega);
+  TSOR_step(v, b, omega);
 }
 
 
@@ -1834,10 +1835,10 @@ SparseMatrix<number>::SSOR_step(Vector<somenumber> &      v,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number om) const
+SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number omega) const
 {
-  // TODO: Is this called anywhere? If so, multiplication with om(2-om)D is
-  // missing
+  // TODO: Is this called anywhere? If so, multiplication with omega(2-omega)D
+  // is missing
   Assert(false, ExcNotImplemented());
 
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
@@ -1863,7 +1864,7 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number om) const
                 s += somenumber(val[j]) * dst(p);
             }
         }
-      dst(i) -= s * somenumber(om);
+      dst(i) -= s * somenumber(omega);
       dst(i) /= somenumber(val[cols->rowstart[i]]);
     }
 
@@ -1880,7 +1881,7 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number om) const
                 s += somenumber(val[j]) * dst(p);
             }
         }
-      dst(i) -= s * somenumber(om) / somenumber(val[cols->rowstart[i]]);
+      dst(i) -= s * somenumber(omega) / somenumber(val[cols->rowstart[i]]);
     }
 }
 
