@@ -536,13 +536,13 @@ namespace internal
 
       template <typename U>
       static decltype(
-        std::declval<U const>().Tvmult(std::declval<VectorType &>(),
+        std::declval<const U>().Tvmult(std::declval<VectorType &>(),
                                        std::declval<const VectorType &>()))
       detect(const U &);
 
     public:
       static const bool value =
-        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
     };
 
     template <typename T, typename VectorType>
@@ -557,13 +557,13 @@ namespace internal
 
       template <typename U>
       static decltype(
-        std::declval<U const>().step(std::declval<VectorType &>(),
+        std::declval<const U>().step(std::declval<VectorType &>(),
                                      std::declval<const VectorType &>()))
       detect(const U &);
 
     public:
       static const bool value =
-        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
     };
 
     template <typename T, typename VectorType>
@@ -578,14 +578,14 @@ namespace internal
 
       template <typename U>
       static decltype(
-        std::declval<U const>().step(std::declval<VectorType &>(),
+        std::declval<const U>().step(std::declval<VectorType &>(),
                                      std::declval<const VectorType &>(),
                                      std::declval<const double>()))
       detect(const U &);
 
     public:
       static const bool value =
-        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
     };
 
     template <typename T, typename VectorType>
@@ -600,13 +600,13 @@ namespace internal
 
       template <typename U>
       static decltype(
-        std::declval<U const>().Tstep(std::declval<VectorType &>(),
+        std::declval<const U>().Tstep(std::declval<VectorType &>(),
                                       std::declval<const VectorType &>()))
       detect(const U &);
 
     public:
       static const bool value =
-        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
     };
 
     template <typename T, typename VectorType>
@@ -621,14 +621,14 @@ namespace internal
 
       template <typename U>
       static decltype(
-        std::declval<U const>().Tstep(std::declval<VectorType &>(),
+        std::declval<const U>().Tstep(std::declval<VectorType &>(),
                                       std::declval<const VectorType &>(),
                                       std::declval<const double>()))
       detect(const U &);
 
     public:
       static const bool value =
-        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
     };
 
     template <typename T, typename VectorType>
@@ -643,14 +643,14 @@ namespace internal
 
       template <typename U>
       static decltype(
-        std::declval<U const>().Jacobi_step(std::declval<VectorType &>(),
+        std::declval<const U>().Jacobi_step(std::declval<VectorType &>(),
                                             std::declval<const VectorType &>(),
                                             1.0))
       detect(const U &);
 
     public:
       static const bool value =
-        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
     };
 
     template <typename T, typename VectorType>
@@ -665,14 +665,14 @@ namespace internal
 
       template <typename U>
       static decltype(
-        std::declval<U const>().SOR_step(std::declval<VectorType &>(),
+        std::declval<const U>().SOR_step(std::declval<VectorType &>(),
                                          std::declval<const VectorType &>(),
                                          1.0))
       detect(const U &);
 
     public:
       static const bool value =
-        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
     };
 
     template <typename T, typename VectorType>
@@ -687,14 +687,14 @@ namespace internal
 
       template <typename U>
       static decltype(
-        std::declval<U const>().SSOR_step(std::declval<VectorType &>(),
+        std::declval<const U>().SSOR_step(std::declval<VectorType &>(),
                                           std::declval<const VectorType &>(),
                                           1.0))
       detect(const U &);
 
     public:
       static const bool value =
-        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
     };
 
     template <typename T, typename VectorType>
@@ -2632,8 +2632,8 @@ namespace internal
       // detector, otherwise SFINAE let's it work with the more general first
       // one that is bool
       static const bool value =
-        !std::is_same<bool,
-                      decltype(detect(std::declval<MatrixType>()))>::value &&
+        !std::is_same<decltype(detect(std::declval<MatrixType>())),
+                      bool>::value &&
         std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value &&
         std::is_same<
           VectorType,

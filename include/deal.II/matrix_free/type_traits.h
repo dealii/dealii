@@ -51,7 +51,7 @@ namespace internal
     // and its return type will be the same as local_element(),
     // that we expect to be T::value_type
     template <typename U>
-    static decltype(std::declval<U const>().local_element(0))
+    static decltype(std::declval<const U>().local_element(0))
     detect(const U &);
 
   public:
@@ -129,13 +129,13 @@ namespace internal
     detect(...);
 
     template <typename U>
-    static decltype(std::declval<U const>().partitioners_are_compatible(
+    static decltype(std::declval<const U>().partitioners_are_compatible(
       std::declval<Utilities::MPI::Partitioner>()))
     detect(const U &);
 
   public:
     static const bool value =
-      std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+      std::is_same<decltype(detect(std::declval<T>())), bool>::value;
   };
 
   // We need to have a separate declaration for static const members
@@ -153,7 +153,7 @@ namespace internal
     detect(...);
 
     template <typename U>
-    static decltype(std::declval<U const>().begin())
+    static decltype(std::declval<const U>().begin())
     detect(const U &);
 
   public:
@@ -176,7 +176,7 @@ namespace internal
     detect(...);
 
     template <typename U>
-    static decltype(std::declval<U const>().shared_vector_data())
+    static decltype(std::declval<const U>().shared_vector_data())
     detect(const U &);
 
   public:
@@ -228,12 +228,12 @@ namespace internal
     detect(...);
 
     template <typename U>
-    static decltype(std::declval<U const>().update_ghost_values_start(0))
+    static decltype(std::declval<const U>().update_ghost_values_start(0))
     detect(const U &);
 
   public:
     static const bool value =
-      !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+      !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
   };
 
   // We need to have a separate declaration for static const members
@@ -257,7 +257,7 @@ namespace internal
 
   public:
     static const bool value =
-      !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+      !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
   };
 
   // We need to have a separate declaration for static const members
