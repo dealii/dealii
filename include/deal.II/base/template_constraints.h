@@ -27,6 +27,68 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <class...>
+using void_t = void;
+
+// Detection idiom from Version 2 of the C++ Extensions for Library
+// Fundamentals, ISO/IEC TS 19568:2017
+
+namespace internal
+{
+  // base class for nonesuch to inherit from so it is not an aggregate
+  struct nonesuch_base
+  {};
+
+  // primary template handles all types not supporting the archetypal Op
+  template <class Default,
+            class /*AlwaysVoid*/,
+            template <class...>
+            class Op,
+            class... /*Args*/>
+  struct detector
+  {
+    using value_t = std::false_type;
+    using type    = Default;
+  };
+
+  // specialization recognizes and handles only types supporting Op
+  template <class Default, template <class...> class Op, class... Args>
+  struct detector<Default, void_t<Op<Args...>>, Op, Args...>
+  {
+    using value_t = std::true_type;
+    using type    = Op<Args...>;
+  };
+} // namespace internal
+
+struct nonesuch : private internal::nonesuch_base
+{
+  ~nonesuch()                = delete;
+  nonesuch(nonesuch const &) = delete;
+  void
+  operator=(nonesuch const &) = delete;
+};
+
+template <class Default, template <class...> class Op, class... Args>
+using detected_or = internal::detector<Default, void, Op, Args...>;
+
+template <template <class...> class Op, class... Args>
+using is_detected = typename detected_or<nonesuch, Op, Args...>::value_t;
+
+template <template <class...> class Op, class... Args>
+using detected_t = typename detected_or<nonesuch, Op, Args...>::type;
+
+template <class Default, template <class...> class Op, class... Args>
+using detected_or_t = typename detected_or<Default, Op, Args...>::type;
+
+template <class Expected, template <class...> class Op, class... Args>
+using is_detected_exact = std::is_same<Expected, detected_t<Op, Args...>>;
+
+template <class To, template <class...> class Op, class... Args>
+using is_detected_convertible =
+  std::is_convertible<detected_t<Op, Args...>, To>;
+
+
+
 namespace internal
 {
   namespace TemplateConstraints
@@ -98,23 +160,11 @@ struct enable_if_all
  * the `begin()` and `end()` functions, or is a C-style array.
  */
 template <typename T>
-class has_begin_and_end
-{
-  template <typename C>
-  static std::false_type
-  test(...);
+using begin_and_end_t =
+  decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()));
 
-  template <typename C>
-  static auto
-  test(int) -> decltype(std::begin(std::declval<C>()),
-                        std::end(std::declval<C>()),
-                        std::true_type());
-
-public:
-  using type = decltype(test<T>(0));
-
-  static const bool value = type::value;
-};
+template <typename T>
+using has_begin_and_end = is_detected<begin_and_end_t, T>;
 
 
 

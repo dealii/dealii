@@ -528,177 +528,73 @@ namespace internal
   namespace PreconditionRelaxation
   {
     template <typename T, typename VectorType>
-    struct has_Tvmult
-    {
-    private:
-      static bool
-      detect(...);
-
-      template <typename U>
-      static decltype(
-        std::declval<const U>().Tvmult(std::declval<VectorType &>(),
-                                       std::declval<const VectorType &>()))
-      detect(const U &);
-
-    public:
-      static const bool value =
-        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-    };
+    using Tvmult_t = decltype(
+      std::declval<T const>().Tvmult(std::declval<VectorType &>(),
+                                     std::declval<const VectorType &>()));
 
     template <typename T, typename VectorType>
-    const bool has_Tvmult<T, VectorType>::value;
+    using has_Tvmult = is_detected<Tvmult_t, T, VectorType>;
 
     template <typename T, typename VectorType>
-    struct has_step
-    {
-    private:
-      static bool
-      detect(...);
-
-      template <typename U>
-      static decltype(
-        std::declval<const U>().step(std::declval<VectorType &>(),
-                                     std::declval<const VectorType &>()))
-      detect(const U &);
-
-    public:
-      static const bool value =
-        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-    };
+    using step_t = decltype(
+      std::declval<T const>().step(std::declval<VectorType &>(),
+                                   std::declval<const VectorType &>()));
 
     template <typename T, typename VectorType>
-    const bool has_step<T, VectorType>::value;
+    using has_step = is_detected<step_t, T, VectorType>;
 
     template <typename T, typename VectorType>
-    struct has_step_omega
-    {
-    private:
-      static bool
-      detect(...);
-
-      template <typename U>
-      static decltype(
-        std::declval<const U>().step(std::declval<VectorType &>(),
-                                     std::declval<const VectorType &>(),
-                                     std::declval<const double>()))
-      detect(const U &);
-
-    public:
-      static const bool value =
-        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-    };
-
-    template <typename T, typename VectorType>
-    const bool has_step_omega<T, VectorType>::value;
-
-    template <typename T, typename VectorType>
-    struct has_Tstep
-    {
-    private:
-      static bool
-      detect(...);
-
-      template <typename U>
-      static decltype(
-        std::declval<const U>().Tstep(std::declval<VectorType &>(),
-                                      std::declval<const VectorType &>()))
-      detect(const U &);
-
-    public:
-      static const bool value =
-        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-    };
-
-    template <typename T, typename VectorType>
-    const bool has_Tstep<T, VectorType>::value;
-
-    template <typename T, typename VectorType>
-    struct has_Tstep_omega
-    {
-    private:
-      static bool
-      detect(...);
-
-      template <typename U>
-      static decltype(
-        std::declval<const U>().Tstep(std::declval<VectorType &>(),
-                                      std::declval<const VectorType &>(),
-                                      std::declval<const double>()))
-      detect(const U &);
-
-    public:
-      static const bool value =
-        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-    };
-
-    template <typename T, typename VectorType>
-    const bool has_Tstep_omega<T, VectorType>::value;
-
-    template <typename T, typename VectorType>
-    struct has_jacobi_step
-    {
-    private:
-      static bool
-      detect(...);
-
-      template <typename U>
-      static decltype(
-        std::declval<const U>().Jacobi_step(std::declval<VectorType &>(),
+    using step_omega_t =
+      decltype(std::declval<T const>().step(std::declval<VectorType &>(),
                                             std::declval<const VectorType &>(),
-                                            1.0))
-      detect(const U &);
-
-    public:
-      static const bool value =
-        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-    };
+                                            std::declval<const double>()));
 
     template <typename T, typename VectorType>
-    const bool has_jacobi_step<T, VectorType>::value;
+    using has_step_omega = is_detected<step_omega_t, T, VectorType>;
 
     template <typename T, typename VectorType>
-    struct has_SOR_step
-    {
-    private:
-      static bool
-      detect(...);
-
-      template <typename U>
-      static decltype(
-        std::declval<const U>().SOR_step(std::declval<VectorType &>(),
-                                         std::declval<const VectorType &>(),
-                                         1.0))
-      detect(const U &);
-
-    public:
-      static const bool value =
-        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-    };
+    using Tstep_t = decltype(
+      std::declval<T const>().Tstep(std::declval<VectorType &>(),
+                                    std::declval<const VectorType &>()));
 
     template <typename T, typename VectorType>
-    const bool has_SOR_step<T, VectorType>::value;
+    using has_Tstep = is_detected<Tstep_t, T, VectorType>;
 
     template <typename T, typename VectorType>
-    struct has_SSOR_step
-    {
-    private:
-      static bool
-      detect(...);
+    using Tstep_omega_t =
+      decltype(std::declval<T const>().Tstep(std::declval<VectorType &>(),
+                                             std::declval<const VectorType &>(),
+                                             std::declval<const double>()));
 
-      template <typename U>
-      static decltype(
-        std::declval<const U>().SSOR_step(std::declval<VectorType &>(),
+    template <typename T, typename VectorType>
+    using has_Tstep_omega = is_detected<Tstep_omega_t, T, VectorType>;
+
+    template <typename T, typename VectorType>
+    using jacobi_step_t = decltype(
+      std::declval<T const>().Jacobi_step(std::declval<VectorType &>(),
                                           std::declval<const VectorType &>(),
-                                          1.0))
-      detect(const U &);
-
-    public:
-      static const bool value =
-        !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-    };
+                                          std::declval<const double>()));
 
     template <typename T, typename VectorType>
-    const bool has_SSOR_step<T, VectorType>::value;
+    using has_jacobi_step = is_detected<jacobi_step_t, T, VectorType>;
+
+    template <typename T, typename VectorType>
+    using SOR_step_t = decltype(
+      std::declval<T const>().SOR_step(std::declval<VectorType &>(),
+                                       std::declval<const VectorType &>(),
+                                       std::declval<const double>()));
+
+    template <typename T, typename VectorType>
+    using has_SOR_step = is_detected<SOR_step_t, T, VectorType>;
+
+    template <typename T, typename VectorType>
+    using SSOR_step_t = decltype(
+      std::declval<T const>().SSOR_step(std::declval<VectorType &>(),
+                                        std::declval<const VectorType &>(),
+                                        std::declval<const double>()));
+
+    template <typename T, typename VectorType>
+    using has_SSOR_step = is_detected<SSOR_step_t, T, VectorType>;
 
     template <typename MatrixType>
     class PreconditionJacobiImpl
