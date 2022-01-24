@@ -570,6 +570,28 @@ namespace internal
     const bool has_step<T, VectorType>::value;
 
     template <typename T, typename VectorType>
+    struct has_step_omega
+    {
+    private:
+      static bool
+      detect(...);
+
+      template <typename U>
+      static decltype(
+        std::declval<U const>().step(std::declval<VectorType &>(),
+                                     std::declval<const VectorType &>(),
+                                     std::declval<const double>()))
+      detect(const U &);
+
+    public:
+      static const bool value =
+        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+    };
+
+    template <typename T, typename VectorType>
+    const bool has_step_omega<T, VectorType>::value;
+
+    template <typename T, typename VectorType>
     struct has_Tstep
     {
     private:
@@ -589,6 +611,28 @@ namespace internal
 
     template <typename T, typename VectorType>
     const bool has_Tstep<T, VectorType>::value;
+
+    template <typename T, typename VectorType>
+    struct has_Tstep_omega
+    {
+    private:
+      static bool
+      detect(...);
+
+      template <typename U>
+      static decltype(
+        std::declval<U const>().Tstep(std::declval<VectorType &>(),
+                                      std::declval<const VectorType &>(),
+                                      std::declval<const double>()))
+      detect(const U &);
+
+    public:
+      static const bool value =
+        !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+    };
+
+    template <typename T, typename VectorType>
+    const bool has_Tstep_omega<T, VectorType>::value;
 
     template <typename T, typename VectorType>
     struct has_jacobi_step
@@ -923,12 +967,31 @@ namespace internal
       const std::vector<size_type> &inverse_permutation;
     };
 
-    template <
-      typename MatrixType,
-      typename PreconditionerType,
-      typename VectorType,
-      typename std::enable_if<has_step<PreconditionerType, VectorType>::value,
-                              PreconditionerType>::type * = nullptr>
+    template <typename MatrixType,
+              typename PreconditionerType,
+              typename VectorType,
+              typename std::enable_if<
+                has_step_omega<PreconditionerType, VectorType>::value,
+                PreconditionerType>::type * = nullptr>
+    void
+    step(const MatrixType &,
+         const PreconditionerType &preconditioner,
+         VectorType &              dst,
+         const VectorType &        src,
+         const double              relaxation,
+         VectorType &,
+         VectorType &)
+    {
+      preconditioner.step(dst, src, relaxation);
+    }
+
+    template <typename MatrixType,
+              typename PreconditionerType,
+              typename VectorType,
+              typename std::enable_if<
+                !has_step_omega<PreconditionerType, VectorType>::value &&
+                  has_step<PreconditionerType, VectorType>::value,
+                PreconditionerType>::type * = nullptr>
     void
     step(const MatrixType &,
          const PreconditionerType &preconditioner,
@@ -945,12 +1008,13 @@ namespace internal
       preconditioner.step(dst, src);
     }
 
-    template <
-      typename MatrixType,
-      typename PreconditionerType,
-      typename VectorType,
-      typename std::enable_if<!has_step<PreconditionerType, VectorType>::value,
-                              PreconditionerType>::type * = nullptr>
+    template <typename MatrixType,
+              typename PreconditionerType,
+              typename VectorType,
+              typename std::enable_if<
+                !has_step_omega<PreconditionerType, VectorType>::value &&
+                  !has_step<PreconditionerType, VectorType>::value,
+                PreconditionerType>::type * = nullptr>
     void
     step(const MatrixType &        A,
          const PreconditionerType &preconditioner,
@@ -970,12 +1034,31 @@ namespace internal
       dst.add(relaxation, tmp);
     }
 
-    template <
-      typename MatrixType,
-      typename PreconditionerType,
-      typename VectorType,
-      typename std::enable_if<has_Tstep<PreconditionerType, VectorType>::value,
-                              PreconditionerType>::type * = nullptr>
+    template <typename MatrixType,
+              typename PreconditionerType,
+              typename VectorType,
+              typename std::enable_if<
+                has_Tstep_omega<PreconditionerType, VectorType>::value,
+                PreconditionerType>::type * = nullptr>
+    void
+    Tstep(const MatrixType &,
+          const PreconditionerType &preconditioner,
+          VectorType &              dst,
+          const VectorType &        src,
+          const double              relaxation,
+          VectorType &,
+          VectorType &)
+    {
+      preconditioner.Tstep(dst, src, relaxation);
+    }
+
+    template <typename MatrixType,
+              typename PreconditionerType,
+              typename VectorType,
+              typename std::enable_if<
+                !has_Tstep_omega<PreconditionerType, VectorType>::value &&
+                  has_Tstep<PreconditionerType, VectorType>::value,
+                PreconditionerType>::type * = nullptr>
     void
     Tstep(const MatrixType &,
           const PreconditionerType &preconditioner,
@@ -1014,12 +1097,13 @@ namespace internal
              ExcMessage("Matrix A does not provide a Tvmult() function!"));
     }
 
-    template <
-      typename MatrixType,
-      typename PreconditionerType,
-      typename VectorType,
-      typename std::enable_if<!has_Tstep<PreconditionerType, VectorType>::value,
-                              PreconditionerType>::type * = nullptr>
+    template <typename MatrixType,
+              typename PreconditionerType,
+              typename VectorType,
+              typename std::enable_if<
+                !has_Tstep_omega<PreconditionerType, VectorType>::value &&
+                  !has_Tstep<PreconditionerType, VectorType>::value,
+                PreconditionerType>::type * = nullptr>
     void
     Tstep(const MatrixType &        A,
           const PreconditionerType &preconditioner,
