@@ -344,8 +344,8 @@ public:
    * entry.
    */
   unsigned int
-  child_cell_on_face(const unsigned int  face_n,
-                     const unsigned int  subface_n,
+  child_cell_on_face(const unsigned int  face,
+                     const unsigned int  subface,
                      const unsigned char face_orientation = 1) const;
 
   /**
