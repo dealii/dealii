@@ -5134,13 +5134,26 @@ namespace internal
                       Assert(false, ExcInternalError());
                     }
 
+                  // Also check whether we have to refine any of the faces and
+                  // edges that bound this cell. They may of course already be
+                  // refined, so we only *mark* them for refinement by setting
+                  // the user flags
                   for (const auto face : cell->face_indices())
-                    if (cell->face(face)->number_of_children() < 4)
+                    if (cell->face(face)->n_children() == 0)
                       cell->face(face)->set_user_flag();
+                    else
+                      Assert(cell->face(face)->n_children() ==
+                               cell->reference_cell()
+                                 .face_reference_cell(face)
+                                 .n_isotropic_children(),
+                             ExcInternalError());
 
                   for (const auto line : cell->line_indices())
                     if (cell->line(line)->has_children() == false)
                       cell->line(line)->set_user_flag();
+                    else
+                      Assert(cell->line(line)->n_children() == 2,
+                             ExcInternalError());
                 }
 
             const unsigned int used_cells =
