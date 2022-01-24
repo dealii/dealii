@@ -1147,6 +1147,7 @@ ReferenceCell::child_cell_on_face(
   const unsigned char face_orientation_raw) const
 {
   AssertIndexRange(face, n_faces());
+  AssertIndexRange(subface, face_reference_cell(face).n_isotropic_children());
 
   if (*this == ReferenceCells::Vertex)
     {
