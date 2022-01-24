@@ -1385,7 +1385,7 @@ public:
   void
   precondition_SOR(Vector<somenumber> &      dst,
                    const Vector<somenumber> &src,
-                   const number              om = 1.) const;
+                   const number              omega = 1.) const;
 
   /**
    * Apply transpose SOR preconditioning matrix to <tt>src</tt>.
@@ -1394,7 +1394,7 @@ public:
   void
   precondition_TSOR(Vector<somenumber> &      dst,
                     const Vector<somenumber> &src,
-                    const number              om = 1.) const;
+                    const number              omega = 1.) const;
 
   /**
    * Perform SSOR preconditioning in-place.  Apply the preconditioner matrix
@@ -1411,7 +1411,7 @@ public:
    */
   template <typename somenumber>
   void
-  SOR(Vector<somenumber> &v, const number om = 1.) const;
+  SOR(Vector<somenumber> &v, const number omega = 1.) const;
 
   /**
    * Perform a transpose SOR preconditioning in-place.  <tt>omega</tt> is the
@@ -1419,7 +1419,7 @@ public:
    */
   template <typename somenumber>
   void
-  TSOR(Vector<somenumber> &v, const number om = 1.) const;
+  TSOR(Vector<somenumber> &v, const number omega = 1.) const;
 
   /**
    * Perform a permuted SOR preconditioning in-place.
@@ -1436,7 +1436,7 @@ public:
   PSOR(Vector<somenumber> &          v,
        const std::vector<size_type> &permutation,
        const std::vector<size_type> &inverse_permutation,
-       const number                  om = 1.) const;
+       const number                  omega = 1.) const;
 
   /**
    * Perform a transposed permuted SOR preconditioning in-place.
@@ -1453,7 +1453,7 @@ public:
   TPSOR(Vector<somenumber> &          v,
         const std::vector<size_type> &permutation,
         const std::vector<size_type> &inverse_permutation,
-        const number                  om = 1.) const;
+        const number                  omega = 1.) const;
 
   /**
    * Do one Jacobi step on <tt>v</tt>.  Performs a direct Jacobi step with
@@ -1464,7 +1464,7 @@ public:
   void
   Jacobi_step(Vector<somenumber> &      v,
               const Vector<somenumber> &b,
-              const number              om = 1.) const;
+              const number              omega = 1.) const;
 
   /**
    * Do one SOR step on <tt>v</tt>.  Performs a direct SOR step with right
@@ -1474,7 +1474,7 @@ public:
   void
   SOR_step(Vector<somenumber> &      v,
            const Vector<somenumber> &b,
-           const number              om = 1.) const;
+           const number              omega = 1.) const;
 
   /**
    * Do one adjoint SOR step on <tt>v</tt>.  Performs a direct TSOR step with
@@ -1484,7 +1484,7 @@ public:
   void
   TSOR_step(Vector<somenumber> &      v,
             const Vector<somenumber> &b,
-            const number              om = 1.) const;
+            const number              omega = 1.) const;
 
   /**
    * Do one SSOR step on <tt>v</tt>.  Performs a direct SSOR step with right
@@ -1494,7 +1494,7 @@ public:
   void
   SSOR_step(Vector<somenumber> &      v,
             const Vector<somenumber> &b,
-            const number              om = 1.) const;
+            const number              omega = 1.) const;
   //@}
   /**
    * @name Iterators
