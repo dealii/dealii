@@ -1376,7 +1376,8 @@ namespace Particles
                                                           reference_locations);
 
               if (GeometryInfo<dim>::is_inside_unit_cell(
-                    reference_locations[0]),1e-12)
+                    reference_locations[0]),
+                  1e-12)
                 {
                   current_cell = *cell;
                   found_cell   = true;
