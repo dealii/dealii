@@ -1019,6 +1019,14 @@ ReferenceCell::n_faces() const
 
 
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::face_indices() const
+{
+  return {0U, n_faces()};
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::vertex_indices() const
 {
   return {0U, n_vertices()};
@@ -1030,14 +1038,6 @@ inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::line_indices() const
 {
   return {0U, n_lines()};
-}
-
-
-
-inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::face_indices() const
-{
-  return {0U, n_faces()};
 }
 
 
