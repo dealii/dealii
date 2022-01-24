@@ -33,6 +33,12 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef DOXYGEN
 template <int, int>
 class FiniteElement;
+class UpdateFlags;
+
+namespace internal
+{
+  constexpr UpdateFlags make_update_flags(int);
+}
 #endif
 
 /*!@addtogroup feaccess */
@@ -63,10 +69,54 @@ class FiniteElement;
  * and
  * @ref FE_vs_Mapping_vs_FEValues "How Mapping, FiniteElement, and FEValues work together".
  */
-enum UpdateFlags
+class UpdateFlags
 {
+	public:
+
+/**
+ * Return an object in which all bits are set which are set in the current
+ * object or in the input argument @p in.
+ */
+constexpr UpdateFlags
+operator|(const UpdateFlags in) const;
+
+/**
+ * Set the bits from the input argument @p in also in the current object.
+ */
+constexpr UpdateFlags &
+operator|=(const UpdateFlags in);
+
+/**
+ * Return an object in which all bits are set which are set in the current
+ * object as well as in the input argument @p in.
+ */
+constexpr UpdateFlags
+operator&(const UpdateFlags in) const;
+
+/**
+ * Clear all the bits in the current object if they are not also set in the
+ * input argument @p in.
+ */
+constexpr UpdateFlags &
+operator&=(const UpdateFlags in);
+
+/**
+ * Check if the current object and the input argument @p in are equal.
+ */ 
+    constexpr bool operator==(const UpdateFlags in) const;
+
+/**
+ * Check if the current object and the input argument @p in are not equal.
+ */
+    constexpr bool operator!=(const UpdateFlags in) const;
+
+/**
+ *  Check if the current objects contains the flags given in the input argument @p in.
+ */
+    constexpr bool contains(const UpdateFlags in) const;
+
   //! No update
-  update_default = 0,
+  static const UpdateFlags update_default;
   //! Shape function values
   /**
    * Compute the values of the shape functions at the quadrature points on the
@@ -75,32 +125,32 @@ enum UpdateFlags
    * cell, but they are different for more complicated elements, such as
    * FE_RaviartThomas elements.
    */
-  update_values = 0x0001,
+  static const UpdateFlags update_values;
   //! Shape function gradients
   /**
    * Compute the gradients of the shape functions in coordinates of the real
    * cell.
    */
-  update_gradients = 0x0002,
+  static const UpdateFlags update_gradients;
   //! Second derivatives of shape functions
   /**
    * Compute the second derivatives of the shape functions in coordinates of
    * the real cell.
    */
-  update_hessians = 0x0004,
+  static const UpdateFlags update_hessians;
   //! Third derivatives of shape functions
   /**
    * Compute the third derivatives of the shape functions in coordinates of
    * the real cell
    */
-  update_3rd_derivatives = 0x0008,
+  static const UpdateFlags update_3rd_derivatives;
   //! Outer normal vector, not normalized
   /**
    * Vector product of tangential vectors, yielding a normal vector with a
    * length corresponding to the surface element; may be more efficient than
    * computing both.
    */
-  update_boundary_forms = 0x0010,
+  static const UpdateFlags update_boundary_forms;
   //! Transformed quadrature points
   /**
    * Compute the quadrature points location in real cell coordinates.
@@ -119,114 +169,117 @@ enum UpdateFlags
    * In the context of DataPostprocessor,
    * DataPostprocessorInputs::CommonInputs::evaluation_points will be updated.
    */
-  update_quadrature_points = 0x0020,
+  static const UpdateFlags update_quadrature_points;
   //! Transformed quadrature weights
   /**
    * Compute the quadrature weights on the real cell, i.e. the weights of the
    * quadrature rule multiplied with the determinant of the Jacobian of the
    * transformation from reference to real cell.
    */
-  update_JxW_values = 0x0040,
+  static const UpdateFlags update_JxW_values;
   //! Normal vectors
   /**
    * Compute the normal vectors, either for a face or for a cell of
    * codimension one. Setting this flag for any other object will raise an
    * error.
    */
-  update_normal_vectors = 0x0080,
+  static const UpdateFlags  update_normal_vectors;
   //! Volume element
   /**
    * Compute the Jacobian of the transformation from the reference cell to the
    * real cell.
    */
-  update_jacobians = 0x0100,
+  static const UpdateFlags  update_jacobians;
   //! Gradient of volume element
   /**
    * Compute the derivatives of the Jacobian of the transformation.
    */
-  update_jacobian_grads = 0x0200,
+  static const UpdateFlags update_jacobian_grads;
   //! Volume element
   /**
    * Compute the inverse Jacobian of the transformation from the reference
    * cell to the real cell.
    */
-  update_inverse_jacobians = 0x0400,
+  static const UpdateFlags update_inverse_jacobians;
   //! Covariant transformation
   /**
    * Compute all values the Mapping needs to perform a contravariant
    * transformation of vectors. For special mappings like MappingCartesian
    * this may be simpler than #update_inverse_jacobians.
    */
-  update_covariant_transformation = 0x0800,
+  static const UpdateFlags update_covariant_transformation;
   //! Contravariant transformation
   /**
    * Compute all values the Mapping needs to perform a contravariant
    * transformation of vectors. For special mappings like MappingCartesian
    * this may be simpler than #update_jacobians.
    */
-  update_contravariant_transformation = 0x1000,
+  static const UpdateFlags update_contravariant_transformation;
   //! Shape function values of transformation
   /**
    * Compute the shape function values of the transformation defined by the
    * Mapping.
    */
-  update_transformation_values = 0x2000,
+  static const UpdateFlags update_transformation_values;
   //! Shape function gradients of transformation
   /**
    * Compute the shape function gradients of the transformation defined by the
    * Mapping.
    */
-  update_transformation_gradients = 0x4000,
+  static const UpdateFlags update_transformation_gradients;
   //! Determinant of the Jacobian
   /**
    * Compute the volume element in each quadrature point.
    */
-  update_volume_elements = 0x10000,
+  static const UpdateFlags update_volume_elements;
   /**
    * Compute the derivatives of the Jacobian of the transformation pushed
    * forward to the real cell coordinates.
    */
-  update_jacobian_pushed_forward_grads = 0x100000,
+  static const UpdateFlags update_jacobian_pushed_forward_grads;
   /**
    * Compute the second derivatives of the Jacobian of the transformation.
    */
-  update_jacobian_2nd_derivatives = 0x200000,
+  static const UpdateFlags update_jacobian_2nd_derivatives;
   /**
    * Compute the second derivatives of the Jacobian of the transformation
    * pushed forward to the real cell coordinates.
    */
-  update_jacobian_pushed_forward_2nd_derivatives = 0x400000,
+  static const UpdateFlags update_jacobian_pushed_forward_2nd_derivatives;
   /**
    * Compute the third derivatives of the Jacobian of the transformation.
    */
-  update_jacobian_3rd_derivatives = 0x800000,
+  static const UpdateFlags update_jacobian_3rd_derivatives;
   /**
    * Compute the third derivatives of the Jacobian of the transformation
    * pushed forward to the real cell coordinates.
    */
-  update_jacobian_pushed_forward_3rd_derivatives = 0x1000000,
+  static const UpdateFlags update_jacobian_pushed_forward_3rd_derivatives;
   //! Values needed for Piola transform
   /**
    * Combination of the flags needed for Piola transform of Hdiv elements.
    */
-  update_piola = update_volume_elements | update_contravariant_transformation,
+  static const UpdateFlags update_piola;
   /**
    * Combination of the flags that require a mapping calculation
    */
-  update_mapping =
-    // Direct data
-  update_quadrature_points | update_JxW_values | update_jacobians |
-  update_jacobian_grads | update_jacobian_pushed_forward_grads |
-  update_jacobian_2nd_derivatives |
-  update_jacobian_pushed_forward_2nd_derivatives |
-  update_jacobian_3rd_derivatives |
-  update_jacobian_pushed_forward_3rd_derivatives | update_inverse_jacobians |
-  update_boundary_forms | update_normal_vectors |
-  // Transformation dependence
-  update_covariant_transformation | update_contravariant_transformation |
-  update_transformation_values | update_transformation_gradients |
-  // Volume data
-  update_volume_elements
+  static const UpdateFlags update_mapping;
+
+	private:
+  /**
+   * An integer representing the flags.
+   */
+  int field;
+
+  /**
+   * Private constructor only to be used internally.
+   */
+  constexpr UpdateFlags(int i);
+
+  /**
+   * Friend declaration so that make_enum can call the private constructor.
+   */
+  friend constexpr UpdateFlags make_enum(int);
 };
 
 
@@ -240,128 +293,170 @@ inline StreamType &
 operator<<(StreamType &s, const UpdateFlags u)
 {
   s << " UpdateFlags|";
-  if (u & update_values)
+  if (u & UpdateFlags::update_values)
     s << "values|";
-  if (u & update_gradients)
+  if (u & UpdateFlags::update_gradients)
     s << "gradients|";
-  if (u & update_hessians)
+  if (u & UpdateFlags::update_hessians)
     s << "hessians|";
-  if (u & update_3rd_derivatives)
+  if (u & UpdateFlags::update_3rd_derivatives)
     s << "3rd_derivatives|";
-  if (u & update_quadrature_points)
+  if (u & UpdateFlags::update_quadrature_points)
     s << "quadrature_points|";
-  if (u & update_JxW_values)
+  if (u & UpdateFlags::update_JxW_values)
     s << "JxW_values|";
-  if (u & update_normal_vectors)
+  if (u & UpdateFlags::update_normal_vectors)
     s << "normal_vectors|";
-  if (u & update_jacobians)
+  if (u & UpdateFlags::update_jacobians)
     s << "jacobians|";
-  if (u & update_inverse_jacobians)
+  if (u & UpdateFlags::update_inverse_jacobians)
     s << "inverse_jacobians|";
-  if (u & update_jacobian_grads)
+  if (u & UpdateFlags::update_jacobian_grads)
     s << "jacobian_grads|";
-  if (u & update_covariant_transformation)
+  if (u & UpdateFlags::update_covariant_transformation)
     s << "covariant_transformation|";
-  if (u & update_contravariant_transformation)
+  if (u & UpdateFlags::update_contravariant_transformation)
     s << "contravariant_transformation|";
-  if (u & update_transformation_values)
+  if (u & UpdateFlags::update_transformation_values)
     s << "transformation_values|";
-  if (u & update_transformation_gradients)
+  if (u & UpdateFlags::update_transformation_gradients)
     s << "transformation_gradients|";
-  if (u & update_jacobian_pushed_forward_grads)
+  if (u & UpdateFlags::update_jacobian_pushed_forward_grads)
     s << "jacobian_pushed_forward_grads|";
-  if (u & update_jacobian_2nd_derivatives)
+  if (u & UpdateFlags::update_jacobian_2nd_derivatives)
     s << "jacobian_2nd_derivatives|";
-  if (u & update_jacobian_pushed_forward_2nd_derivatives)
+  if (u & UpdateFlags::update_jacobian_pushed_forward_2nd_derivatives)
     s << "jacobian_pushed_forward_2nd_derivatives|";
-  if (u & update_jacobian_3rd_derivatives)
+  if (u & UpdateFlags::update_jacobian_3rd_derivatives)
     s << "jacobian_3rd_derivatives|";
-  if (u & update_jacobian_pushed_forward_3rd_derivatives)
+  if (u & UpdateFlags::update_jacobian_pushed_forward_3rd_derivatives)
     s << "jacobian_pushed_forward_3rd_derivatives|";
 
   // TODO: check that 'u' really only has the flags set that are handled above
   return s;
 }
 
+// Import all flags into the global namespace.
+constexpr UpdateFlags update_default = internal::make_enum(0);
+constexpr UpdateFlags UpdateFlags::update_values = internal::make_enum(0x0001);
+constexpr UpdateFlags UpdateFlags::update_gradients = internal::make_enum(0x0002);
+constexpr UpdateFlags UpdateFlags::update_hessians = internal::make_enum(0x0004);
+constexpr UpdateFlags UpdateFlags::update_3rd_derivatives = internal::make_enum(0x0008);
+constexpr UpdateFlags UpdateFlags::update_boundary_forms = internal::make_enum(0x0010);
+constexpr UpdateFlags UpdateFlags::update_quadrature_points = internal::make_enum(0x0020);
+constexpr UpdateFlags UpdateFlags::update_JxW_values = internal::make_enum(0x0040);
+constexpr UpdateFlags UpdateFlags::update_normal_vectors = internal::make_enum(0x0080);
+constexpr UpdateFlags UpdateFlags::update_jacobians = internal::make_enum(0x01000);
+constexpr UpdateFlags UpdateFlags::update_jacobian_grads = internal::make_enum(0x02000:
+constexpr UpdateFlags UpdateFlags::update_inverse_jacobians = internal::make_enum(0x0400);
+constexpr UpdateFlags UpdateFlags::update_covariant_transformation = internal::make_enum(0x0800);
+constexpr UpdateFlags UpdateFlags::update_contravariant_transformation = internal::make_enum(0x1000);
+constexpr UpdateFlags UpdateFlags::update_transformation_values = internal::make_enum(0x2000);
+constexpr UpdateFlags UpdateFlags::update_transformation_gradients = internal::make_enum(0x4000);
+constexpr UpdateFlags UpdateFlags::update_volume_elements = internal::make_enum(0x10000);
+constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_grads = internal::make_enum(0x100000);
+constexpr UpdateFlags UpdateFlags::update_jacobian_2nd_derivatives = internal::make_enum(0x200000);
+constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_2nd_derivatives = internal::make_enum(0x400000);
+constexpr UpdateFlags UpdateFlags::update_jacobian_3rd_derivatives = internal::make_enum(0x800000);
+constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_3rd_derivatives = internal::make_enum(0x1000000);
+constexpr UpdateFlags UpdateFlags::update_piola = update_volume_elements | update_contravariant_transformation,
+constexpr UpdateFlags UpdateFlags::update_mapping =
+update_quadrature_points | update_JxW_values | update_jacobians |
+update_jacobian_grads | update_jacobian_pushed_forward_grads |
+update_jacobian_2nd_derivatives |
+update_jacobian_pushed_forward_2nd_derivatives |
+update_jacobian_3rd_derivatives |
+update_jacobian_pushed_forward_3rd_derivatives | update_inverse_jacobians |
+update_boundary_forms | update_normal_vectors |
+update_covariant_transformation | update_contravariant_transformation |
+update_transformation_values | update_transformation_gradients |
+update_volume_elements;
 
-/**
- * Global operator which returns an object in which all bits are set which are
- * either set in the first or the second argument. This operator exists since
- * if it did not then the result of the bit-or <tt>operator |</tt> would be an
- * integer which would in turn trigger a compiler warning when we tried to
- * assign it to an object of type UpdateFlags.
- *
- * @ref UpdateFlags
- */
-inline UpdateFlags
-operator|(const UpdateFlags f1, const UpdateFlags f2)
+
+// Class member definitions
+
+inline constexpr UpdateFlags
+UpdateFlags::operator|(const UpdateFlags in) const
 {
-  using enum_type = std::underlying_type_t<UpdateFlags>;
-  return static_cast<UpdateFlags>(static_cast<enum_type>(f1) |
-                                  static_cast<enum_type>(f2));
+  return internal::make_enum(field | in.field);
 }
 
 
 
-/**
- * Global operator which sets the bits from the second argument also in the
- * first one.
- *
- * @ref UpdateFlags
- */
-inline UpdateFlags &
-operator|=(UpdateFlags &f1, const UpdateFlags f2)
+inline constexpr UpdateFlags &
+UpdateFlags::operator|=(const UpdateFlags in)
 {
-  f1 = f1 | f2;
-  return f1;
+  field = field | in.field;
+  return *this;
 }
 
 
-/**
- * Global operator which returns an object in which all bits are set which are
- * set in the first as well as the second argument. This operator exists since
- * if it did not then the result of the bit-and <tt>operator &</tt> would be
- * an integer which would in turn trigger a compiler warning when we tried to
- * assign it to an object of type UpdateFlags.
- *
- * @ref UpdateFlags
- */
-inline UpdateFlags
-operator&(const UpdateFlags f1, const UpdateFlags f2)
+
+inline constexpr UpdateFlags
+UpdateFlags::operator&(const UpdateFlags in) const
 {
-  using enum_type = std::underlying_type_t<UpdateFlags>;
-  return static_cast<UpdateFlags>(static_cast<enum_type>(f1) &
-                                  static_cast<enum_type>(f2));
+  return internal::make_enum(field & in.field);
 }
 
 
-/**
- * Global operator which clears all the bits in the first argument if they are
- * not also set in the second argument.
- *
- * @ref UpdateFlags
- */
-inline UpdateFlags &
-operator&=(UpdateFlags &f1, const UpdateFlags f2)
+
+inline constexpr UpdateFlags &
+UpdateFlags::operator&=(const UpdateFlags in)
 {
-  f1 = f1 & f2;
-  return f1;
+  field = field & in.field;
+  return *this;
 }
 
 
-/**
- * Global operator which checks if the flags contained in the first argument
- * contain the flags contained in the second argument.
- *
- * @ref UpdateFlags
- */
-inline bool
-contains_bits(const UpdateFlags flags, const UpdateFlags mask)
+
+inline constexpr bool
+UpdateFlags::operator==(const UpdateFlags in) const
 {
-  using enum_type = std::underlying_type_t<UpdateFlags>;
-  return (static_cast<enum_type>(flags) & static_cast<enum_type>(mask)) != 0;
+  return field == in.field;
 }
 
+
+
+inline constexpr bool
+UpdateFlags::operator!=(const UpdateFlags in) const
+{
+  return field != in.field;
+}
+
+
+inline constexpr bool
+UpdateFlags::contains(const UpdateFlags in)
+{
+  return (field & in.field)!=0;
+}
+
+constexpr UpdateFlags UpdateFlags::update_default = update_default;
+constexpr UpdateFlags UpdateFlags::update_values = update_values;
+constexpr UpdateFlags UpdateFlags::update_gradients = update_gradients;
+constexpr UpdateFlags UpdateFlags::update_hessians = update_hessians;
+constexpr UpdateFlags UpdateFlags::update_3rd_derivatives = update_3rd_derivatives;
+constexpr UpdateFlags UpdateFlags::update_boundary_forms = update_boundary_forms;
+constexpr UpdateFlags UpdateFlags::update_quadrature_points = iupdate_quadrature_points;
+constexpr UpdateFlags UpdateFlags::update_JxW_values = update_JxW_values;
+constexpr UpdateFlags UpdateFlags::update_normal_vectors = update_normal_vectors;
+constexpr UpdateFlags UpdateFlags::update_jacobians = update_jacobians;
+constexpr UpdateFlags UpdateFlags::update_jacobian_grads = update_jacobian_grads;
+constexpr UpdateFlags UpdateFlags::update_inverse_jacobians = update_inverses_jacobians;
+constexpr UpdateFlags UpdateFlags::update_covariant_transformation = update_covariant_transformation;
+constexpr UpdateFlags UpdateFlags::update_contravariant_transformation = update_contravariant_transformation;
+constexpr UpdateFlags UpdateFlags::update_transformation_values = update_transformation_values;
+constexpr UpdateFlags UpdateFlags::update_transformation_gradients = update_transformation_gradients;
+constexpr UpdateFlags UpdateFlags::update_volume_elements = update_volume_elements;
+constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_grads = update_jacobian_pushed_forward_grad;,
+constexpr UpdateFlags UpdateFlags::update_jacobian_2nd_derivatives = update_jacobian_2nd_derivatives;
+constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_2nd_derivatives = update_jacobian_pushed_forward_2nd_derivatives;
+constexpr UpdateFlags UpdateFlags::update_jacobian_3rd_derivatives = update_jacobian_3rd_derivatives;
+constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_3rd_derivatives = update_jacobian_pushed_forward_3rd_derivatives;
+constexpr UpdateFlags UpdateFlags::update_piola = update_piola;
+constexpr UpdateFlags UpdateFlags::update_mapping = update_mapping;
+
+inline constexpr UpdateFlags::UpdateFlags(int i) : field(in)
+{}
 
 /**
  * This enum definition is used for storing similarities of the current cell
