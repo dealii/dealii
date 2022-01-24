@@ -5108,23 +5108,26 @@ namespace internal
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
+                  // Only support isotropic refinement
                   Assert(cell->refine_flag_set() ==
                            RefinementCase<dim>::cut_xyz,
                          ExcInternalError());
+
+                  // Now count up how many new cells, faces, edges, and vertices
+                  // we will need to allocate to do this refinement.
+                  new_cells += cell->reference_cell().n_isotropic_children();
 
                   if (cell->reference_cell() == ReferenceCells::Hexahedron)
                     {
                       ++needed_vertices;
                       needed_lines_single += 6;
                       needed_quads_single += 12;
-                      new_cells += 8;
                     }
                   else if (cell->reference_cell() ==
                            ReferenceCells::Tetrahedron)
                     {
                       needed_lines_single += 1;
                       needed_quads_single += 8;
-                      new_cells += 8;
                     }
                   else
                     {
