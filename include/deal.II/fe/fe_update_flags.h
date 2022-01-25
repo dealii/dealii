@@ -345,6 +345,9 @@ operator<<(StreamType &s, const UpdateFlags u)
   return s;
 }
 
+
+#ifndef DOXYGEN
+
 namespace internal
 {
   constexpr UpdateFlags
@@ -438,6 +441,8 @@ constexpr UpdateFlags update_jacobian_3rd_derivatives;
 constexpr UpdateFlags update_jacobian_pushed_forward_3rd_derivatives;
 constexpr UpdateFlags update_piola;
 constexpr UpdateFlags update_mapping;
+
+#endif
 
 /**
  * This enum definition is used for storing similarities of the current cell
