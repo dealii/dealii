@@ -55,6 +55,7 @@ SET(_unity_include_src
   fe_simplex_p.cc
   fe_simplex_p_bubbles.cc
   fe_trace.cc
+  fe_update_flags.cc
   fe_values_extractors.cc
   fe_wedge_p.cc
   mapping_c1.cc
