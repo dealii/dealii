@@ -302,43 +302,43 @@ inline StreamType &
 operator<<(StreamType &s, const UpdateFlags u)
 {
   s << " UpdateFlags|";
-  if (u & UpdateFlags::update_values)
+  if (u.contains(UpdateFlags::update_values))
     s << "values|";
-  if (u & UpdateFlags::update_gradients)
+  if (u.contains(UpdateFlags::update_gradients))
     s << "gradients|";
-  if (u & UpdateFlags::update_hessians)
+  if (u.contains(UpdateFlags::update_hessians))
     s << "hessians|";
-  if (u & UpdateFlags::update_3rd_derivatives)
+  if (u.contains(UpdateFlags::update_3rd_derivatives))
     s << "3rd_derivatives|";
-  if (u & UpdateFlags::update_quadrature_points)
+  if (u.contains(UpdateFlags::update_quadrature_points))
     s << "quadrature_points|";
-  if (u & UpdateFlags::update_JxW_values)
+  if (u.contains(UpdateFlags::update_JxW_values))
     s << "JxW_values|";
-  if (u & UpdateFlags::update_normal_vectors)
+  if (u.contains(UpdateFlags::update_normal_vectors))
     s << "normal_vectors|";
-  if (u & UpdateFlags::update_jacobians)
+  if (u.contains(UpdateFlags::update_jacobians))
     s << "jacobians|";
-  if (u & UpdateFlags::update_inverse_jacobians)
+  if (u.contains(UpdateFlags::update_inverse_jacobians))
     s << "inverse_jacobians|";
-  if (u & UpdateFlags::update_jacobian_grads)
+  if (u.contains(UpdateFlags::update_jacobian_grads))
     s << "jacobian_grads|";
-  if (u & UpdateFlags::update_covariant_transformation)
+  if (u.contains(UpdateFlags::update_covariant_transformation))
     s << "covariant_transformation|";
-  if (u & UpdateFlags::update_contravariant_transformation)
+  if (u.contains(UpdateFlags::update_contravariant_transformation))
     s << "contravariant_transformation|";
-  if (u & UpdateFlags::update_transformation_values)
+  if (u.contains(UpdateFlags::update_transformation_values))
     s << "transformation_values|";
-  if (u & UpdateFlags::update_transformation_gradients)
+  if (u.contains(UpdateFlags::update_transformation_gradients))
     s << "transformation_gradients|";
-  if (u & UpdateFlags::update_jacobian_pushed_forward_grads)
+  if (u.contains(UpdateFlags::update_jacobian_pushed_forward_grads))
     s << "jacobian_pushed_forward_grads|";
-  if (u & UpdateFlags::update_jacobian_2nd_derivatives)
+  if (u.contains(UpdateFlags::update_jacobian_2nd_derivatives))
     s << "jacobian_2nd_derivatives|";
-  if (u & UpdateFlags::update_jacobian_pushed_forward_2nd_derivatives)
+  if (u.contains(UpdateFlags::update_jacobian_pushed_forward_2nd_derivatives))
     s << "jacobian_pushed_forward_2nd_derivatives|";
-  if (u & UpdateFlags::update_jacobian_3rd_derivatives)
+  if (u.contains(UpdateFlags::update_jacobian_3rd_derivatives))
     s << "jacobian_3rd_derivatives|";
-  if (u & UpdateFlags::update_jacobian_pushed_forward_3rd_derivatives)
+  if (u.contains(UpdateFlags::update_jacobian_pushed_forward_3rd_derivatives))
     s << "jacobian_pushed_forward_3rd_derivatives|";
 
   // TODO: check that 'u' really only has the flags set that are handled above
