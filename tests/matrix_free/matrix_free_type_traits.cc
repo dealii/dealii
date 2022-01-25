@@ -77,18 +77,19 @@ main()
                LinearAlgebra::distributed::BlockVector<double>>::value
           << std::endl;
 
-  deallog << "is_serial_or_dummy:" << std::endl
-          << "LinearAlgebra::distributed::Vector = "
-          << internal::is_serial_or_dummy<
-               LinearAlgebra::distributed::Vector<double>>::value
-          << std::endl
-          << "TrilinosWrappers::MPI::Vector = "
-          << internal::is_serial_or_dummy<TrilinosWrappers::MPI::Vector>::value
-          << std::endl
-          << "Vector = " << internal::is_serial_or_dummy<Vector<double>>::value
-          << std::endl
-          << "unsigned int = "
-          << internal::is_serial_or_dummy<unsigned int>::value << std::endl;
+  deallog
+    << "is_not_parallel_vector:" << std::endl
+    << "LinearAlgebra::distributed::Vector = "
+    << internal::is_not_parallel_vector<
+         LinearAlgebra::distributed::Vector<double>>::value
+    << std::endl
+    << "TrilinosWrappers::MPI::Vector = "
+    << internal::is_not_parallel_vector<TrilinosWrappers::MPI::Vector>::value
+    << std::endl
+    << "Vector = " << internal::is_not_parallel_vector<Vector<double>>::value
+    << std::endl
+    << "unsigned int = "
+    << internal::is_not_parallel_vector<unsigned int>::value << std::endl;
 
   // check that MatrixFree::cell_loop can run for non-vector types
   MatrixFree<2> matrix_free;
