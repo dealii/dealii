@@ -224,7 +224,7 @@ namespace internal
                           face_quadratures,
                           update_gradients | update_JxW_values |
                             (need_quadrature_points ? update_quadrature_points :
-                                                      UpdateFlags()) |
+                                                      update_default) |
                             update_normal_vectors)
     , fe_face_values_neighbor(mapping,
                               finite_element,

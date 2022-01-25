@@ -636,7 +636,7 @@ namespace Step31
       stokes_fe,
       quadrature_formula,
       update_values | update_quadrature_points | update_JxW_values |
-        (rebuild_stokes_matrix == true ? update_gradients : UpdateFlags(0)));
+        (rebuild_stokes_matrix == true ? update_gradients : update_default));
     FEValues<dim>      temperature_fe_values(mapping,
                                         temperature_fe,
                                         quadrature_formula,

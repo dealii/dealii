@@ -2324,7 +2324,7 @@ namespace Step32
         mapping,
         quadrature_formula,
         (update_values | update_quadrature_points | update_JxW_values |
-         (rebuild_stokes_matrix == true ? update_gradients : UpdateFlags(0))),
+         (rebuild_stokes_matrix == true ? update_gradients : update_default)),
         temperature_fe,
         update_values),
       Assembly::CopyData::StokesSystem<dim>(stokes_fe));

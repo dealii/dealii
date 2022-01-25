@@ -662,7 +662,7 @@ namespace MatrixCreator
         assembler_data(fe_collection,
                        update_values | update_JxW_values |
                          (coefficient != nullptr ? update_quadrature_points :
-                                                   UpdateFlags()),
+                                                   update_default),
                        coefficient,
                        /*rhs_function=*/nullptr,
                        q_collection,
@@ -833,7 +833,7 @@ namespace MatrixCreator
         assembler_data(dof.get_fe_collection(),
                        update_values | update_JxW_values |
                          (coefficient != nullptr ? update_quadrature_points :
-                                                   UpdateFlags()),
+                                                   update_default),
                        coefficient,
                        /*rhs_function=*/nullptr,
                        q,
@@ -1937,7 +1937,7 @@ namespace MatrixCreator
         assembler_data(fe_collection,
                        update_gradients | update_JxW_values |
                          (coefficient != nullptr ? update_quadrature_points :
-                                                   UpdateFlags()),
+                                                   update_default),
                        coefficient,
                        /*rhs_function=*/nullptr,
                        q_collection,
@@ -2107,7 +2107,7 @@ namespace MatrixCreator
         assembler_data(dof.get_fe_collection(),
                        update_gradients | update_JxW_values |
                          (coefficient != nullptr ? update_quadrature_points :
-                                                   UpdateFlags()),
+                                                   update_default),
                        coefficient,
                        /*rhs_function=*/nullptr,
                        q,
