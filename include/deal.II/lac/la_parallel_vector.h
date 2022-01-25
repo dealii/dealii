@@ -1899,7 +1899,7 @@ namespace internal
 
       public:
         static const bool value =
-          !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+          !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
       };
 
       // A helper type-trait that leverage SFINAE to figure out if type T has
@@ -1917,7 +1917,7 @@ namespace internal
 
       public:
         static const bool value =
-          !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+          !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
       };
 
       // A helper type-trait that leverage SFINAE to figure out if type T has
@@ -1935,7 +1935,7 @@ namespace internal
 
       public:
         static const bool value =
-          !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+          !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
       };
 
       // A helper type-trait that leverage SFINAE to figure out if type T has
@@ -1954,7 +1954,7 @@ namespace internal
 
       public:
         static const bool value =
-          !std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+          !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
       };
 
       // Used for (Trilinos/PETSc)Wrappers::SparseMatrix
