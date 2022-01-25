@@ -421,47 +421,73 @@ UpdateFlags::contains(const UpdateFlags in) const
   return (field & in.field) != 0;
 }
 
+#endif
+
 // Import all flags into the global namespace.
-constexpr UpdateFlags update_default   = internal::make_update_flags(0);
-constexpr UpdateFlags update_values    = internal::make_update_flags(0x0001);
+//! @copydoc UpdateFlags::update_default
+constexpr UpdateFlags update_default = internal::make_update_flags(0);
+//! @copydoc UpdateFlags::update_values
+constexpr UpdateFlags update_values = internal::make_update_flags(0x0001);
+//! @copydoc UpdateFlags::update_gradients
 constexpr UpdateFlags update_gradients = internal::make_update_flags(0x0002);
-constexpr UpdateFlags update_hessians  = internal::make_update_flags(0x0004);
+//! @copydoc UpdateFlags::update_hessians
+constexpr UpdateFlags update_hessians = internal::make_update_flags(0x0004);
+//! @copydoc UpdateFlags::update_3rd_derivatives
 constexpr UpdateFlags update_3rd_derivatives =
   internal::make_update_flags(0x0008);
+//! @copydoc UpdateFlags::update_boundary_forms
 constexpr UpdateFlags update_boundary_forms =
   internal::make_update_flags(0x0010);
+//! @copydoc UpdateFlags::update_quadrature_points
 constexpr UpdateFlags update_quadrature_points =
   internal::make_update_flags(0x0020);
+//! @copydoc UpdateFlags::update_JxW_values
 constexpr UpdateFlags update_JxW_values = internal::make_update_flags(0x0040);
+//! @copydoc UpdateFlags::update_normal_vectors
 constexpr UpdateFlags update_normal_vectors =
   internal::make_update_flags(0x0080);
+//! @copydoc UpdateFlags::update_jacobians
 constexpr UpdateFlags update_jacobians = internal::make_update_flags(0x0100);
+//! @copydoc UpdateFlags::update_jacobian_grads
 constexpr UpdateFlags update_jacobian_grads =
   internal::make_update_flags(0x0200);
+//! @copydoc UpdateFlags::update_inverse_jacobians
 constexpr UpdateFlags update_inverse_jacobians =
   internal::make_update_flags(0x0400);
+//! @copydoc UpdateFlags::update_covariant_transformation
 constexpr UpdateFlags update_covariant_transformation =
   internal::make_update_flags(0x0800);
+//! @copydoc UpdateFlags::update_contravariant_transformation
 constexpr UpdateFlags update_contravariant_transformation =
   internal::make_update_flags(0x1000);
+//! @copydoc UpdateFlags::update_transformation_values
 constexpr UpdateFlags update_transformation_values =
   internal::make_update_flags(0x2000);
+//! @copydoc UpdateFlags::update_transformation_gradients
 constexpr UpdateFlags update_transformation_gradients =
   internal::make_update_flags(0x4000);
+//! @copydoc UpdateFlags::update_volume_elements
 constexpr UpdateFlags update_volume_elements =
   internal::make_update_flags(0x10000);
+//! @copydoc UpdateFlags::update_jacobian_pushed_forward_grads
 constexpr UpdateFlags update_jacobian_pushed_forward_grads =
   internal::make_update_flags(0x100000);
+//! @copydoc UpdateFlags::update_jacobian_2nd_derivatives
 constexpr UpdateFlags update_jacobian_2nd_derivatives =
   internal::make_update_flags(0x200000);
+//! @copydoc UpdateFlags::update_jacobian_pushed_forward_2nd_derivatives
 constexpr UpdateFlags update_jacobian_pushed_forward_2nd_derivatives =
   internal::make_update_flags(0x400000);
+//! @copydoc UpdateFlags::update_jacobian_3rd_derivatives
 constexpr UpdateFlags update_jacobian_3rd_derivatives =
   internal::make_update_flags(0x800000);
+//! @copydoc UpdateFlags::update_jacobian_pushed_forward_3rd_derivatives
 constexpr UpdateFlags update_jacobian_pushed_forward_3rd_derivatives =
   internal::make_update_flags(0x1000000);
+//! @copydoc UpdateFlags::update_piola
 constexpr UpdateFlags update_piola =
   update_volume_elements | update_contravariant_transformation;
+//! @copydoc UpdateFlags::update_mapping
 constexpr UpdateFlags update_mapping =
   update_quadrature_points | update_JxW_values | update_jacobians |
   update_jacobian_grads | update_jacobian_pushed_forward_grads |
@@ -474,7 +500,7 @@ constexpr UpdateFlags update_mapping =
   update_transformation_values | update_transformation_gradients |
   update_volume_elements;
 
-#endif
+
 
 /**
  * This enum definition is used for storing similarities of the current cell
