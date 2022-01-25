@@ -369,19 +369,22 @@ namespace Utilities
       // object, and as second argument a pointer-to-function, for which
       // we here use a lambda function without captures that acts as the
       // 'deleter' object: it calls `MPI_Type_free` and then deletes the
-      // pointer.
-      return {// The copy of the object:
-              new MPI_Datatype(result),
-              // The deleter:
-              [](MPI_Datatype *p) {
-                if (p != nullptr)
-                  {
-                    const int ierr = MPI_Type_free(p);
-                    AssertThrowMPI(ierr);
+      // pointer. To avoid a compiler warning about a null this pointer
+      // in the lambda (which don't make sense: the lambda doesn't store
+      // anything), we create the deleter first.
+      auto deleter = [](MPI_Datatype *p) {
+        if (p != nullptr)
+          {
+            const int ierr = MPI_Type_free(p);
+            (void)ierr;
+            AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
 
-                    delete p;
-                  }
-              }};
+            delete p;
+          }
+      };
+
+      return std::unique_ptr<MPI_Datatype, void (*)(MPI_Datatype *)>(
+        new MPI_Datatype(result), deleter);
     }
 
 
