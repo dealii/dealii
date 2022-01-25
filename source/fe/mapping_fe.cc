@@ -107,13 +107,12 @@ MappingFE<dim, spacedim>::InternalData::initialize(
 
   if (this->update_each.contains(
         update_covariant_transformation | update_contravariant_transformation |
-         update_JxW_values | update_boundary_forms | update_normal_vectors |
-         update_jacobians | update_jacobian_grads | update_inverse_jacobians |
-         update_jacobian_pushed_forward_grads |
-         update_jacobian_2nd_derivatives |
-         update_jacobian_pushed_forward_2nd_derivatives |
-         update_jacobian_3rd_derivatives |
-         update_jacobian_pushed_forward_3rd_derivatives))
+        update_JxW_values | update_boundary_forms | update_normal_vectors |
+        update_jacobians | update_jacobian_grads | update_inverse_jacobians |
+        update_jacobian_pushed_forward_grads | update_jacobian_2nd_derivatives |
+        update_jacobian_pushed_forward_2nd_derivatives |
+        update_jacobian_3rd_derivatives |
+        update_jacobian_pushed_forward_3rd_derivatives))
     shape_derivatives.resize(n_shape_functions * n_q_points);
 
   if (this->update_each.contains(

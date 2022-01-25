@@ -7358,9 +7358,9 @@ FEEvaluation<dim,
            this->mapped_geometry->is_initialized(),
          ExcNotInitialized());
 
-  Assert(!contains_bits(integration_flag, ~(EvaluationFlags::values |
-                                      EvaluationFlags::gradients |
-                                      EvaluationFlags::hessians)),
+  Assert(!contains_bits(integration_flag,
+                        ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians)),
          ExcMessage(
            "Only EvaluationFlags::values, EvaluationFlags::gradients, and "
            "EvaluationFlags::hessians are supported."));
@@ -7871,9 +7871,9 @@ FEFaceEvaluation<dim,
   evaluate(const VectorizedArrayType *            values_array,
            const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
-  Assert(!contains_bits(evaluation_flag, ~(EvaluationFlags::values |
-                                     EvaluationFlags::gradients |
-                                     EvaluationFlags::hessians)),
+  Assert(!contains_bits(evaluation_flag,
+                        ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians)),
          ExcMessage("Only EvaluationFlags::values, EvaluationFlags::gradients, "
                     "and EvaluationFlags::hessians are supported."));
 
@@ -7997,9 +7997,9 @@ FEFaceEvaluation<dim,
   integrate(const EvaluationFlags::EvaluationFlags integration_flag,
             VectorizedArrayType *                  values_array)
 {
-  Assert(!contains_bits(integration_flag, ~(EvaluationFlags::values |
-                                      EvaluationFlags::gradients |
-                                      EvaluationFlags::hessians)),
+  Assert(!contains_bits(integration_flag,
+                        ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians)),
          ExcMessage("Only EvaluationFlags::values, EvaluationFlags::gradients, "
                     "and EvaluationFlags::hessians are supported."));
 
@@ -8079,9 +8079,9 @@ FEFaceEvaluation<dim,
   gather_evaluate(const VectorType &                     input_vector,
                   const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
-  Assert(!contains_bits(evaluation_flag, ~(EvaluationFlags::values |
-                                     EvaluationFlags::gradients |
-                                     EvaluationFlags::hessians)),
+  Assert(!contains_bits(evaluation_flag,
+                        ~(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians)),
          ExcMessage("Only EvaluationFlags::values, EvaluationFlags::gradients, "
                     "and EvaluationFlags::hessians are supported."));
 

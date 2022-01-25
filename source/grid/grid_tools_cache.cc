@@ -149,7 +149,8 @@ namespace GridTools
               typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_locally_owned_cell_bounding_boxes_rtree() const
   {
-    if (contains_bits(update_flags, update_locally_owned_cell_bounding_boxes_rtree))
+    if (contains_bits(update_flags,
+                      update_locally_owned_cell_bounding_boxes_rtree))
       {
         std::vector<std::pair<
           BoundingBox<spacedim>,

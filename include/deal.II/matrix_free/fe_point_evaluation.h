@@ -1320,7 +1320,8 @@ inline DerivativeForm<1, spacedim, dim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::inverse_jacobian(
   const unsigned int point_index) const
 {
-  Assert(update_flags_mapping.contains(update_inverse_jacobians | update_gradients),
+  Assert(update_flags_mapping.contains(update_inverse_jacobians |
+                                       update_gradients),
          ExcNotInitialized());
   AssertIndexRange(point_index, mapping_data.inverse_jacobians.size());
   return mapping_data.inverse_jacobians[point_index];

@@ -61,7 +61,7 @@ constexpr UpdateFlags
     internal::make_update_flags(0x400000);
 constexpr UpdateFlags UpdateFlags::update_jacobian_3rd_derivatives =
   internal::make_update_flags(0x800000);
-  constexpr UpdateFlags update_jacobian_pushed_forward_3rd_derivatives =
+constexpr UpdateFlags update_jacobian_pushed_forward_3rd_derivatives =
   internal::make_update_flags(0x1000000);
 constexpr UpdateFlags update_piola =
   update_volume_elements | update_contravariant_transformation;
@@ -77,7 +77,7 @@ constexpr UpdateFlags update_mapping =
   update_transformation_values | update_transformation_gradients |
   update_volume_elements;
 
-  constexpr UpdateFlags UpdateFlags::update_default =
+constexpr UpdateFlags UpdateFlags::update_default =
   internal::make_update_flags(0);
 constexpr UpdateFlags UpdateFlags::update_values =
   internal::make_update_flags(0x0001);

@@ -88,12 +88,12 @@ namespace internal
           update_flags_cells, quad);
 
       this->update_flags_boundary_faces =
-        ((update_flags_inner_faces | update_flags_boundary_faces).contains(
-                       update_quadrature_points) ?
+        ((update_flags_inner_faces | update_flags_boundary_faces)
+             .contains(update_quadrature_points) ?
            update_quadrature_points :
            update_default) |
-        ((update_flags_inner_faces | update_flags_boundary_faces).contains(
-                       update_jacobian_grads | update_hessians) ?
+        ((update_flags_inner_faces | update_flags_boundary_faces)
+             .contains(update_jacobian_grads | update_hessians) ?
            update_jacobian_grads :
            update_default) |
         update_normal_vectors | update_JxW_values | update_jacobians;
