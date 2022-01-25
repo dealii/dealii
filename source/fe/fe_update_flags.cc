@@ -77,55 +77,49 @@ constexpr UpdateFlags update_mapping =
   update_transformation_values | update_transformation_gradients |
   update_volume_elements;
 
-constexpr UpdateFlags UpdateFlags::update_default =
-  internal::make_update_flags(0);
-constexpr UpdateFlags UpdateFlags::update_values =
-  internal::make_update_flags(0x0001);
-constexpr UpdateFlags UpdateFlags::update_gradients =
-  internal::make_update_flags(0x0002);
-constexpr UpdateFlags UpdateFlags::update_hessians =
-  internal::make_update_flags(0x0004);
-constexpr UpdateFlags UpdateFlags::update_3rd_derivatives =
+constexpr UpdateFlags update_default   = internal::make_update_flags(0);
+constexpr UpdateFlags update_values    = internal::make_update_flags(0x0001);
+constexpr UpdateFlags update_gradients = internal::make_update_flags(0x0002);
+constexpr UpdateFlags update_hessians  = internal::make_update_flags(0x0004);
+constexpr UpdateFlags update_3rd_derivatives =
   internal::make_update_flags(0x0008);
-constexpr UpdateFlags UpdateFlags::update_boundary_forms =
+constexpr UpdateFlags update_boundary_forms =
   internal::make_update_flags(0x0010);
-constexpr UpdateFlags UpdateFlags::update_quadrature_points =
+constexpr UpdateFlags update_quadrature_points =
   internal::make_update_flags(0x0020);
-constexpr UpdateFlags UpdateFlags::update_JxW_values =
-  internal::make_update_flags(0x0040);
-constexpr UpdateFlags UpdateFlags::update_normal_vectors =
+constexpr UpdateFlags update_JxW_values = internal::make_update_flags(0x0040);
+constexpr UpdateFlags update_normal_vectors =
   internal::make_update_flags(0x0080);
-constexpr UpdateFlags UpdateFlags::update_jacobians =
-  internal::make_update_flags(0x0100);
-constexpr UpdateFlags UpdateFlags::update_jacobian_grads =
+constexpr UpdateFlags update_jacobians = internal::make_update_flags(0x0100);
+constexpr UpdateFlags update_jacobian_grads =
   internal::make_update_flags(0x0200);
-constexpr UpdateFlags UpdateFlags::update_inverse_jacobians =
+constexpr UpdateFlags update_inverse_jacobians =
   internal::make_update_flags(0x0400);
-constexpr UpdateFlags UpdateFlags::update_covariant_transformation =
+constexpr UpdateFlags update_covariant_transformation =
   internal::make_update_flags(0x0800);
-constexpr UpdateFlags UpdateFlags::update_contravariant_transformation =
+constexpr UpdateFlags update_contravariant_transformation =
   internal::make_update_flags(0x1000);
-constexpr UpdateFlags UpdateFlags::update_transformation_values =
+constexpr UpdateFlags update_transformation_values =
   internal::make_update_flags(0x2000);
-constexpr UpdateFlags UpdateFlags::update_transformation_gradients =
+constexpr UpdateFlags update_transformation_gradients =
   internal::make_update_flags(0x4000);
-constexpr UpdateFlags UpdateFlags::update_volume_elements =
+constexpr UpdateFlags update_volume_elements =
   internal::make_update_flags(0x10000);
-constexpr UpdateFlags UpdateFlags::update_jacobian_pushed_forward_grads =
+constexpr UpdateFlags update_jacobian_pushed_forward_grads =
   internal::make_update_flags(0x100000);
-constexpr UpdateFlags UpdateFlags::update_jacobian_2nd_derivatives =
+constexpr UpdateFlags update_jacobian_2nd_derivatives =
   internal::make_update_flags(0x200000);
 constexpr UpdateFlags
   UpdateFlags::update_jacobian_pushed_forward_2nd_derivatives =
     internal::make_update_flags(0x400000);
-constexpr UpdateFlags UpdateFlags::update_jacobian_3rd_derivatives =
+constexpr UpdateFlags update_jacobian_3rd_derivatives =
   internal::make_update_flags(0x800000);
 constexpr UpdateFlags
   UpdateFlags::update_jacobian_pushed_forward_3rd_derivatives =
     internal::make_update_flags(0x1000000);
-constexpr UpdateFlags UpdateFlags::update_piola =
+constexpr UpdateFlags update_piola =
   update_volume_elements | update_contravariant_transformation;
-constexpr UpdateFlags UpdateFlags::update_mapping =
+constexpr UpdateFlags update_mapping =
   update_quadrature_points | update_JxW_values | update_jacobians |
   update_jacobian_grads | update_jacobian_pushed_forward_grads |
   update_jacobian_2nd_derivatives |
