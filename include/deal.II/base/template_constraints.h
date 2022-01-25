@@ -27,14 +27,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <class...>
-using void_t = void;
-
 // Detection idiom from Version 2 of the C++ Extensions for Library
 // Fundamentals, ISO/IEC TS 19568:2017
-
 namespace internal
 {
+  template <class...>
+  using void_t = void;
+
   // base class for nonesuch to inherit from so it is not an aggregate
   struct nonesuch_base
   {};
@@ -58,34 +57,36 @@ namespace internal
     using value_t = std::true_type;
     using type    = Op<Args...>;
   };
+
+
+
+  struct nonesuch : private internal::nonesuch_base
+  {
+    ~nonesuch()                = delete;
+    nonesuch(nonesuch const &) = delete;
+    void
+    operator=(nonesuch const &) = delete;
+  };
+
+  template <class Default, template <class...> class Op, class... Args>
+  using detected_or = internal::detector<Default, void, Op, Args...>;
+
+  template <template <class...> class Op, class... Args>
+  using is_detected = typename detected_or<nonesuch, Op, Args...>::value_t;
+
+  template <template <class...> class Op, class... Args>
+  using detected_t = typename detected_or<nonesuch, Op, Args...>::type;
+
+  template <class Default, template <class...> class Op, class... Args>
+  using detected_or_t = typename detected_or<Default, Op, Args...>::type;
+
+  template <class Expected, template <class...> class Op, class... Args>
+  using is_detected_exact = std::is_same<Expected, detected_t<Op, Args...>>;
+
+  template <class To, template <class...> class Op, class... Args>
+  using is_detected_convertible =
+    std::is_convertible<detected_t<Op, Args...>, To>;
 } // namespace internal
-
-struct nonesuch : private internal::nonesuch_base
-{
-  ~nonesuch()                = delete;
-  nonesuch(nonesuch const &) = delete;
-  void
-  operator=(nonesuch const &) = delete;
-};
-
-template <class Default, template <class...> class Op, class... Args>
-using detected_or = internal::detector<Default, void, Op, Args...>;
-
-template <template <class...> class Op, class... Args>
-using is_detected = typename detected_or<nonesuch, Op, Args...>::value_t;
-
-template <template <class...> class Op, class... Args>
-using detected_t = typename detected_or<nonesuch, Op, Args...>::type;
-
-template <class Default, template <class...> class Op, class... Args>
-using detected_or_t = typename detected_or<Default, Op, Args...>::type;
-
-template <class Expected, template <class...> class Op, class... Args>
-using is_detected_exact = std::is_same<Expected, detected_t<Op, Args...>>;
-
-template <class To, template <class...> class Op, class... Args>
-using is_detected_convertible =
-  std::is_convertible<detected_t<Op, Args...>, To>;
 
 
 
@@ -164,7 +165,7 @@ using begin_and_end_t =
   decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()));
 
 template <typename T>
-using has_begin_and_end = is_detected<begin_and_end_t, T>;
+using has_begin_and_end = internal::is_detected<begin_and_end_t, T>;
 
 
 
