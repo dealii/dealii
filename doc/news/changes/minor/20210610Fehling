@@ -1,4 +1,0 @@
-Fixed: The shell script `p4est-setup.sh` for installing p4est has been
-updated for its latest releases (p4est>=2.3).
-<br>
-(Marc Fehling, 2021/06/10)
