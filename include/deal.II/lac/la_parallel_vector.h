@@ -1887,75 +1887,40 @@ namespace internal
       // A helper type-trait that leverage SFINAE to figure out if type T has
       // void T::get_mpi_communicator()
       template <typename T>
-      struct has_get_mpi_communicator
-      {
-      private:
-        static bool
-        detect(...);
+      using get_mpi_communicator_t =
+        decltype(std::declval<T>().get_mpi_communicator());
 
-        template <typename U>
-        static decltype(std::declval<U>().get_mpi_communicator())
-        detect(const U &);
-
-      public:
-        static const bool value =
-          !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-      };
+      template <typename T>
+      using has_get_mpi_communicator = is_detected<get_mpi_communicator_t, T>;
 
       // A helper type-trait that leverage SFINAE to figure out if type T has
       // void T::locally_owned_domain_indices()
       template <typename T>
-      struct has_locally_owned_domain_indices
-      {
-      private:
-        static bool
-        detect(...);
+      using locally_owned_domain_indices_t =
+        decltype(std::declval<T>().locally_owned_domain_indices());
 
-        template <typename U>
-        static decltype(std::declval<U>().locally_owned_domain_indices())
-        detect(const U &);
-
-      public:
-        static const bool value =
-          !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-      };
+      template <typename T>
+      using has_locally_owned_domain_indices =
+        is_detected<locally_owned_domain_indices_t, T>;
 
       // A helper type-trait that leverage SFINAE to figure out if type T has
       // void T::locally_owned_range_indices()
       template <typename T>
-      struct has_locally_owned_range_indices
-      {
-      private:
-        static bool
-        detect(...);
+      using locally_owned_range_indices_t =
+        decltype(std::declval<T>().locally_owned_range_indices());
 
-        template <typename U>
-        static decltype(std::declval<U>().locally_owned_range_indices())
-        detect(const U &);
-
-      public:
-        static const bool value =
-          !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-      };
+      template <typename T>
+      using has_locally_owned_range_indices =
+        is_detected<locally_owned_range_indices_t, T>;
 
       // A helper type-trait that leverage SFINAE to figure out if type T has
       // void T::initialize_dof_vector(VectorType v)
       template <typename T>
-      struct has_initialize_dof_vector
-      {
-      private:
-        static bool
-        detect(...);
+      using initialize_dof_vector_t =
+        decltype(std::declval<T>().initialize_dof_vector());
 
-        template <typename U>
-        static decltype(std::declval<U>().initialize_dof_vector(
-          std::declval<LinearAlgebra::distributed::Vector<Number> &>()))
-        detect(const U &);
-
-      public:
-        static const bool value =
-          !std::is_same<decltype(detect(std::declval<T>())), bool>::value;
-      };
+      template <typename T>
+      using has_initialize_dof_vector = is_detected<initialize_dof_vector_t, T>;
 
       // Used for (Trilinos/PETSc)Wrappers::SparseMatrix
       template <typename MatrixType,

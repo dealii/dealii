@@ -14,7 +14,7 @@ DEAL::Vector = 0
 DEAL::has_communication_block_size:
 DEAL::LinearAlgebra::distributed::Vector = 0
 DEAL::LinearAlgebra::distributed::BlockVector = 1
-DEAL::is_serial_or_dummy:
+DEAL::is_not_parallel_vector:
 DEAL::LinearAlgebra::distributed::Vector = 0
 DEAL::TrilinosWrappers::MPI::Vector = 0
 DEAL::Vector = 1
