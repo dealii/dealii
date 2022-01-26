@@ -5108,36 +5108,52 @@ namespace internal
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
+                  // Only support isotropic refinement
                   Assert(cell->refine_flag_set() ==
                            RefinementCase<dim>::cut_xyz,
                          ExcInternalError());
+
+                  // Now count up how many new cells, faces, edges, and vertices
+                  // we will need to allocate to do this refinement.
+                  new_cells += cell->reference_cell().n_isotropic_children();
 
                   if (cell->reference_cell() == ReferenceCells::Hexahedron)
                     {
                       ++needed_vertices;
                       needed_lines_single += 6;
                       needed_quads_single += 12;
-                      new_cells += 8;
                     }
                   else if (cell->reference_cell() ==
                            ReferenceCells::Tetrahedron)
                     {
                       needed_lines_single += 1;
                       needed_quads_single += 8;
-                      new_cells += 8;
                     }
                   else
                     {
                       Assert(false, ExcInternalError());
                     }
 
+                  // Also check whether we have to refine any of the faces and
+                  // edges that bound this cell. They may of course already be
+                  // refined, so we only *mark* them for refinement by setting
+                  // the user flags
                   for (const auto face : cell->face_indices())
-                    if (cell->face(face)->number_of_children() < 4)
+                    if (cell->face(face)->n_children() == 0)
                       cell->face(face)->set_user_flag();
+                    else
+                      Assert(cell->face(face)->n_children() ==
+                               cell->reference_cell()
+                                 .face_reference_cell(face)
+                                 .n_isotropic_children(),
+                             ExcInternalError());
 
                   for (const auto line : cell->line_indices())
                     if (cell->line(line)->has_children() == false)
                       cell->line(line)->set_user_flag();
+                    else
+                      Assert(cell->line(line)->n_children() == 2,
+                             ExcInternalError());
                 }
 
             const unsigned int used_cells =

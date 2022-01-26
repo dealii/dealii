@@ -279,6 +279,27 @@ public:
   face_indices() const;
 
   /**
+   * Return the number of cells one would get by isotropically
+   * refining the current cell. Here, "isotropic refinement"
+   * means that we subdivide in each "direction" of a cell.
+   * For example, a square would be refined into four children
+   * by introducing new vertices along each edge and a new
+   * vertex in the cell center. For triangles, one would introduce
+   * new vertices at the center of each edge, and connect them to
+   * obtain four children. Similar constructions can be done for
+   * the other reference cell types.
+   */
+  unsigned int
+  n_isotropic_children() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to n_isotropic_children().
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  isotropic_child_indices() const;
+
+  /**
    * Return the reference-cell type of face @p face_no of the current
    * object. For example, if the current object is
    * ReferenceCells::Tetrahedron, then `face_no` must be between
@@ -1019,6 +1040,53 @@ ReferenceCell::n_faces() const
 
 
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::face_indices() const
+{
+  return {0U, n_faces()};
+}
+
+
+
+inline unsigned int
+ReferenceCell::n_isotropic_children() const
+{
+  if (*this == ReferenceCells::Vertex)
+    return 0;
+  else if (*this == ReferenceCells::Line)
+    return 2;
+  else if (*this == ReferenceCells::Triangle)
+    return 4;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return 4;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return 8;
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      // We haven't yet decided how to refine pyramids. Update
+      // this when we have
+      Assert(false, ExcNotImplemented());
+      return numbers::invalid_unsigned_int;
+    }
+  else if (*this == ReferenceCells::Wedge)
+    return 8;
+  else if (*this == ReferenceCells::Hexahedron)
+    return 8;
+
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::isotropic_child_indices() const
+{
+  return {0U, n_isotropic_children()};
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::vertex_indices() const
 {
   return {0U, n_vertices()};
@@ -1030,14 +1098,6 @@ inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::line_indices() const
 {
   return {0U, n_lines()};
-}
-
-
-
-inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::face_indices() const
-{
-  return {0U, n_faces()};
 }
 
 
@@ -1087,6 +1147,7 @@ ReferenceCell::child_cell_on_face(
   const unsigned char face_orientation_raw) const
 {
   AssertIndexRange(face, n_faces());
+  AssertIndexRange(subface, face_reference_cell(face).n_isotropic_children());
 
   if (*this == ReferenceCells::Vertex)
     {
