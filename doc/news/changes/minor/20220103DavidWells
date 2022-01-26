@@ -1,4 +1,0 @@
-Fixed: deal.II is now compatible with the versions of Boost.Geometry shipped
-with boost 1.77 and boost 1.78.
-<br>
-(David Wells, 2022/01/03)
