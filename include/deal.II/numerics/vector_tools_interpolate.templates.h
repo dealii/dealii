@@ -526,6 +526,8 @@ namespace VectorTools
     VectorType &                                               vec,
     const ComponentMask &                                      component_mask)
   {
+    AssertDimension(dof.get_fe_collection().n_components(),
+                    function.n_components);
     interpolate(get_default_linear_mapping(dof.get_triangulation()),
                 dof,
                 function,
