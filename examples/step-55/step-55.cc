@@ -331,7 +331,7 @@ namespace Step55
   {}
 
 
-  // The Kovasnay flow is defined on the domain [-0.5, 1.5]^2, which we
+  // The Kovasznay flow is defined on the domain [-0.5, 1.5]^2, which we
   // create by passing the min and max values to GridGenerator::hyper_cube.
   template <int dim>
   void StokesProblem<dim>::make_grid()
