@@ -66,7 +66,9 @@ namespace Exceptions
     DeclExceptionMsg(ExcNoTriangulationSelected,
                      "For the operation you are attempting, you first need to "
                      "tell the DataOut or related object which DoFHandler or "
-                     "triangulation you would like to work on.");
+                     "triangulation you would like to work on. This is "
+                     "generally done using the 'attach_dof_handler()' or "
+                     "'attach_triangulation()' member functions.");
 
     /**
      * Exception
@@ -74,7 +76,9 @@ namespace Exceptions
     DeclExceptionMsg(ExcNoDoFHandlerSelected,
                      "For the operation you are attempting, you first need to "
                      "tell the DataOut or related object which DoFHandler "
-                     "you would like to work on.");
+                     "you would like to work on. This is "
+                     "generally done using the 'attach_dof_handler()' "
+                     "member function.");
 
     /**
      * Exception
