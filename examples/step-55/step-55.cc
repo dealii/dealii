@@ -126,8 +126,8 @@ namespace Step55
     InverseMatrix<Matrix, Preconditioner>::vmult(VectorType &      dst,
                                                  const VectorType &src) const
     {
-      SolverControl solver_control(src.size(), 1e-8 * src.l2_norm());
-      SolverCG<LA::MPI::Vector> cg(solver_control);
+      SolverControl        solver_control(src.size(), 1e-8 * src.l2_norm());
+      SolverCG<VectorType> cg(solver_control);
       dst = 0;
 
       try
