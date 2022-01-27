@@ -11180,7 +11180,7 @@ Triangulation<dim, spacedim>::Triangulation(
   , faces(std::move(tria.faces))
   , vertices(std::move(tria.vertices))
   , vertices_used(std::move(tria.vertices_used))
-  , manifold(std::move(tria.manifold))
+  , manifolds(std::move(tria.manifolds))
   , anisotropic_refinement(tria.anisotropic_refinement)
   , check_for_distorted_cells(tria.check_for_distorted_cells)
   , number_cache(std::move(tria.number_cache))
@@ -11209,7 +11209,7 @@ Triangulation<dim, spacedim>::operator=(
   faces                        = std::move(tria.faces);
   vertices                     = std::move(tria.vertices);
   vertices_used                = std::move(tria.vertices_used);
-  manifold                     = std::move(tria.manifold);
+  manifolds                    = std::move(tria.manifolds);
   anisotropic_refinement       = tria.anisotropic_refinement;
   number_cache                 = tria.number_cache;
   vertex_to_boundary_id_map_1d = std::move(tria.vertex_to_boundary_id_map_1d);
@@ -11306,7 +11306,7 @@ Triangulation<dim, spacedim>::set_manifold(
 {
   AssertIndexRange(m_number, numbers::flat_manifold_id);
 
-  manifold[m_number] = manifold_object.clone();
+  manifolds[m_number] = manifold_object.clone();
 }
 
 
@@ -11318,7 +11318,7 @@ Triangulation<dim, spacedim>::reset_manifold(const types::manifold_id m_number)
   AssertIndexRange(m_number, numbers::flat_manifold_id);
 
   // delete the entry located at number.
-  manifold.erase(m_number);
+  manifolds.erase(m_number);
 }
 
 
@@ -11326,7 +11326,7 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::reset_all_manifolds()
 {
-  manifold.clear();
+  manifolds.clear();
 }
 
 
@@ -11410,9 +11410,9 @@ Triangulation<dim, spacedim>::get_manifold(
 {
   // look, if there is a manifold stored at
   // manifold_id number.
-  const auto it = manifold.find(m_number);
+  const auto it = manifolds.find(m_number);
 
-  if (it != manifold.end())
+  if (it != manifolds.end())
     {
       // if we have found an entry, return it
       return *(it->second);
@@ -11507,7 +11507,7 @@ Triangulation<dim, spacedim>::copy_triangulation(
     faces = std::make_unique<internal::TriangulationImplementation::TriaFaces>(
       *other_tria.faces);
 
-  for (const auto &p : other_tria.manifold)
+  for (const auto &p : other_tria.manifolds)
     set_manifold(p.first, *p.second);
 
 
@@ -14712,7 +14712,7 @@ Triangulation<dim, spacedim>::clear_despite_subscriptions()
   vertices.clear();
   vertices_used.clear();
 
-  manifold.clear();
+  manifolds.clear();
 
   number_cache = internal::TriangulationImplementation::NumberCache<dim>();
 }
@@ -16373,7 +16373,7 @@ Triangulation<dim, spacedim>::memory_consumption() const
     mem += MemoryConsumption::memory_consumption(*level);
   mem += MemoryConsumption::memory_consumption(vertices);
   mem += MemoryConsumption::memory_consumption(vertices_used);
-  mem += sizeof(manifold);
+  mem += sizeof(manifolds);
   mem += sizeof(smooth_grid);
   mem += MemoryConsumption::memory_consumption(number_cache);
   mem += sizeof(faces);
