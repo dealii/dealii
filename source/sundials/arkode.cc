@@ -61,8 +61,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
 {
-  using namespace internal;
-
   namespace
   {
     template <typename VectorType>
@@ -519,7 +517,8 @@ namespace SUNDIALS
 
     if (get_local_tolerances)
       {
-        const auto abs_tols = make_nvector_view(get_local_tolerances());
+        const auto abs_tols =
+          internal::make_nvector_view(get_local_tolerances());
         status =
           ARKodeSVtolerances(arkode_mem, data.relative_tolerance, abs_tols);
         AssertARKode(status);

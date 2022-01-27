@@ -50,9 +50,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
 {
-  using namespace internal;
-
-
   template <typename VectorType>
   KINSOL<VectorType>::AdditionalData::AdditionalData(
     const SolutionStrategy &strategy,
@@ -328,7 +325,7 @@ namespace SUNDIALS
   unsigned int
   KINSOL<VectorType>::solve(VectorType &initial_guess_and_solution)
   {
-    NVectorView<VectorType> u_scale, f_scale;
+    internal::NVectorView<VectorType> u_scale, f_scale;
 
     VectorType u_scale_temp, f_scale_temp;
 

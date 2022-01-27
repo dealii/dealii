@@ -32,8 +32,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
-using namespace Manifolds;
-
 /* -------------------------- Manifold --------------------- */
 template <int dim, int spacedim>
 Point<spacedim>
@@ -318,7 +316,7 @@ Point<spacedim>
 Manifold<dim, spacedim>::get_new_point_on_line(
   const typename Triangulation<dim, spacedim>::line_iterator &line) const
 {
-  const auto points_weights = get_default_points_and_weights(line);
+  const auto points_weights = Manifolds::get_default_points_and_weights(line);
   return get_new_point(make_array_view(points_weights.first.begin(),
                                        points_weights.first.end()),
                        make_array_view(points_weights.second.begin(),
@@ -332,7 +330,7 @@ Point<spacedim>
 Manifold<dim, spacedim>::get_new_point_on_quad(
   const typename Triangulation<dim, spacedim>::quad_iterator &quad) const
 {
-  const auto points_weights = get_default_points_and_weights(quad);
+  const auto points_weights = Manifolds::get_default_points_and_weights(quad);
   return get_new_point(make_array_view(points_weights.first.begin(),
                                        points_weights.first.end()),
                        make_array_view(points_weights.second.begin(),
@@ -463,7 +461,8 @@ Point<3>
 Manifold<3, 3>::get_new_point_on_hex(
   const Triangulation<3, 3>::hex_iterator &hex) const
 {
-  const auto points_weights = get_default_points_and_weights(hex, true);
+  const auto points_weights =
+    Manifolds::get_default_points_and_weights(hex, true);
   return get_new_point(make_array_view(points_weights.first.begin(),
                                        points_weights.first.end()),
                        make_array_view(points_weights.second.begin(),

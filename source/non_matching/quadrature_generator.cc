@@ -27,6 +27,7 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
+
 namespace NonMatching
 {
   namespace internal
@@ -1252,8 +1253,6 @@ namespace NonMatching
       }
     } // namespace QuadratureGeneratorImplementation
   }   // namespace internal
-
-  using namespace internal::QuadratureGeneratorImplementation;
 
 
 
