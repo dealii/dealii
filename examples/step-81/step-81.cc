@@ -179,7 +179,7 @@ namespace Step81
     dipole_position = Point<dim>(0., 0.8);
     add_parameter("dipole position",
                   dipole_position,
-                  "posititon of the dipole");
+                  "position of the dipole");
 
     dipole_orientation = Tensor<1, dim, double>{{0., 1.}};
     add_parameter("dipole orientation",
@@ -380,7 +380,7 @@ namespace Step81
     unsigned int refinements;
     unsigned int fe_order;
     unsigned int quadrature_order;
-    unsigned int n_outputs;
+    bool interface_bool;
 
     void parse_parameters_callback();
     void make_grid();
@@ -408,7 +408,8 @@ namespace Step81
   // @sect4{The Constructor}
   // The Constructor simply consists specifications for the mesh
   // and the order of the fnite elements. These are editable through
-  // the .prm file.
+  // the .prm file. The interface_bool can be modified to remove the
+  // interface and the standing wave.
 
   template <int dim>
   Maxwell<dim>::Maxwell()
@@ -421,7 +422,7 @@ namespace Step81
     scaling = 20;
     add_parameter("scaling", scaling, "scale of the hypercube geometry");
 
-    refinements = 10;
+    refinements = 8;
     add_parameter("refinements",
                   refinements,
                   "number of refinements of the geometry");
@@ -433,6 +434,11 @@ namespace Step81
     add_parameter("quadrature order",
                   quadrature_order,
                   "order of the quadrature");
+        
+    interface_bool = true;
+    add_parameter("interface boolean",
+                    interface_bool,
+                    "is there an interface?");
   }
 
 
@@ -442,18 +448,24 @@ namespace Step81
     fe = std::make_unique<FESystem<dim>>(FE_NedelecSZ<dim>(fe_order), 2);
   }
 
-  // Make the mesh for the domain and generate the triangulation required
+  // Make the mesh for the domain and generate the triangulation required.
+  // Additionally, there is an interface added here to visualize
+  // a standing wave. To generate a solution without any interface,
+  // comment out lines 455-459.
+
   template <int dim>
   void Maxwell<dim>::make_grid()
   {
     GridGenerator::hyper_cube(triangulation, -scaling, scaling);
     triangulation.refine_global(refinements);
-
+    
+    if (interface_bool){
     for (auto &cell : triangulation.active_cell_iterators())
       if (cell->center()[1] > 0.)
         cell->set_material_id(1);
       else
         cell->set_material_id(2);
+    }
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl;
@@ -472,9 +484,26 @@ namespace Step81
 
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
+
     constraints.clear();
+
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+
+    VectorTools::project_boundary_values_curl_conforming_l2(
+      dof_handler,
+      0, /* real part */
+      dealii::ZeroFunction<dim>(2 * dim),
+      0, /* boundary id */
+      constraints);
+    VectorTools::project_boundary_values_curl_conforming_l2(
+      dof_handler,
+      dim, /* imaginary part */
+      dealii::ZeroFunction<dim>(2 * dim),
+      0, /* boundary id */
+      constraints);
+
     constraints.close();
+
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler,
                                     dsp,
@@ -614,47 +643,48 @@ namespace Step81
                     const auto inner_radius =
                       perfectly_matched_layer.inner_radius;
 
+                    if (id == 0){
+                        auto mu_inv  = parameters.mu_inv(position, id);
+                        auto epsilon = parameters.epsilon(position, id);
 
-                    auto mu_inv  = parameters.mu_inv(position, id);
-                    auto epsilon = parameters.epsilon(position, id);
-
-                    if (radius >= inner_radius)
-                      {
-                        auto A = perfectly_matched_layer.a_matrix(position);
-                        auto B = perfectly_matched_layer.b_matrix(position);
-                        auto d = perfectly_matched_layer.d_tensor(position);
-
-                        mu_inv  = mu_inv / d;
-                        epsilon = invert(A) * epsilon * invert(B);
-                      };
-
-                    const auto normal = fe_face_values.normal_vector(q_point);
-
-                    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                      {
-                        const auto phi_i = real_part.value(i, q_point) -
-                                           1.0i * imag_part.value(i, q_point);
-                        const auto phi_i_T = tangential_part(phi_i, normal);
-
-                        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                        if (radius >= inner_radius)
                           {
-                            const auto phi_j =
-                              real_part.value(j, q_point) +
-                              1.0i * imag_part.value(j, q_point);
-                            const auto phi_j_T =
-                              tangential_part(phi_j, normal) *
-                              fe_face_values.JxW(q_point);
+                            auto A = perfectly_matched_layer.a_matrix(position);
+                            auto B = perfectly_matched_layer.b_matrix(position);
+                            auto d = perfectly_matched_layer.d_tensor(position);
 
-                            const auto prod      = mu_inv * epsilon;
-                            const auto sqrt_prod = prod;
+                            mu_inv  = mu_inv / d;
+                            epsilon = invert(A) * epsilon * invert(B);
+                          };
 
-                            const auto temp =
-                              -1.0i *
-                              scalar_product((sqrt_prod * phi_j_T), phi_i_T);
-                            cell_matrix(i, j) += temp.real();
-                          } /* j */
-                      }     /* i */
-                  }         /* q_point */
+                        const auto normal = fe_face_values.normal_vector(q_point);
+
+                        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                          {
+                            const auto phi_i = real_part.value(i, q_point) -
+                                               1.0i * imag_part.value(i, q_point);
+                            const auto phi_i_T = tangential_part(phi_i, normal);
+
+                            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                              {
+                                const auto phi_j =
+                                  real_part.value(j, q_point) +
+                                  1.0i * imag_part.value(j, q_point);
+                                const auto phi_j_T =
+                                  tangential_part(phi_j, normal) *
+                                  fe_face_values.JxW(q_point);
+
+                                const auto prod      = mu_inv * epsilon;
+                                const auto sqrt_prod = prod;
+
+                                const auto temp =
+                                  -1.0i *
+                                  scalar_product((sqrt_prod * phi_j_T), phi_i_T);
+                                cell_matrix(i, j) += temp.real();
+                              } /* j */
+                          }     /* i */
+                        }
+                    }         /* q_point */
               }
             else
               {
@@ -721,7 +751,7 @@ namespace Step81
       }
   };
 
-
+  // We use a direct solver from the SparseDirectUMFPACK to solve the system
   template <int dim>
   void Maxwell<dim>::solve()
   {
@@ -730,7 +760,7 @@ namespace Step81
     A_direct.vmult(solution, system_rhs);
   }
 
-
+  // The output is writted into a vtk file with 4 components
   template <int dim>
   void Maxwell<dim>::output_results()
   {

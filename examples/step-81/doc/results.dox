@@ -1,16 +1,103 @@
 <h1>Results</h1>
 
-Using the above code (without the PML) and a forcing term of a Hertzian dipole
-at the center, we have generated the following solution wave. The two complex
-plane solutions are followed by the two solutions in the real plane. Furthermore,
-a significant resonance is observed, causing distorted images and necessitating
-a PML boundary condition. <br />
-TODO: add the images <br />
-The solution of the same problem with a PML of strength 2 of radii 8 and 10
-is shown below (in the same order or complex and real solutions). Clearly,
-the PML significantly reduces the distortion in our solution.<br />
-TODO: add the images<br />
-Additionally, an interface is added at y = 0, and by adjusting the surface
-conductivity value and the position of our dipole, we arrive at a standing
-wave.<br />
-TODO: add the images
+The solution is written to a .vtk file with four components. These are the real and imaginary parts of the $E_x$ and $E_y$ solution waves. With the current setup, the output should read
+
+@code
+Number of active cells: 4096
+Number of degrees of freedom: 16640
+Program ended with exit code: 0
+@endcode
+
+We first run the code without the interface and with the dipole centered at $(0,0)$. To demonstrate the effect of the PML, we first set the strength to 0. Change the following parameters in the .prm file:
+
+@code
+# is there an interface?
+  set interface boolean = false
+
+# position of the dipole
+  set dipole position    = 0, 0
+
+# strength of the PML
+  set strength     = 0
+@endcode
+
+The imaginary component of the E_x wave is shown below. We observe that in absence of the PML, there is a lot of distortion and resonance (the real parts will not be generated without a PML). Now, we increase the strength of the PML to 4. 
+
+@code
+# strength of the PML
+  set strength     = 4
+@endcode
+
+As we see, a much more coherent image is generated with an appropriate PML.
+
+<table width="80%" align="center">
+  <tr>
+    <td align="center">
+      <img src="/Users/manaswineebezbaruah/workspace/dealii/examples/step-81/images/PML0_nointerface.png" alt="Visualization of the solution of step-81 with no interface and PML strength 0" height="500">
+    </td>
+    <td></td>
+<td align="center">
+      <img src="/Users/manaswineebezbaruah/workspace/dealii/examples/step-81/images/PML4_nointerface.png" alt="Visualization of the solution of step-81 with no interface and PML strength 4" height="500">
+    </td>
+  </tr>
+</table>
+
+Now, let's generate a standing wave by adding an interface at the center. In order to observe this effect, we offset the center of the dipole to $(0, 0.8)$ and set the interface boolean to $true$
+
+@code
+# is there an interface?
+  set interface boolean = true
+
+# position of the dipole
+  set dipole position    = 0, 0.8
+@endcode
+
+If the PML strength is set to 0, we see the following output (in order from left to right, the images represent the imaginary components of $E_x$ and $E_y$ and the real components of $E_x$ and $E_y$):
+<table width="80%" align="center">
+  <tr>
+    <td align="center">
+      <img src="/Users/manaswineebezbaruah/workspace/dealii/examples/step-81/images/PML0_imagEx.png" alt="Visualization of the solution of step-81 with an interface and PML strength 0" height="300">
+    </td>
+    <td></td>
+<td align="center">
+      <img src="/Users/manaswineebezbaruah/workspace/dealii/examples/step-81/images/PML0_imagEy.png" alt="Visualization of the solution of step-81 with  an interface and PML strength 0" height="300">
+    </td>
+    <td></td>
+    <td align="center">
+      <img src="/Users/manaswineebezbaruah/workspace/dealii/examples/step-81/images/PML0_realEx.png" alt="Visualization of the solution of step-81 with  an interface and PML strength 0" height="300">
+    </td>
+    <td></td>
+<td align="center">
+      <img src="/Users/manaswineebezbaruah/workspace/dealii/examples/step-81/images/PML0_realEy.png" alt="Visualization of the solution of step-81 with an interface and PML strength 0" height="300">
+    </td>
+  </tr>
+</table>
+
+Once again, we see significant distortion and resonance but the standing wave is visible. Now, we increase the PML strength to 4 and generate the following images (in order from left to right, the images represent the imaginary components of $E_x$ and $E_y$ and the real components of $E_x$ and $E_y$):
+<table width="80%" align="center">
+  <tr>
+    <td align="center">
+      <img src="/Users/manaswineebezbaruah/workspace/dealii/examples/step-81/images/PML4_imagEx.png" alt="Visualization of the solution of step-81 with an interface and PML strength 4" height="300">
+    </td>
+    <td></td>
+<td align="center">
+      <img src="/Users/manaswineebezbaruah/workspace/dealii/examples/step-81/images/PML4_imagEy.png" alt="Visualization of the solution of step-81 with  an interface and PML strength 4" height="300">
+    </td>
+    <td></td>
+    <td align="center">
+      <img src="/Users/manaswineebezbaruah/workspace/dealii/examples/step-81/images/PML4_realEx.png" alt="Visualization of the solution of step-81 with  an interface and PML strength 4" height="300">
+    </td>
+    <td></td>
+<td align="center">
+      <img src="/Users/manaswineebezbaruah/workspace/dealii/examples/step-81/images/PML4_realEy.png" alt="Visualization of the solution of step-81 with an interface and PML strength 4" height="300">
+    </td>
+  </tr>
+</table>
+
+As expected, the PML removes the distortion and resonance. The standing wave is also dissipating and getting absorbed within the PML, and as we increase the PML strength, the standing wave will dissipate more within the PML ring.
+
+
+
+
+
+
