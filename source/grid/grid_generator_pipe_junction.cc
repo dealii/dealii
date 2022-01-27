@@ -132,7 +132,7 @@ namespace
       virtual Point<spacedim>
       push_forward(const Point<3> &chart_point) const override;
 
-    protected:
+    private:
       /**
        * A vector orthogonal to the normal direction.
        */
@@ -148,7 +148,6 @@ namespace
        */
       const Point<spacedim> point_on_axis;
 
-    private:
       /**
        * Pipe segment properties to calculate its height.
        */
@@ -202,8 +201,7 @@ namespace
     std::unique_ptr<dealii::Manifold<dim, spacedim>>
     Manifold<dim, spacedim>::clone() const
     {
-      return std::make_unique<Manifold<dim, spacedim>>(
-        normal_direction, direction, point_on_axis, data, tolerance);
+      return std::make_unique<Manifold<dim, spacedim>>(*this);
     }
 
 
