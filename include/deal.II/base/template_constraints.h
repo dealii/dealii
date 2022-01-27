@@ -36,10 +36,6 @@ namespace internal
     template <class...>
     using void_t = void;
 
-    // base class for nonesuch to inherit from so it is not an aggregate
-    struct nonesuch_base
-    {};
-
     // primary template handles all types not supporting the archetypal Op
     template <class Default,
               class /*AlwaysVoid*/,
@@ -61,6 +57,9 @@ namespace internal
     };
 
 
+    // base class for nonesuch to inherit from so it is not an aggregate
+    struct nonesuch_base
+    {};
 
     struct nonesuch : private nonesuch_base
     {
