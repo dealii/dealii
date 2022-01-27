@@ -31,51 +31,58 @@ DEAL_II_NAMESPACE_OPEN
 // Fundamentals, ISO/IEC TS 19568:2017
 namespace internal
 {
-  template <class...>
-  using void_t = void;
-
-  // base class for nonesuch to inherit from so it is not an aggregate
-  struct nonesuch_base
-  {};
-
-  // primary template handles all types not supporting the archetypal Op
-  template <class Default,
-            class /*AlwaysVoid*/,
-            template <class...>
-            class Op,
-            class... /*Args*/>
-  struct detector
+  namespace SupportsOperation
   {
-    using value_t = std::false_type;
-    using type    = Default;
-  };
+    template <class...>
+    using void_t = void;
 
-  // specialization recognizes and handles only types supporting Op
+    // base class for nonesuch to inherit from so it is not an aggregate
+    struct nonesuch_base
+    {};
+
+    // primary template handles all types not supporting the archetypal Op
+    template <class Default,
+              class /*AlwaysVoid*/,
+              template <class...>
+              class Op,
+              class... /*Args*/>
+    struct detector
+    {
+      using value_t = std::false_type;
+      using type    = Default;
+    };
+
+    // specialization recognizes and handles only types supporting Op
+    template <class Default, template <class...> class Op, class... Args>
+    struct detector<Default, void_t<Op<Args...>>, Op, Args...>
+    {
+      using value_t = std::true_type;
+      using type    = Op<Args...>;
+    };
+
+
+
+    struct nonesuch : private nonesuch_base
+    {
+      ~nonesuch()                = delete;
+      nonesuch(nonesuch const &) = delete;
+      void
+      operator=(nonesuch const &) = delete;
+    };
+
+  } // namespace SupportsOperation
+
   template <class Default, template <class...> class Op, class... Args>
-  struct detector<Default, void_t<Op<Args...>>, Op, Args...>
-  {
-    using value_t = std::true_type;
-    using type    = Op<Args...>;
-  };
-
-
-
-  struct nonesuch : private internal::nonesuch_base
-  {
-    ~nonesuch()                = delete;
-    nonesuch(nonesuch const &) = delete;
-    void
-    operator=(nonesuch const &) = delete;
-  };
-
-  template <class Default, template <class...> class Op, class... Args>
-  using detected_or = internal::detector<Default, void, Op, Args...>;
+  using detected_or =
+    internal::SupportsOperation::detector<Default, void, Op, Args...>;
 
   template <template <class...> class Op, class... Args>
-  using is_detected = typename detected_or<nonesuch, Op, Args...>::value_t;
+  using is_detected =
+    typename detected_or<SupportsOperation::nonesuch, Op, Args...>::value_t;
 
   template <template <class...> class Op, class... Args>
-  using detected_t = typename detected_or<nonesuch, Op, Args...>::type;
+  using detected_t =
+    typename detected_or<SupportsOperation::nonesuch, Op, Args...>::type;
 
   template <class Default, template <class...> class Op, class... Args>
   using detected_or_t = typename detected_or<Default, Op, Args...>::type;
