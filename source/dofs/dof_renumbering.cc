@@ -72,7 +72,6 @@ namespace DoFRenumbering
     namespace boosttypes
     {
       using namespace ::boost;
-      using namespace std;
 
       using Graph     = adjacency_list<vecS,
                                    vecS,
