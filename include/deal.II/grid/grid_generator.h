@@ -1050,7 +1050,7 @@ namespace GridGenerator
    * opening to match their index. All other boundary faces will be assigned
    * boundary ID 3.
    *
-   * <em>Manifold IDs</em> will be set on the mantles of each truncated cone in
+   * @ref GlossManifoldIndicator "Manifold IDs" will be set on the mantles of each truncated cone in
    * the same way. Each cone will have a special manifold object assigned, which
    * is based on the CylindricalManifold class. Further, all cells adjacent to
    * the mantle are given the manifold ID 3. If desired, you can assign an
@@ -1075,8 +1075,9 @@ namespace GridGenerator
    * @param aspect_ratio Aspect ratio of cells, specified as radial over z-extension.
    *                     Default ratio is $\Delta r/\Delta z = 1/2$.
    *
-   * Common configurations of tee fittings that can be generated with the
-   * following sets of parameters are:
+   * Common configurations of tee fittings (that is, "T" fittings, mimicking the
+   * geometry of the letter "T") can be generated with the
+   * following sets of parameters:
    * <div class="threecolumn" style="width: 80%; text-align: center;">
    *   <div>
    *     \htmlonly <style>div.image
