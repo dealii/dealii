@@ -925,6 +925,10 @@ namespace Utilities
      * initialized in the beginning, and de-initialized at the end
      * (by calling sc_init(), p4est_init(), and sc_finalize()).
      *
+     * If deal.II is configured to use Kokkos as a backend that library
+     * will also be initialized in the beginning, and de-initialized at
+     * the end.
+     *
      * If a program uses MPI one would typically just create an object
      * of this type at the beginning of <code>main()</code>. The
      * constructor of this class then runs <code>MPI_Init()</code>
@@ -958,9 +962,9 @@ namespace Utilities
     {
     public:
       /**
-       * Initialize MPI (and, if deal.II was configured to use it, PETSc) and
-       * set the number of threads used by deal.II (via the underlying
-       * Threading Building Blocks library) to the given parameter.
+       * Initialize MPI (and, if deal.II was configured to use them, PETSc and
+       * Kokkos) and et the number of threads used by deal.II (via the
+       * underlying Threading Building Blocks library) to the given parameter.
        *
        * @param[in,out] argc A reference to the 'argc' argument passed to
        * main. This argument is used to initialize MPI (and, possibly, PETSc)
