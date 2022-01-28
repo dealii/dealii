@@ -19,6 +19,7 @@
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/manifold.h>
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -304,7 +305,7 @@ Manifold<dim, spacedim>::get_normals_at_vertices(
   const typename Triangulation<dim, spacedim>::face_iterator &face,
   FaceVertexNormals &                                         n) const
 {
-  for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
+  for (unsigned int v = 0; v < face->reference_cell().n_vertices(); ++v)
     {
       n[v] = normal_vector(face, face->vertex(v));
       n[v] /= n[v].norm();
@@ -762,10 +763,10 @@ FlatManifold<2>::get_normals_at_vertices(
   Manifold<2, 2>::FaceVertexNormals &    face_vertex_normals) const
 {
   const Tensor<1, 2> tangent = face->vertex(1) - face->vertex(0);
-  for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_face;
-       ++vertex)
+  // We're in 2d. Faces are edges:
+  for (const unsigned int vertex : ReferenceCells::Line.vertex_indices())
     // compute normals from tangent
-    face_vertex_normals[vertex] = Point<2>(tangent[1], -tangent[0]);
+    face_vertex_normals[vertex] = Tensor<1, 2>({tangent[1], -tangent[0]});
 }
 
 
