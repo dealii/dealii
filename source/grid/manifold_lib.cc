@@ -138,7 +138,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 PolarManifold<dim, spacedim>::clone() const
 {
-  return std::make_unique<PolarManifold<dim, spacedim>>(center);
+  return std::make_unique<PolarManifold<dim, spacedim>>(*this);
 }
 
 
@@ -369,7 +369,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 SphericalManifold<dim, spacedim>::clone() const
 {
-  return std::make_unique<SphericalManifold<dim, spacedim>>(center);
+  return std::make_unique<SphericalManifold<dim, spacedim>>(*this);
 }
 
 
@@ -1080,9 +1080,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 CylindricalManifold<dim, spacedim>::clone() const
 {
-  return std::make_unique<CylindricalManifold<dim, spacedim>>(direction,
-                                                              point_on_axis,
-                                                              tolerance);
+  return std::make_unique<CylindricalManifold<dim, spacedim>>(*this);
 }
 
 
@@ -1237,10 +1235,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 EllipticalManifold<dim, spacedim>::clone() const
 {
-  const double eccentricity = 1.0 / cosh_u;
-  return std::make_unique<EllipticalManifold<dim, spacedim>>(center,
-                                                             direction,
-                                                             eccentricity);
+  return std::make_unique<EllipticalManifold<dim, spacedim>>(*this);
 }
 
 
