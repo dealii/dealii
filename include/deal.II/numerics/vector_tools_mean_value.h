@@ -23,8 +23,16 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
+// forward declarations
 template <int dim, int spacedim>
 class DoFHandler;
+namespace hp
+{
+  template <int dim, int spacedim>
+  class MappingCollection;
+}
+#endif
 
 namespace VectorTools
 {
@@ -109,6 +117,20 @@ namespace VectorTools
    * finite element function with mean value zero. In fact, it only works for
    * Lagrangian elements. For all other elements, you will need to compute the
    * mean value and subtract it right inside the evaluation routine.
+   */
+  template <int dim, typename VectorType, int spacedim>
+  typename VectorType::value_type
+  compute_mean_value(
+    const hp::MappingCollection<dim, spacedim> &mapping_collection,
+    const DoFHandler<dim, spacedim> &           dof,
+    const hp::QCollection<dim> &                q_collection,
+    const VectorType &                          v,
+    const unsigned int                          component);
+
+  /**
+   * Calls the other compute_mean_value() function, see above, for the non-hp
+   * case. That means, it requires a single FiniteElement, a single Quadrature,
+   * and a single Mapping object.
    */
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type

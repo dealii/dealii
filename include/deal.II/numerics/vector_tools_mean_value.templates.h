@@ -21,6 +21,10 @@
 
 #include <deal.II/grid/filtered_iterator.h>
 
+#include <deal.II/hp/fe_values.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/hp/q_collection.h>
+
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
@@ -123,24 +127,29 @@ namespace VectorTools
 
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type
-  compute_mean_value(const Mapping<dim, spacedim> &   mapping,
-                     const DoFHandler<dim, spacedim> &dof,
-                     const Quadrature<dim> &          quadrature,
-                     const VectorType &               v,
-                     const unsigned int               component)
+  compute_mean_value(
+    const hp::MappingCollection<dim, spacedim> &mapping_collection,
+    const DoFHandler<dim, spacedim> &           dof,
+    const hp::QCollection<dim> &                q_collection,
+    const VectorType &                          v,
+    const unsigned int                          component)
   {
     using Number = typename VectorType::value_type;
-    Assert(v.size() == dof.n_dofs(),
-           ExcDimensionMismatch(v.size(), dof.n_dofs()));
-    AssertIndexRange(component, dof.get_fe(0).n_components());
 
-    FEValues<dim, spacedim> fe(mapping,
-                               dof.get_fe(),
-                               quadrature,
-                               UpdateFlags(update_JxW_values | update_values));
+    const hp::FECollection<dim, spacedim> &fe_collection =
+      dof.get_fe_collection();
+    const unsigned int n_components = fe_collection.n_components();
 
-    std::vector<Vector<Number>> values(
-      quadrature.size(), Vector<Number>(dof.get_fe(0).n_components()));
+    AssertDimension(v.size(), dof.n_dofs());
+    AssertIndexRange(component, n_components);
+
+    hp::FEValues<dim, spacedim> fe_values_collection(
+      mapping_collection,
+      fe_collection,
+      q_collection,
+      UpdateFlags(update_JxW_values | update_values));
+
+    std::vector<Vector<Number>> values;
 
     Number                                            mean = Number();
     typename numbers::NumberTraits<Number>::real_type area = 0.;
@@ -148,12 +157,17 @@ namespace VectorTools
     for (const auto &cell :
          dof.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
       {
-        fe.reinit(cell);
-        fe.get_function_values(v, values);
-        for (unsigned int k = 0; k < quadrature.size(); ++k)
+        fe_values_collection.reinit(cell);
+        const FEValues<dim, spacedim> &fe_values =
+          fe_values_collection.get_present_fe_values();
+
+        values.resize(fe_values.n_quadrature_points,
+                      Vector<Number>(n_components));
+        fe_values.get_function_values(v, values);
+        for (unsigned int k = 0; k < fe_values.n_quadrature_points; ++k)
           {
-            mean += fe.JxW(k) * values[k](component);
-            area += fe.JxW(k);
+            mean += fe_values.JxW(k) * values[k](component);
+            area += fe_values.JxW(k);
           }
       }
 
@@ -189,6 +203,22 @@ namespace VectorTools
 #endif
 
     return (mean / area);
+  }
+
+
+  template <int dim, typename VectorType, int spacedim>
+  typename VectorType::value_type
+  compute_mean_value(const Mapping<dim, spacedim> &   mapping,
+                     const DoFHandler<dim, spacedim> &dof,
+                     const Quadrature<dim> &          quadrature,
+                     const VectorType &               v,
+                     const unsigned int               component)
+  {
+    return compute_mean_value(hp::MappingCollection<dim, spacedim>(mapping),
+                              dof,
+                              hp::QCollection<dim>(quadrature),
+                              v,
+                              component);
   }
 
 
