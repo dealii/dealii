@@ -4017,7 +4017,7 @@ private:
    * type FlatManifold.
    */
   std::map<types::manifold_id, std::unique_ptr<const Manifold<dim, spacedim>>>
-    manifold;
+    manifolds;
 
   /**
    * Flag indicating whether anisotropic refinement took place.
