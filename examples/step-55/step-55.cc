@@ -126,8 +126,8 @@ namespace Step55
     InverseMatrix<Matrix, Preconditioner>::vmult(VectorType &      dst,
                                                  const VectorType &src) const
     {
-      SolverControl solver_control(src.size(), 1e-8 * src.l2_norm());
-      SolverCG<LA::MPI::Vector> cg(solver_control);
+      SolverControl        solver_control(src.size(), 1e-8 * src.l2_norm());
+      SolverCG<VectorType> cg(solver_control);
       dst = 0;
 
       try
@@ -203,19 +203,22 @@ namespace Step55
     const double R_x = p[0];
     const double R_y = p[1];
 
-    const double pi  = numbers::PI;
-    const double pi2 = pi * pi;
-    values[0] =
-      -1.0L / 2.0L * (-2 * sqrt(25.0 + 4 * pi2) + 10.0) *
-        exp(R_x * (-2 * sqrt(25.0 + 4 * pi2) + 10.0)) -
-      0.4 * pi2 * exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) +
-      0.1 * pow(-sqrt(25.0 + 4 * pi2) + 5.0, 2) *
-        exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi);
-    values[1] = 0.2 * pi * (-sqrt(25.0 + 4 * pi2) + 5.0) *
-                  exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) -
-                0.05 * pow(-sqrt(25.0 + 4 * pi2) + 5.0, 3) *
-                  exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) /
-                  pi;
+    constexpr double pi  = numbers::PI;
+    constexpr double pi2 = numbers::PI * numbers::PI;
+
+    values[0] = -1.0L / 2.0L * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0) *
+                  std::exp(R_x * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0)) -
+                0.4 * pi2 * std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                  std::cos(2 * R_y * pi) +
+                0.1 * std::pow(-std::sqrt(25.0 + 4 * pi2) + 5.0, 2) *
+                  std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                  std::cos(2 * R_y * pi);
+    values[1] = 0.2 * pi * (-std::sqrt(25.0 + 4 * pi2) + 5.0) *
+                  std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                  std::sin(2 * R_y * pi) -
+                0.05 * std::pow(-std::sqrt(25.0 + 4 * pi2) + 5.0, 3) *
+                  std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                  std::sin(2 * R_y * pi) / pi;
     values[2] = 0;
   }
 
@@ -229,7 +232,7 @@ namespace Step55
     {}
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  value) const override;
+                              Vector<double> &  values) const override;
   };
 
   template <int dim>
@@ -239,27 +242,30 @@ namespace Step55
     const double R_x = p[0];
     const double R_y = p[1];
 
-    const double pi  = numbers::PI;
-    const double pi2 = pi * pi;
-    values[0] =
-      -exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) + 1;
-    values[1] = (1.0L / 2.0L) * (-sqrt(25.0 + 4 * pi2) + 5.0) *
-                exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) /
-                pi;
+    constexpr double pi  = numbers::PI;
+    constexpr double pi2 = numbers::PI * numbers::PI;
+
+    values[0] = -std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                  std::cos(2 * R_y * pi) +
+                1;
+    values[1] = (1.0L / 2.0L) * (-std::sqrt(25.0 + 4 * pi2) + 5.0) *
+                std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                std::sin(2 * R_y * pi) / pi;
     values[2] =
-      -1.0L / 2.0L * exp(R_x * (-2 * sqrt(25.0 + 4 * pi2) + 10.0)) -
+      -1.0L / 2.0L * std::exp(R_x * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0)) -
       2.0 *
         (-6538034.74494422 +
-         0.0134758939981709 * exp(4 * sqrt(25.0 + 4 * pi2))) /
-        (-80.0 * exp(3 * sqrt(25.0 + 4 * pi2)) +
-         16.0 * sqrt(25.0 + 4 * pi2) * exp(3 * sqrt(25.0 + 4 * pi2))) -
-      1634508.68623606 * exp(-3.0 * sqrt(25.0 + 4 * pi2)) /
-        (-10.0 + 2.0 * sqrt(25.0 + 4 * pi2)) +
-      (-0.00673794699908547 * exp(sqrt(25.0 + 4 * pi2)) +
-       3269017.37247211 * exp(-3 * sqrt(25.0 + 4 * pi2))) /
-        (-8 * sqrt(25.0 + 4 * pi2) + 40.0) +
-      0.00336897349954273 * exp(1.0 * sqrt(25.0 + 4 * pi2)) /
-        (-10.0 + 2.0 * sqrt(25.0 + 4 * pi2));
+         0.0134758939981709 * std::exp(4 * std::sqrt(25.0 + 4 * pi2))) /
+        (-80.0 * std::exp(3 * std::sqrt(25.0 + 4 * pi2)) +
+         16.0 * std::sqrt(25.0 + 4 * pi2) *
+           std::exp(3 * std::sqrt(25.0 + 4 * pi2))) -
+      1634508.68623606 * std::exp(-3.0 * std::sqrt(25.0 + 4 * pi2)) /
+        (-10.0 + 2.0 * std::sqrt(25.0 + 4 * pi2)) +
+      (-0.00673794699908547 * std::exp(std::sqrt(25.0 + 4 * pi2)) +
+       3269017.37247211 * std::exp(-3 * std::sqrt(25.0 + 4 * pi2))) /
+        (-8 * std::sqrt(25.0 + 4 * pi2) + 40.0) +
+      0.00336897349954273 * std::exp(1.0 * std::sqrt(25.0 + 4 * pi2)) /
+        (-10.0 + 2.0 * std::sqrt(25.0 + 4 * pi2));
   }
 
 
@@ -331,7 +337,7 @@ namespace Step55
   {}
 
 
-  // The Kovasnay flow is defined on the domain [-0.5, 1.5]^2, which we
+  // The Kovasznay flow is defined on the domain [-0.5, 1.5]^2, which we
   // create by passing the min and max values to GridGenerator::hyper_cube.
   template <int dim>
   void StokesProblem<dim>::make_grid()
