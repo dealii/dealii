@@ -114,10 +114,6 @@ check(const FiniteElement<dim> &fe_scalar)
 int
 main(int argc, char *argv[])
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   // no threading in this test...
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   initlog();
