@@ -54,8 +54,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
 {
-  using namespace internal;
-
   namespace
   {
     template <typename VectorType>
