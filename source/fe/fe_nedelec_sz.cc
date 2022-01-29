@@ -177,10 +177,12 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                               std::vector<DerivativeForm<1, dim, dim>>(
                                 n_q_points));
     }
-  // Not implementing second derivatives yet:
+
   if ((flags & update_hessians) != 0u)
     {
-      Assert(false, ExcNotImplemented());
+      data.shape_hessians.resize(this->n_dofs_per_cell(),
+                                 std::vector<DerivativeForm<2, dim, dim>>(
+                                   n_q_points));
     }
 
   std::vector<Point<dim>> p_list(n_q_points);
@@ -401,7 +403,8 @@ FE_NedelecSZ<dim, spacedim>::get_data(
             cell_type2_offset + degree * degree;
           const unsigned int cell_type3_offset2 = cell_type3_offset1 + degree;
 
-          if ((flags & (update_values | update_gradients)) != 0u)
+          if ((flags & (update_values | update_gradients | update_hessians)) !=
+              0u)
             {
               // compute all points we must evaluate the 1d polynomials at:
               std::vector<Point<dim>> cell_points(n_q_points);
@@ -424,12 +427,12 @@ FE_NedelecSZ<dim, spacedim>::get_data(
 
                   // We only need poly values and 1st derivative for
                   // update_values, but need the 2nd derivative too for
-                  // update_gradients.
-                  //
-                  // Note that this will need to be updated if we're supporting
-                  // update_hessians.
+                  // update_gradients. For update_hessians we also need the 3rd
+                  // derivatives.
                   const unsigned int poly_length(
-                    (flags & update_gradients) != 0u ? 3 : 2);
+                    (flags & update_hessians) != 0u ?
+                      4 :
+                      ((flags & update_gradients) != 0u ? 3 : 2));
 
                   std::vector<std::vector<double>> polyx(
                     degree, std::vector<double>(poly_length));
@@ -532,6 +535,83 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                           data.shape_grads[dof_index3_2][q][1][0] =
                             2.0 * polyx[j][1];
                           data.shape_grads[dof_index3_2][q][1][1] = 0.0;
+                        }
+                    }
+                  if (flags & update_hessians)
+                    {
+                      for (unsigned int j = 0; j < degree; ++j)
+                        {
+                          const unsigned int shift_j(j * degree);
+                          for (unsigned int i = 0; i < degree; ++i)
+                            {
+                              const unsigned int shift_ij(i + shift_j);
+
+                              // Type 1:
+                              const unsigned int dof_index1(cell_type1_offset +
+                                                            shift_ij);
+                              data.shape_hessians[dof_index1][q][0][0][0] =
+                                8.0 * polyx[i][3] * polyy[j][0];
+                              data.shape_hessians[dof_index1][q][1][0][0] =
+                                8.0 * polyx[i][2] * polyy[j][1];
+
+                              data.shape_hessians[dof_index1][q][0][1][0] =
+                                data.shape_hessians[dof_index1][q][1][0][0];
+                              data.shape_hessians[dof_index1][q][1][1][0] =
+                                8.0 * polyx[i][1] * polyy[j][2];
+
+                              data.shape_hessians[dof_index1][q][0][0][1] =
+                                data.shape_hessians[dof_index1][q][1][0][0];
+                              data.shape_hessians[dof_index1][q][1][0][1] =
+                                data.shape_hessians[dof_index1][q][1][1][0];
+
+                              data.shape_hessians[dof_index1][q][0][1][1] =
+                                data.shape_hessians[dof_index1][q][1][1][0];
+                              data.shape_hessians[dof_index1][q][1][1][1] =
+                                8.0 * polyx[i][0] * polyy[j][3];
+
+
+
+                              // Type 2:
+                              const unsigned int dof_index2(cell_type2_offset +
+                                                            shift_ij);
+                              for (unsigned int d = 0; d < dim; ++d)
+                                {
+                                  data.shape_hessians[dof_index2][q][0][0][d] =
+                                    data.shape_hessians[dof_index1][q][0][0][d];
+                                  data.shape_hessians[dof_index2][q][0][1][d] =
+                                    data.shape_hessians[dof_index1][q][0][1][d];
+                                  data.shape_hessians[dof_index2][q][1][0][d] =
+                                    -1.0 *
+                                    data.shape_hessians[dof_index1][q][1][0][d];
+                                  data.shape_hessians[dof_index2][q][1][1][d] =
+                                    -1.0 *
+                                    data.shape_hessians[dof_index1][q][1][1][d];
+                                }
+                            }
+                          // Type 3:
+                          const unsigned int dof_index3_1(cell_type3_offset1 +
+                                                          j);
+                          data.shape_hessians[dof_index3_1][q][0][0][0] = 0.0;
+                          data.shape_hessians[dof_index3_1][q][0][0][1] = 0.0;
+                          data.shape_hessians[dof_index3_1][q][0][1][0] = 0.0;
+                          data.shape_hessians[dof_index3_1][q][0][1][1] =
+                            4.0 * polyy[j][2];
+                          data.shape_hessians[dof_index3_1][q][1][0][0] = 0.0;
+                          data.shape_hessians[dof_index3_1][q][1][0][1] = 0.0;
+                          data.shape_hessians[dof_index3_1][q][1][1][0] = 0.0;
+                          data.shape_hessians[dof_index3_1][q][1][1][1] = 0.0;
+
+                          const unsigned int dof_index3_2(cell_type3_offset2 +
+                                                          j);
+                          data.shape_hessians[dof_index3_2][q][0][0][0] = 0.0;
+                          data.shape_hessians[dof_index3_2][q][0][0][1] = 0.0;
+                          data.shape_hessians[dof_index3_2][q][0][1][0] = 0.0;
+                          data.shape_hessians[dof_index3_2][q][0][1][1] = 0.0;
+                          data.shape_hessians[dof_index3_2][q][1][0][0] =
+                            4.0 * polyx[j][2];
+                          data.shape_hessians[dof_index3_2][q][1][0][1] = 0.0;
+                          data.shape_hessians[dof_index3_2][q][1][1][0] = 0.0;
+                          data.shape_hessians[dof_index3_2][q][1][1][1] = 0.0;
                         }
                     }
                 }
@@ -799,7 +879,8 @@ FE_NedelecSZ<dim, spacedim>::get_data(
 
               // for cell-based shape functions:
               // these don't depend on the cell, so can precompute all here:
-              if ((flags & (update_values | update_gradients)) != 0u)
+              if ((flags &
+                   (update_values | update_gradients | update_hessians)) != 0u)
                 {
                   // Cell-based shape functions:
                   //
@@ -851,11 +932,15 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                         }
                     }
 
-
-                  // only need poly values and 1st derivative for update_values,
-                  // but need 2nd derivative too for update_gradients.
+                  // We only need poly values and 1st derivative for
+                  // update_values, but need the 2nd derivative too for
+                  // update_gradients. For update_hessians we also need 3rd
+                  // derivative.
                   const unsigned int poly_length(
-                    (flags & update_gradients) != 0u ? 3 : 2);
+                    (flags & update_hessians) != 0u ?
+                      4 :
+                      ((flags & update_gradients) != 0u ? 3 : 2));
+
                   // Loop through quad points:
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
@@ -1091,6 +1176,284 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                                 }
                             }
                         }
+                      if (flags & update_hessians)
+                        {
+                          for (unsigned int k = 0; k < degree; ++k)
+                            {
+                              const unsigned int shift_k(k * degree * degree);
+                              const unsigned int shift_j(
+                                k * degree); // Used below when subbing k for j
+                                             // type 3
+
+                              for (unsigned int j = 0; j < degree; ++j)
+                                {
+                                  const unsigned int shift_jk(j * degree +
+                                                              shift_k);
+                                  for (unsigned int i = 0; i < degree; ++i)
+                                    {
+                                      const unsigned int shift_ijk(shift_jk +
+                                                                   i);
+
+                                      // Type 1:
+                                      const unsigned int dof_index1(
+                                        cell_type1_offset + shift_ijk);
+
+                                      data.shape_hessians[dof_index1][q][0][0]
+                                                         [0] =
+                                        8.0 * polyx[i][3] * polyy[j][0] *
+                                        polyz[k][0];
+                                      data.shape_hessians[dof_index1][q][1][0]
+                                                         [0] =
+                                        8.0 * polyx[i][2] * polyy[j][1] *
+                                        polyz[k][0];
+                                      data.shape_hessians[dof_index1][q][2][0]
+                                                         [0] =
+                                        8.0 * polyx[i][2] * polyy[j][0] *
+                                        polyz[k][1];
+
+                                      data.shape_hessians[dof_index1][q][0][1]
+                                                         [0] =
+                                        data.shape_hessians[dof_index1][q][1][0]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][1][1]
+                                                         [0] =
+                                        8.0 * polyx[i][1] * polyy[j][2] *
+                                        polyz[k][0];
+                                      data.shape_hessians[dof_index1][q][2][1]
+                                                         [0] =
+                                        8.0 * polyx[i][1] * polyy[j][1] *
+                                        polyz[k][1];
+
+                                      data.shape_hessians[dof_index1][q][0][2]
+                                                         [0] =
+                                        data.shape_hessians[dof_index1][q][2][0]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][1][2]
+                                                         [0] =
+                                        data.shape_hessians[dof_index1][q][2][1]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][2][2]
+                                                         [0] =
+                                        8.0 * polyx[i][1] * polyy[j][0] *
+                                        polyz[k][2];
+
+
+                                      data.shape_hessians[dof_index1][q][0][0]
+                                                         [1] =
+                                        data.shape_hessians[dof_index1][q][1][0]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][1][0]
+                                                         [1] =
+                                        data.shape_hessians[dof_index1][q][1][1]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][2][0]
+                                                         [1] =
+                                        data.shape_hessians[dof_index1][q][2][1]
+                                                           [0];
+
+                                      data.shape_hessians[dof_index1][q][0][1]
+                                                         [1] =
+                                        data.shape_hessians[dof_index1][q][1][1]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][1][1]
+                                                         [1] =
+                                        8.0 * polyx[i][0] * polyy[j][3] *
+                                        polyz[k][0];
+                                      data.shape_hessians[dof_index1][q][2][1]
+                                                         [1] =
+                                        8.0 * polyx[i][0] * polyy[j][2] *
+                                        polyz[k][1];
+
+                                      data.shape_hessians[dof_index1][q][0][2]
+                                                         [1] =
+                                        data.shape_hessians[dof_index1][q][2][1]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][1][2]
+                                                         [1] =
+                                        data.shape_hessians[dof_index1][q][2][1]
+                                                           [1];
+                                      data.shape_hessians[dof_index1][q][2][2]
+                                                         [1] =
+                                        8.0 * polyx[i][0] * polyy[j][1] *
+                                        polyz[k][2];
+
+
+                                      data.shape_hessians[dof_index1][q][0][0]
+                                                         [2] =
+                                        data.shape_hessians[dof_index1][q][2][0]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][1][0]
+                                                         [2] =
+                                        data.shape_hessians[dof_index1][q][2][1]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][2][0]
+                                                         [2] =
+                                        data.shape_hessians[dof_index1][q][2][2]
+                                                           [0];
+
+                                      data.shape_hessians[dof_index1][q][0][1]
+                                                         [2] =
+                                        data.shape_hessians[dof_index1][q][2][1]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][1][1]
+                                                         [2] =
+                                        data.shape_hessians[dof_index1][q][2][1]
+                                                           [1];
+                                      data.shape_hessians[dof_index1][q][2][1]
+                                                         [2] =
+                                        data.shape_hessians[dof_index1][q][2][2]
+                                                           [1];
+
+                                      data.shape_hessians[dof_index1][q][0][2]
+                                                         [2] =
+                                        data.shape_hessians[dof_index1][q][2][2]
+                                                           [0];
+                                      data.shape_hessians[dof_index1][q][1][2]
+                                                         [2] =
+                                        data.shape_hessians[dof_index1][q][2][2]
+                                                           [1];
+                                      data.shape_hessians[dof_index1][q][2][2]
+                                                         [2] =
+                                        8.0 * polyx[i][0] * polyy[j][0] *
+                                        polyz[k][3];
+
+
+                                      // Type 2:
+                                      const unsigned int dof_index2_1(
+                                        cell_type2_offset1 + shift_ijk);
+                                      const unsigned int dof_index2_2(
+                                        cell_type2_offset2 + shift_ijk);
+
+                                      for (unsigned int d1 = 0; d1 < dim; ++d1)
+                                        {
+                                          for (unsigned int d2 = 0; d2 < dim;
+                                               ++d2)
+                                            {
+                                              data
+                                                .shape_hessians[dof_index2_1][q]
+                                                               [0][d1][d2] =
+                                                data
+                                                  .shape_hessians[dof_index1][q]
+                                                                 [0][d1][d2];
+                                              data
+                                                .shape_hessians[dof_index2_1][q]
+                                                               [1][d1][d2] =
+                                                -1.0 *
+                                                data
+                                                  .shape_hessians[dof_index1][q]
+                                                                 [1][d1][d2];
+                                              data
+                                                .shape_hessians[dof_index2_1][q]
+                                                               [2][d1][d2] =
+                                                data
+                                                  .shape_hessians[dof_index1][q]
+                                                                 [2][d1][d2];
+
+                                              data
+                                                .shape_hessians[dof_index2_2][q]
+                                                               [0][d1][d2] =
+                                                data
+                                                  .shape_hessians[dof_index1][q]
+                                                                 [0][d1][d2];
+                                              data
+                                                .shape_hessians[dof_index2_2][q]
+                                                               [1][d1][d2] =
+                                                -1.0 *
+                                                data
+                                                  .shape_hessians[dof_index1][q]
+                                                                 [1][d1][d2];
+                                              data
+                                                .shape_hessians[dof_index2_2][q]
+                                                               [2][d1][d2] =
+                                                -1.0 *
+                                                data
+                                                  .shape_hessians[dof_index1][q]
+                                                                 [2][d1][d2];
+                                            }
+                                        }
+                                    }
+                                  // Type 3: (note we re-use k and j for
+                                  // convenience):
+                                  const unsigned int shift_ij(
+                                    j + shift_j); // here we've subbed j for i,
+                                                  // k for j.
+                                  const unsigned int dof_index3_1(
+                                    cell_type3_offset1 + shift_ij);
+                                  const unsigned int dof_index3_2(
+                                    cell_type3_offset2 + shift_ij);
+                                  const unsigned int dof_index3_3(
+                                    cell_type3_offset3 + shift_ij);
+                                  for (unsigned int d1 = 0; d1 < dim; ++d1)
+                                    {
+                                      for (unsigned int d2 = 0; d2 < dim; ++d2)
+                                        {
+                                          for (unsigned int d3 = 0; d3 < dim;
+                                               ++d3)
+                                            {
+                                              data
+                                                .shape_hessians[dof_index3_1][q]
+                                                               [d1][d2][d3] =
+                                                0.0;
+                                              data
+                                                .shape_hessians[dof_index3_2][q]
+                                                               [d1][d2][d3] =
+                                                0.0;
+                                              data
+                                                .shape_hessians[dof_index3_3][q]
+                                                               [d1][d2][d3] =
+                                                0.0;
+                                            }
+                                        }
+                                    }
+                                  data
+                                    .shape_hessians[dof_index3_1][q][0][1][1] =
+                                    4.0 * polyy[j][2] * polyz[k][0];
+                                  data
+                                    .shape_hessians[dof_index3_1][q][0][1][2] =
+                                    4.0 * polyy[j][1] * polyz[k][1];
+
+                                  data
+                                    .shape_hessians[dof_index3_1][q][0][2][1] =
+                                    data
+                                      .shape_hessians[dof_index3_1][q][0][1][2];
+                                  data
+                                    .shape_hessians[dof_index3_1][q][0][2][2] =
+                                    4.0 * polyy[j][0] * polyz[k][2];
+
+
+                                  data
+                                    .shape_hessians[dof_index3_2][q][1][0][0] =
+                                    4.0 * polyx[j][2] * polyz[k][0];
+                                  data
+                                    .shape_hessians[dof_index3_2][q][1][0][2] =
+                                    4.0 * polyx[j][1] * polyz[k][1];
+
+                                  data
+                                    .shape_hessians[dof_index3_2][q][1][2][0] =
+                                    data
+                                      .shape_hessians[dof_index3_2][q][1][0][2];
+                                  data
+                                    .shape_hessians[dof_index3_2][q][1][2][2] =
+                                    4.0 * polyx[j][0] * polyz[k][2];
+
+
+                                  data
+                                    .shape_hessians[dof_index3_3][q][2][0][0] =
+                                    4.0 * polyx[j][2] * polyy[k][0];
+                                  data
+                                    .shape_hessians[dof_index3_3][q][2][0][1] =
+                                    4.0 * polyx[j][1] * polyy[k][1];
+
+                                  data
+                                    .shape_hessians[dof_index3_3][q][2][1][0] =
+                                    data
+                                      .shape_hessians[dof_index3_3][q][2][0][1];
+                                  data
+                                    .shape_hessians[dof_index3_3][q][2][1][1] =
+                                    4.0 * polyx[j][0] * polyy[k][2];
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1155,7 +1518,8 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
     {
       case 2:
         {
-          if ((flags & (update_values | update_gradients)) != 0u)
+          if ((flags & (update_values | update_gradients | update_hessians)) !=
+              0u)
             {
               // Define an edge numbering so that each edge, E_{m} = [e^{m}_{1},
               // e^{m}_{2}] e1 = higher global numbering of the two local
@@ -1182,7 +1546,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                     }
                 }
 
-              // Define \sigma_{m} = sigma_{e^{m}_{2}} - sigma_{e^{m}_{2}}
+              // Define \sigma_{m} = sigma_{e^{m}_{2}} - sigma_{e^{m}_{1}}
               //        \lambda_{m} = \lambda_{e^{m}_{1}} + \lambda_{e^{m}_{2}}
               //
               // To help things, in fe_data, we have precomputed (sigma_{i} -
@@ -1249,7 +1613,9 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
               // derivatives of the 1d polynomials, but only first derivatives
               // for the shape values.
               const unsigned int poly_length(
-                (flags & update_gradients) != 0u ? 3 : 2);
+                (flags & update_hessians) != 0u ?
+                  4 :
+                  ((flags & update_gradients) != 0u ? 3 : 2));
 
               for (unsigned int m = 0; m < lines_per_cell; ++m)
                 {
@@ -1263,7 +1629,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                         {
                           // Compute all required 1d polynomials and their
                           // derivatives, starting at degree 2. e.g. to access
-                          // L'_{3}(2x-1) use polyx[1][1].
+                          // L'_{i+2}(edge_sigma) use polyx[i][1].
                           IntegratedLegendrePolynomials[i + 1].value(
                             edge_sigma_values[m][q], poly[i - 1]);
                         }
@@ -1333,6 +1699,54 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                                 edge_lambda_values[m][q] * poly[poly_index][2];
                             }
                         }
+                      if (flags & update_hessians)
+                        {
+                          // Lowest order edge shape function
+                          for (unsigned int d1 = 0; d1 < dim; ++d1)
+                            {
+                              for (unsigned int d2 = 0; d2 < dim; ++d2)
+                                {
+                                  for (unsigned int d3 = 0; d3 < dim; ++d3)
+                                    {
+                                      fe_data.shape_hessians[shift_m][q][d1][d2]
+                                                            [d3] = 0;
+                                    }
+                                }
+                            }
+
+                          // Higher order edge shape function
+                          for (unsigned int i = 0; i < degree; ++i)
+                            {
+                              const unsigned int dof_index(i + 1 + shift_m);
+
+                              for (unsigned int d1 = 0; d1 < dim; ++d1)
+                                {
+                                  for (unsigned int d2 = 0; d2 < dim; ++d2)
+                                    {
+                                      for (unsigned int d3 = 0; d3 < dim; ++d3)
+                                        {
+                                          fe_data.shape_hessians[dof_index][q]
+                                                                [d1][d2][d3] =
+                                            edge_sigma_grads[m][d1] *
+                                              edge_sigma_grads[m][d2] *
+                                              edge_sigma_grads[m][d3] *
+                                              poly[i][3] *
+                                              edge_lambda_values[m][q] +
+                                            poly[i][2] *
+                                              (edge_sigma_grads[m][d1] *
+                                                 edge_sigma_grads[m][d2] *
+                                                 edge_lambda_grads[m][d3] +
+                                               edge_sigma_grads[m][d3] *
+                                                 edge_sigma_grads[m][d1] *
+                                                 edge_lambda_grads[m][d2] +
+                                               edge_sigma_grads[m][d3] *
+                                                 edge_sigma_grads[m][d2] *
+                                                 edge_lambda_grads[m][d1]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1340,7 +1754,8 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
         }
       case 3:
         {
-          if ((flags & (update_values | update_gradients)) != 0u)
+          if ((flags & (update_values | update_gradients | update_hessians)) !=
+              0u)
             {
               // Define an edge numbering so that each edge, E_{m} = [e^{m}_{1},
               // e^{m}_{2}] e1 = higher global numbering of the two local
@@ -1367,7 +1782,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                     }
                 }
 
-              // Define \sigma_{m} = sigma_{e^{m}_{2}} - sigma_{e^{m}_{2}}
+              // Define \sigma_{m} = sigma_{e^{m}_{1}} - sigma_{e^{m}_{2}}
               //        \lambda_{m} = \lambda_{e^{m}_{1}} + \lambda_{e^{m}_{2}}
               //
               // To help things, in fe_data, we have precomputed (sigma_{i} -
@@ -1437,7 +1852,10 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
               // derivatives of the 1d polynomials, but only first derivatives
               // for the shape values.
               const unsigned int poly_length(
-                (flags & update_gradients) != 0u ? 3 : 2);
+                (flags & update_hessians) != 0u ?
+                  4 :
+                  ((flags & update_gradients) != 0u ? 3 : 2));
+
               std::vector<std::vector<double>> poly(
                 degree, std::vector<double>(poly_length));
               for (unsigned int m = 0; m < lines_per_cell; ++m)
@@ -1446,6 +1864,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
                       // precompute values of all 1d polynomials required:
+                      // for example poly[i][1] = L'_{i+2}(edge_sigma_values)
                       if (degree > 0)
                         {
                           for (unsigned int i = 0; i < degree; ++i)
@@ -1456,13 +1875,14 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                         }
                       if ((flags & update_values) != 0u)
                         {
-                          // Lowest order shape functions:
+                          // Lowest order edge shape functions:
                           for (unsigned int d = 0; d < dim; ++d)
                             {
                               fe_data.shape_values[shift_m][q][d] =
                                 0.5 * edge_sigma_grads[m][d] *
                                 edge_lambda_values[m][q];
                             }
+                          // Higher order edge shape functions
                           if (degree > 0)
                             {
                               for (unsigned int i = 0; i < degree; ++i)
@@ -1480,7 +1900,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                         }
                       if ((flags & update_gradients) != 0u)
                         {
-                          // Lowest order shape functions:
+                          // Lowest order edge shape functions:
                           for (unsigned int d1 = 0; d1 < dim; ++d1)
                             {
                               for (unsigned int d2 = 0; d2 < dim; ++d2)
@@ -1490,6 +1910,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                                     edge_lambda_grads[m][q][d2];
                                 }
                             }
+                          // Higher order edge shape functions
                           if (degree > 0)
                             {
                               for (unsigned int i = 0; i < degree; ++i)
@@ -1514,6 +1935,74 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                                             edge_lambda_gradgrads_3d[m][d1]
                                                                     [d2] *
                                               poly[i][0];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                      if (flags & update_hessians)
+                        {
+                          // Lowest order edge shape functions:
+                          for (unsigned int d1 = 0; d1 < dim; ++d1)
+                            {
+                              for (unsigned int d2 = 0; d2 < dim; ++d2)
+                                {
+                                  for (unsigned int d3 = 0; d3 < dim; ++d3)
+                                    {
+                                      fe_data.shape_hessians[shift_m][q][d1][d2]
+                                                            [d3] =
+                                        0.5 * edge_sigma_grads[m][d1] *
+                                        edge_lambda_gradgrads_3d[m][d3][d2];
+                                    }
+                                }
+                            }
+
+                          // Higher order edge shape functions
+                          if (degree > 0)
+                            {
+                              for (unsigned int i = 0; i < degree; ++i)
+                                {
+                                  const unsigned int dof_index(i + 1 + shift_m);
+
+                                  for (unsigned int d1 = 0; d1 < dim; ++d1)
+                                    {
+                                      for (unsigned int d2 = 0; d2 < dim; ++d2)
+                                        {
+                                          for (unsigned int d3 = 0; d3 < dim;
+                                               ++d3)
+                                            {
+                                              fe_data
+                                                .shape_hessians[dof_index][q]
+                                                               [d1][d2][d3] =
+                                                edge_sigma_grads[m][d1] *
+                                                  edge_sigma_grads[m][d2] *
+                                                  edge_sigma_grads[m][d3] *
+                                                  poly[i][3] *
+                                                  edge_lambda_values[m][q] +
+                                                poly[i][2] *
+                                                  (edge_sigma_grads[m][d1] *
+                                                     edge_sigma_grads[m][d2] *
+                                                     edge_lambda_grads[m][q]
+                                                                      [d3] +
+                                                   edge_sigma_grads[m][d3] *
+                                                     edge_sigma_grads[m][d1] *
+                                                     edge_lambda_grads[m][q]
+                                                                      [d2] +
+                                                   edge_sigma_grads[m][d3] *
+                                                     edge_sigma_grads[m][d2] *
+                                                     edge_lambda_grads[m][q]
+                                                                      [d1]) +
+                                                poly[i][1] *
+                                                  (edge_sigma_grads[m][d1] *
+                                                     edge_lambda_gradgrads_3d
+                                                       [m][d3][d2] +
+                                                   edge_sigma_grads[m][d2] *
+                                                     edge_lambda_gradgrads_3d
+                                                       [m][d3][d1] +
+                                                   edge_sigma_grads[m][d3] *
+                                                     edge_lambda_gradgrads_3d
+                                                       [m][d2][d1]);
+                                            }
                                         }
                                     }
                                 }
@@ -1562,7 +2051,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
     {
       const UpdateFlags flags(fe_data.update_each);
 
-      if ((flags & (update_values | update_gradients)) != 0u)
+      if ((flags & (update_values | update_gradients | update_hessians)) != 0u)
         {
           const unsigned int n_q_points = quadrature.size();
 
@@ -1688,8 +2177,10 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
                 }
             }
           // Now can generate the basis
-          const unsigned int poly_length((flags & update_gradients) != 0u ? 3 :
+          const unsigned int poly_length((flags & update_hessians) != 0u  ? 4 :
+                                         (flags & update_gradients) != 0u ? 3 :
                                                                             2);
+
           std::vector<std::vector<double>> polyxi(
             degree, std::vector<double>(poly_length));
           std::vector<std::vector<double>> polyeta(
@@ -1899,12 +2390,209 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
                             }
                         }
                     }
+                  if ((flags & update_hessians) != 0u)
+                    {
+                      for (unsigned int j = 0; j < degree; ++j)
+                        {
+                          const unsigned int shift_j(j * degree);
+                          for (unsigned int i = 0; i < degree; ++i)
+                            {
+                              const unsigned int shift_ij(shift_j + i);
+
+                              // Type 1:
+                              const unsigned int dof_index1(face_type1_offset +
+                                                            shift_ij);
+                              for (unsigned int d1 = 0; d1 < dim; ++d1)
+                                {
+                                  for (unsigned int d2 = 0; d2 < dim; ++d2)
+                                    {
+                                      for (unsigned int d3 = 0; d3 < dim; ++d3)
+                                        {
+                                          fe_data.shape_hessians[dof_index1][q]
+                                                                [d1][d2][d3] =
+                                            polyxi[i][1] *
+                                              face_xi_grads[m][d3] *
+                                              (face_eta_grads[m][d1] *
+                                                 (polyeta[j][2] *
+                                                    face_eta_grads[m][d2] *
+                                                    face_lambda_values[m][q] +
+                                                  polyeta[j][1] *
+                                                    face_lambda_grads[m][d2]) +
+                                               polyeta[j][1] *
+                                                 face_eta_grads[m][d2] *
+                                                 face_lambda_grads[m][d1]) +
+                                            polyxi[i][0] *
+                                              (polyeta[j][3] *
+                                                 face_eta_grads[m][d1] *
+                                                 face_eta_grads[m][d2] *
+                                                 face_eta_grads[m][d3] *
+                                                 face_lambda_values[m][q] +
+                                               polyeta[j][2] *
+                                                 (face_eta_grads[m][d1] *
+                                                    face_eta_grads[m][d2] *
+                                                    face_lambda_grads[m][d3] +
+                                                  face_eta_grads[m][d3] *
+                                                    (face_eta_grads[m][d1] *
+                                                       face_lambda_grads[m]
+                                                                        [d2] +
+                                                     face_eta_grads[m][d2] *
+                                                       face_lambda_grads
+                                                         [m][d1]))) +
+                                            (polyxi[i][1] * polyeta[j][1] *
+                                               face_eta_grads[m][d3] +
+                                             polyxi[i][2] * polyeta[j][0] *
+                                               face_xi_grads[m][d3]) *
+                                              (face_xi_grads[m][d1] *
+                                                 face_lambda_grads[m][d2] +
+                                               face_xi_grads[m][d2] *
+                                                 face_lambda_grads[m][d1]) +
+                                            face_lambda_grads[m][d3] *
+                                              (polyxi[i][2] * polyeta[j][0] *
+                                                 face_xi_grads[m][d1] *
+                                                 face_xi_grads[m][d2] +
+                                               polyxi[i][1] * polyeta[j][1] *
+                                                 (face_xi_grads[m][d1] *
+                                                    face_eta_grads[m][d2] +
+                                                  face_xi_grads[m][d2] *
+                                                    face_eta_grads[m][d1])) +
+                                            face_lambda_values[m][q] *
+                                              (polyxi[i][3] * polyeta[j][0] *
+                                                 face_xi_grads[m][d1] *
+                                                 face_xi_grads[m][d2] *
+                                                 face_xi_grads[m][d3] +
+                                               polyxi[i][1] * polyeta[j][2] *
+                                                 face_eta_grads[m][d3] *
+                                                 (face_xi_grads[m][d1] *
+                                                    face_eta_grads[m][d2] +
+                                                  face_xi_grads[m][d2] *
+                                                    face_eta_grads[m][d1]) +
+                                               polyxi[i][2] * polyeta[j][1] *
+                                                 (face_xi_grads[m][d3] *
+                                                    face_xi_grads[m][d2] *
+                                                    face_eta_grads[m][d1] +
+                                                  face_xi_grads[m][d1] *
+                                                    (face_xi_grads[m][d2] *
+                                                       face_eta_grads[m][d3] +
+                                                     face_xi_grads[m][d3] *
+                                                       face_eta_grads[m][d2])));
+                                        }
+                                    }
+                                }
+
+                              // Type 2:
+                              const unsigned int dof_index2(face_type2_offset +
+                                                            shift_ij);
+                              for (unsigned int d1 = 0; d1 < dim; ++d1)
+                                {
+                                  for (unsigned int d2 = 0; d2 < dim; ++d2)
+                                    {
+                                      for (unsigned int d3 = 0; d3 < dim; ++d3)
+                                        {
+                                          fe_data.shape_hessians[dof_index2][q]
+                                                                [d1][d2][d3] =
+                                            face_xi_grads[m][d1] *
+                                              (polyxi[i][1] * polyeta[j][1] *
+                                                 (face_eta_grads[m][d2] *
+                                                    face_lambda_grads[m][d3] +
+                                                  face_eta_grads[m][d3] *
+                                                    face_lambda_grads[m][d2]) +
+                                               polyxi[i][2] * polyeta[j][0] *
+                                                 (face_xi_grads[m][d2] *
+                                                    face_lambda_grads[m][d3] +
+                                                  face_xi_grads[m][d3] *
+                                                    face_lambda_grads[m][d2]) +
+                                               face_lambda_values[m][q] *
+                                                 (face_eta_grads[m][d2] *
+                                                    (polyxi[i][1] *
+                                                       polyeta[j][2] *
+                                                       face_eta_grads[m][d3] +
+                                                     polyxi[i][2] *
+                                                       polyeta[j][1] *
+                                                       face_xi_grads[m][d3]) +
+                                                  face_xi_grads[m][d2] *
+                                                    (polyxi[i][2] *
+                                                       polyeta[j][1] *
+                                                       face_eta_grads[m][d3] +
+                                                     polyxi[i][3] *
+                                                       polyeta[j][0] *
+                                                       face_xi_grads[m][d3]))) -
+                                            polyxi[i][0] *
+                                              face_eta_grads[m][d1] *
+                                              (face_eta_grads[m][d2] *
+                                                 (polyeta[j][3] *
+                                                    face_eta_grads[m][d3] *
+                                                    face_lambda_values[m][q] +
+                                                  polyeta[j][2] *
+                                                    face_lambda_grads[m][d3]) +
+                                               polyeta[j][2] *
+                                                 face_eta_grads[m][d3] *
+                                                 face_lambda_grads[m][d2]) -
+                                            face_eta_grads[m][d1] *
+                                              (polyxi[i][1] *
+                                                 face_xi_grads[m][d3] *
+                                                 (polyeta[j][2] *
+                                                    face_eta_grads[m][d2] *
+                                                    face_lambda_values[m][q] +
+                                                  polyeta[j][1] *
+                                                    face_lambda_grads[m][d2]) +
+                                               face_xi_grads[m][d2] *
+                                                 (polyxi[i][1] *
+                                                    (polyeta[j][2] *
+                                                       face_eta_grads[m][d3] *
+                                                       face_lambda_values[m]
+                                                                         [q] +
+                                                     polyeta[j][1] *
+                                                       face_lambda_grads[m]
+                                                                        [d3]) +
+                                                  polyxi[i][2] * polyeta[j][1] *
+                                                    face_xi_grads[m][d3] *
+                                                    face_lambda_values[m][q]));
+                                        }
+                                    }
+                                }
+                            }
+                          // Type 3:
+                          const unsigned int dof_index3_1(face_type3_offset1 +
+                                                          j);
+                          const unsigned int dof_index3_2(face_type3_offset2 +
+                                                          j);
+                          for (unsigned int d1 = 0; d1 < dim; ++d1)
+                            {
+                              for (unsigned int d2 = 0; d2 < dim; ++d2)
+                                {
+                                  for (unsigned int d3 = 0; d3 < dim; ++d3)
+                                    {
+                                      fe_data.shape_hessians[dof_index3_1][q]
+                                                            [d1][d2][d3] =
+                                        face_xi_grads[m][d1] *
+                                        (face_eta_grads[m][d2] *
+                                           (polyeta[j][2] *
+                                              face_eta_grads[m][d3] *
+                                              face_lambda_values[m][q] +
+                                            polyeta[j][1] *
+                                              face_lambda_grads[m][d3]) +
+                                         face_lambda_grads[m][d2] *
+                                           polyeta[j][1] *
+                                           face_eta_grads[m][d3]);
+
+                                      fe_data.shape_hessians[dof_index3_2][q]
+                                                            [d1][d2][d3] =
+                                        face_eta_grads[m][d1] *
+                                        (face_xi_grads[m][d2] *
+                                           (polyxi[j][2] *
+                                              face_xi_grads[m][d3] *
+                                              face_lambda_values[m][q] +
+                                            polyxi[j][1] *
+                                              face_lambda_grads[m][d3]) +
+                                         face_lambda_grads[m][d2] *
+                                           polyxi[j][1] * face_xi_grads[m][d3]);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
-        }
-      if ((flags & update_hessians) != 0u)
-        {
-          Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -1976,6 +2664,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
             }
         }
     }
+
   if ((flags & update_gradients) != 0u)
     {
       // Now have all shape_grads stored on the reference cell.
@@ -2017,6 +2706,72 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
                 {
                   data.shape_gradients[first + d][q] =
                     transformed_shape_grads[q][d];
+                }
+            }
+        }
+    }
+
+  if (flags & update_hessians)
+    {
+      // Now have all shape_grads stored on the reference cell.
+      // Must now transform to the physical cell.
+      std::vector<Tensor<3, dim>> input(n_q_points);
+      std::vector<Tensor<3, dim>> transformed_shape_hessians(n_q_points);
+      for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
+        {
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              input[q] = fe_data.shape_hessians[dof][q];
+            }
+          mapping.transform(make_array_view(input),
+                            mapping_covariant_hessian,
+                            mapping_internal,
+                            make_array_view(transformed_shape_hessians));
+
+          const unsigned int first =
+            data.shape_function_to_row_table[dof * this->n_components() +
+                                             this->get_nonzero_components(dof)
+                                               .first_selected_component()];
+
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              for (unsigned int d1 = 0; d1 < dim; ++d1)
+                {
+                  for (unsigned int d2 = 0; d2 < dim; ++d2)
+                    {
+                      for (unsigned int d3 = 0; d3 < dim; ++d3)
+                        {
+                          for (unsigned int d4 = 0; d4 < dim; ++d4)
+                            {
+                              transformed_shape_hessians[q][d1][d3][d4] -=
+                                (data.shape_values(first + d2, q) *
+                                 mapping_data
+                                   .jacobian_pushed_forward_2nd_derivatives
+                                     [q][d2][d1][d3][d4]) +
+                                (data.shape_gradients[first + d1][q][d2] *
+                                 mapping_data
+                                   .jacobian_pushed_forward_grads[q][d2][d3]
+                                                                 [d4]) +
+                                (data.shape_gradients[first + d2][q][d3] *
+                                 mapping_data
+                                   .jacobian_pushed_forward_grads[q][d2][d1]
+                                                                 [d4]) +
+                                (data.shape_gradients[first + d2][q][d4] *
+                                 mapping_data
+                                   .jacobian_pushed_forward_grads[q][d2][d3]
+                                                                 [d1]);
+                            }
+                        }
+                    }
+                }
+            }
+
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              for (unsigned int d = 0; d < dim; ++d)
+                {
+                  data.shape_hessians[first + d][q] =
+                    transformed_shape_hessians[q][d];
                 }
             }
         }
@@ -2153,6 +2908,70 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
                 {
                   data.shape_gradients[first + d][q] =
                     transformed_shape_grads[q][d];
+                }
+            }
+        }
+    }
+  if (flags & update_hessians)
+    {
+      // Now have all shape_grads stored on the reference cell.
+      // Must now transform to the physical cell.
+      std::vector<Tensor<3, dim>> input(n_q_points);
+      std::vector<Tensor<3, dim>> transformed_shape_hessians(n_q_points);
+      for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
+        {
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            input[q] = fe_data.shape_hessians[dof][offset + q];
+
+          mapping.transform(input,
+                            mapping_covariant_hessian,
+                            mapping_internal,
+                            make_array_view(transformed_shape_hessians));
+
+          const unsigned int first =
+            data.shape_function_to_row_table[dof * this->n_components() +
+                                             this->get_nonzero_components(dof)
+                                               .first_selected_component()];
+
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              for (unsigned int d1 = 0; d1 < dim; ++d1)
+                {
+                  for (unsigned int d2 = 0; d2 < dim; ++d2)
+                    {
+                      for (unsigned int d3 = 0; d3 < dim; ++d3)
+                        {
+                          for (unsigned int d4 = 0; d4 < dim; ++d4)
+                            {
+                              transformed_shape_hessians[q][d1][d3][d4] -=
+                                (data.shape_values(first + d2, q) *
+                                 mapping_data
+                                   .jacobian_pushed_forward_2nd_derivatives
+                                     [q][d2][d1][d3][d4]) +
+                                (data.shape_gradients[first + d1][q][d2] *
+                                 mapping_data
+                                   .jacobian_pushed_forward_grads[q][d2][d3]
+                                                                 [d4]) +
+                                (data.shape_gradients[first + d2][q][d3] *
+                                 mapping_data
+                                   .jacobian_pushed_forward_grads[q][d2][d1]
+                                                                 [d4]) +
+                                (data.shape_gradients[first + d2][q][d4] *
+                                 mapping_data
+                                   .jacobian_pushed_forward_grads[q][d2][d3]
+                                                                 [d1]);
+                            }
+                        }
+                    }
+                }
+            }
+
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              for (unsigned int d = 0; d < dim; ++d)
+                {
+                  data.shape_hessians[first + d][q] =
+                    transformed_shape_hessians[q][d];
                 }
             }
         }
