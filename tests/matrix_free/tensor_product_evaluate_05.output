@@ -1,9 +1,4 @@
 
-DEAL::Evaluate in 1d with polynomial degree 1
-DEAL::Hessian error 8.80000000
-DEAL::Hessian error 8.80000000
-DEAL::Hessian error 8.80000000
-DEAL::Hessian error 8.80000000
 DEAL::Evaluate in 1d with polynomial degree 2
 DEAL::Hessian error 0.00000000
 DEAL::Hessian error 0.00000000
@@ -19,23 +14,6 @@ DEAL::Hessian error 1.99840144e-14
 DEAL::Hessian error 3.55271368e-15
 DEAL::Hessian error 7.10542736e-15
 DEAL::Hessian error 2.70894418e-14
-DEAL::Evaluate in 2d with polynomial degree 1
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
-DEAL::Hessian error 20.0000000
 DEAL::Evaluate in 2d with polynomial degree 2
 DEAL::Hessian error 4.88498131e-15
 DEAL::Hessian error 5.77315973e-15
@@ -87,15 +65,6 @@ DEAL::Hessian error 3.14415161e-13
 DEAL::Hessian error 2.36477504e-13
 DEAL::Hessian error 2.56905608e-13
 DEAL::Hessian error 1.26387789e-12
-DEAL::Evaluate in 3d with polynomial degree 1
-DEAL::Hessian error 33.6000000
-DEAL::Hessian error 33.6000000
-DEAL::Hessian error 33.6000000
-DEAL::Hessian error 33.6000000
-DEAL::Hessian error 33.6000000
-DEAL::Hessian error 33.6000000
-DEAL::Hessian error 33.6000000
-DEAL::Hessian error 33.6000000
 DEAL::Evaluate in 3d with polynomial degree 2
 DEAL::Hessian error 4.84057239e-14
 DEAL::Hessian error 3.81916720e-14

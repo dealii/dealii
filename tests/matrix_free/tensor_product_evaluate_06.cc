@@ -90,10 +90,12 @@ main()
   initlog();
   deallog << std::setprecision(9);
 
-  for (unsigned int degree = 1; degree < 5; ++degree)
+  // We need at least degree 2 to correctly represent the Hessian of a
+  // quadratic function
+  for (unsigned int degree = 2; degree < 5; ++degree)
     test<1>(degree);
-  for (unsigned int degree = 1; degree < 5; ++degree)
+  for (unsigned int degree = 2; degree < 5; ++degree)
     test<2>(degree);
-  for (unsigned int degree = 1; degree < 5; ++degree)
+  for (unsigned int degree = 2; degree < 5; ++degree)
     test<3>(degree);
 }
