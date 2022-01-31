@@ -1,0 +1,5 @@
+New: The FE_Nothing class can now return its (empty) constant modes.
+DoFTools::extract_constant_modes can now work with DoFHandlers that
+contain FE_Nothing.
+<br>
+(Sebastian Proell, 2022/02/07)
