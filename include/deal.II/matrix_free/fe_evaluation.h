@@ -3874,8 +3874,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       !(is_face &&
         this->dof_access_index ==
           internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-        this->is_interior_face == false) &&
-      !(!is_face && !this->is_interior_face))
+        this->is_interior_face() == false) &&
+      !(!is_face && !this->is_interior_face()))
     {
       const unsigned int dof_index =
         dof_indices_cont[this->cell * VectorizedArrayType::size()] +
@@ -3910,8 +3910,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const bool is_ecl =
     (this->dof_access_index ==
        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-     this->is_interior_face == false) ||
-    (!is_face && !this->is_interior_face);
+     this->is_interior_face() == false) ||
+    (!is_face && !this->is_interior_face());
 
   if (vectors_sm[0] != nullptr)
     {
@@ -7563,7 +7563,7 @@ FEFaceEvaluation<dim,
 
   this->cell = face_index;
   this->dof_access_index =
-    this->is_interior_face ?
+    this->is_interior_face() ?
       internal::MatrixFreeFunctions::DoFInfo::dof_access_face_interior :
       internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior;
   Assert(this->mapping_data != nullptr, ExcNotInitialized());
@@ -7572,7 +7572,7 @@ FEFaceEvaluation<dim,
         this->matrix_free->get_task_info().face_partition_data.back() &&
       face_index <
         this->matrix_free->get_task_info().boundary_partition_data.back())
-    Assert(this->is_interior_face,
+    Assert(this->is_interior_face(),
            ExcMessage(
              "Boundary faces do not have a neighbor. When looping over "
              "boundary faces use FEFaceEvaluation with the parameter "
@@ -7593,12 +7593,12 @@ FEFaceEvaluation<dim,
   this->J_value        = &this->mapping_data->JxW_values[offsets];
   this->normal_vectors = &this->mapping_data->normal_vectors[offsets];
   this->jacobian =
-    &this->mapping_data->jacobians[!this->is_interior_face][offsets];
+    &this->mapping_data->jacobians[!this->is_interior_face()][offsets];
   this->normal_x_jacobian =
     &this->mapping_data
-       ->normals_times_jacobians[!this->is_interior_face][offsets];
+       ->normals_times_jacobians[!this->is_interior_face()][offsets];
   this->jacobian_gradients =
-    this->mapping_data->jacobian_gradients[!this->is_interior_face].data() +
+    this->mapping_data->jacobian_gradients[!this->is_interior_face()].data() +
     offsets;
 
   if (this->mapping_data->quadrature_point_offsets.empty() == false)
@@ -7659,7 +7659,7 @@ FEFaceEvaluation<dim,
 
   constexpr unsigned int n_lanes = VectorizedArrayType::size();
 
-  if (this->is_interior_face == false)
+  if (this->is_interior_face() == false)
     {
       // for this case, we need to look into the FaceInfo field that collects
       // information from both sides of a face once for the global mesh, and
@@ -7741,13 +7741,13 @@ FEFaceEvaluation<dim,
                             .normal_vectors[offsets];
   this->jacobian = &this->matrix_free->get_mapping_info()
                       .face_data_by_cells[this->quad_no]
-                      .jacobians[!this->is_interior_face][offsets];
+                      .jacobians[!this->is_interior_face()][offsets];
   this->normal_x_jacobian =
     &this->matrix_free->get_mapping_info()
        .face_data_by_cells[this->quad_no]
-       .normals_times_jacobians[!this->is_interior_face][offsets];
+       .normals_times_jacobians[!this->is_interior_face()][offsets];
   this->jacobian_gradients =
-    this->mapping_data->jacobian_gradients[!this->is_interior_face].data() +
+    this->mapping_data->jacobian_gradients[!this->is_interior_face()].data() +
     offsets;
 
   if (this->matrix_free->get_mapping_info()
@@ -8198,7 +8198,7 @@ FEFaceEvaluation<dim,
 {
   Assert((this->dof_access_index ==
             internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-          this->is_interior_face == false) == false,
+          this->is_interior_face() == false) == false,
          ExcNotImplemented());
 
   const auto shared_vector_data = internal::get_shared_vector_data(
