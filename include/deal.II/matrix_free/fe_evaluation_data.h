@@ -469,7 +469,7 @@ public:
    * internal use.
    */
   bool
-  get_is_interior_face() const;
+  is_interior_face() const;
 
   /**
    * Return the id of the cells this FEEvaluation or FEFaceEvaluation is
@@ -800,7 +800,7 @@ protected:
    * the dof values should be read from the actual cell corresponding to the
    * interior face or the neighboring cell corresponding to the exterior face.
    */
-  bool is_interior_face;
+  bool interior_face;
 
   /**
    * Stores the index an FEFaceEvaluation object is currently pointing into
@@ -940,7 +940,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , gradients_quad_submitted(false)
 #  endif
   , cell(numbers::invalid_unsigned_int)
-  , is_interior_face(is_interior_face)
+  , interior_face(is_interior_face)
   , dof_access_index(
       is_face ?
         (is_interior_face ?
@@ -980,7 +980,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , quadrature_weights(nullptr)
   , cell(0)
   , cell_type(internal::MatrixFreeFunctions::general)
-  , is_interior_face(true)
+  , interior_face(true)
   , dof_access_index(internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
   , mapped_geometry(mapped_geometry)
   , is_reinitialized(false)
@@ -1029,11 +1029,11 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
   gradients_quad_submitted   = false;
 #  endif
 
-  cell             = numbers::invalid_unsigned_int;
-  is_interior_face = other.is_interior_face;
+  cell          = numbers::invalid_unsigned_int;
+  interior_face = other.is_interior_face();
   dof_access_index =
     is_face ?
-      (is_interior_face ?
+      (is_interior_face() ?
          internal::MatrixFreeFunctions::DoFInfo::dof_access_face_interior :
          internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior) :
       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell;
@@ -1097,8 +1097,8 @@ FEEvaluationData<dim, Number, is_face>::reinit_face(
          ExcMessage("Faces can only be set if the is_face template parameter "
                     "is true"));
   face_numbers[0] =
-    (is_interior_face ? face.interior_face_no : face.exterior_face_no);
-  subface_index = is_interior_face == true ?
+    (is_interior_face() ? face.interior_face_no : face.exterior_face_no);
+  subface_index = is_interior_face() == true ?
                     GeometryInfo<dim>::max_children_per_cell :
                     face.subface_index;
 
@@ -1107,11 +1107,11 @@ FEEvaluationData<dim, Number, is_face>::reinit_face(
   // standard-orientation else copy the first three bits
   // (which is equivalent to modulo 8). See also the documentation of
   // internal::MatrixFreeFunctions::FaceToCellTopology::face_orientation.
-  face_orientations[0] = (is_interior_face == (face.face_orientation >= 8)) ?
+  face_orientations[0] = (is_interior_face() == (face.face_orientation >= 8)) ?
                            (face.face_orientation % 8) :
                            0;
 
-  if (is_interior_face)
+  if (is_interior_face())
     cell_ids = face.cells_interior;
   else
     cell_ids = face.cells_exterior;
@@ -1431,7 +1431,7 @@ FEEvaluationData<dim, Number, is_face>::get_face_no(const unsigned int v) const
   Assert(v == 0 || (cell != numbers::invalid_unsigned_int &&
                     dof_access_index ==
                       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-                    is_interior_face == false),
+                    is_interior_face() == false),
          ExcMessage("All face numbers can only be queried for ECL at exterior "
                     "faces. Use get_face_no() in other cases."));
 
@@ -1458,7 +1458,7 @@ FEEvaluationData<dim, Number, is_face>::get_face_orientation(
   Assert(v == 0 || (cell != numbers::invalid_unsigned_int &&
                     dof_access_index ==
                       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-                    is_interior_face == false),
+                    is_interior_face() == false),
          ExcMessage("All face numbers can only be queried for ECL at exterior "
                     "faces. Use get_face_no() in other cases."));
 
@@ -1478,9 +1478,9 @@ FEEvaluationData<dim, Number, is_face>::get_dof_access_index() const
 
 template <int dim, typename Number, bool is_face>
 inline bool
-FEEvaluationData<dim, Number, is_face>::get_is_interior_face() const
+FEEvaluationData<dim, Number, is_face>::is_interior_face() const
 {
-  return is_interior_face;
+  return interior_face;
 }
 
 
