@@ -580,44 +580,6 @@ public:
   //@}
 
   /**
-   * Provides a unified interface to access data in a vector of
-   * VectorizedArray fields of length MatrixFree::n_cell_batches() +
-   * MatrixFree::n_ghost_cell_batches() for both cells (plain read) and faces
-   * (indirect addressing).
-   */
-  VectorizedArrayType
-  read_cell_data(const AlignedVector<VectorizedArrayType> &array) const;
-
-  /**
-   * Provides a unified interface to set data in a vector of
-   * VectorizedArray fields of length MatrixFree::n_cell_batches() +
-   * MatrixFree::n_ghost_cell_batches() for both cells (plain read) and faces
-   * (indirect addressing).
-   */
-  void
-  set_cell_data(AlignedVector<VectorizedArrayType> &array,
-                const VectorizedArrayType &         value) const;
-
-  /**
-   * The same as above, just for std::array of length of VectorizedArrayType for
-   * arbitrary data type.
-   */
-  template <typename T>
-  std::array<T, VectorizedArrayType::size()>
-  read_cell_data(const AlignedVector<std::array<T, VectorizedArrayType::size()>>
-                   &array) const;
-
-  /**
-   * The same as above, just for std::array of length of VectorizedArrayType for
-   * arbitrary data type.
-   */
-  template <typename T>
-  void
-  set_cell_data(
-    AlignedVector<std::array<T, VectorizedArrayType::size()>> &array,
-    const std::array<T, VectorizedArrayType::size()> &         value) const;
-
-  /**
    * Return the underlying MatrixFree object.
    */
   const MatrixFree<dim, Number, VectorizedArrayType> &
@@ -3141,124 +3103,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
          ExcMessage(
            "FEEvaluation was not initialized with a MatrixFree object!"));
   return *matrix_free;
-}
-
-
-namespace internal
-{
-  template <int dim,
-            int n_components,
-            typename Number,
-            bool is_face,
-            typename VectorizedArrayType,
-            typename VectorizedArrayType2,
-            typename GlobalVectorType,
-            typename FU>
-  inline void
-  process_cell_data(
-    const FEEvaluationBase<dim,
-                           n_components,
-                           Number,
-                           is_face,
-                           VectorizedArrayType> &       fe_eval,
-    const MatrixFree<dim, Number, VectorizedArrayType> *matrix_free,
-    GlobalVectorType &                                  array,
-    VectorizedArrayType2 &                              out,
-    const FU &                                          fu)
-  {
-    (void)matrix_free;
-    Assert(matrix_free != nullptr, ExcNotImplemented());
-    AssertDimension(array.size(),
-                    matrix_free->get_task_info().cell_partition_data.back());
-
-    // 1) collect ids of cell
-    const auto cells = fe_eval.get_cell_ids();
-
-    // 2) actually gather values
-    for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
-      if (cells[i] != numbers::invalid_unsigned_int)
-        fu(out[i],
-           array[cells[i] / VectorizedArrayType::size()]
-                [cells[i] % VectorizedArrayType::size()]);
-  }
-} // namespace internal
-
-
-
-template <int dim,
-          int n_components_,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline VectorizedArrayType
-FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_cell_data(const AlignedVector<VectorizedArrayType> &array) const
-{
-  VectorizedArrayType out = Number(1.);
-  internal::process_cell_data(
-    *this, this->matrix_free, array, out, [](auto &local, const auto &global) {
-      local = global;
-    });
-  return out;
-}
-
-
-
-template <int dim,
-          int n_components_,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-inline void
-FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  set_cell_data(AlignedVector<VectorizedArrayType> &array,
-                const VectorizedArrayType &         in) const
-{
-  internal::process_cell_data(
-    *this, this->matrix_free, array, in, [](const auto &local, auto &global) {
-      global = local;
-    });
-}
-
-
-
-template <int dim,
-          int n_components_,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-template <typename T>
-inline std::array<T, VectorizedArrayType::size()>
-FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_cell_data(const AlignedVector<std::array<T, VectorizedArrayType::size()>>
-                   &array) const
-{
-  std::array<T, VectorizedArrayType::size()> out;
-  internal::process_cell_data(
-    *this, this->matrix_free, array, out, [](auto &local, const auto &global) {
-      local = global;
-    });
-  return out;
-}
-
-
-
-template <int dim,
-          int n_components_,
-          typename Number,
-          bool is_face,
-          typename VectorizedArrayType>
-template <typename T>
-inline void
-FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  set_cell_data(
-    AlignedVector<std::array<T, VectorizedArrayType::size()>> &array,
-    const std::array<T, VectorizedArrayType::size()> &         in) const
-{
-  internal::process_cell_data(
-    *this, this->matrix_free, array, in, [](const auto &local, auto &global) {
-      global = local;
-    });
 }
 
 
@@ -7583,9 +7427,9 @@ FEFaceEvaluation<dim,
   unsigned int i = 0;
   for (; i < this->matrix_free->n_active_entries_per_face_batch(this->cell);
        ++i)
-    this->cell_or_face_ids[i] = face_index * VectorizedArrayType::size() + i;
+    this->face_ids[i] = face_index * VectorizedArrayType::size() + i;
   for (; i < VectorizedArrayType::size(); ++i)
-    this->cell_or_face_ids[i] = numbers::invalid_unsigned_int;
+    this->face_ids[i] = numbers::invalid_unsigned_int;
 
   this->cell_type = this->matrix_free->get_mapping_info().face_type[face_index];
   const unsigned int offsets =
@@ -7674,6 +7518,8 @@ FEFaceEvaluation<dim,
                                                                   face_number,
                                                                   i);
 
+          this->face_ids[i] = face_index;
+
           if (face_index == numbers::invalid_unsigned_int)
             {
               this->cell_ids[i]          = numbers::invalid_unsigned_int;
@@ -7722,6 +7568,11 @@ FEFaceEvaluation<dim,
       this->face_numbers[0]      = face_number;
       for (unsigned int i = 0; i < n_lanes; ++i)
         this->cell_ids[i] = cell_index * n_lanes + i;
+      for (unsigned int i = 0; i < n_lanes; ++i)
+        this->face_ids[i] =
+          this->matrix_free->get_cell_and_face_to_plain_faces()(cell_index,
+                                                                face_number,
+                                                                i);
     }
 
   const unsigned int offsets =
