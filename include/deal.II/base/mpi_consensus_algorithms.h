@@ -201,11 +201,23 @@ namespace Utilities
       {
       public:
         /**
+         * Default constructor.
+         */
+        Interface();
+
+        /**
          * Constructor. @p process is an object that provides information
          * about what processes the current process wants to communicate with,
          * and the data to be sent/received. @p comm is the communicator on
          * which this communication is to happen.
+         *
+         * @deprecated This constructor stores the Process object and the
+         *   communicator so that one can later call the run() function
+         *   without arguments. This approach is deprecated. Instead, use
+         *   the default constructor of this class along with the run()
+         *   function that takes an argument.
          */
+        DEAL_II_DEPRECATED
         Interface(Process<T1, T2> &process, const MPI_Comm &comm);
 
         /**
@@ -215,21 +227,82 @@ namespace Utilities
         virtual ~Interface() = default;
 
         /**
-         * Run the consensus algorithm and return the requesting processes.
+         * Run the consensus algorithm and return a vector of process ranks
+         * that have requested answers from the current process.
+         *
+         * @deprecated This function is deprecated. It can be called
+         *   if the Process object and communicator to be used have previously
+         *   been provided to the non-default constructor. Use the run()
+         *   functions taking arguments instead.
+         */
+        DEAL_II_DEPRECATED
+        std::vector<unsigned int>
+        run();
+
+        /**
+         * Run the consensus algorithm and return a vector of process ranks
+         * that have requested answers from the current process.
+         *
+         * This version of the run() function simply unpacks the functions
+         * packaged in `process` and calls the version of the run() function
+         * that takes a number of `std::function` arguments.
+         */
+        std::vector<unsigned int>
+        run(Process<T1, T2> &process, const MPI_Comm &comm);
+
+        /**
+         * Run the consensus algorithm and return a vector of process ranks
+         * that have requested answers from the current process.
+         *
+         * @param[in] targets A vector that contains the ranks of processes
+         *   to which requests should be sent and from which answers need
+         *   to be received.
+         * @param[in] create_request A function object that takes the rank
+         *   of a target process as argument and returns the message that
+         *   forms the request to this target.
+         * @param[in] answer_request A function that takes as arguments the
+         *   rank of the process that has sent a request to us, along with
+         *   the message of the request, and returns the message that forms
+         *   the answer that should be sent back to the requesting process.
+         * @param[in] process_answer A function object that takes as argument
+         *   the rank of a process from which we have received an answer
+         *   to a previously sent request, along with the message that
+         *   forms this answer. This function is used to describe what
+         *   the caller of the consensus algorithm wants to do with the
+         *   received answer.
+         * @param[in] comm The MPI communicator on which the whole algorithm
+         *   is to be performed.
          */
         virtual std::vector<unsigned int>
-        run() = 0;
+        run(const std::vector<unsigned int> &targets,
+            const std::function<std::vector<T1>(const unsigned int)>
+              &create_request,
+            const std::function<std::vector<T2>(const unsigned int,
+                                                const std::vector<T1> &)>
+              &                                                 answer_request,
+            const std::function<void(const unsigned int,
+                                     const std::vector<T2> &)> &process_answer,
+            const MPI_Comm &                                    comm) = 0;
 
-      protected:
+      private:
         /**
          * Reference to the process provided by the user.
+         *
+         * This member variable is only used in the deprecated constructor
+         * and the run() function without argument. It is a `nullptr`
+         * otherwise
          */
-        Process<T1, T2> &process;
+        DEAL_II_DEPRECATED
+        Process<T1, T2> *process;
 
         /**
          * MPI communicator.
+         *
+         * This member variable is only used in the deprecated constructor
+         * and the run() function without argument.
          */
-        const MPI_Comm &comm;
+        DEAL_II_DEPRECATED
+        MPI_Comm comm;
       };
 
 
@@ -251,11 +324,23 @@ namespace Utilities
       {
       public:
         /**
+         * Default constructor.
+         */
+        NBX() = default;
+
+        /**
          * Constructor.
          *
          * @param process Process to be run during consensus algorithm.
          * @param comm MPI Communicator
+         *
+         * @deprecated This constructor stores the Process object and the
+         *   communicator so that one can later call the run() function
+         *   without arguments. This approach is deprecated. Instead, use
+         *   the default constructor of this class along with the run()
+         *   function that takes an argument.
          */
+        DEAL_II_DEPRECATED
         NBX(Process<T1, T2> &process, const MPI_Comm &comm);
 
         /**
@@ -263,19 +348,25 @@ namespace Utilities
          */
         virtual ~NBX() = default;
 
+        // Import the declarations from the base class.
+        using Interface<T1, T2>::run;
+
         /**
          * @copydoc Interface::run()
          */
         virtual std::vector<unsigned int>
-        run() override;
+        run(const std::vector<unsigned int> &targets,
+            const std::function<std::vector<T1>(const unsigned int)>
+              &create_request,
+            const std::function<std::vector<T2>(const unsigned int,
+                                                const std::vector<T1> &)>
+              &                                                 answer_request,
+            const std::function<void(const unsigned int,
+                                     const std::vector<T2> &)> &process_answer,
+            const MPI_Comm &                                    comm) override;
 
       private:
 #ifdef DEAL_II_WITH_MPI
-        /**
-         * List of processes this process wants to send requests to.
-         */
-        std::vector<unsigned int> targets;
-
         /**
          * Buffers for sending requests.
          */
@@ -320,14 +411,17 @@ namespace Utilities
          * have been satisfied.
          */
         bool
-        all_locally_originated_receives_are_completed();
+        all_locally_originated_receives_are_completed(
+          const std::function<void(const unsigned int, const std::vector<T2> &)>
+            &             process_answer,
+          const MPI_Comm &comm);
 
         /**
          * Signal to all other ranks that this rank has received all request
          * answers via entering IBarrier.
          */
         void
-        signal_finish();
+        signal_finish(const MPI_Comm &comm);
 
         /**
          * Check whether all of the requests for answers that were created by
@@ -343,21 +437,29 @@ namespace Utilities
          * answer.
          */
         void
-        maybe_answer_one_request();
+        maybe_answer_one_request(
+          const std::function<std::vector<T2>(const unsigned int,
+                                              const std::vector<T1> &)>
+            &             answer_request,
+          const MPI_Comm &comm);
 
         /**
          * Start to send all requests via ISend and post IRecvs for the incoming
          * answer messages.
          */
         void
-        start_communication();
+        start_communication(
+          const std::vector<unsigned int> &targets,
+          const std::function<std::vector<T1>(const unsigned int)>
+            &             create_request,
+          const MPI_Comm &comm);
 
         /**
          * After all rank has received all answers, the MPI data structures can
          * be freed and the received answers can be processed.
          */
         void
-        clean_up_and_end_communication();
+        clean_up_and_end_communication(const MPI_Comm &comm);
       };
 
       /**
@@ -390,11 +492,24 @@ namespace Utilities
       {
       public:
         /**
+         * Default constructor.
+         */
+        PEX() = default;
+
+
+        /**
          * Constructor.
          *
          * @param process Process to be run during consensus algorithm.
          * @param comm MPI Communicator
+         *
+         * @deprecated This constructor stores the Process object and the
+         *   communicator so that one can later call the run() function
+         *   without arguments. This approach is deprecated. Instead, use
+         *   the default constructor of this class along with the run()
+         *   function that takes an argument.
          */
+        DEAL_II_DEPRECATED
         PEX(Process<T1, T2> &process, const MPI_Comm &comm);
 
         /**
@@ -402,21 +517,25 @@ namespace Utilities
          */
         virtual ~PEX() = default;
 
+        // Import the declarations from the base class.
+        using Interface<T1, T2>::run;
+
         /**
          * @copydoc Interface::run()
          */
         virtual std::vector<unsigned int>
-        run() override;
+        run(const std::vector<unsigned int> &targets,
+            const std::function<std::vector<T1>(const unsigned int)>
+              &create_request,
+            const std::function<std::vector<T2>(const unsigned int,
+                                                const std::vector<T1> &)>
+              &                                                 answer_request,
+            const std::function<void(const unsigned int,
+                                     const std::vector<T2> &)> &process_answer,
+            const MPI_Comm &                                    comm) override;
 
       private:
 #ifdef DEAL_II_WITH_MPI
-        /**
-         * List of ranks of processes this processes wants to send a request to.
-         */
-        std::vector<unsigned int> targets;
-
-        // data structures to send and receive requests
-
         /**
          * Buffers for sending requests.
          */
@@ -452,21 +571,34 @@ namespace Utilities
          * answer messages.
          */
         unsigned int
-        start_communication();
+        start_communication(
+          const std::vector<unsigned int> &targets,
+          const std::function<std::vector<T1>(const unsigned int)>
+            &             create_request,
+          const MPI_Comm &comm);
 
         /**
-         * The ith request message from another rank has been received: process
-         * the request and send an answer.
+         * The `index`th request message from another rank has been received:
+         * process the request and send an answer.
          */
         void
-        answer_one_request(const unsigned int index);
+        answer_one_request(
+          const unsigned int index,
+          const std::function<std::vector<T2>(const unsigned int,
+                                              const std::vector<T1> &)>
+            &             answer_request,
+          const MPI_Comm &comm);
 
         /**
          * Receive and process all of the incoming responses to the
          * requests we sent.
          */
         void
-        process_incoming_answers();
+        process_incoming_answers(
+          const unsigned int n_targets,
+          const std::function<void(const unsigned int, const std::vector<T2> &)>
+            &             process_answer,
+          const MPI_Comm &comm);
 
         /**
          * After all answers have been exchanged, the MPI data structures can be
@@ -487,18 +619,41 @@ namespace Utilities
       {
       public:
         /**
+         * Default constructor.
+         */
+        Serial() = default;
+
+        /**
          * Constructor.
          *
          * @param process Process to be run during consensus algorithm.
          * @param comm MPI Communicator (ignored)
+         *
+         * @deprecated This constructor stores the Process object and the
+         *   communicator so that one can later call the run() function
+         *   without arguments. This approach is deprecated. Instead, use
+         *   the default constructor of this class along with the run()
+         *   function that takes an argument.
          */
+        DEAL_II_DEPRECATED
         Serial(Process<T1, T2> &process, const MPI_Comm &comm);
+
+        // Import the declarations from the base class.
+        using Interface<T1, T2>::run;
 
         /**
          * @copydoc Interface::run()
          */
         virtual std::vector<unsigned int>
-        run() override;
+        run(const std::vector<unsigned int> &targets,
+            const std::function<std::vector<T1>(const unsigned int)>
+              &create_request,
+            const std::function<std::vector<T2>(const unsigned int,
+                                                const std::vector<T1> &)>
+              &                                                 answer_request,
+            const std::function<void(const unsigned int,
+                                     const std::vector<T2> &)> &process_answer,
+            const MPI_Comm &                                    comm) override;
       };
 
 
@@ -520,11 +675,23 @@ namespace Utilities
       {
       public:
         /**
+         * Default constructor.
+         */
+        Selector() = default;
+
+        /**
          * Constructor.
          *
          * @param process Process to be run during consensus algorithm.
          * @param comm MPI Communicator.
+         *
+         * @deprecated This constructor stores the Process object and the
+         *   communicator so that one can later call the run() function
+         *   without arguments. This approach is deprecated. Instead, use
+         *   the default constructor of this class along with the run()
+         *   function that takes an argument.
          */
+        DEAL_II_DEPRECATED
         Selector(Process<T1, T2> &process, const MPI_Comm &comm);
 
         /**
@@ -532,13 +699,24 @@ namespace Utilities
          */
         virtual ~Selector() = default;
 
+        // Import the declarations from the base class.
+        using Interface<T1, T2>::run;
+
         /**
          * @copydoc Interface::run()
          *
          * @note The function call is delegated to another ConsensusAlgorithms::Interface implementation.
          */
         virtual std::vector<unsigned int>
-        run() override;
+        run(const std::vector<unsigned int> &targets,
+            const std::function<std::vector<T1>(const unsigned int)>
+              &create_request,
+            const std::function<std::vector<T2>(const unsigned int,
+                                                const std::vector<T1> &)>
+              &                                                 answer_request,
+            const std::function<void(const unsigned int,
+                                     const std::vector<T2> &)> &process_answer,
+            const MPI_Comm &                                    comm) override;
 
       private:
         // Pointer to the actual ConsensusAlgorithms::Interface implementation.
