@@ -2987,8 +2987,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
     }
 
   // clean up related to update_ghost_values()
-  if (use_src_inplace == false)
-    vec_fine_ptr->set_ghost_state(false); // internal vector
+  if (fine_element_is_continuous == false && use_src_inplace == false)
+    vec_fine_ptr->zero_out_ghost_values(); // internal vector (DG)
+  else if (fine_element_is_continuous && use_src_inplace == false)
+    vec_fine_ptr->set_ghost_state(false); // internal vector (CG)
   else if (fine_element_is_continuous)
     vec_fine_ptr->zero_out_ghost_values(); // external vector
 
