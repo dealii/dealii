@@ -98,20 +98,16 @@ main()
   Dummy<double>  dummy;
   Dummy2<double> dummy2;
 
-  deallog << "has_local_element:" << std::endl
-          << "LinearAlgebra::distributed::Vector = "
-          << internal::has_local_element<
-               LinearAlgebra::distributed::Vector<double>>::value
-          << std::endl
-          << "TrilinosWrappers::MPI::Vector = "
-          << internal::has_local_element<TrilinosWrappers::MPI::Vector>::value
-          << std::endl
-          << "Dummy = " << internal::has_local_element<Dummy<double>>::value
-          << std::endl
-          << "Dummy2 = " << internal::has_local_element<Dummy2<double>>::value
-          << std::endl
-          << "Vector = " << internal::has_local_element<Vector<double>>::value
-          << std::endl;
+  deallog
+    << "has_local_element:" << std::endl
+    << "LinearAlgebra::distributed::Vector = "
+    << internal::has_local_element<
+         LinearAlgebra::distributed::Vector<double>> << std::endl
+    << "TrilinosWrappers::MPI::Vector = "
+    << internal::has_local_element<TrilinosWrappers::MPI::Vector> << std::endl
+    << "Dummy = " << internal::has_local_element<Dummy<double>> << std::endl
+    << "Dummy2 = " << internal::has_local_element<Dummy2<double>> << std::endl
+    << "Vector = " << internal::has_local_element<Vector<double>> << std::endl;
 
   // now check internal::vector_access wrapper
   // we expect local_element() to be called
@@ -121,29 +117,26 @@ main()
 
 
   // now check has_partitioners_are_compatible:
-  deallog << "has_partitioners_are_compatible:" << std::endl
-          << "LinearAlgebra::distributed::Vector = "
-          << internal::has_partitioners_are_compatible<
-               LinearAlgebra::distributed::Vector<double>>::value
-          << std::endl
-          << "TrilinosWrappers::MPI::Vector = "
-          << internal::has_partitioners_are_compatible<
-               TrilinosWrappers::MPI::Vector>::value
-          << std::endl
-          << "Vector = "
-          << internal::has_partitioners_are_compatible<Vector<double>>::value
-          << std::endl;
+  deallog
+    << "has_partitioners_are_compatible:" << std::endl
+    << "LinearAlgebra::distributed::Vector = "
+    << internal::has_partitioners_are_compatible<
+         LinearAlgebra::distributed::Vector<double>> << std::endl
+    << "TrilinosWrappers::MPI::Vector = "
+    << internal::has_partitioners_are_compatible<
+         TrilinosWrappers::MPI::Vector> << std::endl
+    << "Vector = "
+    << internal::has_partitioners_are_compatible<Vector<double>> << std::endl;
 
   // check has_begin:
-  deallog
-    << "has_begin:" << std::endl
-    << "LinearAlgebra::distributed::Vector = "
-    << internal::has_begin<LinearAlgebra::distributed::Vector<double>>::value
-    << std::endl
-    << "TrilinosWrappers::MPI::Vector = "
-    << internal::has_begin<TrilinosWrappers::MPI::Vector>::value << std::endl
-    << "Vector = " << internal::has_begin<Vector<double>>::value << std::endl
-    << "Dummy = " << internal::has_begin<Dummy<double>>::value << std::endl;
+  deallog << "has_begin:" << std::endl
+          << "LinearAlgebra::distributed::Vector = "
+          << internal::has_begin<
+               LinearAlgebra::distributed::Vector<double>> << std::endl
+          << "TrilinosWrappers::MPI::Vector = "
+          << internal::has_begin<TrilinosWrappers::MPI::Vector> << std::endl
+          << "Vector = " << internal::has_begin<Vector<double>> << std::endl
+          << "Dummy = " << internal::has_begin<Dummy<double>> << std::endl;
   // check is_vectorizable:
   deallog
     << "is_vectorizable:" << std::endl
