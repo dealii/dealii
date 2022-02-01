@@ -4080,7 +4080,7 @@ namespace internal
   }
 
   template <typename VectorType,
-            typename std::enable_if<has_shared_vector_data<VectorType>::value,
+            typename std::enable_if<has_shared_vector_data<VectorType>,
                                     VectorType>::type * = nullptr>
   const std::vector<ArrayView<const typename VectorType::value_type>> *
   get_shared_vector_data(VectorType &       vec,
@@ -4099,7 +4099,7 @@ namespace internal
   }
 
   template <typename VectorType,
-            typename std::enable_if<!has_shared_vector_data<VectorType>::value,
+            typename std::enable_if<!has_shared_vector_data<VectorType>,
                                     VectorType>::type * = nullptr>
   const std::vector<ArrayView<const typename VectorType::value_type>> *
   get_shared_vector_data(VectorType &,
@@ -7258,7 +7258,7 @@ namespace internal
             typename VectorType,
             typename EvaluatorType,
             typename std::enable_if<
-              internal::has_begin<VectorType>::value &&
+              internal::has_begin<VectorType> &&
                 std::is_same<decltype(std::declval<VectorType>().begin()),
                              Number *>::value,
               VectorType>::type * = nullptr>
@@ -7308,7 +7308,7 @@ namespace internal
             typename VectorType,
             typename EvaluatorType,
             typename std::enable_if<
-              !internal::has_begin<VectorType>::value ||
+              !internal::has_begin<VectorType> ||
                 !std::is_same<decltype(std::declval<VectorType>().begin()),
                               Number *>::value,
               VectorType>::type * = nullptr>

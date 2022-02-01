@@ -1891,7 +1891,8 @@ namespace internal
         decltype(std::declval<T>().get_mpi_communicator());
 
       template <typename T>
-      using has_get_mpi_communicator = is_detected<get_mpi_communicator_t, T>;
+      static constexpr bool has_get_mpi_communicator =
+        is_supported_operation<get_mpi_communicator_t, T>;
 
       // A helper type-trait that leverage SFINAE to figure out if type T has
       // void T::locally_owned_domain_indices()
@@ -1900,8 +1901,8 @@ namespace internal
         decltype(std::declval<T>().locally_owned_domain_indices());
 
       template <typename T>
-      using has_locally_owned_domain_indices =
-        is_detected<locally_owned_domain_indices_t, T>;
+      static constexpr bool has_locally_owned_domain_indices =
+        is_supported_operation<locally_owned_domain_indices_t, T>;
 
       // A helper type-trait that leverage SFINAE to figure out if type T has
       // void T::locally_owned_range_indices()
@@ -1910,8 +1911,8 @@ namespace internal
         decltype(std::declval<T>().locally_owned_range_indices());
 
       template <typename T>
-      using has_locally_owned_range_indices =
-        is_detected<locally_owned_range_indices_t, T>;
+      static constexpr bool has_locally_owned_range_indices =
+        is_supported_operation<locally_owned_range_indices_t, T>;
 
       // A helper type-trait that leverage SFINAE to figure out if type T has
       // void T::initialize_dof_vector(VectorType v)
@@ -1920,14 +1921,15 @@ namespace internal
         decltype(std::declval<T>().initialize_dof_vector());
 
       template <typename T>
-      using has_initialize_dof_vector = is_detected<initialize_dof_vector_t, T>;
+      static constexpr bool has_initialize_dof_vector =
+        is_supported_operation<initialize_dof_vector_t, T>;
 
       // Used for (Trilinos/PETSc)Wrappers::SparseMatrix
-      template <typename MatrixType,
-                typename std::enable_if<
-                  has_get_mpi_communicator<MatrixType>::value &&
-                    has_locally_owned_domain_indices<MatrixType>::value,
-                  MatrixType>::type * = nullptr>
+      template <
+        typename MatrixType,
+        typename std::enable_if<has_get_mpi_communicator<MatrixType> &&
+                                  has_locally_owned_domain_indices<MatrixType>,
+                                MatrixType>::type * = nullptr>
       static void
       reinit_domain_vector(MatrixType &                                mat,
                            LinearAlgebra::distributed::Vector<Number> &vec,
@@ -1938,10 +1940,9 @@ namespace internal
       }
 
       // Used for MatrixFree and DiagonalMatrix
-      template <
-        typename MatrixType,
-        typename std::enable_if<has_initialize_dof_vector<MatrixType>::value,
-                                MatrixType>::type * = nullptr>
+      template <typename MatrixType,
+                typename std::enable_if<has_initialize_dof_vector<MatrixType>,
+                                        MatrixType>::type * = nullptr>
       static void
       reinit_domain_vector(MatrixType &                                mat,
                            LinearAlgebra::distributed::Vector<Number> &vec,
@@ -1953,11 +1954,11 @@ namespace internal
       }
 
       // Used for (Trilinos/PETSc)Wrappers::SparseMatrix
-      template <typename MatrixType,
-                typename std::enable_if<
-                  has_get_mpi_communicator<MatrixType>::value &&
-                    has_locally_owned_range_indices<MatrixType>::value,
-                  MatrixType>::type * = nullptr>
+      template <
+        typename MatrixType,
+        typename std::enable_if<has_get_mpi_communicator<MatrixType> &&
+                                  has_locally_owned_range_indices<MatrixType>,
+                                MatrixType>::type * = nullptr>
       static void
       reinit_range_vector(MatrixType &                                mat,
                           LinearAlgebra::distributed::Vector<Number> &vec,
@@ -1968,10 +1969,9 @@ namespace internal
       }
 
       // Used for MatrixFree and DiagonalMatrix
-      template <
-        typename MatrixType,
-        typename std::enable_if<has_initialize_dof_vector<MatrixType>::value,
-                                MatrixType>::type * = nullptr>
+      template <typename MatrixType,
+                typename std::enable_if<has_initialize_dof_vector<MatrixType>,
+                                        MatrixType>::type * = nullptr>
       static void
       reinit_range_vector(MatrixType &                                mat,
                           LinearAlgebra::distributed::Vector<Number> &vec,

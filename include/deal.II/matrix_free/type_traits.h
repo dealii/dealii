@@ -41,7 +41,7 @@ namespace internal
   using local_element_t = decltype(std::declval<T const>().local_element(0));
 
   template <typename T>
-  using has_local_element = is_detected<local_element_t, T>;
+  constexpr bool has_local_element = is_supported_operation<local_element_t, T>;
 
 
 
@@ -52,7 +52,8 @@ namespace internal
     decltype(std::declval<T>().add_local_element(0, typename T::value_type()));
 
   template <typename T>
-  using has_add_local_element = is_detected<add_local_element_t, T>;
+  constexpr bool has_add_local_element =
+    is_supported_operation<add_local_element_t, T>;
 
 
 
@@ -63,7 +64,8 @@ namespace internal
     decltype(std::declval<T>().set_local_element(0, typename T::value_type()));
 
   template <typename T>
-  using has_set_local_element = is_detected<set_local_element_t, T>;
+  constexpr bool has_set_local_element =
+    is_supported_operation<set_local_element_t, T>;
 
 
 
@@ -76,8 +78,8 @@ namespace internal
       std::declval<Utilities::MPI::Partitioner>()));
 
   template <typename T>
-  using has_partitioners_are_compatible =
-    is_detected<partitioners_are_compatible_t, T>;
+  constexpr bool has_partitioners_are_compatible =
+    is_supported_operation<partitioners_are_compatible_t, T>;
 
 
 
@@ -87,7 +89,7 @@ namespace internal
   using begin_t = decltype(std::declval<T const>().begin());
 
   template <typename T>
-  using has_begin = is_detected<begin_t, T>;
+  constexpr bool has_begin = is_supported_operation<begin_t, T>;
 
 
 
@@ -98,7 +100,8 @@ namespace internal
     decltype(std::declval<T const>().shared_vector_data());
 
   template <typename T>
-  using has_shared_vector_data = is_detected<shared_vector_data_t, T>;
+  constexpr bool has_shared_vector_data =
+    is_supported_operation<shared_vector_data_t, T>;
 
 
 
@@ -111,8 +114,8 @@ namespace internal
   struct is_vectorizable
   {
     static const bool value =
-      has_begin<T>::value &&
-      (has_local_element<T>::value ||
+      has_begin<T> &&
+      (has_local_element<T> ||
        is_serial_vector<typename std::remove_const<T>::type>::value) &&
       std::is_same<typename T::value_type, Number>::value;
   };
@@ -138,8 +141,8 @@ namespace internal
     decltype(std::declval<T const>().update_ghost_values_start(0));
 
   template <typename T>
-  using has_update_ghost_values_start =
-    is_detected<update_ghost_values_start_t, T>;
+  constexpr bool has_update_ghost_values_start =
+    is_supported_operation<update_ghost_values_start_t, T>;
 
 
 
@@ -150,7 +153,8 @@ namespace internal
     decltype(std::declval<T>().compress_start(0, VectorOperation::add));
 
   template <typename T>
-  using has_compress_start = is_detected<compress_start_t, T>;
+  constexpr bool has_compress_start =
+    is_supported_operation<compress_start_t, T>;
 
 
 
@@ -159,16 +163,8 @@ namespace internal
   // We assume that if both begin() and local_element()
   // exist, then begin() + offset == local_element(offset)
   template <typename T>
-  struct has_exchange_on_subset
-  {
-    static const bool value = has_begin<T>::value &&
-                              has_local_element<T>::value &&
-                              has_partitioners_are_compatible<T>::value;
-  };
-
-  // We need to have a separate declaration for static const members
-  template <typename T>
-  const bool has_exchange_on_subset<T>::value;
+  constexpr bool   has_exchange_on_subset =
+    has_begin<T> &&has_local_element<T> &&has_partitioners_are_compatible<T>;
 
 
 
@@ -178,8 +174,8 @@ namespace internal
   using communication_block_size_t = decltype(T::communication_block_size);
 
   template <typename T>
-  using has_communication_block_size =
-    is_detected<communication_block_size_t, T>;
+  constexpr bool has_communication_block_size =
+    is_supported_operation<communication_block_size_t, T>;
 
 
 
@@ -195,7 +191,7 @@ namespace internal
 
   template <class T>
   using is_not_parallel_vector =
-    detected_or_t<std::true_type, not_parallel_vector_t, T>;
+    SupportsOperation::detected_or_t<std::true_type, not_parallel_vector_t, T>;
 } // namespace internal
 #endif
 
