@@ -2094,65 +2094,66 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                     });
 
           // get offsets of shared cells
+          std::vector<unsigned int> targets;
+          for (unsigned int i = 0; i < cells_shared_ghosts.size(); ++i)
+            if (cells_shared_ghosts[i].size() > 0)
+              targets.push_back(i);
+
+          // Then set up the callbacks the consensus algorithm needs:
+          const auto create_request = [&](const auto other_rank) {
+            auto &source = cells_shared_ghosts[other_rank];
+            std::sort(source.begin(),
+                      source.end(),
+                      [](const auto &a, const auto &b) {
+                        return a.second < b.second;
+                      });
+
+            std::vector<dealii::types::global_dof_index> send_buffer;
+            send_buffer.reserve(source.size());
+            for (const auto &i : source)
+              send_buffer.push_back(i.second);
+
+            return send_buffer;
+          };
+
+          const auto answer_request = [&](const auto, const auto &request) {
+            std::vector<unsigned int> answer;
+            answer.reserve(request.size());
+
+            unsigned int j = 0;
+
+            for (unsigned int i = 0; i < request.size(); ++i)
+              {
+                for (; j < cells_locally_owned.size(); ++j)
+                  if (cells_locally_owned[j].second == request[i])
+                    {
+                      answer.push_back(cells_locally_owned[j].first);
+                      break;
+                    }
+              }
+
+            AssertDimension(answer.size(), request.size());
+            return answer;
+          };
+
+          const auto process_answer = [&](const auto  other_rank,
+                                          const auto &answer) {
+            Assert(answer.size() == cells_shared_ghosts[other_rank].size(),
+                   ExcInternalError());
+            for (unsigned int i = 0; i < answer.size(); ++i)
+              {
+                cells[cells_shared_ghosts[other_rank][i].first] = {other_rank,
+                                                                   answer[i]};
+              }
+          };
+
           Utilities::MPI::ConsensusAlgorithms::
-            AnonymousProcess<dealii::types::global_dof_index, unsigned int>
-              process(
-                [&]() {
-                  std::vector<unsigned int> targets;
-                  for (unsigned int i = 0; i < cells_shared_ghosts.size(); ++i)
-                    if (cells_shared_ghosts[i].size() > 0)
-                      targets.push_back(i);
-                  return targets;
-                },
-                [&](const auto other_rank, auto &send_buffer) {
-                  auto &source = cells_shared_ghosts[other_rank];
-                  std::sort(source.begin(),
-                            source.end(),
-                            [](const auto &a, const auto &b) {
-                              return a.second < b.second;
-                            });
-
-                  send_buffer.reserve(source.size());
-                  for (const auto &i : source)
-                    send_buffer.push_back(i.second);
-                },
-                [&](const auto &other_rank,
-                    const auto &buffer_recv,
-                    auto &      request_buffer) {
-                  (void)other_rank;
-
-                  request_buffer.reserve(buffer_recv.size());
-
-                  unsigned int j = 0;
-
-                  for (unsigned int i = 0; i < buffer_recv.size(); ++i)
-                    {
-                      for (; j < cells_locally_owned.size(); ++j)
-                        if (cells_locally_owned[j].second == buffer_recv[i])
-                          {
-                            request_buffer.push_back(
-                              cells_locally_owned[j].first);
-                            break;
-                          }
-                    }
-
-                  AssertDimension(request_buffer.size(), buffer_recv.size());
-                },
-                [&](const auto other_rank, const auto &recv_buffer) {
-                  Assert(recv_buffer.size() ==
-                           cells_shared_ghosts[other_rank].size(),
-                         ExcInternalError());
-                  for (unsigned int i = 0; i < recv_buffer.size(); ++i)
-                    {
-                      cells[cells_shared_ghosts[other_rank][i].first] = {
-                        other_rank, recv_buffer[i]};
-                    }
-                });
-
-          Utilities::MPI::ConsensusAlgorithms::Selector<
-            dealii::types::global_dof_index,
-            unsigned int>(process, communicator_sm)
-            .run();
+            Selector<dealii::types::global_dof_index, unsigned int>()
+              .run(targets,
+                   create_request,
+                   answer_request,
+                   process_answer,
+                   communicator_sm);
 
           return cells;
         }();

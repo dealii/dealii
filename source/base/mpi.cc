@@ -432,11 +432,8 @@ namespace Utilities
       if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
           1)
         {
-          ConsensusAlgorithms::AnonymousProcess<char, char> process(
-            [&]() { return destinations; });
-          ConsensusAlgorithms::NBX<char, char> consensus_algorithm(process,
-                                                                   mpi_comm);
-          return consensus_algorithm.run();
+          return ConsensusAlgorithms::NBX<char, char>().run(
+            destinations, {}, {}, {}, mpi_comm);
         }
         // If that was not the case, we need to use the remainder of the code
         // below, i.e., just fall through the if condition above.
@@ -591,11 +588,9 @@ namespace Utilities
       if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
           1)
         {
-          ConsensusAlgorithms::AnonymousProcess<char, char> process(
-            [&]() { return destinations; });
-          ConsensusAlgorithms::NBX<char, char> consensus_algorithm(process,
-                                                                   mpi_comm);
-          return consensus_algorithm.run().size();
+          return ConsensusAlgorithms::NBX<char, char>()
+            .run(destinations, {}, {}, {}, mpi_comm)
+            .size();
         }
       else
 #  endif
