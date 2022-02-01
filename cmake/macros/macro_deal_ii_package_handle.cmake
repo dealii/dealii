@@ -45,7 +45,7 @@
 # search.
 #
 
-MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
+MACRO(DEAL_II_PACKAGE_HANDLE _feature)
 
   IF(DEFINED ${_feature}_VERSION)
     MESSAGE(STATUS "  ${_feature}_VERSION: ${${_feature}_VERSION}")
@@ -56,78 +56,66 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
   # value. We need this for modern™ MPI detection where CMake's
   # FindMPI.cmake might only set MPI_FOUND to true and nothing else.
   #
+  SET(_clear_variables_list "")
   IF(NOT DEFINED ${_feature}_FOUND)
     SET(${_feature}_FOUND TRUE)
   ENDIF()
 
-  SET(_variable ${_var})
-  SET(${_feature}_${_variable} "")
+  SET(_suffix "")
   SET(_required TRUE)
-  SET(_fine TRUE)
-  SET(_fill_clear FALSE)
-  SET(_clear "")
 
-  CLEAR_FEATURE(${_feature})
+  #
+  # Clear temporary variables
+  #
+  FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
+    set(_temp_${_suffix} "")
+  ENDFOREACH()
 
   FOREACH(_arg ${ARGN})
-    IF(_arg MATCHES "^LIBRARIES(|_DEBUG|_RELEASE)$"
-       OR _arg MATCHES "^(|BUNDLED_|USER_)INCLUDE_DIRS$"
-       OR _arg MATCHES "^(|USER_)DEFINITIONS(|_DEBUG|_RELEASE)$"
-       OR _arg MATCHES "^CXX_FLAGS(|_DEBUG|_RELEASE)"
-       OR _arg MATCHES "^LINKER_FLAGS(|_DEBUG|_RELEASE)"
-       OR _arg MATCHES "^EXECUTABLE(|_DEBUG|_RELEASE)")
-
-      IF(_fine)
-        IF(_variable MATCHES "^CXX_FLAGS(|_DEBUG|_RELEASE)"
-           OR _variable MATCHES "^LINKER_FLAGS(|_DEBUG|_RELEASE)")
-          TO_STRING(${_feature}_${_variable} ${${_feature}_${_variable}})
-        ENDIF()
-        MESSAGE(STATUS "  ${_feature}_${_variable}: ${${_feature}_${_variable}}")
-      ENDIF()
-
+    IF(("${_arg}" IN_LIST DEAL_II_LIST_SUFFIXES) OR ("${_arg}" IN_LIST DEAL_II_STRING_SUFFIXES))
       #
-      # *Yay* a new keyword.
+      # We encountered a new keyword.
       #
-      SET(_variable ${_arg})
-      SET(${_feature}_${_variable} "")
-      SET(_required TRUE)
-      SET(_fine TRUE)
+      set(_suffix "${_arg}")
+      SET(_fill_clear FALSE)
 
     ELSEIF("${_arg}" STREQUAL "REQUIRED")
       SET(_required TRUE)
+
     ELSEIF("${_arg}" STREQUAL "OPTIONAL")
       SET(_required FALSE)
+
     ELSEIF(_arg MATCHES "^(optimized|debug|general)$"
-            AND "${_variable}" STREQUAL "LIBRARIES")
-      #
-      # Keywords are special...
-      #
-      LIST(APPEND ${_feature}_${_variable} ${_arg})
-    ELSEIF("${_arg}" STREQUAL "CLEAR")
+            AND "${_suffix}" STREQUAL "LIBRARIES")
+      LIST(APPEND _temp_${_suffix} ${_arg})
+
+    ELSEIF("${_arg}" STREQUAL "CLEAR") # FIXME
       SET(_fill_clear TRUE)
+
     ELSE()
       MARK_AS_ADVANCED(${_arg})
-      IF(_fill_clear)
+
+      IF(_fill_clear) # FIXME
         IF(NOT _arg MATCHES "^(optimized|debug|general)$")
-          LIST(APPEND _clear ${_arg})
+          LIST(APPEND _clear_variables_list ${_arg})
         ENDIF()
+
       ELSE()
         IF("${${_arg}}" MATCHES "^\\s*$" OR "${${_arg}}" MATCHES "-NOTFOUND")
-          IF(_required AND _fine)
+          IF(_required)
             IF("${${_arg}}" MATCHES "^\\s*$")
               MESSAGE(STATUS
-                "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" empty ***"
+                "  ${_feature}_${_suffix}: *** Required variable \"${_arg}\" empty ***"
                 )
             ELSE()
               MESSAGE(STATUS
-                "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" set to NOTFOUND ***"
+                "  ${_feature}_${_suffix}: *** Required variable \"${_arg}\" set to NOTFOUND ***"
                 )
             ENDIF()
             SET(${_feature}_FOUND FALSE)
-            SET(_fine FALSE)
           ENDIF()
         ELSE()
-          LIST(APPEND ${_feature}_${_variable} ${${_arg}})
+          LIST(APPEND _temp_${_suffix} ${${_arg}})
         ENDIF()
       ENDIF()
     ENDIF()
@@ -135,23 +123,29 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
 
   SET(${_feature}_CLEAR_VARIABLES ${_clear} CACHE INTERNAL "")
 
-  IF(_fine)
-    IF(_variable MATCHES "^CXX_FLAGS(|_DEBUG|_RELEASE)"
-       OR _variable MATCHES "^LINKER_FLAGS(|_DEBUG|_RELEASE)")
-      TO_STRING(${_feature}_${_variable} ${${_feature}_${_variable}})
-    ENDIF()
-    MESSAGE(STATUS "  ${_feature}_${_variable}: ${${_feature}_${_variable}}")
-  ENDIF()
-
   IF(${_feature}_FOUND)
     #
-    # Deduplicate entries:
+    # Deduplicate and stringify entries:
     #
     FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES})
       IF(_suffix MATCHES "INCLUDE_DIRS$")
-        REMOVE_DUPLICATES(${_feature}_${_suffix})
+        REMOVE_DUPLICATES(_temp_${_suffix})
       ELSE()
-        REMOVE_DUPLICATES(${_feature}_${_suffix} REVERSE)
+        REMOVE_DUPLICATES(_temp_${_suffix} REVERSE)
+      ENDIF()
+    ENDFOREACH()
+    FOREACH(_suffix ${_DEAL_II_STRING_SUFFIXES})
+      TO_STRING(_temp_${_suffix} ${_temp_${_suffix}})
+    ENDFOREACH()
+
+    #
+    # Write back into global variables:
+    #
+    CLEAR_FEATURE(${_feature})
+    FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
+      IF(NOT "${_temp_${_suffix}}" STREQUAL "")
+        set(${_feature}_${_suffix} "${_temp_${_suffix}}")
+        MESSAGE(STATUS "  ${_feature}_${_suffix}: ${${_feature}_${_suffix}}")
       ENDIF()
     ENDFOREACH()
 
