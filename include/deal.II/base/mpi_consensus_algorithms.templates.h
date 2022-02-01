@@ -258,7 +258,8 @@ namespace Utilities
               AssertIndexRange(rank, Utilities::MPI::n_mpi_processes(comm));
 
               auto &send_buffer = send_buffers[index];
-              send_buffer       = create_request(rank);
+              send_buffer =
+                (create_request ? create_request(rank) : std::vector<T1>());
 
               // Post a request to send data
               auto ierr = MPI_Isend(send_buffer.data(),
@@ -349,7 +350,8 @@ namespace Utilities
                   AssertThrowMPI(ierr);
                 }
 
-                process_answer(target, recv_buffer);
+                if (process_answer)
+                  process_answer(target, recv_buffer);
 
                 // Finally, remove this rank from the list of outstanding
                 // targets:
@@ -437,7 +439,8 @@ namespace Utilities
             // and ask the 'process' object to produce an answer:
             request_buffers.emplace_back(std::make_unique<std::vector<T2>>());
             auto &request_buffer = *request_buffers.back();
-            request_buffer       = answer_request(other_rank, buffer_recv);
+            if (answer_request)
+              request_buffer = answer_request(other_rank, buffer_recv);
 
             // Then initiate sending the answer back to the requester.
             request_requests.emplace_back(std::make_unique<MPI_Request>());
@@ -621,7 +624,8 @@ namespace Utilities
 
             // pack data which should be sent
             auto &send_buffer = send_buffers[i];
-            send_buffer       = create_request(rank);
+            send_buffer =
+              (create_request ? create_request(rank) : std::vector<T1>());
 
             // start to send data
             auto ierr = MPI_Isend(send_buffer.data(),
@@ -698,7 +702,9 @@ namespace Utilities
         // Process request by asking the user-provided function for
         // the answer and post a send for it.
         auto &request_buffer = requests_buffers[index];
-        request_buffer       = answer_request(other_rank, buffer_recv);
+        request_buffer =
+          (answer_request ? answer_request(other_rank, buffer_recv) :
+                            std::vector<T2>());
 
         ierr = MPI_Isend(request_buffer.data(),
                          request_buffer.size() * sizeof(T2),
@@ -766,7 +772,8 @@ namespace Utilities
               AssertThrowMPI(ierr);
             }
 
-            process_answer(other_rank, recv_buffer);
+            if (process_answer)
+              process_answer(other_rank, recv_buffer);
           }
 #else
         (void)n_targets;
@@ -845,9 +852,13 @@ namespace Utilities
             // Since the caller indicates that there is a target, and since we
             // know that it is the current process, let the process send
             // something to itself.
-            const std::vector<T1> request = create_request(0);
-            const std::vector<T2> answer  = answer_request(0, request);
-            process_answer(0, answer);
+            const std::vector<T1> request =
+              (create_request ? create_request(0) : std::vector<T1>());
+            const std::vector<T2> answer =
+              (answer_request ? answer_request(0, request) : std::vector<T2>());
+
+            if (process_answer)
+              process_answer(0, answer);
           }
 
         return targets; // nothing to do
