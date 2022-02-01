@@ -3359,7 +3359,7 @@ namespace internal
      * Start update_ghost_value for serial vectors
      */
     template <typename VectorType,
-              typename std::enable_if<is_not_parallel_vector<VectorType>::value,
+              typename std::enable_if<is_not_parallel_vector<VectorType>,
                                       VectorType>::type * = nullptr>
     void
     update_ghost_values_start(const unsigned int /*component_in_block_vector*/,
@@ -3374,7 +3374,7 @@ namespace internal
     template <
       typename VectorType,
       typename std::enable_if<!has_update_ghost_values_start<VectorType> &&
-                                !is_not_parallel_vector<VectorType>::value,
+                                !is_not_parallel_vector<VectorType>,
                               VectorType>::type * = nullptr>
     void
     update_ghost_values_start(const unsigned int component_in_block_vector,
@@ -3580,7 +3580,7 @@ namespace internal
      * Start compress for serial vectors
      */
     template <typename VectorType,
-              typename std::enable_if<is_not_parallel_vector<VectorType>::value,
+              typename std::enable_if<is_not_parallel_vector<VectorType>,
                                       VectorType>::type * = nullptr>
     void
     compress_start(const unsigned int /*component_in_block_vector*/,
@@ -3593,11 +3593,10 @@ namespace internal
      * Start compress for vectors that do not support
      * the split into _start() and finish() stages
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<!has_compress_start<VectorType> &&
-                                !is_not_parallel_vector<VectorType>::value,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              typename std::enable_if<!has_compress_start<VectorType> &&
+                                        !is_not_parallel_vector<VectorType>,
+                                      VectorType>::type * = nullptr>
     void
     compress_start(const unsigned int component_in_block_vector,
                    VectorType &       vec)
@@ -3780,7 +3779,7 @@ namespace internal
      * Reset all ghost values for serial vectors
      */
     template <typename VectorType,
-              typename std::enable_if<is_not_parallel_vector<VectorType>::value,
+              typename std::enable_if<is_not_parallel_vector<VectorType>,
                                       VectorType>::type * = nullptr>
     void
     reset_ghost_values(const VectorType & /*vec*/) const
@@ -3792,11 +3791,10 @@ namespace internal
      * Reset all ghost values for vector that don't support
      * exchange on a subset of DoFs
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<!has_exchange_on_subset<VectorType> &&
-                                !is_not_parallel_vector<VectorType>::value,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              typename std::enable_if<!has_exchange_on_subset<VectorType> &&
+                                        !is_not_parallel_vector<VectorType>,
+                                      VectorType>::type * = nullptr>
     void
     reset_ghost_values(const VectorType &vec) const
     {

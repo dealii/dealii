@@ -189,9 +189,31 @@ namespace internal
   using not_parallel_vector_t =
     std::integral_constant<bool, is_serial_vector<T>::value>;
 
-  template <class T>
-  using is_not_parallel_vector =
-    SupportsOperation::detected_or_t<std::true_type, not_parallel_vector_t, T>;
+  /**
+   * A predicate stating whether something is a vector type. We test this
+   * by seeing whether the `is_serial_vector` type is declared for the
+   * given vector type.
+   */
+  template <class VectorType>
+  using is_vector_type = decltype(is_serial_vector<VectorType>::value);
+
+  /**
+   * A predicate stating whether something is a vector type and is
+   * indeed a serial vector.
+   */
+  template <class VectorType>
+  using is_serial_vector_type = decltype(
+    typename std::enable_if<is_serial_vector<VectorType>::value, int>::type());
+
+  /**
+   * A variable that indicates that the type `T` is either (i) not
+   * a vector type at all, or (ii) if it is a vector type,
+   * that it is not a parallel vector type.
+   */
+  template <class VectorType>
+  constexpr bool is_not_parallel_vector =
+    (is_supported_operation<is_vector_type, VectorType> == false) ||
+    (is_supported_operation<is_serial_vector_type, VectorType> == true);
 } // namespace internal
 #endif
 
