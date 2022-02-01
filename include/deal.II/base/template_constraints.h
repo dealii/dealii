@@ -234,8 +234,8 @@ using begin_and_end_t =
   decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()));
 
 template <typename T>
-using has_begin_and_end =
-  internal::SupportsOperation::is_detected<begin_and_end_t, T>;
+constexpr bool has_begin_and_end =
+  internal::is_supported_operation<begin_and_end_t, T>;
 
 
 
