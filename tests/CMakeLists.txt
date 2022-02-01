@@ -21,7 +21,7 @@
 #    prune_tests    - remove all testsuite subprojects
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 
 MACRO(SET_IF_EMPTY _variable)
   IF("${${_variable}}" STREQUAL "")
