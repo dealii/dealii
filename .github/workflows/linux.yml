@@ -56,7 +56,7 @@ jobs:
             trilinos-all-dev \
             petsc-dev \
             libmetis-dev \
-            libhdf5-dev
+            libhdf5-mpi-dev
     - name: info
       run: |
         mpicc -v
@@ -73,9 +73,6 @@ jobs:
               -D DEAL_II_WITH_PETSC="ON" \
               -D DEAL_II_WITH_METIS="ON" \
               -D DEAL_II_WITH_HDF5="ON" \
-              -D HDF5_INCLUDE_DIR="/usr/include/hdf5/openmpi/" \
-              -D HDF5_LIBRARY="/usr/lib/x86_64-linux-gnu/hdf5/openmpi/libhdf5.so" \
-              -D HDF5_HL_LIBRARY="/usr/lib/x86_64-linux-gnu/hdf5/openmpi/libhdf5_hl.so" \
               -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
               ..
     - name: archive
