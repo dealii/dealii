@@ -20,7 +20,7 @@
 #
 #   HDF5_LIBRARIES
 #   HDF5_INCLUDE_DIRS
-#   HDF5_WITH_MPI
+#   HDF5_IS_PARALLEL
 #
 
 SET(HDF5_DIR "" CACHE PATH "An optional hint to an hdf5 directory")
@@ -40,25 +40,6 @@ ENDIF()
 FIND_PACKAGE(HDF5)
 
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-
-IF(HDF5_FOUND)
-  #
-  # Is hdf5 compiled with support for mpi?
-  #
-  DEAL_II_FIND_FILE(HDF5_PUBCONF NAMES H5pubconf.h H5pubconf-64.h
-    HINTS ${HDF5_INCLUDE_DIRS}
-    PATH_SUFFIXES
-    )
-  FILE(STRINGS ${HDF5_PUBCONF} HDF5_MPI_STRING
-    REGEX "#define.*H5_HAVE_PARALLEL 1"
-    )
-  IF("${HDF5_MPI_STRING}" STREQUAL "")
-    SET(HDF5_WITH_MPI FALSE)
-  ELSE()
-    SET(HDF5_WITH_MPI TRUE)
-  ENDIF()
-ENDIF()
-
 
 SET(_include_dirs "${HDF5_INCLUDE_DIRS}")
 SET(_libraries "${HDF5_LIBRARIES};${HDF5_HL_LIBRARIES}")

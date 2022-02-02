@@ -26,8 +26,8 @@ MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
   IF(HDF5_FOUND)
     SET(${var} TRUE)
 
-    IF( (HDF5_WITH_MPI AND NOT DEAL_II_WITH_MPI) OR
-        (NOT HDF5_WITH_MPI AND DEAL_II_WITH_MPI) )
+    IF( (HDF5_IS_PARALLEL AND NOT DEAL_II_WITH_MPI) OR
+        (NOT HDF5_IS_PARALLEL AND DEAL_II_WITH_MPI) )
       MESSAGE(STATUS "Insufficient hdf5 installation found: "
         "hdf5 has to be configured with the same MPI configuration as deal.II."
         )
