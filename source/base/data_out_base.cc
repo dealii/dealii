@@ -3283,13 +3283,10 @@ namespace DataOutBase
                     b[1] * (v_inter[2] - v_min[2]) - c + v_min[2];
 
       // normalize the gradient
-      double gradient_norm =
-        std::sqrt(std::pow(gradient[0], 2.0) + std::pow(gradient[1], 2.0));
-      gradient[0] /= gradient_norm;
-      gradient[1] /= gradient_norm;
+      gradient /= gradient.norm();
 
-      double lambda = -gradient[0] * (v_min[0] - v_max[0]) -
-                      gradient[1] * (v_min[1] - v_max[1]);
+      const double lambda = -gradient[0] * (v_min[0] - v_max[0]) -
+                            gradient[1] * (v_min[1] - v_max[1]);
 
       Point<6> gradient_parameters;
 
