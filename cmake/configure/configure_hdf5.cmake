@@ -17,8 +17,7 @@
 # Configuration for the hdf5 library:
 #
 
-SET(FEATURE_HDF5_AFTER MPI)
-
+SET(FEATURE_HDF5_DEPENDS MPI)
 
 MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
   FIND_PACKAGE(HDF5)
@@ -26,16 +25,13 @@ MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
   IF(HDF5_FOUND)
     SET(${var} TRUE)
 
-    IF( (HDF5_IS_PARALLEL AND NOT DEAL_II_WITH_MPI) OR
-        (NOT HDF5_IS_PARALLEL AND DEAL_II_WITH_MPI) )
+    IF(NOT HDF5_IS_PARALLEL)
       MESSAGE(STATUS "Insufficient hdf5 installation found: "
-        "hdf5 has to be configured with the same MPI configuration as deal.II."
+        "hdf5 has to be configured with MPI support."
         )
       SET(HDF5_ADDITIONAL_ERROR_STRING
         "Insufficient hdf5 installation found!\n"
-        "hdf5 has to be configured with the same MPI configuration as deal.II, but found:\n"
-        "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
-        "  HDF5_WITH_MPI    = ${HDF5_WITH_MPI}\n"
+        "hdf5 has to be configured with MPI support.\n"
         )
       SET(${var} FALSE)
     ENDIF()
