@@ -93,6 +93,13 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature)
       SET(_fill_clear TRUE)
 
     ELSE()
+      IF ("${_suffix}" STREQUAL "")
+        MESSAGE(FATAL_ERROR
+          "Internal configuration error: the second "
+          "argument to DEAL_II_PACKAGE_HANDLE must be a keyword"
+          )
+      ENDIF()
+
       MARK_AS_ADVANCED(${_arg})
 
       IF(_fill_clear) # FIXME
