@@ -244,7 +244,7 @@ FOREACH(_feature ${_deal_ii_features_sorted})
     # Print the feature configuration:
     #
     FOREACH(_var2
-      C_COMPILER CXX_COMPILER Fortran_COMPILER EXE WITH_64BIT_BLAS_INDICES
+      C_COMPILER CXX_COMPILER Fortran_COMPILER WITH_64BIT_BLAS_INDICES
       ${DEAL_II_STRING_SUFFIXES} ${DEAL_II_LIST_SUFFIXES}
       )
       IF(DEFINED ${_feature}_${_var2})
