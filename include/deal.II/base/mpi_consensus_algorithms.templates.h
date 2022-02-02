@@ -501,6 +501,7 @@ namespace Utilities
       void
       NBX<T1, T2>::clean_up_and_end_communication(const MPI_Comm &comm)
       {
+        (void)comm;
 #ifdef DEAL_II_WITH_MPI
         // clean up
         {
@@ -528,8 +529,6 @@ namespace Utilities
           AssertThrowMPI(ierr);
 #  endif
         }
-#else
-        (void)comm;
 #endif
       }
 
