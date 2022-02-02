@@ -795,9 +795,6 @@ namespace MatrixFreeTools
   {
     using VectorType = LinearAlgebra::distributed::Vector<Number>;
 
-    // initialize vector
-    matrix_free.initialize_dof_vector(diagonal_global, dof_no);
-
     int dummy = 0;
 
     matrix_free.template cell_loop<VectorType, int>(

@@ -101,6 +101,7 @@ public:
     double error_local_1, error_local_2, error_global;
 
     {
+      matrix_free.initialize_dof_vector(diagonal_global);
       MatrixFreeTools::compute_diagonal<dim,
                                         fe_degree,
                                         n_points,
@@ -118,6 +119,7 @@ public:
 
     {
       VectorType diagonal_global;
+      matrix_free.initialize_dof_vector(diagonal_global);
       MatrixFreeTools::compute_diagonal(matrix_free,
                                         diagonal_global,
                                         &Test::cell_function,
