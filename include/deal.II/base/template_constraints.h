@@ -27,28 +27,49 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Detection idiom from Version 2 of the C++ Extensions for Library
+// Detection idiom adapted from Version 2 of the C++ Extensions for Library
 // Fundamentals, ISO/IEC TS 19568:2017
 namespace internal
 {
+  /**
+   * A namespace used to declare the machinery for detecting whether a specific
+   * class supports an operation. This approach simulates C++20-style
+   * concepts with language standards before C++20.
+   */
   namespace SupportsOperation
   {
     template <class...>
     using void_t = void;
 
-    // primary template handles all types not supporting the archetypal Op
+    /**
+     * The primary template class used in detecting operations. If the
+     * compiler does not choose the specialization, then the fall-back
+     * case is this general template, which then declares member variables
+     * and types according to the failed detection.
+     */
     template <class Default,
-              class /*AlwaysVoid*/,
+              class AlwaysVoid,
               template <class...>
               class Op,
-              class... /*Args*/>
+              class... Args>
     struct detector
     {
       using value_t = std::false_type;
       using type    = Default;
     };
 
-    // specialization recognizes and handles only types supporting Op
+    /**
+     * A specialization of the general template.
+     *
+     * The trick this class uses is that, just like the general template,
+     * its second argument is always `void`, but here it is written as
+     * `void_t<Op<Args...>>` and consequently the compiler will only select this
+     * specialization if `Op<Args...>` is in fact a valid type. This means that
+     * the operation we seek to understand is indeed supported.
+     *
+     * This specialization then declares member variables and types according
+     * to the successful detection.
+     */
     template <class Default, template <class...> class Op, class... Args>
     struct detector<Default, void_t<Op<Args...>>, Op, Args...>
     {
@@ -57,10 +78,17 @@ namespace internal
     };
 
 
-    // base class for nonesuch to inherit from so it is not an aggregate
+    /**
+     * A base class for the `nonesuch` type to inherit from so it is not an
+     * aggregate.
+     */
     struct nonesuch_base
     {};
 
+    /**
+     * A type that can not be used in any reasonable way and consequently
+     * can be used to indicate a failed detection in template metaprogramming.
+     */
     struct nonesuch : private nonesuch_base
     {
       ~nonesuch()                = delete;
@@ -69,29 +97,64 @@ namespace internal
       operator=(nonesuch const &) = delete;
     };
 
+    template <class Default, template <class...> class Op, class... Args>
+    using detected_or = detector<Default, void, Op, Args...>;
+
+    template <template <class...> class Op, class... Args>
+    using is_detected = typename detected_or<nonesuch, Op, Args...>::value_t;
+
+    template <template <class...> class Op, class... Args>
+    using detected_t = typename detected_or<nonesuch, Op, Args...>::type;
+
+    template <class Default, template <class...> class Op, class... Args>
+    using detected_or_t = typename detected_or<Default, Op, Args...>::type;
+
+    template <class Expected, template <class...> class Op, class... Args>
+    using is_detected_exact = std::is_same<Expected, detected_t<Op, Args...>>;
+
+    template <class To, template <class...> class Op, class... Args>
+    using is_detected_convertible =
+      std::is_convertible<detected_t<Op, Args...>, To>;
   } // namespace SupportsOperation
 
-  template <class Default, template <class...> class Op, class... Args>
-  using detected_or =
-    internal::SupportsOperation::detector<Default, void, Op, Args...>;
 
+  /**
+   * A `constexpr` variable that describes whether or not `Op<Args...>` is a
+   * valid expression.
+   *
+   * The way this is used is to define an `Op` operation template that
+   * describes the operation we want to perform, and `Args` is a template
+   * pack that describes the arguments to the operation. This variable
+   * then states whether the operation, with these arguments, leads to
+   * a valid C++ expression.
+   *
+   * An example is if one wanted to find out whether a type `T` has
+   * a `get_mpi_communicator()` member function. In that case, one would write
+   * the operation as
+   * @code
+   * template <typename T>
+   * using get_mpi_communicator_op
+   *   = decltype(std::declval<T>().get_mpi_communicator());
+   * @endcode
+   * and could define a variable like
+   * @code
+   * template <typename T>
+   * constexpr bool has_get_mpi_communicator =
+   * is_supported_operation<get_mpi_communicator_op, T>;
+   * @endcode
+   *
+   * The trick used here is that `get_mpi_communicator_op` is a general
+   * template, but when used with a type that does *not* have a
+   * `get_mpi_communicator()` member variable, the `decltype(...)` operation
+   * will fail because its argument does not represent a valid expression for
+   * such a type. In other words, for such types `T` that do not have such a
+   * member function, the general template `get_mpi_communicator_op` represents
+   * a valid declaration, but the instantiation `get_mpi_communicator_op<T>`
+   * is not, and the variable declared here detects and reports this.
+   */
   template <template <class...> class Op, class... Args>
-  using is_detected =
-    typename detected_or<SupportsOperation::nonesuch, Op, Args...>::value_t;
-
-  template <template <class...> class Op, class... Args>
-  using detected_t =
-    typename detected_or<SupportsOperation::nonesuch, Op, Args...>::type;
-
-  template <class Default, template <class...> class Op, class... Args>
-  using detected_or_t = typename detected_or<Default, Op, Args...>::type;
-
-  template <class Expected, template <class...> class Op, class... Args>
-  using is_detected_exact = std::is_same<Expected, detected_t<Op, Args...>>;
-
-  template <class To, template <class...> class Op, class... Args>
-  using is_detected_convertible =
-    std::is_convertible<detected_t<Op, Args...>, To>;
+  constexpr bool is_supported_operation =
+    SupportsOperation::is_detected<Op, Args...>::value;
 } // namespace internal
 
 
@@ -171,7 +234,8 @@ using begin_and_end_t =
   decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()));
 
 template <typename T>
-using has_begin_and_end = internal::is_detected<begin_and_end_t, T>;
+constexpr bool has_begin_and_end =
+  internal::is_supported_operation<begin_and_end_t, T>;
 
 
 

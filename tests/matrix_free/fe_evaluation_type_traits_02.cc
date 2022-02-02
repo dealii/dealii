@@ -105,16 +105,15 @@ main()
   Dummy2<double> dummy2;
 
   deallog << "has_add_local_element:" << std::endl
-          << "Dummy = " << internal::has_add_local_element<Dummy<double>>::value
-          << std::endl
+          << "Dummy = "
+          << internal::has_add_local_element<Dummy<double>> << std::endl
           << "Dummy2 = "
-          << internal::has_add_local_element<Dummy2<double>>::value << std::endl
+          << internal::has_add_local_element<Dummy2<double>> << std::endl
           << "has_set_local_element:" << std::endl
-          << "Dummy = " << internal::has_set_local_element<Dummy<double>>::value
-          << std::endl
+          << "Dummy = "
+          << internal::has_set_local_element<Dummy<double>> << std::endl
           << "Dummy2 = "
-          << internal::has_set_local_element<Dummy2<double>>::value
-          << std::endl;
+          << internal::has_set_local_element<Dummy2<double>> << std::endl;
 
   // now check internal::vector_access_[set|add] wrappers
   deallog << "internal::vector_access_set:" << std::endl;

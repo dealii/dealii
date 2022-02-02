@@ -533,7 +533,7 @@ namespace internal
                                      std::declval<const VectorType &>()));
 
     template <typename T, typename VectorType>
-    using has_Tvmult = is_detected<Tvmult_t, T, VectorType>;
+    constexpr bool has_Tvmult = is_supported_operation<Tvmult_t, T, VectorType>;
 
     template <typename T, typename VectorType>
     using step_t = decltype(
@@ -541,7 +541,7 @@ namespace internal
                                    std::declval<const VectorType &>()));
 
     template <typename T, typename VectorType>
-    using has_step = is_detected<step_t, T, VectorType>;
+    constexpr bool has_step = is_supported_operation<step_t, T, VectorType>;
 
     template <typename T, typename VectorType>
     using step_omega_t =
@@ -550,7 +550,8 @@ namespace internal
                                             std::declval<const double>()));
 
     template <typename T, typename VectorType>
-    using has_step_omega = is_detected<step_omega_t, T, VectorType>;
+    constexpr bool has_step_omega =
+      is_supported_operation<step_omega_t, T, VectorType>;
 
     template <typename T, typename VectorType>
     using Tstep_t = decltype(
@@ -558,7 +559,7 @@ namespace internal
                                     std::declval<const VectorType &>()));
 
     template <typename T, typename VectorType>
-    using has_Tstep = is_detected<Tstep_t, T, VectorType>;
+    constexpr bool has_Tstep = is_supported_operation<Tstep_t, T, VectorType>;
 
     template <typename T, typename VectorType>
     using Tstep_omega_t =
@@ -567,7 +568,8 @@ namespace internal
                                              std::declval<const double>()));
 
     template <typename T, typename VectorType>
-    using has_Tstep_omega = is_detected<Tstep_omega_t, T, VectorType>;
+    constexpr bool has_Tstep_omega =
+      is_supported_operation<Tstep_omega_t, T, VectorType>;
 
     template <typename T, typename VectorType>
     using jacobi_step_t = decltype(
@@ -576,7 +578,8 @@ namespace internal
                                           std::declval<const double>()));
 
     template <typename T, typename VectorType>
-    using has_jacobi_step = is_detected<jacobi_step_t, T, VectorType>;
+    constexpr bool has_jacobi_step =
+      is_supported_operation<jacobi_step_t, T, VectorType>;
 
     template <typename T, typename VectorType>
     using SOR_step_t = decltype(
@@ -585,7 +588,8 @@ namespace internal
                                        std::declval<const double>()));
 
     template <typename T, typename VectorType>
-    using has_SOR_step = is_detected<SOR_step_t, T, VectorType>;
+    constexpr bool has_SOR_step =
+      is_supported_operation<SOR_step_t, T, VectorType>;
 
     template <typename T, typename VectorType>
     using SSOR_step_t = decltype(
@@ -594,7 +598,8 @@ namespace internal
                                         std::declval<const double>()));
 
     template <typename T, typename VectorType>
-    using has_SSOR_step = is_detected<SSOR_step_t, T, VectorType>;
+    constexpr bool has_SSOR_step =
+      is_supported_operation<SSOR_step_t, T, VectorType>;
 
     template <typename MatrixType>
     class PreconditionJacobiImpl
@@ -620,10 +625,9 @@ namespace internal
         this->vmult(dst, src);
       }
 
-      template <
-        typename VectorType,
-        typename std::enable_if<has_jacobi_step<MatrixType, VectorType>::value,
-                                MatrixType>::type * = nullptr>
+      template <typename VectorType,
+                typename std::enable_if<has_jacobi_step<MatrixType, VectorType>,
+                                        MatrixType>::type * = nullptr>
       void
       step(VectorType &dst, const VectorType &src) const
       {
@@ -632,7 +636,7 @@ namespace internal
 
       template <
         typename VectorType,
-        typename std::enable_if<!has_jacobi_step<MatrixType, VectorType>::value,
+        typename std::enable_if<!has_jacobi_step<MatrixType, VectorType>,
                                 MatrixType>::type * = nullptr>
       void
       step(VectorType &, const VectorType &) const
@@ -678,20 +682,18 @@ namespace internal
         this->A->precondition_TSOR(dst, src, this->relaxation);
       }
 
-      template <
-        typename VectorType,
-        typename std::enable_if<has_SOR_step<MatrixType, VectorType>::value,
-                                MatrixType>::type * = nullptr>
+      template <typename VectorType,
+                typename std::enable_if<has_SOR_step<MatrixType, VectorType>,
+                                        MatrixType>::type * = nullptr>
       void
       step(VectorType &dst, const VectorType &src) const
       {
         this->A->SOR_step(dst, src, this->relaxation);
       }
 
-      template <
-        typename VectorType,
-        typename std::enable_if<!has_SOR_step<MatrixType, VectorType>::value,
-                                MatrixType>::type * = nullptr>
+      template <typename VectorType,
+                typename std::enable_if<!has_SOR_step<MatrixType, VectorType>,
+                                        MatrixType>::type * = nullptr>
       void
       step(VectorType &, const VectorType &) const
       {
@@ -699,20 +701,18 @@ namespace internal
                ExcMessage("Matrix A does not provide a SOR_step() function!"));
       }
 
-      template <
-        typename VectorType,
-        typename std::enable_if<has_SOR_step<MatrixType, VectorType>::value,
-                                MatrixType>::type * = nullptr>
+      template <typename VectorType,
+                typename std::enable_if<has_SOR_step<MatrixType, VectorType>,
+                                        MatrixType>::type * = nullptr>
       void
       Tstep(VectorType &dst, const VectorType &src) const
       {
         this->A->TSOR_step(dst, src, this->relaxation);
       }
 
-      template <
-        typename VectorType,
-        typename std::enable_if<!has_SOR_step<MatrixType, VectorType>::value,
-                                MatrixType>::type * = nullptr>
+      template <typename VectorType,
+                typename std::enable_if<!has_SOR_step<MatrixType, VectorType>,
+                                        MatrixType>::type * = nullptr>
       void
       Tstep(VectorType &, const VectorType &) const
       {
@@ -783,20 +783,18 @@ namespace internal
                                    pos_right_of_diagonal);
       }
 
-      template <
-        typename VectorType,
-        typename std::enable_if<has_SSOR_step<MatrixType, VectorType>::value,
-                                MatrixType>::type * = nullptr>
+      template <typename VectorType,
+                typename std::enable_if<has_SSOR_step<MatrixType, VectorType>,
+                                        MatrixType>::type * = nullptr>
       void
       step(VectorType &dst, const VectorType &src) const
       {
         this->A->SSOR_step(dst, src, this->relaxation);
       }
 
-      template <
-        typename VectorType,
-        typename std::enable_if<!has_SSOR_step<MatrixType, VectorType>::value,
-                                MatrixType>::type * = nullptr>
+      template <typename VectorType,
+                typename std::enable_if<!has_SSOR_step<MatrixType, VectorType>,
+                                        MatrixType>::type * = nullptr>
       void
       step(VectorType &, const VectorType &) const
       {
@@ -863,12 +861,12 @@ namespace internal
       const std::vector<size_type> &inverse_permutation;
     };
 
-    template <typename MatrixType,
-              typename PreconditionerType,
-              typename VectorType,
-              typename std::enable_if<
-                has_step_omega<PreconditionerType, VectorType>::value,
-                PreconditionerType>::type * = nullptr>
+    template <
+      typename MatrixType,
+      typename PreconditionerType,
+      typename VectorType,
+      typename std::enable_if<has_step_omega<PreconditionerType, VectorType>,
+                              PreconditionerType>::type * = nullptr>
     void
     step(const MatrixType &,
          const PreconditionerType &preconditioner,
@@ -881,13 +879,13 @@ namespace internal
       preconditioner.step(dst, src, relaxation);
     }
 
-    template <typename MatrixType,
-              typename PreconditionerType,
-              typename VectorType,
-              typename std::enable_if<
-                !has_step_omega<PreconditionerType, VectorType>::value &&
-                  has_step<PreconditionerType, VectorType>::value,
-                PreconditionerType>::type * = nullptr>
+    template <
+      typename MatrixType,
+      typename PreconditionerType,
+      typename VectorType,
+      typename std::enable_if<!has_step_omega<PreconditionerType, VectorType> &&
+                                has_step<PreconditionerType, VectorType>,
+                              PreconditionerType>::type * = nullptr>
     void
     step(const MatrixType &,
          const PreconditionerType &preconditioner,
@@ -904,13 +902,13 @@ namespace internal
       preconditioner.step(dst, src);
     }
 
-    template <typename MatrixType,
-              typename PreconditionerType,
-              typename VectorType,
-              typename std::enable_if<
-                !has_step_omega<PreconditionerType, VectorType>::value &&
-                  !has_step<PreconditionerType, VectorType>::value,
-                PreconditionerType>::type * = nullptr>
+    template <
+      typename MatrixType,
+      typename PreconditionerType,
+      typename VectorType,
+      typename std::enable_if<!has_step_omega<PreconditionerType, VectorType> &&
+                                !has_step<PreconditionerType, VectorType>,
+                              PreconditionerType>::type * = nullptr>
     void
     step(const MatrixType &        A,
          const PreconditionerType &preconditioner,
@@ -930,12 +928,12 @@ namespace internal
       dst.add(relaxation, tmp);
     }
 
-    template <typename MatrixType,
-              typename PreconditionerType,
-              typename VectorType,
-              typename std::enable_if<
-                has_Tstep_omega<PreconditionerType, VectorType>::value,
-                PreconditionerType>::type * = nullptr>
+    template <
+      typename MatrixType,
+      typename PreconditionerType,
+      typename VectorType,
+      typename std::enable_if<has_Tstep_omega<PreconditionerType, VectorType>,
+                              PreconditionerType>::type * = nullptr>
     void
     Tstep(const MatrixType &,
           const PreconditionerType &preconditioner,
@@ -952,8 +950,8 @@ namespace internal
               typename PreconditionerType,
               typename VectorType,
               typename std::enable_if<
-                !has_Tstep_omega<PreconditionerType, VectorType>::value &&
-                  has_Tstep<PreconditionerType, VectorType>::value,
+                !has_Tstep_omega<PreconditionerType, VectorType> &&
+                  has_Tstep<PreconditionerType, VectorType>,
                 PreconditionerType>::type * = nullptr>
     void
     Tstep(const MatrixType &,
@@ -973,7 +971,7 @@ namespace internal
 
     template <typename MatrixType,
               typename VectorType,
-              typename std::enable_if<has_Tvmult<MatrixType, VectorType>::value,
+              typename std::enable_if<has_Tvmult<MatrixType, VectorType>,
                                       MatrixType>::type * = nullptr>
     void
     Tvmult(const MatrixType &A, VectorType &dst, const VectorType &src)
@@ -981,11 +979,10 @@ namespace internal
       A.Tvmult(dst, src);
     }
 
-    template <
-      typename MatrixType,
-      typename VectorType,
-      typename std::enable_if<!has_Tvmult<MatrixType, VectorType>::value,
-                              MatrixType>::type * = nullptr>
+    template <typename MatrixType,
+              typename VectorType,
+              typename std::enable_if<!has_Tvmult<MatrixType, VectorType>,
+                                      MatrixType>::type * = nullptr>
     void
     Tvmult(const MatrixType &, VectorType &, const VectorType &)
     {
@@ -997,8 +994,8 @@ namespace internal
               typename PreconditionerType,
               typename VectorType,
               typename std::enable_if<
-                !has_Tstep_omega<PreconditionerType, VectorType>::value &&
-                  !has_Tstep<PreconditionerType, VectorType>::value,
+                !has_Tstep_omega<PreconditionerType, VectorType> &&
+                  !has_Tstep<PreconditionerType, VectorType>,
                 PreconditionerType>::type * = nullptr>
     void
     Tstep(const MatrixType &        A,

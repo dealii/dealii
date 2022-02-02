@@ -30,66 +30,56 @@ main()
 {
   initlog();
 
-  deallog << "has_update_ghost_values_start:" << std::endl
-          << "LinearAlgebra::distributed::Vector = "
-          << internal::has_update_ghost_values_start<
-               LinearAlgebra::distributed::Vector<double>>::value
-          << std::endl
-          << "TrilinosWrappers::MPI::Vector = "
-          << internal::has_update_ghost_values_start<
-               TrilinosWrappers::MPI::Vector>::value
-          << std::endl
-          << "Vector = "
-          << internal::has_update_ghost_values_start<Vector<double>>::value
-          << std::endl;
-
-  deallog << "has_compress_start:" << std::endl
-          << "LinearAlgebra::distributed::Vector = "
-          << internal::has_compress_start<
-               LinearAlgebra::distributed::Vector<double>>::value
-          << std::endl
-          << "TrilinosWrappers::MPI::Vector = "
-          << internal::has_compress_start<TrilinosWrappers::MPI::Vector>::value
-          << std::endl
-          << "Vector = " << internal::has_compress_start<Vector<double>>::value
-          << std::endl;
+  deallog
+    << "has_update_ghost_values_start:" << std::endl
+    << "LinearAlgebra::distributed::Vector = "
+    << internal::has_update_ghost_values_start<
+         LinearAlgebra::distributed::Vector<double>> << std::endl
+    << "TrilinosWrappers::MPI::Vector = "
+    << internal::has_update_ghost_values_start<
+         TrilinosWrappers::MPI::Vector> << std::endl
+    << "Vector = "
+    << internal::has_update_ghost_values_start<Vector<double>> << std::endl;
 
   deallog
-    << "has_exchange_on_subset:" << std::endl
+    << "has_compress_start:" << std::endl
     << "LinearAlgebra::distributed::Vector = "
-    << internal::has_exchange_on_subset<
-         LinearAlgebra::distributed::Vector<double>>::value
-    << std::endl
+    << internal::has_compress_start<
+         LinearAlgebra::distributed::Vector<double>> << std::endl
     << "TrilinosWrappers::MPI::Vector = "
-    << internal::has_exchange_on_subset<TrilinosWrappers::MPI::Vector>::value
-    << std::endl
-    << "Vector = " << internal::has_exchange_on_subset<Vector<double>>::value
-    << std::endl;
+    << internal::has_compress_start<TrilinosWrappers::MPI::Vector> << std::endl
+    << "Vector = " << internal::has_compress_start<Vector<double>> << std::endl;
+
+  deallog << "has_exchange_on_subset:" << std::endl
+          << "LinearAlgebra::distributed::Vector = "
+          << internal::has_exchange_on_subset<
+               LinearAlgebra::distributed::Vector<double>> << std::endl
+          << "TrilinosWrappers::MPI::Vector = "
+          << internal::has_exchange_on_subset<
+               TrilinosWrappers::MPI::Vector> << std::endl
+          << "Vector = "
+          << internal::has_exchange_on_subset<Vector<double>> << std::endl;
 
 
   deallog << "has_communication_block_size:" << std::endl
           << "LinearAlgebra::distributed::Vector = "
           << internal::has_communication_block_size<
-               LinearAlgebra::distributed::Vector<double>>::value
-          << std::endl
+               LinearAlgebra::distributed::Vector<double>> << std::endl
           << "LinearAlgebra::distributed::BlockVector = "
           << internal::has_communication_block_size<
-               LinearAlgebra::distributed::BlockVector<double>>::value
-          << std::endl;
+               LinearAlgebra::distributed::BlockVector<double>> << std::endl;
 
-  deallog
-    << "is_not_parallel_vector:" << std::endl
-    << "LinearAlgebra::distributed::Vector = "
-    << internal::is_not_parallel_vector<
-         LinearAlgebra::distributed::Vector<double>>::value
-    << std::endl
-    << "TrilinosWrappers::MPI::Vector = "
-    << internal::is_not_parallel_vector<TrilinosWrappers::MPI::Vector>::value
-    << std::endl
-    << "Vector = " << internal::is_not_parallel_vector<Vector<double>>::value
-    << std::endl
-    << "unsigned int = "
-    << internal::is_not_parallel_vector<unsigned int>::value << std::endl;
+  deallog << "is_not_parallel_vector:" << std::endl
+          << "LinearAlgebra::distributed::Vector = "
+          << internal::is_not_parallel_vector<
+               LinearAlgebra::distributed::Vector<double>> << std::endl
+          << "TrilinosWrappers::MPI::Vector = "
+          << internal::is_not_parallel_vector<
+               TrilinosWrappers::MPI::Vector> << std::endl
+          << "Vector = "
+          << internal::is_not_parallel_vector<Vector<double>> << std::endl
+          << "unsigned int = "
+          << internal::is_not_parallel_vector<unsigned int> << std::endl;
 
   // check that MatrixFree::cell_loop can run for non-vector types
   MatrixFree<2> matrix_free;
