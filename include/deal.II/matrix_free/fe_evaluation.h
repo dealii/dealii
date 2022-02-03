@@ -740,33 +740,6 @@ protected:
    * MatrixFree object was given at initialization.
    */
   mutable std::vector<types::global_dof_index> local_dof_indices;
-
-  /**
-   * A temporary data structure for the Jacobian information necessary if
-   * the reinit() function is used that allows to construct user batches.
-   */
-  AlignedVector<Tensor<2, dim, VectorizedArrayType>> jacobian_data;
-
-  /**
-   * A temporary data structure for the Jacobian determinant necessary if
-   * the reinit() function is used that allows to construct user batches.
-   */
-  AlignedVector<VectorizedArrayType> J_value_data;
-
-  /**
-   * A temporary data structure for the gradients of the inverse Jacobian
-   * transformation necessary if the reinit() function is used that allows
-   * to construct user batches.
-   */
-  AlignedVector<
-    Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, VectorizedArrayType>>>
-    jacobian_gradients_data;
-
-  /**
-   * A temporary data structure for the quadrature-point locations necessary if
-   * the reinit() function is used that allows to construct user batches.
-   */
-  AlignedVector<Point<dim, VectorizedArrayType>> quadrature_points_data;
 };
 
 
@@ -6818,12 +6791,6 @@ FEEvaluation<dim,
              VectorizedArrayType>::
   reinit(const std::array<unsigned int, VectorizedArrayType::size()> &cell_ids)
 {
-  Assert(this->mapped_geometry == nullptr,
-         ExcMessage("FEEvaluation was initialized without a matrix-free object."
-                    " Integer indexing is not possible"));
-  if (this->mapped_geometry != nullptr)
-    return;
-
   Assert(this->dof_info != nullptr, ExcNotInitialized());
   Assert(this->mapping_data != nullptr, ExcNotInitialized());
 
@@ -6847,41 +6814,52 @@ FEEvaluation<dim,
     }
 
   // allocate memory for internal data storage
+  if (this->mapped_geometry == nullptr)
+    this->mapped_geometry =
+      std::make_shared<internal::MatrixFreeFunctions::
+                         MappingDataOnTheFly<dim, VectorizedArrayType>>();
+
+  auto &mapping_storage = this->mapped_geometry->get_data_storage();
+
+  auto &this_jacobian_data           = mapping_storage.jacobians[0];
+  auto &this_J_value_data            = mapping_storage.JxW_values;
+  auto &this_jacobian_gradients_data = mapping_storage.jacobian_gradients[0];
+  auto &this_quadrature_points_data  = mapping_storage.quadrature_points;
 
   if (this->cell_type <= internal::MatrixFreeFunctions::GeometryType::affine)
     {
       if (this->mapping_data->jacobians[0].size() > 0)
-        this->jacobian_data.resize_fast(2);
+        this_jacobian_data.resize_fast(2);
 
       if (this->mapping_data->JxW_values.size() > 0)
-        this->J_value_data.resize_fast(1);
+        this_J_value_data.resize_fast(1);
 
       if (this->mapping_data->jacobian_gradients[0].size() > 0)
-        this->jacobian_gradients_data.resize_fast(1);
+        this_jacobian_gradients_data.resize_fast(1);
 
       if (this->mapping_data->quadrature_points.size() > 0)
-        this->quadrature_points_data.resize_fast(1);
+        this_quadrature_points_data.resize_fast(1);
     }
   else
     {
       if (this->mapping_data->jacobians[0].size() > 0)
-        this->jacobian_data.resize_fast(this->n_quadrature_points);
+        this_jacobian_data.resize_fast(this->n_quadrature_points);
 
       if (this->mapping_data->JxW_values.size() > 0)
-        this->J_value_data.resize_fast(this->n_quadrature_points);
+        this_J_value_data.resize_fast(this->n_quadrature_points);
 
       if (this->mapping_data->jacobian_gradients[0].size() > 0)
-        this->jacobian_gradients_data.resize_fast(this->n_quadrature_points);
+        this_jacobian_gradients_data.resize_fast(this->n_quadrature_points);
 
       if (this->mapping_data->quadrature_points.size() > 0)
-        this->quadrature_points_data.resize_fast(this->n_quadrature_points);
+        this_quadrature_points_data.resize_fast(this->n_quadrature_points);
     }
 
   // set pointers to internal data storage
-  this->jacobian           = this->jacobian_data.data();
-  this->J_value            = this->J_value_data.data();
-  this->jacobian_gradients = this->jacobian_gradients_data.data();
-  this->quadrature_points  = this->quadrature_points_data.data();
+  this->jacobian           = this_jacobian_data.data();
+  this->J_value            = this_J_value_data.data();
+  this->jacobian_gradients = this_jacobian_gradients_data.data();
+  this->quadrature_points  = this_quadrature_points_data.data();
 
   // fill internal data storage lane by lane
   for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
@@ -6904,26 +6882,26 @@ FEEvaluation<dim,
           const unsigned int q = 0;
 
           if (this->mapping_data->JxW_values.size() > 0)
-            this->J_value_data[q][v] =
+            this_J_value_data[q][v] =
               this->mapping_data->JxW_values[offsets + q][lane];
 
           if (this->mapping_data->jacobians[0].size() > 0)
             for (unsigned int q = 0; q < 2; ++q)
               for (unsigned int i = 0; i < dim; ++i)
                 for (unsigned int j = 0; j < dim; ++j)
-                  this->jacobian_data[q][i][j][v] =
+                  this_jacobian_data[q][i][j][v] =
                     this->mapping_data->jacobians[0][offsets + q][i][j][lane];
 
           if (this->mapping_data->jacobian_gradients[0].size() > 0)
             for (unsigned int i = 0; i < dim * (dim + 1) / 2; ++i)
               for (unsigned int j = 0; j < dim; ++j)
-                this->jacobian_gradients_data[q][i][j][v] =
+                this_jacobian_gradients_data[q][i][j][v] =
                   this->mapping_data
                     ->jacobian_gradients[0][offsets + q][i][j][lane];
 
           if (this->mapping_data->quadrature_points.size() > 0)
             for (unsigned int i = 0; i < dim; ++i)
-              this->quadrature_points_data[q][i][v] =
+              this_quadrature_points_data[q][i][v] =
                 this->mapping_data->quadrature_points
                   [this->mapping_data
                      ->quadrature_point_offsets[cell_batch_index] +
@@ -6945,20 +6923,20 @@ FEEvaluation<dim,
                   q;
 
               if (this->mapping_data->JxW_values.size() > 0)
-                this->J_value_data[q][v] =
+                this_J_value_data[q][v] =
                   this->mapping_data->JxW_values[offsets + q_src][lane];
 
               if (this->mapping_data->jacobians[0].size() > 0)
                 for (unsigned int i = 0; i < dim; ++i)
                   for (unsigned int j = 0; j < dim; ++j)
-                    this->jacobian_data[q][i][j][v] =
+                    this_jacobian_data[q][i][j][v] =
                       this->mapping_data
                         ->jacobians[0][offsets + q_src][i][j][lane];
 
               if (this->mapping_data->jacobian_gradients[0].size() > 0)
                 for (unsigned int i = 0; i < dim * (dim + 1) / 2; ++i)
                   for (unsigned int j = 0; j < dim; ++j)
-                    this->jacobian_gradients_data[q][i][j][v] =
+                    this_jacobian_gradients_data[q][i][j][v] =
                       this->mapping_data
                         ->jacobian_gradients[0][offsets + q_src][i][j][lane];
 
@@ -6993,13 +6971,13 @@ FEEvaluation<dim,
                                 this->descriptor->quadrature.point(q)[e]);
 
                       for (unsigned int i = 0; i < dim; ++i)
-                        this->quadrature_points_data[q][i][v] = point[i][lane];
+                        this_quadrature_points_data[q][i][v] = point[i][lane];
                     }
                   else
                     {
                       // general case: quadrature points are available
                       for (unsigned int i = 0; i < dim; ++i)
-                        this->quadrature_points_data[q][i][v] =
+                        this_quadrature_points_data[q][i][v] =
                           this->mapping_data->quadrature_points
                             [this->mapping_data
                                ->quadrature_point_offsets[cell_batch_index] +
