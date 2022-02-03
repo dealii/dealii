@@ -147,8 +147,7 @@ public:
    * preconditioner to be handed to a smoother.  This does nothing.
    */
   void
-  clear()
-  {}
+  clear();
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
@@ -1895,6 +1894,14 @@ PreconditionIdentity::Tvmult_add(VectorType &dst, const VectorType &src) const
 {
   dst += src;
 }
+
+
+
+inline void
+PreconditionIdentity::clear()
+{}
+
+
 
 inline PreconditionIdentity::size_type
 PreconditionIdentity::m() const
