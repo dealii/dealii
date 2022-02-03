@@ -63,13 +63,17 @@ DEAL:0:2d::hyper_cube
   </Cells>
   <PointData Scalars="scalars">
     <DataArray type="Float32" Name="level" format="ascii">
-0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1     </DataArray>
+0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 
+    </DataArray>
     <DataArray type="Float32" Name="subdomain" format="ascii">
--1 -1 -1 -1 0 0 0 0 1 1 1 1 -2 -2 -2 -2     </DataArray>
+-1 -1 -1 -1 0 0 0 0 1 1 1 1 -2 -2 -2 -2 
+    </DataArray>
     <DataArray type="Float32" Name="level_subdomain" format="ascii">
-0 0 0 0 -2 -2 -2 -2 0 0 0 0 1 1 1 1     </DataArray>
+0 0 0 0 -2 -2 -2 -2 0 0 0 0 1 1 1 1 
+    </DataArray>
     <DataArray type="Float32" Name="proc_writing" format="ascii">
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0     </DataArray>
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>
@@ -121,13 +125,17 @@ DEAL:0:2d::hyper_cube
   </Cells>
   <PointData Scalars="scalars">
     <DataArray type="Float32" Name="level" format="ascii">
-0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1     </DataArray>
+0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 
+    </DataArray>
     <DataArray type="Float32" Name="subdomain" format="ascii">
--1 -1 -1 -1 0 0 0 0 1 1 1 1 -2 -2 -2 -2     </DataArray>
+-1 -1 -1 -1 0 0 0 0 1 1 1 1 -2 -2 -2 -2 
+    </DataArray>
     <DataArray type="Float32" Name="level_subdomain" format="ascii">
-0 0 0 0 -2 -2 -2 -2 0 0 0 0 1 1 1 1     </DataArray>
+0 0 0 0 -2 -2 -2 -2 0 0 0 0 1 1 1 1 
+    </DataArray>
     <DataArray type="Float32" Name="proc_writing" format="ascii">
-1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1     </DataArray>
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>

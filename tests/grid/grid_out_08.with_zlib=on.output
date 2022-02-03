@@ -26,15 +26,20 @@ AQAAABgAAAAYAAAACwAAAA==eNpjZsYOAAOcAEk=
   </Cells>
   <PointData Scalars="scalars">
     <DataArray type="Float32" Name="level" format="binary">
-AQAAAMAAAADAAAAADwAAAA==eNpjYGiwZxjCGABjsyPR    </DataArray>
+AQAAAMAAAADAAAAADwAAAA==eNpjYGiwZxjCGABjsyPR
+    </DataArray>
     <DataArray type="Float32" Name="manifold" format="binary">
-AQAAAMAAAADAAAAADwAAAA==eNpjYGjYzzCEMQBMOjvR    </DataArray>
+AQAAAMAAAADAAAAADwAAAA==eNpjYGjYzzCEMQBMOjvR
+    </DataArray>
     <DataArray type="Float32" Name="material" format="binary">
-AQAAAMAAAADAAAAADAAAAA==eNpjYBjaAAAAwAAB    </DataArray>
+AQAAAMAAAADAAAAADAAAAA==eNpjYBjaAAAAwAAB
+    </DataArray>
     <DataArray type="Float32" Name="subdomain" format="binary">
-AQAAAMAAAADAAAAADAAAAA==eNpjYBjaAAAAwAAB    </DataArray>
+AQAAAMAAAADAAAAADAAAAA==eNpjYBjaAAAAwAAB
+    </DataArray>
     <DataArray type="Float32" Name="level_subdomain" format="binary">
-AQAAAMAAAADAAAAADAAAAA==eNpjYBjaAAAAwAAB    </DataArray>
+AQAAAMAAAADAAAAADAAAAA==eNpjYBjaAAAAwAAB
+    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>
