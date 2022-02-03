@@ -322,7 +322,7 @@ public:
 
   /**
    * This exception is thrown if a function operating on the vector of history
-   * data of a SolverControl object id called, but storage of history data was
+   * data of a SolverControl object is called, but storage of history data was
    * not enabled by enable_history_data().
    */
   DeclException0(ExcHistoryDataRequired);

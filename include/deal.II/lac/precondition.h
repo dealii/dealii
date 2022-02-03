@@ -62,10 +62,12 @@ namespace LinearAlgebra
 
 
 /**
- * No preconditioning.  This class helps you, if you want to use a linear
- * solver without preconditioning. All solvers in LAC require a
- * preconditioner. Therefore, you must use the identity provided here to avoid
- * preconditioning. It can be used in the following way:
+ * This preconditioner implements the indentity operator.
+ * This class can be used you if you want to use a linear
+ * solver without preconditioning, because all linear solvers
+ * require usage of a preconditioner.
+ *
+ * It can be used in the following way:
  *
  * @code
  * SolverControl           solver_control (1000, 1e-12);
