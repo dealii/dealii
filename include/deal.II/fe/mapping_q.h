@@ -37,12 +37,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int, int>
-class MappingQ;
-
+#ifndef DOXYGEN
 template <int, int>
 class MappingQCache;
-
+#endif
 
 /*!@addtogroup mapping */
 /*@{*/

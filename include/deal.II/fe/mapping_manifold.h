@@ -29,10 +29,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int, int>
-class MappingQ;
-
-
 /*!@addtogroup mapping */
 /*@{*/
 
