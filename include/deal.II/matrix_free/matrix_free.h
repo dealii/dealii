@@ -1506,6 +1506,24 @@ public:
    */
   //@{
   /**
+   * Initialize function for a vector with each entry associated with a cell
+   * batch (cell data). For reading and writing the vector use:
+   * FEEvaluationBase::read_cell_data() and FEEvaluationBase::write_cell_data().
+   */
+  template <typename T>
+  void
+  initialize_cell_data_vector(AlignedVector<T> &vec) const;
+
+  /**
+   * Initialize function for a vector with each entry associated with a face
+   * batch (face data). For reading and writing the vector use:
+   * FEEvaluationBase::read_face_data() and FEEvaluationBase::write_face_data().
+   */
+  template <typename T>
+  void
+  initialize_face_data_vector(AlignedVector<T> &vec) const;
+
+  /**
    * Initialize function for a general vector. The length of the vector is
    * equal to the total number of degrees in the DoFHandler. If the vector is
    * of class LinearAlgebra::distributed::Vector@<Number@>, the ghost entries
@@ -2201,6 +2219,29 @@ private:
 /*----------------------- Inline functions ----------------------------------*/
 
 #ifndef DOXYGEN
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename T>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::initialize_cell_data_vector(
+  AlignedVector<T> &vec) const
+{
+  vec.resize(this->n_cell_batches() + this->n_ghost_cell_batches());
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+template <typename T>
+inline void
+MatrixFree<dim, Number, VectorizedArrayType>::initialize_face_data_vector(
+  AlignedVector<T> &vec) const
+{
+  vec.resize(this->n_inner_face_batches() + this->n_boundary_face_batches() +
+             this->n_ghost_inner_face_batches());
+}
 
 
 
