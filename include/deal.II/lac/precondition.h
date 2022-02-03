@@ -62,10 +62,10 @@ namespace LinearAlgebra
 
 
 /**
- * This preconditioner implements the indentity operator.
+ * This preconditioner implements the identity operator.
  * This class can be used you if you want to use a linear
  * solver without preconditioning, because all linear solvers
- * require usage of a preconditioner.
+ * require the usage of a preconditioner.
  *
  * It can be used in the following way:
  *
