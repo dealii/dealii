@@ -1618,8 +1618,8 @@ namespace GridGenerator
    *
    * @f[
    *     r = r_{\mathrm{inner}} + (r_\mathrm{outer} - r_\mathrm{inner})
-   *     \frac{1 - \tanh(\mathrm{skewness}(1 - k/\mathrm{n\_shells}))}
-   *          {\tanh(\mathrm{skewness})}
+   *     \left(1 - \frac{ \tanh(\mathrm{skewness}(1 - k/\mathrm{n\_shells}))}
+   *          {\tanh(\mathrm{skewness})}\right)
    * @f]
    *
    * where @p skewness is a parameter controlling the shell spacing in the
