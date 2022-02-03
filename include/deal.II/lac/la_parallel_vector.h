@@ -1918,7 +1918,8 @@ namespace internal
       // void T::initialize_dof_vector(VectorType v)
       template <typename T>
       using initialize_dof_vector_t =
-        decltype(std::declval<T>().initialize_dof_vector());
+        decltype(std::declval<T>().initialize_dof_vector(
+          std::declval<LinearAlgebra::distributed::Vector<Number> &>()));
 
       template <typename T>
       static constexpr bool has_initialize_dof_vector =
