@@ -23,7 +23,6 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector_memory.h>
 
-// Ignore deprecation warnings for auto_ptr.
 #include <boost/signals2.hpp>
 
 DEAL_II_NAMESPACE_OPEN
