@@ -380,7 +380,7 @@ namespace Step81
     unsigned int refinements;
     unsigned int fe_order;
     unsigned int quadrature_order;
-    bool interface_bool;
+    bool absorbing_boundary;
 
     void parse_parameters_callback();
     void make_grid();
@@ -408,8 +408,9 @@ namespace Step81
   // @sect4{The Constructor}
   // The Constructor simply consists specifications for the mesh
   // and the order of the fnite elements. These are editable through
-  // the .prm file. The interface_bool can be modified to remove the
-  // interface and the standing wave.
+  // the .prm file. The absorbing_boundary boolean can be modified to
+  // remove the absorbing boundary conditions (in which case our boundary
+  // would be perfectly conducting).
 
   template <int dim>
   Maxwell<dim>::Maxwell()
@@ -435,10 +436,10 @@ namespace Step81
                   quadrature_order,
                   "order of the quadrature");
         
-    interface_bool = true;
-    add_parameter("interface boolean",
-                    interface_bool,
-                    "is there an interface?");
+    absorbing_boundary = true;
+    add_parameter("absorbing boundary condition",
+                    absorbing_boundary,
+                    "use absorbing boundary conditions?");
   }
 
 
@@ -459,13 +460,18 @@ namespace Step81
     GridGenerator::hyper_cube(triangulation, -scaling, scaling);
     triangulation.refine_global(refinements);
     
-    if (interface_bool){
+    if (!absorbing_boundary){
+        for (auto &face : triangulation.active_face_iterators())
+            if (face->at_boundary())
+                face->set_boundary_id(1);
+    };
+      
     for (auto &cell : triangulation.active_cell_iterators())
       if (cell->center()[1] > 0.)
         cell->set_material_id(1);
       else
         cell->set_material_id(2);
-    }
+    
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl;
@@ -555,7 +561,7 @@ namespace Step81
                                             update_quadrature_points |
                                             update_normal_vectors |
                                             update_JxW_values);
-
+    
     const unsigned int dofs_per_cell = fe->dofs_per_cell;
 
     const unsigned int n_q_points      = quadrature_formula.size();
@@ -568,20 +574,21 @@ namespace Step81
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
+        FEValuesViews::Vector<dim> real_part(fe_values, 0);
+        FEValuesViews::Vector<dim> imag_part(fe_values, dim);
+
         cell_matrix = 0.;
         cell_rhs    = 0.;
 
         cell->get_dof_indices(local_dof_indices);
+        const auto id = cell->material_id();
 
-        FEValuesViews::Vector<dim> real_part(fe_values, 0);
-        FEValuesViews::Vector<dim> imag_part(fe_values, dim);
         const auto &quadrature_points = fe_values.get_quadrature_points();
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
             const Point<dim, double> &position = quadrature_points[q_point];
             const auto                radius   = position.norm();
-            const auto                id       = cell->material_id();
             const auto inner_radius = perfectly_matched_layer.inner_radius;
 
             auto       mu_inv  = parameters.mu_inv(position, id);
@@ -629,21 +636,22 @@ namespace Step81
           {
             if (face->at_boundary())
               {
-                fe_face_values.reinit(cell, face);
-                FEValuesViews::Vector<dim> real_part(fe_face_values, 0);
-                FEValuesViews::Vector<dim> imag_part(fe_face_values, dim);
+                const auto id = face->boundary_id();
+                if (id !=0)
+                {
+                    fe_face_values.reinit(cell, face);
+                    FEValuesViews::Vector<dim> real_part(fe_face_values, 0);
+                    FEValuesViews::Vector<dim> imag_part(fe_face_values, dim);
 
-                for (unsigned int q_point = 0; q_point < n_face_q_points;
-                     ++q_point)
-                  {
-                    const Point<dim, double> position =
-                      quadrature_points[q_point];
-                    const auto radius = position.norm();
-                    const auto id     = cell->material_id();
-                    const auto inner_radius =
-                      perfectly_matched_layer.inner_radius;
+                    for (unsigned int q_point = 0; q_point < n_face_q_points;
+                         ++q_point)
+                      {
+                        const Point<dim, double> position =
+                          quadrature_points[q_point];
+                        const auto radius = position.norm();
+                        const auto inner_radius =
+                          perfectly_matched_layer.inner_radius;
 
-                    if (id == 0){
                         auto mu_inv  = parameters.mu_inv(position, id);
                         auto epsilon = parameters.epsilon(position, id);
 
@@ -682,9 +690,9 @@ namespace Step81
                                   scalar_product((sqrt_prod * phi_j_T), phi_i_T);
                                 cell_matrix(i, j) += temp.real();
                               } /* j */
-                          }     /* i */
-                        }
-                    }         /* q_point */
+                          }   /* i */
+                        }  /* q_point */
+                    }
               }
             else
               {
@@ -760,17 +768,17 @@ namespace Step81
     A_direct.vmult(solution, system_rhs);
   }
 
-  // The output is writted into a vtk file with 4 components
-  template <int dim>
-  void Maxwell<dim>::output_results()
-  {
+// The output is written into a vtk file with 4 components
+template <int dim>
+void Maxwell<dim>::output_results()
+{
     DataOut<2> data_out;
     data_out.attach_dof_handler(dof_handler);
-      data_out.add_data_vector(solution, {"real_Ex", "real_Ey", "imag_Ex", "imag_Ey"});
+    data_out.add_data_vector(solution, {"real_Ex", "real_Ey", "imag_Ex", "imag_Ey"});
     data_out.build_patches();
     std::ofstream output("solution.vtk");
     data_out.write_vtk(output);
-  }
+}
 
 
   template <int dim>
