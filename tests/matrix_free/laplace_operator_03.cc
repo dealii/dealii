@@ -15,8 +15,8 @@
 
 
 
-// the same as laplace_operator_01, but heterogeneous Laplace operator with a
-// single constant coefficient per cell
+// the same as laplace_operator_01 (excluding the extra detection tests), but
+// heterogeneous Laplace operator with a single constant coefficient per cell
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
