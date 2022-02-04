@@ -61,6 +61,11 @@ namespace internal
     {
     public:
       /**
+       * Default constructor.
+       */
+      MappingDataOnTheFly() = default;
+
+      /**
        * Constructor, similar to FEValues. Since this class only evaluates the
        * geometry, no finite element has to be specified and the simplest
        * element, FE_Nothing, is used internally for the underlying FEValues
@@ -116,6 +121,16 @@ namespace internal
       get_data_storage() const;
 
       /**
+       * Return a non-const reference to the underlying storage field
+       * of type MappingInfoStorage of the same format as the data fields
+       * in MappingInfo. This function can be used to manually fill the
+       * data if the default constructor has been called and reinit() was
+       * not called for a given cell.
+       */
+      MappingInfoStorage<dim, dim, Number> &
+      get_data_storage();
+
+      /**
        * Return a reference to 1D quadrature underlying this object.
        */
       const Quadrature<1> &
@@ -137,7 +152,7 @@ namespace internal
       /**
        * An underlying FEValues object that performs the (scalar) evaluation.
        */
-      dealii::FEValues<dim> fe_values;
+      std::unique_ptr<dealii::FEValues<dim>> fe_values;
 
       /**
        * Get 1D quadrature formula to be used for reinitializing shape info.
@@ -159,32 +174,33 @@ namespace internal
       const Mapping<dim> & mapping,
       const Quadrature<1> &quadrature,
       const UpdateFlags    update_flags)
-      : fe_values(mapping,
-                  fe_dummy,
-                  Quadrature<dim>(quadrature),
-                  MappingInfoStorage<dim, dim, Number>::compute_update_flags(
-                    update_flags))
+      : fe_values(std::make_unique<dealii::FEValues<dim>>(
+          mapping,
+          fe_dummy,
+          Quadrature<dim>(quadrature),
+          MappingInfoStorage<dim, dim, Number>::compute_update_flags(
+            update_flags)))
       , quadrature_1d(quadrature)
     {
       mapping_info_storage.descriptor.resize(1);
       mapping_info_storage.descriptor[0].initialize(quadrature);
       mapping_info_storage.data_index_offsets.resize(1);
-      mapping_info_storage.JxW_values.resize(fe_values.n_quadrature_points);
-      mapping_info_storage.jacobians[0].resize(fe_values.n_quadrature_points);
+      mapping_info_storage.JxW_values.resize(fe_values->n_quadrature_points);
+      mapping_info_storage.jacobians[0].resize(fe_values->n_quadrature_points);
       if ((update_flags & update_quadrature_points) != 0u)
         {
           mapping_info_storage.quadrature_point_offsets.resize(1, 0);
           mapping_info_storage.quadrature_points.resize(
-            fe_values.n_quadrature_points);
+            fe_values->n_quadrature_points);
         }
-      if (fe_values.get_update_flags() & update_normal_vectors)
+      if (fe_values->get_update_flags() & update_normal_vectors)
         {
           mapping_info_storage.normal_vectors.resize(
-            fe_values.n_quadrature_points);
+            fe_values->n_quadrature_points);
           mapping_info_storage.normals_times_jacobians[0].resize(
-            fe_values.n_quadrature_points);
+            fe_values->n_quadrature_points);
         }
-      Assert(!(fe_values.get_update_flags() & update_jacobian_grads),
+      Assert(!(fe_values->get_update_flags() & update_jacobian_grads),
              ExcNotImplemented());
     }
 
@@ -209,28 +225,28 @@ namespace internal
       if (present_cell == cell)
         return;
       present_cell = cell;
-      fe_values.reinit(present_cell);
-      for (unsigned int q = 0; q < fe_values.get_quadrature().size(); ++q)
+      fe_values->reinit(present_cell);
+      for (unsigned int q = 0; q < fe_values->get_quadrature().size(); ++q)
         {
-          if (fe_values.get_update_flags() & update_JxW_values)
-            mapping_info_storage.JxW_values[q] = fe_values.JxW(q);
-          if (fe_values.get_update_flags() & update_jacobians)
+          if (fe_values->get_update_flags() & update_JxW_values)
+            mapping_info_storage.JxW_values[q] = fe_values->JxW(q);
+          if (fe_values->get_update_flags() & update_jacobians)
             {
-              Tensor<2, dim> jac = fe_values.jacobian(q);
+              Tensor<2, dim> jac = fe_values->jacobian(q);
               jac                = invert(transpose(jac));
               for (unsigned int d = 0; d < dim; ++d)
                 for (unsigned int e = 0; e < dim; ++e)
                   mapping_info_storage.jacobians[0][q][d][e] = jac[d][e];
             }
-          if (fe_values.get_update_flags() & update_quadrature_points)
+          if (fe_values->get_update_flags() & update_quadrature_points)
             for (unsigned int d = 0; d < dim; ++d)
               mapping_info_storage.quadrature_points[q][d] =
-                fe_values.quadrature_point(q)[d];
-          if (fe_values.get_update_flags() & update_normal_vectors)
+                fe_values->quadrature_point(q)[d];
+          if (fe_values->get_update_flags() & update_normal_vectors)
             {
               for (unsigned int d = 0; d < dim; ++d)
                 mapping_info_storage.normal_vectors[q][d] =
-                  fe_values.normal_vector(q)[d];
+                  fe_values->normal_vector(q)[d];
               mapping_info_storage.normals_times_jacobians[0][q] =
                 mapping_info_storage.normal_vectors[q] *
                 mapping_info_storage.jacobians[0][q];
@@ -254,7 +270,7 @@ namespace internal
     inline typename dealii::Triangulation<dim>::cell_iterator
     MappingDataOnTheFly<dim, Number>::get_cell() const
     {
-      return fe_values.get_cell();
+      return fe_values->get_cell();
     }
 
 
@@ -263,7 +279,7 @@ namespace internal
     inline const dealii::FEValues<dim> &
     MappingDataOnTheFly<dim, Number>::get_fe_values() const
     {
-      return fe_values;
+      return *fe_values;
     }
 
 
@@ -271,6 +287,15 @@ namespace internal
     template <int dim, typename Number>
     inline const MappingInfoStorage<dim, dim, Number> &
     MappingDataOnTheFly<dim, Number>::get_data_storage() const
+    {
+      return mapping_info_storage;
+    }
+
+
+
+    template <int dim, typename Number>
+    inline MappingInfoStorage<dim, dim, Number> &
+    MappingDataOnTheFly<dim, Number>::get_data_storage()
     {
       return mapping_info_storage;
     }
