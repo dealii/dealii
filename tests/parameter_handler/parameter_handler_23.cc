@@ -30,7 +30,7 @@ log_entry(const ParameterHandler &       prm,
 {
   for (unsigned int i = 0; i < path.size(); ++i)
     {
-      deallog << path[i] << ".";
+      deallog << path[i] << '.';
     }
 
   deallog << entry << " = ";

@@ -49,7 +49,7 @@ check(TRIA &tr)
         }
       catch (...)
         {
-          deallog << ".";
+          deallog << '.';
         }
       deallog << std::endl;
     }

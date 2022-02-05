@@ -5516,7 +5516,7 @@ namespace DataOutBase
               << Utilities::System::get_time();
         }
       else
-        out << ".";
+        out << '.';
       out << '\n' << "ASCII" << '\n';
       // now output the data header
       out << "DATASET UNSTRUCTURED_GRID\n" << '\n';
@@ -5730,7 +5730,7 @@ namespace DataOutBase
             << Utilities::System::get_date();
       }
     else
-      out << ".";
+      out << '.';
     out << "\n-->\n";
     out << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\"";
 #ifdef DEAL_II_WITH_ZLIB

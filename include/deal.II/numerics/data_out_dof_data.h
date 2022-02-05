@@ -125,7 +125,7 @@ namespace Exceptions
                    int,
                    << "You have to give one name per component in your "
                    << "data vector. The number you gave was " << arg1
-                   << ", but the number of components is " << arg2 << ".");
+                   << ", but the number of components is " << arg2 << '.');
     /**
      * Exception
      */

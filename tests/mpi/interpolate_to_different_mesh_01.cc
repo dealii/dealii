@@ -84,7 +84,7 @@ output(DoFHandler<dim> & dh,
   data_out.add_data_vector(dh, v, "1");
   data_out.build_patches(1);
   std::ostringstream filename;
-  filename << filename_ << Utilities::int_to_string(loop, 2) << "."
+  filename << filename_ << Utilities::int_to_string(loop, 2) << '.'
            << Utilities::int_to_string(myid, 2) << ".vtu";
 
   std::ofstream output(filename.str().c_str());

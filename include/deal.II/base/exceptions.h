@@ -917,7 +917,7 @@ namespace StandardExceptions
   DeclException2(ExcDimensionMismatch,
                  std::size_t,
                  std::size_t,
-                 << "Dimension " << arg1 << " not equal to " << arg2 << ".");
+                 << "Dimension " << arg1 << " not equal to " << arg2 << '.');
 
   /**
    * The first dimension should be either equal to the second or the third,
@@ -928,7 +928,7 @@ namespace StandardExceptions
                  std::size_t,
                  std::size_t,
                  << "Dimension " << arg1 << " neither equal to " << arg2
-                 << " nor to " << arg3 << ".");
+                 << " nor to " << arg3 << '.');
 
   /**
    * This exception indicates that an index is not within the expected range.
@@ -993,7 +993,7 @@ namespace StandardExceptions
                  int,
                  int,
                  << "Number " << arg1 << " must be larger than or equal "
-                 << arg2 << ".");
+                 << arg2 << '.');
 
   /**
    * A generic exception definition for the ExcLowerRange above.
@@ -1003,7 +1003,7 @@ namespace StandardExceptions
                  T,
                  T,
                  << "Number " << arg1 << " must be larger than or equal "
-                 << arg2 << ".");
+                 << arg2 << '.');
 
   /**
    * This exception indicates that the first argument should be an integer

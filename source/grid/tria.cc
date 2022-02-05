@@ -981,7 +981,7 @@ namespace internal
                    int,
                    << "Error while creating cell " << arg1
                    << ": the vertex index " << arg2 << " must be between 0 and "
-                   << arg3 << ".");
+                   << arg3 << '.');
     /**
      * Exception
      * @ingroup Exceptions

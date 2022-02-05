@@ -1126,7 +1126,7 @@ inline void
 TriaRawIterator<Accessor>::print(StreamType &out) const
 {
   if (Accessor::structure_dimension == Accessor::dimension)
-    out << accessor.level() << "." << accessor.index();
+    out << accessor.level() << '.' << accessor.index();
   else
     out << accessor.index();
 }

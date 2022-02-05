@@ -327,7 +327,7 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
 
     deallog << "Convergence step " << std::get<0>(result_mf) << " value "
             << std::get<1>(result_mf) << " max " << std::get<2>(result_mf)
-            << " norm " << std::get<3>(result_mf) << "." << std::endl;
+            << " norm " << std::get<3>(result_mf) << '.' << std::endl;
   };
 
   compare(mf_algo(), mb_algo());

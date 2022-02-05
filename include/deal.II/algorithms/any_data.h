@@ -210,7 +210,7 @@ public:
                  int,
                  std::string,
                  << "Name at position " << arg1 << " is not equal to " << arg2
-                 << ".");
+                 << '.');
 
 private:
   /// The stored data

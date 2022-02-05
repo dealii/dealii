@@ -546,7 +546,7 @@ public:
                  << arg1 << "] is distorted. The cell geometry or the "
                  << "mapping are invalid, giving a non-positive volume "
                  << "fraction of " << arg2 << " in quadrature point " << arg3
-                 << ".");
+                 << '.');
 
   /**
    * @}

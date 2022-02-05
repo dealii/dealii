@@ -1314,7 +1314,7 @@ namespace FETools
                  int,
                  << "The dimension " << arg1
                  << " in the finite element string must match "
-                 << "the space dimension " << arg2 << ".");
+                 << "the space dimension " << arg2 << '.');
 
   /**
    * Exception

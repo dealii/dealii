@@ -655,7 +655,7 @@ namespace Utilities
                      types::global_dof_index,
                      unsigned int,
                      << "Global index " << arg1
-                     << " neither owned nor ghost on proc " << arg2 << ".");
+                     << " neither owned nor ghost on proc " << arg2 << '.');
 
       /**
        * Exception

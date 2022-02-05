@@ -71,7 +71,7 @@ check_constant(const std::vector<Polynomial<double>> &p)
         {
           value += p[i].value(x);
         }
-      deallog << ".";
+      deallog << '.';
       if (std::fabs(1. - value) > 1e-13)
         deallog << "Error1  lg y=" << std::log10(std::fabs(1. - value))
                 << std::endl;

@@ -417,7 +417,7 @@ namespace StandardExceptions
           << std::endl;
       }
     out << "The numerical value of the original error code is " << error_code
-        << "." << std::endl;
+        << '.' << std::endl;
   }
 #endif // DEAL_II_WITH_MPI
 

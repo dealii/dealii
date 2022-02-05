@@ -51,7 +51,7 @@ namespace Functions
                  << "The input interpolation points are not strictly ordered : "
                  << std::endl
                  << "x[" << arg1 << "] = " << arg2 << " >= x[" << (arg1 + 1)
-                 << "] = " << arg3 << ".");
+                 << "] = " << arg3 << '.');
 
   DeclException3(
     ExcCSplineRange,

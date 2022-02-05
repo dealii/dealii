@@ -298,7 +298,7 @@ test(const unsigned int v, const unsigned int degree, const bool do_helmholtz)
               << " : ";
 
     deallog << "Convergence step " << result_mf.first << " value "
-            << result_mf.second << "." << std::endl;
+            << result_mf.second << '.' << std::endl;
   };
 
   compare(mf_algo(), mb_algo());

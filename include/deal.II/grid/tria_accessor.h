@@ -268,7 +268,7 @@ namespace TriaAccessorExceptions
     ExcSetOnlyEvenChildren,
     int,
     << "You can only set the child index of an even numbered child."
-    << "The number of the child given was " << arg1 << ".");
+    << "The number of the child given was " << arg1 << '.');
 } // namespace TriaAccessorExceptions
 
 

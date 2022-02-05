@@ -3457,7 +3457,7 @@ namespace GridTools
   DeclException1(ExcScalingFactorNotPositive,
                  double,
                  << "The scaling factor must be positive, but it is " << arg1
-                 << ".");
+                 << '.');
 
   /**
    * Exception
