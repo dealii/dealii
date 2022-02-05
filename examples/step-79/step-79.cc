@@ -1971,49 +1971,49 @@ namespace SAND
               {
                 /* Write one side at z = 0. */
                 stlfile << "   facet normal " << 0.000000e+00 << " "
-                        << 0.000000e+00 << " " << -1.000000e+00 << "\n";
+                        << 0.000000e+00 << " " << -1.000000e+00 << '\n';
                 stlfile << "      outer loop\n";
                 stlfile << "         vertex " << cell->vertex(0)[0] << " "
-                        << cell->vertex(0)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(0)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "         vertex " << cell->vertex(2)[0] << " "
-                        << cell->vertex(2)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(2)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "         vertex " << cell->vertex(1)[0] << " "
-                        << cell->vertex(1)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(1)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "      endloop\n";
                 stlfile << "   endfacet\n";
                 stlfile << "   facet normal " << 0.000000e+00 << " "
-                        << 0.000000e+00 << " " << -1.000000e+00 << "\n";
+                        << 0.000000e+00 << " " << -1.000000e+00 << '\n';
                 stlfile << "      outer loop\n";
                 stlfile << "         vertex " << cell->vertex(1)[0] << " "
-                        << cell->vertex(1)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(1)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "         vertex " << cell->vertex(2)[0] << " "
-                        << cell->vertex(2)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(2)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "         vertex " << cell->vertex(3)[0] << " "
-                        << cell->vertex(3)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(3)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "      endloop\n";
                 stlfile << "   endfacet\n";
 
                 /* Write one side at z = height. */
                 stlfile << "   facet normal " << 0.000000e+00 << " "
-                        << 0.000000e+00 << " " << 1.000000e+00 << "\n";
+                        << 0.000000e+00 << " " << 1.000000e+00 << '\n';
                 stlfile << "      outer loop\n";
                 stlfile << "         vertex " << cell->vertex(0)[0] << " "
-                        << cell->vertex(0)[1] << " " << height << "\n";
+                        << cell->vertex(0)[1] << " " << height << '\n';
                 stlfile << "         vertex " << cell->vertex(1)[0] << " "
-                        << cell->vertex(1)[1] << " " << height << "\n";
+                        << cell->vertex(1)[1] << " " << height << '\n';
                 stlfile << "         vertex " << cell->vertex(2)[0] << " "
-                        << cell->vertex(2)[1] << " " << height << "\n";
+                        << cell->vertex(2)[1] << " " << height << '\n';
                 stlfile << "      endloop\n";
                 stlfile << "   endfacet\n";
                 stlfile << "   facet normal " << 0.000000e+00 << " "
-                        << 0.000000e+00 << " " << 1.000000e+00 << "\n";
+                        << 0.000000e+00 << " " << 1.000000e+00 << '\n';
                 stlfile << "      outer loop\n";
                 stlfile << "         vertex " << cell->vertex(1)[0] << " "
-                        << cell->vertex(1)[1] << " " << height << "\n";
+                        << cell->vertex(1)[1] << " " << height << '\n';
                 stlfile << "         vertex " << cell->vertex(3)[0] << " "
-                        << cell->vertex(3)[1] << " " << height << "\n";
+                        << cell->vertex(3)[1] << " " << height << '\n';
                 stlfile << "         vertex " << cell->vertex(2)[0] << " "
-                        << cell->vertex(2)[1] << " " << height << "\n";
+                        << cell->vertex(2)[1] << " " << height << '\n';
                 stlfile << "      endloop\n";
                 stlfile << "   endfacet\n";
               }
@@ -2021,49 +2021,49 @@ namespace SAND
               {
                 /* Write one side at z = 0. */
                 stlfile << "   facet normal " << 0.000000e+00 << " "
-                        << 0.000000e+00 << " " << -1.000000e+00 << "\n";
+                        << 0.000000e+00 << " " << -1.000000e+00 << '\n';
                 stlfile << "      outer loop\n";
                 stlfile << "         vertex " << cell->vertex(0)[0] << " "
-                        << cell->vertex(0)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(0)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "         vertex " << cell->vertex(1)[0] << " "
-                        << cell->vertex(1)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(1)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "         vertex " << cell->vertex(2)[0] << " "
-                        << cell->vertex(2)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(2)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "      endloop\n";
                 stlfile << "   endfacet\n";
                 stlfile << "   facet normal " << 0.000000e+00 << " "
-                        << 0.000000e+00 << " " << -1.000000e+00 << "\n";
+                        << 0.000000e+00 << " " << -1.000000e+00 << '\n';
                 stlfile << "      outer loop\n";
                 stlfile << "         vertex " << cell->vertex(1)[0] << " "
-                        << cell->vertex(1)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(1)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "         vertex " << cell->vertex(3)[0] << " "
-                        << cell->vertex(3)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(3)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "         vertex " << cell->vertex(2)[0] << " "
-                        << cell->vertex(2)[1] << " " << 0.000000e+00 << "\n";
+                        << cell->vertex(2)[1] << " " << 0.000000e+00 << '\n';
                 stlfile << "      endloop\n";
                 stlfile << "   endfacet\n";
 
                 /* Write one side at z = height. */
                 stlfile << "   facet normal " << 0.000000e+00 << " "
-                        << 0.000000e+00 << " " << 1.000000e+00 << "\n";
+                        << 0.000000e+00 << " " << 1.000000e+00 << '\n';
                 stlfile << "      outer loop\n";
                 stlfile << "         vertex " << cell->vertex(0)[0] << " "
-                        << cell->vertex(0)[1] << " " << height << "\n";
+                        << cell->vertex(0)[1] << " " << height << '\n';
                 stlfile << "         vertex " << cell->vertex(2)[0] << " "
-                        << cell->vertex(2)[1] << " " << height << "\n";
+                        << cell->vertex(2)[1] << " " << height << '\n';
                 stlfile << "         vertex " << cell->vertex(1)[0] << " "
-                        << cell->vertex(1)[1] << " " << height << "\n";
+                        << cell->vertex(1)[1] << " " << height << '\n';
                 stlfile << "      endloop\n";
                 stlfile << "   endfacet\n";
                 stlfile << "   facet normal " << 0.000000e+00 << " "
-                        << 0.000000e+00 << " " << 1.000000e+00 << "\n";
+                        << 0.000000e+00 << " " << 1.000000e+00 << '\n';
                 stlfile << "      outer loop\n";
                 stlfile << "         vertex " << cell->vertex(1)[0] << " "
-                        << cell->vertex(1)[1] << " " << height << "\n";
+                        << cell->vertex(1)[1] << " " << height << '\n';
                 stlfile << "         vertex " << cell->vertex(2)[0] << " "
-                        << cell->vertex(2)[1] << " " << height << "\n";
+                        << cell->vertex(2)[1] << " " << height << '\n';
                 stlfile << "         vertex " << cell->vertex(3)[0] << " "
-                        << cell->vertex(3)[1] << " " << height << "\n";
+                        << cell->vertex(3)[1] << " " << height << '\n';
                 stlfile << "      endloop\n";
                 stlfile << "   endfacet\n";
               }
@@ -2110,33 +2110,33 @@ namespace SAND
                         stlfile << "   facet normal "
                                 << normal_vector[0] / normal_norm << " "
                                 << normal_vector[1] / normal_norm << " "
-                                << 0.000000e+00 << "\n";
+                                << 0.000000e+00 << '\n';
                         stlfile << "      outer loop\n";
                         stlfile << "         vertex " << face->vertex(0)[0]
                                 << " " << face->vertex(0)[1] << " "
-                                << 0.000000e+00 << "\n";
+                                << 0.000000e+00 << '\n';
                         stlfile << "         vertex " << face->vertex(0)[0]
                                 << " " << face->vertex(0)[1] << " " << height
-                                << "\n";
+                                << '\n';
                         stlfile << "         vertex " << face->vertex(1)[0]
                                 << " " << face->vertex(1)[1] << " "
-                                << 0.000000e+00 << "\n";
+                                << 0.000000e+00 << '\n';
                         stlfile << "      endloop\n";
                         stlfile << "   endfacet\n";
                         stlfile << "   facet normal "
                                 << normal_vector[0] / normal_norm << " "
                                 << normal_vector[1] / normal_norm << " "
-                                << 0.000000e+00 << "\n";
+                                << 0.000000e+00 << '\n';
                         stlfile << "      outer loop\n";
                         stlfile << "         vertex " << face->vertex(0)[0]
                                 << " " << face->vertex(0)[1] << " " << height
-                                << "\n";
+                                << '\n';
                         stlfile << "         vertex " << face->vertex(1)[0]
                                 << " " << face->vertex(1)[1] << " " << height
-                                << "\n";
+                                << '\n';
                         stlfile << "         vertex " << face->vertex(1)[0]
                                 << " " << face->vertex(1)[1] << " "
-                                << 0.000000e+00 << "\n";
+                                << 0.000000e+00 << '\n';
                         stlfile << "      endloop\n";
                         stlfile << "   endfacet\n";
                       }
@@ -2145,33 +2145,33 @@ namespace SAND
                         stlfile << "   facet normal "
                                 << normal_vector[0] / normal_norm << " "
                                 << normal_vector[1] / normal_norm << " "
-                                << 0.000000e+00 << "\n";
+                                << 0.000000e+00 << '\n';
                         stlfile << "      outer loop\n";
                         stlfile << "         vertex " << face->vertex(0)[0]
                                 << " " << face->vertex(0)[1] << " "
-                                << 0.000000e+00 << "\n";
+                                << 0.000000e+00 << '\n';
                         stlfile << "         vertex " << face->vertex(1)[0]
                                 << " " << face->vertex(1)[1] << " "
-                                << 0.000000e+00 << "\n";
+                                << 0.000000e+00 << '\n';
                         stlfile << "         vertex " << face->vertex(0)[0]
                                 << " " << face->vertex(0)[1] << " " << height
-                                << "\n";
+                                << '\n';
                         stlfile << "      endloop\n";
                         stlfile << "   endfacet\n";
                         stlfile << "   facet normal "
                                 << normal_vector[0] / normal_norm << " "
                                 << normal_vector[1] / normal_norm << " "
-                                << 0.000000e+00 << "\n";
+                                << 0.000000e+00 << '\n';
                         stlfile << "      outer loop\n";
                         stlfile << "         vertex " << face->vertex(0)[0]
                                 << " " << face->vertex(0)[1] << " " << height
-                                << "\n";
+                                << '\n';
                         stlfile << "         vertex " << face->vertex(1)[0]
                                 << " " << face->vertex(1)[1] << " "
-                                << 0.000000e+00 << "\n";
+                                << 0.000000e+00 << '\n';
                         stlfile << "         vertex " << face->vertex(1)[0]
                                 << " " << face->vertex(1)[1] << " " << height
-                                << "\n";
+                                << '\n';
                         stlfile << "      endloop\n";
                         stlfile << "   endfacet\n";
                       }

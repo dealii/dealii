@@ -3003,8 +3003,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
       << "\n#"
       << "\n# Note: This file is understood by MathGL v2.1 and higher only, and can "
       << "\n#       be quickly viewed in a graphical environment using \'mglview\'. "
-      << "\n#"
-      << "\n";
+      << "\n#" << '\n';
   }
 
   // define a helper to keep loops approximately dim-independent
@@ -3014,8 +3013,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
   // (ii) write preamble and graphing tweaks
   out << "\n#"
       << "\n#   Preamble."
-      << "\n#"
-      << "\n";
+      << "\n#" << '\n';
 
   if (mathgl_flags.draw_bounding_box)
     out << "\nbox";
@@ -3035,14 +3033,13 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
       default:
         Assert(false, ExcNotImplemented());
     }
-  out << "\n";
+  out << '\n';
 
   // (iii) write vertex ordering
   out << "\n#"
       << "\n#   Vertex ordering."
       << "\n#   list <vertex order> <vertex indices>"
-      << "\n#"
-      << "\n";
+      << "\n#" << '\n';
 
   // todo: This denotes the natural ordering of vertices, but it needs
   // to check this is really always true for a given grid (it's not
@@ -3050,13 +3047,12 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
   switch (dim)
     {
       case 2:
-        out << "\nlist f 0 1 2 3"
-            << "\n";
+        out << "\nlist f 0 1 2 3" << '\n';
         break;
       case 3:
         out
           << "\nlist f 0 2 4 6 | 1 3 5 7 | 0 4 1 5 | 2 6 3 7 | 0 1 2 3 | 4 5 6 7"
-          << "\n";
+          << '\n';
         break;
       default:
         Assert(false, ExcNotImplemented());
@@ -3066,8 +3062,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
   out << "\n#"
       << "\n#   List of vertices."
       << "\n#   list <id> <vertices>"
-      << "\n#"
-      << "\n";
+      << "\n#" << '\n';
 
   // run over all active cells and write out a list of
   // xyz-coordinates that correspond to vertices
@@ -3092,8 +3087,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
   out << "\n#"
       << "\n#   List of cells to quadplot."
       << "\n#   quadplot <vertex order> <id> <style>"
-      << "\n#"
-      << "\n";
+      << "\n#" << '\n';
   for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
     {
       out << "\nquadplot f ";
@@ -3101,13 +3095,12 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
         out << axes[j] << i << " ";
       out << "\'k#\'";
     }
-  out << "\n";
+  out << '\n';
 
   // (vi) write footer
   out << "\n#"
       << "\n#"
-      << "\n#"
-      << "\n";
+      << "\n#" << '\n';
 
   // make sure everything now gets to the output stream
   out.flush();

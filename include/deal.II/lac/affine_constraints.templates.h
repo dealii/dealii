@@ -1242,11 +1242,11 @@ AffineConstraints<number>::print(std::ostream &out) const
         {
           for (const std::pair<size_type, number> &entry : line.entries)
             out << "    " << line.index << " " << entry.first << ":  "
-                << entry.second << "\n";
+                << entry.second << '\n';
 
           // print out inhomogeneity.
           if (line.inhomogeneity != number(0.))
-            out << "    " << line.index << ": " << line.inhomogeneity << "\n";
+            out << "    " << line.index << ": " << line.inhomogeneity << '\n';
         }
       else
         // but also output something if the constraint simply reads
@@ -1254,7 +1254,7 @@ AffineConstraints<number>::print(std::ostream &out) const
         // combination of other dofs
         {
           if (line.inhomogeneity != number(0.))
-            out << "    " << line.index << " = " << line.inhomogeneity << "\n";
+            out << "    " << line.index << " = " << line.inhomogeneity << '\n';
           else
             out << "    " << line.index << " = 0\n";
         }
@@ -1276,9 +1276,9 @@ AffineConstraints<number>::write_dot(std::ostream &out) const
       if (lines[i].entries.size() > 0)
         for (size_type j = 0; j < lines[i].entries.size(); ++j)
           out << "  " << lines[i].index << "->" << lines[i].entries[j].first
-              << "; // weight: " << lines[i].entries[j].second << "\n";
+              << "; // weight: " << lines[i].entries[j].second << '\n';
       else
-        out << "  " << lines[i].index << "\n";
+        out << "  " << lines[i].index << '\n';
     }
   out << "}" << std::endl;
 }
