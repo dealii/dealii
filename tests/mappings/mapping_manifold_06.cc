@@ -91,7 +91,7 @@ test()
           }
       }
 
-  out << "e" << std::endl
+  out << 'e' << std::endl
       << std::endl
       << std::endl
       << "set terminal aqua " << 2 * (dim + spacedim) + 1 << std::endl
@@ -116,7 +116,7 @@ test()
               fe_v.get_normal_vectors();
             for (unsigned int i = 0; i < qps.size(); ++i)
               {
-                out << qps[i] << " " << nps[i] << std::endl;
+                out << qps[i] << ' ' << nps[i] << std::endl;
                 if (std::abs((center + nps[i] - qps[i]).norm()) > 1e-10)
                   out << "# Error! The normal vector should be radial! "
                       << std::endl
@@ -126,7 +126,7 @@ test()
             out << std::endl;
           }
       }
-  out << "e" << std::endl << std::endl;
+  out << 'e' << std::endl << std::endl;
 }
 
 

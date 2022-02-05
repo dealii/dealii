@@ -88,7 +88,7 @@ main(int argc, char **argv)
   ode.output_step = [&](const double       t,
                         const VectorType & sol,
                         const unsigned int step_number) -> int {
-    deallog << t << " " << sol[0] << " " << sol[1] << std::endl;
+    deallog << t << ' ' << sol[0] << ' ' << sol[1] << std::endl;
     return 0;
   };
 

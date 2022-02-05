@@ -110,9 +110,9 @@ check_solve(SolverType &              solver,
   deallog << "Eigenvalues:";
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      deallog << " " << v[i];
+      deallog << ' ' << v[i];
       if (i != (v.size() - 1))
-        deallog << ",";
+        deallog << ',';
     }
   deallog << std::endl << std::endl;
 }

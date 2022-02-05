@@ -2369,7 +2369,7 @@ public:
   DeclException2(ExcWrongInterfaceMatrixSize,
                  int,
                  int,
-                 << "The interface matrix has a size of " << arg1 << "x" << arg2
+                 << "The interface matrix has a size of " << arg1 << 'x' << arg2
                  << ", which is not reasonable for the current element "
                     "in the present dimension.");
   /**

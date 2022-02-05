@@ -48,11 +48,11 @@ check(const unsigned int testcase)
   switch (testcase)
     {
       case 1:
-        deallog << "Pinched cell in " << dim << "d" << std::endl;
+        deallog << "Pinched cell in " << dim << 'd' << std::endl;
         vertices[0] = vertices[1];
         break;
       case 2:
-        deallog << "Twisted cell in " << dim << "d" << std::endl;
+        deallog << "Twisted cell in " << dim << 'd' << std::endl;
         std::swap(vertices[0], vertices[1]);
         break;
       default:

@@ -114,7 +114,7 @@ public:
                                    const VectorType & sol,
                                    const VectorType & sol_dot,
                                    const unsigned int step_number) -> int {
-      out << t << " " << sol[0] << " " << sol[1] << " " << sol_dot[0] << " "
+      out << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol_dot[0] << ' '
           << sol_dot[1] << std::endl;
       return 0;
     };

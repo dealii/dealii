@@ -31,8 +31,8 @@ test(const Quadrature<1> &q_outer, const Quadrature<1> &q_inner)
 
   for (unsigned int q = 0; q < quad.size(); ++q)
     {
-      deallog << quad.point(q) << " ";
-      deallog << quad.weight(q) << " ";
+      deallog << quad.point(q) << ' ';
+      deallog << quad.weight(q) << ' ';
       deallog << std::endl;
     }
   deallog << std::endl;

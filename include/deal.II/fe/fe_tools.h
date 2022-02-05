@@ -1364,8 +1364,8 @@ namespace FETools
                  int,
                  int,
                  int,
-                 << "This is a " << arg1 << "x" << arg2 << " matrix, "
-                 << "but should be a " << arg3 << "x" << arg4 << " matrix.");
+                 << "This is a " << arg1 << 'x' << arg2 << " matrix, "
+                 << "but should be a " << arg3 << 'x' << arg4 << " matrix.");
 
   /**
    * Exception thrown if an embedding matrix was computed inaccurately.

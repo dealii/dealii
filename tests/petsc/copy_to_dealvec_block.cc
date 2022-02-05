@@ -84,8 +84,8 @@ test()
   // check local values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      deallog << myid * 2 << ":" << copied(myid * 2) << std::endl;
-      deallog << myid * 2 + 1 << ":" << copied(myid * 2 + 1) << std::endl;
+      deallog << myid * 2 << ':' << copied(myid * 2) << std::endl;
+      deallog << myid * 2 + 1 << ':' << copied(myid * 2 + 1) << std::endl;
     }
 
   for (unsigned int bl = 0; bl < 2; ++bl)
@@ -106,8 +106,8 @@ test()
   // check local values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      deallog << myid * 2 << ":" << copied(myid * 2) << std::endl;
-      deallog << myid * 2 + 1 << ":" << copied(myid * 2 + 1) << std::endl;
+      deallog << myid * 2 << ':' << copied(myid * 2) << std::endl;
+      deallog << myid * 2 + 1 << ':' << copied(myid * 2 + 1) << std::endl;
     }
 
   for (unsigned int bl = 0; bl < 2; ++bl)

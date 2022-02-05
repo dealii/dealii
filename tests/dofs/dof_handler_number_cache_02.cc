@@ -106,11 +106,11 @@ test()
 
       dof_handler.clear();
       deallog << "those should be zero: " << dof_handler.n_locally_owned_dofs()
-              << " "
+              << ' '
               << Utilities::MPI::all_gather(MPI_COMM_SELF,
                                             dof_handler.n_locally_owned_dofs())
                    .size()
-              << " " << dof_handler.n_dofs() << std::endl;
+              << ' ' << dof_handler.n_dofs() << std::endl;
     }
 }
 

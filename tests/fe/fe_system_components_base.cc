@@ -106,10 +106,10 @@ test(const bool renumber = false)
         << "plot '-' using 1:2 with lines notitle, '-' with labels point pt 2 offset 0.5,0.5 notitle"
         << std::endl;
       GridOut().write_gnuplot(triangulation, f);
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
 
       DoFTools::write_gnuplot_dof_support_point_info(f, support_points);
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
     }
 }
 

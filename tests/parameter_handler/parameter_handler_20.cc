@@ -39,7 +39,7 @@ check(const char *content)
       foo.parse_input(ss);
       deallog << "input: ";
       foo.enter_subsection("bar");
-      deallog << foo.get_double("val") << " ";
+      deallog << foo.get_double("val") << ' ';
       foo.leave_subsection();
       deallog << foo.get_double("val2") << std::endl;
     }

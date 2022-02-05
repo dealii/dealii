@@ -104,10 +104,10 @@ test<2>()
                                                  Vector<double>(dim));
             fe_face_values.get_function_values(vector_0, values_0);
 
-            deallog << "face_no=" << face_no << ":" << std::endl;
+            deallog << "face_no=" << face_no << ':' << std::endl;
 
             for (unsigned int q = 0; q < values_0.size(); ++q)
-              deallog << values_0[q][0] << " " << values_0[q][1] << " "
+              deallog << values_0[q][0] << ' ' << values_0[q][1] << ' '
                       << std::endl;
 
             deallog << std::endl;
@@ -158,11 +158,11 @@ test<3>()
                                                  Vector<double>(dim));
             fe_face_values.get_function_values(vector_0, values_0);
 
-            deallog << "face_no=" << face_no << ":" << std::endl;
+            deallog << "face_no=" << face_no << ':' << std::endl;
 
             for (unsigned int q = 0; q < values_0.size(); ++q)
-              deallog << values_0[q][0] << " " << values_0[q][1] << " "
-                      << " " << values_0[q][2] << " " << std::endl;
+              deallog << values_0[q][0] << ' ' << values_0[q][1] << ' ' << ' '
+                      << values_0[q][2] << ' ' << std::endl;
 
             deallog << std::endl;
           }

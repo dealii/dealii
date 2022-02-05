@@ -1663,9 +1663,9 @@ namespace Step28
             ++iteration;
           }
         while ((error > parameters.convergence_tolerance) && (iteration < 500));
-        convergence_table_stream << cycle << " " << energy_groups[0]->n_dofs()
-                                 << " " << energy_groups[1]->n_dofs() << " "
-                                 << k_eff << " "
+        convergence_table_stream << cycle << ' ' << energy_groups[0]->n_dofs()
+                                 << ' ' << energy_groups[1]->n_dofs() << ' '
+                                 << k_eff << ' '
                                  << energy_groups[0]->solution.linfty_norm() /
                                       energy_groups[1]->solution.linfty_norm()
                                  << '\n';

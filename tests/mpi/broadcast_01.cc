@@ -42,7 +42,7 @@ std::ostream &
 operator<<(std::ostream &os, const TestObject &test_object)
 {
   for (const auto &i : test_object.int_vector)
-    os << i << " ";
+    os << i << ' ';
 
   os << test_object.string;
 
@@ -64,7 +64,7 @@ check(const std::vector<int> &int_vector, const std::string &string)
 
   const auto result = Utilities::MPI::broadcast(MPI_COMM_WORLD, test_object);
 
-  deallog << result << " ";
+  deallog << result << ' ';
   deallog << std::endl;
 }
 

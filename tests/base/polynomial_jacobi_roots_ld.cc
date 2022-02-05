@@ -35,7 +35,7 @@ main()
     for (unsigned int degree = 1; degree < 40; degree += 3)
       {
         const int beta = alpha;
-        deallog << "Jacobi_" << degree << "^(" << alpha << "," << beta << ")"
+        deallog << "Jacobi_" << degree << "^(" << alpha << ',' << beta << ')'
                 << std::endl;
 
         std::vector<long double> roots =

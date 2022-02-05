@@ -78,7 +78,7 @@ plot_faces(Mapping<dim> &                           mapping,
       // now print some data on the shape
       // functions
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-        deallog << "shape_function " << i << ":" << std::endl
+        deallog << "shape_function " << i << ':' << std::endl
                 << "  phi=" << fe_values.shape_value(i, 0) << std::endl
                 << "  grad phi=" << fe_values.shape_grad(i, 0) << std::endl
                 << "  grad^2 phi=" << fe_values.shape_hessian(i, 0)
@@ -124,7 +124,7 @@ plot_subfaces(Mapping<dim> &                           mapping,
         // now print some data on the shape
         // functions
         for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-          deallog << "shape_function " << i << ":" << std::endl
+          deallog << "shape_function " << i << ':' << std::endl
                   << "  phi=" << fe_values.shape_value(i, 0) << std::endl
                   << "  grad phi=" << fe_values.shape_grad(i, 0) << std::endl
                   << "  grad^2 phi=" << fe_values.shape_hessian(i, 0)

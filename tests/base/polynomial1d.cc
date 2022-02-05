@@ -169,14 +169,12 @@ main()
 
   for (unsigned int i = 0; i < p.size(); ++i)
     {
-      deallog << "N0(P" << i << ")"
-              << " = " << p[i].value(0.) << std::endl;
+      deallog << "N0(P" << i << ')' << " = " << p[i].value(0.) << std::endl;
     }
 
   for (unsigned int i = 0; i < p.size(); ++i)
     {
-      deallog << "N1(P" << i << ")"
-              << " = " << p[i].value(1.) << std::endl;
+      deallog << "N1(P" << i << ')' << " = " << p[i].value(1.) << std::endl;
     }
 
   std::vector<double> values(p.size());
@@ -190,8 +188,8 @@ main()
       for (unsigned int i = 0; i < p.size(); ++i)
         {
           p[i].value(.5, values);
-          deallog << "N" << j << "(P" << i << ")"
-                  << " = " << values[j] * factor << std::endl;
+          deallog << 'N' << j << "(P" << i << ')' << " = " << values[j] * factor
+                  << std::endl;
         }
     }
 }

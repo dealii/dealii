@@ -55,7 +55,7 @@ do_test(MPI_Comm communicator)
   typename VectorMemory<VectorType>::Pointer v3(memory);
   *v3 = v1;
 
-  deallog << v1.l2_norm() << " " << v3->l2_norm() << std::endl;
+  deallog << v1.l2_norm() << ' ' << v3->l2_norm() << std::endl;
 }
 
 

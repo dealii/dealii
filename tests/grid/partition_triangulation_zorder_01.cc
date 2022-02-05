@@ -36,7 +36,7 @@ test(const int n_refinements, const int n_partitions, const bool blocked)
   GridTools::partition_triangulation_zorder(n_partitions, tria, blocked);
 
   for (const auto &cell : tria.active_cell_iterators())
-    deallog << cell->subdomain_id() << " ";
+    deallog << cell->subdomain_id() << ' ';
   deallog << std::endl;
 }
 

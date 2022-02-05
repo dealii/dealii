@@ -884,7 +884,7 @@ namespace StandardExceptions
                  int,
                  int,
                  << "You are trying to execute functionality that is "
-                 << "impossible in dimensions <" << arg1 << "," << arg2
+                 << "impossible in dimensions <" << arg1 << ',' << arg2
                  << "> or simply does not make any sense.");
 
 
@@ -947,7 +947,7 @@ namespace StandardExceptions
     std::size_t,
     std::size_t,
     std::size_t,
-    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
+    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ','
     << arg3 << ")."
     << (arg2 == arg3 ?
           " In the current case, this half-open range is in fact empty, "
@@ -977,7 +977,7 @@ namespace StandardExceptions
     T,
     T,
     T,
-    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
+    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ','
     << arg3 << ")."
     << (arg2 == arg3 ?
           " In the current case, this half-open range is in fact empty, "

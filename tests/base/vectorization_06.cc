@@ -110,7 +110,7 @@ test()
   if (n_errors > 0)
     {
       for (unsigned int i = 0; i < vec.size(); ++i)
-        deallog << vec[i] << " ";
+        deallog << vec[i] << ' ';
       deallog << std::endl;
     }
 }

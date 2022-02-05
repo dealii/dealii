@@ -69,7 +69,7 @@ test()
 
           for (const auto &p : hp_fe_face_values.get_present_fe_values()
                                  .get_quadrature_points())
-            deallog << p << " ";
+            deallog << p << ' ';
           deallog << std::endl;
         }
       deallog << std::endl;
@@ -83,7 +83,7 @@ test()
 
           for (const auto &p : hp_fe_face_values.get_present_fe_values()
                                  .get_quadrature_points())
-            deallog << p << " ";
+            deallog << p << ' ';
           deallog << std::endl;
         }
       deallog << std::endl;
@@ -97,7 +97,7 @@ test()
 
           for (const auto &p : hp_fe_face_values.get_present_fe_values()
                                  .get_quadrature_points())
-            deallog << p << " ";
+            deallog << p << ' ';
           deallog << std::endl;
         }
       deallog << std::endl;
@@ -111,7 +111,7 @@ test()
 
           for (const auto &p : hp_fe_face_values.get_present_fe_values()
                                  .get_quadrature_points())
-            deallog << p << " ";
+            deallog << p << ' ';
           deallog << std::endl;
         }
       deallog << std::endl;

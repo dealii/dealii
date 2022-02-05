@@ -70,7 +70,7 @@ test()
     {
       // both maps should contain the same
       Assert(hp_map[i] == map[i], ExcInternalError());
-      deallog << hp_map[i] << " ";
+      deallog << hp_map[i] << ' ';
     }
   deallog << std::endl;
 }

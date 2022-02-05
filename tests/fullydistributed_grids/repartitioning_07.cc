@@ -76,7 +76,7 @@ test(const MPI_Comm comm)
   parallel::fullydistributed::Triangulation<dim> tria_pft(comm);
   tria_pft.create_triangulation(construction_data);
 
-  deallog << tria.n_locally_owned_active_cells() << " "
+  deallog << tria.n_locally_owned_active_cells() << ' '
           << tria_pft.n_locally_owned_active_cells() << std::endl;
 }
 

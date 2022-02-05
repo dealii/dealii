@@ -47,7 +47,7 @@ test(const unsigned int size)
   M.compute_cholesky_factorization();
   const double rcond = M.reciprocal_condition_number(la_l1);
 
-  deallog << 1. / (l1 * inv_l1) << " " << rcond << std::endl;
+  deallog << 1. / (l1 * inv_l1) << ' ' << rcond << std::endl;
 }
 
 

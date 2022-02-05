@@ -286,8 +286,8 @@ test(const unsigned int v, const unsigned int degree, const bool do_helmholtz)
     Assert(std::abs(result_mf.second - result_mb.second) < 1e-8,
            ExcNotImplemented());
 
-    deallog << "dim=" << dim << " ";
-    deallog << "degree=" << degree << " ";
+    deallog << "dim=" << dim << ' ';
+    deallog << "degree=" << degree << ' ';
     deallog << "Type=";
 
     if (do_helmholtz)

@@ -129,7 +129,7 @@ print(const QR<VectorType> &qr, const unsigned int col_size)
       {
         deallog.get_file_stream() << std::setw(9) << Q[j](i);
         if (j < size - 1)
-          deallog.get_file_stream() << " ";
+          deallog.get_file_stream() << ' ';
         else
           deallog.get_file_stream() << std::endl;
       }

@@ -49,7 +49,7 @@ test(int n_refinements, MPI_Comm comm)
       for (const auto cell : tria.cell_iterators_on_level(l))
         if (cell->level_subdomain_id() !=
             dealii::numbers::artificial_subdomain_id)
-          deallog << cell->id() << " -> " << cell->level_subdomain_id() << " "
+          deallog << cell->id() << " -> " << cell->level_subdomain_id() << ' '
                   << cell->global_level_cell_index() << std::endl;
 
       const Utilities::MPI::Partitioner &part =

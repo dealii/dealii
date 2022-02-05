@@ -61,7 +61,7 @@ test()
       const auto p1 = cell->bounding_box().get_boundary_points();
       const auto p2 = euler.get_bounding_box(cell).get_boundary_points();
       deallog << "BBox: [" << p1.first << ", " << p1.second
-              << "], with mapping [" << p2.first << ", " << p2.second << "]"
+              << "], with mapping [" << p2.first << ", " << p2.second << ']'
               << std::endl;
     }
 }

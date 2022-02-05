@@ -59,7 +59,7 @@ test()
           triangulation.begin_active();
         for (; cell != triangulation.end(); ++cell)
           {
-            deallog << cell->subdomain_id() << " ";
+            deallog << cell->subdomain_id() << ' ';
           }
         deallog << std::endl;
       }

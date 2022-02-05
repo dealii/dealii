@@ -1258,7 +1258,7 @@ namespace LinearAlgebra
         << "You tried to access element " << arg1
         << " of a distributed vector, but this element is not "
         << "stored on the current processor. Note: The range of "
-        << "locally owned elements is [" << arg2 << "," << arg3
+        << "locally owned elements is [" << arg2 << ',' << arg3
         << "], and there are " << arg4 << " ghost elements "
         << "that this vector can access."
         << "\n\n"

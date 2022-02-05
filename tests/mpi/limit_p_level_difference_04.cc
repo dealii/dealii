@@ -103,7 +103,7 @@ test(const unsigned int max_difference)
   deallog << "active FE indices after adaptation:" << std::endl;
   for (const auto &cell :
        dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
-    deallog << " " << cell->id().to_string() << " " << cell->active_fe_index()
+    deallog << ' ' << cell->id().to_string() << ' ' << cell->active_fe_index()
             << std::endl;
 
   deallog << "OK" << std::endl;

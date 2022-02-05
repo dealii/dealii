@@ -137,7 +137,7 @@ check_fe(FiniteElement<dim> &fe)
   const unsigned int n_levels = tr.n_global_levels();
   for (unsigned int level = 0; level < n_levels; ++level)
     {
-      deallog << "Level " << level << ":" << std::endl;
+      deallog << "Level " << level << ':' << std::endl;
 
       IndexSet rei = mg_constrained_dofs.get_refinement_edge_indices(level);
       deallog << "get_refinement_edge_indices:" << std::endl;

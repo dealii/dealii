@@ -180,7 +180,7 @@ namespace PETScWrappers
         int,
         << "You tried to access element " << arg1
         << " of a distributed vector, but only elements in range [" << arg2
-        << "," << arg3 << "] are stored locally and can be accessed."
+        << ',' << arg3 << "] are stored locally and can be accessed."
         << "\n\n"
         << "A common source for this kind of problem is that you "
         << "are passing a 'fully distributed' vector into a function "

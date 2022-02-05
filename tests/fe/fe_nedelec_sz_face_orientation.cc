@@ -208,7 +208,7 @@ evaluate(const FiniteElement<3> &fe, const DoFHandler<3> &dof_handler)
         {
           deallog << "DoF#" << i << ", value=["
                   << fe_values[component].value(i, 0) << "], curl=["
-                  << fe_values[component].curl(i, 0) << "]" << std::endl;
+                  << fe_values[component].curl(i, 0) << ']' << std::endl;
         }
     }
 }

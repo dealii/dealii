@@ -324,9 +324,9 @@ namespace Step36
           max_spurious_eigenvalue = std::max(max_spurious_eigenvalue, ev);
         }
 
-    std::cout << "   Spurious eigenvalues are all in the interval "
-              << "[" << min_spurious_eigenvalue << ","
-              << max_spurious_eigenvalue << "]" << std::endl;
+    std::cout << "   Spurious eigenvalues are all in the interval " << '['
+              << min_spurious_eigenvalue << ',' << max_spurious_eigenvalue
+              << ']' << std::endl;
   }
 
 

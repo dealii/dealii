@@ -50,8 +50,8 @@ typename std::enable_if<std::is_constructible<NumberType1, NumberType2>::value,
 test_tensor_constructor(const std::string &type1, const std::string &type2)
 {
   deallog << "Rank " << rank << ", "
-          << "Dim " << dim << ":"
-          << "  From " << type2 << " To " << type1 << " ... " << std::flush;
+          << "Dim " << dim << ':' << "  From " << type2 << " To " << type1
+          << " ... " << std::flush;
   TensorType<rank, dim, NumberType2> tmp2;
   TensorType<rank, dim, NumberType1> tmp1(tmp2);
   deallog << "OK" << std::endl;

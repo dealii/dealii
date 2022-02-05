@@ -77,7 +77,7 @@ test()
           deallog << "[ ";
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
-              deallog << fe_values.jacobian(q)[d][e] << " ";
+              deallog << fe_values.jacobian(q)[d][e] << ' ';
           deallog << " ] ";
         }
       deallog << std::endl;
@@ -86,7 +86,7 @@ test()
         {
           deallog << "[ ";
           for (unsigned int d = 0; d < dim; ++d)
-            deallog << fe_values.shape_grad(fe.dofs_per_cell / 2, q)[d] << " ";
+            deallog << fe_values.shape_grad(fe.dofs_per_cell / 2, q)[d] << ' ';
           deallog << " ] ";
         }
       deallog << std::endl;

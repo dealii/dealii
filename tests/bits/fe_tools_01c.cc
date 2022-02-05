@@ -57,7 +57,7 @@ check(const FE_Q<dim> &fe, const std::string &name)
       Assert(n1[n2[i]] == i, ExcInternalError());
       Assert(n2[n1[i]] == i, ExcInternalError());
 
-      deallog << n1[n2[i]] << " ";
+      deallog << n1[n2[i]] << ' ';
     }
   deallog << std::endl;
 }

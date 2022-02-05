@@ -589,7 +589,7 @@ main()
       for (unsigned int realization = 0; realization < n_realizations;
            ++realization)
         {
-          deallog << "Realization " << realization << ":" << std::endl;
+          deallog << "Realization " << realization << ':' << std::endl;
 
           MinimizationProblem<1> minimization_problem_1d(realization);
           minimization_problem_1d.run();

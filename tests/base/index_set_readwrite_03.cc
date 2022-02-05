@@ -42,7 +42,7 @@ test()
 
   Assert(is1 == is2, ExcInternalError());
 
-  deallog << is1.is_element(4) << " " << is2.is_element(4) << std::endl;
+  deallog << is1.is_element(4) << ' ' << is2.is_element(4) << std::endl;
 
   deallog << "OK" << std::endl;
 

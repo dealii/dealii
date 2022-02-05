@@ -33,14 +33,14 @@ DeclException5(ExcEl,
                double,
                double,
                double,
-               << "Error in element (" << arg1 << "," << arg2 << "): " << arg3
+               << "Error in element (" << arg1 << ',' << arg2 << "): " << arg3
                << " != " << arg4 << " delta=" << arg5);
 
 template <typename NumberType>
 void
 test(const unsigned int n, const unsigned int k, const NumberType eps)
 {
-  deallog << n << " " << k << " " << std::endl;
+  deallog << n << ' ' << k << ' ' << std::endl;
   FullMatrix<NumberType>       A(k, n), C(n, n);
   LAPACKFullMatrix<NumberType> AL(k, n), CL(n, n);
 

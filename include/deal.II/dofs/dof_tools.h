@@ -2400,7 +2400,7 @@ namespace DoFTools
    *     << "'-' with labels point pt 2 offset 1,1"
    *     << std::endl;
    * GridOut().write_gnuplot (triangulation, out);
-   * out << "e" << std::endl;
+   * out << 'e' << std::endl;
    *
    * std::map<types::global_dof_index, Point<dim> > support_points;
    * DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
@@ -2408,7 +2408,7 @@ namespace DoFTools
    *                                       support_points);
    * DoFTools::write_gnuplot_dof_support_point_info(out,
    *                                                support_points);
-   * out << "e" << std::endl;
+   * out << 'e' << std::endl;
    * @endcode
    * and from within gnuplot execute the following command:
    * @code
@@ -2432,7 +2432,7 @@ namespace DoFTools
    *     << "'-' with labels point pt 2 offset 1,1 notitle"
    *     << std::endl;
    * GridOut().write_gnuplot (triangulation, out);
-   * out << "e" << std::endl;
+   * out << 'e' << std::endl;
    *
    * std::map<types::global_dof_index, Point<dim> > support_points;
    * DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
@@ -2440,7 +2440,7 @@ namespace DoFTools
    *                                       support_points);
    * DoFTools::write_gnuplot_dof_support_point_info(out,
    *                                                support_points);
-   * out << "e" << std::endl;
+   * out << 'e' << std::endl;
    * @endcode
    */
   template <int spacedim>

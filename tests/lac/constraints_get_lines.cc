@@ -54,7 +54,7 @@ test()
       deallog << line.index;
       for (auto entry : line.entries)
         {
-          deallog << " (" << entry.first << "," << entry.second << ")";
+          deallog << " (" << entry.first << ',' << entry.second << ')';
         }
       deallog << " - " << line.inhomogeneity << std::endl;
     }

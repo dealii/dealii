@@ -27,7 +27,7 @@ template <int dim>
 void
 test()
 {
-  deallog << "Checking in " << dim << "d" << std::endl;
+  deallog << "Checking in " << dim << 'd' << std::endl;
 
   // check the determinant of the
   // transformation for the reference

@@ -451,7 +451,7 @@ namespace CUDAWrappers
             if (across)
               out << ' ' << i << ',' << cols[j] << ':' << val[j];
             else
-              out << "(" << i << "," << cols[j] << ") " << val[j] << std::endl;
+              out << '(' << i << ',' << cols[j] << ") " << val[j] << std::endl;
           }
       }
     if (across)

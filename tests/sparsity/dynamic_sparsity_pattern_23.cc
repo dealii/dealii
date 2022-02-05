@@ -49,7 +49,7 @@ test()
       deallog << "Row " << row << " has the column indices: ";
       for (auto it = sp.begin(row); it != sp.end(row); ++it)
         {
-          deallog << it->column() << " ";
+          deallog << it->column() << ' ';
         }
       deallog << std::endl;
     }

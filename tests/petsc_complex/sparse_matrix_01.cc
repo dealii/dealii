@@ -47,21 +47,21 @@ test()
 
   deallog << "before: " << m(0, 1) << std::endl;
   for (unsigned int k = 0; k < s; ++k)
-    deallog << m(k, k) << " ";
+    deallog << m(k, k) << ' ';
   deallog << std::endl;
 
   m.add(m2, 1.0);
 
   deallog << "after: " << m(0, 1) << std::endl;
   for (unsigned int k = 0; k < s; ++k)
-    deallog << m(k, k) << " ";
+    deallog << m(k, k) << ' ';
   deallog << std::endl;
 
   m.add(m2, -1.0);
 
   deallog << "back to original: " << m(0, 1) << std::endl;
   for (unsigned int k = 0; k < s; ++k)
-    deallog << m(k, k) << " ";
+    deallog << m(k, k) << ' ';
   deallog << std::endl;
 
   deallog << "OK" << std::endl;

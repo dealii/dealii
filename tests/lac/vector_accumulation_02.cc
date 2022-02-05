@@ -60,7 +60,7 @@ check_norms()
 
             const number result = v1 * v2;
             deallog << static_cast<double>(std::abs(result - inner_product))
-                    << " ";
+                    << ' ';
           }
       deallog << std::endl;
     }

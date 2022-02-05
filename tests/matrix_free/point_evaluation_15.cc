@@ -144,7 +144,7 @@ test()
                              EvaluationFlags::gradients);
 
       for (unsigned int i = 0; i < solution_values.size(); ++i)
-        deallog << solution_values[i] - solution_values2[i] << " ";
+        deallog << solution_values[i] - solution_values2[i] << ' ';
       deallog << std::endl;
     }
 }

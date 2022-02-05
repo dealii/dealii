@@ -94,7 +94,7 @@ LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree)
   , mapping(mapping_degree)
   , last_error(std::numeric_limits<double>::max())
 {
-  deallog << "Using mapping with degree " << mapping_degree << ":" << std::endl
+  deallog << "Using mapping with degree " << mapping_degree << ':' << std::endl
           << "============================" << std::endl;
 }
 

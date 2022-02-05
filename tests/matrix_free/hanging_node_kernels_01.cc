@@ -471,7 +471,7 @@ test(const unsigned int                                           degree,
         }
 
       for (const auto i : values1)
-        deallog << i[0] << " ";
+        deallog << i[0] << ' ';
       deallog << std::endl;
 
       internal::FEEvaluationImplHangingNodesReference<
@@ -483,11 +483,11 @@ test(const unsigned int                                           degree,
           1, eval.get_shape_info(), b == 1, cmask, values2.data());
 
       for (const auto i : values1)
-        deallog << i[0] << " ";
+        deallog << i[0] << ' ';
       deallog << std::endl;
 
       for (const auto i : values2)
-        deallog << i[0] << " ";
+        deallog << i[0] << ' ';
       deallog << std::endl;
       deallog << std::endl;
 

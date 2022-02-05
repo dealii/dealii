@@ -256,7 +256,7 @@ namespace Evaluation
                               const Vector<double> & /*solution*/) const
   {
     std::ostringstream filename;
-    filename << output_name_base << "-" << this->refinement_cycle << ".eps"
+    filename << output_name_base << '-' << this->refinement_cycle << ".eps"
              << std::ends;
 
     GridOut().write_eps(dof_handler.get_triangulation(),

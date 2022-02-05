@@ -75,7 +75,7 @@ test()
   dof_handler.distribute_mg_dofs();
   deallog << "Number of DoFs per level: ";
   for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
-    deallog << dof_handler.n_dofs(level) << " ";
+    deallog << dof_handler.n_dofs(level) << ' ';
   deallog << std::endl;
 }
 

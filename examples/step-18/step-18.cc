@@ -1314,7 +1314,7 @@ namespace Step18
           pcout << (p == 0 ? ' ' : '+')
                 << (GridTools::count_cells_with_subdomain_association(
                      triangulation, p));
-        pcout << ")" << std::endl;
+        pcout << ')' << std::endl;
 
         setup_system();
 
@@ -1324,7 +1324,7 @@ namespace Step18
           pcout << (p == 0 ? ' ' : '+')
                 << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
                                                                     p));
-        pcout << ")" << std::endl;
+        pcout << ')' << std::endl;
 
         solve_timestep();
       }

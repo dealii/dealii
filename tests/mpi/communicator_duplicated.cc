@@ -57,7 +57,7 @@ test(const MPI_Comm comm)
       MPI_Recv(&value[1], 1, MPI_UNSIGNED, src, tag, comm2, MPI_STATUS_IGNORE);
       MPI_Recv(&value[0], 1, MPI_UNSIGNED, src, tag, comm, MPI_STATUS_IGNORE);
 
-      deallog << value[0] << " " << value[1] << " " << value[2] << std::endl;
+      deallog << value[0] << ' ' << value[1] << ' ' << value[2] << std::endl;
     }
 
   Utilities::MPI::free_communicator(comm2);

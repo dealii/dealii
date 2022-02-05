@@ -135,10 +135,10 @@ test(const bool left = true)
         << "plot '-' using 1:2 with lines notitle, '-' with labels point pt 2 offset 1,1 notitle"
         << std::endl;
       GridOut().write_gnuplot(triangulation, f);
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
 
       DoFTools::write_gnuplot_dof_support_point_info(f, support_points);
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
     }
 
   dh.clear();

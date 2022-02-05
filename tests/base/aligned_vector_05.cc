@@ -53,11 +53,11 @@ test()
   AlignedVector<foo> vec;
   vec.push_back(foo(3));
   vec.resize(2, foo(6));
-  deallog << vec[0].element() << " " << vec[1].element() << std::endl;
+  deallog << vec[0].element() << ' ' << vec[1].element() << std::endl;
   vec[1] = foo(13);
-  deallog << vec[0].element() << " " << vec[1].element() << std::endl;
+  deallog << vec[0].element() << ' ' << vec[1].element() << std::endl;
   vec.reserve(3);
-  deallog << vec[0].element() << " " << vec[1].element() << std::endl;
+  deallog << vec[0].element() << ' ' << vec[1].element() << std::endl;
 }
 
 

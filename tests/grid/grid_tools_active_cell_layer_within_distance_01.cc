@@ -43,7 +43,7 @@ write_mat_id_to_file(const Triangulation<dim> &tria)
                                                     endc  = tria.end();
   for (; cell != endc; ++cell, ++count)
     {
-      deallog << count << " " << static_cast<int>(cell->material_id())
+      deallog << count << ' ' << static_cast<int>(cell->material_id())
               << std::endl;
     }
   deallog << std::endl;

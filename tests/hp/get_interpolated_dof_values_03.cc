@@ -46,7 +46,7 @@ template <int dim>
 void
 test()
 {
-  deallog << dim << "D" << std::endl;
+  deallog << dim << 'D' << std::endl;
 
   // create a hp::DoFHandler with different finite elements on the
   // cells. note that we skip setting active_fe_indices on inactive

@@ -76,7 +76,7 @@ test()
   const std::vector<types::global_dof_index> dofs_per_block =
     DoFTools::count_dofs_per_fe_block(dof_handler, sub_blocks);
 
-  deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1]
+  deallog << "size: " << dofs_per_block[0] << ' ' << dofs_per_block[1]
           << std::endl;
 
   std::vector<IndexSet> locally_relevant_partitioning;
@@ -181,7 +181,7 @@ test_alt()
   const std::vector<types::global_dof_index> dofs_per_block =
     DoFTools::count_dofs_per_fe_block(dof_handler, sub_blocks);
 
-  deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1]
+  deallog << "size: " << dofs_per_block[0] << ' ' << dofs_per_block[1]
           << std::endl;
 
   std::vector<IndexSet> locally_relevant_partitioning;

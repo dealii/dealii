@@ -46,7 +46,7 @@ test<2>(const unsigned int n_points)
                          const bool         face_orientation) {
     deallog << "face_no=" << face_no
             << " face_orientation=" << (face_orientation ? "true" : "false")
-            << ":" << std::endl;
+            << ':' << std::endl;
     for (unsigned int
            q = 0,
            i =
@@ -59,8 +59,8 @@ test<2>(const unsigned int n_points)
          q < quad_ref.size();
          ++q, ++i)
       {
-        deallog << quad.point(i) << " ";
-        deallog << quad.weight(i) << " ";
+        deallog << quad.point(i) << ' ';
+        deallog << quad.weight(i) << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;
@@ -92,7 +92,7 @@ test<3>(const unsigned int n_points)
     deallog << "face_no=" << face_no
             << " face_orientation=" << (face_orientation ? "true" : "false")
             << " face_flip=" << (face_flip ? "true" : "false")
-            << " face_rotation=" << (face_rotation ? "true" : "false") << ":"
+            << " face_rotation=" << (face_rotation ? "true" : "false") << ':'
             << std::endl;
     for (unsigned int q = 0,
                       i = QProjector<dim>::DataSetDescriptor::face(
@@ -105,8 +105,8 @@ test<3>(const unsigned int n_points)
          q < quad_ref.size();
          ++q, ++i)
       {
-        deallog << quad.point(i) << " ";
-        deallog << quad.weight(i) << " ";
+        deallog << quad.point(i) << ' ';
+        deallog << quad.weight(i) << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;

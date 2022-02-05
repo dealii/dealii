@@ -305,7 +305,7 @@ namespace Physics
                      int,
                      int,
                      << "The number of rows in the input matrix is " << arg1
-                     << ", but needs to be either " << arg2 << "," << arg3
+                     << ", but needs to be either " << arg2 << ',' << arg3
                      << ", or " << arg4 << '.');
 
 
@@ -330,7 +330,7 @@ namespace Physics
                      int,
                      int,
                      << "The number of columns in the input matrix is " << arg1
-                     << ", but needs to be either " << arg2 << "," << arg3
+                     << ", but needs to be either " << arg2 << ',' << arg3
                      << ", or " << arg4 << '.');
 
 

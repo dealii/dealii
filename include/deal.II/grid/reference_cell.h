@@ -2063,7 +2063,7 @@ namespace internal
     virtual void
     print_info(std::ostream &out) const override
     {
-      out << "[";
+      out << '[';
 
       const unsigned int n_vertices = entity_type.n_vertices();
 
@@ -2071,7 +2071,7 @@ namespace internal
         {
           out << vertices_0[i];
           if (i + 1 != n_vertices)
-            out << ",";
+            out << ',';
         }
 
       out << "] is not a permutation of [";
@@ -2080,7 +2080,7 @@ namespace internal
         {
           out << vertices_1[i];
           if (i + 1 != n_vertices)
-            out << ",";
+            out << ',';
         }
 
       out << "]." << std::endl;

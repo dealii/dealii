@@ -54,8 +54,8 @@ test(const unsigned int size,
   ScaLAPACKMatrix<NumberType> scalapack(
     size, size, grid, block_size, block_size, LAPACKSupport::Property::general);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
-        << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << ' ' << block_size << ' ' << grid->get_process_grid_rows()
+        << ' ' << grid->get_process_grid_columns() << std::endl;
 
   create_random(full);
   scalapack = full;
@@ -78,9 +78,9 @@ test(const unsigned int size,
     dealii::Utilities::MPI::sum(s_frobenius, mpi_communicator) /
     n_mpi_processes;
 
-  pcout << l1 << " " << s_l1 << " " << as_l1 << std::endl
-        << linfty << " " << s_linfty << " " << as_linfty << std::endl
-        << frobenius << " " << s_frobenius << " " << as_frobenius << std::endl;
+  pcout << l1 << ' ' << s_l1 << ' ' << as_l1 << std::endl
+        << linfty << ' ' << s_linfty << ' ' << as_linfty << std::endl
+        << frobenius << ' ' << s_frobenius << ' ' << as_frobenius << std::endl;
 
   AssertThrow(std::abs(l1 - as_l1) < tol * std::abs(l1),
               dealii::ExcInternalError());

@@ -82,7 +82,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
             {
               for (unsigned int e = 0; e < dim; ++e)
                 for (unsigned int f = 0; f < dim; ++f)
-                  deallog << selected_vector_values[q][d][e][f] << " ";
+                  deallog << selected_vector_values[q][d][e][f] << ' ';
               deallog << std::endl;
               Assert((selected_vector_values[q][d] - vector_values[q][c + d])
                          .norm() <= 1e-12 * selected_vector_values[q][d].norm(),

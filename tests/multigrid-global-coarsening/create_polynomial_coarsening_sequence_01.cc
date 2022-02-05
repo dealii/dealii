@@ -32,7 +32,7 @@ test(
           i, type);
 
       for (const auto i : sequence)
-        deallog << i << " ";
+        deallog << i << ' ';
       deallog << std::endl;
     }
   deallog << std::endl;

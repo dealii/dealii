@@ -55,8 +55,8 @@ test(const unsigned int size_1,
     std::make_shared<Utilities::MPI::ProcessGrid>(
       mpi_communicator, size_1, size_2, block_size, block_size);
 
-  pcout << size_1 << "x" << size_2 << " " << block_size << " "
-        << grid->get_process_grid_rows() << " "
+  pcout << size_1 << 'x' << size_2 << ' ' << block_size << ' '
+        << grid->get_process_grid_rows() << ' '
         << grid->get_process_grid_columns() << std::endl;
 
   // Create randomly filled matrix of requested dimension size_1xsize_2:
@@ -106,7 +106,7 @@ test(const unsigned int size_1,
 
   if (this_mpi_process == 0)
     {
-      std::cout << "rank=" << rank << "/" << std::min(size_1, size_2)
+      std::cout << "rank=" << rank << '/' << std::min(size_1, size_2)
                 << std::endl;
       AssertThrow(norm < tol, ExcInternalError());
     }

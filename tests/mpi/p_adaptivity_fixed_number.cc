@@ -50,8 +50,8 @@ validate(const DoFHandler<dim> &dh)
         const unsigned int coarse_cellid =
           std::stoul(cellid.substr(0, cellid.find("_")));
 
-        deallog << " (" << coarse_cellid << "," << cell->future_fe_index()
-                << ")";
+        deallog << " (" << coarse_cellid << ',' << cell->future_fe_index()
+                << ')';
       }
   deallog << std::endl;
 }

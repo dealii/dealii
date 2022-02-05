@@ -43,9 +43,9 @@ print(const BoundingBox<2> &box)
   const auto p2 = p.second;
 
   str << p1 << std::endl
-      << p2[0] << " " << p1[1] << std::endl
+      << p2[0] << ' ' << p1[1] << std::endl
       << p2 << std::endl
-      << p1[0] << " " << p2[1] << std::endl
+      << p1[0] << ' ' << p2[1] << std::endl
       << p1 << std::endl;
   return str.str();
 }

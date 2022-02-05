@@ -2164,7 +2164,7 @@ namespace LinearAlgebra
               out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
                   << '/'
                   << stored_elements[partitioner->locally_owned_size() + i]
-                  << ")" << std::endl;
+                  << ')' << std::endl;
           out << std::endl;
         }
       out << std::flush;

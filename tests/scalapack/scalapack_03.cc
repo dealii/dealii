@@ -62,8 +62,8 @@ test(const unsigned int size, const unsigned int block_size)
   ScaLAPACKMatrix<NumberType> scalapack_matrix(
     size, grid, block_size, LAPACKSupport::Property::symmetric);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
-        << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << ' ' << block_size << ' ' << grid->get_process_grid_rows()
+        << ' ' << grid->get_process_grid_columns() << std::endl;
 
   create_spd(full_in);
 

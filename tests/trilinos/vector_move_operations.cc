@@ -20,9 +20,9 @@
 #include "../tests.h"
 
 #define PRINTME(name, var)                        \
-  deallog << "Vector: " name << ":" << std::endl; \
+  deallog << "Vector: " name << ':' << std::endl; \
   for (unsigned int i = 0; i < var.size(); ++i)   \
-    deallog << var[i] << " ";                     \
+    deallog << var[i] << ' ';                     \
   deallog << std::endl;
 
 int

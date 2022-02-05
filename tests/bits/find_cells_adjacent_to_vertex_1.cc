@@ -53,7 +53,7 @@ check(Triangulation<2> &tria)
       for (unsigned c = 0; c < cells.size(); ++c)
         {
           for (const unsigned int v : GeometryInfo<2>::vertex_indices())
-            deallog << "<" << cells[c]->vertex(v) << "> ";
+            deallog << '<' << cells[c]->vertex(v) << "> ";
           deallog << std::endl;
         }
     }

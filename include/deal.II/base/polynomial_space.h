@@ -322,7 +322,7 @@ PolynomialSpace<dim>::output_indices(StreamType &out) const
       const std::array<unsigned int, dim> ix = compute_index(i);
       out << i << "\t";
       for (unsigned int d = 0; d < dim; ++d)
-        out << ix[d] << " ";
+        out << ix[d] << ' ';
       out << std::endl;
     }
 }

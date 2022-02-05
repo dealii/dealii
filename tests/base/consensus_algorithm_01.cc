@@ -57,7 +57,7 @@ test(const MPI_Comm &comm)
       .run();
 
   for (const auto &i : sources)
-    deallog << i << " ";
+    deallog << i << ' ';
   deallog << std::endl;
 }
 

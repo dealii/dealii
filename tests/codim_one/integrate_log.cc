@@ -142,7 +142,7 @@ main()
 
   deallog
     << "Calculation of the integral of ln(x-a)*f(x) on the interval [a,b] = ["
-    << a << ", " << b << "]" << std::endl;
+    << a << ", " << b << ']' << std::endl;
   for (unsigned int j = 0; j < 13; ++j)
     {
       exact_integral = 0;

@@ -32,7 +32,7 @@ main(int argc, char *argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
   MPI_Comm_size(MPI_COMM_WORLD, &nproc);
 
-  std::cout << " Hi from " << myrank << "/" << nproc << std::endl;
+  std::cout << " Hi from " << myrank << '/' << nproc << std::endl;
 
   if (nproc != 2)
     {

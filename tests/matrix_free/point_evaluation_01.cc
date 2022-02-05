@@ -129,7 +129,7 @@ test(const unsigned int degree)
                           EvaluationFlags::values | EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
-        deallog << factor_float * i << " ";
+        deallog << factor_float * i << ' ';
       deallog << std::endl;
     }
 }

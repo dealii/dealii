@@ -73,7 +73,7 @@ test(const unsigned int orientation)
   cell++;
 
   // check orientation
-  deallog << "face orientation: " << orientation << " " << std::endl;
+  deallog << "face orientation: " << orientation << ' ' << std::endl;
   AssertDimension(orientation,
                   (cell->face_orientation(0) * 1 + cell->face_rotation(0) * 2 +
                    cell->face_flip(0) * 4));
@@ -81,10 +81,10 @@ test(const unsigned int orientation)
   // check vertices
   {
     for (unsigned int v = 0; v < cell->n_vertices(); ++v)
-      deallog << cell->vertex_index(v) << " ";
+      deallog << cell->vertex_index(v) << ' ';
     deallog << " vs. ";
     for (unsigned int v = 0; v < cell->n_vertices(); ++v)
-      deallog << cells[1].vertices[v] << " ";
+      deallog << cells[1].vertices[v] << ' ';
     deallog << std::endl;
 
     for (const auto v : cell->vertex_indices())
@@ -110,7 +110,7 @@ test(const unsigned int orientation)
          cells[1].vertices[(l + 1) % face->n_vertices()]}};
       std::sort(b.begin(), b.end());
 
-      deallog << a[0] << "-" << a[1] << " vs. " << b[0] << "-" << b[1]
+      deallog << a[0] << '-' << a[1] << " vs. " << b[0] << '-' << b[1]
               << std::endl;
 
       AssertDimension(a[0], b[0]);

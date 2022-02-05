@@ -92,10 +92,9 @@ main()
 
   for (unsigned int i = 0; i < surrounding_points.size(); ++i)
     {
-      deallog << "Surrunding point " << i << " " << surrounding_points[i]
+      deallog << "Surrunding point " << i << ' ' << surrounding_points[i]
               << " weight " << weights[i] << std::endl;
     }
   deallog << "Mean point " << new_point_flat << std::endl;
-  deallog << "Projected point "
-          << " " << new_point << std::endl;
+  deallog << "Projected point " << ' ' << new_point << std::endl;
 }

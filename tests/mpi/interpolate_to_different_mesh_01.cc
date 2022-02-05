@@ -206,7 +206,7 @@ test()
       const unsigned int checksum  = tr.get_checksum();
       const unsigned int checksum2 = tr2.get_checksum();
       if (myid == 0)
-        deallog << "Checksum: " << checksum << " " << checksum2 << std::endl;
+        deallog << "Checksum: " << checksum << ' ' << checksum2 << std::endl;
     }
 }
 

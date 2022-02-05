@@ -88,7 +88,7 @@ test(const unsigned int size, const unsigned int block_size)
   copy_I.add(-1, full);
   copy_II.add(-1, full);
 
-  pcout << size << " " << block_size << std::endl;
+  pcout << size << ' ' << block_size << std::endl;
 
   if (copy_I.frobenius_norm() > 1e-12)
     pcout << "norm of difference I: " << copy_I.frobenius_norm() << std::endl;

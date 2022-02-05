@@ -53,10 +53,10 @@ test_values()
     {
       for (unsigned int q = 0; q < quadrature.size(); ++q)
         {
-          deallog << fev.shape_value(i, q) << " ";
+          deallog << fev.shape_value(i, q) << ' ';
           for (unsigned int d = 0; d < 2; ++d)
             {
-              deallog << fev.shape_grad(i, q)[d] << " ";
+              deallog << fev.shape_grad(i, q)[d] << ' ';
             }
         }
       deallog << std::endl;

@@ -43,7 +43,7 @@ validate(const DoFHandler<dim> &dh)
 {
   deallog << " fe_indices:";
   for (const auto &cell : dh.active_cell_iterators())
-    deallog << " " << cell->future_fe_index();
+    deallog << ' ' << cell->future_fe_index();
   deallog << std::endl;
 }
 

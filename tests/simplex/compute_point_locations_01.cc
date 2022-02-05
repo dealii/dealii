@@ -54,18 +54,18 @@ test_in_unit_cube(const std::vector<Point<dim>> &points)
   deallog << "Print out results in " << dim << "D: " << std::endl;
   for (unsigned int i = 0; i < cells.size(); ++i)
     {
-      deallog << "At cell " << i << ":" << std::endl;
+      deallog << "At cell " << i << ':' << std::endl;
       for (unsigned int j = 0; j < qpoints[i].size(); ++j)
         {
           deallog << "    qpoints " << j << ": " << std::endl;
-          deallog << "        reference position  : (" << qpoints[i][j] << ")"
+          deallog << "        reference position  : (" << qpoints[i][j] << ')'
                   << std::endl;
           deallog << "        physical position   : (" << points[indices[i][j]]
-                  << ")" << std::endl;
+                  << ')' << std::endl;
           deallog << "        FE mapping position : ("
                   << mapping.transform_unit_to_real_cell(cells[i],
                                                          qpoints[i][j])
-                  << ")" << std::endl;
+                  << ')' << std::endl;
         }
     }
   deallog << std::endl;

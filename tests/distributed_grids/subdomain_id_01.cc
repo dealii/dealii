@@ -42,7 +42,7 @@ check(TRIA &tr)
 
   for (; cell != endc; ++cell)
     {
-      deallog << cell->level_subdomain_id() << " ";
+      deallog << cell->level_subdomain_id() << ' ';
       try
         {
           deallog << cell->subdomain_id();

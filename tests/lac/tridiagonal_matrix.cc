@@ -177,7 +177,7 @@ check(unsigned int size)
   TridiagonalMatrix<number> M(size);
   deallog << "all_zero " << M.all_zero();
   matrix1(M);
-  deallog << " " << M.all_zero() << std::endl;
+  deallog << ' ' << M.all_zero() << std::endl;
   deallog << "Matrix [-1,2,-1]" << std::endl;
   M.print(deallog, 7, 0);
   check_vmult(M);

@@ -43,7 +43,7 @@ test()
     Mat mm  = m;
     Mat m2m = m2;
 
-    // deallog << mm << " " << m2m << std::endl;
+    // deallog << mm << ' ' << m2m << std::endl;
 
     // forbidden:  m2 = m;
     {
@@ -51,7 +51,7 @@ test()
 
       Mat mm  = m;
       Mat m2m = m2;
-      // deallog << mm << " " << m2m << std::endl;
+      // deallog << mm << ' ' << m2m << std::endl;
     }
   }
 }

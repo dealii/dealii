@@ -135,7 +135,7 @@ test()
   std::get<2>(measures) =
     Utilities::MPI::sum(std::get<2>(measures), MPI_COMM_WORLD);
 
-  deallog << "Testing <" << dim << "," << spacedim << ">" << std::endl;
+  deallog << "Testing <" << dim << ',' << spacedim << '>' << std::endl;
 
   deallog << "Volume: " << std::get<0>(measures) << std::endl;
 

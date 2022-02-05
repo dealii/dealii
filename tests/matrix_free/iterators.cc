@@ -75,7 +75,7 @@ public:
           deallog << "Active level (with max_level="
                   << tria.n_global_levels() - 1 << "):" << std::endl;
         else
-          deallog << "Multigrid level " << level << ":" << std::endl;
+          deallog << "Multigrid level " << level << ':' << std::endl;
 
         AffineConstraints<Number> constraint;
 
@@ -108,7 +108,7 @@ public:
           deallog << "cell:      " << cell.to_string() << std::endl;
 
         for (const auto &face : faces)
-          deallog << "face:      " << face.first.to_string() << " "
+          deallog << "face:      " << face.first.to_string() << ' '
                   << face.second.to_string() << std::endl;
 
         for (const auto boundary : boundaries)

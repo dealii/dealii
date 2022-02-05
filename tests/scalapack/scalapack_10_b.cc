@@ -67,9 +67,9 @@ test(const std::pair<unsigned int, unsigned int> &size,
   scalapack_matrix_copy.copy_to(copy);
   copy.add(-1, full);
 
-  pcout << size.first << "x" << size.second << " & " << block_size << " & "
-        << chunk_size.first << "x" << chunk_size.second << " & "
-        << grid->get_process_grid_rows() << "x"
+  pcout << size.first << 'x' << size.second << " & " << block_size << " & "
+        << chunk_size.first << 'x' << chunk_size.second << " & "
+        << grid->get_process_grid_rows() << 'x'
         << grid->get_process_grid_columns() << std::endl;
   AssertThrow(copy.frobenius_norm() < 1e-12, ExcInternalError());
   std::remove(filename.c_str());

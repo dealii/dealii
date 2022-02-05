@@ -37,7 +37,7 @@ process(const std::vector<Point<spacedim>> &vertices,
   Triangulation<dim, spacedim> tria;
   tria.create_triangulation(vertices, cells, SubCellData());
 
-  deallog << "dim=" << dim << " spacedim=" << spacedim << ":" << std::endl;
+  deallog << "dim=" << dim << " spacedim=" << spacedim << ':' << std::endl;
   for (const auto &cell : tria.active_cell_iterators())
     {
       deallog << "measure:  " << cell->measure() << std::endl;

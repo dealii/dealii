@@ -48,21 +48,21 @@ test()
 
   deallog << "before: " << std::endl;
   for (unsigned int k = 0; k < s; ++k)
-    deallog << "(" << v(k).real() << "," << v(k).imag() << "i) ";
+    deallog << '(' << v(k).real() << ',' << v(k).imag() << "i) ";
   deallog << std::endl;
 
   v.add(1.0, v2);
 
   deallog << "after: " << std::endl;
   for (unsigned int k = 0; k < s; ++k)
-    deallog << "(" << v(k).real() << "," << v(k).imag() << "i) ";
+    deallog << '(' << v(k).real() << ',' << v(k).imag() << "i) ";
   deallog << std::endl;
 
   v.add(-1.0, v2);
 
   deallog << "back to original: " << std::endl;
   for (unsigned int k = 0; k < s; ++k)
-    deallog << "(" << v(k).real() << "," << v(k).imag() << "i) ";
+    deallog << '(' << v(k).real() << ',' << v(k).imag() << "i) ";
   deallog << std::endl;
 
   deallog << "OK" << std::endl;

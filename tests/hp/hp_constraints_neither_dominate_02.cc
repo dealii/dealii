@@ -277,11 +277,11 @@ test2cells(const FiniteElement<dim> &fe_0,
                   {
                     pairs_point_value.push_back(
                       std::make_pair(q_points[q], values[q]));
-                    //                      deallog << "@"<<q_points[q]<<" u =
+                    //                      deallog << '@'<<q_points[q]<<" u =
                     //                      {"<<values[q][0]; for (unsigned int
                     //                      c = 1; c < n_comp; c++)
-                    //                        deallog << ","<<values[q][c];
-                    //                      deallog << "}"<<std::endl;
+                    //                        deallog << ','<<values[q][c];
+                    //                      deallog << '}'<<std::endl;
                   }
               }
           }
@@ -297,10 +297,10 @@ test2cells(const FiniteElement<dim> &fe_0,
       const Vector<double> &val = pairs_point_value[p].second;
 
       Assert(val.size() == n_comp, ExcInternalError());
-      deallog << "@" << pt << " u = {" << val[0];
+      deallog << '@' << pt << " u = {" << val[0];
       for (unsigned int c = 1; c < n_comp; ++c)
-        deallog << "," << val[c];
-      deallog << "}" << std::endl;
+        deallog << ',' << val[c];
+      deallog << '}' << std::endl;
     }
 
   dof_handler.clear();

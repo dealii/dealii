@@ -239,7 +239,7 @@ main(int argc, char **argv)
     {
       deallog << "color:";
       for (auto color : fe_set)
-        deallog << ":" << color;
+        deallog << ':' << color;
       deallog << std::endl;
     }
 

@@ -575,7 +575,7 @@ namespace Step12
     // First write the grid in eps format.
     {
       const std::string filename = "grid-" + std::to_string(cycle) + ".eps";
-      deallog << "Writing grid to <" << filename << ">" << std::endl;
+      deallog << "Writing grid to <" << filename << '>' << std::endl;
       std::ofstream eps_output(filename);
 
       GridOut grid_out;
@@ -585,7 +585,7 @@ namespace Step12
     // Then output the solution in gnuplot format.
     {
       const std::string filename = "sol-" + std::to_string(cycle) + ".gnuplot";
-      deallog << "Writing solution to <" << filename << ">" << std::endl;
+      deallog << "Writing solution to <" << filename << '>' << std::endl;
       std::ofstream gnuplot_output(filename);
 
       DataOut<dim> data_out;

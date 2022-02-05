@@ -111,7 +111,7 @@ namespace Step11
     , dof_handler(triangulation)
     , mapping(mapping_degree)
   {
-    std::cout << "Using mapping with degree " << mapping_degree << ":"
+    std::cout << "Using mapping with degree " << mapping_degree << ':'
               << std::endl
               << "============================" << std::endl;
   }

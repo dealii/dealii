@@ -1241,7 +1241,7 @@ AffineConstraints<number>::print(std::ostream &out) const
       if (line.entries.size() > 0)
         {
           for (const std::pair<size_type, number> &entry : line.entries)
-            out << "    " << line.index << " " << entry.first << ":  "
+            out << "    " << line.index << ' ' << entry.first << ":  "
                 << entry.second << '\n';
 
           // print out inhomogeneity.
@@ -1280,7 +1280,7 @@ AffineConstraints<number>::write_dot(std::ostream &out) const
       else
         out << "  " << lines[i].index << '\n';
     }
-  out << "}" << std::endl;
+  out << '}' << std::endl;
 }
 
 

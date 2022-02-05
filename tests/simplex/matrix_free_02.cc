@@ -308,15 +308,15 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
 
     deallog << "mesh=";
     if (version == 0)
-      deallog << "P";
+      deallog << 'P';
     else if (version == 1)
-      deallog << "Q";
+      deallog << 'Q';
     else if (version == 2)
-      deallog << "M";
+      deallog << 'M';
     deallog << " : ";
 
-    deallog << "dim=" << dim << " ";
-    deallog << "degree=" << degree << " ";
+    deallog << "dim=" << dim << ' ';
+    deallog << "degree=" << degree << ' ';
     deallog << "Type=";
 
     if (do_helmholtz)

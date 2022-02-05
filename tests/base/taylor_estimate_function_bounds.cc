@@ -95,7 +95,7 @@ namespace
   void
   print_bounds(const std::pair<double, double> &bounds)
   {
-    deallog << "[" << bounds.first << ", " << bounds.second << "]" << std::endl;
+    deallog << '[' << bounds.first << ", " << bounds.second << ']' << std::endl;
   }
 
 
@@ -108,7 +108,7 @@ namespace
   void
   run_test()
   {
-    deallog << dim << "D" << std::endl;
+    deallog << dim << 'D' << std::endl;
 
     const TestFunction<dim> function;
     const BoundingBox<dim>  box = create_box<dim>();

@@ -113,7 +113,7 @@ test(const double x, const double y)
 
   Teuchos::RCP<const VectorType> xg = x_rol.getVector();
   std::cout << "The solution to minimization problem is: ";
-  std::cout << (*xg)[0] << " " << (*xg)[1] << std::endl;
+  std::cout << (*xg)[0] << ' ' << (*xg)[1] << std::endl;
 }
 
 int

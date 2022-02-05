@@ -36,7 +36,7 @@ write_active_fe_index_to_file(const DoFHandler<dim> &dof_handler)
                                                  endc = dof_handler.end();
   for (; cell != endc; ++cell, ++count)
     {
-      deallog << count << " " << cell->active_fe_index() << std::endl;
+      deallog << count << ' ' << cell->active_fe_index() << std::endl;
     }
   deallog << std::endl;
 }

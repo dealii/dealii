@@ -28,10 +28,10 @@ print_vec(VECVEC &v)
 {
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      deallog << "[";
+      deallog << '[';
       for (unsigned int j = 0; j < v[i].size(); ++j)
-        deallog << v[i][j] << " ";
-      deallog << "]";
+        deallog << v[i][j] << ' ';
+      deallog << ']';
     }
   deallog << std::endl;
 }

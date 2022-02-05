@@ -129,7 +129,7 @@ test()
   out_dist -= out;
 
   double diff_norm = out_dist.linfty_norm() / out.linfty_norm();
-  deallog << "Norm of difference:          " << diff_norm << " ";
+  deallog << "Norm of difference:          " << diff_norm << ' ';
 
   // test again, now doing a matrix-vector product and then an add, which
   // should give twice the reference result

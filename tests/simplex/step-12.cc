@@ -420,7 +420,7 @@ namespace Step12
   AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
     const std::string filename = "solution-" + std::to_string(cycle) + ".vtk";
-    std::cout << "  Writing solution to <" << filename << ">" << std::endl;
+    std::cout << "  Writing solution to <" << filename << '>' << std::endl;
     std::ofstream output(filename);
 
     DataOut<dim> data_out;

@@ -35,7 +35,7 @@ test(const ReferenceCell &reference_cell)
     {
       deallog << v << ": ";
       for (const auto i : kind.faces_for_given_vertex(v))
-        deallog << i << " ";
+        deallog << i << ' ';
       deallog << std::endl;
     }
   deallog << std::endl;

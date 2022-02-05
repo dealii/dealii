@@ -124,8 +124,8 @@ test(const unsigned int n_refinements,
            operators,
            transfer);
 
-  deallog << dim << " " << fe_degree_fine << " " << n_refinements << " "
-          << (do_simplex_mesh ? "tri " : "quad") << " "
+  deallog << dim << ' ' << fe_degree_fine << ' ' << n_refinements << ' '
+          << (do_simplex_mesh ? "tri " : "quad") << ' '
           << solver_control.last_step() << std::endl;
 
   static unsigned int counter = 0;

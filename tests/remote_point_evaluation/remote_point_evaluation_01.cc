@@ -237,7 +237,7 @@ print(std::tuple<
     {
       const unsigned int n_points = std::get<1>(result)[i].size();
 
-      std::cout << std::get<0>(result)[i]->level() << " "
+      std::cout << std::get<0>(result)[i]->level() << ' '
                 << std::get<0>(result)[i]->index() << " x " << n_points
                 << std::endl;
 

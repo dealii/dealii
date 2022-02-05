@@ -88,7 +88,7 @@ test()
       for (std::set<types::subdomain_id>::iterator it = ghost_owners.begin();
            it != ghost_owners.end();
            ++it)
-        deallog << *it << " ";
+        deallog << *it << ' ';
       deallog << std::endl;
 
       mpi_check(ghost_owners);
@@ -100,7 +100,7 @@ test()
              level_ghost_owners.begin();
            it != level_ghost_owners.end();
            ++it)
-        deallog << *it << " ";
+        deallog << *it << ' ';
       deallog << std::endl;
 
       mpi_check(level_ghost_owners);

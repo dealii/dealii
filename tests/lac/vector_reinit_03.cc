@@ -39,7 +39,7 @@ do_test()
     MPI_Comm communicator =
       Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
     v1.reinit(set, communicator);
-    deallog << "reinit: " << v1.size() << " ";
+    deallog << "reinit: " << v1.size() << ' ';
 
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
@@ -51,7 +51,7 @@ do_test()
       Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
     v2.reinit(set, communicator);
     v1.reinit(v2);
-    deallog << v1.size() << " ";
+    deallog << v1.size() << ' ';
     v1.reinit(v2);
     deallog << v1.size() << std::endl;
 
@@ -65,7 +65,7 @@ do_test()
       Utilities::MPI::duplicate_communicator(MPI_COMM_WORLD);
     v2.reinit(set, communicator);
     v1 = v2;
-    deallog << "assign " << v1.size() << " ";
+    deallog << "assign " << v1.size() << ' ';
     v1 = v2;
     deallog << v1.size() << std::endl;
 
@@ -81,7 +81,7 @@ do_test()
     typename VectorMemory<VectorType>::Pointer v3(memory);
     v1.reinit(set, communicator);
     v3->reinit(v1);
-    deallog << "reinit pool " << v1.size() << " " << v3->size() << " ";
+    deallog << "reinit pool " << v1.size() << ' ' << v3->size() << ' ';
 
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);

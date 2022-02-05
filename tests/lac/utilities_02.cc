@@ -181,7 +181,7 @@ test()
     {
       const double est = Utilities::LinearAlgebra::lanczos_largest_eigenvalue(
         OP, init_vector, k, vector_memory);
-      deallog << k << " " << est << std::endl;
+      deallog << k << ' ' << est << std::endl;
     }
 
     // exact eigenvectors via PArpack

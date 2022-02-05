@@ -43,7 +43,7 @@ check(TRIA &tr)
 
   for (; cell != endc; ++cell)
     {
-      deallog << cell->level() << " " << cell->index() << std::endl;
+      deallog << cell->level() << ' ' << cell->index() << std::endl;
 
       // Store the CellId and create a cell iterator pointing to the same cell
 
@@ -51,7 +51,7 @@ check(TRIA &tr)
 
       typename TRIA::cell_iterator cell2 = tr.create_cell_iterator(cid);
 
-      deallog << cell2->level() << " " << cell2->index() << std::endl;
+      deallog << cell2->level() << ' ' << cell2->index() << std::endl;
     }
 
   deallog << "OK" << std::endl;

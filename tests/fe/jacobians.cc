@@ -62,7 +62,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
 
         for (unsigned int d = 0; d < dim; ++d)
           for (unsigned int e = 0; e < dim; ++e)
-            deallog << fe_val.jacobian(0)[d][e] << " ";
+            deallog << fe_val.jacobian(0)[d][e] << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;
@@ -79,7 +79,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
 
         for (unsigned int d = 0; d < dim; ++d)
           for (unsigned int e = 0; e < dim; ++e)
-            deallog << fe_val.inverse_jacobian(0)[d][e] << " ";
+            deallog << fe_val.inverse_jacobian(0)[d][e] << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;
@@ -97,7 +97,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
         for (unsigned int d = 0; d < dim; ++d)
           for (unsigned int e = 0; e < dim; ++e)
             for (unsigned int f = 0; f < dim; ++f)
-              deallog << fe_val.jacobian_grad(0)[d][e][f] << " ";
+              deallog << fe_val.jacobian_grad(0)[d][e][f] << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;
@@ -118,7 +118,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
         for (unsigned int d = 0; d < dim; ++d)
           for (unsigned int e = 0; e < dim; ++e)
             for (unsigned int f = 0; f < dim; ++f)
-              deallog << fe_val.jacobian_pushed_forward_grad(0)[d][e][f] << " ";
+              deallog << fe_val.jacobian_pushed_forward_grad(0)[d][e][f] << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;
@@ -137,7 +137,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
           for (unsigned int e = 0; e < dim; ++e)
             for (unsigned int f = 0; f < dim; ++f)
               for (unsigned int g = 0; g < dim; ++g)
-                deallog << fe_val.jacobian_2nd_derivative(0)[d][e][f][g] << " ";
+                deallog << fe_val.jacobian_2nd_derivative(0)[d][e][f][g] << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;
@@ -161,7 +161,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
               for (unsigned int g = 0; g < dim; ++g)
                 deallog << fe_val.jacobian_pushed_forward_2nd_derivative(
                              0)[d][e][f][g]
-                        << " ";
+                        << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;
@@ -182,7 +182,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
               for (unsigned int g = 0; g < dim; ++g)
                 for (unsigned int h = 0; h < dim; ++h)
                   deallog << fe_val.jacobian_3rd_derivative(0)[d][e][f][g][h]
-                          << " ";
+                          << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;
@@ -208,7 +208,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
                 for (unsigned int h = 0; h < dim; ++h)
                   deallog << fe_val.jacobian_pushed_forward_3rd_derivative(
                                0)[d][e][f][g][h]
-                          << " ";
+                          << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;

@@ -47,7 +47,7 @@ test(PETScWrappers::FullMatrix &m)
   for (unsigned int i = 0; i < m.m(); ++i)
     {
       for (unsigned int j = 0; j < m.n(); ++j)
-        deallog << m(i, j) << " ";
+        deallog << m(i, j) << ' ';
       deallog << std::endl;
     }
   deallog << std::endl;
@@ -70,7 +70,7 @@ test(PETScWrappers::FullMatrix &m)
   for (unsigned int i = 0; i < m.m(); ++i)
     {
       for (unsigned int j = 0; j < m.n(); ++j)
-        deallog << m(i, j) << " ";
+        deallog << m(i, j) << ' ';
       deallog << std::endl;
     }
   deallog << std::endl;

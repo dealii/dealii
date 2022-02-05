@@ -45,7 +45,7 @@ check(const FE_Q<dim> &fe, const std::string &name)
   const std::vector<unsigned int> n =
     FETools::lexicographic_to_hierarchic_numbering<dim>(fe.degree);
   for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-    deallog << n[i] << " ";
+    deallog << n[i] << ' ';
   deallog << std::endl;
 }
 

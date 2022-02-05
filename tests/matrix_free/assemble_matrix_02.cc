@@ -173,7 +173,7 @@ do_test(const DoFHandler<dim> &dof)
                   phi_u.begin_dof_values()[j][v];
           }
         test_matrix.add(-1., cell_matrix);
-        deallog << test_matrix.frobenius_norm() << " ";
+        deallog << test_matrix.frobenius_norm() << ' ';
       }
     deallog << std::endl;
   }
