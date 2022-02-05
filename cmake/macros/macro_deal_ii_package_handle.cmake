@@ -56,13 +56,9 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature)
   # value. We need this for modern™ MPI detection where CMake's
   # FindMPI.cmake might only set MPI_FOUND to true and nothing else.
   #
-  SET(_clear_variables_list "")
   IF(NOT DEFINED ${_feature}_FOUND)
     SET(${_feature}_FOUND TRUE)
   ENDIF()
-
-  SET(_suffix "")
-  SET(_required TRUE)
 
   #
   # Clear temporary variables
@@ -71,13 +67,29 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature)
     set(_temp_${_suffix} "")
   ENDFOREACH()
 
+  #
+  # State variables for parsing keywords and arguments. We store the
+  # currently encountered keyword in ${_current_suffix} and store the fact
+  # whether we encountered an "OPTIONAL" or "REQUIRED" keyword in
+  # ${_required}
+  #
+  SET(_current_suffix "")
+  SET(_required TRUE)
+
+  #
+  # A temporary list accumulating all variables that should be "cleared"
+  # when the feature gets disabled.
+  #
+  SET(_clear_variables_list "")
+
   FOREACH(_arg ${ARGN})
-    IF(("${_arg}" IN_LIST DEAL_II_LIST_SUFFIXES) OR ("${_arg}" IN_LIST DEAL_II_STRING_SUFFIXES))
+    IF(("${_arg}" IN_LIST DEAL_II_LIST_SUFFIXES) OR
+       ("${_arg}" IN_LIST DEAL_II_STRING_SUFFIXES) OR
+       ("${_arg}" STREQUAL "CLEAR"))
       #
       # We encountered a new keyword.
       #
-      set(_suffix "${_arg}")
-      SET(_fill_clear FALSE)
+      SET(_current_suffix "${_arg}")
 
     ELSEIF("${_arg}" STREQUAL "REQUIRED")
       SET(_required TRUE)
@@ -86,14 +98,11 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature)
       SET(_required FALSE)
 
     ELSEIF(_arg MATCHES "^(optimized|debug|general)$"
-            AND "${_suffix}" STREQUAL "LIBRARIES")
-      LIST(APPEND _temp_${_suffix} ${_arg})
-
-    ELSEIF("${_arg}" STREQUAL "CLEAR") # FIXME
-      SET(_fill_clear TRUE)
+            AND "${_current_suffix}" STREQUAL "LIBRARIES")
+      LIST(APPEND _temp_${_current_suffix} ${_arg})
 
     ELSE()
-      IF ("${_suffix}" STREQUAL "")
+      IF ("${_current_suffix}" STREQUAL "")
         MESSAGE(FATAL_ERROR
           "Internal configuration error: the second "
           "argument to DEAL_II_PACKAGE_HANDLE must be a keyword"
@@ -102,27 +111,28 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature)
 
       MARK_AS_ADVANCED(${_arg})
 
-      IF(_fill_clear) # FIXME
+      IF("${_current_suffix}" STREQUAL "CLEAR")
         IF(NOT _arg MATCHES "^(optimized|debug|general)$")
           LIST(APPEND _clear_variables_list ${_arg})
         ENDIF()
 
       ELSE()
+
         IF("${${_arg}}" MATCHES "^\\s*$" OR "${${_arg}}" MATCHES "-NOTFOUND")
           IF(_required)
             IF("${${_arg}}" MATCHES "^\\s*$")
               MESSAGE(STATUS
-                "  ${_feature}_${_suffix}: *** Required variable \"${_arg}\" empty ***"
+                "  ${_feature}_${_current_suffix}: *** Required variable \"${_arg}\" empty ***"
                 )
             ELSE()
               MESSAGE(STATUS
-                "  ${_feature}_${_suffix}: *** Required variable \"${_arg}\" set to NOTFOUND ***"
+                "  ${_feature}_${_current_suffix}: *** Required variable \"${_arg}\" set to NOTFOUND ***"
                 )
             ENDIF()
             SET(${_feature}_FOUND FALSE)
           ENDIF()
         ELSE()
-          LIST(APPEND _temp_${_suffix} ${${_arg}})
+          LIST(APPEND _temp_${_current_suffix} ${${_arg}})
         ENDIF()
       ENDIF()
     ENDIF()
