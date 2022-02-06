@@ -125,24 +125,24 @@ test(const unsigned int n_refinements = 1)
 
               phi_m.read_dof_values(src);
 
-              for (unsigned int i = 0; i < phi_m.static_dofs_per_component; ++i)
+              for (const auto i : phi_m.dof_indices())
                 deallog << static_cast<int>(phi_m.begin_dof_values()[i][0])
                         << ' ';
               deallog << std::endl;
               phi_m.gather_evaluate(src, EvaluationFlags::values);
-              for (unsigned int i = 0; i < phi_m.static_n_q_points; ++i)
-                deallog << static_cast<int>(phi_m.begin_values()[i][0]) << ' ';
+              for (const auto q : phi_p.quadrature_point_indices())
+                deallog << static_cast<int>(phi_m.begin_values()[q][0]) << " ";
               deallog << std::endl;
 
               phi_p.read_dof_values(src);
-              for (unsigned int i = 0; i < phi_p.static_dofs_per_component; ++i)
+              for (const auto i : phi_p.dof_indices())
                 deallog << static_cast<int>(phi_p.begin_dof_values()[i][0])
                         << ' ';
               deallog << std::endl;
 
               phi_p.gather_evaluate(src, EvaluationFlags::values);
-              for (unsigned int i = 0; i < phi_p.static_n_q_points; ++i)
-                deallog << static_cast<int>(phi_p.begin_values()[i][0]) << ' ';
+              for (const auto q : phi_p.quadrature_point_indices())
+                deallog << static_cast<int>(phi_p.begin_values()[q][0]) << " ";
               deallog << std::endl << std::endl;
             }
         }

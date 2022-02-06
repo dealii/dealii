@@ -533,6 +533,14 @@ public:
       return face_ids;
   }
 
+  /**
+   * Return an object that can be thought of as an array containing all indices
+   * from zero to @p n_quadrature_points. This allows to write code using
+   * range-based for loops.
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  quadrature_point_indices() const;
+
   //@}
 
   /**
@@ -1578,6 +1586,15 @@ inline bool
 FEEvaluationData<dim, Number, is_face>::is_interior_face() const
 {
   return interior_face;
+}
+
+
+
+template <int dim, typename Number, bool is_face>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+FEEvaluationData<dim, Number, is_face>::quadrature_point_indices() const
+{
+  return {0U, n_quadrature_points};
 }
 
 
