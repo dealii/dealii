@@ -1640,7 +1640,9 @@ namespace LinearAlgebra
           partitioner->ghost_indices().is_element(global_index),
         ExcAccessToNonLocalElement(global_index,
                                    partitioner->local_range().first,
-                                   partitioner->local_range().second - 1,
+                                   partitioner->local_range().second == 0 ?
+                                     0 :
+                                     (partitioner->local_range().second - 1),
                                    partitioner->ghost_indices().n_elements()));
       // do not allow reading a vector which is not in ghost mode
       Assert(partitioner->in_local_range(global_index) ||
@@ -1664,7 +1666,9 @@ namespace LinearAlgebra
           partitioner->ghost_indices().is_element(global_index),
         ExcAccessToNonLocalElement(global_index,
                                    partitioner->local_range().first,
-                                   partitioner->local_range().second - 1,
+                                   partitioner->local_range().second == 0 ?
+                                     0 :
+                                     (partitioner->local_range().second - 1),
                                    partitioner->ghost_indices().n_elements()));
       // we would like to prevent reading ghosts from a vector that does not
       // have them imported, but this is not possible because we might be in a
