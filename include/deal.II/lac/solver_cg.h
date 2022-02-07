@@ -71,8 +71,8 @@ class PreconditionIdentity;
  * After @p m steps the matrix T_m can be written in terms of the coefficients
  * @p alpha and @p beta as the tri-diagonal matrix with diagonal elements
  * <tt>1/alpha_0</tt>, <tt>1/alpha_1 + beta_0/alpha_0</tt>, ...,
- * <tt>1/alpha_{m-1</tt>+beta_{m-2}/alpha_{m-2}} and off-diagonal elements
- * <tt>sqrt(beta_0)/alpha_0</tt>, ..., <tt>sqrt(beta_{m-2</tt>)/alpha_{m-2}}.
+ * <tt>1/alpha_{m-1}+beta_{m-2}/alpha_{m-2}</tt> and off-diagonal elements
+ * <tt>sqrt(beta_0)/alpha_0</tt>, ..., <tt>sqrt(beta_{m-2})/alpha_{m-2}</tt>.
  * The eigenvalues of this matrix can be computed by postprocessing.
  *
  * @see Y. Saad: "Iterative methods for Sparse Linear Systems", section 6.7.3
