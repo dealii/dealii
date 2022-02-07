@@ -31,7 +31,7 @@ test_data_type(const std::uint64_t n_bytes)
 {
   const auto bigtype = Utilities::MPI::create_mpi_data_type_n_bytes(n_bytes);
 
-  deallog << "checking size " << n_bytes << ":";
+  deallog << "checking size " << n_bytes << ':';
 
   int size32;
   int ierr = MPI_Type_size(*bigtype, &size32);

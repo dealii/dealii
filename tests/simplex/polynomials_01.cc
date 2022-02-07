@@ -48,11 +48,11 @@ test(const unsigned int degree)
                     fourth_derivatives);
 
       for (auto v : values)
-        deallog << v << " ";
+        deallog << v << ' ';
       deallog << std::endl;
 
       for (auto v : grads)
-        deallog << v << " ";
+        deallog << v << ' ';
       deallog << std::endl;
     }
 }

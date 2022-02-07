@@ -44,7 +44,7 @@ test()
         }
 
   for (const auto i : tria.get_boundary_ids())
-    deallog << i << " ";
+    deallog << i << ' ';
   deallog << std::endl;
 }
 

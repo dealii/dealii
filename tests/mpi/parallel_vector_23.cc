@@ -61,8 +61,7 @@ test()
   v.import(read_write_vector, VectorOperation::max);
   v.update_ghost_values();
 
-  deallog << myid << ":"
-          << "ghost entry after max: " << v(1) << std::endl;
+  deallog << myid << ':' << "ghost entry after max: " << v(1) << std::endl;
 
   if (!myid)
     read_write_vector(1) = -1.0;
@@ -70,8 +69,7 @@ test()
   v.import(read_write_vector, VectorOperation::min);
   v.update_ghost_values();
 
-  deallog << myid << ":"
-          << "ghost entry after min: " << v(1) << std::endl;
+  deallog << myid << ':' << "ghost entry after min: " << v(1) << std::endl;
 
 
   if (myid == 0)

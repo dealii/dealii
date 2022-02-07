@@ -620,11 +620,11 @@ namespace Differentiation
           stream << tape_index << "->" << status_tape
                  << (i < (registered_tape_indices.size() - 1) ? "," : "");
         }
-      stream << "\n";
+      stream << '\n';
 
-      stream << "Keep values? " << keep_independent_values() << "\n";
+      stream << "Keep values? " << keep_independent_values() << '\n';
       stream << "Use stored tape buffer sizes? "
-             << use_stored_taped_buffer_sizes << "\n";
+             << use_stored_taped_buffer_sizes << '\n';
     }
 
 
@@ -645,28 +645,28 @@ namespace Differentiation
       ::tapestats(tape_index, counts.data());
       Assert(counts.size() >= 18, ExcInternalError());
       stream
-        << "Tape index: " << tape_index << "\n"
-        << "Number of independent variables: " << counts[0] << "\n"
-        << "Number of dependent variables:   " << counts[1] << "\n"
-        << "Max number of live, active variables: " << counts[2] << "\n"
-        << "Size of taylor stack (number of overwrites): " << counts[3] << "\n"
-        << "Operations buffer size: " << counts[4] << "\n"
-        << "Total number of recorded operations: " << counts[5] << "\n"
-        << "Operations file written or not: " << counts[6] << "\n"
-        << "Overall number of locations: " << counts[7] << "\n"
-        << "Locations file written or not: " << counts[8] << "\n"
-        << "Overall number of values: " << counts[9] << "\n"
-        << "Values file written or not: " << counts[10] << "\n"
-        << "Locations buffer size: " << counts[11] << "\n"
-        << "Values buffer size: " << counts[12] << "\n"
-        << "Taylor buffer size: " << counts[13] << "\n"
-        << "Number of eq_*_prod for sparsity pattern: " << counts[14] << "\n"
+        << "Tape index: " << tape_index << '\n'
+        << "Number of independent variables: " << counts[0] << '\n'
+        << "Number of dependent variables:   " << counts[1] << '\n'
+        << "Max number of live, active variables: " << counts[2] << '\n'
+        << "Size of taylor stack (number of overwrites): " << counts[3] << '\n'
+        << "Operations buffer size: " << counts[4] << '\n'
+        << "Total number of recorded operations: " << counts[5] << '\n'
+        << "Operations file written or not: " << counts[6] << '\n'
+        << "Overall number of locations: " << counts[7] << '\n'
+        << "Locations file written or not: " << counts[8] << '\n'
+        << "Overall number of values: " << counts[9] << '\n'
+        << "Values file written or not: " << counts[10] << '\n'
+        << "Locations buffer size: " << counts[11] << '\n'
+        << "Values buffer size: " << counts[12] << '\n'
+        << "Taylor buffer size: " << counts[13] << '\n'
+        << "Number of eq_*_prod for sparsity pattern: " << counts[14] << '\n'
         << "Use of 'min_op', deferred to 'abs_op' for piecewise calculations: "
-        << counts[15] << "\n"
+        << counts[15] << '\n'
         << "Number of 'abs' calls that can switch branch: " << counts[16]
-        << "\n"
+        << '\n'
         << "Number of parameters (doubles) interchangeable without retaping: "
-        << counts[17] << "\n"
+        << counts[17] << '\n'
         << std::flush;
     }
 

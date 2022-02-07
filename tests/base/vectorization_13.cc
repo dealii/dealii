@@ -32,7 +32,7 @@ do_test(const VectorizedArrayType                      array,
   auto exponentiated_array = std::pow(array, number);
 
   for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
-    deallog << exponentiated_array[i] << " ";
+    deallog << exponentiated_array[i] << ' ';
   deallog << std::endl;
 }
 
@@ -47,7 +47,7 @@ do_test(const VectorizedArrayType array, const VectorizedArrayType number)
   auto exponentiated_array = std::pow(array, number);
 
   for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
-    deallog << exponentiated_array[i] << " ";
+    deallog << exponentiated_array[i] << ' ';
   deallog << std::endl;
 }
 

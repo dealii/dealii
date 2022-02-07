@@ -77,7 +77,7 @@ test(int n_refinements, MPI_Comm comm)
 
           deallog << std::setw(4) << cell->subdomain_id() << " : ";
           for (const auto dof : dofs)
-            deallog << std::setw(4) << dof << " ";
+            deallog << std::setw(4) << dof << ' ';
           deallog << std::endl;
         }
   }

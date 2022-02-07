@@ -96,19 +96,19 @@ private:
                 if (std::abs(diff[v]) > 1e-12)
                   {
                     deallog << "Error detected on interior face " << face
-                            << ", v=" << v << ", q=" << q << "!" << std::endl;
+                            << ", v=" << v << ", q=" << q << '!' << std::endl;
                     deallog << "ref: ";
                     for (unsigned int i = 0; i < ref.dofs_per_cell; ++i)
-                      deallog << ref.get_dof_value(i)[v] << " ";
+                      deallog << ref.get_dof_value(i)[v] << ' ';
                     deallog << std::endl;
                     deallog << "done: " << check.get_value(q)[v]
                             << " instead of " << ref.get_value(q)[v]
                             << std::endl;
 
                     deallog
-                      << data.get_face_info(face).cells_interior[v] << " "
-                      << (int)data.get_face_info(face).interior_face_no << " "
-                      << (int)data.get_face_info(face).face_orientation << " "
+                      << data.get_face_info(face).cells_interior[v] << ' '
+                      << (int)data.get_face_info(face).interior_face_no << ' '
+                      << (int)data.get_face_info(face).face_orientation << ' '
                       << (int)data.get_face_info(face).subface_index
                       << std::endl;
                     deallog << std::endl;
@@ -144,19 +144,19 @@ private:
                 if (std::abs(diff[v]) > 1e-12)
                   {
                     deallog << "Error detected on exterior face " << face
-                            << ", v=" << v << ", q=" << q << "!" << std::endl;
+                            << ", v=" << v << ", q=" << q << '!' << std::endl;
                     deallog << "ref: ";
                     for (unsigned int i = 0; i < ref.dofs_per_cell; ++i)
-                      deallog << refr.get_dof_value(i)[v] << " ";
+                      deallog << refr.get_dof_value(i)[v] << ' ';
                     deallog << std::endl;
                     deallog << "done: " << checkr.get_value(q)[v]
                             << " instead of " << refr.get_value(q)[v]
                             << std::endl;
 
                     deallog
-                      << data.get_face_info(face).cells_exterior[v] << " "
-                      << (int)data.get_face_info(face).exterior_face_no << " "
-                      << (int)data.get_face_info(face).face_orientation << " "
+                      << data.get_face_info(face).cells_exterior[v] << ' '
+                      << (int)data.get_face_info(face).exterior_face_no << ' '
+                      << (int)data.get_face_info(face).face_orientation << ' '
                       << (int)data.get_face_info(face).subface_index
                       << std::endl;
                     deallog << std::endl;

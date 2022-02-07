@@ -51,7 +51,7 @@ template <int spacedim>
 void
 test()
 {
-  deallog << "Testing <2," << spacedim << ">" << std::endl;
+  deallog << "Testing <2," << spacedim << '>' << std::endl;
 
   Triangulation<2, spacedim> tria1;
   Triangulation<2, spacedim> tria2;

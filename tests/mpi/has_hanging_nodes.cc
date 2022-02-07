@@ -134,7 +134,7 @@ test_int(const unsigned int n_global = 0, const unsigned int n_local = 0)
       tria_sequential.execute_coarsening_and_refinement();
     }
 
-  deallog << n_global << " " << n_local
+  deallog << n_global << ' ' << n_local
           << " distrib=" << tria_distrib.has_hanging_nodes()
           << "; shared=" << tria_sequential.has_hanging_nodes() << std::endl;
 }

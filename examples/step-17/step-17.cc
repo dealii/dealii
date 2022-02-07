@@ -979,7 +979,7 @@ namespace Step17
           pcout << (p == 0 ? ' ' : '+')
                 << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
                                                                     p));
-        pcout << ")" << std::endl;
+        pcout << ')' << std::endl;
 
         assemble_system();
         const unsigned int n_iterations = solve();

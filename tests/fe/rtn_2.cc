@@ -65,11 +65,11 @@ plot_shape_functions(const unsigned int degree)
       if (q_point % QIterated<1>(q_trapez, div).size() == 0)
         deallog << std::endl;
 
-      deallog << fe.quadrature_point(q_point) << " ";
+      deallog << fe.quadrature_point(q_point) << ' ';
 
       for (unsigned int i = 0; i < fe_rt.dofs_per_cell; ++i)
         for (unsigned int c = 0; c < fe.get_fe().n_components(); ++c)
-          deallog << " " << fe.shape_value_component(i, q_point, c);
+          deallog << ' ' << fe.shape_value_component(i, q_point, c);
 
       deallog << std::endl;
     }

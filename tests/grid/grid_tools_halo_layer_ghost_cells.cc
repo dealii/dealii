@@ -79,12 +79,11 @@ test()
                           ExcMessage("Cell is not a ghost cell!"));
               AssertThrow(cell_2->is_ghost() == true,
                           ExcMessage("Halo cell is not a ghost cell!"));
-              deallog << "Ghost " << cell_1->level() << " " << cell_1->index()
-                      << " " << cell_1->id() << " " << cell_1->id().to_string()
-                      << " "
-                      << "Halo " << cell_2->level() << " " << cell_2->index()
-                      << " " << cell_2->id() << " " << cell_2->id().to_string()
-                      << std::endl;
+              deallog << "Ghost " << cell_1->level() << ' ' << cell_1->index()
+                      << ' ' << cell_1->id() << ' ' << cell_1->id().to_string()
+                      << ' ' << "Halo " << cell_2->level() << ' '
+                      << cell_2->index() << ' ' << cell_2->id() << ' '
+                      << cell_2->id().to_string() << std::endl;
               AssertThrow(cell_2 == cell_1,
                           ExcMessage(
                             "Halo cell is not identical to ghost cell."));

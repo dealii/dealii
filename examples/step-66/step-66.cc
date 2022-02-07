@@ -1127,7 +1127,7 @@ namespace Step66
 
 
         timer.stop();
-        pcout << "Time for setup+solve (CPU/Wall) " << timer.cpu_time() << "/"
+        pcout << "Time for setup+solve (CPU/Wall) " << timer.cpu_time() << '/'
               << timer.wall_time() << " s" << std::endl;
         pcout << std::endl;
 

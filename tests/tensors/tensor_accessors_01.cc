@@ -22,7 +22,7 @@
   for (unsigned int i = 0; i < 2; ++i)     \
     for (unsigned int j = 0; j < 2; ++j)   \
       for (unsigned int k = 0; k < 2; ++k) \
-        deallog << bar[i][j][k] << " ";    \
+        deallog << bar[i][j][k] << ' ';    \
   deallog << std::endl;
 
 

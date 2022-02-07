@@ -787,7 +787,7 @@ namespace Step57
         f << p(dim - 1);
 
         for (int j = 0; j < dim; ++j)
-          f << " " << tmp_vector(j);
+          f << ' ' << tmp_vector(j);
         f << std::endl;
       }
   }

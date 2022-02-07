@@ -172,7 +172,7 @@ test(const unsigned int degree)
                           EvaluationFlags::values | EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
-        deallog << i << " ";
+        deallog << i << ' ';
       deallog << std::endl;
 
       evaluator_scalar.integrate(solution_values,
@@ -180,7 +180,7 @@ test(const unsigned int degree)
                                    EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
-        deallog << i << " ";
+        deallog << i << ' ';
       deallog << std::endl;
     }
 }

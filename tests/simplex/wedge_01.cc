@@ -101,7 +101,7 @@ test_3()
           cell->face(face)->get_dof_indices(dof_indices);
 
           for (const auto i : dof_indices)
-            deallog << i << " ";
+            deallog << i << ' ';
           deallog << std::endl;
         }
     }

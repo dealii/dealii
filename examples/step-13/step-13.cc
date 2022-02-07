@@ -1299,7 +1299,7 @@ namespace Step13
         // iteration. Note that the <code>std::flush</code> is needed to have
         // the text actually appear on the screen, rather than only in some
         // buffer that is only flushed the next time we issue an end-line.
-        std::cout << step << " " << std::flush;
+        std::cout << step << ' ' << std::flush;
 
         // Now solve the problem on the present grid, and run the evaluators
         // on it. The long type name of iterators into the list is a little

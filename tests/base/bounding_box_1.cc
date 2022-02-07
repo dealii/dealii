@@ -45,7 +45,7 @@ test_bounding_box()
   deallog << b.get_boundary_points().second << std::endl;
 
   deallog << "Boundary points are inside: " << b.point_inside(boundaries.first)
-          << " " << b.point_inside(boundaries.second) << std::endl;
+          << ' ' << b.point_inside(boundaries.second) << std::endl;
 
   std::vector<Point<spacedim>> test_points;
 
@@ -126,12 +126,12 @@ test_unitary()
   Point<3> p3(0, 0, 1.0);
 
   deallog << "Checking if all vertices are inside: "
-          << b.point_inside(boundaries.first) << " "
+          << b.point_inside(boundaries.first) << ' '
           << b.point_inside(boundaries.second) << std::endl;
 
-  deallog << b.point_inside(p1) << " " << b.point_inside(p2) << " "
-          << b.point_inside(p3) << " " << b.point_inside(p1 + p2) << " "
-          << b.point_inside(p2 + p3) << " " << b.point_inside(p1 + p3) << " "
+  deallog << b.point_inside(p1) << ' ' << b.point_inside(p2) << ' '
+          << b.point_inside(p3) << ' ' << b.point_inside(p1 + p2) << ' '
+          << b.point_inside(p2 + p3) << ' ' << b.point_inside(p1 + p3) << ' '
           << std::endl;
 
   double eps = std::numeric_limits<double>::epsilon();

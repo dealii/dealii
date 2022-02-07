@@ -127,7 +127,7 @@ main()
              i < matrix_free.get_dof_info(0).row_starts[c + 1].first;
              ++i)
           deallog << std::setw(3) << matrix_free.get_dof_info(0).dof_indices[i]
-                  << " ";
+                  << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;

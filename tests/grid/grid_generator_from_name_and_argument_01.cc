@@ -30,7 +30,7 @@ test(const std::string &name, const std::string &arguments)
   Triangulation<dim, spacedim> tria;
 
   deallog << "Generating Triangulation<" << dim << ", " << spacedim
-          << "> : " << name << "(" << arguments << ")" << std::endl;
+          << "> : " << name << '(' << arguments << ')' << std::endl;
 
   GridGenerator::generate_from_name_and_arguments(tria, name, arguments);
 

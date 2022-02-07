@@ -286,8 +286,8 @@ test(const unsigned int v, const unsigned int degree, const bool do_helmholtz)
     Assert(std::abs(result_mf.second - result_mb.second) < 1e-8,
            ExcNotImplemented());
 
-    deallog << "dim=" << dim << " ";
-    deallog << "degree=" << degree << " ";
+    deallog << "dim=" << dim << ' ';
+    deallog << "degree=" << degree << ' ';
     deallog << "Type=";
 
     if (do_helmholtz)
@@ -298,7 +298,7 @@ test(const unsigned int v, const unsigned int degree, const bool do_helmholtz)
               << " : ";
 
     deallog << "Convergence step " << result_mf.first << " value "
-            << result_mf.second << "." << std::endl;
+            << result_mf.second << '.' << std::endl;
   };
 
   compare(mf_algo(), mb_algo());

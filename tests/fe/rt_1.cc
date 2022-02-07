@@ -60,7 +60,7 @@ plot_shape_functions(const unsigned int degree)
             for (unsigned int i = 0; i < fe_rt.dofs_per_cell; ++i)
               {
                 for (unsigned int c = 0; c < dim; ++c)
-                  deallog << " " << fe_rt.shape_value_component(i, p, c);
+                  deallog << ' ' << fe_rt.shape_value_component(i, p, c);
                 deallog << "  ";
               }
             deallog << std::endl << "grad " << p;

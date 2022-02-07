@@ -59,7 +59,7 @@ test1(const bool keep_boundary)
          i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
          ++i)
       {
-        deallog << "Process " << i << ":" << std::endl;
+        deallog << "Process " << i << ':' << std::endl;
         cat_file((filename + "-" + Utilities::int_to_string(i, 2)).c_str());
       }
 

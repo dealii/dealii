@@ -34,7 +34,7 @@ template <int dim>
 void
 test(const unsigned int degree)
 {
-  deallog << "FE_DGPMonomial<" << dim << "> (" << degree << ")" << std::endl;
+  deallog << "FE_DGPMonomial<" << dim << "> (" << degree << ')' << std::endl;
 
   FE_DGPMonomial<dim> fe_q(degree);
 

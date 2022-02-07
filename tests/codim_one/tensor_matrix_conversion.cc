@@ -38,11 +38,11 @@ template <typename number>
 void
 display_matrix(FullMatrix<number> M)
 {
-  deallog << M.m() << "x" << M.n() << " matrix" << std::endl;
+  deallog << M.m() << 'x' << M.n() << " matrix" << std::endl;
   for (unsigned int i = 0; i < M.m(); ++i)
     {
       for (unsigned int j = 0; j < M.n(); ++j)
-        deallog << M(i, j) << " ";
+        deallog << M(i, j) << ' ';
       deallog << std::endl;
     }
 }
@@ -61,11 +61,11 @@ template <int b>
 void
 display_tensor_2(Tensor<2, b> &T)
 {
-  deallog << b << "x" << b << " tensor" << std::endl;
+  deallog << b << 'x' << b << " tensor" << std::endl;
   for (unsigned int i = 0; i < b; ++i)
     {
       for (unsigned int j = 0; j < b; ++j)
-        deallog << T[i][j] << " ";
+        deallog << T[i][j] << ' ';
       deallog << std::endl;
     }
 }

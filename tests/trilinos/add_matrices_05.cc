@@ -46,7 +46,7 @@ test(TrilinosWrappers::SparseMatrix &m)
   m.compress(VectorOperation::insert);
   m2.compress(VectorOperation::insert);
 
-  deallog << "Matrix nonzeros: " << m.n_nonzero_elements() << " "
+  deallog << "Matrix nonzeros: " << m.n_nonzero_elements() << ' '
           << m2.n_nonzero_elements() << std::endl;
 
   m.print(deallog.get_file_stream());

@@ -803,7 +803,7 @@ namespace Step37
     constraints.close();
     setup_time += time.wall_time();
     time_details << "Distribute DoFs & B.C.     (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
     time.restart();
 
     {
@@ -829,7 +829,7 @@ namespace Step37
 
     setup_time += time.wall_time();
     time_details << "Setup matrix-free system   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
     time.restart();
 
     // Next, initialize the matrices for the multigrid method on all the
@@ -883,7 +883,7 @@ namespace Step37
       }
     setup_time += time.wall_time();
     time_details << "Setup matrix-free levels   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
   }
 
 
@@ -920,7 +920,7 @@ namespace Step37
 
     setup_time += time.wall_time();
     time_details << "Assemble right hand side   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
   }
 
 
@@ -1159,7 +1159,7 @@ namespace Step37
 
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level() << ")"
+            << Utilities::System::get_current_vectorization_level() << ')'
             << std::endl;
     }
 

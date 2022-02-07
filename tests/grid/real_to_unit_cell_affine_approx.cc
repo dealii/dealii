@@ -46,7 +46,7 @@ do_test(const Triangulation<dim, spacedim> &tria, const Point<spacedim> &p)
           mapping_point -= cell->real_to_unit_cell_affine_approximation(p);
           deallog << "Distance to mapping point: ";
           for (unsigned int d = 0; d < dim; ++d)
-            deallog << mapping_point[d] << " ";
+            deallog << mapping_point[d] << ' ';
           deallog << std::endl;
         }
       catch (const typename Mapping<dim, spacedim>::ExcTransformationFailed &)

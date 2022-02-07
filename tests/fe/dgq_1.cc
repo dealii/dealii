@@ -35,8 +35,8 @@ template <int dim>
 void
 test(const unsigned int degree1, const unsigned int degree2)
 {
-  deallog << "FE_DGQ<" << dim << "> (" << degree1 << ")"
-          << " to FE_DGQ<" << dim << "> (" << degree2 << ")" << std::endl;
+  deallog << "FE_DGQ<" << dim << "> (" << degree1 << ')' << " to FE_DGQ<" << dim
+          << "> (" << degree2 << ')' << std::endl;
 
   FE_DGQ<dim> fe1(degree1);
   FE_DGQ<dim> fe2(degree2);

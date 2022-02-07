@@ -146,7 +146,7 @@ namespace Differentiation
         const SD::types::substitution_map &symbol_value_map)
       {
         for (const auto &entry : symbol_value_map)
-          stream << entry.first << " = " << entry.second << "\n";
+          stream << entry.first << " = " << entry.second << '\n';
 
         stream << std::flush;
         return stream;

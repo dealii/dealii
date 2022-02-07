@@ -614,7 +614,7 @@ namespace Step25
 
         std::cout << std::endl
                   << "Time step #" << timestep_number << "; "
-                  << "advancing to t = " << time << "." << std::endl;
+                  << "advancing to t = " << time << '.' << std::endl;
 
         // At the beginning of each time step we must solve the nonlinear
         // equation in the split formulation via Newton's method ---

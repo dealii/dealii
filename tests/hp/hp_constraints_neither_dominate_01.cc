@@ -208,8 +208,8 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
               fe_face_values.get_quadrature_points();
 
             for (unsigned int q = 0; q < n_q_points; ++q)
-              deallog << "u[" << q_points[q] << "]={" << values[q][0] << ","
-                      << values[q][1] << "}" << std::endl;
+              deallog << "u[" << q_points[q] << "]={" << values[q][0] << ','
+                      << values[q][1] << '}' << std::endl;
           }
     }
 

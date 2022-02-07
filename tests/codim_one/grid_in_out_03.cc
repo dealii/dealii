@@ -32,7 +32,7 @@ void
 test(std::string filename)
 {
   deallog.get_file_stream()
-    << " Tria<" << dim << "," << spacedim << ">: " << std::endl;
+    << " Tria<" << dim << ',' << spacedim << ">: " << std::endl;
   Triangulation<dim, spacedim> tria;
   GridIn<dim, spacedim>        gi;
   gi.attach_triangulation(tria);

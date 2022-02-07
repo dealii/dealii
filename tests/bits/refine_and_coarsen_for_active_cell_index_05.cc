@@ -165,7 +165,7 @@ check()
     check(x);
   }
 
-  deallog << "OK for " << dim << "d" << std::endl;
+  deallog << "OK for " << dim << 'd' << std::endl;
 }
 
 

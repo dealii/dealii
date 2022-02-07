@@ -92,7 +92,7 @@ test()
   const auto expected_global_count =
     Utilities::MPI::sum(local_points.size(), MPI_COMM_WORLD);
 
-  deallog << global_count << " " << expected_global_count << std::endl;
+  deallog << global_count << ' ' << expected_global_count << std::endl;
 }
 
 

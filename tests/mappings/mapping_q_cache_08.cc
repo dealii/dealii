@@ -66,7 +66,7 @@ do_test(const unsigned int degree)
 
   mapping_cache.initialize(tria, position_lambda);
 
-  deallog << "Testing degree " << degree << " in " << dim << "D" << std::endl;
+  deallog << "Testing degree " << degree << " in " << dim << 'D' << std::endl;
   for (const auto &cell : tria.cell_iterators())
     {
       deallog << "vertices on cell " << cell->id() << std::endl;
@@ -83,7 +83,7 @@ do_test(const unsigned int degree)
   tria.refine_global(1);
   mapping_cache.initialize(tria, position_lambda);
 
-  deallog << "Testing degree " << degree << " in " << dim << "D" << std::endl;
+  deallog << "Testing degree " << degree << " in " << dim << 'D' << std::endl;
   for (const auto &cell : tria.active_cell_iterators())
     {
       deallog << "vertices on cell " << cell->id() << std::endl;

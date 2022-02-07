@@ -129,7 +129,7 @@ test()
       std::sort(i.begin(), i.end());
 
       for (const auto &j : i)
-        deallog << j << " ";
+        deallog << j << ' ';
       deallog << std::endl;
     }
 
@@ -138,7 +138,7 @@ test()
     {
       std::sort(i.begin(), i.end());
       for (const auto &j : i)
-        deallog << j.first << "@" << j.second << "   ";
+        deallog << j.first << '@' << j.second << "   ";
       deallog << std::endl;
     }
 
@@ -149,7 +149,7 @@ test()
         {
           std::sort(i.begin(), i.end());
           for (const auto &j : i)
-            deallog << j.first << "@" << j.second << "   ";
+            deallog << j.first << '@' << j.second << "   ";
           deallog << std::endl;
         }
     }

@@ -149,14 +149,14 @@ private:
 
         if ((test - dp_real).norm() > tol)
           {
-            deallog << " " << std::endl;
+            deallog << ' ' << std::endl;
             deallog << "ERROR" << std::endl;
             deallog << "cell = " << index << std::endl;
             deallog << "cell vertex(0): " << cell->vertex(0) << std::endl;
             deallog << "cell vertex(1): " << cell->vertex(1) << std::endl;
             deallog << "cell vertex(2): " << cell->vertex(2) << std::endl;
             deallog << "cell vertex(3): " << cell->vertex(3) << std::endl;
-            deallog << " " << std::endl;
+            deallog << ' ' << std::endl;
             deallog << "test point =   " << test << "  mapped point =   " << dp
                     << "  back-mapping =   " << dp_real << std::endl;
             deallog << "test point (unit mid) =   " << test_unit_mid

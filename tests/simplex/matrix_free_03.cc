@@ -355,8 +355,8 @@ test(const unsigned int degree)
 
     Vector<double> difference(tria.n_active_cells());
 
-    deallog << "dim=" << dim << " ";
-    deallog << "degree=" << degree << " ";
+    deallog << "dim=" << dim << ' ';
+    deallog << "degree=" << degree << ' ';
 
     VectorTools::integrate_difference(mapping,
                                       dof_handler,

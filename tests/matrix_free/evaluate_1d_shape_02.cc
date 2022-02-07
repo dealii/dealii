@@ -90,7 +90,7 @@ test()
 
   deallog << "Errors no transpose: ";
   for (unsigned int i = 0; i < M; ++i)
-    deallog << y[i] - y_ref[i] << " ";
+    deallog << y[i] - y_ref[i] << ' ';
   deallog << std::endl;
 
 
@@ -116,7 +116,7 @@ test()
 
   deallog << "Errors transpose:    ";
   for (unsigned int i = 0; i < N; ++i)
-    deallog << x[i] - x_ref[i] << " ";
+    deallog << x[i] - x_ref[i] << ' ';
   deallog << std::endl;
 }
 

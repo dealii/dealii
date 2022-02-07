@@ -3463,7 +3463,7 @@ public:
                  << arg1
                  << " of a triangulation, but this triangulation only has "
                  << arg2 << " refinement levels. The given level " << arg1
-                 << " must be *less* than " << arg2 << ".");
+                 << " must be *less* than " << arg2 << '.');
   /**
    * The function raising this exception can only operate on an empty
    * Triangulation, i.e., a Triangulation without grid cells.

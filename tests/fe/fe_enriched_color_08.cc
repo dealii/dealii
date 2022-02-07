@@ -132,11 +132,11 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
         << std::endl;
       GridOut grid_out;
       grid_out.write_gnuplot(dof_handler.get_triangulation(), f);
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
 
       DoFTools::write_gnuplot_dof_support_point_info(f, support_points);
 
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
 
       deallog << "...finished printing support points" << std::endl;
     }

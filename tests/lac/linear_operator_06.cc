@@ -25,7 +25,7 @@
 #include "../tests.h"
 
 #define PRINTME(name, var)                              \
-  deallog << "Block vector: " name << ":" << std::endl; \
+  deallog << "Block vector: " name << ':' << std::endl; \
   for (unsigned int i = 0; i < var.n_blocks(); ++i)     \
     deallog << "[block " << i << " ]  " << var.block(i);
 

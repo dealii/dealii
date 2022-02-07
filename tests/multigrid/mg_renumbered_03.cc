@@ -377,11 +377,11 @@ LaplaceProblem<dim>::test()
   for (unsigned int l = 0; l < triangulation.n_levels(); ++l)
     {
       diff(d[l], mg_dof_handler_renumbered, u[l], l);
-      deallog << l << " " << u[l].l2_norm() << '\t' << v[l].l2_norm() << '\t'
+      deallog << l << ' ' << u[l].l2_norm() << '\t' << v[l].l2_norm() << '\t'
               << d[l].l2_norm() << std::endl;
       for (unsigned int i = 0; i < d[l].size(); ++i)
         if (d[l](i) != 0)
-          deallog << i << " " << d[l](i) << std::endl;
+          deallog << i << ' ' << d[l](i) << std::endl;
     }
   output_gpl(mg_dof_handler_renumbered, d);
 }

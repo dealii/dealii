@@ -708,7 +708,7 @@ namespace internal
               for (unsigned int j = 0; j < con_it->first; ++j, ++index)
                 {
                   Assert(glob_indices + index != end_row, ExcInternalError());
-                  out << glob_indices[index] << " ";
+                  out << glob_indices[index] << ' ';
                 }
 
               out << "[ ";
@@ -717,14 +717,14 @@ namespace internal
                    k++, index++)
                 {
                   Assert(glob_indices + index != end_row, ExcInternalError());
-                  out << glob_indices[index] << "/" << constraint_pool_data[k]
-                      << " ";
+                  out << glob_indices[index] << '/' << constraint_pool_data[k]
+                      << ' ';
                 }
               out << "] ";
             }
           glob_indices += index;
           for (; glob_indices != end_row; ++glob_indices)
-            out << *glob_indices << " ";
+            out << *glob_indices << ' ';
           out << std::endl;
         }
     }

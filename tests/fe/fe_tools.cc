@@ -42,7 +42,7 @@ print_formatted(const FullMatrix<number> &A,
             deallog << std::setw(width) << std::setprecision(precision)
                     << A(i, j);
           else
-            deallog << std::setw(width) << std::setprecision(precision) << "~";
+            deallog << std::setw(width) << std::setprecision(precision) << '~';
           deallog << ' ';
         };
       deallog << std::endl;

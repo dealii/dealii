@@ -84,7 +84,7 @@ test2()
   double c = vector_function.value(point, 1);
 
   // Output the evaluated function
-  deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"
+  deallog << "Function '" << expressions[0] << ',' << expressions[1] << "'"
           << " @ " << point << " is " << std::flush;
   result.print(deallog.get_file_stream(), 4, false);
   deallog.get_file_stream() << "DEAL::" << std::endl;

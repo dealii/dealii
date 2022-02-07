@@ -351,7 +351,7 @@ public:
                  const char *,
                  const char *,
                  << "The stored type for entry with name \"" << arg1 << "\" is "
-                 << arg2 << " but you requested type " << arg3 << ".");
+                 << arg2 << " but you requested type " << arg3 << '.');
 
 private:
   /**

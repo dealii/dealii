@@ -82,7 +82,7 @@ template <int dim>
 void
 mesh_info(const Triangulation<dim> &tria, const std::string &filename)
 {
-  deallog << "Mesh info for " << filename << ":" << std::endl
+  deallog << "Mesh info for " << filename << ':' << std::endl
           << " dimension: " << dim << std::endl
           << " no. of cells: " << tria.n_active_cells() << std::endl;
 
@@ -105,7 +105,7 @@ mesh_info(const Triangulation<dim> &tria, const std::string &filename)
          it != boundary_count.end();
          ++it)
       {
-        deallog << it->first << "(" << it->second << " times) ";
+        deallog << it->first << '(' << it->second << " times) ";
       }
     deallog << std::endl;
   }

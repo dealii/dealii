@@ -1651,7 +1651,7 @@ namespace Step44
   {
     std::cout << std::endl
               << "Timestep " << time.get_timestep() << " @ " << time.current()
-              << "s" << std::endl;
+              << 's' << std::endl;
 
     BlockVector<double> newton_update(dofs_per_block);
 
@@ -1687,7 +1687,7 @@ namespace Step44
     unsigned int newton_iteration = 0;
     for (; newton_iteration < parameters.max_iterations_NR; ++newton_iteration)
       {
-        std::cout << " " << std::setw(2) << newton_iteration << " "
+        std::cout << ' ' << std::setw(2) << newton_iteration << ' '
                   << std::flush;
 
         // We construct the linear system, but hold off on solving it
@@ -1767,7 +1767,7 @@ namespace Step44
     static const unsigned int l_width = 150;
 
     for (unsigned int i = 0; i < l_width; ++i)
-      std::cout << "_";
+      std::cout << '_';
     std::cout << std::endl;
 
     std::cout << "               SOLVER STEP               "
@@ -1776,7 +1776,7 @@ namespace Step44
               << " NU_U       NU_P       NU_J " << std::endl;
 
     for (unsigned int i = 0; i < l_width; ++i)
-      std::cout << "_";
+      std::cout << '_';
     std::cout << std::endl;
   }
 
@@ -1788,7 +1788,7 @@ namespace Step44
     static const unsigned int l_width = 150;
 
     for (unsigned int i = 0; i < l_width; ++i)
-      std::cout << "_";
+      std::cout << '_';
     std::cout << std::endl;
 
     const std::pair<double, double> error_dil = get_error_dilation();

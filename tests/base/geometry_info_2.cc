@@ -51,7 +51,7 @@ test()
   for (const unsigned int f : GeometryInfo<dim>::face_indices())
     deallog << "face normal" << f << ' '
             << (GeometryInfo<dim>::unit_normal_orientation[f] > 0. ? '+' : '-')
-            << "x" << GeometryInfo<dim>::unit_normal_direction[f] << std::endl;
+            << 'x' << GeometryInfo<dim>::unit_normal_direction[f] << std::endl;
 
   for (const unsigned int f : GeometryInfo<dim>::face_indices())
     {

@@ -65,7 +65,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   DoFTools::distribute_cell_to_dof_vector(dof_handler, cell_data, dof_data);
   // output every third element
   for (unsigned int i = 0; i < dof_data.size(); i += 3)
-    deallog << dof_data(i) << " ";
+    deallog << dof_data(i) << ' ';
   deallog << std::endl;
 
   // check that no other values were
@@ -97,7 +97,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   DoFTools::distribute_cell_to_dof_vector(
     dof_handler, cell_data, dof_data, dof_handler.get_fe().n_components() - 1);
   for (unsigned int i = 0; i < dof_data.size(); i += 3)
-    deallog << dof_data(i) << " ";
+    deallog << dof_data(i) << ' ';
   deallog << std::endl;
 
   // check that no other values were

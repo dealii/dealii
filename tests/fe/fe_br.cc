@@ -80,8 +80,8 @@ test(const Triangulation<dim> &tr,
         {
           deallog << i << ": ( ";
           for (unsigned int d = 0; d < dim; ++d)
-            deallog << cell->vertex(i)[d] << " ";
-          deallog << ")" << std::endl;
+            deallog << cell->vertex(i)[d] << ' ';
+          deallog << ')' << std::endl;
         }
 
       for (unsigned int c = 0; c < fe.n_components(); ++c)

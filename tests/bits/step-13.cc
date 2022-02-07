@@ -188,7 +188,7 @@ namespace Evaluation
     //     data_out.build_patches ();
 
     //     std::ostringstream filename;
-    //     filename << output_name_base << "-"
+    //     filename << output_name_base << '-'
     //       << this->refinement_cycle
     //       << data_out.default_suffix (output_format)
     //       << std::ends;
@@ -718,7 +718,7 @@ run_simulation(
 
   for (unsigned int step = 0; true; ++step)
     {
-      deallog << step << " " << std::flush;
+      deallog << step << ' ' << std::flush;
 
       solver.solve_problem();
 

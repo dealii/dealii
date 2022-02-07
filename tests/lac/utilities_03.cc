@@ -119,7 +119,7 @@ check(const int          degree,
         x(i) = random_value<double>();
       }
 
-  deallog << " Modes inside/outside: " << n_in << " " << n_out << std::endl;
+  deallog << " Modes inside/outside: " << n_in << ' ' << n_out << std::endl;
 
   // for x = x_i v_i , where v_i are eigenvectors
   // p[H]x = \sum_i x_i p(\lambda_i) v_i
@@ -142,7 +142,7 @@ check(const int          degree,
   diff = y;
   diff -= exact;
 
-  deallog << " Filter [" << a << "," << b << "]" << std::endl;
+  deallog << " Filter [" << a << ',' << b << ']' << std::endl;
   deallog << " Error: " << diff.linfty_norm() / exact.linfty_norm()
           << std::endl;
 

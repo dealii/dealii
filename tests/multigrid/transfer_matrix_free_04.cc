@@ -105,7 +105,7 @@ check(const unsigned int fe_degree)
           deallog << "Diff prolongate   l" << level << ": "
                   << filter_out_small_numbers(v3.l2_norm(), tolerance)
                   << std::endl;
-          deallog << "Vectors have ghosts: " << v2.has_ghost_elements() << " "
+          deallog << "Vectors have ghosts: " << v2.has_ghost_elements() << ' '
                   << v3.has_ghost_elements() << std::endl;
         }
 

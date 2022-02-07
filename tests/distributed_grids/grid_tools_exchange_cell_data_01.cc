@@ -79,14 +79,14 @@ test()
       [&](const cell_iterator &cell) {
         DT                 value = map[cell->id()];
         std::ostringstream oss;
-        oss << "pack " << cell->id() << " " << value;
+        oss << "pack " << cell->id() << ' ' << value;
         input.insert(oss.str());
 
         return value;
       },
       [&](const cell_iterator &cell, const DT &data) {
         std::ostringstream oss;
-        oss << "unpack " << cell->id() << " " << data << " from "
+        oss << "unpack " << cell->id() << ' ' << data << " from "
             << cell->subdomain_id();
 
         output.insert(oss.str());

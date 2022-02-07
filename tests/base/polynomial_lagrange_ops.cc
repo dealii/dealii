@@ -42,7 +42,7 @@ check_scale(const std::vector<Polynomial<double>> &p)
           std::max(1e-13, 1e-13 * std::fabs(value1)))
         deallog << "Error scale at x=" << x << ": p(t)=" << value1
                 << ", q(x)=" << value2 << std::endl;
-      deallog << ".";
+      deallog << '.';
     }
   deallog << std::endl;
 }
@@ -69,7 +69,7 @@ check_shift(const std::vector<Polynomial<double>> &p)
           std::max(1e-13, 1e-13 * std::fabs(value1)))
         deallog << "Error shift at x=" << x << ": p(t)=" << value1
                 << ", q(x)=" << value2 << std::endl;
-      deallog << ".";
+      deallog << '.';
     }
   deallog << std::endl;
 }
@@ -92,7 +92,7 @@ check_mult_scalar(const std::vector<Polynomial<double>> &p)
           std::max(1e-13, 1e-13 * std::fabs(value1)))
         deallog << "Error multiply at x=" << x << ": a*p(x)=" << value1
                 << ", q(x)=" << value2 << std::endl;
-      deallog << ".";
+      deallog << '.';
     }
   deallog << std::endl;
 }
@@ -118,7 +118,7 @@ check_mult(const std::vector<Polynomial<double>> &p)
                     << ": p_1(x)*p_2(x)=" << value1 << ", q(x)=" << value2
                     << std::endl;
         }
-      deallog << ".";
+      deallog << '.';
     }
   deallog << std::endl;
 }
@@ -152,7 +152,7 @@ check_expand(const std::vector<Polynomial<double>> &p)
           std::max(1e-10, 1e-10 * std::fabs(value1)))
         deallog << "Error expansion at x=" << x << ": p(x)=" << value1
                 << ", q(x)=" << value2 << std::endl;
-      deallog << ".";
+      deallog << '.';
     }
   deallog << std::endl;
 }
@@ -182,7 +182,7 @@ check_mult_expand(const std::vector<Polynomial<double>> &p)
                     << j << "(x)=" << value1 << ", q(x)=" << value2
                     << std::endl;
         }
-      deallog << ".";
+      deallog << '.';
     }
   deallog << std::endl;
 }

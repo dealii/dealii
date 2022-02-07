@@ -44,7 +44,7 @@ do_test(const unsigned int degree)
   for (unsigned int d = 0; d < dim; ++d)
     p2[d] = 0.5;
 
-  deallog << "Testing degree " << degree << " in " << dim << "D" << std::endl;
+  deallog << "Testing degree " << degree << " in " << dim << 'D' << std::endl;
   for (const auto &cell : tria.active_cell_iterators())
     {
       deallog << "cell " << cell->id() << ": "

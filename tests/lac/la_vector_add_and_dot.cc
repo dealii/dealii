@@ -50,18 +50,18 @@ check()
         {
           deallog << "Vector add reference:   ";
           for (unsigned int i = 0; i < size; ++i)
-            deallog << v1[i] << " ";
+            deallog << v1[i] << ' ';
           deallog << std::endl;
           deallog << "Vector check reference: ";
           for (unsigned int i = 0; i < size; ++i)
-            deallog << check[i] << " ";
+            deallog << check[i] << ' ';
           deallog << std::endl;
 
           const number constant = 1.;
           v1.add(constant);
           deallog << "Vector add constant:    ";
           for (unsigned int i = 0; i < size; ++i)
-            deallog << v1[i] << " ";
+            deallog << v1[i] << ' ';
           deallog << std::endl;
         }
 

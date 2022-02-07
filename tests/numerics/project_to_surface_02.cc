@@ -140,7 +140,7 @@ test()
           deallog << quad->vertex(2);
           deallog << " to ";
           deallog << quad->vertex(3);
-          deallog << ")" << std::endl;
+          deallog << ')' << std::endl;
 
           // now make sure that p is
           // indeed closer to

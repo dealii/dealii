@@ -130,7 +130,7 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
 
   constraints[max_level].distribute(dst);
 
-  deallog << dim << " " << fe_degree_fine << " " << n_refinements << " "
+  deallog << dim << ' ' << fe_degree_fine << ' ' << n_refinements << ' '
           << solver_control.last_step() << std::endl;
 
   return;

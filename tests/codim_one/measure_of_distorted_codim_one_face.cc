@@ -78,7 +78,7 @@ test()
   if (std::abs(sum_1 - sum_2) < tol)
     deallog << "Test passed" << std::endl;
   else
-    deallog << sum_1 << " " << sum_2 << std::endl;
+    deallog << sum_1 << ' ' << sum_2 << std::endl;
   deallog << std::endl;
 }
 

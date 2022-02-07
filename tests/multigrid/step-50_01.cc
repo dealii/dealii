@@ -423,10 +423,10 @@ namespace Step50
     for (unsigned int i = 0; i < triangulation.n_global_levels(); ++i)
       {
         mg_matrices[i].compress(VectorOperation::add);
-        deallog << "mg_mat" << i << " " << mg_matrices[i].frobenius_norm()
+        deallog << "mg_mat" << i << ' ' << mg_matrices[i].frobenius_norm()
                 << std::endl;
         mg_interface_matrices[i].compress(VectorOperation::add);
-        deallog << "mg_interface_mat" << i << " "
+        deallog << "mg_interface_mat" << i << ' '
                 << mg_interface_matrices[i].frobenius_norm() << std::endl;
       }
   }

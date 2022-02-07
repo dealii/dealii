@@ -1314,7 +1314,7 @@ namespace FETools
                  int,
                  << "The dimension " << arg1
                  << " in the finite element string must match "
-                 << "the space dimension " << arg2 << ".");
+                 << "the space dimension " << arg2 << '.');
 
   /**
    * Exception
@@ -1364,8 +1364,8 @@ namespace FETools
                  int,
                  int,
                  int,
-                 << "This is a " << arg1 << "x" << arg2 << " matrix, "
-                 << "but should be a " << arg3 << "x" << arg4 << " matrix.");
+                 << "This is a " << arg1 << 'x' << arg2 << " matrix, "
+                 << "but should be a " << arg3 << 'x' << arg4 << " matrix.");
 
   /**
    * Exception thrown if an embedding matrix was computed inaccurately.

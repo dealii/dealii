@@ -56,7 +56,7 @@ check(const T &object)
 {
   const std::vector<char> buffer = Utilities::pack(object);
   if (buffer.size() != sizeof(object))
-    deallog << buffer.size() << " should be " << sizeof(object) << "!"
+    deallog << buffer.size() << " should be " << sizeof(object) << '!'
             << std::endl;
   else
     deallog << "same size!" << std::endl;

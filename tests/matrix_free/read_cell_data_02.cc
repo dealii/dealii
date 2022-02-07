@@ -130,7 +130,7 @@ private:
                 Assert(cell_data_m[lane] ==
                          data.get_cell_iterator(cell, lane)->id(),
                        ExcInternalError());
-                // deallog << "m" << cell_data_m[lane] << std::endl;
+                // deallog << 'm' << cell_data_m[lane] << std::endl;
 
                 const auto bids =
                   data.get_faces_by_cells_boundary_id(cell, face);

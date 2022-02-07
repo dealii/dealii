@@ -72,7 +72,7 @@ write_dof_data(DoFHandler<dim> &dof_handler)
                   << ", "
                   << "cell " << cell->id() << ", mg_dof_indices: ";
           for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-            deallog << local_mg_dof_indices[i] << " ";
+            deallog << local_mg_dof_indices[i] << ' ';
           deallog << std::endl;
         }
     }
@@ -119,7 +119,7 @@ test()
          tria.level_ghost_owners().begin();
        it != tria.level_ghost_owners().end();
        ++it)
-    deallog << *it << " ";
+    deallog << *it << ' ';
   deallog << std::endl;
 
   write_dof_data(dof_handler);

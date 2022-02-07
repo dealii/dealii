@@ -54,7 +54,7 @@ test()
 
           GridTools::get_subdomain_association(tr, cell_subd);
           for (unsigned int i = 0; i < tr.n_active_cells(); ++i)
-            deallog << cell_subd[i] << " ";
+            deallog << cell_subd[i] << ' ';
           deallog << std::endl;
         }
 

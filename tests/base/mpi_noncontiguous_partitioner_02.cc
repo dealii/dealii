@@ -130,10 +130,10 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
                                  ArrayView<double>(dst.data(), dst.size()));
 
   for (size_t i = 0; i < src.size(); ++i)
-    deallog << static_cast<int>(src[i]) << " ";
+    deallog << static_cast<int>(src[i]) << ' ';
   deallog << std::endl;
   for (size_t i = 0; i < dst.size(); ++i)
-    deallog << static_cast<int>(dst[i]) << " ";
+    deallog << static_cast<int>(dst[i]) << ' ';
   deallog << std::endl << std::endl;
 
 

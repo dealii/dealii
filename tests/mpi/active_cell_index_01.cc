@@ -61,7 +61,7 @@ check()
   check(tria);
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    deallog << "OK for " << dim << "d" << std::endl;
+    deallog << "OK for " << dim << 'd' << std::endl;
 }
 
 

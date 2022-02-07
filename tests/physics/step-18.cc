@@ -610,7 +610,7 @@ namespace Step18
           pcout << (p == 0 ? ' ' : '+')
                 << (GridTools::count_cells_with_subdomain_association(
                      triangulation, p));
-        pcout << ")" << std::endl;
+        pcout << ')' << std::endl;
         setup_system();
         pcout << "    Number of degrees of freedom: " << dof_handler.n_dofs()
               << " (by partition:";
@@ -618,7 +618,7 @@ namespace Step18
           pcout << (p == 0 ? ' ' : '+')
                 << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
                                                                     p));
-        pcout << ")" << std::endl;
+        pcout << ')' << std::endl;
         // Get point at which to output displacement
         // (outer radius of displaced surface)
         {

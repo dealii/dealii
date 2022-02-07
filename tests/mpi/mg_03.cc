@@ -117,7 +117,7 @@ test()
               if (dofs[i] == numbers::invalid_dof_index)
                 deallog << "- ";
               else
-                deallog << dofs[i] << " ";
+                deallog << dofs[i] << ' ';
             deallog << " | ";
           }
         deallog << std::endl;

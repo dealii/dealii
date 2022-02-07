@@ -540,7 +540,7 @@ namespace Step48
       const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level() << ")"
+            << Utilities::System::get_current_vectorization_level() << ')'
             << std::endl
             << std::endl;
     }
@@ -630,7 +630,7 @@ namespace Step48
           << "   Performed " << timestep_number << " time steps." << std::endl;
 
     pcout << "   Average wallclock time per time step: "
-          << wtime / timestep_number << "s" << std::endl;
+          << wtime / timestep_number << 's' << std::endl;
 
     pcout << "   Spent " << output_time << "s on output and " << wtime
           << "s on computations." << std::endl;

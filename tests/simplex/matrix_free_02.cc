@@ -308,15 +308,15 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
 
     deallog << "mesh=";
     if (version == 0)
-      deallog << "P";
+      deallog << 'P';
     else if (version == 1)
-      deallog << "Q";
+      deallog << 'Q';
     else if (version == 2)
-      deallog << "M";
+      deallog << 'M';
     deallog << " : ";
 
-    deallog << "dim=" << dim << " ";
-    deallog << "degree=" << degree << " ";
+    deallog << "dim=" << dim << ' ';
+    deallog << "degree=" << degree << ' ';
     deallog << "Type=";
 
     if (do_helmholtz)
@@ -327,7 +327,7 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
 
     deallog << "Convergence step " << std::get<0>(result_mf) << " value "
             << std::get<1>(result_mf) << " max " << std::get<2>(result_mf)
-            << " norm " << std::get<3>(result_mf) << "." << std::endl;
+            << " norm " << std::get<3>(result_mf) << '.' << std::endl;
   };
 
   compare(mf_algo(), mb_algo());

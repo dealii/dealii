@@ -98,8 +98,8 @@ main(int argc, char **argv)
     // limit the output to every 10th step and increase the precision to make
     // the test more robust
     if (step_number % 10 == 0)
-      deallog << t << " " << std::setprecision(10) << sol[0] << " " << sol[1]
-              << " " << sol[2] << std::endl;
+      deallog << t << ' ' << std::setprecision(10) << sol[0] << ' ' << sol[1]
+              << ' ' << sol[2] << std::endl;
     return 0;
   };
 

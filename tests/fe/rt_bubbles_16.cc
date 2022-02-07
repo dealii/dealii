@@ -38,7 +38,7 @@ test(const unsigned int degree)
           << ", restriction is additive flags:" << std::endl;
 
   for (unsigned int i = 0; i < fe_rt_bubbles.dofs_per_cell; ++i)
-    deallog << fe_rt_bubbles.restriction_is_additive(i) << " ";
+    deallog << fe_rt_bubbles.restriction_is_additive(i) << ' ';
 
   deallog << std::endl;
 }

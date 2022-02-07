@@ -1609,7 +1609,7 @@ public:
    */
   DeclException1(ExcEntryAlreadyExists,
                  std::string,
-                 << "The following entry already exists: " << arg1 << ".");
+                 << "The following entry already exists: " << arg1 << '.');
   /**
    * Exception
    */

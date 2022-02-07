@@ -86,7 +86,7 @@ check_poly_q(const PolynomialsBernardiRaugel<dim> &poly)
       deallog << "BR1<" << dim << "> point " << i << " (" << points[i][0];
       for (unsigned int d = 1; d < dim; ++d)
         deallog << ", " << points[i][d];
-      deallog << ")" << std::endl;
+      deallog << ')' << std::endl;
 
       poly.evaluate(points[i], values, grads, grads2, thirds, fourths);
 
@@ -146,7 +146,7 @@ check_poly_bubble(const PolynomialsBernardiRaugel<dim> &poly)
               << points[i][0];
       for (unsigned int d = 1; d < dim; ++d)
         deallog << ", " << points[i][d];
-      deallog << ")" << std::endl;
+      deallog << ')' << std::endl;
 
       poly.evaluate(points[i], values, grads, grads2, thirds, fourths);
 

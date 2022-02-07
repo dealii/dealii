@@ -173,7 +173,7 @@ test()
           mf.vmult(out, in);
           out -= ref;
           const double diff_norm = out.linfty_norm();
-          deallog << " " << diff_norm;
+          deallog << ' ' << diff_norm;
         }
       deallog << std::endl;
     }

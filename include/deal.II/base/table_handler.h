@@ -617,7 +617,7 @@ public:
    */
   DeclException1(ExcUndefinedTexFormat,
                  std::string,
-                 << "<" << arg1 << "> is not a tex column format. Use "
+                 << '<' << arg1 << "> is not a tex column format. Use "
                  << "'l', 'c', or 'r' to indicate left, centered, or "
                  << "right aligned text.");
   //@}

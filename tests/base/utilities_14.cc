@@ -59,7 +59,7 @@ test()
     Utilities::inverse_Hilbert_space_filling_curve(points, bit_depth);
 
   for (const auto &p : res)
-    deallog << p[0] << " " << p[1] << " "
+    deallog << p[0] << ' ' << p[1] << ' '
             << Utilities::pack_integers<2>(p, bit_depth) << std::endl;
 }
 

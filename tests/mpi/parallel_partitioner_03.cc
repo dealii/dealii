@@ -76,18 +76,18 @@ test()
     file << "**** proc " << myid << std::endl;
     file << "ghost targets: ";
     for (unsigned int i = 0; i < v.ghost_targets().size(); ++i)
-      file << "[" << v.ghost_targets()[i].first << "/"
+      file << '[' << v.ghost_targets()[i].first << '/'
            << v.ghost_targets()[i].second << "] ";
     file << std::endl;
     file << "import targets: ";
     for (unsigned int i = 0; i < v.import_targets().size(); ++i)
-      file << "[" << v.import_targets()[i].first << "/"
+      file << '[' << v.import_targets()[i].first << '/'
            << v.import_targets()[i].second << "] ";
     file << std::endl;
     file << "import indices:" << std::endl;
     for (unsigned int i = 0; i < v.import_indices().size(); ++i)
-      file << "[" << v.import_indices()[i].first << "/"
-           << v.import_indices()[i].second << ")" << std::endl;
+      file << '[' << v.import_indices()[i].first << '/'
+           << v.import_indices()[i].second << ')' << std::endl;
     file << "****" << std::endl;
   }
 

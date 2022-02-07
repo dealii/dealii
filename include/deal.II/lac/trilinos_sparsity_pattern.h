@@ -965,10 +965,10 @@ namespace TrilinosWrappers
                    size_type,
                    size_type,
                    size_type,
-                   << "You tried to access element (" << arg1 << "/" << arg2
-                   << ")"
+                   << "You tried to access element (" << arg1 << '/' << arg2
+                   << ')'
                    << " of a distributed matrix, but only rows in range ["
-                   << arg3 << "," << arg4
+                   << arg3 << ',' << arg4
                    << "] are stored locally and can be accessed.");
 
     /**
@@ -977,9 +977,8 @@ namespace TrilinosWrappers
     DeclException2(ExcAccessToNonPresentElement,
                    size_type,
                    size_type,
-                   << "You tried to access element (" << arg1 << "/" << arg2
-                   << ")"
-                   << " of a sparse matrix, but it appears to not"
+                   << "You tried to access element (" << arg1 << '/' << arg2
+                   << ')' << " of a sparse matrix, but it appears to not"
                    << " exist in the Trilinos sparsity pattern.");
     //@}
   private:

@@ -124,7 +124,7 @@ test(const bool adaptive_ref = true)
         my_rows.erase(std::unique(my_rows.begin(), my_rows.end()),
                       my_rows.end());
         for (auto el : my_rows)
-          deallog << " " << el;
+          deallog << ' ' << el;
         deallog << std::endl;
       };
       get_and_log(true);
@@ -166,7 +166,7 @@ test(const bool adaptive_ref = true)
         << "plot '-' using 1:2 with lines notitle, '-' with labels tc rgb 'red' nopoint notitle, '-' with labels point pt 4 offset 1,1 notitle"
         << std::endl;
       GridOut().write_gnuplot(tria, f);
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
 
       // output cell blocks:
       for (unsigned int cell = 0; cell < n_cells; ++cell)
@@ -177,11 +177,11 @@ test(const bool adaptive_ref = true)
           }
 
       f << std::flush;
-      f << "e" << std::endl << std::endl;
+      f << 'e' << std::endl << std::endl;
 
       DoFTools::write_gnuplot_dof_support_point_info(f, support_points);
 
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
     }
 }
 

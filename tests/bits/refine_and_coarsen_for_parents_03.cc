@@ -115,7 +115,7 @@ check()
     for (unsigned int child = 0; child < cell->n_children(); ++child)
       AssertThrow(cell->child(child)->parent() == cell, ExcInternalError());
 
-  deallog << "OK for " << dim << "d" << std::endl;
+  deallog << "OK for " << dim << 'd' << std::endl;
 }
 
 

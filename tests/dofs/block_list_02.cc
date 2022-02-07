@@ -38,7 +38,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     print_patches(bl);
     deallog.push("inv vertex mapping");
     for (unsigned int i = 0; i < vm.size(); ++i)
-      deallog << " " << vm[i];
+      deallog << ' ' << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -54,7 +54,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     print_patches(bl);
     deallog.push("inv vertex mapping");
     for (unsigned int i = 0; i < vm.size(); ++i)
-      deallog << " " << vm[i];
+      deallog << ' ' << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -70,7 +70,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     print_patches(bl);
     deallog.push("inv vertex mapping");
     for (unsigned int i = 0; i < vm.size(); ++i)
-      deallog << " " << vm[i];
+      deallog << ' ' << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -86,7 +86,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     print_patches(bl);
     deallog.push("inv vertex mapping");
     for (unsigned int i = 0; i < vm.size(); ++i)
-      deallog << " " << vm[i];
+      deallog << ' ' << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -102,7 +102,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     print_patches(bl);
     deallog.push("inv vertex mapping");
     for (unsigned int i = 0; i < vm.size(); ++i)
-      deallog << " " << vm[i];
+      deallog << ' ' << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -116,7 +116,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       bl, dof, level, true, true, true, true, false);
     deallog.push("vertex mapping");
     for (unsigned int i = 0; i < vm.size(); ++i)
-      deallog << " " << vm[i];
+      deallog << ' ' << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -130,7 +130,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       bl, dof, level, true, true, false, false, false);
     deallog.push("vertex mapping");
     for (unsigned int i = 0; i < vm.size(); ++i)
-      deallog << " " << vm[i];
+      deallog << ' ' << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -144,7 +144,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       bl, dof, level, true, false, false, false, false);
     deallog.push("vertex mapping");
     for (unsigned int i = 0; i < vm.size(); ++i)
-      deallog << " " << vm[i];
+      deallog << ' ' << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -158,7 +158,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       bl, dof, level, false, true, true, true, false);
     deallog.push("vertex mapping");
     for (unsigned int i = 0; i < vm.size(); ++i)
-      deallog << " " << vm[i];
+      deallog << ' ' << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -172,7 +172,7 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       bl, dof, level, false, false, false, false, false);
     deallog.push("vertex mapping");
     for (unsigned int i = 0; i < vm.size(); ++i)
-      deallog << " " << vm[i];
+      deallog << ' ' << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();

@@ -69,7 +69,7 @@ test()
   BoundingBox<dim> bounding_box =
     GridTools::compute_bounding_box(tria, predicate); // General predicate
 
-  deallog << bounding_box.get_boundary_points().first << " "
+  deallog << bounding_box.get_boundary_points().first << ' '
           << bounding_box.get_boundary_points().second << std::endl;
 }
 

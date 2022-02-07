@@ -201,7 +201,7 @@ namespace internal
                      size_type,
                      size_type,
                      << "Index " << N - P + 1 << "has a value of " << arg1
-                     << " but needs to be in the range [" << arg2 << "," << arg3
+                     << " but needs to be in the range [" << arg2 << ',' << arg3
                      << "[.");
 
     private:

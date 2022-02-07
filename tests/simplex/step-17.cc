@@ -438,7 +438,7 @@ namespace Step17
       deallog << (p == 0 ? ' ' : '+')
               << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
                                                                   p));
-    deallog << ")" << std::endl;
+    deallog << ')' << std::endl;
 
     assemble_system();
     solve();

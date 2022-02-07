@@ -492,7 +492,7 @@ namespace Step35
                    double,
                    << " The time step " << arg1 << " is out of range."
                    << std::endl
-                   << " The permitted range is (0," << arg2 << "]");
+                   << " The permitted range is (0," << arg2 << ']');
 
     void create_triangulation_and_dofs(const unsigned int n_refines);
 

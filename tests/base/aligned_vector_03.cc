@@ -28,7 +28,7 @@ test()
   VEC a(4);
   deallog << "Constructor: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   a[2] = true;
@@ -41,25 +41,25 @@ test()
 
   deallog << "Insertion: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   a.resize(4);
   deallog << "Shrinking: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   a.reserve(100);
   deallog << "Reserve: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   a = b;
   deallog << "Assignment: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   // check setting elements for large vectors

@@ -70,7 +70,7 @@ test()
   for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
        cell != tria.end();
        ++cell)
-    deallog << cell->id().to_string() << " " << cell->level_subdomain_id()
+    deallog << cell->id().to_string() << ' ' << cell->level_subdomain_id()
             << std::endl;
 
   FE_DGQ<dim>     fe1(1);

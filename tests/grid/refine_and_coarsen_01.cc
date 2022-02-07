@@ -57,7 +57,7 @@ check()
 
   deallog << "n_active_cells: " << tria.n_active_cells() << std::endl;
 
-  deallog << "OK for " << dim << "d" << std::endl;
+  deallog << "OK for " << dim << 'd' << std::endl;
 }
 
 

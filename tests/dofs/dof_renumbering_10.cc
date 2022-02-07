@@ -98,9 +98,9 @@ test(const bool adaptive_ref = true)
   for (const auto &c : cell_order)
     {
       c->get_active_or_mg_dof_indices(cell_dofs);
-      deallog << c->center() << ":";
+      deallog << c->center() << ':';
       for (const auto d : cell_dofs)
-        deallog << " " << d;
+        deallog << ' ' << d;
       deallog << std::endl;
     }
 
@@ -134,14 +134,14 @@ test(const bool adaptive_ref = true)
         << "plot '-' using 1:2 with lines notitle, '-' with labels tc rgb 'red' nopoint notitle, '-' with labels point pt 4 offset 1,1 notitle"
         << std::endl;
       GridOut().write_gnuplot(tria, f);
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
 
       // output cell order
       for (unsigned int index = 0; index < cell_order.size(); ++index)
         f << cell_order[index]->center() << " \"" << index << "\"\n";
 
       f << std::flush;
-      f << "e" << std::endl << std::endl;
+      f << 'e' << std::endl << std::endl;
 
       // output only owned support points
       for (auto it = support_points.cbegin(); it != support_points.cend();)
@@ -154,7 +154,7 @@ test(const bool adaptive_ref = true)
 
       DoFTools::write_gnuplot_dof_support_point_info(f, support_points);
 
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
     }
 }
 

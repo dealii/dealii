@@ -34,15 +34,15 @@ print_triangulation(const Triangulation<dim, dim> &tria)
 {
   for (const auto &cell : tria)
     {
-      deallog << cell.material_id() << " ";
+      deallog << cell.material_id() << ' ';
 
       for (const unsigned int f : GeometryInfo<dim>::face_indices())
         deallog << (cell.face(f)->at_boundary() ? cell.face(f)->boundary_id() :
                                                   -1)
-                << " ";
+                << ' ';
 
       for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
-        deallog << cell.vertex(v) << " ";
+        deallog << cell.vertex(v) << ' ';
 
       deallog << std::endl;
     }

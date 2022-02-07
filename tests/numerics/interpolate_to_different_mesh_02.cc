@@ -102,7 +102,7 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
           unit_support_point = cell->get_fe().unit_support_point(shapefun);
           support_point =
             mapping.transform_unit_to_real_cell(cell, unit_support_point);
-          deallog << " " << support_point << ":\n "
+          deallog << ' ' << support_point << ":\n "
                   << u_1[local_dof_indices_1[shapefun]] << endl
                   << endl;
         }
@@ -118,7 +118,7 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
           unit_support_point = cell->get_fe().unit_support_point(shapefun);
           support_point =
             mapping.transform_unit_to_real_cell(cell, unit_support_point);
-          deallog << " " << support_point << ":\n "
+          deallog << ' ' << support_point << ":\n "
                   << u_2[local_dof_indices_2[shapefun]] << endl
                   << endl;
         }

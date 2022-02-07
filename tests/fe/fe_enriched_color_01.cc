@@ -98,7 +98,7 @@ test()
   for (int i = 0; i < 5; ++i)
     for (int j = 0; j < 5; ++j)
       {
-        deallog << i << ":" << j << "="
+        deallog << i << ':' << j << '='
                 << ColorEnriched::internal::find_connection_between_subdomains(
                      dof_handler, predicates[i], predicates[j])
                 << std::endl;

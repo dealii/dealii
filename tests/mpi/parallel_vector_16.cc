@@ -57,7 +57,7 @@ test()
                                                MPI_COMM_WORLD);
 
   deallog << "Local range of proc 0: "
-          << v.get_partitioner()->local_range().first << " "
+          << v.get_partitioner()->local_range().first << ' '
           << v.get_partitioner()->local_range().second << std::endl;
 
   // set local values

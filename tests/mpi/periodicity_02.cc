@@ -701,7 +701,7 @@ namespace Step22
 
     std::ostringstream filename;
     filename
-      << "solution-" << Utilities::int_to_string(refinement_cycle, 2) << "."
+      << "solution-" << Utilities::int_to_string(refinement_cycle, 2) << '.'
       << Utilities::int_to_string(triangulation.locally_owned_subdomain(), 2)
       << ".vtu";
 

@@ -469,7 +469,7 @@ namespace Step42
       hy = 1.0 / (ny - 1);
 
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-        std::cout << "Read obstacle from file <" << name << ">" << std::endl
+        std::cout << "Read obstacle from file <" << name << '>' << std::endl
                   << "Resolution of the scanned obstacle picture: " << nx
                   << " x " << ny << std::endl;
     }
@@ -1716,7 +1716,7 @@ namespace Step42
                  !transfer_solution)
           constitutive_law.set_sigma_0(correct_sigma);
 
-        pcout << " " << std::endl;
+        pcout << ' ' << std::endl;
         pcout << "   Newton iteration " << newton_step << std::endl;
         pcout << "      Updating active set..." << std::endl;
 
@@ -2154,7 +2154,7 @@ namespace Step42
         Utilities::System::MemoryStats stats;
         Utilities::System::get_memory_stats(stats);
         pcout << "Peak virtual memory used, resident in kB: " << stats.VmSize
-              << " " << stats.VmRSS << std::endl;
+              << ' ' << stats.VmRSS << std::endl;
 
         if (base_mesh == "box")
           output_contact_force();

@@ -72,6 +72,6 @@ main(int argc, char **argv)
   deallog << "Number of colors used: " << num_colors << std::endl;
   for (unsigned int i = 0; i < num_indices; ++i)
     {
-      deallog << i << " " << color_indices[i] << std::endl;
+      deallog << i << ' ' << color_indices[i] << std::endl;
     }
 }

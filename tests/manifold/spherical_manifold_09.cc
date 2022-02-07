@@ -53,7 +53,7 @@ main()
                 << (1.0 - cell->face(f)->vertex(1) *
                             spherical.normal_vector(cell->face(f),
                                                     cell->face(f)->vertex(1)))
-                << " "
+                << ' '
                 << (1.0 -
                     cell->face(f)->center(/*respect_manifold=*/true) *
                       spherical.normal_vector(cell->face(f),
@@ -70,7 +70,7 @@ main()
                 << (0.5 - cell->face(f)->vertex(1) *
                             spherical.normal_vector(cell->face(f),
                                                     cell->face(f)->vertex(1)))
-                << " "
+                << ' '
                 << (0.5 -
                     cell->face(f)->center(/*respect_manifold=*/true) *
                       spherical.normal_vector(cell->face(f),

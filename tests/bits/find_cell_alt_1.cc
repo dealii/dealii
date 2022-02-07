@@ -44,7 +44,7 @@ check(Triangulation<2> &tria)
 
   deallog << cell.first << std::endl;
   for (const unsigned int v : GeometryInfo<2>::vertex_indices())
-    deallog << "<" << cell.first->vertex(v) << "> ";
+    deallog << '<' << cell.first->vertex(v) << "> ";
   deallog << "[ " << cell.second << "] ";
   deallog << std::endl;
 

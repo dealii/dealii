@@ -675,10 +675,10 @@ namespace MeshWorker
     os << "M: " << M1.size() << " face " << M2.size() << std::endl;
     for (unsigned int i = 0; i < M1.size(); ++i)
       {
-        os << "  " << M1[i].row << "," << M1[i].column << " "
+        os << "  " << M1[i].row << ',' << M1[i].column << ' '
            << M1[i].matrix.m() << 'x' << M1[i].matrix.n();
         if (i < M2.size())
-          os << " face " << M2[i].row << "," << M2[i].column << " "
+          os << " face " << M2[i].row << ',' << M2[i].column << ' '
              << M2[i].matrix.m() << 'x' << M2[i].matrix.n();
         os << std::endl;
       }

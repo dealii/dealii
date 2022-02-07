@@ -82,8 +82,8 @@ class Vector;
  *         << " @ " << point
  *         << " is: "
  *         << std::endl
- *         << result[0][0] << " " << result[0][1] << std::endl
- *         << result[1][0] << " " << result[1][1]
+ *         << result[0][0] << ' ' << result[0][1] << std::endl
+ *         << result[1][0] << ' ' << result[1][1]
  *         << std::endl;
  * @endcode
  *

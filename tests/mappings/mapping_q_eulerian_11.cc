@@ -128,7 +128,7 @@ test()
 
   for (auto point = active_vertices.begin(); point != active_vertices.end();
        ++point)
-    deallog << point->second << " ";
+    deallog << point->second << ' ';
 
   deallog << std::endl << "Ok." << std::endl;
 }

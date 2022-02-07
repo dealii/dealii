@@ -37,7 +37,7 @@ test()
 
   deallog << "Contents of new VEC: ";
   for (unsigned int i = 0; i < b.size(); ++i)
-    deallog << b[i] << " ";
+    deallog << b[i] << ' ';
   deallog << std::endl;
 
   a.resize(6, 42);
@@ -46,7 +46,7 @@ test()
 
   deallog << "Contents of new VEC: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   a = std::move(b);

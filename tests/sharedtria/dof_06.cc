@@ -91,7 +91,7 @@ test()
       cell->get_dof_indices(local_dof_indices);
       deallog << "cell" << cell->index() << " has dofs: ";
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-        deallog << local_dof_indices[i] << " ";
+        deallog << local_dof_indices[i] << ' ';
       deallog << std::endl;
     }
 }

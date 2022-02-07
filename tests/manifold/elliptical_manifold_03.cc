@@ -67,7 +67,7 @@ main()
     ellipse.push_forward(chart_point_minusphi);
 
   deallog << "Gradient by finite differences: "
-          << (space_point_plusc - space_point_minusc) / (2.0 * h) << " "
+          << (space_point_plusc - space_point_minusc) / (2.0 * h) << ' '
           << (space_point_plusphi - space_point_minusphi) / (2.0 * h)
           << std::endl;
   deallog << "Analytic gradient:              "

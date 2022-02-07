@@ -2543,7 +2543,7 @@ SparseMatrix<number>::print(StreamType &out,
               if (across)
                 out << ' ' << i << ',' << cols->colnums[j] << ':' << val[j];
               else
-                out << "(" << i << "," << cols->colnums[j] << ") " << val[j]
+                out << '(' << i << ',' << cols->colnums[j] << ") " << val[j]
                     << std::endl;
             }
         }

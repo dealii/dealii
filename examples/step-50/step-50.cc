@@ -327,7 +327,7 @@ bool Settings::try_parse(const std::string &prm_filename)
     {
       std::cout << "****  Error: No input file provided!\n"
                 << "****  Error: Call this program as './step-50 input.prm\n"
-                << "\n"
+                << '\n'
                 << "****  You may want to use one of the input files in this\n"
                 << "****  directory, or use the following default values\n"
                 << "****  to create an input file:\n";

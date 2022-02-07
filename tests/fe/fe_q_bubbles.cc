@@ -303,7 +303,7 @@ Step3<dim>::output_results(unsigned int i) const
   const double Linfty_error = difference_per_cell.linfty_norm();
 
   deallog << std::endl
-          << fe->get_name() << " " << i << std::endl
+          << fe->get_name() << ' ' << i << std::endl
           << "L2_error: " << L2_error << std::endl
           << "H1_error: " << H1_error << std::endl
           << "Linfty_error: " << Linfty_error << std::endl

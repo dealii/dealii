@@ -285,7 +285,7 @@ test()
       sparse_matrix.vmult(ref, in[i]);
       out[i] -= ref;
       const double diff_norm = out[i].linfty_norm();
-      deallog << diff_norm << " ";
+      deallog << diff_norm << ' ';
     }
   deallog << std::endl << std::endl;
 }

@@ -62,7 +62,7 @@ do_test()
       for (unsigned int i = 0; i < n_numbers; ++i)
         {
           for (unsigned int j = 0; j < n_vectors; ++j)
-            deallog << arr[i][j] << " ";
+            deallog << arr[i][j] << ' ';
           deallog << std::endl;
         }
     }
@@ -84,7 +84,7 @@ do_test()
       for (unsigned int i = 0; i < n_vectors; ++i)
         {
           for (unsigned int j = 0; j < n_numbers; ++j)
-            deallog << other[i * n_numbers + j] << " ";
+            deallog << other[i * n_numbers + j] << ' ';
           deallog << std::endl;
         }
     }
@@ -106,7 +106,7 @@ do_test()
       for (unsigned int i = 0; i < n_vectors; ++i)
         {
           for (unsigned int j = 0; j < n_numbers; ++j)
-            deallog << other[i * n_numbers + j] << " ";
+            deallog << other[i * n_numbers + j] << ' ';
           deallog << std::endl;
         }
     }

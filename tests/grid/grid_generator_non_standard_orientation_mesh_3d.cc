@@ -63,7 +63,7 @@ plot_all_info(const Triangulation<dim> &tria)
         {
           deallog << cell->line_orientation(line_index) << "  ";
         } // line_index
-      deallog << "}" << std::endl << std::endl;
+      deallog << '}' << std::endl << std::endl;
     } // cell
 }
 

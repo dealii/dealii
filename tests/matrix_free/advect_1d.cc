@@ -305,7 +305,7 @@ test(const unsigned int n_refine)
   out -= in;
 
   double diff_norm = out.linfty_norm();
-  deallog << "Norm of difference:          " << diff_norm << " " << std::endl;
+  deallog << "Norm of difference:          " << diff_norm << ' ' << std::endl;
 }
 
 

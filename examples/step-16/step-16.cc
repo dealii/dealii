@@ -586,7 +586,7 @@ namespace Step16
 
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
     std::cout << "   Number of CG iterations: " << solver_control.last_step()
-              << "\n"
+              << '\n'
               << std::endl;
     constraints.distribute(solution);
   }

@@ -1209,7 +1209,7 @@ namespace Step75
       pcout << "   Frequencies of poly. degrees:";
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         if (n_fe_indices[i] > 0)
-          pcout << ' ' << fe_collection[i].degree << ":" << n_fe_indices[i];
+          pcout << ' ' << fe_collection[i].degree << ':' << n_fe_indices[i];
       pcout << std::endl;
     }
   }

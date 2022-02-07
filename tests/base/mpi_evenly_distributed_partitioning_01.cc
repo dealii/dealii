@@ -80,7 +80,7 @@ test()
   deallog << "Total size=" << size << std::endl;
   for (unsigned int p = 0; p < vec.size(); ++p)
     {
-      deallog << "p=" << p << ":" << std::endl;
+      deallog << "p=" << p << ':' << std::endl;
       vec[p].print(deallog.get_file_stream());
     }
 }

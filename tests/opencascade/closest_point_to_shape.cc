@@ -82,7 +82,7 @@ main()
       v           = std::get<3>(ref);
 
       deallog << "Origin: " << points[i] << ", on unit circle: " << pp
-              << ", with local coordinates (u, v): (" << u << ", " << v << ")"
+              << ", with local coordinates (u, v): (" << u << ", " << v << ')'
               << std::endl;
     }
   return 0;

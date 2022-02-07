@@ -51,7 +51,7 @@ namespace Functions
                  << "The input interpolation points are not strictly ordered : "
                  << std::endl
                  << "x[" << arg1 << "] = " << arg2 << " >= x[" << (arg1 + 1)
-                 << "] = " << arg3 << ".");
+                 << "] = " << arg3 << '.');
 
   DeclException3(
     ExcCSplineRange,
@@ -60,7 +60,7 @@ namespace Functions
     double,
     << "Spline function can not be evaluated outside of the interpolation range: "
     << std::endl
-    << arg1 << " is not in [" << arg2 << ";" << arg3 << "].");
+    << arg1 << " is not in [" << arg2 << ';' << arg3 << "].");
 
   /**
    * The cubic spline function using GNU Scientific Library.

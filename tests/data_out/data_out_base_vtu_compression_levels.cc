@@ -78,7 +78,7 @@ check_all(std::ostream &log)
             Assert(false, ExcInternalError());
         }
       log << "==============================\n"
-          << dim << spacedim << "-" << flags.compression_level << ".vtu"
+          << dim << spacedim << '-' << flags.compression_level << ".vtu"
           << "\n==============================\n";
       check<dim, spacedim>(flags, log);
     }

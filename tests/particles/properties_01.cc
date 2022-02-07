@@ -107,13 +107,13 @@ test()
       for (unsigned int i = 0; i < ncomponents; ++i)
         {
           deallog << interpolatedParticleQuantities[part * ncomponents + i]
-                  << " ";
+                  << ' ';
         }
       deallog << std::endl;
       deallog << "expected quantities: ";
       for (unsigned int i = 0; i < dim; ++i)
         {
-          deallog << iter->get_location()[i] << " ";
+          deallog << iter->get_location()[i] << ' ';
         }
       deallog << " 1" << std::endl;
       deallog << std::endl;

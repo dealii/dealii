@@ -520,7 +520,7 @@ DGHeat<dim>::output_results(unsigned int it) const
 
   std::string fname = dimension + Utilities::int_to_string(it) + ".vtk";
 
-  deallog << "  Writing solution to <" << fname << ">" << std::endl;
+  deallog << "  Writing solution to <" << fname << '>' << std::endl;
 
   std::ofstream output(fname.c_str());
 
