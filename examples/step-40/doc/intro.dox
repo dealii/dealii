@@ -52,13 +52,13 @@ entire problem these thousands of computers are solving on every last
 processor is clearly not going to scale: it is going to take forever,
 and maybe more importantly no single machine will have enough memory
 to store a mesh that has a billion cells (at least not at the time of
-writing this). In reality, programs like step-17 and step-18 can
-therefore not be run on more than maybe 100 or 200 processors and even
-there storing the Triangulation and DoFHandler objects consumes the
-vast majority of memory on each machine.
+writing this). In reality, programs like step-17 and step-18 can therefore 
+not be run on more than maybe 100 or 200 processors, and even then storing 
+the Triangulation and DoFHandler objects consumes the vast majority of 
+memory on each machine.
 
-Consequently, we need to approach the problem differently: to scale to
-very large problems each processor can only store its own little piece
+Consequently, we need to approach the problem differently: to scale to 
+very large problems, each processor can only store its own little piece 
 of the Triangulation and DoFHandler objects. deal.II implements such a
 scheme in the parallel::distributed namespace and the classes
 therein. It builds on an external library, <a
@@ -66,8 +66,8 @@ href="http://www.p4est.org/">p4est</a> (a play on the expression
 <i>parallel forest</i> that describes the parallel storage of a
 hierarchically constructed mesh as a forest of quad- or
 oct-trees). You need to <a
-href="../../external-libs/p4est.html">install and configure p4est</a>
-but apart from that all of its workings are hidden under the surface
+href="../../external-libs/p4est.html">install and configure p4est,</a>
+but apart from that, all of its workings are hidden under the surface
 of deal.II.
 
 In essence, what the parallel::distributed::Triangulation class and
