@@ -623,7 +623,8 @@ namespace GridGenerator
       for (const auto &face : cell->face_iterators())
         if (face->at_boundary())
           {
-            if (face->manifold_id() == numbers::flat_manifold_id)
+            if (face->manifold_id() == numbers::flat_manifold_id ||
+                face->manifold_id() == n_pipes)
               // opening cross section
               face->set_boundary_id(cell->material_id());
             else
