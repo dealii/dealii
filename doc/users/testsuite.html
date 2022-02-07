@@ -110,7 +110,7 @@ tests/my_test.prm</pre>
 SET(TARGET step-1)
 SET(TARGET_SRC step-1.cc)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 FIND_PACKAGE(deal.II 10.0.0 REQUIRED
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
@@ -215,7 +215,7 @@ tests/support/my_test_2.output</pre>
       <pre class="cmake">
 # top-level CMakelists.txt
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 FIND_PACKAGE(deal.II 10.0.0 REQUIRED
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
