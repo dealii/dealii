@@ -100,7 +100,7 @@ FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
 #
 # Always undefine the following variables in the setup_tests target:
 #
-FOREACH(_var DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT)
+FOREACH(_var DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT TEST_MPI_RANK_LIMIT TEST_THREAD_LIMIT)
   LIST(APPEND _options "-U${_var}")
   IF(NOT "${${_var}}" STREQUAL "")
     LIST(APPEND _options "-D${_var}=${${_var}}")

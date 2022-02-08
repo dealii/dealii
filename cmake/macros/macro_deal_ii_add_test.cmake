@@ -69,17 +69,20 @@
 #     - Complete path to the numdiff binary.
 #
 #   TEST_TIME_LIMIT
-#     - specifying the maximal wall clock time in seconds a test is allowed
-#       to run
+#     - Specifies the maximal wall clock time in seconds a test is allowed
+#       to run.
 #
 #   TEST_MPI_RANK_LIMIT
 #     - Specifies the maximal number of MPI ranks that can be used. If a
 #       test variant configures a larger number of MPI ranks (via
 #       .mpirun=N. in the output file) than this limit the test will be
 #       dropped. The special value 0 enforces no limit. Defaults to 0.
+
 #   TEST_THREAD_LIMIT
-#     - Specifies the maximal number of worker threads that can be used by
-#       the threading backend. Defaults to 3.
+#     - Specifies the maximal number of worker threads that can should be
+#       used by the threading backend. Note that individual tests might
+#       exceed this limit by calling MultithreadInfo::set_thread_limit(), or
+#       by manually creating additional threads. Defaults to 3.
 #
 # Usage:
 #     DEAL_II_ADD_TEST(category test_name comparison_file)
