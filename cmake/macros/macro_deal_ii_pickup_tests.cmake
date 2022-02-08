@@ -36,6 +36,12 @@
 #     TEST_TIME_LIMIT
 #       - Specifies the maximal wall clock time in seconds a test is
 #         allowed to run. Defaults to 600.
+#     TEST_MPI_RANK_LIMIT
+#       - specifying the maximal number of MPI ranks that can be used. If a
+#         test variant configures a larger number of MPI ranks (via
+#         .mpirun=N. in the output file) than this limit the test will be
+#         dropped. The special value "0" enforces no limit.
+#
 #     TEST_PICKUP_REGEX
 #       - A regular expression to select only a subset of tests during setup.
 #         An empty string is interpreted as a catchall (this is the default).
@@ -46,9 +52,6 @@
 # Usage:
 #     DEAL_II_PICKUP_TESTS()
 #
-
-# We use CONTINUE(), which is new in cmake 3.2
-CMAKE_MINIMUM_REQUIRED(VERSION 3.2.0)
 
 #
 # Two very small macros that are used below:
@@ -172,11 +175,14 @@ MACRO(DEAL_II_PICKUP_TESTS)
   ENDIF()
 
   #
-  # Set time limit:
+  # Set various limits:
   #
 
   SET_IF_EMPTY(TEST_TIME_LIMIT "$ENV{TEST_TIME_LIMIT}")
   SET_IF_EMPTY(TEST_TIME_LIMIT 600)
+
+  SET_IF_EMPTY(TEST_MPI_RANK_LIMIT "$ENV{TEST_MPI_RANK_LIMIT}")
+  SET_IF_EMPTY(TEST_MPI_RANK_LIMIT 0)
 
   #
   # ... and finally pick up tests:

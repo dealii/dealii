@@ -72,11 +72,17 @@
 #     - specifying the maximal wall clock time in seconds a test is allowed
 #       to run
 #
+#   TEST_MPI_RANK_LIMIT
+#     - specifying the maximal number of MPI ranks that can be used. If a
+#       test variant configures a larger number of MPI ranks (via
+#       .mpirun=N. in the output file) than this limit the test will be
+#       dropped. The special value "0" enforces no limit.
+#
 # Usage:
 #     DEAL_II_ADD_TEST(category test_name comparison_file)
 #
 
-MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
+FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
   IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
@@ -106,6 +112,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
     SET(_n_cpu 0) # 0 indicates that no mpirun should be used
   ELSE()
     STRING(REGEX REPLACE "^mpirun=([0-9]*)$" "\\1" _n_cpu ${_n_cpu})
+  ENDIF()
+
+  #
+  # If the number of MPI ranks specified for the test via .mpirun=N.
+  # exceeds the limit ${TEST_MPI_RANK_LIMIT}, skip defining the test
+  #
+  IF(TEST_MPI_RANK_LIMIT GREATER 0 AND _n_cpu GREATER TEST_MPI_RANK_LIMIT)
+    RETURN()
   ENDIF()
 
   #
@@ -391,9 +405,9 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
             DEPENDS ${TEST_DEPENDENCIES_${_target}}
             )
         ENDIF()
-        SET(TEST_DEPENDENCIES_${_target} ${_test_full})
+        SET(TEST_DEPENDENCIES_${_target} ${_test_full} PARENT_SCOPE)
       ENDIF()
 
     ENDIF()
   ENDFOREACH()
-ENDMACRO()
+ENDFUNCTION()
