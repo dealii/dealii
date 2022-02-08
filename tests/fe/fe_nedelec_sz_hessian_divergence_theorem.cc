@@ -149,11 +149,6 @@ test_hyper_ball(const double tolerance)
   Triangulation<dim> tr;
   GridGenerator::hyper_ball(tr);
 
-  static const SphericalManifold<dim> boundary;
-  tr.set_manifold(0, boundary);
-
-  tr.refine_global(1);
-
   FE_NedelecSZ<dim> fe(1);
   test(tr, fe, tolerance);
 }
