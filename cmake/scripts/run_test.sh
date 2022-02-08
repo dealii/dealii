@@ -44,7 +44,7 @@ case $STAGE in
     ##
 
     # Limit the deal.II thread pool to TEST_THREAD_LIMIT threads.
-    export DEAL_II_NUM_THREADS="${TEST_THREAD_LIMIT}"
+    export TEST_N_THREADS="${TEST_THREAD_LIMIT}"
 
     # Limit the OpenMP pool to two threads.
     export OMP_NUM_THREADS="2"
