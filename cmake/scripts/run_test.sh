@@ -31,10 +31,6 @@ shift 2
 
 # Ensure uniform sorting for pathname expansion
 export LC_ALL=C
-# Prevent OpenMP from creating additional threads
-export OMP_NUM_THREADS=2
-# Allow oversubscription for MPI (needed for Openmpi@3.0)
-export OMPI_MCA_rmaps_base_oversubscribe=1
 
 case $STAGE in
   run)
@@ -46,6 +42,15 @@ case $STAGE in
     #   - if test exits with non-zero return value, output is renamed to
     #     failing_output
     ##
+
+    # Limit the deal.II thread pool to TEST_THREAD_LIMIT threads.
+    export DEAL_II_NUM_THREADS="${TEST_THREAD_LIMIT}"
+
+    # Limit the OpenMP pool to two threads.
+    export OMP_NUM_THREADS="2"
+
+    # Allow oversubscription for MPI (needed for Openmpi@3.0)
+    export OMPI_MCA_rmaps_base_oversubscribe=1
 
     rm -f failing_output
     rm -f output

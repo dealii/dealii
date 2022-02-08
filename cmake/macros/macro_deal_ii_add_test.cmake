@@ -73,10 +73,13 @@
 #       to run
 #
 #   TEST_MPI_RANK_LIMIT
-#     - specifying the maximal number of MPI ranks that can be used. If a
+#     - Specifies the maximal number of MPI ranks that can be used. If a
 #       test variant configures a larger number of MPI ranks (via
 #       .mpirun=N. in the output file) than this limit the test will be
-#       dropped. The special value "0" enforces no limit.
+#       dropped. The special value 0 enforces no limit. Defaults to 0.
+#   TEST_THREAD_LIMIT
+#     - Specifies the maximal number of worker threads that can be used by
+#       the threading backend. Defaults to 3.
 #
 # Usage:
 #     DEAL_II_ADD_TEST(category test_name comparison_file)
@@ -323,7 +326,8 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       #
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
-        COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+        COMMAND TEST_THREAD_LIMIT=${TEST_THREAD_LIMIT}
+          sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
           run "${_test_full}" ${_run_args}
         COMMAND ${PERL_EXECUTABLE}
           -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl

@@ -27,20 +27,23 @@
 #     TEST_LIBRARIES
 #     TEST_LIBRARIES_DEBUG
 #     TEST_LIBRARIES_RELEASE
-#       - specifying additional libraries (and targets) to link against.
+#       - Specify additional libraries (and targets) to link against.
 #
 #     TEST_TARGET or
 #     TEST_TARGET_DEBUG and TEST_TARGET_RELEASE
-#       - specifying a test target to be executed for a parameter run.
+#       - Specifies a test target to be executed for a parameter run.
 #
 #     TEST_TIME_LIMIT
 #       - Specifies the maximal wall clock time in seconds a test is
 #         allowed to run. Defaults to 600.
 #     TEST_MPI_RANK_LIMIT
-#       - specifying the maximal number of MPI ranks that can be used. If a
+#       - Specifies the maximal number of MPI ranks that can be used. If a
 #         test variant configures a larger number of MPI ranks (via
 #         .mpirun=N. in the output file) than this limit the test will be
-#         dropped. The special value "0" enforces no limit.
+#         dropped. The special value 0 enforces no limit. Defaults to 0.
+#     TEST_THREAD_LIMIT
+#       - Specifies the maximal number of worker threads that can be used
+#         by the threading backend. Defaults to 3.
 #
 #     TEST_PICKUP_REGEX
 #       - A regular expression to select only a subset of tests during setup.
@@ -183,6 +186,9 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   SET_IF_EMPTY(TEST_MPI_RANK_LIMIT "$ENV{TEST_MPI_RANK_LIMIT}")
   SET_IF_EMPTY(TEST_MPI_RANK_LIMIT 0)
+
+  SET_IF_EMPTY(TEST_THREAD_LIMIT "$ENV{TEST_THREAD_LIMIT}")
+  SET_IF_EMPTY(TEST_THREAD_LIMIT 3)
 
   #
   # ... and finally pick up tests:
