@@ -1,0 +1,4 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+INCLUDE(../setup_testsubproject.cmake)
+PROJECT(testsuite CXX)
+DEAL_II_PICKUP_TESTS()
