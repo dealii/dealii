@@ -69,14 +69,30 @@
 #     - Complete path to the numdiff binary.
 #
 #   TEST_TIME_LIMIT
-#     - specifying the maximal wall clock time in seconds a test is allowed
-#       to run
+#     - Specifies the maximal wall clock time in seconds a test is allowed
+#       to run.
+#
+#   TEST_MPI_RANK_LIMIT
+#     - Specifies the maximal number of MPI ranks that can be used. If a
+#       test variant configures a larger number of MPI ranks (via
+#       .mpirun=N. in the output file) than this limit the test will be
+#       dropped. The special value 0 enforces no limit. Defaults to 0.
+#
+#   TEST_THREAD_LIMIT
+#     - Specifies the maximal number of worker threads that can should be
+#       used by the threading backend. If a test variant configures a
+#       larger number of threads (via .threads=N. in the output file) than
+#       this limit the test will be dropped. Note that individual tests
+#       might exceed this limit by calling
+#       MultithreadInfo::set_thread_limit(), or by manually creating
+#       additional threads. The special value 0 enforces no limit. Defaults
+#       to 0.
 #
 # Usage:
 #     DEAL_II_ADD_TEST(category test_name comparison_file)
 #
 
-MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
+FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
   IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
@@ -101,11 +117,65 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   #
   # Determine whether the test should be run with mpirun:
   #
-  STRING(REGEX MATCH "mpirun=([0-9]*)" _n_cpu ${_file})
+  STRING(REGEX MATCH "mpirun=([0-9]+|max)" _n_cpu ${_file})
   IF("${_n_cpu}" STREQUAL "")
     SET(_n_cpu 0) # 0 indicates that no mpirun should be used
   ELSE()
-    STRING(REGEX REPLACE "^mpirun=([0-9]*)$" "\\1" _n_cpu ${_n_cpu})
+    STRING(REGEX REPLACE "^mpirun=([0-9]+|max)$" "\\1" _n_cpu ${_n_cpu})
+  ENDIF()
+
+  #
+  # If we encounter the special string "mpirun=max" set the number of MPI
+  # ranks used for the test to the maximum number of allowed ranks. If no
+  # limit has been specified, i.e., TEST_MPI_RANK_LIMIT is 0, skip defining
+  # the test.
+  #
+  IF("${_n_cpu}" STREQUAL "max")
+    IF(TEST_MPI_RANK_LIMIT EQUAL 0)
+      RETURN()
+    ENDIF()
+    SET(_n_cpu "${TEST_MPI_RANK_LIMIT}")
+  ENDIF()
+
+  #
+  # If the number of MPI ranks specified for the test via .mpirun=N.
+  # exceeds the limit ${TEST_MPI_RANK_LIMIT}, skip defining the test
+  #
+  IF(TEST_MPI_RANK_LIMIT GREATER 0 AND _n_cpu GREATER TEST_MPI_RANK_LIMIT)
+    RETURN()
+  ENDIF()
+
+  #
+  # Determine whether the test declaration specifies a thread pool size via
+  # threads=N:
+  #
+  STRING(REGEX MATCH "threads=([0-9]+|max)" _n_threads ${_file})
+  IF("${_n_threads}" STREQUAL "")
+    SET(_n_threads 0) # 0 indicates that the default thread pool size
+                      # should be used (currently set to 3 in tests.h)
+  ELSE()
+    STRING(REGEX REPLACE "^threads=([0-9]+|max)$" "\\1" _n_threads ${_n_threads})
+  ENDIF()
+
+  #
+  # If we encounter the special string "threads=max" set the number of
+  # threads of the threading pool to the maximum number of allowed threads.
+  # If no limit has been specified, i.e., TEST_THREAD_LIMIT is 0, skip
+  # defining the test.
+  #
+  IF("${_n_threads}" STREQUAL "max")
+    IF(TEST_THREAD_LIMIT EQUAL 0)
+      RETURN()
+    ENDIF()
+    SET(_n_threads "${TEST_THREAD_LIMIT}")
+  ENDIF()
+
+  #
+  # If the number of threads specified for the test via .threads=N. exceeds
+  # the limit ${TEST_THREAD_LIMIT}, skip defining the test
+  #
+  IF(TEST_THREAD_LIMIT GREATER 0 AND _n_threads GREATER TEST_THREAD_LIMIT)
+    RETURN()
   ENDIF()
 
   #
@@ -309,7 +379,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       #
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
-        COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+        COMMAND TEST_N_THREADS=${_n_threads}
+          sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
           run "${_test_full}" ${_run_args}
         COMMAND ${PERL_EXECUTABLE}
           -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
@@ -391,9 +462,9 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
             DEPENDS ${TEST_DEPENDENCIES_${_target}}
             )
         ENDIF()
-        SET(TEST_DEPENDENCIES_${_target} ${_test_full})
+        SET(TEST_DEPENDENCIES_${_target} ${_test_full} PARENT_SCOPE)
       ENDIF()
 
     ENDIF()
   ENDFOREACH()
-ENDMACRO()
+ENDFUNCTION()

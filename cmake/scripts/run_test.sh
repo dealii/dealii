@@ -31,10 +31,6 @@ shift 2
 
 # Ensure uniform sorting for pathname expansion
 export LC_ALL=C
-# Prevent OpenMP from creating additional threads
-export OMP_NUM_THREADS=2
-# Allow oversubscription for MPI (needed for Openmpi@3.0)
-export OMPI_MCA_rmaps_base_oversubscribe=1
 
 case $STAGE in
   run)
@@ -46,6 +42,27 @@ case $STAGE in
     #   - if test exits with non-zero return value, output is renamed to
     #     failing_output
     ##
+
+    #
+    # If TEST_N_THREADS is not equal to zero then:
+    #  - Export the environment variable DEAL_II_NUM_THREADS set to
+    #    $TEST_N_THREADS. This will enforce an upper bound of
+    #    DEAL_II_NUM_THREADS during thread initialization of the threading
+    #    pool in deal.II.
+    #  - Export TEST_N_THREADS which is internally used in the deal.II
+    #    testsuite to explicitly set the number of threads in the header
+    #    file tests.h.
+    #
+    if [ "${TEST_N_THREADS+0}" -ne 0 ]; then
+      export DEAL_II_NUM_THREADS="${TEST_N_THREADS}"
+      export TEST_N_THREADS
+    fi
+
+    # Limit the OpenMP pool to two threads.
+    export OMP_NUM_THREADS="2"
+
+    # Allow oversubscription for MPI (needed for Openmpi@3.0)
+    export OMPI_MCA_rmaps_base_oversubscribe=1
 
     rm -f failing_output
     rm -f output
