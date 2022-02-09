@@ -118,10 +118,12 @@ TEST_MPI_RANK_LIMIT
 
 TEST_THREAD_LIMIT
   - Specifies the maximal number of worker threads that can should be
-    used by the threading backend. Note that individual tests might
-    exceed this limit by calling MultithreadInfo::set_thread_limit(), or
-    by manually creating additional threads. The special value 0
-    enforces no limit. Defaults to 0.
+    used by the threading backend. If a test variant configures a larger
+    number of threads (via .threads=N. in the output file) than this limit
+    the test will be dropped. Note that individual tests might exceed this
+    limit by calling MultithreadInfo::set_thread_limit(), or by manually
+    creating additional threads. The special value 0 enforces no limit.
+    Defaults to 0.
 
 TEST_PICKUP_REGEX
   - A regular expression to select only a subset of tests during setup.
@@ -473,7 +475,7 @@ category/test.output
       just <code>category/test.output</code>. In pseudo code:
 <pre>
 category/test.[with_&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;on|off|version&gt;.]*
-              [mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
+              [mpirun=&lt;N|all&gt;.][threads=&lt;N|all&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
 </pre>
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.

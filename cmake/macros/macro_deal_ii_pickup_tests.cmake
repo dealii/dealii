@@ -43,10 +43,13 @@
 #         dropped. The special value 0 enforces no limit. Defaults to 0.
 #     TEST_THREAD_LIMIT
 #       - Specifies the maximal number of worker threads that can should be
-#         used by the threading backend. Note that individual tests might
-#         exceed this limit by calling MultithreadInfo::set_thread_limit(),
-#         or by manually creating additional threads. The special value 0
-#         enforces no limit. Defaults to 0.
+#         used by the threading backend. If a test variant configures a
+#         larger number of threads (via .threads=N. in the output file)
+#         than this limit the test will be dropped. Note that individual
+#         tests might exceed this limit by calling
+#         MultithreadInfo::set_thread_limit(), or by manually creating
+#         additional threads. The special value 0 enforces no limit.
+#         Defaults to 0.
 #
 #     TEST_PICKUP_REGEX
 #       - A regular expression to select only a subset of tests during setup.
