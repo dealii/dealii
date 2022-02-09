@@ -113,11 +113,24 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   #
   # Determine whether the test should be run with mpirun:
   #
-  STRING(REGEX MATCH "mpirun=([0-9]*)" _n_cpu ${_file})
+  STRING(REGEX MATCH "mpirun=([0-9]+|max)" _n_cpu ${_file})
   IF("${_n_cpu}" STREQUAL "")
     SET(_n_cpu 0) # 0 indicates that no mpirun should be used
   ELSE()
-    STRING(REGEX REPLACE "^mpirun=([0-9]*)$" "\\1" _n_cpu ${_n_cpu})
+    STRING(REGEX REPLACE "^mpirun=([0-9]+|max)$" "\\1" _n_cpu ${_n_cpu})
+  ENDIF()
+
+  #
+  # If we encountered the special string "mpirun=max" set the number of MPI
+  # ranks used for the test to the maximum number of allowed ranks. If no
+  # limit has been specified, i.e., TEST_MPI_RANK_LIMIT is 0, skip defining
+  # the test.
+  #
+  IF("${_n_cpu}" STREQUAL "max")
+    IF(TEST_MPI_RANK_LIMIT EQUAL 0)
+      RETURN()
+    ENDIF()
+    SET(_n_cpu "${TEST_MPI_RANK_LIMIT}")
   ENDIF()
 
   #
