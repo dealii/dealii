@@ -468,6 +468,17 @@ public:
                additional_data = typename PreconditionerType::AdditionalData());
 
   /**
+   * In contrast to the function above, only initialize the matrices. The
+   * smoothers need to be set up manually by the user as a subsequent step
+   * in the code. For this purpose, the public field @p smoothers
+   * can be directly modified. This is useful if one wants full flexibility in
+   * the choice of smoothers, e.g., use different smoothers on the levels.
+   */
+  template <typename MatrixType2>
+  void
+  initialize_matrices(const MGLevelObject<MatrixType2> &matrices);
+
+  /**
    * Initialize for matrices. This function stores pointers to the level
    * matrices and initializes the smoothing operator with the according
    * smoother for each level.
@@ -1033,8 +1044,34 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
       matrices[i] =
-        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
-      smoothers[i].initialize(m[i], data);
+        linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                    Utilities::get_underlying_value(m[i]));
+      smoothers[i].initialize(Utilities::get_underlying_value(m[i]), data);
+    }
+}
+
+
+
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
+template <typename MatrixType2>
+inline void
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::
+  initialize_matrices(const MGLevelObject<MatrixType2> &m)
+{
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
+
+  matrices.resize(min, max);
+  smoothers.resize(min, max);
+
+  for (unsigned int i = min; i <= max; ++i)
+    {
+      // Workaround: Unfortunately, not every "m[i]" object has a rich
+      // enough interface to populate reinit_(domain|range)_vector. Thus,
+      // apply an empty LinearOperator exemplar.
+      matrices[i] =
+        linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                    Utilities::get_underlying_value(m[i]));
     }
 }
 
