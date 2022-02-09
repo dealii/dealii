@@ -427,17 +427,20 @@ filter_out_small_numbers(const Number number, const double tolerance)
 inline unsigned int
 testing_max_num_threads()
 {
+  const int default_n_threads = 3;
+
   if (const char *penv = std::getenv("TEST_N_THREADS"))
     try
       {
-        return Utilities::string_to_int(std::string(penv));
+        const int n_threads = Utilities::string_to_int(std::string(penv));
+        return n_threads > 0 ? n_threads : default_n_threads;
       }
     catch (...)
       {
-        return 3;
+        return default_n_threads;
       }
   else
-    return 3;
+    return default_n_threads;
 }
 
 struct LimitConcurrency
