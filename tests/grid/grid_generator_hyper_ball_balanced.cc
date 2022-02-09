@@ -28,22 +28,31 @@ template <int dim>
 void
 check_grid()
 {
-  Triangulation<dim> triangulation;
-  GridGenerator::hyper_ball_balanced(triangulation, Point<dim>(), 1.);
-  deallog << "Number of cells: " << triangulation.n_cells() << std::endl;
-  deallog << "Number of vertices: " << triangulation.n_vertices() << std::endl;
-  triangulation.refine_global();
+  // Check centered at the origin and at another point
+  std::array<Point<dim>, 2> centers;
+  centers[1][0]       = 0.6;
+  centers[1][1]       = 0.5;
+  centers[1][dim - 1] = 0.5;
+  for (const Point<dim> &center : centers)
+    {
+      Triangulation<dim> triangulation;
+      GridGenerator::hyper_ball_balanced(triangulation, center, 1.);
+      deallog << "Number of cells: " << triangulation.n_cells() << std::endl;
+      deallog << "Number of vertices: " << triangulation.n_vertices()
+              << std::endl;
+      triangulation.refine_global();
 
-  GridOut            go;
-  GridOutFlags::XFig xfig_flags;
-  xfig_flags.fill_style = 25;
+      GridOut            go;
+      GridOutFlags::XFig xfig_flags;
+      xfig_flags.fill_style = 25;
 
-  go.set_flags(xfig_flags);
-  GridOut::OutputFormat format = GridOut::xfig;
-  if (dim == 3)
-    format = GridOut::dx;
+      go.set_flags(xfig_flags);
+      GridOut::OutputFormat format = GridOut::xfig;
+      if (dim == 3)
+        format = GridOut::dx;
 
-  go.write(triangulation, deallog.get_file_stream(), format);
+      go.write(triangulation, deallog.get_file_stream(), format);
+    }
 }
 
 

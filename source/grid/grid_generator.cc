@@ -5835,9 +5835,12 @@ namespace GridGenerator
     // a time by appropriate rotations, starting from the quarter ball. The
     // rotations make sure we do not generate inverted cells that would appear
     // if we tried the slightly simpler approach to simply mirror the cells.
+    //
+    // Make the rotations easy by centering at the origin now and shifting by p
+    // later.
 
     Triangulation<dim> tria_piece;
-    GridGenerator::quarter_hyper_ball(tria_piece, p, radius);
+    GridGenerator::quarter_hyper_ball(tria_piece, Point<dim>(), radius);
 
     for (unsigned int round = 0; round < dim; ++round)
       {
@@ -5910,6 +5913,7 @@ namespace GridGenerator
         cell->set_manifold_id(1);
       else
         cell->set_all_manifold_ids(numbers::flat_manifold_id);
+    GridTools::shift(p, tria);
 
     tria.set_all_manifold_ids_on_boundary(0);
     tria.set_manifold(0, SphericalManifold<dim>(p));
