@@ -43,8 +43,20 @@ case $STAGE in
     #     failing_output
     ##
 
-    # Limit the deal.II thread pool to TEST_THREAD_LIMIT threads.
-    export TEST_N_THREADS="${TEST_THREAD_LIMIT}"
+    #
+    # If TEST_N_THREADS is not equal to zero then:
+    #  - Export the environment variable DEAL_II_NUM_THREADS set to
+    #    $TEST_N_THREADS. This will enforce an upper bound of
+    #    DEAL_II_NUM_THREADS during thread initialization of the threading
+    #    pool in deal.II.
+    #  - Export TEST_N_THREADS which is internally used in the deal.II
+    #    testsuite to explicitly set the number of threads in the header
+    #    file tests.h.
+    #
+    if [ "${TEST_N_THREADS+0}" -ne 0 ]; then
+      export DEAL_II_NUM_THREADS="${TEST_N_THREADS}"
+      export TEST_N_THREADS
+    fi
 
     # Limit the OpenMP pool to two threads.
     export OMP_NUM_THREADS="2"

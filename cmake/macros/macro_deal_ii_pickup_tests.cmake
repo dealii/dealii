@@ -45,7 +45,8 @@
 #       - Specifies the maximal number of worker threads that can should be
 #         used by the threading backend. Note that individual tests might
 #         exceed this limit by calling MultithreadInfo::set_thread_limit(),
-#         or by manually creating additional threads. Defaults to 3.
+#         or by manually creating additional threads. The special value 0
+#         enforces no limit. Defaults to 0.
 #
 #     TEST_PICKUP_REGEX
 #       - A regular expression to select only a subset of tests during setup.
@@ -190,7 +191,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
   SET_IF_EMPTY(TEST_MPI_RANK_LIMIT 0)
 
   SET_IF_EMPTY(TEST_THREAD_LIMIT "$ENV{TEST_THREAD_LIMIT}")
-  SET_IF_EMPTY(TEST_THREAD_LIMIT 3)
+  SET_IF_EMPTY(TEST_THREAD_LIMIT 0)
 
   #
   # ... and finally pick up tests:

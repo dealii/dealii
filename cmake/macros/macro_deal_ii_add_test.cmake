@@ -82,7 +82,8 @@
 #     - Specifies the maximal number of worker threads that can should be
 #       used by the threading backend. Note that individual tests might
 #       exceed this limit by calling MultithreadInfo::set_thread_limit(), or
-#       by manually creating additional threads. Defaults to 3.
+#       by manually creating additional threads. The special value 0
+#       enforces no limit. Defaults to 0.
 #
 # Usage:
 #     DEAL_II_ADD_TEST(category test_name comparison_file)
@@ -121,7 +122,7 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   ENDIF()
 
   #
-  # If we encountered the special string "mpirun=max" set the number of MPI
+  # If we encounter the special string "mpirun=max" set the number of MPI
   # ranks used for the test to the maximum number of allowed ranks. If no
   # limit has been specified, i.e., TEST_MPI_RANK_LIMIT is 0, skip defining
   # the test.
@@ -138,6 +139,39 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   # exceeds the limit ${TEST_MPI_RANK_LIMIT}, skip defining the test
   #
   IF(TEST_MPI_RANK_LIMIT GREATER 0 AND _n_cpu GREATER TEST_MPI_RANK_LIMIT)
+    RETURN()
+  ENDIF()
+
+  #
+  # Determine whether the test declaration specifies a thread pool size via
+  # threads=N:
+  #
+  STRING(REGEX MATCH "threads=([0-9]+|max)" _n_threads ${_file})
+  IF("${_n_threads}" STREQUAL "")
+    SET(_n_threads 0) # 0 indicates that the default thread pool size
+                      # should be used (currently set to 3 in tests.h)
+  ELSE()
+    STRING(REGEX REPLACE "^threads=([0-9]+|max)$" "\\1" _n_threads ${_n_threads})
+  ENDIF()
+
+  #
+  # If we encounter the special string "threads=max" set the number of
+  # threads of the threading pool to the maximum number of allowed threads.
+  # If no limit has been specified, i.e., TEST_THREAD_LIMIT is 0, skip
+  # defining the test.
+  #
+  IF("${_n_threads}" STREQUAL "max")
+    IF(TEST_THREAD_LIMIT EQUAL 0)
+      RETURN()
+    ENDIF()
+    SET(_n_threads "${TEST_THREAD_LIMIT}")
+  ENDIF()
+
+  #
+  # If the number of threads specified for the test via .threads=N. exceeds
+  # the limit ${TEST_THREAD_LIMIT}, skip defining the test
+  #
+  IF(TEST_THREAD_LIMIT GREATER 0 AND _n_threads GREATER TEST_THREAD_LIMIT)
     RETURN()
   ENDIF()
 
@@ -342,7 +376,7 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       #
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
-        COMMAND TEST_THREAD_LIMIT=${TEST_THREAD_LIMIT}
+        COMMAND TEST_N_THREADS=${_n_threads}
           sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
           run "${_test_full}" ${_run_args}
         COMMAND ${PERL_EXECUTABLE}
