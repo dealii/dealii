@@ -1,0 +1,51 @@
+#!/bin/bash
+## ---------------------------------------------------------------------
+##
+## Copyright (C) 2022 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## The deal.II library is free software; you can use it, redistribute
+## it, and/or modify it under the terms of the GNU Lesser General
+## Public License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
+##
+## ---------------------------------------------------------------------
+
+#
+# Performance tests record timing/sensor statistics in the output file
+# "output".
+#
+# This script collects all individual measurements from these files and
+# pretty prints a parsable table to stdout.
+#
+
+for i in tests/performance/*/output tests/performance/*/mpirun*/output
+do
+  # Skip output files that have fewer than 3 lines
+  if [[ "$(wc -l $i 2> /dev/null | awk '{ print $1 }')" -le 2 ]]; then
+    continue
+  fi
+
+  # Recover test name from full file path stored in ${i}
+  test_name=${i##tests/performance/}
+  test_name=${test_name%%/output}
+  test_name=${test_name/.release/}
+  test_name=${test_name/.debug/}
+
+  {
+    read -r test_type # first line of output file contains test type
+    read -r           # skip second line
+
+    # iterate over all remaining lines and output a table:
+    while read -r line
+    do
+      echo -e "$test_name\t$test_type\t${line}"
+    done
+  } < "${i}"
+done | sort |
+  column -s $'\t' -t \
+    -N "test_name,test_type,sensor,min/value,max,mean,std_dev,samples"
+

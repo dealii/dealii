@@ -83,7 +83,7 @@
 #
 #   MEMORYCHECK
 #     - If set to ON the CTEST_MEMORYCHECK() stage will be run.
-#     Test results must go into the "Experimantal" section.
+#     Test results must go into the "Experimental" section.
 #
 #   MAKEOPTS
 #     - Additional options that will be passed directly to make (or ninja).
@@ -270,7 +270,7 @@ ENDIF()
 # Pass all relevant variables down to configure:
 GET_CMAKE_PROPERTY(_variables VARIABLES)
 FOREACH(_var ${_variables})
-  IF( _var MATCHES "^(TEST|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
+  IF( _var MATCHES "^(ENABLE|TEST|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
       _var MATCHES "^(DOCUMENTATION|EXAMPLES)" OR
       _var MATCHES "^(ADOLC|ARBORX|ARPACK|BOOST|OPENCASCADE|MUPARSER|HDF5|KOKKOS|METIS|MPI)_" OR
       _var MATCHES "^(GINKGO|P4EST|PETSC|SCALAPACK|SLEPC|THREADS|TBB|TRILINOS)_" OR
@@ -578,14 +578,29 @@ Unable to determine test submission files from TAG. Bailing out.
 ENDIF()
 
 #
+# Create performance test report
+#
+IF(ENABLE_PERFORMANCE_TESTS)
+  MESSAGE("-- Collecting performance measurements")
+  EXECUTE_PROCESS(
+    COMMAND bash "${CMAKE_CURRENT_LIST_DIR}/performance/collect_measurements"
+    WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
+    OUTPUT_FILE ${CTEST_BINARY_DIRECTORY}/performance.log
+    )
+ENDIF()
+
+
+#
 # And finally submit:
 #
 
-MESSAGE("-- Running CTEST_SUBMIT()")
-CTEST_SUBMIT(RETURN_VALUE _res)
+IF(NOT ${SKIP_SUBMISSION})
+  MESSAGE("-- Running CTEST_SUBMIT()")
+  CTEST_SUBMIT(RETURN_VALUE _res)
 
-IF("${_res}" STREQUAL "0")
-  MESSAGE("-- Submission successful. Goodbye!")
+  IF("${_res}" STREQUAL "0")
+    MESSAGE("-- Submission successful. Goodbye!")
+  ENDIF()
 ENDIF()
 
-# .oO( This script is freaky 600 lines long... )
+# .oO( This script is freaky 606 lines long... )
