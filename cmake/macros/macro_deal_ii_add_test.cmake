@@ -88,6 +88,17 @@
 #       additional threads. The special value 0 enforces no limit. Defaults
 #       to 0.
 #
+#   ENABLE_PERFORMANCE_TESTS
+#     - If defined and set to true the execution of performance tests will
+#       be enabled.
+#
+#   TESTING_ENVIRONMENT
+#     - Specifies the performance test testing environment. Valid options
+#       are:
+#         * "light":  mobile laptop, >=2 physical cores, >=8GB RAM
+#         * "medium": workstation, >=8 physical cores, >=32GB RAM
+#         * "heavy":  compute node, >=32 physical cores, >=128GB RAM
+#
 # Usage:
 #     DEAL_II_ADD_TEST(category test_name comparison_file)
 #
@@ -226,6 +237,13 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         )
     ENDIF()
   ENDFOREACH()
+
+  IF(NOT TESTING_ENVIRONMENT MATCHES "^(light|medium|heavy)$")
+    MESSAGE(FATAL_ERROR
+      "The TESTING_ENVIRONMENT variable must be set to either \"light\","
+      " \"medium\", or \"heavy\"."
+      )
+  ENDIF()
 
   FOREACH(_build ${_build_types})
 
@@ -374,8 +392,17 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           )
 
         SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-          COMPILE_DEFINITIONS SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+          COMPILE_DEFINITIONS
+            SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+            TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT}
           )
+
+        IF(ENABLE_PERFORMANCE_TESTS)
+          SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+            COMPILE_DEFINITIONS ENABLE_PERFORMANCE_TESTS
+            )
+        ENDIF()
+
         SET_PROPERTY(TARGET ${_target} PROPERTY
           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target_short}"
           )
