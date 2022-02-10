@@ -149,7 +149,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
         }
     }
 
-  std::map<unsigned int, std::vector<ConstraintLine>> received =
+  const std::map<unsigned int, std::vector<ConstraintLine>> received =
     Utilities::MPI::some_to_some(mpi_communicator, to_send);
 
   unsigned int inconsistent = 0;
