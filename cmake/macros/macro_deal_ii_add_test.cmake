@@ -314,13 +314,13 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       # otherwise run the test with mpirun:
       IF("${_n_cpu}" STREQUAL "0")
 
-        SET(_diff_target ${_category}.${_test_name}.${_build_lowercase}.diff) # diff target name
+        SET(_test_target ${_category}.${_test_name}.${_build_lowercase}.test) # diff target name
         SET(_test_full ${_category}/${_test_name}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
 
       ELSE()
 
-        SET(_diff_target ${_category}.${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
+        SET(_test_target ${_category}.${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.test) # diff target name
         SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/mpirun=${_n_cpu}) # directory to run the test in
         SET(_run_args
@@ -407,7 +407,7 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         VERBATIM
         )
 
-      ADD_CUSTOM_TARGET(${_diff_target}
+      ADD_CUSTOM_TARGET(${_test_target}
         COMMAND echo "${_test_full}: BUILD successful."
         COMMAND echo "${_test_full}: RUN successful."
         COMMAND echo "${_test_full}: DIFF successful."
@@ -421,7 +421,7 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
       ADD_TEST(NAME ${_test_full}
         COMMAND ${CMAKE_COMMAND}
-          -DTRGT=${_diff_target}
+          -DTRGT=${_test_target}
           -DTEST=${_test_full}
           -DEXPECT=${_expect}
           -DBINARY_DIR=${CMAKE_BINARY_DIR}
