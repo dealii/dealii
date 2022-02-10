@@ -1,0 +1,4 @@
+Fixed: GridGenerator::hyper_ball_balanced() now works correctly with nonzero
+centers.
+<br>
+(David Wells, 2022/02/09)
