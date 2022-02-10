@@ -212,7 +212,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   SET(DEAL_II_SOURCE_DIR) # avoid a bogus warning
 
-  FILE(GLOB _tests "*.output")
+  FILE(GLOB _tests "*.output" "*.run_only")
   FOREACH(_test ${_tests})
     SET(_comparison ${_test})
     GET_FILENAME_COMPONENT(_test ${_test} NAME)

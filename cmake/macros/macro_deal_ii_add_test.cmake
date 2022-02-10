@@ -190,6 +190,14 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   ENDIF()
 
   #
+  # Determine whether the .run_only keyword is present:
+  #
+  SET(_run_only FALSE)
+  IF(_file MATCHES "\\.run_only$")
+    SET(_run_only TRUE)
+  ENDIF()
+
+  #
   # Determine for which build types a test should be defined.
   #
   # Every deal.II build type (given by the list DEAL_II_BUILD_TYPES) that
@@ -314,13 +322,13 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       # otherwise run the test with mpirun:
       IF("${_n_cpu}" STREQUAL "0")
 
-        SET(_diff_target ${_category}.${_test_name}.${_build_lowercase}.diff) # diff target name
+        SET(_test_target ${_category}.${_test_name}.${_build_lowercase}.test) # diff target name
         SET(_test_full ${_category}/${_test_name}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
 
       ELSE()
 
-        SET(_diff_target ${_category}.${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
+        SET(_test_target ${_category}.${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.test) # diff target name
         SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/mpirun=${_n_cpu}) # directory to run the test in
         SET(_run_args
@@ -393,27 +401,40 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         VERBATIM
         )
 
-      FILE(GLOB _comparison_files ${_comparison_file} ${_comparison_file}.*)
+      IF(_run_only)
+        ADD_CUSTOM_TARGET(${_test_target}
+          COMMAND echo "${_test_full}: BUILD successful."
+          COMMAND echo "${_test_full}: RUN successful."
+          COMMAND echo "${_test_full}: DIFF skipped."
+          COMMAND echo "${_test_full}: PASSED."
+          DEPENDS ${_test_directory}/output
+          )
 
-      ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
-        COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
-          diff "${_test_full}" "${NUMDIFF_EXECUTABLE}"
-          "${_comparison_file}" ${_run_args}
-        WORKING_DIRECTORY
-          ${_test_directory}
-        DEPENDS
-          ${_test_directory}/output
-          ${_comparison_files}
-        VERBATIM
-        )
+      ELSE()
 
-      ADD_CUSTOM_TARGET(${_diff_target}
-        COMMAND echo "${_test_full}: BUILD successful."
-        COMMAND echo "${_test_full}: RUN successful."
-        COMMAND echo "${_test_full}: DIFF successful."
-        COMMAND echo "${_test_full}: PASSED."
-        DEPENDS ${_test_directory}/diff
-        )
+        FILE(GLOB _comparison_files ${_comparison_file} ${_comparison_file}.*)
+
+        ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
+          COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+            diff "${_test_full}" "${NUMDIFF_EXECUTABLE}"
+            "${_comparison_file}" ${_run_args}
+          WORKING_DIRECTORY
+            ${_test_directory}
+          DEPENDS
+            ${_test_directory}/output
+            ${_comparison_files}
+          VERBATIM
+          )
+
+        ADD_CUSTOM_TARGET(${_test_target}
+          COMMAND echo "${_test_full}: BUILD successful."
+          COMMAND echo "${_test_full}: RUN successful."
+          COMMAND echo "${_test_full}: DIFF successful."
+          COMMAND echo "${_test_full}: PASSED."
+          DEPENDS ${_test_directory}/diff
+          )
+
+      ENDIF()
 
       #
       # And finally define the test:
@@ -421,7 +442,7 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
       ADD_TEST(NAME ${_test_full}
         COMMAND ${CMAKE_COMMAND}
-          -DTRGT=${_diff_target}
+          -DTRGT=${_test_target}
           -DTEST=${_test_full}
           -DEXPECT=${_expect}
           -DBINARY_DIR=${CMAKE_BINARY_DIR}

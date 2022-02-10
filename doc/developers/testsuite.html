@@ -475,7 +475,7 @@ category/test.output
       just <code>category/test.output</code>. In pseudo code:
 <pre>
 category/test.[with_&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;on|off|version&gt;.]*
-              [mpirun=&lt;N|all&gt;.][threads=&lt;N|all&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
+              [mpirun=&lt;N|all&gt;.][threads=&lt;N|all&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.](output|run_only)
 </pre>
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.
@@ -607,6 +607,20 @@ category/test.output.4
 <pre>
 category/test.expect=run.output
 </pre>
+    </p>
+    <p>
+      The testsuite also suppors the special file ending
+      <code>.run_only</code> that indicates that the diff stage should be
+      skipped in order to reach the <code>PASSED</code> stage. You can
+      specify the keyword by changing the file ending from
+      <code>.output</code> to <code>.run_only</code>:
+<pre>
+category/test.run_only
+</pre>
+      Note that this is semantically different from specifying
+      <code>expect=diff.output</code>: The expect keyword requires that a
+      test reaches a specified stage but <i>fails</i> in it. In this case
+      the test has to reach the <code>DIFF</code> stage but fail it.
     </p>
 
 
