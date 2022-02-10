@@ -1362,7 +1362,7 @@ namespace Utilities
         else
           send_to.emplace_back(m.first);
 
-      const unsigned int n_point_point_communications =
+      const unsigned int n_expected_incoming_messages =
         Utilities::MPI::compute_n_point_to_point_communications(comm, send_to);
 
       // Protect the following communication:
@@ -1373,7 +1373,7 @@ namespace Utilities
       // processors, we need to visit one of the two scopes below. Otherwise,
       // no other action is required by this mpi process, and we can safely
       // return.
-      if (send_to.size() == 0 && n_point_point_communications == 0)
+      if (send_to.size() == 0 && n_expected_incoming_messages == 0)
         return received_objects;
 
       const int mpi_tag =
@@ -1406,7 +1406,7 @@ namespace Utilities
       {
         std::vector<char> buffer;
         // We do this on a first come/first served basis
-        for (unsigned int i = 0; i < n_point_point_communications; ++i)
+        for (unsigned int i = 0; i < n_expected_incoming_messages; ++i)
           {
             // Probe what's going on. Take data from the first available sender
             MPI_Status status;
@@ -1449,6 +1449,8 @@ namespace Utilities
       return received_objects;
 #  endif // deal.II with MPI
     }
+
+
 
     template <typename T>
     std::vector<T>
