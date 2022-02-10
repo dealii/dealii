@@ -1139,30 +1139,26 @@ namespace FETools
       // communication of information in cases where we do not know up
       // front which processes (and from how many processes) we have to
       // expect information from.
-      const auto get_destinations = [&destinations]() { return destinations; };
-
       const auto create_request =
-        [&cells_to_send](const types::subdomain_id other_rank,
-                         std::vector<char> &       send_buffer) {
+        [&cells_to_send](const types::subdomain_id other_rank) {
           std::vector<CellData> cells_for_this_destination;
           for (const auto &cell : cells_to_send)
             if (cell.receiver == other_rank)
               cells_for_this_destination.emplace_back(cell);
 
-          send_buffer = Utilities::pack(cells_for_this_destination, false);
+          return Utilities::pack(cells_for_this_destination, false);
         };
 
       const auto answer_request =
         [&received_cells](const unsigned int       other_rank,
-                          const std::vector<char> &buffer_recv,
-                          std::vector<char> &      request_buffer) {
+                          const std::vector<char> &request) {
           // We got a message from 'other_rank', so let us decode the
           // message in the same way as we have assembled it above.
           // Note that the cells just received do not contain
           // information where they came from, and we have to add that
           // ourselves for later use.
           for (CellData &cell_data :
-               Utilities::unpack<std::vector<CellData>>(buffer_recv, false))
+               Utilities::unpack<std::vector<CellData>>(request, false))
             {
               cell_data.receiver = other_rank;
               received_cells.emplace_back(std::move(cell_data));
@@ -1170,26 +1166,23 @@ namespace FETools
 
           // Nothing left to do here, we don't actually need to provide an
           // answer:
-          request_buffer.clear();
+          return std::vector<char>();
         };
 
       const auto read_answer = [](const unsigned int /*other_rank*/,
-                                  const std::vector<char> &recv_buffer) {
+                                  const std::vector<char> &answer) {
         // We don't put anything into the answers, so nothing should
         // have been coming out at this end either:
-        (void)recv_buffer;
-        Assert(recv_buffer.size() == 0, ExcInternalError());
+        (void)answer;
+        Assert(answer.size() == 0, ExcInternalError());
       };
 
-      Utilities::MPI::ConsensusAlgorithms::AnonymousProcess<char, char>
-        operations(get_destinations,
-                   create_request,
-                   answer_request,
-                   read_answer);
-
-      Utilities::MPI::ConsensusAlgorithms::Selector<char, char>(operations,
-                                                                communicator)
-        .run();
+      Utilities::MPI::ConsensusAlgorithms::Selector<char, char>().run(
+        destinations,
+        create_request,
+        answer_request,
+        read_answer,
+        communicator);
     }
 
 

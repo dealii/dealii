@@ -113,37 +113,42 @@ namespace TriangulationDescription
           const MPI_Comm &                                   comm,
           const bool vertices_have_unique_ids)
         {
-          dealii::Utilities::MPI::ConsensusAlgorithms::AnonymousProcess<char,
-                                                                        char>
-            process(
-              [&]() { return relevant_processes; },
-              [&](const unsigned int other_rank,
-                  std::vector<char> &send_buffer) {
-                const auto ptr = std::find(relevant_processes.begin(),
-                                           relevant_processes.end(),
-                                           other_rank);
+          const auto create_request = [&](const unsigned int other_rank) {
+            const auto ptr = std::find(relevant_processes.begin(),
+                                       relevant_processes.end(),
+                                       other_rank);
 
-                Assert(ptr != relevant_processes.end(), ExcInternalError());
+            Assert(ptr != relevant_processes.end(), ExcInternalError());
 
-                const auto other_rank_index =
-                  std::distance(relevant_processes.begin(), ptr);
+            const auto other_rank_index =
+              std::distance(relevant_processes.begin(), ptr);
 
-                send_buffer =
-                  dealii::Utilities::pack(description_temp[other_rank_index],
-                                          false);
-              },
-              [&](const unsigned int &,
-                  const std::vector<char> &recv_buffer,
-                  std::vector<char> &) {
-                this->merge(
-                  dealii::Utilities::unpack<DescriptionTemp<dim, spacedim>>(
-                    recv_buffer, false),
-                  vertices_have_unique_ids);
-              });
+            return dealii::Utilities::pack(description_temp[other_rank_index],
+                                           false);
+          };
 
-          dealii::Utilities::MPI::ConsensusAlgorithms::Selector<char, char>(
-            process, comm)
-            .run();
+          const auto answer_request = [&](const unsigned int,
+                                          const std::vector<char> &request) {
+            this->merge(
+              dealii::Utilities::unpack<DescriptionTemp<dim, spacedim>>(request,
+                                                                        false),
+              vertices_have_unique_ids);
+            return std::vector<char>();
+          };
+
+          const auto process_answer = [](const unsigned int,
+                                         const std::vector<char> &answer) {
+            (void)answer;
+            Assert(answer.size() == 0, ExcInternalError());
+          };
+
+
+          dealii::Utilities::MPI::ConsensusAlgorithms::Selector<char, char>()
+            .run(relevant_processes,
+                 create_request,
+                 answer_request,
+                 process_answer,
+                 comm);
         }
 
         /**
