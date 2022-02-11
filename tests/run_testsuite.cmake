@@ -521,6 +521,24 @@ IF("${_res}" STREQUAL "0")
   IF("${_res}" STREQUAL "0")
     # Only run tests if the build was successful:
 
+    IF(ENABLE_PERFORMANCE_TESTS)
+      MESSAGE("-- Running prune_tests")
+      EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
+        --build . --target prune_tests
+        -- ${MAKEOPTS}
+        WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
+        OUTPUT_QUIET
+        RESULT_VARIABLE _res
+        )
+
+      IF(NOT "${_res}" STREQUAL "0")
+        MESSAGE(FATAL_ERROR "
+\"prune_tests\" target exited with an error. Bailing out.
+"
+          )
+      ENDIF()
+    ENDIF()
+
     MESSAGE("-- Running setup_tests")
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
       --build . --target setup_tests
