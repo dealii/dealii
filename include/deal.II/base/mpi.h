@@ -1278,6 +1278,7 @@ namespace Utilities
     std::set<T>
     compute_set_union(const std::set<T> &set, const MPI_Comm &comm);
 
+
 #ifndef DOXYGEN
     // declaration for an internal function that lives in mpi.templates.h
     namespace internal
@@ -1290,6 +1291,8 @@ namespace Utilities
                  const ArrayView<T> &      output);
     }
 
+
+
     // Since these depend on N they must live in the header file
     template <typename T, unsigned int N>
     void
@@ -1301,6 +1304,8 @@ namespace Utilities
                            ArrayView<T>(sums, N));
     }
 
+
+
     template <typename T, unsigned int N>
     void
     max(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&maxima)[N])
@@ -1311,6 +1316,8 @@ namespace Utilities
                            ArrayView<T>(maxima, N));
     }
 
+
+
     template <typename T, unsigned int N>
     void
     min(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&minima)[N])
@@ -1320,6 +1327,8 @@ namespace Utilities
                            mpi_communicator,
                            ArrayView<T>(minima, N));
     }
+
+
 
     template <typename T, unsigned int N>
     void
@@ -1335,6 +1344,8 @@ namespace Utilities
                            mpi_communicator,
                            ArrayView<T>(results, N));
     }
+
+
 
     template <typename T>
     std::map<unsigned int, T>
@@ -1512,6 +1523,8 @@ namespace Utilities
       return received_objects;
 #  endif
     }
+
+
 
     template <typename T>
     std::vector<T>
