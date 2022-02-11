@@ -1663,7 +1663,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
     }
 
   // We no longer need the shmem roots communicator, so get rid of it
-  Utilities::MPI::free_communicator(shmem_group_communicator);
+  Utilities::MPI::free_communicator(shmem_roots_communicator);
 
 
   // **** Step 3 ****
