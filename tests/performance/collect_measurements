@@ -22,7 +22,22 @@
 # pretty prints a parsable table to stdout.
 #
 
-for i in tests/performance/*/output tests/performance/*/mpirun*/output
+#
+# First, collect some metatadata:
+#
+
+site="${1}"
+shift
+
+branch="$(sed -n -e 's/.*Branch: \+\(.*\)/\1/p' revision.log)"
+revision="$(sed -n -e 's/.*Revision: \+\(.*\)/\1/p' revision.log)"
+
+#
+# Now collect all output files and postprocess them into a tab-separated
+# list of values:
+#
+
+output="$(for i in tests/performance/*/output tests/performance/*/mpirun*/output
 do
   # Skip output files that have fewer than 3 lines
   if [[ "$(wc -l $i 2> /dev/null | awk '{ print $1 }')" -le 2 ]]; then
@@ -45,7 +60,30 @@ do
       echo -e "$test_name\t$test_type\t${line}"
     done
   } < "${i}"
-done | sort |
-  column -s $'\t' -t \
-    -N "test_name,test_type,sensor,min/value,max,mean,std_dev,samples"
+done | sort | tr $'\t' ',')"
 
+#
+# Output a test results as a comma separated list of values (CSV) to
+# performance.csv for easier parsing:
+#
+
+(
+  echo "# Date:     $(date -u --rfc-3339=s)"
+  echo "# Site:     ${site}"
+  echo "# Branch:   $branch"
+  echo "# Revision: $revision"
+) > performance.csv
+
+(
+  echo "test_name,test_type,sensor,min/value,max,mean,std_dev,samples"
+  echo "${output}"
+) >> performance.csv
+
+#
+# Also save and print a nicely formatted table of the test results in
+# performance.log and to stdout:
+#
+
+echo "${output}" | column -s ',' -t \
+  -N "test_name,test_type,sensor,min/value,max,mean,std_dev,samples" |
+  tee performance.log

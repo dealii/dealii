@@ -581,11 +581,10 @@ ENDIF()
 # Create performance test report
 #
 IF(ENABLE_PERFORMANCE_TESTS)
-  MESSAGE("-- Collecting performance measurements")
+  MESSAGE("-- Collecting performance measurements\n")
   EXECUTE_PROCESS(
-    COMMAND bash "${CMAKE_CURRENT_LIST_DIR}/performance/collect_measurements"
+    COMMAND bash "${CMAKE_CURRENT_LIST_DIR}/performance/collect_measurements" "${CTEST_SITE}"
     WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
-    OUTPUT_FILE ${CTEST_BINARY_DIRECTORY}/performance.log
     )
 ENDIF()
 
