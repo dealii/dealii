@@ -235,11 +235,11 @@ Step3::run()
   output_results();
   timer["output_results"].stop();
 
-  return {timer["make_grid"].cpu_time(),
-          timer["setup_system"].cpu_time(),
-          timer["assemble_system"].cpu_time(),
-          timer["solve"].cpu_time(),
-          timer["output_results"].cpu_time()};
+  return {timer["make_grid"].wall_time(),
+          timer["setup_system"].wall_time(),
+          timer["assemble_system"].wall_time(),
+          timer["solve"].wall_time(),
+          timer["output_results"].wall_time()};
 }
 
 

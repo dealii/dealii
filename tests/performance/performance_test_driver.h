@@ -159,7 +159,7 @@ main(int argc, char *argv[])
     }
   else
     {
-      pout << "name\tmin\tmax\taverage\tstd_dev\tsamples\n";
+      pout << "name\tmin\tmax\tmean\tstd_dev\tsamples\n";
     }
 
   // Perform measurements:

@@ -16,7 +16,7 @@
 //
 // Description:
 //
-// A performance benchmark based on step 3 that measures timings for system
+// A performance benchmark based on step 22 that measures timings for system
 // setup, assembly, solve and postprocessing for a Stokes problem.
 //
 
@@ -647,11 +647,11 @@ StokesProblem<dim>::run()
 
       debug_output << std::endl;
     }
-  return {timer["refinement"].cpu_time(),
-          timer["setup_system"].cpu_time(),
-          timer["assemble_system"].cpu_time(),
-          timer["solve"].cpu_time(),
-          timer["output_results"].cpu_time()};
+  return {timer["refinement"].wall_time(),
+          timer["setup_system"].wall_time(),
+          timer["assemble_system"].wall_time(),
+          timer["solve"].wall_time(),
+          timer["output_results"].wall_time()};
 }
 
 
