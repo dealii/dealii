@@ -463,10 +463,7 @@ namespace Step55
                                    dof_handler.locally_owned_dofs()),
         mpi_communicator,
         locally_relevant_dofs);
-      preconditioner_matrix.reinit(owned_partitioning,
-                                   //      owned_partitioning,
-                                   dsp,
-                                   mpi_communicator);
+      preconditioner_matrix.reinit(owned_partitioning, dsp, mpi_communicator);
     }
 
     // Finally, we construct the block vectors with the right sizes. The
