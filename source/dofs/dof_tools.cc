@@ -1048,12 +1048,11 @@ namespace DoFTools
 
 
   template <int dim, int spacedim>
-  void
-  extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler,
-                              IndexSet &                       dof_set)
+  IndexSet
+  extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler)
   {
     // collect all the locally owned dofs
-    dof_set = dof_handler.locally_owned_dofs();
+    IndexSet dof_set = dof_handler.locally_owned_dofs();
 
     // add the DoF on the adjacent ghost cells to the IndexSet, cache them
     // in a set. need to check each dof manually because we can't be sure
@@ -1075,19 +1074,30 @@ namespace DoFTools
     dof_set.add_indices(global_dof_indices.begin(), global_dof_indices.end());
 
     dof_set.compress();
+
+    return dof_set;
   }
 
 
 
   template <int dim, int spacedim>
   void
+  extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler,
+                              IndexSet &                       dof_set)
+  {
+    dof_set = extract_locally_active_dofs(dof_handler);
+  }
+
+
+
+  template <int dim, int spacedim>
+  IndexSet
   extract_locally_active_level_dofs(
     const DoFHandler<dim, spacedim> &dof_handler,
-    IndexSet &                       dof_set,
     const unsigned int               level)
   {
     // collect all the locally owned dofs
-    dof_set = dof_handler.locally_owned_mg_dofs(level);
+    IndexSet dof_set = dof_handler.locally_owned_mg_dofs(level);
 
     // add the DoF on the adjacent ghost cells to the IndexSet, cache them
     // in a set. need to check each dof manually because we can't be sure
@@ -1111,17 +1121,30 @@ namespace DoFTools
     dof_set.add_indices(global_dof_indices.begin(), global_dof_indices.end());
 
     dof_set.compress();
+
+    return dof_set;
   }
 
 
 
   template <int dim, int spacedim>
   void
-  extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler,
-                                IndexSet &                       dof_set)
+  extract_locally_active_level_dofs(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    IndexSet &                       dof_set,
+    const unsigned int               level)
+  {
+    dof_set = extract_locally_active_level_dofs(dof_handler, level);
+  }
+
+
+
+  template <int dim, int spacedim>
+  IndexSet
+  extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler)
   {
     // collect all the locally owned dofs
-    dof_set = dof_handler.locally_owned_dofs();
+    IndexSet dof_set = dof_handler.locally_owned_dofs();
 
     // now add the DoF on the adjacent ghost cells to the IndexSet
 
@@ -1150,19 +1173,30 @@ namespace DoFTools
                         std::unique(dofs_on_ghosts.begin(),
                                     dofs_on_ghosts.end()));
     dof_set.compress();
+
+    return dof_set;
   }
 
 
 
   template <int dim, int spacedim>
   void
+  extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler,
+                                IndexSet &                       dof_set)
+  {
+    dof_set = extract_locally_relevant_dofs(dof_handler);
+  }
+
+
+
+  template <int dim, int spacedim>
+  IndexSet
   extract_locally_relevant_level_dofs(
     const DoFHandler<dim, spacedim> &dof_handler,
-    const unsigned int               level,
-    IndexSet &                       dof_set)
+    const unsigned int               level)
   {
     // collect all the locally owned dofs
-    dof_set = dof_handler.locally_owned_mg_dofs(level);
+    IndexSet dof_set = dof_handler.locally_owned_mg_dofs(level);
 
     // add the DoF on the adjacent ghost cells to the IndexSet
 
@@ -1198,6 +1232,20 @@ namespace DoFTools
                                     dofs_on_ghosts.end()));
 
     dof_set.compress();
+
+    return dof_set;
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  extract_locally_relevant_level_dofs(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const unsigned int               level,
+    IndexSet &                       dof_set)
+  {
+    dof_set = extract_locally_relevant_level_dofs(dof_handler, level);
   }
 
 

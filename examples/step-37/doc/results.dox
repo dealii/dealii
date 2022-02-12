@@ -427,8 +427,7 @@ temporary vector and LinearAlgebra::distributed::Vector::copy_locally_owned_data
 as shown below.
 
 @code
-IndexSet locally_relevant_dofs;
-DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+const IndexSet locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_handler);
 LinearAlgebra::distributed::Vector<double> copy_vec(solution);
 solution.reinit(dof_handler.locally_owned_dofs(),
                 locally_relevant_dofs,

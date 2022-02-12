@@ -1864,16 +1864,16 @@ namespace Step32
       stokes_partitioning.push_back(stokes_index_set.get_view(0, n_u));
       stokes_partitioning.push_back(stokes_index_set.get_view(n_u, n_u + n_p));
 
-      DoFTools::extract_locally_relevant_dofs(stokes_dof_handler,
-                                              stokes_relevant_set);
+      stokes_relevant_set =
+        DoFTools::extract_locally_relevant_dofs(stokes_dof_handler);
       stokes_relevant_partitioning.push_back(
         stokes_relevant_set.get_view(0, n_u));
       stokes_relevant_partitioning.push_back(
         stokes_relevant_set.get_view(n_u, n_u + n_p));
 
       temperature_partitioning = temperature_dof_handler.locally_owned_dofs();
-      DoFTools::extract_locally_relevant_dofs(
-        temperature_dof_handler, temperature_relevant_partitioning);
+      temperature_relevant_partitioning =
+        DoFTools::extract_locally_relevant_dofs(temperature_dof_handler);
     }
 
     // Following this, we can compute constraints for the solution vectors,

@@ -19,11 +19,23 @@ for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
     namespace DoFTools
     \{
+      template IndexSet
+      extract_locally_relevant_dofs<deal_II_dimension, deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension>
+          &dof_handler);
+
       template void
       extract_locally_relevant_dofs<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension>
           &       dof_handler,
         IndexSet &dof_set);
+
+      template IndexSet
+      extract_locally_relevant_level_dofs<deal_II_dimension,
+                                          deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension>
+          &                dof_handler,
+        const unsigned int level);
 
       template void
       extract_locally_relevant_level_dofs<deal_II_dimension,
@@ -33,11 +45,23 @@ for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
         const unsigned int level,
         IndexSet &         dof_set);
 
+      template IndexSet
+      extract_locally_active_dofs<deal_II_dimension, deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension>
+          &dof_handler);
+
       template void
       extract_locally_active_dofs<deal_II_dimension, deal_II_space_dimension>(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension>
           &       dof_handler,
         IndexSet &dof_set);
+
+      template IndexSet
+      extract_locally_active_level_dofs<deal_II_dimension,
+                                        deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension>
+          &                dof_handler,
+        const unsigned int level);
 
       template void
       extract_locally_active_level_dofs<deal_II_dimension,

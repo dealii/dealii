@@ -1231,8 +1231,8 @@ namespace Step70
     fluid_owned_dofs[1] =
       fluid_dh.locally_owned_dofs().get_view(n_u, n_u + n_p);
 
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(fluid_dh, locally_relevant_dofs);
+    const IndexSet locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(fluid_dh);
     fluid_relevant_dofs.resize(2);
     fluid_relevant_dofs[0] = locally_relevant_dofs.get_view(0, n_u);
     fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);

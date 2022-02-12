@@ -427,7 +427,8 @@ namespace Step48
     // access in MPI-local numbers that need to match between the vector and
     // MatrixFree), so we just ask it to initialize the vectors to be sure the
     // ghost exchange is properly handled.
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);

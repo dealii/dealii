@@ -262,8 +262,8 @@ MGConstrainedDoFs::initialize(
         }
       else
         {
-          IndexSet relevant_dofs;
-          DoFTools::extract_locally_relevant_level_dofs(dof, l, relevant_dofs);
+          const IndexSet relevant_dofs =
+            DoFTools::extract_locally_relevant_level_dofs(dof, l);
           level_constraints[l].reinit(relevant_dofs);
         }
 
