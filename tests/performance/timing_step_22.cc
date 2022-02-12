@@ -19,6 +19,8 @@
 // A performance benchmark based on step 22 that measures timings for system
 // setup, assembly, solve and postprocessing for a Stokes problem.
 //
+// Status: experimental
+//
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
