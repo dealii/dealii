@@ -1180,6 +1180,14 @@ namespace Utilities
      * uses `boost::serialize`, see in Utilities::pack() for details) accepts
      * `T` as an argument.
      *
+     * @note Be aware that this function is typically a lot more
+     * expensive than an `MPI_Bcast` if you are using simple types
+     * directly supported by MPI. This function will use
+     * boost::serialization to (de)serialize, and execute a second
+     * `MPI_Bcast` to transmit the size before sending the data
+     * itself. You can also use the other broadcast() function in this
+     * namespace.
+     *
      * @param[in] comm MPI communicator.
      * @param[in] object_to_send An object to send to all processes.
      * @param[in] root_process The process that sends the object to all
@@ -1194,6 +1202,28 @@ namespace Utilities
     broadcast(const MPI_Comm &   comm,
               const T &          object_to_send,
               const unsigned int root_process = 0);
+
+    /**
+     * Broadcast the information in @p buffer from @p root to all
+     * other ranks.
+     *
+     * Like `MPI_Bcast` but with support to send data with a @p count
+     * bigger than 2^31. The datatype to send needs to be supported
+     * directly by MPI and is automatically deduced from T.
+     *
+     * Throws an exception if any MPI command fails.
+     *
+     * @param buffer Buffer of @p count objects
+     * @param count The number of objects to send
+     * @param root The rank of the process with the data
+     * @param comm The MPI communicator to use
+     */
+    template <typename T>
+    void
+    broadcast(T *                buffer,
+              const size_t       count,
+              const unsigned int root,
+              const MPI_Comm &   comm);
 
     /**
      * A function that combines values @p local_value from all processes
@@ -1757,6 +1787,40 @@ namespace Utilities
             }
         }
       return received_objects;
+#  endif
+    }
+
+
+
+    template <typename T>
+    void
+    broadcast(T *                buffer,
+              const size_t       count,
+              const unsigned int root,
+              const MPI_Comm &   comm)
+    {
+#  ifndef DEAL_II_WITH_MPI
+      (void)buffer;
+      (void)count;
+      (void)root;
+      (void)comm;
+#  else
+      // MPI_Bcast's count is a signed int, so send at most 2^31 in each
+      // iteration:
+      const size_t max_send_count = std::numeric_limits<signed int>::max();
+
+      size_t total_sent_count = 0;
+      while (total_sent_count < count)
+        {
+          const size_t current_count =
+            std::min(count - total_sent_count, max_send_count);
+
+          const int ierr =
+            MPI_Bcast(buffer, current_count, mpi_type_id(buffer), root, comm);
+          AssertThrowMPI(ierr);
+          total_sent_count += current_count;
+          buffer += current_count;
+        }
 #  endif
     }
 
