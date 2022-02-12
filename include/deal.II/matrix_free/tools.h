@@ -45,8 +45,7 @@ namespace MatrixFreeTools
 
   /**
    * Compute the diagonal of a linear operator (@p diagonal_global), given
-   * @p matrix_free and the local cell integral operation @p local_vmult. The
-   * vector is initialized to the right size in the function.
+   * @p matrix_free and the local cell integral operation @p local_vmult.
    *
    * The parameters @p dof_no, @p quad_no, and @p first_selected_component are
    * passed to the constructor of the FEEvaluation that is internally set up.
@@ -93,6 +92,63 @@ namespace MatrixFreeTools
                                                n_components,
                                                Number,
                                                VectorizedArrayType> &) const,
+    const CLASS *      owning_class,
+    const unsigned int dof_no                   = 0,
+    const unsigned int quad_no                  = 0,
+    const unsigned int first_selected_component = 0);
+
+  /**
+   * Compute the diagonal of a linear operator (@p diagonal_global), given
+   * @p matrix_free and the local cell integral operation @p local_vmult.
+   *
+   * In contrast to the function above, this function works on a vector of
+   * FEEvaluation objects with single component. This is particularly useful if
+   * the number of components is not known at compile time.
+   */
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            typename Number,
+            typename VectorizedArrayType,
+            typename VectorType>
+  void
+  compute_diagonal(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    VectorType &                                        diagonal_global,
+    const int                                           n_components,
+    const std::function<void(std::vector<FEEvaluation<dim,
+                                                      fe_degree,
+                                                      n_q_points_1d,
+                                                      1,
+                                                      Number,
+                                                      VectorizedArrayType>> &)>
+      &                local_vmult,
+    const unsigned int dof_no                   = 0,
+    const unsigned int quad_no                  = 0,
+    const unsigned int first_selected_component = 0);
+
+  /**
+   * Same as above but with a class and a function pointer.
+   */
+  template <typename CLASS,
+            int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            typename Number,
+            typename VectorizedArrayType,
+            typename VectorType>
+  void
+  compute_diagonal(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    VectorType &                                        diagonal_global,
+    const int                                           n_components,
+    void (CLASS::*cell_operation)(
+      std::vector<FEEvaluation<dim,
+                               fe_degree,
+                               n_q_points_1d,
+                               1,
+                               Number,
+                               VectorizedArrayType>> &) const,
     const CLASS *      owning_class,
     const unsigned int dof_no                   = 0,
     const unsigned int quad_no                  = 0,
@@ -151,6 +207,68 @@ namespace MatrixFreeTools
                                                n_components,
                                                Number,
                                                VectorizedArrayType> &) const,
+    const CLASS *      owning_class,
+    const unsigned int dof_no                   = 0,
+    const unsigned int quad_no                  = 0,
+    const unsigned int first_selected_component = 0);
+
+
+  /**
+   * Compute the matrix representation of a linear operator (@p matrix), given
+   * @p matrix_free and the local cell integral operation @p local_vmult.
+   * Constrained entries on the diagonal are set to one.
+   *
+   * In contrast to the function above, this function works on a vector of
+   * FEEvaluation objects with single component. This is particularly useful if
+   * the number of components is not known at compile time.
+   */
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            typename Number,
+            typename VectorizedArrayType,
+            typename MatrixType>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const AffineConstraints<Number> &                   constraints,
+    MatrixType &                                        matrix,
+    const int                                           n_components,
+    const std::function<void(std::vector<FEEvaluation<dim,
+                                                      fe_degree,
+                                                      n_q_points_1d,
+                                                      1,
+                                                      Number,
+                                                      VectorizedArrayType>> &)>
+      &                local_vmult,
+    const unsigned int dof_no                   = 0,
+    const unsigned int quad_no                  = 0,
+    const unsigned int first_selected_component = 0);
+
+
+  /**
+   * Same as above but with a class and a function pointer.
+   */
+  template <typename CLASS,
+            int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            typename Number,
+            typename VectorizedArrayType,
+            typename MatrixType>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const AffineConstraints<Number> &                   constraints,
+    MatrixType &                                        matrix,
+    const int                                           n_components,
+    void (CLASS::*cell_operation)(
+      std::vector<FEEvaluation<dim,
+                               fe_degree,
+                               n_q_points_1d,
+                               1,
+                               Number,
+                               VectorizedArrayType>> &) const,
     const CLASS *      owning_class,
     const unsigned int dof_no                   = 0,
     const unsigned int quad_no                  = 0,
@@ -253,7 +371,7 @@ namespace MatrixFreeTools
     template <int dim,
               int fe_degree,
               int n_q_points_1d,
-              int n_components,
+              int n_components_phi,
               typename Number,
               typename VectorizedArrayType>
     class ComputeDiagonalHelper
@@ -261,31 +379,36 @@ namespace MatrixFreeTools
     public:
       static const unsigned int n_lanes = VectorizedArrayType::size();
 
-      ComputeDiagonalHelper(FEEvaluation<dim,
-                                         fe_degree,
-                                         n_q_points_1d,
-                                         n_components,
-                                         Number,
-                                         VectorizedArrayType> &phi)
+      ComputeDiagonalHelper(std::vector<FEEvaluation<dim,
+                                                     fe_degree,
+                                                     n_q_points_1d,
+                                                     n_components_phi,
+                                                     Number,
+                                                     VectorizedArrayType>> &phi)
         : phi(phi)
       {}
 
       void
       reinit(const unsigned int cell)
       {
-        this->phi.reinit(cell);
+        for (unsigned int p = 0; p < phi.size(); ++p)
+          this->phi[p].reinit(cell);
+
         // STEP 1: get relevant information from FEEvaluation
-        const auto &       dof_info        = phi.get_dof_info();
+        const auto &       shape_info = phi[0].get_shape_info();
+        const auto &       dof_info   = phi[0].get_dof_info();
+        const unsigned int n_components =
+          phi.size() > 1 ? phi.size() : n_components_phi;
         const unsigned int n_fe_components = dof_info.start_components.back();
-        const unsigned int dofs_per_component = phi.dofs_per_component;
-        const auto &       matrix_free        = phi.get_matrix_free();
+        const unsigned int dofs_per_component = phi[0].dofs_per_component;
+        const auto &       matrix_free        = phi[0].get_matrix_free();
 
         // if we have a block vector with components with the same DoFHandler,
         // each component is described with same set of constraints and
         // we consider the shift in components only during access of the global
         // vector
         const unsigned int first_selected_component =
-          n_fe_components == 1 ? 0 : phi.get_first_selected_component();
+          n_fe_components == 1 ? 0 : phi[0].get_first_selected_component();
 
         const unsigned int n_lanes_filled =
           matrix_free.n_active_entries_per_cell_batch(cell);
@@ -489,10 +612,10 @@ namespace MatrixFreeTools
                               dim,
                               Number,
                               VectorizedArrayType>::apply(1,
-                                                          phi.get_shape_info()
-                                                            .data.front()
+                                                          shape_info.data
+                                                            .front()
                                                             .fe_degree,
-                                                          phi.get_shape_info(),
+                                                          shape_info,
                                                           false,
                                                           constraint_mask,
                                                           values_dofs.data());
@@ -690,8 +813,9 @@ namespace MatrixFreeTools
         // compute i-th column of element stiffness matrix:
         // this could be simply performed as done at the moment with
         // matrix-free operator evaluation applied to a ith-basis vector
-        for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
-          phi.begin_dof_values()[j] = static_cast<Number>(i == j);
+        for (unsigned int p = 0, c = 0; p < phi.size(); ++p)
+          for (unsigned int j = 0; j < phi[p].dofs_per_cell; ++j, ++c)
+            phi[p].begin_dof_values()[j] = static_cast<Number>(i == c);
       }
 
       void
@@ -701,17 +825,17 @@ namespace MatrixFreeTools
         // we need to figure out which component and which DoF within the
         // comonent are we currently considering
         const unsigned int n_fe_components =
-          phi.get_dof_info().start_components.back();
+          phi[0].get_dof_info().start_components.back();
         const unsigned int comp =
-          n_fe_components == 1 ? i / phi.dofs_per_component : 0;
+          n_fe_components == 1 ? i / phi[0].dofs_per_component : 0;
         const unsigned int i_comp =
-          n_fe_components == 1 ? (i % phi.dofs_per_component) : i;
+          n_fe_components == 1 ? (i % phi[0].dofs_per_component) : i;
 
         // apply local constraint matrix from left and from right:
         // loop over all rows of transposed constrained matrix
         for (unsigned int v = 0;
-             v < phi.get_matrix_free().n_active_entries_per_cell_batch(
-                   phi.get_current_cell_index());
+             v < phi[0].get_matrix_free().n_active_entries_per_cell_batch(
+                   phi[0].get_current_cell_index());
              ++v)
           {
             const auto &c_pool = c_pools[v];
@@ -736,9 +860,14 @@ namespace MatrixFreeTools
                 // apply constraint matrix from the left
                 Number temp = 0.0;
                 for (unsigned int k = c_pool.row[j]; k < c_pool.row[j + 1]; ++k)
-                  temp += c_pool.val[k] *
-                          phi.begin_dof_values()[comp * phi.dofs_per_component +
-                                                 c_pool.col[k]][v];
+                  {
+                    const unsigned int read_index =
+                      comp * phi[0].dofs_per_component + c_pool.col[k];
+                    temp += c_pool.val[k] *
+                            phi[read_index / phi[0].dofs_per_cell]
+                              .begin_dof_values()[read_index %
+                                                  phi[0].dofs_per_cell][v];
+                  }
 
                 // apply constraint matrix from the right
                 diagonals_local_constrained
@@ -755,13 +884,16 @@ namespace MatrixFreeTools
       {
         // STEP 4: assembly results: add into global vector
         const unsigned int n_fe_components =
-          phi.get_dof_info().start_components.back();
+          phi[0].get_dof_info().start_components.back();
         const unsigned int first_selected_component =
-          phi.get_first_selected_component();
+          phi[0].get_first_selected_component();
+
+        const unsigned int n_components =
+          phi.size() > 1 ? phi.size() : n_components_phi;
 
         for (unsigned int v = 0;
-             v < phi.get_matrix_free().n_active_entries_per_cell_batch(
-                   phi.get_current_cell_index());
+             v < phi[0].get_matrix_free().n_active_entries_per_cell_batch(
+                   phi[0].get_current_cell_index());
              ++v)
           // if we have a block vector with components with the same
           // DoFHandler, we need to loop over all components manully and
@@ -786,12 +918,12 @@ namespace MatrixFreeTools
       }
 
     private:
-      FEEvaluation<dim,
-                   fe_degree,
-                   n_q_points_1d,
-                   n_components,
-                   Number,
-                   VectorizedArrayType> &phi;
+      std::vector<FEEvaluation<dim,
+                               fe_degree,
+                               n_q_points_1d,
+                               n_components_phi,
+                               Number,
+                               VectorizedArrayType>> &phi;
 
       unsigned int i;
 
@@ -837,13 +969,16 @@ namespace MatrixFreeTools
           VectorType &                                        diagonal_global,
           const int &,
           const std::pair<unsigned int, unsigned int> &range) mutable {
-        FEEvaluation<dim,
-                     fe_degree,
-                     n_q_points_1d,
-                     n_components,
-                     Number,
-                     VectorizedArrayType>
-          phi(matrix_free, range, dof_no, quad_no, first_selected_component);
+        std::vector<FEEvaluation<dim,
+                                 fe_degree,
+                                 n_q_points_1d,
+                                 n_components,
+                                 Number,
+                                 VectorizedArrayType>>
+          phi;
+
+        phi.emplace_back(
+          matrix_free, range, dof_no, quad_no, first_selected_component);
 
         internal::ComputeDiagonalHelper<dim,
                                         fe_degree,
@@ -857,12 +992,81 @@ namespace MatrixFreeTools
           {
             helper.reinit(cell);
 
-            for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
+            for (unsigned int i = 0; i < phi[0].dofs_per_cell; ++i)
               {
                 helper.prepare_basis_vector(i);
-                local_vmult(phi);
+                local_vmult(phi[0]);
                 helper.submit();
               }
+
+            helper.distribute_local_to_global(diagonal_global);
+          }
+      },
+      diagonal_global,
+      dummy,
+      false);
+  }
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            typename Number,
+            typename VectorizedArrayType,
+            typename VectorType>
+  void
+  compute_diagonal(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    VectorType &                                        diagonal_global,
+    const int                                           n_components,
+    const std::function<void(std::vector<FEEvaluation<dim,
+                                                      fe_degree,
+                                                      n_q_points_1d,
+                                                      1,
+                                                      Number,
+                                                      VectorizedArrayType>> &)>
+      &                local_vmult,
+    const unsigned int dof_no,
+    const unsigned int quad_no,
+    const unsigned int first_selected_component)
+  {
+    int dummy = 0;
+
+    matrix_free.template cell_loop<VectorType, int>(
+      [&](const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+          VectorType &                                        diagonal_global,
+          const int &,
+          const std::pair<unsigned int, unsigned int> &range) mutable {
+        std::vector<FEEvaluation<dim,
+                                 fe_degree,
+                                 n_q_points_1d,
+                                 1,
+                                 Number,
+                                 VectorizedArrayType>>
+          phi;
+
+        for (unsigned int i = 0; i < n_components; ++i)
+          phi.emplace_back(
+            matrix_free, range, dof_no, quad_no, first_selected_component + i);
+
+        internal::ComputeDiagonalHelper<dim,
+                                        fe_degree,
+                                        n_q_points_1d,
+                                        1,
+                                        Number,
+                                        VectorizedArrayType>
+          helper(phi);
+
+        for (unsigned int cell = range.first; cell < range.second; ++cell)
+          {
+            helper.reinit(cell);
+
+            for (unsigned int p = 0, c = 0; p < phi.size(); ++p)
+              for (unsigned int i = 0; i < phi[p].dofs_per_cell; ++i, ++c)
+                {
+                  helper.prepare_basis_vector(c);
+                  local_vmult(phi);
+                  helper.submit();
+                }
 
             helper.distribute_local_to_global(diagonal_global);
           }
@@ -904,6 +1108,45 @@ namespace MatrixFreeTools
                      VectorType>(
       matrix_free,
       diagonal_global,
+      [&](auto &feeval) { (owning_class->*cell_operation)(feeval); },
+      dof_no,
+      quad_no,
+      first_selected_component);
+  }
+
+  template <typename CLASS,
+            int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            typename Number,
+            typename VectorizedArrayType,
+            typename VectorType>
+  void
+  compute_diagonal(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    VectorType &                                        diagonal_global,
+    const int                                           n_components,
+    void (CLASS::*cell_operation)(
+      std::vector<FEEvaluation<dim,
+                               fe_degree,
+                               n_q_points_1d,
+                               1,
+                               Number,
+                               VectorizedArrayType>> &) const,
+    const CLASS *      owning_class,
+    const unsigned int dof_no,
+    const unsigned int quad_no,
+    const unsigned int first_selected_component)
+  {
+    compute_diagonal<dim,
+                     fe_degree,
+                     n_q_points_1d,
+                     Number,
+                     VectorizedArrayType,
+                     VectorType>(
+      matrix_free,
+      diagonal_global,
+      n_components,
       [&](auto &feeval) { (owning_class->*cell_operation)(feeval); },
       dof_no,
       quad_no,
@@ -1104,6 +1347,192 @@ namespace MatrixFreeTools
       matrix_free,
       constraints,
       matrix,
+      [&](auto &feeval) { (owning_class->*cell_operation)(feeval); },
+      dof_no,
+      quad_no,
+      first_selected_component);
+  }
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            typename Number,
+            typename VectorizedArrayType,
+            typename MatrixType>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const AffineConstraints<Number> &                   constraints_in,
+    MatrixType &                                        matrix,
+    const int                                           n_components,
+    const std::function<void(std::vector<FEEvaluation<dim,
+                                                      fe_degree,
+                                                      n_q_points_1d,
+                                                      1,
+                                                      Number,
+                                                      VectorizedArrayType>> &)>
+      &                local_vmult,
+    const unsigned int dof_no,
+    const unsigned int quad_no,
+    const unsigned int first_selected_component)
+  {
+    std::unique_ptr<AffineConstraints<typename MatrixType::value_type>>
+      constraints_for_matrix;
+    const AffineConstraints<typename MatrixType::value_type> &constraints =
+      internal::create_new_affine_constraints_if_needed(matrix,
+                                                        constraints_in,
+                                                        constraints_for_matrix);
+
+    matrix_free.template cell_loop<MatrixType, MatrixType>(
+      [&](const auto &, auto &dst, const auto &, const auto range) {
+        std::vector<FEEvaluation<dim,
+                                 fe_degree,
+                                 n_q_points_1d,
+                                 1,
+                                 Number,
+                                 VectorizedArrayType>>
+          integrator;
+
+        integrator.reserve(n_components);
+
+        for (int c = 0; c < n_components; ++c)
+          integrator.emplace_back(
+            matrix_free, range, dof_no, quad_no, c + first_selected_component);
+
+        const unsigned int dofs_per_component =
+          integrator[0].dofs_per_component;
+
+        for (int c = 0; c < n_components; ++c)
+          AssertDimension(dofs_per_component, integrator[c].dofs_per_component);
+
+        std::vector<types::global_dof_index> dof_indices(dofs_per_component *
+                                                         n_components);
+
+        std::array<std::vector<std::vector<types::global_dof_index>>,
+                   VectorizedArrayType::size()>
+          dof_indices_mf;
+
+        std::array<std::vector<FullMatrix<typename MatrixType::value_type>>,
+                   VectorizedArrayType::size()>
+          matrices;
+
+        for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+          {
+            dof_indices_mf[v].resize(n_components);
+            matrices[v].resize(n_components);
+
+            for (int c = 0; c < n_components; ++c)
+              {
+                dof_indices_mf[v][c].resize(dofs_per_component);
+                matrices[v][c] = FullMatrix<typename MatrixType::value_type>(
+                  dofs_per_component, dofs_per_component);
+              }
+          }
+
+        const auto lexicographic_numbering =
+          matrix_free
+            .get_shape_info(dof_no,
+                            quad_no,
+                            first_selected_component,
+                            integrator[0].get_active_fe_index(),
+                            integrator[0].get_active_quadrature_index())
+            .lexicographic_numbering;
+
+        for (auto cell = range.first; cell < range.second; ++cell)
+          {
+            for (unsigned int c = 0; c < n_components; ++c)
+              integrator[c].reinit(cell);
+
+            unsigned int const n_filled_lanes =
+              matrix_free.n_active_entries_per_cell_batch(cell);
+
+            for (unsigned int v = 0; v < n_filled_lanes; ++v)
+              {
+                const auto cell_v =
+                  matrix_free.get_cell_iterator(cell, v, dof_no);
+
+                if (matrix_free.get_mg_level() != numbers::invalid_unsigned_int)
+                  cell_v->get_mg_dof_indices(dof_indices);
+                else
+                  cell_v->get_dof_indices(dof_indices);
+
+                for (unsigned int j = 0; j < dof_indices.size(); ++j)
+                  dof_indices_mf[v][j / dofs_per_component]
+                                [j % dofs_per_component] =
+                                  dof_indices[lexicographic_numbering[j]];
+              }
+
+            for (unsigned int cj = 0; cj < n_components; ++cj)
+              {
+                for (unsigned int j = 0; j < dofs_per_component; ++j)
+                  {
+                    for (unsigned int ci = 0; ci < n_components; ++ci)
+                      for (unsigned int i = 0; i < dofs_per_component; ++i)
+                        integrator[ci].begin_dof_values()[i] =
+                          static_cast<Number>((ci == cj) && (i == j));
+
+                    local_vmult(integrator);
+
+                    for (unsigned int ci = 0; ci < n_components; ++ci)
+                      for (unsigned int i = 0; i < dofs_per_component; ++i)
+                        for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                          matrices[v][ci](i, j) =
+                            integrator[ci].begin_dof_values()[i][v];
+                  }
+
+                for (unsigned int ci = 0; ci < n_components; ++ci)
+                  for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                    {
+                      constraints.distribute_local_to_global(
+                        matrices[v][ci],
+                        dof_indices_mf[v][ci],
+                        dof_indices_mf[v][cj],
+                        dst);
+                    }
+              }
+          }
+      },
+      matrix,
+      matrix);
+
+    matrix.compress(VectorOperation::add);
+  }
+
+  template <typename CLASS,
+            int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            typename Number,
+            typename VectorizedArrayType,
+            typename MatrixType>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const AffineConstraints<Number> &                   constraints,
+    MatrixType &                                        matrix,
+    const int                                           n_components,
+    void (CLASS::*cell_operation)(
+      std::vector<FEEvaluation<dim,
+                               fe_degree,
+                               n_q_points_1d,
+                               1,
+                               Number,
+                               VectorizedArrayType>> &) const,
+    const CLASS *      owning_class,
+    const unsigned int dof_no,
+    const unsigned int quad_no,
+    const unsigned int first_selected_component)
+  {
+    compute_matrix<dim,
+                   fe_degree,
+                   n_q_points_1d,
+                   Number,
+                   VectorizedArrayType,
+                   MatrixType>(
+      matrix_free,
+      constraints,
+      matrix,
+      n_components,
       [&](auto &feeval) { (owning_class->*cell_operation)(feeval); },
       dof_no,
       quad_no,
