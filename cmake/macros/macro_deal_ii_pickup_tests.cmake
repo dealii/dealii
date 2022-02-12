@@ -55,6 +55,17 @@
 #       - A regular expression to select only a subset of tests during setup.
 #         An empty string is interpreted as a catchall (this is the default).
 #
+#     ENABLE_PERFORMANCE_TESTS
+#       - If defined and set to true the execution of performance tests
+#         will be enabled.
+#
+#     TESTING_ENVIRONMENT
+#       - Specifies the performance test testing environment. Valid options
+#         are:
+#          * "light":  mobile laptop, >=2 physical cores, >=8GB RAM
+#          * "medium": workstation, >=8 physical cores, >=32GB RAM
+#          * "heavy":  compute node, >=32 physical cores, >=128GB RAM
+#
 # numdiff is used for the comparison of test results. Its location can be
 # specified with NUMDIFF_DIR.
 #
@@ -197,12 +208,21 @@ MACRO(DEAL_II_PICKUP_TESTS)
   SET_IF_EMPTY(TEST_THREAD_LIMIT 0)
 
   #
+  # Other variables:
+  #
+
+  SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
+
+  SET_IF_EMPTY(ENABLE_PERFORMANCE_TESTS "$ENV{ENABLE_PERFORMANCE_TESTS}")
+
+  SET_IF_EMPTY(TESTING_ENVIRONMENT "$ENV{TESTING_ENVIRONMENT}")
+  SET_IF_EMPTY(TESTING_ENVIRONMENT "light")
+
+  #
   # ... and finally pick up tests:
   #
 
   ENABLE_TESTING()
-
-  SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
 
   IF("${ARGN}" STREQUAL "")
     GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
