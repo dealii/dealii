@@ -119,16 +119,14 @@ test()
           if (myid == i)
             MPI_Send(&renumbering[0],
                      renumbering.size(),
-                     Utilities::MPI::internal::mpi_type_id(
-                       &complete_renumbering[0]),
+                     Utilities::MPI::mpi_type_id(&complete_renumbering[0]),
                      0,
                      i,
                      MPI_COMM_WORLD);
           else if (myid == 0)
             MPI_Recv(&complete_renumbering[offset],
                      dofs_per_proc[i].n_elements(),
-                     Utilities::MPI::internal::mpi_type_id(
-                       &complete_renumbering[0]),
+                     Utilities::MPI::mpi_type_id(&complete_renumbering[0]),
                      i,
                      i,
                      MPI_COMM_WORLD,
