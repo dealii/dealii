@@ -555,7 +555,7 @@ public:
    * of each block is determined by the size() of the respective IndexSet.
    * Each block only stores the rows given by the values in the IndexSet,
    * which is useful for distributed memory parallel computations and usually
-   * corresponds to the locally owned DoFs.
+   * corresponds to the locally relevant DoFs.
    */
   BlockDynamicSparsityPattern(const std::vector<IndexSet> &partitioning);
 
