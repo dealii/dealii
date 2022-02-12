@@ -25,8 +25,6 @@ IF("${TESTING_ENVIRONMENT}" STREQUAL "whistler-node")
   SET(TESTING_ENVIRONMENT "heavy")
 ENDIF()
 
-MESSAGE("${CTEST_SITE}")
-
 #
 # Determine appropriate resource limits for performance tests:
 #
