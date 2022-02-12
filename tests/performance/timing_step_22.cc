@@ -544,10 +544,6 @@ StokesProblem<dim>::output_results(const unsigned int refinement_cycle) const
                            DataOut<dim>::type_dof_data,
                            data_component_interpretation);
   data_out.build_patches();
-
-  std::ofstream output("solution-" +
-                       Utilities::int_to_string(refinement_cycle, 2) + ".vtk");
-  data_out.write_vtk(output);
 }
 
 
