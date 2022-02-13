@@ -537,11 +537,15 @@ IF("${_res}" STREQUAL "0")
 "
           )
       ENDIF()
+
+      SET(_target setup_tests_performance)
+    ELSE()
+      SET(_target setup_tests)
     ENDIF()
 
-    MESSAGE("-- Running setup_tests")
+    MESSAGE("-- Running ${_target}")
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-      --build . --target setup_tests
+      --build . --target ${_target}
       -- ${MAKEOPTS}
       WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
       OUTPUT_QUIET
