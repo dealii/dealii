@@ -139,6 +139,22 @@ namespace Utilities
    */
   namespace MPI
   {
+#ifdef DOXYGEN
+    /**
+     * Given a pointer to an object of class T, return the matching
+     * `MPI_Datatype` to be used for MPI communication.
+     *
+     * As an example, passing an `int*` to this function returns `MPI_INT`.
+     *
+     * @note In reality, these functions are not template functions templated
+     * on the parameter T, but free standing inline function overloads. This
+     * templated version only exists so that it shows up in the documentation.
+     */
+    template <typename T>
+    MPI_Datatype
+    mpi_type_id(const T *);
+#endif
+
     /**
      * Return the number of MPI processes there exist in the given
      * @ref GlossMPICommunicator "communicator"
@@ -1279,17 +1295,154 @@ namespace Utilities
     compute_set_union(const std::set<T> &set, const MPI_Comm &comm);
 
 
+
 #ifndef DOXYGEN
-    // declaration for an internal function that lives in mpi.templates.h
+
+    /* --------------------------- inline functions ------------------------- */
+
+#  ifdef DEAL_II_WITH_MPI
+    inline MPI_Datatype
+    mpi_type_id(const bool *)
+    {
+#    if DEAL_II_MPI_VERSION_GTE(2, 2)
+      return MPI_CXX_BOOL;
+#    else
+      return MPI_C_BOOL;
+#    endif
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const char *)
+    {
+      return MPI_CHAR;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const signed char *)
+    {
+      return MPI_SIGNED_CHAR;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const short *)
+    {
+      return MPI_SHORT;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const int *)
+    {
+      return MPI_INT;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const long int *)
+    {
+      return MPI_LONG;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const unsigned char *)
+    {
+      return MPI_UNSIGNED_CHAR;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const unsigned short *)
+    {
+      return MPI_UNSIGNED_SHORT;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const unsigned int *)
+    {
+      return MPI_UNSIGNED;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const unsigned long int *)
+    {
+      return MPI_UNSIGNED_LONG;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const unsigned long long int *)
+    {
+      return MPI_UNSIGNED_LONG_LONG;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const float *)
+    {
+      return MPI_FLOAT;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const double *)
+    {
+      return MPI_DOUBLE;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const long double *)
+    {
+      return MPI_LONG_DOUBLE;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const std::complex<float> *)
+    {
+      return MPI_COMPLEX;
+    }
+
+
+
+    inline MPI_Datatype
+    mpi_type_id(const std::complex<double> *)
+    {
+      return MPI_DOUBLE_COMPLEX;
+    }
+#  endif
+
+
     namespace internal
     {
+      // declaration for an internal function that lives in mpi.templates.h
       template <typename T>
       void
       all_reduce(const MPI_Op &            mpi_op,
                  const ArrayView<const T> &values,
                  const MPI_Comm &          mpi_communicator,
                  const ArrayView<T> &      output);
-    }
+    } // namespace internal
 
 
 
