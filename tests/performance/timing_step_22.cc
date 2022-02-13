@@ -19,6 +19,8 @@
 // A performance benchmark based on step 22 that measures timings for system
 // setup, assembly, solve and postprocessing for a Stokes problem.
 //
+// Status: experimental
+//
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
@@ -544,10 +546,6 @@ StokesProblem<dim>::output_results(const unsigned int refinement_cycle) const
                            DataOut<dim>::type_dof_data,
                            data_component_interpretation);
   data_out.build_patches();
-
-  std::ofstream output("solution-" +
-                       Utilities::int_to_string(refinement_cycle, 2) + ".vtk");
-  data_out.write_vtk(output);
 }
 
 
