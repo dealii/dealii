@@ -1026,7 +1026,7 @@ namespace MatrixFreeTools
           {
             integrator.reinit(cell);
 
-            unsigned int const n_filled_lanes =
+            const unsigned int n_filled_lanes =
               matrix_free.n_active_entries_per_cell_batch(cell);
 
             for (unsigned int v = 0; v < n_filled_lanes; ++v)

@@ -50,16 +50,12 @@ test()
   DoFTools::make_zero_boundary_constraints(dof_handler_q, constraints_q);
   constraints_q.close();
 
-  constraints_q.print(std::cout);
-
   AffineConstraints<Number> constraints_system;
   DoFTools::make_hanging_node_constraints(dof_handler_system,
                                           constraints_system);
   DoFTools::make_zero_boundary_constraints(dof_handler_system,
                                            constraints_system);
   constraints_system.close();
-
-  constraints_system.print(std::cout);
 
   typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
     additional_data;
