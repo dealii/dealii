@@ -44,6 +44,11 @@ if [ ! -f contrib/utilities/indent ]; then
   exit 1
 fi
 
+if [ ! -f contrib/utilities/indent_common.sh ]; then
+  echo "*** This script requires contrib/utilities/indent_common.sh."
+  exit 1
+fi
+
 source contrib/utilities/indent_common.sh
 
 #
