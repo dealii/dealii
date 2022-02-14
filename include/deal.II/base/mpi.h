@@ -1862,11 +1862,8 @@ namespace Utilities
         }
 
       // Exchange the size of buffer
-      int ierr = MPI_Bcast(&buffer_size,
-                           1,
-                           internal::mpi_type_id(&buffer_size),
-                           root_process,
-                           comm);
+      int ierr = MPI_Bcast(
+        &buffer_size, 1, mpi_type_id(&buffer_size), root_process, comm);
       AssertThrowMPI(ierr);
 
       // If not on the root process, correctly size the buffer to
@@ -1874,9 +1871,7 @@ namespace Utilities
       if (this_mpi_process(comm) != root_process)
         buffer.resize(buffer_size);
 
-      ierr =
-        MPI_Bcast(buffer.data(), buffer_size, MPI_CHAR, root_process, comm);
-      AssertThrowMPI(ierr);
+      broadcast(buffer.data(), buffer_size, root_process, comm);
 
       if (Utilities::MPI::this_mpi_process(comm) == root_process)
         return object_to_send;
