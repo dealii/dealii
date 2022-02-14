@@ -534,7 +534,7 @@ DynamicSparsityPattern::print(std::ostream &out) const
       out << ']' << std::endl;
     }
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -557,7 +557,7 @@ DynamicSparsityPattern::print_gnuplot(std::ostream &out) const
     }
 
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 

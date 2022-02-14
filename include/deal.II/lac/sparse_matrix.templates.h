@@ -1937,7 +1937,7 @@ SparseMatrix<number>::print_formatted(std::ostream &     out,
           out << std::setw(width) << zero_string << ' ';
       out << std::endl;
     };
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // reset output format
   out.precision(old_precision);
@@ -1965,7 +1965,7 @@ SparseMatrix<number>::print_pattern(std::ostream &out,
           out << ':';
       out << std::endl;
     };
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -1975,7 +1975,7 @@ void
 SparseMatrix<number>::print_as_numpy_arrays(std::ostream &     out,
                                             const unsigned int precision) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   boost::io::ios_flags_saver restore_flags(out);
 
   out.precision(precision);
@@ -2013,7 +2013,7 @@ SparseMatrix<number>::print_as_numpy_arrays(std::ostream &     out,
   out << '\n';
   out << std::flush;
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -2022,7 +2022,7 @@ template <typename number>
 void
 SparseMatrix<number>::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // first the simple objects,
   // bracketed in [...]
@@ -2033,7 +2033,7 @@ SparseMatrix<number>::block_write(std::ostream &out) const
               reinterpret_cast<const char *>(val.get()));
   out << ']';
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -2042,7 +2042,7 @@ template <typename number>
 void
 SparseMatrix<number>::block_read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   char c;
 

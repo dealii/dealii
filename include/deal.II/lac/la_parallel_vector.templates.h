@@ -2112,7 +2112,7 @@ namespace LinearAlgebra
                                            const bool         across) const
     {
       Assert(partitioner.get() != nullptr, ExcInternalError());
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
       std::ios::fmtflags old_flags     = out.flags();
       unsigned int       old_precision = out.precision(precision);
 
@@ -2185,7 +2185,7 @@ namespace LinearAlgebra
         }
 #endif
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
       // reset output format
       out.flags(old_flags);
       out.precision(old_precision);

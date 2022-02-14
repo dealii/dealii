@@ -876,7 +876,7 @@ SparsityPatternBase::print(std::ostream &out) const
 {
   Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   for (size_type i = 0; i < rows; ++i)
     {
@@ -887,7 +887,7 @@ SparsityPatternBase::print(std::ostream &out) const
       out << ']' << std::endl;
     }
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -897,7 +897,7 @@ SparsityPatternBase::print_gnuplot(std::ostream &out) const
 {
   Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = rowstart[i]; j < rowstart[i + 1]; ++j)
@@ -907,7 +907,7 @@ SparsityPatternBase::print_gnuplot(std::ostream &out) const
         // the order of output
         out << colnums[j] << " " << -static_cast<signed int>(i) << std::endl;
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 void
@@ -966,7 +966,7 @@ SparsityPatternBase::bandwidth() const
 void
 SparsityPattern::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // first the simple objects, bracketed in [...]
   out << '[' << max_dim << ' ' << rows << ' ' << cols << ' ' << max_vec_len
@@ -982,7 +982,7 @@ SparsityPattern::block_write(std::ostream &out) const
               reinterpret_cast<const char *>(colnums.get()));
   out << ']';
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -990,7 +990,7 @@ SparsityPattern::block_write(std::ostream &out) const
 void
 SparsityPattern::block_read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   char c;
 

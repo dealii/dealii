@@ -919,7 +919,7 @@ namespace Utilities
       std::ifstream cpuinfo;
       cpuinfo.open("/proc/loadavg");
 
-      AssertThrow(cpuinfo, ExcIO());
+      AssertThrow(cpuinfo.fail() == false, ExcIO());
 
       double load;
       cpuinfo >> load;

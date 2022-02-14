@@ -455,7 +455,7 @@ IndexSet::write(std::ostream &out) const
 void
 IndexSet::read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   size_type    s;
   unsigned int n_ranges;
@@ -465,7 +465,7 @@ IndexSet::read(std::istream &in)
   set_size(s);
   for (unsigned int i = 0; i < n_ranges; ++i)
     {
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
 
       size_type b, e;
       in >> b >> e;
@@ -477,7 +477,7 @@ IndexSet::read(std::istream &in)
 void
 IndexSet::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   out.write(reinterpret_cast<const char *>(&index_space_size),
             sizeof(index_space_size));
   std::size_t n_ranges = ranges.size();
@@ -485,7 +485,7 @@ IndexSet::block_write(std::ostream &out) const
   if (ranges.empty() == false)
     out.write(reinterpret_cast<const char *>(&*ranges.begin()),
               ranges.size() * sizeof(Range));
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 void

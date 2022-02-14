@@ -401,7 +401,7 @@ ParameterHandler::parse_input(std::istream &     input,
                               const std::string &last_line,
                               const bool         skip_undefined)
 {
-  AssertThrow(input, ExcIO());
+  AssertThrow(input.fail() == false, ExcIO());
 
   // store subsections we are currently in
   const std::vector<std::string> saved_path = subsection_path;
@@ -700,7 +700,7 @@ void
 ParameterHandler::parse_input_from_xml(std::istream &in,
                                        const bool    skip_undefined)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
   // read the XML tree assuming that (as we
   // do in print_parameters(XML) it has only
   // a single top-level node called
@@ -756,7 +756,7 @@ void
 ParameterHandler::parse_input_from_json(std::istream &in,
                                         const bool    skip_undefined)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   boost::property_tree::ptree node_tree;
   // This boost function will raise an exception if this is not a valid JSON
@@ -1250,7 +1250,7 @@ std::ostream &
 ParameterHandler::print_parameters(std::ostream &    out,
                                    const OutputStyle style) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   assert_validity_of_output_style(style);
 
@@ -1369,7 +1369,7 @@ ParameterHandler::print_parameters(
     output_style = style | LaTeX;
 
   std::ofstream out(filename);
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   print_parameters(out, output_style);
 }
 
@@ -1383,7 +1383,7 @@ ParameterHandler::recursively_print_parameters(
   const unsigned int                 indent_level,
   std::ostream &                     out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // this function should not be necessary for XML or JSON output...
   Assert(!(style & (XML | JSON)), ExcInternalError());
@@ -2099,7 +2099,7 @@ MultipleParameterLoop::parse_input(std::istream &     input,
                                    const std::string &last_line,
                                    const bool         skip_undefined)
 {
-  AssertThrow(input, ExcIO());
+  AssertThrow(input.fail() == false, ExcIO());
 
   // Note that (to avoid infinite recursion) we have to explicitly call the
   // base class version of parse_input and *not* a wrapper (which may be

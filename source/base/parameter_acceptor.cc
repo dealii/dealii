@@ -94,7 +94,7 @@ void
 ParameterAcceptor::initialize(std::istream &input_stream, ParameterHandler &prm)
 
 {
-  AssertThrow(input_stream, ExcIO());
+  AssertThrow(input_stream.fail() == false, ExcIO());
   declare_all_parameters(prm);
   prm.parse_input(input_stream);
   parse_all_parameters(prm);

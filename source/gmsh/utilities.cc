@@ -97,7 +97,7 @@ namespace Gmsh
                            " file."));
 
     std::ifstream grid_file(msh_file_name);
-    Assert(grid_file, ExcIO());
+    Assert(grid_file.fail() == false, ExcIO());
 
     GridIn<2, spacedim> gridin;
     gridin.attach_triangulation(tria);

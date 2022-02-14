@@ -615,7 +615,7 @@ namespace LinearAlgebra
                   const bool         scientific,
                   const bool         across) const
     {
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
       boost::io::ios_flags_saver restore_flags(out);
 
       // Get a representation of the vector and loop over all
@@ -642,7 +642,7 @@ namespace LinearAlgebra
 
       // restore the representation
       // of the vector
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
     }
 
 

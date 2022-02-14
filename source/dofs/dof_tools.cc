@@ -2273,7 +2273,7 @@ namespace DoFTools
     std::ostream &                                            out,
     const std::map<types::global_dof_index, Point<spacedim>> &support_points)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     std::map<Point<spacedim>,
              std::vector<types::global_dof_index>,

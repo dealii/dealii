@@ -1401,13 +1401,13 @@ inline std::ostream &
 operator<<(std::ostream &out, const Vector<number> &v)
 {
   Assert(v.size() != 0, ExcEmptyObject());
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   for (typename Vector<number>::size_type i = 0; i < v.size() - 1; ++i)
     out << v(i) << ' ';
   out << v(v.size() - 1);
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   return out;
 }

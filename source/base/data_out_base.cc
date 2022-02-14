@@ -3322,7 +3322,7 @@ namespace DataOutBase
     // tested, therefore currently not allowed.
     AssertThrow(dim > 0, ExcNotImplemented());
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -3392,7 +3392,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -3412,7 +3412,7 @@ namespace DataOutBase
     // Point output is currently not implemented.
     AssertThrow(dim > 0, ExcNotImplemented());
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -3674,7 +3674,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -3692,7 +3692,7 @@ namespace DataOutBase
     const GnuplotFlags &flags,
     std::ostream &      out)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most
@@ -4067,7 +4067,7 @@ namespace DataOutBase
     // make sure everything now gets to disk
     out.flush();
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -4093,7 +4093,7 @@ namespace DataOutBase
                     const PovrayFlags &             flags,
                     std::ostream &                  out)
     {
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
       // verify that there are indeed patches to be written out. most
@@ -4410,7 +4410,7 @@ namespace DataOutBase
       // make sure everything now gets to disk
       out.flush();
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
     }
   } // namespace
 
@@ -4465,7 +4465,7 @@ namespace DataOutBase
     const EpsFlags &flags,
     std::ostream &  out)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -4765,7 +4765,7 @@ namespace DataOutBase
 
     out.flush();
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -4790,7 +4790,7 @@ namespace DataOutBase
     AssertThrow(dim > 0, ExcNotImplemented());
 
     Assert(dim <= 3, ExcNotImplemented());
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -4902,7 +4902,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -4920,7 +4920,7 @@ namespace DataOutBase
     const TecplotFlags &flags,
     std::ostream &      out)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     // The FEBLOCK or FEPOINT formats of tecplot only allows full elements (e.g.
     // triangles), not single points. Other tecplot format allow point output,
@@ -5061,7 +5061,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -5189,7 +5189,7 @@ namespace DataOutBase
       }
 
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
 #  ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -5477,7 +5477,7 @@ namespace DataOutBase
     const VtkFlags &flags,
     std::ostream &  out)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -5712,14 +5712,14 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
   void
   write_vtu_header(std::ostream &out, const VtkFlags &flags)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
     out << "<?xml version=\"1.0\" ?> \n";
     out << "<!-- \n";
     out << "# vtk DataFile Version 3.0" << '\n'
@@ -5752,7 +5752,7 @@ namespace DataOutBase
   void
   write_vtu_footer(std::ostream &out)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
     out << " </UnstructuredGrid>\n";
     out << "</VTKFile>\n";
   }
@@ -5795,7 +5795,7 @@ namespace DataOutBase
     const VtkFlags &flags,
     std::ostream &  out)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     // If the user provided physical units, make sure that they don't contain
     // quote characters as this would make the VTU file invalid XML and
@@ -6222,7 +6222,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -6240,7 +6240,7 @@ namespace DataOutBase
       &             nonscalar_data_ranges,
     const VtkFlags &flags)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     // If the user provided physical units, make sure that they don't contain
     // quote characters as this would make the VTU file invalid XML and
@@ -6375,7 +6375,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -6385,7 +6385,7 @@ namespace DataOutBase
     std::ostream &                                     out,
     const std::vector<std::pair<double, std::string>> &times_and_names)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     out << "<?xml version=\"1.0\"?>\n";
 
@@ -6412,7 +6412,7 @@ namespace DataOutBase
     out.flush();
     out.precision(ss);
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -6434,7 +6434,7 @@ namespace DataOutBase
   write_visit_record(std::ostream &                               out,
                      const std::vector<std::vector<std::string>> &piece_names)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     if (piece_names.size() == 0)
       return;
@@ -6464,7 +6464,7 @@ namespace DataOutBase
     const std::vector<std::pair<double, std::vector<std::string>>>
       &times_and_piece_names)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     if (times_and_piece_names.size() == 0)
       return;
@@ -7489,7 +7489,7 @@ namespace DataOutBase
     const Deal_II_IntermediateFlags & /*flags*/,
     std::ostream &out)
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     // first write tokens indicating the template parameters. we need this in
     // here because we may want to read in data again even if we don't know in
@@ -7527,7 +7527,7 @@ namespace DataOutBase
   std::pair<unsigned int, unsigned int>
   determine_intermediate_format_dimensions(std::istream &input)
   {
-    AssertThrow(input, ExcIO());
+    AssertThrow(input.fail() == false, ExcIO());
 
     unsigned int dim, spacedim;
     input >> dim >> spacedim;
@@ -8874,7 +8874,7 @@ template <int dim, int spacedim>
 void
 DataOutReader<dim, spacedim>::read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // first empty previous content
   {
@@ -8976,7 +8976,7 @@ DataOutReader<dim, spacedim>::read(std::istream &in)
       std::get<2>(nonscalar_data_ranges[i]) = name;
     }
 
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 }
 
 
@@ -9337,7 +9337,7 @@ namespace DataOutBase
   std::istream &
   operator>>(std::istream &in, Patch<dim, spacedim> &patch)
   {
-    AssertThrow(in, ExcIO());
+    AssertThrow(in.fail() == false, ExcIO());
 
     // read a header line and compare it to what we usually write. skip all
     // lines that contain only blanks at the start
@@ -9402,7 +9402,7 @@ namespace DataOutBase
       for (unsigned int j = 0; j < patch.data.n_cols(); ++j)
         in >> patch.data[i][j];
 
-    AssertThrow(in, ExcIO());
+    AssertThrow(in.fail() == false, ExcIO());
 
     return in;
   }
