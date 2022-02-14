@@ -1778,7 +1778,7 @@ namespace Utilities
       (void)n_procs;
 
       std::vector<char> buffer;
-      unsigned int      buffer_size = numbers::invalid_unsigned_int;
+      std::size_t       buffer_size = numbers::invalid_size_type;
 
       // On the root process, pack the data and determine what the
       // buffer size needs to be.
@@ -1789,7 +1789,11 @@ namespace Utilities
         }
 
       // Exchange the size of buffer
-      int ierr = MPI_Bcast(&buffer_size, 1, MPI_UNSIGNED, root_process, comm);
+      int ierr = MPI_Bcast(&buffer_size,
+                           1,
+                           internal::mpi_type_id(&buffer_size),
+                           root_process,
+                           comm);
       AssertThrowMPI(ierr);
 
       // If not on the root process, correctly size the buffer to
