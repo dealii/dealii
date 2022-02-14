@@ -58,7 +58,9 @@ public:
    * arguments @p indices
    *
    * This constructor will result in a compiler error if
-   * the template argument @p N is different from the number of the arguments.
+   * the number of arguments given is different from the number of the
+   * indices this class stores (i.e., the template argument `N` of
+   * this class), or if any of the arguments is not of some integer type.
    */
   template <typename... T>
   constexpr TableIndices(const T... indices);
