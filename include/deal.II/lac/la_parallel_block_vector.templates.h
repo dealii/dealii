@@ -920,7 +920,7 @@ namespace LinearAlgebra
 
       // in case one vector is empty and the second one is not, the
       // FullMatrix resized to (m,n) will have 0 both in m() and n()
-      // which is how TableBase<N,T>::reinit() works as of deal.ii@8.5.0.
+      // which is how TableBase<N,T>::reinit() works as of deal.II@8.5.0.
       // Since in this case there is nothing to do anyway -- return immediately.
       if (n == 0 || m == 0)
         return;
