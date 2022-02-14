@@ -1213,10 +1213,11 @@ namespace Utilities
      *
      * Throws an exception if any MPI command fails.
      *
-     * @param buffer Buffer of @p count objects
-     * @param count The number of objects to send
-     * @param root The rank of the process with the data
-     * @param comm The MPI communicator to use
+     * @param buffer Buffer of @p count objects.
+     * @param count The number of objects to send. All processes need
+     *              to specify the correct size.
+     * @param root The rank of the process with the data.
+     * @param comm The MPI communicator to use.
      */
     template <typename T>
     void
@@ -1805,6 +1806,12 @@ namespace Utilities
       (void)root;
       (void)comm;
 #  else
+      Assert(count >= 0,
+             ExcMessage(
+               "The number of objects you want to send cannot be negative."));
+      Assert(root < n_mpi_processes(comm),
+             ExcMessage("Invalid root rank specified."));
+
       // MPI_Bcast's count is a signed int, so send at most 2^31 in each
       // iteration:
       const size_t max_send_count = std::numeric_limits<signed int>::max();
@@ -1815,11 +1822,13 @@ namespace Utilities
           const size_t current_count =
             std::min(count - total_sent_count, max_send_count);
 
-          const int ierr =
-            MPI_Bcast(buffer, current_count, mpi_type_id(buffer), root, comm);
+          const int ierr = MPI_Bcast(buffer + total_sent_count,
+                                     current_count,
+                                     mpi_type_id(buffer),
+                                     root,
+                                     comm);
           AssertThrowMPI(ierr);
           total_sent_count += current_count;
-          buffer += current_count;
         }
 #  endif
     }
