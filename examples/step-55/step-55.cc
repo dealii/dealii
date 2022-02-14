@@ -425,7 +425,7 @@ namespace Step55
           else
             coupling[c][d] = DoFTools::none;
 
-      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      BlockDynamicSparsityPattern dsp(relevant_partitioning);
 
       DoFTools::make_sparsity_pattern(
         dof_handler, coupling, dsp, constraints, false);
@@ -453,7 +453,7 @@ namespace Step55
           else
             coupling[c][d] = DoFTools::none;
 
-      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      BlockDynamicSparsityPattern dsp(relevant_partitioning);
 
       DoFTools::make_sparsity_pattern(
         dof_handler, coupling, dsp, constraints, false);
