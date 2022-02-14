@@ -39,7 +39,7 @@
 # changes.
 #
 
-if [ ! -f contrib/utilities/indent_common.sh ]; then
+if [ ! -f contrib/utilities/indent ]; then
   echo "*** This script must be run from the top-level directory of deal.II."
   exit 1
 fi
@@ -82,4 +82,3 @@ process_changed "tests include source examples cmake/scripts contrib/python-bind
 
 process_changed "tests include source examples cmake/scripts contrib/python-bindings doc" \
   ".*\.(cc|h|cu|cuh|html|dox|txt)" ensure_single_trailing_newline
-
