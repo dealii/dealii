@@ -13,14 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-
-
-// Test Utilities::MPI::broadcast().
-
-// If this flag is enabled, messages bigger than 2^32 bytes will be
-// transmitted. This takes a while and requires quite a bit of memory,
-// so it is disabled by default:
-bool big = false;
+// Test Utilities::MPI::broadcast() including sending a large message
+// with >2^31 elements
 
 #include <deal.II/base/mpi.h>
 
@@ -54,14 +48,14 @@ check2(std::size_t count)
   std::vector<char> x(count, '?');
   if (my_proc == 0)
     {
-      for (auto &c : x)
-        c = 'X';
+      // a classical baby shout:
+      std::fill(x.begin(), x.end(), 'A');
       x[count - 1] = '!';
     }
 
   Utilities::MPI::broadcast(x.data(), count, 0, MPI_COMM_WORLD);
 
-  AssertThrow(x[0] == 'X', ExcInternalError());
+  AssertThrow(x[0] == 'A', ExcInternalError());
   AssertThrow(x[count - 1] == '!', ExcInternalError());
   deallog << "OK" << std::endl;
 }
@@ -74,12 +68,6 @@ main(int argc, char *argv[])
 
   check1();
   check2(1ULL << 3);
-
-  if (big)
-    {
-      check2(1ULL << 31);
-      check2((1ULL << 31) + 1);
-      check2(1ULL << 32);
-      check2((1ULL << 32) + 5);
-    }
+  check2(1ULL << 31);
+  check2((1ULL << 32) + 5);
 }
