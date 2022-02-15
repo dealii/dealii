@@ -1254,7 +1254,14 @@ namespace PETScWrappers
 
             Assert(index >= static_cast<unsigned int>(begin) &&
                      index < static_cast<unsigned int>(end),
-                   ExcInternalError());
+                   ExcMessage("You are accessing elements of a vector without "
+                              "ghost elements that are not actually owned by "
+                              "this vector. A typical case where this may "
+                              "happen is if you are passing a non-ghosted "
+                              "(completely distributed) vector to a function "
+                              "that expects a vector that stores ghost "
+                              "elements for all locally relevant or locally "
+                              "active vector entries."));
 
             *(values_begin + i) = *(ptr + index - begin);
           }
