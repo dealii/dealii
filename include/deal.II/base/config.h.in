@@ -210,6 +210,9 @@
 #cmakedefine DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
 #cmakedefine DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING
 
+/* cmake/modules/FindARBORX.cmake */
+#cmakedefine DEAL_II_ARBORX_WITH_MPI
+
 /* cmake/modules/FindARPACK.cmake */
 #cmakedefine DEAL_II_ARPACK_WITH_PARPACK
 
