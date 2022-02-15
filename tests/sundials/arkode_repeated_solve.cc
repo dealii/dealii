@@ -35,7 +35,7 @@ create_solver()
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
 
-  std::ifstream ifile(SOURCE_DIR "/arkode_repeated_solve.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_repeated_solve_in.prm");
   prm.parse_input(ifile);
 
   auto ode = std::make_unique<SUNDIALS::ARKode<VectorType>>(data);
