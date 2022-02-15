@@ -314,6 +314,7 @@ FE_Nothing<dim, spacedim>::get_face_interpolation_matrix(
 }
 
 
+
 template <int dim, int spacedim>
 void
 FE_Nothing<dim, spacedim>::get_subface_interpolation_matrix(
@@ -330,6 +331,16 @@ FE_Nothing<dim, spacedim>::get_subface_interpolation_matrix(
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
   Assert(interpolation_matrix.n() == 0,
          ExcDimensionMismatch(interpolation_matrix.m(), 0));
+}
+
+
+
+template <int dim, int spacedim>
+std::pair<Table<2, bool>, std::vector<unsigned int>>
+FE_Nothing<dim, spacedim>::get_constant_modes() const
+{
+  // since this element has no dofs, there are no constant modes
+  return {Table<2, bool>{}, std::vector<unsigned int>{}};
 }
 
 

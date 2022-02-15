@@ -1249,26 +1249,47 @@ namespace DoFTools
       dof_handler.get_fe_collection();
     std::vector<Table<2, bool>> element_constant_modes;
     std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-                 constant_mode_to_component_translation(n_components);
-    unsigned int n_constant_modes = 0;
-    for (unsigned int f = 0; f < fe_collection.size(); ++f)
-      {
-        std::pair<Table<2, bool>, std::vector<unsigned int>> data =
-          fe_collection[f].get_constant_modes();
-        element_constant_modes.push_back(data.first);
-        if (f == 0)
-          for (unsigned int i = 0; i < data.second.size(); ++i)
-            if (component_mask[data.second[i]])
-              constant_mode_to_component_translation[data.second[i]]
-                .emplace_back(n_constant_modes++, i);
-        AssertDimension(element_constant_modes.back().n_rows(),
-                        element_constant_modes[0].n_rows());
-      }
+      constant_mode_to_component_translation(n_components);
+    {
+      unsigned int n_constant_modes              = 0;
+      int          first_non_empty_constant_mode = -1;
+      for (unsigned int f = 0; f < fe_collection.size(); ++f)
+        {
+          std::pair<Table<2, bool>, std::vector<unsigned int>> data =
+            fe_collection[f].get_constant_modes();
 
-    // First count the number of dofs in the current component.
-    constant_modes.clear();
-    constant_modes.resize(n_constant_modes,
-                          std::vector<bool>(n_selected_dofs, false));
+          // Store the index of the current element if it is the first that has
+          // non-empty constant modes.
+          if (first_non_empty_constant_mode < 0 && data.first.n_rows() > 0)
+            {
+              first_non_empty_constant_mode = f;
+              // This is the first non-empty constant mode, so we figure out the
+              // translation between index in the constant modes and the
+              // components
+              for (unsigned int i = 0; i < data.second.size(); ++i)
+                if (component_mask[data.second[i]])
+                  constant_mode_to_component_translation[data.second[i]]
+                    .emplace_back(n_constant_modes++, i);
+            }
+
+          // Add the constant modes of this element to the list and assert that
+          // there are as many constant modes as for the other elements (or zero
+          // constant modes).
+          element_constant_modes.push_back(data.first);
+          Assert(
+            element_constant_modes.back().n_rows() == 0 ||
+              element_constant_modes.back().n_rows() ==
+                element_constant_modes[first_non_empty_constant_mode].n_rows(),
+            ExcInternalError());
+        }
+      AssertIndexRange(first_non_empty_constant_mode, fe_collection.size());
+
+      // Now we know the number of constant modes and resize the return vector
+      // accordingly
+      constant_modes.clear();
+      constant_modes.resize(n_constant_modes,
+                            std::vector<bool>(n_selected_dofs, false));
+    }
 
     // Loop over all owned cells and ask the element for the constant modes
     std::vector<types::global_dof_index> dof_indices;

@@ -327,6 +327,15 @@ public:
     const unsigned int                  face_no = 0) const override;
 
   /**
+   * Return a list of constant modes of the element.
+   *
+   * Since the current finite element has no degrees of freedom, the returned
+   * list is necessarily empty.
+   */
+  virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
+  get_constant_modes() const override;
+
+  /**
    * @return true if the FE dominates any other.
    */
   bool
