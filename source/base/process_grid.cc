@@ -247,11 +247,12 @@ namespace Utilities
       Assert(count > 0, ExcInternalError());
       if (mpi_communicator_inactive_with_root != MPI_COMM_NULL)
         {
-          const int ierr = MPI_Bcast(value,
-                                     count,
-                                     Utilities::MPI::mpi_type_id(value),
-                                     0 /*from root*/,
-                                     mpi_communicator_inactive_with_root);
+          const int ierr =
+            MPI_Bcast(value,
+                      count,
+                      Utilities::MPI::mpi_type_id<decltype(*value)>,
+                      0 /*from root*/,
+                      mpi_communicator_inactive_with_root);
           AssertThrowMPI(ierr);
         }
     }

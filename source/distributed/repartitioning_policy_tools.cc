@@ -89,8 +89,8 @@ namespace RepartitioningPolicyTools
     const int ierr = MPI_Exscan(&process_has_active_locally_owned_cells,
                                 &offset,
                                 1,
-                                Utilities::MPI::mpi_type_id(
-                                  &process_has_active_locally_owned_cells),
+                                Utilities::MPI::mpi_type_id<decltype(
+                                  process_has_active_locally_owned_cells)>,
                                 MPI_SUM,
                                 comm);
     AssertThrowMPI(ierr);
@@ -308,12 +308,13 @@ namespace RepartitioningPolicyTools
     // determine partial sum of weights of this process
     uint64_t process_local_weight_offset = 0;
 
-    int ierr = MPI_Exscan(&process_local_weight,
-                          &process_local_weight_offset,
-                          1,
-                          Utilities::MPI::mpi_type_id(&process_local_weight),
-                          MPI_SUM,
-                          tria->get_communicator());
+    int ierr =
+      MPI_Exscan(&process_local_weight,
+                 &process_local_weight_offset,
+                 1,
+                 Utilities::MPI::mpi_type_id<decltype(process_local_weight)>,
+                 MPI_SUM,
+                 tria->get_communicator());
     AssertThrowMPI(ierr);
 
     // total weight of all processes
@@ -321,7 +322,7 @@ namespace RepartitioningPolicyTools
 
     ierr = MPI_Bcast(&total_weight,
                      1,
-                     Utilities::MPI::mpi_type_id(&total_weight),
+                     Utilities::MPI::mpi_type_id<decltype(total_weight)>,
                      n_subdomains - 1,
                      mpi_communicator);
     AssertThrowMPI(ierr);

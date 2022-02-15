@@ -87,6 +87,26 @@ namespace Utilities
 
   namespace MPI
   {
+#ifdef DEAL_II_WITH_MPI
+    // Provide definitions of template variables for all valid instantiations.
+    template const MPI_Datatype mpi_type_id<bool>;
+    template const MPI_Datatype mpi_type_id<char>;
+    template const MPI_Datatype mpi_type_id<signed char>;
+    template const MPI_Datatype mpi_type_id<short>;
+    template const MPI_Datatype mpi_type_id<int>;
+    template const MPI_Datatype mpi_type_id<long int>;
+    template const MPI_Datatype mpi_type_id<unsigned char>;
+    template const MPI_Datatype mpi_type_id<unsigned short>;
+    template const MPI_Datatype mpi_type_id<unsigned long int>;
+    template const MPI_Datatype mpi_type_id<unsigned long long int>;
+    template const MPI_Datatype mpi_type_id<float>;
+    template const MPI_Datatype mpi_type_id<double>;
+    template const MPI_Datatype mpi_type_id<long double>;
+    template const MPI_Datatype mpi_type_id<std::complex<float>>;
+    template const MPI_Datatype mpi_type_id<std::complex<double>>;
+#endif
+
+
     MinMaxAvg
     min_max_avg(const double my_value, const MPI_Comm &mpi_communicator)
     {

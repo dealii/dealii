@@ -427,7 +427,7 @@ namespace parallel
       MPI_Exscan(&n_locally_owned_cells,
                  &cell_index,
                  1,
-                 Utilities::MPI::mpi_type_id(&n_locally_owned_cells),
+                 Utilities::MPI::mpi_type_id<decltype(n_locally_owned_cells)>,
                  MPI_SUM,
                  this->mpi_communicator);
     AssertThrowMPI(ierr);
@@ -493,13 +493,13 @@ namespace parallel
         std::vector<types::global_cell_index> cell_index(
           this->n_global_levels(), 0);
 
-        int ierr =
-          MPI_Exscan(n_locally_owned_cells.data(),
-                     cell_index.data(),
-                     this->n_global_levels(),
-                     Utilities::MPI::mpi_type_id(n_locally_owned_cells.data()),
-                     MPI_SUM,
-                     this->mpi_communicator);
+        int ierr = MPI_Exscan(
+          n_locally_owned_cells.data(),
+          cell_index.data(),
+          this->n_global_levels(),
+          Utilities::MPI::mpi_type_id<decltype(*n_locally_owned_cells.data())>,
+          MPI_SUM,
+          this->mpi_communicator);
         AssertThrowMPI(ierr);
 
         // 3) determine global number of "active" cells on each level
@@ -509,11 +509,12 @@ namespace parallel
         for (unsigned int l = 0; l < this->n_global_levels(); ++l)
           n_cells_level[l] = n_locally_owned_cells[l] + cell_index[l];
 
-        ierr = MPI_Bcast(n_cells_level.data(),
-                         this->n_global_levels(),
-                         Utilities::MPI::mpi_type_id(n_cells_level.data()),
-                         this->n_subdomains - 1,
-                         this->mpi_communicator);
+        ierr = MPI_Bcast(
+          n_cells_level.data(),
+          this->n_global_levels(),
+          Utilities::MPI::mpi_type_id<decltype(*n_cells_level.data())>,
+          this->n_subdomains - 1,
+          this->mpi_communicator);
         AssertThrowMPI(ierr);
 
         // 4) give global indices to locally-owned cells on level and mark

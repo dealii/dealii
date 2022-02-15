@@ -896,7 +896,7 @@ namespace internal
             const int ierr =
               MPI_Irecv(buffer.data() + ghost_targets_data[i][1] + offset,
                         ghost_targets_data[i][2],
-                        Utilities::MPI::mpi_type_id(buffer.data()),
+                        Utilities::MPI::mpi_type_id<decltype(*buffer.data())>,
                         ghost_targets_data[i][0],
                         communication_channel + 1,
                         comm,
@@ -917,16 +917,15 @@ namespace internal
                   data_this[import_indices_data.second[j].first + l];
 
             // send data away
-            const int ierr =
-              MPI_Isend(temporary_storage.data() + import_targets_data[i][1],
-                        import_targets_data[i][2],
-                        Utilities::MPI::mpi_type_id(data_this.data()),
-                        import_targets_data[i][0],
-                        communication_channel + 1,
-                        comm,
-                        requests.data() + sm_import_ranks.size() +
-                          sm_ghost_ranks.size() + ghost_targets_data.size() +
-                          i);
+            const int ierr = MPI_Isend(
+              temporary_storage.data() + import_targets_data[i][1],
+              import_targets_data[i][2],
+              Utilities::MPI::mpi_type_id<decltype(*data_this.data())>,
+              import_targets_data[i][0],
+              communication_channel + 1,
+              comm,
+              requests.data() + sm_import_ranks.size() + sm_ghost_ranks.size() +
+                ghost_targets_data.size() + i);
             AssertThrowMPI(ierr);
           }
 #endif
@@ -1173,7 +1172,7 @@ namespace internal
             const int ierr =
               MPI_Isend(buffer.data() + ghost_targets_data[i][1],
                         ghost_targets_data[i][2],
-                        Utilities::MPI::mpi_type_id(buffer.data()),
+                        Utilities::MPI::mpi_type_id<decltype(*buffer.data())>,
                         ghost_targets_data[i][0],
                         communication_channel + 0,
                         comm,
@@ -1184,16 +1183,15 @@ namespace internal
 
         for (unsigned int i = 0; i < import_targets_data.size(); ++i)
           {
-            const int ierr =
-              MPI_Irecv(temporary_storage.data() + import_targets_data[i][1],
-                        import_targets_data[i][2],
-                        Utilities::MPI::mpi_type_id(temporary_storage.data()),
-                        import_targets_data[i][0],
-                        communication_channel + 0,
-                        comm,
-                        requests.data() + sm_ghost_ranks.size() +
-                          sm_import_ranks.size() + ghost_targets_data.size() +
-                          i);
+            const int ierr = MPI_Irecv(
+              temporary_storage.data() + import_targets_data[i][1],
+              import_targets_data[i][2],
+              Utilities::MPI::mpi_type_id<decltype(*temporary_storage.data())>,
+              import_targets_data[i][0],
+              communication_channel + 0,
+              comm,
+              requests.data() + sm_ghost_ranks.size() + sm_import_ranks.size() +
+                ghost_targets_data.size() + i);
             AssertThrowMPI(ierr);
           }
 #endif

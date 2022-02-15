@@ -1303,154 +1303,180 @@ namespace Utilities
 
     /* --------------------------- inline functions ------------------------- */
 
-    /**
-     * Given a pointer to an object of class T, return the matching
-     * `MPI_Datatype` to be used for MPI communication.
-     *
-     * As an example, passing an `int*` to this function returns `MPI_INT`.
-     *
-     * @note In reality, these functions are not template functions templated
-     * on the parameter T, but free standing inline function overloads. This
-     * templated version only exists so that it shows up in the documentation.
-     * The `=delete` statement at the end of the declaration ensures that the
-     * compiler will never choose this general template and instead look
-     * for one of the overloads.
-     */
-    template <typename T>
-    inline MPI_Datatype
-    mpi_type_id(const T *) = delete;
+    namespace internal
+    {
+      namespace MPIDataTypes
+      {
+        /**
+         * Given a pointer to an object of class T, return the matching
+         * `MPI_Datatype` to be used for MPI communication.
+         *
+         * As an example, passing an `int*` to this function returns `MPI_INT`.
+         *
+         * @note In reality, these functions are not template functions templated
+         * on the parameter T, but free standing inline function overloads. This
+         * templated version only exists so that it shows up in the
+         * documentation. The `=delete` statement at the end of the declaration
+         * ensures that the compiler will never choose this general template and
+         * instead look for one of the overloads.
+         */
+        template <typename T>
+        inline MPI_Datatype
+        mpi_type_id(const T *) = delete;
 
 #ifndef DOXYGEN
 
 #  ifdef DEAL_II_WITH_MPI
-    inline MPI_Datatype
-    mpi_type_id(const bool *)
-    {
-      return MPI_CXX_BOOL;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const bool *)
+        {
+          return MPI_CXX_BOOL;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const char *)
-    {
-      return MPI_CHAR;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const char *)
+        {
+          return MPI_CHAR;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const signed char *)
-    {
-      return MPI_SIGNED_CHAR;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const signed char *)
+        {
+          return MPI_SIGNED_CHAR;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const short *)
-    {
-      return MPI_SHORT;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const short *)
+        {
+          return MPI_SHORT;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const int *)
-    {
-      return MPI_INT;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const int *)
+        {
+          return MPI_INT;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const long int *)
-    {
-      return MPI_LONG;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const long int *)
+        {
+          return MPI_LONG;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const unsigned char *)
-    {
-      return MPI_UNSIGNED_CHAR;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const unsigned char *)
+        {
+          return MPI_UNSIGNED_CHAR;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const unsigned short *)
-    {
-      return MPI_UNSIGNED_SHORT;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const unsigned short *)
+        {
+          return MPI_UNSIGNED_SHORT;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const unsigned int *)
-    {
-      return MPI_UNSIGNED;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const unsigned int *)
+        {
+          return MPI_UNSIGNED;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const unsigned long int *)
-    {
-      return MPI_UNSIGNED_LONG;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const unsigned long int *)
+        {
+          return MPI_UNSIGNED_LONG;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const unsigned long long int *)
-    {
-      return MPI_UNSIGNED_LONG_LONG;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const unsigned long long int *)
+        {
+          return MPI_UNSIGNED_LONG_LONG;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const float *)
-    {
-      return MPI_FLOAT;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const float *)
+        {
+          return MPI_FLOAT;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const double *)
-    {
-      return MPI_DOUBLE;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const double *)
+        {
+          return MPI_DOUBLE;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const long double *)
-    {
-      return MPI_LONG_DOUBLE;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const long double *)
+        {
+          return MPI_LONG_DOUBLE;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const std::complex<float> *)
-    {
-      return MPI_COMPLEX;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const std::complex<float> *)
+        {
+          return MPI_COMPLEX;
+        }
 
 
 
-    inline MPI_Datatype
-    mpi_type_id(const std::complex<double> *)
-    {
-      return MPI_DOUBLE_COMPLEX;
-    }
+        inline MPI_Datatype
+        mpi_type_id(const std::complex<double> *)
+        {
+          return MPI_DOUBLE_COMPLEX;
+        }
 #  endif
+#endif
+      } // namespace MPIDataTypes
+    }   // namespace internal
 
 
+
+    /**
+     * A template variable that translates from the data type given as
+     * template argument to the corresponding
+     * `MPI_Datatype` to be used for MPI communication.
+     *
+     * As an example, the value of `mpi_type_id<int>` is `MPI_INT`. A
+     * common way to use this variable is when sending an object `obj`
+     * via MPI functions to another process, and using
+     * `mpi_type_id<decltype(obj)>` to infer the correct MPI type to
+     * use for the communication.
+     */
+    template <typename T>
+    const MPI_Datatype mpi_type_id = internal::MPIDataTypes::mpi_type_id(
+      static_cast<std::remove_cv_t<
+        std::remove_reference_t<std::remove_all_extents_t<T>>> *>(nullptr));
+
+
+#ifndef DOXYGEN
     namespace internal
     {
       // declaration for an internal function that lives in mpi.templates.h
@@ -1808,7 +1834,7 @@ namespace Utilities
 
           const int ierr = MPI_Bcast(buffer + total_sent_count,
                                      current_count,
-                                     mpi_type_id(buffer),
+                                     mpi_type_id<decltype(*buffer)>,
                                      root,
                                      comm);
           AssertThrowMPI(ierr);
@@ -1846,8 +1872,11 @@ namespace Utilities
         }
 
       // Exchange the size of buffer
-      int ierr = MPI_Bcast(
-        &buffer_size, 1, mpi_type_id(&buffer_size), root_process, comm);
+      int ierr = MPI_Bcast(&buffer_size,
+                           1,
+                           mpi_type_id<decltype(buffer_size)>,
+                           root_process,
+                           comm);
       AssertThrowMPI(ierr);
 
       // If not on the root process, correctly size the buffer to

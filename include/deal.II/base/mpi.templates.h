@@ -85,7 +85,7 @@ namespace Utilities
                               MPI_IN_PLACE,
                             static_cast<void *>(output.data()),
                             static_cast<int>(values.size()),
-                            mpi_type_id(values.data()),
+                            mpi_type_id<decltype(*values.data())>,
                             mpi_op,
                             mpi_communicator);
             AssertThrowMPI(ierr);
@@ -125,7 +125,7 @@ namespace Utilities
                               MPI_IN_PLACE,
                             static_cast<void *>(output.data()),
                             static_cast<int>(values.size() * 2),
-                            mpi_type_id(static_cast<T *>(nullptr)),
+                            mpi_type_id<T>,
                             mpi_op,
                             mpi_communicator);
             AssertThrowMPI(ierr);
