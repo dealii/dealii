@@ -127,7 +127,7 @@ main(int argc, char *argv[])
 
 #ifndef ENABLE_PERFORMANCE_TESTS
   pout << "Performance test framework disabled, do not run test." << std::endl;
-  return 1;
+  return 0;
 #endif
 
   const auto description           = describe_measurements();
