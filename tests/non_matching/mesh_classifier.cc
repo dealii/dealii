@@ -315,6 +315,48 @@ test_lagrange_coefficents_positive()
 
 
 
+// Check that the values of LocationToLevelSet for the cells and faces get
+// updated correctly when calling reclassify() multiple times.
+//
+// First, make the level set function all negative, call reclassify(), and check
+// that the values of LocationToLevelSet for all cells and faces equals
+// LocationToLevelSet::inside. Then, change the level set function to all
+// positive, call reclassify() again, and check that all values have been
+// changed to LocationToLevelSet::outside.
+template <int dim>
+void
+test_reclassify_called_multiple_times()
+{
+  deallog << "test_reclassify_called_multiple_times" << std::endl;
+  Triangulation<dim> triangulation;
+  GridGenerator::hyper_cube(triangulation);
+
+  const FE_Q<dim> element(1);
+
+  DoFHandler<dim> dof_handler(triangulation);
+  dof_handler.distribute_dofs(element);
+
+  Vector<double>                   level_set(element.dofs_per_cell);
+  NonMatching::MeshClassifier<dim> classifier(dof_handler, level_set);
+
+  const typename Triangulation<dim>::active_cell_iterator cell =
+    triangulation.begin_active();
+
+  deallog << "Level set negative" << std::endl;
+  level_set = -1;
+  classifier.reclassify();
+  print_cell_and_face_locations(classifier, cell);
+
+  deallog << "Level set positive" << std::endl;
+  level_set = 1;
+  classifier.reclassify();
+  print_cell_and_face_locations(classifier, cell);
+
+  deallog << std::endl;
+}
+
+
+
 template <int dim>
 void
 run_test()
@@ -327,6 +369,8 @@ run_test()
   // This test doesn't make sense in 1D.
   if (dim != 1)
     test_lagrange_coefficents_positive<dim>();
+
+  test_reclassify_called_multiple_times<dim>();
 }
 
 
