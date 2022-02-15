@@ -617,7 +617,7 @@ ENDIF()
 # And finally submit:
 #
 
-IF(NOT ${SKIP_SUBMISSION})
+IF(NOT SKIP_SUBMISSION)
   MESSAGE("-- Running CTEST_SUBMIT()")
   CTEST_SUBMIT(RETURN_VALUE _res)
 
