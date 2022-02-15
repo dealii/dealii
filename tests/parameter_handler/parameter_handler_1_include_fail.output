@@ -1,4 +1,4 @@
 
 DEAL::ExcCannotOpenIncludeStatementFile (current_line_n, input_filename, line)
-Line <4> of file <input file>: This line contains an 'include' or 'INCLUDE' statement, but the given file to include <parameter_handler_1_include_fail.prm2> cannot be opened.
+Line <4> of file <input file>: This line contains an 'include' or 'INCLUDE' statement, but the given file to include <parameter_handler_1_include_fail_in.prm2> cannot be opened.
 DEAL::test_1=1,1,1

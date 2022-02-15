@@ -31,7 +31,7 @@ check()
 
   prm.declare_entry("Dimension", "1", Patterns::Integer(1, 3));
 
-  std::ifstream in(SOURCE_DIR "/parameter_handler_24.prm");
+  std::ifstream in(SOURCE_DIR "/parameter_handler_24_in.prm");
   prm.parse_input(in, "input file", "", true);
 
   prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
