@@ -139,22 +139,6 @@ namespace Utilities
    */
   namespace MPI
   {
-#ifdef DOXYGEN
-    /**
-     * Given a pointer to an object of class T, return the matching
-     * `MPI_Datatype` to be used for MPI communication.
-     *
-     * As an example, passing an `int*` to this function returns `MPI_INT`.
-     *
-     * @note In reality, these functions are not template functions templated
-     * on the parameter T, but free standing inline function overloads. This
-     * templated version only exists so that it shows up in the documentation.
-     */
-    template <typename T>
-    MPI_Datatype
-    mpi_type_id(const T *);
-#endif
-
     /**
      * Return the number of MPI processes there exist in the given
      * @ref GlossMPICommunicator "communicator"
@@ -1327,9 +1311,26 @@ namespace Utilities
 
 
 
-#ifndef DOXYGEN
-
     /* --------------------------- inline functions ------------------------- */
+
+    /**
+     * Given a pointer to an object of class T, return the matching
+     * `MPI_Datatype` to be used for MPI communication.
+     *
+     * As an example, passing an `int*` to this function returns `MPI_INT`.
+     *
+     * @note In reality, these functions are not template functions templated
+     * on the parameter T, but free standing inline function overloads. This
+     * templated version only exists so that it shows up in the documentation.
+     * The `=delete` statement at the end of the declaration ensures that the
+     * compiler will never choose this general template and instead look
+     * for one of the overloads.
+     */
+    template <typename T>
+    inline MPI_Datatype
+    mpi_type_id(const T *) = delete;
+
+#ifndef DOXYGEN
 
 #  ifdef DEAL_II_WITH_MPI
     inline MPI_Datatype
