@@ -1902,7 +1902,7 @@ namespace TrilinosWrappers
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
-     * linear system with the given matrix. This function takes a deal.ii
+     * linear system with the given matrix. This function takes a deal.II
      * matrix and copies the content into a Trilinos matrix, so the function
      * can be considered rather inefficient.
      */
