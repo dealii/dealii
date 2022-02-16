@@ -345,12 +345,10 @@ namespace Step48
   template <int dim>
   SineGordonProblem<dim>::SineGordonProblem()
     : pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    ,
 #ifdef DEAL_II_WITH_P4EST
-    triangulation(MPI_COMM_WORLD)
-    ,
+    , triangulation(MPI_COMM_WORLD)
 #endif
-    fe(QGaussLobatto<1>(fe_degree + 1))
+    , fe(QGaussLobatto<1>(fe_degree + 1))
     , dof_handler(triangulation)
     , n_global_refinements(10 - 2 * dim)
     , time(-10)
