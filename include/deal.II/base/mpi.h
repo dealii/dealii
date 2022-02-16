@@ -1807,9 +1807,6 @@ namespace Utilities
       (void)root;
       (void)comm;
 #  else
-      Assert(count >= 0,
-             ExcMessage(
-               "The number of objects you want to send cannot be negative."));
       Assert(root < n_mpi_processes(comm),
              ExcMessage("Invalid root rank specified."));
 
