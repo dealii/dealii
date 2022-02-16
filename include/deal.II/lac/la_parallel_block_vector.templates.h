@@ -211,6 +211,20 @@ namespace LinearAlgebra
 
 
 
+    template <typename Number>
+    template <typename Number2>
+    void
+    BlockVector<Number>::copy_locally_owned_data_from(
+      const BlockVector<Number2> &v)
+    {
+      AssertDimension(this->n_blocks(), v.n_blocks());
+
+      for (unsigned int b = 0; b < this->n_blocks(); ++b)
+        this->block(b).copy_locally_owned_data_from(v.block(b));
+    }
+
+
+
 #ifdef DEAL_II_WITH_PETSC
 
     namespace petsc_helpers
