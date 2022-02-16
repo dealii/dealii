@@ -1584,9 +1584,6 @@ namespace Patterns
       template <typename T>
       struct is_list_compatible : std::false_type
       {};
-      template <typename T, std::size_t N>
-      struct is_list_compatible<std::array<T, N>> : std::true_type
-      {};
       template <typename... Args>
       struct is_list_compatible<std::vector<Args...>> : std::true_type
       {};
@@ -1750,12 +1747,20 @@ namespace Patterns
           std::max(RankInfo<Key>::map_rank, RankInfo<Value>::map_rank) + 1;
       };
 
-
+      // Rank of std::tuple types
       template <class... Types>
       struct RankInfo<std::tuple<Types...>>
       {
         static constexpr int list_rank = max_list_rank<Types...>();
         static constexpr int map_rank  = max_map_rank<Types...>() + 1;
+      };
+
+      // Rank of std::array types
+      template <class T, std::size_t N>
+      struct RankInfo<std::array<T, N>>
+      {
+        static constexpr int list_rank = RankInfo<T>::list_rank + 1;
+        static constexpr int map_rank  = RankInfo<T>::map_rank;
       };
     } // namespace internal
 
@@ -1905,6 +1910,74 @@ namespace Patterns
               Convert<typename T::mapped_type>::to_value(key_val[1], *val_p)));
           }
 
+        return t;
+      }
+    };
+
+    // std::array
+    template <class ValueType, std::size_t N>
+    struct Convert<std::array<ValueType, N>>
+    {
+      using T = std::array<ValueType, N>;
+
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
+      {
+        static_assert(internal::RankInfo<T>::list_rank > 0,
+                      "Cannot use this class for non List-compatible types.");
+        return std::make_unique<Patterns::List>(
+          *Convert<typename T::value_type>::to_pattern(),
+          N,
+          N,
+          internal::default_list_separator[internal::RankInfo<T>::list_rank -
+                                           1]);
+      }
+
+      static std::string
+      to_string(
+        const T &                    t,
+        const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
+      {
+        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        AssertThrow(p,
+                    ExcMessage("I need a List pattern to convert a "
+                               "string to a std::array."));
+        auto                     base_p = p->get_base_pattern().clone();
+        std::vector<std::string> vec(t.size());
+
+        std::transform(
+          t.cbegin(), t.cend(), vec.begin(), [&base_p](const auto &entry) {
+            return Convert<typename T::value_type>::to_string(entry, *base_p);
+          });
+
+        std::string s;
+        if (vec.size() > 0)
+          s = vec[0];
+        for (unsigned int i = 1; i < vec.size(); ++i)
+          s += p->get_separator() + " " + vec[i];
+
+        AssertThrow(pattern.match(s), ExcNoMatch(s, p->description()));
+        return s;
+      }
+
+      static T
+      to_value(const std::string &          s,
+               const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
+      {
+        AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
+
+        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        AssertThrow(p,
+                    ExcMessage("I need a List pattern to convert a string "
+                               "to a std::array."));
+
+        auto base_p = p->get_base_pattern().clone();
+        T    t;
+
+        auto v = Utilities::split_string_list(s, p->get_separator());
+        AssertDimension(v.size(), N);
+        for (unsigned int i = 0; i < N; ++i)
+          t[i] = Convert<typename T::value_type>::to_value(v[i], *base_p);
         return t;
       }
     };

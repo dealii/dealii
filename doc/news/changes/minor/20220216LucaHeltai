@@ -1,0 +1,3 @@
+Fixed: Patterns::Tools::Convert now supports also std::array types.
+<br>
+(Luca Heltai, 2022/02/16)
