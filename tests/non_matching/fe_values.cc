@@ -67,9 +67,10 @@ assert_doesnt_have_value(const std_cxx17::optional<FEVALUES> &fe_values)
 // Test the following:
 // 1. That we can construct a NonMatching::FEValues object.
 // 2. That when we call reinit on each cell in the triangulation,
-// the boost::optionals that we get from get_inside/outside/surface_fe_values
-// are set up correctly. That is, the optionals that should contain a value do
-// and the ones that should not contain a value do not.
+// the std_cxx17::optionals that we get from
+// get_inside/outside/surface_fe_values are set up correctly. That is, the
+// optionals that should contain a value do and the ones that should not contain
+// a value do not.
 template <int dim>
 class Test
 {
@@ -94,7 +95,7 @@ private:
 
   Triangulation<dim>    triangulation;
   hp::FECollection<dim> fe_collection;
-  hp::DoFHandler<dim>   dof_handler;
+  DoFHandler<dim>       dof_handler;
 
   hp::MappingCollection<dim> mapping_collection;
   hp::QCollection<dim>       q_collection;
