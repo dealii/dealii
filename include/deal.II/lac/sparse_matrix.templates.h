@@ -1501,7 +1501,11 @@ SparseMatrix<number>::precondition_SSOR(
           const size_type first_right_of_diagonal_index =
             pos_right_of_diagonal[row];
           number s = 0;
-          for (size_type j = first_right_of_diagonal_index; j < end_row; ++j)
+          // go through the column from the end towards the diagonal in order
+          // to delay the use of the newly computed "dst" values on
+          // out-of-order-execution hardware
+          for (size_type j = end_row - 1; j >= first_right_of_diagonal_index;
+               --j)
             s += val[j] * number(dst(cols->colnums[j]));
 
           *dst_ptr -= s * omega;
