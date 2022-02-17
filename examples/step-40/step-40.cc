@@ -256,7 +256,8 @@ namespace Step40
     // around the locally owned cells; we need all of these degrees of
     // freedom, for example, to estimate the error on the local cells).
     locally_owned_dofs = dof_handler.locally_owned_dofs();
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     // Next, let us initialize the solution and right hand side vectors. As
     // mentioned above, the solution vector we seek does not only store

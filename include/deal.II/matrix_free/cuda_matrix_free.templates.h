@@ -1077,8 +1077,8 @@ namespace CUDAWrappers
     IndexSet locally_relevant_dofs;
     if (comm)
       {
-        DoFTools::extract_locally_relevant_dofs(*dof_handler,
-                                                locally_relevant_dofs);
+        locally_relevant_dofs =
+          DoFTools::extract_locally_relevant_dofs(*dof_handler);
         partitioner = std::make_shared<Utilities::MPI::Partitioner>(
           dof_handler->locally_owned_dofs(), locally_relevant_dofs, *comm);
       }

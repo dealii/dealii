@@ -474,8 +474,8 @@ namespace Step68
   {
     fluid_dh.distribute_dofs(fluid_fe);
     const IndexSet locally_owned_dofs = fluid_dh.locally_owned_dofs();
-    IndexSet       locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(fluid_dh, locally_relevant_dofs);
+    const IndexSet locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(fluid_dh);
 
     velocity_field.reinit(locally_owned_dofs,
                           locally_relevant_dofs,

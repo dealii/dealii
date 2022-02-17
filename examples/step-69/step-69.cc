@@ -713,7 +713,7 @@ namespace Step69
       locally_owned   = dof_handler.locally_owned_dofs();
       n_locally_owned = locally_owned.n_elements();
 
-      DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant);
+      locally_relevant   = DoFTools::extract_locally_relevant_dofs(dof_handler);
       n_locally_relevant = locally_relevant.n_elements();
 
       partitioner =

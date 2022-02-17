@@ -1554,6 +1554,26 @@ namespace DoFTools
    * with the locally owned subdomain id.
    */
   template <int dim, int spacedim>
+  IndexSet
+  extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler);
+
+  /**
+   * Extract the set of global DoF indices that are active on the current
+   * DoFHandler. For regular DoFHandlers, these are all DoF indices, but for
+   * DoFHandler objects built on parallel::distributed::Triangulation this set
+   * is a superset of DoFHandler::locally_owned_dofs() and contains all DoF
+   * indices that live on all locally owned cells (including on the interface
+   * to ghost cells). However, it does not contain the DoF indices that are
+   * exclusively defined on ghost or artificial cells (see
+   * @ref GlossArtificialCell "the glossary").
+   *
+   * The degrees of freedom identified by this function equal those obtained
+   * from the dof_indices_with_subdomain_association() function when called
+   * with the locally owned subdomain id.
+   *
+   * @deprecated Use the previous function instead.
+   */
+  template <int dim, int spacedim>
   void
   extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                               IndexSet &                       dof_set);
@@ -1563,6 +1583,20 @@ namespace DoFTools
    * This function returns all DoF indices that live on
    * all locally owned cells (including on the interface to ghost cells) on the
    * given level.
+   */
+  template <int dim, int spacedim>
+  IndexSet
+  extract_locally_active_level_dofs(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const unsigned int               level);
+
+  /**
+   * Same function as above but for a certain (multigrid-)level.
+   * This function returns all DoF indices that live on
+   * all locally owned cells (including on the interface to ghost cells) on the
+   * given level.
+   *
+   * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
   void
@@ -1581,10 +1615,24 @@ namespace DoFTools
    * @ref GlossArtificialCell "the glossary").
    */
   template <int dim, int spacedim>
+  IndexSet
+  extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler);
+
+  /**
+   * Extract the set of global DoF indices that are active on the current
+   * DoFHandler. For regular DoFHandlers, these are all DoF indices, but for
+   * DoFHandler objects built on parallel::distributed::Triangulation this set
+   * is the union of DoFHandler::locally_owned_dofs() and the DoF indices on
+   * all ghost cells. In essence, it is the DoF indices on all cells that are
+   * not artificial (see
+   * @ref GlossArtificialCell "the glossary").
+   *
+   * @deprecated Use the previous function instead.
+   */
+  template <int dim, int spacedim>
   void
   extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                                 IndexSet &                       dof_set);
-
 
   /**
    * Extract the set of locally owned DoF indices for each component within the
@@ -1638,10 +1686,21 @@ namespace DoFTools
   locally_relevant_dofs_per_subdomain(
     const DoFHandler<dim, spacedim> &dof_handler);
 
+  /**
+   * Same as extract_locally_relevant_dofs() but for multigrid DoFs for the
+   * given @p level.
+   */
+  template <int dim, int spacedim>
+  IndexSet
+  extract_locally_relevant_level_dofs(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const unsigned int               level);
 
   /**
    * Same as extract_locally_relevant_dofs() but for multigrid DoFs for the
    * given @p level.
+   *
+   * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
   void

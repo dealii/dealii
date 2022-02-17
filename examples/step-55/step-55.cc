@@ -382,8 +382,8 @@ namespace Step55
     owned_partitioning[1] =
       dof_handler.locally_owned_dofs().get_view(n_u, n_u + n_p);
 
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    const IndexSet locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
     relevant_partitioning.resize(2);
     relevant_partitioning[0] = locally_relevant_dofs.get_view(0, n_u);
     relevant_partitioning[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
