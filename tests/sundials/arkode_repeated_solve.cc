@@ -29,15 +29,8 @@ using VectorType = Vector<double>;
 double kappa = 1.0;
 
 std::unique_ptr<SUNDIALS::ARKode<VectorType>>
-create_solver()
+create_solver(SUNDIALS::ARKode<VectorType>::AdditionalData data)
 {
-  ParameterHandler                             prm;
-  SUNDIALS::ARKode<VectorType>::AdditionalData data;
-  data.add_parameters(prm);
-
-  std::ifstream ifile(SOURCE_DIR "/arkode_repeated_solve.prm");
-  prm.parse_input(ifile);
-
   auto ode = std::make_unique<SUNDIALS::ARKode<VectorType>>(data);
 
   // will yield analytic solution y[0] = sin(kappa*t); y[1] = kappa*cos(kappa*t)
@@ -65,7 +58,14 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, numbers::invalid_unsigned_int);
 
-  auto ode = create_solver();
+  SUNDIALS::ARKode<VectorType>::AdditionalData data;
+  ParameterHandler                             prm;
+  data.add_parameters(prm);
+
+  std::ifstream ifile(SOURCE_DIR "/arkode_repeated_solve.prm");
+  prm.parse_input(ifile);
+
+  auto ode = create_solver(data);
   {
     Vector<double> y(2);
     y[0] = 0;
@@ -88,7 +88,7 @@ main(int argc, char **argv)
   }
 
   // solve in two steps with new object
-  ode = create_solver();
+  ode = create_solver(data);
 
   {
     Vector<double> y(2);
@@ -123,6 +123,18 @@ main(int argc, char **argv)
     // manually reset solver
     ode->reset(0.0, 0.01, y0);
     ode->solve_ode_incrementally(y, 2.0);
+  }
+
+  // use a garbage value for `final time` which is not used in incremental solve
+  data.final_time = -1.0;
+  ode             = create_solver(data);
+  {
+    Vector<double> y(2);
+    y[0] = 0;
+    y[1] = kappa;
+
+    ode->solve_ode_incrementally(y, 1.0);
+    deallog << "Solve incrementally ignores data.final_time" << std::endl;
   }
 
   return 0;
