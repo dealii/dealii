@@ -46,8 +46,8 @@ main()
   // is necessary so that we can include files there
   const int chdir_return_code = chdir(SOURCE_DIR);
   AssertThrow(chdir_return_code == 0, ExcInternalError());
-  check("parameter_handler_22_last_line.prm", "");
-  check("parameter_handler_22_last_line.prm", "# end-of-parameter-section");
+  check("parameter_handler_22_last_line_in.prm", "");
+  check("parameter_handler_22_last_line_in.prm", "# end-of-parameter-section");
 
   return 0;
 }

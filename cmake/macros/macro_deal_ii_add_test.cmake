@@ -245,95 +245,89 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       )
   ENDIF()
 
-  FOREACH(_build ${_build_types})
+  #
+  # Determine source or parameter file:
+  #
 
+  FILE(GLOB _source_file
+    "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.c[cu]"
+    "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.json"
+    "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.json.in"
+    )
+
+  LIST(LENGTH _source_file _number)
+  IF(NOT _number EQUAL 1)
+    IF(_number EQUAL 0)
+      MESSAGE(FATAL_ERROR "\n${_comparison_file}:\n"
+        "A comparison file (ending in .output or .run-only) has been "
+        "picked up but no suitable source file or parameter file was "
+        "found. Please provide exactly one of the following.\n"
+        "A source file \"${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.c[cu]\",\n"
+        "or a parameter file \"${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.(prm|json)[.in]\".\n"
+        )
+    ELSE()
+      STRING(REPLACE ";" "\n" _source_file "${_source_file}")
+      MESSAGE(FATAL_ERROR "\n${_comparison_file}:\n"
+        "A comparison file (ending in .output or .run-only) has been "
+        "picked up with multiple suitable source files or parameter files:\n"
+        "${_source_file}\n"
+        "There must be exactly one source or parameter file.\n"
+        )
+    ENDIF()
+  ENDIF()
+
+  #
+  # Run CONFIGURE_FILE on every parameter file ending in ".in":
+  #
+
+  IF("${_source_file}" MATCHES "\.in$")
+    SET(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    STRING(REGEX MATCH "(json|prm)\.in$" _suffix "${_source_file}")
+    STRING(REPLACE ".in" "" _suffix "${_suffix}")
+    CONFIGURE_FILE(
+      "${_source_file}"
+      "${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_suffix}"
+      @ONLY
+      )
+    SET(_source_file "${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_suffix}")
+  ENDIF()
+
+  FOREACH(_build ${_build_types})
     #
     # Obey "debug" and "release" keywords in the output file:
     #
     ITEM_MATCHES(_match "${_build}" ${_configuration})
     IF(_match OR "${_configuration}" STREQUAL "")
-
       STRING(TOLOWER ${_build} _build_lowercase)
 
+      SET(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
+      SET(_target_short ${_test_name}.${_build_lowercase}) # short target name
+      SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
+
       #
-      # Select a suitable target:
+      # Override target and run command for parameter file variants:
       #
-      IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.cc")
-
-        SET(_source_file "${_test_name}.cc")
-
-        SET(_target_short ${_test_name}.${_build_lowercase}) # target name
-        SET(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
-        SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
-
-      ELSEIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.cu")
-
-        SET(_source_file "${_test_name}.cu")
-
-        SET(_target_short ${_test_name}.${_build_lowercase}) # target name
-        SET(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
-        SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
-
-      ELSEIF( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm" OR
-              EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm.in" )
-
-        IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm.in")
-          SET(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-          CONFIGURE_FILE(
-            "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.prm"
-            @ONLY
-            )
-          SET(_prm_file "${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.prm")
-        ELSE()
-          SET(_prm_file "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm")
-        ENDIF()
-
+      IF("${_source_file}" MATCHES "(prm|json)$")
         IF(NOT "${TEST_TARGET_${_build}}" STREQUAL "")
           SET(_target ${TEST_TARGET_${_build}})
         ELSEIF(NOT "${TEST_TARGET}" STREQUAL "")
           SET(_target ${TEST_TARGET})
         ELSE()
-          MESSAGE(FATAL_ERROR
-            "\nFor ${_comparison_file}: \"${_test_name}.prm(.in)\" provided, "
-            "but neither \"\${TEST_TARGET}\", nor \"\${TEST_TARGET_${_build}}"
-            "\" is defined.\n\n"
+          MESSAGE(FATAL_ERROR "\n${_comparison_file}:\n"
+            "A parameter file \"${_test_name}.(prm|json)(|.in)\" has been "
+            "found, but neither \"\${TEST_TARGET}\", nor "
+            "\"\${TEST_TARGET_${_build}}\" have been defined.\n"
             )
         ENDIF()
         SET(_target_short ${_target})
         SET(_run_args
           "$<TARGET_FILE:${_target}>"
-          "${_prm_file}"
-          )
-      ELSEIF( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.json")
-        # the same as above but for json files
-        SET(_json_file "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.json")
-
-        IF(NOT "${TEST_TARGET_${_build}}" STREQUAL "")
-          SET(_target ${TEST_TARGET_${_build}})
-        ELSEIF(NOT "${TEST_TARGET}" STREQUAL "")
-          SET(_target ${TEST_TARGET})
-        ELSE()
-          MESSAGE(FATAL_ERROR
-            "\nFor ${_comparison_file}: \"${_test_name}.json\" provided, "
-            "but neither \"\${TEST_TARGET}\", nor \"\${TEST_TARGET_${_build}}"
-            "\" is defined.\n\n"
-            )
-        ENDIF()
-        SET(_target_short ${_target})
-        SET(_run_args
-          "$<TARGET_FILE:${_target}>"
-          "${_json_file}"
-          )
-      ELSE()
-        MESSAGE(FATAL_ERROR
-          "\nFor ${_comparison_file}: Neither \"${_test_name}.cc\", "
-          "nor \"${_test_name}.prm\" could be found!\n\n"
+          "${_source_file}"
           )
       ENDIF()
 
-      #
-      # Set up a bunch of variables describing this particular test:
       #
       # If _n_cpu or _n_threads are larger than zero we have to accomodate
       # the fact that multiple output files specifying a different mpirun or

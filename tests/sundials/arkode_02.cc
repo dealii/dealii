@@ -64,7 +64,7 @@ main(int argc, char **argv)
   data.add_parameters(prm);
 
   // Use the same parameters of test 1.
-  std::ifstream ifile(SOURCE_DIR "/arkode_01.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_01_in.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKode<VectorType> ode(data);
