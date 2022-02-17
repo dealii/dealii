@@ -1305,28 +1305,14 @@ namespace Utilities
 
     namespace internal
     {
+      /**
+       * Given a pointer to an object of class T, the functions in this
+       * namespace return the matching
+       * `MPI_Datatype` to be used for MPI communication.
+       */
       namespace MPIDataTypes
       {
-        /**
-         * Given a pointer to an object of class T, return the matching
-         * `MPI_Datatype` to be used for MPI communication.
-         *
-         * As an example, passing an `int*` to this function returns `MPI_INT`.
-         *
-         * @note In reality, these functions are not template functions templated
-         * on the parameter T, but free standing inline function overloads. This
-         * templated version only exists so that it shows up in the
-         * documentation. The `=delete` statement at the end of the declaration
-         * ensures that the compiler will never choose this general template and
-         * instead look for one of the overloads.
-         */
-        template <typename T>
-        inline MPI_Datatype
-        mpi_type_id(const T *) = delete;
-
-#ifndef DOXYGEN
-
-#  ifdef DEAL_II_WITH_MPI
+#ifdef DEAL_II_WITH_MPI
         inline MPI_Datatype
         mpi_type_id(const bool *)
         {
@@ -1452,13 +1438,13 @@ namespace Utilities
         {
           return MPI_DOUBLE_COMPLEX;
         }
-#  endif
 #endif
       } // namespace MPIDataTypes
     }   // namespace internal
 
 
 
+#ifdef DEAL_II_WITH_MPI
     /**
      * A template variable that translates from the data type given as
      * template argument to the corresponding
@@ -1474,7 +1460,7 @@ namespace Utilities
     const MPI_Datatype mpi_type_id = internal::MPIDataTypes::mpi_type_id(
       static_cast<std::remove_cv_t<
         std::remove_reference_t<std::remove_all_extents_t<T>>> *>(nullptr));
-
+#endif
 
 #ifndef DOXYGEN
     namespace internal
