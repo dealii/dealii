@@ -37,6 +37,7 @@
 #       PREFIX_GIT_REVISION
 #       PREFIX_GIT_SHORTREV
 #       PREFIX_GIT_TAG
+#       PREFIX_GIT_TIMESTAMP
 #
 
 MACRO(DEAL_II_QUERY_GIT_INFORMATION)
@@ -76,19 +77,32 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
     #
     # Query for revision:
     #
+    # Format options for git log:
+    #   %H   - the full sha1 hash of the commit, aka "revision"
+    #   %h   - the abbreviated sha1 hash of the commit, aka "shortrev"
+    #   %cd  - the commit date (for which we use the strict iso date format)
+    #
 
     EXECUTE_PROCESS(
-       COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"%H %h"
+       COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"%H\;%h\;%cd" --date=iso-strict
        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
        OUTPUT_VARIABLE _info
        RESULT_VARIABLE _result
        OUTPUT_STRIP_TRAILING_WHITESPACE
        )
     IF(${_result} EQUAL 0)
-      STRING(REGEX REPLACE "^\"([^ ]+) ([^ ]+)\"$"
+      STRING(REGEX REPLACE "^\"([^;]+);([^;]+);([^;]+)\"$"
         "\\1" ${_prefix}GIT_REVISION "${_info}")
-      STRING(REGEX REPLACE "^\"([^ ]+) ([^ ]+)\"$"
+      STRING(REGEX REPLACE "^\"([^;]+);([^;]+);([^;]+)\"$"
         "\\2" ${_prefix}GIT_SHORTREV "${_info}")
+      STRING(REGEX REPLACE "^\"([^;]+);([^;]+);([^;]+)\"$"
+        "\\3" ${_prefix}GIT_TIMESTAMP "${_info}")
+
+      #
+      # Replace "T" by a space in order to have the same output as
+      #   $ date --rfc-3339=seconds"
+      #
+      STRING(REPLACE "T" " " ${_prefix}GIT_TIMESTAMP "${${_prefix}GIT_TIMESTAMP}")
     ENDIF()
 
     #
