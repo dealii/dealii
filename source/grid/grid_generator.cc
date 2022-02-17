@@ -3940,6 +3940,15 @@ namespace GridGenerator
 
   template <>
   void
+  hyper_ball_balanced(Triangulation<1> &, const Point<1> &, const double)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+
+  template <>
+  void
   cylinder(Triangulation<1> &, const double, const double)
   {
     Assert(false, ExcNotImplemented());
