@@ -31,6 +31,7 @@ shift
 
 branch="$(sed -n -e 's/.*Branch: \+\(.*\)/\1/p' revision.log)"
 revision="$(sed -n -e 's/.*Revision: \+\(.*\)/\1/p' revision.log)"
+timestamp="$(sed -n -e 's/.*Timestamp: \+\(.*\)/\1/p' revision.log)"
 
 #
 # Now collect all output files and postprocess them into a tab-separated
@@ -72,10 +73,11 @@ done | sort | tr $'\t' ',')"
 #
 
 (
-  echo "# Date:     $(date -u --rfc-3339=s)"
-  echo "# Site:     ${site}"
-  echo "# Branch:   $branch"
-  echo "# Revision: $revision"
+  echo "# Date:      $(date -u --rfc-3339=s)"
+  echo "# Site:      ${site}"
+  echo "# Branch:    ${branch}"
+  echo "# Revision:  ${revision}"
+  echo "# Timestamp: ${timestamp}"
 ) > performance.csv
 
 (
