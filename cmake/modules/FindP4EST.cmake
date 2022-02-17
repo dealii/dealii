@@ -162,7 +162,7 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   # Extract version numbers:
   #
   FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_VERSION
-    REGEX "#define P4EST_VERSION \"")
+    REGEX "^[ \t]*#[ \t]*define[ \t]+P4EST_VERSION \"")
   STRING(REGEX REPLACE "^.*P4EST_VERSION.*\"([0-9]+.*)\".*" "\\1"
     P4EST_VERSION "${P4EST_VERSION}"
     )

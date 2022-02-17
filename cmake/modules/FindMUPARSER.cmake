@@ -45,7 +45,7 @@ IF(EXISTS ${MUPARSER_INCLUDE_DIR}/muParserDef.h)
     # Try to match the line
     #
     #     #define MUP_VERSION _T("2.2.4")
-    REGEX "#define MUP_VERSION _T"
+    REGEX "^[ \t]*#[ \t]*define[ \t]+MUP_VERSION _T"
     )
 
   IF("${MUPARSER_VERSION_STRING_LINE}" STREQUAL "")

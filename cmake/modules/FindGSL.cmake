@@ -63,7 +63,7 @@ DEAL_II_FIND_PATH(GSL_INCLUDE_DIR gsl/gsl_version.h
 
 IF(EXISTS "${GSL_INCLUDE_DIR}/gsl/gsl_version.h" )
   FILE(STRINGS "${GSL_INCLUDE_DIR}/gsl/gsl_version.h" GSL_VERSION_STRING_LINE
-    REGEX "#define GSL_VERSION"
+    REGEX "^[ \t]*#[ \t]*define[ \t]+GSL_VERSION"
     )
   STRING(REGEX REPLACE ".*([0-9].[0-9]+).*" "\\1" GSL_VERSION
     "${GSL_VERSION_STRING_LINE}"
