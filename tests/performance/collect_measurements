@@ -50,6 +50,10 @@ do
   test_name=${test_name/.release/}
   test_name=${test_name/.debug/}
 
+  # Some minor cleanup:
+  test_name=${test_name/mpirun_0-/}
+  test_name=${test_name/-threads_0/}
+
   {
     read -r test_type # first line of output file contains test type
     read -r           # skip second line

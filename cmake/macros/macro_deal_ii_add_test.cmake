@@ -335,26 +335,37 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       #
       # Set up a bunch of variables describing this particular test:
       #
-
-      # If _n_cpu is equal to "0", a normal, sequential test will be run,
-      # otherwise run the test with mpirun:
-      IF("${_n_cpu}" STREQUAL "0")
-
+      # If _n_cpu or _n_threads are larger than zero we have to accomodate
+      # the fact that multiple output files specifying a different mpirun or
+      # threads count are present. In order to accomodate this we create a
+      # runtime subdirectory "mpirun_M-threads_N" to the test.
+      #
+      # Note that we could do this unconditionally for every test but for
+      # aesthetic reasons chose to not create the directory for
+      # "mpirun_0-threads_0".
+      #
+      IF("${_n_cpu}" STREQUAL "0" AND "${_n_threads}" STREQUAL "0")
         SET(_test_target ${_category}.${_test_name}.${_build_lowercase}.test) # diff target name
         SET(_test_full ${_category}/${_test_name}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
 
       ELSE()
+        SET(_test_target ${_category}.${_test_name}.mpirun${_n_cpu}.threads${_n_threads}.${_build_lowercase}.test) # diff target name
+        SET(_test_full   ${_category}/${_test_name}.mpirun=${_n_cpu}.threads=${_n_threads}.${_build_lowercase}) # full test name
+        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/mpirun_${_n_cpu}-threads_${_n_threads}) # directory to run the test in
+      ENDIF()
 
-        SET(_test_target ${_category}.${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.test) # diff target name
-        SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
-        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/mpirun=${_n_cpu}) # directory to run the test in
+      #
+      # Test variants with ".mpirun=[...]." have to be executed via mpirun
+      # (or whatever ${DEAL_II_MPIEXEC} is set to).
+      #
+      IF(NOT "${_n_cpu}" STREQUAL "0")
         SET(_run_args
           "${DEAL_II_MPIEXEC}"
           ${DEAL_II_MPIEXEC_NUMPROC_FLAG} ${_n_cpu}
           ${DEAL_II_MPIEXEC_PREFLAGS}
           ${_run_args}
-          "${DEAL_II_MPIEXEC_POSTFLAGS}"
+          ${DEAL_II_MPIEXEC_POSTFLAGS}
           )
       ENDIF()
 
@@ -376,7 +387,6 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
-
 
         ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL
           ${_generated_files}
@@ -495,12 +505,11 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         SET_TESTS_PROPERTIES(${_test_full} PROPERTIES PROCESSORS ${_slots})
       ENDIF()
 
-      IF(NOT "${_n_cpu}" STREQUAL "0")
+      IF(NOT "${_n_cpu}${_n_threads}" STREQUAL "00")
         #
-        # We have to be careful not to run different mpirun settings for the
-        # same executable in parallel because this triggers a race condition
-        # when compiling the not yet existent executable that is shared
-        # between the different tests.
+        # Running multiple variants in parallel triggers a race condition
+        # where the same (not yet existent) executable is built
+        # concurrently leading to undefined outcomes.
         #
         # Luckily CMake has a mechanism to force a test to be run after
         # another has finished (and both are scheduled):
