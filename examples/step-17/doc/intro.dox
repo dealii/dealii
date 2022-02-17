@@ -3,14 +3,14 @@
 
 <h3>Overview</h3>
 
-This program does not introduce any new mathematical ideas; in fact, all it does 
-is to do the same computations that step-8 already does, but it does so in a 
-different manner.  Instead of using deal.II's linear algebra classes, we build 
+This program does not introduce any new mathematical ideas; in fact, all it does
+is to do the same computations that step-8 already does, but it does so in a
+different manner.  Instead of using deal.II's linear algebra classes, we build
 everything on top of classes deal.II provides that wrap around the linear algebra implementation of the <a
 href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library. And
-since PETSc allows the distribution of matrices and vectors across several 
-computers within an MPI network, the resulting code will even be capable of 
-solving the problem in %parallel. If you don't know what PETSc is, then this 
+since PETSc allows the distribution of matrices and vectors across several
+computers within an MPI network, the resulting code will even be capable of
+solving the problem in %parallel. If you don't know what PETSc is, then this
 would be a good time to take a quick glimpse at their homepage.
 
 As a prerequisite of this program, you need to have PETSc installed, and if
@@ -142,14 +142,14 @@ example, in the program we will use function calls that take a number
 from each processor, add them all up, and return the sum to all
 processors. Internally, this is implemented using individual messages,
 but to the user this is transparent. We call such operations <i>collectives</i>
-because <i>all</i> processors participate in them. Collectives allow us 
-to write programs where not every copy of the executable is doing 
-something completely different (this would be incredibly difficult to 
-program) but where all copies are doing the same thing (though on 
-different data) for themselves, running through the same blocks of code; 
-then they communicate data through collectives and then go back to doing 
-something for themselves again running through the same blocks of data. 
-This is the key piece to being able to write programs, and it is the 
+because <i>all</i> processors participate in them. Collectives allow us
+to write programs where not every copy of the executable is doing
+something completely different (this would be incredibly difficult to
+program) but where all copies are doing the same thing (though on
+different data) for themselves, running through the same blocks of code;
+then they communicate data through collectives and then go back to doing
+something for themselves again running through the same blocks of data.
+This is the key piece to being able to write programs, and it is the
 key component to making sure that programs can run on any number of processors,
 since we do not have to write different code for each of the participating
 processors.
