@@ -95,7 +95,7 @@ Step3::make_grid()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1);
 
-  switch (get_testing_envrionment())
+  switch (get_testing_environment())
     {
       case TestingEnvironment::light:
         triangulation.refine_global(9);

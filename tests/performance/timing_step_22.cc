@@ -602,7 +602,7 @@ StokesProblem<dim>::run()
         face->set_all_boundary_ids(1);
 
 
-  switch (get_testing_envrionment())
+  switch (get_testing_environment())
     {
       case TestingEnvironment::light:
         triangulation.refine_global(5 - dim);

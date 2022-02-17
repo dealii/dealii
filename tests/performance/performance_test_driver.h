@@ -60,7 +60,7 @@ enum class TestingEnvironment
  * Return the current testing environment
  */
 TestingEnvironment
-get_testing_envrionment()
+get_testing_environment()
 {
 #ifndef TESTING_ENVIRONMENT
 #  define TESTING_ENVIRONMENT light
