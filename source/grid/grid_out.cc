@@ -783,7 +783,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
 {
   // TODO:[GK] allow for boundary faces only
   Assert(dx_flags.write_all_faces, ExcNotImplemented());
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   // Copied and adapted from write_ucd
   const std::vector<Point<spacedim>> &vertices    = tria.get_vertices();
   const std::vector<bool> &           vertex_used = tria.get_used_vertices();
@@ -1009,7 +1009,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
   // disk
   out.flush();
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -1019,7 +1019,7 @@ void
 GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
                    std::ostream &                      out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // get the positions of the
   // vertices and whether they are
@@ -1110,7 +1110,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   // disk
   out.flush();
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -1119,7 +1119,7 @@ void
 GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
                    std::ostream &                      out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // get the positions of the
   // vertices and whether they are
@@ -1226,7 +1226,7 @@ GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
   // disk
   out.flush();
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -1429,7 +1429,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
   // disk
   out.flush();
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -2982,7 +2982,7 @@ void
 GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
                       std::ostream &                      out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // (i) write header
   {
@@ -3104,7 +3104,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
 
   // make sure everything now gets to the output stream
   out.flush();
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -3305,7 +3305,7 @@ void
 GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
                    std::ostream &                      out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // get the positions of the vertices
   const std::vector<Point<spacedim>> &vertices = tria.get_vertices();
@@ -3534,7 +3534,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
 
   out.flush();
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -3544,7 +3544,7 @@ void
 GridOut::write_vtu(const Triangulation<dim, spacedim> &tria,
                    std::ostream &                      out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // convert the cells of the triangulation into a set of patches
   // and then have them output. since there is no data attached to
@@ -3581,7 +3581,7 @@ GridOut::write_vtu(const Triangulation<dim, spacedim> &tria,
     DataOutBase::write_vtu_footer(out);
 
   out << std::flush;
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -4183,7 +4183,7 @@ namespace internal
                   const Mapping<1, spacedim> *,
                   const GridOutFlags::Gnuplot &gnuplot_flags)
     {
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
 
       for (const auto &cell : tria.active_cell_iterators())
         {
@@ -4201,7 +4201,7 @@ namespace internal
       // disk
       out.flush();
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
     }
 
 
@@ -4213,7 +4213,7 @@ namespace internal
                   const Mapping<2, spacedim> *              mapping,
                   const GridOutFlags::Gnuplot &             gnuplot_flags)
     {
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
 
       const int dim = 2;
 
@@ -4313,7 +4313,7 @@ namespace internal
       // make sure everything now gets to disk
       out.flush();
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
     }
 
 
@@ -4325,7 +4325,7 @@ namespace internal
                   const Mapping<3, spacedim> *              mapping,
                   const GridOutFlags::Gnuplot &             gnuplot_flags)
     {
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
 
       const int dim = 3;
 
@@ -4580,7 +4580,7 @@ namespace internal
       // make sure everything now gets to disk
       out.flush();
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
     }
   } // namespace
 } // namespace internal
@@ -4684,7 +4684,7 @@ namespace internal
           static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_2) :
           static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_3);
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
       const unsigned int n_points = eps_flags_base.n_boundary_face_points;
 
       // make up a list of lines by which
@@ -5091,7 +5091,7 @@ namespace internal
       // disk
       out.flush();
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
     }
   } // namespace
 } // namespace internal

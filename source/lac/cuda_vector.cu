@@ -634,7 +634,7 @@ namespace LinearAlgebra
                           const bool         scientific,
                           const bool) const
     {
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
       std::ios::fmtflags old_flags     = out.flags();
       unsigned int       old_precision = out.precision(precision);
 
@@ -655,7 +655,7 @@ namespace LinearAlgebra
         out << cpu_val[i] << std::endl;
       out << std::flush;
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
       // reset output format
       out.flags(old_flags);
       out.precision(old_precision);

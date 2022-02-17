@@ -2336,7 +2336,7 @@ LAPACKFullMatrix<number>::print_formatted(std::ostream &     out,
       out << std::endl;
     }
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   // reset output format
   out.flags(old_flags);
   out.precision(old_precision);

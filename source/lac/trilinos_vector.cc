@@ -787,7 +787,7 @@ namespace TrilinosWrappers
                   const bool         scientific,
                   const bool         across) const
     {
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
       boost::io::ios_flags_saver restore_flags(out);
 
 
@@ -824,7 +824,7 @@ namespace TrilinosWrappers
           out << std::endl;
         }
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
     }
 
 

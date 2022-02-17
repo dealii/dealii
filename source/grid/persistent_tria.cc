@@ -175,7 +175,7 @@ PersistentTriangulation<dim, spacedim>::write_flags(std::ostream &out) const
 {
   const unsigned int n_flag_levels = refine_flags.size();
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   out << mn_persistent_tria_flags_begin << ' ' << n_flag_levels << std::endl;
 
@@ -193,7 +193,7 @@ PersistentTriangulation<dim, spacedim>::write_flags(std::ostream &out) const
 
   out << mn_persistent_tria_flags_end << std::endl;
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -204,7 +204,7 @@ PersistentTriangulation<dim, spacedim>::read_flags(std::istream &in)
 {
   Assert(refine_flags.size() == 0 && coarsen_flags.size() == 0,
          ExcFlagsNotCleared());
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   unsigned int magic_number;
   in >> magic_number;
@@ -231,7 +231,7 @@ PersistentTriangulation<dim, spacedim>::read_flags(std::istream &in)
   AssertThrow(magic_number == mn_persistent_tria_flags_end,
               typename Triangulation<dim>::ExcGridReadError());
 
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 }
 
 

@@ -513,7 +513,7 @@ namespace CUDAWrappers
           }
         out << std::endl;
       };
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     // reset output format
     out.precision(old_precision);

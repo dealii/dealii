@@ -626,7 +626,7 @@ namespace parallel
       {
         std::string   fname = std::string(filename) + ".info";
         std::ifstream f(fname.c_str());
-        AssertThrow(f, ExcIO());
+        AssertThrow(f.fail() == false, ExcIO());
         std::string firstline;
         getline(f, firstline); // skip first line
         f >> version >> numcpus >> attached_count_fixed >>

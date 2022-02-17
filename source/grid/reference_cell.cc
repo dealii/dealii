@@ -546,7 +546,7 @@ ReferenceCell::gmsh_element_type() const
 std::ostream &
 operator<<(std::ostream &out, const ReferenceCell &reference_cell)
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // Output as an integer to avoid outputting it as a character with
   // potentially non-printing value:
@@ -559,7 +559,7 @@ operator<<(std::ostream &out, const ReferenceCell &reference_cell)
 std::istream &
 operator>>(std::istream &in, ReferenceCell &reference_cell)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // Read the information as an integer and convert it to the correct type
   unsigned int value;

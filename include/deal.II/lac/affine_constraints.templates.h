@@ -1260,7 +1260,7 @@ AffineConstraints<number>::print(std::ostream &out) const
         }
     }
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 

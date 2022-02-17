@@ -673,7 +673,7 @@ namespace PETScWrappers
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 

@@ -382,7 +382,7 @@ TableHandler::set_scientific(const std::string &key, const bool scientific)
 void
 TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   boost::io::ios_flags_saver restore_flags(out);
 
   // first pad the table from below if necessary
@@ -600,7 +600,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
 {
   // TODO[TH]: update code similar to
   // write_text() to use the cache
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   if (with_header)
     out << "\\documentclass[10pt]{report}" << '\n'
         << "\\usepackage{float}" << '\n'

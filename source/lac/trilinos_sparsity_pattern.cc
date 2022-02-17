@@ -983,7 +983,7 @@ namespace TrilinosWrappers
           }
       }
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -1015,7 +1015,7 @@ namespace TrilinosWrappers
               << std::endl;
       }
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
   // TODO: Implement!

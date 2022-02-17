@@ -16306,7 +16306,7 @@ Triangulation<dim, spacedim>::write_bool_vector(
   for (unsigned int position = 0; position < N; ++position)
     flags[position / 8] |= (v[position] ? (1 << (position % 8)) : 0);
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // format:
   // 0. magic number
@@ -16321,7 +16321,7 @@ Triangulation<dim, spacedim>::write_bool_vector(
 
   delete[] flags;
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -16332,7 +16332,7 @@ Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
                                                const unsigned int magic_number2,
                                                std::istream &     in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   unsigned int magic_number;
   in >> magic_number;
@@ -16358,7 +16358,7 @@ Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
 
   delete[] flags;
 
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 }
 
 
