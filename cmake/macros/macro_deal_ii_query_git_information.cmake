@@ -84,18 +84,18 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
     #
 
     EXECUTE_PROCESS(
-       COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"%H\;%h\;%cd" --date=iso-strict
+       COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"revision=%H, shortrev=%h, date=%cd" --date=iso-strict
        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
        OUTPUT_VARIABLE _info
        RESULT_VARIABLE _result
        OUTPUT_STRIP_TRAILING_WHITESPACE
        )
     IF(${_result} EQUAL 0)
-      STRING(REGEX REPLACE "^\"([^;]+);([^;]+);([^;]+)\"$"
+      STRING(REGEX REPLACE "^\"revision=(.+), shortrev=(.+), date=(.+)\"$"
         "\\1" ${_prefix}GIT_REVISION "${_info}")
-      STRING(REGEX REPLACE "^\"([^;]+);([^;]+);([^;]+)\"$"
+      STRING(REGEX REPLACE "^\"revision=(.+), shortrev=(.+), date=(.+)\"$"
         "\\2" ${_prefix}GIT_SHORTREV "${_info}")
-      STRING(REGEX REPLACE "^\"([^;]+);([^;]+);([^;]+)\"$"
+      STRING(REGEX REPLACE "^\"revision=(.+), shortrev=(.+), date=(.+)\"$"
         "\\3" ${_prefix}GIT_TIMESTAMP "${_info}")
 
       #
