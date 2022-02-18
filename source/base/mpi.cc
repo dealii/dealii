@@ -432,7 +432,7 @@ namespace Utilities
       if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
           1)
         {
-          return ConsensusAlgorithms::NBX<char, char>().run(
+          return ConsensusAlgorithms::nbx<char, char>(
             destinations, {}, {}, {}, mpi_comm);
         }
         // If that was not the case, we need to use the remainder of the code
@@ -588,8 +588,8 @@ namespace Utilities
       if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
           1)
         {
-          return ConsensusAlgorithms::NBX<char, char>()
-            .run(destinations, {}, {}, {}, mpi_comm)
+          return ConsensusAlgorithms::nbx<char, char>(
+                   destinations, {}, {}, {}, mpi_comm)
             .size();
         }
       else

@@ -143,12 +143,12 @@ namespace TriangulationDescription
           };
 
 
-          dealii::Utilities::MPI::ConsensusAlgorithms::Selector<char, char>()
-            .run(relevant_processes,
-                 create_request,
-                 answer_request,
-                 process_answer,
-                 comm);
+          dealii::Utilities::MPI::ConsensusAlgorithms::selector<char, char>(
+            relevant_processes,
+            create_request,
+            answer_request,
+            process_answer,
+            comm);
         }
 
         /**
