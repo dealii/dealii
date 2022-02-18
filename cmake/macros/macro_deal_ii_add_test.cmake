@@ -279,12 +279,12 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   ENDIF()
 
   #
-  # Run CONFIGURE_FILE on every parameter file ending in ".in":
+  # Run CONFIGURE_FILE on every parameter file ending in "in"
   #
 
-  IF("${_source_file}" MATCHES "\.in$")
+  IF("${_source_file}" MATCHES ".in$")
     SET(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-    STRING(REGEX MATCH "(json|prm)\.in$" _suffix "${_source_file}")
+    STRING(REGEX MATCH "(json|prm).in$" _suffix "${_source_file}")
     STRING(REPLACE ".in" "" _suffix "${_suffix}")
     CONFIGURE_FILE(
       "${_source_file}"
