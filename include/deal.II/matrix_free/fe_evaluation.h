@@ -3279,11 +3279,15 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                           "FEEvaluation. In that case, you must pass an "
                           "std::vector<VectorType> or a BlockVector to " +
                           "read_dof_values and distribute_local_to_global."));
-        internal::check_vector_compatibility(*src[comp], *this->dof_info);
+        internal::check_vector_compatibility(*src[comp],
+                                             *this->matrix_free,
+                                             *this->dof_info);
       }
   else
     {
-      internal::check_vector_compatibility(*src[0], *this->dof_info);
+      internal::check_vector_compatibility(*src[0],
+                                           *this->matrix_free,
+                                           *this->dof_info);
     }
 
   // Case 2: contiguous indices which use reduced storage of indices and can
