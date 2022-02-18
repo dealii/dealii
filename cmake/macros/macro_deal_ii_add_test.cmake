@@ -338,16 +338,25 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       # aesthetic reasons chose to not create the directory for
       # "mpirun_0-threads_0".
       #
-      IF("${_n_cpu}" STREQUAL "0" AND "${_n_threads}" STREQUAL "0")
-        SET(_test_target ${_category}.${_test_name}.${_build_lowercase}.test) # diff target name
-        SET(_test_full ${_category}/${_test_name}.${_build_lowercase}) # full test name
-        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
 
-      ELSE()
-        SET(_test_target ${_category}.${_test_name}.mpirun${_n_cpu}.threads${_n_threads}.${_build_lowercase}.test) # diff target name
-        SET(_test_full   ${_category}/${_test_name}.mpirun=${_n_cpu}.threads=${_n_threads}.${_build_lowercase}) # full test name
-        SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}/mpirun_${_n_cpu}-threads_${_n_threads}) # directory to run the test in
+      SET(_test_target    ${_category}.${_test_name}) # diff target name
+      SET(_test_full      ${_category}/${_test_name}) # full test name
+      SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
+
+      IF(NOT "${_n_cpu}" STREQUAL "0")
+        STRING(APPEND _test_target   ".mpirun${_n_cpu}")
+        STRING(APPEND _test_full     ".mpirun=${_n_cpu}")
+        STRING(APPEND _test_directory "/mpirun=${_n_cpu}")
       ENDIF()
+
+      IF(NOT "${_n_threads}" STREQUAL "0")
+        STRING(APPEND _test_target   ".threads${_n_threads}")
+        STRING(APPEND _test_full     ".threads=${_n_threads}")
+        STRING(APPEND _test_directory "/threads=${_n_threads}")
+      ENDIF()
+
+      STRING(APPEND _test_target ".${_build_lowercase}.test")
+      STRING(APPEND _test_full   ".${_build_lowercase}")
 
       #
       # Test variants with ".mpirun=[...]." have to be executed via mpirun
