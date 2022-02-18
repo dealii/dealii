@@ -59,28 +59,14 @@ namespace Utilities
             std::vector<unsigned int> &actually_owning_ranks,
             const std::pair<types::global_dof_index, types::global_dof_index>
               &                        local_range,
-            std::vector<unsigned int> &actually_owning_rank_list)
-            : buffers(buffers)
-            , actually_owning_ranks(actually_owning_ranks)
-            , local_range(local_range)
-            , actually_owning_rank_list(actually_owning_rank_list)
-          {
-            Assert(local_range.first <= local_range.second, ExcInternalError());
-          }
+            std::vector<unsigned int> &actually_owning_rank_list);
 
           /**
            * Implementation of
            * Utilities::MPI::ConsensusAlgorithms::Process::compute_targets().
            */
           virtual std::vector<unsigned int>
-          compute_targets() override
-          {
-            std::vector<unsigned int> targets;
-            for (const auto &rank_pair : buffers)
-              targets.push_back(rank_pair.first);
-
-            return targets;
-          }
+          compute_targets() override;
 
           /**
            * Implementation of
@@ -90,10 +76,7 @@ namespace Utilities
           create_request(const unsigned int other_rank,
                          std::vector<std::pair<types::global_dof_index,
                                                types::global_dof_index>>
-                           &send_buffer) override
-          {
-            send_buffer = this->buffers.at(other_rank);
-          }
+                           &send_buffer) override;
 
           /**
            * Implementation of
@@ -104,40 +87,7 @@ namespace Utilities
             const unsigned int                                     other_rank,
             const std::vector<std::pair<types::global_dof_index,
                                         types::global_dof_index>> &buffer_recv,
-            std::vector<unsigned int> &request_buffer) override
-          {
-            (void)request_buffer; // not needed
-
-
-            // process message: loop over all intervals
-            for (auto interval : buffer_recv)
-              {
-#ifdef DEBUG
-                for (types::global_dof_index i = interval.first;
-                     i < interval.second;
-                     i++)
-                  Assert(
-                    actually_owning_ranks[i - local_range.first] ==
-                      numbers::invalid_unsigned_int,
-                    ExcMessage(
-                      "Multiple processes seem to own the same global index. "
-                      "A possible reason is that the sets of locally owned "
-                      "indices are not distinct."));
-                Assert(interval.first < interval.second, ExcInternalError());
-                Assert(
-                  local_range.first <= interval.first &&
-                    interval.second <= local_range.second,
-                  ExcMessage(
-                    "The specified interval is not handled by the current process."));
-#endif
-                std::fill(actually_owning_ranks.data() + interval.first -
-                            local_range.first,
-                          actually_owning_ranks.data() + interval.second -
-                            local_range.first,
-                          other_rank);
-              }
-            actually_owning_rank_list.push_back(other_rank);
-          }
+            std::vector<unsigned int> &request_buffer) override;
 
         private:
           const std::map<unsigned int,
