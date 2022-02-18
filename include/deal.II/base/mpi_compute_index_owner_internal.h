@@ -204,26 +204,14 @@ namespace Utilities
            * ensure a balance over the MPI ranks due to the grain size.
            */
           unsigned int
-          dof_to_dict_rank(const types::global_dof_index i)
-          {
-            // note: this formula is also explicitly used in
-            // get_index_offset(), so keep the two in sync
-            return (i / dofs_per_process) * stride_small_size;
-          }
+          dof_to_dict_rank(const types::global_dof_index i);
 
           /**
            * Given an MPI rank id of an arbitrary processor, return the index
            * offset where the local range of that processor begins.
            */
           types::global_dof_index
-          get_index_offset(const unsigned int rank)
-          {
-            return std::min(dofs_per_process *
-                              static_cast<types::global_dof_index>(
-                                (rank + stride_small_size - 1) /
-                                stride_small_size),
-                            size);
-          }
+          get_index_offset(const unsigned int rank);
 
           /**
            * Given the rank in the owned indices from `actually_owning_ranks`,
@@ -232,22 +220,7 @@ namespace Utilities
            */
           unsigned int
           get_owning_rank_index(const unsigned int rank_in_owned_indices,
-                                const unsigned int guess = 0)
-          {
-            AssertIndexRange(guess, actually_owning_rank_list.size());
-            if (actually_owning_rank_list[guess] == rank_in_owned_indices)
-              return guess;
-            else
-              {
-                auto it = std::lower_bound(actually_owning_rank_list.begin(),
-                                           actually_owning_rank_list.end(),
-                                           rank_in_owned_indices);
-                Assert(it != actually_owning_rank_list.end(),
-                       ExcInternalError());
-                Assert(*it == rank_in_owned_indices, ExcInternalError());
-                return it - actually_owning_rank_list.begin();
-              }
-          }
+                                const unsigned int guess = 0);
 
         private:
           /**
@@ -424,6 +397,49 @@ namespace Utilities
                               unsigned int &                owner_index,
                               const unsigned int            rank_of_request);
         };
+
+        /* ------------------------- inline functions ----------------------- */
+
+        inline unsigned int
+        Dictionary::dof_to_dict_rank(const types::global_dof_index i)
+        {
+          // note: this formula is also explicitly used in
+          // get_index_offset(), so keep the two in sync
+          return (i / dofs_per_process) * stride_small_size;
+        }
+
+
+        inline types::global_dof_index
+        Dictionary::get_index_offset(const unsigned int rank)
+        {
+          return std::min(dofs_per_process *
+                            static_cast<types::global_dof_index>(
+                              (rank + stride_small_size - 1) /
+                              stride_small_size),
+                          size);
+        }
+
+
+
+        inline unsigned int
+        Dictionary::get_owning_rank_index(
+          const unsigned int rank_in_owned_indices,
+          const unsigned int guess)
+        {
+          AssertIndexRange(guess, actually_owning_rank_list.size());
+          if (actually_owning_rank_list[guess] == rank_in_owned_indices)
+            return guess;
+          else
+            {
+              auto it = std::lower_bound(actually_owning_rank_list.begin(),
+                                         actually_owning_rank_list.end(),
+                                         rank_in_owned_indices);
+              Assert(it != actually_owning_rank_list.end(), ExcInternalError());
+              Assert(*it == rank_in_owned_indices, ExcInternalError());
+              return it - actually_owning_rank_list.begin();
+            }
+        }
+
 
       } // namespace ComputeIndexOwner
     }   // namespace internal
