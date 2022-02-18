@@ -3,16 +3,15 @@
 
 <h3>Overview</h3>
 
-This program does not introduce any new mathematical ideas; in fact, all it
-does is to do the exact same computations that step-8
-already does, but it does so in a different manner: instead of using deal.II's
-own linear algebra classes, we build everything on top of classes deal.II
-provides that wrap around the linear algebra implementation of the <a
+This program does not introduce any new mathematical ideas; in fact, all it does
+is to do the same computations that step-8 already does, but it does so in a
+different manner.  Instead of using deal.II's linear algebra classes, we build
+everything on top of classes deal.II provides that wrap around the linear algebra implementation of the <a
 href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library. And
-since PETSc allows to distribute matrices and vectors across several computers
-within an MPI network, the resulting code will even be able to solve the
-problem in %parallel. If you don't know what PETSc is, then this would be a
-good time to take a quick glimpse at their homepage.
+since PETSc allows the distribution of matrices and vectors across several
+computers within an MPI network, the resulting code will even be capable of
+solving the problem in %parallel. If you don't know what PETSc is, then this
+would be a good time to take a quick glimpse at their homepage.
 
 As a prerequisite of this program, you need to have PETSc installed, and if
 you want to run in %parallel on a cluster, you also need <a
@@ -94,7 +93,7 @@ process is called "partitioning" a mesh into @ref GlossSubdomainId "subdomains".
 
 For larger problems, having to store the <i>entire</i> mesh on every processor
 will clearly yield a bottleneck. Splitting up the mesh is slightly, though not
-much more complicated (from a user perspective, though it is <i>much</i> more
+much more, complicated (from a user perspective, though it is <i>much</i> more
 complicated under the hood) to achieve and
 we will show how to do this in step-40 and some other programs. There are
 numerous occasions where, in the course of discussing how a function of this
@@ -144,14 +143,14 @@ from each processor, add them all up, and return the sum to all
 processors. Internally, this is implemented using individual messages,
 but to the user this is transparent. We call such operations <i>collectives</i>
 because <i>all</i> processors participate in them. Collectives allow us
-to write programs where not every copy of the executable is doing something
-completely different (this would be incredibly difficult to program) but
-where in essence all copies are doing the same thing (though on different
-data) for themselves, running through the same blocks of code; then they
-communicate data through collectives; and then go back to doing something
-for themselves again running through the same blocks of data. This is the
-key piece to being able to write programs, and it is the key component
-to making sure that programs can run on any number of processors,
+to write programs where not every copy of the executable is doing
+something completely different (this would be incredibly difficult to
+program) but where all copies are doing the same thing (though on
+different data) for themselves, running through the same blocks of code;
+then they communicate data through collectives and then go back to doing
+something for themselves again running through the same blocks of data.
+This is the key piece to being able to write programs, and it is the
+key component to making sure that programs can run on any number of processors,
 since we do not have to write different code for each of the participating
 processors.
 
