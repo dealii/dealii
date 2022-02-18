@@ -368,6 +368,324 @@ namespace Utilities
         }
 
 
+        ConsensusAlgorithmsPayload::ConsensusAlgorithmsPayload(
+          const IndexSet &           owned_indices,
+          const IndexSet &           indices_to_look_up,
+          const MPI_Comm &           comm,
+          std::vector<unsigned int> &owning_ranks,
+          const bool                 track_index_requests)
+          : owned_indices(owned_indices)
+          , indices_to_look_up(indices_to_look_up)
+          , comm(comm)
+          , my_rank(this_mpi_process(comm))
+          , n_procs(n_mpi_processes(comm))
+          , track_index_requests(track_index_requests)
+          , owning_ranks(owning_ranks)
+        {
+          dict.reinit(owned_indices, comm);
+          requesters.resize(dict.actually_owning_rank_list.size());
+        }
+
+
+
+        void
+        ConsensusAlgorithmsPayload::answer_request(
+          const unsigned int                                     other_rank,
+          const std::vector<std::pair<types::global_dof_index,
+                                      types::global_dof_index>> &buffer_recv,
+          std::vector<unsigned int> &                            request_buffer)
+        {
+          unsigned int owner_index = 0;
+          for (const auto &interval : buffer_recv)
+            for (auto i = interval.first; i < interval.second; ++i)
+              {
+                const unsigned int actual_owner =
+                  dict.actually_owning_ranks[i - dict.local_range.first];
+                request_buffer.push_back(actual_owner);
+
+                if (track_index_requests)
+                  append_index_origin(i, owner_index, other_rank);
+              }
+        }
+
+
+
+        std::vector<unsigned int>
+        ConsensusAlgorithmsPayload::compute_targets()
+        {
+          std::vector<unsigned int> targets;
+
+          // 1) collect relevant processes and process local dict entries
+          {
+            unsigned int index       = 0;
+            unsigned int owner_index = 0;
+            for (auto i : indices_to_look_up)
+              {
+                unsigned int other_rank = dict.dof_to_dict_rank(i);
+                if (other_rank == my_rank)
+                  {
+                    owning_ranks[index] =
+                      dict.actually_owning_ranks[i - dict.local_range.first];
+                    if (track_index_requests)
+                      append_index_origin(i, owner_index, my_rank);
+                  }
+                else if (targets.empty() || targets.back() != other_rank)
+                  targets.push_back(other_rank);
+                index++;
+              }
+          }
+
+
+          for (auto i : targets)
+            {
+              recv_indices[i]                    = {};
+              indices_to_look_up_by_dict_rank[i] = {};
+            }
+
+          // 3) collect indices for each process
+          {
+            unsigned int index = 0;
+            for (auto i : indices_to_look_up)
+              {
+                unsigned int other_rank = dict.dof_to_dict_rank(i);
+                if (other_rank != my_rank)
+                  {
+                    recv_indices[other_rank].push_back(index);
+                    indices_to_look_up_by_dict_rank[other_rank].push_back(i);
+                  }
+                index++;
+              }
+          }
+
+          Assert(targets.size() == recv_indices.size() &&
+                   targets.size() == indices_to_look_up_by_dict_rank.size(),
+                 ExcMessage("Size does not match!"));
+
+          return targets;
+        }
+
+
+
+        void
+        ConsensusAlgorithmsPayload::create_request(
+          const unsigned int                               other_rank,
+          std::vector<std::pair<types::global_dof_index,
+                                types::global_dof_index>> &send_buffer)
+        {
+          // create index set and compress data to be sent
+          auto &   indices_i = indices_to_look_up_by_dict_rank[other_rank];
+          IndexSet is(dict.size);
+          is.add_indices(indices_i.begin(), indices_i.end());
+          is.compress();
+
+          for (auto interval = is.begin_intervals();
+               interval != is.end_intervals();
+               ++interval)
+            send_buffer.emplace_back(*interval->begin(), interval->last() + 1);
+        }
+
+
+
+        void
+        ConsensusAlgorithmsPayload::read_answer(
+          const unsigned int               other_rank,
+          const std::vector<unsigned int> &recv_buffer)
+        {
+          Assert(recv_buffer.size() == recv_indices[other_rank].size(),
+                 ExcInternalError());
+          Assert(recv_indices[other_rank].size() == recv_buffer.size(),
+                 ExcMessage("Sizes do not match!"));
+
+          for (unsigned int j = 0; j < recv_indices[other_rank].size(); ++j)
+            owning_ranks[recv_indices[other_rank][j]] = recv_buffer[j];
+        }
+
+
+
+        std::map<unsigned int, IndexSet>
+        ConsensusAlgorithmsPayload::get_requesters()
+        {
+          Assert(track_index_requests,
+                 ExcMessage("Must enable index range tracking in "
+                            "constructor of ConsensusAlgorithmProcess"));
+
+          std::map<unsigned int, dealii::IndexSet> requested_indices;
+
+#ifdef DEAL_II_WITH_MPI
+
+          static CollectiveMutex      mutex;
+          CollectiveMutex::ScopedLock lock(mutex, comm);
+
+          const int mpi_tag = Utilities::MPI::internal::Tags::
+            consensus_algorithm_payload_get_requesters;
+
+          // reserve enough slots for the requests ahead; depending on
+          // whether the owning rank is one of the requesters or not, we
+          // might have one less requests to execute, so fill the requests
+          // on demand.
+          std::vector<MPI_Request> send_requests;
+          send_requests.reserve(requesters.size());
+
+          // We use an integer vector for the data exchange. Since we send
+          // data associated to intervals with different requesters, we will
+          // need to send (a) the MPI rank of the requester, (b) the number
+          // of intervals directed to this requester, and (c) a list of
+          // intervals, i.e., two integers per interval. The number of items
+          // sent in total can be deduced both via the MPI status message at
+          // the receiver site as well as be counting the buckets from
+          // different requesters.
+          std::vector<std::vector<unsigned int>> send_data(requesters.size());
+          for (unsigned int i = 0; i < requesters.size(); ++i)
+            {
+              // special code for our own indices
+              if (dict.actually_owning_rank_list[i] == my_rank)
+                {
+                  for (const auto &j : requesters[i])
+                    {
+                      const types::global_dof_index index_offset =
+                        dict.get_index_offset(my_rank);
+                      IndexSet &my_index_set = requested_indices[j.first];
+                      my_index_set.set_size(owned_indices.size());
+                      for (const auto &interval : j.second)
+                        my_index_set.add_range(index_offset + interval.first,
+                                               index_offset + interval.second);
+                    }
+                }
+              else
+                {
+                  for (const auto &j : requesters[i])
+                    {
+                      send_data[i].push_back(j.first);
+                      send_data[i].push_back(j.second.size());
+                      for (const auto &interval : j.second)
+                        {
+                          send_data[i].push_back(interval.first);
+                          send_data[i].push_back(interval.second);
+                        }
+                    }
+                  send_requests.push_back(MPI_Request());
+                  const int ierr = MPI_Isend(send_data[i].data(),
+                                             send_data[i].size(),
+                                             MPI_UNSIGNED,
+                                             dict.actually_owning_rank_list[i],
+                                             mpi_tag,
+                                             comm,
+                                             &send_requests.back());
+                  AssertThrowMPI(ierr);
+                }
+            }
+
+          // receive the data
+          for (unsigned int c = 0; c < dict.n_dict_procs_in_owned_indices; ++c)
+            {
+              // wait for an incoming message
+              MPI_Status status;
+              int ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
+              AssertThrowMPI(ierr);
+
+              // retrieve size of incoming message
+              int number_amount;
+              ierr = MPI_Get_count(&status, MPI_UNSIGNED, &number_amount);
+              AssertThrowMPI(ierr);
+
+              // receive message
+              Assert(number_amount % 2 == 0, ExcInternalError());
+              std::vector<std::pair<unsigned int, unsigned int>> buffer(
+                number_amount / 2);
+              ierr = MPI_Recv(buffer.data(),
+                              number_amount,
+                              MPI_UNSIGNED,
+                              status.MPI_SOURCE,
+                              status.MPI_TAG,
+                              comm,
+                              &status);
+              AssertThrowMPI(ierr);
+
+              // unpack the message and translate the dictionary-local
+              // indices coming via MPI to the global index range
+              const types::global_dof_index index_offset =
+                dict.get_index_offset(status.MPI_SOURCE);
+              unsigned int offset = 0;
+              while (offset < buffer.size())
+                {
+                  AssertIndexRange(offset + buffer[offset].second,
+                                   buffer.size());
+
+                  IndexSet my_index_set(owned_indices.size());
+                  for (unsigned int i = offset + 1;
+                       i < offset + buffer[offset].second + 1;
+                       ++i)
+                    my_index_set.add_range(index_offset + buffer[i].first,
+                                           index_offset + buffer[i].second);
+
+                  // the underlying index set is able to merge ranges coming
+                  // from different ranks due to the partitioning in the
+                  // dictionary
+                  IndexSet &index_set = requested_indices[buffer[offset].first];
+                  if (index_set.size() == 0)
+                    index_set.set_size(owned_indices.size());
+                  index_set.add_indices(my_index_set);
+
+                  offset += buffer[offset].second + 1;
+                }
+              AssertDimension(offset, buffer.size());
+            }
+
+          if (send_requests.size() > 0)
+            {
+              const auto ierr = MPI_Waitall(send_requests.size(),
+                                            send_requests.data(),
+                                            MPI_STATUSES_IGNORE);
+              AssertThrowMPI(ierr);
+            }
+
+
+#  ifdef DEBUG
+          for (const auto &it : requested_indices)
+            {
+              IndexSet copy_set = it.second;
+              copy_set.subtract_set(owned_indices);
+              Assert(copy_set.n_elements() == 0,
+                     ExcInternalError(
+                       "The indices requested from the current "
+                       "MPI rank should be locally owned here!"));
+            }
+#  endif
+
+#endif // DEAL_II_WITH_MPI
+
+          return requested_indices;
+        }
+
+
+
+        void
+        ConsensusAlgorithmsPayload::append_index_origin(
+          const types::global_dof_index index,
+          unsigned int &                owner_index,
+          const unsigned int            rank_of_request)
+        {
+          // remember who requested which index. We want to use an
+          // std::vector with simple addressing, via a good guess from the
+          // preceding index, rather than std::map, because this is an inner
+          // loop and it avoids the map lookup in every iteration
+          const unsigned int rank_of_owner =
+            dict.actually_owning_ranks[index - dict.local_range.first];
+          owner_index = dict.get_owning_rank_index(rank_of_owner, owner_index);
+          if (requesters[owner_index].empty() ||
+              requesters[owner_index].back().first != rank_of_request)
+            requesters[owner_index].emplace_back(
+              rank_of_request,
+              std::vector<std::pair<unsigned int, unsigned int>>());
+          if (requesters[owner_index].back().second.empty() ||
+              requesters[owner_index].back().second.back().second !=
+                index - dict.local_range.first)
+            requesters[owner_index].back().second.emplace_back(
+              index - dict.local_range.first,
+              index - dict.local_range.first + 1);
+          else
+            ++requesters[owner_index].back().second.back().second;
+        }
       } // namespace ComputeIndexOwner
     }   // namespace internal
   }     // namespace MPI
