@@ -1526,6 +1526,20 @@ public:
     const Table<2, bool> &        dof_mask = Table<2, bool>()) const;
 
   /**
+   * Similar to the other function, but for non-quadratic sparsity patterns, and
+   * for different constraints in the column space.
+   */
+  template <typename SparsityPatternType>
+  void
+  add_entries_local_to_global(
+    const std::vector<size_type> &   row_indices,
+    const AffineConstraints<number> &col_constraints,
+    const std::vector<size_type> &   col_indices,
+    SparsityPatternType &            sparsity_pattern,
+    const bool                       keep_constrained_entries = true,
+    const Table<2, bool> &           dof_mask = Table<2, bool>()) const;
+
+  /**
    * This function imports values from a global vector (@p global_vector) by
    * applying the constraints to a vector of local values, expressed in
    * iterator format.  In most cases, the local values will be identified by

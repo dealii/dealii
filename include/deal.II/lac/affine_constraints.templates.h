@@ -4356,11 +4356,12 @@ template <typename number>
 template <typename SparsityPatternType>
 void
 AffineConstraints<number>::add_entries_local_to_global(
-  const std::vector<size_type> &row_indices,
-  const std::vector<size_type> &col_indices,
-  SparsityPatternType &         sparsity_pattern,
-  const bool                    keep_constrained_entries,
-  const Table<2, bool> &        dof_mask) const
+  const std::vector<size_type> &   row_indices,
+  const AffineConstraints<number> &col_constraints,
+  const std::vector<size_type> &   col_indices,
+  SparsityPatternType &            sparsity_pattern,
+  const bool                       keep_constrained_entries,
+  const Table<2, bool> &           dof_mask) const
 {
   const size_type n_local_rows = row_indices.size();
   const size_type n_local_cols = col_indices.size();
@@ -4374,7 +4375,7 @@ AffineConstraints<number>::add_entries_local_to_global(
           for (const size_type col_index : col_indices)
             sparsity_pattern.add(row_index, col_index);
       for (const size_type col_index : col_indices)
-        if (is_constrained(col_index))
+        if (col_constraints.is_constrained(col_index))
           for (const size_type row_index : row_indices)
             sparsity_pattern.add(row_index, col_index);
     }
@@ -4390,7 +4391,7 @@ AffineConstraints<number>::add_entries_local_to_global(
       std::vector<size_type> actual_row_indices(n_local_rows);
       std::vector<size_type> actual_col_indices(n_local_cols);
       make_sorted_row_list(row_indices, actual_row_indices);
-      make_sorted_row_list(col_indices, actual_col_indices);
+      col_constraints.make_sorted_row_list(col_indices, actual_col_indices);
       const size_type n_actual_rows = actual_row_indices.size();
 
       // now add the indices we collected above to the sparsity pattern. Very
@@ -4405,6 +4406,27 @@ AffineConstraints<number>::add_entries_local_to_global(
 
   // TODO: implement this
   Assert(false, ExcNotImplemented());
+}
+
+
+
+template <typename number>
+template <typename SparsityPatternType>
+void
+AffineConstraints<number>::add_entries_local_to_global(
+  const std::vector<size_type> &row_indices,
+  const std::vector<size_type> &col_indices,
+  SparsityPatternType &         sparsity_pattern,
+  const bool                    keep_constrained_entries,
+  const Table<2, bool> &        dof_mask) const
+{
+  // Call the function with the same name that takes a column constraint as well
+  add_entries_local_to_global(row_indices,
+                              *this,
+                              col_indices,
+                              sparsity_pattern,
+                              keep_constrained_entries,
+                              dof_mask);
 }
 
 
