@@ -20,9 +20,6 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_tools_cache.h>
-
 DEAL_II_NAMESPACE_OPEN
 
 

@@ -32,8 +32,6 @@
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
 
-#include <deal.II/grid/grid_tools.h>
-
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>

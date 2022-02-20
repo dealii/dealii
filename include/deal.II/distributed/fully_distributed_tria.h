@@ -22,8 +22,6 @@
 #include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
 
-#include <deal.II/grid/grid_tools.h>
-
 #include <vector>
 
 #ifdef DEAL_II_WITH_MPI
