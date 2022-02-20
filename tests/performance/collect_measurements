@@ -38,7 +38,11 @@ timestamp="$(sed -n -e 's/.*Timestamp: \+\(.*\)/\1/p' revision.log)"
 # list of values:
 #
 
-output="$(for i in tests/performance/*/output tests/performance/*/mpirun*/output
+output="$(for i in \
+  tests/performance/*/output \
+  tests/performance/*/mpirun*/output \
+  tests/performance/*/mpirun*/threads*/output \
+  tests/performance/*/threads*/output
 do
   # Skip output files that have fewer than 3 lines
   if [[ "$(wc -l $i 2> /dev/null | awk '{ print $1 }')" -le 2 ]]; then
