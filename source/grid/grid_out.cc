@@ -1595,10 +1595,6 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
                                                all_element_nodes);
       }
 
-  // Make sure nodes belong to the right entities.
-  gmsh::model::mesh::reclassifyNodes();
-  gmsh::model::mesh::removeDuplicateNodes();
-
   // Now for each individual pair of dim and entry, add a physical group, if
   // necessary
   for (const auto &it : dim_entity_tag)
