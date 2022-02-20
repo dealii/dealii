@@ -25,6 +25,7 @@
 #include <boost/range/adaptor/indexed.hpp>
 
 #include <algorithm>
+#include <initializer_list>
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -76,6 +77,9 @@ enum class Metric
 {
   /** a timing (wall clock time / cpu time) in seconds */
   timing,
+
+  /** an instruction count (instrumented for example with callgrind) */
+  instruction_count,
 };
 
 
@@ -91,12 +95,26 @@ describe_measurements();
 
 
 /**
- * The Measurement type returned by perform_single_measurement(). This is
- * currently just a typedef for <code>std::vector<double></code> but could
- * be easily extended to a std::variant (or similar) data type supporting
- * something else than double.
+ * The Measurement type returned by perform_single_measurement(). We
+ * support returning a <code>std::vector<double></code> for timings or a
+ * <code>std::vector<unsigned long long></code> for instruction counts.
+ *
+ * Note that the following could be improved using std::variant once we
+ * switch to C++17.
  */
-using Measurement = std::vector<double>;
+struct Measurement
+{
+  Measurement(std::initializer_list<double> results)
+    : timing(results)
+  {}
+
+  Measurement(std::initializer_list<unsigned long long> results)
+    : instruction_count(results)
+  {}
+
+  std::vector<double>             timing;
+  std::vector<unsigned long long> instruction_count;
+};
 
 
 /**
@@ -135,12 +153,13 @@ main(int argc, char *argv[])
   const auto number_of_repetitions = std::get<1>(description);
   const auto names                 = std::get<2>(description);
 
-  Assert(number_of_repetitions > 0, dealii::ExcInternalError);
-  if (number_of_repetitions == 0)
-    {
-      pout << "Test specified an invalid number of measurements." << std::endl;
-      return 1;
-    }
+  AssertThrow(number_of_repetitions > 0,
+              dealii::ExcMessage(
+                "Test specified an invalid number of measurements."));
+
+  AssertThrow(metric != Metric::instruction_count || number_of_repetitions == 1,
+              dealii::ExcMessage(
+                "Test specified an invalid number of measurements."));
 
   // Print the measurement type:
 
@@ -148,6 +167,9 @@ main(int argc, char *argv[])
     {
       case Metric::timing:
         pout << "timing\n";
+        break;
+      case Metric::instruction_count:
+        pout << "instruction_count\n";
         break;
     }
 
@@ -171,39 +193,50 @@ main(int argc, char *argv[])
 
   for (std::size_t i = 0; i < names.size(); ++i)
     {
-      const double x = measurements[0][i];
-
-      if (number_of_repetitions == 1)
+      switch (metric)
         {
-          pout << names[i] << "\t" << x << "\n";
-        }
-      else
-        {
-          double min      = x;
-          double max      = x;
-          double mean     = x;
-          double variance = 0.;
+          case Metric::timing:
+            if (number_of_repetitions == 1)
+              {
+                const double x = measurements[0].timing[i];
+                pout << names[i] << "\t" << x << "\n";
+              }
+            else
+              {
+                const double x        = measurements[0].timing[i];
+                double       min      = x;
+                double       max      = x;
+                double       mean     = x;
+                double       variance = 0.;
 
-          for (unsigned int k = 1; k < number_of_repetitions; ++k)
-            {
-              const double x = measurements[k][i];
+                for (unsigned int k = 1; k < number_of_repetitions; ++k)
+                  {
+                    const double x = measurements[k].timing[i];
 
-              min = std::min(min, x);
-              max = std::max(max, x);
+                    min = std::min(min, x);
+                    max = std::max(max, x);
 
-              const auto new_mean = mean + (x - mean) / (k + 1);
+                    const auto new_mean = mean + (x - mean) / (k + 1);
 
-              variance = variance + (x - mean) * (x - new_mean);
-              mean     = new_mean;
-            }
+                    variance = variance + (x - mean) * (x - new_mean);
+                    mean     = new_mean;
+                  }
 
-          const double std_dev =
-            number_of_repetitions == 1 ?
-              0. :
-              std::sqrt(variance / (number_of_repetitions - 1));
+                const double std_dev =
+                  number_of_repetitions == 1 ?
+                    0. :
+                    std::sqrt(variance / (number_of_repetitions - 1));
 
-          pout << names[i] << "\t" << min << "\t" << max << "\t" << mean << "\t"
-               << std_dev << "\t" << number_of_repetitions << "\n";
+                pout << names[i] << "\t" << min << "\t" << max << "\t" << mean
+                     << "\t" << std_dev << "\t" << number_of_repetitions
+                     << "\n";
+              }
+            break;
+
+          case Metric::instruction_count:
+            const unsigned long long x = measurements[0].instruction_count[i];
+            pout << names[i] << "\t" << x << "\n";
+            break;
         }
     }
 

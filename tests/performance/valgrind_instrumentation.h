@@ -16,6 +16,10 @@
 #ifndef dealii_valgrind_instrumentation_h
 #define dealii_valgrind_instrumentation_h
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exceptions.h>
+
 #include <unistd.h>
 #include <valgrind/callgrind.h>
 

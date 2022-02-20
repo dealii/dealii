@@ -86,7 +86,7 @@ class StokesProblem
 {
 public:
   StokesProblem(const unsigned int degree);
-  std::vector<double>
+  Measurement
   run();
 
 private:
@@ -574,7 +574,7 @@ StokesProblem<dim>::refine_mesh()
 
 
 template <int dim>
-std::vector<double>
+Measurement
 StokesProblem<dim>::run()
 {
   std::map<std::string, dealii::Timer> timer;

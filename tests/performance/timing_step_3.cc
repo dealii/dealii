@@ -57,7 +57,7 @@ class Step3
 public:
   Step3();
 
-  std::vector<double>
+  Measurement
   run();
 
 private:
@@ -212,7 +212,7 @@ Step3::output_results() const
 }
 
 
-std::vector<double>
+Measurement
 Step3::run()
 {
   std::map<std::string, dealii::Timer> timer;
