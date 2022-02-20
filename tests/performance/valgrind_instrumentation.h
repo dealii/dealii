@@ -61,7 +61,7 @@ namespace callgrind_wrapper
       std::remove("callgrind.out");
       CALLGRIND_ZERO_STATS;
       CALLGRIND_START_INSTRUMENTATION;
-      const auto my_pid = getpid(); // do something useful
+      const unsigned my_pid = getpid(); // do something useful
       CALLGRIND_DUMP_STATS_AT("callgrind-wrapper-token");
       CALLGRIND_STOP_INSTRUMENTATION;
 
