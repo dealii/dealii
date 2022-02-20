@@ -315,6 +315,15 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
 
       #
+      # If the variable ${category_test_RUNARGS_PREFIX) is nonempty prepend
+      # it to the command line of the test:
+      #
+      if(NOT "${${_category}_${_test_name}_RUNARGS_PREFIX}" STREQUAL "")
+        SET(_run_args
+          ${${_category}_${_test_name}_RUNARGS_PREFIX} "${_run_args}")
+      ENDIF()
+
+      #
       # Override target and run command for parameter file variants:
       #
       IF("${_source_file}" MATCHES "(prm|json)$")
