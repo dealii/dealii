@@ -209,6 +209,14 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   ENDIF()
 
   #
+  # Determine whether the .exclusive. keyword is present:
+  #
+  SET(_exclusive FALSE)
+  IF(_file MATCHES "\\.exclusive\\.")
+    SET(_exclusive TRUE)
+  ENDIF()
+
+  #
   # Determine for which build types a test should be defined.
   #
   # Every deal.II build type (given by the list DEAL_II_BUILD_TYPES) that
@@ -495,9 +503,14 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         TIMEOUT ${TEST_TIME_LIMIT}
         )
 
-      IF(NOT ENABLE_PERFORMANCE_TESTS)
+      IF(_exclusive)
+        #
+        # Ensure that the test is not executed concurrently with any other
+        # tests.
+        #
+        SET_TESTS_PROPERTIES(${_test_full} PROPERTIES RUN_SERIAL TRUE)
 
-      IF(NOT ENABLE_PERFORMANCE_TESTS)
+      ELSEIF(NOT ENABLE_PERFORMANCE_TESTS)
         #
         # Limit concurrency of mpi tests. We can only set concurrency for
         # the entire test, which includes the compiling and linking stages
