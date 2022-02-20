@@ -34,8 +34,6 @@
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
 
-#include <deal.II/grid/grid_tools.h>
-
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_postprocessor.h>

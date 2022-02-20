@@ -34,7 +34,6 @@
 
 #include <deal.II/grid/cell_id_translator.h>
 #include <deal.II/grid/filtered_iterator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_description.h>
 
 #include <deal.II/hp/dof_handler.h>
