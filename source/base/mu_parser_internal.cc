@@ -112,6 +112,12 @@ namespace internal
     }
 
     double
+    mu_erf(double value)
+    {
+      return std::erf(value);
+    }
+
+    double
     mu_erfc(double value)
     {
       return std::erfc(value);
@@ -186,6 +192,7 @@ namespace internal
       "floor",
       "sec",
       "pow",
+      "erf",
       "erfc",
       "rand",
       "rand_seed"};
