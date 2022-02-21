@@ -209,6 +209,14 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   ENDIF()
 
   #
+  # Determine whether the .exclusive. keyword is present:
+  #
+  SET(_exclusive FALSE)
+  IF(_file MATCHES "\\.exclusive\\.")
+    SET(_exclusive TRUE)
+  ENDIF()
+
+  #
   # Determine for which build types a test should be defined.
   #
   # Every deal.II build type (given by the list DEAL_II_BUILD_TYPES) that
@@ -495,16 +503,40 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         TIMEOUT ${TEST_TIME_LIMIT}
         )
 
-      #
-      # Limit concurrency of mpi tests. We can only set concurrency
-      # for the entire test, which includes the compiling and linking
-      # stages that are purely sequential. There is no good way to model
-      # this without unnecessarily restricting concurrency. Consequently,
-      # we just choose to model an "average" concurrency as one half of
-      # the number of MPI jobs.
-      #
-      IF(_n_cpu GREATER 2)
-        MATH(EXPR _slots "${_n_cpu} / 2")
+      IF(_exclusive)
+        #
+        # Ensure that the test is not executed concurrently with any other
+        # tests.
+        #
+        SET_TESTS_PROPERTIES(${_test_full} PROPERTIES RUN_SERIAL TRUE)
+
+      ELSEIF(NOT ENABLE_PERFORMANCE_TESTS)
+        #
+        # Limit concurrency of mpi tests. We can only set concurrency for
+        # the entire test, which includes the compiling and linking stages
+        # that are purely sequential. There is no good way to model this
+        # without unnecessarily restricting concurrency. Consequently, we
+        # just choose to model an "average" concurrency as one half of the
+        # number of MPI jobs.
+        #
+        IF(_n_cpu GREATER 2)
+          MATH(EXPR _slots "${_n_cpu} / 2")
+          SET_TESTS_PROPERTIES(${_test_full} PROPERTIES PROCESSORS ${_slots})
+        ENDIF()
+
+      ELSE()
+        #
+        # In case ENABLE_PERFORMANCE_TESTS is set we limit the concurrency
+        # of performance tests to the number of specified mpi ranks times
+        # the number of specified threads.
+        #
+        SET(_slots 1)
+        IF(_n_cpu GREATER 0)
+          MATH(EXPR _slots "${_slots} * ${_n_cpu}")
+        ENDIF()
+        IF(_n_threads GREATER 0)
+          MATH(EXPR _slots "${_slots} * ${_n_threads}")
+        ENDIF()
         SET_TESTS_PROPERTIES(${_test_full} PROPERTIES PROCESSORS ${_slots})
       ENDIF()
 
