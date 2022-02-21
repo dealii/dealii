@@ -22,6 +22,8 @@
 
 #include <deal.II/grid/grid_generator.h>
 
+#include <deal.II/lac/la_vector.h>
+
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
