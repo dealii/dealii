@@ -1417,7 +1417,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::dof_index(
   return dealii::internal::DoFAccessorImplementation::Implementation::
     get_dof_index(*this->dof_handler,
                   this->level(),
-                  this->present_index,
+                  this->index(),
                   fe_index,
                   i,
                   std::integral_constant<int, structdim>());
@@ -1430,8 +1430,10 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::mg_dof_index(
   const int          level,
   const unsigned int i) const
 {
-  return this->dof_handler->template get_dof_index<structdim>(
-    level, this->present_index, 0, i);
+  return this->dof_handler->template get_dof_index<structdim>(level,
+                                                              this->index(),
+                                                              0,
+                                                              i);
 }
 
 
@@ -1452,7 +1454,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_dof_index(
   dealii::internal::DoFAccessorImplementation::Implementation::set_dof_index(
     *this->dof_handler,
     this->level(),
-    this->present_index,
+    this->index(),
     fe_index,
     i,
     std::integral_constant<int, structdim>(),
@@ -1470,7 +1472,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::n_active_fe_indices()
   return dealii::internal::DoFAccessorImplementation::Implementation::
     n_active_fe_indices(*this->dof_handler,
                         this->level(),
-                        this->present_index,
+                        this->index(),
                         std::integral_constant<int, structdim>());
 }
 
@@ -1485,7 +1487,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::nth_active_fe_index(
   return dealii::internal::DoFAccessorImplementation::Implementation::
     nth_active_fe_index(*this->dof_handler,
                         this->level(),
-                        this->present_index,
+                        this->index(),
                         n,
                         std::integral_constant<int, structdim>());
 }
@@ -1514,7 +1516,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::fe_index_is_active(
   return dealii::internal::DoFAccessorImplementation::Implementation::
     fe_index_is_active(*this->dof_handler,
                        this->level(),
-                       this->present_index,
+                       this->index(),
                        fe_index,
                        std::integral_constant<int, structdim>());
 }
@@ -1621,7 +1623,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_index(
   const types::global_dof_index index) const
 {
   this->dof_handler->template set_dof_index<structdim>(
-    level, this->present_index, 0, i, index);
+    level, this->index(), 0, i, index);
 }
 
 
@@ -2580,12 +2582,9 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
   const auto dofs_per_cell = this->get_fe().n_dofs_per_cell();
   if (dofs_per_cell > 0)
     {
-      const types::global_dof_index *cache =
-        dealii::internal::DoFAccessorImplementation::Implementation::
-          get_cache_ptr(this->dof_handler,
-                        this->present_level,
-                        this->present_index,
-                        dofs_per_cell);
+      const types::global_dof_index *cache = dealii::internal::
+        DoFAccessorImplementation::Implementation::get_cache_ptr(
+          this->dof_handler, this->present_level, this->index(), dofs_per_cell);
       for (unsigned int i = 0; i < dofs_per_cell; ++i, ++cache)
         dof_indices[i] = *cache;
     }
@@ -2671,7 +2670,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
     dealii::internal::DoFAccessorImplementation::Implementation::get_cache_ptr(
       this->dof_handler,
       this->present_level,
-      this->present_index,
+      this->index(),
       this->get_fe().n_dofs_per_cell());
   dealii::internal::DoFAccessorImplementation::Implementation::
     extract_subvector_to(values,
@@ -2706,7 +2705,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
     dealii::internal::DoFAccessorImplementation::Implementation::get_cache_ptr(
       this->dof_handler,
       this->present_level,
-      this->present_index,
+      this->index(),
       this->get_fe().n_dofs_per_cell());
 
   constraints.get_dof_values(values,
@@ -2740,7 +2739,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::set_dof_values(
     dealii::internal::DoFAccessorImplementation::Implementation::get_cache_ptr(
       this->dof_handler,
       this->present_level,
-      this->present_index,
+      this->index(),
       this->get_fe().n_dofs_per_cell());
 
   for (unsigned int i = 0; i < this->get_fe().n_dofs_per_cell(); ++i, ++cache)
@@ -2967,7 +2966,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
   const types::global_dof_index *dofs =
     dealii::internal::DoFAccessorImplementation::Implementation::get_cache_ptr(
-      this->dof_handler, this->level(), this->present_index, n_dofs);
+      this->dof_handler, this->level(), this->index(), n_dofs);
 
   // distribute cell vector
   global_destination.add(n_dofs, dofs, local_source_begin);
@@ -2999,7 +2998,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
   const types::global_dof_index *dofs =
     dealii::internal::DoFAccessorImplementation::Implementation::get_cache_ptr(
-      this->dof_handler, this->level(), this->present_index, n_dofs);
+      this->dof_handler, this->level(), this->index(), n_dofs);
 
   // distribute cell vector
   constraints.distribute_local_to_global(local_source_begin,
@@ -3034,7 +3033,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
   const types::global_dof_index *dofs =
     dealii::internal::DoFAccessorImplementation::Implementation::get_cache_ptr(
-      this->dof_handler, this->level(), this->present_index, n_dofs);
+      this->dof_handler, this->level(), this->index(), n_dofs);
 
   // distribute cell matrix
   for (unsigned int i = 0; i < n_dofs; ++i)
@@ -3072,7 +3071,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
   const unsigned int             n_dofs = this->get_fe().n_dofs_per_cell();
   const types::global_dof_index *dofs =
     dealii::internal::DoFAccessorImplementation::Implementation::get_cache_ptr(
-      this->dof_handler, this->level(), this->present_index, n_dofs);
+      this->dof_handler, this->level(), this->index(), n_dofs);
 
   // distribute cell matrices
   for (unsigned int i = 0; i < n_dofs; ++i)
