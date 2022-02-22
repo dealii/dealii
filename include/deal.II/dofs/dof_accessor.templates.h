@@ -198,6 +198,51 @@ namespace internal
   namespace DoFAccessorImplementation
   {
     /**
+     * Convert an FE index that might contain the right value but also
+     * invalid_fe_index to a right value if needed/possible.
+     */
+    template <int structdim, int dim, int spacedim, bool level_dof_access>
+    unsigned int
+    get_fe_index_or_default(
+      const DoFAccessor<structdim, dim, spacedim, level_dof_access> &cell,
+      const unsigned int                                             fe_index)
+    {
+      if (cell.get_dof_handler().has_hp_capabilities() == false)
+        {
+          // No hp enabled, and the argument is at its default value -> we
+          // can translate to the default active fe index
+          Assert(
+            (fe_index == DoFHandler<dim, spacedim>::invalid_fe_index) ||
+              (fe_index == DoFHandler<dim, spacedim>::default_fe_index),
+            ExcMessage(
+              "It is not possible to specify a FE index if no hp support is used!"));
+
+          return DoFHandler<dim, spacedim>::default_fe_index;
+        }
+      else
+        {
+          // Otherwise: If anything other than the default is provided by
+          // the caller, then we should take just that. As an exception, if
+          // we are on a cell (rather than a face/edge/vertex), then we know
+          // that there is only one active fe index on this cell and we can
+          // use that:
+          if ((dim == structdim) &&
+              (fe_index == DoFHandler<dim, spacedim>::invalid_fe_index))
+            {
+              AssertDimension(cell.n_active_fe_indices(), 1);
+
+              return cell.nth_active_fe_index(0);
+            }
+
+          Assert((fe_index != DoFHandler<dim, spacedim>::invalid_fe_index),
+                 ExcMessage(
+                   "You need to specify a FE index if hp support is used!"));
+
+          return fe_index;
+        }
+    }
+
+    /**
      * A class like the one with same name in tria.cc. See there for more
      * information.
      */
@@ -884,11 +929,9 @@ namespace internal
           }
         else
           {
-            const unsigned int fe_index =
-              (accessor.get_dof_handler().hp_capability_enabled == false &&
-               fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-                DoFHandler<dim, spacedim>::default_fe_index :
-                fe_index_;
+            const auto fe_index =
+              internal::DoFAccessorImplementation::get_fe_index_or_default(
+                accessor, fe_index_);
 
             unsigned int index = 0;
 
@@ -1054,11 +1097,9 @@ namespace internal
           const unsigned int  fe_index_,
           const DoFProcessor &dof_processor) const
         {
-          const unsigned int fe_index =
-            (accessor.get_dof_handler().hp_capability_enabled == false &&
-             fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-              DoFHandler<dim, spacedim>::default_fe_index :
-              fe_index_;
+          const auto fe_index =
+            internal::DoFAccessorImplementation::get_fe_index_or_default(
+              accessor, fe_index_);
 
           process_object(
             accessor.get_dof_handler(),
@@ -1092,11 +1133,9 @@ namespace internal
           const unsigned int  fe_index_,
           const DoFProcessor &dof_processor) const
         {
-          const unsigned int fe_index =
-            (accessor.get_dof_handler().hp_capability_enabled == false &&
-             fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-              DoFHandler<dim, spacedim>::default_fe_index :
-              fe_index_;
+          const auto fe_index =
+            internal::DoFAccessorImplementation::get_fe_index_or_default(
+              accessor, fe_index_);
 
           process_object(accessor.get_dof_handler(),
                          accessor.level(),
@@ -1407,11 +1446,9 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::dof_index(
   const unsigned int i,
   const unsigned int fe_index_) const
 {
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-      DoFHandler<dim, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
 
   // access the respective DoF
   return dealii::internal::DoFAccessorImplementation::Implementation::
@@ -1444,11 +1481,9 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_dof_index(
   const types::global_dof_index index,
   const unsigned int            fe_index_) const
 {
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-      DoFHandler<dim, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
 
   // access the respective DoF
   dealii::internal::DoFAccessorImplementation::Implementation::set_dof_index(
@@ -1564,11 +1599,9 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::mg_vertex_dof_index(
   const unsigned int i,
   const unsigned int fe_index_) const
 {
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-      DoFHandler<dim, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
   (void)fe_index;
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
   Assert(this->dof_handler->mg_vertex_dofs.size() > 0,
@@ -1596,11 +1629,9 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::
                           const types::global_dof_index index,
                           const unsigned int            fe_index_) const
 {
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-      DoFHandler<dim, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
   (void)fe_index;
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
   AssertIndexRange(vertex, this->n_vertices());
@@ -1648,11 +1679,9 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_indices(
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
 
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-      DoFHandler<dim, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
 
   Assert(static_cast<unsigned int>(this->level()) <
            this->dof_handler->object_dof_indices.size(),
@@ -1691,11 +1720,9 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
          ExcMessage("Multigrid DoF indices can only be accessed after "
                     "DoFHandler::distribute_mg_dofs() has been called!"));
 
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-      DoFHandler<dim, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
 
   internal::DoFAccessorImplementation::Implementation::get_mg_dof_indices(
     *this, level, dof_indices, fe_index);
@@ -1711,11 +1738,9 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
 {
   Assert(this->dof_handler != nullptr, ExcInvalidObject());
 
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
-      DoFHandler<dim, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
 
   internal::DoFAccessorImplementation::Implementation::set_mg_dof_indices(
     *this, level, dof_indices, fe_index);
@@ -1907,11 +1932,9 @@ DoFAccessor<0, 1, spacedim, level_dof_access>::get_dof_indices(
   std::vector<types::global_dof_index> &dof_indices,
   const unsigned int                    fe_index_) const
 {
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<1, spacedim>::invalid_fe_index) ?
-      DoFHandler<1, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
 
   for (unsigned int i = 0; i < dof_indices.size(); ++i)
     dof_indices[i] = dealii::internal::DoFAccessorImplementation::
@@ -1932,11 +1955,9 @@ DoFAccessor<0, 1, spacedim, level_dof_access>::get_mg_dof_indices(
   std::vector<types::global_dof_index> &dof_indices,
   const unsigned int                    fe_index_) const
 {
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<1, spacedim>::invalid_fe_index) ?
-      DoFHandler<1, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
   (void)fe_index;
   AssertDimension(fe_index, (DoFHandler<1, spacedim>::default_fe_index));
 
@@ -1955,11 +1976,9 @@ DoFAccessor<0, 1, spacedim, level_dof_access>::vertex_dof_index(
   const unsigned int i,
   const unsigned int fe_index_) const
 {
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<1, spacedim>::invalid_fe_index) ?
-      DoFHandler<1, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
 
   (void)vertex;
   AssertIndexRange(vertex, 1);
@@ -1980,11 +1999,9 @@ DoFAccessor<0, 1, spacedim, level_dof_access>::dof_index(
   const unsigned int i,
   const unsigned int fe_index_) const
 {
-  const unsigned int fe_index =
-    (this->dof_handler->hp_capability_enabled == false &&
-     fe_index_ == DoFHandler<1, spacedim>::invalid_fe_index) ?
-      DoFHandler<1, spacedim>::default_fe_index :
-      fe_index_;
+  const auto fe_index =
+    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
+                                                                 fe_index_);
 
   return dealii::internal::DoFAccessorImplementation::Implementation::
     get_dof_index(*this->dof_handler,
