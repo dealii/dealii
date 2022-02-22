@@ -487,7 +487,7 @@ namespace internal
                     if (add)
                       out[col * stride] += shape_values[col] * in[0];
                     else
-                      out[col * stride] += shape_values[col] * in[0];
+                      out[col * stride] = shape_values[col] * in[0];
                     if (max_derivative > 0)
                       out[col * stride] +=
                         shape_values[col + n_rows] * in[out_stride];
