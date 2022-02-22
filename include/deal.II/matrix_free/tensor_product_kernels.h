@@ -836,10 +836,10 @@ namespace internal
                         val0 = shape_data[col * n_columns + i];
                       res0 += val0 * x[i];
                     }
-                  if (add == false)
-                    out[stride * col] = res0;
-                  else
+                  if (add)
                     out[stride * col] += res0;
+                  else
+                    out[stride * col] = res0;
                 }
 
               if (one_line == false)
