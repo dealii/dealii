@@ -1,0 +1,6 @@
+Updated: Spurious inclusions of the header files `deal.II/grid/grid_tools.h`
+and `deal.II/grid/grid_tools_cache.h` from other headers of deal.II have been
+removed. User codes relying on this implicit inclusion will need to add the
+respective include files.
+<br>
+(Martin Kronbichler, 2022/02/22)
