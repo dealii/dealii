@@ -3953,8 +3953,6 @@ namespace parallel
             other_distributed->coarse_cell_to_p4est_tree_permutation;
           p4est_tree_to_coarse_cell_permutation =
             other_distributed->p4est_tree_to_coarse_cell_permutation;
-          this->cell_attached_data = other_distributed->cell_attached_data;
-          this->data_transfer      = other_distributed->data_transfer;
 
           // create deep copy of connectivity graph
           typename dealii::internal::p4est::types<dim>::connectivity
