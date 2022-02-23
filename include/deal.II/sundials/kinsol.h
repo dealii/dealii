@@ -685,9 +685,21 @@ namespace SUNDIALS
     AdditionalData data;
 
     /**
+     * The MPI communicator to be used by this solver, if any.
+     */
+    MPI_Comm mpi_communicator;
+
+    /**
      * KINSOL memory object.
      */
     void *kinsol_mem;
+
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+    /**
+     * A context object associated with the KINSOL solver.
+     */
+    SUNContext kinsol_ctx;
+#  endif
 
     /**
      * Memory pool of vectors.

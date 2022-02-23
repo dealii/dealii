@@ -197,21 +197,32 @@ namespace SUNDIALS
   IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm &mpi_comm)
     : data(data)
     , ida_mem(nullptr)
-    , communicator(is_serial_vector<VectorType>::value ?
-                     MPI_COMM_SELF :
-                     Utilities::MPI::duplicate_communicator(mpi_comm))
+    , mpi_communicator(is_serial_vector<VectorType>::value ?
+                         MPI_COMM_SELF :
+                         Utilities::MPI::duplicate_communicator(mpi_comm))
   {
     set_functions_to_trigger_an_assert();
   }
+
+
 
   template <typename VectorType>
   IDA<VectorType>::~IDA()
   {
     if (ida_mem)
-      IDAFree(&ida_mem);
+      {
+        IDAFree(&ida_mem);
+
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+        const int status = SUNContext_Free(&ida_ctx);
+        (void)status;
+        AssertIDA(status);
+#  endif
+      }
+
 #  ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
-      Utilities::MPI::free_communicator(communicator);
+      Utilities::MPI::free_communicator(mpi_communicator);
 #  endif
   }
 
@@ -242,8 +253,18 @@ namespace SUNDIALS
       {
         next_time += data.output_period;
 
-        auto yy = internal::make_nvector_view(solution);
-        auto yp = internal::make_nvector_view(solution_dot);
+        auto yy = internal::make_nvector_view(solution
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                              ,
+                                              ida_ctx
+#  endif
+        );
+        auto yp = internal::make_nvector_view(solution_dot
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                              ,
+                                              ida_ctx
+#  endif
+        );
 
         status = IDASolve(ida_mem, next_time, &t, yy, yp, IDA_NORMAL);
         AssertIDA(status);
@@ -274,23 +295,53 @@ namespace SUNDIALS
     bool first_step = (current_time == data.initial_time);
 
     if (ida_mem)
-      IDAFree(&ida_mem);
+      {
+        IDAFree(&ida_mem);
 
-    ida_mem = IDACreate();
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+        const int status = SUNContext_Free(&ida_ctx);
+        (void)status;
+        AssertIDA(status);
+#  endif
+      }
 
     int status;
     (void)status;
 
-    auto yy = internal::make_nvector_view(solution);
-    auto yp = internal::make_nvector_view(solution_dot);
+
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+    ida_mem = IDACreate();
+#  else
+    status = SUNContext_Create(&mpi_communicator, &ida_ctx);
+    AssertIDA(status);
+
+    ida_mem            = IDACreate(ida_ctx);
+#  endif
+
+    auto yy = internal::make_nvector_view(solution
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                          ,
+                                          ida_ctx
+#  endif
+    );
+    auto yp = internal::make_nvector_view(solution_dot
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                          ,
+                                          ida_ctx
+#  endif
+    );
 
     status =
       IDAInit(ida_mem, residual_callback<VectorType>, current_time, yy, yp);
     AssertIDA(status);
     if (get_local_tolerances)
       {
-        const auto abs_tols =
-          internal::make_nvector_view(get_local_tolerances());
+        const auto abs_tols = internal::make_nvector_view(get_local_tolerances()
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                            ,
+                                                          ida_ctx
+#  endif
+        );
         status = IDASVtolerances(ida_mem, data.relative_tolerance, abs_tols);
         AssertIDA(status);
       }
@@ -319,8 +370,13 @@ namespace SUNDIALS
           diff_comp_vector[*i] = 1.0;
         diff_comp_vector.compress(VectorOperation::insert);
 
-        const auto diff_id = internal::make_nvector_view(diff_comp_vector);
-        status             = IDASetId(ida_mem, diff_id);
+        const auto diff_id = internal::make_nvector_view(diff_comp_vector
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                         ,
+                                                         ida_ctx
+#  endif
+        );
+        status = IDASetId(ida_mem, diff_id);
         AssertIDA(status);
       }
 
@@ -352,7 +408,12 @@ namespace SUNDIALS
     // called do not actually receive the IDAMEM object, just the LS
     // object, so we have to store a pointer to the current
     // object in the LS object
-    LS          = SUNLinSolNewEmpty();
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+    LS = SUNLinSolNewEmpty();
+#    else
+    LS = SUNLinSolNewEmpty(ida_ctx);
+#    endif
+
     LS->content = this;
 
     LS->ops->gettype = [](SUNLinearSolver /*ignored*/) -> SUNLinearSolver_Type {
@@ -398,7 +459,11 @@ namespace SUNDIALS
     // if we don't set it, it won't call the functions that set up
     // the matrix object (i.e., the argument to the 'IDASetJacFn'
     // function below).
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     J          = SUNMatNewEmpty();
+#    else
+    J  = SUNMatNewEmpty(ida_ctx);
+#    endif
     J->content = this;
 
     J->ops->getid = [](SUNMatrix /*ignored*/) -> SUNMatrix_ID {

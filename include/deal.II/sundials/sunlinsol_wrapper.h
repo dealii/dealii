@@ -156,7 +156,7 @@ namespace SUNDIALS
 
   namespace internal
   {
-    /*!
+    /**
      * Attach wrapper functions to SUNDIALS' linear solver interface. We pretend
      * that the user-supplied linear solver is matrix-free, even though it can
      * be matrix-based. This way SUNDIALS does not need to understand our matrix
@@ -166,7 +166,12 @@ namespace SUNDIALS
     class LinearSolverWrapper
     {
     public:
-      explicit LinearSolverWrapper(LinearSolveFunction<VectorType> lsolve);
+      explicit LinearSolverWrapper(LinearSolveFunction<VectorType> lsolve
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                   ,
+                                   SUNContext &linsol_ctx
+#    endif
+      );
 
       ~LinearSolverWrapper();
 
