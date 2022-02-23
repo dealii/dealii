@@ -680,7 +680,7 @@ public:
    * of an inlined function; the compiler may therefore produce more efficient
    * code and you may use this value to declare other data types.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Publish the rank of this tensor to the outside world.

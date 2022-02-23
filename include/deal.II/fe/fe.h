@@ -656,7 +656,7 @@ public:
   /**
    * The dimension of the image space, corresponding to Triangulation.
    */
-  static const unsigned int space_dimension = spacedim;
+  static constexpr unsigned int space_dimension = spacedim;
 
   /**
    * A base class for internal data that derived finite element classes may

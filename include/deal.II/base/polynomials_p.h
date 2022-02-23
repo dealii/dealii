@@ -51,7 +51,7 @@ public:
    * Access to the dimension of this object, for checking and automatic
    * setting of dimension in other classes.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Constructor. Creates all basis functions of $P_p$. @arg p: the degree of

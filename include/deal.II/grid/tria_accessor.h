@@ -306,14 +306,14 @@ public:
    * For example, if this accessor represents a quad that is part of a two-
    * dimensional surface in four-dimensional space, then this value is four.
    */
-  static const unsigned int space_dimension = spacedim;
+  static constexpr unsigned int space_dimension = spacedim;
 
   /**
    * Dimensionality of the object that the thing represented by this accessor
    * is part of. For example, if this accessor represents a line that is part
    * of a hexahedron, then this value will be three.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Dimensionality of the current object represented by this accessor. For
@@ -1881,14 +1881,14 @@ public:
    * For example, if this accessor represents a quad that is part of a two-
    * dimensional surface in four-dimensional space, then this value is four.
    */
-  static const unsigned int space_dimension = spacedim;
+  static constexpr unsigned int space_dimension = spacedim;
 
   /**
    * Dimensionality of the object that the thing represented by this accessor
    * is part of. For example, if this accessor represents a line that is part
    * of a hexahedron, then this value will be three.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Dimensionality of the current object represented by this accessor. For
@@ -2299,14 +2299,14 @@ public:
    * For example, if this accessor represents a quad that is part of a two-
    * dimensional surface in four-dimensional space, then this value is four.
    */
-  static const unsigned int space_dimension = spacedim;
+  static constexpr unsigned int space_dimension = spacedim;
 
   /**
    * Dimensionality of the object that the thing represented by this accessor
    * is part of. For example, if this accessor represents a line that is part
    * of a hexahedron, then this value will be three.
    */
-  static const unsigned int dimension = 1;
+  static constexpr unsigned int dimension = 1;
 
   /**
    * Dimensionality of the current object represented by this accessor. For

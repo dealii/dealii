@@ -111,8 +111,8 @@ public:
   /**
    * Make the dimension available in function templates.
    */
-  static const unsigned int dimension      = dim;
-  static const unsigned int spacedimension = spacedim;
+  static constexpr unsigned int dimension      = dim;
+  static const unsigned int     spacedimension = spacedim;
 
   /**
    * Build up the triangulation from the coarse grid in future. Copy smoothing

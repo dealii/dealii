@@ -42,7 +42,7 @@ DEAL_II_NAMESPACE_OPEN
  * functions can be used as template parameter @p PolynomialType.
  *
  * @code
- *  static const unsigned int dimension;
+ *  static constexpr unsigned int dimension;
  *
  *  void evaluate (const Point<dim>            &unit_point,
  *                 std::vector<double>         &values,

@@ -128,7 +128,7 @@ public:
   /**
    * The dimension set by the template argument `dim`.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Collects the options for initialization of the MatrixFree class. The
