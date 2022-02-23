@@ -427,6 +427,7 @@ namespace Step75
   void LaplaceOperator<dim, number>::compute_inverse_diagonal(
     VectorType &diagonal) const
   {
+    this->matrix_free.initialize_dof_vector(diagonal);
     MatrixFreeTools::compute_diagonal(matrix_free,
                                       diagonal,
                                       &LaplaceOperator::do_cell_integral_local,
