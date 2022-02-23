@@ -81,8 +81,8 @@ namespace MeshWorker
     std::vector<std::shared_ptr<FEValuesBase<dim, spacedim>>> fevalv;
 
   public:
-    static const unsigned int dimension       = dim;
-    static const unsigned int space_dimension = spacedim;
+    static constexpr unsigned int dimension       = dim;
+    static constexpr unsigned int space_dimension = spacedim;
 
     /**
      * Constructor.

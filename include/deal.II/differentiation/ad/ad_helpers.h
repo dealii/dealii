@@ -2646,7 +2646,7 @@ namespace Differentiation
        * Type definition for the dimension of the associated input and output
        * tensor types.
        */
-      static const unsigned int dimension = dim;
+      static constexpr unsigned int dimension = dim;
 
       /**
        * Type definition for the floating point number type that is used in,

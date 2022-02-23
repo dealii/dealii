@@ -243,7 +243,7 @@ public:
   /**
    * Make the dimension available to the outside.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Get the standard Lagrange basis for a specified degree.
