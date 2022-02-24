@@ -448,6 +448,8 @@ namespace SUNDIALS
     while (!time.is_at_end())
       {
         time.set_desired_next_step_size(data.output_period);
+
+        // Let ARKode advance time by one period:
         double actual_next_time;
 #  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
         const auto status = SundialsARKode(arkode_mem,
@@ -465,9 +467,12 @@ namespace SUNDIALS
         (void)status;
         AssertARKode(status);
 
+        // Then reflect this time advancement in our own DiscreteTime object:
         time.set_next_step_size(actual_next_time - time.get_current_time());
         time.advance_time();
 
+        // Finally check whether resets or output calls are desired at this
+        // time:
         while (solver_should_restart(time.get_current_time(), solution))
           reset(time.get_current_time(),
                 time.get_previous_step_size(),
