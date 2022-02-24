@@ -751,13 +751,12 @@ namespace MatrixFreeTools
 
       template <typename VectorType>
       inline void
-      distribute_local_to_global(VectorType &diagonal_global)
+      distribute_local_to_global(
+        std::array<VectorType *, n_components> &diagonal_global)
       {
         // STEP 4: assembly results: add into global vector
         const unsigned int n_fe_components =
           phi.get_dof_info().start_components.back();
-        const unsigned int first_selected_component =
-          phi.get_first_selected_component();
 
         for (unsigned int v = 0;
              v < phi.get_matrix_free().n_active_entries_per_cell_batch(
@@ -773,13 +772,7 @@ namespace MatrixFreeTools
                            1);
                  ++comp)
               ::dealii::internal::vector_access_add(
-                *::dealii::internal::BlockVectorSelector<
-                  VectorType,
-                  IsBlockVector<VectorType>::value>::
-                  get_vector_component(diagonal_global,
-                                       n_fe_components == 1 ?
-                                         comp + first_selected_component :
-                                         0),
+                *diagonal_global[n_fe_components == 1 ? comp : 0],
                 c_pools[v].row_lid_to_gid[j],
                 diagonals_local_constrained
                   [v][j + comp * c_pools[v].row_lid_to_gid.size()]);
@@ -832,9 +825,42 @@ namespace MatrixFreeTools
   {
     int dummy = 0;
 
+    std::array<typename dealii::internal::BlockVectorSelector<
+                 VectorType,
+                 IsBlockVector<VectorType>::value>::BaseVectorType *,
+               n_components>
+      diagonal_global_components;
+
+    for (unsigned int d = 0; d < n_components; ++d)
+      diagonal_global_components[d] = dealii::internal::
+        BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::
+          get_vector_component(diagonal_global, d + first_selected_component);
+
+    const auto &dof_info = matrix_free.get_dof_info(dof_no);
+
+    if (dof_info.start_components.back() == 1)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
+        {
+          Assert(diagonal_global_components[comp] != nullptr,
+                 ExcMessage("The finite element underlying this FEEvaluation "
+                            "object is scalar, but you requested " +
+                            std::to_string(n_components) +
+                            " components via the template argument in "
+                            "FEEvaluation. In that case, you must pass an "
+                            "std::vector<VectorType> or a BlockVector to " +
+                            "read_dof_values and distribute_local_to_global."));
+          dealii::internal::check_vector_compatibility(
+            *diagonal_global_components[comp], matrix_free, dof_info);
+        }
+    else
+      {
+        dealii::internal::check_vector_compatibility(
+          *diagonal_global_components[0], matrix_free, dof_info);
+      }
+
     matrix_free.template cell_loop<VectorType, int>(
       [&](const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-          VectorType &                                        diagonal_global,
+          VectorType &,
           const int &,
           const std::pair<unsigned int, unsigned int> &range) mutable {
         FEEvaluation<dim,
@@ -864,7 +890,7 @@ namespace MatrixFreeTools
                 helper.submit();
               }
 
-            helper.distribute_local_to_global(diagonal_global);
+            helper.distribute_local_to_global(diagonal_global_components);
           }
       },
       diagonal_global,
