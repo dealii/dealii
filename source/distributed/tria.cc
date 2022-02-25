@@ -1508,8 +1508,17 @@ namespace
     Assert(this_object->current_pointer < this_object->cell_weights_list.end(),
            ExcInternalError());
 
-    // get the weight, increment the pointer, and return the weight
-    return *this_object->current_pointer++;
+    // Get the weight, increment the pointer, and return the weight. Also
+    // make sure that we don't exceed the 'int' data type that p4est uses
+    // to represent weights
+    const unsigned int weight = *this_object->current_pointer;
+    ++this_object->current_pointer;
+
+    Assert(weight < std::numeric_limits<int>::max(),
+           ExcMessage("p4est uses 'signed int' to represent the partition "
+                      "weights for cells. The weight provided here exceeds "
+                      "the maximum value represented as a 'signed int'."));
+    return weight;
   }
 
   template <int dim, int spacedim>
