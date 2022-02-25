@@ -88,7 +88,6 @@ main()
   // get the interpolated solution
   // back
   Vector<double> tmp(dh.n_dofs());
-  tmp = 2;
   soltrans.interpolate(solution, tmp);
 
   deallog << "New values:" << std::endl;

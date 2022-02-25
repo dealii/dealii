@@ -424,7 +424,8 @@ namespace parallel
       for (; it_input != dof_values.cend(); ++it_input, ++it_output)
         cell->set_dof_values_by_interpolation(*it_input,
                                               *(*it_output),
-                                              fe_index);
+                                              fe_index,
+                                              true);
     }
   } // namespace distributed
 } // namespace parallel
