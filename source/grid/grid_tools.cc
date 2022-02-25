@@ -4028,6 +4028,7 @@ namespace GridTools
                       "are already partitioned implicitly and can not be "
                       "partitioned again explicitly."));
     Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+    Assert(triangulation.signals.cell_weight.empty(), ExcNotImplemented());
 
     // signal that partitioning is going to happen
     triangulation.signals.pre_partition();
@@ -4128,10 +4129,7 @@ namespace GridTools
     unsigned int n_levels = triangulation.n_levels();
     for (int lvl = n_levels - 1; lvl >= 0; --lvl)
       {
-        typename Triangulation<dim, spacedim>::cell_iterator
-          cell = triangulation.begin(lvl),
-          endc = triangulation.end(lvl);
-        for (; cell != endc; ++cell)
+        for (const auto &cell : triangulation.cell_iterators_on_level(lvl))
           {
             if (cell->is_active())
               cell->set_level_subdomain_id(cell->subdomain_id());
