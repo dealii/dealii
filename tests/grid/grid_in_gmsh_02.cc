@@ -28,6 +28,8 @@
 #include <iostream>
 #include <map>
 
+#include "../tests.h"
+
 using namespace dealii;
 
 
