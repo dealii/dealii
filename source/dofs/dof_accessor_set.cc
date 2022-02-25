@@ -287,6 +287,33 @@ DoFCellAccessor<dim, spacedim, lda>::set_dof_values_by_interpolation(
 }
 
 
+template <int dim, int spacedim, bool lda>
+template <class OutputVector, typename number>
+void
+DoFCellAccessor<dim, spacedim, lda>::
+  distribute_local_to_global_by_interpolation(
+    const Vector<number> &local_values,
+    OutputVector &        values,
+    const unsigned int    fe_index_) const
+{
+  internal::process_by_interpolation<dim, spacedim, lda, OutputVector, number>(
+    *this,
+    local_values,
+    values,
+    fe_index_,
+    [](const DoFCellAccessor<dim, spacedim, lda> &cell,
+       const Vector<number> &                     local_values,
+       OutputVector &                             values) {
+      std::vector<types::global_dof_index> dof_indices(
+        cell.get_fe().n_dofs_per_cell());
+      cell.get_dof_indices(dof_indices);
+      AffineConstraints<number>().distribute_local_to_global(local_values,
+                                                             dof_indices,
+                                                             values);
+    });
+}
+
+
 // --------------------------------------------------------------------------
 // explicit instantiations
 #include "dof_accessor_set.inst"
