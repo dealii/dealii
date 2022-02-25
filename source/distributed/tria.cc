@@ -1518,7 +1518,7 @@ namespace
            ExcMessage("p4est uses 'signed int' to represent the partition "
                       "weights for cells. The weight provided here exceeds "
                       "the maximum value represented as a 'signed int'."));
-    return weight;
+    return static_cast<int>(weight);
   }
 
   template <int dim, int spacedim>
