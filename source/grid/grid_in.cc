@@ -2688,7 +2688,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
       // ... and cells
       if (dim == spacedim)
-        GridTools::invert_all_negative_measure_cells(vertices, cells);
+        GridTools::invert_cells_with_negative_measure(vertices, cells);
       GridTools::consistently_order_cells(cells);
     }
   tria->create_triangulation(vertices, cells, subcelldata);

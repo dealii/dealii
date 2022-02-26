@@ -859,13 +859,13 @@ namespace GridTools
 
 
   template <int dim, int spacedim>
-  void
-  invert_all_negative_measure_cells(
+  std::size_t
+  invert_cells_with_negative_measure(
     const std::vector<Point<spacedim>> &all_vertices,
     std::vector<CellData<dim>> &        cells)
   {
     if (dim == 1)
-      return;
+      return 0;
     if (dim == 2 && spacedim == 3)
       Assert(false, ExcNotImplemented());
 
@@ -902,6 +902,18 @@ namespace GridTools
                         ExcInternalError());
           }
       }
+    return n_negative_cells;
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  invert_all_negative_measure_cells(
+    const std::vector<Point<spacedim>> &all_vertices,
+    std::vector<CellData<dim>> &        cells)
+  {
+    const std::size_t n_negative_cells =
+      invert_cells_with_negative_measure(all_vertices, cells);
 
     // We assume that all cells of a grid have
     // either positive or negative volumes but

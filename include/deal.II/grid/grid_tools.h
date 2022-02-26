@@ -455,6 +455,21 @@ namespace GridTools
     std::vector<CellData<dim>> &        cells);
 
   /**
+   * Check the given cells and inverts any cell that is considered to have
+   * negative measure/volume in the orientation required by deal.II.
+   *
+   * This function is identical to invert_all_negative_measure_cells() except it
+   * does not throw an error if only some of the cells are inverted.  Instead,
+   * this function returns how many cells were inverted.  Additionally, it will
+   * always throw an exception outside of codimension 0.
+   */
+  template <int dim, int spacedim>
+  std::size_t
+  invert_cells_with_negative_measure(
+    const std::vector<Point<spacedim>> &all_vertices,
+    std::vector<CellData<dim>> &        cells);
+
+  /**
    * Given a vector of CellData objects describing a mesh, reorder their
    * vertices so that all lines are consistently oriented.
    *
