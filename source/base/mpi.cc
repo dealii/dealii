@@ -89,21 +89,21 @@ namespace Utilities
   {
 #ifdef DEAL_II_WITH_MPI
     // Provide definitions of template variables for all valid instantiations.
-    template const MPI_Datatype mpi_type_id<bool>;
-    template const MPI_Datatype mpi_type_id<char>;
-    template const MPI_Datatype mpi_type_id<signed char>;
-    template const MPI_Datatype mpi_type_id<short>;
-    template const MPI_Datatype mpi_type_id<int>;
-    template const MPI_Datatype mpi_type_id<long int>;
-    template const MPI_Datatype mpi_type_id<unsigned char>;
-    template const MPI_Datatype mpi_type_id<unsigned short>;
-    template const MPI_Datatype mpi_type_id<unsigned long int>;
-    template const MPI_Datatype mpi_type_id<unsigned long long int>;
-    template const MPI_Datatype mpi_type_id<float>;
-    template const MPI_Datatype mpi_type_id<double>;
-    template const MPI_Datatype mpi_type_id<long double>;
-    template const MPI_Datatype mpi_type_id<std::complex<float>>;
-    template const MPI_Datatype mpi_type_id<std::complex<double>>;
+    template const MPI_Datatype mpi_type_id_for_type<bool>;
+    template const MPI_Datatype mpi_type_id_for_type<char>;
+    template const MPI_Datatype mpi_type_id_for_type<signed char>;
+    template const MPI_Datatype mpi_type_id_for_type<short>;
+    template const MPI_Datatype mpi_type_id_for_type<int>;
+    template const MPI_Datatype mpi_type_id_for_type<long int>;
+    template const MPI_Datatype mpi_type_id_for_type<unsigned char>;
+    template const MPI_Datatype mpi_type_id_for_type<unsigned short>;
+    template const MPI_Datatype mpi_type_id_for_type<unsigned long int>;
+    template const MPI_Datatype mpi_type_id_for_type<unsigned long long int>;
+    template const MPI_Datatype mpi_type_id_for_type<float>;
+    template const MPI_Datatype mpi_type_id_for_type<double>;
+    template const MPI_Datatype mpi_type_id_for_type<long double>;
+    template const MPI_Datatype mpi_type_id_for_type<std::complex<float>>;
+    template const MPI_Datatype mpi_type_id_for_type<std::complex<double>>;
 #endif
 
 

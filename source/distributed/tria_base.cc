@@ -423,13 +423,13 @@ namespace parallel
     // 2) determine the offset of each process
     types::global_cell_index cell_index = 0;
 
-    const int ierr =
-      MPI_Exscan(&n_locally_owned_cells,
-                 &cell_index,
-                 1,
-                 Utilities::MPI::mpi_type_id<decltype(n_locally_owned_cells)>,
-                 MPI_SUM,
-                 this->mpi_communicator);
+    const int ierr = MPI_Exscan(
+      &n_locally_owned_cells,
+      &cell_index,
+      1,
+      Utilities::MPI::mpi_type_id_for_type<decltype(n_locally_owned_cells)>,
+      MPI_SUM,
+      this->mpi_communicator);
     AssertThrowMPI(ierr);
 
     // 3) give global indices to locally-owned cells and mark all other cells as
@@ -493,13 +493,13 @@ namespace parallel
         std::vector<types::global_cell_index> cell_index(
           this->n_global_levels(), 0);
 
-        int ierr = MPI_Exscan(
-          n_locally_owned_cells.data(),
-          cell_index.data(),
-          this->n_global_levels(),
-          Utilities::MPI::mpi_type_id<decltype(*n_locally_owned_cells.data())>,
-          MPI_SUM,
-          this->mpi_communicator);
+        int ierr = MPI_Exscan(n_locally_owned_cells.data(),
+                              cell_index.data(),
+                              this->n_global_levels(),
+                              Utilities::MPI::mpi_type_id_for_type<decltype(
+                                *n_locally_owned_cells.data())>,
+                              MPI_SUM,
+                              this->mpi_communicator);
         AssertThrowMPI(ierr);
 
         // 3) determine global number of "active" cells on each level
@@ -512,7 +512,7 @@ namespace parallel
         ierr = MPI_Bcast(
           n_cells_level.data(),
           this->n_global_levels(),
-          Utilities::MPI::mpi_type_id<decltype(*n_cells_level.data())>,
+          Utilities::MPI::mpi_type_id_for_type<decltype(*n_cells_level.data())>,
           this->n_subdomains - 1,
           this->mpi_communicator);
         AssertThrowMPI(ierr);

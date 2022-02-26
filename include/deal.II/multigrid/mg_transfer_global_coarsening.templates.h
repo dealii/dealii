@@ -571,7 +571,7 @@ namespace internal
             const auto ierr_1 = MPI_Isend(
               buffer.data(),
               buffer.size(),
-              Utilities::MPI::mpi_type_id<decltype(*buffer.data())>,
+              Utilities::MPI::mpi_type_id_for_type<decltype(*buffer.data())>,
               i.first,
               Utilities::MPI::internal::Tags::fine_dof_handler_view_reinit,
               communicator,
@@ -640,7 +640,7 @@ namespace internal
             int       message_length;
             const int ierr_2 = MPI_Get_count(
               &status,
-              Utilities::MPI::mpi_type_id<decltype(*buffer.data())>,
+              Utilities::MPI::mpi_type_id_for_type<decltype(*buffer.data())>,
               &message_length);
             AssertThrowMPI(ierr_2);
 
@@ -649,7 +649,7 @@ namespace internal
             const int ierr_3 = MPI_Recv(
               buffer.data(),
               buffer.size(),
-              Utilities::MPI::mpi_type_id<decltype(*buffer.data())>,
+              Utilities::MPI::mpi_type_id_for_type<decltype(*buffer.data())>,
               status.MPI_SOURCE,
               Utilities::MPI::internal::Tags::fine_dof_handler_view_reinit,
               communicator,

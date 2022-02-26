@@ -1450,16 +1450,16 @@ namespace Utilities
      * template argument to the corresponding
      * `MPI_Datatype` to be used for MPI communication.
      *
-     * As an example, the value of `mpi_type_id<int>` is `MPI_INT`. A
+     * As an example, the value of `mpi_type_id_for_type<int>` is `MPI_INT`. A
      * common way to use this variable is when sending an object `obj`
      * via MPI functions to another process, and using
-     * `mpi_type_id<decltype(obj)>` to infer the correct MPI type to
+     * `mpi_type_id_for_type<decltype(obj)>` to infer the correct MPI type to
      * use for the communication.
      */
     template <typename T>
-    const MPI_Datatype mpi_type_id = internal::MPIDataTypes::mpi_type_id(
-      static_cast<std::remove_cv_t<
-        std::remove_reference_t<std::remove_all_extents_t<T>>> *>(nullptr));
+    const MPI_Datatype
+      mpi_type_id_for_type = internal::MPIDataTypes::mpi_type_id(
+        static_cast<std::remove_cv_t<std::remove_reference_t<T>> *>(nullptr));
 #endif
 
 #ifndef DOXYGEN
@@ -1820,7 +1820,7 @@ namespace Utilities
 
           const int ierr = MPI_Bcast(buffer + total_sent_count,
                                      current_count,
-                                     mpi_type_id<decltype(*buffer)>,
+                                     mpi_type_id_for_type<decltype(*buffer)>,
                                      root,
                                      comm);
           AssertThrowMPI(ierr);
@@ -1860,7 +1860,7 @@ namespace Utilities
       // Exchange the size of buffer
       int ierr = MPI_Bcast(&buffer_size,
                            1,
-                           mpi_type_id<decltype(buffer_size)>,
+                           mpi_type_id_for_type<decltype(buffer_size)>,
                            root_process,
                            comm);
       AssertThrowMPI(ierr);

@@ -250,7 +250,7 @@ namespace Utilities
           const int ierr =
             MPI_Bcast(value,
                       count,
-                      Utilities::MPI::mpi_type_id<decltype(*value)>,
+                      Utilities::MPI::mpi_type_id_for_type<decltype(*value)>,
                       0 /*from root*/,
                       mpi_communicator_inactive_with_root);
           AssertThrowMPI(ierr);
