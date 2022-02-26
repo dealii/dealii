@@ -1514,7 +1514,7 @@ namespace
     const unsigned int weight = *this_object->current_pointer;
     ++this_object->current_pointer;
 
-    Assert(weight < std::numeric_limits<int>::max(),
+    Assert(weight < static_cast<unsigned int>(std::numeric_limits<int>::max()),
            ExcMessage("p4est uses 'signed int' to represent the partition "
                       "weights for cells. The weight provided here exceeds "
                       "the maximum value represented as a 'signed int'."));
