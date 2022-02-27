@@ -1471,6 +1471,12 @@ namespace Utilities
      * via MPI functions to another process, and using
      * `mpi_type_id_for_type<decltype(obj)>` to infer the correct MPI type to
      * use for the communication.
+     *
+     * The type `T` given here must be one of the data types supported
+     * by MPI, such as `int` or `double`. It may not be an array of
+     * objects of such a type, or a pointer to an object of such a
+     * type. The compiler will produce an error if this requirement is
+     * not satisfied.
      */
     template <typename T>
     const MPI_Datatype
