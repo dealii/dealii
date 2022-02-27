@@ -174,7 +174,7 @@ pipeline
                   time ninja -j $NP
                   time ninja test # quicktests
                   time ninja setup_tests
-                  time ctest -R "all-headers|multigrid/transfer|matrix_free/matrix_" --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
+                  time ctest --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
               '''
             }
           }
