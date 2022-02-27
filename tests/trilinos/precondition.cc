@@ -228,7 +228,7 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("Jacobi");
-    static constexpr std::array<unsigned int, 2> lower{49, 100};
+    static constexpr std::array<unsigned int, 2> lower{{49, 100}};
     TrilinosWrappers::PreconditionJacobi         preconditioner;
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
@@ -244,7 +244,7 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("SSOR");
-    static constexpr std::array<unsigned int, 2> lower{40, 77};
+    static constexpr std::array<unsigned int, 2> lower{{40, 77}};
     TrilinosWrappers::PreconditionSSOR           preconditioner;
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
@@ -260,7 +260,7 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("SOR");
-    static constexpr std::array<unsigned int, 2> lower{31, 62};
+    static constexpr std::array<unsigned int, 2> lower{{31, 62}};
     TrilinosWrappers::PreconditionSOR            preconditioner;
     solution = 0;
     SolverControl    solver_control(1000, 1e-5);
@@ -276,7 +276,7 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("BlockJacobi");
-    static constexpr std::array<unsigned int, 2>              lower{73, 145};
+    static constexpr std::array<unsigned int, 2>              lower{{73, 145}};
     TrilinosWrappers::PreconditionBlockJacobi                 preconditioner;
     TrilinosWrappers::PreconditionBlockJacobi::AdditionalData data;
     data.block_size = 16;
@@ -294,7 +294,7 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("BlockSSOR");
-    static constexpr std::array<unsigned int, 2>            lower{30, 59};
+    static constexpr std::array<unsigned int, 2>            lower{{30, 59}};
     TrilinosWrappers::PreconditionBlockSSOR                 preconditioner;
     TrilinosWrappers::PreconditionBlockSSOR::AdditionalData data;
     data.block_size = 16;
@@ -313,7 +313,7 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("BlockSOR");
-    static constexpr std::array<unsigned int, 2>           lower{18, 37};
+    static constexpr std::array<unsigned int, 2>           lower{{18, 37}};
     TrilinosWrappers::PreconditionBlockSOR                 preconditioner;
     TrilinosWrappers::PreconditionBlockSOR::AdditionalData data;
     data.block_size = 16;
@@ -332,7 +332,7 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("IC");
-    static constexpr std::array<unsigned int, 2> lower{48, 67};
+    static constexpr std::array<unsigned int, 2> lower{{48, 67}};
     TrilinosWrappers::PreconditionIC             preconditioner;
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
@@ -347,7 +347,7 @@ Step4<dim>::solve(int cycle)
   }
 
   {
-    static constexpr std::array<unsigned int, 2> lower{30, 56};
+    static constexpr std::array<unsigned int, 2> lower{{30, 56}};
     deallog.push("ILU");
     TrilinosWrappers::PreconditionILU preconditioner;
     solution = 0;
@@ -364,7 +364,7 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("ILUT");
-    static constexpr std::array<unsigned int, 2>       lower{11, 19};
+    static constexpr std::array<unsigned int, 2>       lower{{11, 19}};
     TrilinosWrappers::PreconditionILUT                 preconditioner;
     TrilinosWrappers::PreconditionILUT::AdditionalData data;
     data.ilut_drop = 1e-6;
@@ -383,7 +383,7 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("Chebyshev");
-    static constexpr std::array<unsigned int, 2>            lower{23, 46};
+    static constexpr std::array<unsigned int, 2>            lower{{23, 46}};
     TrilinosWrappers::PreconditionChebyshev                 preconditioner;
     TrilinosWrappers::PreconditionChebyshev::AdditionalData data;
     data.max_eigenvalue = 2.5;
