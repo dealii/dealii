@@ -134,6 +134,7 @@ public:
   compute_inverse_diagonal(VectorType &diagonal) const
   {
     // compute diagonal
+    matrix_free.initialize_dof_vector(diagonal);
     MatrixFreeTools::compute_diagonal(matrix_free,
                                       diagonal,
                                       &Operator::do_cell_integral_local,
