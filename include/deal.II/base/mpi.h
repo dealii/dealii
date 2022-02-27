@@ -1338,6 +1338,14 @@ namespace Utilities
 
 
         inline MPI_Datatype
+        mpi_type_id(const wchar_t *)
+        {
+          return MPI_WCHAR;
+        }
+
+
+
+        inline MPI_Datatype
         mpi_type_id(const short *)
         {
           return MPI_SHORT;
@@ -1357,6 +1365,14 @@ namespace Utilities
         mpi_type_id(const long int *)
         {
           return MPI_LONG;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const long long int *)
+        {
+          return MPI_LONG_LONG;
         }
 
 
