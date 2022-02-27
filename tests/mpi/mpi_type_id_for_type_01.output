@@ -1,0 +1,63 @@
+
+DEAL::--------- Checking <signed char> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <unsigned char> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <wchar_t> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <short> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <unsigned short> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <int> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <unsigned int> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <long> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <unsigned long> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <long long> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <long long int> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <unsigned long long> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <float> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <double> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <long double> ---------------
+DEAL::T is supported: true
+DEAL::T[] is supported: false
+DEAL::T* is supported: false
+DEAL::--------- Checking <X> ---------------
+DEAL::T is supported: false
