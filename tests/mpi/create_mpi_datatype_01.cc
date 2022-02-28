@@ -43,13 +43,12 @@ test_data_type(const std::uint64_t n_bytes)
   else
     deallog << " size32=" << size32;
 
-#if DEAL_II_MPI_VERSION_GTE(3, 0)
   MPI_Count size64;
   ierr = MPI_Type_size_x(*bigtype, &size64);
   AssertThrowMPI(ierr);
 
   deallog << " size64=" << size64;
-#endif
+
 
   deallog << std::endl;
 }

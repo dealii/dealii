@@ -149,7 +149,6 @@ namespace LinearAlgebra
           else
             {
 #ifdef DEAL_II_WITH_MPI
-#  if DEAL_II_MPI_VERSION_GTE(3, 0)
               allocated_size = new_alloc_size;
 
               const unsigned int size_sm =
@@ -237,11 +236,6 @@ namespace LinearAlgebra
                                const auto ierr = MPI_Win_free(&mpi_window);
                                AssertThrowMPI(ierr);
                              }};
-#  else
-              AssertThrow(false,
-                          ExcMessage(
-                            "Sorry, this feature requires MPI 3.0 support"));
-#  endif
 #else
               Assert(false, ExcInternalError());
 #endif

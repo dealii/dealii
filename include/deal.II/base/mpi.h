@@ -80,19 +80,7 @@ using MPI_Op       = int;
  * 4. const_cast the given expression @p expr to this new type.
  */
 #ifdef DEAL_II_WITH_MPI
-#  if DEAL_II_MPI_VERSION_GTE(3, 0)
-
-#    define DEAL_II_MPI_CONST_CAST(expr) (expr)
-
-#  else
-
-#    include <type_traits>
-
-#    define DEAL_II_MPI_CONST_CAST(expr)     \
-      const_cast<typename std::remove_const< \
-        typename std::remove_pointer<decltype(expr)>::type>::type *>(expr)
-
-#  endif
+#  define DEAL_II_MPI_CONST_CAST(expr) (expr)
 #endif
 
 
@@ -1336,11 +1324,7 @@ namespace Utilities
     inline MPI_Datatype
     mpi_type_id(const bool *)
     {
-#    if DEAL_II_MPI_VERSION_GTE(2, 2)
       return MPI_CXX_BOOL;
-#    else
-      return MPI_C_BOOL;
-#    endif
     }
 
 
