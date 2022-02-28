@@ -7718,19 +7718,17 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
       std::stringstream ss;
       DataOutBase::write_vtu_header(ss, vtk_flags);
       header_size = ss.str().size();
-      ierr = MPI_File_write(fh,
-                            DEAL_II_MPI_CONST_CAST(ss.str().c_str()),
-                            header_size,
-                            MPI_CHAR,
-                            MPI_STATUS_IGNORE);
+      // Write the header on rank 0 and automatically move the
+      // shared file pointer to the location after header;
+      ierr = MPI_File_write_shared(fh,
+                                   DEAL_II_MPI_CONST_CAST(ss.str().c_str()),
+                                   header_size,
+                                   MPI_CHAR,
+                                   MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
     }
 
-  ierr = MPI_Bcast(&header_size, 1, MPI_UNSIGNED, 0, comm);
-  AssertThrowMPI(ierr);
 
-  ierr = MPI_File_seek_shared(fh, header_size, MPI_SEEK_SET);
-  AssertThrowMPI(ierr);
   {
     const auto &patches = get_patches();
     const types::global_dof_index my_n_patches = patches.size();
