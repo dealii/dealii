@@ -36,6 +36,8 @@ jobs:
     - name: build
       run: |
         make -j 2
+    - name: quicktest
+      run: make test
 
   linux-debug-parallel-simplex:
     # simple parallel debug build using g++ with simplex configuration enabled
