@@ -39,6 +39,15 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
+    IF(MPI_VERSION VERSION_LESS "3.0")
+      MESSAGE(STATUS
+        "Could not find a sufficient MPI version: "
+        "Your MPI implementation does not support the MPI 3.0 standard.")
+      SET(MPI_ADDITIONAL_ERROR_STRING
+        "Your MPI implementation does not support the MPI 3.0 standard.\n")
+      SET(${var} FALSE)
+    ENDIF()
+
   ENDIF()
 ENDMACRO()
 
