@@ -136,9 +136,9 @@ DEAL_II_NAMESPACE_OPEN
  * The node values above rely on integrals, which will be computed by
  * quadrature rules themselves. The generalized support points are a set of
  * points such that this quadrature can be performed with sufficient accuracy.
- * The points needed are those of QGauss<sub>k+1</sub> on each edge and
- * QGauss<sub>k+2</sub> on each face and in the interior of the cell (or none
- * for N<sub>1</sub>).
+ * The points needed are those of QGauss(k+1) on each edge and
+ * QGauss(k+2) on each face and in the interior of the cell (or none
+ * for FE_Nedelec(0)).
  *
  * <h3> Depictions of shape functions </h3>
  *
