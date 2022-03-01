@@ -170,7 +170,11 @@ namespace internal
 
     /**
      * A helper class whose `value` member is true or false depending on
-     * whether all of the given boolean template arguments are true.
+     * whether all of the given boolean template arguments are `true`.
+     * The class works by comparing the list of boolean values
+     * `true, Values...` with the list `Values..., true` (i.e., with
+     * its rotated self). The two are only the same if `Values...` is
+     * a list of only `true` values.
      */
     template <bool... Values>
     struct all_true
@@ -178,6 +182,28 @@ namespace internal
       static constexpr bool value =
         std::is_same<BoolStorage<Values..., true>,
                      BoolStorage<true, Values...>>::value;
+    };
+
+
+    /**
+     * A class whose `value` member is set to `true` if any of the
+     * boolean template arguments are true.
+     */
+    template <bool... Values>
+    struct any_true;
+
+
+    template <bool V1, bool... Values>
+    struct any_true<V1, Values...>
+    {
+      static constexpr bool value = V1 || any_true<Values...>::value;
+    };
+
+
+    template <>
+    struct any_true<>
+    {
+      static constexpr bool value = false;
     };
   } // namespace TemplateConstraints
 } // namespace internal
@@ -201,12 +227,27 @@ struct is_base_of_all
  * This struct is a generalization of std::is_same to template
  * parameter packs and tests if all of the types in the `Types...`
  * parameter pack are equal to the `Type` given as first template
- * argument. The result is stored in the member variable value.
+ * argument. The result is stored in the member variable `value`.
  */
 template <class Type, class... Types>
 struct all_same_as
 {
   static constexpr bool value = internal::TemplateConstraints::all_true<
+    std::is_same<Type, Types>::value...>::value;
+};
+
+
+
+/**
+ * This struct is a generalization of std::is_same to template
+ * parameter packs and tests if any of the types in the `Types...`
+ * parameter pack are equal to the `Type` given as first template
+ * argument. The result is stored in the member variable `value`.
+ */
+template <class Type, class... Types>
+struct is_same_as_any_of
+{
+  static constexpr bool value = internal::TemplateConstraints::any_true<
     std::is_same<Type, Types>::value...>::value;
 };
 
