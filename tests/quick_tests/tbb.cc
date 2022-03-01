@@ -18,8 +18,6 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 
-#include <tbb/task_scheduler_init.h>
-
 #include <iostream>
 
 using namespace dealii;
@@ -87,8 +85,7 @@ test2()
 int
 main()
 {
-  std::cout << "TBB will use "
-            << tbb::task_scheduler_init::default_num_threads() << " threads."
+  std::cout << "TBB will use " << MultithreadInfo::n_threads() << " threads."
             << std::endl;
 
   test1();
