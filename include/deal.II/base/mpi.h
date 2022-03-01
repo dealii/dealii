@@ -22,9 +22,11 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <boost/signals2.hpp>
 
+#include <complex>
 #include <map>
 #include <numeric>
 #include <set>
@@ -139,6 +141,36 @@ namespace Utilities
    */
   namespace MPI
   {
+    /**
+     * A template variable that is `true` if the template argument `T` is a data
+     * type that is natively supported by MPI, and `false` otherwise. This
+     * variable can be used together with `std::enable_if` to selectively allow
+     * template functions only for those data types for which the template type
+     * is supported by MPI. The variable is, in essence, a concept in the sense
+     * of C++20.
+     */
+    template <typename T>
+    constexpr bool is_mpi_type = is_same_as_any_of<T,
+                                                   char,
+                                                   signed short,
+                                                   signed int,
+                                                   signed long,
+                                                   signed long long,
+                                                   signed char,
+                                                   unsigned char,
+                                                   unsigned short,
+                                                   unsigned int,
+                                                   unsigned long int,
+                                                   unsigned long long,
+                                                   float,
+                                                   double,
+                                                   long double,
+                                                   bool,
+                                                   std::complex<float>,
+                                                   std::complex<double>,
+                                                   std::complex<long double>,
+                                                   wchar_t>::value;
+
     /**
      * Return the number of MPI processes there exist in the given
      * @ref GlossMPICommunicator "communicator"
