@@ -163,6 +163,10 @@ namespace internal
 {
   namespace TemplateConstraints
   {
+    // TODO: Once we are able to use DEAL_II_HAVE_CXX17, the following classes
+    // can be made much simpler with the help of fold expressions, see
+    // https://en.cppreference.com/w/cpp/language/fold
+
     // helper struct for is_base_of_all and all_same_as
     template <bool... Values>
     struct BoolStorage;
