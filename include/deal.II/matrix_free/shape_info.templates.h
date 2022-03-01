@@ -33,6 +33,7 @@
 #include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_dg0.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
 #include <deal.II/fe/fe_tools.h>
@@ -170,8 +171,6 @@ namespace internal
         }
     }
 
-
-
     template <int dim_to, int dim, int spacedim>
     std::unique_ptr<FiniteElement<dim_to, dim_to>>
     create_fe(const FiniteElement<dim, spacedim> &fe)
@@ -192,7 +191,6 @@ namespace internal
       }
       return FETools::get_fe_by_name<dim_to, dim_to>(fe_name);
     }
-
 
 
     // ----------------- actual ShapeInfo implementation --------------------
@@ -238,15 +236,171 @@ namespace internal
     {
       static_assert(dim == spacedim,
                     "Currently, only the case dim=spacedim is implemented");
-      if (quad_in.is_tensor_product() == false ||
-          dynamic_cast<const FE_SimplexP<dim> *>(
-            &fe_in.base_element(base_element_number)) ||
-          dynamic_cast<const FE_SimplexDGP<dim> *>(
-            &fe_in.base_element(base_element_number)) ||
-          dynamic_cast<const FE_WedgeP<dim> *>(
-            &fe_in.base_element(base_element_number)) ||
-          dynamic_cast<const FE_PyramidP<dim> *>(
+
+      // ShapeInfo for RT elements. Here, data is of size 2 instead of 1.
+      // data[0] is univariate_shape_data in normal direction and
+      // data[1] is univariate_shape_data in tangential direction
+      //
+      if (dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
             &fe_in.base_element(base_element_number)))
+        {
+          element_type = tensor_raviart_thomas;
+
+          const auto quad = quad_in.get_tensor_basis()[0];
+
+          const FiniteElement<dim> &fe =
+            fe_in.base_element(base_element_number);
+          n_dimensions = dim;
+          n_components = fe_in.n_components();
+
+          data.resize(2);
+          const unsigned int n_q_points_1d = quad.size();
+
+          n_q_points      = Utilities::fixed_power<dim>(n_q_points_1d);
+          n_q_points_face = Utilities::fixed_power<dim - 1>(n_q_points_1d);
+
+          dofs_per_component_on_cell = fe_in.n_dofs_per_cell() / n_components;
+
+          // NOTE dofs_per_component_on_face is in tangential direction!
+          dofs_per_component_on_face =
+            fe_in.n_dofs_per_face() + Utilities::pow(fe_in.degree, dim - 2);
+          const unsigned int dofs_per_face_normal = fe_in.n_dofs_per_face();
+
+          lexicographic_numbering =
+            get_lexicographic_numbering_rt_nodal<dim>(fe_in.degree);
+
+          // To get the right shape_values of the RT element
+          std::vector<unsigned int> lex_normal, lex_tangent;
+          for (unsigned int i = 0; i < fe.degree; ++i)
+            lex_tangent.push_back(i);
+
+          lex_normal.push_back(0);
+          for (unsigned int i = dofs_per_face_normal * 2 * dim;
+               i < dofs_per_face_normal * 2 * dim + fe.degree - 1;
+               ++i)
+            lex_normal.push_back(i);
+          lex_normal.push_back(dofs_per_face_normal);
+
+          // 'direction' distingusishes between normal and tangential direction
+          for (unsigned int direction = 0; direction < 2; ++direction)
+            {
+              UnivariateShapeData<Number> &univariate_shape_data =
+                (direction == 0) ? data.front() : data.back();
+
+              univariate_shape_data.element_type  = tensor_raviart_thomas;
+              univariate_shape_data.quadrature    = quad;
+              univariate_shape_data.n_q_points_1d = n_q_points_1d;
+              univariate_shape_data.fe_degree     = fe.degree - direction;
+
+              // grant write access to common univariate shape data
+              auto &shape_values    = univariate_shape_data.shape_values;
+              auto &shape_gradients = univariate_shape_data.shape_gradients;
+              auto &shape_hessians  = univariate_shape_data.shape_hessians;
+
+              auto &values_within_subface =
+                univariate_shape_data.values_within_subface;
+              auto &gradients_within_subface =
+                univariate_shape_data.gradients_within_subface;
+              auto &hessians_within_subface =
+                univariate_shape_data.hessians_within_subface;
+
+              auto &shape_data_on_face =
+                univariate_shape_data.shape_data_on_face;
+
+              const unsigned int n_dofs_1d  = fe.degree + 1 - direction;
+              const unsigned int array_size = n_dofs_1d * n_q_points_1d;
+
+              shape_gradients.resize_fast(array_size);
+              shape_values.resize_fast(array_size);
+              shape_hessians.resize_fast(array_size);
+
+              values_within_subface[0].resize(array_size);
+              values_within_subface[1].resize(array_size);
+              gradients_within_subface[0].resize(array_size);
+              gradients_within_subface[1].resize(array_size);
+              hessians_within_subface[0].resize(array_size);
+              hessians_within_subface[1].resize(array_size);
+
+              shape_data_on_face[0].resize(3 * n_dofs_1d);
+              shape_data_on_face[1].resize(3 * n_dofs_1d);
+
+              Point<dim> unit_point;
+              for (unsigned int i = 0; i < n_dofs_1d; ++i)
+                {
+                  // need to reorder from hierarchical to lexicographic to get
+                  // the DoFs correct
+                  const unsigned int my_i =
+                    (direction == 0) ? lex_normal[i] : lex_tangent[i];
+                  for (unsigned int q = 0; q < n_q_points_1d; ++q)
+                    {
+                      Point<dim> q_point = unit_point;
+                      q_point[direction] = quad.get_points()[q][0];
+
+                      shape_values[i * n_q_points_1d + q] =
+                        fe.shape_value_component(my_i, q_point, 0);
+                      shape_gradients[i * n_q_points_1d + q] =
+                        fe.shape_grad_component(my_i, q_point, 0)[direction];
+                      shape_hessians[i * n_q_points_1d + q] =
+                        fe.shape_grad_grad_component(my_i,
+                                                     q_point,
+                                                     0)[direction][direction];
+
+                      // evaluate basis functions on the two 1D subfaces (i.e.,
+                      // at the positions divided by one half and shifted by one
+                      // half, respectively) for hanging nodes
+                      q_point[direction] *= 0.5;
+                      values_within_subface[0][i * n_q_points_1d + q] =
+                        fe.shape_value_component(my_i, q_point, 0);
+                      gradients_within_subface[0][i * n_q_points_1d + q] =
+                        fe.shape_grad_component(my_i, q_point, 0)[direction];
+                      hessians_within_subface[0][i * n_q_points_1d + q] =
+                        fe.shape_grad_grad_component(my_i,
+                                                     q_point,
+                                                     0)[direction][direction];
+                      q_point[direction] += 0.5;
+                      values_within_subface[1][i * n_q_points_1d + q] =
+                        fe.shape_value_component(my_i, q_point, 0);
+                      gradients_within_subface[1][i * n_q_points_1d + q] =
+                        fe.shape_grad_component(my_i, q_point, 0)[direction];
+                      hessians_within_subface[1][i * n_q_points_1d + q] =
+                        fe.shape_grad_grad_component(my_i,
+                                                     q_point,
+                                                     0)[direction][direction];
+                    }
+                  // evaluate basis functions on the 1D faces, i.e., in zero and
+                  // one
+                  Point<dim> q_point = unit_point;
+                  q_point[direction] = 0;
+                  shape_data_on_face[0][i] =
+                    fe.shape_value_component(my_i, q_point, 0);
+                  shape_data_on_face[0][i + n_dofs_1d] =
+                    fe.shape_grad_component(my_i, q_point, 0)[direction];
+                  shape_data_on_face[0][i + 2 * n_dofs_1d] =
+                    fe.shape_grad_grad_component(my_i,
+                                                 q_point,
+                                                 0)[direction][direction];
+                  q_point[direction] = 1;
+                  shape_data_on_face[1][i] =
+                    fe.shape_value_component(my_i, q_point, 0);
+                  shape_data_on_face[1][i + n_dofs_1d] =
+                    fe.shape_grad_component(my_i, q_point, 0)[direction];
+                  shape_data_on_face[1][i + 2 * n_dofs_1d] =
+                    fe.shape_grad_grad_component(my_i,
+                                                 q_point,
+                                                 0)[direction][direction];
+                }
+            }
+          return;
+        }
+      else if (quad_in.is_tensor_product() == false ||
+               dynamic_cast<const FE_SimplexP<dim> *>(
+                 &fe_in.base_element(base_element_number)) ||
+               dynamic_cast<const FE_SimplexDGP<dim> *>(
+                 &fe_in.base_element(base_element_number)) ||
+               dynamic_cast<const FE_WedgeP<dim> *>(
+                 &fe_in.base_element(base_element_number)) ||
+               dynamic_cast<const FE_PyramidP<dim> *>(
+                 &fe_in.base_element(base_element_number)))
         {
           // specialization for arbitrary finite elements and quadrature rules
           // as needed in the context, e.g., of simplices

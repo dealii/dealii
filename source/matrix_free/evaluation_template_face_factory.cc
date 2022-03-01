@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,13 +14,15 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS;
-     deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
-  {
-    template struct dealii::internal::
-      FEEvaluationFactory<deal_II_dimension, deal_II_scalar_vectorized>;
+#include <deal.II/matrix_free/evaluation_template_face_factory.templates.h>
 
-    // inverse mass
-    template struct dealii::internal::
-      CellwiseInverseMassFactory<deal_II_dimension, deal_II_scalar_vectorized>;
-  }
+DEAL_II_NAMESPACE_OPEN
+
+#define SPLIT_INSTANTIATIONS_COUNT 6
+#ifndef SPLIT_INSTANTIATIONS_INDEX
+#  define SPLIT_INSTANTIATIONS_INDEX 0
+#endif
+
+#include "evaluation_template_face_factory.inst"
+
+DEAL_II_NAMESPACE_CLOSE

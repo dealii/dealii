@@ -1160,16 +1160,21 @@ namespace internal
             dof_info[no].fe_index_conversion[fe_index].clear();
             for (unsigned int c = 0; c < dof_info[no].n_base_elements; ++c)
               {
-                dof_info[no].n_components[c] = fe.element_multiplicity(c);
+                dof_info[no].n_components[c] =
+                  fe.element_multiplicity(c) *
+                  fe.base_element(c).n_components();
                 for (unsigned int l = 0; l < dof_info[no].n_components[c]; ++l)
                   {
                     dof_info[no].component_to_base_index.push_back(c);
                     dof_info[no]
                       .component_dof_indices_offset[fe_index]
-                      .push_back(dof_info[no]
-                                   .component_dof_indices_offset[fe_index]
-                                   .back() +
-                                 fe.base_element(c).n_dofs_per_cell());
+                      .push_back(
+                        dof_info[no]
+                          .component_dof_indices_offset[fe_index]
+                          .back() +
+                        shape_infos(dof_info[no].global_base_element_offset + c,
+                                    fe_index)
+                          .dofs_per_component_on_cell);
                     dof_info[no].fe_index_conversion[fe_index].push_back(
                       fe.base_element(c).degree);
                   }

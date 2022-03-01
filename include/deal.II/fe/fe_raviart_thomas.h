@@ -327,6 +327,14 @@ private:
  * FiniteElementData<dim>::degree is higher by one than the constructor
  * argument!
  */
+
+namespace internal
+{
+  template <int dim>
+  std::vector<unsigned int>
+  get_lexicographic_numbering_rt_nodal(const unsigned int degree);
+} // namespace internal
+
 template <int dim>
 class FE_RaviartThomasNodal : public FE_PolyTensor<dim>
 {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,14 +13,5 @@
 //
 // ---------------------------------------------------------------------
 
-
-for (deal_II_dimension : DIMENSIONS;
-     deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
-  {
-    template struct dealii::internal::
-      FEEvaluationFactory<deal_II_dimension, deal_II_scalar_vectorized>;
-
-    // inverse mass
-    template struct dealii::internal::
-      CellwiseInverseMassFactory<deal_II_dimension, deal_II_scalar_vectorized>;
-  }
+#define SPLIT_INSTANTIATIONS_INDEX 3
+#include "evaluation_template_face_factory.cc"
