@@ -189,6 +189,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING=1 \
                          DEAL_II_DEPRECATED_EARLY= \
                          DEAL_II_WITH_ARBORX=1 \
+                         DEAL_II_ARBORX_WITH_MPI=1 \
                          DEAL_II_WITH_ARPACK=1 \
                          DEAL_II_ARPACK_WITH_PARPACK=1 \
                          DEAL_II_WITH_ASSIMP=1 \
