@@ -710,7 +710,25 @@ namespace TrilinosWrappers
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
 
-    ierr = graph->OptimizeStorage();
+    try
+      {
+        ierr = graph->OptimizeStorage();
+      }
+    catch (const int error_code)
+      {
+        AssertThrow(
+          false,
+          ExcMessage(
+            "The Epetra_CrsGraph::OptimizeStorage() function "
+            "has thrown an error with code " +
+            std::to_string(error_code) +
+            ". You will have to look up the exact meaning of this error "
+            "in the Trilinos source code, but oftentimes, this function "
+            "throwing an error indicates that you are trying to allocate "
+            "more than 2,147,483,647 nonzero entries in the sparsity "
+            "pattern on the local process; this will not work because "
+            "Epetra indexes entries with a simple 'signed int'."));
+      }
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
