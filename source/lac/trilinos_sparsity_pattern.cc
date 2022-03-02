@@ -260,7 +260,7 @@ namespace TrilinosWrappers
       AssertThrow((TrilinosWrappers::max_my_gid(row_map) -
                    TrilinosWrappers::min_my_gid(row_map)) *
                       std::uint64_t(n_entries_per_row) <
-                    std::numeric_limits<int>::max(),
+                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
                   ExcMessage("The TrilinosWrappers use Epetra internally which "
                              "uses 'signed int' to represent local indices. "
                              "Therefore, only 2,147,483,647 nonzero matrix "
@@ -328,7 +328,7 @@ namespace TrilinosWrappers
       AssertThrow(std::accumulate(local_entries_per_row.begin(),
                                   local_entries_per_row.end(),
                                   std::uint64_t(0)) <
-                    std::numeric_limits<int>::max(),
+                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
                   ExcMessage("The TrilinosWrappers use Epetra internally which "
                              "uses 'signed int' to represent local indices. "
                              "Therefore, only 2,147,483,647 nonzero matrix "
@@ -389,7 +389,7 @@ namespace TrilinosWrappers
       AssertThrow(std::accumulate(n_entries_per_row.begin(),
                                   n_entries_per_row.end(),
                                   std::uint64_t(0)) <
-                    std::numeric_limits<int>::max(),
+                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
                   ExcMessage("The TrilinosWrappers use Epetra internally which "
                              "uses 'signed int' to represent local indices. "
                              "Therefore, only 2,147,483,647 nonzero matrix "
