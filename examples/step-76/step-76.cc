@@ -510,7 +510,7 @@ namespace Euler_DG
   EulerOperator<dim, degree, n_points_1d>::EulerOperator(TimerOutput &timer)
     : timer(timer)
   {
-#if DEAL_II_MPI_VERSION_GTE(3, 0)
+#ifdef DEAL_II_WITH_MPI
     if (group_size == 1)
       {
         this->subcommunicator = MPI_COMM_SELF;

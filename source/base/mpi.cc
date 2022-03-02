@@ -285,7 +285,6 @@ namespace Utilities
 
 #  ifdef DEBUG
       MPI_Count size64;
-      // this function is only available starting with MPI 3.0:
       ierr = MPI_Type_size_x(result, &size64);
       AssertThrowMPI(ierr);
 
@@ -367,7 +366,7 @@ namespace Utilities
       // So we need to run a different algorithm, specifically one that
       // requires more memory -- MPI_Reduce_scatter_block will require memory
       // proportional to the number of processes involved; that function is
-      // also only available for MPI 2.2 or later:
+      // available for MPI 2.2 or later:
       static CollectiveMutex      mutex;
       CollectiveMutex::ScopedLock lock(mutex, mpi_comm);
 
