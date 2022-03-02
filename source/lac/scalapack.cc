@@ -395,10 +395,11 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
   MPI_Comm communicator_B;
 
   const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_from;
-  Utilities::MPI::create_group(this->grid->mpi_communicator,
-                               group_B,
-                               mpi_tag,
-                               &communicator_B);
+  const int ierr    = MPI_Comm_create_group(this->grid->mpi_communicator,
+                                         group_B,
+                                         mpi_tag,
+                                         &communicator_B);
+  AssertThrowMPI(ierr);
   int n_proc_rows_B = 1, n_proc_cols_B = 1;
   int this_process_row_B = -1, this_process_column_B = -1;
   int blacs_context_B = -1;
@@ -565,10 +566,11 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
   MPI_Comm communicator_B;
 
   const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_to;
-  Utilities::MPI::create_group(this->grid->mpi_communicator,
-                               group_B,
-                               mpi_tag,
-                               &communicator_B);
+  const int ierr    = MPI_Comm_create_group(this->grid->mpi_communicator,
+                                         group_B,
+                                         mpi_tag,
+                                         &communicator_B);
+  AssertThrowMPI(ierr);
   int n_proc_rows_B = 1, n_proc_cols_B = 1;
   int this_process_row_B = -1, this_process_column_B = -1;
   int blacs_context_B = -1;
@@ -900,10 +902,10 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
       // processes. the same holds for the wrapper/fallback we are using here.
 
       const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_to2;
-      ierr              = Utilities::MPI::create_group(MPI_COMM_WORLD,
-                                          group_union,
-                                          mpi_tag,
-                                          &mpi_communicator_union);
+      ierr              = MPI_Comm_create_group(MPI_COMM_WORLD,
+                                   group_union,
+                                   mpi_tag,
+                                   &mpi_communicator_union);
       AssertThrowMPI(ierr);
 
       /*

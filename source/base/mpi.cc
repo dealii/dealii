@@ -183,7 +183,9 @@ namespace Utilities
                  const int        tag,
                  MPI_Comm *       new_comm)
     {
-      return MPI_Comm_create_group(comm, group, tag, new_comm);
+      const int ierr = MPI_Comm_create_group(comm, group, tag, new_comm);
+      AssertThrowMPI(ierr);
+      return ierr;
     }
 
 
