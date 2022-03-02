@@ -39,8 +39,7 @@ namespace RepartitioningPolicyTools
     {
       is_fine.add_index(cell_id_translator.translate(cell));
 
-      if (cell->level() > 0 &&
-          (cell->index() % GeometryInfo<dim>::max_children_per_cell) == 0)
+      if (cell->level() > 0 && cell->parent()->child(0) == cell)
         add_indices_recursively_for_first_child_policy(cell->parent(),
                                                        cell_id_translator,
                                                        is_fine);
