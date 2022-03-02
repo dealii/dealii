@@ -1502,7 +1502,6 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
                                                 const unsigned int root_process)
 {
 #  ifdef DEAL_II_WITH_MPI
-#    if DEAL_II_MPI_VERSION_GTE(3, 0)
 
   // **** Step 0 ****
   // All but the root process no longer need their data, so release the memory
@@ -1873,20 +1872,13 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   // **** Consistency check ****
   // At this point, each process should have a copy of the data.
   // Verify this in some sort of round-about way
-#      ifdef DEBUG
+#    ifdef DEBUG
   const std::vector<char> packed_data = Utilities::pack(*this);
   const int               hash =
     std::accumulate(packed_data.begin(), packed_data.end(), int(0));
   Assert(Utilities::MPI::max(hash, communicator) == hash, ExcInternalError());
-#      endif
-
-
-
-#    else
-  // If we only have MPI 2.x, then simply broadcast the current object to all
-  // other processes and forego the idea of using shmem
-  *this = Utilities::MPI::broadcast(communicator, *this, root_process);
 #    endif
+
 #  else
   // No MPI -> nothing to replicate
   (void)communicator;

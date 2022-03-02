@@ -466,15 +466,8 @@ namespace Utilities
       NBX<T1, T2>::signal_finish(const MPI_Comm &comm)
       {
 #ifdef DEAL_II_WITH_MPI
-#  if DEAL_II_MPI_VERSION_GTE(3, 0)
         const auto ierr = MPI_Ibarrier(comm, &barrier_request);
         AssertThrowMPI(ierr);
-#  else
-        AssertThrow(false,
-                    ExcMessage(
-                      "ConsensusAlgorithms::NBX uses MPI 3.0 features. "
-                      "You should compile with at least MPI 3.0."));
-#  endif
 #else
         (void)comm;
 #endif
@@ -895,15 +888,13 @@ namespace Utilities
                                         Utilities::MPI::n_mpi_processes(comm) :
                                         1);
 #ifdef DEAL_II_WITH_MPI
-#  if DEAL_II_MPI_VERSION_GTE(3, 0)
-#    ifdef DEBUG
+#  ifdef DEBUG
         if (n_procs > 10)
-#    else
+#  else
         if (n_procs > 99)
-#    endif
+#  endif
           consensus_algo.reset(new NBX<T1, T2>());
         else
-#  endif
 #endif
           if (n_procs > 1)
           consensus_algo.reset(new PEX<T1, T2>());
