@@ -46,13 +46,15 @@ create_sub_comm(const MPI_Comm &comm, const unsigned int size)
   int color = rank < size;
 
   MPI_Comm sub_comm;
-  MPI_Comm_split(comm, color, rank, &sub_comm);
+  int      ierr = MPI_Comm_split(comm, color, rank, &sub_comm);
+  AssertThrowMPI(ierr);
 
   if (rank < size)
     return sub_comm;
   else
     {
-      MPI_Comm_free(&sub_comm);
+      ierr = MPI_Comm_free(&sub_comm);
+      AssertThrowMPI(ierr);
       return MPI_COMM_NULL;
     }
 }
@@ -135,7 +137,10 @@ test(const MPI_Comm comm, const unsigned int n_partitions)
   print_statistics(dof_handler);
 
   if (sub_comm != MPI_COMM_NULL)
-    MPI_Comm_free(&sub_comm);
+    {
+      const int ierr = MPI_Comm_free(&sub_comm);
+      AssertThrowMPI(ierr);
+    }
 }
 
 
