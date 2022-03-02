@@ -1523,11 +1523,10 @@ public:
 
   /**
    * Initialize function for a general vector. The length of the vector is
-   * equal to the total number of degrees in the DoFHandler. If the vector is
-   * of class LinearAlgebra::distributed::Vector@<Number@>, the ghost entries
-   * are set accordingly. For vector-valued problems with several DoFHandlers
-   * underlying this class, the parameter @p vector_component defines which
-   * component is to be used.
+   * equal to the total number of degrees in the DoFHandler. Vector entries
+   * are initialized with zero. For vector-valued problems with several
+   * DoFHandlers underlying this class, the parameter @p vector_component
+   * defines which component is to be used.
    *
    * For the vectors used with MatrixFree and in FEEvaluation, a vector needs
    * to hold all
@@ -1547,24 +1546,10 @@ public:
                         const unsigned int dof_handler_index = 0) const;
 
   /**
-   * Initialize function for a distributed vector. The length of the vector is
-   * equal to the total number of degrees in the DoFHandler. If the vector is
-   * of class LinearAlgebra::distributed::Vector@<Number@>, the ghost entries
-   * are set accordingly. For vector-valued problems with several DoFHandlers
-   * underlying this class, the parameter @p vector_component defines which
-   * component is to be used.
+   * See the other function with the same name for descriptions.
    *
-   * For the vectors used with MatrixFree and in FEEvaluation, a vector needs
-   * to hold all
-   * @ref GlossLocallyActiveDof "locally active DoFs"
-   * and also some of the
-   * @ref GlossLocallyRelevantDof "locally relevant DoFs".
-   * The selection of DoFs is such that one can read all degrees of freedom on
-   * all locally relevant elements (locally active) plus the degrees of freedom
-   * that constraints expand into from the locally owned cells. However, not
-   * all locally relevant DoFs are stored because most of them would never be
-   * accessed in matrix-vector products and result in too much data sent
-   * around which impacts the performance.
+   * Since the vector is of class LinearAlgebra::distributed::Vector@<Number@>,
+   * the ghost entries are set accordingly.
    */
   template <typename Number2>
   void
