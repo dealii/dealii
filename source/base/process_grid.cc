@@ -184,10 +184,10 @@ namespace Utilities
       const int mpi_tag =
         Utilities::MPI::internal::Tags::process_grid_constructor;
 
-      ierr = Utilities::MPI::create_group(mpi_communicator,
-                                          inactive_with_root_group,
-                                          mpi_tag,
-                                          &mpi_communicator_inactive_with_root);
+      ierr = MPI_Comm_create_group(mpi_communicator,
+                                   inactive_with_root_group,
+                                   mpi_tag,
+                                   &mpi_communicator_inactive_with_root);
       AssertThrowMPI(ierr);
 
       ierr = MPI_Group_free(&all_group);
