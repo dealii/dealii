@@ -230,14 +230,6 @@ namespace parallel
       prepare_coarsening_and_refinement() override;
 
       /**
-       * Return true if the triangulation has hanging nodes.
-       *
-       * @note Not implemented yet.
-       */
-      virtual bool
-      has_hanging_nodes() const override;
-
-      /**
        * Return the local memory consumption in bytes.
        */
       virtual std::size_t

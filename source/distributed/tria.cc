@@ -1961,32 +1961,6 @@ namespace parallel
     }
 
 
-    template <int dim, int spacedim>
-    bool
-    Triangulation<dim, spacedim>::has_hanging_nodes() const
-    {
-      if (this->n_global_levels() <= 1)
-        return false; // can not have hanging nodes without refined cells
-
-      // if there are any active cells with level less than n_global_levels()-1,
-      // then there is obviously also one with level n_global_levels()-1, and
-      // consequently there must be a hanging node somewhere.
-      //
-      // The problem is that we cannot just ask for the first active cell, but
-      // instead need to filter over locally owned cells.
-      const bool have_coarser_cell =
-        std::any_of(this->begin_active(this->n_global_levels() - 2),
-                    this->end_active(this->n_global_levels() - 2),
-                    [](const CellAccessor<dim, spacedim> &cell) {
-                      return cell.is_locally_owned();
-                    });
-
-      // return true if at least one process has a coarser cell
-      return 0 < Utilities::MPI::max(have_coarser_cell ? 1 : 0,
-                                     this->mpi_communicator);
-    }
-
-
 
     template <int dim, int spacedim>
     void

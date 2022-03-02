@@ -27,6 +27,8 @@ print_statistics(const Triangulation<dim, spacedim> &tria, bool do_mg = false)
   deallog << "n_cells:                   " << tria.n_cells() << std::endl;
   deallog << "n_active_cells:            " << tria.n_active_cells()
           << std::endl;
+  deallog << "has_hanging_nodes:         "
+          << (tria.has_hanging_nodes() ? "true" : "false") << std::endl;
 
   if (do_mg)
     {
@@ -51,6 +53,10 @@ print_statistics(const DoFHandler<dim, spacedim> &dof_handler,
           << std::endl;
   deallog << "n_locally_owned_dofs:               "
           << dof_handler.n_locally_owned_dofs() << std::endl;
+  deallog << "has_hanging_nodes:                  "
+          << (dof_handler.get_triangulation().has_hanging_nodes() ? "true" :
+                                                                    "false")
+          << std::endl;
 
   const auto n_levels = dof_handler.get_triangulation().n_levels();
 

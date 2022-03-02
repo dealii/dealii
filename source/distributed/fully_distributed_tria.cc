@@ -376,16 +376,6 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    bool
-    Triangulation<dim, spacedim>::has_hanging_nodes() const
-    {
-      Assert(false, ExcNotImplemented());
-      return false;
-    }
-
-
-
-    template <int dim, int spacedim>
     std::size_t
     Triangulation<dim, spacedim>::memory_consumption() const
     {
