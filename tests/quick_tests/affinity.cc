@@ -48,9 +48,12 @@ getaffinity(unsigned int &bits_set, unsigned int &mask)
       return false;
     }
   for (int i = 0; i < CPU_SETSIZE; ++i)
-    bits_set += CPU_ISSET(i, &my_set);
+    if (CPU_ISSET(i, &my_set))
+      {
+        ++bits_set;
+        mask |= (1 << i);
+      }
 
-  mask = *reinterpret_cast<int *>(&my_set);
 #else
   // sadly we don't have an implementation
   // for mac/windows
