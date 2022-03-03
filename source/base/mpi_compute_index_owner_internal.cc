@@ -146,21 +146,21 @@ namespace Utilities
               // smaller pieces in terms of the dictionary number.
               std::pair<types::global_dof_index, types::global_dof_index>
                 index_range(*interval->begin(), interval->last() + 1);
-              const unsigned int owner_last =
-                dof_to_dict_rank(interval->last());
-              unsigned int owner_first = numbers::invalid_unsigned_int;
-              while (owner_first != owner_last)
+
+              AssertThrow(index_range.second <= size, ExcInternalError());
+
+              while (index_range.first != index_range.second)
                 {
                   Assert(index_range.first < index_range.second,
                          ExcInternalError());
 
-                  owner_first = dof_to_dict_rank(index_range.first);
+                  const unsigned int owner =
+                    dof_to_dict_rank(index_range.first);
 
                   // this explicitly picks up the formula of
                   // dof_to_dict_rank, so the two places must be in sync
-                  types::global_dof_index next_index =
-                    std::min(get_index_offset(owner_first + 1),
-                             index_range.second);
+                  const types::global_dof_index next_index =
+                    std::min(get_index_offset(owner + 1), index_range.second);
 
                   Assert(next_index > index_range.first, ExcInternalError());
 
@@ -170,12 +170,12 @@ namespace Utilities
                   for (types::global_dof_index i = index_range.first + 1;
                        i < next_index;
                        ++i)
-                    AssertDimension(owner_first, dof_to_dict_rank(i));
+                    AssertDimension(owner, dof_to_dict_rank(i));
 #  endif
 
                   // add the interval, either to the local range or into a
                   // buffer to be sent to another processor
-                  if (owner_first == my_rank)
+                  if (owner == my_rank)
                     {
                       std::fill(actually_owning_ranks.data() +
                                   index_range.first - local_range.first,
@@ -187,8 +187,7 @@ namespace Utilities
                         actually_owning_rank_list.push_back(my_rank);
                     }
                   else
-                    buffers[owner_first].emplace_back(index_range.first,
-                                                      next_index);
+                    buffers[owner].emplace_back(index_range.first, next_index);
 
                   index_range.first = next_index;
                 }
