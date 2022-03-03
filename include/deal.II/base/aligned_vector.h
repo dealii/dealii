@@ -1503,6 +1503,19 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
 {
 #  ifdef DEAL_II_WITH_MPI
 
+  // Let the root process broadcast its size. If it is zero, then all
+  // processes just clear() their memory and reset themselves to a non-shared
+  // empty object -- there is no point to run through complicated MPI
+  // calls if the end result is an empty array. Otherwise, we continue on.
+  const size_type new_size =
+    Utilities::MPI::broadcast(communicator, size(), root_process);
+  if (new_size == 0)
+    {
+      clear();
+      return;
+    }
+
+
   // **** Step 0 ****
   // All but the root process no longer need their data, so release the memory
   // used to store the previous elements.
@@ -1693,18 +1706,6 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   // this for forward compatibility; MPI implementations ignore flags they don't
   // know anything about, and so setting this flag is backward compatible also
   // to older MPI versions.
-  //
-  // There is one final piece we can already take care of here. At the beginning
-  // of all of this, only the shmem_root knows how many elements there are in
-  // the array. But at the end of it, all processes of course need to know. We
-  // could put this information somewhere into the shmem area, along with the
-  // other data, but that seems clumsy. It turns out that when calling
-  // MPI_Win_allocate_shared, we are asked for the value of a parameter called
-  // 'disp_unit' whose meaning is difficult to determine from the MPI
-  // documentation, and that we do not actually need. So we "abuse" it a bit: On
-  // the shmem root, we put the array size into it. Later on, the remaining
-  // processes can query the shmem root's value of 'disp_unit', and so will be
-  // able to learn about the array size that way.
   MPI_Win        shmem_window;
   void *         base_ptr;
   const MPI_Aint align_by = 64;
@@ -1714,8 +1715,6 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
                               0);
 
   {
-    const int disp_unit = (is_shmem_root ? size() : 1);
-
     int ierr;
 
     MPI_Info mpi_info;
@@ -1726,7 +1725,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
                         std::to_string(align_by).c_str());
     AssertThrowMPI(ierr);
     ierr = MPI_Win_allocate_shared((is_shmem_root ? alloc_size : 0),
-                                   disp_unit,
+                                   /* disp_unit = */ 1,
                                    mpi_info,
                                    shmem_group_communicator,
                                    &base_ptr,
@@ -1751,14 +1750,11 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   //
   // This will allow us to obtain the pointer to the shmem root's memory area,
   // which is the only one we care about. (None of the other processes have
-  // even allocated any memory.) But this will also retrieve the shmem root's
-  // disp_unit, which in step 3 above we have abused to pass along the number of
-  // elements in the array.
+  // even allocated any memory.)
   //
   // We don't need to do this on the shmem root process: This process has
   // already gotten its base_ptr correctly set above, and we can determine the
   // array size by just calling size().
-  size_type array_size = (is_shmem_root ? size() : size_type(0));
   if (is_shmem_root == false)
     {
       int       disp_unit;
@@ -1767,11 +1763,10 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
         shmem_window, MPI_PROC_NULL, &alloc_size, &disp_unit, &base_ptr);
       AssertThrowMPI(ierr);
 
-      // Make sure we actually got a pointer, and also unpack the array size as
-      // discussed above.
+      // Make sure we actually got a pointer, and check that the disp_unit is
+      // equal to 1 (as set above)
       Assert(base_ptr != nullptr, ExcInternalError());
-
-      array_size = disp_unit;
+      Assert(disp_unit == 1, ExcInternalError());
     }
 
 
@@ -1788,7 +1783,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   std::size_t available_space       = alloc_size;
   void *      base_ptr_backup       = base_ptr;
   T *         aligned_shmem_pointer = static_cast<T *>(
-    std::align(align_by, array_size * sizeof(T), base_ptr, available_space));
+    std::align(align_by, new_size * sizeof(T), base_ptr, available_space));
   Assert(aligned_shmem_pointer != nullptr, ExcInternalError());
 
   // There is one step to guard against. It is *conceivable* that the base_ptr
@@ -1866,7 +1861,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
   // the current object. Note that the new buffer size is exactly as large as
   // necessary, i.e., can store size() elements, regardless of the number of
   // allocated elements in the original objects.
-  used_elements_end      = elements.get() + array_size;
+  used_elements_end      = elements.get() + new_size;
   allocated_elements_end = used_elements_end;
 
   // **** Consistency check ****
