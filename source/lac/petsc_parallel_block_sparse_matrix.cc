@@ -32,6 +32,7 @@ namespace PETScWrappers
     }
 
 
+#  ifndef DOXYGEN
     void
     BlockSparseMatrix::reinit(const size_type n_block_rows,
                               const size_type n_block_columns)
@@ -55,6 +56,7 @@ namespace PETScWrappers
             this->sub_objects[r][c] = p;
           }
     }
+#  endif
 
     void
     BlockSparseMatrix::reinit(const std::vector<IndexSet> &      rows,
