@@ -251,6 +251,14 @@ namespace PETScWrappers
       locally_owned_range_indices() const;
 
       /**
+       * Return the number of nonzero elements of this matrix. Actually, it
+       * returns the number of entries in the sparsity pattern; if any of the
+       * entries should happen to be zero, it is counted anyway.
+       */
+      size_type
+      n_nonzero_elements() const;
+
+      /**
        * Return a reference to the MPI communicator object in use with this
        * matrix.
        */

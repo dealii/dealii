@@ -133,6 +133,17 @@ namespace PETScWrappers
       return index_sets;
     }
 
+    BlockSparseMatrix::size_type
+    BlockSparseMatrix::n_nonzero_elements() const
+    {
+      size_type n_nonzero = 0;
+      for (size_type rows = 0; rows < this->n_block_rows(); ++rows)
+        for (size_type cols = 0; cols < this->n_block_cols(); ++cols)
+          n_nonzero += this->block(rows, cols).n_nonzero_elements();
+
+      return n_nonzero;
+    }
+
     const MPI_Comm &
     BlockSparseMatrix::get_mpi_communicator() const
     {
