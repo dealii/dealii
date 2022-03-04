@@ -415,10 +415,6 @@ namespace internal
                  dealii::BlockVector<T> &                    vec);
   } // namespace AffineConstraintsImplementation
 } // namespace internal
-
-
-template <typename number>
-class AffineConstraints;
 #endif
 
 // TODO[WB]: We should have a function of the kind
@@ -2348,6 +2344,8 @@ AffineConstraints<number>::get_dof_values(
     }
 }
 
+// Forward declarations
+#ifndef DOXYGEN
 template <typename MatrixType>
 class BlockMatrixBase;
 template <typename SparsityPatternType>
@@ -2465,6 +2463,7 @@ namespace internal
 
   } // namespace AffineConstraints
 } // namespace internal
+#endif
 
 
 
