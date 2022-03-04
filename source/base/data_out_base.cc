@@ -7694,11 +7694,8 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   int ierr = MPI_Info_create(&info);
   AssertThrowMPI(ierr);
   MPI_File fh;
-  ierr = MPI_File_open(comm,
-                       DEAL_II_MPI_CONST_CAST(filename.c_str()),
-                       MPI_MODE_CREATE | MPI_MODE_WRONLY,
-                       info,
-                       &fh);
+  ierr = MPI_File_open(
+    comm, filename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
   AssertThrow(ierr == MPI_SUCCESS, ExcFileNotOpen(filename));
 
   ierr = MPI_File_set_size(fh, 0); // delete the file contents
@@ -7720,11 +7717,8 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
       header_size = ss.str().size();
       // Write the header on rank 0 and automatically move the
       // shared file pointer to the location after header;
-      ierr = MPI_File_write_shared(fh,
-                                   DEAL_II_MPI_CONST_CAST(ss.str().c_str()),
-                                   header_size,
-                                   MPI_CHAR,
-                                   MPI_STATUS_IGNORE);
+      ierr = MPI_File_write_shared(
+        fh, ss.str().c_str(), header_size, MPI_CHAR, MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
     }
 
@@ -7747,11 +7741,8 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
                                   vtk_flags,
                                   ss);
 
-    ierr = MPI_File_write_ordered(fh,
-                                  DEAL_II_MPI_CONST_CAST(ss.str().c_str()),
-                                  ss.str().size(),
-                                  MPI_CHAR,
-                                  MPI_STATUS_IGNORE);
+    ierr = MPI_File_write_ordered(
+      fh, ss.str().c_str(), ss.str().size(), MPI_CHAR, MPI_STATUS_IGNORE);
     AssertThrowMPI(ierr);
   }
 
@@ -7761,11 +7752,8 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
       std::stringstream ss;
       DataOutBase::write_vtu_footer(ss);
       unsigned int footer_size = ss.str().size();
-      ierr = MPI_File_write_shared(fh,
-                                   DEAL_II_MPI_CONST_CAST(ss.str().c_str()),
-                                   footer_size,
-                                   MPI_CHAR,
-                                   MPI_STATUS_IGNORE);
+      ierr = MPI_File_write_shared(
+        fh, ss.str().c_str(), footer_size, MPI_CHAR, MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
     }
   ierr = MPI_File_close(&fh);

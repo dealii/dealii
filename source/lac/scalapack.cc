@@ -391,7 +391,7 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
   const int              n = 1;
   const std::vector<int> ranks(n, rank);
   MPI_Group              group_B;
-  MPI_Group_incl(group_A, n, DEAL_II_MPI_CONST_CAST(ranks.data()), &group_B);
+  MPI_Group_incl(group_A, n, ranks.data(), &group_B);
   MPI_Comm communicator_B;
 
   const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_from;
@@ -562,7 +562,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
   const int              n = 1;
   const std::vector<int> ranks(n, rank);
   MPI_Group              group_B;
-  MPI_Group_incl(group_A, n, DEAL_II_MPI_CONST_CAST(ranks.data()), &group_B);
+  MPI_Group_incl(group_A, n, ranks.data(), &group_B);
   MPI_Comm communicator_B;
 
   const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_to;

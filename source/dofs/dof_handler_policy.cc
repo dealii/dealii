@@ -3913,13 +3913,12 @@ namespace internal
         // --------- Phase 4: shift indices so that each processor has a unique
         //                    range of indices
         dealii::types::global_dof_index my_shift = 0;
-        const int                       ierr =
-          MPI_Exscan(DEAL_II_MPI_CONST_CAST(&n_locally_owned_dofs),
-                     &my_shift,
-                     1,
-                     DEAL_II_DOF_INDEX_MPI_TYPE,
-                     MPI_SUM,
-                     triangulation->get_communicator());
+        const int                       ierr = MPI_Exscan(&n_locally_owned_dofs,
+                                    &my_shift,
+                                    1,
+                                    DEAL_II_DOF_INDEX_MPI_TYPE,
+                                    MPI_SUM,
+                                    triangulation->get_communicator());
         AssertThrowMPI(ierr);
 
         // make dof indices globally consecutive
@@ -4130,8 +4129,7 @@ namespace internal
             //* 3. communicate local dofcount and shift ids to make
             // them unique
             dealii::types::global_dof_index my_shift = 0;
-            int ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(
-                                    &level_number_cache.n_locally_owned_dofs),
+            int ierr = MPI_Exscan(&level_number_cache.n_locally_owned_dofs,
                                   &my_shift,
                                   1,
                                   DEAL_II_DOF_INDEX_MPI_TYPE,
