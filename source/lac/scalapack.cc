@@ -184,14 +184,14 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
     }
   int ierr = MPI_Bcast(&n_rows,
                        1,
-                       Utilities::MPI::mpi_type_id(&n_rows),
+                       Utilities::MPI::mpi_type_id_for_type<decltype(n_rows)>,
                        0 /*from root*/,
                        process_grid->mpi_communicator);
   AssertThrowMPI(ierr);
 
   ierr = MPI_Bcast(&n_columns,
                    1,
-                   Utilities::MPI::mpi_type_id(&n_columns),
+                   Utilities::MPI::mpi_type_id_for_type<decltype(n_columns)>,
                    0 /*from root*/,
                    process_grid->mpi_communicator);
   AssertThrowMPI(ierr);
