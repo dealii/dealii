@@ -26,18 +26,126 @@ namespace Utilities
   {
     namespace internal
     {
-      /**
-       * An internal namespace used for Utilities::MPI::compute_index_owner()
-       * and for Utilities::MPI::Partitioner::set_ghost_indices().
-       */
       namespace ComputeIndexOwner
       {
+        const FlexibleIndexStorage::index_type
+          FlexibleIndexStorage::invalid_index_value;
+
+
+
+        FlexibleIndexStorage::FlexibleIndexStorage(const bool use_vector)
+          : use_vector(use_vector)
+          , size(0)
+        {}
+
+
+
+        void
+        FlexibleIndexStorage::reinit(const bool        use_vector,
+                                     const std::size_t size)
+        {
+          this->use_vector = use_vector;
+          this->size       = size;
+
+          data.clear();
+          data_map.clear();
+
+          if (use_vector)
+            {
+              data = {};
+              data.resize(size, invalid_index_value);
+            }
+        }
+
+
+
+        void
+        FlexibleIndexStorage::fill(
+          const std::size_t                       start,
+          const std::size_t                       end,
+          const FlexibleIndexStorage::index_type &value)
+        {
+          AssertIndexRange(start, size);
+          AssertIndexRange(end, size + 1);
+
+          if (use_vector)
+            {
+              AssertDimension(data.size(), size);
+              std::fill(data.begin() + start, data.begin() + end, value);
+            }
+          else
+            {
+              for (auto i = start; i < end; ++i)
+                data_map[i] = value;
+            }
+        }
+
+
+
+        FlexibleIndexStorage::index_type &
+        FlexibleIndexStorage::operator[](const std::size_t index)
+        {
+          AssertIndexRange(index, size);
+
+          if (use_vector)
+            {
+              AssertDimension(data.size(), size);
+              return data[index];
+            }
+          else
+            {
+              if (data_map.find(index) == data_map.end())
+                data_map[index] = invalid_index_value;
+
+              return data_map[index];
+            }
+        }
+
+
+
+        FlexibleIndexStorage::index_type
+        FlexibleIndexStorage::operator[](const std::size_t index) const
+        {
+          AssertIndexRange(index, size);
+
+          if (use_vector)
+            {
+              AssertDimension(data.size(), size);
+              return data[index];
+            }
+          else
+            {
+              if (data_map.find(index) == data_map.end())
+                return invalid_index_value;
+
+              return data_map.at(index);
+            }
+        }
+
+
+
+        bool
+        FlexibleIndexStorage::entry_has_been_set(const std::size_t index) const
+        {
+          AssertIndexRange(index, size);
+
+          if (use_vector)
+            {
+              AssertDimension(data.size(), size);
+              return data[index] != invalid_index_value;
+            }
+          else
+            return data_map.find(index) != data_map.end();
+        }
+
+
+
         DictionaryPayLoad::DictionaryPayLoad(
           const std::map<unsigned int,
                          std::vector<std::pair<types::global_dof_index,
                                                types::global_dof_index>>>
-            &                        buffers,
-          std::vector<unsigned int> &actually_owning_ranks,
+            &                   buffers,
+          FlexibleIndexStorage &actually_owning_ranks,
           const std::pair<types::global_dof_index, types::global_dof_index>
             &                        local_range,
           std::vector<unsigned int> &actually_owning_rank_list)
@@ -92,8 +200,8 @@ namespace Utilities
                    i < interval.second;
                    i++)
                 Assert(
-                  actually_owning_ranks[i - local_range.first] ==
-                    numbers::invalid_unsigned_int,
+                  actually_owning_ranks.entry_has_been_set(
+                    i - local_range.first) == false,
                   ExcMessage(
                     "Multiple processes seem to own the same global index. "
                     "A possible reason is that the sets of locally owned "
@@ -105,11 +213,9 @@ namespace Utilities
                 ExcMessage(
                   "The specified interval is not handled by the current process."));
 #endif
-              std::fill(actually_owning_ranks.data() + interval.first -
-                          local_range.first,
-                        actually_owning_ranks.data() + interval.second -
-                          local_range.first,
-                        other_rank);
+              actually_owning_ranks.fill(interval.first - local_range.first,
+                                         interval.second - local_range.first,
+                                         other_rank);
             }
           actually_owning_rank_list.push_back(other_rank);
         }
@@ -131,9 +237,12 @@ namespace Utilities
                                          types::global_dof_index>>>
             buffers;
 
-          std::fill(actually_owning_ranks.begin(),
-                    actually_owning_ranks.end(),
-                    numbers::invalid_subdomain_id);
+          const auto owned_indices_size_actual =
+            Utilities::MPI::sum(owned_indices.n_elements(), comm);
+
+          actually_owning_ranks.reinit((owned_indices_size_actual *
+                                        sparsity_factor) > owned_indices.size(),
+                                       locally_owned_size);
 
           // 2) collect relevant processes and process local dict entries
           for (auto interval = owned_indices.begin_intervals();
@@ -177,11 +286,10 @@ namespace Utilities
                   // buffer to be sent to another processor
                   if (owner == my_rank)
                     {
-                      std::fill(actually_owning_ranks.data() +
-                                  index_range.first - local_range.first,
-                                actually_owning_ranks.data() + next_index -
-                                  local_range.first,
-                                my_rank);
+                      actually_owning_ranks.fill(index_range.first -
+                                                   local_range.first,
+                                                 next_index - local_range.first,
+                                                 my_rank);
                       dic_local_received += next_index - index_range.first;
                       if (actually_owning_rank_list.empty())
                         actually_owning_rank_list.push_back(my_rank);
@@ -197,8 +305,7 @@ namespace Utilities
           std::vector<MPI_Request> request;
 
           // Check if index set space is partitioned globally without gaps.
-          if (Utilities::MPI::sum(owned_indices.n_elements(), comm) ==
-              owned_indices.size())
+          if (owned_indices_size_actual == owned_indices.size())
             {
               // no gaps: setup is simple! Processes send their locally owned
               // indices to the dictionary. The dictionary stores the sending
@@ -268,8 +375,8 @@ namespace Utilities
                       for (types::global_dof_index i = interval.first;
                            i < interval.second;
                            i++)
-                        Assert(actually_owning_ranks[i - local_range.first] ==
-                                 numbers::invalid_unsigned_int,
+                        Assert(actually_owning_ranks.entry_has_been_set(
+                                 i - local_range.first) == false,
                                ExcInternalError());
                       Assert(interval.first >= local_range.first &&
                                interval.first < local_range.second,
@@ -279,11 +386,11 @@ namespace Utilities
                              ExcInternalError());
 #  endif
 
-                      std::fill(actually_owning_ranks.data() + interval.first -
-                                  local_range.first,
-                                actually_owning_ranks.data() + interval.second -
-                                  local_range.first,
-                                other_rank);
+                      actually_owning_ranks.fill(interval.first -
+                                                   local_range.first,
+                                                 interval.second -
+                                                   local_range.first,
+                                                 other_rank);
                       dic_local_received += interval.second - interval.first;
                     }
                 }
@@ -356,10 +463,6 @@ namespace Utilities
           local_range.second = get_index_offset(my_rank + 1);
 
           locally_owned_size = local_range.second - local_range.first;
-
-          actually_owning_ranks = {};
-          actually_owning_ranks.resize(locally_owned_size,
-                                       numbers::invalid_unsigned_int);
 #else
           (void)owned_indices;
           (void)comm;
