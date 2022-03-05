@@ -149,10 +149,10 @@ namespace internal
 
     tree_sizes.push_back(0);
     for (unsigned int i = 0; i < n_global_levels; ++i)
-      tree_sizes.push_back(
-        tree_sizes.back() +
-        Utilities::pow(GeometryInfo<dim>::max_children_per_cell, i) *
-          n_coarse_cells);
+      tree_sizes.push_back(tree_sizes.back() +
+                           Utilities::pow<types::global_cell_index>(
+                             GeometryInfo<dim>::max_children_per_cell, i) *
+                             n_coarse_cells);
   }
 
 
@@ -162,8 +162,8 @@ namespace internal
   CellIDTranslator<dim>::size() const
   {
     return n_coarse_cells *
-           (Utilities::pow(GeometryInfo<dim>::max_children_per_cell,
-                           n_global_levels) -
+           (Utilities::pow<types::global_cell_index>(
+              GeometryInfo<dim>::max_children_per_cell, n_global_levels) -
             1);
   }
 
