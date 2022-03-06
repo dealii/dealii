@@ -20,13 +20,13 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/std_cxx17/variant.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
-#include <boost/variant.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <fstream>
@@ -48,10 +48,10 @@ namespace internal
   /**
    * A <tt>TableEntry</tt> stores the value of a table entry. It can either be
    * of type int, unsigned int, std::uint64_t, double or std::string. In
-   * essence, this structure is the same as <code>boost::variant@<int,unsigned
-   * int,std::uint64_t,double,std::string@></code> but we wrap this object in a
+   * essence, this structure is the same as `std::variant<int,unsigned
+   * int,std::uint64_t,double,std::string>` but we wrap this object in a
    * structure for which we can write a function that can serialize it. This is
-   * also why the function is not in fact of type boost::any.
+   * also why the function is not in fact of type std::any.
    */
   struct TableEntry
   {
@@ -151,7 +151,7 @@ namespace internal
      * Abbreviation for the data type stored by this object.
      */
     using value_type =
-      boost::variant<int, unsigned int, std::uint64_t, double, std::string>;
+      std_cxx17::variant<int, unsigned int, std::uint64_t, double, std::string>;
 
     /**
      * Stored value.
@@ -820,13 +820,13 @@ namespace internal
   {
     // we don't quite know the data type in 'value', but
     // it must be one of the ones in the type list of the
-    // boost::variant. so if T is not in the list, or if
+    // std_cxx17::variant. so if T is not in the list, or if
     // the data stored in the TableEntry is not of type
     // T, then we will get an exception that we can
     // catch and produce an error message
     try
       {
-        return boost::get<T>(value);
+        return std_cxx17::get<T>(value);
       }
     catch (...)
       {
