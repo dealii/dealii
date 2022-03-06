@@ -318,6 +318,7 @@ namespace parallel
   }
 
 
+
   template <int dim, int spacedim>
   types::subdomain_id
   TriangulationBase<dim, spacedim>::locally_owned_subdomain() const
@@ -639,6 +640,8 @@ namespace parallel
     return number_cache.active_cell_index_partitioner;
   }
 
+
+
   template <int dim, int spacedim>
   const std::weak_ptr<const Utilities::MPI::Partitioner>
   TriangulationBase<dim, spacedim>::global_level_cell_index_partitioner(
@@ -725,6 +728,34 @@ namespace parallel
   }
 
 
+
+  template <int dim, int spacedim>
+  bool
+  DistributedTriangulationBase<dim, spacedim>::has_hanging_nodes() const
+  {
+    if (this->n_global_levels() <= 1)
+      return false; // can not have hanging nodes without refined cells
+
+    // if there are any active cells with level less than n_global_levels()-1,
+    // then there is obviously also one with level n_global_levels()-1, and
+    // consequently there must be a hanging node somewhere.
+    //
+    // The problem is that we cannot just ask for the first active cell, but
+    // instead need to filter over locally owned cells.
+    const bool have_coarser_cell =
+      std::any_of(this->begin_active(this->n_global_levels() - 2),
+                  this->end_active(this->n_global_levels() - 2),
+                  [](const CellAccessor<dim, spacedim> &cell) {
+                    return cell.is_locally_owned();
+                  });
+
+    // return true if at least one process has a coarser cell
+    return Utilities::MPI::max(have_coarser_cell ? 1 : 0,
+                               this->mpi_communicator) != 0;
+  }
+
+
+
   template <int dim, int spacedim>
   void
   DistributedTriangulationBase<dim, spacedim>::load_attached_data(
@@ -760,6 +791,8 @@ namespace parallel
       }
   }
 
+
+
   template <int dim, int spacedim>
   unsigned int
   DistributedTriangulationBase<dim, spacedim>::register_data_attach(
@@ -787,6 +820,7 @@ namespace parallel
 
     return handle;
   }
+
 
 
   template <int dim, int spacedim>

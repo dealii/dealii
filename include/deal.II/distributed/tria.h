@@ -567,25 +567,6 @@ namespace parallel
       void
       repartition();
 
-
-      /**
-       * Return true if the triangulation has hanging nodes.
-       *
-       * In the context of parallel distributed triangulations, every
-       * processor stores only that part of the triangulation it locally owns.
-       * However, it also stores the entire coarse mesh, and to guarantee the
-       * 2:1 relationship between cells, this may mean that there are hanging
-       * nodes between cells that are not locally owned or ghost cells (i.e.,
-       * between ghost cells and artificial cells, or between artificial and
-       * artificial cells; see
-       * @ref GlossArtificialCell "the glossary").
-       * One is not typically interested in this case, so the function returns
-       * whether there are hanging nodes between any two cells of the "global"
-       * mesh, i.e., the union of locally owned cells on all processors.
-       */
-      virtual bool
-      has_hanging_nodes() const override;
-
       /**
        * Return the local memory consumption in bytes.
        */
