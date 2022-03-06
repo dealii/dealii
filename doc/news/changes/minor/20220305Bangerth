@@ -1,0 +1,6 @@
+New: There is now a function ReferenceCell::contains_point() that
+provides the generalized equivalent of a function in the GeometryInfo
+class that will eventually be deprecated.
+type.
+<br>
+(Wolfgang Bangerth, 2022/03/05)
