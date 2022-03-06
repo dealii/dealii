@@ -80,9 +80,7 @@ namespace Utilities
             }
 #  endif
             const int ierr =
-              MPI_Allreduce(values != output ?
-                              DEAL_II_MPI_CONST_CAST(values.data()) :
-                              MPI_IN_PLACE,
+              MPI_Allreduce(values != output ? values.data() : MPI_IN_PLACE,
                             static_cast<void *>(output.data()),
                             static_cast<int>(values.size()),
                             mpi_type_id_for_type<decltype(*values.data())>,

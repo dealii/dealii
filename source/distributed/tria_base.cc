@@ -1451,7 +1451,7 @@ namespace parallel
 
       MPI_File fh;
       ierr = MPI_File_open(mpi_communicator,
-                           DEAL_II_MPI_CONST_CAST(fname_fixed.c_str()),
+                           fname_fixed.c_str(),
                            MPI_MODE_CREATE | MPI_MODE_WRONLY,
                            info,
                            &fh);
@@ -1475,8 +1475,7 @@ namespace parallel
         {
           ierr = MPI_File_write_at(fh,
                                    0,
-                                   DEAL_II_MPI_CONST_CAST(
-                                     sizes_fixed_cumulative.data()),
+                                   sizes_fixed_cumulative.data(),
                                    sizes_fixed_cumulative.size(),
                                    MPI_UNSIGNED,
                                    MPI_STATUS_IGNORE);
@@ -1496,13 +1495,12 @@ namespace parallel
       if (src_data_fixed.size() <=
           static_cast<std::size_t>(std::numeric_limits<int>::max()))
         {
-          ierr =
-            MPI_File_write_at(fh,
-                              my_global_file_position,
-                              DEAL_II_MPI_CONST_CAST(src_data_fixed.data()),
-                              src_data_fixed.size(),
-                              MPI_BYTE,
-                              MPI_STATUS_IGNORE);
+          ierr = MPI_File_write_at(fh,
+                                   my_global_file_position,
+                                   src_data_fixed.data(),
+                                   src_data_fixed.size(),
+                                   MPI_BYTE,
+                                   MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
         }
       else
@@ -1511,7 +1509,7 @@ namespace parallel
           ierr =
             MPI_File_write_at(fh,
                               my_global_file_position,
-                              DEAL_II_MPI_CONST_CAST(src_data_fixed.data()),
+                              src_data_fixed.data(),
                               1,
                               *Utilities::MPI::create_mpi_data_type_n_bytes(
                                 src_data_fixed.size()),
@@ -1539,7 +1537,7 @@ namespace parallel
 
         MPI_File fh;
         ierr = MPI_File_open(mpi_communicator,
-                             DEAL_II_MPI_CONST_CAST(fname_variable.c_str()),
+                             fname_variable.c_str(),
                              MPI_MODE_CREATE | MPI_MODE_WRONLY,
                              info,
                              &fh);
@@ -1566,13 +1564,12 @@ namespace parallel
                           std::numeric_limits<int>::max()),
                       ExcNotImplemented());
 
-          ierr =
-            MPI_File_write_at(fh,
-                              my_global_file_position,
-                              DEAL_II_MPI_CONST_CAST(src_sizes_variable.data()),
-                              src_sizes_variable.size(),
-                              MPI_INT,
-                              MPI_STATUS_IGNORE);
+          ierr = MPI_File_write_at(fh,
+                                   my_global_file_position,
+                                   src_sizes_variable.data(),
+                                   src_sizes_variable.size(),
+                                   MPI_INT,
+                                   MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
         }
 
@@ -1581,7 +1578,7 @@ namespace parallel
         // to avoid overflow for files larger than 4GB:
         const std::uint64_t size_on_proc = src_data_variable.size();
         std::uint64_t       prefix_sum   = 0;
-        ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
+        ierr                             = MPI_Exscan(&size_on_proc,
                           &prefix_sum,
                           1,
                           MPI_UINT64_T,
@@ -1599,8 +1596,7 @@ namespace parallel
           {
             ierr = MPI_File_write_at(fh,
                                      my_global_file_position,
-                                     DEAL_II_MPI_CONST_CAST(
-                                       src_data_variable.data()),
+                                     src_data_variable.data(),
                                      src_data_variable.size(),
                                      MPI_BYTE,
                                      MPI_STATUS_IGNORE);
@@ -1612,8 +1608,7 @@ namespace parallel
             ierr =
               MPI_File_write_at(fh,
                                 my_global_file_position,
-                                DEAL_II_MPI_CONST_CAST(
-                                  src_data_variable.data()),
+                                src_data_variable.data(),
                                 1,
                                 *Utilities::MPI::create_mpi_data_type_n_bytes(
                                   src_data_variable.size()),
@@ -1667,11 +1662,8 @@ namespace parallel
       AssertThrowMPI(ierr);
 
       MPI_File fh;
-      ierr = MPI_File_open(mpi_communicator,
-                           DEAL_II_MPI_CONST_CAST(fname_fixed.c_str()),
-                           MPI_MODE_RDONLY,
-                           info,
-                           &fh);
+      ierr = MPI_File_open(
+        mpi_communicator, fname_fixed.c_str(), MPI_MODE_RDONLY, info, &fh);
       AssertThrowMPI(ierr);
 
       ierr = MPI_Info_free(&info);
@@ -1747,11 +1739,8 @@ namespace parallel
         AssertThrowMPI(ierr);
 
         MPI_File fh;
-        ierr = MPI_File_open(mpi_communicator,
-                             DEAL_II_MPI_CONST_CAST(fname_variable.c_str()),
-                             MPI_MODE_RDONLY,
-                             info,
-                             &fh);
+        ierr = MPI_File_open(
+          mpi_communicator, fname_variable.c_str(), MPI_MODE_RDONLY, info, &fh);
         AssertThrowMPI(ierr);
 
         ierr = MPI_Info_free(&info);
@@ -1780,7 +1769,7 @@ namespace parallel
                           0ULL);
 
         std::uint64_t prefix_sum = 0;
-        ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
+        ierr                     = MPI_Exscan(&size_on_proc,
                           &prefix_sum,
                           1,
                           MPI_UINT64_T,

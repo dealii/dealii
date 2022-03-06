@@ -1182,14 +1182,13 @@ namespace SparsityTools
       unsigned int idx = 0;
       for (const auto &sparsity_line : send_data)
         {
-          const int ierr =
-            MPI_Isend(DEAL_II_MPI_CONST_CAST(sparsity_line.second.data()),
-                      sparsity_line.second.size(),
-                      DEAL_II_DOF_INDEX_MPI_TYPE,
-                      sparsity_line.first,
-                      mpi_tag,
-                      mpi_comm,
-                      &requests[idx++]);
+          const int ierr = MPI_Isend(sparsity_line.second.data(),
+                                     sparsity_line.second.size(),
+                                     DEAL_II_DOF_INDEX_MPI_TYPE,
+                                     sparsity_line.first,
+                                     mpi_tag,
+                                     mpi_comm,
+                                     &requests[idx++]);
           AssertThrowMPI(ierr);
         }
     }
