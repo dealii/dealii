@@ -457,6 +457,29 @@ public:
    * @{
    */
 
+  /**
+   * Return true if the given point is inside the reference cell of the present
+   * space dimension up to some tolerance. This function accepts an additional
+   * parameter (which defaults to zero) which specifies by how much the point
+   * position may actually be outside the true reference cell. This is useful
+   * because in practice we may often not be able to compute the coordinates of
+   * a point in reference coordinates exactly, but only up to numerical
+   * roundoff. For example, strictly speaking one would expect that for points
+   * on the boundary of the reference cell, the function would return `true` if
+   * the tolerance was zero. But in practice, this may or may not actually be
+   * true; for example, the point $(1/3, 2/3)$ is on the boundary of the
+   * reference triangle because $1/3+2/3 \le 1$, but since neither of its
+   * coordinates are exactly representable in floating point arithmetic, the
+   * floating point representations of $1/3$ and $2/3$ may or may not add up to
+   * anything that is less than or equal to one.
+   *
+   * The tolerance parameter may be less than zero, indicating that the point
+   * should be safely inside the cell.
+   */
+  template <int dim>
+  bool
+  contains_point(const Point<dim> &p, const double tolerance = 0) const;
+
   /*
    * Return $i$-th unit tangential vector of a face of the reference cell.
    * The vectors are arranged such that the
@@ -1896,6 +1919,69 @@ ReferenceCell::d_linear_shape_function_gradient(const Point<dim> & xi,
 
   return Point<dim>(+0.0, +0.0, +0.0);
 }
+
+
+
+template <int dim>
+inline bool
+ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
+{
+  AssertDimension(dim, get_dimension());
+
+  if (*this == ReferenceCells::Vertex)
+    {
+      // Vertices are special cases in that they do not actually
+      // have coordinates. Error out if this function is called
+      // with a vertex:
+      Assert(false,
+             ExcMessage("Vertices are zero-dimensional objects and "
+                        "as a consequence have no coordinates. You "
+                        "cannot meaningfully ask whether a point is "
+                        "inside a vertex (within a certain tolerance) "
+                        "without coordinate values."));
+      return false;
+    }
+  else if (*this == ReferenceCells::get_hypercube<dim>())
+    {
+      for (unsigned int d = 0; d < dim; ++d)
+        if ((p[d] < -tolerance) || (p[d] > 1 + tolerance))
+          return false;
+      return true;
+    }
+  else if (*this == ReferenceCells::get_simplex<dim>())
+    {
+      // First make sure that we are in the first quadrant or octant
+      for (unsigned int d = 0; d < dim; ++d)
+        if (p[d] < -tolerance)
+          return false;
+
+      // Now we also need to make sure that we are below the diagonal line
+      // or plane that delineates the simplex. This diagonal is given by
+      // sum(p[d])<=1, and a diagonal a distance eps away is given by
+      // sum(p[d])<=1+eps*sqrt(d). (For example, the point at (1,1) is a
+      // distance of 1/sqrt(2) away from the diagonal. That is, its
+      // sum satisfies
+      //   sum(p[d]) = 2 <= 1 + (1/sqrt(2)) * sqrt(2)
+      // in other words, it satisfies the predicate with eps=1/sqrt(2).)
+      double sum = 0;
+      for (unsigned int d = 0; d < dim; ++d)
+        sum += p[d];
+      return (sum <= 1 + tolerance * std::sqrt(1. * dim));
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+  Assert(false, ExcNotImplemented());
+
+  return false;
+}
+
 
 
 template <int dim>
