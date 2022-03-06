@@ -205,9 +205,16 @@ public:
 
   /**
    * Return a quadrature rule with the support points of the given reference
-   * cell.
+   * cell. For 1d line segments, this corresponds to the quadrature points
+   * of the trapezoidal rule, which by taking tensor products easily
+   * generalizes also to other hypercube elements (see also QTrapezoid).
+   * For all reference cell shapes, the quadrature points are ordered
+   * in the same order as the vertices of the reference cell.
    *
-   * @note The weights of the quadrature object are left unfilled.
+   * @note The weights of the quadrature object are left unfilled and
+   *   consequently the object cannot usefully be used for actually
+   *   computing integrals. This is in contrast to, for example, the QTrapez
+   *   class that correctly sets quadrature weights.
    */
   template <int dim>
   const Quadrature<dim> &
