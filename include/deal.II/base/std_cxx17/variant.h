@@ -32,7 +32,38 @@ namespace std_cxx17
   using boost::get;
   using boost::variant;
 #else
-  using std::get;
+
+  template <std::size_t I, class... Types>
+  constexpr std::add_pointer_t<
+    std::variant_alternative_t<I, std::variant<Types...>>>
+  get(std::variant<Types...> *pv) noexcept
+  {
+    return std::get_if<I>(pv);
+  }
+
+  template <std::size_t I, class... Types>
+  constexpr std::add_pointer_t<
+    const std::variant_alternative_t<I, std::variant<Types...>>>
+  get(const std::variant<Types...> *pv) noexcept
+  {
+    return std::get_if<I>(pv);
+  }
+
+  template <class T, class... Types>
+  constexpr std::add_pointer_t<T>
+  get(std::variant<Types...> *pv) noexcept
+  {
+    return std::get_if<T>(pv);
+  }
+
+  template <class T, class... Types>
+  constexpr std::add_pointer_t<const T>
+  get(const std::variant<Types...> *pv) noexcept
+  {
+    return std::get_if<T>(pv);
+  }
+
+
   using std::variant;
 #endif
 } // namespace std_cxx17
