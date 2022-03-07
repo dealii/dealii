@@ -423,12 +423,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       // set variables that are independent of FE
       if (Utilities::MPI::job_supports_mpi() == true)
         {
-          const parallel::TriangulationBase<dim> *dist_tria =
-            dynamic_cast<const parallel::TriangulationBase<dim> *>(
-              &(dof_handler[0]->get_triangulation()));
-          task_info.communicator = dist_tria != nullptr ?
-                                     dist_tria->get_communicator() :
-                                     MPI_COMM_SELF;
+          task_info.communicator = dof_handler[0]->get_communicator();
           task_info.my_pid =
             Utilities::MPI::this_mpi_process(task_info.communicator);
           task_info.n_procs =
