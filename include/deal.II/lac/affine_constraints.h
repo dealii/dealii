@@ -771,6 +771,22 @@ public:
   close();
 
   /**
+   * Check if the function close() was called or there are no
+   * constraints locally, which is normally the case if a dummy
+   * AffineConstraints was created for the DG case.
+   */
+  bool
+  is_closed() const;
+
+  /**
+   * Check if the function close() was called or there are no
+   * constraints globally, which is normally the case if a dummy
+   * AffineConstraints was created for the DG case.
+   */
+  bool
+  is_closed(const MPI_Comm &comm) const;
+
+  /**
    * Merge the constraints represented by the object given as argument into
    * the constraints represented by this object. Both objects may or may not
    * be closed (by having their function close() called before). If this

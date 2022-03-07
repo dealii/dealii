@@ -939,6 +939,23 @@ AffineConstraints<number>::close()
 
 
 template <typename number>
+bool
+AffineConstraints<number>::is_closed() const
+{
+  return sorted || (n_constraints() == 0);
+}
+
+
+
+template <typename number>
+bool
+AffineConstraints<number>::is_closed(const MPI_Comm &comm) const
+{
+  return Utilities::MPI::min(static_cast<unsigned int>(is_closed()), comm) == 1;
+}
+
+
+template <typename number>
 void
 AffineConstraints<number>::merge(
   const AffineConstraints<number> &other_constraints,
