@@ -846,27 +846,27 @@ namespace internal
     // write first an identifier for the kind
     // of data stored and then the actual
     // data, in its correct data type
-    if (const int *p = boost::get<int>(&value))
+    if (const int *p = std_cxx17::get<int>(&value))
       {
         char c = 'i';
         ar &c &*p;
       }
-    else if (const unsigned int *p = boost::get<unsigned int>(&value))
+    else if (const unsigned int *p = std_cxx17::get<unsigned int>(&value))
       {
         char c = 'u';
         ar &c &*p;
       }
-    else if (const double *p = boost::get<double>(&value))
+    else if (const double *p = std_cxx17::get<double>(&value))
       {
         char c = 'd';
         ar &c &*p;
       }
-    else if (const std::string *p = boost::get<std::string>(&value))
+    else if (const std::string *p = std_cxx17::get<std::string>(&value))
       {
         char c = 's';
         ar &c &*p;
       }
-    else if (const std::uint64_t *p = boost::get<std::uint64_t>(&value))
+    else if (const std::uint64_t *p = std_cxx17::get<std::uint64_t>(&value))
       {
         char c = 'l';
         ar &c &*p;
