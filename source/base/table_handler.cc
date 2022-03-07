@@ -91,7 +91,11 @@ namespace internal
     else
       ss.setf(std::ios::fixed, std::ios::floatfield);
 
+#ifdef DEAL_II_HAVE_CXX17
+    std::visit([&ss](auto &v) { ss << v; }, value);
+#else
     ss << value;
+#endif
 
     cached_value = ss.str();
     if (cached_value.size() == 0)
@@ -132,7 +136,9 @@ namespace internal
     // Let std::visit figure out which data type is actually stored,
     // and then set the object so stored to a default-constructed
     // one.
-    std::visit([](auto &arg) { arg = decltype(arg)(); }, new_entry.value);
+    std::visit([](
+                 auto &arg) { arg = std::remove_reference_t<decltype(arg)>(); },
+               new_entry.value);
 #endif
 
     return new_entry;
@@ -722,7 +728,11 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
           else
             out.setf(std::ios::fixed, std::ios::floatfield);
 
+#ifdef DEAL_II_HAVE_CXX17
+          std::visit([&out](auto &v) { out << v; }, column.entries[i].value);
+#else
           out << column.entries[i].value;
+#endif
 
           if (j < n_cols - 1)
             out << " & ";
