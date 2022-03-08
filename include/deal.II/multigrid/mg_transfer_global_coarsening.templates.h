@@ -395,6 +395,74 @@ namespace internal
       return matrix;
     }
 
+    template <int dim>
+    bool
+    use_fast_hanging_node_algorithm(const DoFHandler<dim> &dof_handler_coarse,
+                                    const unsigned int     mg_level_coarse)
+    {
+      // algorithm is only needed on active levels
+      bool use_fast_hanging_node_algorithm =
+        mg_level_coarse == numbers::invalid_unsigned_int;
+
+      // algorithm can be only used on meshes consisting of hypercube and
+      // simplices
+      if (use_fast_hanging_node_algorithm)
+        {
+          const auto &reference_cells =
+            dof_handler_coarse.get_triangulation().get_reference_cells();
+          use_fast_hanging_node_algorithm =
+            std::all_of(reference_cells.begin(),
+                        reference_cells.end(),
+                        [](const auto &r) {
+                          return r.is_hyper_cube() || r.is_simplex();
+                        });
+        }
+
+      // local p-refinement is not supported
+      if (use_fast_hanging_node_algorithm)
+        {
+          const auto &fes = dof_handler_coarse.get_fe_collection();
+
+          use_fast_hanging_node_algorithm &=
+            std::all_of(fes.begin(), fes.end(), [&fes](const auto &fe) {
+              return fes[0].compare_for_domination(fe) ==
+                     FiniteElementDomination::Domination::
+                       either_element_can_dominate;
+            });
+        }
+
+      // check that all components are either supported or not
+      if (use_fast_hanging_node_algorithm)
+        {
+          const std::vector<std::vector<bool>> supported_components =
+            internal::MatrixFreeFunctions::HangingNodes<
+              dim>::compute_supported_components(dof_handler_coarse
+                                                   .get_fe_collection());
+
+          use_fast_hanging_node_algorithm &= std::any_of(
+            supported_components.begin(),
+            supported_components.end(),
+            [](const auto &supported_components_per_fe) {
+              return std::all_of(supported_components_per_fe.begin(),
+                                 supported_components_per_fe.end(),
+                                 [](const auto &a) { return a == true; });
+            });
+
+          use_fast_hanging_node_algorithm &= std::all_of(
+            supported_components.begin(),
+            supported_components.end(),
+            [](const auto &supported_components_per_fe) {
+              return std::all_of(supported_components_per_fe.begin(),
+                                 supported_components_per_fe.end(),
+                                 [&supported_components_per_fe](const auto &a) {
+                                   return a == supported_components_per_fe[0];
+                                 });
+            });
+        }
+
+      return use_fast_hanging_node_algorithm;
+    }
+
   } // namespace
 
   class FineDoFHandlerViewCell
@@ -1288,105 +1356,32 @@ namespace internal
                                              hanging_nodes;
       std::vector<std::vector<unsigned int>> lexicographic_mappings;
 
-      {
-        // algorithm is only needed on active levels
-        bool use_fast_hanging_node_algorithm =
-          mg_level_coarse == numbers::invalid_unsigned_int;
+      // create helper class
+      if (use_fast_hanging_node_algorithm(dof_handler_coarse, mg_level_coarse))
+        {
+          hanging_nodes =
+            std::make_unique<internal::MatrixFreeFunctions::HangingNodes<dim>>(
+              dof_handler_coarse.get_triangulation());
 
-        const auto &tria = dof_handler_coarse.get_triangulation();
+          const auto &fes = dof_handler_coarse.get_fe_collection();
+          lexicographic_mappings.resize(fes.size());
 
-        // algorithm can be only used on meshes consisting of hypercube and
-        // simplices
-        if (use_fast_hanging_node_algorithm)
-          {
-            const auto &reference_cells = tria.get_reference_cells();
-            use_fast_hanging_node_algorithm =
-              std::all_of(reference_cells.begin(),
-                          reference_cells.end(),
-                          [](const auto &r) {
-                            return r.is_hyper_cube() || r.is_simplex();
-                          });
-          }
-
-        // local p-refinement is not supported
-        if (use_fast_hanging_node_algorithm)
-          {
-            const auto &fes = dof_handler_coarse.get_fe_collection();
-
-            use_fast_hanging_node_algorithm &=
-              std::all_of(fes.begin(), fes.end(), [&fes](const auto &fe) {
-                return fes[0].compare_for_domination(fe) ==
-                       FiniteElementDomination::Domination::
-                         either_element_can_dominate;
-              });
-          }
-
-        // check that all components are either supported or not
-        if (use_fast_hanging_node_algorithm)
-          {
-            const std::vector<std::vector<bool>> supported_components =
-              internal::MatrixFreeFunctions::HangingNodes<
-                dim>::compute_supported_components(dof_handler_coarse
-                                                     .get_fe_collection());
-
-            use_fast_hanging_node_algorithm &= std::any_of(
-              supported_components.begin(),
-              supported_components.end(),
-              [](const auto &supported_components_per_fe) {
-                return std::all_of(supported_components_per_fe.begin(),
-                                   supported_components_per_fe.end(),
-                                   [](const auto &a) { return a == true; });
-              });
-
-            use_fast_hanging_node_algorithm &=
-              std::all_of(supported_components.begin(),
-                          supported_components.end(),
-                          [](const auto &supported_components_per_fe) {
-                            return std::all_of(
-                              supported_components_per_fe.begin(),
-                              supported_components_per_fe.end(),
-                              [&supported_components_per_fe](const auto &a) {
-                                return a == supported_components_per_fe[0];
-                              });
-                          });
-          }
-
-        use_fast_hanging_node_algorithm = false;
-
-        // create helper class
-        if (use_fast_hanging_node_algorithm)
-          {
-            hanging_nodes = std::make_unique<
-              internal::MatrixFreeFunctions::HangingNodes<dim>>(tria);
-
-            const auto &fes = dof_handler_coarse.get_fe_collection();
-            lexicographic_mappings.resize(fes.size());
-
-            for (unsigned int i = 0; i < fes.size(); ++i)
-              if (fes[i].reference_cell().is_hyper_cube())
-                {
-                  const Quadrature<1> dummy_quadrature(
-                    std::vector<Point<1>>(1, Point<1>()));
-                  internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
-                  shape_info.reinit(dummy_quadrature, fes[i], 0);
-                  lexicographic_mappings[i] =
-                    shape_info.lexicographic_numbering;
-                }
-
-            if (fes[fe_index_coarse].reference_cell().is_hyper_cube())
+          for (unsigned int i = 0; i < fes.size(); ++i)
+            if (fes[i].reference_cell().is_hyper_cube())
               {
                 const Quadrature<1> dummy_quadrature(
                   std::vector<Point<1>>(1, Point<1>()));
                 internal::MatrixFreeFunctions::ShapeInfo<
                   VectorizedArray<Number>>
                   shape_info;
-                shape_info.reinit(dummy_quadrature, fes[fe_index_coarse], 0);
+                shape_info.reinit(dummy_quadrature, fes[i], 0);
+                lexicographic_mappings[i] = shape_info.lexicographic_numbering;
 
-                transfer.schemes[0].shape_info_coarse =
-                  transfer.schemes[1].shape_info_coarse = shape_info;
+                if (i == fe_index_coarse)
+                  transfer.schemes[0].shape_info_coarse =
+                    transfer.schemes[1].shape_info_coarse = shape_info;
               }
-          }
-      }
+        }
 
       // create partitioners and vectors for internal purposes
       {
@@ -2002,8 +1997,34 @@ namespace internal
                       return fe.n_base_elements() == 1 &&
                              (dynamic_cast<const FE_Q<dim> *>(
                                 &fe.base_element(0)) != nullptr);
-                      ;
                     });
+
+      std::unique_ptr<internal::MatrixFreeFunctions::HangingNodes<dim>>
+                                             hanging_nodes;
+      std::vector<std::vector<unsigned int>> lexicographic_mappings;
+
+      // create helper class
+      if (use_fast_hanging_node_algorithm(dof_handler_coarse, mg_level_coarse))
+        {
+          hanging_nodes =
+            std::make_unique<internal::MatrixFreeFunctions::HangingNodes<dim>>(
+              dof_handler_coarse.get_triangulation());
+
+          const auto &fes = dof_handler_coarse.get_fe_collection();
+          lexicographic_mappings.resize(fes.size());
+
+          for (unsigned int i = 0; i < fes.size(); ++i)
+            if (fes[i].reference_cell().is_hyper_cube())
+              {
+                const Quadrature<1> dummy_quadrature(
+                  std::vector<Point<1>>(1, Point<1>()));
+                internal::MatrixFreeFunctions::ShapeInfo<
+                  VectorizedArray<Number>>
+                  shape_info;
+                shape_info.reinit(dummy_quadrature, fes[i], 0);
+                lexicographic_mappings[i] = shape_info.lexicographic_numbering;
+              }
+        }
 
       const auto process_cells = [&](const auto &fu) {
         loop_over_active_or_level_cells(
@@ -2100,11 +2121,15 @@ namespace internal
         std::vector<std::vector<types::global_dof_index>>
           local_dof_indices_coarse(fe_index_pairs.size());
         std::vector<std::vector<types::global_dof_index>>
+          local_dof_indices_coarse_lex(fe_index_pairs.size());
+        std::vector<std::vector<types::global_dof_index>>
           local_dof_indices_fine(fe_index_pairs.size());
 
         for (const auto &fe_index_pair : fe_index_pairs)
           {
             local_dof_indices_coarse[fe_index_pair.second].resize(
+              transfer.schemes[fe_index_pair.second].n_dofs_per_cell_coarse);
+            local_dof_indices_coarse_lex[fe_index_pair.second].resize(
               transfer.schemes[fe_index_pair.second].n_dofs_per_cell_coarse);
             local_dof_indices_fine[fe_index_pair.second].resize(
               transfer.schemes[fe_index_pair.second].n_dofs_per_cell_fine);
@@ -2130,7 +2155,9 @@ namespace internal
               {
                 const Quadrature<1> dummy_quadrature(
                   std::vector<Point<1>>(1, Point<1>()));
-                internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
+                internal::MatrixFreeFunctions::ShapeInfo<
+                  VectorizedArray<Number>>
+                  shape_info;
                 shape_info.reinit(dummy_quadrature,
                                   dof_handler_fine.get_fe(
                                     fe_index_pair.first.second),
@@ -2144,6 +2171,10 @@ namespace internal
                                   0);
                 lexicographic_numbering_coarse[fe_index_pair.second] =
                   shape_info.lexicographic_numbering;
+
+                if (hanging_nodes)
+                  transfer.schemes[fe_index_pair.second].shape_info_coarse =
+                    shape_info;
               }
             else
               {
@@ -2174,22 +2205,53 @@ namespace internal
           }
 
         transfer.level_dof_indices_fine.resize(n_dof_indices_fine.back());
+        if (hanging_nodes)
+          transfer.level_dof_indices_coarse.resize(n_dof_indices_coarse.back());
         transfer.level_dof_indices_coarse_plain.resize(
           n_dof_indices_coarse.back());
 
         // ------------------------------ indices  -----------------------------
-        std::vector<unsigned int *> level_dof_indices_coarse_(
+        std::vector<unsigned int *> level_dof_indices_coarse(
           fe_index_pairs.size());
-        std::vector<unsigned int *> level_dof_indices_fine_(
+        std::vector<unsigned int *> level_dof_indices_coarse_plain(
+          fe_index_pairs.size());
+        std::vector<unsigned int *> level_dof_indices_fine(
           fe_index_pairs.size());
 
         for (unsigned int i = 0; i < fe_index_pairs.size(); ++i)
           {
-            level_dof_indices_fine_[i] =
+            level_dof_indices_fine[i] =
               transfer.level_dof_indices_fine.data() + n_dof_indices_fine[i];
-            level_dof_indices_coarse_[i] =
+            level_dof_indices_coarse[i] =
+              transfer.level_dof_indices_coarse.data() +
+              n_dof_indices_coarse[i];
+            level_dof_indices_coarse_plain[i] =
               transfer.level_dof_indices_coarse_plain.data() +
               n_dof_indices_coarse[i];
+          }
+
+        std::vector<internal::MatrixFreeFunctions::ConstraintKinds *>
+          coarse_cell_refinement_configurations;
+
+        if (hanging_nodes)
+          {
+            unsigned int n_coarse_cells = 0;
+            for (unsigned int i = 0; i < transfer.schemes.size(); ++i)
+              n_coarse_cells += transfer.schemes[i].n_coarse_cells;
+            transfer.coarse_cell_refinement_configurations.resize(
+              n_coarse_cells);
+
+            coarse_cell_refinement_configurations.resize(fe_index_pairs.size());
+
+            if (fe_index_pairs.size() > 0)
+              {
+                coarse_cell_refinement_configurations[0] =
+                  transfer.coarse_cell_refinement_configurations.data();
+                for (unsigned int i = 1; i < transfer.schemes.size(); ++i)
+                  coarse_cell_refinement_configurations[i] =
+                    coarse_cell_refinement_configurations[i - 1] +
+                    transfer.schemes[i - 1].n_coarse_cells;
+              }
           }
 
         bool           fine_indices_touch_remote_dofs = false;
@@ -2203,40 +2265,86 @@ namespace internal
             fe_index_pairs[std::pair<unsigned int, unsigned int>(
               cell_coarse->active_fe_index(), cell_fine->active_fe_index())];
 
-          if (mg_level_coarse == numbers::invalid_unsigned_int)
-            cell_coarse->get_dof_indices(local_dof_indices_coarse[fe_pair_no]);
-          else
-            cell_coarse->get_mg_dof_indices(
-              local_dof_indices_coarse[fe_pair_no]);
+          // parent
+          {
+            if (mg_level_coarse == numbers::invalid_unsigned_int)
+              cell_coarse->get_dof_indices(
+                local_dof_indices_coarse[fe_pair_no]);
+            else
+              cell_coarse->get_mg_dof_indices(
+                local_dof_indices_coarse[fe_pair_no]);
 
-          for (unsigned int i = 0;
-               i < transfer.schemes[fe_pair_no].n_dofs_per_cell_coarse;
-               i++)
-            level_dof_indices_coarse_[fe_pair_no][i] =
-              transfer.partitioner_coarse->global_to_local(
+            for (unsigned int i = 0;
+                 i < local_dof_indices_coarse[fe_pair_no].size();
+                 ++i)
+              local_dof_indices_coarse_lex[fe_pair_no][i] =
                 local_dof_indices_coarse
-                  [fe_pair_no][lexicographic_numbering_coarse[fe_pair_no][i]]);
+                  [fe_pair_no][lexicographic_numbering_coarse[fe_pair_no][i]];
 
-          cell_fine->get_dof_indices(local_dof_indices_fine[fe_pair_no]);
-          for (unsigned int i = 0;
-               i < transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
-               i++)
-            {
-              level_dof_indices_fine_[fe_pair_no][i] =
-                transfer.partitioner_fine->global_to_local(
-                  local_dof_indices_fine
-                    [fe_pair_no][lexicographic_numbering_fine[fe_pair_no][i]]);
-              if (!locally_owned_dofs.is_element(
+            for (auto &i : local_dof_indices_coarse_lex[fe_pair_no])
+              i = transfer.partitioner_coarse->global_to_local(i);
+
+            if (hanging_nodes)
+              {
+                std::vector<internal::MatrixFreeFunctions::ConstraintKinds>
+                  mask(transfer.n_components);
+
+                local_dof_indices_coarse[fe_pair_no] =
+                  local_dof_indices_coarse_lex[fe_pair_no];
+
+                hanging_nodes->setup_constraints(
+                  cell_coarse,
+                  transfer.partitioner_coarse,
+                  lexicographic_mappings,
+                  local_dof_indices_coarse[fe_pair_no],
+                  mask);
+
+                for (unsigned int i = 0;
+                     i < transfer.schemes[fe_pair_no].n_dofs_per_cell_coarse;
+                     i++)
+                  level_dof_indices_coarse[fe_pair_no][i] =
+                    local_dof_indices_coarse[fe_pair_no][i];
+
+                coarse_cell_refinement_configurations[fe_pair_no][0] = mask[0];
+                coarse_cell_refinement_configurations[fe_pair_no] += 1;
+              }
+
+            for (unsigned int i = 0;
+                 i < transfer.schemes[fe_pair_no].n_dofs_per_cell_coarse;
+                 i++)
+              level_dof_indices_coarse_plain[fe_pair_no][i] =
+                local_dof_indices_coarse_lex[fe_pair_no][i];
+          }
+
+          // child
+          {
+            cell_fine->get_dof_indices(local_dof_indices_fine[fe_pair_no]);
+            for (unsigned int i = 0;
+                 i < transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
+                 i++)
+              {
+                level_dof_indices_fine[fe_pair_no][i] =
+                  transfer.partitioner_fine->global_to_local(
                     local_dof_indices_fine
                       [fe_pair_no]
-                      [lexicographic_numbering_fine[fe_pair_no][i]]))
-                fine_indices_touch_remote_dofs = true;
-            }
+                      [lexicographic_numbering_fine[fe_pair_no][i]]);
+                if (!locally_owned_dofs.is_element(
+                      local_dof_indices_fine
+                        [fe_pair_no]
+                        [lexicographic_numbering_fine[fe_pair_no][i]]))
+                  fine_indices_touch_remote_dofs = true;
+              }
+          }
 
-          level_dof_indices_coarse_[fe_pair_no] +=
-            transfer.schemes[fe_pair_no].n_dofs_per_cell_coarse;
-          level_dof_indices_fine_[fe_pair_no] +=
-            transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
+          // move pointers
+          {
+            level_dof_indices_coarse[fe_pair_no] +=
+              transfer.schemes[fe_pair_no].n_dofs_per_cell_coarse;
+            level_dof_indices_coarse_plain[fe_pair_no] +=
+              transfer.schemes[fe_pair_no].n_dofs_per_cell_coarse;
+            level_dof_indices_fine[fe_pair_no] +=
+              transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
+          }
         });
 
         // if all access goes to the locally owned dofs on all ranks, we do
@@ -2245,6 +2353,15 @@ namespace internal
                                   fine_indices_touch_remote_dofs),
                                 comm) == 0)
           transfer.vec_fine.reinit(0);
+
+        if (hanging_nodes &&
+            std::all_of(transfer.coarse_cell_refinement_configurations.begin(),
+                        transfer.coarse_cell_refinement_configurations.end(),
+                        [](const auto i) {
+                          return i == internal::MatrixFreeFunctions::
+                                        ConstraintKinds::unconstrained;
+                        }))
+          transfer.coarse_cell_refinement_configurations.clear();
       }
 
       // ------------------------- prolongation matrix -------------------------
@@ -2700,10 +2817,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   const unsigned int *indices_coarse = level_dof_indices_coarse.size() > 0 ?
                                          level_dof_indices_coarse.data() :
                                          level_dof_indices_coarse_plain.data();
-  const unsigned int *indices_coarse_plain =
-    level_dof_indices_coarse_plain.data();
-  const unsigned int *indices_fine = level_dof_indices_fine.data();
-  const Number *      weights      = nullptr;
+  const unsigned int *indices_fine   = level_dof_indices_fine.data();
+  const Number *      weights        = nullptr;
   const std::array<VectorizedArray<Number>, Utilities::pow(3, dim)>
     *weights_compressed = nullptr;
 
@@ -2748,7 +2863,6 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                 evaluation_data_coarse[i][v] =
                   read_dof_values(indices_coarse[i], this->vec_coarse);
               indices_coarse += scheme.n_dofs_per_cell_coarse;
-              indices_coarse_plain += scheme.n_dofs_per_cell_coarse;
             }
 
           // ... fast hanging-node-constraints algorithm
@@ -2869,10 +2983,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   const unsigned int *indices_coarse = level_dof_indices_coarse.size() > 0 ?
                                          level_dof_indices_coarse.data() :
                                          level_dof_indices_coarse_plain.data();
-  const unsigned int *indices_coarse_plain =
-    level_dof_indices_coarse_plain.data();
-  const unsigned int *indices_fine = level_dof_indices_fine.data();
-  const Number *      weights      = nullptr;
+  const unsigned int *indices_fine   = level_dof_indices_fine.data();
+  const Number *      weights        = nullptr;
   const std::array<VectorizedArray<Number>, Utilities::pow(3, dim)>
     *weights_compressed = nullptr;
 
@@ -2979,7 +3091,6 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                                            evaluation_data_coarse[i][v],
                                            this->vec_coarse);
               indices_coarse += scheme.n_dofs_per_cell_coarse;
-              indices_coarse_plain += scheme.n_dofs_per_cell_coarse;
             }
         }
     }
