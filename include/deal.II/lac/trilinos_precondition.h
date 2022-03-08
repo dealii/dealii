@@ -1497,11 +1497,11 @@ namespace TrilinosWrappers
        * <tt>n_component</tt>, the provided @p constant_modes should fulfill
        * the following requirements:
        * <ul>
-       * <li>  n_component.size() == <tt>n_component</tt> </li>
-       * <li>  n_component[*].size() == n_dof_local or n_component[*].size()
-       * == n_dof_global </li>
-       * <li>  n_component[<tt>ic</tt>][<tt>id</tt>] ==
-       * "<tt>id</tt><em>th</em> DoF is corresponding to component <tt>ic</tt>
+       * <li>  <tt>constant_modes.size() == n_component</tt> </li>
+       * <li>  <tt>constant_modes[*].size() == n_dof_local</tt> or
+       *       <tt>constant_modes[*].size() == n_dof_global</tt> </li>
+       * <li>  <tt>constant_modes[ic][id] == id</tt><em>th</em> DoF is
+       *       corresponding to component <tt>ic</tt>
        * </li>
        * </ul>
        */
