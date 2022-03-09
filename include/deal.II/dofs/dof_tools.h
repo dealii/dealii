@@ -1492,10 +1492,10 @@ namespace DoFTools
    * on algebraic properties of the respective matrix, it has no chance to
    * detect whether the matrix comes from a scalar or a vector valued problem.
    * However, a near null space supplies exactly the needed information about
-   * the components placement of vector components within the matrix. The null
+   * the components' placement of vector components within the matrix. The null
    * space (or rather, the constant modes) is provided by the finite element
    * underlying the given DoFHandler and for most elements, the null space
-   * will consist of as many vectors as there are true arguments in
+   * will consist of as many vectors as there are `true` arguments in
    * <tt>component_mask</tt> (see
    * @ref GlossComponentMask),
    * each of which will be one in one vector component and zero in all others.
@@ -1512,6 +1512,8 @@ namespace DoFTools
    *
    * The main reason for this program is the use of the null space with the
    * AMG preconditioner.
+   *
+   * This function is used in step-31, step-32, and step-42, for example.
    */
   template <int dim, int spacedim>
   void
