@@ -444,7 +444,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         Assert(
           constraint->is_closed(task_info.communicator),
           ExcMessage(
-            "You have proveded a non-empty AffineConstraint object that has not "
+            "You have provided a non-empty AffineConstraints object that has not "
             "been closed. Please call AffineConstraints::close() before "
             "calling MatrixFree::reinit()!"));
 #endif
