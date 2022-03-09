@@ -305,11 +305,11 @@ FE_Enriched<dim, spacedim>::requires_update_flags(const UpdateFlags flags) const
   if (is_enriched)
     {
       // if we ask for values or gradients, then we would need quadrature points
-      if ((flags & (update_values | update_gradients)) != 0u)
+      if (flags & (update_values | update_gradients))
         out |= update_quadrature_points;
 
       // if need gradients, add update_values due to product rule
-      if ((out & update_gradients) != 0u)
+      if (out & update_gradients)
         out |= update_values;
     }
 
