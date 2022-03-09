@@ -24,7 +24,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
-#include <deal.II/matrix_free/hanging_nodes_internal.h>
+#include <deal.II/matrix_free/constraint_info.h>
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <deal.II/multigrid/mg_base.h>
@@ -407,22 +407,11 @@ private:
   mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
 
   /**
-   * Constraint-entry indices for performing manual
-   * constraint_coarse.distribute_local_to_global().
+   * Helper class for reading from and writing to global vectors and for
+   * applying constraints.
    */
-  std::vector<unsigned int> distribute_local_to_global_indices;
-
-  /**
-   * Constraint-entry values for performing manual
-   * constraint_coarse.distribute_local_to_global().
-   */
-  std::vector<Number> distribute_local_to_global_values;
-
-  /**
-   * Pointers to the constraint entries for performing manual
-   * constraint_coarse.distribute_local_to_global().
-   */
-  std::vector<unsigned int> distribute_local_to_global_ptr;
+  internal::MatrixFreeFunctions::ConstraintInfo<dim, VectorizedArray<Number>>
+    constraint_info;
 
   /**
    * Weights for continuous elements.
@@ -437,18 +426,6 @@ private:
     weights_compressed;
 
   /**
-   * DoF indices of the coarse cells, expressed in indices local to the MPI
-   * rank.
-   */
-  std::vector<unsigned int> level_dof_indices_coarse;
-
-  /**
-   * DoF indices of the coarse cells, expressed in indices local to the MPI
-   * rank.
-   */
-  std::vector<unsigned int> level_dof_indices_coarse_plain;
-
-  /**
    * DoF indices of the fine cells, expressed in indices local to the MPI
    * rank.
    */
@@ -459,28 +436,7 @@ private:
    */
   unsigned int n_components;
 
-  /**
-   * Refinement configuration of the coarse cells, needed for fast
-   * application of hanging-node constraints. If no hanging-node
-   * constraints have to be applied or the fast algorithm is not
-   * applicable, the vector is empty.
-   */
-  std::vector<internal::MatrixFreeFunctions::ConstraintKinds>
-    coarse_cell_refinement_configurations;
-
   friend class internal::MGTwoLevelTransferImplementation;
-
-  /**
-   * Apply hanging-node constrains with fast algorithm.
-   */
-  void
-  apply_hanging_node_constraints(
-    const MGTransferScheme &scheme,
-    const internal::MatrixFreeFunctions::ConstraintKinds
-      *                coarse_cell_refinement_configurations_ptr,
-    const unsigned int n_lanes_filled,
-    const bool         transpose,
-    AlignedVector<VectorizedArray<Number>> &evaluation_data_coarse) const;
 };
 
 
