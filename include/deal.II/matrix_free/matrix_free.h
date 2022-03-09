@@ -1522,14 +1522,30 @@ public:
   initialize_face_data_vector(AlignedVector<T> &vec) const;
 
   /**
-   * Initialize function for a general vector. The length of the vector is
-   * equal to the total number of degrees in the DoFHandler. Vector entries
-   * are initialized with zero. For vector-valued problems with several
-   * DoFHandlers underlying this class, the parameter @p vector_component
-   * defines which component is to be used.
+   * Initialize function for a general serial non-block vector.
+   * After a call to this function, the length of the vector is equal to the
+   * total number of degrees of freedom in the DoFHandler. Vector entries are
+   * initialized with zero.
    *
-   * For the vectors used with MatrixFree and in FEEvaluation, a vector needs
-   * to hold all
+   * If MatrixFree was set up with several DoFHandler objects, the parameter
+   * @p dof_handler_index defines which component is to be used.
+   *
+   * @note Serial vectors also include Trilinos and PETSc vectors; however
+   * in these cases, MatrixFree has to be used in a serial context, i.e., the
+   * size of the communicator has to be exactly one.
+   */
+  template <typename VectorType>
+  void
+  initialize_dof_vector(VectorType &       vec,
+                        const unsigned int dof_handler_index = 0) const;
+
+  /**
+   * Specialization of the method initialize_dof_vector() for the
+   * class LinearAlgebra::distributed::Vector@<Number@>.
+   * See the other function with the same name for the general descriptions.
+   *
+   * @note For the parallel vectors used with MatrixFree and in FEEvaluation, a
+   * vector needs to hold all
    * @ref GlossLocallyActiveDof "locally active DoFs"
    * and also some of the
    * @ref GlossLocallyRelevantDof "locally relevant DoFs".
@@ -1539,17 +1555,6 @@ public:
    * all locally relevant DoFs are stored because most of them would never be
    * accessed in matrix-vector products and result in too much data sent
    * around which impacts the performance.
-   */
-  template <typename VectorType>
-  void
-  initialize_dof_vector(VectorType &       vec,
-                        const unsigned int dof_handler_index = 0) const;
-
-  /**
-   * See the other function with the same name for descriptions.
-   *
-   * Since the vector is of class LinearAlgebra::distributed::Vector@<Number@>,
-   * the ghost entries are set accordingly.
    */
   template <typename Number2>
   void
@@ -2235,6 +2240,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_vector(
   VectorType &       vec,
   const unsigned int comp) const
 {
+  static_assert(IsBlockVector<VectorType>::value == false,
+                "This function is not supported for block vectors.");
+
+  Assert(task_info.n_procs == 1,
+         ExcMessage("This function can only be used in serial."));
+
   AssertIndexRange(comp, n_components());
   vec.reinit(dof_info[comp].vector_partitioner->size());
 }
