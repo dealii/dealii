@@ -1178,33 +1178,70 @@ namespace Utilities
            const unsigned int root_process = 0);
 
     /**
-     * Sends an object @p object_to_send from the process @p root_process
+     * This function sends an object @p object_to_send from the process @p root_process
      * to all other processes.
      *
-     * A generalization of the classic `MPI_Bcast` function that accepts
-     * arbitrary data types `T`, as long as Utilities::pack() (which in turn
-     * uses `boost::serialize`, see in Utilities::pack() for details) accepts
-     * `T` as an argument.
+     * This function is a generalization of the classic `MPI_Bcast` function
+     * that accepts arbitrary data types `T`, as long as Utilities::pack()
+     * (which in turn uses `boost::serialize`, see in Utilities::pack() for
+     * details) accepts `T` as an argument.
      *
      * @note Be aware that this function is typically a lot more
-     * expensive than an `MPI_Bcast` if you are using simple types
-     * directly supported by MPI. This function will use
+     * expensive than an `MPI_Bcast` because the function will use
      * boost::serialization to (de)serialize, and execute a second
      * `MPI_Bcast` to transmit the size before sending the data
-     * itself. You can also use the other broadcast() function in this
-     * namespace.
+     * itself. On the other hand, if you have a single element of
+     * a data type `T` that is natively supported by MPI, then the
+     * compiler will choose another broadcast() overload that is efficient.
+     * If you have an array of such elements, you should use the other
+     * broadcast() function in this namespace that takes a pointer and a count
+     * argument.
      *
      * @param[in] comm MPI communicator.
      * @param[in] object_to_send An object to send to all processes.
      * @param[in] root_process The process that sends the object to all
      * processes. By default the process with rank 0 is the root process.
      *
+     * @tparam T Any type for which the Utilities::pack() and
+     *   Utilities::unpack() functions can be used to convert the object
+     *   into an array of `char`. The compiler will not select this function
+     *   if `T` is a type that is natively supported by MPI and instead
+     *   use a more efficient overload.
+     *
      * @return On the root process, return a copy of @p object_to_send.
      *   On every other process, return a copy of the object sent by
      *   the @p root_process.
      */
     template <typename T>
-    T
+    typename std::enable_if<is_mpi_type<T> == false, T>::type
+    broadcast(const MPI_Comm &   comm,
+              const T &          object_to_send,
+              const unsigned int root_process = 0);
+
+    /**
+     * This function sends an object @p object_to_send from the process @p root_process
+     * to all other processes.
+     *
+     * This function is wrapper around the `MPI_Bcast` function selected
+     * by the compiler whenever `T` is a data type natively supported by
+     * MPI.
+     *
+     * @param[in] comm MPI communicator.
+     * @param[in] object_to_send An object to send to all processes.
+     * @param[in] root_process The process that sends the object to all
+     * processes. By default the process with rank 0 is the root process.
+     *
+     * @tparam T Any type. The compiler will only select this function
+     *   if `T` is a type that is natively supported by MPI. It will choose
+     *   the other overloaded version of this function if that is not
+     *   the case.
+     *
+     * @return On the root process, return a copy of @p object_to_send.
+     *   On every other process, return a copy of the object sent by
+     *   the @p root_process.
+     */
+    template <typename T>
+    typename std::enable_if<is_mpi_type<T> == true, T>::type
     broadcast(const MPI_Comm &   comm,
               const T &          object_to_send,
               const unsigned int root_process = 0);
@@ -1886,7 +1923,7 @@ namespace Utilities
 
 
     template <typename T>
-    T
+    typename std::enable_if<is_mpi_type<T> == false, T>::type
     broadcast(const MPI_Comm &   comm,
               const T &          object_to_send,
               const unsigned int root_process)
@@ -1932,6 +1969,30 @@ namespace Utilities
         return Utilities::unpack<T>(buffer, false);
 #  endif
     }
+
+
+
+    template <typename T>
+    typename std::enable_if<is_mpi_type<T> == true, T>::type
+    broadcast(const MPI_Comm &   comm,
+              const T &          object_to_send,
+              const unsigned int root_process)
+    {
+#  ifndef DEAL_II_WITH_MPI
+      (void)comm;
+      (void)root_process;
+      return object_to_send;
+#  else
+
+      T   object = object_to_send;
+      int ierr =
+        MPI_Bcast(&object, 1, mpi_type_id_for_type<T>, root_process, comm);
+      AssertThrowMPI(ierr);
+
+      return object;
+#  endif
+    }
+
 
 
 #  ifdef DEAL_II_WITH_MPI
