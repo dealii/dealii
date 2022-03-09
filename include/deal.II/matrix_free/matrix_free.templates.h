@@ -372,7 +372,7 @@ void
 MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   const std::shared_ptr<hp::MappingCollection<dim>> &    mapping,
   const std::vector<const DoFHandler<dim, dim> *> &      dof_handler,
-  const std::vector<const AffineConstraints<number2> *> &constraint,
+  const std::vector<const AffineConstraints<number2> *> &constraints,
   const std::vector<IndexSet> &                          locally_owned_dofs,
   const std::vector<hp::QCollection<q_dim>> &            quad,
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
@@ -414,7 +414,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
     {
       clear();
       Assert(dof_handler.size() > 0, ExcMessage("No DoFHandler is given."));
-      AssertDimension(dof_handler.size(), constraint.size());
+      AssertDimension(dof_handler.size(), constraints.size());
       AssertDimension(dof_handler.size(), locally_owned_dofs.size());
 
       task_info.allow_ghosted_vectors_in_loops =
@@ -438,6 +438,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
           task_info.my_pid          = 0;
           task_info.n_procs         = 1;
         }
+
+#ifdef DEBUG
+      for (const auto &constraint : constraints)
+        Assert(
+          constraint->is_closed(task_info.communicator),
+          ExcMessage(
+            "You have proveded a non-empty AffineConstraint object that has not "
+            "been closed. Please call AffineConstraints::close() before "
+            "calling MatrixFree::reinit()!"));
+#endif
 
       initialize_dof_handlers(dof_handler, additional_data);
       for (unsigned int no = 0; no < dof_handler.size(); ++no)
@@ -469,7 +479,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       // constraint_pool_data. It also reorders the way cells are gone through
       // (to separate cells with overlap to other processors from others
       // without).
-      initialize_indices(constraint, locally_owned_dofs, additional_data);
+      initialize_indices(constraints, locally_owned_dofs, additional_data);
     }
 
   // initialize bare structures
