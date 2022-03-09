@@ -35,6 +35,39 @@ namespace Utilities
        */
       namespace ComputeIndexOwner
       {
+        class FlexibleIndexStorage
+        {
+        public:
+          using index_type = unsigned int;
+          static const index_type invalid_index_value =
+            numbers::invalid_unsigned_int;
+
+          FlexibleIndexStorage(const bool use_vector = true);
+
+          void
+          reinit(const bool use_vector, const std::size_t size);
+
+          void
+          fill(const std::size_t start,
+               const std::size_t end,
+               const index_type &value);
+
+          index_type &
+          operator[](const std::size_t index);
+
+          index_type
+          operator[](const std::size_t index) const;
+
+          bool
+          entry_has_been_set(const std::size_t index) const;
+
+        private:
+          bool                              use_vector;
+          std::size_t                       size;
+          std::vector<index_type>           data;
+          std::map<std::size_t, index_type> data_map;
+        };
+
         /**
          * Specialization of ConsensusAlgorithms::Process for setting up the
          * Dictionary even if there are ranges in the IndexSet space not owned
@@ -55,8 +88,8 @@ namespace Utilities
             const std::map<unsigned int,
                            std::vector<std::pair<types::global_dof_index,
                                                  types::global_dof_index>>>
-              &                        buffers,
-            std::vector<unsigned int> &actually_owning_ranks,
+              &                   buffers,
+            FlexibleIndexStorage &actually_owning_ranks,
             const std::pair<types::global_dof_index, types::global_dof_index>
               &                        local_range,
             std::vector<unsigned int> &actually_owning_rank_list);
@@ -95,7 +128,7 @@ namespace Utilities
                                                types::global_dof_index>>>
             &buffers;
 
-          std::vector<unsigned int> &actually_owning_ranks;
+          FlexibleIndexStorage &actually_owning_ranks;
 
           const std::pair<types::global_dof_index, types::global_dof_index>
             &local_range;
@@ -133,7 +166,15 @@ namespace Utilities
            * up to factors of 4096 can be handled with at most 64 messages as
            * well.
            */
-          static const unsigned int range_minimum_grain_size = 64;
+          static constexpr unsigned int range_minimum_grain_size = 64;
+
+          /**
+           * Factor that determines if an index set is sparse or not. An index
+           * set if sparse if less than 25% of the indices are owned by any
+           * process. If the index set is sparse, we switch the internal storage
+           * from a fast storage (vector) to a memory-efficient storage (map).
+           */
+          static constexpr unsigned int sparsity_factor = 4;
 
           /**
            * A vector with as many entries as there are dofs in the dictionary
@@ -141,7 +182,7 @@ namespace Utilities
            * owner of that dof in the IndexSet `owned_indices`. This is
            * queried in the index lookup, so we keep an expanded list.
            */
-          std::vector<unsigned int> actually_owning_ranks;
+          FlexibleIndexStorage actually_owning_ranks;
 
           /**
            * A sorted vector containing the MPI ranks appearing in
