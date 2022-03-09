@@ -3184,24 +3184,22 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   for (const auto &scheme : schemes)
     {
-      // identity -> take short cut and work directly on global vectors
-      if (scheme.restriction_matrix.size() == 0 &&
-          scheme.restriction_matrix_1d.size() == 0)
-        {
-          for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
-            {
-              if ((scheme.n_dofs_per_cell_fine != 0) &&
-                  (scheme.n_dofs_per_cell_coarse != 0))
-                for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine; ++i)
-                  vec_coarse_ptr->local_element(indices_coarse_plain[i]) =
-                    vec_fine_ptr->local_element(indices_fine[i]);
+      if (scheme.n_coarse_cells == 0)
+        continue;
 
-              indices_fine += scheme.n_dofs_per_cell_fine;
-              indices_coarse_plain += scheme.n_dofs_per_cell_coarse;
-            }
+      if (scheme.n_dofs_per_cell_fine == 0 ||
+          scheme.n_dofs_per_cell_coarse == 0)
+        {
+          indices_fine += scheme.n_coarse_cells * scheme.n_dofs_per_cell_fine;
+          indices_coarse_plain +=
+            scheme.n_coarse_cells * scheme.n_dofs_per_cell_coarse;
 
           continue;
         }
+
+      const bool needs_interpolation =
+        (scheme.prolongation_matrix.size() == 0 &&
+         scheme.prolongation_matrix_1d.size() == 0) == false;
 
       // general case -> local restriction is needed
       evaluation_data_fine.resize(scheme.n_dofs_per_cell_fine);
@@ -3233,20 +3231,23 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
             }
 
           // ------------------------------ fine -------------------------------
-          for (int c = n_components - 1; c >= 0; --c)
-            {
-              CellRestrictor<dim, VectorizedArrayType> cell_restrictor(
-                scheme.restriction_matrix,
-                scheme.restriction_matrix_1d,
-                evaluation_data_fine.begin() + c * n_scalar_dofs_fine,
-                evaluation_data_coarse.begin() + c * n_scalar_dofs_coarse);
+          if (needs_interpolation)
+            for (int c = n_components - 1; c >= 0; --c)
+              {
+                CellRestrictor<dim, VectorizedArrayType> cell_restrictor(
+                  scheme.restriction_matrix,
+                  scheme.restriction_matrix_1d,
+                  evaluation_data_fine.begin() + c * n_scalar_dofs_fine,
+                  evaluation_data_coarse.begin() + c * n_scalar_dofs_coarse);
 
-              if (scheme.restriction_matrix_1d.size() > 0)
-                cell_transfer.run(cell_restrictor);
-              else
-                cell_restrictor.run_full(n_scalar_dofs_fine,
-                                         n_scalar_dofs_coarse);
-            }
+                if (scheme.restriction_matrix_1d.size() > 0)
+                  cell_transfer.run(cell_restrictor);
+                else
+                  cell_restrictor.run_full(n_scalar_dofs_fine,
+                                           n_scalar_dofs_coarse);
+              }
+          else
+            evaluation_data_coarse = evaluation_data_fine; // TODO
           // ----------------------------- coarse ------------------------------
 
           // write into dst vector
