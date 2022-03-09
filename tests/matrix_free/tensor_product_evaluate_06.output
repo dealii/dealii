@@ -1,0 +1,94 @@
+
+DEAL::Evaluate in 1d with polynomial degree 2
+DEAL::Hessian error 0.00000000
+DEAL::Hessian error 0.00000000
+DEAL::Hessian error 0.00000000
+DEAL::Hessian error 0.00000000
+DEAL::Evaluate in 1d with polynomial degree 3
+DEAL::Hessian error 7.99360578e-15
+DEAL::Hessian error 2.22044605e-15
+DEAL::Hessian error 7.99360578e-15
+DEAL::Hessian error 1.46549439e-14
+DEAL::Evaluate in 1d with polynomial degree 4
+DEAL::Hessian error 1.99840144e-14
+DEAL::Hessian error 3.55271368e-15
+DEAL::Hessian error 7.10542736e-15
+DEAL::Hessian error 2.70894418e-14
+DEAL::Evaluate in 2d with polynomial degree 2
+DEAL::Hessian error 4.88498131e-15
+DEAL::Hessian error 5.77315973e-15
+DEAL::Hessian error 7.10542736e-15
+DEAL::Hessian error 1.55431223e-14
+DEAL::Hessian error 5.77315973e-15
+DEAL::Hessian error 6.21724894e-15
+DEAL::Hessian error 9.32587341e-15
+DEAL::Hessian error 1.33226763e-14
+DEAL::Hessian error 1.22124533e-14
+DEAL::Hessian error 5.77315973e-15
+DEAL::Hessian error 1.17683641e-14
+DEAL::Hessian error 1.15463195e-14
+DEAL::Hessian error 1.82076576e-14
+DEAL::Hessian error 8.88178420e-15
+DEAL::Hessian error 1.53210777e-14
+DEAL::Hessian error 1.68753900e-14
+DEAL::Evaluate in 2d with polynomial degree 3
+DEAL::Hessian error 3.01980663e-14
+DEAL::Hessian error 4.61852778e-14
+DEAL::Hessian error 7.10542736e-14
+DEAL::Hessian error 9.59232693e-14
+DEAL::Hessian error 3.33066907e-14
+DEAL::Hessian error 1.75415238e-14
+DEAL::Hessian error 2.53130850e-14
+DEAL::Hessian error 8.83737528e-14
+DEAL::Hessian error 8.03801470e-14
+DEAL::Hessian error 3.28626015e-14
+DEAL::Hessian error 7.26085858e-14
+DEAL::Hessian error 1.62314606e-13
+DEAL::Hessian error 9.68114477e-14
+DEAL::Hessian error 1.28785871e-13
+DEAL::Hessian error 1.90514271e-13
+DEAL::Hessian error 2.10942375e-13
+DEAL::Evaluate in 2d with polynomial degree 4
+DEAL::Hessian error 1.00364161e-13
+DEAL::Hessian error 1.23678845e-13
+DEAL::Hessian error 1.19904087e-13
+DEAL::Hessian error 4.53193039e-13
+DEAL::Hessian error 1.16795462e-13
+DEAL::Hessian error 3.90798505e-14
+DEAL::Hessian error 5.50670620e-14
+DEAL::Hessian error 3.40172335e-13
+DEAL::Hessian error 1.88737914e-13
+DEAL::Hessian error 4.64073224e-14
+DEAL::Hessian error 6.01740879e-14
+DEAL::Hessian error 3.16191517e-13
+DEAL::Hessian error 3.14415161e-13
+DEAL::Hessian error 2.36477504e-13
+DEAL::Hessian error 2.56905608e-13
+DEAL::Hessian error 1.26387789e-12
+DEAL::Evaluate in 3d with polynomial degree 2
+DEAL::Hessian error 4.84057239e-14
+DEAL::Hessian error 3.81916720e-14
+DEAL::Hessian error 6.26165786e-14
+DEAL::Hessian error 8.94839758e-14
+DEAL::Hessian error 4.77395901e-14
+DEAL::Hessian error 5.12923037e-14
+DEAL::Hessian error 4.88498131e-14
+DEAL::Hessian error 9.52571355e-14
+DEAL::Evaluate in 3d with polynomial degree 3
+DEAL::Hessian error 8.70414851e-14
+DEAL::Hessian error 1.37667655e-13
+DEAL::Hessian error 1.63646874e-13
+DEAL::Hessian error 3.19744231e-13
+DEAL::Hessian error 2.10276241e-13
+DEAL::Hessian error 3.64153152e-13
+DEAL::Hessian error 3.00204306e-13
+DEAL::Hessian error 5.62661029e-13
+DEAL::Evaluate in 3d with polynomial degree 4
+DEAL::Hessian error 8.45989945e-14
+DEAL::Hessian error 2.23820962e-13
+DEAL::Hessian error 2.29816166e-13
+DEAL::Hessian error 3.69038133e-13
+DEAL::Hessian error 2.57571742e-13
+DEAL::Hessian error 3.51718654e-13
+DEAL::Hessian error 3.60378394e-13
+DEAL::Hessian error 3.74811293e-13

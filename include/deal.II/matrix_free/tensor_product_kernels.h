@@ -2523,6 +2523,105 @@ namespace internal
 
 
 
+  template <int dim, typename Number, typename Number2>
+  SymmetricTensor<2, dim, typename ProductTypeNoPoint<Number, Number2>::type>
+  evaluate_tensor_product_hessian(
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const std::vector<Number> &                         values,
+    const Point<dim, Number2> &                         p,
+    const std::vector<unsigned int> &                   renumber = {})
+  {
+    static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
+
+    using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
+
+    // use `int` type for this variable and the loops below to inform the
+    // compiler that the loops below will never overflow, which allows it to
+    // generate more optimized code for the variable loop bounds in the
+    // present context
+    const int n_shapes = poly.size();
+    AssertDimension(Utilities::pow(n_shapes, dim), values.size());
+    Assert(renumber.empty() || renumber.size() == values.size(),
+           ExcDimensionMismatch(renumber.size(), values.size()));
+
+    AssertIndexRange(n_shapes, 200);
+    std::array<Number2, 3 * dim * 200> shapes;
+
+    // Evaluate 1D polynomials and their derivatives
+    for (unsigned int d = 0; d < dim; ++d)
+      for (int i = 0; i < n_shapes; ++i)
+        poly[i].value(p[d], 2, shapes.data() + 3 * (d * n_shapes + i));
+
+    // Go through the tensor product of shape functions and interpolate
+    // with optimal algorithm
+    SymmetricTensor<2, dim, Number3> result;
+    for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+      {
+        Number3 value_y = {}, deriv_x = {}, deriv_y = {}, deriv_xx = {},
+                deriv_xy = {}, deriv_yy = {};
+        for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
+          {
+            // Interpolation + derivative x direction
+            Number3 value = {}, deriv_1 = {}, deriv_2 = {};
+
+            // Distinguish the inner loop based on whether we have a
+            // renumbering or not
+            if (renumber.empty())
+              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+                {
+                  value += shapes[3 * i0] * values[i];
+                  deriv_1 += shapes[3 * i0 + 1] * values[i];
+                  deriv_2 += shapes[3 * i0 + 2] * values[i];
+                }
+            else
+              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+                {
+                  value += shapes[3 * i0] * values[renumber[i]];
+                  deriv_1 += shapes[3 * i0 + 1] * values[renumber[i]];
+                  deriv_2 += shapes[3 * i0 + 2] * values[renumber[i]];
+                }
+
+            // Interpolation + derivative in y direction
+            if (dim > 1)
+              {
+                if (dim > 2)
+                  {
+                    value_y += value * shapes[3 * n_shapes + 3 * i1];
+                    deriv_x += deriv_1 * shapes[3 * n_shapes + 3 * i1];
+                    deriv_y += value * shapes[3 * n_shapes + 3 * i1 + 1];
+                  }
+                deriv_xx += deriv_2 * shapes[3 * n_shapes + 3 * i1];
+                deriv_xy += deriv_1 * shapes[3 * n_shapes + 3 * i1 + 1];
+                deriv_yy += value * shapes[3 * n_shapes + 3 * i1 + 2];
+              }
+            else
+              {
+                result[0][0] = deriv_2;
+              }
+          }
+        if (dim == 3)
+          {
+            // Interpolation + derivative in z direction
+            result[0][0] += deriv_xx * shapes[6 * n_shapes + 3 * i2];
+            result[0][1] += deriv_xy * shapes[6 * n_shapes + 3 * i2];
+            result[0][2] += deriv_x * shapes[6 * n_shapes + 3 * i2 + 1];
+            result[1][1] += deriv_yy * shapes[6 * n_shapes + 3 * i2];
+            result[1][2] += deriv_y * shapes[6 * n_shapes + 3 * i2 + 1];
+            result[2][2] += value_y * shapes[6 * n_shapes + 3 * i2 + 2];
+          }
+        else if (dim == 2)
+          {
+            result[0][0] = deriv_xx;
+            result[1][0] = deriv_xy;
+            result[1][1] = deriv_yy;
+          }
+      }
+
+    return result;
+  }
+
+
+
   /**
    * Same as evaluate_tensor_product_value_and_gradient() but for integration.
    */
