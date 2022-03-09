@@ -644,7 +644,7 @@ MGTransferGlobalCoarsening<dim, VectorType>::build(
       const unsigned int min_level = transfer.min_level();
       const unsigned int max_level = transfer.max_level();
 
-      AssertDimension(external_partitioners.size(), max_level - min_level + 1);
+      AssertDimension(external_partitioners.size(), transfer.n_levels());
 
       this->initialize_dof_vector =
         [external_partitioners, min_level](
@@ -669,18 +669,19 @@ MGTransferGlobalCoarsening<dim, VectorType>::build(
 {
   if (initialize_dof_vector)
     {
-      const unsigned int n_levels =
-        transfer.max_level() - transfer.min_level() + 1;
+      const unsigned int min_level = transfer.min_level();
+      const unsigned int max_level = transfer.max_level();
+      const unsigned int n_levels  = transfer.n_levels();
 
       std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
         external_partitioners(n_levels);
 
-      for (unsigned int level = 0; level < n_levels; ++level)
+      for (unsigned int l = min_level; l <= max_level; ++l)
         {
           LinearAlgebra::distributed::Vector<typename VectorType::value_type>
             vector;
-          initialize_dof_vector(level, vector);
-          external_partitioners[level] = vector.get_partitioner();
+          initialize_dof_vector(l, vector);
+          external_partitioners[l - min_level] = vector.get_partitioner();
         }
 
       build(external_partitioners);
