@@ -448,6 +448,7 @@ namespace MatrixFreeTools
 
             // STEP 2c: apply hanging-node constraints
             if (dof_info.hanging_node_constraint_masks.size() > 0 &&
+                dof_info.hanging_node_constraint_masks_comp.size() > 0 &&
                 dof_info
                   .hanging_node_constraint_masks_comp[phi.get_active_fe_index()]
                                                      [first_selected_component])

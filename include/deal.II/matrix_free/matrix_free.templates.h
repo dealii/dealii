@@ -1241,7 +1241,23 @@ namespace internal
         hanging_nodes = std::make_unique<
           dealii::internal::MatrixFreeFunctions::HangingNodes<dim>>(tria);
         for (unsigned int no = 0; no < n_dof_handlers; ++no)
-          dof_info[no].hanging_node_constraint_masks.resize(n_active_cells);
+          {
+            dof_info[no].hanging_node_constraint_masks.resize(n_active_cells);
+
+            dof_info[no].hanging_node_constraint_masks_comp =
+              hanging_nodes->compute_supported_components(
+                dof_handler[no]->get_fe_collection());
+
+            if ([](const auto &supported_components) {
+                  return std::none_of(supported_components.begin(),
+                                      supported_components.end(),
+                                      [](const auto &a) {
+                                        return *std::max_element(a.begin(),
+                                                                 a.end());
+                                      });
+                }(dof_info[no].hanging_node_constraint_masks_comp))
+              dof_info[no].hanging_node_constraint_masks_comp = {};
+          }
       }
 
     for (unsigned int counter = 0; counter < n_active_cells; ++counter)

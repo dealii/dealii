@@ -3325,6 +3325,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       for (unsigned int v = 0; v < n_lanes; ++v)
         if (cells[v] != numbers::invalid_unsigned_int &&
             this->dof_info->hanging_node_constraint_masks.size() > 0 &&
+            this->dof_info->hanging_node_constraint_masks_comp.size() > 0 &&
             this->dof_info->hanging_node_constraint_masks[cells[v]] !=
               internal::MatrixFreeFunctions::ConstraintKinds::unconstrained &&
             this->dof_info->hanging_node_constraint_masks_comp
@@ -3427,6 +3428,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             has_constraints = true;
 
           if (this->dof_info->hanging_node_constraint_masks.size() > 0 &&
+              this->dof_info->hanging_node_constraint_masks_comp.size() > 0 &&
               this->dof_info->hanging_node_constraint_masks[cells[v]] !=
                 internal::MatrixFreeFunctions::ConstraintKinds::unconstrained &&
               this->dof_info->hanging_node_constraint_masks_comp
@@ -3515,6 +3517,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
              this->dof_info->row_starts[cell_dof_index + n_components_read]
                .second ||
            ((this->dof_info->hanging_node_constraint_masks.size() > 0 &&
+             this->dof_info->hanging_node_constraint_masks_comp.size() > 0 &&
              this->dof_info->hanging_node_constraint_masks[cell_index] !=
                internal::MatrixFreeFunctions::ConstraintKinds::unconstrained) &&
             this->dof_info->hanging_node_constraint_masks_comp
@@ -4155,6 +4158,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 {
   if (this->dof_info == nullptr ||
       this->dof_info->hanging_node_constraint_masks.size() == 0 ||
+      this->dof_info->hanging_node_constraint_masks_comp.size() == 0 ||
       this->dof_info->hanging_node_constraint_masks_comp
           [this->active_fe_index][this->first_selected_component] == false)
     return; // nothing to do with faces
