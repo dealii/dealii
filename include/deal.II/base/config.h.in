@@ -256,7 +256,7 @@
  */
 
 /**
- * Returns true if the used deal.II version is greater or equal than the 
+ * Returns true if the used deal.II version is greater than or equal the 
  * version specified by the three arguments. The internal implementation 
  * assumes that the number of minor and subminor versions is not larger 
  * than 100.
@@ -266,6 +266,19 @@
     DEAL_II_VERSION_MINOR * 100 + \
      DEAL_II_VERSION_SUBMINOR) \
     >=  \
+    (major)*10000 + (minor)*100 + (subminor))
+
+/**
+ * Returns true if the used deal.II version is less than or equal the 
+ * version specified by the three arguments. The internal implementation 
+ * assumes that the number of minor and subminor versions is not larger 
+ * than 100.
+ */
+#define DEAL_II_VERSION_LTE(major,minor,subminor) \
+ ((DEAL_II_VERSION_MAJOR * 10000 + \
+    DEAL_II_VERSION_MINOR * 100 + \
+     DEAL_II_VERSION_SUBMINOR) \
+    <=  \
     (major)*10000 + (minor)*100 + (subminor))
 
 /*
