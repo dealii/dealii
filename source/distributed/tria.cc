@@ -4041,13 +4041,10 @@ namespace parallel
                static_cast<unsigned int>(parallel_forest->local_num_quadrants),
              ExcInternalError());
 
-      // Allocate the space for the weights. In fact we do not know yet, how
-      // many cells we own after the refinement (only p4est knows that
-      // at this point). We simply reserve n_active_cells space and if many
-      // more cells are refined than coarsened than additional reallocation
-      // will be done inside get_cell_weights_recursively.
+      // Allocate the space for the weights. We reserve an integer for each
+      // locally owned quadrant on the already refined p4est object.
       std::vector<unsigned int> weights;
-      weights.reserve(this->n_active_cells());
+      weights.reserve(this->local_cell_relations.size());
 
       // Iterate over p4est and Triangulation relations
       // to find refined/coarsened/kept
