@@ -53,6 +53,7 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/graph/properties.hpp>
 #include <boost/random.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
+
 #undef BOOST_BIND_GLOBAL_PLACEHOLDERS
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
@@ -2248,6 +2249,159 @@ namespace DoFRenumbering
            ExcInternalError());
   }
 
+
+
+  template <int dim, int spacedim>
+  void
+  support_point_wise(DoFHandler<dim, spacedim> &dof_handler)
+  {
+    std::vector<types::global_dof_index> renumbering(
+      dof_handler.n_locally_owned_dofs(), numbers::invalid_dof_index);
+    compute_support_point_wise(renumbering, dof_handler);
+
+    // If there is only one component then there is nothing to do, so check
+    // first:
+    if (Utilities::MPI::max(renumbering.size(),
+                            dof_handler.get_communicator()) > 0)
+      dof_handler.renumber_dofs(renumbering);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  compute_support_point_wise(
+    std::vector<types::global_dof_index> &new_dof_indices,
+    const DoFHandler<dim, spacedim> &     dof_handler)
+  {
+    const types::global_dof_index n_dofs = dof_handler.n_locally_owned_dofs();
+    Assert(new_dof_indices.size() == n_dofs,
+           ExcDimensionMismatch(new_dof_indices.size(), n_dofs));
+
+    // This renumbering occurs in three steps:
+    // 1. Compute the component-wise renumbering so that all DoFs of component
+    //    i are less than the DoFs of component i + 1.
+    // 2. Compute a second renumbering component_to_nodal in which the
+    //    renumbering is now, for two components, [u0, v0, u1, v1, ...]: i.e.,
+    //    DoFs are first sorted by component and then by support point.
+    // 3. Compose the two renumberings to obtain the final result.
+
+    // Step 1:
+    std::vector<types::global_dof_index> component_renumbering(
+      n_dofs, numbers::invalid_dof_index);
+    compute_component_wise<dim, spacedim>(component_renumbering,
+                                          dof_handler.begin_active(),
+                                          dof_handler.end(),
+                                          std::vector<unsigned int>(),
+                                          false);
+
+    const std::vector<types::global_dof_index> dofs_per_component =
+      DoFTools::count_dofs_per_fe_component(dof_handler, true);
+
+    // At this point we have no more communication to do - simplify things by
+    // returning early if possible
+    if (component_renumbering.size() == 0)
+      {
+        new_dof_indices.resize(0);
+        return;
+      }
+    std::fill(new_dof_indices.begin(),
+              new_dof_indices.end(),
+              numbers::invalid_dof_index);
+    // This index set equals what dof_handler.locally_owned_dofs() would be if
+    // we executed the componentwise renumbering.
+    IndexSet component_renumbered_dofs(dof_handler.n_dofs());
+    component_renumbered_dofs.add_indices(component_renumbering.begin(),
+                                          component_renumbering.end());
+    for (const auto &dpc : dofs_per_component)
+      AssertThrow(dofs_per_component[0] == dpc, ExcNotImplemented());
+    for (const FiniteElement<dim, spacedim> &fe :
+         dof_handler.get_fe_collection())
+      {
+        AssertThrow(fe.dofs_per_cell == 0 || fe.has_support_points(),
+                    ExcNotImplemented());
+        for (unsigned int i = 0; i < fe.n_base_elements(); ++i)
+          AssertThrow(
+            fe.base_element(0).get_unit_support_points() ==
+              fe.base_element(i).get_unit_support_points(),
+            ExcMessage(
+              "All base elements should have the same support points."));
+      }
+
+    std::vector<types::global_dof_index> component_to_nodal(
+      dof_handler.n_locally_owned_dofs(), numbers::invalid_dof_index);
+
+    // Step 2:
+    std::vector<types::global_dof_index> cell_dofs;
+    std::vector<types::global_dof_index> component_renumbered_cell_dofs;
+    const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+    // Reuse the original index space for the new renumbering: it is the right
+    // size and is contiguous on the current processor
+    auto next_dof_it = locally_owned_dofs.begin();
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          const FiniteElement<dim, spacedim> &fe = cell->get_fe();
+          cell_dofs.resize(fe.dofs_per_cell);
+          component_renumbered_cell_dofs.resize(fe.dofs_per_cell);
+          cell->get_dof_indices(cell_dofs);
+          // Apply the component renumbering while skipping any ghost dofs. This
+          // algorithm assumes that all locally owned DoFs before the component
+          // renumbering are still locally owned afterwards (just with a new
+          // index).
+          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+            {
+              if (locally_owned_dofs.is_element(cell_dofs[i]))
+                {
+                  const auto local_index =
+                    locally_owned_dofs.index_within_set(cell_dofs[i]);
+                  component_renumbered_cell_dofs[i] =
+                    component_renumbering[local_index];
+                }
+              else
+                {
+                  component_renumbered_cell_dofs[i] =
+                    numbers::invalid_dof_index;
+                }
+            }
+
+          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+            {
+              if (fe.system_to_component_index(i).first == 0 &&
+                  component_renumbered_dofs.is_element(
+                    component_renumbered_cell_dofs[i]))
+                {
+                  for (unsigned int component = 0;
+                       component < fe.n_components();
+                       ++component)
+                    {
+                      // Since we are indexing in an odd way here it is much
+                      // simpler to compute the permutation separately and
+                      // combine it at the end instead of doing both at once
+                      const auto local_index =
+                        component_renumbered_dofs.index_within_set(
+                          component_renumbered_cell_dofs[i] +
+                          dofs_per_component[0] * component);
+
+                      if (component_to_nodal[local_index] ==
+                          numbers::invalid_dof_index)
+                        {
+                          component_to_nodal[local_index] = *next_dof_it;
+                          ++next_dof_it;
+                        }
+                    }
+                }
+            }
+        }
+
+    // Step 3:
+    for (std::size_t i = 0; i < dof_handler.n_locally_owned_dofs(); ++i)
+      {
+        const auto local_index =
+          component_renumbered_dofs.index_within_set(component_renumbering[i]);
+        new_dof_indices[i] = component_to_nodal[local_index];
+      }
+  }
 } // namespace DoFRenumbering
 
 

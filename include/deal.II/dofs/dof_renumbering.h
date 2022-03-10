@@ -1214,6 +1214,55 @@ namespace DoFRenumbering
    * @}
    */
 
+  /**
+   * @name Numberings based on properties of the finite element space
+   * @{
+   */
+
+  /**
+   * Stably sort DoFs first by component and second by location of their support
+   * points, so that DoFs with the same support point are listed consecutively
+   * in the component order.
+   *
+   * The primary use of this ordering is that it enables one to interpret a
+   * vector of FE coefficients as a vector of tensors. For example, suppose `X`
+   * is a vector containing coordinates (i.e., the sort of vector one would use
+   * with MappingFEField) and `U` is a vector containing velocities in 2D. Then
+   * the `k`th support point is mapped to `{X[2*k], X[2*k + 1]}` and the
+   * velocity there is `{U[2*k], U[2*k + 1]}`. Hence, with this reordering, one
+   * can read solution data at each support point without additional indexing.
+   * This is useful for, e.g., passing vectors of FE coefficients to external
+   * libraries which expect nodal data in this format.
+   *
+   * @warning This function only supports finite elements which have the same
+   * number of DoFs in each component. This is checked with an assertion.
+   *
+   * @note This renumbering assumes that the base elements of each vector-valued
+   * element in @p dof_handler are numbered in the way FESystem currently
+   * distributes DoFs: i.e., for a given support point, the global dof indices
+   * for component i should be less than the global dof indices for component i
+   * + 1. Due to various technical complications (like DoF unification in
+   * hp-mode) this assumption needs to be satified for this function to work in
+   * all relevant cases.
+   */
+  template <int dim, int spacedim>
+  void
+  support_point_wise(DoFHandler<dim, spacedim> &dof_handler);
+
+  /**
+   * Compute the renumbering vector needed by the support_point_wise() function.
+   * Does not perform the renumbering on the @p DoFHandler dofs but returns the
+   * renumbering vector.
+   */
+  template <int dim, int spacedim>
+  void
+  compute_support_point_wise(
+    std::vector<types::global_dof_index> &new_dof_indices,
+    const DoFHandler<dim, spacedim> &     dof_handler);
+
+  /**
+   * @}
+   */
 
 
   /**

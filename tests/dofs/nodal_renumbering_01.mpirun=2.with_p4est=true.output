@@ -1,0 +1,31 @@
+
+DEAL:0::locally owned dofs =
+{[0,7]}
+DEAL:0::
+DEAL:0::difference norm = 0.00000
+DEAL:0::locally owned dofs =
+{[0,3]}
+DEAL:0::
+DEAL:0::locally owned dofs =
+{[0,230]}
+DEAL:0::
+DEAL:0::locally owned dofs =
+{[0,1721]}
+DEAL:0::
+DEAL:0::difference norm = 0.00000
+
+DEAL:1::locally owned dofs =
+{[8,9]}
+DEAL:1::
+DEAL:1::difference norm = 0.00000
+DEAL:1::locally owned dofs =
+{4}
+DEAL:1::
+DEAL:1::locally owned dofs =
+{[231,440]}
+DEAL:1::
+DEAL:1::locally owned dofs =
+{[1722,3361]}
+DEAL:1::
+DEAL:1::difference norm = 0.00000
+
