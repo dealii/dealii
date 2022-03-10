@@ -2903,6 +2903,29 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 template <int dim, typename Number>
 void
 MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
+{
+  if (this->partitioner_coarse->is_globally_compatible(*partitioner_coarse))
+    {
+      this->partitioner_coarse = partitioner_coarse;
+      this->vec_coarse.reinit(0);
+    }
+
+  if (this->partitioner_fine->is_globally_compatible(*partitioner_fine))
+    {
+      this->partitioner_fine = partitioner_fine;
+      this->vec_fine.reinit(0);
+    }
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   reinit_geometric_transfer(const DoFHandler<dim> &          dof_handler_fine,
                             const DoFHandler<dim> &          dof_handler_coarse,
                             const AffineConstraints<Number> &constraints_fine,

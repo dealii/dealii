@@ -181,6 +181,16 @@ public:
   interpolate(VectorType &dst, const VectorType &src) const;
 
   /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  void
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine);
+
+  /**
    * Return the memory consumption of the allocated memory in this class.
    */
   std::size_t
@@ -292,6 +302,16 @@ public:
   void
   interpolate(LinearAlgebra::distributed::Vector<Number> &      dst,
               const LinearAlgebra::distributed::Vector<Number> &src) const;
+
+  /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  void
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine);
 
   /**
    * Return the memory consumption of the allocated memory in this class.
@@ -473,6 +493,25 @@ public:
       &initialize_dof_vector = {});
 
   /**
+   * Similar function to MGTransferMatrixFree::build() with the difference that
+   * the information for the prolongation for each level has already been built.
+   * So this function only tries to optimize the data structues of the two-level
+   * transfer operators, e.g., by enabling inplace vector operations, by
+   * checking if @p external_partitioners and the internal ones are compatible.
+   */
+  void
+  build(const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+          &external_partitioners = {});
+
+  /**
+   * Same as above but taking a lambda for initializing vector instead of
+   * partitioners.
+   */
+  void
+  build(const std::function<void(const unsigned int, VectorType &)>
+          &initialize_dof_vector);
+
+  /**
    * Perform prolongation.
    */
   void
@@ -561,13 +600,12 @@ private:
   /**
    * Collection of the two-level transfer operators.
    */
-  const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer;
+  MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> transfer;
 
   /**
-   * %Function to initialize internal level vectors.
+   * Function to initialize internal level vectors.
    */
-  const std::function<void(const unsigned int, VectorType &)>
-    initialize_dof_vector;
+  std::function<void(const unsigned int, VectorType &)> initialize_dof_vector;
 };
 
 
@@ -584,8 +622,74 @@ MGTransferGlobalCoarsening<dim, VectorType>::MGTransferGlobalCoarsening(
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
   : transfer(transfer)
-  , initialize_dof_vector(initialize_dof_vector)
-{}
+{
+  build(initialize_dof_vector);
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTransferGlobalCoarsening<dim, VectorType>::build(
+  const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+    &external_partitioners)
+{
+  if (external_partitioners.size() > 0)
+    {
+      Assert(
+        this->initialize_dof_vector == nullptr,
+        ExcMessage(
+          "A initialize_dof_vector function has already been registered in the constructor!"));
+
+      const unsigned int min_level = transfer.min_level();
+      const unsigned int max_level = transfer.max_level();
+
+      AssertDimension(external_partitioners.size(), max_level - min_level + 1);
+
+      this->initialize_dof_vector =
+        [external_partitioners, min_level](
+          const unsigned int level,
+          LinearAlgebra::distributed::Vector<typename VectorType::value_type>
+            &vec) { vec.reinit(external_partitioners[level - min_level]); };
+
+      for (unsigned int l = min_level + 1; l <= max_level; ++l)
+        transfer[l].enable_inplace_operations_if_possible(
+          external_partitioners[l - 1 - min_level],
+          external_partitioners[l - min_level]);
+    }
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTransferGlobalCoarsening<dim, VectorType>::build(
+  const std::function<void(const unsigned int, VectorType &)>
+    &initialize_dof_vector)
+{
+  if (initialize_dof_vector)
+    {
+      const unsigned int n_levels =
+        transfer.max_level() - transfer.min_level() + 1;
+
+      std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        external_partitioners(n_levels);
+
+      for (unsigned int level = 0; level < n_levels; ++level)
+        {
+          LinearAlgebra::distributed::Vector<typename VectorType::value_type>
+            vector;
+          initialize_dof_vector(level, vector);
+          external_partitioners[level] = vector.get_partitioner();
+        }
+
+      build(external_partitioners);
+    }
+  else
+    {
+      this->build();
+    }
+}
 
 
 
