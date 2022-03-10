@@ -68,7 +68,7 @@ jobs:
         mkdir build
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
-              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_CXX_FLAGS='-Werror -std=c++17' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_TRILINOS="ON" \
