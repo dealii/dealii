@@ -104,8 +104,9 @@ namespace internal
           // one
           const bool has_constraints =
             (hanging_node_constraint_masks.size() != 0 &&
-             hanging_node_constraint_masks[ib] !=
-               ConstraintKinds::unconstrained) ||
+             hanging_node_constraint_masks[cell * n_vectorization + v] !=
+               ConstraintKinds::unconstrained &&
+             hanging_node_constraint_masks_comp[fe_index][0 /*TODO*/]) ||
             (row_starts[ib].second != row_starts[ib + n_fe_components].second);
 
           auto do_copy = [&](const unsigned int *begin,
@@ -226,13 +227,19 @@ namespace internal
                 {
                   bool has_hanging_nodes = false;
 
-                  if (hanging_node_constraint_masks.size() > 0)
+                  const unsigned int fe_index =
+                    (cell_active_fe_index.size() == 0 ||
+                     dofs_per_cell.size() == 1) ?
+                      0 :
+                      cell_active_fe_index[boundary_cells[i]];
+                  AssertIndexRange(fe_index, dofs_per_cell.size());
+
+                  if (hanging_node_constraint_masks.size() > 0 &&
+                      hanging_node_constraint_masks[boundary_cells[i]] !=
+                        ConstraintKinds::unconstrained)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       has_hanging_nodes |=
-                        hanging_node_constraint_masks[boundary_cells[i] *
-                                                        n_components +
-                                                      comp] !=
-                        ConstraintKinds::unconstrained;
+                        hanging_node_constraint_masks_comp[fe_index][comp];
 
                   if (has_hanging_nodes ||
                       row_starts[boundary_cells[i] * n_components].second !=
@@ -242,12 +249,6 @@ namespace internal
                       unsigned int *data_ptr =
                         plain_dof_indices.data() +
                         row_starts_plain_indices[boundary_cells[i]];
-                      const unsigned int fe_index =
-                        (cell_active_fe_index.size() == 0 ||
-                         dofs_per_cell.size() == 1) ?
-                          0 :
-                          cell_active_fe_index[boundary_cells[i]];
-                      AssertIndexRange(fe_index, dofs_per_cell.size());
                       const unsigned int *row_end =
                         data_ptr + dofs_per_cell[fe_index];
                       for (; data_ptr != row_end; ++data_ptr)
@@ -340,7 +341,7 @@ namespace internal
 
       std::vector<ConstraintKinds> new_hanging_node_constraint_masks;
       new_hanging_node_constraint_masks.reserve(
-        new_hanging_node_constraint_masks.size());
+        hanging_node_constraint_masks.size());
 
       if (store_plain_indices == true)
         {
@@ -373,6 +374,19 @@ namespace internal
 
               bool has_hanging_nodes = false;
 
+              if (hanging_node_constraint_masks.size() > 0)
+                {
+                  const auto mask =
+                    hanging_node_constraint_masks[renumbering[position_cell +
+                                                              j]];
+                  new_hanging_node_constraint_masks.push_back(mask);
+
+                  if (mask != ConstraintKinds::unconstrained)
+                    for (unsigned int comp = 0; comp < n_components; ++comp)
+                      has_hanging_nodes |= hanging_node_constraint_masks_comp
+                        [have_hp ? cell_active_fe_index[i] : 0][comp];
+                }
+
               for (unsigned int comp = 0; comp < n_components; ++comp)
                 {
                   new_row_starts[(i * vectorization_length + j) * n_components +
@@ -381,15 +395,6 @@ namespace internal
                   new_row_starts[(i * vectorization_length + j) * n_components +
                                  comp]
                     .second = new_constraint_indicator.size();
-
-                  if (hanging_node_constraint_masks.size() > 0)
-                    {
-                      const auto mask =
-                        hanging_node_constraint_masks[cell_no + comp];
-                      new_hanging_node_constraint_masks.push_back(mask);
-                      has_hanging_nodes |=
-                        mask != ConstraintKinds::unconstrained;
-                    }
 
                   new_dof_indices.insert(
                     new_dof_indices.end(),
@@ -426,11 +431,13 @@ namespace internal
                 new_row_starts[(i * vectorization_length + j) * n_components +
                                comp]
                   .second = new_constraint_indicator.size();
-
-                if (hanging_node_constraint_masks.size() > 0)
-                  new_hanging_node_constraint_masks.push_back(
-                    ConstraintKinds::unconstrained);
               }
+
+          for (unsigned int j = n_vect; j < vectorization_length; ++j)
+            if (hanging_node_constraint_masks.size() > 0)
+              new_hanging_node_constraint_masks.push_back(
+                ConstraintKinds::unconstrained);
+
           position_cell += n_vect;
         }
       AssertDimension(position_cell * n_components + 1, row_starts.size());

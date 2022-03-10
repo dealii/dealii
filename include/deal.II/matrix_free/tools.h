@@ -447,13 +447,13 @@ namespace MatrixFreeTools
               locally_relevant_constrains.end());
 
             // STEP 2c: apply hanging-node constraints
-            if (dof_info.hanging_node_constraint_masks.size() > 0)
+            if (dof_info.hanging_node_constraint_masks.size() > 0 &&
+                dof_info
+                  .hanging_node_constraint_masks_comp[phi.get_active_fe_index()]
+                                                     [first_selected_component])
               {
                 const auto mask =
-                  dof_info
-                    .hanging_node_constraint_masks[(cell * n_lanes + v) *
-                                                     n_fe_components +
-                                                   first_selected_component];
+                  dof_info.hanging_node_constraint_masks[cell * n_lanes + v];
 
                 // cell has hanging nodes
                 if (mask != dealii::internal::MatrixFreeFunctions::

@@ -527,6 +527,12 @@ namespace internal
       std::vector<unsigned int> dof_indices;
 
       /**
+       * Supported components of all entries of the hp::FECollection object of
+       * the given DoFHandler.
+       */
+      std::vector<std::vector<bool>> hanging_node_constraint_masks_comp;
+
+      /**
        * Masks indicating for each cell and component if the optimized
        * hanging-node constraint is applicable and if yes which type.
        */

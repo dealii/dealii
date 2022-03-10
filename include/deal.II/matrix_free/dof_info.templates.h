@@ -283,13 +283,38 @@ namespace internal
       const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
       std::vector<types::global_dof_index> &                dof_indices)
     {
-      const ArrayView<ConstraintKinds> mask_view(
-        hanging_node_constraint_masks.data() +
-          cell_number * cell->get_fe().n_components(),
-        cell->get_fe().n_components());
+      // 1) check if finite elements support fast hanging-node algorithm
+      this->hanging_node_constraint_masks_comp =
+        hanging_nodes.compute_supported_components(
+          cell->get_dof_handler().get_fe_collection());
 
-      return hanging_nodes.setup_constraints(
-        cell, {}, lexicographic_mapping, dof_indices, mask_view);
+      if ([](const auto &supported_components) {
+            return std::none_of(supported_components.begin(),
+                                supported_components.end(),
+                                [](const auto &a) {
+                                  return *std::max_element(a.begin(), a.end());
+                                });
+          }(hanging_node_constraint_masks_comp))
+        return false;
+
+      // 2) determine the refinement configuration of the cell
+      const auto refinement_configuration =
+        hanging_nodes.compute_refinement_configuration(cell);
+
+      if (refinement_configuration == ConstraintKinds::unconstrained)
+        return false;
+
+      // 3) update DoF indices of cell for specified components
+      hanging_nodes.update_dof_indices(cell,
+                                       {},
+                                       lexicographic_mapping,
+                                       hanging_node_constraint_masks_comp,
+                                       refinement_configuration,
+                                       dof_indices);
+
+      hanging_node_constraint_masks[cell_number] = refinement_configuration;
+
+      return true;
     }
 
 
