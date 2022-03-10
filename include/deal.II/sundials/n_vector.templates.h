@@ -125,7 +125,12 @@ namespace SUNDIALS
      */
     template <typename VectorType>
     N_Vector
-    create_nvector(NVectorContent<VectorType> *content);
+    create_nvector(NVectorContent<VectorType> *content
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                   ,
+                   SUNContext nvector_context
+#  endif
+    );
 
     /**
      * Helper to create an empty vector with all operations but no content.
@@ -133,7 +138,11 @@ namespace SUNDIALS
      */
     template <typename VectorType>
     N_Vector
-    create_empty_nvector();
+    create_empty_nvector(
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+      SUNContext nvector_context
+#  endif
+    );
 
     /**
      * Collection of all operations specified by SUNDIALS N_Vector
@@ -356,9 +365,19 @@ namespace SUNDIALS
 
     template <typename VectorType>
     NVectorView<VectorType>
-    make_nvector_view(VectorType &vector)
+    make_nvector_view(VectorType &vector
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                      ,
+                      SUNContext nvector_context
+#  endif
+    )
     {
-      return NVectorView<VectorType>(vector);
+      return NVectorView<VectorType>(vector
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                     ,
+                                     nvector_context
+#  endif
+      );
     }
 
 
@@ -390,11 +409,21 @@ namespace SUNDIALS
 
 
     template <typename VectorType>
-    NVectorView<VectorType>::NVectorView(VectorType &vector)
+    NVectorView<VectorType>::NVectorView(VectorType &vector
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                         ,
+                                         SUNContext nvector_context
+#  endif
+                                         )
       : vector_ptr(
           create_nvector(
             new NVectorContent<typename std::remove_const<VectorType>::type>(
-              &vector)),
+              &vector)
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+              ,
+            nvector_context
+#  endif
+            ),
           [](N_Vector v) { N_VDestroy(v); })
     {}
 
@@ -421,10 +450,19 @@ namespace SUNDIALS
 
     template <typename VectorType>
     N_Vector
-    create_nvector(NVectorContent<VectorType> *content)
+    create_nvector(NVectorContent<VectorType> *content
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                   ,
+                   SUNContext nvector_context
+#  endif
+    )
     {
       // Create an N_Vector with operators attached and empty content
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
       N_Vector v = create_empty_nvector<VectorType>();
+#  else
+      N_Vector v = create_empty_nvector<VectorType>(nvector_context);
+#  endif
       Assert(v != nullptr, ExcInternalError());
 
       v->content = content;
@@ -447,7 +485,11 @@ namespace SUNDIALS
       clone_empty(N_Vector w)
       {
         Assert(w != nullptr, ExcInternalError());
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
         N_Vector v = N_VNewEmpty();
+#  else
+        N_Vector v = N_VNewEmpty(w->sunctx);
+#  endif
         Assert(v != nullptr, ExcInternalError());
 
         int status = N_VCopyOps(w, v);
@@ -940,9 +982,17 @@ namespace SUNDIALS
 
     template <typename VectorType>
     N_Vector
-    create_empty_nvector()
+    create_empty_nvector(
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+      SUNContext nvector_context
+#  endif
+    )
     {
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
       N_Vector v = N_VNewEmpty();
+#  else
+      N_Vector v = N_VNewEmpty(nvector_context);
+#  endif
       Assert(v != nullptr, ExcInternalError());
 
       /* constructors, destructors, and utility operations */
