@@ -93,6 +93,7 @@ MGTransferMatrixFree<dim, Number>::clear()
 }
 
 
+
 template <int dim, typename Number>
 void
 MGTransferMatrixFree<dim, Number>::build(
@@ -106,6 +107,20 @@ MGTransferMatrixFree<dim, Number>::build(
            "distribute_mg_dofs() function called, but this is a prerequisite "
            "for multigrid transfers. You will need to call this function, "
            "probably close to where you already call distribute_dofs()."));
+  if (external_partitioners.size() > 0)
+    {
+      Assert(
+        this->initialize_dof_vector == nullptr,
+        ExcMessage(
+          "A initialize_dof_vector function has already been registered in the constructor!"));
+
+      this->initialize_dof_vector =
+        [external_partitioners](
+          const unsigned int                          level,
+          LinearAlgebra::distributed::Vector<Number> &vec) {
+          vec.reinit(external_partitioners[level]);
+        };
+    }
 
   this->fill_and_communicate_copy_indices(dof_handler);
 
@@ -182,6 +197,39 @@ MGTransferMatrixFree<dim, Number>::build(
     }
 
   evaluation_data.resize(n_child_cell_dofs);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMatrixFree<dim, Number>::build(
+  const DoFHandler<dim, dim> &dof_handler,
+  const std::function<void(const unsigned int,
+                           LinearAlgebra::distributed::Vector<Number> &)>
+    &initialize_dof_vector)
+{
+  if (initialize_dof_vector)
+    {
+      const unsigned int n_levels =
+        dof_handler.get_triangulation().n_global_levels();
+
+      std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        external_partitioners(n_levels);
+
+      for (unsigned int level = 0; level < n_levels; ++level)
+        {
+          LinearAlgebra::distributed::Vector<Number> vector;
+          initialize_dof_vector(level, vector);
+          external_partitioners[level] = vector.get_partitioner();
+        }
+
+      build(dof_handler, external_partitioners);
+    }
+  else
+    {
+      build(dof_handler);
+    }
 }
 
 

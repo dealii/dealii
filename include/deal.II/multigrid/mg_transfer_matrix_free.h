@@ -106,6 +106,16 @@ public:
             std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>());
 
   /**
+   * Same as above but taking a lambda for initializing vector instead of
+   * partitioners.
+   */
+  void
+  build(const DoFHandler<dim, dim> &dof_handler,
+        const std::function<void(const unsigned int,
+                                 LinearAlgebra::distributed::Vector<Number> &)>
+          &initialize_dof_vector);
+
+  /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
    * <tt>to_level</tt> using the embedding matrices of the underlying finite
    * element. The previous content of <tt>dst</tt> is overwritten.

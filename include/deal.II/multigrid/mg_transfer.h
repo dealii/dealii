@@ -611,6 +611,13 @@ protected:
   mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
     solution_ghosted_level_vector;
 
+  /**
+   * Function to initialize internal level vectors.
+   */
+  std::function<void(const unsigned int,
+                     LinearAlgebra::distributed::Vector<Number> &)>
+    initialize_dof_vector;
+
 private:
   /**
    * This function is called to make sure that build() has been invoked.
