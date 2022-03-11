@@ -17,7 +17,7 @@ Otherwise:
   directory (should you have one).
 
 - Is there a missing feature you want to implement? Please briefly describe it and
-  and the problem it solves.
+  the problem it solves.
 
 - Did you find some other issue with deal.II? Summarize the problem here.
 -->
