@@ -1,0 +1,5 @@
+New: Add new wrappers ArborXWrappers::SphereIntersectPredicate and
+ArborXWrappers::SphereNearestPredicate to perform geometrical search on spheres
+using ArborX.
+<br>
+(Bruno Turcksin, 2022/03/11)
