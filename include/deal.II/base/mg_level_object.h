@@ -149,6 +149,12 @@ public:
   max_level() const;
 
   /**
+   * Number of levels, i.e., `max_level()-min_level()+1`.
+   */
+  unsigned int
+  n_levels() const;
+
+  /**
    * Apply the action @p action to every object stored in here. The
    * parameter @p action is expected to be a function object that accepts
    * the syntax
@@ -278,6 +284,14 @@ unsigned int
 MGLevelObject<Object>::max_level() const
 {
   return minlevel + objects.size() - 1;
+}
+
+
+template <class Object>
+unsigned int
+MGLevelObject<Object>::n_levels() const
+{
+  return objects.size();
 }
 
 template <class Object>
