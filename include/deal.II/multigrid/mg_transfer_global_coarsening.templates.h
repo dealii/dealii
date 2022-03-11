@@ -2905,19 +2905,73 @@ void
 MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
-      &partitioner_coarse,
-    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
+      &external_partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &external_partitioner_fine)
 {
-  if (this->partitioner_coarse->is_globally_compatible(*partitioner_coarse))
+  const auto is_partitioner_contained =
+    [](const auto &partitioner, const auto &external_partitioner) -> bool {
+    // no external partitioner has been given
+    if (external_partitioner.get() == nullptr)
+      return false;
+
+    // check if locally owned ranges are the same
+    if (external_partitioner->size() != partitioner->size())
+      return false;
+
+    if (external_partitioner->locally_owned_range() !=
+        partitioner->locally_owned_range())
+      return false;
+
+    const int ghosts_locally_contained =
+      ((external_partitioner->ghost_indices() & partitioner->ghost_indices()) ==
+       partitioner->ghost_indices()) ?
+        1 :
+        0;
+
+    // check if ghost values are contained in external partititioner
+    return Utilities::MPI::min(ghosts_locally_contained,
+                               partitioner->get_mpi_communicator()) == 1;
+  };
+
+  if (this->partitioner_coarse->is_globally_compatible(
+        *external_partitioner_coarse))
     {
-      this->partitioner_coarse = partitioner_coarse;
       this->vec_coarse.reinit(0);
+      this->partitioner_coarse = external_partitioner_coarse;
+    }
+  else if (is_partitioner_contained(this->partitioner_coarse,
+                                    external_partitioner_coarse))
+    {
+      this->vec_coarse.reinit(0);
+
+      for (auto &i : constraint_info.dof_indices)
+        i = external_partitioner_coarse->global_to_local(
+          this->partitioner_coarse->local_to_global(i));
+
+      for (auto &i : constraint_info.plain_dof_indices)
+        i = external_partitioner_coarse->global_to_local(
+          this->partitioner_coarse->local_to_global(i));
+
+      this->partitioner_coarse = external_partitioner_coarse;
     }
 
-  if (this->partitioner_fine->is_globally_compatible(*partitioner_fine))
+  if (this->partitioner_fine->is_globally_compatible(
+        *external_partitioner_fine))
     {
-      this->partitioner_fine = partitioner_fine;
       this->vec_fine.reinit(0);
+      this->partitioner_fine = external_partitioner_fine;
+    }
+  else if (is_partitioner_contained(this->partitioner_fine,
+                                    external_partitioner_fine))
+    {
+      this->vec_fine.reinit(0);
+
+      for (auto &i : level_dof_indices_fine)
+        i = external_partitioner_fine->global_to_local(
+          this->partitioner_fine->local_to_global(i));
+
+      this->partitioner_fine = external_partitioner_fine;
     }
 }
 
