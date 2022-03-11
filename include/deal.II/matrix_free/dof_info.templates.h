@@ -283,18 +283,7 @@ namespace internal
       const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
       std::vector<types::global_dof_index> &                dof_indices)
     {
-      // 1) check if finite elements support fast hanging-node algorithm
-      this->hanging_node_constraint_masks_comp =
-        hanging_nodes.compute_supported_components(
-          cell->get_dof_handler().get_fe_collection());
-
-      if ([](const auto &supported_components) {
-            return std::none_of(supported_components.begin(),
-                                supported_components.end(),
-                                [](const auto &a) {
-                                  return *std::max_element(a.begin(), a.end());
-                                });
-          }(hanging_node_constraint_masks_comp))
+      if (this->hanging_node_constraint_masks_comp.size() == 0)
         return false;
 
       // 2) determine the refinement configuration of the cell

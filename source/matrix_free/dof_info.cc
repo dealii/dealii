@@ -104,6 +104,7 @@ namespace internal
           // one
           const bool has_constraints =
             (hanging_node_constraint_masks.size() != 0 &&
+             hanging_node_constraint_masks_comp.size() != 0 &&
              hanging_node_constraint_masks[cell * n_vectorization + v] !=
                ConstraintKinds::unconstrained &&
              hanging_node_constraint_masks_comp[fe_index][0 /*TODO*/]) ||
@@ -235,6 +236,7 @@ namespace internal
                   AssertIndexRange(fe_index, dofs_per_cell.size());
 
                   if (hanging_node_constraint_masks.size() > 0 &&
+                      hanging_node_constraint_masks_comp.size() > 0 &&
                       hanging_node_constraint_masks[boundary_cells[i]] !=
                         ConstraintKinds::unconstrained)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -374,7 +376,8 @@ namespace internal
 
               bool has_hanging_nodes = false;
 
-              if (hanging_node_constraint_masks.size() > 0)
+              if (hanging_node_constraint_masks.size() > 0 &&
+                  hanging_node_constraint_masks_comp.size() > 0)
                 {
                   const auto mask =
                     hanging_node_constraint_masks[renumbering[position_cell +
