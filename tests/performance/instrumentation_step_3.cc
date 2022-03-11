@@ -103,7 +103,7 @@ Step3::make_grid()
         triangulation.refine_global(6);
         break;
       case TestingEnvironment::medium:
-        /* fallthrough */
+        DEAL_II_FALLTHROUGH;
       case TestingEnvironment::heavy:
         triangulation.refine_global(7);
         break;
@@ -217,7 +217,7 @@ Step3::output_results() const
 Measurement
 Step3::run()
 {
-  std::map<std::string, unsigned long long> cycle_count;
+  std::map<std::string, std::uint64_t> cycle_count;
 
   callgrind_wrapper::start_instrumentation();
   make_grid();

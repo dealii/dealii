@@ -579,7 +579,7 @@ template <int dim>
 Measurement
 StokesProblem<dim>::run()
 {
-  std::map<std::string, unsigned long long> cycle_count;
+  std::map<std::string, std::uint64_t> cycle_count;
 
   {
     std::vector<unsigned int> subdivisions(dim, 1);
@@ -611,7 +611,7 @@ StokesProblem<dim>::run()
         triangulation.refine_global(4 - dim);
         break;
       case TestingEnvironment::medium:
-        /* fallthrough */
+        DEAL_II_FALLTHROUGH;
       case TestingEnvironment::heavy:
         triangulation.refine_global(5 - dim);
         break;

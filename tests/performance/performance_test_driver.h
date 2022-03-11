@@ -97,7 +97,7 @@ describe_measurements();
 /**
  * The Measurement type returned by perform_single_measurement(). We
  * support returning a <code>std::vector<double></code> for timings or a
- * <code>std::vector<unsigned long long></code> for instruction counts.
+ * <code>std::vector<std::uint64_t></code> for instruction counts.
  *
  * Note that the following could be improved using std::variant once we
  * switch to C++17.
@@ -108,12 +108,12 @@ struct Measurement
     : timing(results)
   {}
 
-  Measurement(std::initializer_list<unsigned long long> results)
+  Measurement(std::initializer_list<std::uint64_t> results)
     : instruction_count(results)
   {}
 
-  std::vector<double>             timing;
-  std::vector<unsigned long long> instruction_count;
+  std::vector<double>        timing;
+  std::vector<std::uint64_t> instruction_count;
 };
 
 
@@ -234,7 +234,7 @@ main(int argc, char *argv[])
             break;
 
           case Metric::instruction_count:
-            const unsigned long long x = measurements[0].instruction_count[i];
+            const std::uint64_t x = measurements[0].instruction_count[i];
             pout << names[i] << "\t" << x << "\n";
             break;
         }

@@ -65,11 +65,11 @@ namespace callgrind_wrapper
       CALLGRIND_DUMP_STATS_AT("callgrind-wrapper-token");
       CALLGRIND_STOP_INSTRUMENTATION;
 
-      std::ifstream      callgrind_output("callgrind.out");
-      std::string        token;
-      unsigned long long cycles      = 0ull;
-      bool               found_token = false;
-      unsigned long      found_pid   = 0;
+      std::ifstream callgrind_output("callgrind.out");
+      std::string   token;
+      std::uint64_t cycles      = 0ull;
+      bool          found_token = false;
+      unsigned long found_pid   = 0;
 
       while (callgrind_output)
         {
@@ -117,15 +117,15 @@ namespace callgrind_wrapper
    * executed since the last start_instrumentation() call.
    */
   DEAL_II_ALWAYS_INLINE
-  inline unsigned long long
+  inline std::uint64_t
   stop_instrumentation()
   {
     CALLGRIND_DUMP_STATS;
     CALLGRIND_STOP_INSTRUMENTATION;
 
-    std::ifstream      callgrind_output("callgrind.out");
-    std::string        token;
-    unsigned long long cycles = 0ull;
+    std::ifstream callgrind_output("callgrind.out");
+    std::string   token;
+    std::uint64_t cycles = 0ull;
 
     while (callgrind_output)
       {
