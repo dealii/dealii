@@ -23,6 +23,8 @@
 
 #  include <ArborX.hpp>
 
+#  include <utility>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -42,7 +44,7 @@ namespace ArborXWrappers
     PointPredicate(const std::vector<dealii::Point<dim, Number>> &points);
 
     /**
-     * Number of points stored in the structure.
+     * The number of points stored in the structure.
      */
     std::size_t
     size() const;
@@ -133,7 +135,7 @@ namespace ArborXWrappers
       const std::vector<dealii::BoundingBox<dim, Number>> &bounding_boxes);
 
     /**
-     * Number of bounding boxes stored in the structure.
+     * The number of bounding boxes stored in the structure.
      */
     std::size_t
     size() const;
@@ -205,6 +207,100 @@ namespace ArborXWrappers
   private:
     unsigned int n_nearest_neighbors;
   };
+
+
+
+  /**
+   * Base class for Sphere-based predicates providing basic functionality for
+   * derived classes; not supposed to be used on its own.
+   */
+  class SpherePredicate
+  {
+  protected:
+    /**
+     * Constructor. @p spheres is a list of spheres, i.e. a center and radius
+     * pair, used by the predicate.
+     */
+    template <int dim, typename Number>
+    SpherePredicate(
+      const std::vector<std::pair<dealii::Point<dim, Number>, Number>>
+        &spheres);
+
+    /**
+     * The number of spheres stored in the structure.
+     */
+    std::size_t
+    size() const;
+
+    /**
+     * Return the `i`th sphere stored in the object.
+     */
+    const std::pair<dealii::Point<3, float>, float> &
+    get(unsigned int) const;
+
+  private:
+    std::vector<std::pair<dealii::Point<3, float>, float>> spheres;
+  };
+
+
+
+  /**
+   *  This class defines a predicate used by ArborXWrappers::BVH to determine
+   *  for given spheres which of the bounding boxes used to build the
+   *  ArborXWrappers::BVH intersect with them.
+   *  @note The class is not supposed to be used in a polymorphic context.
+   */
+  class SphereIntersectPredicate : private SpherePredicate
+  {
+  public:
+    /**
+     * Constructor. @p spheres is a list of spheres which we are interested in
+     * knowing if they intersect ArborXWrappers::BVH bounding boxes.
+     */
+    template <int dim, typename Number>
+    SphereIntersectPredicate(
+      const std::vector<std::pair<dealii::Point<dim, Number>, Number>>
+        &spheres);
+
+    // We need these since we inherit privately to avoid polymorphic use.
+    using SpherePredicate::get;
+    using SpherePredicate::size;
+  };
+
+
+
+  /**
+   * This class defines a predicate used by ArborXWrappers::BVH to determine,
+   * for the given spheres, which are the nearest bounding boxes/points among
+   * the ones used to build the ArborXWrappers::BVH.
+   * @note The class is not supposed to be used in a polymorphic context.
+   */
+  class SphereNearestPredicate : private SpherePredicate
+  {
+  public:
+    /**
+     * Constructor. @p spheres is a list of spheres for which we are
+     * interested in the @p n_nearest_neighbors in the ArborXWrappers::BVH
+     * bounding boxes/points.
+     */
+    template <int dim, typename Number>
+    SphereNearestPredicate(
+      const std::vector<std::pair<dealii::Point<dim, Number>, Number>> &spheres,
+      const unsigned int n_nearest_neighbors);
+
+    /**
+     * Return the number of nearest neighbors we are looking for.
+     */
+    unsigned int
+    get_n_nearest_neighbors() const;
+
+    // We need these since we inherit privately to avoid polymorphic use.
+    using SpherePredicate::get;
+    using SpherePredicate::size;
+
+  private:
+    unsigned int n_nearest_neighbors;
+  };
 } // namespace ArborXWrappers
 
 DEAL_II_NAMESPACE_CLOSE
@@ -264,6 +360,34 @@ namespace ArborX
 
 
   /**
+   * This struct allows ArborX to use
+   * std::vector<std::pair<dealii::Point, Number> as primitive.
+   */
+  template <int dim, typename Number>
+  struct AccessTraits<
+    std::vector<std::pair<dealii::Point<dim, Number>, Number>>,
+    PrimitivesTag>
+  {
+    using memory_space = Kokkos::HostSpace;
+
+    /**
+     * Return the size of the vector @p v.
+     */
+    static std::size_t
+    size(const std::vector<std::pair<dealii::Point<dim, Number>, Number>> &v);
+
+    /**
+     * Return an ArborX::Sphere from the std::pair<dealii::Point, Number>
+     * `v[i]`.
+     */
+    static Sphere
+    get(const std::vector<std::pair<dealii::Point<dim, Number>, Number>> &v,
+        std::size_t                                                       i);
+  };
+
+
+
+  /**
    * This struct allows ArborX to use PointIntersectPredicate as a predicate.
    */
   template <>
@@ -273,19 +397,20 @@ namespace ArborX
     using memory_space = Kokkos::HostSpace;
 
     /**
-     * Number of Point stored in @p pt_intersect.
+     * The number of points stored in @p pt_intersect.
      */
     static std::size_t
     size(const dealii::ArborXWrappers::PointIntersectPredicate &pt_intersect);
 
     /**
-     * Return an Arbox::intersects(ArborX::Point) object constructed from the
+     * Return an ArborX::intersects(ArborX::Point) object constructed from the
      * `i`th dealii::Point stored in @p pt_intersect.
      */
     static auto
     get(const dealii::ArborXWrappers::PointIntersectPredicate &pt_intersect,
         std::size_t                                            i);
   };
+
 
 
   /**
@@ -298,13 +423,13 @@ namespace ArborX
     using memory_space = Kokkos::HostSpace;
 
     /**
-     * Number of Point stored in @p pt_nearest.
+     * The number of points stored in @p pt_nearest.
      */
     static std::size_t
     size(const dealii::ArborXWrappers::PointNearestPredicate &pt_nearest);
 
     /**
-     * Return an Arbox::nearest(ArborX::Point,
+     * Return an ArborX::nearest(ArborX::Point,
      * PointNearestPredicate::get_n_nearest_neighbors) object constructed from
      * the `i`th dealii::Point stored in @p pt_nearest.
      */
@@ -312,6 +437,7 @@ namespace ArborX
     get(const dealii::ArborXWrappers::PointNearestPredicate &pt_nearest,
         std::size_t                                          i);
   };
+
 
 
   /**
@@ -325,7 +451,7 @@ namespace ArborX
     using memory_space = Kokkos::HostSpace;
 
     /**
-     * Number of BoundingBox stored in @p bb_intersect.
+     * The number of bounding boxes stored in @p bb_intersect.
      */
     static std::size_t
     size(const dealii::ArborXWrappers::BoundingBoxIntersectPredicate
@@ -342,6 +468,7 @@ namespace ArborX
   };
 
 
+
   /**
    * This struct allows ArborX to use BoundingBoxNearstPredicate as a
    * predicate.
@@ -353,7 +480,7 @@ namespace ArborX
     using memory_space = Kokkos::HostSpace;
 
     /**
-     * Number of BoundingBox stored in @p bb_nearest.
+     * The number of bounding boxes stored in @p bb_nearest.
      */
     static std::size_t
     size(const dealii::ArborXWrappers::BoundingBoxNearestPredicate &bb_nearest);
@@ -368,6 +495,59 @@ namespace ArborX
     static auto
     get(const dealii::ArborXWrappers::BoundingBoxNearestPredicate &bb_nearest,
         std::size_t                                                i);
+  };
+
+
+
+  /**
+   * This struct allows ArborX to use SphereIntersectPredicate as a predicate.
+   */
+  template <>
+  struct AccessTraits<dealii::ArborXWrappers::SphereIntersectPredicate,
+                      PredicatesTag>
+  {
+    using memory_space = Kokkos::HostSpace;
+
+    /**
+     * The number of points stored in @p sph_intersect.
+     */
+    static std::size_t
+    size(const dealii::ArborXWrappers::SphereIntersectPredicate &sph_intersect);
+
+    /**
+     * Return an ArborX::intersects(ArborX::Sphere) object constructed from the
+     * `i`th sphere stored in @p sph_intersect.
+     */
+    static auto
+    get(const dealii::ArborXWrappers::SphereIntersectPredicate &sph_intersect,
+        std::size_t                                             i);
+  };
+
+
+
+  /**
+   * This struct allows ArborX to use SphereNearestPredicate as a predicate.
+   */
+  template <>
+  struct AccessTraits<dealii::ArborXWrappers::SphereNearestPredicate,
+                      PredicatesTag>
+  {
+    using memory_space = Kokkos::HostSpace;
+
+    /**
+     * The number of spheres stored in @p sph_nearest.
+     */
+    static std::size_t
+    size(const dealii::ArborXWrappers::SphereNearestPredicate &sph_nearest);
+
+    /**
+     * Return an ArborX::nearest(ArborX::Sphere,
+     * SphereNearestPredicate::get_n_nearest_neightbors) object constructed from
+     * the `i`th sphere stored in @p sph_nearest.
+     */
+    static auto
+    get(const dealii::ArborXWrappers::SphereNearestPredicate &sph_nearest,
+        std::size_t                                           i);
   };
 
   // ------------------------------- Inline ----------------------------------//
@@ -468,6 +648,52 @@ namespace ArborX
     return nearest(Box{{min_corner[0], min_corner[1], min_corner[2]},
                        {max_corner[0], max_corner[1], max_corner[2]}},
                    bb_nearest.get_n_nearest_neighbors());
+  }
+
+
+
+  inline std::size_t
+  AccessTraits<dealii::ArborXWrappers::SphereIntersectPredicate,
+               PredicatesTag>::
+    size(const dealii::ArborXWrappers::SphereIntersectPredicate &sph_intersect)
+  {
+    return sph_intersect.size();
+  }
+
+
+
+  inline auto
+  AccessTraits<dealii::ArborXWrappers::SphereIntersectPredicate,
+               PredicatesTag>::
+    get(const dealii::ArborXWrappers::SphereIntersectPredicate &sph_intersect,
+        std::size_t                                             i)
+  {
+    const auto sphere = sph_intersect.get(i);
+    return intersects(
+      Sphere{{sphere.first[0], sphere.first[1], sphere.first[2]},
+             sphere.second});
+  }
+
+
+
+  inline std::size_t
+  AccessTraits<dealii::ArborXWrappers::SphereNearestPredicate, PredicatesTag>::
+    size(const dealii::ArborXWrappers::SphereNearestPredicate &sph_nearest)
+  {
+    return sph_nearest.size();
+  }
+
+
+
+  inline auto
+  AccessTraits<dealii::ArborXWrappers::SphereNearestPredicate, PredicatesTag>::
+    get(const dealii::ArborXWrappers::SphereNearestPredicate &sph_nearest,
+        std::size_t                                           i)
+  {
+    const auto sphere = sph_nearest.get(i);
+    return nearest(Sphere{{sphere.first[0], sphere.first[1], sphere.first[2]},
+                          sphere.second},
+                   sph_nearest.get_n_nearest_neighbors());
   }
 } // namespace ArborX
 

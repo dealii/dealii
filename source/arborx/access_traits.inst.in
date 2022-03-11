@@ -31,6 +31,14 @@ for (DIM : DIMENSIONS; SCALAR : REAL_SCALARS)
       template BoundingBoxNearestPredicate::BoundingBoxNearestPredicate(
         const std::vector<dealii::BoundingBox<DIM, SCALAR>> &bb,
         const unsigned int n_nearest_neighbors);
+
+      template SphereIntersectPredicate::SphereIntersectPredicate(
+        const std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>
+          &spheres);
+      template SphereNearestPredicate::SphereNearestPredicate(
+        const std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>
+          &                spheres,
+        const unsigned int n_nearest_neighbors);
     \}
     DEAL_II_NAMESPACE_CLOSE
 
@@ -38,8 +46,13 @@ for (DIM : DIMENSIONS; SCALAR : REAL_SCALARS)
     {
       template struct AccessTraits<std::vector<dealii::Point<DIM, SCALAR>>,
                                    PrimitivesTag>;
+
       template struct AccessTraits<
         std::vector<dealii::BoundingBox<DIM, SCALAR>>,
+        PrimitivesTag>;
+
+      template struct AccessTraits<
+        std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>,
         PrimitivesTag>;
     \}
 #endif
