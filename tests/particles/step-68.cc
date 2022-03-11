@@ -249,7 +249,7 @@ namespace Step68
   // return value of this function (representing "work for this cell") is
   // calculated based on the number of particles in the current cell.
   // The function is
-  // connected to the cell_weight() signal inside the triangulation, and will be
+  // connected to the `weight` signal inside the triangulation, and will be
   // called once per cell, whenever the triangulation repartitions the domain
   // between ranks (the connection is created inside the
   // generate_particles() function of this class).
@@ -327,7 +327,7 @@ namespace Step68
     // be created once, so we might as well have set it up in the constructor
     // of this class, but for the purpose of this example we want to group the
     // particle related instructions.
-    background_triangulation.signals.cell_weight.connect(
+    background_triangulation.signals.weight.connect(
       [&](
         const typename parallel::distributed::Triangulation<dim>::cell_iterator
           &cell,

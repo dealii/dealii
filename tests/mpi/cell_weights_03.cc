@@ -63,7 +63,7 @@ test()
 
   tr.refine_global(1);
 
-  tr.signals.cell_weight.connect(&cell_weight<dim>);
+  tr.signals.weight.connect(&cell_weight<dim>);
 
   tr.repartition();
 

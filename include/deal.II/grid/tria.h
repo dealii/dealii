@@ -2044,7 +2044,7 @@ public:
   };
 
   /**
-   * A structure used to accumulate the results of the cell_weights slot
+   * A structure used to accumulate the results of the weight signal slot
    * functions below. It takes an iterator range and returns the sum of
    * values.
    */
@@ -2203,7 +2203,126 @@ public:
     boost::signals2::signal<unsigned int(const cell_iterator &,
                                          const CellStatus),
                             CellWeightSum<unsigned int>>
-      cell_weight;
+      weight;
+
+#ifndef DOXYGEN
+    /**
+     * Legacy constructor that connects deprecated signals to their new ones.
+     */
+    Signals()
+      : cell_weight(weight)
+    {}
+
+    /**
+     * Legacy signal emulation to deprecate the old signal.
+     */
+    class LegacySignal
+    {
+    public:
+      using signature_type = unsigned int(const cell_iterator &,
+                                          const CellStatus);
+      using combiner_type  = CellWeightSum<unsigned int>;
+
+      using slot_function_type = boost::function<signature_type>;
+      using slot_type =
+        boost::signals2::slot<signature_type, slot_function_type>;
+
+      LegacySignal(
+        boost::signals2::signal<signature_type, combiner_type> &new_signal)
+        : new_signal(new_signal)
+      {}
+
+      ~LegacySignal()
+      {
+        base_weight.disconnect();
+      }
+
+      DEAL_II_DEPRECATED_EARLY
+      boost::signals2::connection
+      connect(
+        const slot_type &                 slot,
+        boost::signals2::connect_position position = boost::signals2::at_back)
+      {
+        if (base_weight.connected() == false)
+          {
+            base_weight = new_signal.connect(
+              [](const cell_iterator &, const CellStatus) -> unsigned int {
+                return 1000;
+              });
+            Assert(base_weight.connected() && new_signal.num_slots() == 1,
+                   ExcInternalError());
+          }
+
+        return new_signal.connect(slot, position);
+      }
+
+      DEAL_II_DEPRECATED_EARLY
+      std::size_t
+      num_slots() const
+      {
+        return new_signal.num_slots() -
+               static_cast<std::size_t>(base_weight.connected());
+      }
+
+      DEAL_II_DEPRECATED_EARLY
+      bool
+      empty() const
+      {
+        if (num_slots() == 0)
+          {
+            Assert(new_signal.num_slots() == 0, ExcInternalError());
+            return true;
+          }
+        return false;
+      }
+
+      template <typename S>
+      DEAL_II_DEPRECATED_EARLY void
+      disconnect(const S &connection)
+      {
+        new_signal.disconnect(connection);
+
+        if (num_slots() == 0)
+          {
+            Assert(base_weight.connected() && new_signal.num_slots() == 1,
+                   ExcInternalError());
+            new_signal.disconnect(base_weight);
+          }
+      }
+
+      DEAL_II_DEPRECATED_EARLY
+      unsigned int
+      operator()(const cell_iterator &iterator, const CellStatus status)
+      {
+        return new_signal(iterator, status);
+      }
+
+    private:
+      boost::signals2::connection base_weight;
+
+      boost::signals2::signal<signature_type, combiner_type> &new_signal;
+    };
+#endif
+
+    /**
+     * @copydoc weight
+     *
+     * As a reference a value of 1000 is added for every cell to the total
+     * weight. This means a signal return value of 1000 (resulting in a weight
+     * of 2000) means that it is twice as expensive for a process to handle this
+     * particular cell.
+     *
+     * @deprecated Use the weight signal instead which omits the base weight.
+     * You can invoke the old behavior by connecting a function to the signal
+     * that returns the base weight like this:
+     * @code{.cc}
+     * triangulation.signals.weight.connect(
+     *   [](const typename Triangulation<dim>::cell_iterator &,
+     *      const typename Triangulation<dim>::CellStatus)
+     *     -> unsigned int { return 1000; });
+     * @endcode
+     */
+    LegacySignal cell_weight;
 
     /**
      * This signal is triggered at the beginning of execution of the

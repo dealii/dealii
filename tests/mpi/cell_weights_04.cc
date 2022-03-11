@@ -57,7 +57,7 @@ test()
 
   GridGenerator::subdivided_hyper_cube(tr, 16);
 
-  tr.signals.cell_weight.connect(&cell_weight<dim>);
+  tr.signals.weight.connect(&cell_weight<dim>);
 
   tr.refine_global(1);
 

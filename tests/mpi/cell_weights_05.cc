@@ -77,7 +77,7 @@ test()
 
 
   // repartition the mesh; attach different weights to all cells
-  tr.signals.cell_weight.connect(&cell_weight<dim>);
+  tr.signals.weight.connect(&cell_weight<dim>);
 
   tr.repartition();
 

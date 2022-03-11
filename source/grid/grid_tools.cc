@@ -3816,7 +3816,7 @@ namespace GridTools
     std::vector<unsigned int> cell_weights;
 
     // Get cell weighting if a signal has been attached to the triangulation
-    if (!triangulation.signals.cell_weight.empty())
+    if (!triangulation.signals.weight.empty())
       {
         cell_weights.resize(triangulation.n_active_cells(), 0U);
 
@@ -3826,7 +3826,7 @@ namespace GridTools
         for (const auto &cell : triangulation.active_cell_iterators())
           if (cell->is_locally_owned())
             cell_weights[cell->active_cell_index()] =
-              triangulation.signals.cell_weight(
+              triangulation.signals.weight(
                 cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
 
         // If this is a parallel triangulation, we then need to also
@@ -3920,7 +3920,7 @@ namespace GridTools
     std::vector<unsigned int> cell_weights;
 
     // Get cell weighting if a signal has been attached to the triangulation
-    if (!triangulation.signals.cell_weight.empty())
+    if (!triangulation.signals.weight.empty())
       {
         cell_weights.resize(triangulation.n_active_cells(), 0U);
 
@@ -3930,7 +3930,7 @@ namespace GridTools
         for (const auto &cell : triangulation.active_cell_iterators() |
                                   IteratorFilters::LocallyOwnedCell())
           cell_weights[cell->active_cell_index()] =
-            triangulation.signals.cell_weight(
+            triangulation.signals.weight(
               cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
 
         // If this is a parallel triangulation, we then need to also
@@ -4060,7 +4060,7 @@ namespace GridTools
                       "are already partitioned implicitly and can not be "
                       "partitioned again explicitly."));
     Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
-    Assert(triangulation.signals.cell_weight.empty(), ExcNotImplemented());
+    Assert(triangulation.signals.weight.empty(), ExcNotImplemented());
 
     // signal that partitioning is going to happen
     triangulation.signals.pre_partition();

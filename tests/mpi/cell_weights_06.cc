@@ -77,7 +77,7 @@ test()
 
   // repartition the mesh; attach different weights to all cells
   n_global_active_cells = tr.n_global_active_cells();
-  tr.signals.cell_weight.connect(&cell_weight<dim>);
+  tr.signals.weight.connect(&cell_weight<dim>);
   tr.repartition();
 
   const auto n_locally_owned_active_cells_per_processor =

@@ -1453,7 +1453,7 @@ namespace
   {
   public:
     /**
-     * This constructor assumes the cell_weights are already sorted in the
+     * This constructor assumes the @p cell_weights are already sorted in the
      * order that p4est will encounter the cells, and they do not contain
      * ghost cells or artificial cells.
      */
@@ -3351,7 +3351,7 @@ namespace parallel
         {
           // partition the new mesh between all processors. If cell weights
           // have not been given balance the number of cells.
-          if (this->signals.cell_weight.num_slots() == 0)
+          if (this->signals.weight.empty())
             dealii::internal::p4est::functions<dim>::partition(
               parallel_forest,
               /* prepare coarsening */ 1,
@@ -3529,7 +3529,7 @@ namespace parallel
                         (parallel_forest->mpisize + 1));
         }
 
-      if (this->signals.cell_weight.num_slots() == 0)
+      if (this->signals.weight.empty())
         {
           // no cell weights given -- call p4est's 'partition' without a
           // callback for cell weights
@@ -4056,16 +4056,16 @@ namespace parallel
 
       // Iterate over p4est and Triangulation relations
       // to find refined/coarsened/kept
-      // cells. Then append cell_weight.
+      // cells. Then append weight.
       // Note that we need to follow the p4est ordering
-      // instead of the deal.II ordering to get the cell_weights
+      // instead of the deal.II ordering to get the weights
       // in the same order p4est will encounter them during repartitioning.
       for (const auto &cell_rel : this->local_cell_relations)
         {
           const auto &cell_it     = cell_rel.first;
           const auto &cell_status = cell_rel.second;
 
-          weights.push_back(this->signals.cell_weight(cell_it, cell_status));
+          weights.push_back(this->signals.weight(cell_it, cell_status));
         }
 
       return weights;
