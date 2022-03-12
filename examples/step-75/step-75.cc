@@ -1047,9 +1047,12 @@ namespace Step75
   // remove one cell in every cell from the negative direction, but remove one
   // from the positive x-direction.
   //
-  // In the end, we supply the number of initial refinements that corresponds to
-  // the supplied minimal grid refinement level. Further, we set the initial
-  // active FE indices accordingly.
+  // On the coarse grid, we set the initial active FE indices and distribute the
+  // degrees of freedom once. We do that in order to assign the hp::FECollection
+  // to the DoFHandler, so that all cells know how many DoFs they are going to
+  // have. This step is mandatory for the weighted load balancing algorithm,
+  // which will be called implicitly in
+  // parallel::distributed::Triangulation::refine_global().
   template <int dim>
   void LaplaceProblem<dim>::initialize_grid()
   {
@@ -1077,12 +1080,14 @@ namespace Step75
     GridGenerator::subdivided_hyper_L(
       triangulation, repetitions, bottom_left, top_right, cells_to_remove);
 
-    triangulation.refine_global(prm.min_h_level);
-
     const unsigned int min_fe_index = prm.min_p_degree - 1;
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         cell->set_active_fe_index(min_fe_index);
+
+    dof_handler.distribute_dofs(fe_collection);
+
+    triangulation.refine_global(prm.min_h_level);
   }
 
 
