@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,12 +53,11 @@ namespace parallel
    * The connected weighting function may be changed anytime using the
    * CellWeights::reinit() function. The following code snippet demonstrates how
    * to achieve each cell being weighted by its current number of degrees of
-   * freedom. We chose a factor of `1000` that corresponds to the initial weight
-   * each cell is assigned to upon creation.
+   * freedom.
    * @code
    * parallel::CellWeights<dim, spacedim> cell_weights(
    *   hp_dof_handler,
-   *   parallel::CellWeights<dim, spacedim>::ndofs_weighting({1000, 1}));
+   *   parallel::CellWeights<dim, spacedim>::ndofs_weighting({1, 1}));
    * @endcode
    *
    * On the other hand, you are also able to take care of handling the signal
@@ -69,8 +68,7 @@ namespace parallel
    *   hp_dof_handler.get_triangulation().signals.cell_weight.connect(
    *     parallel::CellWeights<dim, spacedim>::make_weighting_callback(
    *       hp_dof_handler,
-   *       parallel::CellWeights<dim, spacedim>::ndofs_weighting(
-   *         {1000, 1}));
+   *       parallel::CellWeights<dim, spacedim>::ndofs_weighting({1, 1}));
    * @endcode
    *
    * The use of this class is demonstrated in step-75.
@@ -84,6 +82,17 @@ namespace parallel
    * latter via DoFHandler::reinit(), an assertion will be triggered in
    * the weight_callback() function. Use CellWeights::reinit() to deregister the
    * weighting function on the old Triangulation and connect it to the new one.
+   *
+   * @note A hp::FECollection needs to be attached to your DoFHandler object via
+   * DoFHandler::distribute_dofs() <em>once before</em> the
+   * Triangulation::Signals::cell_weight signal will be triggered. Otherwise,
+   * your DoFHandler does not know many degrees of freedom your cells have. In
+   * other words, you need to call DoFHandler::distribute_dofs() once before you
+   * call
+   * parallel::distributed::Triangulation::execute_coarsening_and_refinement(),
+   * parallel::distributed::Triangulation::refine_global(),
+   * parallel::distributed::Triangulation::repartition(), or
+   * GridTools::partition_triangulation() for the very first time.
    *
    * @ingroup distributed
    */
@@ -156,7 +165,7 @@ namespace parallel
      * Choose a constant weight @p factor on each cell.
      */
     static WeightingFunction
-    constant_weighting(const unsigned int factor = 1000);
+    constant_weighting(const unsigned int factor = 1);
 
     /**
      * The pair of floating point numbers $(a,b)$ provided via

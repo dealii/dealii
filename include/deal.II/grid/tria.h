@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2173,8 +2173,7 @@ public:
 
     /**
      * This signal is triggered for each cell during every automatic or manual
-     * repartitioning. This signal is somewhat special in that it is only
-     * triggered for distributed parallel calculations and only if functions
+     * repartitioning. This signal will only be triggered if functions
      * are connected to it. It is intended to allow a weighted repartitioning
      * of the domain to balance the computational load across processes in a
      * different way than balancing the number of cells. Any connected
@@ -2183,18 +2182,23 @@ public:
      * coarsened or left untouched (see the documentation of the CellStatus
      * enum for more information). The function is expected to return an
      * unsigned integer, which is interpreted as the additional computational
-     * load of this cell. If this cell is going to be coarsened, the signal is
-     * called for the parent cell and you need to provide the weight of the
-     * future parent cell. If this cell is going to be refined the function
-     * should return a weight, which will be equally assigned to every future
-     * child cell of the current cell. As a reference a value of 1000 is added
-     * for every cell to the total weight. This means a signal return value of
-     * 1000 (resulting in a weight of 2000) means that it is twice as
-     * expensive for a process to handle this particular cell. If several
-     * functions are connected to this signal, their return values will be
-     * summed to calculate the final weight.
+     * load of this cell.
      *
-     * This function is used in step-68.
+     * In serial and parallel shared applications, partitioning happens after
+     * refinement. So all cells will have the `CELL_PERSIST` status.
+     *
+     * In parallel distributed applications, partitioning happens during
+     * refinement. If this cell is going to be coarsened, the signal is called
+     * for the parent cell and you need to provide the weight of the future
+     * parent cell. If this cell is going to be refined, the function is called
+     * on all children and you should ideally return the same weight for all
+     * children.
+     *
+     * If several functions are connected to this signal, their return values
+     * will be summed to calculate the final weight via `CellWeightSum`.
+     *
+     * This function is used in step-68 and implicitely in step-75 using the
+     * parallel::CellWeights class.
      */
     boost::signals2::signal<unsigned int(const cell_iterator &,
                                          const CellStatus),

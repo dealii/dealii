@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2021 by the deal.II authors
+ * Copyright (C) 2020 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -26,7 +26,6 @@
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/timer.h>
 
-#include <deal.II/distributed/cell_weights.h>
 #include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
@@ -262,21 +261,18 @@ namespace Step68
     const typename parallel::distributed::Triangulation<dim>::CellStatus status)
     const
   {
-    // We do not assign any weight to cells we do not own (i.e., artificial
-    // or ghost cells)
-    if (!cell->is_locally_owned())
-      return 0;
+    // First, we introduce a base weight that will be assigned to every cell.
+    const unsigned int base_weight = 1;
 
-    // This determines how important particle work is compared to cell
-    // work (by default every cell has a weight of 1000).
-    // We set the weight per particle much higher to indicate that
-    // the particle load is the only one that is important to distribute the
-    // cells in this example. The optimal value of this number depends on the
-    // application and can range from 0 (cheap particle operations,
-    // expensive cell operations) to much larger than 1000 (expensive
-    // particle operations, cheap cell operations, like presumed in this
-    // example).
-    const unsigned int particle_weight = 10000;
+    // The following variable then determines how important particle work is
+    // compared to cell work. We set the weight per particle much higher to
+    // indicate that the particle load is the only one that is important to
+    // distribute the cells in this example. The optimal value of this number
+    // depends on the application and can range from 0 (cheap particle
+    // operations, expensive cell operations) to much larger than the base
+    // weight of 1 (expensive particle operations, cheap cell operations, like
+    // presumed in this example).
+    const unsigned int particle_weight = 10;
 
     // This example does not use adaptive refinement, therefore every cell
     // should have the status `CELL_PERSIST`. However this function can also

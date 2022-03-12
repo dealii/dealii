@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2021 by the deal.II authors
+ * Copyright (C) 2021 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -191,7 +191,7 @@ namespace Step75
     double p_refine_fraction  = 0.9;
     double p_coarsen_fraction = 0.9;
 
-    double weighting_factor   = 1e6;
+    double weighting_factor   = 1.;
     double weighting_exponent = 1.;
   };
 
@@ -980,16 +980,13 @@ namespace Step75
     // for hp-adaptation and right before repartitioning for load balancing is
     // about to happen. Functions can be registered that will attach weights in
     // the form that $a (n_\text{dofs})^b$ with a provided pair of parameters
-    // $(a,b)$. We register such a function in the following. Every cell will be
-    // charged with a constant weight at creation, which is a value of 1000 (see
-    // Triangulation::Signals::cell_weight).
+    // $(a,b)$. We register such a function in the following.
     //
     // For load balancing, efficient solvers like the one we use should scale
-    // linearly with the number of degrees of freedom owned. Further, to
-    // increase the impact of the weights we would like to attach, make sure
-    // that the individual weight will exceed this base weight by orders of
-    // magnitude. We set the parameters for cell weighting correspondingly: A
-    // large weighting factor of $10^6$ and an exponent of $1$.
+    // linearly with the number of degrees of freedom owned. We set the
+    // parameters for cell weighting correspondingly: A weighting factor of $1$
+    // and an exponent of $1$ (see the definitions of the `weighting_factor` and
+    // `weighting_exponent` above).
     cell_weights = std::make_unique<parallel::CellWeights<dim>>(
       dof_handler,
       parallel::CellWeights<dim>::ndofs_weighting(

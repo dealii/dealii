@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// Copyright (C) 2008 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -4038,47 +4038,7 @@ namespace parallel
           const auto &cell_it     = cell_rel.first;
           const auto &cell_status = cell_rel.second;
 
-          switch (cell_status)
-            {
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_PERSIST:
-                weights.push_back(1000);
-                weights.back() += this->signals.cell_weight(
-                  cell_it,
-                  parallel::distributed::Triangulation<dim,
-                                                       spacedim>::CELL_PERSIST);
-                break;
-
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_REFINE:
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_INVALID:
-                {
-                  // calculate weight of parent cell
-                  unsigned int parent_weight = 1000;
-                  parent_weight += this->signals.cell_weight(
-                    cell_it,
-                    parallel::distributed::Triangulation<dim, spacedim>::
-                      CELL_REFINE);
-                  // assign the weight of the parent cell equally to all
-                  // children
-                  weights.push_back(parent_weight);
-                  break;
-                }
-
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_COARSEN:
-                weights.push_back(1000);
-                weights.back() += this->signals.cell_weight(
-                  cell_it,
-                  parallel::distributed::Triangulation<dim,
-                                                       spacedim>::CELL_COARSEN);
-                break;
-
-              default:
-                Assert(false, ExcInternalError());
-                break;
-            }
+          weights.push_back(this->signals.cell_weight(cell_it, cell_status));
         }
 
       return weights;
