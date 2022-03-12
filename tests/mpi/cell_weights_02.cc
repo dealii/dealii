@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2020 by the deal.II authors
+// Copyright (C) 2009 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,7 @@ cell_weight(
   const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
   const typename parallel::distributed::Triangulation<dim>::CellStatus status)
 {
-  return 100;
+  return 1;
 }
 
 template <int dim>
@@ -55,14 +55,13 @@ test()
 
   GridGenerator::subdivided_hyper_cube(tr, 16);
 
-  tr.signals.cell_weight.connect(
-    std::bind(&cell_weight<dim>, std::placeholders::_1, std::placeholders::_2));
+  tr.signals.cell_weight.connect(&cell_weight<dim>);
   tr.refine_global(1);
 
   const auto n_locally_owned_active_cells_per_processor =
     Utilities::MPI::all_gather(tr.get_communicator(),
                                tr.n_locally_owned_active_cells());
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+  if (myid == 0)
     for (unsigned int p = 0; p < numproc; ++p)
       deallog << "processor " << p << ": "
               << n_locally_owned_active_cells_per_processor[p]
