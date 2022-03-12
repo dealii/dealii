@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2021 by the deal.II authors
+// Copyright (C) 2001 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3832,7 +3832,7 @@ namespace GridTools
         // If this is a parallel triangulation, we then need to also
         // get the weights for all other cells. We have asserted above
         // that this function can't be used for
-        // parallel::distribute::Triangulation objects, so the only
+        // parallel::distributed::Triangulation objects, so the only
         // ones we have to worry about here are
         // parallel::shared::Triangulation
         if (const auto shared_tria =
@@ -3841,6 +3841,16 @@ namespace GridTools
           Utilities::MPI::sum(cell_weights,
                               shared_tria->get_communicator(),
                               cell_weights);
+
+#ifdef DEBUG
+        // verify that the global sum of weights is larger than 0
+        const auto global_cell_sum = std::accumulate(cell_weights.begin(),
+                                                     cell_weights.end(),
+                                                     std::uint64_t(0));
+        Assert(global_cell_sum > 0,
+               ExcMessage("The global sum of weights over all active cells "
+                          "is zero. Please verify how you generate weights."));
+#endif
       }
 
     // Call the other more general function
@@ -3935,6 +3945,16 @@ namespace GridTools
           Utilities::MPI::sum(cell_weights,
                               shared_tria->get_communicator(),
                               cell_weights);
+
+#ifdef DEBUG
+        // verify that the global sum of weights is larger than 0
+        const auto global_cell_sum = std::accumulate(cell_weights.begin(),
+                                                     cell_weights.end(),
+                                                     std::uint64_t(0));
+        Assert(global_cell_sum > 0,
+               ExcMessage("The global sum of weights over all active cells "
+                          "is zero. Please verify how you generate weights."));
+#endif
       }
 
     // Call the other more general function
