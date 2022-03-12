@@ -278,27 +278,28 @@ namespace Step68
     // should have the status `CELL_PERSIST`. However this function can also
     // be used to distribute load during refinement, therefore we consider
     // refined or coarsened cells as well.
-    if (status == parallel::distributed::Triangulation<dim>::CELL_PERSIST ||
-        status == parallel::distributed::Triangulation<dim>::CELL_REFINE)
+    unsigned int n_particles_in_cell = 0;
+    switch (status)
       {
-        const unsigned int n_particles_in_cell =
-          particle_handler.n_particles_in_cell(cell);
-        return n_particles_in_cell * particle_weight;
+        case parallel::distributed::Triangulation<dim>::CELL_PERSIST:
+        case parallel::distributed::Triangulation<dim>::CELL_REFINE:
+          n_particles_in_cell = particle_handler.n_particles_in_cell(cell);
+          break;
+
+        case parallel::distributed::Triangulation<dim>::CELL_INVALID:
+          break;
+
+        case parallel::distributed::Triangulation<dim>::CELL_COARSEN:
+          for (const auto &child : cell->child_iterators())
+            n_particles_in_cell += particle_handler.n_particles_in_cell(child);
+          break;
+
+        default:
+          Assert(false, ExcInternalError());
+          break;
       }
-    else if (status == parallel::distributed::Triangulation<dim>::CELL_COARSEN)
-      {
-        unsigned int n_particles_in_cell = 0;
 
-        for (unsigned int child_index = 0; child_index < cell->n_children();
-             ++child_index)
-          n_particles_in_cell +=
-            particle_handler.n_particles_in_cell(cell->child(child_index));
-
-        return n_particles_in_cell * particle_weight;
-      }
-
-    Assert(false, ExcInternalError());
-    return 0;
+    return base_weight + particle_weight * n_particles_in_cell;
   }
 
 
