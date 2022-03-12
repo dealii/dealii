@@ -16,8 +16,9 @@
 //
 // Description:
 //
-// A performance benchmark based on step 22 that measures timings for system
-// setup, assembly, solve and postprocessing for a Stokes problem.
+// A performance benchmark based on step 22 that measures the number of
+// instruction cycles for system setup, assembly, solve and postprocessing
+// for a Stokes problem.
 //
 // Status: experimental
 //
@@ -61,6 +62,7 @@
 #include <memory>
 
 #include "performance_test_driver.h"
+#include "valgrind_instrumentation.h"
 
 using namespace dealii;
 
@@ -577,7 +579,7 @@ template <int dim>
 Measurement
 StokesProblem<dim>::run()
 {
-  std::map<std::string, dealii::Timer> timer;
+  std::map<std::string, std::uint64_t> cycle_count;
 
   {
     std::vector<unsigned int> subdivisions(dim, 1);
@@ -606,12 +608,12 @@ StokesProblem<dim>::run()
   switch (get_testing_environment())
     {
       case TestingEnvironment::light:
-        triangulation.refine_global(5 - dim);
+        triangulation.refine_global(4 - dim);
         break;
       case TestingEnvironment::medium:
         DEAL_II_FALLTHROUGH;
       case TestingEnvironment::heavy:
-        triangulation.refine_global(6 - dim);
+        triangulation.refine_global(5 - dim);
         break;
     }
 
@@ -622,43 +624,43 @@ StokesProblem<dim>::run()
 
       if (refinement_cycle > 0)
         {
-          timer["refinement"].start();
+          CallgrindWrapper::start_instrumentation();
           refine_mesh();
-          timer["refinement"].stop();
+          cycle_count["refinement"] = CallgrindWrapper::stop_instrumentation();
         }
 
-      timer["setup_system"].start();
+      CallgrindWrapper::start_instrumentation();
       setup_dofs();
-      timer["setup_system"].stop();
+      cycle_count["setup_system"] = CallgrindWrapper::stop_instrumentation();
 
       debug_output << "   Assembling..." << std::endl << std::flush;
-      timer["assemble_system"].start();
+      CallgrindWrapper::start_instrumentation();
       assemble_system();
-      timer["assemble_system"].stop();
+      cycle_count["assemble_system"] = CallgrindWrapper::stop_instrumentation();
 
-      timer["solve"].start();
+      CallgrindWrapper::start_instrumentation();
       solve();
-      timer["solve"].stop();
+      cycle_count["solve"] = CallgrindWrapper::stop_instrumentation();
 
-      timer["output_results"].start();
+      CallgrindWrapper::start_instrumentation();
       output_results(refinement_cycle);
-      timer["output_results"].stop();
+      cycle_count["output_results"] = CallgrindWrapper::stop_instrumentation();
 
       debug_output << std::endl;
     }
-  return {timer["refinement"].wall_time(),
-          timer["setup_system"].wall_time(),
-          timer["assemble_system"].wall_time(),
-          timer["solve"].wall_time(),
-          timer["output_results"].wall_time()};
+  return {cycle_count["refinement"],
+          cycle_count["setup_system"],
+          cycle_count["assemble_system"],
+          cycle_count["solve"],
+          cycle_count["output_results"]};
 }
 
 
 std::tuple<Metric, unsigned int, std::vector<std::string>>
 describe_measurements()
 {
-  return {Metric::timing,
-          4,
+  return {Metric::instruction_count,
+          1,
           {"refinement",
            "setup_system",
            "assemble_system",

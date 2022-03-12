@@ -304,7 +304,8 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem();
-  std::vector<double>
+
+  Measurement
   run();
 
 private:
@@ -588,7 +589,7 @@ LaplaceProblem<dim>::solve()
 
 
 template <int dim>
-std::vector<double>
+Measurement
 LaplaceProblem<dim>::run()
 {
   std::map<std::string, dealii::Timer> timer;

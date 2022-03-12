@@ -16,8 +16,9 @@
 //
 // Description:
 //
-// A performance benchmark based on step 3 that measures timings for system
-// setup, assembly, solve and postprocessing for a simple Poisson problem.
+// A performance benchmark based on step 3 that measures the number of
+// instruction cycles for system setup, assembly, solve and postprocessing
+// for a Stokes problem.
 //
 // Status: experimental
 //
@@ -47,6 +48,7 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include "performance_test_driver.h"
+#include "valgrind_instrumentation.h"
 
 using namespace dealii;
 
@@ -98,12 +100,12 @@ Step3::make_grid()
   switch (get_testing_environment())
     {
       case TestingEnvironment::light:
-        triangulation.refine_global(9);
+        triangulation.refine_global(6);
         break;
       case TestingEnvironment::medium:
         DEAL_II_FALLTHROUGH;
       case TestingEnvironment::heavy:
-        triangulation.refine_global(10);
+        triangulation.refine_global(7);
         break;
     }
 
@@ -215,41 +217,41 @@ Step3::output_results() const
 Measurement
 Step3::run()
 {
-  std::map<std::string, dealii::Timer> timer;
+  std::map<std::string, std::uint64_t> cycle_count;
 
-  timer["make_grid"].start();
+  CallgrindWrapper::start_instrumentation();
   make_grid();
-  timer["make_grid"].stop();
+  cycle_count["make_grid"] = CallgrindWrapper::stop_instrumentation();
 
-  timer["setup_system"].start();
+  CallgrindWrapper::start_instrumentation();
   setup_system();
-  timer["setup_system"].stop();
+  cycle_count["setup_system"] = CallgrindWrapper::stop_instrumentation();
 
-  timer["assemble_system"].start();
+  CallgrindWrapper::start_instrumentation();
   assemble_system();
-  timer["assemble_system"].stop();
+  cycle_count["assemble_system"] = CallgrindWrapper::stop_instrumentation();
 
-  timer["solve"].start();
+  CallgrindWrapper::start_instrumentation();
   solve();
-  timer["solve"].stop();
+  cycle_count["solve"] = CallgrindWrapper::stop_instrumentation();
 
-  timer["output_results"].start();
+  CallgrindWrapper::start_instrumentation();
   output_results();
-  timer["output_results"].stop();
+  cycle_count["output_results"] = CallgrindWrapper::stop_instrumentation();
 
-  return {timer["make_grid"].wall_time(),
-          timer["setup_system"].wall_time(),
-          timer["assemble_system"].wall_time(),
-          timer["solve"].wall_time(),
-          timer["output_results"].wall_time()};
+  return {cycle_count["make_grid"],
+          cycle_count["setup_system"],
+          cycle_count["assemble_system"],
+          cycle_count["solve"],
+          cycle_count["output_results"]};
 }
 
 
 std::tuple<Metric, unsigned int, std::vector<std::string>>
 describe_measurements()
 {
-  return {Metric::timing,
-          4,
+  return {Metric::instruction_count,
+          1,
           {"make_grid",
            "setup_system",
            "assemble_system",
