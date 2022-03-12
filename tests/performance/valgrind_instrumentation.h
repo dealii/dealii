@@ -37,7 +37,7 @@
  *            --callgrind-out-file=callgrind.out ./executable
  * @endcode
  */
-namespace callgrind_wrapper
+namespace CallgrindWrapper
 {
   /**
    * Reset the current instruction counter to zero and start callgrind
@@ -102,7 +102,7 @@ namespace callgrind_wrapper
     AssertThrow(
       is_initialized,
       dealii::ExcMessage(
-        "callgrind_wrapper::start_instrumentation() can only be called when "
+        "CallgrindWrapper::start_instrumentation() can only be called when "
         "the executable is run via \"valgrind --tool=callgrind -q "
         "--combine-dumps=yes --instr-atstart=no "
         "--callgrind-out-file=callgrind.out ./executable\""));
@@ -138,6 +138,6 @@ namespace callgrind_wrapper
     return cycles;
   }
 
-} // namespace callgrind_wrapper
+} // namespace CallgrindWrapper
 
 #endif

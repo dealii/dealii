@@ -624,28 +624,27 @@ StokesProblem<dim>::run()
 
       if (refinement_cycle > 0)
         {
-          callgrind_wrapper::start_instrumentation();
+          CallgrindWrapper::start_instrumentation();
           refine_mesh();
-          cycle_count["refinement"] = callgrind_wrapper::stop_instrumentation();
+          cycle_count["refinement"] = CallgrindWrapper::stop_instrumentation();
         }
 
-      callgrind_wrapper::start_instrumentation();
+      CallgrindWrapper::start_instrumentation();
       setup_dofs();
-      cycle_count["setup_system"] = callgrind_wrapper::stop_instrumentation();
+      cycle_count["setup_system"] = CallgrindWrapper::stop_instrumentation();
 
       debug_output << "   Assembling..." << std::endl << std::flush;
-      callgrind_wrapper::start_instrumentation();
+      CallgrindWrapper::start_instrumentation();
       assemble_system();
-      cycle_count["assemble_system"] =
-        callgrind_wrapper::stop_instrumentation();
+      cycle_count["assemble_system"] = CallgrindWrapper::stop_instrumentation();
 
-      callgrind_wrapper::start_instrumentation();
+      CallgrindWrapper::start_instrumentation();
       solve();
-      cycle_count["solve"] = callgrind_wrapper::stop_instrumentation();
+      cycle_count["solve"] = CallgrindWrapper::stop_instrumentation();
 
-      callgrind_wrapper::start_instrumentation();
+      CallgrindWrapper::start_instrumentation();
       output_results(refinement_cycle);
-      cycle_count["output_results"] = callgrind_wrapper::stop_instrumentation();
+      cycle_count["output_results"] = CallgrindWrapper::stop_instrumentation();
 
       debug_output << std::endl;
     }

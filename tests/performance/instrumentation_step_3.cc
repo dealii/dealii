@@ -219,25 +219,25 @@ Step3::run()
 {
   std::map<std::string, std::uint64_t> cycle_count;
 
-  callgrind_wrapper::start_instrumentation();
+  CallgrindWrapper::start_instrumentation();
   make_grid();
-  cycle_count["make_grid"] = callgrind_wrapper::stop_instrumentation();
+  cycle_count["make_grid"] = CallgrindWrapper::stop_instrumentation();
 
-  callgrind_wrapper::start_instrumentation();
+  CallgrindWrapper::start_instrumentation();
   setup_system();
-  cycle_count["setup_system"] = callgrind_wrapper::stop_instrumentation();
+  cycle_count["setup_system"] = CallgrindWrapper::stop_instrumentation();
 
-  callgrind_wrapper::start_instrumentation();
+  CallgrindWrapper::start_instrumentation();
   assemble_system();
-  cycle_count["assemble_system"] = callgrind_wrapper::stop_instrumentation();
+  cycle_count["assemble_system"] = CallgrindWrapper::stop_instrumentation();
 
-  callgrind_wrapper::start_instrumentation();
+  CallgrindWrapper::start_instrumentation();
   solve();
-  cycle_count["solve"] = callgrind_wrapper::stop_instrumentation();
+  cycle_count["solve"] = CallgrindWrapper::stop_instrumentation();
 
-  callgrind_wrapper::start_instrumentation();
+  CallgrindWrapper::start_instrumentation();
   output_results();
-  cycle_count["output_results"] = callgrind_wrapper::stop_instrumentation();
+  cycle_count["output_results"] = CallgrindWrapper::stop_instrumentation();
 
   return {cycle_count["make_grid"],
           cycle_count["setup_system"],
