@@ -689,7 +689,12 @@ namespace DoFRenumbering
                                             dof_handler.end(),
                                             component_order_arg,
                                             false);
-    if (result == 0)
+    (void)result;
+
+    // If we don't have a renumbering (i.e., when there is 1 component) then
+    // return
+    if (Utilities::MPI::max(renumbering.size(),
+                            dof_handler.get_communicator()) == 0)
       return;
 
     // verify that the last numbered
@@ -730,13 +735,13 @@ namespace DoFRenumbering
     const types::global_dof_index result =
       compute_component_wise<dim, spacedim>(
         renumbering, start, end, component_order_arg, true);
+    (void)result;
 
-    if (result == 0)
-      return;
+    Assert(result == 0 || result == dof_handler.n_dofs(level),
+           ExcInternalError());
 
-    Assert(result == dof_handler.n_dofs(level), ExcInternalError());
-
-    if (renumbering.size() != 0)
+    if (Utilities::MPI::max(renumbering.size(),
+                            dof_handler.get_communicator()) > 0)
       dof_handler.renumber_dofs(level, renumbering);
   }
 
@@ -1048,13 +1053,13 @@ namespace DoFRenumbering
                                                                start,
                                                                end,
                                                                true);
+    (void)result;
 
-    if (result == 0)
-      return;
+    Assert(result == 0 || result == dof_handler.n_dofs(level),
+           ExcInternalError());
 
-    Assert(result == dof_handler.n_dofs(level), ExcInternalError());
-
-    if (renumbering.size() != 0)
+    if (Utilities::MPI::max(renumbering.size(),
+                            dof_handler.get_communicator()) > 0)
       dof_handler.renumber_dofs(level, renumbering);
   }
 
