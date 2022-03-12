@@ -1889,7 +1889,6 @@ namespace internal
             dof_handler_fine.get_fe(fe_index_pair.first.second).degree;
         }
 
-      const auto comm = dof_handler_coarse.get_communicator();
       {
         transfer.partitioner_fine =
           std::make_shared<Utilities::MPI::Partitioner>(
@@ -2012,12 +2011,6 @@ namespace internal
               transfer.level_dof_indices_fine.data() + n_dof_indices_fine[i];
           }
 
-        bool           fine_indices_touch_remote_dofs = false;
-        const IndexSet locally_owned_dofs =
-          mg_level_fine == numbers::invalid_unsigned_int ?
-            dof_handler_fine.locally_owned_dofs() :
-            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
-
         transfer.constraint_info.reinit(
           dof_handler_coarse,
           cell_no.back(),
@@ -2044,18 +2037,10 @@ namespace internal
             for (unsigned int i = 0;
                  i < transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
                  i++)
-              {
-                level_dof_indices_fine[fe_pair_no][i] =
-                  transfer.partitioner_fine->global_to_local(
-                    local_dof_indices_fine
-                      [fe_pair_no]
-                      [lexicographic_numbering_fine[fe_pair_no][i]]);
-                if (!locally_owned_dofs.is_element(
-                      local_dof_indices_fine
-                        [fe_pair_no]
-                        [lexicographic_numbering_fine[fe_pair_no][i]]))
-                  fine_indices_touch_remote_dofs = true;
-              }
+              level_dof_indices_fine[fe_pair_no][i] =
+                transfer.partitioner_fine->global_to_local(
+                  local_dof_indices_fine
+                    [fe_pair_no][lexicographic_numbering_fine[fe_pair_no][i]]);
           }
 
           // move pointers
@@ -2064,13 +2049,6 @@ namespace internal
               transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
           }
         });
-
-        // if all access goes to the locally owned dofs on all ranks, we do
-        // not need the vec_fine vector
-        if (Utilities::MPI::max(static_cast<unsigned int>(
-                                  fine_indices_touch_remote_dofs),
-                                comm) == 0)
-          transfer.vec_fine.reinit(0);
 
         transfer.constraint_info.finalize();
       }
