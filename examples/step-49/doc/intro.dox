@@ -263,7 +263,10 @@ The other four surfaces are declared in a similar way.
 
 Next we define the physical surface itself.  This line is what makes our mesh 2D.
 The values in the braces on the right hand side are the tags for the `Plane Surface`s
-we declared above.
+we declared above.  The number in the parentheses of physical surfaces will become the
+material ID of the mesh as well.  For more information about material IDs, check the
+glossary entry
+@ref GlossMaterialId "material indicators" .
 
 @code
 Physical Surface(2) = {1, 2, 3, 4};
