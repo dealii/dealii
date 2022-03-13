@@ -21,6 +21,9 @@
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nedelec_sz.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_system.h>
@@ -77,7 +80,7 @@ test(DoFHandler<2> &dof_handler, const hp::MappingCollection<2> &mappings)
   const MPI_Comm comm = dof_handler.get_communicator();
 
   const IndexSet &local_dofs = dof_handler.locally_owned_dofs();
-  deallog << "locally owned dofs =\n";
+  deallog << "new case with locally owned dofs = ";
   local_dofs.print(deallog);
   deallog << std::endl;
   const IndexSet relevant_dofs =
@@ -104,8 +107,7 @@ test(DoFHandler<2> &dof_handler, const hp::MappingCollection<2> &mappings)
                                position);
 
       Test test(n_components);
-      if (n_components == 2)
-        VectorTools::interpolate(mappings, dof_handler, test, solution1);
+      VectorTools::interpolate(mappings, dof_handler, test, solution1);
 
       // Verify that we get the same results when we interpolate either manually
       // or by reading off position data and evaluating the interpolated
@@ -174,6 +176,51 @@ main(int argc, char **argv)
     test(dof_handler, mappings);
   }
 
+  // Try discontinuous elements
+  {
+    parallel::shared::Triangulation<2> tria(
+      comm,
+      dealii::Triangulation<2>::none,
+      true,
+      parallel::shared::Triangulation<2>::partition_zorder);
+    GridGenerator::hyper_ball(tria);
+
+    hp::FECollection<2>      fe(FESystem<2>(FE_DGQ<2>(4), 2));
+    hp::MappingCollection<2> mappings(MappingQ<2>(1));
+    DoFHandler<2>            dof_handler(tria);
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      if (cell->is_locally_owned())
+        cell->set_active_fe_index(0);
+    dof_handler.distribute_dofs(fe);
+
+    test(dof_handler, mappings);
+  }
+
+  // Test with p::d::T, hp-FE, multiple components
+  {
+    parallel::distributed::Triangulation<2> tria(comm);
+    GridGenerator::hyper_ball(tria);
+    tria.refine_global(3);
+    for (const auto &cell : tria.active_cell_iterators())
+      if (cell->is_locally_owned() && std::abs(cell->center()[0]) < 0.1)
+        cell->set_refine_flag();
+    tria.execute_coarsening_and_refinement();
+
+    hp::FECollection<2>      fe(FESystem<2>(FE_Q<2>(2), 2),
+                           FESystem<2>(FE_Q<2>(4), 2),
+                           FESystem<2>(FE_Nothing<2>(), 2));
+    hp::MappingCollection<2> mappings(MappingQ<2>(1),
+                                      MappingQ<2>(1),
+                                      MappingQ<2>(1));
+    DoFHandler<2>            dof_handler(tria);
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      if (cell->is_locally_owned())
+        cell->set_active_fe_index(cell->index() % 3);
+    dof_handler.distribute_dofs(fe);
+
+    test(dof_handler, mappings);
+  }
+
   // Test with a scalar FE
   {
     parallel::shared::Triangulation<2> tria(
@@ -237,5 +284,65 @@ main(int argc, char **argv)
       cell->set_active_fe_index(0);
 
     test(dof_handler, mappings);
+  }
+
+  // Make sure that we fail correctly when we do weird things
+  deal_II_exceptions::disable_abort_on_exception();
+  {
+    try
+      {
+        parallel::distributed::Triangulation<2> tria(comm);
+        GridGenerator::hyper_cube(tria);
+        tria.refine_global(3);
+
+        FESystem<2>   fe(FE_NedelecSZ<2>(0), 1, FE_Q<2>(1), 2);
+        DoFHandler<2> dof_handler(tria);
+        dof_handler.distribute_dofs(fe);
+        hp::MappingCollection<2> mappings(MappingQ<2>(1));
+        for (const auto &cell : dof_handler.active_cell_iterators())
+          cell->set_active_fe_index(0);
+
+        test(dof_handler, mappings);
+      }
+    catch (const ExceptionBase &exc)
+      {
+        // The third line contains line numbers so skip it
+        const std::vector<std::string> lines =
+          Utilities::split_string_list(exc.what(), "\n");
+        deallog
+          << "FE_NedelecSZ nodal renumbering failed successfully with message:"
+          << std::endl;
+        for (std::size_t i = 3; i < 6; ++i)
+          deallog << lines[i] << std::endl;
+      }
+  }
+
+  {
+    try
+      {
+        parallel::distributed::Triangulation<2> tria(comm);
+        GridGenerator::hyper_cube(tria);
+        tria.refine_global(3);
+
+        FE_NedelecSZ<2> fe(0);
+        DoFHandler<2>   dof_handler(tria);
+        dof_handler.distribute_dofs(fe);
+        hp::MappingCollection<2> mappings(MappingQ<2>(1));
+        for (const auto &cell : dof_handler.active_cell_iterators())
+          cell->set_active_fe_index(0);
+
+        test(dof_handler, mappings);
+      }
+    catch (const ExceptionBase &exc)
+      {
+        // The third line contains line numbers so skip it
+        const std::vector<std::string> lines =
+          Utilities::split_string_list(exc.what(), "\n");
+        deallog
+          << "FE_NedelecSZ nodal renumbering failed successfully with message:"
+          << std::endl;
+        for (std::size_t i = 3; i < 6; ++i)
+          deallog << lines[i] << std::endl;
+      }
   }
 }
