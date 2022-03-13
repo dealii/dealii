@@ -73,7 +73,7 @@ consists of the following files (click to inspect):
 foreach my $file (@src_files)
 { 
   print "- <a href=\"../code-gallery/$gallery/$file\">$file</a>\n";
-  if ($file =~ /.*\.(md|markdown|cc|cpp|cxx|c\+\+|h|hh|hxx)/) 
+  if ($file =~ /.*\.(md|markdown|cc|cpp|cxx|c\+\+|h|hh|hxx|py|sh|m)$/)
   {
       print "  (<a href=\"#ann-$file\">annotated version</a>)\n";
   }
@@ -128,7 +128,7 @@ foreach my $file (@src_files)
     # that may be inlined. doxygen doesn't seem to understand the
     # ```...``` form of offset commands, so keep track of that as
     # well
-    if ($file =~ /.*\.(md|markdown)/)
+    if ($file =~ /.*\.(md|markdown)$/)
     {
         print "<a name=\"ann-$file\"></a>\n";
         print "<h1>Annotated version of $file</h1>\n";
@@ -157,13 +157,36 @@ foreach my $file (@src_files)
         print "\n\n";
     }
 
-    # annotate source files
-    if ($file =~ /.*\.(cc|cpp|cxx|c\+\+|h|hh|hxx)/)
+    # annotate C++ source files
+    elsif ($file =~ /.*\.(cc|cpp|cxx|c\+\+|h|hh|hxx)$/)
     {
         print "<a name=\"ann-$file\"></a>\n";
         print "<h1>Annotated version of $file</h1>\n";
 
         system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen", "$gallery_dir/$file";
+
+        print "\n\n";
+    }
+
+    # let doxygen mark up files in other supported languages (and in
+    # some unsupported ones like .m Matlab files, which doxygen then
+    # simply copies into the output unparsed and without markup):
+    elsif ($file =~ /.*\.(py|sh|m)$/)
+    {
+        $extension = $1;
+
+        print "<a name=\"ann-$file\"></a>\n";
+        print "<h1>Annotated version of $file</h1>\n";
+
+
+        print "\@code{.$extension}\n";
+        open MD, "<$gallery_dir/$file";
+        my $incode = 0;
+        while ($line = <MD>)
+        {
+            print "$line";
+        }
+        print "\@endcode\n";
 
         print "\n\n";
     }
