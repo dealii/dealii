@@ -4803,6 +4803,65 @@ private:
 
 #endif // DOXYGEN
 
+
+namespace internal
+{
+  /**
+   * A utility function to convert a vectorized array of one scalar type, to
+   * that of another scalar type.
+   *
+   * @tparam ScalarTypeOut The scalar type of the output array.
+   * @tparam ScalarTypeIn The scalar type of the input array.
+   * @tparam width The number of elements in the array,
+   * @param input_array The input array that is to be converted.
+   * @return An array with the same data as the @p input_array, but converted to
+   *         the desired @p ScalarTypeOut.
+   */
+  template <typename ScalarTypeOut,
+            typename ScalarTypeIn,
+            std::size_t width,
+            typename = typename std::enable_if<
+              !std::is_same<ScalarTypeOut, ScalarTypeIn>::value>::type>
+  VectorizedArray<ScalarTypeOut, width>
+  convert_vectorized_array(
+    const VectorizedArray<ScalarTypeIn, width> &input_array)
+  {
+    VectorizedArray<ScalarTypeOut, width> output_array;
+
+    DEAL_II_OPENMP_SIMD_PRAGMA
+    for (unsigned int v = 0; v < width; v++)
+      output_array[v] = input_array[v];
+
+    return output_array;
+  }
+
+  /**
+   * A utility function to convert a vectorized array of one scalar type, to
+   * that of another scalar type.
+   * This specialization is for the case that the @p ScalarTypeOut is the same as
+   * the @p ScalarTypeIn.
+   *
+   * @tparam ScalarTypeOut The scalar type of the output array.
+   * @tparam ScalarTypeIn The scalar type of the input array.
+   * @tparam width The number of elements in the array,
+   * @param input_array The input array that is to be converted.
+   * @return An array with the same data as the @p input_array, but converted to
+   *         the desired @p ScalarTypeOut.
+   */
+  template <typename ScalarTypeOut,
+            typename ScalarTypeIn,
+            std::size_t width,
+            typename = typename std::enable_if<
+              std::is_same<ScalarTypeOut, ScalarTypeIn>::value>::type>
+  const VectorizedArray<ScalarTypeIn, width> &
+  convert_vectorized_array(
+    const VectorizedArray<ScalarTypeIn, width> &input_array)
+  {
+    return input_array;
+  }
+} // namespace internal
+
+
 /**
  * @name Arithmetic operations with VectorizedArray
  */
@@ -4869,6 +4928,27 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 }
 
 /**
+ * Multiplication of two vectorized arrays with operator *.
+ * This variant permits the input arrays to have different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          typename Number2,
+          std::size_t width,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE
+  VectorizedArray<typename ProductType<Number1, Number2>::type, width>
+  operator*(const VectorizedArray<Number1, width> &u,
+            const VectorizedArray<Number2, width> &v)
+{
+  using ResultScalar_t = typename ProductType<Number1, Number2>::type;
+  return internal::convert_vectorized_array<ResultScalar_t>(u) *
+         internal::convert_vectorized_array<ResultScalar_t>(v);
+}
+
+/**
  * Division of two vectorized arrays with operator /.
  *
  * @relatesalso VectorizedArray
@@ -4883,6 +4963,27 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 }
 
 /**
+ * Division of two vectorized arrays with operator /.
+ * This variant permits the input arrays to have different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          typename Number2,
+          std::size_t width,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE
+  VectorizedArray<typename ProductType<Number1, Number2>::type, width>
+  operator/(const VectorizedArray<Number1, width> &u,
+            const VectorizedArray<Number2, width> &v)
+{
+  using ResultScalar_t = typename ProductType<Number1, Number2>::type;
+  return internal::convert_vectorized_array<ResultScalar_t>(u) /
+         internal::convert_vectorized_array<ResultScalar_t>(v);
+}
+
+/**
  * Addition of a scalar (expanded to a vectorized array with @p
  * size() equal entries) and a vectorized array.
  *
@@ -4894,6 +4995,28 @@ operator+(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
   return tmp += v;
+}
+
+/**
+ * Addition of a scalar (expanded to a vectorized array with @p
+ * size() equal entries) and a vectorized array.
+ * This variant permits the input arguments to have different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          typename Number2,
+          std::size_t width,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE
+  VectorizedArray<typename ProductType<Number1, Number2>::type, width>
+  operator+(const typename EnableIfScalar<Number1>::type &u,
+            const VectorizedArray<Number2, width> &       v)
+{
+  using ResultScalar_t = typename ProductType<Number1, Number2>::type;
+  return internal::convert_vectorized_array<ResultScalar_t>(u) +
+         internal::convert_vectorized_array<ResultScalar_t>(v);
 }
 
 /**
@@ -4921,6 +5044,26 @@ operator+(const double u, const VectorizedArray<float, width> &v)
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 operator+(const VectorizedArray<Number, width> &v, const Number &u)
+{
+  return u + v;
+}
+
+/**
+ * Addition of a vectorized array and a scalar (expanded to a vectorized array
+ * with @p size() equal entries).
+ * This variant permits the input arguments to have different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          typename Number2,
+          std::size_t width,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE
+  VectorizedArray<typename ProductType<Number1, Number2>::type, width>
+  operator+(const VectorizedArray<Number1, width> &       v,
+            const typename EnableIfScalar<Number2>::type &u)
 {
   return u + v;
 }
@@ -4956,6 +5099,28 @@ operator-(const Number &u, const VectorizedArray<Number, width> &v)
 
 /**
  * Subtraction of a vectorized array from a scalar (expanded to a vectorized
+ * array with @p size() equal entries).
+ * This variant permits the input arguments to have different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          typename Number2,
+          std::size_t width,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE
+  VectorizedArray<typename ProductType<Number1, Number2>::type, width>
+  operator-(const typename EnableIfScalar<Number1>::type &u,
+            const VectorizedArray<Number2, width> &       v)
+{
+  using ResultScalar_t = typename ProductType<Number1, Number2>::type;
+  return internal::convert_vectorized_array<ResultScalar_t>(u) -
+         internal::convert_vectorized_array<ResultScalar_t>(v);
+}
+
+/**
+ * Subtraction of a vectorized array from a scalar (expanded to a vectorized
  * array with @p size() equal entries) in case the scalar is a
  * double (needed in order to be able to write simple code with constants that
  * are usually double numbers).
@@ -4982,6 +5147,28 @@ operator-(const VectorizedArray<Number, width> &v, const Number &u)
 {
   VectorizedArray<Number, width> tmp = u;
   return v - tmp;
+}
+
+/**
+ * Subtraction of a scalar (expanded to a vectorized array with @p
+ * size() equal entries) from a vectorized array.
+ * This variant permits the input arguments to have different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          typename Number2,
+          std::size_t width,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE
+  VectorizedArray<typename ProductType<Number1, Number2>::type, width>
+  operator-(const VectorizedArray<Number1, width> &       v,
+            const typename EnableIfScalar<Number2>::type &u)
+{
+  using ResultScalar_t = typename ProductType<Number1, Number2>::type;
+  return internal::convert_vectorized_array<ResultScalar_t>(v) -
+         internal::convert_vectorized_array<ResultScalar_t>(u);
 }
 
 /**
@@ -5016,6 +5203,28 @@ operator*(const Number &u, const VectorizedArray<Number, width> &v)
 
 /**
  * Multiplication of a scalar (expanded to a vectorized array with @p
+ * size() equal entries) and a vectorized array.
+ * This variant permits the input arguments to have different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          typename Number2,
+          std::size_t width,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE
+  VectorizedArray<typename ProductType<Number1, Number2>::type, width>
+  operator*(const typename EnableIfScalar<Number1>::type &u,
+            const VectorizedArray<Number2, width> &       v)
+{
+  using ResultScalar_t = typename ProductType<Number1, Number2>::type;
+  return internal::convert_vectorized_array<ResultScalar_t>(u) *
+         internal::convert_vectorized_array<ResultScalar_t>(v);
+}
+
+/**
+ * Multiplication of a scalar (expanded to a vectorized array with @p
  * size() equal entries) and a vectorized array in case the scalar
  * is a double (needed in order to be able to write simple code with constants
  * that are usually double numbers).
@@ -5039,6 +5248,26 @@ operator*(const double u, const VectorizedArray<float, width> &v)
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
 operator*(const VectorizedArray<Number, width> &v, const Number &u)
+{
+  return u * v;
+}
+
+/**
+ * Multiplication of a vectorized array and a scalar (expanded to a vectorized
+ * array with @p size() equal entries).
+ * This variant permits the input arguments to have different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          typename Number2,
+          std::size_t width,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE
+  VectorizedArray<typename ProductType<Number1, Number2>::type, width>
+  operator*(const VectorizedArray<Number1, width> &       v,
+            const typename EnableIfScalar<Number2>::type &u)
 {
   return u * v;
 }
@@ -5074,6 +5303,28 @@ operator/(const Number &u, const VectorizedArray<Number, width> &v)
 
 /**
  * Quotient between a scalar (expanded to a vectorized array with @p
+ * size() equal entries) and a vectorized array.
+ * This variant permits the input arguments to have different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          typename Number2,
+          std::size_t width,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE
+  VectorizedArray<typename ProductType<Number1, Number2>::type, width>
+  operator/(const typename EnableIfScalar<Number1>::type &u,
+            const VectorizedArray<Number2, width> &       v)
+{
+  using ResultScalar_t = typename ProductType<Number1, Number2>::type;
+  return internal::convert_vectorized_array<ResultScalar_t>(u) /
+         internal::convert_vectorized_array<ResultScalar_t>(v);
+}
+
+/**
+ * Quotient between a scalar (expanded to a vectorized array with @p
  * size() equal entries) and a vectorized array in case the scalar
  * is a double (needed in order to be able to write simple code with constants
  * that are usually double numbers).
@@ -5100,6 +5351,28 @@ operator/(const VectorizedArray<Number, width> &v, const Number &u)
 {
   VectorizedArray<Number, width> tmp = u;
   return v / tmp;
+}
+
+/**
+ * Quotient between a vectorized array and a scalar (expanded to a vectorized
+ * array with @p size() equal entries).
+ * This variant permits the input arguments to have different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          typename Number2,
+          std::size_t width,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE
+  VectorizedArray<typename ProductType<Number1, Number2>::type, width>
+  operator/(const VectorizedArray<Number1, width> &       v,
+            const typename EnableIfScalar<Number2>::type &u)
+{
+  using ResultScalar_t = typename ProductType<Number1, Number2>::type;
+  return internal::convert_vectorized_array<ResultScalar_t>(v) /
+         internal::convert_vectorized_array<ResultScalar_t>(u);
 }
 
 /**
