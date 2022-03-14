@@ -1,0 +1,6 @@
+Improved: Some mathematical operations involving VectorizedArrays of mixed
+scalar types is now supported. For example, a 
+`VectorizedArray<std::complex<double>, width>` can be added to, or multiplied by, 
+a `VectorizedArray<double, width>`.
+<br>
+(Jean-Paul Pelteret, 2022/03/14)
