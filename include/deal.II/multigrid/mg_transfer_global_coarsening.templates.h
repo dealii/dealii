@@ -2467,9 +2467,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const bool use_dst_inplace = this->vec_fine.size() == 0;
   const auto vec_fine_ptr    = use_dst_inplace ? &dst : &this->vec_fine;
+  Assert(vec_fine_ptr->get_partitioner().get() == partitioner_fine.get(),
+         ExcInternalError());
 
   const bool use_src_inplace = this->vec_coarse.size() == 0;
   const auto vec_coarse_ptr  = use_src_inplace ? &src : &this->vec_coarse;
+  Assert(vec_coarse_ptr->get_partitioner().get() == partitioner_coarse.get(),
+         ExcInternalError());
 
   if (use_src_inplace == false)
     vec_coarse.copy_locally_owned_data_from(src);
@@ -2611,9 +2615,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const bool use_src_inplace = this->vec_fine.size() == 0;
   const auto vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
+  Assert(vec_fine_ptr->get_partitioner().get() == partitioner_fine.get(),
+         ExcInternalError());
 
   const bool use_dst_inplace = this->vec_coarse.size() == 0;
   const auto vec_coarse_ptr  = use_dst_inplace ? &dst : &this->vec_coarse;
+  Assert(vec_coarse_ptr->get_partitioner().get() == partitioner_coarse.get(),
+         ExcInternalError());
 
   if (use_src_inplace == false)
     this->vec_fine.copy_locally_owned_data_from(src);
@@ -2765,9 +2773,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const bool use_src_inplace = this->vec_fine.size() == 0;
   const auto vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
+  Assert(vec_fine_ptr->get_partitioner().get() == partitioner_fine.get(),
+         ExcInternalError());
 
   const bool use_dst_inplace = this->vec_coarse.size() == 0;
   const auto vec_coarse_ptr  = use_dst_inplace ? &dst : &this->vec_coarse;
+  Assert(vec_coarse_ptr->get_partitioner().get() == partitioner_coarse.get(),
+         ExcInternalError());
 
   if (use_src_inplace == false)
     this->vec_fine.copy_locally_owned_data_from(src);
