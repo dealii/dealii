@@ -598,14 +598,21 @@ public:
 
 private:
   /**
+   * Function to initialize internal level vectors.
+   */
+  void
+  initialize_dof_vector(const unsigned int level, VectorType &vector) const;
+
+  /**
    * Collection of the two-level transfer operators.
    */
   MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> transfer;
 
   /**
-   * Function to initialize internal level vectors.
+   * External partitioners used during initialize_dof_vector().
    */
-  std::function<void(const unsigned int, VectorType &)> initialize_dof_vector;
+  std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+    external_partitioners;
 };
 
 
@@ -623,7 +630,7 @@ MGTransferGlobalCoarsening<dim, VectorType>::MGTransferGlobalCoarsening(
     &initialize_dof_vector)
   : transfer(transfer)
 {
-  build(initialize_dof_vector);
+  this->build(initialize_dof_vector);
 }
 
 
@@ -634,28 +641,19 @@ MGTransferGlobalCoarsening<dim, VectorType>::build(
   const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
     &external_partitioners)
 {
-  if (external_partitioners.size() > 0)
-    {
-      Assert(
-        this->initialize_dof_vector == nullptr,
-        ExcMessage(
-          "A initialize_dof_vector function has already been registered in the constructor!"));
+  this->external_partitioners = external_partitioners;
 
+  if (this->external_partitioners.size() > 0)
+    {
       const unsigned int min_level = transfer.min_level();
       const unsigned int max_level = transfer.max_level();
 
-      AssertDimension(external_partitioners.size(), transfer.n_levels());
-
-      this->initialize_dof_vector =
-        [external_partitioners, min_level](
-          const unsigned int level,
-          LinearAlgebra::distributed::Vector<typename VectorType::value_type>
-            &vec) { vec.reinit(external_partitioners[level - min_level]); };
+      AssertDimension(this->external_partitioners.size(), transfer.n_levels());
 
       for (unsigned int l = min_level + 1; l <= max_level; ++l)
         transfer[l].enable_inplace_operations_if_possible(
-          external_partitioners[l - 1 - min_level],
-          external_partitioners[l - min_level]);
+          this->external_partitioners[l - 1 - min_level],
+          this->external_partitioners[l - min_level]);
     }
 }
 
@@ -684,12 +682,30 @@ MGTransferGlobalCoarsening<dim, VectorType>::build(
           external_partitioners[l - min_level] = vector.get_partitioner();
         }
 
-      build(external_partitioners);
+      this->build(external_partitioners);
     }
   else
     {
       this->build();
     }
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTransferGlobalCoarsening<dim, VectorType>::initialize_dof_vector(
+  const unsigned int level,
+  VectorType &       vec) const
+{
+  AssertDimension(transfer.n_levels(), external_partitioners.size());
+  AssertIndexRange(level, transfer.max_level() + 1);
+
+  const auto &external_partitioner =
+    external_partitioners[level - transfer.min_level()];
+
+  if (vec.get_partitioner().get() != external_partitioner.get())
+    vec.reinit(external_partitioner);
 }
 
 
@@ -741,13 +757,6 @@ MGTransferGlobalCoarsening<dim, VectorType>::copy_to_mg(
 {
   (void)dof_handler;
 
-  Assert(
-    initialize_dof_vector,
-    ExcMessage(
-      "To be able to use this function, a function to initialize an internal "
-      "DoF vector has to be provided in the constructor of "
-      "MGTransferGlobalCoarsening."));
-
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
     {
       initialize_dof_vector(level, dst[level]);
@@ -783,13 +792,6 @@ MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
   MGLevelObject<VectorType> &dst,
   const InVector &           src) const
 {
-  Assert(
-    initialize_dof_vector,
-    ExcMessage(
-      "To be able to use this function, a function to initialize an internal "
-      "DoF vector has to be provided in the constructor of "
-      "MGTransferGlobalCoarsening."));
-
   const unsigned int min_level = transfer.min_level();
   const unsigned int max_level = transfer.max_level();
 
