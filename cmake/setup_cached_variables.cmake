@@ -54,6 +54,7 @@
 #     DEAL_II_COMPILE_EXAMPLES
 #     DEAL_II_CPACK_BUNDLE_NAME
 #     DEAL_II_CPACK_EXTERNAL_LIBS
+#     DEAL_II_USE_KOKKOS_BACKEND
 #
 # *)  May also be set via environment variable (CXXFLAGS, LDFLAGS)
 #     (a nonempty cached variable has precedence and will not be
@@ -370,12 +371,18 @@ UNSET(ENV{NVCCFLAGS})
 #                                                                      #
 ########################################################################
 
-
+include(CMakeDependentOption)
 OPTION(DEAL_II_WITH_64BIT_INDICES
   "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
   OFF
   )
 LIST(APPEND DEAL_II_FEATURES 64BIT_INDICES)
+
+CMAKE_DEPENDENT_OPTION(DEAL_II_USE_KOKKOS_BACKEND
+	"Experimental: If set to ON, Kokkos is used for all operations in LinearAlgebra::distributed::Vector. In particular, this allows accessing all Kokkos backends."
+  OFF "DEAL_II_WITH_KOKKOS" OFF
+  )
+LIST(APPEND DEAL_II_FEATURES KOKKOS_BACKEND)
 
 OPTION(DEAL_II_WITH_COMPLEX_VALUES
   "If set to OFF, the classes that take a number type are not explicitly instantiated for std::complex<float> and std::complex<double>. This effectively disables the support for computing with complex values. If PETSc is built with complex scalar type, this option must be ON."
