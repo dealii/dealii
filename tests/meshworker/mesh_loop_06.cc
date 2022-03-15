@@ -129,7 +129,7 @@ test(const types::material_id test_id)
             boundary_worker,
             face_worker);
 
-  deallog << "Testing <" << dim << "," << spacedim << ">" << std::endl;
+  deallog << "Testing <" << dim << ',' << spacedim << '>' << std::endl;
 
   deallog << "Volume: " << std::get<0>(measures) << std::endl;
 

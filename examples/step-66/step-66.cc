@@ -544,8 +544,8 @@ namespace Step66
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs();
 
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    const IndexSet locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
@@ -593,10 +593,8 @@ namespace Step66
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {
-        IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                      level,
-                                                      relevant_dofs);
+        const IndexSet relevant_dofs =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
 
         AffineConstraints<double> level_constraints;
         level_constraints.reinit(relevant_dofs);
@@ -1127,7 +1125,7 @@ namespace Step66
 
 
         timer.stop();
-        pcout << "Time for setup+solve (CPU/Wall) " << timer.cpu_time() << "/"
+        pcout << "Time for setup+solve (CPU/Wall) " << timer.cpu_time() << '/'
               << timer.wall_time() << " s" << std::endl;
         pcout << std::endl;
 

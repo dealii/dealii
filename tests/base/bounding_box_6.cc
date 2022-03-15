@@ -38,8 +38,8 @@ print_box(const BoundingBox<dim> &box)
   for (unsigned int d = 0; d < dim; ++d)
     {
       if (d > 0)
-        deallog << "x";
-      deallog << "[" << box.lower_bound(d) << ", " << box.upper_bound(d) << "]";
+        deallog << 'x';
+      deallog << '[' << box.lower_bound(d) << ", " << box.upper_bound(d) << ']';
     }
   deallog << std::endl;
 }
@@ -112,7 +112,7 @@ test_side_length()
   const BoundingBox<dim> box(lower_upper_corners);
 
   for (unsigned int d = 0; d < dim; ++d)
-    deallog << box.side_length(d) << " ";
+    deallog << box.side_length(d) << ' ';
   deallog << std::endl;
 }
 

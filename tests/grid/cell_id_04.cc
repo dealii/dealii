@@ -44,7 +44,7 @@ check(Triangulation<dim> &tr)
 
   for (; cell != endc; ++cell)
     {
-      deallog << cell->level() << " " << cell->index() << std::endl;
+      deallog << cell->level() << ' ' << cell->index() << std::endl;
 
       // Store the CellId, convert it to a binary representation,
       // create a new CellId from that, and create a cell iterator
@@ -62,7 +62,7 @@ check(Triangulation<dim> &tr)
       Assert(cid2 == cid, ExcInternalError());
       Assert(cell2 == cell, ExcInternalError());
 
-      deallog << cell2->level() << " " << cell2->index() << std::endl;
+      deallog << cell2->level() << ' ' << cell2->index() << std::endl;
     }
 
   deallog << "OK" << std::endl;

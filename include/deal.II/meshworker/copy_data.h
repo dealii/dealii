@@ -51,6 +51,13 @@ namespace MeshWorker
   struct CopyData
   {
     /**
+     * Default constructor. All of the @p matrices, @p vectors and
+     * @p local_dof_indices are empty, and should be initialized using
+     * one of the reinit() functions.
+     */
+    explicit CopyData() = default;
+
+    /**
      * Initialize everything with the same @p size. This is usually the number
      * of local degrees of freedom.
      */
@@ -69,6 +76,45 @@ namespace MeshWorker
      */
     CopyData(const CopyData<n_matrices, n_vectors, n_dof_indices> &other) =
       default;
+
+    /**
+     * Reinitialize everything the same @p size. This is usually the number of
+     * local degrees of freedom.
+     */
+    void
+    reinit(const unsigned int size);
+
+    /**
+     * Reinitialize the @p index'th matrix, vector and local DoF index vector
+     * with the same @p size. This is usually the number of local degrees of
+     * freedom.
+     *
+     * @note In the event that there are a different number of @p matrices,
+     * @p vectors and @p local_dof_indices, this function will not throw an
+     * error when the index is over the size of one or two of these data
+     * structures. However, if the index exceeds the size of all three of them
+     * then an error will be thrown.
+     */
+    void
+    reinit(const unsigned int index, const unsigned int size);
+
+    /**
+     * Reinitialize the @p index'th matrix with @p size_rows `x` @p size_columns,
+     * and the vector and local DoF index vector with @p size_columns. These
+     * sizes usually correspond to some local degrees of freedom (e.g., the
+     * number of cell DoFs for @p size_rows and number of neighbor cell DoFs
+     * for @p size_columns).
+     *
+     * @note In the event that there are a different number of @p matrices,
+     * @p vectors and @p local_dof_indices, this function will not throw an
+     * error when the index is over the size of one or two of these data
+     * structures. However, if the index exceeds the size of all three of them
+     * then an error will be thrown.
+     */
+    void
+    reinit(const unsigned int index,
+           const unsigned int size_rows,
+           const unsigned int size_columns);
 
     /**
      * An array of local matrices.
@@ -96,12 +142,7 @@ namespace MeshWorker
   CopyData<n_matrices, n_vectors, n_dof_indices>::CopyData(
     const unsigned int size)
   {
-    for (auto &m : matrices)
-      m.reinit({size, size});
-    for (auto &v : vectors)
-      v.reinit(size);
-    for (auto &d : local_dof_indices)
-      d.resize(size);
+    reinit(size);
   }
 
 
@@ -120,6 +161,57 @@ namespace MeshWorker
 
     for (unsigned int i = 0; i < n_dof_indices; ++i)
       local_dof_indices[i].resize(dof_indices_sizes[i++]);
+  }
+
+
+
+  template <int n_matrices, int n_vectors, int n_dof_indices>
+  void
+  CopyData<n_matrices, n_vectors, n_dof_indices>::reinit(
+    const unsigned int size)
+  {
+    for (auto &m : matrices)
+      m.reinit({size, size});
+    for (auto &v : vectors)
+      v.reinit(size);
+    for (auto &d : local_dof_indices)
+      d.resize(size);
+  }
+
+
+
+  template <int n_matrices, int n_vectors, int n_dof_indices>
+  void
+  CopyData<n_matrices, n_vectors, n_dof_indices>::reinit(
+    const unsigned int index,
+    const unsigned int size)
+  {
+    reinit(index, size, size);
+  }
+
+
+
+  template <int n_matrices, int n_vectors, int n_dof_indices>
+  void
+  CopyData<n_matrices, n_vectors, n_dof_indices>::reinit(
+    const unsigned int index,
+    const unsigned int size_rows,
+    const unsigned int size_columns)
+  {
+    // We permit different numbers of matrices, vectors and DoF index vectors.
+    // So we have to be a bit permissive here.
+    constexpr const int max_index =
+      std::max(std::max(n_matrices, n_vectors), n_dof_indices);
+    Assert(index < max_index, ExcIndexRange(index, 0, max_index));
+
+    if (index < n_matrices)
+      matrices[index].reinit({size_rows, size_columns});
+
+    if (index < n_vectors)
+      vectors[index].reinit(size_columns);
+
+    if (index < n_dof_indices)
+      local_dof_indices[index].resize(size_columns);
   }
 
 #endif // DOXYGEN

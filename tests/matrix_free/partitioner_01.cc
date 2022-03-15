@@ -156,7 +156,7 @@ private:
          i++)
       dst.begin()[i] = 0;
     for (unsigned int i = 0; i < 2 * Utilities::pow(fe_degree + 1, dim); ++i)
-      deallog << static_cast<int>(dst[i]) << " ";
+      deallog << static_cast<int>(dst[i]) << ' ';
     deallog << std::endl << std::endl;
   }
 
@@ -168,7 +168,7 @@ private:
   {
     deallog << "src:" << std::endl;
     for (unsigned int i = 0; i < 2 * Utilities::pow(fe_degree + 1, dim); ++i)
-      deallog << static_cast<int>(src[i]) << " ";
+      deallog << static_cast<int>(src[i]) << ' ';
     deallog << std::endl;
 
     for (unsigned int i = Utilities::pow(fe_degree + 1, dim);

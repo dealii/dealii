@@ -65,7 +65,7 @@ test()
   auto bounding_box =
     GridTools::compute_bounding_box(tria, predicate); // General predicate
 
-  deallog << bounding_box.first << " " << bounding_box.second << std::endl;
+  deallog << bounding_box.first << ' ' << bounding_box.second << std::endl;
 }
 
 

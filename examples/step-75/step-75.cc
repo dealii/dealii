@@ -51,6 +51,7 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -324,9 +325,8 @@ namespace Step75
     {
       AffineConstraints<number> constraints_without_dbc;
 
-      IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                              locally_relevant_dofs);
+      const IndexSet locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof_handler);
       constraints_without_dbc.reinit(locally_relevant_dofs);
 
       DoFTools::make_hanging_node_constraints(dof_handler,
@@ -427,6 +427,7 @@ namespace Step75
   void LaplaceOperator<dim, number>::compute_inverse_diagonal(
     VectorType &diagonal) const
   {
+    this->matrix_free.initialize_dof_vector(diagonal);
     MatrixFreeTools::compute_diagonal(matrix_free,
                                       diagonal,
                                       &LaplaceOperator::do_cell_integral_local,
@@ -777,9 +778,8 @@ namespace Step75
         const auto &dof_handler = dof_handlers[level];
         auto &      constraint  = constraints[level];
 
-        IndexSet locally_relevant_dofs;
-        DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                                locally_relevant_dofs);
+        const IndexSet locally_relevant_dofs =
+          DoFTools::extract_locally_relevant_dofs(dof_handler);
         constraint.reinit(locally_relevant_dofs);
 
         DoFTools::make_hanging_node_constraints(dof_handler, constraint);
@@ -1105,7 +1105,8 @@ namespace Step75
     dof_handler.distribute_dofs(fe_collection);
 
     locally_owned_dofs = dof_handler.locally_owned_dofs();
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     locally_relevant_solution.reinit(locally_owned_dofs,
                                      locally_relevant_dofs,
@@ -1209,7 +1210,7 @@ namespace Step75
       pcout << "   Frequencies of poly. degrees:";
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         if (n_fe_indices[i] > 0)
-          pcout << ' ' << fe_collection[i].degree << ":" << n_fe_indices[i];
+          pcout << ' ' << fe_collection[i].degree << ':' << n_fe_indices[i];
       pcout << std::endl;
     }
   }

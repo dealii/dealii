@@ -84,7 +84,7 @@ output(DoFHandler<dim> & dh,
   data_out.add_data_vector(dh, v, "1");
   data_out.build_patches(1);
   std::ostringstream filename;
-  filename << filename_ << Utilities::int_to_string(loop, 2) << "."
+  filename << filename_ << Utilities::int_to_string(loop, 2) << '.'
            << Utilities::int_to_string(myid, 2) << ".vtu";
 
   std::ofstream output(filename.str().c_str());
@@ -206,7 +206,7 @@ test()
       const unsigned int checksum  = tr.get_checksum();
       const unsigned int checksum2 = tr2.get_checksum();
       if (myid == 0)
-        deallog << "Checksum: " << checksum << " " << checksum2 << std::endl;
+        deallog << "Checksum: " << checksum << ' ' << checksum2 << std::endl;
     }
 }
 

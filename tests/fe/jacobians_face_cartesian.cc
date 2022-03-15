@@ -63,7 +63,7 @@ test()
 
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
-              deallog << fe_val.jacobian(0)[d][e] << " ";
+              deallog << fe_val.jacobian(0)[d][e] << ' ';
           deallog << std::endl;
 
           // Also check the Jacobian with FESubfaceValues
@@ -76,7 +76,7 @@ test()
 
               for (unsigned int d = 0; d < dim; ++d)
                 for (unsigned int e = 0; e < dim; ++e)
-                  deallog << fe_sub_val.jacobian(0)[d][e] << " ";
+                  deallog << fe_sub_val.jacobian(0)[d][e] << ' ';
               deallog << std::endl;
             }
         }
@@ -101,7 +101,7 @@ test()
 
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
-              deallog << fe_val.inverse_jacobian(0)[d][e] << " ";
+              deallog << fe_val.inverse_jacobian(0)[d][e] << ' ';
           deallog << std::endl;
 
           // Also check the inverse Jacobian with FESubfaceValues
@@ -114,7 +114,7 @@ test()
 
               for (unsigned int d = 0; d < dim; ++d)
                 for (unsigned int e = 0; e < dim; ++e)
-                  deallog << fe_sub_val.inverse_jacobian(0)[d][e] << " ";
+                  deallog << fe_sub_val.inverse_jacobian(0)[d][e] << ' ';
               deallog << std::endl;
             }
         }
@@ -140,7 +140,7 @@ test()
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
               for (unsigned int f = 0; f < dim; ++f)
-                deallog << fe_val.jacobian_grad(0)[d][e][f] << " ";
+                deallog << fe_val.jacobian_grad(0)[d][e][f] << ' ';
           deallog << std::endl;
 
           // Also check the Jacobian with FESubfaceValues
@@ -154,7 +154,7 @@ test()
               for (unsigned int d = 0; d < dim; ++d)
                 for (unsigned int e = 0; e < dim; ++e)
                   for (unsigned int f = 0; f < dim; ++f)
-                    deallog << fe_sub_val.jacobian_grad(0)[d][e][f] << " ";
+                    deallog << fe_sub_val.jacobian_grad(0)[d][e][f] << ' ';
               deallog << std::endl;
             }
         }
@@ -184,7 +184,7 @@ test()
             for (unsigned int e = 0; e < dim; ++e)
               for (unsigned int f = 0; f < dim; ++f)
                 deallog << fe_val.jacobian_pushed_forward_grad(0)[d][e][f]
-                        << " ";
+                        << ' ';
           deallog << std::endl;
 
           // Also check the Jacobian with FESubfaceValues
@@ -200,7 +200,7 @@ test()
                   for (unsigned int f = 0; f < dim; ++f)
                     deallog
                       << fe_sub_val.jacobian_pushed_forward_grad(0)[d][e][f]
-                      << " ";
+                      << ' ';
               deallog << std::endl;
             }
         }
@@ -231,7 +231,7 @@ test()
               for (unsigned int f = 0; f < dim; ++f)
                 for (unsigned int g = 0; g < dim; ++g)
                   deallog << fe_val.jacobian_2nd_derivative(0)[d][e][f][g]
-                          << " ";
+                          << ' ';
           deallog << std::endl;
 
           // Also check the Jacobian with FESubfaceValues
@@ -248,7 +248,7 @@ test()
                     for (unsigned int g = 0; g < dim; ++g)
                       deallog
                         << fe_sub_val.jacobian_2nd_derivative(0)[d][e][f][g]
-                        << " ";
+                        << ' ';
               deallog << std::endl;
             }
         }
@@ -278,7 +278,7 @@ test()
                 for (unsigned int g = 0; g < dim; ++g)
                   deallog << fe_val.jacobian_pushed_forward_2nd_derivative(
                                0)[d][e][f][g]
-                          << " ";
+                          << ' ';
           deallog << std::endl;
 
           // Also check the Jacobian with FESubfaceValues
@@ -296,7 +296,7 @@ test()
                       deallog
                         << fe_sub_val.jacobian_pushed_forward_2nd_derivative(
                              0)[d][e][f][g]
-                        << " ";
+                        << ' ';
               deallog << std::endl;
             }
         }
@@ -328,7 +328,7 @@ test()
                 for (unsigned int g = 0; g < dim; ++g)
                   for (unsigned int h = 0; h < dim; ++h)
                     deallog << fe_val.jacobian_3rd_derivative(0)[d][e][f][g][h]
-                            << " ";
+                            << ' ';
           deallog << std::endl;
 
           // Also check the Jacobian with FESubfaceValues
@@ -346,7 +346,7 @@ test()
                       for (unsigned int h = 0; h < dim; ++h)
                         deallog << fe_sub_val.jacobian_3rd_derivative(
                                      0)[d][e][f][g][h]
-                                << " ";
+                                << ' ';
               deallog << std::endl;
             }
         }
@@ -378,7 +378,7 @@ test()
                   for (unsigned int h = 0; h < dim; ++h)
                     deallog << fe_val.jacobian_pushed_forward_3rd_derivative(
                                  0)[d][e][f][g][h]
-                            << " ";
+                            << ' ';
           deallog << std::endl;
 
           // Also check the Jacobian with FESubfaceValues
@@ -397,7 +397,7 @@ test()
                         deallog
                           << fe_sub_val.jacobian_pushed_forward_3rd_derivative(
                                0)[d][e][f][g][h]
-                          << " ";
+                          << ' ';
               deallog << std::endl;
             }
         }

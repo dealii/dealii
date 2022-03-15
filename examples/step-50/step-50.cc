@@ -327,7 +327,7 @@ bool Settings::try_parse(const std::string &prm_filename)
     {
       std::cout << "****  Error: No input file provided!\n"
                 << "****  Error: Call this program as './step-50 input.prm\n"
-                << "\n"
+                << '\n'
                 << "****  You may want to use one of the input files in this\n"
                 << "****  directory, or use the following default values\n"
                 << "****  to create an input file:\n";
@@ -487,8 +487,8 @@ void LaplaceProblem<dim, degree>::setup_system()
 
   dof_handler.distribute_dofs(fe);
 
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
-  locally_owned_dofs = dof_handler.locally_owned_dofs();
+  locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_handler);
+  locally_owned_dofs    = dof_handler.locally_owned_dofs();
 
   solution.reinit(locally_owned_dofs, mpi_communicator);
   right_hand_side.reinit(locally_owned_dofs, mpi_communicator);
@@ -594,10 +594,9 @@ void LaplaceProblem<dim, degree>::setup_multigrid()
 
           for (unsigned int level = 0; level < n_levels; ++level)
             {
-              IndexSet relevant_dofs;
-              DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                            level,
-                                                            relevant_dofs);
+              const IndexSet relevant_dofs =
+                DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                              level);
               AffineConstraints<double> level_constraints;
               level_constraints.reinit(relevant_dofs);
               level_constraints.add_lines(
@@ -642,10 +641,9 @@ void LaplaceProblem<dim, degree>::setup_multigrid()
 
           for (unsigned int level = 0; level < n_levels; ++level)
             {
-              IndexSet dof_set;
-              DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                            level,
-                                                            dof_set);
+              const IndexSet dof_set =
+                DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                              level);
 
               {
 #ifdef USE_PETSC_LA
@@ -828,10 +826,8 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
     triangulation.n_global_levels());
   for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
     {
-      IndexSet dof_set;
-      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                    level,
-                                                    dof_set);
+      const IndexSet dof_set =
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
       boundary_constraints[level].reinit(dof_set);
       boundary_constraints[level].add_lines(
         mg_constrained_dofs.get_refinement_edge_indices(level));

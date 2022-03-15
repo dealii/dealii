@@ -48,8 +48,8 @@ check(TRIA &tr)
       CellId             tmp;
       std::istringstream in(outb.str());
       in >> tmp;
-      deallog << cell->level() << " " << cell->index() << " " << cell->id()
-              << " " << tmp << std::endl;
+      deallog << cell->level() << ' ' << cell->index() << ' ' << cell->id()
+              << ' ' << tmp << std::endl;
     }
 
 

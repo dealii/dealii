@@ -55,7 +55,7 @@ namespace LACExceptions
       }
 #endif // DEAL_II_WITH_PETSC
     out << "The numerical value of the original error code is " << error_code
-        << "." << std::endl;
+        << '.' << std::endl;
   }
 } // namespace LACExceptions
 

@@ -211,6 +211,20 @@ namespace LinearAlgebra
 
 
 
+    template <typename Number>
+    template <typename Number2>
+    void
+    BlockVector<Number>::copy_locally_owned_data_from(
+      const BlockVector<Number2> &v)
+    {
+      AssertDimension(this->n_blocks(), v.n_blocks());
+
+      for (unsigned int b = 0; b < this->n_blocks(); ++b)
+        this->block(b).copy_locally_owned_data_from(v.block(b));
+    }
+
+
+
 #ifdef DEAL_II_WITH_PETSC
 
     namespace petsc_helpers
@@ -920,7 +934,7 @@ namespace LinearAlgebra
 
       // in case one vector is empty and the second one is not, the
       // FullMatrix resized to (m,n) will have 0 both in m() and n()
-      // which is how TableBase<N,T>::reinit() works as of deal.ii@8.5.0.
+      // which is how TableBase<N,T>::reinit() works as of deal.II@8.5.0.
       // Since in this case there is nothing to do anyway -- return immediately.
       if (n == 0 || m == 0)
         return;

@@ -126,7 +126,7 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
           << std::endl
           << "Total number of cells: " << triangulation.n_cells() << std::endl
           << "Number of degrees of freedom: " << dof_handler.n_dofs() << " = ("
-          << n_stress_dof << " + " << n_gamma_dof << ")" << std::endl;
+          << n_stress_dof << " + " << n_gamma_dof << ')' << std::endl;
 
   // following step-22 use of simple
   // compressed block sparsity

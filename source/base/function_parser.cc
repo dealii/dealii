@@ -187,6 +187,9 @@ FunctionParser<dim>::init_muparser() const
       fp.get()[component]->DefineFun("pow",
                                      internal::FunctionParser::mu_pow,
                                      true);
+      fp.get()[component]->DefineFun("erf",
+                                     internal::FunctionParser::mu_erf,
+                                     true);
       fp.get()[component]->DefineFun("erfc",
                                      internal::FunctionParser::mu_erfc,
                                      true);

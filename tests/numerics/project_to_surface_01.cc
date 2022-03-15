@@ -118,7 +118,7 @@ test()
           else
             deallog << cell->vertex(1);
 
-          deallog << ")" << std::endl;
+          deallog << ')' << std::endl;
         }
       tria.clear();
     }

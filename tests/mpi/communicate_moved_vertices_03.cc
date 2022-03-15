@@ -28,7 +28,7 @@ template <int dim>
 void
 test()
 {
-  deallog << "Testing " << Utilities::int_to_string(dim, 1) << "D" << std::endl;
+  deallog << "Testing " << Utilities::int_to_string(dim, 1) << 'D' << std::endl;
 
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(triangulation, -1., 1., true);

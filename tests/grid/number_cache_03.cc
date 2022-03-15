@@ -79,7 +79,7 @@ template <int dim>
 void
 test()
 {
-  deallog << dim << "d" << std::endl;
+  deallog << dim << 'd' << std::endl;
 
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);

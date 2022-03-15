@@ -1050,8 +1050,17 @@ namespace GridGenerator
    * opening to match their index. All other boundary faces will be assigned
    * boundary ID 3.
    *
-   * <em>Manifold IDs</em> will be set on the mantles of each truncated cone in
-   * the same way. Currently, no manifold objects will be attached.
+   * @ref GlossManifoldIndicator "Manifold IDs" will be set on the mantles of each truncated cone in
+   * the same way. Each cone will have a special manifold object assigned, which
+   * is based on the CylindricalManifold class. Further, all cells adjacent to
+   * the mantle are given the manifold ID 3. If desired, you can assign an
+   * (expensive) TransfiniteInterpolationManifold object to that particular
+   * layer of cells with the following code snippet.
+   * @code
+   * TransfiniteInterpolationManifold<3> transfinite;
+   * transfinite.initialize(triangulation);
+   * triangulation.set_manifold(3, transfinite);
+   * @endcode
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
@@ -1066,8 +1075,9 @@ namespace GridGenerator
    * @param aspect_ratio Aspect ratio of cells, specified as radial over z-extension.
    *                     Default ratio is $\Delta r/\Delta z = 1/2$.
    *
-   * Common configurations of tee fittings that can be generated with the
-   * following sets of parameters are:
+   * Common configurations of tee fittings (that is, "T" fittings, mimicking the
+   * geometry of the letter "T") can be generated with the
+   * following sets of parameters:
    * <div class="threecolumn" style="width: 80%; text-align: center;">
    *   <div>
    *     \htmlonly <style>div.image
@@ -1608,8 +1618,8 @@ namespace GridGenerator
    *
    * @f[
    *     r = r_{\mathrm{inner}} + (r_\mathrm{outer} - r_\mathrm{inner})
-   *     \frac{1 - \tanh(\mathrm{skewness}(1 - k/\mathrm{n\_shells}))}
-   *          {\tanh(\mathrm{skewness})}
+   *     \left(1 - \frac{ \tanh(\mathrm{skewness}(1 - k/\mathrm{n\_shells}))}
+   *          {\tanh(\mathrm{skewness})}\right)
    * @f]
    *
    * where @p skewness is a parameter controlling the shell spacing in the

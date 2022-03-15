@@ -27,6 +27,7 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
+
 namespace NonMatching
 {
   namespace internal
@@ -596,7 +597,7 @@ namespace NonMatching
             const double function_max =
               std::max(std::max(left_value, right_value), value_bounds.second);
 
-            // If the functions is negative there are no roots.
+            // If the function is negative there are no roots.
             if (function_max < 0)
               return;
 
@@ -1252,8 +1253,6 @@ namespace NonMatching
       }
     } // namespace QuadratureGeneratorImplementation
   }   // namespace internal
-
-  using namespace internal::QuadratureGeneratorImplementation;
 
 
 

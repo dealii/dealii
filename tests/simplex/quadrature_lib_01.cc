@@ -31,8 +31,8 @@ test(const unsigned int n_points)
 
   for (unsigned int q = 0; q < quad.size(); ++q)
     {
-      deallog << quad.point(q) << " ";
-      deallog << quad.weight(q) << " ";
+      deallog << quad.point(q) << ' ';
+      deallog << quad.weight(q) << ' ';
       deallog << std::endl;
     }
 }

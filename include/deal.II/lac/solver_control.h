@@ -90,7 +90,6 @@ public:
    * the last step are stored in this object and can be recovered upon
    * catching an exception of this class.
    */
-
   class NoConvergence : public dealii::ExceptionBase
   {
   public:
@@ -147,10 +146,10 @@ public:
    * specifies the whether the final result is logged to @p deallog. Default
    * is yes.
    */
-  SolverControl(const unsigned int n           = 100,
-                const double       tol         = 1.e-10,
-                const bool         log_history = false,
-                const bool         log_result  = true);
+  explicit SolverControl(const unsigned int n           = 100,
+                         const double       tol         = 1.e-10,
+                         const bool         log_history = false,
+                         const bool         log_result  = true);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
@@ -322,7 +321,7 @@ public:
 
   /**
    * This exception is thrown if a function operating on the vector of history
-   * data of a SolverControl object id called, but storage of history data was
+   * data of a SolverControl object is called, but storage of history data was
    * not enabled by enable_history_data().
    */
   DeclException0(ExcHistoryDataRequired);
@@ -428,11 +427,11 @@ public:
    * have the same meaning as those of the constructor of the SolverControl
    * constructor.
    */
-  ReductionControl(const unsigned int maxiter     = 100,
-                   const double       tolerance   = 1.e-10,
-                   const double       reduce      = 1.e-2,
-                   const bool         log_history = false,
-                   const bool         log_result  = true);
+  explicit ReductionControl(const unsigned int maxiter     = 100,
+                            const double       tolerance   = 1.e-10,
+                            const double       reduce      = 1.e-2,
+                            const bool         log_history = false,
+                            const bool         log_result  = true);
 
   /**
    * Initialize with a SolverControl object. The result will emulate
@@ -515,10 +514,10 @@ public:
    * Constructor.  Provide exactly the same arguments as the constructor of
    * the SolverControl class.
    */
-  IterationNumberControl(const unsigned int maxiter     = 100,
-                         const double       tolerance   = 1e-12,
-                         const bool         log_history = false,
-                         const bool         log_result  = true);
+  explicit IterationNumberControl(const unsigned int maxiter     = 100,
+                                  const double       tolerance   = 1e-12,
+                                  const bool         log_history = false,
+                                  const bool         log_result  = true);
 
   /**
    * Initialize with a SolverControl object. The result will emulate
@@ -570,11 +569,11 @@ public:
    * convergence. Other arguments have the same meaning as those of the
    * constructor of the SolverControl.
    */
-  ConsecutiveControl(const unsigned int maxiter                  = 100,
-                     const double       tolerance                = 1.e-10,
-                     const unsigned int n_consecutive_iterations = 2,
-                     const bool         log_history              = false,
-                     const bool         log_result               = false);
+  explicit ConsecutiveControl(const unsigned int maxiter   = 100,
+                              const double       tolerance = 1.e-10,
+                              const unsigned int n_consecutive_iterations = 2,
+                              const bool         log_history = false,
+                              const bool         log_result  = false);
 
   /**
    * Initialize with a SolverControl object. The result will emulate

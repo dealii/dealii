@@ -57,7 +57,7 @@ struct PrintTensor
     for (int i = 0; i < dim; ++i)
       {
         PrintTensor<rank - 1, dim>::print_tensor(tensor[i]);
-        deallog << " ";
+        deallog << ' ';
       }
   }
 };
@@ -69,7 +69,7 @@ struct PrintTensor<1, dim>
   print_tensor(const Tensor<1, dim> &tensor)
   {
     for (int i = 0; i < dim; ++i)
-      deallog << tensor[i] << " ";
+      deallog << tensor[i] << ' ';
   }
 };
 

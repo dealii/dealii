@@ -318,6 +318,7 @@ namespace parallel
   }
 
 
+
   template <int dim, int spacedim>
   types::subdomain_id
   TriangulationBase<dim, spacedim>::locally_owned_subdomain() const
@@ -423,13 +424,13 @@ namespace parallel
     // 2) determine the offset of each process
     types::global_cell_index cell_index = 0;
 
-    const int ierr =
-      MPI_Exscan(&n_locally_owned_cells,
-                 &cell_index,
-                 1,
-                 Utilities::MPI::internal::mpi_type_id(&n_locally_owned_cells),
-                 MPI_SUM,
-                 this->mpi_communicator);
+    const int ierr = MPI_Exscan(
+      &n_locally_owned_cells,
+      &cell_index,
+      1,
+      Utilities::MPI::mpi_type_id_for_type<decltype(n_locally_owned_cells)>,
+      MPI_SUM,
+      this->mpi_communicator);
     AssertThrowMPI(ierr);
 
     // 3) give global indices to locally-owned cells and mark all other cells as
@@ -496,8 +497,8 @@ namespace parallel
         int ierr = MPI_Exscan(n_locally_owned_cells.data(),
                               cell_index.data(),
                               this->n_global_levels(),
-                              Utilities::MPI::internal::mpi_type_id(
-                                n_locally_owned_cells.data()),
+                              Utilities::MPI::mpi_type_id_for_type<decltype(
+                                *n_locally_owned_cells.data())>,
                               MPI_SUM,
                               this->mpi_communicator);
         AssertThrowMPI(ierr);
@@ -509,12 +510,12 @@ namespace parallel
         for (unsigned int l = 0; l < this->n_global_levels(); ++l)
           n_cells_level[l] = n_locally_owned_cells[l] + cell_index[l];
 
-        ierr =
-          MPI_Bcast(n_cells_level.data(),
-                    this->n_global_levels(),
-                    Utilities::MPI::internal::mpi_type_id(n_cells_level.data()),
-                    this->n_subdomains - 1,
-                    this->mpi_communicator);
+        ierr = MPI_Bcast(
+          n_cells_level.data(),
+          this->n_global_levels(),
+          Utilities::MPI::mpi_type_id_for_type<decltype(*n_cells_level.data())>,
+          this->n_subdomains - 1,
+          this->mpi_communicator);
         AssertThrowMPI(ierr);
 
         // 4) give global indices to locally-owned cells on level and mark
@@ -639,6 +640,8 @@ namespace parallel
     return number_cache.active_cell_index_partitioner;
   }
 
+
+
   template <int dim, int spacedim>
   const std::weak_ptr<const Utilities::MPI::Partitioner>
   TriangulationBase<dim, spacedim>::global_level_cell_index_partitioner(
@@ -725,6 +728,34 @@ namespace parallel
   }
 
 
+
+  template <int dim, int spacedim>
+  bool
+  DistributedTriangulationBase<dim, spacedim>::has_hanging_nodes() const
+  {
+    if (this->n_global_levels() <= 1)
+      return false; // can not have hanging nodes without refined cells
+
+    // if there are any active cells with level less than n_global_levels()-1,
+    // then there is obviously also one with level n_global_levels()-1, and
+    // consequently there must be a hanging node somewhere.
+    //
+    // The problem is that we cannot just ask for the first active cell, but
+    // instead need to filter over locally owned cells.
+    const bool have_coarser_cell =
+      std::any_of(this->begin_active(this->n_global_levels() - 2),
+                  this->end_active(this->n_global_levels() - 2),
+                  [](const CellAccessor<dim, spacedim> &cell) {
+                    return cell.is_locally_owned();
+                  });
+
+    // return true if at least one process has a coarser cell
+    return Utilities::MPI::max(have_coarser_cell ? 1 : 0,
+                               this->mpi_communicator) != 0;
+  }
+
+
+
   template <int dim, int spacedim>
   void
   DistributedTriangulationBase<dim, spacedim>::load_attached_data(
@@ -760,6 +791,8 @@ namespace parallel
       }
   }
 
+
+
   template <int dim, int spacedim>
   unsigned int
   DistributedTriangulationBase<dim, spacedim>::register_data_attach(
@@ -787,6 +820,7 @@ namespace parallel
 
     return handle;
   }
+
 
 
   template <int dim, int spacedim>
@@ -1417,7 +1451,7 @@ namespace parallel
 
       MPI_File fh;
       ierr = MPI_File_open(mpi_communicator,
-                           DEAL_II_MPI_CONST_CAST(fname_fixed.c_str()),
+                           fname_fixed.c_str(),
                            MPI_MODE_CREATE | MPI_MODE_WRONLY,
                            info,
                            &fh);
@@ -1441,8 +1475,7 @@ namespace parallel
         {
           ierr = MPI_File_write_at(fh,
                                    0,
-                                   DEAL_II_MPI_CONST_CAST(
-                                     sizes_fixed_cumulative.data()),
+                                   sizes_fixed_cumulative.data(),
                                    sizes_fixed_cumulative.size(),
                                    MPI_UNSIGNED,
                                    MPI_STATUS_IGNORE);
@@ -1462,13 +1495,12 @@ namespace parallel
       if (src_data_fixed.size() <=
           static_cast<std::size_t>(std::numeric_limits<int>::max()))
         {
-          ierr =
-            MPI_File_write_at(fh,
-                              my_global_file_position,
-                              DEAL_II_MPI_CONST_CAST(src_data_fixed.data()),
-                              src_data_fixed.size(),
-                              MPI_BYTE,
-                              MPI_STATUS_IGNORE);
+          ierr = MPI_File_write_at(fh,
+                                   my_global_file_position,
+                                   src_data_fixed.data(),
+                                   src_data_fixed.size(),
+                                   MPI_BYTE,
+                                   MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
         }
       else
@@ -1477,7 +1509,7 @@ namespace parallel
           ierr =
             MPI_File_write_at(fh,
                               my_global_file_position,
-                              DEAL_II_MPI_CONST_CAST(src_data_fixed.data()),
+                              src_data_fixed.data(),
                               1,
                               *Utilities::MPI::create_mpi_data_type_n_bytes(
                                 src_data_fixed.size()),
@@ -1505,7 +1537,7 @@ namespace parallel
 
         MPI_File fh;
         ierr = MPI_File_open(mpi_communicator,
-                             DEAL_II_MPI_CONST_CAST(fname_variable.c_str()),
+                             fname_variable.c_str(),
                              MPI_MODE_CREATE | MPI_MODE_WRONLY,
                              info,
                              &fh);
@@ -1532,13 +1564,12 @@ namespace parallel
                           std::numeric_limits<int>::max()),
                       ExcNotImplemented());
 
-          ierr =
-            MPI_File_write_at(fh,
-                              my_global_file_position,
-                              DEAL_II_MPI_CONST_CAST(src_sizes_variable.data()),
-                              src_sizes_variable.size(),
-                              MPI_INT,
-                              MPI_STATUS_IGNORE);
+          ierr = MPI_File_write_at(fh,
+                                   my_global_file_position,
+                                   src_sizes_variable.data(),
+                                   src_sizes_variable.size(),
+                                   MPI_INT,
+                                   MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
         }
 
@@ -1547,7 +1578,7 @@ namespace parallel
         // to avoid overflow for files larger than 4GB:
         const std::uint64_t size_on_proc = src_data_variable.size();
         std::uint64_t       prefix_sum   = 0;
-        ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
+        ierr                             = MPI_Exscan(&size_on_proc,
                           &prefix_sum,
                           1,
                           MPI_UINT64_T,
@@ -1565,8 +1596,7 @@ namespace parallel
           {
             ierr = MPI_File_write_at(fh,
                                      my_global_file_position,
-                                     DEAL_II_MPI_CONST_CAST(
-                                       src_data_variable.data()),
+                                     src_data_variable.data(),
                                      src_data_variable.size(),
                                      MPI_BYTE,
                                      MPI_STATUS_IGNORE);
@@ -1578,8 +1608,7 @@ namespace parallel
             ierr =
               MPI_File_write_at(fh,
                                 my_global_file_position,
-                                DEAL_II_MPI_CONST_CAST(
-                                  src_data_variable.data()),
+                                src_data_variable.data(),
                                 1,
                                 *Utilities::MPI::create_mpi_data_type_n_bytes(
                                   src_data_variable.size()),
@@ -1633,11 +1662,8 @@ namespace parallel
       AssertThrowMPI(ierr);
 
       MPI_File fh;
-      ierr = MPI_File_open(mpi_communicator,
-                           DEAL_II_MPI_CONST_CAST(fname_fixed.c_str()),
-                           MPI_MODE_RDONLY,
-                           info,
-                           &fh);
+      ierr = MPI_File_open(
+        mpi_communicator, fname_fixed.c_str(), MPI_MODE_RDONLY, info, &fh);
       AssertThrowMPI(ierr);
 
       ierr = MPI_Info_free(&info);
@@ -1713,11 +1739,8 @@ namespace parallel
         AssertThrowMPI(ierr);
 
         MPI_File fh;
-        ierr = MPI_File_open(mpi_communicator,
-                             DEAL_II_MPI_CONST_CAST(fname_variable.c_str()),
-                             MPI_MODE_RDONLY,
-                             info,
-                             &fh);
+        ierr = MPI_File_open(
+          mpi_communicator, fname_variable.c_str(), MPI_MODE_RDONLY, info, &fh);
         AssertThrowMPI(ierr);
 
         ierr = MPI_Info_free(&info);
@@ -1746,7 +1769,7 @@ namespace parallel
                           0ULL);
 
         std::uint64_t prefix_sum = 0;
-        ierr = MPI_Exscan(DEAL_II_MPI_CONST_CAST(&size_on_proc),
+        ierr                     = MPI_Exscan(&size_on_proc,
                           &prefix_sum,
                           1,
                           MPI_UINT64_T,

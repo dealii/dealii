@@ -720,29 +720,26 @@ namespace Step37
   // grid, we also need to specifically enable the multigrid hierarchy.
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem()
-    :
 #ifdef DEAL_II_WITH_P4EST
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy)
-    ,
+    : triangulation(MPI_COMM_WORLD,
+                    Triangulation<dim>::limit_level_difference_at_vertices,
+                    parallel::distributed::Triangulation<
+                      dim>::construct_multigrid_hierarchy)
 #else
-    triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
-    ,
+    : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
 #endif
-    fe(degree_finite_element)
+    , fe(degree_finite_element)
     , dof_handler(triangulation)
     , setup_time(0.)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    ,
     // The LaplaceProblem class holds an additional output stream that
     // collects detailed timings about the setup phase. This stream, called
     // time_details, is disabled by default through the @p false argument
     // specified here. For detailed timings, removing the @p false argument
     // prints all the details.
-    time_details(std::cout,
-                 false && Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    , time_details(std::cout,
+                   false &&
+                     Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
   {}
 
 
@@ -792,8 +789,8 @@ namespace Step37
     pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
 
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    const IndexSet locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
@@ -803,7 +800,7 @@ namespace Step37
     constraints.close();
     setup_time += time.wall_time();
     time_details << "Distribute DoFs & B.C.     (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
     time.restart();
 
     {
@@ -829,7 +826,7 @@ namespace Step37
 
     setup_time += time.wall_time();
     time_details << "Setup matrix-free system   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
     time.restart();
 
     // Next, initialize the matrices for the multigrid method on all the
@@ -852,10 +849,8 @@ namespace Step37
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {
-        IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                      level,
-                                                      relevant_dofs);
+        const IndexSet relevant_dofs =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
         AffineConstraints<double> level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(
@@ -883,7 +878,7 @@ namespace Step37
       }
     setup_time += time.wall_time();
     time_details << "Setup matrix-free levels   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
   }
 
 
@@ -920,7 +915,7 @@ namespace Step37
 
     setup_time += time.wall_time();
     time_details << "Assemble right hand side   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
   }
 
 
@@ -1159,7 +1154,7 @@ namespace Step37
 
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level() << ")"
+            << Utilities::System::get_current_vectorization_level() << ')'
             << std::endl;
     }
 

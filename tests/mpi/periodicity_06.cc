@@ -210,9 +210,9 @@ test(const unsigned numRefinementLevels = 2)
   if (locally_relevant_dofs.is_element(i) && constraints.is_constrained(i))
     {
       deallog << "Coordinates:" << std::endl;
-      deallog << i << "@" << supportPoints[i] << std::endl;
+      deallog << i << '@' << supportPoints[i] << std::endl;
       for (auto c : *constraints.get_constraint_entries(i))
-        deallog << c.first << "@" << supportPoints[c.first] << std::endl;
+        deallog << c.first << '@' << supportPoints[c.first] << std::endl;
     }
 }
 

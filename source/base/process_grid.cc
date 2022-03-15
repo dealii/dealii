@@ -184,10 +184,10 @@ namespace Utilities
       const int mpi_tag =
         Utilities::MPI::internal::Tags::process_grid_constructor;
 
-      ierr = Utilities::MPI::create_group(mpi_communicator,
-                                          inactive_with_root_group,
-                                          mpi_tag,
-                                          &mpi_communicator_inactive_with_root);
+      ierr = MPI_Comm_create_group(mpi_communicator,
+                                   inactive_with_root_group,
+                                   mpi_tag,
+                                   &mpi_communicator_inactive_with_root);
       AssertThrowMPI(ierr);
 
       ierr = MPI_Group_free(&all_group);
@@ -235,7 +235,7 @@ namespace Utilities
         Cblacs_gridexit(blacs_context);
 
       if (mpi_communicator_inactive_with_root != MPI_COMM_NULL)
-        MPI_Comm_free(&mpi_communicator_inactive_with_root);
+        Utilities::MPI::free_communicator(mpi_communicator_inactive_with_root);
     }
 
 
@@ -250,7 +250,7 @@ namespace Utilities
           const int ierr =
             MPI_Bcast(value,
                       count,
-                      Utilities::MPI::internal::mpi_type_id(value),
+                      Utilities::MPI::mpi_type_id_for_type<decltype(*value)>,
                       0 /*from root*/,
                       mpi_communicator_inactive_with_root);
           AssertThrowMPI(ierr);

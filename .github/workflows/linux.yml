@@ -36,6 +36,8 @@ jobs:
     - name: build
       run: |
         make -j 2
+    - name: quicktest
+      run: make test
 
   linux-debug-parallel-simplex:
     # simple parallel debug build using g++ with simplex configuration enabled
@@ -56,7 +58,7 @@ jobs:
             trilinos-all-dev \
             petsc-dev \
             libmetis-dev \
-            libhdf5-dev
+            libhdf5-mpi-dev
     - name: info
       run: |
         mpicc -v
@@ -66,16 +68,13 @@ jobs:
         mkdir build
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
-              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_CXX_FLAGS='-Werror -std=c++17' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_TRILINOS="ON" \
               -D DEAL_II_WITH_PETSC="ON" \
               -D DEAL_II_WITH_METIS="ON" \
               -D DEAL_II_WITH_HDF5="ON" \
-              -D HDF5_INCLUDE_DIR="/usr/include/hdf5/openmpi/" \
-              -D HDF5_LIBRARY="/usr/lib/x86_64-linux-gnu/hdf5/openmpi/libhdf5.so" \
-              -D HDF5_HL_LIBRARY="/usr/lib/x86_64-linux-gnu/hdf5/openmpi/libhdf5_hl.so" \
               -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
               ..
     - name: archive

@@ -39,7 +39,7 @@ check_this(const DoFHandler<dim> &dof_handler)
     deallog << (map[i] == numbers::invalid_dof_index ?
                   -1 :
                   static_cast<signed int>(map[i]))
-            << " ";
+            << ' ';
   deallog << std::endl;
 
   // check for boundary id 0 and 1
@@ -49,6 +49,6 @@ check_this(const DoFHandler<dim> &dof_handler)
     deallog << (map[i] == numbers::invalid_dof_index ?
                   -1 :
                   static_cast<signed int>(map[i]))
-            << " ";
+            << ' ';
   deallog << std::endl;
 }

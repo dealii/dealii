@@ -64,7 +64,7 @@ main(int argc, char **argv)
   data.add_parameters(prm);
 
   // Use the same parameters of test 1.
-  std::ifstream ifile(SOURCE_DIR "/arkode_01.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_01_in.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKode<VectorType> ode(data);
@@ -84,7 +84,7 @@ main(int argc, char **argv)
     // limit the output to every 10th step and increase the precision to make
     // the test more robust
     if (step_number % 10 == 0)
-      deallog << t << " " << std::setprecision(7) << sol[0] << " " << sol[1]
+      deallog << t << ' ' << std::setprecision(7) << sol[0] << ' ' << sol[1]
               << std::endl;
     return 0;
   };

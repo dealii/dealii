@@ -254,8 +254,8 @@ advance the solution. This leaves very little reason to use vector-valued
 finite element spaces both in theory and/or practice.
 
 We will use the usual Lagrange finite elements: let $\{\mathbf{x}_i\}_{i \in
-\mathcal{V}}$ denote the set of all support points (see @ref GlossSupport "this
-glossary entry"), where $\mathbf{x}_i \in \mathbb{R}^d$. Then each index $i \in
+\mathcal{V}}$ denote the set of all support points (see @ref GlossSupport "this glossary entry"),
+where $\mathbf{x}_i \in \mathbb{R}^d$. Then each index $i \in
 \mathcal{V}$ uniquely identifies a support point $\mathbf{x}_i$, as well as a
 scalar-valued shape function $\phi_i$. With this notation at hand we can define
 the (explicit time stepping) scheme as:

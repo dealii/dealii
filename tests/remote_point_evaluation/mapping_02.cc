@@ -25,6 +25,8 @@
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/lac/la_vector.h>
 
@@ -92,7 +94,7 @@ test()
   const auto expected_global_count =
     Utilities::MPI::sum(local_points.size(), MPI_COMM_WORLD);
 
-  deallog << global_count << " " << expected_global_count << std::endl;
+  deallog << global_count << ' ' << expected_global_count << std::endl;
 }
 
 

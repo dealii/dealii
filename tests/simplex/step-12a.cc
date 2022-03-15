@@ -473,7 +473,7 @@ namespace Step12
       dim == 2 ? ("step12-tri-" + std::to_string(cycle) + ".vtk") :
                  ("step12-tet-" + std::to_string(cycle) + ".vtk");
 #  endif
-    deallog << "  Writing solution to <" << filename << ">" << std::endl;
+    deallog << "  Writing solution to <" << filename << '>' << std::endl;
     std::ofstream output(filename);
 
     DataOut<dim> data_out;

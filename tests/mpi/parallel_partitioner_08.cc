@@ -110,10 +110,10 @@ test()
   auto print = [&]() {
     deallog << "owned:" << std::endl;
     for (auto el : owned)
-      deallog << el << " ";
+      deallog << el << ' ';
     deallog << std::endl << "ghost:" << std::endl;
     for (auto el : ghost)
-      deallog << el << " ";
+      deallog << el << ' ';
     deallog << std::endl;
   };
 

@@ -94,13 +94,13 @@ check()
 
   deallog << "Exact inverse:     ";
   for (unsigned int i = 0; i < size; ++i)
-    deallog << in(i) / m(i, i) << " ";
+    deallog << in(i) / m(i, i) << ' ';
   deallog << std::endl;
 
   deallog << "Check  vmult usual init: ";
   prec.vmult(ref, in);
   for (unsigned int i = 0; i < size; ++i)
-    deallog << ref(i) << " ";
+    deallog << ref(i) << ' ';
   deallog << std::endl;
 
   prec.initialize(m, data);
@@ -109,7 +109,7 @@ check()
   prec.vmult(out, in);
   deallog << "Check  vmult zero init:  ";
   for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << " ";
+    deallog << out(i) << ' ';
   out -= ref;
   deallog << " difference norm = " << out.linfty_norm() << std::endl;
 
@@ -122,7 +122,7 @@ check()
   prec2.vmult(out, in);
   deallog << "Check  vmult zero init:  ";
   for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << " ";
+    deallog << out(i) << ' ';
   out -= ref;
   deallog << " difference norm = " << out.linfty_norm() << std::endl;
 }

@@ -56,7 +56,7 @@ namespace Functions
      * Export the value of the template parameter as a static member constant.
      * This is sometimes useful in the context of template programming.
      */
-    static const unsigned int dimension = dim;
+    static constexpr unsigned int dimension = dim;
 
     /**
      * The scalar-valued real type used for representing time.

@@ -919,7 +919,7 @@ namespace Utilities
       std::ifstream cpuinfo;
       cpuinfo.open("/proc/loadavg");
 
-      AssertThrow(cpuinfo, ExcIO());
+      AssertThrow(cpuinfo.fail() == false, ExcIO());
 
       double load;
       cpuinfo >> load;
@@ -1158,10 +1158,10 @@ namespace Utilities
       Epetra_MpiComm *mpi_comm = dynamic_cast<Epetra_MpiComm *>(&communicator);
       if (mpi_comm != nullptr)
         {
-          MPI_Comm comm  = mpi_comm->GetMpiComm();
-          *mpi_comm      = Epetra_MpiComm(MPI_COMM_SELF);
-          const int ierr = MPI_Comm_free(&comm);
-          AssertThrowMPI(ierr);
+          MPI_Comm comm = mpi_comm->GetMpiComm();
+          *mpi_comm     = Epetra_MpiComm(MPI_COMM_SELF);
+
+          Utilities::MPI::free_communicator(comm);
         }
 #  endif
     }

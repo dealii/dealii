@@ -509,11 +509,11 @@ namespace Step24
 
         detector_data << time;
         for (unsigned int i = 0; i < detector_locations.size(); ++i)
-          detector_data << " "
+          detector_data << ' '
                         << VectorTools::point_value(dof_handler,
                                                     solution_p,
                                                     detector_locations[i])
-                        << " ";
+                        << ' ';
         detector_data << std::endl;
 
         old_solution_p = solution_p;

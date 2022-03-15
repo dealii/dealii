@@ -479,7 +479,7 @@ mapping_test()
       dof.distribute_dofs(fe_q4);
       typename DoFHandler<dim>::cell_iterator cell = dof.begin_active();
 
-      deallog << "Triangulation" << i << ":" << std::endl;
+      deallog << "Triangulation" << i << ':' << std::endl;
 
       deallog << "exact_area=" << exact_areas[i] << std::endl;
       for (unsigned int j = 0; j < mapping_size; ++j)

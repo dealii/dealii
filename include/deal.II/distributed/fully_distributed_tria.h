@@ -22,8 +22,6 @@
 #include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
 
-#include <deal.II/grid/grid_tools.h>
-
 #include <vector>
 
 #ifdef DEAL_II_WITH_MPI
@@ -230,14 +228,6 @@ namespace parallel
        */
       virtual bool
       prepare_coarsening_and_refinement() override;
-
-      /**
-       * Return true if the triangulation has hanging nodes.
-       *
-       * @note Not implemented yet.
-       */
-      virtual bool
-      has_hanging_nodes() const override;
 
       /**
        * Return the local memory consumption in bytes.

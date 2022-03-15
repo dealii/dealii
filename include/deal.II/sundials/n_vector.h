@@ -56,13 +56,22 @@ namespace SUNDIALS
      * @tparam VectorType Type of the viewed vector. This parameter can be
      *   deduced automatically and will respect a potential const-qualifier.
      * @param vector The vector to view.
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+     * @param nvector_context A SUNDIALS context object to be used for the
+     *   operations we want to do on this vector.
+#  endif
      * @return A NVectorView of the @p vector.
      *
      * @related NVectorView
      */
     template <typename VectorType>
     NVectorView<VectorType>
-    make_nvector_view(VectorType &vector);
+    make_nvector_view(VectorType &vector
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                      ,
+                      SUNContext nvector_context
+#  endif
+    );
 
     /**
      * Retrieve the underlying vector attached to N_Vector @p v. This call will
@@ -129,7 +138,12 @@ namespace SUNDIALS
       /**
        * Constructor. Create view of @p vector.
        */
-      NVectorView(VectorType &vector);
+      NVectorView(VectorType &vector
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                  ,
+                  SUNContext nvector_context
+#  endif
+      );
 
       /**
        * Move assignment.

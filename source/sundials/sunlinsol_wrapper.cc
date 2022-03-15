@@ -176,10 +176,20 @@ namespace SUNDIALS
 
   template <typename VectorType>
   internal::LinearSolverWrapper<VectorType>::LinearSolverWrapper(
-    LinearSolveFunction<VectorType> lsolve)
+    LinearSolveFunction<VectorType> lsolve
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+    ,
+    SUNContext &linsol_ctx
+#    endif
+    )
     : content(std::make_unique<LinearSolverContent<VectorType>>())
   {
-    sun_linear_solver                  = SUNLinSolNewEmpty();
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+    sun_linear_solver = SUNLinSolNewEmpty();
+#    else
+    sun_linear_solver = SUNLinSolNewEmpty(linsol_ctx);
+#    endif
+
     sun_linear_solver->ops->gettype    = arkode_linsol_get_type;
     sun_linear_solver->ops->solve      = arkode_linsol_solve<VectorType>;
     sun_linear_solver->ops->setup      = arkode_linsol_setup<VectorType>;
@@ -230,11 +240,21 @@ namespace SUNDIALS
   SundialsOperator<VectorType>::vmult(VectorType &      dst,
                                       const VectorType &src) const
   {
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     auto sun_dst = internal::make_nvector_view(dst);
     auto sun_src = internal::make_nvector_view(src);
     int  status  = a_times_fn(A_data, sun_src, sun_dst);
     (void)status;
     AssertSundialsSolver(status);
+#    else
+    // We don't currently know how to implement this: the
+    // internal::make_nvector_view() function called above requires a
+    // SUNContext object, but we don't actually have access to such an
+    // object here...
+    (void)dst;
+    (void)src;
+    Assert(false, ExcNotImplemented());
+#    endif
   }
 
 
@@ -263,6 +283,7 @@ namespace SUNDIALS
         return;
       }
 
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     auto sun_dst = internal::make_nvector_view(dst);
     auto sun_src = internal::make_nvector_view(src);
     // for custom preconditioners no distinction between left and right
@@ -271,6 +292,15 @@ namespace SUNDIALS
       p_solve_fn(P_data, sun_src, sun_dst, tol, 0 /*precondition_type*/);
     (void)status;
     AssertSundialsSolver(status);
+#    else
+    // We don't currently know how to implement this: the
+    // internal::make_nvector_view() function called above requires a
+    // SUNContext object, but we don't actually have access to such an
+    // object here...
+    (void)dst;
+    (void)src;
+    Assert(false, ExcNotImplemented());
+#    endif
   }
 
   template struct SundialsOperator<Vector<double>>;

@@ -157,7 +157,7 @@ test()
               typename dealii::DoFHandler<dim>::active_cell_iterator
                          patch_cell = *(patch_iter);
               Point<dim> cell_bary  = patch_cell->barycenter();
-              deallog << "(";
+              deallog << '(';
               for (unsigned int d = 0; d < dim - 1; ++d)
                 deallog << cell_bary[d] << ", ";
               deallog << cell_bary[dim - 1] << ") ";

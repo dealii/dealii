@@ -39,7 +39,7 @@ test()
   for (unsigned int i = 0; i < res.size(); ++i)
     {
       for (unsigned int d = 0; d < dim; ++d)
-        deallog << " " << res[i][d];
+        deallog << ' ' << res[i][d];
 
       deallog << std::endl;
     }

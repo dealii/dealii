@@ -33,7 +33,7 @@ check(const std::function<std::vector<T>(const std::vector<T> &,
     fu);
 
   for (const auto r : result)
-    deallog << r << " ";
+    deallog << r << ' ';
   deallog << std::endl;
 
   for (unsigned int rank = 0;
@@ -47,7 +47,7 @@ check(const std::function<std::vector<T>(const std::vector<T> &,
         rank);
 
       for (const auto r : result)
-        deallog << r << " ";
+        deallog << r << ' ';
       deallog << std::endl;
     }
 }

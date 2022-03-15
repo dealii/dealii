@@ -117,7 +117,7 @@ public:
                                    const VectorType & sol,
                                    const VectorType & sol_dot,
                                    const unsigned int step_number) -> int {
-      out << t << " " << sol[0] << " " << sol[1] << " " << sol_dot[0] << " "
+      out << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol_dot[0] << ' '
           << sol_dot[1] << std::endl;
       return 0;
     };
@@ -158,7 +158,7 @@ main(int argc, char **argv)
   // prm.print_parameters(ofile, ParameterHandler::ShortText);
   // ofile.close();
 
-  std::ifstream ifile(SOURCE_DIR "/ida_01.prm");
+  std::ifstream ifile(SOURCE_DIR "/ida_01_in.prm");
   prm.parse_input(ifile);
 
 

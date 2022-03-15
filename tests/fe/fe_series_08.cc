@@ -42,8 +42,8 @@ test()
 
   std::pair<double, double> fit = FESeries::linear_regression(x, y);
 
-  deallog << "exact:      " << k_in << " " << b_in << std::endl;
-  deallog << "calculated: " << fit.first << " " << fit.second << std::endl;
+  deallog << "exact:      " << k_in << ' ' << b_in << std::endl;
+  deallog << "calculated: " << fit.first << ' ' << fit.second << std::endl;
 }
 
 

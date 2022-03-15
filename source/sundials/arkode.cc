@@ -61,8 +61,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
 {
-  using namespace internal;
-
   namespace
   {
     template <typename VectorType>
@@ -370,31 +368,37 @@ namespace SUNDIALS
                              const MPI_Comm &      mpi_comm)
     : data(data)
     , arkode_mem(nullptr)
-    , communicator(is_serial_vector<VectorType>::value ?
-                     MPI_COMM_SELF :
-                     Utilities::MPI::duplicate_communicator(mpi_comm))
+    , mpi_communicator(is_serial_vector<VectorType>::value ?
+                         MPI_COMM_SELF :
+                         Utilities::MPI::duplicate_communicator(mpi_comm))
     , last_end_time(data.initial_time)
   {
     set_functions_to_trigger_an_assert();
   }
 
+
+
   template <typename VectorType>
   ARKode<VectorType>::~ARKode()
   {
     if (arkode_mem)
+      {
 #  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
-      ARKodeFree(&arkode_mem);
+        ARKodeFree(&arkode_mem);
 #  else
-      ARKStepFree(&arkode_mem);
+        ARKStepFree(&arkode_mem);
 #  endif
+
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+        const int status = SUNContext_Free(&arkode_ctx);
+        (void)status;
+        AssertARKode(status);
+#  endif
+      }
 
 #  ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
-      {
-        const int ierr = MPI_Comm_free(&communicator);
-        (void)ierr;
-        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
-      }
+      Utilities::MPI::free_communicator(mpi_communicator);
 #  endif
   }
 
@@ -447,11 +451,18 @@ namespace SUNDIALS
                       time.get_step_number());
       }
 
-    auto solution_nvector = internal::make_nvector_view(solution);
+    auto solution_nvector = internal::make_nvector_view(solution
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                        ,
+                                                        arkode_ctx
+#  endif
+    );
 
     while (!time.is_at_end())
       {
         time.set_desired_next_step_size(data.output_period);
+
+        // Let ARKode advance time by one period:
         double actual_next_time;
 #  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
         const auto status = SundialsARKode(arkode_mem,
@@ -469,9 +480,12 @@ namespace SUNDIALS
         (void)status;
         AssertARKode(status);
 
+        // Then reflect this time advancement in our own DiscreteTime object:
         time.set_next_step_size(actual_next_time - time.get_current_time());
         time.advance_time();
 
+        // Finally check whether resets or output calls are desired at this
+        // time:
         while (solver_should_restart(time.get_current_time(), solution))
           reset(time.get_current_time(),
                 time.get_previous_step_size(),
@@ -509,7 +523,12 @@ namespace SUNDIALS
 
     // just a view on the memory in solution, all write operations on yy by
     // ARKODE will automatically be mirrored to solution
-    auto initial_condition_nvector = internal::make_nvector_view(solution);
+    auto initial_condition_nvector = internal::make_nvector_view(solution
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                                 ,
+                                                                 arkode_ctx
+#    endif
+    );
 
     status = ARKodeInit(
       arkode_mem,
@@ -521,7 +540,12 @@ namespace SUNDIALS
 
     if (get_local_tolerances)
       {
-        const auto abs_tols = make_nvector_view(get_local_tolerances());
+        const auto abs_tols = internal::make_nvector_view(get_local_tolerances()
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                            ,
+                                                          arkode_ctx
+#    endif
+        );
         status =
           ARKodeSVtolerances(arkode_mem, data.relative_tolerance, abs_tols);
         AssertARKode(status);
@@ -603,30 +627,58 @@ namespace SUNDIALS
   {
     last_end_time = current_time;
     if (arkode_mem)
-      ARKStepFree(&arkode_mem);
+      {
+        ARKStepFree(&arkode_mem);
+
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+        const int status = SUNContext_Free(&arkode_ctx);
+        (void)status;
+        AssertARKode(status);
+#    endif
+      }
 
     int status;
     (void)status;
 
     // just a view on the memory in solution, all write operations on yy by
     // ARKODE will automatically be mirrored to solution
-    auto initial_condition_nvector = internal::make_nvector_view(solution);
+    auto initial_condition_nvector = internal::make_nvector_view(solution
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                                 ,
+                                                                 arkode_ctx
+#    endif
+    );
 
     Assert(explicit_function || implicit_function,
            ExcFunctionNotProvided("explicit_function || implicit_function"));
 
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     arkode_mem = ARKStepCreate(
       explicit_function ? &explicit_function_callback<VectorType> : nullptr,
       implicit_function ? &implicit_function_callback<VectorType> : nullptr,
       current_time,
       initial_condition_nvector);
+#    else
+    status = SUNContext_Create(&mpi_communicator, &arkode_ctx);
+    AssertARKode(status);
 
+    arkode_mem = ARKStepCreate(
+      explicit_function ? &explicit_function_callback<VectorType> : nullptr,
+      implicit_function ? &implicit_function_callback<VectorType> : nullptr,
+      current_time,
+      initial_condition_nvector,
+      arkode_ctx);
+#    endif
     Assert(arkode_mem != nullptr, ExcInternalError());
 
     if (get_local_tolerances)
       {
-        const auto abs_tols =
-          internal::make_nvector_view(get_local_tolerances());
+        const auto abs_tols = internal::make_nvector_view(get_local_tolerances()
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                            ,
+                                                          arkode_ctx
+#    endif
+        );
         status =
           ARKStepSVtolerances(arkode_mem, data.relative_tolerance, abs_tols);
         AssertARKode(status);
@@ -681,18 +733,36 @@ namespace SUNDIALS
           {
             linear_solver =
               std::make_unique<internal::LinearSolverWrapper<VectorType>>(
-                solve_linearized_system);
+                solve_linearized_system
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                ,
+                arkode_ctx
+#    endif
+              );
             sun_linear_solver = *linear_solver;
           }
         else
           {
             // use default solver from SUNDIALS
             // TODO give user options
-            auto y_template = internal::make_nvector_view(solution);
+            auto y_template = internal::make_nvector_view(solution
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                          ,
+                                                          arkode_ctx
+#    endif
+            );
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
             sun_linear_solver =
               SUNLinSol_SPGMR(y_template,
                               PREC_NONE,
                               0 /*krylov subvectors, 0 uses default*/);
+#    else
+            sun_linear_solver =
+              SUNLinSol_SPGMR(y_template,
+                              PREC_NONE,
+                              0 /*krylov subvectors, 0 uses default*/,
+                              arkode_ctx);
+#    endif
           }
         status = ARKStepSetLinearSolver(arkode_mem, sun_linear_solver, nullptr);
         AssertARKode(status);
@@ -722,11 +792,23 @@ namespace SUNDIALS
       }
     else
       {
-        auto y_template = internal::make_nvector_view(solution);
+        auto y_template = internal::make_nvector_view(solution
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                      ,
+                                                      arkode_ctx
+#    endif
+        );
 
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
         SUNNonlinearSolver fixed_point_solver =
           SUNNonlinSol_FixedPoint(y_template,
                                   data.anderson_acceleration_subspace);
+#    else
+        SUNNonlinearSolver fixed_point_solver =
+          SUNNonlinSol_FixedPoint(y_template,
+                                  data.anderson_acceleration_subspace,
+                                  arkode_ctx);
+#    endif
 
         status = ARKStepSetNonlinearSolver(arkode_mem, fixed_point_solver);
         AssertARKode(status);
@@ -753,16 +835,34 @@ namespace SUNDIALS
           {
             mass_solver =
               std::make_unique<internal::LinearSolverWrapper<VectorType>>(
-                solve_mass);
+                solve_mass
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                ,
+                arkode_ctx
+#    endif
+              );
             sun_mass_linear_solver = *mass_solver;
           }
         else
           {
-            auto y_template = internal::make_nvector_view(solution);
+            auto y_template = internal::make_nvector_view(solution
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                          ,
+                                                          arkode_ctx
+#    endif
+            );
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
             sun_mass_linear_solver =
               SUNLinSol_SPGMR(y_template,
                               PREC_NONE,
                               0 /*krylov subvectors, 0 uses default*/);
+#    else
+            sun_mass_linear_solver =
+              SUNLinSol_SPGMR(y_template,
+                              PREC_NONE,
+                              0 /*krylov subvectors, 0 uses default*/,
+                              arkode_ctx);
+#    endif
           }
         booleantype mass_time_dependent =
           data.mass_is_time_independent ? SUNFALSE : SUNTRUE;

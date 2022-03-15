@@ -257,6 +257,18 @@ namespace TrilinosWrappers
       graph.reset();
       column_space_map = std::make_unique<Epetra_Map>(col_map);
 
+      AssertThrow((TrilinosWrappers::max_my_gid(row_map) -
+                   TrilinosWrappers::min_my_gid(row_map)) *
+                      std::uint64_t(n_entries_per_row) <
+                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
+                  ExcMessage("The TrilinosWrappers use Epetra internally which "
+                             "uses 'signed int' to represent local indices. "
+                             "Therefore, only 2,147,483,647 nonzero matrix "
+                             "entries can be stored on a single process, "
+                             "but you are requesting more than that. "
+                             "If possible, use more MPI processes."));
+
+
       // for more than one processor, need to specify only row map first and
       // let the matrix entries decide about the column map (which says which
       // columns are present in the matrix, not to be confused with the
@@ -303,12 +315,26 @@ namespace TrilinosWrappers
                       TrilinosWrappers::n_global_elements(row_map));
 
       column_space_map = std::make_unique<Epetra_Map>(col_map);
+
+      // Translate the vector of row lengths into one that only stores
+      // those entries that related to the locally stored rows of the matrix:
       std::vector<int> local_entries_per_row(
         TrilinosWrappers::max_my_gid(row_map) -
         TrilinosWrappers::min_my_gid(row_map));
       for (unsigned int i = 0; i < local_entries_per_row.size(); ++i)
         local_entries_per_row[i] =
           n_entries_per_row[TrilinosWrappers::min_my_gid(row_map) + i];
+
+      AssertThrow(std::accumulate(local_entries_per_row.begin(),
+                                  local_entries_per_row.end(),
+                                  std::uint64_t(0)) <
+                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
+                  ExcMessage("The TrilinosWrappers use Epetra internally which "
+                             "uses 'signed int' to represent local indices. "
+                             "Therefore, only 2,147,483,647 nonzero matrix "
+                             "entries can be stored on a single process, "
+                             "but you are requesting more than that. "
+                             "If possible, use more MPI processes."));
 
       if (row_map.Comm().NumProc() > 1)
         graph = std::make_unique<Epetra_FECrsGraph>(
@@ -359,6 +385,17 @@ namespace TrilinosWrappers
       for (size_type row = first_row; row < last_row; ++row)
         n_entries_per_row[row - first_row] =
           static_cast<int>(sp.row_length(row));
+
+      AssertThrow(std::accumulate(n_entries_per_row.begin(),
+                                  n_entries_per_row.end(),
+                                  std::uint64_t(0)) <
+                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
+                  ExcMessage("The TrilinosWrappers use Epetra internally which "
+                             "uses 'signed int' to represent local indices. "
+                             "Therefore, only 2,147,483,647 nonzero matrix "
+                             "entries can be stored on a single process, "
+                             "but you are requesting more than that. "
+                             "If possible, use more MPI processes."));
 
       if (row_map.Comm().NumProc() > 1)
         graph = std::make_unique<Epetra_FECrsGraph>(Copy,
@@ -710,7 +747,25 @@ namespace TrilinosWrappers
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
 
-    ierr = graph->OptimizeStorage();
+    try
+      {
+        ierr = graph->OptimizeStorage();
+      }
+    catch (const int error_code)
+      {
+        AssertThrow(
+          false,
+          ExcMessage(
+            "The Epetra_CrsGraph::OptimizeStorage() function "
+            "has thrown an error with code " +
+            std::to_string(error_code) +
+            ". You will have to look up the exact meaning of this error "
+            "in the Trilinos source code, but oftentimes, this function "
+            "throwing an error indicates that you are trying to allocate "
+            "more than 2,147,483,647 nonzero entries in the sparsity "
+            "pattern on the local process; this will not work because "
+            "Epetra indexes entries with a simple 'signed int'."));
+      }
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
@@ -983,7 +1038,7 @@ namespace TrilinosWrappers
           }
       }
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -1015,7 +1070,7 @@ namespace TrilinosWrappers
               << std::endl;
       }
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
   // TODO: Implement!

@@ -74,8 +74,8 @@ test(const bool enforce_unique_map)
     eval, dof_handler, vec, VectorTools::EvaluationFlags::insert);
 
   for (unsigned int i = 0; i < evaluation_points.size(); ++i)
-    deallog << "1e-" << (i + 1) << " " << result_avg[i] << " " << result_min[i]
-            << " " << result_max[i] << " " << result_insert[i] << " "
+    deallog << "1e-" << (i + 1) << ' ' << result_avg[i] << ' ' << result_min[i]
+            << ' ' << result_max[i] << ' ' << result_insert[i] << ' '
             << eval.get_point_ptrs()[i + 1] - eval.get_point_ptrs()[i]
             << std::endl;
 }

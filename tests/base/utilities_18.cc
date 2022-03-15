@@ -54,7 +54,7 @@ test(unsigned int plane = 1)
                                                   res[b].end());
             });
 
-  deallog << plane << ":" << std::endl;
+  deallog << plane << ':' << std::endl;
   for (const auto ind : index)
     {
       AssertThrow(res[ind][0] == 0, ExcInternalError());

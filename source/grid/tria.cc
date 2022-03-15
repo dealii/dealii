@@ -981,7 +981,7 @@ namespace internal
                    int,
                    << "Error while creating cell " << arg1
                    << ": the vertex index " << arg2 << " must be between 0 and "
-                   << arg3 << ".");
+                   << arg3 << '.');
     /**
      * Exception
      * @ingroup Exceptions
@@ -5108,36 +5108,52 @@ namespace internal
                  triangulation.active_cell_iterators_on_level(level))
               if (cell->refine_flag_set())
                 {
+                  // Only support isotropic refinement
                   Assert(cell->refine_flag_set() ==
                            RefinementCase<dim>::cut_xyz,
                          ExcInternalError());
+
+                  // Now count up how many new cells, faces, edges, and vertices
+                  // we will need to allocate to do this refinement.
+                  new_cells += cell->reference_cell().n_isotropic_children();
 
                   if (cell->reference_cell() == ReferenceCells::Hexahedron)
                     {
                       ++needed_vertices;
                       needed_lines_single += 6;
                       needed_quads_single += 12;
-                      new_cells += 8;
                     }
                   else if (cell->reference_cell() ==
                            ReferenceCells::Tetrahedron)
                     {
                       needed_lines_single += 1;
                       needed_quads_single += 8;
-                      new_cells += 8;
                     }
                   else
                     {
                       Assert(false, ExcInternalError());
                     }
 
+                  // Also check whether we have to refine any of the faces and
+                  // edges that bound this cell. They may of course already be
+                  // refined, so we only *mark* them for refinement by setting
+                  // the user flags
                   for (const auto face : cell->face_indices())
-                    if (cell->face(face)->number_of_children() < 4)
+                    if (cell->face(face)->n_children() == 0)
                       cell->face(face)->set_user_flag();
+                    else
+                      Assert(cell->face(face)->n_children() ==
+                               cell->reference_cell()
+                                 .face_reference_cell(face)
+                                 .n_isotropic_children(),
+                             ExcInternalError());
 
                   for (const auto line : cell->line_indices())
                     if (cell->line(line)->has_children() == false)
                       cell->line(line)->set_user_flag();
+                    else
+                      Assert(cell->line(line)->n_children() == 2,
+                             ExcInternalError());
                 }
 
             const unsigned int used_cells =
@@ -11164,7 +11180,7 @@ Triangulation<dim, spacedim>::Triangulation(
   , faces(std::move(tria.faces))
   , vertices(std::move(tria.vertices))
   , vertices_used(std::move(tria.vertices_used))
-  , manifold(std::move(tria.manifold))
+  , manifolds(std::move(tria.manifolds))
   , anisotropic_refinement(tria.anisotropic_refinement)
   , check_for_distorted_cells(tria.check_for_distorted_cells)
   , number_cache(std::move(tria.number_cache))
@@ -11193,7 +11209,7 @@ Triangulation<dim, spacedim>::operator=(
   faces                        = std::move(tria.faces);
   vertices                     = std::move(tria.vertices);
   vertices_used                = std::move(tria.vertices_used);
-  manifold                     = std::move(tria.manifold);
+  manifolds                    = std::move(tria.manifolds);
   anisotropic_refinement       = tria.anisotropic_refinement;
   number_cache                 = tria.number_cache;
   vertex_to_boundary_id_map_1d = std::move(tria.vertex_to_boundary_id_map_1d);
@@ -11290,7 +11306,7 @@ Triangulation<dim, spacedim>::set_manifold(
 {
   AssertIndexRange(m_number, numbers::flat_manifold_id);
 
-  manifold[m_number] = manifold_object.clone();
+  manifolds[m_number] = manifold_object.clone();
 }
 
 
@@ -11302,7 +11318,7 @@ Triangulation<dim, spacedim>::reset_manifold(const types::manifold_id m_number)
   AssertIndexRange(m_number, numbers::flat_manifold_id);
 
   // delete the entry located at number.
-  manifold.erase(m_number);
+  manifolds.erase(m_number);
 }
 
 
@@ -11310,7 +11326,7 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::reset_all_manifolds()
 {
-  manifold.clear();
+  manifolds.clear();
 }
 
 
@@ -11394,9 +11410,9 @@ Triangulation<dim, spacedim>::get_manifold(
 {
   // look, if there is a manifold stored at
   // manifold_id number.
-  const auto it = manifold.find(m_number);
+  const auto it = manifolds.find(m_number);
 
-  if (it != manifold.end())
+  if (it != manifolds.end())
     {
       // if we have found an entry, return it
       return *(it->second);
@@ -11491,7 +11507,7 @@ Triangulation<dim, spacedim>::copy_triangulation(
     faces = std::make_unique<internal::TriangulationImplementation::TriaFaces>(
       *other_tria.faces);
 
-  for (const auto &p : other_tria.manifold)
+  for (const auto &p : other_tria.manifolds)
     set_manifold(p.first, *p.second);
 
 
@@ -14696,7 +14712,7 @@ Triangulation<dim, spacedim>::clear_despite_subscriptions()
   vertices.clear();
   vertices_used.clear();
 
-  manifold.clear();
+  manifolds.clear();
 
   number_cache = internal::TriangulationImplementation::NumberCache<dim>();
 }
@@ -16290,7 +16306,7 @@ Triangulation<dim, spacedim>::write_bool_vector(
   for (unsigned int position = 0; position < N; ++position)
     flags[position / 8] |= (v[position] ? (1 << (position % 8)) : 0);
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // format:
   // 0. magic number
@@ -16305,7 +16321,7 @@ Triangulation<dim, spacedim>::write_bool_vector(
 
   delete[] flags;
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -16316,7 +16332,7 @@ Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
                                                const unsigned int magic_number2,
                                                std::istream &     in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   unsigned int magic_number;
   in >> magic_number;
@@ -16342,7 +16358,7 @@ Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
 
   delete[] flags;
 
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 }
 
 
@@ -16357,7 +16373,7 @@ Triangulation<dim, spacedim>::memory_consumption() const
     mem += MemoryConsumption::memory_consumption(*level);
   mem += MemoryConsumption::memory_consumption(vertices);
   mem += MemoryConsumption::memory_consumption(vertices_used);
-  mem += sizeof(manifold);
+  mem += sizeof(manifolds);
   mem += sizeof(smooth_grid);
   mem += MemoryConsumption::memory_consumption(number_cache);
   mem += sizeof(faces);

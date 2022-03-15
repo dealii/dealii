@@ -101,7 +101,7 @@ check(const unsigned int p)
           for (unsigned int d = 0; d < dim; ++d)
             deallog << (d == 0 ? "" : " ") << shape_values[q](d);
 
-          deallog << "]" << std::endl;
+          deallog << ']' << std::endl;
         };
 
       deallog << std::endl;

@@ -17,9 +17,19 @@
 for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
     template SUNDIALS::internal::NVectorView<V<S>>
-    SUNDIALS::internal::make_nvector_view<>(V<S> &);
+    SUNDIALS::internal::make_nvector_view<>(V<S> &
+#if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#endif
+    );
     template SUNDIALS::internal::NVectorView<const V<S>>
-                         SUNDIALS::internal::make_nvector_view<>(const V<S> &);
+    SUNDIALS::internal::make_nvector_view<>(const V<S> &
+#if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#endif
+    );
     template V<S> *      SUNDIALS::internal::unwrap_nvector<V<S>>(N_Vector);
     template const V<S> *SUNDIALS::internal::unwrap_nvector_const<V<S>>(
       N_Vector);
@@ -32,11 +42,21 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
 for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
     template SUNDIALS::internal::NVectorView<LinearAlgebra::distributed::V<S>>
-    SUNDIALS::internal::make_nvector_view<>(LinearAlgebra::distributed::V<S> &);
+    SUNDIALS::internal::make_nvector_view<>(LinearAlgebra::distributed::V<S> &
+#if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#endif
+    );
     template SUNDIALS::internal::NVectorView<
       const LinearAlgebra::distributed::V<S>>
     SUNDIALS::internal::make_nvector_view<>(
-      const LinearAlgebra::distributed::V<S> &);
+      const LinearAlgebra::distributed::V<S> &
+#if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+      ,
+      SUNContext
+#endif
+    );
     template LinearAlgebra::distributed::V<S>
       *SUNDIALS::internal::unwrap_nvector<LinearAlgebra::distributed::V<S>>(
         N_Vector);
@@ -54,9 +74,19 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
 for (V : DEAL_II_VEC_TEMPLATES)
   {
     template SUNDIALS::internal::NVectorView<TrilinosWrappers::MPI::V>
-    SUNDIALS::internal::make_nvector_view<>(TrilinosWrappers::MPI::V &);
+    SUNDIALS::internal::make_nvector_view<>(TrilinosWrappers::MPI::V &
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#  endif
+    );
     template SUNDIALS::internal::NVectorView<const TrilinosWrappers::MPI::V>
-    SUNDIALS::internal::make_nvector_view<>(const TrilinosWrappers::MPI::V &);
+    SUNDIALS::internal::make_nvector_view<>(const TrilinosWrappers::MPI::V &
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#  endif
+    );
     template TrilinosWrappers::MPI::V
       *SUNDIALS::internal::unwrap_nvector<TrilinosWrappers::MPI::V>(N_Vector);
     template const TrilinosWrappers::MPI::V
@@ -74,9 +104,19 @@ for (V : DEAL_II_VEC_TEMPLATES)
 for (V : DEAL_II_VEC_TEMPLATES)
   {
     template SUNDIALS::internal::NVectorView<PETScWrappers::MPI::V>
-    SUNDIALS::internal::make_nvector_view<>(PETScWrappers::MPI::V &);
+    SUNDIALS::internal::make_nvector_view<>(PETScWrappers::MPI::V &
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#  endif
+    );
     template SUNDIALS::internal::NVectorView<const PETScWrappers::MPI::V>
-    SUNDIALS::internal::make_nvector_view<>(const PETScWrappers::MPI::V &);
+    SUNDIALS::internal::make_nvector_view<>(const PETScWrappers::MPI::V &
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#  endif
+    );
     template PETScWrappers::MPI::V
       *SUNDIALS::internal::unwrap_nvector<PETScWrappers::MPI::V>(N_Vector);
     template const PETScWrappers::MPI::V *

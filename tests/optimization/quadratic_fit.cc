@@ -44,9 +44,9 @@ test()
     const double g1  = g(x1);
     const double g2  = g(x2);
     const double res = *LineMinimization::quadratic_fit(x1, f1, g1, x2, f2);
-    deallog << x1 << " " << x2 << std::endl
-            << f1 << " " << f2 << std::endl
-            << g1 << " " << g2 << std::endl
+    deallog << x1 << ' ' << x2 << std::endl
+            << f1 << ' ' << f2 << std::endl
+            << g1 << ' ' << g2 << std::endl
             << res << std::endl;
   }
 }

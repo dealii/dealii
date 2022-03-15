@@ -237,27 +237,26 @@ write_test(HDF5::Group &root_group)
     auto                       dataset =
       group.create_dataset<Number>(dataset_name, dataset_dimensions);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " << dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " << dataset_name << "<" << type_name << ">"
+    deallog << "Size " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_size() << std::endl;
-    deallog << "Rank " << dataset_name << "<" << type_name << ">"
+    deallog << "Rank " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_rank() << std::endl;
     auto data = initialize_container<std::vector, Number>(dataset_dimensions);
     assign_data(data);
 
     dataset.write(data);
 
-    deallog << "Data " + dataset_name << "<" << type_name << ">"
+    deallog << "Data " + dataset_name << '<' << type_name << '>'
             << " (Write): " << container_to_string(data) << std::endl;
-    std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+    std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
               << " (Write): " << dataset.get_io_mode() << std::endl;
-    std::cout << "Local no collective cause " + dataset_name << "<" << type_name
-              << ">"
-              << " (Write): " << dataset.get_local_no_collective_cause()
+    std::cout << "Local no collective cause " + dataset_name << '<' << type_name
+              << '>' << " (Write): " << dataset.get_local_no_collective_cause()
               << std::endl;
-    std::cout << "Global no collective cause " + dataset_name << "<"
-              << type_name << ">"
+    std::cout << "Global no collective cause " + dataset_name << '<'
+              << type_name << '>'
               << " (Write): " << dataset.get_global_no_collective_cause()
               << std::endl;
   }
@@ -277,27 +276,26 @@ write_test(HDF5::Group &root_group)
     auto                       dataset =
       group.create_dataset<Number>(dataset_name, dataset_dimensions);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " << dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " << dataset_name << "<" << type_name << ">"
+    deallog << "Size " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_size() << std::endl;
-    deallog << "Rank " << dataset_name << "<" << type_name << ">"
+    deallog << "Rank " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_rank() << std::endl;
     auto data = initialize_container<std::vector, Number>(dataset_dimensions);
     assign_data(data);
 
     dataset.write(data);
 
-    deallog << "Data " + dataset_name << "<" << type_name << ">"
+    deallog << "Data " + dataset_name << '<' << type_name << '>'
             << " (Write): " << container_to_string(data) << std::endl;
-    std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+    std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
               << " (Write): " << dataset.get_io_mode() << std::endl;
-    std::cout << "Local no collective cause " + dataset_name << "<" << type_name
-              << ">"
-              << " (Write): " << dataset.get_local_no_collective_cause()
+    std::cout << "Local no collective cause " + dataset_name << '<' << type_name
+              << '>' << " (Write): " << dataset.get_local_no_collective_cause()
               << std::endl;
-    std::cout << "Global no collective cause " + dataset_name << "<"
-              << type_name << ">"
+    std::cout << "Global no collective cause " + dataset_name << '<'
+              << type_name << '>'
               << " (Write): " << dataset.get_global_no_collective_cause()
               << std::endl;
   }
@@ -317,11 +315,11 @@ write_test(HDF5::Group &root_group)
     auto                       dataset =
       group.create_dataset<Number>(dataset_name, dataset_dimensions);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " << dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " << dataset_name << "<" << type_name << ">"
+    deallog << "Size " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_size() << std::endl;
-    deallog << "Rank " << dataset_name << "<" << type_name << ">"
+    deallog << "Rank " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_rank() << std::endl;
 
     {
@@ -332,14 +330,14 @@ write_test(HDF5::Group &root_group)
       const std::vector<hsize_t> hyperslab_count  = {1, 5, 3};
       dataset.write_hyperslab(data, hyperslab_offset, hyperslab_count);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -354,14 +352,14 @@ write_test(HDF5::Group &root_group)
       const std::vector<hsize_t> hyperslab_count  = {1, 5, 3};
       dataset.write_hyperslab(data, hyperslab_offset, hyperslab_count);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -383,11 +381,11 @@ write_test(HDF5::Group &root_group)
     auto                       dataset =
       group.create_dataset<Number>(dataset_name, dataset_dimensions);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " << dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " << dataset_name << "<" << type_name << ">"
+    deallog << "Size " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_size() << std::endl;
-    deallog << "Rank " << dataset_name << "<" << type_name << ">"
+    deallog << "Rank " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_rank() << std::endl;
 
     {
@@ -398,14 +396,14 @@ write_test(HDF5::Group &root_group)
       const std::vector<hsize_t> hyperslab_count  = {3, 1, 4};
       dataset.write_hyperslab(data, hyperslab_offset, hyperslab_count);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -420,14 +418,14 @@ write_test(HDF5::Group &root_group)
       const std::vector<hsize_t> hyperslab_count  = {3, 1, 4};
       dataset.write_hyperslab(data, hyperslab_offset, hyperslab_count);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -450,11 +448,11 @@ write_test(HDF5::Group &root_group)
     auto                       dataset =
       group.create_dataset<Number>(dataset_name, dataset_dimensions);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " << dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " << dataset_name << "<" << type_name << ">"
+    deallog << "Size " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_size() << std::endl;
-    deallog << "Rank " << dataset_name << "<" << type_name << ">"
+    deallog << "Rank " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_rank() << std::endl;
 
     {
@@ -474,14 +472,14 @@ write_test(HDF5::Group &root_group)
 
       dataset.write_selection(data, coordinates);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -503,14 +501,14 @@ write_test(HDF5::Group &root_group)
 
       dataset.write_selection(data, coordinates);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -535,14 +533,14 @@ write_test(HDF5::Group &root_group)
 
       dataset.write_selection(data, coordinates);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -565,11 +563,11 @@ write_test(HDF5::Group &root_group)
     auto                       dataset =
       group.create_dataset<Number>(dataset_name, dataset_dimensions);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " << dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " << dataset_name << "<" << type_name << ">"
+    deallog << "Size " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_size() << std::endl;
-    deallog << "Rank " << dataset_name << "<" << type_name << ">"
+    deallog << "Rank " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_rank() << std::endl;
 
     {
@@ -584,14 +582,14 @@ write_test(HDF5::Group &root_group)
       dataset.write_hyperslab(
         data, data_dimensions, offset, stride, count, block);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -609,14 +607,14 @@ write_test(HDF5::Group &root_group)
       dataset.write_hyperslab(
         data, data_dimensions, offset, stride, count, block);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -639,11 +637,11 @@ write_test(HDF5::Group &root_group)
     auto                       dataset =
       group.create_dataset<Number>(dataset_name, dataset_dimensions);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " << dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " << dataset_name << "<" << type_name << ">"
+    deallog << "Size " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_size() << std::endl;
-    deallog << "Rank " << dataset_name << "<" << type_name << ">"
+    deallog << "Rank " << dataset_name << '<' << type_name << '>'
             << " (Write): " << dataset.get_rank() << std::endl;
 
     {
@@ -667,14 +665,14 @@ write_test(HDF5::Group &root_group)
 
       dataset.write_selection(data, coordinates);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -700,14 +698,14 @@ write_test(HDF5::Group &root_group)
 
       dataset.write_selection(data, coordinates);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -737,14 +735,14 @@ write_test(HDF5::Group &root_group)
 
       dataset.write_selection(data, coordinates);
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Write): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " + dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " + dataset_name << '<'
+                << type_name << '>'
                 << " (Write): " << dataset.get_global_no_collective_cause()
                 << std::endl;
     }
@@ -777,27 +775,27 @@ read_test(HDF5::Group root_group)
 
     auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " + dataset_name << "<" << type_name << ">"
+    deallog << "Size " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_size() << std::endl;
-    deallog << "Rank " + dataset_name << "<" << type_name << ">"
+    deallog << "Rank " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_rank() << std::endl;
     {
       auto data = dataset.read<FullMatrix<Number>>();
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Data " + dataset_name << "<" << type_name << ">"
+      deallog << "Data " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
 
@@ -809,18 +807,18 @@ read_test(HDF5::Group root_group)
                                                               hyperslab_count);
 
       std::cout << "Column vector" << std::endl;
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Column vector " + dataset_name << "<" << type_name << ">"
+      deallog << "Column vector " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
 
@@ -832,18 +830,18 @@ read_test(HDF5::Group root_group)
                                                               hyperslab_count);
 
       std::cout << "Row vector" << std::endl;
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Row vector " + dataset_name << "<" << type_name << ">"
+      deallog << "Row vector " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
 
@@ -855,18 +853,18 @@ read_test(HDF5::Group root_group)
                                                              hyperslab_count);
 
       std::cout << "Sub-matrix" << std::endl;
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Sub-matrix " + dataset_name << "<" << type_name << ">"
+      deallog << "Sub-matrix " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
   }
@@ -884,27 +882,27 @@ read_test(HDF5::Group root_group)
 
     auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " + dataset_name << "<" << type_name << ">"
+    deallog << "Size " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_size() << std::endl;
-    deallog << "Rank " + dataset_name << "<" << type_name << ">"
+    deallog << "Rank " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_rank() << std::endl;
     {
       auto data = dataset.read<std::vector<Number>>();
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Data " + dataset_name << "<" << type_name << ">"
+      deallog << "Data " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
 
@@ -916,18 +914,18 @@ read_test(HDF5::Group root_group)
                                                               hyperslab_count);
 
       std::cout << "Column vector" << std::endl;
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Column vector " + dataset_name << "<" << type_name << ">"
+      deallog << "Column vector " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
 
@@ -939,18 +937,18 @@ read_test(HDF5::Group root_group)
                                                               hyperslab_count);
 
       std::cout << "Row vector" << std::endl;
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Row vector " + dataset_name << "<" << type_name << ">"
+      deallog << "Row vector " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
 
@@ -962,18 +960,18 @@ read_test(HDF5::Group root_group)
                                                              hyperslab_count);
 
       std::cout << "Sub-matrix" << std::endl;
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Sub-matrix " + dataset_name << "<" << type_name << ">"
+      deallog << "Sub-matrix " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
 
@@ -985,18 +983,18 @@ read_test(HDF5::Group root_group)
                                                              hyperslab_count);
 
       std::cout << "Sub-matrix" << std::endl;
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Sub-matrix " + dataset_name << "<" << type_name << ">"
+      deallog << "Sub-matrix " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
 
@@ -1013,18 +1011,18 @@ read_test(HDF5::Group root_group)
         data_dimensions, offset, stride, count, block);
 
       std::cout << "Sub-matrix" << std::endl;
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Sub-matrix " + dataset_name << "<" << type_name << ">"
+      deallog << "Sub-matrix " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
 
@@ -1049,20 +1047,19 @@ read_test(HDF5::Group root_group)
       auto data = dataset.read_selection<std::vector<Number>>(coordinates);
 
       std::cout << "Sub-matrix" << std::endl;
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Selection std::vector " + dataset_name << "<" << type_name
-              << ">"
-              << " (Read): " << container_to_string(data) << std::endl;
+      deallog << "Selection std::vector " + dataset_name << '<' << type_name
+              << '>' << " (Read): " << container_to_string(data) << std::endl;
     }
 
     {
@@ -1086,18 +1083,18 @@ read_test(HDF5::Group root_group)
       auto data = dataset.read_selection<Vector<Number>>(coordinates);
 
       std::cout << "Sub-matrix" << std::endl;
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Selection Vector " + dataset_name << "<" << type_name << ">"
+      deallog << "Selection Vector " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
   }
@@ -1115,27 +1112,27 @@ read_test(HDF5::Group root_group)
 
     auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " + dataset_name << "<" << type_name << ">"
+    deallog << "Size " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_size() << std::endl;
-    deallog << "Rank " + dataset_name << "<" << type_name << ">"
+    deallog << "Rank " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_rank() << std::endl;
     {
       auto data = dataset.read<std::vector<Number>>();
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Data " + dataset_name << "<" << type_name << ">"
+      deallog << "Data " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
   }
@@ -1154,27 +1151,27 @@ read_test(HDF5::Group root_group)
 
     auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " + dataset_name << "<" << type_name << ">"
+    deallog << "Size " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_size() << std::endl;
-    deallog << "Rank " + dataset_name << "<" << type_name << ">"
+    deallog << "Rank " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_rank() << std::endl;
     {
       auto data = dataset.read<std::vector<Number>>();
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Data " + dataset_name << "<" << type_name << ">"
+      deallog << "Data " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
   }
@@ -1194,27 +1191,27 @@ read_test(HDF5::Group root_group)
 
     auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " + dataset_name << "<" << type_name << ">"
+    deallog << "Size " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_size() << std::endl;
-    deallog << "Rank " + dataset_name << "<" << type_name << ">"
+    deallog << "Rank " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_rank() << std::endl;
     {
       auto data = dataset.read<std::vector<Number>>();
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Data " + dataset_name << "<" << type_name << ">"
+      deallog << "Data " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
   }
@@ -1235,27 +1232,27 @@ read_test(HDF5::Group root_group)
 
     auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " + dataset_name << "<" << type_name << ">"
+    deallog << "Size " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_size() << std::endl;
-    deallog << "Rank " + dataset_name << "<" << type_name << ">"
+    deallog << "Rank " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_rank() << std::endl;
     {
       auto data = dataset.read<FullMatrix<Number>>();
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Data " + dataset_name << "<" << type_name << ">"
+      deallog << "Data " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
   }
@@ -1275,27 +1272,27 @@ read_test(HDF5::Group root_group)
 
     auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
-    deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
+    deallog << "Dimensions " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_dimensions() << std::endl;
-    deallog << "Size " + dataset_name << "<" << type_name << ">"
+    deallog << "Size " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_size() << std::endl;
-    deallog << "Rank " + dataset_name << "<" << type_name << ">"
+    deallog << "Rank " + dataset_name << '<' << type_name << '>'
             << " (Read): " << dataset.get_rank() << std::endl;
     {
       auto data = dataset.read<std::vector<Number>>();
 
-      std::cout << "IO mode " + dataset_name << "<" << type_name << ">"
+      std::cout << "IO mode " + dataset_name << '<' << type_name << '>'
                 << " (Read): " << dataset.get_io_mode() << std::endl;
-      std::cout << "Local no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Local no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_local_no_collective_cause()
                 << std::endl;
-      std::cout << "Global no collective cause " << dataset_name << "<"
-                << type_name << ">"
+      std::cout << "Global no collective cause " << dataset_name << '<'
+                << type_name << '>'
                 << " (Read): " << dataset.get_global_no_collective_cause()
                 << std::endl;
 
-      deallog << "Data " + dataset_name << "<" << type_name << ">"
+      deallog << "Data " + dataset_name << '<' << type_name << '>'
               << " (Read): " << container_to_string(data) << std::endl;
     }
   }

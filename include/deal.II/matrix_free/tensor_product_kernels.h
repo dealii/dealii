@@ -380,10 +380,10 @@ namespace internal
                       val0 = shape_data[col * n_columns + i];
                     res0 += val0 * x[i];
                   }
-                if (add == false)
-                  out[stride * col] = res0;
-                else
+                if (add)
                   out[stride * col] += res0;
+                else
+                  out[stride * col] = res0;
               }
 
             if (one_line == false)
@@ -463,15 +463,7 @@ namespace internal
                     if (max_derivative > 1)
                       res2 += shape_values[ind + 2 * n_rows] * in[stride * ind];
                   }
-                if (add == false)
-                  {
-                    out[0] = res0;
-                    if (max_derivative > 0)
-                      out[out_stride] = res1;
-                    if (max_derivative > 1)
-                      out[2 * out_stride] = res2;
-                  }
-                else
+                if (add)
                   {
                     out[0] += res0;
                     if (max_derivative > 0)
@@ -479,15 +471,23 @@ namespace internal
                     if (max_derivative > 1)
                       out[2 * out_stride] += res2;
                   }
+                else
+                  {
+                    out[0] = res0;
+                    if (max_derivative > 0)
+                      out[out_stride] = res1;
+                    if (max_derivative > 1)
+                      out[2 * out_stride] = res2;
+                  }
               }
             else
               {
                 for (int col = 0; col < n_rows; ++col)
                   {
-                    if (add == false)
-                      out[col * stride] = shape_values[col] * in[0];
-                    else
+                    if (add)
                       out[col * stride] += shape_values[col] * in[0];
+                    else
+                      out[col * stride] = shape_values[col] * in[0];
                     if (max_derivative > 0)
                       out[col * stride] +=
                         shape_values[col + n_rows] * in[out_stride];
@@ -758,10 +758,10 @@ namespace internal
                   {
                     const Number result =
                       shape_data[col] * x0 + shape_data_1[col] * x1;
-                    if (add == false)
-                      out[stride * col] = result;
-                    else
+                    if (add)
                       out[stride * col] += result;
+                    else
+                      out[stride * col] = result;
                   }
 
                 if (one_line == false)
@@ -792,10 +792,10 @@ namespace internal
                     const Number result = shape_data[col] * x0 +
                                           shape_data_1[col] * x1 +
                                           shape_data_2[col] * x2;
-                    if (add == false)
-                      out[stride * col] = result;
-                    else
+                    if (add)
                       out[stride * col] += result;
+                    else
+                      out[stride * col] = result;
                   }
 
                 if (one_line == false)
@@ -836,10 +836,10 @@ namespace internal
                         val0 = shape_data[col * n_columns + i];
                       res0 += val0 * x[i];
                     }
-                  if (add == false)
-                    out[stride * col] = res0;
-                  else
+                  if (add)
                     out[stride * col] += res0;
+                  else
+                    out[stride * col] = res0;
                 }
 
               if (one_line == false)
@@ -904,15 +904,7 @@ namespace internal
                     if (max_derivative > 1)
                       res2 += shape_values[ind + 2 * n_rows] * in[stride * ind];
                   }
-                if (add == false)
-                  {
-                    out[0] = res0;
-                    if (max_derivative > 0)
-                      out[out_stride] = res1;
-                    if (max_derivative > 1)
-                      out[2 * out_stride] = res2;
-                  }
-                else
+                if (add)
                   {
                     out[0] += res0;
                     if (max_derivative > 0)
@@ -920,15 +912,23 @@ namespace internal
                     if (max_derivative > 1)
                       out[2 * out_stride] += res2;
                   }
+                else
+                  {
+                    out[0] = res0;
+                    if (max_derivative > 0)
+                      out[out_stride] = res1;
+                    if (max_derivative > 1)
+                      out[2 * out_stride] = res2;
+                  }
               }
             else
               {
                 for (unsigned int col = 0; col < n_rows; ++col)
                   {
-                    if (add == false)
-                      out[col * stride] = shape_values[col] * in[0];
-                    else
+                    if (add)
                       out[col * stride] += shape_values[col] * in[0];
+                    else
+                      out[col * stride] = shape_values[col] * in[0];
                     if (max_derivative > 0)
                       out[col * stride] +=
                         shape_values[col + n_rows] * in[out_stride];
@@ -1182,23 +1182,23 @@ namespace internal
                         res1 += in1;
                       }
                   }
-                if (add == false)
-                  {
-                    out[stride * col]            = res0;
-                    out[stride * (nn - 1 - col)] = res1;
-                  }
-                else
+                if (add)
                   {
                     out[stride * col] += res0;
                     out[stride * (nn - 1 - col)] += res1;
                   }
+                else
+                  {
+                    out[stride * col]            = res0;
+                    out[stride * (nn - 1 - col)] = res1;
+                  }
               }
             if (contract_over_rows == true && nn % 2 == 1 && mm % 2 == 1)
               {
-                if (add == false)
-                  out[stride * n_cols] = in[stride * mid];
-                else
+                if (add)
                   out[stride * n_cols] += in[stride * mid];
+                else
+                  out[stride * n_cols] = in[stride * mid];
               }
             else if (contract_over_rows == true && nn % 2 == 1)
               {
@@ -1216,10 +1216,10 @@ namespace internal
                   }
                 else
                   res0 = Number();
-                if (add == false)
-                  out[stride * n_cols] = res0;
-                else
+                if (add)
                   out[stride * n_cols] += res0;
+                else
+                  out[stride * n_cols] = res0;
               }
             else if (contract_over_rows == false && nn % 2 == 1)
               {
@@ -1240,10 +1240,10 @@ namespace internal
                   }
                 else
                   res0 = in[0];
-                if (add == false)
-                  out[stride * n_cols] = res0;
-                else
+                if (add)
                   out[stride * n_cols] += res0;
+                else
+                  out[stride * n_cols] = res0;
               }
 
             ++in;
@@ -1362,15 +1362,15 @@ namespace internal
                     res0 += in1;
                     res1 -= in1;
                   }
-                if (add == false)
-                  {
-                    out[stride * col]            = res0;
-                    out[stride * (nn - 1 - col)] = res1;
-                  }
-                else
+                if (add)
                   {
                     out[stride * col] += res0;
                     out[stride * (nn - 1 - col)] += res1;
+                  }
+                else
+                  {
+                    out[stride * col]            = res0;
+                    out[stride * (nn - 1 - col)] = res1;
                   }
               }
             if (nn % 2 == 1)
@@ -1392,10 +1392,10 @@ namespace internal
                       val0 * (in[stride * ind] - in[stride * (mm - 1 - ind)]);
                     res0 += in1;
                   }
-                if (add == false)
-                  out[stride * n_cols] = res0;
-                else
+                if (add)
                   out[stride * n_cols] += res0;
+                else
+                  out[stride * n_cols] = res0;
               }
 
             ++in;
@@ -1498,15 +1498,15 @@ namespace internal
                     res0 += in1;
                     res1 += in1;
                   }
-                if (add == false)
-                  {
-                    out[stride * col]            = res0;
-                    out[stride * (nn - 1 - col)] = res1;
-                  }
-                else
+                if (add)
                   {
                     out[stride * col] += res0;
                     out[stride * (nn - 1 - col)] += res1;
+                  }
+                else
+                  {
+                    out[stride * col]            = res0;
+                    out[stride * (nn - 1 - col)] = res1;
                   }
               }
             if (nn % 2 == 1)
@@ -1541,10 +1541,10 @@ namespace internal
                       val0 = shape_hessians[n_cols * n_columns + mid];
                     res0 += val0 * in[stride * mid];
                   }
-                if (add == false)
-                  out[stride * n_cols] = res0;
-                else
+                if (add)
                   out[stride * n_cols] += res0;
+                else
+                  out[stride * n_cols] = res0;
               }
 
             ++in;
@@ -1860,15 +1860,7 @@ namespace internal
                 else if (mm % 2 == 1 && (nn % 2 == 0 || type > 0 || mm == 3))
                   r0 += shapes[col * offset + mid] * xmid;
 
-                if (add == false)
-                  {
-                    out[stride * col] = r0 + r1;
-                    if (type == 1 && contract_over_rows == false)
-                      out[stride * (nn - 1 - col)] = r1 - r0;
-                    else
-                      out[stride * (nn - 1 - col)] = r0 - r1;
-                  }
-                else
+                if (add)
                   {
                     out[stride * col] += r0 + r1;
                     if (type == 1 && contract_over_rows == false)
@@ -1876,14 +1868,22 @@ namespace internal
                     else
                       out[stride * (nn - 1 - col)] += r0 - r1;
                   }
+                else
+                  {
+                    out[stride * col] = r0 + r1;
+                    if (type == 1 && contract_over_rows == false)
+                      out[stride * (nn - 1 - col)] = r1 - r0;
+                    else
+                      out[stride * (nn - 1 - col)] = r0 - r1;
+                  }
               }
             if (type == 0 && contract_over_rows == true && nn % 2 == 1 &&
                 mm % 2 == 1 && mm > 3)
               {
-                if (add == false)
-                  out[stride * n_cols] = shapes[mid * offset + n_cols] * xmid;
-                else
+                if (add)
                   out[stride * n_cols] += shapes[mid * offset + n_cols] * xmid;
+                else
+                  out[stride * n_cols] = shapes[mid * offset + n_cols] * xmid;
               }
             else if (contract_over_rows == true && nn % 2 == 1)
               {
@@ -1899,10 +1899,10 @@ namespace internal
                 if (type != 1 && mm % 2 == 1)
                   r0 += shapes[mid * offset + n_cols] * xmid;
 
-                if (add == false)
-                  out[stride * n_cols] = r0;
-                else
+                if (add)
                   out[stride * n_cols] += r0;
+                else
+                  out[stride * n_cols] = r0;
               }
             else if (contract_over_rows == false && nn % 2 == 1)
               {
@@ -1928,10 +1928,10 @@ namespace internal
                 if ((type == 0 || type == 2) && mm % 2 == 1)
                   r0 += shapes[n_cols * offset + mid] * xmid;
 
-                if (add == false)
-                  out[stride * n_cols] = r0;
-                else
+                if (add)
                   out[stride * n_cols] += r0;
+                else
+                  out[stride * n_cols] = r0;
               }
             if (one_line == false)
               {
@@ -2204,21 +2204,21 @@ namespace internal
                       r0 = r1 = Number();
                     if (mm % 2 == 1)
                       r0 += shapes[col + (mm - 1) * n_columns] * x[mm - 1];
-                    if (add == false)
-                      {
-                        out[stride * col] = r0 + r1;
-                        if (type == 1)
-                          out[stride * (nn - 1 - col)] = r1 - r0;
-                        else
-                          out[stride * (nn - 1 - col)] = r0 - r1;
-                      }
-                    else
+                    if (add)
                       {
                         out[stride * col] += r0 + r1;
                         if (type == 1)
                           out[stride * (nn - 1 - col)] += r1 - r0;
                         else
                           out[stride * (nn - 1 - col)] += r0 - r1;
+                      }
+                    else
+                      {
+                        out[stride * col] = r0 + r1;
+                        if (type == 1)
+                          out[stride * (nn - 1 - col)] = r1 - r0;
+                        else
+                          out[stride * (nn - 1 - col)] = r0 - r1;
                       }
                   }
                 if (nn % 2 == 1)
@@ -2236,10 +2236,10 @@ namespace internal
                       r0 = 0;
                     if (type != 1 && mm % 2 == 1)
                       r0 += shapes[n_cols + (mm - 1) * n_columns] * x[mm - 1];
-                    if (add == false)
-                      out[stride * n_cols] = r0;
-                    else
+                    if (add)
                       out[stride * n_cols] += r0;
+                    else
+                      out[stride * n_cols] = r0;
                   }
               }
             else
@@ -2282,15 +2282,15 @@ namespace internal
                         else
                           r0 += shapes[2 * col * n_columns + mid] * xp[mid];
                       }
-                    if (add == false)
-                      {
-                        out[stride * (2 * col)]     = r0;
-                        out[stride * (2 * col + 1)] = r1;
-                      }
-                    else
+                    if (add)
                       {
                         out[stride * (2 * col)] += r0;
                         out[stride * (2 * col + 1)] += r1;
+                      }
+                    else
+                      {
+                        out[stride * (2 * col)]     = r0;
+                        out[stride * (2 * col + 1)] = r1;
                       }
                   }
                 if (nn % 2 == 1)
@@ -2306,10 +2306,10 @@ namespace internal
                       r0 = Number();
                     if (mm % 2 == 1 && type == 0)
                       r0 += shapes[(nn - 1) * n_columns + mid] * xp[mid];
-                    if (add == false)
-                      out[stride * (nn - 1)] = r0;
-                    else
+                    if (add)
                       out[stride * (nn - 1)] += r0;
+                    else
+                      out[stride * (nn - 1)] = r0;
                   }
               }
             if (one_line == false)
@@ -2515,6 +2515,105 @@ namespace internal
             result.first     = value_y;
             result.second[0] = deriv_x;
             result.second[1] = deriv_y;
+          }
+      }
+
+    return result;
+  }
+
+
+
+  template <int dim, typename Number, typename Number2>
+  SymmetricTensor<2, dim, typename ProductTypeNoPoint<Number, Number2>::type>
+  evaluate_tensor_product_hessian(
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const std::vector<Number> &                         values,
+    const Point<dim, Number2> &                         p,
+    const std::vector<unsigned int> &                   renumber = {})
+  {
+    static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
+
+    using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
+
+    // use `int` type for this variable and the loops below to inform the
+    // compiler that the loops below will never overflow, which allows it to
+    // generate more optimized code for the variable loop bounds in the
+    // present context
+    const int n_shapes = poly.size();
+    AssertDimension(Utilities::pow(n_shapes, dim), values.size());
+    Assert(renumber.empty() || renumber.size() == values.size(),
+           ExcDimensionMismatch(renumber.size(), values.size()));
+
+    AssertIndexRange(n_shapes, 200);
+    std::array<Number2, 3 * dim * 200> shapes;
+
+    // Evaluate 1D polynomials and their derivatives
+    for (unsigned int d = 0; d < dim; ++d)
+      for (int i = 0; i < n_shapes; ++i)
+        poly[i].value(p[d], 2, shapes.data() + 3 * (d * n_shapes + i));
+
+    // Go through the tensor product of shape functions and interpolate
+    // with optimal algorithm
+    SymmetricTensor<2, dim, Number3> result;
+    for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
+      {
+        Number3 value_y = {}, deriv_x = {}, deriv_y = {}, deriv_xx = {},
+                deriv_xy = {}, deriv_yy = {};
+        for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
+          {
+            // Interpolation + derivative x direction
+            Number3 value = {}, deriv_1 = {}, deriv_2 = {};
+
+            // Distinguish the inner loop based on whether we have a
+            // renumbering or not
+            if (renumber.empty())
+              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+                {
+                  value += shapes[3 * i0] * values[i];
+                  deriv_1 += shapes[3 * i0 + 1] * values[i];
+                  deriv_2 += shapes[3 * i0 + 2] * values[i];
+                }
+            else
+              for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
+                {
+                  value += shapes[3 * i0] * values[renumber[i]];
+                  deriv_1 += shapes[3 * i0 + 1] * values[renumber[i]];
+                  deriv_2 += shapes[3 * i0 + 2] * values[renumber[i]];
+                }
+
+            // Interpolation + derivative in y direction
+            if (dim > 1)
+              {
+                if (dim > 2)
+                  {
+                    value_y += value * shapes[3 * n_shapes + 3 * i1];
+                    deriv_x += deriv_1 * shapes[3 * n_shapes + 3 * i1];
+                    deriv_y += value * shapes[3 * n_shapes + 3 * i1 + 1];
+                  }
+                deriv_xx += deriv_2 * shapes[3 * n_shapes + 3 * i1];
+                deriv_xy += deriv_1 * shapes[3 * n_shapes + 3 * i1 + 1];
+                deriv_yy += value * shapes[3 * n_shapes + 3 * i1 + 2];
+              }
+            else
+              {
+                result[0][0] = deriv_2;
+              }
+          }
+        if (dim == 3)
+          {
+            // Interpolation + derivative in z direction
+            result[0][0] += deriv_xx * shapes[6 * n_shapes + 3 * i2];
+            result[0][1] += deriv_xy * shapes[6 * n_shapes + 3 * i2];
+            result[0][2] += deriv_x * shapes[6 * n_shapes + 3 * i2 + 1];
+            result[1][1] += deriv_yy * shapes[6 * n_shapes + 3 * i2];
+            result[1][2] += deriv_y * shapes[6 * n_shapes + 3 * i2 + 1];
+            result[2][2] += value_y * shapes[6 * n_shapes + 3 * i2 + 2];
+          }
+        else if (dim == 2)
+          {
+            result[0][0] = deriv_xx;
+            result[1][0] = deriv_xy;
+            result[1][1] = deriv_yy;
           }
       }
 

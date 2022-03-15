@@ -71,7 +71,7 @@ main()
       for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
           deallog << "  face = " << face
-                  << "  (neighbor = " << cell->neighbor(face) << ")"
+                  << "  (neighbor = " << cell->neighbor(face) << ')'
                   << std::endl;
 
           if (cell->face(face)->has_children())

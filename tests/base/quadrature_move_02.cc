@@ -55,8 +55,8 @@ void
 check_quadrature_assign_move(Args &&...args)
 {
   deallog << check_q_assign_move<Quad, 1>(std::forward<Args>(args)...) << 1
-          << " " << check_q_assign_move<Quad, 2>(std::forward<Args>(args)...)
-          << 2 << " "
+          << ' ' << check_q_assign_move<Quad, 2>(std::forward<Args>(args)...)
+          << 2 << ' '
           << check_q_assign_move<Quad, 3>(std::forward<Args>(args)...) << 3
           << std::endl;
 }

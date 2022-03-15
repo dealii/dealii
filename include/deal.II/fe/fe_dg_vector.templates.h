@@ -70,8 +70,8 @@ std::string
 FE_DGVector<PolynomialType, dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_DGVector_" << this->poly_space->name() << "<" << dim << ">("
-          << this->degree - 1 << ")";
+  namebuf << "FE_DGVector_" << this->poly_space->name() << '<' << dim << ">("
+          << this->degree - 1 << ')';
   return namebuf.str();
 }
 

@@ -135,8 +135,8 @@ test(const bool apply_constrains, const unsigned int hp)
       data_out.build_patches(20);
 
       std::ostringstream filename;
-      filename << "shape_" << dim << "d"
-               << (apply_constrains ? "_constrained" : "") << hp_string << "_"
+      filename << "shape_" << dim << 'd'
+               << (apply_constrains ? "_constrained" : "") << hp_string << '_'
                << i << ".vtk";
 
       std::ofstream output(filename.str().c_str());

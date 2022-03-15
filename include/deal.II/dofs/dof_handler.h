@@ -506,12 +506,12 @@ public:
   /**
    * Make the dimension available in function templates.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Make the space dimension available in function templates.
    */
-  static const unsigned int space_dimension = spacedim;
+  static constexpr unsigned int space_dimension = spacedim;
 
   /**
    * The default index of the finite element to be used on a given cell.

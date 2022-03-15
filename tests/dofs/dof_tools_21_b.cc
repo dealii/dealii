@@ -297,24 +297,24 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler,
   deallog << "DoFs of face_1:";
   for (unsigned int c = 0; c < fe.n_components(); ++c)
     {
-      deallog << std::endl << " component " << c << ":";
+      deallog << std::endl << " component " << c << ':';
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
         {
           if (fe.face_system_to_component_index(i).first == c)
             deallog << " (" << dofs_1[i] << " - " << support_points[dofs_1[i]]
-                    << ")";
+                    << ')';
         }
     }
   deallog << std::endl;
   deallog << "DoFs of face_2:";
   for (unsigned int c = 0; c < fe.n_components(); ++c)
     {
-      deallog << std::endl << " component " << c << ":";
+      deallog << std::endl << " component " << c << ':';
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
         {
           if (fe.face_system_to_component_index(i).first == c)
             deallog << " (" << dofs_2[i] << " - " << support_points[dofs_2[i]]
-                    << ")";
+                    << ')';
         }
     }
   deallog << std::endl;

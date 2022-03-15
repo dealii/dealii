@@ -201,7 +201,7 @@ namespace internal
                      size_type,
                      size_type,
                      << "Index " << N - P + 1 << "has a value of " << arg1
-                     << " but needs to be in the range [" << arg2 << "," << arg3
+                     << " but needs to be in the range [" << arg2 << ',' << arg3
                      << "[.");
 
     private:
@@ -1548,6 +1548,18 @@ public:
         const size_type size3,
         InputIterator   entries,
         const bool      C_style_indexing = true);
+
+  /**
+   * Reinitialize the object. Passes down to the base class
+   * by converting the arguments to the data type requested by the base class.
+   */
+  void
+  reinit(const size_type size1,
+         const size_type size2,
+         const size_type size3,
+         const bool      omit_default_initialization = false);
+
+  using TableBase<3, T>::reinit;
 
   /**
    * Access operator. Generate an object that accesses the requested two-
@@ -3235,6 +3247,19 @@ inline Table<3, T>::Table(const size_type size1,
                     entries,
                     C_style_indexing)
 {}
+
+
+
+template <typename T>
+inline void
+Table<3, T>::reinit(const size_type size1,
+                    const size_type size2,
+                    const size_type size3,
+                    const bool      omit_default_initialization)
+{
+  this->TableBase<3, T>::reinit(TableIndices<3>(size1, size2, size3),
+                                omit_default_initialization);
+}
 
 
 

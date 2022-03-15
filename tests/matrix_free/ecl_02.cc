@@ -21,6 +21,7 @@
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
@@ -126,22 +127,22 @@ test(const unsigned int n_refinements = 1)
 
               for (unsigned int i = 0; i < phi_m.static_dofs_per_component; ++i)
                 deallog << static_cast<int>(phi_m.begin_dof_values()[i][0])
-                        << " ";
+                        << ' ';
               deallog << std::endl;
               phi_m.gather_evaluate(src, EvaluationFlags::values);
               for (unsigned int i = 0; i < phi_m.static_n_q_points; ++i)
-                deallog << static_cast<int>(phi_m.begin_values()[i][0]) << " ";
+                deallog << static_cast<int>(phi_m.begin_values()[i][0]) << ' ';
               deallog << std::endl;
 
               phi_p.read_dof_values(src);
               for (unsigned int i = 0; i < phi_p.static_dofs_per_component; ++i)
                 deallog << static_cast<int>(phi_p.begin_dof_values()[i][0])
-                        << " ";
+                        << ' ';
               deallog << std::endl;
 
               phi_p.gather_evaluate(src, EvaluationFlags::values);
               for (unsigned int i = 0; i < phi_p.static_n_q_points; ++i)
-                deallog << static_cast<int>(phi_p.begin_values()[i][0]) << " ";
+                deallog << static_cast<int>(phi_p.begin_values()[i][0]) << ' ';
               deallog << std::endl << std::endl;
             }
         }

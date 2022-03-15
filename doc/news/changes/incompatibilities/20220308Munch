@@ -1,0 +1,9 @@
+Changed: To be able to guarantee correctness of
+the application of constraints in MatrixFree, we
+require that users call AffineConstraints::close()
+before calling MatrixFree::reinit() if AffineConstraints
+objects are passed that are not empty. One can check
+if an AffineConstraints object is closed with the
+new function AffineConstraints::is_closed(). 
+<br>
+(Peter Munch, 2022/03/08)

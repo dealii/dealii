@@ -71,12 +71,6 @@ namespace hp
     explicit MappingCollection(const Mapping<dim, spacedim> &mapping);
 
     /**
-     * Copy constructor.
-     */
-    MappingCollection(
-      const MappingCollection<dim, spacedim> &mapping_collection);
-
-    /**
      * Constructor. This constructor creates a MappingCollection from one or
      * more mapping objects passed to the constructor. For this
      * call to be valid, all arguments need to be of types derived
@@ -84,6 +78,34 @@ namespace hp
      */
     template <class... MappingTypes>
     explicit MappingCollection(const MappingTypes &...mappings);
+
+    /**
+     * Copy constructor.
+     */
+    MappingCollection(
+      const MappingCollection<dim, spacedim> &mapping_collection);
+
+    /**
+     * Move constructor.
+     *
+     * @note The implementation of standard datatypes may change with different
+     * libraries, so their move members may or may not be flagged non-throwing.
+     * We need to explicitly set the noexcept specifier according to its
+     * member variables to still get the performance benefits (and to satisfy
+     * clang-tidy).
+     */
+    MappingCollection(MappingCollection<dim, spacedim> &&) noexcept(
+      std::is_nothrow_move_constructible<
+        std::vector<std::shared_ptr<const Mapping<dim, spacedim>>>>::value
+        &&std::is_nothrow_move_constructible<std::function<
+          unsigned int(const typename hp::MappingCollection<dim, spacedim> &,
+                       const unsigned int)>>::value) = default;
+
+    /**
+     * Move assignment operator.
+     */
+    MappingCollection<dim, spacedim> &
+    operator=(MappingCollection<dim, spacedim> &&) = default; // NOLINT
 
     /**
      * Add a new mapping to the MappingCollection. Generally, you will

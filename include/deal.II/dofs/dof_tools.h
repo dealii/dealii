@@ -1492,10 +1492,10 @@ namespace DoFTools
    * on algebraic properties of the respective matrix, it has no chance to
    * detect whether the matrix comes from a scalar or a vector valued problem.
    * However, a near null space supplies exactly the needed information about
-   * the components placement of vector components within the matrix. The null
+   * the components' placement of vector components within the matrix. The null
    * space (or rather, the constant modes) is provided by the finite element
    * underlying the given DoFHandler and for most elements, the null space
-   * will consist of as many vectors as there are true arguments in
+   * will consist of as many vectors as there are `true` arguments in
    * <tt>component_mask</tt> (see
    * @ref GlossComponentMask),
    * each of which will be one in one vector component and zero in all others.
@@ -1512,6 +1512,8 @@ namespace DoFTools
    *
    * The main reason for this program is the use of the null space with the
    * AMG preconditioner.
+   *
+   * This function is used in step-31, step-32, and step-42, for example.
    */
   template <int dim, int spacedim>
   void
@@ -1554,6 +1556,26 @@ namespace DoFTools
    * with the locally owned subdomain id.
    */
   template <int dim, int spacedim>
+  IndexSet
+  extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler);
+
+  /**
+   * Extract the set of global DoF indices that are active on the current
+   * DoFHandler. For regular DoFHandlers, these are all DoF indices, but for
+   * DoFHandler objects built on parallel::distributed::Triangulation this set
+   * is a superset of DoFHandler::locally_owned_dofs() and contains all DoF
+   * indices that live on all locally owned cells (including on the interface
+   * to ghost cells). However, it does not contain the DoF indices that are
+   * exclusively defined on ghost or artificial cells (see
+   * @ref GlossArtificialCell "the glossary").
+   *
+   * The degrees of freedom identified by this function equal those obtained
+   * from the dof_indices_with_subdomain_association() function when called
+   * with the locally owned subdomain id.
+   *
+   * @deprecated Use the previous function instead.
+   */
+  template <int dim, int spacedim>
   void
   extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                               IndexSet &                       dof_set);
@@ -1563,6 +1585,20 @@ namespace DoFTools
    * This function returns all DoF indices that live on
    * all locally owned cells (including on the interface to ghost cells) on the
    * given level.
+   */
+  template <int dim, int spacedim>
+  IndexSet
+  extract_locally_active_level_dofs(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const unsigned int               level);
+
+  /**
+   * Same function as above but for a certain (multigrid-)level.
+   * This function returns all DoF indices that live on
+   * all locally owned cells (including on the interface to ghost cells) on the
+   * given level.
+   *
+   * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
   void
@@ -1581,10 +1617,24 @@ namespace DoFTools
    * @ref GlossArtificialCell "the glossary").
    */
   template <int dim, int spacedim>
+  IndexSet
+  extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler);
+
+  /**
+   * Extract the set of global DoF indices that are active on the current
+   * DoFHandler. For regular DoFHandlers, these are all DoF indices, but for
+   * DoFHandler objects built on parallel::distributed::Triangulation this set
+   * is the union of DoFHandler::locally_owned_dofs() and the DoF indices on
+   * all ghost cells. In essence, it is the DoF indices on all cells that are
+   * not artificial (see
+   * @ref GlossArtificialCell "the glossary").
+   *
+   * @deprecated Use the previous function instead.
+   */
+  template <int dim, int spacedim>
   void
   extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                                 IndexSet &                       dof_set);
-
 
   /**
    * Extract the set of locally owned DoF indices for each component within the
@@ -1638,10 +1688,21 @@ namespace DoFTools
   locally_relevant_dofs_per_subdomain(
     const DoFHandler<dim, spacedim> &dof_handler);
 
+  /**
+   * Same as extract_locally_relevant_dofs() but for multigrid DoFs for the
+   * given @p level.
+   */
+  template <int dim, int spacedim>
+  IndexSet
+  extract_locally_relevant_level_dofs(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const unsigned int               level);
 
   /**
    * Same as extract_locally_relevant_dofs() but for multigrid DoFs for the
    * given @p level.
+   *
+   * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
   void
@@ -2400,7 +2461,7 @@ namespace DoFTools
    *     << "'-' with labels point pt 2 offset 1,1"
    *     << std::endl;
    * GridOut().write_gnuplot (triangulation, out);
-   * out << "e" << std::endl;
+   * out << 'e' << std::endl;
    *
    * std::map<types::global_dof_index, Point<dim> > support_points;
    * DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
@@ -2408,7 +2469,7 @@ namespace DoFTools
    *                                       support_points);
    * DoFTools::write_gnuplot_dof_support_point_info(out,
    *                                                support_points);
-   * out << "e" << std::endl;
+   * out << 'e' << std::endl;
    * @endcode
    * and from within gnuplot execute the following command:
    * @code
@@ -2432,7 +2493,7 @@ namespace DoFTools
    *     << "'-' with labels point pt 2 offset 1,1 notitle"
    *     << std::endl;
    * GridOut().write_gnuplot (triangulation, out);
-   * out << "e" << std::endl;
+   * out << 'e' << std::endl;
    *
    * std::map<types::global_dof_index, Point<dim> > support_points;
    * DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
@@ -2440,7 +2501,7 @@ namespace DoFTools
    *                                       support_points);
    * DoFTools::write_gnuplot_dof_support_point_info(out,
    *                                                support_points);
-   * out << "e" << std::endl;
+   * out << 'e' << std::endl;
    * @endcode
    */
   template <int spacedim>

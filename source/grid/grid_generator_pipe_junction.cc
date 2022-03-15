@@ -69,6 +69,192 @@ namespace
             ((y > 0) ? data.cotangent_azimuth_half_right :
                        data.cotangent_azimuth_half_left);
     }
+
+
+
+    /**
+     * Pipe segment manifold description.
+     *
+     * The manifold class is too specific to being of any other use than for the
+     * pipe junction geometry.
+     */
+    template <int dim, int spacedim = dim>
+    class Manifold : public ChartManifold<dim, spacedim, 3>
+    {
+    public:
+      /**
+       * Constructor. The manifold described is a pipe segment whose central
+       * axis points in @p direction and goes through the given
+       * @p point_on_axis.
+       *
+       * The vector @p normal_direction needs to be perpendicular to
+       * @p direction and acts as the reference for azimuth angles. In other
+       * words, $\phi = 0$ corresponds to @p normal_direction. For the pipe
+       * junction geometry, it needs to point in the same direction as the
+       * projection of the bifurcation edge on the opening plane, as this is
+       * the reference direction for azimuth angles by construction.
+       *
+       * Both @p normal_direction and @p direction have to be unit vectors.
+       *
+       * We need @p data to map the pipe segment to a regular cylinder and back.
+       *
+       * The @p tolerance value is used to validate both direction vectors and
+       * to determine if a point in on the axis.
+       */
+      Manifold(const Tensor<1, spacedim> &normal_direction,
+               const Tensor<1, spacedim> &direction,
+               const Point<spacedim> &    point_on_axis,
+               const AdditionalData &     data,
+               const double               tolerance = 1e-10);
+
+      /**
+       * Make a clone of this Manifold object.
+       */
+      virtual std::unique_ptr<dealii::Manifold<dim, spacedim>>
+      clone() const override;
+
+      /**
+       * Compute the cylindrical coordinates $(r, \phi, \lambda)$ for the given
+       * space point and map them to a cylinder of height one, where $r$ denotes
+       * the distance from the axis, $\phi$ the angle between the given point
+       * and the normal direction, and $\lambda$ the axial position.
+       */
+      virtual Point<3>
+      pull_back(const Point<spacedim> &space_point) const override;
+
+      /**
+       * Compute the Cartesian coordinates for a chart point given in
+       * cylindrical coordinates $(r, \phi, \lambda)$ on a cylinder of height
+       * one, where $r$ denotes the distance from the axis, $\phi$ the angle
+       * between the given point and the normal direction, and $\lambda$ the
+       * axial position.
+       */
+      virtual Point<spacedim>
+      push_forward(const Point<3> &chart_point) const override;
+
+    private:
+      /**
+       * A vector orthogonal to the normal direction.
+       */
+      const Tensor<1, spacedim> normal_direction;
+
+      /**
+       * The direction vector of the axis.
+       */
+      const Tensor<1, spacedim> direction;
+
+      /**
+       * An arbitrary point on the axis.
+       */
+      const Point<spacedim> point_on_axis;
+
+      /**
+       * Pipe segment properties to calculate its height.
+       */
+      const AdditionalData data;
+
+      /**
+       * Relative tolerance to measure zero distances.
+       */
+      const double tolerance;
+
+      /**
+       * The direction vector perpendicular to both direction and
+       * normal_direction.
+       */
+      const Tensor<1, spacedim> dxn;
+    };
+
+
+
+    template <int dim, int spacedim>
+    Manifold<dim, spacedim>::Manifold(
+      const Tensor<1, spacedim> &normal_direction,
+      const Tensor<1, spacedim> &direction,
+      const Point<spacedim> &    point_on_axis,
+      const AdditionalData &     data,
+      const double               tolerance)
+      : ChartManifold<dim, spacedim, 3>(Tensor<1, 3>({0, 2. * numbers::PI, 0}))
+      , normal_direction(normal_direction)
+      , direction(direction)
+      , point_on_axis(point_on_axis)
+      , data(data)
+      , tolerance(tolerance)
+      , dxn(cross_product_3d(direction, normal_direction))
+    {
+      Assert(spacedim == 3,
+             ExcMessage(
+               "PipeSegment::Manifold can only be used for spacedim==3!"));
+
+      Assert(std::abs(normal_direction.norm() - 1) < tolerance,
+             ExcMessage("Normal direction must be unit vector."));
+      Assert(std::abs(direction.norm() - 1) < tolerance,
+             ExcMessage("Direction must be unit vector."));
+      Assert(normal_direction * direction < tolerance,
+             ExcMessage(
+               "Direction and normal direction must be perpendicular."));
+    }
+
+
+
+    template <int dim, int spacedim>
+    std::unique_ptr<dealii::Manifold<dim, spacedim>>
+    Manifold<dim, spacedim>::clone() const
+    {
+      return std::make_unique<Manifold<dim, spacedim>>(*this);
+    }
+
+
+
+    template <int dim, int spacedim>
+    Point<3>
+    Manifold<dim, spacedim>::pull_back(const Point<spacedim> &space_point) const
+    {
+      // First find the projection of the given point to the axis.
+      const Tensor<1, spacedim> normalized_point = space_point - point_on_axis;
+      double                    lambda           = normalized_point * direction;
+      const Point<spacedim>     projection = point_on_axis + direction * lambda;
+      const Tensor<1, spacedim> p_diff     = space_point - projection;
+      const double              r          = p_diff.norm();
+
+      Assert(r > tolerance * data.skeleton_length,
+             ExcMessage(
+               "This class won't handle points on the direction axis."));
+
+      // Then compute the angle between the projection direction and
+      // another vector orthogonal to the direction vector.
+      const double phi =
+        Physics::VectorRelations::signed_angle(normal_direction,
+                                               p_diff,
+                                               /*axis=*/direction);
+
+      // Map the axial coordinate to a cylinder of height one.
+      lambda /= compute_z_expansion(r * std::cos(phi), r * std::sin(phi), data);
+
+      // Return distance from the axis, angle and signed distance on the axis.
+      return {r, phi, lambda};
+    }
+
+
+
+    template <int dim, int spacedim>
+    Point<spacedim>
+    Manifold<dim, spacedim>::push_forward(const Point<3> &chart_point) const
+    {
+      // Rotate the orthogonal direction by the given angle.
+      const double sine_r   = chart_point(0) * std::sin(chart_point(1));
+      const double cosine_r = chart_point(0) * std::cos(chart_point(1));
+
+      const Tensor<1, spacedim> intermediate =
+        normal_direction * cosine_r + dxn * sine_r;
+
+      // Map the axial coordinate back to the pipe segment.
+      const double lambda =
+        chart_point(2) * compute_z_expansion(cosine_r, sine_r, data);
+
+      // Finally, put everything together.
+      return point_on_axis + direction * lambda + intermediate;
+    }
   } // namespace PipeSegment
 } // namespace
 
@@ -100,7 +286,7 @@ namespace GridGenerator
   {
     constexpr unsigned int dim      = 3;
     constexpr unsigned int spacedim = 3;
-    using vector                    = Tensor<1, spacedim, double>;
+    using vector3d                  = Tensor<1, spacedim, double>;
 
     constexpr unsigned int n_pipes   = 3;
     constexpr double       tolerance = 1.e-12;
@@ -128,14 +314,14 @@ namespace GridGenerator
     };
 
     // Cartesian base represented by unit vectors.
-    constexpr std::array<vector, spacedim> directions = {
-      {vector({1., 0., 0.}), vector({0., 1., 0.}), vector({0., 0., 1.})}};
+    constexpr std::array<vector3d, spacedim> directions = {
+      {vector3d({1., 0., 0.}), vector3d({0., 1., 0.}), vector3d({0., 0., 1.})}};
 
     // The skeleton corresponds to the axis of symmetry in the center of each
     // pipe segment. Each skeleton vector points from the associated opening to
     // the common bifurcation point. For convenience, we also compute length and
     // unit vector of every skeleton vector here.
-    std::array<vector, n_pipes> skeleton;
+    std::array<vector3d, n_pipes> skeleton;
     for (unsigned int p = 0; p < n_pipes; ++p)
       skeleton[p] = bifurcation.first - openings[p].first;
 
@@ -151,7 +337,7 @@ namespace GridGenerator
       tolerance *
       *std::max_element(skeleton_length.begin(), skeleton_length.end());
 
-    std::array<vector, n_pipes> skeleton_unit;
+    std::array<vector3d, n_pipes> skeleton_unit;
     for (unsigned int p = 0; p < n_pipes; ++p)
       {
         Assert(skeleton_length[p] > tolerance_length,
@@ -168,8 +354,8 @@ namespace GridGenerator
     // which all pipe segments meet. If we would interpret the bifurcation as a
     // ball joint, the normal vector would correspond to the polar axis of the
     // ball.
-    vector normal = cross_product_3d(skeleton_unit[1] - skeleton_unit[0],
-                                     skeleton_unit[2] - skeleton_unit[0]);
+    vector3d normal = cross_product_3d(skeleton_unit[1] - skeleton_unit[0],
+                                       skeleton_unit[2] - skeleton_unit[0]);
     Assert(normal.norm() > tolerance_length,
            ExcMessage("Invalid input: all three openings "
                       "are located on one line."));
@@ -177,7 +363,7 @@ namespace GridGenerator
 
     // Projections of all skeleton vectors perpendicular to the normal vector,
     // or in other words, onto the plane described above.
-    std::array<vector, n_pipes> skeleton_plane;
+    std::array<vector3d, n_pipes> skeleton_plane;
     for (unsigned int p = 0; p < n_pipes; ++p)
       {
         skeleton_plane[p] = skeleton[p] - (skeleton[p] * normal) * normal;
@@ -201,6 +387,8 @@ namespace GridGenerator
     // will be merged with the parameter triangulation in the end.
     Assert(tria.n_cells() == 0,
            ExcMessage("The output triangulation object needs to be empty."));
+
+    std::vector<PipeSegment::Manifold<dim, spacedim>> manifolds;
     for (unsigned int p = 0; p < n_pipes; ++p)
       {
         Triangulation<dim, spacedim> pipe;
@@ -247,6 +435,7 @@ namespace GridGenerator
                   else
                     {
                       // cone mantle
+                      cell->set_all_manifold_ids(n_pipes);
                       face->set_all_manifold_ids(p);
                     }
                 }
@@ -256,7 +445,7 @@ namespace GridGenerator
         // Step 2: transform unit cylinder to pipe segment
         //
         // For the given cylinder, we will interpret the base in the xy-plane as
-        // the cross section of the opening, and the base at z=1 as the surface
+        // the cross section of the opening, and the top at z=1 as the surface
         // where all pipe segments meet. On the latter surface, we assign the
         // section in positive y-direction to face the next (right/cyclic) pipe
         // segment, and allocate the domain in negative y-direction to border
@@ -319,7 +508,8 @@ namespace GridGenerator
           std::cos(.5 * azimuth_angle_left) / std::sin(.5 * azimuth_angle_left);
 
         // Now transform the cylinder as described above.
-        const auto pipe_segment = [&](const Point<spacedim> &pt) {
+        const auto pipe_segment_transform =
+          [&](const Point<spacedim> &pt) -> Point<spacedim> {
           // We transform the cylinder in x- and y-direction to become a
           // truncated cone, similarly to GridGenerator::truncated_cone().
           const double r_factor =
@@ -337,15 +527,9 @@ namespace GridGenerator
                             "is not long enough in this configuration"));
           const double z_new = z_factor * pt[2];
 
-          // TODO: MSVC can't capture const or constexpr values in lambda
-          // functions (due to either a missing implementation or a bug).
-          // Instead, we duplicate the declaration here.
-          //   See also: https://developercommunity.visualstudio.com/t/
-          //             invalid-template-argument-expected-compile-time-co/187862
-          constexpr unsigned int spacedim = 3;
-          return Point<spacedim>(x_new, y_new, z_new);
+          return {x_new, y_new, z_new};
         };
-        GridTools::transform(pipe_segment, pipe);
+        GridTools::transform(pipe_segment_transform, pipe);
 
         //
         // Step 3: rotate pipe segment to match skeleton direction
@@ -357,8 +541,8 @@ namespace GridGenerator
         // cross product of both vectors.
         const double rotation_angle =
           Physics::VectorRelations::angle(directions[2], skeleton_unit[p]);
-        const vector rotation_axis = [&]() {
-          const vector rotation_axis =
+        const vector3d rotation_axis = [&]() {
+          const vector3d rotation_axis =
             cross_product_3d(directions[2], skeleton_unit[p]);
           const double norm = rotation_axis.norm();
           if (norm < tolerance)
@@ -385,11 +569,11 @@ namespace GridGenerator
         // With the latest rotation however, this is no longer the case. We
         // rotate the unit vector in x-direction in the same fashion, which
         // gives us the current direction of the projected edge.
-        const vector Rx = rotation_matrix * directions[0];
+        const vector3d Rx = rotation_matrix * directions[0];
 
         // To determine how far we need to rotate, we also need to project the
         // polar axis of the bifurcation ball joint into the same plane.
-        const vector normal_projected_on_opening =
+        const vector3d normal_projected_on_opening =
           normal - (normal * skeleton_unit[p]) * skeleton_unit[p];
 
         // Both the projected normal and Rx must be in the opening plane.
@@ -407,23 +591,40 @@ namespace GridGenerator
         GridTools::rotate(skeleton_unit[p], lateral_angle, pipe);
 
         //
-        // Step 5: shift to final position
+        // Step 5: shift to final position and merge this pipe into the entire
+        // assembly
         //
         GridTools::shift(openings[p].first, pipe);
+
+        // Create a manifold object for the mantle of this particular pipe
+        // segment. Since GridGenerator::merge_triangulations() does not copy
+        // manifold objects, but just IDs if requested, we will copy them to
+        // the final triangulation later.
+        manifolds.emplace_back(
+          /*normal_direction=*/normal_projected_on_opening /
+            normal_projected_on_opening.norm(),
+          /*direction=*/skeleton_unit[p],
+          /*point_on_axis=*/openings[p].first,
+          data,
+          tolerance);
 
         GridGenerator::merge_triangulations(
           pipe, tria, tria, tolerance_length, /*copy_manifold_ids=*/true);
       }
 
-    // Since GridGenerator::merge_triangulations() does not copy boundary IDs,
-    // we need to set them after the final geometry is created. Luckily,
+    for (unsigned int p = 0; p < n_pipes; ++p)
+      tria.set_manifold(p, manifolds[p]);
+
+    // Since GridGenerator::merge_triangulations() does not copy boundary IDs
+    // either, we need to set them after the final geometry is created. Luckily,
     // boundary IDs match with material IDs, so we simply translate them with
     // the help of manifold IDs to identify openings.
     for (const auto &cell : tria.active_cell_iterators())
       for (const auto &face : cell->face_iterators())
         if (face->at_boundary())
           {
-            if (face->manifold_id() == numbers::flat_manifold_id)
+            if (face->manifold_id() == numbers::flat_manifold_id ||
+                face->manifold_id() == n_pipes)
               // opening cross section
               face->set_boundary_id(cell->material_id());
             else

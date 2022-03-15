@@ -376,16 +376,6 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    bool
-    Triangulation<dim, spacedim>::has_hanging_nodes() const
-    {
-      Assert(false, ExcNotImplemented());
-      return false;
-    }
-
-
-
-    template <int dim, int spacedim>
     std::size_t
     Triangulation<dim, spacedim>::memory_consumption() const
     {
@@ -527,7 +517,7 @@ namespace parallel
         // Open file.
         MPI_File fh;
         ierr = MPI_File_open(this->mpi_communicator,
-                             DEAL_II_MPI_CONST_CAST(fname_tria.c_str()),
+                             fname_tria.c_str(),
                              MPI_MODE_CREATE | MPI_MODE_WRONLY,
                              info,
                              &fh);
@@ -569,7 +559,7 @@ namespace parallel
         // Write offsets to file.
         ierr = MPI_File_write_at(fh,
                                  myrank * sizeof(unsigned int),
-                                 DEAL_II_MPI_CONST_CAST(&buffer_size),
+                                 &buffer_size,
                                  1,
                                  MPI_UNSIGNED,
                                  MPI_STATUS_IGNORE);
@@ -579,7 +569,7 @@ namespace parallel
         ierr = MPI_File_write_at(fh,
                                  mpisize * sizeof(unsigned int) +
                                    offset, // global position in file
-                                 DEAL_II_MPI_CONST_CAST(buffer.data()),
+                                 buffer.data(),
                                  buffer.size(), // local buffer
                                  MPI_CHAR,
                                  MPI_STATUS_IGNORE);
@@ -626,7 +616,7 @@ namespace parallel
       {
         std::string   fname = std::string(filename) + ".info";
         std::ifstream f(fname.c_str());
-        AssertThrow(f, ExcIO());
+        AssertThrow(f.fail() == false, ExcIO());
         std::string firstline;
         getline(f, firstline); // skip first line
         f >> version >> numcpus >> attached_count_fixed >>
@@ -656,7 +646,7 @@ namespace parallel
 
         MPI_File fh;
         ierr = MPI_File_open(this->mpi_communicator,
-                             DEAL_II_MPI_CONST_CAST(fname_tria.c_str()),
+                             fname_tria.c_str(),
                              MPI_MODE_RDONLY,
                              info,
                              &fh);
@@ -670,7 +660,7 @@ namespace parallel
 
         ierr = MPI_File_read_at(fh,
                                 myrank * sizeof(unsigned int),
-                                DEAL_II_MPI_CONST_CAST(&buffer_size),
+                                &buffer_size,
                                 1,
                                 MPI_UNSIGNED,
                                 MPI_STATUS_IGNORE);
@@ -691,7 +681,7 @@ namespace parallel
         ierr = MPI_File_read_at(fh,
                                 mpisize * sizeof(unsigned int) +
                                   offset, // global position in file
-                                DEAL_II_MPI_CONST_CAST(buffer.data()),
+                                buffer.data(),
                                 buffer.size(), // local buffer
                                 MPI_CHAR,
                                 MPI_STATUS_IGNORE);

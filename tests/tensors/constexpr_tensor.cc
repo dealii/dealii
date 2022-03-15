@@ -26,7 +26,7 @@ test_constexpr_tensor_constructors()
   constexpr dealii::Tensor<rank, dim, Number> a;
   constexpr dealii::Tensor<rank, dim, Number> b(a);
   constexpr dealii::Tensor<rank, dim, Number> c = a;
-  deallog << " Tensor<" << rank << "," << dim << ">" << std::endl;
+  deallog << " Tensor<" << rank << ',' << dim << '>' << std::endl;
   deallog << a << std::endl;
   deallog << b << std::endl;
   deallog << c << std::endl;

@@ -800,7 +800,8 @@ namespace Step18
   {
     dof_handler.distribute_dofs(fe);
     locally_owned_dofs = dof_handler.locally_owned_dofs();
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     // The next step is to set up constraints due to hanging nodes. This has
     // been handled many times before:
@@ -1314,7 +1315,7 @@ namespace Step18
           pcout << (p == 0 ? ' ' : '+')
                 << (GridTools::count_cells_with_subdomain_association(
                      triangulation, p));
-        pcout << ")" << std::endl;
+        pcout << ')' << std::endl;
 
         setup_system();
 
@@ -1324,7 +1325,7 @@ namespace Step18
           pcout << (p == 0 ? ' ' : '+')
                 << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
                                                                     p));
-        pcout << ")" << std::endl;
+        pcout << ')' << std::endl;
 
         solve_timestep();
       }

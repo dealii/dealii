@@ -205,9 +205,16 @@ public:
 
   /**
    * Return a quadrature rule with the support points of the given reference
-   * cell.
+   * cell. For 1d line segments, this corresponds to the quadrature points
+   * of the trapezoidal rule, which by taking tensor products easily
+   * generalizes also to other hypercube elements (see also QTrapezoid).
+   * For all reference cell shapes, the quadrature points are ordered
+   * in the same order as the vertices of the reference cell.
    *
-   * @note The weights of the quadrature object are left unfilled.
+   * @note The weights of the quadrature object are left unfilled and
+   *   consequently the object cannot usefully be used for actually
+   *   computing integrals. This is in contrast to, for example, the QTrapez
+   *   class that correctly sets quadrature weights.
    */
   template <int dim>
   const Quadrature<dim> &
@@ -279,6 +286,27 @@ public:
   face_indices() const;
 
   /**
+   * Return the number of cells one would get by isotropically
+   * refining the current cell. Here, "isotropic refinement"
+   * means that we subdivide in each "direction" of a cell.
+   * For example, a square would be refined into four children
+   * by introducing new vertices along each edge and a new
+   * vertex in the cell center. For triangles, one would introduce
+   * new vertices at the center of each edge, and connect them to
+   * obtain four children. Similar constructions can be done for
+   * the other reference cell types.
+   */
+  unsigned int
+  n_isotropic_children() const;
+
+  /**
+   * Return an object that can be thought of as an array containing all
+   * indices from zero to n_isotropic_children().
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  isotropic_child_indices() const;
+
+  /**
    * Return the reference-cell type of face @p face_no of the current
    * object. For example, if the current object is
    * ReferenceCells::Tetrahedron, then `face_no` must be between
@@ -344,8 +372,8 @@ public:
    * entry.
    */
   unsigned int
-  child_cell_on_face(const unsigned int  face_n,
-                     const unsigned int  subface_n,
+  child_cell_on_face(const unsigned int  face,
+                     const unsigned int  subface,
                      const unsigned char face_orientation = 1) const;
 
   /**
@@ -428,6 +456,29 @@ public:
    * @name Querying the number of building blocks of a reference cell
    * @{
    */
+
+  /**
+   * Return true if the given point is inside the reference cell of the present
+   * space dimension up to some tolerance. This function accepts an additional
+   * parameter (which defaults to zero) which specifies by how much the point
+   * position may actually be outside the true reference cell. This is useful
+   * because in practice we may often not be able to compute the coordinates of
+   * a point in reference coordinates exactly, but only up to numerical
+   * roundoff. For example, strictly speaking one would expect that for points
+   * on the boundary of the reference cell, the function would return `true` if
+   * the tolerance was zero. But in practice, this may or may not actually be
+   * true; for example, the point $(1/3, 2/3)$ is on the boundary of the
+   * reference triangle because $1/3+2/3 \le 1$, but since neither of its
+   * coordinates are exactly representable in floating point arithmetic, the
+   * floating point representations of $1/3$ and $2/3$ may or may not add up to
+   * anything that is less than or equal to one.
+   *
+   * The tolerance parameter may be less than zero, indicating that the point
+   * should be safely inside the cell.
+   */
+  template <int dim>
+  bool
+  contains_point(const Point<dim> &p, const double tolerance = 0) const;
 
   /*
    * Return $i$-th unit tangential vector of a face of the reference cell.
@@ -1019,6 +1070,53 @@ ReferenceCell::n_faces() const
 
 
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::face_indices() const
+{
+  return {0U, n_faces()};
+}
+
+
+
+inline unsigned int
+ReferenceCell::n_isotropic_children() const
+{
+  if (*this == ReferenceCells::Vertex)
+    return 0;
+  else if (*this == ReferenceCells::Line)
+    return 2;
+  else if (*this == ReferenceCells::Triangle)
+    return 4;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return 4;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return 8;
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      // We haven't yet decided how to refine pyramids. Update
+      // this when we have
+      Assert(false, ExcNotImplemented());
+      return numbers::invalid_unsigned_int;
+    }
+  else if (*this == ReferenceCells::Wedge)
+    return 8;
+  else if (*this == ReferenceCells::Hexahedron)
+    return 8;
+
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+ReferenceCell::isotropic_child_indices() const
+{
+  return {0U, n_isotropic_children()};
+}
+
+
+
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::vertex_indices() const
 {
   return {0U, n_vertices()};
@@ -1030,14 +1128,6 @@ inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::line_indices() const
 {
   return {0U, n_lines()};
-}
-
-
-
-inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::face_indices() const
-{
-  return {0U, n_faces()};
 }
 
 
@@ -1087,6 +1177,7 @@ ReferenceCell::child_cell_on_face(
   const unsigned char face_orientation_raw) const
 {
   AssertIndexRange(face, n_faces());
+  AssertIndexRange(subface, face_reference_cell(face).n_isotropic_children());
 
   if (*this == ReferenceCells::Vertex)
     {
@@ -1830,6 +1921,69 @@ ReferenceCell::d_linear_shape_function_gradient(const Point<dim> & xi,
 }
 
 
+
+template <int dim>
+inline bool
+ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
+{
+  AssertDimension(dim, get_dimension());
+
+  if (*this == ReferenceCells::Vertex)
+    {
+      // Vertices are special cases in that they do not actually
+      // have coordinates. Error out if this function is called
+      // with a vertex:
+      Assert(false,
+             ExcMessage("Vertices are zero-dimensional objects and "
+                        "as a consequence have no coordinates. You "
+                        "cannot meaningfully ask whether a point is "
+                        "inside a vertex (within a certain tolerance) "
+                        "without coordinate values."));
+      return false;
+    }
+  else if (*this == ReferenceCells::get_hypercube<dim>())
+    {
+      for (unsigned int d = 0; d < dim; ++d)
+        if ((p[d] < -tolerance) || (p[d] > 1 + tolerance))
+          return false;
+      return true;
+    }
+  else if (*this == ReferenceCells::get_simplex<dim>())
+    {
+      // First make sure that we are in the first quadrant or octant
+      for (unsigned int d = 0; d < dim; ++d)
+        if (p[d] < -tolerance)
+          return false;
+
+      // Now we also need to make sure that we are below the diagonal line
+      // or plane that delineates the simplex. This diagonal is given by
+      // sum(p[d])<=1, and a diagonal a distance eps away is given by
+      // sum(p[d])<=1+eps*sqrt(d). (For example, the point at (1,1) is a
+      // distance of 1/sqrt(2) away from the diagonal. That is, its
+      // sum satisfies
+      //   sum(p[d]) = 2 <= 1 + (1/sqrt(2)) * sqrt(2)
+      // in other words, it satisfies the predicate with eps=1/sqrt(2).)
+      double sum = 0;
+      for (unsigned int d = 0; d < dim; ++d)
+        sum += p[d];
+      return (sum <= 1 + tolerance * std::sqrt(1. * dim));
+    }
+  else if (*this == ReferenceCells::Wedge)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+  Assert(false, ExcNotImplemented());
+
+  return false;
+}
+
+
+
 template <int dim>
 inline Tensor<1, dim>
 ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
@@ -2002,7 +2156,7 @@ namespace internal
     virtual void
     print_info(std::ostream &out) const override
     {
-      out << "[";
+      out << '[';
 
       const unsigned int n_vertices = entity_type.n_vertices();
 
@@ -2010,7 +2164,7 @@ namespace internal
         {
           out << vertices_0[i];
           if (i + 1 != n_vertices)
-            out << ",";
+            out << ',';
         }
 
       out << "] is not a permutation of [";
@@ -2019,7 +2173,7 @@ namespace internal
         {
           out << vertices_1[i];
           if (i + 1 != n_vertices)
-            out << ",";
+            out << ',';
         }
 
       out << "]." << std::endl;

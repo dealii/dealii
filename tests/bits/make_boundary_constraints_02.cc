@@ -50,7 +50,7 @@ template <int dim>
 void
 test()
 {
-  deallog << dim << "D" << std::endl;
+  deallog << dim << 'D' << std::endl;
 
   Triangulation<dim> triangulation;
   const Point<dim>   p2 =

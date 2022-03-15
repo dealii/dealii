@@ -814,9 +814,8 @@ namespace Step63
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
       {
-        IndexSet locally_owned_level_dof_indices;
-        DoFTools::extract_locally_relevant_level_dofs(
-          dof_handler, level, locally_owned_level_dof_indices);
+        const IndexSet locally_owned_level_dof_indices =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
         boundary_constraints[level].reinit(locally_owned_level_dof_indices);
         boundary_constraints[level].add_lines(
           mg_constrained_dofs.get_refinement_edge_indices(level));

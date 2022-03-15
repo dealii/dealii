@@ -46,7 +46,7 @@ inspect_fiv(FEInterfaceValues<dim> &fiv)
 
   deallog << "interface_dof_indices: ";
   for (auto i : indices)
-    deallog << i << " ";
+    deallog << i << ' ';
   deallog << "\n";
 
 
@@ -146,7 +146,7 @@ test()
             mycell->get_dof_indices(indices);
             deallog << "cell " << c << ": ";
             for (auto i : indices)
-              deallog << i << " ";
+              deallog << i << ' ';
             deallog << "\n";
             ++mycell;
           }

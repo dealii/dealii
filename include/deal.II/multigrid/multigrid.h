@@ -156,11 +156,6 @@ namespace mg
  * vector. This is a nontrivial operation, usually initiated automatically by
  * the class PreconditionMG and performed by the classes derived from
  * MGTransferBase.
- *
- * @note The interface of this class is still very clumsy. In particular, you
- * will have to set up quite a few auxiliary objects before you can use it.
- * Unfortunately, it seems that this can be avoided only be restricting the
- * flexibility of this class in an unacceptable way.
  */
 template <typename VectorType>
 class Multigrid : public Subscriptor

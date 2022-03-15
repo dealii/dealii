@@ -54,12 +54,9 @@ main()
                 function,
                 constants);
 
-  deallog << "Function "
-          << "[" << function[0] << "]"
-          << " @point "
-          << "[" << point << "]"
-          << " is "
-          << "[" << fp.value(point) << "]" << std::endl;
+  deallog << "Function " << '[' << function[0] << ']' << " @point " << '['
+          << point << ']' << " is " << '[' << fp.value(point) << ']'
+          << std::endl;
 
   // now initialize with a function
   // that's a string, not vector of
@@ -69,12 +66,9 @@ main()
                  function[0],
                  constants);
 
-  deallog << "Function "
-          << "[" << function[0] << "]"
-          << " @point "
-          << "[" << point << "]"
-          << " is "
-          << "[" << fp4.value(point) << "]" << std::endl;
+  deallog << "Function " << '[' << function[0] << ']' << " @point " << '['
+          << point << ']' << " is " << '[' << fp4.value(point) << ']'
+          << std::endl;
 
   // now initialize a function without
   // units to check backwards
@@ -84,12 +78,9 @@ main()
   fp2.initialize(FunctionParser<2>::default_variable_names(),
                  function,
                  constants);
-  deallog << "Function "
-          << "[" << function[0] << "]"
-          << " @point "
-          << "[" << point << "]"
-          << " is "
-          << "[" << fp2.value(point) << "]" << std::endl;
+  deallog << "Function " << '[' << function[0] << ']' << " @point " << '['
+          << point << ']' << " is " << '[' << fp2.value(point) << ']'
+          << std::endl;
 
 
 
@@ -100,10 +91,7 @@ main()
                  function[0],
                  constants);
 
-  deallog << "Function "
-          << "[" << function[0] << "]"
-          << " @point "
-          << "[" << point << "]"
-          << " is "
-          << "[" << fp3.value(point) << "]" << std::endl;
+  deallog << "Function " << '[' << function[0] << ']' << " @point " << '['
+          << point << ']' << " is " << '[' << fp3.value(point) << ']'
+          << std::endl;
 }

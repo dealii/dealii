@@ -27,8 +27,8 @@ template <int dim, int spacedim>
 void
 test(const std::uint8_t kind, const std::string out = "")
 {
-  deallog << "Testing kind(" << (int)kind << ") in dimensions "
-          << "<" << dim << "," << spacedim << ">" << std::endl;
+  deallog << "Testing kind(" << (int)kind << ") in dimensions " << '<' << dim
+          << ',' << spacedim << '>' << std::endl;
 
   Triangulation<dim, spacedim> tria;
   GridGenerator::reference_cell(

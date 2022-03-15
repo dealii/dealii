@@ -147,7 +147,7 @@ public:
   DeclException2(ExcDecompositionNotStable,
                  int,
                  double,
-                 << "The diagonal element (" << arg1 << "," << arg1 << ") is "
+                 << "The diagonal element (" << arg1 << ',' << arg1 << ") is "
                  << arg2 << ", but must be positive");
 
   //@}

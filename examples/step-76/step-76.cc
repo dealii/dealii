@@ -510,7 +510,7 @@ namespace Euler_DG
   EulerOperator<dim, degree, n_points_1d>::EulerOperator(TimerOutput &timer)
     : timer(timer)
   {
-#if DEAL_II_MPI_VERSION_GTE(3, 0)
+#ifdef DEAL_II_WITH_MPI
     if (group_size == 1)
       {
         this->subcommunicator = MPI_COMM_SELF;
@@ -1522,10 +1522,10 @@ namespace Euler_DG
       pcout << "Running with "
             << Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)
             << " MPI processes" << std::endl;
-      pcout << "Vectorization over " << n_vect_number << " "
+      pcout << "Vectorization over " << n_vect_number << ' '
             << (std::is_same<Number, double>::value ? "doubles" : "floats")
             << " = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level() << ")"
+            << Utilities::System::get_current_vectorization_level() << ')'
             << std::endl;
     }
 

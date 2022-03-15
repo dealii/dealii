@@ -60,7 +60,7 @@ test()
     (std::next(dof_handler.begin(0)))->face(1),
     cm);
 
-  deallog << "dim " << std::to_string(dim) << ":" << std::endl;
+  deallog << "dim " << std::to_string(dim) << ':' << std::endl;
   cm.print(deallog.get_file_stream());
 }
 

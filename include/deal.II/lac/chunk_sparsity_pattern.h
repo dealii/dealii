@@ -768,7 +768,7 @@ public:
                  size_type,
                  size_type,
                  << "The given index " << arg1 << " should be less than "
-                 << arg2 << ".");
+                 << arg2 << '.');
   /**
    * Exception
    */

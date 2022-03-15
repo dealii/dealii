@@ -38,11 +38,11 @@ test(const FiniteElement<dim, spacedim> &fe, const Quadrature<dim> &quad)
     {
       deallog << point << " : " << std::endl;
       for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-        deallog << fe.shape_value(i, point) << " ";
+        deallog << fe.shape_value(i, point) << ' ';
       for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-        deallog << fe.shape_grad(i, point) << " ";
+        deallog << fe.shape_grad(i, point) << ' ';
       for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-        deallog << fe.shape_grad_grad(i, point) << " ";
+        deallog << fe.shape_grad_grad(i, point) << ' ';
       deallog << std::endl;
     }
   deallog << std::endl;

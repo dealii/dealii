@@ -44,6 +44,7 @@ const bool big = false;
 
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>

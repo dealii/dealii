@@ -69,7 +69,7 @@ main(int argc, char **argv)
   kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
 
   kinsol.residual = [](const VectorType &u, VectorType &F) -> int {
-    deallog << "Evaluating the solution at u=(" << u[0] << ',' << u[1] << ")"
+    deallog << "Evaluating the solution at u=(" << u[0] << ',' << u[1] << ')'
             << std::endl;
 
     F(0) = std::cos(u[0] + u[1]) - 1 + 2 * u[0];
@@ -93,7 +93,7 @@ main(int argc, char **argv)
   kinsol.setup_jacobian = [](const VectorType &u, const VectorType &F) -> int {
     // We don't do any kind of set-up in this program, but we can at least
     // say that we're here
-    deallog << "Setting up Jacobian system at u=(" << u[0] << ',' << u[1] << ")"
+    deallog << "Setting up Jacobian system at u=(" << u[0] << ',' << u[1] << ')'
             << std::endl;
     return 0;
   };
@@ -103,7 +103,7 @@ main(int argc, char **argv)
                                   VectorType &      dst,
                                   const double /*tolerance*/) -> int {
     deallog << "Solving Jacobian system with rhs=(" << rhs[0] << ',' << rhs[1]
-            << ")" << std::endl;
+            << ')' << std::endl;
 
     // This isn't right for SUNDIALS >4.0: We don't actually get a valid
     // 'u' vector, and so do the linearization of the problem around

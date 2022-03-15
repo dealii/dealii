@@ -95,19 +95,19 @@ check()
 
   deallog << "Exact inverse:     ";
   for (unsigned int i = 0; i < size; ++i)
-    deallog << in(i) / m(i, i) << " ";
+    deallog << in(i) / m(i, i) << ' ';
   deallog << std::endl;
 
   deallog << "Check  vmult ones: ";
   prec.vmult(out, in);
   for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << " ";
+    deallog << out(i) << ' ';
   deallog << std::endl;
 
   deallog << "Check Tvmult ones: ";
   prec.Tvmult(out, in);
   for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << " ";
+    deallog << out(i) << ' ';
   deallog << std::endl;
 
   data.preconditioner->reinit(m);
@@ -118,13 +118,13 @@ check()
   deallog << "Check  vmult diag: ";
   prec.vmult(out, in);
   for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << " ";
+    deallog << out(i) << ' ';
   deallog << std::endl;
 
   deallog << "Check Tvmult diag: ";
   prec.Tvmult(out, in);
   for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << " ";
+    deallog << out(i) << ' ';
   deallog << std::endl;
 }
 

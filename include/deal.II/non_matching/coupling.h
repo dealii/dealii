@@ -107,7 +107,9 @@ namespace NonMatching
     const Mapping<dim0, spacedim> &   space_mapping =
       StaticMappingQ1<dim0, spacedim>::mapping,
     const Mapping<dim1, spacedim> &immersed_mapping =
-      StaticMappingQ1<dim1, spacedim>::mapping);
+      StaticMappingQ1<dim1, spacedim>::mapping,
+    const AffineConstraints<number> &immersed_constraints =
+      AffineConstraints<number>());
 
   /**
    * Same as above, but takes an additional GridTools::Cache object, instead of
@@ -131,7 +133,9 @@ namespace NonMatching
     const ComponentMask &            space_comps = ComponentMask(),
     const ComponentMask &            immersed_comps = ComponentMask(),
     const Mapping<dim1, spacedim> &  immersed_mapping =
-      StaticMappingQ1<dim1, spacedim>::mapping);
+      StaticMappingQ1<dim1, spacedim>::mapping,
+    const AffineConstraints<number> &immersed_constraints =
+      AffineConstraints<number>());
 
 
   /**
@@ -192,7 +196,9 @@ namespace NonMatching
     const Mapping<dim0, spacedim> &space_mapping =
       StaticMappingQ1<dim0, spacedim>::mapping,
     const Mapping<dim1, spacedim> &immersed_mapping =
-      StaticMappingQ1<dim1, spacedim>::mapping);
+      StaticMappingQ1<dim1, spacedim>::mapping,
+    const AffineConstraints<typename Matrix::value_type> &immersed_constraints =
+      AffineConstraints<typename Matrix::value_type>());
 
   /**
    * Same as above, but takes an additional GridTools::Cache object, instead of
@@ -213,7 +219,9 @@ namespace NonMatching
     const ComponentMask &          space_comps    = ComponentMask(),
     const ComponentMask &          immersed_comps = ComponentMask(),
     const Mapping<dim1, spacedim> &immersed_mapping =
-      StaticMappingQ1<dim1, spacedim>::mapping);
+      StaticMappingQ1<dim1, spacedim>::mapping,
+    const AffineConstraints<typename Matrix::value_type> &immersed_constraints =
+      AffineConstraints<typename Matrix::value_type>());
 
   /**
    * Create a coupling sparsity pattern for non-matching independent grids,

@@ -882,12 +882,19 @@ namespace SUNDIALS
      */
     void *ida_mem;
 
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+    /**
+     * A context object associated with the IDA solver.
+     */
+    SUNContext ida_ctx;
+#  endif
+
     /**
      * MPI communicator. SUNDIALS solver runs happily in
      * parallel. Note that if the library is compiled without MPI
      * support, MPI_Comm is aliased as int.
      */
-    MPI_Comm communicator;
+    MPI_Comm mpi_communicator;
 
     /**
      * Memory pool of vectors.

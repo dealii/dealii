@@ -47,7 +47,7 @@ check_parallelepiped(bool colorize, bool log, const unsigned int (&subd)[dim])
 {
   deallog << "* checking dim=" << dim << " subd=";
   for (unsigned int i = 0; i < dim; ++i)
-    deallog << subd[i] << " ";
+    deallog << subd[i] << ' ';
   deallog << std::endl;
 
   // Data structure defining dim coordinates that make up a
@@ -109,7 +109,7 @@ check_parallelepiped(bool colorize, bool log, const unsigned int (&subd)[dim])
          it != boundary_count.end();
          ++it)
       {
-        deallog << it->first << "(" << it->second << " times) ";
+        deallog << it->first << '(' << it->second << " times) ";
       }
     deallog << std::endl;
   }

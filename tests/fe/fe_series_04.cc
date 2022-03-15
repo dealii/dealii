@@ -128,7 +128,7 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
 
     deallog << "local dofs:";
     for (unsigned int i = 0; i < cell_n_dofs; ++i)
-      dealii::deallog << " " << local_dof_values[i];
+      dealii::deallog << ' ' << local_dof_values[i];
 
     dealii::deallog << std::endl;
   }
@@ -163,7 +163,7 @@ test_legendre_orthonormal(const unsigned int N)
     {
       deallog << "l=" << l << ": ";
       for (double x = -1.0; x <= 1.0; x += 1.0)
-        deallog << std_cxx17::legendre(l, x) << " ";
+        deallog << std_cxx17::legendre(l, x) << ' ';
 
       deallog << std::endl;
     }
@@ -187,7 +187,7 @@ test_legendre_orthonormal(const unsigned int N)
           }
         ortho *= (1.0 + k1 + k2) / 2.0;
 
-        deallog << "(" << k1 << "," << k2 << ") = " << ortho << std::endl;
+        deallog << '(' << k1 << ',' << k2 << ") = " << ortho << std::endl;
       }
   deallog << std::endl;
 }

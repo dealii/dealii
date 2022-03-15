@@ -406,7 +406,7 @@ LaplaceProblem<dim>::assemble_multigrid()
           else
             {
               cell_matrix(i, j) = 0;
-              std::cout << i << " " << j << "\n";
+              std::cout << i << ' ' << j << "\n";
             }
 
 

@@ -106,6 +106,7 @@ main()
 
   AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+  constraints.close();
 
   const auto print = [](const auto &label, const auto &matrix_free) {
     deallog << label << std::endl;
@@ -127,7 +128,7 @@ main()
              i < matrix_free.get_dof_info(0).row_starts[c + 1].first;
              ++i)
           deallog << std::setw(3) << matrix_free.get_dof_info(0).dof_indices[i]
-                  << " ";
+                  << ' ';
         deallog << std::endl;
       }
     deallog << std::endl;

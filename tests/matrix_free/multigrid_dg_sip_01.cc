@@ -596,9 +596,11 @@ do_test(const DoFHandler<dim> &dof, const unsigned n_q_points_1d)
   mg_constrained_dofs.initialize(dof);
   mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
-  MGTransferMF<dim, LevelMatrixType> mg_transfer(mg_matrices,
-                                                 mg_constrained_dofs);
-  mg_transfer.build(dof);
+  MGTransferMatrixFree<dim, number> mg_transfer(mg_constrained_dofs);
+
+  mg_transfer.build(dof, [&](const unsigned int level, auto &vec) {
+    mg_matrices[level].initialize_dof_vector(vec);
+  });
 
   mg::Matrix<LinearAlgebra::distributed::Vector<double>> mg_matrix(mg_matrices);
 
@@ -606,7 +608,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned n_q_points_1d)
     mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<double>,
-                 MGTransferMF<dim, LevelMatrixType>>
+                 MGTransferMatrixFree<dim, number>>
     preconditioner(dof, mg, mg_transfer);
 
   {

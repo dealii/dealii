@@ -128,7 +128,7 @@ test()
   out_dist -= out;
 
   double diff_norm = out_dist.linfty_norm() / out.linfty_norm();
-  deallog << "Norm of difference:          " << diff_norm << " ";
+  deallog << "Norm of difference:          " << diff_norm << ' ';
 
   // test again, now doing matrix-vector product twice
   mf2.vmult(out_dist, in);

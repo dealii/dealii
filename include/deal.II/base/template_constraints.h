@@ -27,10 +27,146 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Detection idiom adapted from Version 2 of the C++ Extensions for Library
+// Fundamentals, ISO/IEC TS 19568:2017
+namespace internal
+{
+  /**
+   * A namespace used to declare the machinery for detecting whether a specific
+   * class supports an operation. This approach simulates C++20-style
+   * concepts with language standards before C++20.
+   */
+  namespace SupportsOperation
+  {
+    template <class...>
+    using void_t = void;
+
+    /**
+     * The primary template class used in detecting operations. If the
+     * compiler does not choose the specialization, then the fall-back
+     * case is this general template, which then declares member variables
+     * and types according to the failed detection.
+     */
+    template <class Default,
+              class AlwaysVoid,
+              template <class...>
+              class Op,
+              class... Args>
+    struct detector
+    {
+      using value_t = std::false_type;
+      using type    = Default;
+    };
+
+    /**
+     * A specialization of the general template.
+     *
+     * The trick this class uses is that, just like the general template,
+     * its second argument is always `void`, but here it is written as
+     * `void_t<Op<Args...>>` and consequently the compiler will only select this
+     * specialization if `Op<Args...>` is in fact a valid type. This means that
+     * the operation we seek to understand is indeed supported.
+     *
+     * This specialization then declares member variables and types according
+     * to the successful detection.
+     */
+    template <class Default, template <class...> class Op, class... Args>
+    struct detector<Default, void_t<Op<Args...>>, Op, Args...>
+    {
+      using value_t = std::true_type;
+      using type    = Op<Args...>;
+    };
+
+
+    /**
+     * A base class for the `nonesuch` type to inherit from so it is not an
+     * aggregate.
+     */
+    struct nonesuch_base
+    {};
+
+    /**
+     * A type that can not be used in any reasonable way and consequently
+     * can be used to indicate a failed detection in template metaprogramming.
+     */
+    struct nonesuch : private nonesuch_base
+    {
+      ~nonesuch()                = delete;
+      nonesuch(nonesuch const &) = delete;
+      void
+      operator=(nonesuch const &) = delete;
+    };
+
+    template <class Default, template <class...> class Op, class... Args>
+    using detected_or = detector<Default, void, Op, Args...>;
+
+    template <template <class...> class Op, class... Args>
+    using is_detected = typename detected_or<nonesuch, Op, Args...>::value_t;
+
+    template <template <class...> class Op, class... Args>
+    using detected_t = typename detected_or<nonesuch, Op, Args...>::type;
+
+    template <class Default, template <class...> class Op, class... Args>
+    using detected_or_t = typename detected_or<Default, Op, Args...>::type;
+
+    template <class Expected, template <class...> class Op, class... Args>
+    using is_detected_exact = std::is_same<Expected, detected_t<Op, Args...>>;
+
+    template <class To, template <class...> class Op, class... Args>
+    using is_detected_convertible =
+      std::is_convertible<detected_t<Op, Args...>, To>;
+  } // namespace SupportsOperation
+
+
+  /**
+   * A `constexpr` variable that describes whether or not `Op<Args...>` is a
+   * valid expression.
+   *
+   * The way this is used is to define an `Op` operation template that
+   * describes the operation we want to perform, and `Args` is a template
+   * pack that describes the arguments to the operation. This variable
+   * then states whether the operation, with these arguments, leads to
+   * a valid C++ expression.
+   *
+   * An example is if one wanted to find out whether a type `T` has
+   * a `get_mpi_communicator()` member function. In that case, one would write
+   * the operation as
+   * @code
+   * template <typename T>
+   * using get_mpi_communicator_op
+   *   = decltype(std::declval<T>().get_mpi_communicator());
+   * @endcode
+   * and could define a variable like
+   * @code
+   * template <typename T>
+   * constexpr bool has_get_mpi_communicator =
+   * is_supported_operation<get_mpi_communicator_op, T>;
+   * @endcode
+   *
+   * The trick used here is that `get_mpi_communicator_op` is a general
+   * template, but when used with a type that does *not* have a
+   * `get_mpi_communicator()` member variable, the `decltype(...)` operation
+   * will fail because its argument does not represent a valid expression for
+   * such a type. In other words, for such types `T` that do not have such a
+   * member function, the general template `get_mpi_communicator_op` represents
+   * a valid declaration, but the instantiation `get_mpi_communicator_op<T>`
+   * is not, and the variable declared here detects and reports this.
+   */
+  template <template <class...> class Op, class... Args>
+  constexpr bool is_supported_operation =
+    SupportsOperation::is_detected<Op, Args...>::value;
+} // namespace internal
+
+
+
 namespace internal
 {
   namespace TemplateConstraints
   {
+    // TODO: Once we are able to use DEAL_II_HAVE_CXX17, the following classes
+    // can be made much simpler with the help of fold expressions, see
+    // https://en.cppreference.com/w/cpp/language/fold
+
     // helper struct for is_base_of_all and all_same_as
     template <bool... Values>
     struct BoolStorage;
@@ -38,7 +174,11 @@ namespace internal
 
     /**
      * A helper class whose `value` member is true or false depending on
-     * whether all of the given boolean template arguments are true.
+     * whether all of the given boolean template arguments are `true`.
+     * The class works by comparing the list of boolean values
+     * `true, Values...` with the list `Values..., true` (i.e., with
+     * its rotated self). The two are only the same if `Values...` is
+     * a list of only `true` values.
      */
     template <bool... Values>
     struct all_true
@@ -46,6 +186,28 @@ namespace internal
       static constexpr bool value =
         std::is_same<BoolStorage<Values..., true>,
                      BoolStorage<true, Values...>>::value;
+    };
+
+
+    /**
+     * A class whose `value` member is set to `true` if any of the
+     * boolean template arguments are true.
+     */
+    template <bool... Values>
+    struct any_true;
+
+
+    template <bool V1, bool... Values>
+    struct any_true<V1, Values...>
+    {
+      static constexpr bool value = V1 || any_true<Values...>::value;
+    };
+
+
+    template <>
+    struct any_true<>
+    {
+      static constexpr bool value = false;
     };
   } // namespace TemplateConstraints
 } // namespace internal
@@ -69,12 +231,27 @@ struct is_base_of_all
  * This struct is a generalization of std::is_same to template
  * parameter packs and tests if all of the types in the `Types...`
  * parameter pack are equal to the `Type` given as first template
- * argument. The result is stored in the member variable value.
+ * argument. The result is stored in the member variable `value`.
  */
 template <class Type, class... Types>
 struct all_same_as
 {
   static constexpr bool value = internal::TemplateConstraints::all_true<
+    std::is_same<Type, Types>::value...>::value;
+};
+
+
+
+/**
+ * This struct is a generalization of std::is_same to template
+ * parameter packs and tests if any of the types in the `Types...`
+ * parameter pack are equal to the `Type` given as first template
+ * argument. The result is stored in the member variable `value`.
+ */
+template <class Type, class... Types>
+struct is_same_as_any_of
+{
+  static constexpr bool value = internal::TemplateConstraints::any_true<
     std::is_same<Type, Types>::value...>::value;
 };
 
@@ -98,23 +275,12 @@ struct enable_if_all
  * the `begin()` and `end()` functions, or is a C-style array.
  */
 template <typename T>
-class has_begin_and_end
-{
-  template <typename C>
-  static std::false_type
-  test(...);
+using begin_and_end_t =
+  decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()));
 
-  template <typename C>
-  static auto
-  test(int) -> decltype(std::begin(std::declval<C>()),
-                        std::end(std::declval<C>()),
-                        std::true_type());
-
-public:
-  using type = decltype(test<T>(0));
-
-  static const bool value = type::value;
-};
+template <typename T>
+constexpr bool has_begin_and_end =
+  internal::is_supported_operation<begin_and_end_t, T>;
 
 
 

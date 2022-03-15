@@ -260,7 +260,7 @@ test_1(const Triangulation<dim, spacedim> &surface_mesh,
           {
             if (JxW[q].distance(Point<spacedim>(phi_normal.get_value(q))) >
                 1e-7)
-              std::cout << JxW[q] << " " << phi_normal.get_value(q)
+              std::cout << JxW[q] << ' ' << phi_normal.get_value(q)
                         << std::endl;
           }
       }
@@ -318,7 +318,7 @@ test_2(const Triangulation<dim, spacedim> &surface_mesh,
     {
       if (integration_points[i].distance(
             Point<spacedim>(evaluation_point_results[i])) > 1e-7)
-        std::cout << integration_points[i] << " " << evaluation_point_results[i]
+        std::cout << integration_points[i] << ' ' << evaluation_point_results[i]
                   << std::endl;
     }
 }

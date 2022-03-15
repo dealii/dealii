@@ -45,7 +45,7 @@ main()
 
   particle_handler.signals.particle_lost.connect(
     [](const auto &particle, const auto &cell) {
-      deallog << particle->get_id() << " " << cell->id() << std::endl;
+      deallog << particle->get_id() << ' ' << cell->id() << std::endl;
     });
 
   particle_handler.begin()->set_location(Point<dim>{2.0, 2.0});

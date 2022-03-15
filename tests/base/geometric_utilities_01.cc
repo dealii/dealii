@@ -31,11 +31,11 @@ print(T point1, T point2)
 {
   deallog << std::endl << "Point 1: ";
   for (unsigned int i = 0; i < dim; ++i)
-    deallog << point1[i] << " ";
+    deallog << point1[i] << ' ';
 
   deallog << std::endl << "Point 2: ";
   for (unsigned int i = 0; i < dim; ++i)
-    deallog << point2[i] << " ";
+    deallog << point2[i] << ' ';
 
   deallog << std::endl;
 }

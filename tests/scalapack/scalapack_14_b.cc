@@ -55,7 +55,7 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid =
     std::make_shared<Utilities::MPI::ProcessGrid>(
       mpi_communicator, sizes[0], sizes[1], block_size_i, block_size_i);
-  pcout << "2D process grid: " << grid->get_process_grid_rows() << "x"
+  pcout << "2D process grid: " << grid->get_process_grid_rows() << 'x'
         << grid->get_process_grid_columns() << std::endl
         << std::endl;
 
@@ -80,7 +80,7 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
       full_A(i, j) *= scaling_factors[j];
 
   pcout << "   Column scaling for"
-        << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << ")"
+        << " A in R^(" << scalapack_A.m() << 'x' << scalapack_A.n() << ')'
         << std::endl;
   pcout << "   norms: " << tmp_full_A.frobenius_norm() << " & "
         << full_A.frobenius_norm() << "  for " << typeid(NumberType).name()

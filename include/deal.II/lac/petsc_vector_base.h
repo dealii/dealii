@@ -180,7 +180,7 @@ namespace PETScWrappers
         int,
         << "You tried to access element " << arg1
         << " of a distributed vector, but only elements in range [" << arg2
-        << "," << arg3 << "] are stored locally and can be accessed."
+        << ',' << arg3 << "] are stored locally and can be accessed."
         << "\n\n"
         << "A common source for this kind of problem is that you "
         << "are passing a 'fully distributed' vector into a function "
@@ -1254,7 +1254,14 @@ namespace PETScWrappers
 
             Assert(index >= static_cast<unsigned int>(begin) &&
                      index < static_cast<unsigned int>(end),
-                   ExcInternalError());
+                   ExcMessage("You are accessing elements of a vector without "
+                              "ghost elements that are not actually owned by "
+                              "this vector. A typical case where this may "
+                              "happen is if you are passing a non-ghosted "
+                              "(completely distributed) vector to a function "
+                              "that expects a vector that stores ghost "
+                              "elements for all locally relevant or locally "
+                              "active vector entries."));
 
             *(values_begin + i) = *(ptr + index - begin);
           }

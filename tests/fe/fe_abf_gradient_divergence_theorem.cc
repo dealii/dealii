@@ -89,8 +89,8 @@ test(const Triangulation<dim> &tr,
         {
           deallog << i << ": ( ";
           for (unsigned int d = 0; d < dim; ++d)
-            deallog << cell->vertex(i)[d] << " ";
-          deallog << ")" << std::endl;
+            deallog << cell->vertex(i)[d] << ' ';
+          deallog << ')' << std::endl;
         }
 
       bool cell_ok = true;

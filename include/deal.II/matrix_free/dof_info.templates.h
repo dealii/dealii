@@ -283,13 +283,27 @@ namespace internal
       const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
       std::vector<types::global_dof_index> &                dof_indices)
     {
-      const ArrayView<ConstraintKinds> mask_view(
-        hanging_node_constraint_masks.data() +
-          cell_number * cell->get_fe().n_components(),
-        cell->get_fe().n_components());
+      if (this->hanging_node_constraint_masks_comp.size() == 0)
+        return false;
 
-      return hanging_nodes.setup_constraints(
-        cell, {}, lexicographic_mapping, dof_indices, mask_view);
+      // 2) determine the refinement configuration of the cell
+      const auto refinement_configuration =
+        hanging_nodes.compute_refinement_configuration(cell);
+
+      if (refinement_configuration == ConstraintKinds::unconstrained)
+        return false;
+
+      // 3) update DoF indices of cell for specified components
+      hanging_nodes.update_dof_indices(cell,
+                                       {},
+                                       lexicographic_mapping,
+                                       hanging_node_constraint_masks_comp,
+                                       refinement_configuration,
+                                       dof_indices);
+
+      hanging_node_constraint_masks[cell_number] = refinement_configuration;
+
+      return true;
     }
 
 
@@ -708,7 +722,7 @@ namespace internal
               for (unsigned int j = 0; j < con_it->first; ++j, ++index)
                 {
                   Assert(glob_indices + index != end_row, ExcInternalError());
-                  out << glob_indices[index] << " ";
+                  out << glob_indices[index] << ' ';
                 }
 
               out << "[ ";
@@ -717,14 +731,14 @@ namespace internal
                    k++, index++)
                 {
                   Assert(glob_indices + index != end_row, ExcInternalError());
-                  out << glob_indices[index] << "/" << constraint_pool_data[k]
-                      << " ";
+                  out << glob_indices[index] << '/' << constraint_pool_data[k]
+                      << ' ';
                 }
               out << "] ";
             }
           glob_indices += index;
           for (; glob_indices != end_row; ++glob_indices)
-            out << *glob_indices << " ";
+            out << *glob_indices << ' ';
           out << std::endl;
         }
     }

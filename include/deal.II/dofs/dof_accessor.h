@@ -216,13 +216,13 @@ public:
    * A static variable that allows users of this class to discover the value
    * of the second template argument.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * A static variable that allows users of this class to discover the value
    * of the third template argument.
    */
-  static const unsigned int space_dimension = spacedim;
+  static constexpr unsigned int space_dimension = spacedim;
 
   /**
    * Declare an alias to the base class to make accessing some of the
@@ -770,13 +770,13 @@ public:
    * A static variable that allows users of this class to discover the value
    * of the second template argument.
    */
-  static const unsigned int dimension = 1;
+  static constexpr unsigned int dimension = 1;
 
   /**
    * A static variable that allows users of this class to discover the value
    * of the third template argument.
    */
-  static const unsigned int space_dimension = spacedim;
+  static constexpr unsigned int space_dimension = spacedim;
 
   /**
    * Declare an alias to the base class to make accessing some of the

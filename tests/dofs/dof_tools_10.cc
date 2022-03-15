@@ -43,6 +43,6 @@ check_this(const DoFHandler<dim> &dof_handler)
 
   // output every third element
   for (unsigned int i = 0; i < map.size(); i += 3)
-    deallog << map[i] << " ";
+    deallog << map[i] << ' ';
   deallog << std::endl;
 }

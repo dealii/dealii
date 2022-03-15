@@ -80,7 +80,7 @@ test(const unsigned int degree)
               deallog << "[ ";
               for (unsigned int c = 0; c < fe_rt.n_components(); ++c)
                 deallog << fe_values.shape_grad_component(i, q, c) << ' ';
-              deallog << "]";
+              deallog << ']';
             }
           deallog << std::endl;
         }

@@ -54,7 +54,7 @@ test()
 
       deallog << " idx: " << fe_index << ", sequence:";
       for (const auto index : sequence)
-        deallog << " " << index;
+        deallog << ' ' << index;
       deallog << std::endl;
     }
 }

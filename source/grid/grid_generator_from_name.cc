@@ -129,6 +129,9 @@ namespace GridGenerator
         parse_and_create<dim, dim, const Point<dim> &, double, bool>(hyper_ball,
                                                                      arguments,
                                                                      tria);
+      else if (name == "hyper_ball_balanced")
+        parse_and_create<dim, dim, const Point<dim> &, double>(
+          hyper_ball_balanced, arguments, tria);
 
       else if (name == "quarter_hyper_ball")
         parse_and_create<dim, dim, const Point<dim> &, double>(

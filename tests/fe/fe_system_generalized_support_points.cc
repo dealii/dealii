@@ -34,7 +34,7 @@ test()
     deallog << fe.get_name() << std::endl;
     for (auto it : fe.get_generalized_support_points())
       {
-        deallog << "(" << it[0] << "," << it[1] << ") ";
+        deallog << '(' << it[0] << ',' << it[1] << ") ";
       }
     deallog << std::endl;
   };

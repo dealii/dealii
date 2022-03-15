@@ -136,9 +136,262 @@ DEAL_II_NAMESPACE_OPEN
  * The node values above rely on integrals, which will be computed by
  * quadrature rules themselves. The generalized support points are a set of
  * points such that this quadrature can be performed with sufficient accuracy.
- * The points needed are those of QGauss<sub>k+1</sub> on each edge and
- * QGauss<sub>k+2</sub> on each face and in the interior of the cell (or none
- * for N<sub>1</sub>).
+ * The points needed are those of QGauss(k+1) on each edge and
+ * QGauss(k+2) on each face and in the interior of the cell (or none
+ * for FE_Nedelec(0)).
+ *
+ * <h3> Depictions of shape functions </h3>
+ *
+ * The following subsections depict the shape functions defined by this class on
+ * the unit cell. The figures below illustrate the direction and magnitude of
+ * these shape functions.
+ *
+ * <h4>FE_Nedelec(0)</h4>
+ *
+ * For the lowest order N&eacute;d&eacute;lec element, we have a single shape
+ * function associated with each edge (i.e., the tangential component of each
+ * shape function is non-zero on only one edge).
+ *
+ * In 2D, these shape functions look as follows: <table> <tr> <td
+ * align="center">
+ * @image html fe_nedelec_shape_function_0_00.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_0_01.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(0) element, shape function 0
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(0) element, shape function 1 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_0_02.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_0_03.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(0) element, shape function 2
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(0) element, shape function 3 </td> </tr>
+ * </table>
+ *
+ * <h4>FE_Nedelec(1)</h4>
+ *
+ * For higher order N&eacute;d&eacute;lec cells, we have shape functions
+ * associated with the edges, faces, and the volume.
+ *
+ * In 2D, for example, with FE_Nedelec(1), we have 2 shape functions associated
+ * with each edge, and 4 shape functions associated with the cell, which
+ * correspond to the shape functions with no non-zero tangential components on
+ * the boundary of the cell.
+ *
+ * These shape functions look
+ * as follows: <table> <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_1_00.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_1_01.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(1) element, shape function 0
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(1) element, shape function 1 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_1_02.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_1_03.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(1) element, shape function 2
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(1) element, shape function 3 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_1_04.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_1_05.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(1) element, shape function 4
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(1) element, shape function 5 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_1_06.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_1_07.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(1) element, shape function 6
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(1) element, shape function 7 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_1_08.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_1_09.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(1) element, shape function 8
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(1) element, shape function 9 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_1_10.png
+ * </td>
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_1_11.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(1) element, shape function 10
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(1) element, shape function 11 </td> </table>
+ *
+ * <h4>FE_Nedelec(2)</h4>
+ *
+ * For higher order N&eacute;d&eacute;lec cells, we have shape functions
+ * associated with the edges, faces, and the volume.
+ *
+ * In 2D, with FE_Nedelec(2), we have 3 shape functions associated with each
+ * edge, and 12 shape functions associated with the cell.
+ *
+ * These shape functions look
+ * as follows: <table> <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_00.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_01.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 0
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 1 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_02.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_03.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 2
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 3 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_04.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_05.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 4
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 5 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_06.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_07.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 6
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 7 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_08.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_09.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 8
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 9 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_10.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_11.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 10
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 11 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_12.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_13.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 12
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 13 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_14.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_15.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 14
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 15 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_16.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_17.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 16
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 17 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_18.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_19.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 18
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 19 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_20.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_21.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 20
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 21 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html fe_nedelec_shape_function_2_22.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html fe_nedelec_shape_function_2_23.png
+ * </td> </tr> <tr> <td align="center"> FE_Nedelec(2) element, shape function 22
+ * </td>
+ *
+ * <td align="center"> FE_Nedelec(2) element, shape function 23 </td> </table>
  */
 template <int dim>
 class FE_Nedelec : public FE_PolyTensor<dim>

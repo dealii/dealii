@@ -112,7 +112,7 @@ print(const Table<2, double> &coeff)
 {
   for (unsigned int i = 0; i < coeff.size(0); ++i)
     for (unsigned int j = 0; j < coeff.size(1); ++j)
-      deallog << coeff(i, j) << " ";
+      deallog << coeff(i, j) << ' ';
   deallog << std::endl;
 }
 
@@ -122,7 +122,7 @@ print(const Table<3, double> &coeff)
   for (unsigned int i = 0; i < coeff.size(0); ++i)
     for (unsigned int j = 0; j < coeff.size(1); ++j)
       for (unsigned int k = 0; k < coeff.size(2); ++k)
-        deallog << coeff(i, j, k) << " ";
+        deallog << coeff(i, j, k) << ' ';
   deallog << std::endl;
 }
 

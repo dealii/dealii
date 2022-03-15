@@ -69,7 +69,7 @@ test()
 
           for (unsigned int i = 0; i < locally_level_active.size(); ++i)
             if (locally_level_active.is_element(i))
-              deallog << i << " ";
+              deallog << i << ' ';
           deallog << "OK" << std::endl;
         }
     }

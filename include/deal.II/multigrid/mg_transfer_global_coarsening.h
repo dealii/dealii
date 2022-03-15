@@ -24,7 +24,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
-#include <deal.II/matrix_free/hanging_nodes_internal.h>
+#include <deal.II/matrix_free/constraint_info.h>
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <deal.II/multigrid/mg_base.h>
@@ -181,6 +181,16 @@ public:
   interpolate(VectorType &dst, const VectorType &src) const;
 
   /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  void
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine);
+
+  /**
    * Return the memory consumption of the allocated memory in this class.
    */
   std::size_t
@@ -292,6 +302,16 @@ public:
   void
   interpolate(LinearAlgebra::distributed::Vector<Number> &      dst,
               const LinearAlgebra::distributed::Vector<Number> &src) const;
+
+  /**
+   * Enable inplace vector operations if external and internal vectors
+   * are compatible.
+   */
+  void
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine);
 
   /**
    * Return the memory consumption of the allocated memory in this class.
@@ -407,22 +427,11 @@ private:
   mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
 
   /**
-   * Constraint-entry indices for performing manual
-   * constraint_coarse.distribute_local_to_global().
+   * Helper class for reading from and writing to global vectors and for
+   * applying constraints.
    */
-  std::vector<unsigned int> distribute_local_to_global_indices;
-
-  /**
-   * Constraint-entry values for performing manual
-   * constraint_coarse.distribute_local_to_global().
-   */
-  std::vector<Number> distribute_local_to_global_values;
-
-  /**
-   * Pointers to the constraint entries for performing manual
-   * constraint_coarse.distribute_local_to_global().
-   */
-  std::vector<unsigned int> distribute_local_to_global_ptr;
+  internal::MatrixFreeFunctions::ConstraintInfo<dim, VectorizedArray<Number>>
+    constraint_info;
 
   /**
    * Weights for continuous elements.
@@ -437,18 +446,6 @@ private:
     weights_compressed;
 
   /**
-   * DoF indices of the coarse cells, expressed in indices local to the MPI
-   * rank.
-   */
-  std::vector<unsigned int> level_dof_indices_coarse;
-
-  /**
-   * DoF indices of the coarse cells, expressed in indices local to the MPI
-   * rank.
-   */
-  std::vector<unsigned int> level_dof_indices_coarse_plain;
-
-  /**
    * DoF indices of the fine cells, expressed in indices local to the MPI
    * rank.
    */
@@ -459,28 +456,7 @@ private:
    */
   unsigned int n_components;
 
-  /**
-   * Refinement configuration of the coarse cells, needed for fast
-   * application of hanging-node constraints. If no hanging-node
-   * constraints have to be applied or the fast algorithm is not
-   * applicable, the vector is empty.
-   */
-  std::vector<internal::MatrixFreeFunctions::ConstraintKinds>
-    coarse_cell_refinement_configurations;
-
   friend class internal::MGTwoLevelTransferImplementation;
-
-  /**
-   * Apply hanging-node constrains with fast algorithm.
-   */
-  void
-  apply_hanging_node_constraints(
-    const MGTransferScheme &scheme,
-    const internal::MatrixFreeFunctions::ConstraintKinds
-      *                coarse_cell_refinement_configurations_ptr,
-    const unsigned int n_lanes_filled,
-    const bool         transpose,
-    AlignedVector<VectorizedArray<Number>> &evaluation_data_coarse) const;
 };
 
 
@@ -515,6 +491,25 @@ public:
     const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer,
     const std::function<void(const unsigned int, VectorType &)>
       &initialize_dof_vector = {});
+
+  /**
+   * Similar function to MGTransferMatrixFree::build() with the difference that
+   * the information for the prolongation for each level has already been built.
+   * So this function only tries to optimize the data structues of the two-level
+   * transfer operators, e.g., by enabling inplace vector operations, by
+   * checking if @p external_partitioners and the internal ones are compatible.
+   */
+  void
+  build(const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+          &external_partitioners = {});
+
+  /**
+   * Same as above but taking a lambda for initializing vector instead of
+   * partitioners.
+   */
+  void
+  build(const std::function<void(const unsigned int, VectorType &)>
+          &initialize_dof_vector);
 
   /**
    * Perform prolongation.
@@ -603,15 +598,21 @@ public:
 
 private:
   /**
-   * Collection of the two-level transfer operators.
+   * Function to initialize internal level vectors.
    */
-  const MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> &transfer;
+  void
+  initialize_dof_vector(const unsigned int level, VectorType &vector) const;
 
   /**
-   * %Function to initialize internal level vectors.
+   * Collection of the two-level transfer operators.
    */
-  const std::function<void(const unsigned int, VectorType &)>
-    initialize_dof_vector;
+  MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> transfer;
+
+  /**
+   * External partitioners used during initialize_dof_vector().
+   */
+  std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+    external_partitioners;
 };
 
 
@@ -628,8 +629,84 @@ MGTransferGlobalCoarsening<dim, VectorType>::MGTransferGlobalCoarsening(
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
   : transfer(transfer)
-  , initialize_dof_vector(initialize_dof_vector)
-{}
+{
+  this->build(initialize_dof_vector);
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTransferGlobalCoarsening<dim, VectorType>::build(
+  const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+    &external_partitioners)
+{
+  this->external_partitioners = external_partitioners;
+
+  if (this->external_partitioners.size() > 0)
+    {
+      const unsigned int min_level = transfer.min_level();
+      const unsigned int max_level = transfer.max_level();
+
+      AssertDimension(this->external_partitioners.size(), transfer.n_levels());
+
+      for (unsigned int l = min_level + 1; l <= max_level; ++l)
+        transfer[l].enable_inplace_operations_if_possible(
+          this->external_partitioners[l - 1 - min_level],
+          this->external_partitioners[l - min_level]);
+    }
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTransferGlobalCoarsening<dim, VectorType>::build(
+  const std::function<void(const unsigned int, VectorType &)>
+    &initialize_dof_vector)
+{
+  if (initialize_dof_vector)
+    {
+      const unsigned int min_level = transfer.min_level();
+      const unsigned int max_level = transfer.max_level();
+      const unsigned int n_levels  = transfer.n_levels();
+
+      std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        external_partitioners(n_levels);
+
+      for (unsigned int l = min_level; l <= max_level; ++l)
+        {
+          LinearAlgebra::distributed::Vector<typename VectorType::value_type>
+            vector;
+          initialize_dof_vector(l, vector);
+          external_partitioners[l - min_level] = vector.get_partitioner();
+        }
+
+      this->build(external_partitioners);
+    }
+  else
+    {
+      this->build();
+    }
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTransferGlobalCoarsening<dim, VectorType>::initialize_dof_vector(
+  const unsigned int level,
+  VectorType &       vec) const
+{
+  AssertDimension(transfer.n_levels(), external_partitioners.size());
+  AssertIndexRange(level, transfer.max_level() + 1);
+
+  const auto &external_partitioner =
+    external_partitioners[level - transfer.min_level()];
+
+  if (vec.get_partitioner().get() != external_partitioner.get())
+    vec.reinit(external_partitioner);
+}
 
 
 
@@ -680,13 +757,6 @@ MGTransferGlobalCoarsening<dim, VectorType>::copy_to_mg(
 {
   (void)dof_handler;
 
-  Assert(
-    initialize_dof_vector,
-    ExcMessage(
-      "To be able to use this function, a function to initialize an internal "
-      "DoF vector has to be provided in the constructor of "
-      "MGTransferGlobalCoarsening."));
-
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
     {
       initialize_dof_vector(level, dst[level]);
@@ -722,13 +792,6 @@ MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
   MGLevelObject<VectorType> &dst,
   const InVector &           src) const
 {
-  Assert(
-    initialize_dof_vector,
-    ExcMessage(
-      "To be able to use this function, a function to initialize an internal "
-      "DoF vector has to be provided in the constructor of "
-      "MGTransferGlobalCoarsening."));
-
   const unsigned int min_level = transfer.min_level();
   const unsigned int max_level = transfer.max_level();
 

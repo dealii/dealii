@@ -39,6 +39,7 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_sparsity_pattern.h>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
@@ -133,6 +134,7 @@ public:
   compute_inverse_diagonal(VectorType &diagonal) const
   {
     // compute diagonal
+    matrix_free.initialize_dof_vector(diagonal);
     MatrixFreeTools::compute_diagonal(matrix_free,
                                       diagonal,
                                       &Operator::do_cell_integral_local,

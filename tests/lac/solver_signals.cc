@@ -67,7 +67,7 @@ output_hessenberg_matrix(const FullMatrix<NUMBER> &H, const std::string &text)
   for (unsigned int i = 0; i < H.m(); ++i)
     {
       for (unsigned int j = 0; j < H.n(); ++j)
-        deallog << H(i, j) << " ";
+        deallog << H(i, j) << ' ';
       deallog << std::endl;
     }
 }

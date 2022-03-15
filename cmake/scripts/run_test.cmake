@@ -60,8 +60,12 @@ EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
   )
 
 #
-# Determine the last successful stage of the test:
-# (Possible values are CONFIGURE, BUILD, RUN, DIFF, PASSED)
+# Determine the stage a test reached: Possible values are
+#   CONFIGURE  - the test started with a special configure stage and failed during configure
+#   BUILD      - the test reached the build stage and a compilation error occured
+#   RUN        - the test reached the run stage but the run terminated with an error
+#   DIFF       - the test reached the diff stage but output differed
+#   PASSED     - the test passed all stages
 #
 
 STRING(REGEX MATCH "${TEST}: CONFIGURE failed\\." _configure_regex "${_output}")

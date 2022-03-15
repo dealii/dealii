@@ -40,7 +40,7 @@ template <int dim>
 void
 test()
 {
-  deallog << dim << "D" << std::endl;
+  deallog << dim << 'D' << std::endl;
 
   // create a 2x1 (or 2x1x1) mesh and refine the leftmost cell twice
   Triangulation<dim>        triangulation;

@@ -43,7 +43,7 @@ we will focus on the simpler Stokes system.
 Note that when deriving the more general compressible Navier-Stokes equations,
 the diffusion is modeled as the divergence of the stress tensor
 @f{eqnarray*}
-  \tau = - \mu (2\varepsilon(\textbf{u}) - \frac{2}{3}\nabla \cdot \textbf{u} I),
+  \tau = - \mu \left(2\varepsilon(\textbf{u}) - \frac{2}{3}\nabla \cdot \textbf{u} I\right),
 @f}
 where $\mu$ is the viscosity of the fluid. With the assumption of $\mu=1$
 (assume constant viscosity and non-dimensionalize the equation by dividing out
@@ -60,7 +60,7 @@ are continuous), the formulations are equivalent:
 @f{eqnarray*}
   \textrm{div}\; \tau
   = -2\textrm{div}\;\varepsilon(\textbf{u})
-  = -\triangle \textbf{u} + \nabla \cdot (\nabla\textbf{u})^T
+  = -\triangle \textbf{u} - \nabla \cdot (\nabla\textbf{u})^T
   = -\triangle \textbf{u}.
 @f}
 This is because the $i$th entry of  $\nabla \cdot (\nabla\textbf{u})^T$ is given by:
@@ -70,7 +70,8 @@ This is because the $i$th entry of  $\nabla \cdot (\nabla\textbf{u})^T$ is given
 = \sum_j \frac{\partial}{\partial x_j} [(\nabla\textbf{u})]_{j,i}
 = \sum_j \frac{\partial}{\partial x_j} \frac{\partial}{\partial x_i} \textbf{u}_j
 = \sum_j \frac{\partial}{\partial x_i} \frac{\partial}{\partial x_j} \textbf{u}_j
-= \frac{\partial}{\partial x_i} \textrm{div}\; \textbf{u}
+= \frac{\partial}{\partial x_i}
+  \underbrace{\textrm{div}\; \textbf{u}}_{=0}
 = 0.
 @f}
 If you can not assume the above mentioned regularity, or if your viscosity is

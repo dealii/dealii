@@ -35,7 +35,7 @@ print(const VECTOR &vec)
 {
   for (types::global_dof_index i = 0; i < vec.size(); ++i)
     {
-      deallog << vec(i) << " ";
+      deallog << vec(i) << ' ';
     }
   deallog << std::endl;
 }

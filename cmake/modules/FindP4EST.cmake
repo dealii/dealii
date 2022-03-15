@@ -114,7 +114,13 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_MPI_STRING
     REGEX "#define.*P4EST_MPI 1")
   IF("${P4EST_MPI_STRING}" STREQUAL "")
-    SET(P4EST_WITH_MPI FALSE)
+    FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_MPI_STRING
+      REGEX "#define.*P4EST_ENABLE_MPI")
+    IF("${P4EST_MPI_STRING}" STREQUAL "")
+      SET(P4EST_WITH_MPI FALSE)
+    ELSE()
+      SET(P4EST_WITH_MPI TRUE)
+    ENDIF()
   ELSE()
     SET(P4EST_WITH_MPI TRUE)
   ENDIF()
@@ -123,7 +129,7 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   # Is p4est built against zlib?
   #
   FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_ZLIB_STRING
-    REGEX "#define.*P4EST_HAVE_ZLIB 1")
+    REGEX "^#define.*P4EST_HAVE_ZLIB")
   IF("${P4EST_ZLIB_STRING}" STREQUAL "")
     SET(P4EST_WITH_ZLIB FALSE)
   ELSE()
@@ -156,7 +162,7 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   # Extract version numbers:
   #
   FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_VERSION
-    REGEX "#define P4EST_VERSION \"")
+    REGEX "^[ \t]*#[ \t]*define[ \t]+P4EST_VERSION \"")
   STRING(REGEX REPLACE "^.*P4EST_VERSION.*\"([0-9]+.*)\".*" "\\1"
     P4EST_VERSION "${P4EST_VERSION}"
     )

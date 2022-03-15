@@ -149,7 +149,7 @@ test(const unsigned int n_blocks = 5)
 
   const double diff_norm  = std::abs(res - res2);
   const double diff_norm2 = std::abs(res - res3);
-  deallog << "Norm of difference: " << diff_norm << " " << diff_norm2
+  deallog << "Norm of difference: " << diff_norm << ' ' << diff_norm2
           << std::endl;
 }
 

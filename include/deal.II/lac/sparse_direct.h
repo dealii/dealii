@@ -322,7 +322,7 @@ public:
     ExcUMFPACKError,
     std::string,
     int,
-    << "UMFPACK routine " << arg1 << " returned error status " << arg2 << "."
+    << "UMFPACK routine " << arg1 << " returned error status " << arg2 << '.'
     << "\n\n"
     << ("A complete list of error codes can be found in the file "
         "<bundled/umfpack/UMFPACK/Include/umfpack.h>."

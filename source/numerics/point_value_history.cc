@@ -14,6 +14,8 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/grid/grid_tools.h>
+
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
@@ -1020,7 +1022,7 @@ PointValueHistory<dim>::write_gnuplot(
             {
               to_gnuplot << "<" << indep_name << "> ";
             }
-          to_gnuplot << "\n";
+          to_gnuplot << '\n';
         }
       else
         {
@@ -1028,7 +1030,7 @@ PointValueHistory<dim>::write_gnuplot(
             {
               to_gnuplot << "<Indep_" << component << "> ";
             }
-          to_gnuplot << "\n";
+          to_gnuplot << '\n';
         }
       // write general data stored
       for (unsigned int key = 0; key < dataset_key.size(); ++key)
@@ -1039,7 +1041,7 @@ PointValueHistory<dim>::write_gnuplot(
             {
               to_gnuplot << " " << independent_values[component][key];
             }
-          to_gnuplot << "\n";
+          to_gnuplot << '\n';
         }
 
       to_gnuplot.close();
@@ -1092,14 +1094,14 @@ PointValueHistory<dim>::write_gnuplot(
           // support point into the file as
           // comments
           to_gnuplot << "# Requested location: " << point->requested_location
-                     << "\n";
+                     << '\n';
           to_gnuplot << "# DoF_index : Support location (for each component)\n";
           for (unsigned int component = 0;
                component < dof_handler->get_fe(0).n_components();
                component++)
             {
               to_gnuplot << "# " << point->solution_indices[component] << " : "
-                         << point->support_point_locations[component] << "\n";
+                         << point->support_point_locations[component] << '\n';
             }
           if (triangulation_changed)
             to_gnuplot
@@ -1160,7 +1162,7 @@ PointValueHistory<dim>::write_gnuplot(
                     }
                 }
             }
-          to_gnuplot << "\n";
+          to_gnuplot << '\n';
 
           // write data stored for the point
           for (unsigned int key = 0; key < dataset_key.size(); ++key)
@@ -1187,7 +1189,7 @@ PointValueHistory<dim>::write_gnuplot(
                                                component][key];
                     }
                 }
-              to_gnuplot << "\n";
+              to_gnuplot << '\n';
             }
 
           to_gnuplot.close();
@@ -1307,12 +1309,11 @@ void
 PointValueHistory<dim>::status(std::ostream &out)
 {
   out << "***PointValueHistory status output***\n\n";
-  out << "Closed: " << closed << "\n";
-  out << "Cleared: " << cleared << "\n";
-  out << "Triangulation_changed: " << triangulation_changed << "\n";
-  out << "Have_dof_handler: " << have_dof_handler << "\n";
-  out << "Geometric Data"
-      << "\n";
+  out << "Closed: " << closed << '\n';
+  out << "Cleared: " << cleared << '\n';
+  out << "Triangulation_changed: " << triangulation_changed << '\n';
+  out << "Have_dof_handler: " << have_dof_handler << '\n';
+  out << "Geometric Data" << '\n';
 
   typename std::vector<
     internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
@@ -1328,16 +1329,16 @@ PointValueHistory<dim>::status(std::ostream &out)
           for (; point != point_geometry_data.end(); ++point)
             {
               out << "# Requested location: " << point->requested_location
-                  << "\n";
+                  << '\n';
               out << "# DoF_index : Support location (for each component)\n";
               for (unsigned int component = 0;
                    component < dof_handler->get_fe(0).n_components();
                    component++)
                 {
                   out << point->solution_indices[component] << " : "
-                      << point->support_point_locations[component] << "\n";
+                      << point->support_point_locations[component] << '\n';
                 }
-              out << "\n";
+              out << '\n';
             }
         }
       else
@@ -1345,12 +1346,12 @@ PointValueHistory<dim>::status(std::ostream &out)
           out << "#Cannot access DoF_indices once cleared\n";
         }
     }
-  out << "\n";
+  out << '\n';
 
   if (independent_values.size() != 0)
     {
       out << "Independent value(s): " << independent_values.size() << " : "
-          << independent_values[0].size() << "\n";
+          << independent_values[0].size() << '\n';
       if (indep_names.size() > 0)
         {
           out << "Names: ";
@@ -1358,7 +1359,7 @@ PointValueHistory<dim>::status(std::ostream &out)
             {
               out << "<" << indep_name << "> ";
             }
-          out << "\n";
+          out << '\n';
         }
     }
   else
@@ -1389,15 +1390,14 @@ PointValueHistory<dim>::status(std::ostream &out)
           out << data_entry.first << ": " << data_entry.second.size() << " (";
           out << mask->second.size() << ", "
               << mask->second.n_selected_components() << ") : ";
-          out << (data_entry.second)[0].size() << "\n";
+          out << (data_entry.second)[0].size() << '\n';
         }
       else
         {
           out << data_entry.first << ": " << data_entry.second.size() << " (";
           out << mask->second.size() << ", "
               << mask->second.n_selected_components() << ") : ";
-          out << "No points added"
-              << "\n";
+          out << "No points added" << '\n';
         }
       // add names, if available
       if (component_names->second.size() > 0)
@@ -1406,10 +1406,10 @@ PointValueHistory<dim>::status(std::ostream &out)
             {
               out << "<" << name << "> ";
             }
-          out << "\n";
+          out << '\n';
         }
     }
-  out << "\n";
+  out << '\n';
   out << "***end of status output***\n\n";
 }
 

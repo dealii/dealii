@@ -114,11 +114,11 @@ test<2>()
             fe_face_values.get_present_fe_values().get_function_values(
               vector_0, values_0);
 
-            deallog << "q_index=" << q_index << " face_no=" << face_no << ":"
+            deallog << "q_index=" << q_index << " face_no=" << face_no << ':'
                     << std::endl;
 
             for (unsigned int q = 0; q < values_0.size(); ++q)
-              deallog << values_0[q][0] << " " << values_0[q][1] << " "
+              deallog << values_0[q][0] << ' ' << values_0[q][1] << ' '
                       << std::endl;
 
             deallog << std::endl;

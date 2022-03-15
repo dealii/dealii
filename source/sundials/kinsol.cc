@@ -50,9 +50,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
 {
-  using namespace internal;
-
-
   template <typename VectorType>
   KINSOL<VectorType>::AdditionalData::AdditionalData(
     const SolutionStrategy &strategy,
@@ -306,8 +303,12 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
-  KINSOL<VectorType>::KINSOL(const AdditionalData &data, const MPI_Comm &)
+  KINSOL<VectorType>::KINSOL(const AdditionalData &data,
+                             const MPI_Comm &      mpi_comm)
     : data(data)
+    , mpi_communicator(is_serial_vector<VectorType>::value ?
+                         MPI_COMM_SELF :
+                         Utilities::MPI::duplicate_communicator(mpi_comm))
     , kinsol_mem(nullptr)
   {
     set_functions_to_trigger_an_assert();
@@ -318,8 +319,23 @@ namespace SUNDIALS
   template <typename VectorType>
   KINSOL<VectorType>::~KINSOL()
   {
+    int status = 0;
+    (void)status;
+
     if (kinsol_mem)
-      KINFree(&kinsol_mem);
+      {
+        KINFree(&kinsol_mem);
+
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+        status = SUNContext_Free(&kinsol_ctx);
+        AssertKINSOL(status);
+#  endif
+      }
+
+#  ifdef DEAL_II_WITH_MPI
+    if (is_serial_vector<VectorType>::value == false)
+      Utilities::MPI::free_communicator(mpi_communicator);
+#  endif
   }
 
 
@@ -328,26 +344,46 @@ namespace SUNDIALS
   unsigned int
   KINSOL<VectorType>::solve(VectorType &initial_guess_and_solution)
   {
-    NVectorView<VectorType> u_scale, f_scale;
+    internal::NVectorView<VectorType> u_scale, f_scale;
 
     VectorType u_scale_temp, f_scale_temp;
 
     if (get_solution_scaling)
-      u_scale = internal::make_nvector_view(get_solution_scaling());
+      u_scale = internal::make_nvector_view(get_solution_scaling()
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                              ,
+                                            kinsol_ctx
+#  endif
+      );
     else
       {
         reinit_vector(u_scale_temp);
         u_scale_temp = 1.0;
-        u_scale      = internal::make_nvector_view(u_scale_temp);
+        u_scale      = internal::make_nvector_view(u_scale_temp
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                              ,
+                                              kinsol_ctx
+#  endif
+        );
       }
 
     if (get_function_scaling)
-      f_scale = internal::make_nvector_view(get_function_scaling());
+      f_scale = internal::make_nvector_view(get_function_scaling()
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                              ,
+                                            kinsol_ctx
+#  endif
+      );
     else
       {
         reinit_vector(f_scale_temp);
         f_scale_temp = 1.0;
-        f_scale      = internal::make_nvector_view(f_scale_temp);
+        f_scale      = internal::make_nvector_view(f_scale_temp
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                              ,
+                                              kinsol_ctx
+#  endif
+        );
       }
 
     // Make sure we have what we need
@@ -364,15 +400,34 @@ namespace SUNDIALS
                  "solve_jacobian_system || solve_with_jacobian"));
       }
 
-    auto solution = internal::make_nvector_view(initial_guess_and_solution);
-
-    if (kinsol_mem)
-      KINFree(&kinsol_mem);
-
-    kinsol_mem = KINCreate();
+    auto solution = internal::make_nvector_view(initial_guess_and_solution
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                                ,
+                                                kinsol_ctx
+#  endif
+    );
 
     int status = 0;
     (void)status;
+
+    if (kinsol_mem)
+      {
+        KINFree(&kinsol_mem);
+
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+        status = SUNContext_Free(&kinsol_ctx);
+        AssertKINSOL(status);
+#  endif
+      }
+
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+    kinsol_mem = KINCreate();
+#  else
+    status = SUNContext_Create(&mpi_communicator, &kinsol_ctx);
+    AssertKINSOL(status);
+
+    kinsol_mem = KINCreate(kinsol_ctx);
+#  endif
 
     status = KINSetUserData(kinsol_mem, static_cast<void *>(this));
     AssertKINSOL(status);
@@ -446,7 +501,11 @@ namespace SUNDIALS
         // called do not actually receive the KINSOL object, just the LS
         // object, so we have to store a pointer to the current
         // object in the LS object
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
         LS          = SUNLinSolNewEmpty();
+#    else
+        LS = SUNLinSolNewEmpty(kinsol_ctx);
+#    endif
         LS->content = this;
 
         LS->ops->gettype =
@@ -476,7 +535,11 @@ namespace SUNDIALS
         // if we don't set it, it won't call the functions that set up
         // the matrix object (i.e., the argument to the 'KINSetJacFn'
         // function below).
+#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
         J          = SUNMatNewEmpty();
+#    else
+        J  = SUNMatNewEmpty(kinsol_ctx);
+#    endif
         J->content = this;
 
         J->ops->getid = [](SUNMatrix /*ignored*/) -> SUNMatrix_ID {

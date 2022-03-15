@@ -572,7 +572,8 @@ public:
    *
    * If the physical groups are not named, then the behavior is the same as
    * the other read_msh() function, i.e., the physical tag itself is interpreted
-   * as a boundary or material id.
+   * as a boundary or material id.  Physical surface numbers created in Gmsh,
+   * which can be seen in the .geo file, become material IDs.
    *
    * @ingroup simplex
    */

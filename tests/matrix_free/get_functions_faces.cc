@@ -82,7 +82,7 @@ private:
         deallog << "Face " << face << ": ";
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
-            deallog << fe_eval.get_value(q)[0] << " "
+            deallog << fe_eval.get_value(q)[0] << ' '
                     << fe_eval.get_normal_derivative(q)[0] << "   ";
           }
         deallog << std::endl;

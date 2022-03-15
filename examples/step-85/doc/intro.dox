@@ -1,0 +1,251 @@
+<i>
+This program was contributed by Simon Sticko.
+
+The material is based upon work partially supported by
+eSSENCE of e-Science and the Swedish Research Council
+under grants 2014-6088 (Kreiss) and 2017-05038 (Massing).
+</i>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+<h3>The Cut Finite Element Method</h3>
+
+In this example, we show how to use the cut finite element method (CutFEM) in deal.II.
+For illustration, we want to solve the simplest possible problem,
+so we again consider Poisson's equation:
+@f{align*}
+  -\Delta u &= f \qquad && \text{in }\, \Omega,
+  \\
+  u &= u_D       \qquad && \text{on }\, \Gamma = \partial \Omega,
+@f}
+where we choose $f(x) = 4$ and $u_D(x) = 1$.
+CutFEM is an immersed method.
+In this context,
+"immersed" means that the mesh is unfitted to the geometry of the domain, $\Omega$.
+Instead, $\Omega$ floats freely on top of a uniform background mesh, $\mathcal{T}^h$.
+@image html step-85-background-mesh.svg
+Since we no longer use the mesh to describe the geometry of the domain,
+we need some other way to represent it.
+This can be done in several ways but here we assume that $\Omega$ is described by a level set function,
+$\psi : \mathbb{R}^{\text{dim}} \to \mathbb{R}$ such that
+@f{align*}
+  \Omega &= \{x \in \mathbb{R}^{\text{dim}} : \psi(x) < 0 \}, \\
+  \Gamma &= \{x \in \mathbb{R}^{\text{dim}} : \psi(x) = 0 \}.
+@f}
+For simplicity, we choose $\Omega$ to be a unit disk, so that
+@f{equation*}
+  \psi(x) = \| x \| - 1.
+@f}
+As can be seen from the figure below,
+the level set function is negative for points in $\Omega$,
+zero on the boundary, and positive everywhere else.
+@image html step-85-level-set.png
+To solve this problem,
+we want to distribute degrees of freedom over the smallest submesh, $\mathcal{T}_\Omega^h$,
+that completely covers the domain:
+@f{equation*}
+  \mathcal{T}_\Omega^h = \{ T \in \mathcal{T}^{h} : T \cap \Omega \neq \emptyset \}.
+@f}
+This is usually referred to as the "active mesh".
+@image html step-85-active-mesh.svg
+The finite element space where we want to find our numerical solution, $u_h$, is now
+@f{equation*}
+  V_\Omega^h = \{ v \in C(\mathcal{N}_\Omega^h) : v \in Q_p(T), \, T \in \mathcal{T}_\Omega^h \},
+@f}
+where
+@f{equation*}
+  \mathcal{N}_\Omega^h = \bigcup_{T \in \mathcal{T}_\Omega^h} \overline{T},
+@f}
+and $\overline{T}$ denotes the closure of $T$.
+The set $\mathcal{N}_\Omega^h$ is sometimes referred to as the "fictitious domain".
+Since $\Omega \subset \mathcal{N}_\Omega^h$,
+we see that the numerical solution is defined over a slightly larger region than the analytical solution.
+
+In this type of immersed finite element method,
+the standard way to apply boundary conditions is using Nitsche's method.
+Multiplying the PDE with a test function, $v_h \in V_\Omega^h$,
+and integrating by parts over $\Omega$, as usual, gives us
+@f{equation*}
+  (\nabla u_h, \nabla v_h)_\Omega - (\partial_n u_h, v_h)_\Gamma = (f,v)_\Omega.
+@f}
+Let $\gamma_D > 0$ be a scalar penalty parameter and let $h$ be some measure of the local cell size.
+We now note that the following terms are consistent with the Dirichlet boundary condition:
+@f{align*}
+  -(u_h, \partial_n v_h)_\Gamma &= -(u_D, \partial_n v_h)_\Gamma, \\
+  \left (\frac{\gamma_D}{h} u_h, v_h \right )_\Gamma &= \left (\frac{\gamma_D}{h}u_D, v_h \right )_\Gamma.
+@f}
+Thus, we can add these to the weak formulation to enforce the boundary condition.
+This leads to the following weak formulation:
+Find $u_h \in V_\Omega^h$ such that
+@f{equation*}
+  a_h(u_h, v_h) = L_h(v_h), \quad \forall v_h \in V_\Omega^h,
+@f}
+where
+@f{align*}
+  a_h(u_h, v_h) &=  (\nabla u_h, \nabla v_h)_\Omega
+                  - (\partial_n u_h, v_h)_\Gamma
+                  - (u_h, \partial_n v_h)_\Gamma
+                  + \left (\frac{\gamma_D}{h} u_h, v_h \right )_\Gamma,
+  \\
+  L_h(v_h)      &=  (f,v)_\Omega
+                  + \left (u_D, \frac{\gamma_D}{h} v_h -\partial_n v_h \right )_\Gamma.
+@f}
+In this formulation, there is one big difference,
+compared to a standard boundary-fitted finite element method.
+On each cell,
+we need to integrate over the part of the domain and the part of the boundary that falls within the cell.
+Thus, on each cell intersected by $\Gamma$,
+we need special quadrature rules that only integrate over these parts of the cell,
+that is, over $T \cap \Omega$ and $T \cap \Gamma$.
+@image html immersed_quadratures.svg
+Since $\Omega \cap T$ is the part of the cell that lies inside the domain,
+we shall refer to the following regions
+@f{align*}
+  \{x \in T : \psi(x) < 0 \}, \\
+  \{x \in T : \psi(x) > 0 \}, \\
+  \{x \in T : \psi(x) = 0 \},
+@f}
+as the "inside", "outside" and the "surface region" of the cell $T$.
+
+The above finite element method that uses the bilinear form $a_h(\cdot, \cdot)$
+is sometimes referred to as the "naive weak formulation"
+because it suffers from the so-called "small cut problem".
+Depending on how $\Omega$ is located relative to $\mathcal{T}_h$,
+a cut between a cell, $T \in \mathcal{T}_h$, and $\Omega$ can become arbitrarily small:
+$|\Omega \cap T | \rightarrow 0$.
+For Neumann boundary conditions,
+the consequence is that the stiffness matrix can become arbitrarily ill-conditioned
+as the cut-size approaches zero.
+For a Dirichlet condition, the situation is even worse.
+For any finite choice of Nitsche constant, $\gamma_D$,
+the bilinear form $a_h(\cdot,\cdot)$ loses coercivity as the size of a cell cut approaches zero.
+This makes the above weak formulation essentially useless
+because as we refine we typically can not control how the cells intersect $\Gamma$.
+One way to avoid this problem is to add a so-called ghost penalty term, $g_h$,
+to the weak formulation (see e.g. @cite burman_hansbo_2012 and @cite cutfem_2015).
+This leads to the stabilized cut finite element method,
+which reads: Find $u_h \in V_\Omega^h$ such that
+@f{equation*}
+  A_h(u_h, v_h) = L_h(v_h), \quad \forall v_h \in V_\Omega^h,
+@f}
+where
+@f{equation*}
+  A_h(u_h,v_h) = a_h(u_h,v_h) + g_h(u_h, v_h).
+@f}
+The point of this ghost penalty is that it makes the numerical method essentially independent
+of how $\Omega$ relates to the background mesh.
+In particular, $A_h$ can be shown to be continuous and coercive,
+with constants that do not depend on how $\Omega$ intersects $\mathcal{T}^h$.
+To define the ghost penalty, let $\mathcal{T}_\Gamma^h$ be the set of intersected cells:
+@f{equation*}
+  \mathcal{T}_{\Gamma}^h = \{ T \in \mathcal{T}_{\Omega}^{h} : T \cap \Gamma \neq \emptyset \},
+@f}
+and let $\mathcal{F}_h$ denote the interior faces of the intersected cells in the active mesh:
+@f{equation*}
+  \mathcal{F}_h = \{ F = \overline{T}_+ \cap \overline{T}_- : \,
+                     T_+ \in \mathcal{T}_{\Gamma}^h, \,
+                     T_- \in \mathcal{T}_{\Omega}^h
+                  \}.
+@f}
+@image html step-85-ghost-faces.svg
+The ghost penalty acts on these faces and reads
+@f{equation*}
+  g_h(u_h,v_h) = \gamma_A \sum_{F \in \mathcal{F}_h} g_F(u_h, v_h),
+@f}
+where $g_F$ is the face-wise ghost penalty:
+@f{equation*}
+  g_F(u_h, v_h) = \gamma_A \sum_{k=0}^p \left(\frac{h_F^{2k-1}}{k!^2}[\partial_n^k u_h], [\partial_n^k v_h] \right)_F.
+@f}
+Here, $\gamma_A$ is a penalty parameter and $h_F$ is some measure of the face size.
+We see that $g_F$ penalizes the jumps in the face-normal derivatives, $\partial_n^k$,
+over $F = \overline{T}_+ \cap \overline{T}_-$.
+Since we include all normal derivatives up to the polynomial degree,
+we weakly force the piecewise polynomial to behave as a single polynomial over $\overline{T}_+ \cup \overline{T}_-$.
+Hand-wavingly speaking,
+this is the reason why we obtain a cut-independent method when we enforce $g_F(u_h, v_h) = 0$ over the faces in $\mathcal{F}_h$.
+Here, we shall use a continuous space of $Q_1$-elements,
+so the ghost penalty is reduced to
+@f{equation*}
+  g_h(u_h,v_h) = \gamma_A \sum_{F \in \mathcal{F}_h} (h_F [\partial_n u_h], [\partial_n v_h])_F.
+@f}
+
+<h3>Discrete Level Set Function</h3>
+A typical use case of a level set method is a problem where the domain is advected in a velocity field,
+such that the domain deforms with time.
+For such a problem,
+one would typically solve for an approximation of the level set function, $\psi_h \in V^h$,
+in a separate finite element space over the whole background mesh:
+@f{equation*}
+  V^h = \{ v \in C(\mathcal{N}^h) : v \in Q_p(T), \, T \in \mathcal{T}^h \},
+@f}
+where $\mathcal{N}^h = \bigcup_{T \in \mathcal{T}^h} \overline{T}$.
+Even if we solve a much simpler problem with a stationary domain in this tutorial,
+we shall, just to illustrate, still use a discrete level set function for the Poisson problem.
+Technically,
+this is a so-called "variational crime" because we are actually not using the bilinear form $a_h$ but instead
+@f{equation*}
+  a_h^\star(u_h, v_h) = (\nabla u_h, \nabla v_h)_{\Omega_h}
+                      - (\partial_n u_h, v_h)_{\Gamma_h} + \ldots
+@f}
+This is an approximation of $a_h$ since we integrate over the approximations of the geometry that we get via the discrete level set function:
+@f{align*}
+  \Omega_h &= \{x \in \mathbb{R}^{\text{dim}} : \psi_h(x) < 0 \}, \\
+  \Gamma_h &= \{x \in \mathbb{R}^{\text{dim}} : \psi_h(x) = 0 \}.
+@f}
+Using $\Omega_h$ instead of $\Omega$ in the method will give rise to a larger error in the numerical solution.
+This is often referred to as the "geometrical error".
+However, when the same element order, $p$, is used in $V^h$ and $V_\Omega^h$,
+one can often show that the method gives the same order of convergence
+as if the exact domain would have been used.
+Furthermore, deal.II allows us to independently choose a more accurate geometry representation
+with a higher-order level set function, compared to the function space for solving the Poisson equation.
+
+<h3>The MeshClassifier Class</h3>
+Even if we have used $\mathcal{T}_\Omega^h$ to define the finite element space,
+we will not create this submesh in practice. As in step-46, we shall
+instead use the hp-framework. To create $V_\Omega^h$, we first add an FE_Q and an
+FE_Nothing element to an hp::FECollection. We then iterate over each cell,
+$T$, and depending on whether $T$ belongs to $\mathcal{T}_\Omega^h$ or not,
+we set the active_fe_index to either 0 or 1. To do so, we need to
+determine if a given cell is in $\mathcal{T}_\Omega^h$ or not.
+For this purpose, we will use the class NonMatching::MeshClassifier.
+The MeshClassifier takes the discrete level set function,
+described as a (DoFHandler, Vector)-pair, as arguments to its constructor:
+@code
+  MeshClassifier(const DoFHandler<dim> &level_set_dof_handler,
+                 const VectorType &     level_set);
+@endcode
+When we call the reclassify() function on an object of this class,
+each active cell and face is associated with one of the values
+{inside, outside, intersected} of the enum NonMatching::LocationToLevelSet.
+Here, "inside" means that the level set function is negative over the whole cell
+so that it lies completely inside the domain.
+Analogously, "outside" means that $\psi$ is positive over the whole cell,
+and "intersected" means that $\psi$ varies in sign over $T$
+so that the zero-contour of $\psi$ goes through $T$.
+
+| LocationToLevelSet | $\psi(x)$ for $x \in T$  | Relation to $\Omega$           |
+|:------------------:|:------------------------:|:------------------------------:|
+| inside             | $\psi(x) < 0$            | $T \cap \Omega = T$            |
+| outside            | $0 < \psi(x)$            | $T \cap \Omega = \emptyset$    |
+| intersected        | $\psi(x)$ varies in sign | $T \cap \Gamma \neq \emptyset$ |
+
+Each active face is classified in the same way, according to how the sign of $\psi$ varies over the face.
+MeshClassifier lets you query this information for a given cell/face via its MeshClassifier::location_to_level_set() methods:
+@code
+  NonMatching::MeshClassifier<dim> mesh_classifier(dof_handler, level_set);
+  mesh_classifier.reclassify();
+
+  for (const auto &cell : triangulation.active_cell_iterators())
+    {
+      NonMatching::LocationToLevelSet cell_location =
+        mesh_classifier.location_to_level_set(cell);
+
+      for (const unsigned int f : cell->face_indices())
+        {
+          NonMatching::LocationToLevelSet face_location =
+            mesh_classifier.location_to_level_set(cell, f);
+        }
+    }
+@endcode

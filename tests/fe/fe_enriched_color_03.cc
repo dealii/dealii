@@ -149,7 +149,7 @@ main(int argc, char **argv)
       // 0 1 0 indicates predicate with index 2 is true in the cell.
       deallog << cell->index() << ":predicates=";
       for (auto predicate : vec_predicates)
-        deallog << predicate(cell) << ":";
+        deallog << predicate(cell) << ':';
 
       // print color predicate pairs for a cell
       // Note that here material id is used to identify cells
@@ -158,7 +158,7 @@ main(int argc, char **argv)
       for (auto color_predicate_pair :
            cellwise_color_predicate_map[cell->material_id()])
         {
-          deallog << "(" << color_predicate_pair.first << ","
+          deallog << '(' << color_predicate_pair.first << ','
                   << color_predicate_pair.second << "):";
         }
 
@@ -166,7 +166,7 @@ main(int argc, char **argv)
       //{1,2} indicates 2 enrichment functions of color 1 and 2 are relevant.
       deallog << ":fe_active_index:" << cell->active_fe_index() << ":fe_set:";
       for (auto fe_set_element : fe_sets[cell->active_fe_index()])
-        deallog << fe_set_element << ":";
+        deallog << fe_set_element << ':';
       deallog << std::endl;
     }
 

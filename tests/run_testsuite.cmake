@@ -83,7 +83,7 @@
 #
 #   MEMORYCHECK
 #     - If set to ON the CTEST_MEMORYCHECK() stage will be run.
-#     Test results must go into the "Experimantal" section.
+#     Test results must go into the "Experimental" section.
 #
 #   MAKEOPTS
 #     - Additional options that will be passed directly to make (or ninja).
@@ -231,14 +231,16 @@ MESSAGE("-- CTEST_CMAKE_GENERATOR:  ${CTEST_CMAKE_GENERATOR}")
 # CTEST_SITE:
 #
 
-FIND_PROGRAM(HOSTNAME_COMMAND NAMES hostname)
-IF(NOT "${HOSTNAME_COMMAND}" MATCHES "-NOTFOUND")
-  EXEC_PROGRAM(${HOSTNAME_COMMAND} OUTPUT_VARIABLE _hostname)
-  STRING(REGEX REPLACE "\\..*$" "" _hostname ${_hostname})
-  SET(CTEST_SITE "${_hostname}")
-ELSE()
-  # Well, no hostname available. What about:
-  SET(CTEST_SITE "BobMorane")
+IF("${CTEST_SITE}" STREQUAL "")
+  FIND_PROGRAM(HOSTNAME_COMMAND NAMES hostname)
+  IF(NOT "${HOSTNAME_COMMAND}" MATCHES "-NOTFOUND")
+    EXEC_PROGRAM(${HOSTNAME_COMMAND} OUTPUT_VARIABLE _hostname)
+    STRING(REGEX REPLACE "\\..*$" "" _hostname ${_hostname})
+    SET(CTEST_SITE "${_hostname}")
+  ELSE()
+    # Well, no hostname available. What about:
+    SET(CTEST_SITE "BobMorane")
+  ENDIF()
 ENDIF()
 
 MESSAGE("-- CTEST_SITE:             ${CTEST_SITE}")
@@ -270,7 +272,7 @@ ENDIF()
 # Pass all relevant variables down to configure:
 GET_CMAKE_PROPERTY(_variables VARIABLES)
 FOREACH(_var ${_variables})
-  IF( _var MATCHES "^(TEST|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
+  IF( _var MATCHES "^(ENABLE|TEST|TESTING|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
       _var MATCHES "^(DOCUMENTATION|EXAMPLES)" OR
       _var MATCHES "^(ADOLC|ARBORX|ARPACK|BOOST|OPENCASCADE|MUPARSER|HDF5|KOKKOS|METIS|MPI)_" OR
       _var MATCHES "^(GINKGO|P4EST|PETSC|SCALAPACK|SLEPC|THREADS|TBB|TRILINOS)_" OR
@@ -520,9 +522,31 @@ IF("${_res}" STREQUAL "0")
   IF("${_res}" STREQUAL "0")
     # Only run tests if the build was successful:
 
-    MESSAGE("-- Running setup_tests")
+    IF(ENABLE_PERFORMANCE_TESTS)
+      MESSAGE("-- Running prune_tests")
+      EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
+        --build . --target prune_tests
+        -- ${MAKEOPTS}
+        WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
+        OUTPUT_QUIET
+        RESULT_VARIABLE _res
+        )
+
+      IF(NOT "${_res}" STREQUAL "0")
+        MESSAGE(FATAL_ERROR "
+\"prune_tests\" target exited with an error. Bailing out.
+"
+          )
+      ENDIF()
+
+      SET(_target setup_tests_performance)
+    ELSE()
+      SET(_target setup_tests)
+    ENDIF()
+
+    MESSAGE("-- Running ${_target}")
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-      --build . --target setup_tests
+      --build . --target ${_target}
       -- ${MAKEOPTS}
       WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
       OUTPUT_QUIET
@@ -578,14 +602,28 @@ Unable to determine test submission files from TAG. Bailing out.
 ENDIF()
 
 #
+# Create performance test report
+#
+IF(ENABLE_PERFORMANCE_TESTS)
+  MESSAGE("-- Collecting performance measurements\n")
+  EXECUTE_PROCESS(
+    COMMAND bash "${CMAKE_CURRENT_LIST_DIR}/performance/collect_measurements" "${CTEST_SITE}"
+    WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY}
+    )
+ENDIF()
+
+
+#
 # And finally submit:
 #
 
-MESSAGE("-- Running CTEST_SUBMIT()")
-CTEST_SUBMIT(RETURN_VALUE _res)
+IF(NOT SKIP_SUBMISSION)
+  MESSAGE("-- Running CTEST_SUBMIT()")
+  CTEST_SUBMIT(RETURN_VALUE _res)
 
-IF("${_res}" STREQUAL "0")
-  MESSAGE("-- Submission successful. Goodbye!")
+  IF("${_res}" STREQUAL "0")
+    MESSAGE("-- Submission successful. Goodbye!")
+  ENDIF()
 ENDIF()
 
-# .oO( This script is freaky 600 lines long... )
+# .oO( This script is freaky 606 lines long... )

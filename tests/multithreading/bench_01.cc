@@ -383,7 +383,7 @@ assemble()
   const unsigned int n_phys_cores =
     std::min(n_max_threads, MultithreadInfo::n_cores());
   std::cout << "MultithreadInfo::n_cores()=" << n_phys_cores
-            << " (limited from " << MultithreadInfo::n_cores() << ")"
+            << " (limited from " << MultithreadInfo::n_cores() << ')'
             << std::endl;
   std::cout << "MultithreadInfo::n_threads()=" << MultithreadInfo::n_threads()
             << std::endl;
@@ -428,7 +428,7 @@ assemble()
         timer.stop();
         const double time = timer.last_wall_time();
         avg += time;
-        std::cout << time << " " << std::flush;
+        std::cout << time << ' ' << std::flush;
         reference_l2 = system_rhs.l2_norm();
       }
     avg /= n_runs;
@@ -486,7 +486,7 @@ assemble()
             timer.stop();
             const double time = timer.last_wall_time();
             avg += time;
-            std::cout << time << " " << std::flush;
+            std::cout << time << ' ' << std::flush;
             Assert(abs(reference_l2 - system_rhs.l2_norm()) < 1e-10,
                    ExcInternalError());
           }
@@ -527,7 +527,7 @@ assemble()
             timer.stop();
             const double time = timer.last_wall_time();
             avg += time;
-            std::cout << time << " " << std::flush;
+            std::cout << time << ' ' << std::flush;
             Assert(abs(reference_l2 - system_rhs.l2_norm()) < 1e-10,
                    ExcInternalError());
           }
@@ -561,7 +561,7 @@ assemble()
             timer.stop();
             const double time = timer.last_wall_time();
             avg += time;
-            std::cout << time << " " << std::flush;
+            std::cout << time << ' ' << std::flush;
             Assert(abs(reference_l2 - system_rhs.l2_norm()) < 1e-10,
                    ExcInternalError());
           }
@@ -597,7 +597,7 @@ assemble()
             timer.stop();
             const double time = timer.last_wall_time();
             avg += time;
-            std::cout << time << " " << std::flush;
+            std::cout << time << ' ' << std::flush;
             Assert(abs(reference_l2 - system_rhs.l2_norm()) < 1e-10,
                    ExcInternalError());
           }
@@ -630,7 +630,7 @@ assemble()
             timer.stop();
             const double time = timer.last_wall_time();
             avg += time;
-            std::cout << time << " " << std::flush;
+            std::cout << time << ' ' << std::flush;
             Assert(abs(reference_l2 - system_rhs.l2_norm()) < 1e-10,
                    ExcInternalError());
           }

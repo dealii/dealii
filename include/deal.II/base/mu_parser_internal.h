@@ -72,6 +72,9 @@ namespace internal
     mu_pow(double a, double b);
 
     double
+    mu_erf(double value);
+
+    double
     mu_erfc(double value);
 
     // returns a random value in the range [0,1] initializing the generator

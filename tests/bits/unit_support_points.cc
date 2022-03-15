@@ -74,7 +74,7 @@ check_cell2(const FiniteElement<dim> &fe, const unsigned int comp)
 {
   for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
     if (fe.system_to_component_index(i).first == comp)
-      deallog << i << " " << fe.unit_support_point(i) << std::endl;
+      deallog << i << ' ' << fe.unit_support_point(i) << std::endl;
   deallog << "dim=" << dim << ", cell=ok" << std::endl;
 }
 
@@ -85,7 +85,7 @@ check_face2(const FiniteElement<dim> &fe, const unsigned int comp)
 {
   for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
     if (fe.face_system_to_component_index(i).first == comp)
-      deallog << i << " " << fe.unit_face_support_point(i) << std::endl;
+      deallog << i << ' ' << fe.unit_face_support_point(i) << std::endl;
   deallog << "dim=" << dim << ", face=ok" << std::endl;
 }
 

@@ -79,8 +79,8 @@ test()
   ff.laplacian_list(vec, values_c);
   fef.laplacian_list(vec, values_a);
   deallog << "Value of the laplacian in 0.5*e1 and 0.25 * e1:" << std::endl;
-  deallog << " correct values: " << values_c[0] << " " << values_c[1]
-          << ", approximations: " << values_a[0] << " " << values_a[1]
+  deallog << " correct values: " << values_c[0] << ' ' << values_c[1]
+          << ", approximations: " << values_a[0] << ' ' << values_a[1]
           << std::endl;
 }
 

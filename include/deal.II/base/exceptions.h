@@ -884,7 +884,7 @@ namespace StandardExceptions
                  int,
                  int,
                  << "You are trying to execute functionality that is "
-                 << "impossible in dimensions <" << arg1 << "," << arg2
+                 << "impossible in dimensions <" << arg1 << ',' << arg2
                  << "> or simply does not make any sense.");
 
 
@@ -917,7 +917,7 @@ namespace StandardExceptions
   DeclException2(ExcDimensionMismatch,
                  std::size_t,
                  std::size_t,
-                 << "Dimension " << arg1 << " not equal to " << arg2 << ".");
+                 << "Dimension " << arg1 << " not equal to " << arg2 << '.');
 
   /**
    * The first dimension should be either equal to the second or the third,
@@ -928,7 +928,7 @@ namespace StandardExceptions
                  std::size_t,
                  std::size_t,
                  << "Dimension " << arg1 << " neither equal to " << arg2
-                 << " nor to " << arg3 << ".");
+                 << " nor to " << arg3 << '.');
 
   /**
    * This exception indicates that an index is not within the expected range.
@@ -947,7 +947,7 @@ namespace StandardExceptions
     std::size_t,
     std::size_t,
     std::size_t,
-    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
+    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ','
     << arg3 << ")."
     << (arg2 == arg3 ?
           " In the current case, this half-open range is in fact empty, "
@@ -977,7 +977,7 @@ namespace StandardExceptions
     T,
     T,
     T,
-    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
+    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ','
     << arg3 << ")."
     << (arg2 == arg3 ?
           " In the current case, this half-open range is in fact empty, "
@@ -993,7 +993,7 @@ namespace StandardExceptions
                  int,
                  int,
                  << "Number " << arg1 << " must be larger than or equal "
-                 << arg2 << ".");
+                 << arg2 << '.');
 
   /**
    * A generic exception definition for the ExcLowerRange above.
@@ -1003,7 +1003,7 @@ namespace StandardExceptions
                  T,
                  T,
                  << "Number " << arg1 << " must be larger than or equal "
-                 << arg2 << ".");
+                 << arg2 << '.');
 
   /**
    * This exception indicates that the first argument should be an integer

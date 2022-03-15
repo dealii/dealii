@@ -69,12 +69,12 @@ main(int argc, char **argv)
 
   if (false)
     {
-      std::ofstream ofile(SOURCE_DIR "/arkode_07.prm");
+      std::ofstream ofile(SOURCE_DIR "/arkode_07_in.prm");
       prm.print_parameters(ofile, ParameterHandler::ShortText);
       ofile.close();
     }
 
-  std::ifstream ifile(SOURCE_DIR "/arkode_07.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_07_in.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKode<VectorType> ode(data);
@@ -157,7 +157,7 @@ main(int argc, char **argv)
   ode.output_step = [&](const double       t,
                         const VectorType & sol,
                         const unsigned int step_number) -> int {
-    deallog << t << " " << sol[0] << " " << sol[1] << " " << sol[2]
+    deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol[2]
             << std::endl;
     return 0;
   };

@@ -1539,12 +1539,12 @@ public:
   /**
    * Make the dimension available in function templates.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Make the space-dimension available in function templates.
    */
-  static const unsigned int space_dimension = spacedim;
+  static constexpr unsigned int space_dimension = spacedim;
 
   /**
    * Create an empty triangulation. Do not create any cells.
@@ -2237,11 +2237,6 @@ public:
      * This signal is triggered at the beginning of execution of the
      * parallel::distributed::Triangulation::repartition() function. At the time
      * this signal is triggered, the triangulation is still unchanged.
-     *
-     * @note The parallel::distributed::Triangulation::repartition() function is
-     * also called by parallel::distributed::Triangulation::load(). Thus, the
-     * pre_distributed_repartition signal will be triggered after the
-     * pre_distributed_load one.
      */
     boost::signals2::signal<void()> pre_distributed_repartition;
 
@@ -3463,7 +3458,7 @@ public:
                  << arg1
                  << " of a triangulation, but this triangulation only has "
                  << arg2 << " refinement levels. The given level " << arg1
-                 << " must be *less* than " << arg2 << ".");
+                 << " must be *less* than " << arg2 << '.');
   /**
    * The function raising this exception can only operate on an empty
    * Triangulation, i.e., a Triangulation without grid cells.
@@ -4017,7 +4012,7 @@ private:
    * type FlatManifold.
    */
   std::map<types::manifold_id, std::unique_ptr<const Manifold<dim, spacedim>>>
-    manifold;
+    manifolds;
 
   /**
    * Flag indicating whether anisotropic refinement took place.

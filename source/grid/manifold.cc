@@ -19,6 +19,7 @@
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/manifold.h>
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -31,8 +32,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN
-
-using namespace Manifolds;
 
 /* -------------------------- Manifold --------------------- */
 template <int dim, int spacedim>
@@ -304,7 +303,7 @@ Manifold<dim, spacedim>::get_normals_at_vertices(
   const typename Triangulation<dim, spacedim>::face_iterator &face,
   FaceVertexNormals &                                         n) const
 {
-  for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
+  for (unsigned int v = 0; v < face->reference_cell().n_vertices(); ++v)
     {
       n[v] = normal_vector(face, face->vertex(v));
       n[v] /= n[v].norm();
@@ -318,7 +317,7 @@ Point<spacedim>
 Manifold<dim, spacedim>::get_new_point_on_line(
   const typename Triangulation<dim, spacedim>::line_iterator &line) const
 {
-  const auto points_weights = get_default_points_and_weights(line);
+  const auto points_weights = Manifolds::get_default_points_and_weights(line);
   return get_new_point(make_array_view(points_weights.first.begin(),
                                        points_weights.first.end()),
                        make_array_view(points_weights.second.begin(),
@@ -332,7 +331,7 @@ Point<spacedim>
 Manifold<dim, spacedim>::get_new_point_on_quad(
   const typename Triangulation<dim, spacedim>::quad_iterator &quad) const
 {
-  const auto points_weights = get_default_points_and_weights(quad);
+  const auto points_weights = Manifolds::get_default_points_and_weights(quad);
   return get_new_point(make_array_view(points_weights.first.begin(),
                                        points_weights.first.end()),
                        make_array_view(points_weights.second.begin(),
@@ -463,7 +462,8 @@ Point<3>
 Manifold<3, 3>::get_new_point_on_hex(
   const Triangulation<3, 3>::hex_iterator &hex) const
 {
-  const auto points_weights = get_default_points_and_weights(hex, true);
+  const auto points_weights =
+    Manifolds::get_default_points_and_weights(hex, true);
   return get_new_point(make_array_view(points_weights.first.begin(),
                                        points_weights.first.end()),
                        make_array_view(points_weights.second.begin(),
@@ -762,10 +762,10 @@ FlatManifold<2>::get_normals_at_vertices(
   Manifold<2, 2>::FaceVertexNormals &    face_vertex_normals) const
 {
   const Tensor<1, 2> tangent = face->vertex(1) - face->vertex(0);
-  for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_face;
-       ++vertex)
+  // We're in 2d. Faces are edges:
+  for (const unsigned int vertex : ReferenceCells::Line.vertex_indices())
     // compute normals from tangent
-    face_vertex_normals[vertex] = Point<2>(tangent[1], -tangent[0]);
+    face_vertex_normals[vertex] = Tensor<1, 2>({tangent[1], -tangent[0]});
 }
 
 

@@ -27,7 +27,7 @@ template <int dim>
 void
 test()
 {
-  deallog << "Checking in " << dim << "d" << std::endl;
+  deallog << "Checking in " << dim << 'd' << std::endl;
 
   // check phi_i(v_j) = delta_{ij}
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())

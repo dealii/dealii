@@ -3911,8 +3911,8 @@ namespace Step71
               const SymmetricTensor<2, dim> sigma =
                 Physics::Transformations::Piola::push_forward(
                   material_hand_calculated.get_S(), F);
-              stream << time.get_current_time() << ";" << h[2] << ";" << b[2]
-                     << ";" << F[1][2] * 100.0 << ";" << sigma[1][2] << "\n";
+              stream << time.get_current_time() << ';' << h[2] << ';' << b[2]
+                     << ';' << F[1][2] * 100.0 << ';' << sigma[1][2] << '\n';
             }
         }
 

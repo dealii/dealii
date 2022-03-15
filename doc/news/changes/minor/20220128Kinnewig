@@ -1,0 +1,3 @@
+New: Added support for hessians to FE_NedelecSZ
+<br>
+(Sebastian Kinnewig, 2022/01/28)

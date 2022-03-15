@@ -71,7 +71,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   for (unsigned int l = 0; l < sp.n_rows(); ++l)
     {
       for (unsigned int c = 0; c < sp.row_length(l); ++c)
-        deallog << sp.column_number(l, c) << " ";
+        deallog << sp.column_number(l, c) << ' ';
       deallog << std::endl;
     }
 

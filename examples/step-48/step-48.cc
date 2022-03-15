@@ -345,12 +345,10 @@ namespace Step48
   template <int dim>
   SineGordonProblem<dim>::SineGordonProblem()
     : pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    ,
 #ifdef DEAL_II_WITH_P4EST
-    triangulation(MPI_COMM_WORLD)
-    ,
+    , triangulation(MPI_COMM_WORLD)
 #endif
-    fe(QGaussLobatto<1>(fe_degree + 1))
+    , fe(QGaussLobatto<1>(fe_degree + 1))
     , dof_handler(triangulation)
     , n_global_refinements(10 - 2 * dim)
     , time(-10)
@@ -427,7 +425,8 @@ namespace Step48
     // access in MPI-local numbers that need to match between the vector and
     // MatrixFree), so we just ask it to initialize the vectors to be sure the
     // ghost exchange is properly handled.
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
@@ -540,7 +539,7 @@ namespace Step48
       const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level() << ")"
+            << Utilities::System::get_current_vectorization_level() << ')'
             << std::endl
             << std::endl;
     }
@@ -630,7 +629,7 @@ namespace Step48
           << "   Performed " << timestep_number << " time steps." << std::endl;
 
     pcout << "   Average wallclock time per time step: "
-          << wtime / timestep_number << "s" << std::endl;
+          << wtime / timestep_number << 's' << std::endl;
 
     pcout << "   Spent " << output_time << "s on output and " << wtime
           << "s on computations." << std::endl;

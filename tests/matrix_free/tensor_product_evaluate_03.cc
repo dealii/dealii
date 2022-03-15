@@ -92,7 +92,7 @@ test(const unsigned int degree)
 
   if (degree == 1)
     {
-      deallog << "Evaluate d-linear shortcut in " << dim << "d" << std::endl;
+      deallog << "Evaluate d-linear shortcut in " << dim << 'd' << std::endl;
       for (const auto &p : evaluation_points)
         {
           Point<dim, VectorizedArray<double>> p_vec;

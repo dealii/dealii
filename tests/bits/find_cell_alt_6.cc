@@ -54,8 +54,8 @@ check(Triangulation<2> &tria)
 
       deallog << "Vertex <" << v[i] << "> found in cell ";
       for (const unsigned int v : GeometryInfo<2>::vertex_indices())
-        deallog << "<" << cell.first->vertex(v) << "> ";
-      deallog << " [local: " << cell.second << "]" << std::endl;
+        deallog << '<' << cell.first->vertex(v) << "> ";
+      deallog << " [local: " << cell.second << ']' << std::endl;
     }
 }
 

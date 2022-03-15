@@ -362,7 +362,7 @@ interpolation operation over the completely regular data fields of the
 reference cell. We illustrate the process of complexity reduction in two space
 dimensions, but the same technique can be used in higher dimensions. On the
 reference cell, the basis functions are of the tensor product form
-$\phi(x,y,z) = \varphi_i(x) \varphi_j(y)$. The part of the matrix
+$\phi(x,y) = \varphi_i(x) \varphi_j(y)$. The part of the matrix
 <i>B</i><sub>ref_cell</sub> that computes the first component has the form
 $B_\mathrm{sub\_cell}^x = B_\mathrm{grad,x} \otimes B_\mathrm{val,y}$, where
 <i>B</i><sub>grad,x</sub> and <i>B</i><sub>val,y</sub> contain the evaluation

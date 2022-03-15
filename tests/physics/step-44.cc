@@ -1251,7 +1251,7 @@ namespace Step44
   {
     pcout << std::endl
           << "Timestep " << time.get_timestep() << " @ " << time.current()
-          << "s" << std::endl;
+          << 's' << std::endl;
     BlockVector<double> newton_update(dofs_per_block);
     error_residual.reset();
     error_residual_0.reset();
@@ -1263,7 +1263,7 @@ namespace Step44
     unsigned int newton_iteration = 0;
     for (; newton_iteration < parameters.max_iterations_NR; ++newton_iteration)
       {
-        pcout << " " << std::setw(2) << newton_iteration << " " << std::flush;
+        pcout << ' ' << std::setw(2) << newton_iteration << ' ' << std::flush;
         tangent_matrix = 0.0;
         system_rhs     = 0.0;
         assemble_system_rhs();
@@ -1308,14 +1308,14 @@ namespace Step44
   {
     static const unsigned int l_width = 155;
     for (unsigned int i = 0; i < l_width; ++i)
-      pcout << "_";
+      pcout << '_';
     pcout << std::endl;
     pcout << "                 SOLVER STEP                  "
           << " |  LIN_IT   LIN_RES    RES_NORM    "
           << " RES_U     RES_P      RES_J     NU_NORM     "
           << " NU_U       NU_P       NU_J " << std::endl;
     for (unsigned int i = 0; i < l_width; ++i)
-      pcout << "_";
+      pcout << '_';
     pcout << std::endl;
   }
   template <int dim>
@@ -1324,7 +1324,7 @@ namespace Step44
   {
     static const unsigned int l_width = 155;
     for (unsigned int i = 0; i < l_width; ++i)
-      pcout << "_";
+      pcout << '_';
     pcout << std::endl;
     const std::pair<double, double> error_dil = get_error_dilation();
     pcout << "Relative errors:" << std::endl

@@ -38,7 +38,7 @@ test()
   std::stringstream reference_stream;
   for (unsigned int i = 0; i < n - 1; ++i)
     {
-      reference_stream << Number(i + 1) << " ";
+      reference_stream << Number(i + 1) << ' ';
     }
   reference_stream << Number(n);
 

@@ -1056,7 +1056,7 @@ namespace Step19
         for (const auto &particle : particle_handler)
           {
             deallog << "Particle " << particle.get_id() << ", at "
-                    << particle.get_location() << "/"
+                    << particle.get_location() << '/'
                     << particle.get_reference_location() << " with properties ";
             for (const auto x : particle.get_properties())
               deallog << x << ' ';

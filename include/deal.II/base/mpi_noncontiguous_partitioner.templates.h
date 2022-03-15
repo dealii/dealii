@@ -109,7 +109,7 @@ namespace Utilities
           const int ierr =
             MPI_Irecv(buffers.data() + recv_ptr[i],
                       recv_ptr[i + 1] - recv_ptr[i],
-                      Utilities::MPI::internal::mpi_type_id(buffers.data()),
+                      Utilities::MPI::mpi_type_id_for_type<Number>,
                       recv_ranks[i],
                       tag,
                       communicator,
@@ -138,7 +138,7 @@ namespace Utilities
           const int ierr =
             MPI_Isend(buffers.data() + send_ptr[i],
                       send_ptr[i + 1] - send_ptr[i],
-                      Utilities::MPI::internal::mpi_type_id(buffers.data()),
+                      Utilities::MPI::mpi_type_id_for_type<Number>,
                       send_ranks[i],
                       tag,
                       communicator,

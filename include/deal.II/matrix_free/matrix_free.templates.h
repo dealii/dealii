@@ -372,7 +372,7 @@ void
 MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   const std::shared_ptr<hp::MappingCollection<dim>> &    mapping,
   const std::vector<const DoFHandler<dim, dim> *> &      dof_handler,
-  const std::vector<const AffineConstraints<number2> *> &constraint,
+  const std::vector<const AffineConstraints<number2> *> &constraints,
   const std::vector<IndexSet> &                          locally_owned_dofs,
   const std::vector<hp::QCollection<q_dim>> &            quad,
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
@@ -414,7 +414,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
     {
       clear();
       Assert(dof_handler.size() > 0, ExcMessage("No DoFHandler is given."));
-      AssertDimension(dof_handler.size(), constraint.size());
+      AssertDimension(dof_handler.size(), constraints.size());
       AssertDimension(dof_handler.size(), locally_owned_dofs.size());
 
       task_info.allow_ghosted_vectors_in_loops =
@@ -423,12 +423,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       // set variables that are independent of FE
       if (Utilities::MPI::job_supports_mpi() == true)
         {
-          const parallel::TriangulationBase<dim> *dist_tria =
-            dynamic_cast<const parallel::TriangulationBase<dim> *>(
-              &(dof_handler[0]->get_triangulation()));
-          task_info.communicator = dist_tria != nullptr ?
-                                     dist_tria->get_communicator() :
-                                     MPI_COMM_SELF;
+          task_info.communicator = dof_handler[0]->get_communicator();
           task_info.my_pid =
             Utilities::MPI::this_mpi_process(task_info.communicator);
           task_info.n_procs =
@@ -443,6 +438,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
           task_info.my_pid          = 0;
           task_info.n_procs         = 1;
         }
+
+#ifdef DEBUG
+      for (const auto &constraint : constraints)
+        Assert(
+          constraint->is_closed(task_info.communicator),
+          ExcMessage(
+            "You have provided a non-empty AffineConstraints object that has not "
+            "been closed. Please call AffineConstraints::close() before "
+            "calling MatrixFree::reinit()!"));
+#endif
 
       initialize_dof_handlers(dof_handler, additional_data);
       for (unsigned int no = 0; no < dof_handler.size(); ++no)
@@ -474,7 +479,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       // constraint_pool_data. It also reorders the way cells are gone through
       // (to separate cells with overlap to other processors from others
       // without).
-      initialize_indices(constraint, locally_owned_dofs, additional_data);
+      initialize_indices(constraints, locally_owned_dofs, additional_data);
     }
 
   // initialize bare structures
@@ -1236,8 +1241,23 @@ namespace internal
         hanging_nodes = std::make_unique<
           dealii::internal::MatrixFreeFunctions::HangingNodes<dim>>(tria);
         for (unsigned int no = 0; no < n_dof_handlers; ++no)
-          dof_info[no].hanging_node_constraint_masks.resize(
-            n_active_cells * dof_handler[no]->get_fe().n_components());
+          {
+            dof_info[no].hanging_node_constraint_masks.resize(n_active_cells);
+
+            dof_info[no].hanging_node_constraint_masks_comp =
+              hanging_nodes->compute_supported_components(
+                dof_handler[no]->get_fe_collection());
+
+            if ([](const auto &supported_components) {
+                  return std::none_of(supported_components.begin(),
+                                      supported_components.end(),
+                                      [](const auto &a) {
+                                        return *std::max_element(a.begin(),
+                                                                 a.end());
+                                      });
+                }(dof_info[no].hanging_node_constraint_masks_comp))
+              dof_info[no].hanging_node_constraint_masks_comp = {};
+          }
       }
 
     for (unsigned int counter = 0; counter < n_active_cells; ++counter)
@@ -2094,65 +2114,66 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                     });
 
           // get offsets of shared cells
+          std::vector<unsigned int> targets;
+          for (unsigned int i = 0; i < cells_shared_ghosts.size(); ++i)
+            if (cells_shared_ghosts[i].size() > 0)
+              targets.push_back(i);
+
+          // Then set up the callbacks the consensus algorithm needs:
+          const auto create_request = [&](const auto other_rank) {
+            auto &source = cells_shared_ghosts[other_rank];
+            std::sort(source.begin(),
+                      source.end(),
+                      [](const auto &a, const auto &b) {
+                        return a.second < b.second;
+                      });
+
+            std::vector<dealii::types::global_dof_index> send_buffer;
+            send_buffer.reserve(source.size());
+            for (const auto &i : source)
+              send_buffer.push_back(i.second);
+
+            return send_buffer;
+          };
+
+          const auto answer_request = [&](const auto, const auto &request) {
+            std::vector<unsigned int> answer;
+            answer.reserve(request.size());
+
+            unsigned int j = 0;
+
+            for (unsigned int i = 0; i < request.size(); ++i)
+              {
+                for (; j < cells_locally_owned.size(); ++j)
+                  if (cells_locally_owned[j].second == request[i])
+                    {
+                      answer.push_back(cells_locally_owned[j].first);
+                      break;
+                    }
+              }
+
+            AssertDimension(answer.size(), request.size());
+            return answer;
+          };
+
+          const auto process_answer = [&](const auto  other_rank,
+                                          const auto &answer) {
+            Assert(answer.size() == cells_shared_ghosts[other_rank].size(),
+                   ExcInternalError());
+            for (unsigned int i = 0; i < answer.size(); ++i)
+              {
+                cells[cells_shared_ghosts[other_rank][i].first] = {other_rank,
+                                                                   answer[i]};
+              }
+          };
+
           Utilities::MPI::ConsensusAlgorithms::
-            AnonymousProcess<dealii::types::global_dof_index, unsigned int>
-              process(
-                [&]() {
-                  std::vector<unsigned int> targets;
-                  for (unsigned int i = 0; i < cells_shared_ghosts.size(); ++i)
-                    if (cells_shared_ghosts[i].size() > 0)
-                      targets.push_back(i);
-                  return targets;
-                },
-                [&](const auto other_rank, auto &send_buffer) {
-                  auto &source = cells_shared_ghosts[other_rank];
-                  std::sort(source.begin(),
-                            source.end(),
-                            [](const auto &a, const auto &b) {
-                              return a.second < b.second;
-                            });
-
-                  send_buffer.reserve(source.size());
-                  for (const auto &i : source)
-                    send_buffer.push_back(i.second);
-                },
-                [&](const auto &other_rank,
-                    const auto &buffer_recv,
-                    auto &      request_buffer) {
-                  (void)other_rank;
-
-                  request_buffer.reserve(buffer_recv.size());
-
-                  unsigned int j = 0;
-
-                  for (unsigned int i = 0; i < buffer_recv.size(); ++i)
-                    {
-                      for (; j < cells_locally_owned.size(); ++j)
-                        if (cells_locally_owned[j].second == buffer_recv[i])
-                          {
-                            request_buffer.push_back(
-                              cells_locally_owned[j].first);
-                            break;
-                          }
-                    }
-
-                  AssertDimension(request_buffer.size(), buffer_recv.size());
-                },
-                [&](const auto other_rank, auto &recv_buffer) {
-                  recv_buffer.resize(cells_shared_ghosts[other_rank].size());
-                },
-                [&](const auto other_rank, const auto &recv_buffer) {
-                  for (unsigned int i = 0; i < recv_buffer.size(); ++i)
-                    {
-                      cells[cells_shared_ghosts[other_rank][i].first] = {
-                        other_rank, recv_buffer[i]};
-                    }
-                });
-
-          Utilities::MPI::ConsensusAlgorithms::Selector<
-            dealii::types::global_dof_index,
-            unsigned int>(process, communicator_sm)
-            .run();
+            Selector<dealii::types::global_dof_index, unsigned int>()
+              .run(targets,
+                   create_request,
+                   answer_request,
+                   process_answer,
+                   communicator_sm);
 
           return cells;
         }();

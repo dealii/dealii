@@ -238,7 +238,7 @@ test_neumann(const NeumanBC<dim> &func)
 
   dealii::deallog << "dof values:" << std::endl;
   for (unsigned int i = 0; i < values.size(); ++i)
-    dealii::deallog << " " << values[i];
+    dealii::deallog << ' ' << values[i];
   dealii::deallog << std::endl;
 
   // call Kelly
@@ -262,7 +262,7 @@ test_neumann(const NeumanBC<dim> &func)
 
   dealii::deallog << "error:" << std::endl;
   for (unsigned int i = 0; i < error.size(); ++i)
-    dealii::deallog << " " << error[i];
+    dealii::deallog << ' ' << error[i];
   dealii::deallog << std::endl;
 
   // output("neuman.vtu",
@@ -275,7 +275,7 @@ test_neumann(const NeumanBC<dim> &func)
   get_h_area<dim>(h, A, L);
   const double expected_value_squared = h * A * std::pow(func.get_c(), 2) / p;
   dealii::deallog << "expected:" << std::endl
-                  << " " << std::sqrt(expected_value_squared) << std::endl;
+                  << ' ' << std::sqrt(expected_value_squared) << std::endl;
 
   AssertThrow(std::fabs(std::sqrt(expected_value_squared) - error[0]) < 1e-5,
               dealii::ExcInternalError());
@@ -356,7 +356,7 @@ test_regular(const MyFunction<dim> &func)
 
   dealii::deallog << "dof values:" << std::endl;
   for (unsigned int i = 0; i < values.size(); ++i)
-    dealii::deallog << " " << values[i];
+    dealii::deallog << ' ' << values[i];
   dealii::deallog << std::endl;
 
   // call Kelly
@@ -376,7 +376,7 @@ test_regular(const MyFunction<dim> &func)
 
   dealii::deallog << "error:" << std::endl;
   for (unsigned int i = 0; i < error.size(); ++i)
-    dealii::deallog << " " << error[i];
+    dealii::deallog << ' ' << error[i];
   dealii::deallog << std::endl;
 
   // output("regular.vtu",
@@ -390,7 +390,7 @@ test_regular(const MyFunction<dim> &func)
   const double expected_value_squared =
     h * A * std::pow(func.get_k(), 2) / 2.0 / std::max(p1, p2);
   dealii::deallog << "expected:" << std::endl
-                  << " " << std::sqrt(expected_value_squared) << std::endl;
+                  << ' ' << std::sqrt(expected_value_squared) << std::endl;
   for (unsigned int i = 0; i < error.size(); ++i)
     AssertThrow(std::fabs(std::sqrt(expected_value_squared) - error[i]) < 1e-6,
                 dealii::ExcInternalError());
@@ -487,7 +487,7 @@ test_irregular(const MyFunction<dim> &func)
 
   dealii::deallog << "dof values:" << std::endl;
   for (unsigned int i = 0; i < values.size(); ++i)
-    dealii::deallog << " " << values[i];
+    dealii::deallog << ' ' << values[i];
   dealii::deallog << std::endl;
 
   // call Kelly
@@ -507,7 +507,7 @@ test_irregular(const MyFunction<dim> &func)
 
   dealii::deallog << "error:" << std::endl;
   for (unsigned int i = 0; i < error.size(); ++i)
-    dealii::deallog << " " << error[i];
+    dealii::deallog << ' ' << error[i];
   dealii::deallog << std::endl;
 
   // output("irregular.vtu",
@@ -541,7 +541,7 @@ test_irregular(const MyFunction<dim> &func)
 
   dealii::deallog << "expected:" << std::endl;
   for (unsigned int i = 0; i < expected_error.size(); ++i)
-    deallog << " " << expected_error[i];
+    deallog << ' ' << expected_error[i];
   deallog << std::endl;
 
   for (unsigned int i = 0; i < expected_error.size(); ++i)
@@ -659,7 +659,7 @@ test(const MySecondFunction<dim> &func)
 
   dealii::deallog << "dof values:" << std::endl;
   for (unsigned int i = 0; i < values.size(); ++i)
-    dealii::deallog << " " << values[i];
+    dealii::deallog << ' ' << values[i];
   dealii::deallog << std::endl;
 
   // call Kelly
@@ -679,7 +679,7 @@ test(const MySecondFunction<dim> &func)
 
   dealii::deallog << "error:" << std::endl;
   for (unsigned int i = 0; i < error.size(); ++i)
-    dealii::deallog << " " << error[i];
+    dealii::deallog << ' ' << error[i];
   dealii::deallog << std::endl;
 
   dof_handler.clear();

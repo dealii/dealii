@@ -664,6 +664,11 @@
  *        <td> Solving the fourth-order biharmonic equation using a lifting operator approach.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-85</td>
+ *       <td> Solving the Poisson equation using the cut finite element method.
+ *       </td></tr>
+ *
  * </table>
  *
  *
@@ -1004,7 +1009,8 @@
  *     </td>
  *     <td>
  *       step-60,
- *       step-70
+ *       step-70,
+ *       step-85
  *     </td>
  *   </tr>
  *

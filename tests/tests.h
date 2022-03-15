@@ -418,15 +418,29 @@ filter_out_small_numbers(const Number number, const double tolerance)
 
 
 /*
- * If we run 64 tests at the same time on a 64-core system, and
- * each of them runs 64 threads, then we get astronomical loads.
- * Limit concurrency to a fixed (small) number of threads, independent
- * of the core count.
+ * If we run 64 tests at the same time on a 64-core system, and each of
+ * them runs 64 threads, then we get astronomical loads. Limit concurrency
+ * to a fixed (small) number of threads, independent of the core count. The
+ * limit defaults to 3 and can be overriden by the environment variable
+ * TEST_N_THREADS.
  */
 inline unsigned int
 testing_max_num_threads()
 {
-  return 3;
+  const int default_n_threads = 3;
+
+  if (const char *penv = std::getenv("TEST_N_THREADS"))
+    try
+      {
+        const int n_threads = Utilities::string_to_int(std::string(penv));
+        return n_threads > 0 ? n_threads : default_n_threads;
+      }
+    catch (...)
+      {
+        return default_n_threads;
+      }
+  else
+    return default_n_threads;
 }
 
 struct LimitConcurrency

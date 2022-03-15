@@ -59,7 +59,7 @@ mesh_info(const Triangulation<dim> &tria)
          it != boundary_count.end();
          ++it)
       {
-        deallog << it->first << "(" << it->second << " times) ";
+        deallog << it->first << '(' << it->second << " times) ";
       }
     deallog << std::endl;
   }

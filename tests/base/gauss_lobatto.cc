@@ -28,7 +28,7 @@ main()
 
   for (unsigned int n = 2; n < 20; ++n)
     {
-      deallog << "QGaussLobatto(" << n << ")" << std::endl;
+      deallog << "QGaussLobatto(" << n << ')' << std::endl;
 
       QGaussLobatto<1> q(n);
       for (unsigned int i = 0; i < q.size(); ++i)

@@ -94,7 +94,7 @@ test()
   /*deallog << "n_locally_owned_active_cells_per_processor: ";
   std::vector<unsigned int> v = tr.n_locally_owned_active_cells_per_processor();
   for (unsigned int i=0;i<v.size();++i)
-    deallog << v[i] << " ";
+    deallog << v[i] << ' ';
     deallog << std::endl;*/
 
   // until parmetis is stable, do not output partitioning
@@ -107,7 +107,7 @@ test()
       // cell->subdomain_id()
       AssertThrow(true_subdomain_ids_of_cells[index] == it->subdomain_id(),
                   ExcInternalError());
-      // deallog << it->subdomain_id() << " ";
+      // deallog << it->subdomain_id() << ' ';
     }
   deallog << std::endl;
 

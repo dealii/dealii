@@ -35,7 +35,7 @@ test()
   foo.leave_subsection();
   foo.declare_entry("val2", "2.0", dealii::Patterns::Double(), "");
 
-  foo.parse_input(SOURCE_DIR "/parameter_handler_16.prm");
+  foo.parse_input(SOURCE_DIR "/parameter_handler_16_in.prm");
 
 
 

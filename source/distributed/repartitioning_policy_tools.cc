@@ -39,8 +39,7 @@ namespace RepartitioningPolicyTools
     {
       is_fine.add_index(cell_id_translator.translate(cell));
 
-      if (cell->level() > 0 &&
-          (cell->index() % GeometryInfo<dim>::max_children_per_cell) == 0)
+      if (cell->level() > 0 && cell->parent()->child(0) == cell)
         add_indices_recursively_for_first_child_policy(cell->parent(),
                                                        cell_id_translator,
                                                        is_fine);
@@ -89,8 +88,8 @@ namespace RepartitioningPolicyTools
     const int ierr = MPI_Exscan(&process_has_active_locally_owned_cells,
                                 &offset,
                                 1,
-                                Utilities::MPI::internal::mpi_type_id(
-                                  &process_has_active_locally_owned_cells),
+                                Utilities::MPI::mpi_type_id_for_type<decltype(
+                                  process_has_active_locally_owned_cells)>,
                                 MPI_SUM,
                                 comm);
     AssertThrowMPI(ierr);
@@ -308,23 +307,24 @@ namespace RepartitioningPolicyTools
     // determine partial sum of weights of this process
     uint64_t process_local_weight_offset = 0;
 
-    int ierr =
-      MPI_Exscan(&process_local_weight,
-                 &process_local_weight_offset,
-                 1,
-                 Utilities::MPI::internal::mpi_type_id(&process_local_weight),
-                 MPI_SUM,
-                 tria->get_communicator());
+    int ierr = MPI_Exscan(
+      &process_local_weight,
+      &process_local_weight_offset,
+      1,
+      Utilities::MPI::mpi_type_id_for_type<decltype(process_local_weight)>,
+      MPI_SUM,
+      tria->get_communicator());
     AssertThrowMPI(ierr);
 
     // total weight of all processes
     uint64_t total_weight = process_local_weight_offset + process_local_weight;
 
-    ierr = MPI_Bcast(&total_weight,
-                     1,
-                     Utilities::MPI::internal::mpi_type_id(&total_weight),
-                     n_subdomains - 1,
-                     mpi_communicator);
+    ierr =
+      MPI_Bcast(&total_weight,
+                1,
+                Utilities::MPI::mpi_type_id_for_type<decltype(total_weight)>,
+                n_subdomains - 1,
+                mpi_communicator);
     AssertThrowMPI(ierr);
 
     // setup partition

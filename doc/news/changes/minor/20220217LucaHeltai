@@ -1,0 +1,3 @@
+New: GridGenerator::generate_from_name_and_argument() now supports also GridGenerator::hyper_ball_balanced()
+<br>
+(Luca Heltai, 2022/02/17)

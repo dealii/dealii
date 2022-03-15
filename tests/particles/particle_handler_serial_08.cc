@@ -51,7 +51,7 @@ test()
   auto p = random_point<spacedim>();
   for (const auto &part : tree | bgi::adaptors::queried(bgi::nearest(p, 3)))
     deallog << "Particle " << part.get_id() << " is close to " << p
-            << " (location = " << part.get_location() << ")" << std::endl;
+            << " (location = " << part.get_location() << ')' << std::endl;
 }
 
 int

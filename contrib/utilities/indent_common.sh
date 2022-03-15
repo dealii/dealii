@@ -227,7 +227,7 @@ dos_to_unix()
   tr -d '\015' <"${file}" >"${tmpfile}"
 
   fix_or_report "${file}" "${tmpfile}" "file has non-unix line-ending '\\r\\n'"
-  rm -f "${tmpfile}" "${tmpfile}"
+  rm -f "${tmpfile}"
 }
 export -f dos_to_unix
 

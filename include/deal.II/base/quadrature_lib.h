@@ -588,6 +588,9 @@ public:
  *
  * No transformation is applied to the weights, and the weights referring to
  * points that live outside the reference simplex are simply discarded.
+ * Because this leads to (or *may* lead to) a sum of quadrature weights that
+ * do not equal the area of the simplex, the resulting quadrature formula
+ * is not useful for actually computing integrals.
  *
  * The main use of this quadrature formula is not to chop tensor product
  * quadratures. Ideally you should pass to this class a quadrature formula

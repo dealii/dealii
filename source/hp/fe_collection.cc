@@ -17,6 +17,7 @@
 #include <deal.II/base/memory_consumption.h>
 
 #include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/mapping_collection.h>
 
 #include <set>
 
@@ -72,6 +73,40 @@ namespace hp
                       "same number of vector components!"));
 
     Collection<FiniteElement<dim, spacedim>>::push_back(new_fe.clone());
+  }
+
+
+
+  template <int dim, int spacedim>
+  const MappingCollection<dim, spacedim> &
+  FECollection<dim, spacedim>::get_reference_cell_default_linear_mapping() const
+  {
+    Assert(this->size() > 0, ExcNoFiniteElements());
+
+    // Since we can only add elements to an FECollection, we are safe comparing
+    // the sizes of this object and the MappingCollection. One circumstance that
+    // might lead to their sizes diverging is this:
+    // - An FECollection is created and then this function is called. The shared
+    //   map is now initialized.
+    // - A second FECollection is made as a copy of this one. The shared map is
+    //   not recreated.
+    // - The second FECollection is then resized by adding a new FE. The shared
+    //   map is thus invalid for the second instance.
+    if (!reference_cell_default_linear_mapping ||
+        reference_cell_default_linear_mapping->size() != this->size())
+      {
+        auto &this_nc = const_cast<FECollection<dim, spacedim> &>(*this);
+
+        this_nc.reference_cell_default_linear_mapping =
+          std::make_shared<MappingCollection<dim, spacedim>>();
+
+        for (const auto &fe : *this)
+          this_nc.reference_cell_default_linear_mapping->push_back(
+            fe.reference_cell()
+              .template get_default_linear_mapping<dim, spacedim>());
+      }
+
+    return *reference_cell_default_linear_mapping;
   }
 
 

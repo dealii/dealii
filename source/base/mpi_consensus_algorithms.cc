@@ -25,6 +25,8 @@ namespace Utilities
     {
       template class Process<unsigned int, unsigned int>;
 
+      template class Interface<unsigned int, unsigned int>;
+
       template class NBX<unsigned int, unsigned int>;
 
       template class PEX<unsigned int, unsigned int>;
@@ -35,6 +37,10 @@ namespace Utilities
 
 
       template class Process<
+        std::pair<types::global_dof_index, types::global_dof_index>,
+        unsigned int>;
+
+      template class Interface<
         std::pair<types::global_dof_index, types::global_dof_index>,
         unsigned int>;
 
@@ -57,6 +63,8 @@ namespace Utilities
 #ifdef DEAL_II_WITH_64BIT_INDICES
       template class Process<types::global_dof_index, unsigned int>;
 
+      template class Interface<types::global_dof_index, unsigned int>;
+
       template class NBX<types::global_dof_index, unsigned int>;
 
       template class Serial<types::global_dof_index, unsigned int>;
@@ -67,6 +75,8 @@ namespace Utilities
 #endif
 
       template class Process<char, char>;
+
+      template class Interface<char, char>;
 
       template class NBX<char, char>;
 

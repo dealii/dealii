@@ -119,7 +119,7 @@ check()
 
   check(tria);
 
-  deallog << "OK for " << dim << "d" << std::endl;
+  deallog << "OK for " << dim << 'd' << std::endl;
 }
 
 

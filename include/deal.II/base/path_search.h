@@ -190,7 +190,7 @@ public:
                  std::string,
                  std::string,
                  << "The file \"" << arg1 << "\" was not found in the path for "
-                 << "files of class " << arg2 << ".");
+                 << "files of class " << arg2 << '.');
 
 private:
   /**

@@ -622,7 +622,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
   Assert(tria != nullptr, ExcNoTriangulationSelected());
   Assert((dim == 2) || (dim == 3), ExcNotImplemented());
 
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
   skip_comment_lines(in, '#'); // skip comments (if any) at beginning of file
 
   int tmp;
@@ -630,13 +630,13 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
   // loop over sections, read until section 2411 is found, and break once found
   while (true)
     {
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
       in >> tmp;
       AssertThrow(tmp == -1,
                   ExcMessage("Invalid UNV file format. "
                              "Expected '-1' before and after a section."));
 
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
       in >> tmp;
       AssertThrow(tmp >= 0, ExcUnknownSectionType(tmp));
       if (tmp != 2411)
@@ -645,7 +645,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           while (true)
             {
               std::string line;
-              AssertThrow(in, ExcIO());
+              AssertThrow(in.fail() == false, ExcIO());
               std::getline(in, line);
               // remove leading and trailing spaces in the line
               boost::algorithm::trim(line);
@@ -672,7 +672,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       int    dummy;
       double x[3];
 
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
       in >> no;
 
       tmp = no;
@@ -681,7 +681,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
 
       in >> dummy >> dummy >> dummy;
 
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
       in >> x[0] >> x[1] >> x[2];
 
       vertices.emplace_back();
@@ -694,9 +694,9 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       no_vertex++;
     }
 
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
   in >> tmp;
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
   in >> tmp;
 
   // section 2412 describes elements: see
@@ -723,7 +723,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       int type;
       int dummy;
 
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
       in >> no;
 
       tmp = no;
@@ -741,7 +741,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           const auto reference_cell = ReferenceCells::get_hypercube<dim>();
           cells.emplace_back();
 
-          AssertThrow(in, ExcIO());
+          AssertThrow(in.fail() == false, ExcIO());
           for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             in >> cells.back()
                     .vertices[reference_cell.unv_vertex_to_deal_vertex(v)];
@@ -758,12 +758,12 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       else if (((type == 11) && (dim == 2)) ||
                ((type == 11) && (dim == 3))) // boundary line
         {
-          AssertThrow(in, ExcIO());
+          AssertThrow(in.fail() == false, ExcIO());
           in >> dummy >> dummy >> dummy;
 
           subcelldata.boundary_lines.emplace_back();
 
-          AssertThrow(in, ExcIO());
+          AssertThrow(in.fail() == false, ExcIO());
           for (unsigned int &vertex :
                subcelldata.boundary_lines.back().vertices)
             in >> vertex;
@@ -783,7 +783,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           const auto reference_cell = ReferenceCells::Quadrilateral;
           subcelldata.boundary_quads.emplace_back();
 
-          AssertThrow(in, ExcIO());
+          AssertThrow(in.fail() == false, ExcIO());
           Assert(subcelldata.boundary_quads.back().vertices.size() ==
                    GeometryInfo<2>::vertices_per_cell,
                  ExcInternalError());
@@ -817,7 +817,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
 
   if (!in.eof())
     {
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
       in >> tmp;
 
       // section 2467 (2477) describes (materials - first and bcs - second) or
@@ -833,7 +833,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           int no;         // unv
           int dummy;
 
-          AssertThrow(in, ExcIO());
+          AssertThrow(in.fail() == false, ExcIO());
           in >> dummy;
 
           tmp = dummy;
@@ -843,7 +843,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           in >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
             n_entities;
 
-          AssertThrow(in, ExcIO());
+          AssertThrow(in.fail() == false, ExcIO());
           in >> id;
 
           const unsigned int n_lines =
@@ -861,7 +861,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
               for (unsigned int no_fragment = 0; no_fragment < n_fragments;
                    no_fragment++)
                 {
-                  AssertThrow(in, ExcIO());
+                  AssertThrow(in.fail() == false, ExcIO());
                   in >> dummy >> no >> dummy >> dummy;
 
                   if (cell_indices.count(no) > 0) // cell - material
@@ -899,7 +899,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                 const bool    apply_all_indicators_to_manifolds)
 {
   Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // skip comments at start of file
   skip_comment_lines(in, '#');
@@ -912,7 +912,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
   in >> n_vertices >> n_cells >> dummy // number of data vectors
     >> dummy                           // cell data
     >> dummy;                          // model data
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // set up array of vertices
   std::vector<Point<spacedim>> vertices(n_vertices);
@@ -927,7 +927,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
       double x[3];
 
       // read vertex
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
       in >> vertex_number >> x[0] >> x[1] >> x[2];
 
       // store vertex
@@ -950,7 +950,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
       // cells at the top, there
       // should still be input here,
       // so check this:
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
 
       std::string cell_type;
 
@@ -1112,7 +1112,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
   // check that no forbidden arrays are used
   Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
@@ -1169,7 +1169,7 @@ GridIn<dim, spacedim>::read_abaqus(std::istream &in,
   Assert((spacedim == 2 && dim == spacedim) ||
            (spacedim == 3 && (dim == spacedim || dim == spacedim - 1)),
          ExcNotImplemented());
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // Read in the Abaqus file into an intermediate object
   // that is to be passed along to the UCD reader
@@ -1219,7 +1219,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   Assert(tria != nullptr, ExcNoTriangulationSelected());
   Assert(dim == 2, ExcNotImplemented());
 
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // skip comments at start of file
   skip_comment_lines(in, '#');
@@ -1366,7 +1366,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   // check that no forbidden arrays are used
   Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
@@ -1383,7 +1383,7 @@ void
 GridIn<dim, spacedim>::read_xda(std::istream &in)
 {
   Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   const auto reference_cell = ReferenceCells::get_hypercube<dim>();
 
@@ -1413,7 +1413,7 @@ GridIn<dim, spacedim>::read_xda(std::istream &in)
     {
       // note that since in the input file we found the number of cells at the
       // top, there should still be input here, so check this:
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
 
       // XDA happens to use ExodusII's numbering because XDA/XDR is libMesh's
       // native format, and libMesh's node numberings come from ExodusII:
@@ -1434,7 +1434,7 @@ GridIn<dim, spacedim>::read_xda(std::istream &in)
           in >> dummy;
         }
     }
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
@@ -1451,7 +1451,7 @@ void
 GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
 {
   Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // Start by making our life a bit easier: The file format
   // allows for comments in a whole bunch of places, including
@@ -1495,7 +1495,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
   // # Types
   // 3 obj
 
-  AssertThrow(whole_file, ExcIO());
+  AssertThrow(whole_file.fail() == false, ExcIO());
 
   {
     unsigned int version_major, version_minor;
@@ -1544,7 +1544,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
   //
   // # Mesh vertex coordinates
   // ...
-  AssertThrow(whole_file, ExcIO());
+  AssertThrow(whole_file.fail() == false, ExcIO());
   {
     unsigned int dummy;
     whole_file >> dummy >> dummy >> dummy;
@@ -1606,7 +1606,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
   //  6
   //  3
   //  [...]
-  AssertThrow(whole_file, ExcIO());
+  AssertThrow(whole_file.fail() == false, ExcIO());
 
   std::vector<CellData<dim>> cells;
   SubCellData                subcelldata;
@@ -1709,7 +1709,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
         n_vertices_per_element);
       for (unsigned int e = 0; e < n_elements; ++e)
         {
-          AssertThrow(whole_file, ExcIO());
+          AssertThrow(whole_file.fail() == false, ExcIO());
           for (unsigned int v = 0; v < n_vertices_per_element; ++v)
             {
               whole_file >> vertices_for_this_element[v];
@@ -1780,7 +1780,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
         {
           for (unsigned int e = 0; e < n_geom_entity_indices; ++e)
             {
-              AssertThrow(whole_file, ExcIO());
+              AssertThrow(whole_file.fail() == false, ExcIO());
               unsigned int geometric_entity_index;
               whole_file >> geometric_entity_index;
               if (object_type == ReferenceCells::Vertex)
@@ -1822,7 +1822,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
             }
         }
     }
-  AssertThrow(whole_file, ExcIO());
+  AssertThrow(whole_file.fail() == false, ExcIO());
 
   // Now finally create the mesh. Because of the quirk with boundary
   // edges and faces described in the documentation of this function,
@@ -1997,7 +1997,7 @@ void
 GridIn<dim, spacedim>::read_msh(std::istream &in)
 {
   Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   unsigned int n_vertices;
   unsigned int n_cells;
@@ -2352,7 +2352,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             // cells at the top, there
             // should still be input here,
             // so check this:
-            AssertThrow(in, ExcIO());
+            AssertThrow(in.fail() == false, ExcIO());
 
             unsigned int nod_num;
 
@@ -2670,7 +2670,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   // check that no forbidden arrays are used
   Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // check that we actually read some cells.
   AssertThrow(cells.size() > 0,
@@ -2688,7 +2688,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
       // ... and cells
       if (dim == spacedim)
-        GridTools::invert_all_negative_measure_cells(vertices, cells);
+        GridTools::invert_cells_with_negative_measure(vertices, cells);
       GridTools::consistently_order_cells(cells);
     }
   tria->create_triangulation(vertices, cells, subcelldata);
@@ -3155,7 +3155,7 @@ GridIn<2>::read_tecplot(std::istream &in)
   const unsigned int dim      = 2;
   const unsigned int spacedim = 2;
   Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // skip comments at start of file
   skip_comment_lines(in, '#');
@@ -3362,7 +3362,7 @@ GridIn<2>::read_tecplot(std::istream &in)
           // we found the number of cells at
           // the top, there should still be
           // input here, so check this:
-          AssertThrow(in, ExcIO());
+          AssertThrow(in.fail() == false, ExcIO());
 
           // get the connectivity from the
           // input file. the vertices are
@@ -3378,7 +3378,7 @@ GridIn<2>::read_tecplot(std::istream &in)
   // used. as we do not read in any
   // subcelldata, nothing should happen here.
   Assert(subcelldata.check_consistency(dim), ExcInternalError());
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   // do some cleanup on cells
   GridTools::invert_all_negative_measure_cells(vertices, cells);
@@ -4390,7 +4390,7 @@ namespace
     // http://www.egr.msu.edu/software/abaqus/Documentation/docs/v6.7/books/usb/default.htm?startat=pt01ch02.html
     // http://www.cprogramming.com/tutorial/string.html
 
-    AssertThrow(input_stream, ExcIO());
+    AssertThrow(input_stream.fail() == false, ExcIO());
     std::string line;
 
     while (std::getline(input_stream, line))
@@ -4819,7 +4819,7 @@ namespace
     // http://www.dealii.org/developer/doxygen/deal.II/structGeometryInfo.html
     // http://people.scs.fsu.edu/~burkardt/data/ucd/ucd.html
 
-    AssertThrow(output, ExcIO());
+    AssertThrow(output.fail() == false, ExcIO());
 
     // save old formatting options
     const boost::io::ios_base_all_saver formatting_saver(output);

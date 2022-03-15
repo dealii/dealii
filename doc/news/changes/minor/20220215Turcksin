@@ -1,0 +1,6 @@
+New: Add new DistributedTree class based on ArborX. This class performs multiple
+kinds of geometric search on distributed objects: intersection of bounding boxes
+and intersection of bounding boxes with points. This class is the distributed
+equivalent of ArborXWrappers::BVH.
+<br>
+(Bruno Turcksin, 2022/02/15)

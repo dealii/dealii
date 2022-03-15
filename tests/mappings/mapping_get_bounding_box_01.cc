@@ -37,8 +37,8 @@ void
 test_bounding_boxes(const Mapping<dim, spacedim> &mapping,
                     const unsigned int            degree)
 {
-  deallog << "Testing " << boost::core::demangle(typeid(mapping).name()) << "("
-          << degree << ")" << std::endl;
+  deallog << "Testing " << boost::core::demangle(typeid(mapping).name()) << '('
+          << degree << ')' << std::endl;
 
   Triangulation<dim, spacedim> triangulation;
   GridGenerator::hyper_ball(triangulation);

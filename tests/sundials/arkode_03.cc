@@ -62,12 +62,12 @@ main(int argc, char **argv)
 
   if (false)
     {
-      std::ofstream ofile(SOURCE_DIR "/arkode_03.prm");
+      std::ofstream ofile(SOURCE_DIR "/arkode_03_in.prm");
       prm.print_parameters(ofile, ParameterHandler::ShortText);
       ofile.close();
     }
 
-  std::ifstream ifile(SOURCE_DIR "/arkode_03.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_03_in.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKode<VectorType> ode(data);
@@ -98,8 +98,8 @@ main(int argc, char **argv)
     // limit the output to every 10th step and increase the precision to make
     // the test more robust
     if (step_number % 10 == 0)
-      deallog << t << " " << std::setprecision(10) << sol[0] << " " << sol[1]
-              << " " << sol[2] << std::endl;
+      deallog << t << ' ' << std::setprecision(10) << sol[0] << ' ' << sol[1]
+              << ' ' << sol[2] << std::endl;
     return 0;
   };
 

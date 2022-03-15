@@ -322,12 +322,12 @@ test_hessians(const unsigned int                             degree,
 
   deallog << "dst FEE: ";
   for (unsigned int i = 0; i < end_of_print_dst; ++i)
-    deallog << dst[i] << " ";
+    deallog << dst[i] << ' ';
   deallog << std::endl;
 
   deallog << "dst FEV: ";
   for (unsigned int i = 0; i < end_of_print_dst; ++i)
-    deallog << dst2[i] << " ";
+    deallog << dst2[i] << ' ';
   deallog << std::endl;
 
   // compare solutions of matrix vector product

@@ -37,9 +37,9 @@ test(IndexSet &index_set)
        ++it)
     {
       if (it->n_elements() == 1)
-        deallog << *(it->begin()) << " ";
+        deallog << *(it->begin()) << ' ';
       else
-        deallog << "[" << *(it->begin()) << "," << it->last() << "] ";
+        deallog << '[' << *(it->begin()) << ',' << it->last() << "] ";
     }
   deallog << std::endl;
 
@@ -48,7 +48,7 @@ test(IndexSet &index_set)
     for (IndexSet::ElementIterator it = index_set.begin();
          it != index_set.end();
          ++it)
-      deallog << *it << " ";
+      deallog << *it << ' ';
     deallog << std::endl;
   }
 

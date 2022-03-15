@@ -80,7 +80,7 @@ namespace Utilities
         MPI_Exscan(&local_size,
                    &prefix_sum,
                    1,
-                   Utilities::MPI::internal::mpi_type_id(&prefix_sum),
+                   Utilities::MPI::mpi_type_id_for_type<decltype(prefix_sum)>,
                    MPI_SUM,
                    communicator);
       AssertThrowMPI(ierr);

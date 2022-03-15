@@ -66,12 +66,12 @@ main(int argc, char **argv)
   // Set to true to reset input file.
   if (false)
     {
-      std::ofstream ofile(SOURCE_DIR "/arkode_01.prm");
+      std::ofstream ofile(SOURCE_DIR "/arkode_01_in.prm");
       prm.print_parameters(ofile, ParameterHandler::ShortText);
       ofile.close();
     }
 
-  std::ifstream ifile(SOURCE_DIR "/arkode_01.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_01_in.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKode<VectorType> ode(data);
@@ -88,7 +88,7 @@ main(int argc, char **argv)
   ode.output_step = [&](const double       t,
                         const VectorType & sol,
                         const unsigned int step_number) -> int {
-    deallog << t << " " << sol[0] << " " << sol[1] << std::endl;
+    deallog << t << ' ' << sol[0] << ' ' << sol[1] << std::endl;
     return 0;
   };
 

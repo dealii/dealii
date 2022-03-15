@@ -101,21 +101,21 @@ test()
   deallog << "Ghost subset in " << v.n_ghost_indices() << " indices: ";
   for (unsigned int i = 0; i < v.ghost_indices_within_larger_ghost_set().size();
        ++i)
-    deallog << "[" << v.ghost_indices_within_larger_ghost_set()[i].first << ", "
+    deallog << '[' << v.ghost_indices_within_larger_ghost_set()[i].first << ", "
             << v.ghost_indices_within_larger_ghost_set()[i].second << ") ";
   deallog << std::endl;
 
   deallog << "Ghost subset in " << w.n_ghost_indices() << " indices: ";
   for (unsigned int i = 0; i < w.ghost_indices_within_larger_ghost_set().size();
        ++i)
-    deallog << "[" << w.ghost_indices_within_larger_ghost_set()[i].first << ", "
+    deallog << '[' << w.ghost_indices_within_larger_ghost_set()[i].first << ", "
             << w.ghost_indices_within_larger_ghost_set()[i].second << ") ";
   deallog << std::endl;
 
   deallog << "Ghost subset in " << x.n_ghost_indices() << " indices: ";
   for (unsigned int i = 0; i < x.ghost_indices_within_larger_ghost_set().size();
        ++i)
-    deallog << "[" << x.ghost_indices_within_larger_ghost_set()[i].first << ", "
+    deallog << '[' << x.ghost_indices_within_larger_ghost_set()[i].first << ", "
             << x.ghost_indices_within_larger_ghost_set()[i].second << ") ";
   deallog << std::endl;
 }

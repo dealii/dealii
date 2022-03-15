@@ -349,9 +349,9 @@ namespace NonMatching
   MeshClassifier<dim>::reclassify()
   {
     initialize();
-    cell_locations.resize(triangulation->n_active_cells(),
+    cell_locations.assign(triangulation->n_active_cells(),
                           LocationToLevelSet::unassigned);
-    face_locations.resize(triangulation->n_raw_faces(),
+    face_locations.assign(triangulation->n_raw_faces(),
                           LocationToLevelSet::unassigned);
 
     // Loop over all cells and determine the location of all non artificial

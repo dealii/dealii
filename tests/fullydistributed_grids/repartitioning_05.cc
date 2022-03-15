@@ -46,14 +46,16 @@ create_sub_comm(const MPI_Comm &comm, const unsigned int size)
   int color = rank < size;
 
   MPI_Comm sub_comm;
-  MPI_Comm_split(comm, color, rank, &sub_comm);
+  int      ierr = MPI_Comm_split(comm, color, rank, &sub_comm);
+  AssertThrowMPI(ierr);
 
   if (rank < size)
     return sub_comm;
   else
     {
-      MPI_Comm_free(&sub_comm);
-      return MPI_COMM_NULL;
+      ierr = MPI_Comm_free(&sub_comm);
+      AssertThrowMPI(ierr);
+      return MPI_COMM_SELF;
     }
 }
 
@@ -67,9 +69,9 @@ partition_distributed_triangulation(const Triangulation<dim, spacedim> &tria_in,
   const auto comm_tria = tria_in.get_communicator();
 
   const auto n_global_active_cells = Utilities::MPI::max(
-    comm_tria == MPI_COMM_NULL ? 0 : tria_in.n_global_active_cells(), comm);
+    comm_tria == MPI_COMM_SELF ? 0 : tria_in.n_global_active_cells(), comm);
 
-  if (comm_tria == MPI_COMM_NULL)
+  if (comm_tria == MPI_COMM_SELF)
     {
       LinearAlgebra::distributed::Vector<double> partition{
         IndexSet(n_global_active_cells), IndexSet(n_global_active_cells), comm};
@@ -109,7 +111,7 @@ test(const MPI_Comm comm, const unsigned int n_partitions)
 
   parallel::distributed::Triangulation<dim> tria(sub_comm);
 
-  if (sub_comm != MPI_COMM_NULL)
+  if (sub_comm != MPI_COMM_SELF)
     {
       GridGenerator::subdivided_hyper_cube(tria, 4);
       tria.refine_global(3);
@@ -134,8 +136,11 @@ test(const MPI_Comm comm, const unsigned int n_partitions)
   print_statistics(tria_pft);
   print_statistics(dof_handler);
 
-  if (sub_comm != MPI_COMM_NULL)
-    MPI_Comm_free(&sub_comm);
+  if (sub_comm != MPI_COMM_SELF)
+    {
+      const int ierr = MPI_Comm_free(&sub_comm);
+      AssertThrowMPI(ierr);
+    }
 }
 
 

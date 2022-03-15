@@ -102,7 +102,7 @@ public:
    * Access to the dimension of this object, for checking and automatic
    * setting of dimension in other classes.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Constructor. <tt>pols</tt> is a vector of pointers to one-dimensional
@@ -322,7 +322,7 @@ PolynomialSpace<dim>::output_indices(StreamType &out) const
       const std::array<unsigned int, dim> ix = compute_index(i);
       out << i << "\t";
       for (unsigned int d = 0; d < dim; ++d)
-        out << ix[d] << " ";
+        out << ix[d] << ' ';
       out << std::endl;
     }
 }

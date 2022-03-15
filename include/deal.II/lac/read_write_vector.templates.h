@@ -1013,7 +1013,7 @@ namespace LinearAlgebra
                                  const unsigned int precision,
                                  const bool         scientific) const
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
     boost::io::ios_flags_saver restore_flags(out);
 
     out.precision(precision);
@@ -1027,10 +1027,10 @@ namespace LinearAlgebra
     out << std::endl;
     unsigned int i = 0;
     for (const auto idx : this->stored_elements)
-      out << "[" << idx << "]: " << values[i++] << '\n';
+      out << '[' << idx << "]: " << values[i++] << '\n';
     out << std::flush;
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 

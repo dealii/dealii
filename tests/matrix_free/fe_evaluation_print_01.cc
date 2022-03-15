@@ -40,7 +40,7 @@ test()
     {
       for (unsigned int j = 1; j < 25; ++j)
         if (FEEvaluation<dim, -1, 0, 1>::fast_evaluation_supported(i, j))
-          deallog << 1 << " ";
+          deallog << 1 << ' ';
         else
           deallog << "  ";
       deallog << std::endl;
@@ -49,7 +49,7 @@ test()
     {
       for (unsigned int j = 1; j < 25; ++j)
         if (FEFaceEvaluation<dim, -1, 0, 1>::fast_evaluation_supported(i, j))
-          deallog << 1 << " ";
+          deallog << 1 << ' ';
         else
           deallog << "  ";
       deallog << std::endl;

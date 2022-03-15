@@ -971,21 +971,21 @@ main(int argc, char *argv[])
   {
     degree = 1;
     FESystem<dim> fe(FE_Q<dim>(degree + 1), dim, FE_Q<dim>(degree), 1);
-    deallog << fe.get_name() << ":" << std::endl;
+    deallog << fe.get_name() << ':' << std::endl;
     StokesProblem<2> flow_problem(degree, fe);
     flow_problem.run();
   }
   {
     degree = 1;
     FESystem<2> fe(FE_Q<dim>(degree + 1), dim, FE_Q_DG0<dim>(degree), 1);
-    deallog << fe.get_name() << ":" << std::endl;
+    deallog << fe.get_name() << ':' << std::endl;
     StokesProblem<2> flow_problem(degree, fe);
     flow_problem.run();
   }
   {
     degree = 2;
     FESystem<2> fe(FE_Q<dim>(degree + 1), dim, FE_Q_DG0<dim>(degree), 1);
-    deallog << fe.get_name() << ":" << std::endl;
+    deallog << fe.get_name() << ':' << std::endl;
     StokesProblem<2> flow_problem(degree, fe);
     flow_problem.run();
   }

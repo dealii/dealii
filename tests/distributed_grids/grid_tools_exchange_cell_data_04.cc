@@ -87,7 +87,7 @@ test()
           {
             DT value = counter;
 
-            oss << "pack " << cell->id() << " " << value;
+            oss << "pack " << cell->id() << ' ' << value;
             input[cell->id()] = oss.str();
             return value;
           }
@@ -100,7 +100,7 @@ test()
       },
       [&](const cell_iterator &cell, const DT &data) {
         std::ostringstream oss;
-        oss << "unpack " << cell->id() << " " << data << " from "
+        oss << "unpack " << cell->id() << ' ' << data << " from "
             << cell->subdomain_id();
 
         output.insert(oss.str());

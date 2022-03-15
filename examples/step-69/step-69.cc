@@ -713,7 +713,7 @@ namespace Step69
       locally_owned   = dof_handler.locally_owned_dofs();
       n_locally_owned = locally_owned.n_elements();
 
-      DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant);
+      locally_relevant   = DoFTools::extract_locally_relevant_dofs(dof_handler);
       n_locally_relevant = locally_relevant.n_elements();
 
       partitioner =
@@ -2618,7 +2618,7 @@ namespace Step69
   typename MainLoop<dim>::vector_type
   MainLoop<dim>::interpolate_initial_values(const double t)
   {
-    pcout << "MainLoop<dim>::interpolate_initial_values(t = " << t << ")"
+    pcout << "MainLoop<dim>::interpolate_initial_values(t = " << t << ')'
           << std::endl;
     TimerOutput::Scope scope(computing_timer,
                              "main_loop - setup scratch space");
@@ -2708,7 +2708,7 @@ namespace Step69
                              const double                               t,
                              const unsigned int                         cycle)
   {
-    pcout << "MainLoop<dim>::output(t = " << t << ")" << std::endl;
+    pcout << "MainLoop<dim>::output(t = " << t << ')' << std::endl;
 
     // If the asynchronous writeback option is set we launch a background
     // thread performing all the slow IO to disc. In that case we have to

@@ -151,7 +151,6 @@ namespace LinearAlgebra
           else
             {
 #ifdef DEAL_II_WITH_MPI
-#  if DEAL_II_MPI_VERSION_GTE(3, 0)
               allocated_size = new_alloc_size;
 
               const unsigned int size_sm =
@@ -260,11 +259,6 @@ namespace LinearAlgebra
                                AssertThrowMPI(ierr);
                              }};
 #    endif
-#  else
-              AssertThrow(false,
-                          ExcMessage(
-                            "Sorry, this feature requires MPI 3.0 support"));
-#  endif
 #else
               Assert(false, ExcInternalError());
 #endif
@@ -2248,7 +2242,7 @@ namespace LinearAlgebra
                                            const bool         across) const
     {
       Assert(partitioner.get() != nullptr, ExcInternalError());
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
       std::ios::fmtflags old_flags     = out.flags();
       unsigned int       old_precision = out.precision(precision);
 
@@ -2300,7 +2294,7 @@ namespace LinearAlgebra
               out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
                   << '/'
                   << stored_elements[partitioner->locally_owned_size() + i]
-                  << ")" << std::endl;
+                  << ')' << std::endl;
           out << std::endl;
         }
       out << std::flush;
@@ -2321,7 +2315,7 @@ namespace LinearAlgebra
         }
 #endif
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
       // reset output format
       out.flags(old_flags);
       out.precision(old_precision);

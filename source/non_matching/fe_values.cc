@@ -28,6 +28,8 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
+#include <deal.II/matrix_free/fe_point_evaluation.h>
+
 #include <deal.II/non_matching/fe_values.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -163,6 +165,23 @@ namespace NonMatching
          * set_active_cell()
          */
         std::vector<typename VectorType::value_type> local_dof_values;
+
+        /**
+         * Description of the 1D polynomial basis for tensor product elements
+         * used for the fast path of this class using tensor product
+         * evaluators.
+         */
+        std::vector<Polynomials::Polynomial<double>> poly;
+
+        /**
+         * Renumbering for the tensor-product evaluator in the fast path.
+         */
+        std::vector<unsigned int> renumber;
+
+        /**
+         * Check whether the shape functions are linear.
+         */
+        bool polynomials_are_hat_functions;
       };
 
 
@@ -199,7 +218,36 @@ namespace NonMatching
 
         // Save the element and the local dof values, since this is what we need
         // to evaluate the function.
-        element = &dof_handler_cell->get_fe();
+
+        // Check if we can use the fast path. In case we have a different
+        // element from the one used before we need to set up the data
+        // structures again.
+        if (element != &dof_handler_cell->get_fe())
+          {
+            poly.clear();
+            element = &dof_handler_cell->get_fe();
+
+            if (element->n_base_elements() == 1 &&
+                dealii::internal::FEPointEvaluation::is_fast_path_supported(
+                  *element, 0))
+              {
+                dealii::internal::MatrixFreeFunctions::ShapeInfo<double>
+                  shape_info;
+
+                shape_info.reinit(QMidpoint<1>(), *element, 0);
+                renumber = shape_info.lexicographic_numbering;
+                poly =
+                  dealii::internal::FEPointEvaluation::get_polynomial_space(
+                    element->base_element(0));
+
+                polynomials_are_hat_functions =
+                  (poly.size() == 2 && poly[0].value(0.) == 1. &&
+                   poly[0].value(1.) == 0. && poly[1].value(0.) == 0. &&
+                   poly[1].value(1.) == 1.);
+              }
+          }
+        else
+          element = &dof_handler_cell->get_fe();
 
         local_dof_indices.resize(element->dofs_per_cell);
         dof_handler_cell->get_dof_indices(local_dof_indices);
@@ -234,12 +282,26 @@ namespace NonMatching
         AssertIndexRange(component, this->n_components);
         Assert(cell_is_set(), ExcCellNotSet());
 
-        double value = 0;
-        for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
-          value += local_dof_values[i] *
-                   element->shape_value_component(i, point, component);
+        if (!poly.empty() && component == 0)
+          {
+            // TODO: this could be extended to a component that is not zero
+            return dealii::internal::evaluate_tensor_product_value_and_gradient(
+                     poly,
+                     local_dof_values,
+                     point,
+                     polynomials_are_hat_functions,
+                     renumber)
+              .first;
+          }
+        else
+          {
+            double value = 0;
+            for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
+              value += local_dof_values[i] *
+                       element->shape_value_component(i, point, component);
 
-        return value;
+            return value;
+          }
       }
 
 
@@ -253,12 +315,26 @@ namespace NonMatching
         AssertIndexRange(component, this->n_components);
         Assert(cell_is_set(), ExcCellNotSet());
 
-        Tensor<1, dim> gradient;
-        for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
-          gradient += local_dof_values[i] *
-                      element->shape_grad_component(i, point, component);
+        if (!poly.empty() && component == 0)
+          {
+            // TODO: this could be extended to a component that is not zero
+            return dealii::internal::evaluate_tensor_product_value_and_gradient(
+                     poly,
+                     local_dof_values,
+                     point,
+                     polynomials_are_hat_functions,
+                     renumber)
+              .second;
+          }
+        else
+          {
+            Tensor<1, dim> gradient;
+            for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
+              gradient += local_dof_values[i] *
+                          element->shape_grad_component(i, point, component);
 
-        return gradient;
+            return gradient;
+          }
       }
 
 
@@ -272,12 +348,22 @@ namespace NonMatching
         AssertIndexRange(component, this->n_components);
         Assert(cell_is_set(), ExcCellNotSet());
 
-        Tensor<2, dim> hessian;
-        for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
-          hessian += local_dof_values[i] *
-                     element->shape_grad_grad_component(i, point, component);
+        if (!poly.empty() && component == 0)
+          {
+            // TODO: this could be extended to a component that is not zero
+            return dealii::internal::evaluate_tensor_product_hessian(
+              poly, local_dof_values, point, renumber);
+          }
+        else
+          {
+            Tensor<2, dim> hessian;
+            for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
+              hessian +=
+                local_dof_values[i] *
+                element->shape_grad_grad_component(i, point, component);
 
-        return symmetrize(hessian);
+            return symmetrize(hessian);
+          }
       }
     } // namespace FEValuesImplementation
   }   // namespace internal
@@ -353,20 +439,18 @@ namespace NonMatching
 
     Assert(fe_collection->size() > 0,
            ExcMessage("Incoming hp::FECollection can not be empty."));
-    Assert(
-      mapping_collection->size() == fe_collection->size() ||
-        mapping_collection->size() == 1,
-      ExcMessage(
-        "Size of hp::MappingCollection must be the same as hp::FECollection or 1."));
-    Assert(
-      q_collection.size() == fe_collection->size() || q_collection.size() == 1,
-      ExcMessage(
-        "Size of hp::QCollection<dim> must be the same as hp::FECollection or 1."));
-    Assert(
-      q_collection_1D.size() == fe_collection->size() ||
-        q_collection_1D.size() == 1,
-      ExcMessage(
-        "Size of hp::QCollection<1> must be the same as hp::FECollection or 1."));
+    Assert(mapping_collection->size() == fe_collection->size() ||
+             mapping_collection->size() == 1,
+           ExcMessage("Size of hp::MappingCollection must be "
+                      "the same as hp::FECollection or 1."));
+    Assert(q_collection.size() == fe_collection->size() ||
+             q_collection.size() == 1,
+           ExcMessage("Size of hp::QCollection<dim> must be the "
+                      "same as hp::FECollection or 1."));
+    Assert(q_collection_1D.size() == fe_collection->size() ||
+             q_collection_1D.size() == 1,
+           ExcMessage("Size of hp::QCollection<1> must be the "
+                      "same as hp::FECollection or 1."));
 
     // For each element in fe_collection, create dealii::FEValues objects to use
     // on the non-intersected cells.
@@ -442,8 +526,8 @@ namespace NonMatching
               quadrature_generator.get_surface_quadrature();
 
             // Even if a cell is formally intersected the number of created
-            // quadrature points can be 0. Avoid creating an FEValues object if
-            // that is the case.
+            // quadrature points can be 0. Avoid creating an FEValues object
+            // if that is the case.
             if (inside_quadrature.size() > 0)
               {
                 fe_values_inside.emplace((*mapping_collection)[mapping_index],

@@ -46,9 +46,6 @@ test(const MPI_Comm &comm)
               << std::endl;
       request_buffer.push_back(my_rank);
     },
-    [&](const unsigned int other_rank, std::vector<T2> &recv_buffer) {
-      recv_buffer.resize(1);
-    },
     [&](const unsigned int other_rank, const std::vector<T2> &recv_buffer) {
       AssertDimension(other_rank, recv_buffer.front());
       deallog << "ConsensusAlgorithmProcess::function_read_answer() passed!"
@@ -60,7 +57,7 @@ test(const MPI_Comm &comm)
       .run();
 
   for (const auto &i : sources)
-    deallog << i << " ";
+    deallog << i << ' ';
   deallog << std::endl;
 }
 

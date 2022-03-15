@@ -1,0 +1,5 @@
+New: A tutorial, Step-85, which shows how to use functionality in the
+NonMatching namespace to solve a PDE with the cut finite element method,
+when the domain is described by a level set function.
+<br>
+(Simon Sticko, 2022/01/07)

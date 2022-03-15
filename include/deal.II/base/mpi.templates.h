@@ -39,142 +39,6 @@ namespace Utilities
   {
     namespace internal
     {
-#ifdef DEAL_II_WITH_MPI
-      /**
-       * Return the corresponding MPI data type id for the argument given.
-       */
-      inline MPI_Datatype
-      mpi_type_id(const bool *)
-      {
-#  if DEAL_II_MPI_VERSION_GTE(2, 2)
-        return MPI_CXX_BOOL;
-#  else
-        return MPI_C_BOOL;
-#  endif
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const char *)
-      {
-        return MPI_CHAR;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const signed char *)
-      {
-        return MPI_SIGNED_CHAR;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const short *)
-      {
-        return MPI_SHORT;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const int *)
-      {
-        return MPI_INT;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const long int *)
-      {
-        return MPI_LONG;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const unsigned char *)
-      {
-        return MPI_UNSIGNED_CHAR;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const unsigned short *)
-      {
-        return MPI_UNSIGNED_SHORT;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const unsigned int *)
-      {
-        return MPI_UNSIGNED;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const unsigned long int *)
-      {
-        return MPI_UNSIGNED_LONG;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const unsigned long long int *)
-      {
-        return MPI_UNSIGNED_LONG_LONG;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const float *)
-      {
-        return MPI_FLOAT;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const double *)
-      {
-        return MPI_DOUBLE;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const long double *)
-      {
-        return MPI_LONG_DOUBLE;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const std::complex<float> *)
-      {
-        return MPI_COMPLEX;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const std::complex<double> *)
-      {
-        return MPI_DOUBLE_COMPLEX;
-      }
-#endif
-
-
       template <typename T>
       void
       all_reduce(const MPI_Op &            mpi_op,
@@ -216,12 +80,10 @@ namespace Utilities
             }
 #  endif
             const int ierr =
-              MPI_Allreduce(values != output ?
-                              DEAL_II_MPI_CONST_CAST(values.data()) :
-                              MPI_IN_PLACE,
+              MPI_Allreduce(values != output ? values.data() : MPI_IN_PLACE,
                             static_cast<void *>(output.data()),
                             static_cast<int>(values.size()),
-                            internal::mpi_type_id(values.data()),
+                            mpi_type_id_for_type<decltype(*values.data())>,
                             mpi_op,
                             mpi_communicator);
             AssertThrowMPI(ierr);
@@ -261,7 +123,7 @@ namespace Utilities
                               MPI_IN_PLACE,
                             static_cast<void *>(output.data()),
                             static_cast<int>(values.size() * 2),
-                            internal::mpi_type_id(static_cast<T *>(nullptr)),
+                            mpi_type_id_for_type<T>,
                             mpi_op,
                             mpi_communicator);
             AssertThrowMPI(ierr);

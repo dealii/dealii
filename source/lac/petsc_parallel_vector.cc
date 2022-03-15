@@ -374,7 +374,7 @@ namespace PETScWrappers
                   const bool         scientific,
                   const bool         across) const
     {
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
 
       // get a representation of the vector and
       // loop over all the elements
@@ -440,7 +440,7 @@ namespace PETScWrappers
       ierr = VecRestoreArray(vector, &val);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-      AssertThrow(out, ExcIO());
+      AssertThrow(out.fail() == false, ExcIO());
     }
 
   } // namespace MPI

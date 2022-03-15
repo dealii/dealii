@@ -171,9 +171,9 @@ namespace ArborX
   {
     // ArborX assumes that the point coordinates use float and that the point
     // is 3D
-    return {{static_cast<float>(v[i][0]),
-             static_cast<float>(v[i][1]),
-             dim == 2 ? 0 : static_cast<float>(v[i][2])}};
+    return {static_cast<float>(v[i][0]),
+            static_cast<float>(v[i][1]),
+            dim == 2 ? 0 : static_cast<float>(v[i][2])};
   }
 
 

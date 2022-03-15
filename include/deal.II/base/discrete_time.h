@@ -208,7 +208,7 @@ DEAL_II_NAMESPACE_OPEN
  *     << "Timestep: " << time.get_step_number() << " -- "
  *     << "Solving for the solution at "
  *     << "t = " << time_of_simulation << " with "
- *     << "dt = " << timestep_size << "." << std::endl;
+ *     << "dt = " << timestep_size << '.' << std::endl;
  *   // } end snapshot stage
  *
  *   // update stage {

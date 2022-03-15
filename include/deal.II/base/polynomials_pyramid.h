@@ -34,7 +34,7 @@ public:
   /**
    * Make the dimension available to the outside.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /*
    * Constructor taking the polynomial @p degree as input.

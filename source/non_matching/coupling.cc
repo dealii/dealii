@@ -182,7 +182,8 @@ namespace NonMatching
     const ComponentMask &             space_comps,
     const ComponentMask &             immersed_comps,
     const Mapping<dim0, spacedim> &   space_mapping,
-    const Mapping<dim1, spacedim> &   immersed_mapping)
+    const Mapping<dim1, spacedim> &   immersed_mapping,
+    const AffineConstraints<number> & immersed_constraints)
   {
     GridTools::Cache<dim0, spacedim> cache(space_dh.get_triangulation(),
                                            space_mapping);
@@ -194,7 +195,8 @@ namespace NonMatching
                                      constraints,
                                      space_comps,
                                      immersed_comps,
-                                     immersed_mapping);
+                                     immersed_mapping,
+                                     immersed_constraints);
   }
 
 
@@ -214,7 +216,8 @@ namespace NonMatching
     const AffineConstraints<number> &       constraints,
     const ComponentMask &                   space_comps,
     const ComponentMask &                   immersed_comps,
-    const Mapping<dim1, spacedim> &         immersed_mapping)
+    const Mapping<dim1, spacedim> &         immersed_mapping,
+    const AffineConstraints<number> &       immersed_constraints)
   {
     AssertDimension(sparsity.n_rows(), space_dh.n_dofs());
     AssertDimension(sparsity.n_cols(), immersed_dh.n_dofs());
@@ -350,7 +353,10 @@ namespace NonMatching
                 // for the case of non-trivial dof_mask, we should
                 // uncomment the missing part.
                 constraints.add_entries_local_to_global(
-                  odofs, dofs, sparsity); //, true, dof_mask);
+                  odofs,
+                  immersed_constraints,
+                  dofs,
+                  sparsity); //, true, dof_mask);
               }
           }
         ++i;
@@ -370,7 +376,8 @@ namespace NonMatching
     const ComponentMask &                                 space_comps,
     const ComponentMask &                                 immersed_comps,
     const Mapping<dim0, spacedim> &                       space_mapping,
-    const Mapping<dim1, spacedim> &                       immersed_mapping)
+    const Mapping<dim1, spacedim> &                       immersed_mapping,
+    const AffineConstraints<typename Matrix::value_type> &immersed_constraints)
   {
     GridTools::Cache<dim0, spacedim> cache(space_dh.get_triangulation(),
                                            space_mapping);
@@ -382,7 +389,8 @@ namespace NonMatching
                                 constraints,
                                 space_comps,
                                 immersed_comps,
-                                immersed_mapping);
+                                immersed_mapping,
+                                immersed_constraints);
   }
 
 
@@ -398,7 +406,8 @@ namespace NonMatching
     const AffineConstraints<typename Matrix::value_type> &constraints,
     const ComponentMask &                                 space_comps,
     const ComponentMask &                                 immersed_comps,
-    const Mapping<dim1, spacedim> &                       immersed_mapping)
+    const Mapping<dim1, spacedim> &                       immersed_mapping,
+    const AffineConstraints<typename Matrix::value_type> &immersed_constraints)
   {
     AssertDimension(matrix.m(), space_dh.n_dofs());
     AssertDimension(matrix.n(), immersed_dh.n_dofs());
@@ -608,10 +617,8 @@ namespace NonMatching
                   }
 
                 // Now assemble the matrices
-                constraints.distribute_local_to_global(cell_matrix,
-                                                       odofs,
-                                                       dofs,
-                                                       matrix);
+                constraints.distribute_local_to_global(
+                  cell_matrix, odofs, immersed_constraints, dofs, matrix);
               }
           }
       }

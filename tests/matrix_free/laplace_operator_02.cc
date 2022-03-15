@@ -15,7 +15,8 @@
 
 
 
-// the same as laplace_operator_01, but tests heterogeneous Laplace operator.
+// the same as laplace_operator_01 (excluding the extra detection tests), but
+// tests heterogeneous Laplace operator.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>

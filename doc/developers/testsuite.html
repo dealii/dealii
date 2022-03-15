@@ -52,7 +52,6 @@
           <li><a href="#restrictbuild">Restricting tests to build configurations</a></li>
           <li><a href="#restrictfeature">Restricting tests to feature configurations</a></li>
           <li><a href="#mpi">Running tests with MPI</a></li>
-          <li><a href="#binary">Tests with binary output</a></li>
           <li><a href="#variants">Tests with multiple comparison files</a></li>
           <li><a href="#expect">Changing condition for success</a></li>
           <li><a href="#layoutaddtests">Adding new tests</a></li>
@@ -109,6 +108,21 @@ $ make prune_tests - removes all testsuite subprojects
 TEST_TIME_LIMIT
   - The time limit (in seconds) a single test is allowed to take. Defaults
     to 180 seconds
+
+TEST_MPI_RANK_LIMIT
+  - Specifies the maximal number of MPI ranks that can be used. If a
+    test variant configures a larger number of MPI ranks (via
+    .mpirun=N. in the output file) than this limit the test will be
+    dropped. The special value 0 enforces no limit. Defaults to 0.
+
+TEST_THREAD_LIMIT
+  - Specifies the maximal number of worker threads that can should be
+    used by the threading backend. If a test variant configures a larger
+    number of threads (via .threads=N. in the output file) than this limit
+    the test will be dropped. Note that individual tests might exceed this
+    limit by calling MultithreadInfo::set_thread_limit(), or by manually
+    creating additional threads. The special value 0 enforces no limit.
+    Defaults to 0.
 
 TEST_PICKUP_REGEX
   - A regular expression to select only a subset of tests during setup.
@@ -460,7 +474,7 @@ category/test.output
       just <code>category/test.output</code>. In pseudo code:
 <pre>
 category/test.[with_&lt;string&gt;(&lt;=|&gt;=|=|&lt;|&gt;)&lt;on|off|version&gt;.]*
-              [mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
+              [mpirun=&lt;N|all&gt;.][threads=&lt;N|all&gt;.][expect=&lt;y&gt;.][exclusive.][&lt;debug|release&gt;.](output|run_only)
 </pre>
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.
@@ -485,7 +499,7 @@ category/test.release.output
     <a name="restrictfeature"></a>
     <h3>Restricting tests to feature configurations</h3>
     <p>
-      In a similar vain as for build configurations, it is possible to restrict
+      In a similar vein as for build configurations, it is possible to restrict
       tests to specific feature configurations, e.g.,
 <pre>
 category/test.with_umfpack=on.output, or
@@ -528,7 +542,7 @@ category/test.with_umfpack=on.with_zlib=on.output
 
 
     <a name="mpi"></a>
-    <h3>Running tests with MPI</h3>
+    <h3>Running tests with MPI or a specific thread pool size</h3>
     <p>
       If a test should be run with MPI in parallel, the number of MPI
       processes <code>N</code> with which a program needs to be run for
@@ -538,6 +552,38 @@ category/test.mpirun=N.output
 </pre>
       It is quite typical for an MPI-enabled test to have multiple output
       files for different numbers of MPI processes.
+
+      Similarly, the thread pool size of a test can be specified by using
+      <code>threads=N</code>, where <code>N</code> is the number of
+      concurrent worker threads that should be initialized:
+<pre>
+category/test.threads=N.output
+</pre>
+      This declaration is equivalent to setting the environment variable
+      <code>DEAL_II_NUM_THREADS</code>, or calling
+      <code>MultithreadInfo::set_thread_limit()</code> by hand.
+    </p>
+
+    <p>
+      In order to account for the increased computational workload of MPI
+      parallel code the testsuite will add a processing weight to
+      individual MPI tests equal to half of the number of MPI ranks that
+      ensures that the machine the testsuite runs on is at most
+      overcommitted by a factor of 2. Thread concurrency is not accounted
+      for.
+
+      This behavior is modified for performance tests. Here, the
+      processing weight is taken directly to be the product of the number
+      of MPI ranks times the number of threads.
+
+      Particularly sensitive timing tests that have to be run
+      exclusively without any other test running concurrently can be
+      annotated with the <code>.exclusive</code> keyword:
+<pre>
+category/test.exclusive.output
+</pre>
+       This ensures that the test in question always runs "in serial" without
+       another test scheduled concurrently.
     </p>
 
     <a name="variants"></a>
@@ -592,6 +638,20 @@ category/test.output.4
 <pre>
 category/test.expect=run.output
 </pre>
+    </p>
+    <p>
+      The testsuite also suppors the special file ending
+      <code>.run_only</code> that indicates that the diff stage should be
+      skipped in order to reach the <code>PASSED</code> stage. You can
+      specify the keyword by changing the file ending from
+      <code>.output</code> to <code>.run_only</code>:
+<pre>
+category/test.run_only
+</pre>
+      Note that this is semantically different from specifying
+      <code>expect=diff.output</code>: The expect keyword requires that a
+      test reaches a specified stage but <i>fails</i> in it. In this case
+      the test has to reach the <code>DIFF</code> stage but fail it.
     </p>
 
 
@@ -720,7 +780,7 @@ $ ctest -V -R "category/my_new_test"
       a <code>CMakeLists.txt</code> file into it containing
     </p>
 <pre>
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
 INCLUDE(${DEAL_II_TARGET_CONFIG})
@@ -841,7 +901,8 @@ MAKEOPTS
   - Additional options that will be passed directly to make (or ninja).
 </pre>
 
-      Furthermore, the variables TEST_TIME_LIMIT and TEST_PICKUP_REGEX (as
+      Furthermore, the variables TEST_TIME_LIMIT, TEST_MPI_RANK_LIMIT,
+      TEST_THREAD_LIMIT and TEST_PICKUP_REGEX (as
       described <a href="#setupbuild">above</a>), DIFF_DIR, and NUMDIFF_DIR
       can also be set and will be handed automatically down
       to <code>cmake</code>. For more details on the different tracks, see

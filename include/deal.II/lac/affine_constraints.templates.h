@@ -149,7 +149,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
         }
     }
 
-  std::map<unsigned int, std::vector<ConstraintLine>> received =
+  const std::map<unsigned int, std::vector<ConstraintLine>> received =
     Utilities::MPI::some_to_some(mpi_communicator, to_send);
 
   unsigned int inconsistent = 0;
@@ -939,6 +939,23 @@ AffineConstraints<number>::close()
 
 
 template <typename number>
+bool
+AffineConstraints<number>::is_closed() const
+{
+  return sorted || (n_constraints() == 0);
+}
+
+
+
+template <typename number>
+bool
+AffineConstraints<number>::is_closed(const MPI_Comm &comm) const
+{
+  return Utilities::MPI::min(static_cast<unsigned int>(is_closed()), comm) == 1;
+}
+
+
+template <typename number>
 void
 AffineConstraints<number>::merge(
   const AffineConstraints<number> &other_constraints,
@@ -1241,12 +1258,12 @@ AffineConstraints<number>::print(std::ostream &out) const
       if (line.entries.size() > 0)
         {
           for (const std::pair<size_type, number> &entry : line.entries)
-            out << "    " << line.index << " " << entry.first << ":  "
-                << entry.second << "\n";
+            out << "    " << line.index << ' ' << entry.first << ":  "
+                << entry.second << '\n';
 
           // print out inhomogeneity.
           if (line.inhomogeneity != number(0.))
-            out << "    " << line.index << ": " << line.inhomogeneity << "\n";
+            out << "    " << line.index << ": " << line.inhomogeneity << '\n';
         }
       else
         // but also output something if the constraint simply reads
@@ -1254,13 +1271,13 @@ AffineConstraints<number>::print(std::ostream &out) const
         // combination of other dofs
         {
           if (line.inhomogeneity != number(0.))
-            out << "    " << line.index << " = " << line.inhomogeneity << "\n";
+            out << "    " << line.index << " = " << line.inhomogeneity << '\n';
           else
             out << "    " << line.index << " = 0\n";
         }
     }
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -1276,11 +1293,11 @@ AffineConstraints<number>::write_dot(std::ostream &out) const
       if (lines[i].entries.size() > 0)
         for (size_type j = 0; j < lines[i].entries.size(); ++j)
           out << "  " << lines[i].index << "->" << lines[i].entries[j].first
-              << "; // weight: " << lines[i].entries[j].second << "\n";
+              << "; // weight: " << lines[i].entries[j].second << '\n';
       else
-        out << "  " << lines[i].index << "\n";
+        out << "  " << lines[i].index << '\n';
     }
-  out << "}" << std::endl;
+  out << '}' << std::endl;
 }
 
 
@@ -4356,11 +4373,12 @@ template <typename number>
 template <typename SparsityPatternType>
 void
 AffineConstraints<number>::add_entries_local_to_global(
-  const std::vector<size_type> &row_indices,
-  const std::vector<size_type> &col_indices,
-  SparsityPatternType &         sparsity_pattern,
-  const bool                    keep_constrained_entries,
-  const Table<2, bool> &        dof_mask) const
+  const std::vector<size_type> &   row_indices,
+  const AffineConstraints<number> &col_constraints,
+  const std::vector<size_type> &   col_indices,
+  SparsityPatternType &            sparsity_pattern,
+  const bool                       keep_constrained_entries,
+  const Table<2, bool> &           dof_mask) const
 {
   const size_type n_local_rows = row_indices.size();
   const size_type n_local_cols = col_indices.size();
@@ -4374,7 +4392,7 @@ AffineConstraints<number>::add_entries_local_to_global(
           for (const size_type col_index : col_indices)
             sparsity_pattern.add(row_index, col_index);
       for (const size_type col_index : col_indices)
-        if (is_constrained(col_index))
+        if (col_constraints.is_constrained(col_index))
           for (const size_type row_index : row_indices)
             sparsity_pattern.add(row_index, col_index);
     }
@@ -4390,7 +4408,7 @@ AffineConstraints<number>::add_entries_local_to_global(
       std::vector<size_type> actual_row_indices(n_local_rows);
       std::vector<size_type> actual_col_indices(n_local_cols);
       make_sorted_row_list(row_indices, actual_row_indices);
-      make_sorted_row_list(col_indices, actual_col_indices);
+      col_constraints.make_sorted_row_list(col_indices, actual_col_indices);
       const size_type n_actual_rows = actual_row_indices.size();
 
       // now add the indices we collected above to the sparsity pattern. Very
@@ -4405,6 +4423,27 @@ AffineConstraints<number>::add_entries_local_to_global(
 
   // TODO: implement this
   Assert(false, ExcNotImplemented());
+}
+
+
+
+template <typename number>
+template <typename SparsityPatternType>
+void
+AffineConstraints<number>::add_entries_local_to_global(
+  const std::vector<size_type> &row_indices,
+  const std::vector<size_type> &col_indices,
+  SparsityPatternType &         sparsity_pattern,
+  const bool                    keep_constrained_entries,
+  const Table<2, bool> &        dof_mask) const
+{
+  // Call the function with the same name that takes a column constraint as well
+  add_entries_local_to_global(row_indices,
+                              *this,
+                              col_indices,
+                              sparsity_pattern,
+                              keep_constrained_entries,
+                              dof_mask);
 }
 
 

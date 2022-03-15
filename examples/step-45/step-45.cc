@@ -374,9 +374,8 @@ namespace Step45
       owned_partitioning.push_back(locally_owned_dofs.get_view(n_u, n_u + n_p));
 
       relevant_partitioning.clear();
-      IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                              locally_relevant_dofs);
+      const IndexSet locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof_handler);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
       relevant_partitioning.push_back(
         locally_relevant_dofs.get_view(n_u, n_u + n_p));

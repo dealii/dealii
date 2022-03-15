@@ -68,7 +68,7 @@ test()
 
     deallog << "owning_ranks_of_ghosts:" << std::endl;
     for (auto i : owning_ranks_of_ghosts)
-      deallog << i << " ";
+      deallog << i << ' ';
     deallog << std::endl;
 
     deallog << "requesters:" << std::endl;

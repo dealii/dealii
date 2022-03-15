@@ -38,7 +38,7 @@ check(Triangulation<3> &tria)
 
   deallog << cell << std::endl;
   for (const unsigned int v : GeometryInfo<3>::vertex_indices())
-    deallog << "<" << cell->vertex(v) << "> ";
+    deallog << '<' << cell->vertex(v) << "> ";
   deallog << std::endl;
 
   Assert(p.distance(cell->center()) < cell->diameter() / 2, ExcInternalError());

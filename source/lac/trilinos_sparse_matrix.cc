@@ -2290,7 +2290,7 @@ namespace TrilinosWrappers
           }
       }
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 

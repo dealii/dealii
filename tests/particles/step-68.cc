@@ -570,7 +570,7 @@ namespace Step68
                                   "analytical-particles");
 
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      deallog << "Writing particle output file: " << file_name << "-" << it
+      deallog << "Writing particle output file: " << file_name << '-' << it
               << std::endl;
 
     particle_output.write_vtu_with_pvtu_record(
@@ -607,7 +607,7 @@ namespace Step68
     const std::string file_name("background");
 
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-      deallog << "Writing background field file: " << file_name << "-" << it
+      deallog << "Writing background field file: " << file_name << '-' << it
               << std::endl;
 
     data_out.write_vtu_with_pvtu_record(

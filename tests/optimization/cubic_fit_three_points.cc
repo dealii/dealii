@@ -47,9 +47,9 @@ test()
     const double g1 = g(x1);
     const double res =
       *LineMinimization::cubic_fit_three_points(x1, f1, g1, x2, f2, x3, f3);
-    deallog << x1 << " " << f1 << " " << g1 << std::endl
-            << x2 << " " << f2 << std::endl
-            << x3 << " " << f3 << std::endl
+    deallog << x1 << ' ' << f1 << ' ' << g1 << std::endl
+            << x2 << ' ' << f2 << std::endl
+            << x3 << ' ' << f3 << std::endl
             << res << std::endl;
   }
 }

@@ -39,9 +39,9 @@ main()
   for (unsigned int i = 0; i <= div; ++i)
     {
       const double x = 1. * i / div;
-      deallog << x << " ";
+      deallog << x << ' ';
       for (unsigned int j = 0; j < p.size(); ++j)
-        deallog << p[j].value(x) << " ";
+        deallog << p[j].value(x) << ' ';
       deallog << std::endl;
     }
 }

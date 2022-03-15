@@ -145,10 +145,10 @@ check_function(const Functions::FlowFunction<dim> &f,
                         << " )"
                         << " comp "
                         << k
-                        //      << " norms " << d1.norm() << " " << d2.norm()
+                        //      << " norms " << d1.norm() << ' ' << d2.norm()
                         << std::endl;
                 for (unsigned int d = 0; d < dim; ++d)
-                  deallog << " " << gradients[k][i][d] << " "
+                  deallog << ' ' << gradients[k][i][d] << ' '
                           << gradients1[i][k][d] << std::endl;
               }
           }
@@ -164,7 +164,7 @@ check_function(const Functions::FlowFunction<dim> &f,
       for (unsigned int d = 0; d < dim; ++d)
         div += gradients[d][k][d];
       if (std::fabs(div) > 1.e-13)
-        deallog << "Divergence " << k << " " << div << std::endl;
+        deallog << "Divergence " << k << ' ' << div << std::endl;
     }
   deallog << "tested" << std::endl;
 

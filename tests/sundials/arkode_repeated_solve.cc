@@ -35,7 +35,7 @@ create_solver()
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
 
-  std::ifstream ifile(SOURCE_DIR "/arkode_repeated_solve.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_repeated_solve_in.prm");
   prm.parse_input(ifile);
 
   auto ode = std::make_unique<SUNDIALS::ARKode<VectorType>>(data);
@@ -51,7 +51,7 @@ create_solver()
   ode->output_step = [&](const double       t,
                          const VectorType & sol,
                          const unsigned int step_number) -> int {
-    deallog << t << " " << sol[0] << " " << sol[1] << std::endl;
+    deallog << t << ' ' << sol[0] << ' ' << sol[1] << std::endl;
     return 0;
   };
   return ode;

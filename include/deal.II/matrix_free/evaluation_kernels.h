@@ -3206,7 +3206,7 @@ namespace internal
     std::array<const unsigned int *, n_face_orientations> orientation = {};
 
     if (dim == 3 && n_face_orientations == n_lanes && !all_faces_are_same &&
-        fe_eval.get_is_interior_face() == 0)
+        fe_eval.is_interior_face() == 0)
       for (unsigned int v = 0; v < n_lanes; ++v)
         {
           // the loop breaks once an invalid_unsigned_int is hit for
@@ -3749,7 +3749,7 @@ namespace internal
 
       if (fe_eval.get_dof_access_index() ==
             MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-          fe_eval.get_is_interior_face() == false)
+          fe_eval.is_interior_face() == false)
         fe_face_evaluation_process_and_io<VectorizedArrayType::size()>(
           p, n_components, evaluation_flag, src_ptr, sm_ptr, fe_eval, temp);
       else
@@ -3794,7 +3794,7 @@ namespace internal
         {
           if (fe_eval.get_dof_access_index() ==
                 MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-              fe_eval.get_is_interior_face() == false)
+              fe_eval.is_interior_face() == false)
             {
               for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
                 {
@@ -3972,7 +3972,7 @@ namespace internal
         {
           if (fe_eval.get_dof_access_index() ==
                 MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-              fe_eval.get_is_interior_face() == false)
+              fe_eval.is_interior_face() == false)
             for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
               {
                 // the loop breaks once an invalid_unsigned_int is hit for
@@ -4047,7 +4047,7 @@ namespace internal
 
       if (fe_eval.get_dof_access_index() ==
             MatrixFreeFunctions::DoFInfo::dof_access_cell &&
-          fe_eval.get_is_interior_face() == false)
+          fe_eval.is_interior_face() == false)
         fe_face_evaluation_process_and_io<VectorizedArrayType::size()>(
           p, n_components, integration_flag, dst_ptr, sm_ptr, fe_eval, temp);
       else

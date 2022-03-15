@@ -32,6 +32,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations:
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class FEValuesBase;
 template <int dim, int spacedim>
@@ -47,6 +49,7 @@ namespace NonMatching
 }
 template <int dim, int spacedim>
 class FESystem;
+#endif
 
 /**
  * This is the base class for finite elements in arbitrary dimensions. It
@@ -653,7 +656,7 @@ public:
   /**
    * The dimension of the image space, corresponding to Triangulation.
    */
-  static const unsigned int space_dimension = spacedim;
+  static constexpr unsigned int space_dimension = spacedim;
 
   /**
    * A base class for internal data that derived finite element classes may
@@ -2366,7 +2369,7 @@ public:
   DeclException2(ExcWrongInterfaceMatrixSize,
                  int,
                  int,
-                 << "The interface matrix has a size of " << arg1 << "x" << arg2
+                 << "The interface matrix has a size of " << arg1 << 'x' << arg2
                  << ", which is not reasonable for the current element "
                     "in the present dimension.");
   /**

@@ -38,7 +38,7 @@ test<1>()
   unsigned int indices1[GeometryInfo<1>::vertices_per_cell] = {0, 1};
   std::vector<unsigned int> indices2                        = {0, 1};
 
-  deallog << "1d: " << GridTools::cell_measure(points, indices1) << " "
+  deallog << "1d: " << GridTools::cell_measure(points, indices1) << ' '
           << GridTools::cell_measure(points, indices2) << std::endl;
 }
 
@@ -55,7 +55,7 @@ test<2>()
   unsigned int indices1[GeometryInfo<2>::vertices_per_cell] = {0, 1, 2, 3};
   std::vector<unsigned int> indices2                        = {0, 1, 2, 3};
 
-  deallog << "2d: " << GridTools::cell_measure(points, indices1) << " "
+  deallog << "2d: " << GridTools::cell_measure(points, indices1) << ' '
           << GridTools::cell_measure(points, indices2) << std::endl;
 }
 
@@ -77,7 +77,7 @@ test<3>()
     0, 1, 2, 3, 4, 5, 6, 7};
   std::vector<unsigned int> indices2 = {0, 1, 2, 3, 4, 5, 6, 7};
 
-  deallog << "3d: " << GridTools::cell_measure(points, indices1) << " "
+  deallog << "3d: " << GridTools::cell_measure(points, indices1) << ' '
           << GridTools::cell_measure(points, indices2) << std::endl;
 }
 

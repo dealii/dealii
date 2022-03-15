@@ -60,9 +60,9 @@ test_mpi()
 
   if (myid == 0)
     {
-      deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols()
+      deallog << "blocks: " << csp.n_block_rows() << 'x' << csp.n_block_cols()
               << std::endl;
-      deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
+      deallog << "size: " << csp.n_rows() << 'x' << csp.n_cols() << std::endl;
     }
 
   SparsityTools::distribute_sparsity_pattern(csp,
@@ -118,9 +118,9 @@ test_mpi()
 
   if (myid == 0)
     {
-      deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols()
+      deallog << "blocks: " << csp.n_block_rows() << 'x' << csp.n_block_cols()
               << std::endl;
-      deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
+      deallog << "size: " << csp.n_rows() << 'x' << csp.n_cols() << std::endl;
     }
 
   // checking...

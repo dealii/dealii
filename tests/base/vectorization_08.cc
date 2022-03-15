@@ -34,6 +34,6 @@ main()
   deallog << "Point norm: " << p.norm()[0] << std::endl;
   SymmetricTensor<2, 3, VectorizedArray<double>> st2;
   SymmetricTensor<4, 2, VectorizedArray<double>> st4;
-  deallog << "Symmetric tensor norm: " << st2.norm()[0] << " " << st4.norm()[0]
+  deallog << "Symmetric tensor norm: " << st2.norm()[0] << ' ' << st4.norm()[0]
           << std::endl;
 }

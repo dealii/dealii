@@ -38,14 +38,14 @@ test(const FiniteElement<dim, spacedim> &fe)
   deallog << "  n_dofs_per_quad():   ";
   for (unsigned int i = 0; i < (dim == 2 ? 1 : fe.reference_cell().n_faces());
        ++i)
-    deallog << fe.n_dofs_per_quad(i) << " ";
+    deallog << fe.n_dofs_per_quad(i) << ' ';
   deallog << std::endl;
 
   deallog << "  n_dofs_per_hex():    " << fe.n_dofs_per_hex() << std::endl;
 
   deallog << "  n_dofs_per_face():   ";
   for (unsigned int i = 0; i < fe.reference_cell().n_faces(); ++i)
-    deallog << fe.n_dofs_per_face(i) << " ";
+    deallog << fe.n_dofs_per_face(i) << ' ';
   deallog << std::endl;
 
   deallog << "  n_dofs_per_cell():   " << fe.n_dofs_per_cell() << std::endl;

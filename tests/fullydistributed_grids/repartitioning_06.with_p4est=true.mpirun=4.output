@@ -2,6 +2,7 @@
 DEAL:0:all::n_levels:                  7
 DEAL:0:all::n_cells:                   577
 DEAL:0:all::n_active_cells:            433
+DEAL:0:all::has_hanging_nodes:         true
 DEAL:0:all::n_cells on level=0:        1
 DEAL:0:all::n_cells on level=1:        4
 DEAL:0:all::n_cells on level=2:        16
@@ -20,6 +21,7 @@ DEAL:0:all::
 DEAL:0:all::n_levels:                  7
 DEAL:0:all::n_cells:                   577
 DEAL:0:all::n_active_cells:            433
+DEAL:0:all::has_hanging_nodes:         true
 DEAL:0:all::n_cells on level=0:        1
 DEAL:0:all::n_cells on level=1:        4
 DEAL:0:all::n_cells on level=2:        16
@@ -37,6 +39,7 @@ DEAL:0:all::n_active_cells on level=6: 372
 DEAL:0:all::
 DEAL:0:all::n_dofs:                             4813
 DEAL:0:all::n_locally_owned_dofs:               1233
+DEAL:0:all::has_hanging_nodes:                  true
 DEAL:0:all::n_dofs on level=0:                  9
 DEAL:0:all::n_dofs on level=1:                  25
 DEAL:0:all::n_dofs on level=2:                  81
@@ -54,6 +57,7 @@ DEAL:0:all::n_locally_owned_mg_dofs on level=6: 1233
 DEAL:0:all::
 DEAL:0:all::n_dofs:                             4813
 DEAL:0:all::n_locally_owned_dofs:               1233
+DEAL:0:all::has_hanging_nodes:                  true
 DEAL:0:all::n_dofs on level=0:                  9
 DEAL:0:all::n_dofs on level=1:                  25
 DEAL:0:all::n_dofs on level=2:                  81
@@ -73,6 +77,7 @@ DEAL:0:all::
 DEAL:1:all::n_levels:                  7
 DEAL:1:all::n_cells:                   713
 DEAL:1:all::n_active_cells:            535
+DEAL:1:all::has_hanging_nodes:         true
 DEAL:1:all::n_cells on level=0:        1
 DEAL:1:all::n_cells on level=1:        4
 DEAL:1:all::n_cells on level=2:        16
@@ -91,6 +96,7 @@ DEAL:1:all::
 DEAL:1:all::n_levels:                  7
 DEAL:1:all::n_cells:                   713
 DEAL:1:all::n_active_cells:            535
+DEAL:1:all::has_hanging_nodes:         true
 DEAL:1:all::n_cells on level=0:        1
 DEAL:1:all::n_cells on level=1:        4
 DEAL:1:all::n_cells on level=2:        16
@@ -108,6 +114,7 @@ DEAL:1:all::n_active_cells on level=6: 428
 DEAL:1:all::
 DEAL:1:all::n_dofs:                             4813
 DEAL:1:all::n_locally_owned_dofs:               1184
+DEAL:1:all::has_hanging_nodes:                  true
 DEAL:1:all::n_dofs on level=0:                  9
 DEAL:1:all::n_dofs on level=1:                  25
 DEAL:1:all::n_dofs on level=2:                  81
@@ -125,6 +132,7 @@ DEAL:1:all::n_locally_owned_mg_dofs on level=6: 1184
 DEAL:1:all::
 DEAL:1:all::n_dofs:                             4813
 DEAL:1:all::n_locally_owned_dofs:               1184
+DEAL:1:all::has_hanging_nodes:                  true
 DEAL:1:all::n_dofs on level=0:                  9
 DEAL:1:all::n_dofs on level=1:                  25
 DEAL:1:all::n_dofs on level=2:                  81
@@ -145,6 +153,7 @@ DEAL:1:all::
 DEAL:2:all::n_levels:                  7
 DEAL:2:all::n_cells:                   717
 DEAL:2:all::n_active_cells:            538
+DEAL:2:all::has_hanging_nodes:         true
 DEAL:2:all::n_cells on level=0:        1
 DEAL:2:all::n_cells on level=1:        4
 DEAL:2:all::n_cells on level=2:        16
@@ -163,6 +172,7 @@ DEAL:2:all::
 DEAL:2:all::n_levels:                  7
 DEAL:2:all::n_cells:                   717
 DEAL:2:all::n_active_cells:            538
+DEAL:2:all::has_hanging_nodes:         true
 DEAL:2:all::n_cells on level=0:        1
 DEAL:2:all::n_cells on level=1:        4
 DEAL:2:all::n_cells on level=2:        16
@@ -180,6 +190,7 @@ DEAL:2:all::n_active_cells on level=6: 420
 DEAL:2:all::
 DEAL:2:all::n_dofs:                             4813
 DEAL:2:all::n_locally_owned_dofs:               1168
+DEAL:2:all::has_hanging_nodes:                  true
 DEAL:2:all::n_dofs on level=0:                  9
 DEAL:2:all::n_dofs on level=1:                  25
 DEAL:2:all::n_dofs on level=2:                  81
@@ -197,6 +208,7 @@ DEAL:2:all::n_locally_owned_mg_dofs on level=6: 1168
 DEAL:2:all::
 DEAL:2:all::n_dofs:                             4813
 DEAL:2:all::n_locally_owned_dofs:               1168
+DEAL:2:all::has_hanging_nodes:                  true
 DEAL:2:all::n_dofs on level=0:                  9
 DEAL:2:all::n_dofs on level=1:                  25
 DEAL:2:all::n_dofs on level=2:                  81
@@ -217,6 +229,7 @@ DEAL:2:all::
 DEAL:3:all::n_levels:                  7
 DEAL:3:all::n_cells:                   613
 DEAL:3:all::n_active_cells:            460
+DEAL:3:all::has_hanging_nodes:         true
 DEAL:3:all::n_cells on level=0:        1
 DEAL:3:all::n_cells on level=1:        4
 DEAL:3:all::n_cells on level=2:        16
@@ -235,6 +248,7 @@ DEAL:3:all::
 DEAL:3:all::n_levels:                  7
 DEAL:3:all::n_cells:                   613
 DEAL:3:all::n_active_cells:            460
+DEAL:3:all::has_hanging_nodes:         true
 DEAL:3:all::n_cells on level=0:        1
 DEAL:3:all::n_cells on level=1:        4
 DEAL:3:all::n_cells on level=2:        16
@@ -252,6 +266,7 @@ DEAL:3:all::n_active_cells on level=6: 284
 DEAL:3:all::
 DEAL:3:all::n_dofs:                             4813
 DEAL:3:all::n_locally_owned_dofs:               1228
+DEAL:3:all::has_hanging_nodes:                  true
 DEAL:3:all::n_dofs on level=0:                  9
 DEAL:3:all::n_dofs on level=1:                  25
 DEAL:3:all::n_dofs on level=2:                  81
@@ -269,6 +284,7 @@ DEAL:3:all::n_locally_owned_mg_dofs on level=6: 640
 DEAL:3:all::
 DEAL:3:all::n_dofs:                             4813
 DEAL:3:all::n_locally_owned_dofs:               1228
+DEAL:3:all::has_hanging_nodes:                  true
 DEAL:3:all::n_dofs on level=0:                  9
 DEAL:3:all::n_dofs on level=1:                  25
 DEAL:3:all::n_dofs on level=2:                  81

@@ -52,7 +52,7 @@ test()
   out << "set view equal xyz" << std::endl
       << "splot '-' with lines, '-' with vectors " << std::endl;
   GridOut().write_gnuplot(tria, out);
-  out << "e" << std::endl;
+  out << 'e' << std::endl;
 
   Triangulation<2, 3>::active_cell_iterator it = tria.begin_active();
   for (; it != tria.end(); ++it)
@@ -62,9 +62,9 @@ test()
       Tensor<1, 3> t2 = manifold.get_tangent_vector(p, it->vertex(1));
       Tensor<1, 3> n  = cross_product_3d(t1, t2);
       n /= -n.norm();
-      out << it->center() << " " << n << std::endl;
+      out << it->center() << ' ' << n << std::endl;
     }
-  out << "e" << std::endl;
+  out << 'e' << std::endl;
 }
 
 

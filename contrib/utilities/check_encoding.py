@@ -17,7 +17,7 @@
 # This script checks if the files in the deal.II repository are encoded with
 # valid UTF8.
 #
-# This script should be invoked from the root folder of the deal.ii
+# This script should be invoked from the root folder of the deal.II
 # repository:
 # contrib/utilities/check_encoding.py
 from __future__ import print_function

@@ -46,9 +46,9 @@ test()
     const double g2   = g(x2);
     const double res  = *LineMinimization::cubic_fit(x1, f1, g1, x2, f2, g2);
     const double res2 = *LineMinimization::cubic_fit(x2, f2, g2, x1, f1, g1);
-    deallog << x1 << " " << x2 << std::endl
-            << f1 << " " << f2 << std::endl
-            << g1 << " " << g2 << std::endl
+    deallog << x1 << ' ' << x2 << std::endl
+            << f1 << ' ' << f2 << std::endl
+            << g1 << ' ' << g2 << std::endl
             << res << std::endl
             << res2 << std::endl;
   }

@@ -451,7 +451,7 @@ namespace CUDAWrappers
             if (across)
               out << ' ' << i << ',' << cols[j] << ':' << val[j];
             else
-              out << "(" << i << "," << cols[j] << ") " << val[j] << std::endl;
+              out << '(' << i << ',' << cols[j] << ") " << val[j] << std::endl;
           }
       }
     if (across)
@@ -513,7 +513,7 @@ namespace CUDAWrappers
           }
         out << std::endl;
       };
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     // reset output format
     out.precision(old_precision);

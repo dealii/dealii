@@ -2020,19 +2020,19 @@ inline void
 IndexSet::print(StreamType &out) const
 {
   compress();
-  out << "{";
+  out << '{';
   std::vector<Range>::const_iterator p;
   for (p = ranges.begin(); p != ranges.end(); ++p)
     {
       if (p->end - p->begin == 1)
         out << p->begin;
       else
-        out << "[" << p->begin << "," << p->end - 1 << "]";
+        out << '[' << p->begin << ',' << p->end - 1 << ']';
 
       if (p != --ranges.end())
         out << ", ";
     }
-  out << "}" << std::endl;
+  out << '}' << std::endl;
 }
 
 

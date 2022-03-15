@@ -132,12 +132,12 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
   }
 
   for (unsigned int i = 0; i < coeff_in.size(); ++i)
-    deallog << coeff_in[i] << " ";
+    deallog << coeff_in[i] << ' ';
 
   deallog << std::endl;
 
   for (unsigned int i = 0; i < N; ++i)
-    deallog << coeff_out[i] << " ";
+    deallog << coeff_out[i] << ' ';
 
   deallog << std::endl;
 

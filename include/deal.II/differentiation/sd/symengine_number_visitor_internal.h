@@ -746,12 +746,12 @@ namespace Differentiation
             const SymEngine::RCP<const SymEngine::Basic> &cse_expr =
               intermediate_symbols_exprs[i].second;
             stream << "  " << i << ": " << cse_symbol << " = " << cse_expr
-                   << "\n";
+                   << '\n';
           }
 
         stream << "  Final reduced expressions for dependent variables: \n";
         for (unsigned i = 0; i < reduced_exprs.size(); ++i)
-          stream << "  " << i << ": " << reduced_exprs[i] << "\n";
+          stream << "  " << i << ": " << reduced_exprs[i] << '\n';
 
         stream << std::flush;
       }
@@ -976,7 +976,7 @@ namespace Differentiation
           {
             stream << "Independent variables: \n";
             for (unsigned i = 0; i < independent_symbols.size(); ++i)
-              stream << "  " << i << ": " << independent_symbols[i] << "\n";
+              stream << "  " << i << ": " << independent_symbols[i] << '\n';
 
             stream << std::flush;
           }
@@ -994,7 +994,7 @@ namespace Differentiation
               {
                 stream << "Dependent variables: \n";
                 for (unsigned i = 0; i < dependent_functions.size(); ++i)
-                  stream << "  " << i << dependent_functions[i] << "\n";
+                  stream << "  " << i << dependent_functions[i] << '\n';
 
                 stream << std::flush;
               }
