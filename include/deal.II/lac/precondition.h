@@ -1740,7 +1740,7 @@ public:
 
   /**
    * A struct that contains information about the eigenvalue estimation
-   * performed by the PreconditionChebychev class.
+   * performed by the PreconditionChebyshev class.
    */
   struct EigenvalueInformation
   {
