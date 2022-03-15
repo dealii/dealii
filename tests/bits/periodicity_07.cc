@@ -35,7 +35,6 @@
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -252,10 +251,6 @@ check_periodicity(const DoFHandler<3> &dof_handler,
 int
 main(int argc, char *argv[])
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   initlog();
 
   constexpr int      dim = 3;
@@ -291,9 +286,4 @@ main(int argc, char *argv[])
                            projection[i]);
       check_periodicity(dof_handler, projection[i], i);
     }
-
-  GrowingVectorMemory<
-    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
-
-  return 0;
 }

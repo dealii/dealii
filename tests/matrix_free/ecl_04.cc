@@ -180,7 +180,7 @@ test(const unsigned int geometry, const MPI_Comm comm = MPI_COMM_SELF)
 }
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 

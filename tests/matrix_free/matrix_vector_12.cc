@@ -301,6 +301,4 @@ main(int argc, char **argv)
       test<3, 1>();
       test<3, 2>();
     }
-
-  return 0;
 }

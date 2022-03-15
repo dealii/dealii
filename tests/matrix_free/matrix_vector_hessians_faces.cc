@@ -346,7 +346,7 @@ test_hessians(const unsigned int                             degree,
 }
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 

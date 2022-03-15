@@ -81,12 +81,8 @@ test(std::string filename, unsigned int n)
 
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   initlog();
 
   for (unsigned int n = 1; n < 5; ++n)

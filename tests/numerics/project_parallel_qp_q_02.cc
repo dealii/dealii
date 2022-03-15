@@ -43,6 +43,4 @@ main(int argc, char *argv[])
 
   test<2>();
   test<3>();
-
-  return 0;
 }

@@ -657,6 +657,4 @@ main(int argc, char **argv)
     test<3>(2);
     deallog.pop();
   }
-
-  return 0;
 }

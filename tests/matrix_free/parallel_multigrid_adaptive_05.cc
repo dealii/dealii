@@ -658,7 +658,7 @@ test()
 
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
   // The original issue with partition_color
   // is hit with 2 threads and 4 cores.

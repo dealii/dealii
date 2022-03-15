@@ -37,7 +37,6 @@
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -200,12 +199,8 @@ test(const Triangulation<dim> &tria,
 
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   initlog();
 
   Triangulation<2> tria;
@@ -228,9 +223,4 @@ main(int argc, char *argv[])
   deallog.push("dg2dg1_diff");
   test(tria, mapping, FE_DGQ<2>(2), "dg2", FE_DGQ<2>(1), "dg1", 3);
   deallog.pop();
-
-  GrowingVectorMemory<
-    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
-
-  return 0;
 }

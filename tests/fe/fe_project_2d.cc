@@ -34,7 +34,6 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -255,12 +254,8 @@ test(const FiniteElement<dim> &fe,
 }
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   initlog();
   deallog << std::setprecision(7) << std::fixed;
 
@@ -293,9 +288,4 @@ main(int argc, char *argv[])
   test<dim>(FE_ABF<dim>(order), n_cycles, true, vertices);
 
   deallog << std::endl;
-
-  GrowingVectorMemory<
-    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
-
-  return 0;
 }

@@ -33,8 +33,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/lac/vector_memory.h>
-
 #include <fstream>
 #include <iomanip>
 #include <string>
@@ -153,11 +151,8 @@ check(const FiniteElement<dim> &fe, const std::string &name)
 
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
   try
     {
       std::ofstream logfile("output");
@@ -243,6 +238,8 @@ main(int argc, char *argv[])
                  FESystem<2>(FE_Q<2>(2), 1, FE_Nedelec<2>(0), 2),
                  2,
                  2);
+
+      return 0;
     }
   catch (std::exception &exc)
     {
@@ -269,9 +266,4 @@ main(int argc, char *argv[])
               << std::endl;
       return 1;
     };
-
-  GrowingVectorMemory<
-    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
-
-  return 0;
 }

@@ -219,7 +219,7 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
 
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
   mpi_initlog();

@@ -142,6 +142,4 @@ main(int argc, char **argv)
   mpi_initlog();
 
   check<2, double>(1);
-
-  return 0;
 }

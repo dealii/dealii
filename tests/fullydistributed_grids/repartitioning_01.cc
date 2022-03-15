@@ -100,7 +100,7 @@ test(const MPI_Comm comm, const unsigned int n_partitions)
 
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    all;

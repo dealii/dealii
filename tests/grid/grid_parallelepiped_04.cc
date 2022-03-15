@@ -146,7 +146,7 @@ check_parallelepiped(bool colorize, bool log, const unsigned int (&subd)[dim])
 }
 
 int
-main(int argc, char *argv[])
+main()
 {
   initlog(true);
 

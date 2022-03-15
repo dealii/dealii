@@ -189,7 +189,7 @@ private:
 
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
@@ -201,6 +201,4 @@ main(int argc, char *argv[])
     runner.run(3);
     deallog.pop();
   }
-
-  return 0;
 }

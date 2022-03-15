@@ -169,6 +169,4 @@ main(int argc, char **argv)
   for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
     for (unsigned int degree = 2; degree <= 2; ++degree)
       test<2>(n_refinements, degree, true /*triangle*/);
-
-  return 0;
 }

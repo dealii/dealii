@@ -33,8 +33,6 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/vector_memory.h>
-
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
@@ -109,12 +107,8 @@ test(const FiniteElement<dim, spacedim> &fe)
 }
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   initlog();
   {
     const int dim = 2;
@@ -125,7 +119,4 @@ main(int argc, char *argv[])
     const int dim = 3;
     test<dim>(FE_SimplexP<dim>(1));
   }
-
-  GrowingVectorMemory<
-    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
 }

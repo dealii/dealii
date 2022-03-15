@@ -45,7 +45,6 @@
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -346,21 +345,12 @@ test_with_2d_deformed_refined_mesh(const FiniteElement<dim> &fe,
 
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   initlog();
   deallog << std::setprecision(3);
 
   test<1>();
   test<2>();
   test<3>();
-
-  GrowingVectorMemory<
-    LinearAlgebra::distributed::Vector<double>>::release_unused_memory();
-
-  return 0;
 }

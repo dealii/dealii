@@ -43,12 +43,8 @@
 
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   initlog();
 
   Triangulation<2> triangulation(Triangulation<2>::none);

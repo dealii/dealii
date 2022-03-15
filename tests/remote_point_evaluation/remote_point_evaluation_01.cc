@@ -560,6 +560,4 @@ main(int argc, char **argv)
   MPILogInitAll                    all;
 
   test<1>();
-
-  return 0;
 }

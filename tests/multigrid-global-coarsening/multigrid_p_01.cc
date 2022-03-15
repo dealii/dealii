@@ -204,6 +204,4 @@ main(int argc, char **argv)
         for (unsigned int degree = 2; degree <= 2; ++degree)
           test<2>(n_refinements, degree, true /*triangle*/, mesh_type);
     }
-
-  return 0;
 }

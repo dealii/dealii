@@ -69,7 +69,7 @@ create_partitioner(const DoFHandler<dim, spacedim> &dof_handler)
 
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    all;

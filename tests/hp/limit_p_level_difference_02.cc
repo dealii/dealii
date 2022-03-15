@@ -115,12 +115,8 @@ test(const unsigned int fes_size, const unsigned int max_difference)
 
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   initlog();
 
   test<2>(4, 1);

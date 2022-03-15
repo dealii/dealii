@@ -121,12 +121,8 @@ test()
 
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   deal_II_exceptions::disable_abort_on_exception();
   initlog();
   test();

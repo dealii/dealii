@@ -602,7 +602,7 @@ LaplaceProblem<dim>::run()
 // This is again the same function as
 // in step-6:
 int
-main(int argc, char *argv[])
+main()
 {
   initlog();
   deallog << std::setprecision(4);

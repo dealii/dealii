@@ -319,12 +319,8 @@ test()
 }
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   std::ofstream logfile("output");
   deallog.attach(logfile, /*do not print job id*/ false);
   deallog.depth_console(0);

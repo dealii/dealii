@@ -160,17 +160,12 @@ check(const int          degree,
           << " y =" << y(max_i) << std::endl
           << " ex=" << exact(max_i) << std::endl;
 #endif
-  vector_memory.release_unused_memory();
 }
 
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   initlog();
   deallog << std::setprecision(6);
 

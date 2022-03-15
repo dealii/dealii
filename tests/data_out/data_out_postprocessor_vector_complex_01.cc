@@ -191,12 +191,8 @@ LaplaceProblem<dim>::run()
 
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   logfile << std::setprecision(2);
   deallog << std::setprecision(2);
 

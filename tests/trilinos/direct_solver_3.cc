@@ -318,6 +318,4 @@ main(int argc, char **argv)
 
   Step4<2> test;
   test.run();
-
-  return 0;
 }

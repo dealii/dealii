@@ -148,6 +148,4 @@ main(int argc, char **argv)
   check<3, double>(3);
   check<2, float>(2);
   check<3, float>(2);
-
-  return 0;
 }

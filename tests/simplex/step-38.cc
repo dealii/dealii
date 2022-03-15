@@ -410,15 +410,8 @@ namespace Step38
 } // namespace Step38
 
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#else
-  (void)argc;
-  (void)argv;
-#endif
-
   try
     {
       using namespace Step38;

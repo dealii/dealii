@@ -1122,12 +1122,8 @@ namespace Step56
 
 // @sect3{The main function}
 int
-main(int argc, char *argv[])
+main()
 {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
-  Kokkos::ScopeGuard kokkos_guard(argc, argv);
-#endif
-
   try
     {
       using namespace Step56;

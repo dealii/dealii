@@ -111,9 +111,8 @@ test(const FiniteElement<dim, spacedim> &fe,
 }
 
 int
-main(int argc, char **argv)
+main()
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   initlog();
 
   for (unsigned int i = 0; i < 2; ++i)

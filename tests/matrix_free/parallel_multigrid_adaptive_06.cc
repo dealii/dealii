@@ -424,7 +424,7 @@ test(const unsigned int nbands = 1)
 
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
   mpi_initlog();

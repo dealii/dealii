@@ -84,7 +84,7 @@ output_grid(const Triangulation<dim, spacedim> &tria, const std::string &label)
 }
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    all;

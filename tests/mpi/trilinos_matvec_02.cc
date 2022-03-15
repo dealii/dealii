@@ -144,6 +144,4 @@ main(int argc, char **argv)
     }
   else
     test();
-
-  return 0;
 }

@@ -507,7 +507,7 @@ test()
 
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
@@ -520,6 +520,4 @@ main(int argc, char *argv[])
     test<3, 1, double>();
     test<3, 2, float>();
   }
-
-  return 0;
 }

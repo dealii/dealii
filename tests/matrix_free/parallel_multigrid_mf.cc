@@ -470,6 +470,4 @@ main(int argc, char **argv)
     test<3, 1, double>();
     test<3, 2, float>();
   }
-
-  return 0;
 }
