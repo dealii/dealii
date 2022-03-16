@@ -74,6 +74,9 @@ namespace Utilities
        *
        * @warning This is a collective call that needs to be executed by all
        *   processors in the communicator.
+       *
+       * @note If you want to be sure that all points have been found, call
+       *   all_points_found() after calling this function.
        */
       void
       reinit(const std::vector<Point<spacedim>> &points,
@@ -155,6 +158,18 @@ namespace Utilities
        */
       bool
       is_map_unique() const;
+
+      /**
+       * Return if all points could be found in the domain.
+       */
+      bool
+      all_points_found() const;
+
+      /**
+       * Return if point @p i could be found in the domain.
+       */
+      bool
+      point_found(const unsigned int i) const;
 
       /**
        * Return the Triangulation object used during reinit().

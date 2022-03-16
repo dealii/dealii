@@ -186,6 +186,33 @@ namespace Utilities
 
 
     template <int dim, int spacedim>
+    bool
+    RemotePointEvaluation<dim, spacedim>::all_points_found() const
+    {
+      if (is_map_unique())
+        return true;
+
+      for (unsigned int i = 1; i < point_ptrs.size(); ++i)
+        if (point_found(i) == false)
+          return false;
+
+      return true;
+    }
+
+
+
+    template <int dim, int spacedim>
+    bool
+    RemotePointEvaluation<dim, spacedim>::point_found(
+      const unsigned int i) const
+    {
+      AssertIndexRange(i, point_ptrs.size());
+      return (point_ptrs[i] - point_ptrs[i - 1]) > 0;
+    }
+
+
+
+    template <int dim, int spacedim>
     const Triangulation<dim, spacedim> &
     RemotePointEvaluation<dim, spacedim>::get_triangulation() const
     {

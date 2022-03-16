@@ -108,6 +108,11 @@ namespace VectorTools
    *   cache, dof_handler_2, vector_2);
    * @endcode
    *
+   * @note If a point cannot be found, the result for these points will
+   *   be undefined (most probably 0). If you want to be sure that all
+   *   points received a valid result, call `cache.all_points_found()`
+   *   after this function call.
+   *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
    */
