@@ -1615,7 +1615,8 @@ public:
     /**
      * This determines the degree of the Chebyshev polynomial. The degree of
      * the polynomial gives the number of matrix-vector products to be
-     * performed for one application of the vmult() operation. Degree one
+     * performed for one application of the step() operation. During vmult(),
+     * the method performs `(degree-1)` matrix-vector products. Degree one
      * corresponds to a damped Jacobi method.
      *
      * If the degree is set to numbers::invalid_unsigned_int, the algorithm
