@@ -5920,21 +5920,70 @@ namespace std
   /**
    * Raises the given number @p x to the power @p p for a vectorized data
    * field. The result is returned as vectorized array in the form
-   * <tt>{pow(x[0],p[0]), pow(x[1],p[1]), ...,
-   * pow(x[size()-1],p[size()-1])}</tt>.
+   * <tt>{pow(x[0],p), pow(x[1],p), ..., pow(x[size()-1],p)}</tt>.
+   * This variant permits the input arguments to have different underlying
+   * types.
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, std::size_t width>
-  inline ::dealii::VectorizedArray<Number, width>
-  pow(const ::dealii::VectorizedArray<Number, width> &x,
-      const ::dealii::VectorizedArray<Number, width> &p)
+  template <typename Number,
+            typename Number2,
+            std::size_t width,
+            typename = typename std::enable_if<
+              std::is_same<Number2, typename ::dealii::EnableIfScalar<Number2>::type>::value &&
+              !std::is_same<Number, Number2>::value>::type>
+  inline ::dealii::VectorizedArray<
+    typename ::dealii::ProductType<Number, Number2>::type,
+    width>
+  pow(const ::dealii::VectorizedArray<Number, width> &x, const Number2 p)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    using ResultScalar_t =
+      typename ::dealii::ProductType<Number, Number2>::type;
+    static_assert(::dealii::VectorizedArray<Number, width>::size() <=
+                    ::dealii::VectorizedArray<ResultScalar_t, width>::size(),
+                  "VectorizedArray sizes do not match for mixed types.");
+
+    ResultScalar_t values[::dealii::VectorizedArray<Number, width>::size()];
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      values[i] = std::pow(x[i], p);
+    ::dealii::VectorizedArray<ResultScalar_t, width> out;
+    out.load(&values[0]);
+    return out;
+  }
+
+
+
+  /**
+   * Raises the given number @p x to the power @p p for a vectorized data
+   * field. The result is returned as vectorized array in the form
+   * <tt>{pow(x[0],p[0]), pow(x[1],p[1]), ...,
+   * pow(x[size()-1],p[size()-1])}</tt>.
+   * This variant permits the input arrays to have different underlying types.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, typename Number2, std::size_t width>
+  inline ::dealii::VectorizedArray<
+    typename ::dealii::ProductType<Number, Number2>::type,
+    width>
+  pow(const ::dealii::VectorizedArray<Number, width> & x,
+      const ::dealii::VectorizedArray<Number2, width> &p)
+  {
+    using ResultScalar_t =
+      typename ::dealii::ProductType<Number, Number2>::type;
+    static_assert(::dealii::VectorizedArray<Number, width>::size() ==
+                    ::dealii::VectorizedArray<Number2, width>::size(),
+                  "VectorizedArray sizes do not match for mixed types.");
+    static_assert(::dealii::VectorizedArray<Number, width>::size() <=
+                    ::dealii::VectorizedArray<ResultScalar_t, width>::size(),
+                  "VectorizedArray sizes do not match for mixed types.");
+
+    ResultScalar_t values[::dealii::VectorizedArray<Number, width>::size()];
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
       values[i] = std::pow(x[i], p[i]);
-    ::dealii::VectorizedArray<Number, width> out;
+    ::dealii::VectorizedArray<ResultScalar_t, width> out;
     out.load(&values[0]);
     return out;
   }
