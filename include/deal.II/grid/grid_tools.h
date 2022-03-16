@@ -88,6 +88,12 @@ namespace hp
 }
 
 class SparsityPattern;
+
+namespace GridTools
+{
+  template <int dim, int spacedim>
+  class Cache;
+}
 #endif
 
 namespace internal
@@ -124,9 +130,6 @@ namespace internal
  */
 namespace GridTools
 {
-  template <int dim, int spacedim>
-  class Cache;
-
   /**
    * @name Information about meshes and cells
    */
