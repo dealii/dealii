@@ -4807,6 +4807,29 @@ private:
 namespace internal
 {
   /**
+   * A utility function to convert a scalar or complex scalar value to a
+   * vectorized array.
+   *
+   * @tparam ScalarTypeOut The scalar type of the output array.
+   * @tparam ScalarTypeIn The scalar type of the input array.
+   * @tparam width The number of elements in the array,
+   * @param input_array The input array that is to be converted.
+   * @return An array with the same data as the @p input_array, but converted to
+   *         the desired @p ScalarTypeOut.
+   */
+  template <typename ScalarTypeOut,
+            std::size_t width,
+            typename ScalarTypeIn,
+            typename = typename std::enable_if<std::is_same<
+              ScalarTypeIn,
+              typename EnableIfScalar<ScalarTypeIn>::type>::value>::type>
+  VectorizedArray<ScalarTypeOut, width>
+  convert_vectorized_array(const ScalarTypeIn &input_value)
+  {
+    return VectorizedArray<ScalarTypeOut, width>(input_value);
+  }
+
+  /**
    * A utility function to convert a vectorized array of one scalar type, to
    * that of another scalar type.
    *
@@ -4818,8 +4841,8 @@ namespace internal
    *         the desired @p ScalarTypeOut.
    */
   template <typename ScalarTypeOut,
-            typename ScalarTypeIn,
             std::size_t width,
+            typename ScalarTypeIn,
             typename = typename std::enable_if<
               !std::is_same<ScalarTypeOut, ScalarTypeIn>::value>::type>
   VectorizedArray<ScalarTypeOut, width>
@@ -4849,8 +4872,8 @@ namespace internal
    *         the desired @p ScalarTypeOut.
    */
   template <typename ScalarTypeOut,
-            typename ScalarTypeIn,
             std::size_t width,
+            typename ScalarTypeIn,
             typename = typename std::enable_if<
               std::is_same<ScalarTypeOut, ScalarTypeIn>::value>::type>
   const VectorizedArray<ScalarTypeIn, width> &
@@ -4944,8 +4967,8 @@ inline DEAL_II_ALWAYS_INLINE
             const VectorizedArray<Number2, width> &v)
 {
   using ResultScalar_t = typename ProductType<Number1, Number2>::type;
-  return internal::convert_vectorized_array<ResultScalar_t>(u) *
-         internal::convert_vectorized_array<ResultScalar_t>(v);
+  return internal::convert_vectorized_array<ResultScalar_t, width>(u) *
+         internal::convert_vectorized_array<ResultScalar_t, width>(v);
 }
 
 /**
@@ -4979,8 +5002,8 @@ inline DEAL_II_ALWAYS_INLINE
             const VectorizedArray<Number2, width> &v)
 {
   using ResultScalar_t = typename ProductType<Number1, Number2>::type;
-  return internal::convert_vectorized_array<ResultScalar_t>(u) /
-         internal::convert_vectorized_array<ResultScalar_t>(v);
+  return internal::convert_vectorized_array<ResultScalar_t, width>(u) /
+         internal::convert_vectorized_array<ResultScalar_t, width>(v);
 }
 
 /**
@@ -5004,19 +5027,20 @@ operator+(const Number &u, const VectorizedArray<Number, width> &v)
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number1,
-          typename Number2,
-          std::size_t width,
-          typename = typename std::enable_if<
-            !std::is_same<Number1, Number2>::value>::type>
+template <
+  typename Number1,
+  typename Number2,
+  std::size_t width,
+  typename = typename std::enable_if<
+    std::is_same<Number1, typename EnableIfScalar<Number1>::type>::value &&
+    !std::is_same<Number1, Number2>::value>::type>
 inline DEAL_II_ALWAYS_INLINE
   VectorizedArray<typename ProductType<Number1, Number2>::type, width>
-  operator+(const typename EnableIfScalar<Number1>::type &u,
-            const VectorizedArray<Number2, width> &       v)
+  operator+(const Number1 &u, const VectorizedArray<Number2, width> &v)
 {
   using ResultScalar_t = typename ProductType<Number1, Number2>::type;
-  return internal::convert_vectorized_array<ResultScalar_t>(u) +
-         internal::convert_vectorized_array<ResultScalar_t>(v);
+  return internal::convert_vectorized_array<ResultScalar_t, width>(u) +
+         internal::convert_vectorized_array<ResultScalar_t, width>(v);
 }
 
 /**
@@ -5055,15 +5079,16 @@ operator+(const VectorizedArray<Number, width> &v, const Number &u)
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number1,
-          typename Number2,
-          std::size_t width,
-          typename = typename std::enable_if<
-            !std::is_same<Number1, Number2>::value>::type>
+template <
+  typename Number1,
+  typename Number2,
+  std::size_t width,
+  typename = typename std::enable_if<
+    std::is_same<Number2, typename EnableIfScalar<Number2>::type>::value &&
+    !std::is_same<Number1, Number2>::value>::type>
 inline DEAL_II_ALWAYS_INLINE
   VectorizedArray<typename ProductType<Number1, Number2>::type, width>
-  operator+(const VectorizedArray<Number1, width> &       v,
-            const typename EnableIfScalar<Number2>::type &u)
+  operator+(const VectorizedArray<Number1, width> &v, const Number2 &u)
 {
   return u + v;
 }
@@ -5104,19 +5129,20 @@ operator-(const Number &u, const VectorizedArray<Number, width> &v)
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number1,
-          typename Number2,
-          std::size_t width,
-          typename = typename std::enable_if<
-            !std::is_same<Number1, Number2>::value>::type>
+template <
+  typename Number1,
+  typename Number2,
+  std::size_t width,
+  typename = typename std::enable_if<
+    std::is_same<Number1, typename EnableIfScalar<Number1>::type>::value &&
+    !std::is_same<Number1, Number2>::value>::type>
 inline DEAL_II_ALWAYS_INLINE
   VectorizedArray<typename ProductType<Number1, Number2>::type, width>
-  operator-(const typename EnableIfScalar<Number1>::type &u,
-            const VectorizedArray<Number2, width> &       v)
+  operator-(const Number1 &u, const VectorizedArray<Number2, width> &v)
 {
   using ResultScalar_t = typename ProductType<Number1, Number2>::type;
-  return internal::convert_vectorized_array<ResultScalar_t>(u) -
-         internal::convert_vectorized_array<ResultScalar_t>(v);
+  return internal::convert_vectorized_array<ResultScalar_t, width>(u) -
+         internal::convert_vectorized_array<ResultScalar_t, width>(v);
 }
 
 /**
@@ -5156,19 +5182,20 @@ operator-(const VectorizedArray<Number, width> &v, const Number &u)
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number1,
-          typename Number2,
-          std::size_t width,
-          typename = typename std::enable_if<
-            !std::is_same<Number1, Number2>::value>::type>
+template <
+  typename Number1,
+  typename Number2,
+  std::size_t width,
+  typename = typename std::enable_if<
+    std::is_same<Number2, typename EnableIfScalar<Number2>::type>::value &&
+    !std::is_same<Number1, Number2>::value>::type>
 inline DEAL_II_ALWAYS_INLINE
   VectorizedArray<typename ProductType<Number1, Number2>::type, width>
-  operator-(const VectorizedArray<Number1, width> &       v,
-            const typename EnableIfScalar<Number2>::type &u)
+  operator-(const VectorizedArray<Number1, width> &v, const Number2 &u)
 {
   using ResultScalar_t = typename ProductType<Number1, Number2>::type;
-  return internal::convert_vectorized_array<ResultScalar_t>(v) -
-         internal::convert_vectorized_array<ResultScalar_t>(u);
+  return internal::convert_vectorized_array<ResultScalar_t, width>(v) -
+         internal::convert_vectorized_array<ResultScalar_t, width>(u);
 }
 
 /**
@@ -5208,19 +5235,20 @@ operator*(const Number &u, const VectorizedArray<Number, width> &v)
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number1,
-          typename Number2,
-          std::size_t width,
-          typename = typename std::enable_if<
-            !std::is_same<Number1, Number2>::value>::type>
+template <
+  typename Number1,
+  typename Number2,
+  std::size_t width,
+  typename = typename std::enable_if<
+    std::is_same<Number1, typename EnableIfScalar<Number1>::type>::value &&
+    !std::is_same<Number1, Number2>::value>::type>
 inline DEAL_II_ALWAYS_INLINE
   VectorizedArray<typename ProductType<Number1, Number2>::type, width>
-  operator*(const typename EnableIfScalar<Number1>::type &u,
-            const VectorizedArray<Number2, width> &       v)
+  operator*(const Number1 &u, const VectorizedArray<Number2, width> &v)
 {
   using ResultScalar_t = typename ProductType<Number1, Number2>::type;
-  return internal::convert_vectorized_array<ResultScalar_t>(u) *
-         internal::convert_vectorized_array<ResultScalar_t>(v);
+  return internal::convert_vectorized_array<ResultScalar_t, width>(u) *
+         internal::convert_vectorized_array<ResultScalar_t, width>(v);
 }
 
 /**
@@ -5259,15 +5287,16 @@ operator*(const VectorizedArray<Number, width> &v, const Number &u)
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number1,
-          typename Number2,
-          std::size_t width,
-          typename = typename std::enable_if<
-            !std::is_same<Number1, Number2>::value>::type>
+template <
+  typename Number1,
+  typename Number2,
+  std::size_t width,
+  typename = typename std::enable_if<
+    std::is_same<Number2, typename EnableIfScalar<Number2>::type>::value &&
+    !std::is_same<Number1, Number2>::value>::type>
 inline DEAL_II_ALWAYS_INLINE
   VectorizedArray<typename ProductType<Number1, Number2>::type, width>
-  operator*(const VectorizedArray<Number1, width> &       v,
-            const typename EnableIfScalar<Number2>::type &u)
+  operator*(const VectorizedArray<Number1, width> &v, const Number2 &u)
 {
   return u * v;
 }
@@ -5308,19 +5337,20 @@ operator/(const Number &u, const VectorizedArray<Number, width> &v)
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number1,
-          typename Number2,
-          std::size_t width,
-          typename = typename std::enable_if<
-            !std::is_same<Number1, Number2>::value>::type>
+template <
+  typename Number1,
+  typename Number2,
+  std::size_t width,
+  typename = typename std::enable_if<
+    std::is_same<Number1, typename EnableIfScalar<Number1>::type>::value &&
+    !std::is_same<Number1, Number2>::value>::type>
 inline DEAL_II_ALWAYS_INLINE
   VectorizedArray<typename ProductType<Number1, Number2>::type, width>
-  operator/(const typename EnableIfScalar<Number1>::type &u,
-            const VectorizedArray<Number2, width> &       v)
+  operator/(const Number1 &u, const VectorizedArray<Number2, width> &v)
 {
   using ResultScalar_t = typename ProductType<Number1, Number2>::type;
-  return internal::convert_vectorized_array<ResultScalar_t>(u) /
-         internal::convert_vectorized_array<ResultScalar_t>(v);
+  return internal::convert_vectorized_array<ResultScalar_t, width>(u) /
+         internal::convert_vectorized_array<ResultScalar_t, width>(v);
 }
 
 /**
@@ -5360,19 +5390,20 @@ operator/(const VectorizedArray<Number, width> &v, const Number &u)
  *
  * @relatesalso VectorizedArray
  */
-template <typename Number1,
-          typename Number2,
-          std::size_t width,
-          typename = typename std::enable_if<
-            !std::is_same<Number1, Number2>::value>::type>
+template <
+  typename Number1,
+  typename Number2,
+  std::size_t width,
+  typename = typename std::enable_if<
+    std::is_same<Number2, typename EnableIfScalar<Number2>::type>::value &&
+    !std::is_same<Number1, Number2>::value>::type>
 inline DEAL_II_ALWAYS_INLINE
   VectorizedArray<typename ProductType<Number1, Number2>::type, width>
-  operator/(const VectorizedArray<Number1, width> &       v,
-            const typename EnableIfScalar<Number2>::type &u)
+  operator/(const VectorizedArray<Number1, width> &v, const Number2 &u)
 {
   using ResultScalar_t = typename ProductType<Number1, Number2>::type;
-  return internal::convert_vectorized_array<ResultScalar_t>(v) /
-         internal::convert_vectorized_array<ResultScalar_t>(u);
+  return internal::convert_vectorized_array<ResultScalar_t, width>(v) /
+         internal::convert_vectorized_array<ResultScalar_t, width>(u);
 }
 
 /**
@@ -5926,12 +5957,14 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number,
-            typename Number2,
-            std::size_t width,
-            typename = typename std::enable_if<
-              std::is_same<Number2, typename ::dealii::EnableIfScalar<Number2>::type>::value &&
-              !std::is_same<Number, Number2>::value>::type>
+  template <
+    typename Number,
+    typename Number2,
+    std::size_t width,
+    typename = typename std::enable_if<
+      std::is_same<Number2,
+                   typename ::dealii::EnableIfScalar<Number2>::type>::value &&
+      !std::is_same<Number, Number2>::value>::type>
   inline ::dealii::VectorizedArray<
     typename ::dealii::ProductType<Number, Number2>::type,
     width>
