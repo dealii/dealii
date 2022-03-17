@@ -85,7 +85,7 @@ jobs:
               -D DEAL_II_WITH_KOKKOS="ON" \
               -D DEAL_II_WITH_KOKKOS_BACKEND="ON" \
               -D DEAL_II_WITH_MPI="ON" \
-              -D DEAL_II_WITH_TRILINOS="ON" \
+              -D DEAL_II_WITH_TRILINOS="OFF" \
               -D DEAL_II_WITH_PETSC="ON" \
               -D DEAL_II_WITH_METIS="ON" \
               -D DEAL_II_WITH_HDF5="ON" \
