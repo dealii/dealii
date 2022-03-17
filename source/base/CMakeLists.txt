@@ -46,6 +46,7 @@ SET(_unity_include_src
   incremental_function.cc
   index_set.cc
   job_identifier.cc
+  kokkos.cc
   logstream.cc
   hdf5.cc
   mpi.cc

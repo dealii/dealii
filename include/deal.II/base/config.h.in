@@ -534,18 +534,6 @@ static_assert(
   "that you have set up your application with the same version of boost as "
   "deal.II.");
 
-#include <Kokkos_Core.hpp>
-
-namespace Impl{
- inline void ensure_kokkos_initialized()
- {
-   if(!Kokkos::is_initialized())
-     Kokkos::initialize();
-     std::atexit(Kokkos::finalize);
- } 
-}
-
-
 #endif
 
 
