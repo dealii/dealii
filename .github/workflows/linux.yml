@@ -73,7 +73,9 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DCMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/kokkos-install ..
+        cmake -D BUILD_SHARED_LIBS=ON \
+              -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/kokkos-install \
+              ..
         make install
     - name: configure
       run: |
