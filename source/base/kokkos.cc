@@ -24,21 +24,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace Impl{
  void cleanup_kokkos()
  {
-    GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<double, Kokkos::HostSpace>>::
-        release_unused_memory();
-      GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<float, Kokkos::HostSpace>>::
-        release_unused_memory();
-#ifdef DEAL_II_WITH_CUDA
-        GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>::
-        release_unused_memory();
-      GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>::
-        release_unused_memory();
-#endif
-      Kokkos::finalize();
  }
 
  void ensure_kokkos_initialized()
@@ -54,8 +39,25 @@ namespace Impl{
       GrowingVectorMemory<
         LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>{};
 #endif
+         Kokkos::push_finalize_hook(GrowingVectorMemory<
+        LinearAlgebra::distributed::Vector<double, Kokkos::HostSpace>>::
+        release_unused_memory);
+   Kokkos::push_finalize_hook(
+      GrowingVectorMemory<
+        LinearAlgebra::distributed::Vector<float, Kokkos::HostSpace>>::
+        release_unused_memory);
+#ifdef DEAL_II_WITH_CUDA
+   Kokkos::push_finalize_hook(
+        GrowingVectorMemory<
+        LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>::
+        release_unused_memory);
+   Kokkos::push_finalize_hook(
+      GrowingVectorMemory<
+        LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>::
+        release_unused_memory);
+#endif
      Kokkos::initialize();
-     std::atexit(cleanup_kokkos);
+     std::atexit(Kokkos::finalize);
  }
 }
 DEAL_II_NAMESPACE_CLOSE
