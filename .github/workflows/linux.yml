@@ -35,7 +35,7 @@ jobs:
         configuration: Release
     - name: configure
       run: |
-        cmake -D BOOST_DIR=/home/runner/work/dealii/boost -D BOOST_INCLUDEDIR=/home/runner/work/dealii/boost -D BOOST_LIBRARYDIR=/home/runner/work/dealii/boost/stage/x64/Release/lib -D CMAKE_BUILD_TYPE=Release -D CMAKE_CXX_COMPILER=g++-10 -D DEAL_II_CXX_FLAGS='-Werror -std=c++2a' -D DEAL_II_EARLY_DEPRECATIONS=ON -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON .
+        cmake -D BOOST_DIR=/home/runner/work/dealii/boost -D BOOST_INCLUDEDIR=/home/runner/work/dealii/boost -D BOOST_LIBRARYDIR=/home/runner/work/dealii/boost/stage/x64/Release/lib -D CMAKE_BUILD_TYPE=Release -D CMAKE_CXX_COMPILER=g++-10 -D DEAL_II_CXX_FLAGS='-Werror -std=c++20' -D DEAL_II_EARLY_DEPRECATIONS=ON -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON .
     - name: archive
       uses: actions/upload-artifact@v1
       with:
