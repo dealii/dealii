@@ -1,0 +1,3 @@
+New: Added methods for enforcing boundary conditions directly with Hermite elements on an aligned rectangular grid.
+<br>
+(Ivy Weber, 2023/09/19)

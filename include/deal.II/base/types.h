@@ -234,6 +234,14 @@ namespace numbers
     static_cast<types::global_dof_index>(-1);
 
   /**
+   * A degree of freedom index used by the implementation of Hermite finite
+   * elements to denote functions that are assigned on the boundary of the
+   * domain, but that should be treated as internal domain d.o.f.s.
+   */
+  const types::global_dof_index unconstrained_boundary_dof_index =
+    static_cast<types::global_dof_index>(-1);
+
+  /**
    * An invalid value for coarse cell ids. See the glossary
    * entry on
    * @ref GlossCoarseCellId "coarse cell IDs"

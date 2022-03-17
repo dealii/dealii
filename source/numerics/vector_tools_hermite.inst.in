@@ -1,0 +1,68 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2023 - 2023 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template void VectorTools::internal::do_hermite_direct_projection<
+      deal_II_dimension,
+      deal_II_dimension,
+      double>(const MappingCartesian<deal_II_dimension> &mapping_h,
+              const DoFHandler<deal_II_dimension>       &dof_handler,
+              const std::map<types::boundary_id,
+                             const Function<deal_II_dimension, double> *>
+                                                        &boundary_functions,
+              const Quadrature<deal_II_dimension - 1>   &quadrature,
+              const unsigned int                         position,
+              std::map<types::global_dof_index, double> &boundary_values,
+              std::vector<unsigned int>                  component_mapping);
+
+    template void VectorTools::project_hermite_boundary_values<
+      deal_II_dimension,
+      deal_II_dimension,
+      double>(const Mapping<deal_II_dimension>    &mapping_h,
+              const DoFHandler<deal_II_dimension> &dof_handler,
+              const std::map<types::boundary_id,
+                             const Function<deal_II_dimension, double> *>
+                                                      &boundary_functions,
+              const Quadrature<deal_II_dimension - 1> &quadrature,
+              const unsigned int boundary_norm_deriv_order,
+              std::map<types::global_dof_index, double> &boundary_values,
+              std::vector<unsigned int>                  component_mapping);
+
+    template void VectorTools::project_hermite_boundary_values<
+      deal_II_dimension,
+      deal_II_dimension,
+      double>(const Mapping<deal_II_dimension>    &mapping_h,
+              const DoFHandler<deal_II_dimension> &dof_handler,
+              const std::map<types::boundary_id,
+                             const Function<deal_II_dimension, double> *>
+                                                        &boundary_functions,
+              const Quadrature<deal_II_dimension - 1>   &quadrature,
+              std::map<types::global_dof_index, double> &boundary_values,
+              std::vector<unsigned int>                  component_mapping);
+
+    template void VectorTools::
+      project_hermite<deal_II_dimension, Vector<double>, deal_II_dimension>(
+        const Mapping<deal_II_dimension>                    &mapping,
+        const DoFHandler<deal_II_dimension>                 &dof,
+        const AffineConstraints<Vector<double>::value_type> &constraints,
+        const Quadrature<deal_II_dimension>                 &quadrature,
+        const Function<deal_II_dimension, Vector<double>::value_type> &function,
+        Vector<double>                                                &vec,
+        const bool                               enforce_zero_boundary,
+        const Quadrature<deal_II_dimension - 1> &q_boundary,
+        const bool                               project_to_boundary_first);
+  }

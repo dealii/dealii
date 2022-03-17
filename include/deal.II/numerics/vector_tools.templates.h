@@ -19,6 +19,7 @@
 
 #include <deal.II/numerics/vector_tools_boundary.templates.h>
 #include <deal.II/numerics/vector_tools_constraints.templates.h>
+#include <deal.II/numerics/vector_tools_hermite.templates.h>
 #include <deal.II/numerics/vector_tools_integrate_difference.templates.h>
 #include <deal.II/numerics/vector_tools_interpolate.templates.h>
 #include <deal.II/numerics/vector_tools_mean_value.templates.h>
