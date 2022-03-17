@@ -14,52 +14,54 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/kokkos.h>
+
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_memory.h>
 
-#include <Kokkos_Core.hpp>
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#  include <Kokkos_Core.hpp>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Impl{
- void cleanup_kokkos()
- {
- }
-
- void ensure_kokkos_initialized()
- {
-   if(!Kokkos::is_initialized())
-	   GrowingVectorMemory<
+namespace Impl
+{
+  void
+  ensure_kokkos_initialized()
+  {
+#ifdef DEAL_II_USE_KOKKOS_BACKEND
+    if (!Kokkos::is_initialized())
+      GrowingVectorMemory<
         LinearAlgebra::distributed::Vector<double, Kokkos::HostSpace>>{};
+    GrowingVectorMemory<
+      LinearAlgebra::distributed::Vector<float, Kokkos::HostSpace>>{};
+#  ifdef DEAL_II_WITH_CUDA
+    GrowingVectorMemory<
+      LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>{};
+    GrowingVectorMemory<
+      LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>{};
+#  endif
+    Kokkos::push_finalize_hook(
       GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<float, Kokkos::HostSpace>>{};
-      #ifdef DEAL_II_WITH_CUDA
-        GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>{};
-      GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>{};
-#endif
-         Kokkos::push_finalize_hook(GrowingVectorMemory<
         LinearAlgebra::distributed::Vector<double, Kokkos::HostSpace>>::
         release_unused_memory);
-   Kokkos::push_finalize_hook(
+    Kokkos::push_finalize_hook(
       GrowingVectorMemory<
         LinearAlgebra::distributed::Vector<float, Kokkos::HostSpace>>::
         release_unused_memory);
-#ifdef DEAL_II_WITH_CUDA
-   Kokkos::push_finalize_hook(
-        GrowingVectorMemory<
+#  ifdef DEAL_II_WITH_CUDA
+    Kokkos::push_finalize_hook(
+      GrowingVectorMemory<
         LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>::
         release_unused_memory);
-   Kokkos::push_finalize_hook(
+    Kokkos::push_finalize_hook(
       GrowingVectorMemory<
         LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>::
         release_unused_memory);
+#  endif
+    Kokkos::initialize();
+    std::atexit(Kokkos::finalize);
 #endif
-     Kokkos::initialize();
-     std::atexit(Kokkos::finalize);
- }
-}
+  }
+} // namespace Impl
 DEAL_II_NAMESPACE_CLOSE
-
-

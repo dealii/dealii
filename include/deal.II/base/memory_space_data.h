@@ -141,7 +141,8 @@ namespace MemorySpace
 #  ifdef DEAL_II_USE_KOKKOS_BACKEND
   template <typename T, typename MemorySpace>
   MemorySpaceData<T, MemorySpace>::MemorySpaceData()
-    : values((dealii::Impl::ensure_kokkos_initialized(), Kokkos::View<T *, MemorySpace>("memoryspace data", 0)))
+    : values((dealii::Impl::ensure_kokkos_initialized(),
+              Kokkos::View<T *, MemorySpace>("memoryspace data", 0)))
   {}
 
 

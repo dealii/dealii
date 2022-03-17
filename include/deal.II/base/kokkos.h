@@ -20,13 +20,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Impl{
- void cleanup_kokkos();
- void ensure_kokkos_initialized();
+namespace Impl
+{
+  void
+  ensure_kokkos_initialized();
 }
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-
-

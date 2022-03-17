@@ -231,7 +231,7 @@ namespace LinearAlgebra
                 data.values_sm[i] =
                   ArrayView<const Number>(others[i], new_alloc_sizes[i]);
 
-#    ifdef DEAL_II_USE_KOKKOS_BACKEND
+#  ifdef DEAL_II_USE_KOKKOS_BACKEND
               data.values =
                 Kokkos::View<Number *,
                              ::dealii::MemorySpace::Host,
@@ -250,7 +250,7 @@ namespace LinearAlgebra
                                         MPI_Win_free(&mpi_window);
                                       AssertThrowMPI(ierr);
                                     }};
-#    else
+#  else
               data.values = {ptr_aligned, [mpi_window](Number *) mutable {
                                // note: we are creating here a copy of the
                                // window other approaches led to segmentation
@@ -258,7 +258,7 @@ namespace LinearAlgebra
                                const auto ierr = MPI_Win_free(&mpi_window);
                                AssertThrowMPI(ierr);
                              }};
-#    endif
+#  endif
 #else
               Assert(false, ExcInternalError());
 #endif
