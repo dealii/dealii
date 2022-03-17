@@ -90,6 +90,7 @@ jobs:
               -D DEAL_II_WITH_METIS="ON" \
               -D DEAL_II_WITH_HDF5="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
+              -D KOKKOS_DIR=${GITHUB_WORKSPACE}/kokkos-install \
               ..
     - name: archive
       uses: actions/upload-artifact@v1
