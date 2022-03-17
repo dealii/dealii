@@ -76,11 +76,23 @@ Multigrid<VectorType>::set_cycle(typename Multigrid<VectorType>::Cycle c)
 
 template <typename VectorType>
 void
-Multigrid<VectorType>::set_edge_matrices(const MGMatrixBase<VectorType> &down,
-                                         const MGMatrixBase<VectorType> &up)
+Multigrid<VectorType>::set_edge_matrices(
+  const MGMatrixBase<VectorType> &edge_out,
+  const MGMatrixBase<VectorType> &edge_in)
 {
-  edge_out = &down;
-  edge_in  = &up;
+  this->edge_out = &edge_out;
+  this->edge_in  = &edge_in;
+}
+
+
+
+template <typename VectorType>
+void
+Multigrid<VectorType>::set_edge_in_matrix(
+  const MGMatrixBase<VectorType> &edge_in)
+{
+  this->edge_out = nullptr;
+  this->edge_in  = &edge_in;
 }
 
 
@@ -88,11 +100,11 @@ Multigrid<VectorType>::set_edge_matrices(const MGMatrixBase<VectorType> &down,
 template <typename VectorType>
 void
 Multigrid<VectorType>::set_edge_flux_matrices(
-  const MGMatrixBase<VectorType> &down,
-  const MGMatrixBase<VectorType> &up)
+  const MGMatrixBase<VectorType> &edge_down,
+  const MGMatrixBase<VectorType> &edge_up)
 {
-  edge_down = &down;
-  edge_up   = &up;
+  this->edge_down = &edge_down;
+  this->edge_up   = &edge_up;
 }
 
 
