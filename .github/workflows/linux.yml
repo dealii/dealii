@@ -63,6 +63,18 @@ jobs:
       run: |
         mpicc -v
         cmake --version
+    - uses: actions/checkout@v2
+      with:
+        repository: kokkos/kokkos
+        ref: 3.5.00
+        path: kokkos
+    - name: install kokkos
+      working-directory: kokkos
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/kokkos-install ..
+        make install
     - name: configure
       run: |
         mkdir build
@@ -70,6 +82,8 @@ jobs:
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D DEAL_II_CXX_FLAGS='-Werror -std=c++17' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_KOKKOS="ON" \
+              -D DEAL_II_WITH_KOKKOS_BACKEND="ON" \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_TRILINOS="ON" \
               -D DEAL_II_WITH_PETSC="ON" \
