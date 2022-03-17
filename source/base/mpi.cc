@@ -62,7 +62,7 @@
 #  include <zoltan_cpp.h>
 #endif
 
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
 #  include <Kokkos_Core.hpp>
 #endif
 
@@ -776,7 +776,7 @@ namespace Utilities
              ExcMessage("You can only create a single object of this class "
                         "in a program since it initializes the MPI system."));
 
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
       // If the user explicitly provide max_num_thread, we set the maximum
       // number of threads using Kokkos::InitArguments. Otherwise, we pass the
       // command the command line to Kokkos.
@@ -1072,7 +1072,7 @@ namespace Utilities
         }
 #endif
 
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
       Kokkos::finalize();
 #endif
     }

@@ -18,7 +18,7 @@
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_memory.h>
 
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
 #  include <Kokkos_Core.hpp>
 #endif
 
@@ -29,7 +29,7 @@ namespace Impl
   void
   ensure_kokkos_initialized()
   {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
     if (!Kokkos::is_initialized())
       GrowingVectorMemory<
         LinearAlgebra::distributed::Vector<double, Kokkos::HostSpace>>{};

@@ -54,7 +54,7 @@
 #     DEAL_II_COMPILE_EXAMPLES
 #     DEAL_II_CPACK_BUNDLE_NAME
 #     DEAL_II_CPACK_EXTERNAL_LIBS
-#     DEAL_II_USE_KOKKOS_BACKEND
+#     DEAL_II_WITH_KOKKOS_BACKEND
 #
 # *)  May also be set via environment variable (CXXFLAGS, LDFLAGS)
 #     (a nonempty cached variable has precedence and will not be
@@ -378,7 +378,7 @@ OPTION(DEAL_II_WITH_64BIT_INDICES
   )
 LIST(APPEND DEAL_II_FEATURES 64BIT_INDICES)
 
-CMAKE_DEPENDENT_OPTION(DEAL_II_USE_KOKKOS_BACKEND
+CMAKE_DEPENDENT_OPTION(DEAL_II_WITH_KOKKOS_BACKEND
 	"Experimental: If set to ON, Kokkos is used for all operations in LinearAlgebra::distributed::Vector. In particular, this allows accessing all Kokkos backends."
   OFF "DEAL_II_WITH_KOKKOS" OFF
   )

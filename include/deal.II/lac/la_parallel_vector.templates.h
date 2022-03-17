@@ -132,7 +132,7 @@ namespace LinearAlgebra
         {
           if (comm_shared == MPI_COMM_SELF)
             {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
               Kokkos::realloc(data.values, new_alloc_size);
 #else
               Number *new_val;
@@ -231,7 +231,7 @@ namespace LinearAlgebra
                 data.values_sm[i] =
                   ArrayView<const Number>(others[i], new_alloc_sizes[i]);
 
-#  ifdef DEAL_II_USE_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
               data.values =
                 Kokkos::View<Number *,
                              ::dealii::MemorySpace::Host,
@@ -285,7 +285,7 @@ namespace LinearAlgebra
           ::dealii::LinearAlgebra::distributed::
             Vector<Number, ::dealii::MemorySpace::Host>
               tmp_vector(communication_pattern);
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
           // fill entries from ReadWriteVector into the distributed vector,
           // including ghost entries. this is not really efficient right now
           // because indices are translated twice, once by
@@ -394,7 +394,7 @@ namespace LinearAlgebra
                           const unsigned int              size,
                           RealType &                      max)
         {
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
           RealType max_reduce;
           Kokkos::parallel_reduce(
             Kokkos::RangePolicy<
@@ -629,7 +629,7 @@ namespace LinearAlgebra
       resize_val(size, comm_sm);
 
       // delete previous content in import data
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
       Kokkos::resize(import_data.values, 0);
 #else
       import_data.values.reset();
@@ -664,7 +664,7 @@ namespace LinearAlgebra
       resize_val(local_size + ghost_size, comm_sm);
 
       // delete previous content in import data
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
       Kokkos::resize(import_data.values, 0);
 #else
       import_data.values.reset();
@@ -714,7 +714,7 @@ namespace LinearAlgebra
         // is only used as temporary storage for compress() and
         // update_ghost_values, and we might have vectors where we never
         // call these methods and hence do not need to have the storage.
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
       Kokkos::resize(import_data.values, 0);
 #else
       import_data.values.reset();
@@ -778,7 +778,7 @@ namespace LinearAlgebra
       // is only used as temporary storage for compress() and
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
       Kokkos::resize(import_data.values, 0);
 #else
       import_data.values.reset();
@@ -1117,7 +1117,7 @@ namespace LinearAlgebra
 #  endif
               if (!import_data.has_data_on_host())
                 {
-#  ifdef DEAL_II_USE_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
                   Kokkos::resize(import_data.values,
                                  partitioner->n_import_indices());
 #  else
@@ -1302,7 +1302,7 @@ namespace LinearAlgebra
 #    endif
           if (!import_data.has_data_on_host())
             {
-#    ifdef DEAL_II_USE_KOKKOS_BACKEND
+#    ifdef DEAL_II_WITH_KOKKOS_BACKEND
               Kokkos::resize(import_data.values,
                              partitioner->n_import_indices());
 #    else
@@ -2222,7 +2222,7 @@ namespace LinearAlgebra
       if (partitioner.use_count() > 0)
         memory +=
           partitioner->memory_consumption() / partitioner.use_count() + 1;
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
       if (import_data.has_data_on_host())
 #else
       if (import_data.has_data_on_host() || import_data.values_dev != nullptr)

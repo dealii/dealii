@@ -26,7 +26,7 @@
 #include <functional>
 #include <memory>
 
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
 #  include <Kokkos_Core.hpp>
 #endif
 
@@ -91,7 +91,7 @@ namespace MemorySpace
     void
     copy_from(const T *begin, const std::size_t n_elements);
 
-#ifdef DEAL_II_USE_KOKKOS_BACKEND
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
     /**
      * Kokkos View to the data
      */
@@ -138,7 +138,7 @@ namespace MemorySpace
 #ifndef DOXYGEN
 
 
-#  ifdef DEAL_II_USE_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
   template <typename T, typename MemorySpace>
   MemorySpaceData<T, MemorySpace>::MemorySpaceData()
     : values((dealii::Impl::ensure_kokkos_initialized(),
