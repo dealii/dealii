@@ -1022,18 +1022,18 @@ MappingFE<dim, spacedim>::requires_update_flags(const UpdateFlags in) const
       // update_boundary_forms is simply
       // ignored for the interior of a
       // cell.
-      if ((out & (update_JxW_values | update_normal_vectors)) != 0u)
+      if (out & (update_JxW_values | update_normal_vectors))
         out |= update_boundary_forms;
 
-      if ((out & (update_covariant_transformation | update_JxW_values |
-                  update_jacobians | update_jacobian_grads |
-                  update_boundary_forms | update_normal_vectors)) != 0u)
+      if (out & (update_covariant_transformation | update_JxW_values |
+                 update_jacobians | update_jacobian_grads |
+                 update_boundary_forms | update_normal_vectors))
         out |= update_contravariant_transformation;
 
-      if ((out &
-           (update_inverse_jacobians | update_jacobian_pushed_forward_grads |
-            update_jacobian_pushed_forward_2nd_derivatives |
-            update_jacobian_pushed_forward_3rd_derivatives)) != 0u)
+      if (out &
+          (update_inverse_jacobians | update_jacobian_pushed_forward_grads |
+           update_jacobian_pushed_forward_2nd_derivatives |
+           update_jacobian_pushed_forward_3rd_derivatives))
         out |= update_covariant_transformation;
 
       // The contravariant transformation is used in the Piola
@@ -1042,12 +1042,12 @@ MappingFE<dim, spacedim>::requires_update_flags(const UpdateFlags in) const
       // knowing here whether the finite element wants to use the
       // contravariant or the Piola transforms, we add the JxW values
       // to the list of flags to be updated for each cell.
-      if ((out & update_contravariant_transformation) != 0u)
+      if (out & update_contravariant_transformation)
         out |= update_volume_elements;
 
       // the same is true when computing normal vectors: they require
       // the determinant of the Jacobian
-      if ((out & update_normal_vectors) != 0u)
+      if (out & update_normal_vectors)
         out |= update_volume_elements;
     }
 
@@ -1211,7 +1211,7 @@ MappingFE<dim, spacedim>::fill_fe_values(
   // Multiply quadrature weights by absolute value of Jacobian determinants or
   // the area element g=sqrt(DX^t DX) in case of codim > 0
 
-  if ((update_flags & (update_normal_vectors | update_JxW_values)) != 0u)
+  if (update_flags & (update_normal_vectors | update_JxW_values))
     {
       AssertDimension(output_data.JxW_values.size(), n_q_points);
 
@@ -1263,12 +1263,12 @@ MappingFE<dim, spacedim>::fill_fe_values(
                     CellSimilarity::inverted_translation)
                   {
                     // we only need to flip the normal
-                    if ((update_flags & update_normal_vectors) != 0u)
+                    if (update_flags & update_normal_vectors)
                       output_data.normal_vectors[point] *= -1.;
                   }
                 else
                   {
-                    if ((update_flags & update_normal_vectors) != 0u)
+                    if (update_flags & update_normal_vectors)
                       {
                         Assert(spacedim == dim + 1,
                                ExcMessage(
@@ -1301,7 +1301,7 @@ MappingFE<dim, spacedim>::fill_fe_values(
 
 
   // copy values from InternalData to vector given by reference
-  if ((update_flags & update_jacobians) != 0u)
+  if (update_flags & update_jacobians)
     {
       AssertDimension(output_data.jacobians.size(), n_q_points);
       if (computed_cell_similarity != CellSimilarity::translation)
@@ -1310,7 +1310,7 @@ MappingFE<dim, spacedim>::fill_fe_values(
     }
 
   // copy values from InternalData to vector given by reference
-  if ((update_flags & update_inverse_jacobians) != 0u)
+  if (update_flags & update_inverse_jacobians)
     {
       AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       if (computed_cell_similarity != CellSimilarity::translation)

@@ -7194,11 +7194,11 @@ FEEvaluation<dim,
     }
 
 #  ifdef DEBUG
-  if ((evaluation_flag_actual & EvaluationFlags::values) != 0u)
+  if (evaluation_flag_actual & EvaluationFlags::values)
     this->values_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::gradients) != 0u)
+  if (evaluation_flag_actual & EvaluationFlags::gradients)
     this->gradients_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::hessians) != 0u)
+  if (evaluation_flag_actual & EvaluationFlags::hessians)
     this->hessians_quad_initialized = true;
 #  endif
 }
@@ -7430,10 +7430,10 @@ FEEvaluation<dim,
             const bool                             sum_into_values_array)
 {
 #  ifdef DEBUG
-  if ((integration_flag & EvaluationFlags::values) != 0u)
+  if (integration_flag & EvaluationFlags::values)
     Assert(this->values_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
-  if ((integration_flag & EvaluationFlags::gradients) != 0u)
+  if (integration_flag & EvaluationFlags::gradients)
     Assert(this->gradients_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
   if ((integration_flag & EvaluationFlags::hessians) != 0u)
@@ -7987,9 +7987,9 @@ FEFaceEvaluation<dim,
       n_components, evaluation_flag_actual, values_array, *this);
 
 #  ifdef DEBUG
-  if ((evaluation_flag_actual & EvaluationFlags::values) != 0u)
+  if (evaluation_flag_actual & EvaluationFlags::values)
     this->values_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::gradients) != 0u)
+  if (evaluation_flag_actual & EvaluationFlags::gradients)
     this->gradients_quad_initialized = true;
   if ((evaluation_flag_actual & EvaluationFlags::hessians) != 0u)
     this->hessians_quad_initialized = true;
@@ -8096,7 +8096,7 @@ FEFaceEvaluation<dim,
                     "and EvaluationFlags::hessians are supported."));
 
   EvaluationFlags::EvaluationFlags integration_flag_actual = integration_flag;
-  if (((integration_flag & EvaluationFlags::hessians) != 0u) &&
+  if (integration_flag & EvaluationFlags::hessians &&
       (this->cell_type > internal::MatrixFreeFunctions::affine))
     {
       unsigned int size = n_components * dim * n_q_points;
