@@ -129,6 +129,9 @@ jobs:
     name: linux debug cuda-10
     runs-on: [ubuntu-18.04]
 
+    env: 
+      CUDA_ROOT: /usr/local/cuda
+
     steps:
     - uses: actions/checkout@v2
     - name: modules
