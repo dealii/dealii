@@ -151,13 +151,35 @@ jobs:
       run: |
         mpicc -v
         cmake --version
+    - uses: actions/checkout@v2
+      with:
+        repository: kokkos/kokkos
+        ref: 3.5.00
+        path: kokkos
+    - name: install kokkos
+      working-directory: kokkos
+      run: |
+        mkdir build
+        cd build
+        cmake -D BUILD_SHARED_LIBS=ON \
+              -D CMAKE_CXX_COMPILER=${GITHUB_WORKSPACE}/kokkos/bin/nvcc_wrapper \
+              -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/kokkos-install \
+              -D Kokkos_ENABLE_CUDA=ON \
+              -D Kokkos_ENABLE_CUDA_LAMBDA=ON \
+              -D Kokkos_ARCH_VOLTA70=ON \
+              ..
+        make install
     - name: configure
       run: |
         cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D CMAKE_CXX_COMPILER=${GITHUB_WORKSPACE}/kokkos/bin/nvcc_wrapper \
               -D DEAL_II_CUDA_FLAGS='-arch=sm_70' \
               -D DEAL_II_CXX_FLAGS='-Werror -Wno-non-template-friend' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_CUDA="ON" \
+              -D DEAL_II_WITH_KOKKOS="ON" \
+              -D DEAL_II_WITH_KOKKOS_BACKEND="ON" \
+              -D KOKKOS_DIR=${GITHUB_WORKSPACE}/kokkos-install \                                       -
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_P4EST="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="ON" \
