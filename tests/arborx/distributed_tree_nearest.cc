@@ -18,7 +18,7 @@
 
 
 #include <deal.II/arborx/access_traits.h>
-#include <deal.II/arborx/bvh.h>
+#include <deal.II/arborx/distributed_tree.h>
 
 #include <deal.II/base/bounding_box.h>
 
@@ -69,13 +69,13 @@ test_bounding_box_2d()
   ArborXWrappers::BoundingBoxNearestPredicate bb_nearest(query_bounding_boxes,
                                                          1);
   auto indices_ranks_offsets = distributed_tree.query(bb_nearest);
-  auto indices               = indices_ranks_offsets.first;
+  auto indices_ranks         = indices_ranks_offsets.first;
   auto offsets               = indices_ranks_offsets.second;
 
   std::vector<int> indices_ref = {0, 15};
   std::vector<int> offsets_ref = {0, 1, 2};
 
-  AssertThrow(indices.size() == indices_ref.size(), ExcInternalError());
+  AssertThrow(indices_ranks.size() == indices_ref.size(), ExcInternalError());
   AssertThrow(offsets.size() == offsets_ref.size(), ExcInternalError());
   for (unsigned int i = 0; i < offsets.size() - 1; ++i)
     {
@@ -119,21 +119,21 @@ test_point_2d()
         }
     }
 
-  Point<3> point_a(0.5 + offset_query, 0.5 + offset_query, 0.5 + offset_query);
-  Point<3> point_b(1.5 + offset_query, 1.5 + offset_query, 1.5 + offset_query);
-  Point<3> point_c(2.2 + offset_query, 2.2 + offset_query, 2.2 + offset_query);
-  Point<3> point_d(2.6 + offset_query, 2.6 + offset_query, 2.6 + offset_query);
+  Point<2> point_a(0.5 + offset_query, 0.5 + offset_query);
+  Point<2> point_b(1.5 + offset_query, 1.5 + offset_query);
+  Point<2> point_c(2.2 + offset_query, 2.2 + offset_query);
+  Point<2> point_d(2.6 + offset_query, 2.6 + offset_query);
 
-  std::vector<BoundingBox<3>> query_bounding_boxes;
+  std::vector<BoundingBox<2>> query_bounding_boxes;
   query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
   query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
 
   ArborXWrappers::DistributedTree distributed_tree(MPI_COMM_WORLD, points);
   ArborXWrappers::BoundingBoxNearestPredicate bb_nearest(query_bounding_boxes,
                                                          1);
-  auto indices_ranks_offset = distributed_tree.query(bb_nearest);
-  auto indices              = indices_ranks_offset.first;
-  auto offsets              = indices_ranks_offset.second;
+  auto indices_ranks_offsets = distributed_tree.query(bb_nearest);
+  auto indices_ranks         = indices_ranks_offsets.first;
+  auto offsets               = indices_ranks_offsets.second;
 
   std::vector<int> indices_ref = {6, 12};
   std::vector<int> offsets_ref = {0, 1, 2};
@@ -173,8 +173,8 @@ test_bounding_box_3d()
   unsigned int n_points_1d  = 5;
   const int    rank         = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const int    n_procs      = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-  const int    offset_bb    = 2 * rank * n_points_1d;
-  const int    offset_query = 2 * ((rank + 1) % n_procs) * n_points_1d;
+  const int    offset_bb    = 20 * rank * n_points_1d;
+  const int    offset_query = 20 * ((rank + 1) % n_procs) * n_points_1d;
   for (unsigned int i = 0; i < n_points_1d; ++i)
     {
       for (unsigned int j = 0; j < n_points_1d; ++j)
@@ -202,10 +202,18 @@ test_bounding_box_3d()
         }
     }
 
-  Point<3> point_a(-1.0 + offst_query, -1.0 + offst_query, -1.0 + offst_query);
-  Point<3> point_b(-0.5 + offst_query, -0.5 + offst_query, -0.5 + offst_query);
-  Point<3> point_c(10.2 + offst_query, 10.2 + offst_query, 10.2 + offst_query);
-  Point<3> point_d(10.6 + offst_query, 10.6 + offst_query, 10.6 + offst_query);
+  Point<3> point_a(-1.0 + offset_query,
+                   -1.0 + offset_query,
+                   -1.0 + offset_query);
+  Point<3> point_b(-0.5 + offset_query,
+                   -0.5 + offset_query,
+                   -0.5 + offset_query);
+  Point<3> point_c(10.2 + offset_query,
+                   10.2 + offset_query,
+                   10.2 + offset_query);
+  Point<3> point_d(10.6 + offset_query,
+                   10.6 + offset_query,
+                   10.6 + offset_query);
 
   std::vector<BoundingBox<3>> query_bounding_boxes;
   query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
@@ -281,13 +289,13 @@ test_point_3d()
   ArborXWrappers::BoundingBoxNearestPredicate bb_nearest(query_bounding_boxes,
                                                          1);
   auto indices_ranks_offsets = distributed_tree.query(bb_nearest);
-  auto indices_ranks         = indices_offset.first;
-  auto offsets               = indices_offset.second;
+  auto indices_ranks         = indices_ranks_offsets.first;
+  auto offsets               = indices_ranks_offsets.second;
 
   std::vector<int> indices_ref = {31, 62};
   std::vector<int> offsets_ref = {0, 1, 2};
 
-  AssertThrow(indices.size() == indices_ref.size(), ExcInternalError());
+  AssertThrow(indices_ranks.size() == indices_ref.size(), ExcInternalError());
   AssertThrow(offsets.size() == offsets_ref.size(), ExcInternalError());
   for (unsigned int i = 0; i < offsets.size() - 1; ++i)
     {
@@ -317,6 +325,7 @@ main(int argc, char **argv)
 {
   // Initialize Kokkos
   Kokkos::initialize(argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv);
 
   initlog();
 
