@@ -24,13 +24,13 @@ how to implement simple first-order absorbing boundary conditions and a
 more sophisticated "perfectly matched layer" for electromagnetic waves.
 
 
-<h2>Time-Harmonic Maxwell's Equations with interface conditions</h2>
+<h3>Time-Harmonic Maxwell's Equations with interface conditions</h3>
 
 We start the discussion with a short derivation of the governing equations
 and some pointers to literature.
 
 
-<h3>Derivation of time-harmonic Maxwell's equations</h3>
+<h4>Derivation of time-harmonic Maxwell's equations</h4>
 
 In two ($d=2$) or three ($d=3$) spatial dimensions,
 the time evolution of an electromagnetic
@@ -105,7 +105,7 @@ write $\mathbf{E}(\mathbf{x})$, $\mathbf{H}(\mathbf{x})$, etc., when
 referring to the time-harmonic fields.
 
 
-<h3>Jump conditions on lower dimensional interfaces</h3>
+<h4>Jump conditions on lower dimensional interfaces</h4>
 
 Graphene is a two-dimensional carbon allotrope with a <i>single</i> atom
 layer that is arranged in a honeycomb lattice @cite Geim2004. Due to its
@@ -133,7 +133,11 @@ field. This is best seen by visualizing <a
 href="https://en.wikipedia.org/wiki/Amp%C3%A8re%27s_circuital_law">Ampère's
 law</a>,
 
-@f[\text{TODO}@f]
+@htmlonly
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-81-cartoon.png" alt="Visualization of Ohm's law and Ampère's law leading to a jump condition over the interface" height="200">
+</p>
+@endhtmlonly
 
 and then taking the limit of the upper and lower part of the line integral
 approaching the sheet. In contrast, the tangential part of the electric
@@ -151,7 +155,7 @@ when approaching the interface from above or below the interface:
 $\mathbf{F}^\pm(\mathbf{x})=\lim_{\delta\to0,\delta>0}\mathbf{F}(\mathbf{x}\pm\delta\mathbf{\nu})$.
 
 
-<h3> Rescaling </h3>
+<h4> Rescaling </h4>
 
 We will be using a rescaled version of the Maxwell's equations described above.
 The rescaling has the following key differences:<br />
@@ -210,7 +214,7 @@ i\varepsilon_r\hat{\mathbf{E}} + \nabla\times(\mu^{-1}\mathbf{H})
 
 We will omit the hat in further discussion for ease of notation.
 
-<h3> Variational Statement</h3>
+<h4> Variational Statement</h4>
 
 Let $\Omega \subset \mathbb{R}^n$, $(n = 2,3)$ be a simply connected and bounded
 domain with Lipschitz-continuous and piecewise smooth boundary, $\partial\Omega$.
@@ -310,7 +314,7 @@ A(\mathbf{E},\varphi) = F(\varphi)
 @f]
 
 
-<h3>Absorbing boundary conditions and perfectly matched layer</h3>
+<h4>Absorbing boundary conditions and perfectly matched layer</h4>
 
 Moreover, the above equations are supplemented by the Silver-Müller radiation
 condition, if the ambient (unbounded) medium is isotropic. This amounts to the
@@ -326,7 +330,7 @@ x \not\in \Sigma
 In our case, we eliminate reflection from infinity by implementing a PML and
 avoid the explicit use of the last condition.
 
-<h2> Discretization Scheme</h2>
+<h3> Discretization Scheme</h3>
 
 The variational form is discretized on a non-uniform quadrilateral mesh with
 higher-order, curl-conforming Nédélec elements. This way the interface with a
@@ -361,7 +365,7 @@ A_{ij} = F_i
 Using a skeleton similar to step-4, we have constructed a Maxwell class and we
 have used complex-valued FENedelec elements to solve our equations. <br />
 
-<h2> Perfectly Matched Layer </h2>
+<h3> Perfectly Matched Layer </h3>
 The SPP amplitude is negatively effected by the absorbing boundary condition and
 this causes the solution image to be distorted. In order to reduce the resonance
 and distortion in our solutions, we are implementing a Perfectly Matched Layer
@@ -381,7 +385,7 @@ be a function of the radial distance $\rho$ from the origin $e_r$. The normal fi
 $\nu$ of $\Sigma$ is orthogonal to the radial direction $e_r$, which makes
 $\mathbf{J}_a \equiv 0$ and $\mathbf{M}_a \equiv 0$ within the PML. <br />
 
-<img src = "PML.png"></img>
+<img src = "PML.png">
 
 Introduce a change of coordinates
 @f[

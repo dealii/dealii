@@ -14,7 +14,7 @@ The following images are the outputs for the imaginary $E_x$ without the interfa
 
 @code
 # use absorbing boundary conditions?
-  set absorbing boundary condition boolean = false
+  set absorbing boundary condition = false
 
 # position of the dipole
   set dipole position    = 0, 0
@@ -25,21 +25,24 @@ The following images are the outputs for the imaginary $E_x$ without the interfa
 # surface conductivity between material 1 and material 2
   set sigma              = 0, 0; 0, 0| 0, 0; 0, 0
 @endcode
- 
+
 Following are the output images:
 
 <table width="80%" align="center">
   <tr>
+      <td align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_abs_PML0.png" alt="Visualization of the solution of step-81 with no interface, Dirichlet boundary conditions and PML strength 0" height="210"/>
+      <p> Solution with no interface, Dirichlet boundary conditions and PML strength 0.</p>
+      </td>
+      <td></td>
 	<td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_abs_PML0.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 0" height="300">
-    	</td>
-    	<td></td>
-	<td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_noabs_PML0.png" alt="Visualization of the solution of step-81 with no interface, no absorbing boundary conditions and PML strength 0" height="300">
+      <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_noabs_PML0.png" alt="Visualization of the solution of step-81 with no interface, no absorbing boundary conditions and PML strength 0" height="210">
+	<p> Solution with no interface, absorbing boundary conditions and PML strength 0.</p>
     	</td>
 	<td></td>
     	<td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_abs_PML4.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 4" height="300">
+      <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_abs_PML4.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 4" height="210">
+      <p> Solution with no interface, absorbing boundary conditions and PML strength 4.</p>
     </td>
   </tr>
 </table>
@@ -62,16 +65,19 @@ Once again, we will visualize the output with absorbing boundary conditions and 
 <table width="80%" align="center">
   <tr>
 	<td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_noabs_PML0.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 0" height="300">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_noabs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
     	</td>
     	<td></td>
 	<td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_abs_PML0.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 0" height="300">
-    </td>
-    <td></td>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_abs_PML4.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 4" height="300">
-    </td>
+        <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_abs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+	<p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        </td>
+        <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_abs_PML4.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
+	<p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+        </td>
   </tr>
 </table>
 
@@ -79,26 +85,69 @@ Once again, we will visualize the output with absorbing boundary conditions and 
 <table width="80%" align="center">
   <tr>
 	<td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_noabs_PML0.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 0" height="300">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_noabs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+	<p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
     	</td>
     	<td></td>
 	<td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_abs_PML0.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 0" height="300">
-    </td>
-    <td></td>
-    <td align="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_abs_PML4.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 4" height="300">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_abs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+	<p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        </td>
+        <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_abs_PML4.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
+	<p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
     </td>
   </tr>
 </table>
 
 The SPP is confined near the interface that we created, however without absorbing boundary conditions, we don't observe a dissipation effect. On adding the absorbing boundary conditions, we observe distortion and resonance and we still don't notice any dissipation. As expected, the PML removes the distortion and resonance. The standing wave is also dissipating and getting absorbed within the PML, and as we increase the PML strength, the standing wave will dissipate more within the PML ring.
 
+Here are some animations to demonstrate the effect of the PML
+<table width="80%" align="center">
+  <tr>
+	<td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-dirichlet_Ex.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
+    	</td>
+    	<td></td>
+	<td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-absorbing_Ex.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+	<p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        </td>
+        <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-perfectly_matched_layer_Ex.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
+	<p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+        </td>
+  </tr>
+</table>
+
+
+<table width="80%" align="center">
+  <tr>
+	<td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-dirichlet_Ey.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+        <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
+    	</td>
+    	<td></td>
+	<td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-absorbing_Ey.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
+	<p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        </td>
+        <td></td>
+        <td align="center">
+        <img src="https://www.dealii.org/images/steps/developer/step-81-perfectly_matched_layer_Ey.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
+	<p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+        </td>
+  </tr>
+</table>
+
 <h3> Notes </h3>
 
 <h4> Real and Complex Matrices </h4>
-As is evident from the results, we are splitting our solution matrices into the real and the imaginary components. We started off using the $H^{curl}$ conforming Nédélec Elements, and we made two copies of the Finite Elements in order 
-to represent the real and the imaginary components of our input (FE_NedelecSZ was used instead of FE_Nedelec to avoid the sign conflicts issues present in traditional Nédélec elements). In the assembly, we create two vectors of dimension $dim$ that assist us in extracting the real and the imaginary components of our finite elements.  
+As is evident from the results, we are splitting our solution matrices into the real and the imaginary components. We started off using the $H^{curl}$ conforming Nédélec Elements, and we made two copies of the Finite Elements in order
+to represent the real and the imaginary components of our input (FE_NedelecSZ was used instead of FE_Nedelec to avoid the sign conflicts issues present in traditional Nédélec elements). In the assembly, we create two vectors of dimension $dim$ that assist us in extracting the real and the imaginary components of our finite elements.
 
 
 <h4> Rotations and Scaling </h4>
@@ -134,7 +183,7 @@ We will create a video demonstrating the wave in motion, which is essentially an
 template <int dim>
 void Maxwell<dim>::output_results(unsigned int t)
 {
-	std::cout << "Running step:" << alpha << std::endl;
+    std::cout << "Running step:" << t << std::endl;
     DataOut<2> data_out;
     data_out.attach_dof_handler(dof_handler);
     Vector<double> postprocessed;
@@ -151,10 +200,10 @@ void Maxwell<dim>::output_results(unsigned int t)
     data_out.add_data_vector(postprocessed, {"E_x","E_y","null0","null1"});
     data_out.build_patches();
     const std::string filename =
-               "solution-" + Utilities::int_to_string(alpha) + ".vtk";
+               "solution-" + Utilities::int_to_string(t) + ".vtk";
     std::ofstream output(filename);
     data_out.write_vtk(output);
-    std::cout << "Done running step:" << alpha << std::endl;
+    std::cout << "Done running step:" << t << std::endl;
 
 @endcode
 
@@ -168,8 +217,8 @@ for(int t = 0; t<=100; t++){
 This would generate 100 solution .vtk files, which can be opened in a group on Paraview and then can be saved as an animation. We used FFMPEG to generate gifs.
 
 <h4> Resulting videos </h4>
-Following are the resulting videos of our experiments. As we see, TODO 
+Following are the resulting videos of our experiments. As we see, TODO
 
 <h3> Possibilities for Extension </h3>
-The current program doesn't allow for iterative solvers as the solutions will not converge with an iterative solver. One possible direction for future work is to implement an iterative solver and involve more preconditioners. An advantage of iterative solvers is the more efficient memory usage, and our current memory usage does not allow for a large number of DOFs. 
-Another possible direction would be to perform Local Mesh Refinement (instead of Global Mesh Refinement). This will also help us visualize more DOFs in a more memory and time efficient way. 
+The current program doesn't allow for iterative solvers as the solutions will not converge with an iterative solver. One possible direction for future work is to implement an iterative solver and involve more preconditioners. An advantage of iterative solvers is the more efficient memory usage, and our current memory usage does not allow for a large number of DOFs.
+Another possible direction would be to perform Local Mesh Refinement (instead of Global Mesh Refinement). This will also help us visualize more DOFs in a more memory and time efficient way.

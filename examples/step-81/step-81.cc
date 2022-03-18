@@ -19,10 +19,10 @@
 
 // @sect3{Include files}
 
- // The set of include files is quite standard. The most notable incluse is
- // the fe/fe_nedelec_sz.h file that allows us to use the FE_NedelecSZ elements.
- // This is an implementation of the $H^{curl}$ conforming Nédélec Elements
- // that resolves the sign conflict issues that arise from parametrization.
+// The set of include files is quite standard. The most notable incluse is
+// the fe/fe_nedelec_sz.h file that allows us to use the FE_NedelecSZ elements.
+// This is an implementation of the $H^{curl}$ conforming Nédélec Elements
+// that resolves the sign conflict issues that arise from parametrization.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/parameter_acceptor.h>
@@ -75,29 +75,31 @@ namespace Step81
   using namespace dealii;
   using namespace std::complex_literals;
 
-   // @sect4{Parameters Class}
+  // @sect4{Parameters Class}
 
-   // The Parameters class inherits ParameterAcceptor, and instantiates all the
-   // coefficients in our variational equations.
-   // These coefficients are passed through ParameterAcceptor and are editable
-   // through a .prm file
-   // More explanation on the use and inheritance from the ParameterAcceptor
-   // can be found in step-60.
-  
-   // epsilon is the Electric Permitivitty coefficient and it is a rank 2 tensor. Depending on the material,
-   // we assign the i^th diagonal element of the tensor to the material epsilon value
-   // (one of the private epsilon_1_ or epsilon_2_ variables).
-   //
-   // mu_inv  is the inverese of the Magnetic Permiabillity coefficient and it is a complex number.
-   
-   // sigma is the Surface Conductivity coefficient between material left and material right
-   // and it is a rank 2 tensor. It is only changed if we are at the interface between two
-   // materials. If we are at an interface, we assign the i^th diagonal element of the
-   // tensor to the private sigma_ value.
-   
-   // J_a is the strength and orientation of the dipole. It is a rank 1 tensor that depends
-   // on the private dipole_position_, dipole_radius_, dipole_strength_, dipole_orientation_
-   // variables.
+  // The Parameters class inherits ParameterAcceptor, and instantiates all the
+  // coefficients in our variational equations.
+  // These coefficients are passed through ParameterAcceptor and are editable
+  // through a .prm file
+  // More explanation on the use and inheritance from the ParameterAcceptor
+  // can be found in step-60.
+
+  // epsilon is the Electric Permitivitty coefficient and it is a rank 2 tensor.
+  // Depending on the material, we assign the i^th diagonal element of the
+  // tensor to the material epsilon value (one of the private epsilon_1_ or
+  // epsilon_2_ variables).
+  //
+  // mu_inv  is the inverese of the Magnetic Permiabillity coefficient and it is
+  // a complex number.
+
+  // sigma is the Surface Conductivity coefficient between material left and
+  // material right and it is a rank 2 tensor. It is only changed if we are at
+  // the interface between two materials. If we are at an interface, we assign
+  // the i^th diagonal element of the tensor to the private sigma_ value.
+
+  // J_a is the strength and orientation of the dipole. It is a rank 1 tensor
+  // that depends on the private dipole_position_, dipole_radius_,
+  // dipole_strength_, dipole_orientation_ variables.
 
   template <int dim>
   class Parameters : public ParameterAcceptor
@@ -114,18 +116,16 @@ namespace Step81
     using curl_type = Tensor<1, dim == 2 ? 1 : dim, rank0_type>;
 
   public:
-    rank2_type epsilon(const Point<dim, double> &x,
-                       types::material_id        material);
+    rank2_type epsilon(const Point<dim> &x, types::material_id material);
 
-    std::complex<double> mu_inv(const Point<dim, double> &x,
-                                types::material_id        material);
+    std::complex<double> mu_inv(const Point<dim> & x,
+                                types::material_id material);
 
-    rank2_type sigma(const dealii::Point<dim, double> &x,
-                     types::material_id                left,
-                     types::material_id                right);
+    rank2_type sigma(const dealii::Point<dim> &x,
+                     types::material_id        left,
+                     types::material_id        right);
 
-    rank1_type J_a(const dealii::Point<dim, double> &point,
-                   types::material_id                id);
+    rank1_type J_a(const dealii::Point<dim> &point, types::material_id id);
 
   private:
     rank2_type           epsilon_1;
@@ -134,10 +134,10 @@ namespace Step81
     std::complex<double> mu_inv_2;
     rank2_type           sigma_tensor;
 
-    double                 dipole_radius;
-    Point<dim>             dipole_position;
-    Tensor<1, dim, double> dipole_orientation;
-    rank0_type             dipole_strength;
+    double         dipole_radius;
+    Point<dim>     dipole_position;
+    Tensor<1, dim> dipole_orientation;
+    rank0_type     dipole_strength;
   };
 
 
@@ -177,11 +177,9 @@ namespace Step81
     add_parameter("dipole radius", dipole_radius, "radius of the dipole");
 
     dipole_position = Point<dim>(0., 0.8);
-    add_parameter("dipole position",
-                  dipole_position,
-                  "position of the dipole");
+    add_parameter("dipole position", dipole_position, "position of the dipole");
 
-    dipole_orientation = Tensor<1, dim, double>{{0., 1.}};
+    dipole_orientation = Tensor<1, dim>{{0., 1.}};
     add_parameter("dipole orientation",
                   dipole_orientation,
                   "orientation of the dipole");
@@ -192,14 +190,14 @@ namespace Step81
 
   template <int dim>
   typename Parameters<dim>::rank2_type
-  Parameters<dim>::epsilon(const Point<dim, double> & /*x*/,
+  Parameters<dim>::epsilon(const Point<dim> & /*x*/,
                            types::material_id material)
   {
     return (material == 1 ? epsilon_1 : epsilon_2);
   }
 
   template <int dim>
-  std::complex<double> Parameters<dim>::mu_inv(const Point<dim, double> & /*x*/,
+  std::complex<double> Parameters<dim>::mu_inv(const Point<dim> & /*x*/,
                                                types::material_id material)
   {
     return (material == 1 ? mu_inv_1 : mu_inv_2);
@@ -207,7 +205,7 @@ namespace Step81
 
   template <int dim>
   typename Parameters<dim>::rank2_type
-  Parameters<dim>::sigma(const dealii::Point<dim, double> & /*x*/,
+  Parameters<dim>::sigma(const dealii::Point<dim> & /*x*/,
                          types::material_id left,
                          types::material_id right)
   {
@@ -216,7 +214,7 @@ namespace Step81
 
   template <int dim>
   typename Parameters<dim>::rank1_type
-  Parameters<dim>::J_a(const dealii::Point<dim, double> &point,
+  Parameters<dim>::J_a(const dealii::Point<dim> &point,
                        types::material_id /*id*/)
   {
     rank1_type J_a;
@@ -230,13 +228,23 @@ namespace Step81
     return J_a;
   }
 
-   // @sect4{PerfectlyMatchedLayer Class}
-   // The PerfectlyMatchedLayer class inherits ParameterAcceptor,
-   // and it modifies our coefficients from Parameters.
-   // The radii and the strength of the PML is specified, and the
-   // coefficients will be modified using transformation
-   // matrices within the PML region. The radii and strength of
-   // the PML are editable through a .prm file
+  // @sect4{PerfectlyMatchedLayer Class}
+  // The PerfectlyMatchedLayer class inherits ParameterAcceptor,
+  // and it modifies our coefficients from Parameters.
+  // The radii and the strength of the PML is specified, and the
+  // coefficients will be modified using transformation
+  // matrices within the PML region. The radii and strength of
+  // the PML are editable through a .prm file
+  // The rotation function is the $T_{exer}$ mentioned in the
+  // perfectly matched layer section of the introduction.
+  // Moreover, the matrices A, B and C are defined as mentioned
+  // @f[
+  // A = T_{e_xe_r}^{-1}
+  // \text{diag}\left(\frac{1}{\bar{d}^2},\frac{1}{d\bar{d}}\right)T_{e_xe_r},\qquad
+  // B = T_{e_xe_r}^{-1} \text{diag}\left(d,\bar{d}\right)T_{e_xe_r},\qquad
+  // C = T_{e_xe_r}^{-1} \text{diag}\left(\frac{1}{\bar{d}},\frac{1}{d}\right)
+  // T_{e_xe_r}.\qquad
+  // @f]
 
   template <int dim>
   class PerfectlyMatchedLayer : public ParameterAcceptor
@@ -256,20 +264,20 @@ namespace Step81
     double outer_radius;
     double strength;
 
-    std::complex<double> d_tensor(const Point<dim, double> point);
+    std::complex<double> d(const Point<dim> point);
 
-    std::complex<double> d_bar_tensor(const Point<dim, double> point);
+    std::complex<double> d_bar(const Point<dim> point);
 
 
-    rank2_type T_exer(std::complex<double> d_1,
-                      std::complex<double> d_2,
-                      Point<dim>           point);
+    rank2_type rotation(std::complex<double> d_1,
+                        std::complex<double> d_2,
+                        Point<dim>           point);
 
-    rank2_type a_matrix(const Point<dim, double> point);
+    rank2_type a_matrix(const Point<dim> point);
 
-    rank2_type b_matrix(const Point<dim, double> point);
+    rank2_type b_matrix(const Point<dim> point);
 
-    rank2_type c_matrix(const Point<dim, double> point);
+    rank2_type c_matrix(const Point<dim> point);
   };
 
 
@@ -281,30 +289,30 @@ namespace Step81
     add_parameter("inner radius",
                   inner_radius,
                   "inner radius of the PML shell");
-    outer_radius = 15.;
+    outer_radius = 20.;
     add_parameter("outer radius",
                   outer_radius,
                   "outer radius of the PML shell");
     strength = 8.;
     add_parameter("strength", strength, "strength of the PML");
-  };
-
-
-  template <int dim>
-  typename std::complex<double>
-  PerfectlyMatchedLayer<dim>::d_tensor(const Point<dim, double> point)
-  {
-    const auto   radius = point.norm();
-    const double s =
-      strength * ((radius - inner_radius) * (radius - inner_radius)) /
-      ((outer_radius - inner_radius) * (outer_radius - inner_radius));
-    return 1 + 1.0i * s;
   }
 
 
   template <int dim>
   typename std::complex<double>
-  PerfectlyMatchedLayer<dim>::d_bar_tensor(const Point<dim, double> point)
+  PerfectlyMatchedLayer<dim>::d(const Point<dim> point)
+  {
+    const auto   radius = point.norm();
+    const double s =
+      strength * ((radius - inner_radius) * (radius - inner_radius)) /
+      ((outer_radius - inner_radius) * (outer_radius - inner_radius));
+    return 1.0 + 1.0i * s;
+  }
+
+
+  template <int dim>
+  typename std::complex<double>
+  PerfectlyMatchedLayer<dim>::d_bar(const Point<dim> point)
   {
     const auto   radius = point.norm();
     const double s_bar =
@@ -312,15 +320,15 @@ namespace Step81
       ((radius - inner_radius) * (radius - inner_radius) *
        (radius - inner_radius)) /
       (radius * (outer_radius - inner_radius) * (outer_radius - inner_radius));
-    return 1 + 1.0i * s_bar;
+    return 1.0 + 1.0i * s_bar;
   }
 
 
   template <int dim>
   typename PerfectlyMatchedLayer<dim>::rank2_type
-  PerfectlyMatchedLayer<dim>::T_exer(std::complex<double> d_1,
-                                     std::complex<double> d_2,
-                                     Point<dim>           point)
+  PerfectlyMatchedLayer<dim>::rotation(std::complex<double> d_1,
+                                       std::complex<double> d_2,
+                                       Point<dim>           point)
   {
     rank2_type result;
     result[0][0] = point[0] * point[0] * d_1 + point[1] * point[1] * d_2;
@@ -333,39 +341,43 @@ namespace Step81
 
   template <int dim>
   typename PerfectlyMatchedLayer<dim>::rank2_type
-  PerfectlyMatchedLayer<dim>::a_matrix(const Point<dim, double> point)
+  PerfectlyMatchedLayer<dim>::a_matrix(const Point<dim> point)
   {
-    const auto d     = d_tensor(point);
-    const auto d_bar = d_bar_tensor(point);
-    return invert(T_exer(d * d, d * d_bar, point)) *
-           T_exer(d * d, d * d_bar, point);
+    const auto d     = this->d(point);
+    const auto d_bar = this->d_bar(point);
+    return invert(rotation(d * d, d * d_bar, point)) *
+           rotation(d * d, d * d_bar, point);
   }
 
 
   template <int dim>
   typename PerfectlyMatchedLayer<dim>::rank2_type
-  PerfectlyMatchedLayer<dim>::b_matrix(const Point<dim, double> point)
+  PerfectlyMatchedLayer<dim>::b_matrix(const Point<dim> point)
   {
-    const auto d     = d_tensor(point);
-    const auto d_bar = d_bar_tensor(point);
-    return invert(T_exer(d, d_bar, point)) * T_exer(d, d_bar, point);
+    const auto d     = this->d(point);
+    const auto d_bar = this->d_bar(point);
+    return invert(rotation(d, d_bar, point)) * rotation(d, d_bar, point);
   }
 
 
   template <int dim>
   typename PerfectlyMatchedLayer<dim>::rank2_type
-  PerfectlyMatchedLayer<dim>::c_matrix(const Point<dim, double> point)
+  PerfectlyMatchedLayer<dim>::c_matrix(const Point<dim> point)
   {
-    const auto d     = d_tensor(point);
-    const auto d_bar = d_bar_tensor(point);
-    return invert(T_exer(1. / d_bar, 1. / d, point)) *
-           T_exer(1. / d_bar, 1. / d, point);
+    const auto d     = this->d(point);
+    const auto d_bar = this->d_bar(point);
+    return invert(rotation(1. / d_bar, 1. / d, point)) *
+           rotation(1. / d_bar, 1. / d, point);
   }
 
 
   // @sect4{Maxwell Class}
   // At this point we are ready to instantiate all the major functions of
-  // the finite element program and also a list of variables.
+  // the finite element program and also a list of variables. Most of these
+  // an exact copy of the functions in the tutorial programs. In addition,
+  // we instatiate the parameters and the perfectly matched layer. The
+  // default values of these parameters are set to show us a standing wave
+  // with absorbing boundary conditions and a PML.
 
   template <int dim>
   class Maxwell : public ParameterAcceptor
@@ -380,7 +392,7 @@ namespace Step81
     unsigned int refinements;
     unsigned int fe_order;
     unsigned int quadrature_order;
-    bool absorbing_boundary;
+    bool         absorbing_boundary;
 
     void parse_parameters_callback();
     void make_grid();
@@ -435,11 +447,11 @@ namespace Step81
     add_parameter("quadrature order",
                   quadrature_order,
                   "order of the quadrature");
-        
+
     absorbing_boundary = true;
     add_parameter("absorbing boundary condition",
-                    absorbing_boundary,
-                    "use absorbing boundary conditions?");
+                  absorbing_boundary,
+                  "use absorbing boundary conditions?");
   }
 
 
@@ -459,24 +471,25 @@ namespace Step81
   {
     GridGenerator::hyper_cube(triangulation, -scaling, scaling);
     triangulation.refine_global(refinements);
-    
-    if (!absorbing_boundary){
+
+    if (!absorbing_boundary)
+      {
         for (auto &face : triangulation.active_face_iterators())
-            if (face->at_boundary())
-                face->set_boundary_id(1);
-    };
-      
+          if (face->at_boundary())
+            face->set_boundary_id(1);
+      };
+
     for (auto &cell : triangulation.active_cell_iterators())
       if (cell->center()[1] > 0.)
         cell->set_material_id(1);
       else
         cell->set_material_id(2);
-    
+
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl;
   }
- 
+
   // Enumerate all the degrees of freedom and set up matrix and vector
   // objects to hold the system data. Enumerating is done by using
   // DoFHandler::distribute_dofs().
@@ -532,17 +545,20 @@ namespace Step81
   }
 
 
- // Assemble the stiffness matrix and the right-hand side:
- //\f{align*}{
- // A_{ij} = \int_\Omega (\mu_r^{-1}\nabla \times \varphi_i) \cdot (\nabla\times\bar{\varphi}_j)\text{d}x
- // - \int_\Omega \varepsilon_r\varphi_i \cdot \bar{\varphi}_j\text{d}x
- // - i\int_\Sigma (\sigma_r^{\Sigma}(\varphi_i)_T) \cdot (\bar{\varphi}_j)_T\text{do}x
- // - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}(\varphi_i)_T) \cdot (\nabla\times(\bar{\varphi}_j)_T)\text{d}x,
- // \f}
- // \f{align}{
- //  F_i = i\int_\Omega J_a \cdot \bar{\varphi_i}\text{d}x - \int_\Omega \mu_r^{-1} \cdot (\nabla \times \bar{\varphi_i}) \text{d}x.
- // \f}
- // In addition, we will be modifying the coefficients if the position of the cell is within the PML region.
+  // Assemble the stiffness matrix and the right-hand side:
+  //\f{align*}{
+  // A_{ij} = \int_\Omega (\mu_r^{-1}\nabla \times \varphi_i) \cdot
+  // (\nabla\times\bar{\varphi}_j)\text{d}x
+  // - \int_\Omega \varepsilon_r\varphi_i \cdot \bar{\varphi}_j\text{d}x
+  // - i\int_\Sigma (\sigma_r^{\Sigma}(\varphi_i)_T) \cdot
+  // (\bar{\varphi}_j)_T\text{do}x
+  // - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}(\varphi_i)_T) \cdot
+  // (\nabla\times(\bar{\varphi}_j)_T)\text{d}x, \f} \f{align}{
+  //  F_i = i\int_\Omega J_a \cdot \bar{\varphi_i}\text{d}x - \int_\Omega
+  //  \mu_r^{-1} \cdot (\nabla \times \bar{\varphi_i}) \text{d}x.
+  // \f}
+  // In addition, we will be modifying the coefficients if the position of the
+  // cell is within the PML region.
 
   template <int dim>
   void Maxwell<dim>::assemble_system()
@@ -561,7 +577,7 @@ namespace Step81
                                             update_quadrature_points |
                                             update_normal_vectors |
                                             update_JxW_values);
-    
+
     const unsigned int dofs_per_cell = fe->dofs_per_cell;
 
     const unsigned int n_q_points      = quadrature_formula.size();
@@ -571,6 +587,22 @@ namespace Step81
     Vector<double>     cell_rhs(dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
+    // This is assembling the interior of the domain on the left hand side.
+    // So we are assembling
+    // //\f{align*}{
+    // \int_\Omega (\mu_r^{-1}\nabla \times \varphi_i) \cdot
+    // (\nabla\times\bar{\varphi}_j)\text{d}x
+    // - \int_\Omega \varepsilon_r\varphi_i \cdot \bar{\varphi}_j\text{d}x
+    // \f}
+    // and
+    // \f{align}{
+    // i\int_\Omega J_a \cdot \bar{\varphi_i}\text{d}x
+    // - \int_\Omega \mu_r^{-1} \cdot (\nabla \times \bar{\varphi_i}) \text{d}x.
+    // \f}
+    // In doing so, we need test functions $\phi_i$ and $\phi_j$, and the curl
+    // of these test variables. We must be careful with the signs of the
+    // imaginary parts of these comples test variables. Moreover, we have a
+    // conditional that changes the parameters if the cell is in the PML region.
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
@@ -587,9 +619,9 @@ namespace Step81
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
-            const Point<dim, double> &position = quadrature_points[q_point];
-            const auto                radius   = position.norm();
-            const auto inner_radius = perfectly_matched_layer.inner_radius;
+            const Point<dim> &position = quadrature_points[q_point];
+            const auto        radius   = position.norm();
+            const auto inner_radius    = perfectly_matched_layer.inner_radius;
 
             auto       mu_inv  = parameters.mu_inv(position, id);
             auto       epsilon = parameters.epsilon(position, id);
@@ -599,7 +631,7 @@ namespace Step81
               {
                 auto A = perfectly_matched_layer.a_matrix(position);
                 auto B = perfectly_matched_layer.b_matrix(position);
-                auto d = perfectly_matched_layer.d_tensor(position);
+                auto d = perfectly_matched_layer.d(position);
 
                 mu_inv  = mu_inv / d;
                 epsilon = invert(A) * epsilon * invert(B);
@@ -632,13 +664,23 @@ namespace Step81
               }
           }
 
+        // Now we assemble the face and the boundary. The following loops will
+        // assemble
+        // //\f{align*}{
+        // - i\int_\Sigma (\sigma_r^{\Sigma}(\varphi_i)_T) \cdot
+        // (\bar{\varphi}_j)_T\text{do}x \f} and \f{align}{
+        //  - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}(\varphi_i)_T)
+        //  \cdot (\nabla\times(\bar{\varphi}_j)_T)\text{d}x,
+        // \f}
+        // respectively. The test variables and the PML are implemented
+        // similarly as the domain.
         for (const auto &face : cell->face_iterators())
           {
             if (face->at_boundary())
               {
                 const auto id = face->boundary_id();
-                if (id !=0)
-                {
+                if (id != 0)
+                  {
                     fe_face_values.reinit(cell, face);
                     FEValuesViews::Vector<dim> real_part(fe_face_values, 0);
                     FEValuesViews::Vector<dim> imag_part(fe_face_values, dim);
@@ -646,10 +688,9 @@ namespace Step81
                     for (unsigned int q_point = 0; q_point < n_face_q_points;
                          ++q_point)
                       {
-                        const Point<dim, double> position =
-                          quadrature_points[q_point];
-                        const auto radius = position.norm();
-                        const auto inner_radius =
+                        const auto &position = quadrature_points[q_point];
+                        const auto  radius   = position.norm();
+                        const auto  inner_radius =
                           perfectly_matched_layer.inner_radius;
 
                         auto mu_inv  = parameters.mu_inv(position, id);
@@ -659,18 +700,20 @@ namespace Step81
                           {
                             auto A = perfectly_matched_layer.a_matrix(position);
                             auto B = perfectly_matched_layer.b_matrix(position);
-                            auto d = perfectly_matched_layer.d_tensor(position);
+                            auto d = perfectly_matched_layer.d(position);
 
                             mu_inv  = mu_inv / d;
                             epsilon = invert(A) * epsilon * invert(B);
                           };
 
-                        const auto normal = fe_face_values.normal_vector(q_point);
+                        const auto normal =
+                          fe_face_values.normal_vector(q_point);
 
                         for (unsigned int i = 0; i < dofs_per_cell; ++i)
                           {
-                            const auto phi_i = real_part.value(i, q_point) -
-                                               1.0i * imag_part.value(i, q_point);
+                            const auto phi_i =
+                              real_part.value(i, q_point) -
+                              1.0i * imag_part.value(i, q_point);
                             const auto phi_i_T = tangential_part(phi_i, normal);
 
                             for (unsigned int j = 0; j < dofs_per_cell; ++j)
@@ -686,13 +729,13 @@ namespace Step81
                                 const auto sqrt_prod = prod;
 
                                 const auto temp =
-                                  -1.0i *
-                                  scalar_product((sqrt_prod * phi_j_T), phi_i_T);
+                                  -1.0i * scalar_product((sqrt_prod * phi_j_T),
+                                                         phi_i_T);
                                 cell_matrix(i, j) += temp.real();
                               } /* j */
-                          }   /* i */
-                        }  /* q_point */
-                    }
+                          }     /* i */
+                      }         /* q_point */
+                  }
               }
             else
               {
@@ -712,10 +755,9 @@ namespace Step81
                 for (unsigned int q_point = 0; q_point < n_face_q_points;
                      ++q_point)
                   {
-                    const Point<dim, double> position =
-                      quadrature_points[q_point];
-                    const auto radius = position.norm();
-                    const auto inner_radius =
+                    const auto &position = quadrature_points[q_point];
+                    const auto  radius   = position.norm();
+                    const auto  inner_radius =
                       perfectly_matched_layer.inner_radius;
 
                     auto sigma = parameters.sigma(position, id1, id2);
@@ -757,7 +799,7 @@ namespace Step81
         constraints.distribute_local_to_global(
           cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
       }
-  };
+  }
 
   // We use a direct solver from the SparseDirectUMFPACK to solve the system
   template <int dim>
@@ -768,17 +810,18 @@ namespace Step81
     A_direct.vmult(solution, system_rhs);
   }
 
-// The output is written into a vtk file with 4 components
-template <int dim>
-void Maxwell<dim>::output_results()
-{
+  // The output is written into a vtk file with 4 components
+  template <int dim>
+  void Maxwell<dim>::output_results()
+  {
     DataOut<2> data_out;
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution, {"real_Ex", "real_Ey", "imag_Ex", "imag_Ey"});
+    data_out.add_data_vector(solution,
+                             {"real_Ex", "real_Ey", "imag_Ex", "imag_Ey"});
     data_out.build_patches();
     std::ofstream output("solution.vtk");
     data_out.write_vtk(output);
-}
+  }
 
 
   template <int dim>
@@ -793,8 +836,8 @@ void Maxwell<dim>::output_results()
 
 } // namespace Step81
 
-// The following main function calls the class step-81(), initializes the ParameterAcceptor,
-// and calls the run() function.
+// The following main function calls the class step-81(), initializes the
+// ParameterAcceptor, and calls the run() function.
 
 int main()
 {
