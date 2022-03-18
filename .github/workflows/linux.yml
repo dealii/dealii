@@ -159,6 +159,8 @@ jobs:
     - name: install kokkos
       working-directory: kokkos
       run: |
+        /usr/local/cuda/bin/nvcc --version
+        echo "CUDA_ROOT: ${CUDA_ROOT}"
         mkdir build
         cd build
         cmake -D BUILD_SHARED_LIBS=ON \
