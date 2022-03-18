@@ -162,8 +162,6 @@ jobs:
     - name: install kokkos
       working-directory: kokkos
       run: |
-        /usr/local/cuda/bin/nvcc --version
-        echo "CUDA_ROOT: ${CUDA_ROOT}"
         mkdir build
         cd build
         cmake -D BUILD_SHARED_LIBS=ON \
@@ -184,7 +182,7 @@ jobs:
               -D DEAL_II_WITH_CUDA="ON" \
               -D DEAL_II_WITH_KOKKOS="ON" \
               -D DEAL_II_WITH_KOKKOS_BACKEND="ON" \
-              -D KOKKOS_DIR=${GITHUB_WORKSPACE}/kokkos-install \                                       -
+              -D KOKKOS_DIR=${GITHUB_WORKSPACE}/kokkos-install \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_P4EST="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="ON" \
