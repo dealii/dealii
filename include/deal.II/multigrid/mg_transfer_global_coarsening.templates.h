@@ -2320,6 +2320,8 @@ namespace MGTransferGlobalCoarseningTools
         coarse_grid_triangulations[l - 1] = new_tria;
       }
 
+    AssertDimension(coarse_grid_triangulations[0]->n_global_levels(), 1);
+
     return coarse_grid_triangulations;
   }
 
@@ -2429,6 +2431,8 @@ namespace MGTransferGlobalCoarseningTools
         coarse_grid_triangulations[l - 1] = level_triangulation;
       }
 #endif
+
+    AssertDimension(coarse_grid_triangulations[0]->n_global_levels(), 1);
 
     return coarse_grid_triangulations;
   }
