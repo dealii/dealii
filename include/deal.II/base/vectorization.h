@@ -22,8 +22,11 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/template_constraints.h>
 
+#include <boost/type_traits/is_complex.hpp>
+
 #include <array>
 #include <cmath>
+#include <complex>
 
 // Note:
 // The flag DEAL_II_VECTORIZATION_WIDTH_IN_BITS is essentially constructed
@@ -77,6 +80,151 @@
 
 
 DEAL_II_NAMESPACE_OPEN
+
+
+namespace internal
+{
+  template <typename Number1,
+            std::size_t width1,
+            typename Number2,
+            std::size_t width2,
+            typename T = void>
+  struct VectorizationProductType;
+
+
+  // Vectorized Array scalar type and other scalar type are the same.
+  // The width is not necessarily the same though (consider a binary operation
+  // with a vectorized array as one operand and a floating point type as the
+  // other).
+  template <typename Number1,
+            std::size_t width1,
+            typename Number2,
+            std::size_t width2>
+  struct VectorizationProductType<
+    Number1,
+    width1,
+    Number2,
+    width2,
+    typename std::enable_if<std::is_same<Number1, Number2>::value>::type>
+  {
+    using type = VectorizedArray<Number1, std::max(width1, width2)>;
+  };
+
+
+  // Vectorized Array scalar type and other scalar type are the different.
+  // Specialization for when both input number types are not complex valued.
+  template <typename Number1,
+            std::size_t width1,
+            typename Number2,
+            std::size_t width2>
+  struct VectorizationProductType<
+    Number1,
+    width1,
+    Number2,
+    width2,
+    typename std::enable_if<!std::is_same<Number1, Number2>::value &&
+                            !boost::is_complex<Number1>::value &&
+                            !boost::is_complex<Number2>::value>::type>
+  {
+    static constexpr std::size_t width = std::max(width1, width2);
+
+    // If both scalar types are associated with a vectorized array type of
+    // the same width (e.g. as would  happen if the vectorization with is
+    // unity), then we allow promotion based on which scalar has the highest
+    // precision. If the scalars do not have the same vectorization width, then
+    // we are bound to respect the type with the largest width. That's the only
+    // way to ensure that no data is lost during the conversion (even if it
+    // means that we lose some precision).
+    using scalar_t = typename std::conditional<
+      (width == width1 && width == width2),
+      typename std::conditional<(sizeof(Number1) > sizeof(Number2)),
+                                Number1,
+                                Number2>::type,
+      typename std::conditional<(width == width1), Number1, Number2>::type>::
+      type;
+
+    using type = VectorizedArray<scalar_t, width>;
+  };
+
+
+  // Specialization when the first input number type is complex
+  template <typename Number1,
+            std::size_t width1,
+            typename Number2,
+            std::size_t width2>
+  struct VectorizationProductType<
+    Number1,
+    width1,
+    Number2,
+    width2,
+    typename std::enable_if<!std::is_same<Number1, Number2>::value &&
+                            boost::is_complex<Number1>::value &&
+                            !boost::is_complex<Number2>::value>::type>
+  {
+  private:
+    using VPT = VectorizationProductType<typename Number1::value_type,
+                                         width1,
+                                         Number2,
+                                         width2>;
+
+  public:
+    using type =
+      VectorizedArray<std::complex<typename VPT::scalar_t>, VPT::width>;
+  };
+
+
+  // Specialization when the second input number type is complex
+  template <typename Number1,
+            std::size_t width1,
+            typename Number2,
+            std::size_t width2>
+  struct VectorizationProductType<
+    Number1,
+    width1,
+    Number2,
+    width2,
+    typename std::enable_if<!std::is_same<Number1, Number2>::value &&
+                            !boost::is_complex<Number1>::value &&
+                            boost::is_complex<Number2>::value>::type>
+  {
+  private:
+    using VPT = VectorizationProductType<Number1,
+                                         width1,
+                                         typename Number2::value_type,
+                                         width2>;
+
+  public:
+    using type =
+      VectorizedArray<std::complex<typename VPT::scalar_t>, VPT::width>;
+  };
+
+
+  // Specialization when both input number types are complex
+  template <typename Number1,
+            std::size_t width1,
+            typename Number2,
+            std::size_t width2>
+  struct VectorizationProductType<
+    Number1,
+    width1,
+    Number2,
+    width2,
+    typename std::enable_if<!std::is_same<Number1, Number2>::value &&
+                            boost::is_complex<Number1>::value &&
+                            boost::is_complex<Number2>::value>::type>
+  {
+  private:
+    using VPT = VectorizationProductType<typename Number1::value_type,
+                                         width1,
+                                         typename Number2::value_type,
+                                         width2>;
+
+  public:
+    using type =
+      VectorizedArray<std::complex<typename VPT::scalar_t>, VPT::width>;
+  };
+
+} // namespace internal
 
 
 // Enable the EnableIfScalar type trait for VectorizedArray<Number> such
