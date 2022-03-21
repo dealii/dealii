@@ -1221,8 +1221,7 @@ namespace internal
         }
 
       // vectorize weights
-      std::vector<std::array<VectorizedArray<Number>, Utilities::pow(3, dim)>>
-        masks_vectorized;
+      AlignedVector<VectorizedArray<Number>> masks_vectorized;
 
       const unsigned int n_lanes = VectorizedArray<Number>::size();
 
@@ -1239,6 +1238,7 @@ namespace internal
                   n_lanes;
 
               std::array<VectorizedArray<Number>, Utilities::pow(3, dim)> mask;
+              mask.fill(VectorizedArray<Number>());
 
               for (unsigned int v = 0; v < n_lanes_filled; ++v, ++c)
                 {
@@ -1248,7 +1248,7 @@ namespace internal
                     mask[i][v] = masks[c][i];
                 }
 
-              masks_vectorized.push_back(mask);
+              masks_vectorized.insert_back(mask.begin(), mask.end());
             }
         }
 
@@ -2490,10 +2490,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
 
-  const unsigned int *indices_fine = level_dof_indices_fine.data();
-  const Number *      weights      = nullptr;
-  const std::array<VectorizedArray<Number>, Utilities::pow(3, dim)>
-    *weights_compressed = nullptr;
+  const unsigned int *           indices_fine = level_dof_indices_fine.data();
+  const Number *                 weights      = nullptr;
+  const VectorizedArray<Number> *weights_compressed = nullptr;
 
   if (fine_element_is_continuous)
     {
@@ -2568,11 +2567,11 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           if (fine_element_is_continuous && this->weights_compressed.size() > 0)
             {
               internal::weight_fe_q_dofs_by_entity<dim, -1, Number>(
-                weights_compressed->data(),
+                weights_compressed,
                 n_components,
                 scheme.degree_fine + 1,
                 evaluation_data_fine.begin());
-              weights_compressed += 1;
+              weights_compressed += Utilities::pow(3, dim);
             }
 
           for (unsigned int v = 0; v < n_lanes_filled; ++v)
@@ -2642,10 +2641,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
 
-  const unsigned int *indices_fine = level_dof_indices_fine.data();
-  const Number *      weights      = nullptr;
-  const std::array<VectorizedArray<Number>, Utilities::pow(3, dim)>
-    *weights_compressed = nullptr;
+  const unsigned int *           indices_fine = level_dof_indices_fine.data();
+  const Number *                 weights      = nullptr;
+  const VectorizedArray<Number> *weights_compressed = nullptr;
 
   if (fine_element_is_continuous)
     {
@@ -2704,11 +2702,11 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           if (fine_element_is_continuous && this->weights_compressed.size() > 0)
             {
               internal::weight_fe_q_dofs_by_entity<dim, -1, Number>(
-                weights_compressed->data(),
+                weights_compressed,
                 n_components,
                 scheme.degree_fine + 1,
                 evaluation_data_fine.begin());
-              weights_compressed += 1;
+              weights_compressed += Utilities::pow(3, dim);
             }
 
           // ------------------------------ fine -------------------------------
