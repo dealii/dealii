@@ -499,7 +499,7 @@ namespace parallel
        * @note This function by default partitions the mesh in such a way that
        * the number of cells on all processors is roughly equal. If you want
        * to set weights for partitioning, e.g. because some cells are more
-       * expensive to compute than others, you can use the signal weight
+       * expensive to compute than others, you can use the signal `weight`
        * as documented in the dealii::Triangulation class. This function will
        * check whether a function is connected to the signal and if so use it.
        * If you prefer to repartition the mesh yourself at user-defined
@@ -508,7 +508,7 @@ namespace parallel
        * flag to the constructor, which ensures that calling the current
        * function only refines and coarsens the triangulation, but doesn't
        * partition it. You can then call the repartition() function manually.
-       * The usage of the weight signal is identical in both cases, if a
+       * The usage of the `weight` signal is identical in both cases, if a
        * function is connected to the signal it will be used to balance the
        * calculated weights, otherwise the number of cells is balanced.
        */
@@ -542,7 +542,7 @@ namespace parallel
        * the same way as execute_coarsening_and_refinement() with respect to
        * dealing with data movement (SolutionTransfer, etc.).
        *
-       * @note If no function is connected to the weight signal described
+       * @note If no function is connected to the `weight` signal described
        * in the dealii::Triangulation class, this function will balance the
        * number of cells on each processor. If one or more functions are
        * connected, it will calculate the sum of the weights and balance the

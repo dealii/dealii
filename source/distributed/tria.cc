@@ -3361,19 +3361,14 @@ namespace parallel
               // get cell weights for a weighted repartitioning.
               const std::vector<unsigned int> cell_weights = get_cell_weights();
 
-#  ifdef DEBUG
               // verify that the global sum of weights is larger than 0
-              const auto local_weights_sum =
-                std::accumulate(cell_weights.begin(),
-                                cell_weights.end(),
-                                std::uint64_t(0));
-              const auto global_weights_sum =
-                Utilities::MPI::sum(local_weights_sum, this->mpi_communicator);
-              Assert(global_weights_sum > 0,
+              Assert(Utilities::MPI::sum(std::accumulate(cell_weights.begin(),
+                                                         cell_weights.end(),
+                                                         std::uint64_t(0)),
+                                         this->mpi_communicator) > 0,
                      ExcMessage(
                        "The global sum of weights over all active cells "
                        "is zero. Please verify how you generate weights."));
-#  endif
 
               PartitionWeights<dim, spacedim> partition_weights(cell_weights);
 
@@ -3543,18 +3538,14 @@ namespace parallel
           // get cell weights for a weighted repartitioning.
           const std::vector<unsigned int> cell_weights = get_cell_weights();
 
-#  ifdef DEBUG
           // verify that the global sum of weights is larger than 0
-          const auto local_weights_sum = std::accumulate(cell_weights.begin(),
-                                                         cell_weights.end(),
-                                                         std::uint64_t(0));
-          const auto global_weights_sum =
-            Utilities::MPI::sum(local_weights_sum, this->mpi_communicator);
-          Assert(global_weights_sum > 0,
+          Assert(Utilities::MPI::sum(std::accumulate(cell_weights.begin(),
+                                                     cell_weights.end(),
+                                                     std::uint64_t(0)),
+                                     this->mpi_communicator) > 0,
                  ExcMessage(
                    "The global sum of weights over all active cells "
                    "is zero. Please verify how you generate weights."));
-#  endif
 
           PartitionWeights<dim, spacedim> partition_weights(cell_weights);
 

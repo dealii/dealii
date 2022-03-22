@@ -84,7 +84,7 @@ namespace parallel
    * weighting function on the old Triangulation and connect it to the new one.
    *
    * @note A hp::FECollection needs to be attached to your DoFHandler object via
-   * DoFHandler::distribute_dofs() <em>once before</em> the
+   * DoFHandler::distribute_dofs() <em>before</em> the
    * Triangulation::Signals::weight signal will be triggered. Otherwise,
    * your DoFHandler does not know many degrees of freedom your cells have. In
    * other words, you need to call DoFHandler::distribute_dofs() once before you
@@ -197,13 +197,13 @@ namespace parallel
 
   private:
     /**
-     * A connection to the corresponding weight signal of the Triangulation
+     * A connection to the corresponding `weight` signal of the Triangulation
      * which is attached to the DoFHandler.
      */
     boost::signals2::connection connection;
 
     /**
-     * A callback function that will be connected to the weight signal of
+     * A callback function that will be connected to the `weight` signal of
      * the @p triangulation, to which the @p dof_handler is attached. Ultimately
      * returns the weight for each cell, determined by the @p weighting_function
      * provided as a parameter. Returns zero if @p dof_handler has not been
