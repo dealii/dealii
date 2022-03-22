@@ -121,6 +121,9 @@ namespace Particles
         const Mapping<dim, spacedim> &mapping,
         std::mt19937 &                random_number_generator)
       {
+        Assert(cell->reference_cell().is_hyper_cube() == true,
+               ExcNotImplemented());
+
         // Uniform distribution on the interval [0,1]. This
         // will be used to generate random particle locations.
         std::uniform_real_distribution<double> uniform_distribution_01(0, 1);
