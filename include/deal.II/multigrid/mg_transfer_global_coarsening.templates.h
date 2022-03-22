@@ -50,6 +50,9 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
+  template <int dim, typename Number>
+  class CellProlongator;
+
   /**
    * Helper class to select the right templated implementation.
    *
@@ -74,12 +77,12 @@ namespace
         fu.template run<2 * deg, deg>(); // h-MG (FE_Q)
       else if ((degree_fine == (2 * deg + 1)) && (degree_coarse == deg))
         fu.template run<2 * deg + 1, deg>(); // h-MG
-      else if ((degree_fine == deg) && (degree_coarse == std::max(deg / 2, 1u)))
-        fu.template run<deg, std::max(deg / 2u, 1u)>(); // p-MG: bisection
+/*      else if ((degree_fine == deg) && (degree_coarse == std::max(deg / 2, 1u)))
+        fu.template run<deg, std::max(deg / 2u, 1u)>(numbers::invalid_unsigned_int, numbers::invalid_unsigned_int); // p-MG: bisection*/
       else if ((degree_fine == deg) && (degree_coarse == deg))
         fu.template run<deg, deg>(); // identity (nothing to do)
-      else if ((degree_fine == deg) && (degree_coarse == std::max(deg - 1, 1u)))
-        fu.template run<deg, std::max(deg - 1u, 1u)>(); // p-MG: --
+      /*else if ((degree_fine == deg) && (degree_coarse == std::max(deg - 1, 1u)))
+        fu.template run<deg, std::max(deg - 1u, 1u)>(numbers::invalid_unsigned_int, numbers::invalid_unsigned_int); // p-MG: --*/
       else if ((degree_fine == deg) && (degree_coarse == 1))
         fu.template run<deg, 1>(); // p-MG: jump to 1
       else if (deg < max_degree)

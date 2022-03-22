@@ -23,6 +23,7 @@ DEAL_II_NAMESPACE_OPEN
 template class VectorMemory<LinearAlgebra::CUDAWrappers::Vector<float>>;
 template class VectorMemory<LinearAlgebra::CUDAWrappers::Vector<double>>;
 template class GrowingVectorMemory<LinearAlgebra::CUDAWrappers::Vector<float>>;
+bla
 template class GrowingVectorMemory<LinearAlgebra::CUDAWrappers::Vector<double>>;
 template class VectorMemory<
   LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>;
