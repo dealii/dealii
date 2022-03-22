@@ -148,7 +148,7 @@ namespace Particles
                 position_unit =
                   mapping.transform_real_to_unit_cell(cell, position);
 
-                if (GeometryInfo<dim>::is_inside_unit_cell(position_unit))
+                if (cell->reference_cell().contains_point(position_unit))
                   return std::make_pair(position, position_unit);
               }
             catch (typename Mapping<dim>::ExcTransformationFailed &)
