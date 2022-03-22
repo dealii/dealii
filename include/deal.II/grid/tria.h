@@ -2044,7 +2044,7 @@ public:
   };
 
   /**
-   * A structure used to accumulate the results of the weight signal slot
+   * A structure used to accumulate the results of the `weight` signal slot
    * functions below. It takes an iterator range and returns the sum of
    * values.
    */
@@ -2173,8 +2173,7 @@ public:
 
     /**
      * This signal is triggered for each cell during every automatic or manual
-     * repartitioning. This signal will only be triggered if functions
-     * are connected to it. It is intended to allow a weighted repartitioning
+     * repartitioning. It is intended to allow a weighted repartitioning
      * of the domain to balance the computational load across processes in a
      * different way than balancing the number of cells. Any connected
      * function is expected to take an iterator to a cell, and a CellStatus
@@ -2191,13 +2190,20 @@ public:
      * refinement. If this cell is going to be coarsened, the signal is called
      * for the parent cell and you need to provide the weight of the future
      * parent cell. If this cell is going to be refined, the function is called
-     * on all children and you should ideally return the same weight for all
-     * children.
+     * on all children while `cell_iterator` refers to their parent cell. In
+     * this case, you need to pick a weight for each individual child based on
+     * information given by the parent cell.
      *
      * If several functions are connected to this signal, their return values
-     * will be summed to calculate the final weight via `CellWeightSum`.
+     * will be summed to calculate the final weight of a cell. This allows
+     * different parts of a larger code base to have their own functions
+     * computing the weight of a cell; for example in a code that does both
+     * finite element and particle computations on each cell, the code could
+     * separate the computation of a cell's weight into two functions, each
+     * implemented in their respective files, that provide the finite
+     * element-based and the particle-based weights.
      *
-     * This function is used in step-68 and implicitely in step-75 using the
+     * This function is used in step-68 and implicitly in step-75 using the
      * parallel::CellWeights class.
      */
     boost::signals2::signal<unsigned int(const cell_iterator &,
@@ -2307,14 +2313,15 @@ public:
     /**
      * @copydoc weight
      *
-     * As a reference a value of 1000 is added for every cell to the total
+     * As a reference, a value of 1000 is added for every cell to the total
      * weight. This means a signal return value of 1000 (resulting in a weight
      * of 2000) means that it is twice as expensive for a process to handle this
      * particular cell.
      *
-     * @deprecated Use the weight signal instead which omits the base weight.
+     * @deprecated Use the `weight` signal instead which omits the base weight.
      * You can invoke the old behavior by connecting a function to the signal
-     * that returns the base weight like this:
+     * that returns the base weight as follows. This function should be added
+     * <em>in addition</em> to the one that actually computes the weight.
      * @code{.cc}
      * triangulation.signals.weight.connect(
      *   [](const typename Triangulation<dim>::cell_iterator &,
