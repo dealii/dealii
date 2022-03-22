@@ -50,7 +50,7 @@ namespace parallel
       &weighting_function)
   {
     connection.disconnect();
-    connection = dof_handler.get_triangulation().signals.cell_weight.connect(
+    connection = dof_handler.get_triangulation().signals.weight.connect(
       make_weighting_callback(dof_handler, weighting_function));
   }
 

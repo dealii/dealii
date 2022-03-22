@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,8 +24,6 @@
 // repartitioning the triangulation. The expected accumulated weight on
 // each processor should correlate to the sum of all degrees of
 // freedom on all cells of the corresponding subdomain.
-// We employ a large proportionality factor on our weighting function
-// to neglect the standard weight of '1000' per cell.
 //
 // This test works on a parallel::distributed::Triangulation.
 
@@ -78,7 +76,7 @@ test()
 
 
   const parallel::CellWeights<dim> cell_weights(
-    dh, parallel::CellWeights<dim>::ndofs_weighting({100000, 1}));
+    dh, parallel::CellWeights<dim>::ndofs_weighting({1, 1}));
 
   tria.repartition();
 

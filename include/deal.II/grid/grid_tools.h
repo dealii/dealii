@@ -2166,7 +2166,7 @@ namespace GridTools
    * single-partition case without packages installed, and only requires them
    * installed when multiple partitions are required.
    *
-   * @note If the @p cell_weight signal has been attached to the @p triangulation,
+   * @note If the @p weight signal has been attached to the @p triangulation,
    * then this will be used and passed to the partitioner.
    */
   template <int dim, int spacedim>
@@ -2236,7 +2236,7 @@ namespace GridTools
    * case like this, partitioning algorithm may sometimes make bad decisions and
    * you may want to build your own connectivity graph.
    *
-   * @note If the @p cell_weight signal has been attached to the @p triangulation,
+   * @note If the @p weight signal has been attached to the @p triangulation,
    * then this will be used and passed to the partitioner.
    */
   template <int dim, int spacedim>

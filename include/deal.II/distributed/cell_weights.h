@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,12 +53,11 @@ namespace parallel
    * The connected weighting function may be changed anytime using the
    * CellWeights::reinit() function. The following code snippet demonstrates how
    * to achieve each cell being weighted by its current number of degrees of
-   * freedom. We chose a factor of `1000` that corresponds to the initial weight
-   * each cell is assigned to upon creation.
+   * freedom.
    * @code
    * parallel::CellWeights<dim, spacedim> cell_weights(
    *   hp_dof_handler,
-   *   parallel::CellWeights<dim, spacedim>::ndofs_weighting({1000, 1}));
+   *   parallel::CellWeights<dim, spacedim>::ndofs_weighting({1, 1}));
    * @endcode
    *
    * On the other hand, you are also able to take care of handling the signal
@@ -66,16 +65,15 @@ namespace parallel
    * this case, an analogous code example looks as follows.
    * @code
    * boost::signals2::connection connection =
-   *   hp_dof_handler.get_triangulation().signals.cell_weight.connect(
+   *   hp_dof_handler.get_triangulation().signals.weight.connect(
    *     parallel::CellWeights<dim, spacedim>::make_weighting_callback(
    *       hp_dof_handler,
-   *       parallel::CellWeights<dim, spacedim>::ndofs_weighting(
-   *         {1000, 1}));
+   *       parallel::CellWeights<dim, spacedim>::ndofs_weighting({1, 1}));
    * @endcode
    *
    * The use of this class is demonstrated in step-75.
    *
-   * @note See Triangulation::Signals::cell_weight for more information on
+   * @note See Triangulation::Signals::weight for more information on
    * weighting and load balancing.
    *
    * @note Be aware that this class connects the weight function to the
@@ -84,6 +82,17 @@ namespace parallel
    * latter via DoFHandler::reinit(), an assertion will be triggered in
    * the weight_callback() function. Use CellWeights::reinit() to deregister the
    * weighting function on the old Triangulation and connect it to the new one.
+   *
+   * @note A hp::FECollection needs to be attached to your DoFHandler object via
+   * DoFHandler::distribute_dofs() <em>once before</em> the
+   * Triangulation::Signals::weight signal will be triggered. Otherwise,
+   * your DoFHandler does not know many degrees of freedom your cells have. In
+   * other words, you need to call DoFHandler::distribute_dofs() once before you
+   * call
+   * parallel::distributed::Triangulation::execute_coarsening_and_refinement(),
+   * parallel::distributed::Triangulation::refine_global(),
+   * parallel::distributed::Triangulation::repartition(), or
+   * GridTools::partition_triangulation() for the very first time.
    *
    * @ingroup distributed
    */
@@ -156,7 +165,7 @@ namespace parallel
      * Choose a constant weight @p factor on each cell.
      */
     static WeightingFunction
-    constant_weighting(const unsigned int factor = 1000);
+    constant_weighting(const unsigned int factor = 1);
 
     /**
      * The pair of floating point numbers $(a,b)$ provided via
@@ -188,13 +197,13 @@ namespace parallel
 
   private:
     /**
-     * A connection to the corresponding cell_weight signal of the Triangulation
+     * A connection to the corresponding weight signal of the Triangulation
      * which is attached to the DoFHandler.
      */
     boost::signals2::connection connection;
 
     /**
-     * A callback function that will be connected to the cell_weight signal of
+     * A callback function that will be connected to the weight signal of
      * the @p triangulation, to which the @p dof_handler is attached. Ultimately
      * returns the weight for each cell, determined by the @p weighting_function
      * provided as a parameter. Returns zero if @p dof_handler has not been
