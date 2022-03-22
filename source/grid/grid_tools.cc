@@ -3842,15 +3842,12 @@ namespace GridTools
                               shared_tria->get_communicator(),
                               cell_weights);
 
-#ifdef DEBUG
         // verify that the global sum of weights is larger than 0
-        const auto global_cell_sum = std::accumulate(cell_weights.begin(),
-                                                     cell_weights.end(),
-                                                     std::uint64_t(0));
-        Assert(global_cell_sum > 0,
+        Assert(std::accumulate(cell_weights.begin(),
+                               cell_weights.end(),
+                               std::uint64_t(0)) > 0,
                ExcMessage("The global sum of weights over all active cells "
                           "is zero. Please verify how you generate weights."));
-#endif
       }
 
     // Call the other more general function
@@ -3946,15 +3943,12 @@ namespace GridTools
                               shared_tria->get_communicator(),
                               cell_weights);
 
-#ifdef DEBUG
         // verify that the global sum of weights is larger than 0
-        const auto global_cell_sum = std::accumulate(cell_weights.begin(),
-                                                     cell_weights.end(),
-                                                     std::uint64_t(0));
-        Assert(global_cell_sum > 0,
+        Assert(std::accumulate(cell_weights.begin(),
+                               cell_weights.end(),
+                               std::uint64_t(0)) > 0,
                ExcMessage("The global sum of weights over all active cells "
                           "is zero. Please verify how you generate weights."));
-#endif
       }
 
     // Call the other more general function
