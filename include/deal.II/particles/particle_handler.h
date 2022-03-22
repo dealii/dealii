@@ -166,7 +166,7 @@ namespace Particles
      * particles to be newly inserted.
      */
     void
-    reserve(std::size_t n_particles);
+    reserve(const std::size_t n_particles);
 
     /**
      * Update all internally cached numbers. Note that all functions that
