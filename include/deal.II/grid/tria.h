@@ -2211,9 +2211,10 @@ public:
                             CellWeightSum<unsigned int>>
       weight;
 
-#ifndef DOXYGEN
     /**
-     * Legacy constructor that connects deprecated signals to their new ones.
+     * Constructor.
+     *
+     * Connects a deprecated signal to its successor.
      */
     Signals()
       : cell_weight(weight)
@@ -2233,16 +2234,28 @@ public:
       using slot_type =
         boost::signals2::slot<signature_type, slot_function_type>;
 
+      /**
+       * Constructor.
+       */
       LegacySignal(
         boost::signals2::signal<signature_type, combiner_type> &new_signal)
         : new_signal(new_signal)
       {}
 
+      /**
+       * Destructor.
+       */
       ~LegacySignal()
       {
         base_weight.disconnect();
       }
 
+      /**
+       * Connects a function to the signal.
+       *
+       * Connects an additional base weight function if signal was previously
+       * empty.
+       */
       DEAL_II_DEPRECATED_EARLY
       boost::signals2::connection
       connect(
@@ -2262,6 +2275,10 @@ public:
         return new_signal.connect(slot, position);
       }
 
+      /**
+       * Returns the number of connected functions <em>without</em> the base
+       * weight.
+       */
       DEAL_II_DEPRECATED_EARLY
       std::size_t
       num_slots() const
@@ -2270,6 +2287,9 @@ public:
                static_cast<std::size_t>(base_weight.connected());
       }
 
+      /**
+       * Checks if there are any connected functions to the signal.
+       */
       DEAL_II_DEPRECATED_EARLY
       bool
       empty() const
@@ -2282,6 +2302,12 @@ public:
         return false;
       }
 
+      /**
+       * Disconnects a function from the signal.
+       *
+       * Also disconnects the base weight function if it is the last connected
+       * function.
+       */
       template <typename S>
       DEAL_II_DEPRECATED_EARLY void
       disconnect(const S &connection)
@@ -2296,6 +2322,9 @@ public:
           }
       }
 
+      /**
+       * Triggers the signal.
+       */
       DEAL_II_DEPRECATED_EARLY
       unsigned int
       operator()(const cell_iterator &iterator, const CellStatus status)
@@ -2304,11 +2333,16 @@ public:
       }
 
     private:
+      /**
+       * Monitors the connection of the base weight function.
+       */
       boost::signals2::connection base_weight;
 
+      /**
+       * Reference to the successor signal.
+       */
       boost::signals2::signal<signature_type, combiner_type> &new_signal;
     };
-#endif
 
     /**
      * @copydoc weight
