@@ -59,7 +59,7 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
         PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
         )
 
-      IF(DEAL_II_WITH_CUDA)
+      IF(FALSE AND DEAL_II_WITH_CUDA)
         #
         # Add cxx compiler and cuda compilation flags to cuda source files:
         #

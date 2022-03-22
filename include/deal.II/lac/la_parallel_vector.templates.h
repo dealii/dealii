@@ -1063,7 +1063,8 @@ namespace LinearAlgebra
         std::fill_n(data.data() + partitioner->locally_owned_size(),
                     partitioner->n_ghost_indices(),
                     Number());
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
+#if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+  !defined(DEAL_II_WITH_KOKKOS_BACKEND)
       if (data.values_dev != nullptr)
         {
           const cudaError_t cuda_error_code =

@@ -134,7 +134,7 @@ MACRO(DEAL_II_SETUP_TARGET _target)
       PUBLIC ${DEAL_II_USER_DEFINITIONS} ${DEAL_II_USER_DEFINITIONS_${_build}}
       )
 
-    IF(DEAL_II_WITH_CUDA)
+    IF(FALSE AND DEAL_II_WITH_CUDA)
       #
       # Add cxx compiler and cuda compilation flags to cuda source files:
       #
