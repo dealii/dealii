@@ -147,11 +147,11 @@ namespace Particles
 
             try
               {
-                const Point<dim> position_unit =
+                const Point<dim> reference_position =
                   mapping.transform_real_to_unit_cell(cell, position);
 
-                if (cell->reference_cell().contains_point(position_unit))
-                  return {position, position_unit};
+                if (cell->reference_cell().contains_point(reference_position))
+                  return {position, reference_position};
               }
             catch (typename Mapping<dim>::ExcTransformationFailed &)
               {
@@ -164,14 +164,15 @@ namespace Particles
         // randomly within the reference cell and then mapping it to to
         // real space. This is not generating a
         // uniform distribution in real space, but will always succeed.
-        Point<dim> position_unit;
+        Point<dim> reference_position;
         for (unsigned int d = 0; d < dim; ++d)
-          position_unit[d] = uniform_distribution_01(random_number_generator);
+          reference_position[d] =
+            uniform_distribution_01(random_number_generator);
 
         const Point<spacedim> position =
-          mapping.transform_unit_to_real_cell(cell, position_unit);
+          mapping.transform_unit_to_real_cell(cell, reference_position);
 
-        return {position, position_unit};
+        return {position, reference_position};
       }
     } // namespace
 
