@@ -70,10 +70,25 @@ namespace internal
 
 
     /**
+     * Type of the 9-bit representation of the refinement configuration.
+     */
+    using compressed_constraint_kind = std::uint8_t;
+
+
+
+    /**
+     * Value of compressed_constraint_kind for the unconstrained case.
+     */
+    constexpr compressed_constraint_kind
+      unconstrained_compressed_constraint_kind = 0;
+
+
+
+    /**
      * Check if the combinations of the bits in @p kind_in are valid.
      */
     inline bool
-    check(const ConstraintKinds &kind_in, const unsigned int dim)
+    check(const ConstraintKinds kind_in, const unsigned int dim)
     {
       const std::uint16_t kind    = static_cast<std::uint16_t>(kind_in);
       const std::uint16_t subcell = (kind >> 0) & 7;
@@ -106,6 +121,60 @@ namespace internal
         }
 
       return false;
+    }
+
+
+
+    /**
+     * Compress a 9-bit representation of the refinement configuration
+     * to a 8-bit representation.
+     */
+    inline compressed_constraint_kind
+    compress(const ConstraintKinds kind_in, const unsigned int dim)
+    {
+      Assert(check(kind_in, dim), ExcInternalError());
+
+      if (dim == 2)
+        return static_cast<compressed_constraint_kind>(kind_in);
+
+      if (kind_in == ConstraintKinds::unconstrained)
+        return unconstrained_compressed_constraint_kind;
+
+      const std::uint16_t kind    = static_cast<std::uint16_t>(kind_in);
+      const std::uint16_t subcell = (kind >> 0) & 7;
+      const std::uint16_t face    = (kind >> 3) & 7;
+      const std::uint16_t edge    = (kind >> 6) & 7;
+
+      return subcell + ((face > 0) << 3) + ((edge > 0) << 4) +
+             (std::max(face, edge) << 5);
+    }
+
+
+
+    /**
+     * Decompress a 8-bit representation of the refinement configuration
+     * to a 9-bit representation.
+     */
+    inline ConstraintKinds
+    decompress(const compressed_constraint_kind kind_in, const unsigned int dim)
+    {
+      if (dim == 2)
+        return static_cast<ConstraintKinds>(kind_in);
+
+      if (kind_in == unconstrained_compressed_constraint_kind)
+        return ConstraintKinds::unconstrained;
+
+      const std::uint16_t subcell = (kind_in >> 0) & 7;
+      const std::uint16_t flag_0  = (kind_in >> 3) & 3;
+      const std::uint16_t flag_1  = (kind_in >> 5) & 7;
+
+      const auto result = static_cast<ConstraintKinds>(
+        subcell + (((flag_0 & 0b01) ? flag_1 : 0) << 3) +
+        (((flag_0 & 0b10) ? flag_1 : 0) << 6));
+
+      Assert(check(result, dim), ExcInternalError());
+
+      return result;
     }
 
 
