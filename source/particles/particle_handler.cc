@@ -223,7 +223,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleHandler<dim, spacedim>::reserve(std::size_t n_particles)
+  ParticleHandler<dim, spacedim>::reserve(const std::size_t n_particles)
   {
     property_pool->reserve(n_particles);
   }
