@@ -154,6 +154,13 @@ public:
   get_bounding_box(const typename Triangulation<dim, spacedim>::cell_iterator
                      &cell) const override;
 
+  /**
+   * Return the locations of support points for the mapping.
+   */
+  std::vector<Point<spacedim>>
+  get_mapping_support_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
+
   virtual bool
   is_compatible_with(const ReferenceCell &reference_cell) const override;
 

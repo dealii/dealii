@@ -1918,6 +1918,16 @@ MappingQ<dim, spacedim>::get_bounding_box(
 
 
 template <int dim, int spacedim>
+std::vector<Point<spacedim>>
+MappingQ<dim, spacedim>::get_mapping_support_points(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  return this->compute_mapping_support_points(cell);
+}
+
+
+
+template <int dim, int spacedim>
 bool
 MappingQ<dim, spacedim>::is_compatible_with(
   const ReferenceCell &reference_cell) const
