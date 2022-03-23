@@ -109,29 +109,15 @@ namespace internal
   }
 
 
-#ifndef DEAL_II_HAVE_CXX17
-  namespace Local
-  {
-    // see which type we can cast to, then use this type to create
-    // a default constructed object
-    struct SetValueToDefault : public boost::static_visitor<>
-    {
-      template <typename T>
-      void
-      operator()(T &operand) const
-      {
-        operand = T();
-      }
-    };
-  } // namespace Local
-#endif
 
   TableEntry
   TableEntry::get_default_constructed_copy() const
   {
     TableEntry new_entry = *this;
 #ifndef DEAL_II_HAVE_CXX17
-    boost::apply_visitor(Local::SetValueToDefault(), new_entry.value);
+    boost::apply_visitor(
+      [](auto &arg) { arg = std::remove_reference_t<decltype(arg)>(); },
+      new_entry.value);
 #else
     // Let std::visit figure out which data type is actually stored,
     // and then set the object so stored to a default-constructed
