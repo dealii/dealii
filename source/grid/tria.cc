@@ -14642,10 +14642,9 @@ Triangulation<dim, spacedim>::update_reference_cells()
     if (cell->is_locally_owned())
       reference_cells_set.insert(cell->reference_cell());
 
-  std::vector<ReferenceCell> reference_cells(reference_cells_set.begin(),
-                                             reference_cells_set.end());
-
-  this->reference_cells = reference_cells;
+  this->reference_cells =
+    std::vector<ReferenceCell>(reference_cells_set.begin(),
+                               reference_cells_set.end());
 }
 
 
