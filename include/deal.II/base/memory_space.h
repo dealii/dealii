@@ -43,12 +43,18 @@ namespace MemorySpace
 #endif
 
 
-
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+  /**
+   * Structure describing CUDA memory space.
+   */
+  using CUDA = ::Kokkos::CudaSpace;
+#else
   /**
    * Structure describing CUDA memory space.
    */
   struct CUDA
   {};
+#endif
 
 } // namespace MemorySpace
 

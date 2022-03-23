@@ -62,11 +62,16 @@ SET(_separate_src
 
 # Add CUDA wrapper files
 IF(DEAL_II_WITH_CUDA)
+	#  MESSAGE(FATAL_ERROR "blabla")
   SET(_separate_src
     ${_separate_src}
     vector_memory.cu
     affine_constraints.cu
     )
+  IF(DEAL_II_WITH_KOKKOS_BACKEND)
+    set_source_files_properties(vector_memory.cu PROPERTIES LANGUAGE CXX)
+    set_source_files_properties(affine_constraints.cu PROPERTIES LANGUAGE CXX)
+  ENDIF()
 ENDIF()
 
 SET(_inst
@@ -170,6 +175,15 @@ IF(DEAL_II_WITH_CUDA)
     la_parallel_vector.cu
     read_write_vector.cu
   )
+  IF(DEAL_II_WITH_KOKKOS_BACKEND)
+    set_source_files_properties(cuda_kernels.cu PROPERTIES LANGUAGE CXX)
+    set_source_files_properties(cuda_precondition.cu PROPERTIES LANGUAGE CXX)
+    set_source_files_properties(cuda_solver_direct.cu PROPERTIES LANGUAGE CXX)
+    set_source_files_properties(cuda_sparse_matrix.cu PROPERTIES LANGUAGE CXX)
+    set_source_files_properties(cuda_vector.cu PROPERTIES LANGUAGE CXX)
+    set_source_files_properties(la_parallel_vector.cu PROPERTIES LANGUAGE CXX)
+    set_source_files_properties(read_write_vector.cu PROPERTIES LANGUAGE CXX)
+  ENDIF()
 ENDIF()
 
 # determined by profiling

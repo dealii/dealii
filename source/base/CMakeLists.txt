@@ -118,6 +118,10 @@ IF(DEAL_II_WITH_CUDA)
     cuda.cu
     partitioner.cu
   )
+  IF(DEAL_II_WITH_KOKKOS_BACKEND)
+    set_source_files_properties(cuda.cu PROPERTIES LANGUAGE CXX)
+    set_source_files_properties(partitioner.cu PROPERTIES LANGUAGE CXX)
+  ENDIF()
 ENDIF()
 
 # determined by profiling

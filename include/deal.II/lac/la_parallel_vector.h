@@ -1491,7 +1491,7 @@ namespace LinearAlgebra
       };
 
 
-
+#ifndef DEAL_II_WITH_KOKKOS_BACKEND
       template <typename Number>
       struct Policy<Number, ::dealii::MemorySpace::CUDA>
       {
@@ -1518,6 +1518,34 @@ namespace LinearAlgebra
           return data.values_dev.get();
         }
       };
+#else
+      template <typename Number>
+      struct Policy<Number, ::dealii::MemorySpace::CUDA>
+      {
+        static inline
+          typename Vector<Number, ::dealii::MemorySpace::CUDA>::iterator
+          begin(::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+        {
+          return data.data();
+        }
+
+        static inline
+          typename Vector<Number, ::dealii::MemorySpace::CUDA>::const_iterator
+          begin(const ::dealii::MemorySpace::
+                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+        {
+          return data.data();
+        }
+
+        static inline Number *
+        get_values(::dealii::MemorySpace::
+                     MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
+        {
+          return data.data();
+        }
+      };
+#endif
     } // namespace internal
 
 
