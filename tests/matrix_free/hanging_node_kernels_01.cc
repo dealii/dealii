@@ -450,14 +450,23 @@ test(const unsigned int                                           degree,
   FEEvaluation<dim, -1, 0, 1, double> eval(matrix_free);
   eval.reinit(0);
 
-  std::array<dealii::internal::MatrixFreeFunctions::ConstraintKinds,
+  std::array<dealii::internal::MatrixFreeFunctions::compressed_constraint_kind,
              VectorizedArray<double>::size()>
     cmask;
+  std::fill(cmask.begin(),
+            cmask.end(),
+            dealii::internal::MatrixFreeFunctions::
+              unconstrained_compressed_constraint_kind);
+  cmask[0] = dealii::internal::MatrixFreeFunctions::compress(mask_value, dim);
+
+  std::array<dealii::internal::MatrixFreeFunctions::ConstraintKinds,
+             VectorizedArray<double>::size()>
+    cmask_;
   std::fill(
-    cmask.begin(),
-    cmask.end(),
+    cmask_.begin(),
+    cmask_.end(),
     dealii::internal::MatrixFreeFunctions::ConstraintKinds::unconstrained);
-  cmask[0] = mask_value;
+  cmask_[0] = mask_value;
 
   for (unsigned int b = 0; b < 2; ++b)
     {
@@ -477,7 +486,7 @@ test(const unsigned int                                           degree,
       internal::FEEvaluationImplHangingNodesReference<
         dim,
         VectorizedArray<double>,
-        false>::template run<-1, -1>(eval, b == 1, cmask, values1.data());
+        false>::template run<-1, -1>(eval, b == 1, cmask_, values1.data());
       internal::FEEvaluationImplHangingNodes<dim, VectorizedArray<double>>::
         template run<-1, -1>(
           1, eval.get_shape_info(), b == 1, cmask, values2.data());

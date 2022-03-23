@@ -106,7 +106,7 @@ namespace internal
             (hanging_node_constraint_masks.size() != 0 &&
              hanging_node_constraint_masks_comp.size() != 0 &&
              hanging_node_constraint_masks[cell * n_vectorization + v] !=
-               ConstraintKinds::unconstrained &&
+               unconstrained_compressed_constraint_kind &&
              hanging_node_constraint_masks_comp[fe_index][0 /*TODO*/]) ||
             (row_starts[ib].second != row_starts[ib + n_fe_components].second);
 
@@ -238,7 +238,7 @@ namespace internal
                   if (hanging_node_constraint_masks.size() > 0 &&
                       hanging_node_constraint_masks_comp.size() > 0 &&
                       hanging_node_constraint_masks[boundary_cells[i]] !=
-                        ConstraintKinds::unconstrained)
+                        unconstrained_compressed_constraint_kind)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       has_hanging_nodes |=
                         hanging_node_constraint_masks_comp[fe_index][comp];
@@ -341,7 +341,7 @@ namespace internal
       new_dof_indices.reserve(dof_indices.size());
       new_constraint_indicator.reserve(constraint_indicator.size());
 
-      std::vector<ConstraintKinds> new_hanging_node_constraint_masks;
+      std::vector<compressed_constraint_kind> new_hanging_node_constraint_masks;
       new_hanging_node_constraint_masks.reserve(
         hanging_node_constraint_masks.size());
 
@@ -384,7 +384,7 @@ namespace internal
                                                               j]];
                   new_hanging_node_constraint_masks.push_back(mask);
 
-                  if (mask != ConstraintKinds::unconstrained)
+                  if (mask != unconstrained_compressed_constraint_kind)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
                       has_hanging_nodes |= hanging_node_constraint_masks_comp
                         [have_hp ? cell_active_fe_index[i] : 0][comp];
@@ -439,7 +439,7 @@ namespace internal
           for (unsigned int j = n_vect; j < vectorization_length; ++j)
             if (hanging_node_constraint_masks.size() > 0)
               new_hanging_node_constraint_masks.push_back(
-                ConstraintKinds::unconstrained);
+                unconstrained_compressed_constraint_kind);
 
           position_cell += n_vect;
         }

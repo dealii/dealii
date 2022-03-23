@@ -36,7 +36,7 @@ namespace internal
     const unsigned int                                         fe_degree,
     const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
     const bool                                                 transpose,
-    const std::array<MatrixFreeFunctions::ConstraintKinds,
+    const std::array<MatrixFreeFunctions::compressed_constraint_kind,
                      VectorizedArrayType::size()> &            c_mask,
     VectorizedArrayType *                                      values)
   {
