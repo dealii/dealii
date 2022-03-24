@@ -3,7 +3,7 @@
 <h1> Introduction </h1>
 
 A surface plasmon-polariton (SPP) is a slowly decaying electromagnetic
-wave, confined near a metal-air (or similar) interfaces. SPP structures on
+wave, confined near a metal-air (or similar) interface. SPP structures on
 novel "2D" materials such as graphene, a monoatomic layer of carbon atoms
 arranged in a hexagonal lattice, typically have wavelengths much shorter
 than the wavelength of the free-space radiation. This scale separation
@@ -12,23 +12,23 @@ optical devices.
 
 In the following, we discuss a method for observing SPPs numerically by
 solving a suitable electromagnetic model based on time-harmonic Maxwell's
-equations that incorporates jump conditions on lower-dimensional material
+equations which incorporate jump conditions on lower-dimensional material
 interfaces: The conducting sheet is modeled as an idealized hypersurface
-with an effective electric conductivity, and the weak discontinuity for the
+with an effective electric conductivity and the weak discontinuity for the
 tangential surface appears naturally in the variational form.
 
 This tutorial presents a direct solver for the time-harmonic Maxwell
 equations for scattering configurations with lower-dimensional interfaces.
-We discuss in particular how to set up a complex-valued (time-harmonic),
-how to implement simple first-order absorbing boundary conditions and a
-more sophisticated "perfectly matched layer" for electromagnetic waves.
+In particular, we discuss using complex values, simple first-order absorbing
+boundary conditions, and a more sophisticated
+<a href="https://en.wikipedia.org/wiki/Perfectly_matched_layer">perfectly
+  matched layer</a> (PML) boundary condition for electromagnetic waves.
 
 
 <h3>Time-Harmonic Maxwell's Equations with interface conditions</h3>
 
 We start the discussion with a short derivation of the governing equations
-and some pointers to literature.
-
+and some literature references.
 
 <h4>Derivation of time-harmonic Maxwell's equations</h4>
 
@@ -53,40 +53,37 @@ equations</a>
 \nabla\cdot(\varepsilon\mathbf{E}) = \rho_m,
 \end{cases}
 @f]
-where $\nabla\times\mathbf{F}(\mathbf{x})$ denotes the curl and
-$\nabla\cdot\mathbf{F}(\mathbf{x})$ denotes the divergence of a vector
-field $\mathbf{F}:\Omega\to\mathbb{R}^d$ and where we have set $d=2,3$. We
-have introduced two (time-independent) material parameters, the
-<a href="https://en.wikipedia.org/wiki/Permittivity">electric permittivity</a>
-$\varepsilon$
-and the
-<a href="https://en.wikipedia.org/wiki/Permeability">magnetic permeability</a>
-$\mu$. In addition, $\rho$ is the (electric) charge density and $\rho_m$ is
-a corresponding (hypothetical)
-<a href="https://en.wikipedia.org/wiki/Magnetic_monopole">magnetic monopole</a>
-density. $\mathbf{J}_a$ and $\mathbf{M}_a$ are the electric and magnetic
-flux densities. Both are related to their respective charge densities by a
-conservation equation @cite Schwartz1972 :
+in which $\nabla\times$ is the curl operator, $\nabla\cdot$ is the divergence operator,
+$\varepsilon$ is the
+<a href="https://en.wikipedia.org/wiki/Permittivity">electric permittivity</a>,
+$\mu$ is the
+<a href="https://en.wikipedia.org/wiki/Permeability">magnetic permeability</a>,
+$\rho$ is the electric charge density, and $\rho_m$ is a corresponding
+(hypothetical) <a href="https://en.wikipedia.org/wiki/Magnetic_monopole">magnetic
+  monopole</a> density.
+$\mathbf{J}_a$ and $\mathbf{M}_a$ are the electric and magnetic
+flux densities which are related to their respective charge densities by the
+conservation equations @cite Schwartz1972
 @f[
-\frac{\partial}{\partial t} \rho + \nabla\cdot\mathbf{J}_a \,=\, 0,
-\qquad
-\frac{\partial}{\partial t} \rho_m + \nabla\cdot\mathbf{M}_a \,=\, 0.
+\frac{\partial}{\partial t} \rho + \nabla\cdot\mathbf{J}_a = 0
+\text{ and }
+\frac{\partial}{\partial t} \rho_m + \nabla\cdot\mathbf{M}_a = 0.
 @f]
 
 We now make the important assumption that the material parameters
 $\varepsilon$ and $\mu$ are time-independent and that the fields
 $\mathbf{E}$ and $\mathbf{H}$, the fluxes $\mathbf{M}_a$ and
 $\mathbf{J}_a$, as well as the densities $\rho$ and $\rho_m$ are all
-<i>time-harmonic</i>, i.e., their time evolution is completely described by
+<em>time-harmonic</em>, i.e., their time evolution is completely described by
 @f[
   \mathbf{F}(\mathbf{x},t) = \text{Re}\{e^{-i\omega
   t}\tilde{\mathbf{F}}(\mathbf{x})\},
 @f]
-where $\omega$ is the temporal angular frequency and
+in which $\omega$ is the temporal angular frequency and
 $\tilde{\mathbf{F}}(\mathbf{x})$ is a corresponding complex-valued vector
 field (or density). Inserting this ansatz into Maxwell's equations,
 substituting the charge conservation equations and some minor algebra then
-yields the so-called <i>time-harmonic</i> Maxwell's equations, viz.,
+yields the so-called <em>time-harmonic</em> Maxwell's equations:
 @f[
 \begin{cases}
 -i\omega \tilde{\mathbf{H}} + \nabla \times \tilde{\mathbf{E}} =
@@ -107,7 +104,7 @@ referring to the time-harmonic fields.
 
 <h4>Jump conditions on lower dimensional interfaces</h4>
 
-Graphene is a two-dimensional carbon allotrope with a <i>single</i> atom
+Graphene is a two-dimensional carbon allotrope with a <em>single</em> atom
 layer that is arranged in a honeycomb lattice @cite Geim2004. Due to its
 atomic thickness it is an example of a so-called 2D material: Compared to
 the other spatial dimensions (where graphene samples can reach up to
@@ -120,18 +117,18 @@ one-dimensional line in two spatial dimensions. The special electronic
 structure of graphene gives rise to a current density on the
 lower-dimensional interface that is modeled with an effective surface
 conductivity $\sigma^\Sigma$ obeying <a
-href="https://en.wikipedia.org/wiki/Ohm%27s_law">Ohm's Law</a>, viz,
+href="https://en.wikipedia.org/wiki/Ohm%27s_law">Ohm's Law</a>:
 @f[
-  \mathbf{J}^\Sigma=\sigma^\Sigma\,\mathbf{E}_T.
+  \mathbf{J}^\Sigma=\sigma^\Sigma\,\mathbf{E}_T
 @f]
-Here, $\mathbf{J}^\Sigma$ is the surface current density, $\mathbf{E}_T$
+in which $\mathbf{J}^\Sigma$ is the surface current density, $\mathbf{E}_T$
 denotes the tangential part of the electric field $\mathbf{E}$, and
 $\sigma^\Sigma$ is an appropriately chosen surface conductivity that will
 be discussed in more detail below. The surface current density gives rise
 to a jump condition on $\Sigma$ in the tangential component of the magnetic
 field. This is best seen by visualizing <a
 href="https://en.wikipedia.org/wiki/Amp%C3%A8re%27s_circuital_law">Ampère's
-law</a>,
+law</a>:
 
 @htmlonly
 <p align="center">
@@ -150,7 +147,7 @@ $\Sigma$ both jump conditions read,
 \mathbf{\nu} \times \left[\mathbf{E}^+ - \mathbf{E}^-\right]|_{\Sigma} = 0.
 \end{cases}
 @f]
-Here, the notation $\mathbf{F}^\pm$ indicates the limit values of the field
+The notation $\mathbf{F}^\pm$ indicates the limit values of the field
 when approaching the interface from above or below the interface:
 $\mathbf{F}^\pm(\mathbf{x})=\lim_{\delta\to0,\delta>0}\mathbf{F}(\mathbf{x}\pm\delta\mathbf{\nu})$.
 
@@ -160,11 +157,11 @@ $\mathbf{F}^\pm(\mathbf{x})=\lim_{\delta\to0,\delta>0}\mathbf{F}(\mathbf{x}\pm\d
 We will be using a rescaled version of the Maxwell's equations described above.
 The rescaling has the following key differences:<br />
 1. Every length is rescaled by the free-space wavelength $2\pi k^{-1}
-:= 2\pi(\omega\sqrt{\varepsilon_0\mu_0})^{-1}$, where $\varepsilon_0$ and $\mu_0$
+\dealcoloneq 2\pi(\omega\sqrt{\varepsilon_0\mu_0})^{-1}$, in which $\varepsilon_0$ and $\mu_0$
 denote the vacuum dielectric permittivity and magnetic permeability, respectively.
 <br />
 2. $\mathbf{E}$, $\mathbf{H}$, $\mathbf{J}_a$, $\mathbf{M}_a$ are all rescaled by
-typical electric current strength $J_0$, where $J_0$ is the strength of the
+typical electric current strength $J_0$, i.e., the strength of the
 prescribed dipole source at location $a$ in the $e_i$ direction in Cartesian
 coordinates.
 @f[
@@ -173,14 +170,15 @@ coordinates.
 <br />
 
 Accordingly, our electric permittivity and magnetic permeability are rescaled by
-$\varepsilon_0$ and $\mu_0$ as follows:
+$\varepsilon_0$ and $\mu_0$ as
 @f[
-\mu_r = \frac{1}{\mu_0}\mu,\qquad
+\mu_r = \frac{1}{\mu_0}\mu
+\text{ and }
 \varepsilon_r = \frac{1}{\varepsilon_0}\varepsilon.
 @f]
 
-We use the free space wave number $k_0 = \omega\sqrt{\varepsilon_0\mu_0}$, and
-the dipole strength, $J_0$, to arrive at the following rescaling of the vector
+We use the free-space wave number $k_0 = \omega\sqrt{\varepsilon_0\mu_0}$ and
+the dipole strength, $J_0$ to arrive at the following rescaling of the vector
 fields and coordinates:
 @f[
 \begin{align*}
@@ -193,12 +191,12 @@ fields and coordinates:
 \end{align*}
 @f]
 
-Finally, the interface conductivity is rescaled as follows:
+Finally, the interface conductivity is rescaled as
 @f[
 \sigma^{\Sigma}_r = \sqrt{\frac{\mu_0}{\varepsilon_0}}\sigma^{\Sigma}.
 @f]
 
-Accordingly, our rescaled equations are:
+Accordingly, our rescaled equations are
 @f[
 \begin{cases}
 -i\mu_r \hat{\mathbf{H}} + \hat{\nabla} \times \hat{\mathbf{E}}
@@ -222,11 +220,11 @@ Let $\Sigma$ be an oriented, Lipschitz-continuous, piecewise smooth hypersurface
 Fix a normal field $\nu$ on $\Sigma$ and let $n$ denote the outer normal vector
 on $\partial\Omega$.<br />
 
-In order to arrive at the variational form, we will substitute $\mathbf{H}$ in
-the first equation as follows:
+In order to arrive at the variational form, we will substitute for $\mathbf{H}$ in
+the first equation and obtain
 @f[
 \nabla \times (\mu_r^{-1}\nabla\times\mathbf{E}) - \varepsilon_r \mathbf{E}
-= i\mathbf{J}_a - \nabla\times (\mu_r^{-1}\mathbf{M}_a)
+= i\mathbf{J}_a - \nabla\times (\mu_r^{-1}\mathbf{M}_a).
 @f]
 
 Now, consider a smooth test function $\varphi$ with complex conjugate $\bar{\varphi}$.
@@ -243,10 +241,14 @@ i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
 - \int_\Omega \mu_r^{-1}\mathbf{M}_a \cdot (\nabla \times \bar{\varphi})\;\text{d}x.
 @f]
 
-We use the subscript $T$ to denote the tangential part of the given vector i.e.
-$F_T = (\nu\times F)\times\nu$ and $[\cdot]_{\Sigma}$ to denote a jump over
-$\Sigma$ i.e. $[F]_{\Sigma}(x) = \lim\limits_{s\searrow 0}(F(x+s\nu)-F(x-s\nu))$
-for $x\in \Sigma$.<br />
+We use the subscript $T$ to denote the tangential part of the given vector
+and $[\cdot]_{\Sigma}$ to denote a jump over $\Sigma$, i.e.,
+@f[
+  F_T = (\nu\times F)\times\nu
+  \text{ and }
+  [F]_{\Sigma}(x) = \lim\limits_{s\searrow 0}(F(x+s\nu)-F(x-s\nu))
+@f]
+for $x\in \Sigma$.
 
 For the computational domain $\Omega$, we introduce the absorbing boundary condition
 at $\partial\Omega$, which is obtained by using a first-order approximation of
@@ -254,9 +256,9 @@ the Silver-Müller radiation condition, truncated at $\partial\Omega$.
 @f[
 \nu\times\mathbf{H}+\sqrt{\mu_r^{-1}\varepsilon_r}\mathbf{E}=0\qquad x\in\partial\Omega
 @f]
-We assume that $\mu_r^{-1}$ and $\varepsilon$ have well-defined square root. In
+We assume that $\mu_r^{-1}$ and $\varepsilon$ have well-defined square roots. In
 our numerical computation, we combine the above absorbing boundary condition
-with a Perfectly Matched Layer (PML). <br />
+with a PML. <br />
 
 The jump condition can be expressed as a weak discontinuity as follows:
 @f[
@@ -285,60 +287,67 @@ such that $\sqrt{\mu_r^{-1}\varepsilon_r}$ is real valued and strictly positive
 in $\partial\Omega$. <br />
 
 $\mathbf{H}(curl;\Omega)$ is space of vector-valued, measurable and square
-integrable functions whose (distributive) curl admits a representation by a
+integrable functions whose weak curl admits a representation by a
 square integrable function. Define a Hilbert space
 @f[
 X(\Omega) = \{\varphi \in \mathbf{H}(curl;\Omega)\;\;:\;\; \varphi_T|_{\Sigma}
 \in L^2(\Sigma)^2,\;\varphi_T|_{\partial\Omega} \in L^2(\partial\Omega)^2\}
 @f]
-equipped with the norm $\|\varphi\|^2_X = \|\varphi\|^2_{L^2(\Omega)} +
-\|\nabla\times\varphi\|^2_{L^2(\Omega)} + \|\varphi_T\|^2_{L^2(\Sigma)} +
-\|\varphi_T\|^2_{L^2(\partial\Omega)}.$
+equipped with the norm
+@f[
+  \|\varphi\|^2_X = \|\varphi\|^2_{L^2(\Omega)} +
+  \|\nabla\times\varphi\|^2_{L^2(\Omega)} + \|\varphi_T\|^2_{L^2(\Sigma)} +
+  \|\varphi_T\|^2_{L^2(\partial\Omega)}.
+@f]
 
 Define
 @f[
-A(\mathbf{E},\varphi) := \int_\Omega (\mu_r^{-1}\nabla\times\mathbf{E})\cdot
+A(\mathbf{E},\varphi) \dealcoloneq \int_\Omega (\mu_r^{-1}\nabla\times\mathbf{E})\cdot
 (\nabla\times\bar{\varphi})\;\text{d}x
 - \int_\Omega \varepsilon_r\mathbf{E} \cdot \bar{\varphi}\;\text{d}x
 - i\int_\Sigma (\sigma_r^{\Sigma}\mathbf{E}_T) \cdot \bar{\varphi}_T\;\text{d}o_x
 - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}\mathbf{E}_T) \cdot
 (\nabla\times\bar{\varphi}_T)\;\text{d}o_x.\\
-F(\varphi) := i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
+F(\varphi) \dealcoloneq i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
 - \int_\Omega \mu_r^{-1}\mathbf{M}_a \cdot (\nabla \times \bar{\varphi})\;\text{d}x.
 @f]
 
 Then, our rescaled weak formulation is:<br />
-Find a unique $\mathbf{E} \in X(\Omega)$ such that for all $\varphi \in X(\Omega)$
+Find a unique $\mathbf{E} \in X(\Omega)$ such that, for all $\varphi \in X(\Omega)$,
 @f[
-A(\mathbf{E},\varphi) = F(\varphi)
+A(\mathbf{E},\varphi) = F(\varphi).
 @f]
 
 
-<h4>Absorbing boundary conditions and perfectly matched layer</h4>
+<h4>Absorbing boundary conditions and the perfectly matched layer</h4>
 
 Moreover, the above equations are supplemented by the Silver-Müller radiation
 condition, if the ambient (unbounded) medium is isotropic. This amounts to the
-requirement that $\mathbf{E}, \mathbf{H}$ approach a spherical wave uniformly in
-the radial direction for points at infinity and away from the conducting sheet.
+requirement that $\mathbf{E}$ and $\mathbf{H}$ both approach a spherical wave
+uniformly in the radial direction for points at infinity and away from the
+conducting sheet, i.e.,
 
 @f[
-\lim\limits_{|x|\to\infty} \{\mathbf{H}\times x - c^{-1}|x|\mathbf{E}\} = 0;\qquad
-\lim\limits_{|x|\to\infty} \{\mathbf{E}\times x - c^{-1}|x|\mathbf{H}\} = 0;\qquad
-x \not\in \Sigma
+\lim\limits_{|x|\to\infty} \{\mathbf{H}\times x - c^{-1}|x|\mathbf{E}\} = 0
+\text{ and }
+\lim\limits_{|x|\to\infty} \{\mathbf{E}\times x - c^{-1}|x|\mathbf{H}\} = 0
+\text{ for }
+x \not\in \Sigma.
 @f]
 
-In our case, we eliminate reflection from infinity by implementing a PML and
-avoid the explicit use of the last condition.
+In our case, we eliminate reflection from infinity by implementing a PML, which
+is described at length below, and avoid the explicit use of the last condition.
 
 <h3> Discretization Scheme</h3>
 
 The variational form is discretized on a non-uniform quadrilateral mesh with
-higher-order, curl-conforming Nédélec elements. This way the interface with a
-weak discontinuity can be aligned with or away from the mesh, and the convergence
-rate is high. Specifically, we use second-order Nédélec elements, which under our
-conditions will have a convergence rate $\mathcal{O}(\#\text{dofs})$. <br />
+higher-order, curl-conforming Nédélec elements implemented by the FE_NedelecSZ
+class. This way the interface with a weak discontinuity can be aligned with or
+away from the mesh and the convergence rate is high. Specifically, we use
+second-order Nédélec elements, which under our conditions will have a
+convergence rate $\mathcal{O}(\#\text{dofs})$.
 
-Now, consider the finite element subspace $X_h(\Omega) \subset X(\Omega)$. Define
+Consider the finite element subspace $X_h(\Omega) \subset X(\Omega)$. Define
 the matrices
 @f[
 A_{ij} = \int_\Omega (\mu_r^{-1}\nabla \times \varphi_i) \cdot
@@ -361,9 +370,6 @@ that for all $\varphi_i \in X_h(\Omega)$:
 @f[
 A_{ij} = F_i
 @f]
-
-Using a skeleton similar to step-4, we have constructed a Maxwell class and we
-have used complex-valued FENedelec elements to solve our equations. <br />
 
 <h3> Perfectly Matched Layer </h3>
 The SPP amplitude is negatively effected by the absorbing boundary condition and
