@@ -184,11 +184,11 @@ the dipole strength, $J_0$, to arrive at the following rescaling of the vector
 fields and coordinates:
 @f[
 \begin{align*}
-\hat{x} = k_0x,\qquad
+\hat{x} = k_0x, &\qquad
 \hat{\nabla} = \frac{1}{k_0}\nabla,\\
-\hat{\mathbf{H}} = \frac{k_0}{J_0}\mu^{-1}\mathbf{H},\qquad
+\hat{\mathbf{H}} = \frac{k_0}{J_0}\mu^{-1}\mathbf{H},&\qquad
 \hat{\mathbf{E}} = \frac{k_0^2}{\omega\mu_0 J_0}\mathbf{E},\\
-\hat{\mathbf{J}}_a = \frac{1}{J_0}\mathbf{J}_a,\qquad
+\hat{\mathbf{J}}_a = \frac{1}{J_0}\mathbf{J}_a,&\qquad
 \hat{\mathbf{M}}_a = \frac{k_0}{\omega\mu_0 J_0}\mathbf{M}_a.
 \end{align*}
 @f]
@@ -385,7 +385,9 @@ be a function of the radial distance $\rho$ from the origin $e_r$. The normal fi
 $\nu$ of $\Sigma$ is orthogonal to the radial direction $e_r$, which makes
 $\mathbf{J}_a \equiv 0$ and $\mathbf{M}_a \equiv 0$ within the PML. <br />
 
-<img src = "PML.png">
+<p align="center">
+  <img src = "https://www.dealii.org/images/steps/developer/step-81-PML.png">
+</p>
 
 Introduce a change of coordinates
 @f[
