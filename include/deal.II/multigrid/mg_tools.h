@@ -284,14 +284,42 @@ namespace MGTools
   max_level_for_coarse_mesh(const Triangulation<dim, spacedim> &tria);
 
   /**
+   * This function returns the local work of each level, i.e., the
+   * number of locally-owned cells on each multigrid level.
+   *
+   * @note This function requires that
+   * parallel::TriangulationBase::is_multilevel_hierarchy_constructed()
+   * is true, which can be controlled by setting the
+   * construct_multigrid_hierarchy flag when constructing the
+   * Triangulation.
+   */
+  template <int dim, int spacedim>
+  std::vector<types::global_dof_index>
+  local_workload(const Triangulation<dim, spacedim> &tria);
+
+  /**
+   * Similar to the above function but for a vector of triangulations as created
+   * e.g. by
+   * MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence().
+   * This returns the number of locally-owned cells on each of the
+   * triangulations.
+   */
+  template <int dim, int spacedim>
+  std::vector<types::global_dof_index>
+  local_workload(
+    const std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+      &trias);
+
+  /**
    * Return the imbalance of the parallel distribution of the multigrid
-   * mesh hierarchy. Ideally this value is equal to 1 (every processor owns
+   * mesh hierarchy, based on the local workload provided by local_workload().
+   * Ideally this value is equal to 1 (every processor owns
    * the same number of cells on each level, approximately true for most
    * globally refined meshes). Values greater than 1 estimate the slowdown
    * one should see in a geometric multigrid v-cycle as compared with the same
    * computation on a perfectly distributed mesh hierarchy.
    *
-   * This function is a collective MPI call between all ranks of the
+   * @note This function is a collective MPI call between all ranks of the
    * Triangulation and therefore needs to be called from all ranks.
    *
    * @note This function requires that
@@ -303,6 +331,69 @@ namespace MGTools
   template <int dim, int spacedim>
   double
   workload_imbalance(const Triangulation<dim, spacedim> &tria);
+
+  /**
+   * Similar to the above function but for a vector of triangulations as created
+   * e.g. by
+   * MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence().
+   */
+  template <int dim, int spacedim>
+  double
+  workload_imbalance(
+    const std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+      &trias);
+
+  /**
+   * Return the vertical communication cost between levels.
+   * The returned vector contains for each level the number
+   * of cells that have the same owning process as their
+   * corresponding coarse cell (parent) and the number of cells that have not
+   * the same owning process as their corresponding coarse cell.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
+  local_vertical_communication_cost(const Triangulation<dim, spacedim> &tria);
+
+  /**
+   * Similar to the above function but for a vector of triangulations as created
+   * e.g. by
+   * MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence().
+   *
+   * @note This function is a collective MPI call between all ranks of the
+   * Triangulation and therefore needs to be called from all ranks.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
+  local_vertical_communication_cost(
+    const std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+      &trias);
+
+  /**
+   * Share of fine cells that have the same owning process as their
+   * corresponding coarse cell (parent). This quantity gives an
+   * indication on the efficiency of a multigrid transfer operator
+   * and on how much data has to be sent around. A small number indicates
+   * that most of the data has to be completely permuted, involving a large
+   * volume of communication.
+   *
+   * @note This function is a collective MPI call between all ranks of the
+   * Triangulation and therefore needs to be called from all ranks.
+   */
+  template <int dim, int spacedim>
+  double
+  vertical_communication_efficiency(const Triangulation<dim, spacedim> &tria);
+
+  /**
+   * Similar to the above function but for a vector of triangulations as created
+   * e.g. by
+   * MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence().
+   */
+  template <int dim, int spacedim>
+  double
+  vertical_communication_efficiency(
+    const std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+      &trias);
+
 
 } // namespace MGTools
 

@@ -1,0 +1,29 @@
+
+DEAL:0:2d::Workload efficiency:               0.666667
+DEAL:0:2d::Local workload:                    1 2 8 
+DEAL:0:2d::Vertical communication efficiency: 0.937500
+DEAL:0:2d::Vertical communication costs:      (0, 0) (2, 2) (8, 0) 
+DEAL:0:2d::Workload efficiency:               0.764706
+DEAL:0:2d::Local workload:                    1 2 8 
+DEAL:0:2d::Vertical communication efficiency: 0.937500
+DEAL:0:2d::Vertical communication costs:      (0, 0) (2, 2) (8, 0) 
+
+DEAL:1:2d::Workload efficiency:               0.666667
+DEAL:1:2d::Local workload:                    1 6 8 
+DEAL:1:2d::Vertical communication efficiency: 0.937500
+DEAL:1:2d::Vertical communication costs:      (0, 0) (4, 0) (8, 0) 
+DEAL:1:2d::Workload efficiency:               0.764706
+DEAL:1:2d::Local workload:                    1 3 12 
+DEAL:1:2d::Vertical communication efficiency: 0.937500
+DEAL:1:2d::Vertical communication costs:      (0, 0) (0, 0) (12, 0) 
+
+
+DEAL:2:2d::Workload efficiency:               0.666667
+DEAL:2:2d::Local workload:                    2 8 0 
+DEAL:2:2d::Vertical communication efficiency: 0.937500
+DEAL:2:2d::Vertical communication costs:      (0, 0) (8, 0) (0, 0) 
+DEAL:2:2d::Workload efficiency:               0.764706
+DEAL:2:2d::Local workload:                    2 2 8 
+DEAL:2:2d::Vertical communication efficiency: 0.937500
+DEAL:2:2d::Vertical communication costs:      (0, 0) (0, 0) (8, 0) 
+

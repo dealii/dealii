@@ -15,6 +15,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/mg_level_object.h>
+#include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -24,6 +25,7 @@
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/fe.h>
 
+#include <deal.II/grid/cell_id_translator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
@@ -1596,61 +1598,269 @@ namespace MGTools
 
 
 
+  namespace internal
+  {
+    double
+    workload_imbalance(
+      const std::vector<types::global_dof_index> &n_cells_on_levels,
+      const MPI_Comm                              comm)
+    {
+      std::vector<types::global_dof_index> n_cells_on_leves_max(
+        n_cells_on_levels.size());
+      std::vector<types::global_dof_index> n_cells_on_leves_sum(
+        n_cells_on_levels.size());
+
+      Utilities::MPI::max(n_cells_on_levels, comm, n_cells_on_leves_max);
+      Utilities::MPI::sum(n_cells_on_levels, comm, n_cells_on_leves_sum);
+
+      const unsigned int n_proc = Utilities::MPI::n_mpi_processes(comm);
+
+      const double ideal_work = std::accumulate(n_cells_on_leves_sum.begin(),
+                                                n_cells_on_leves_sum.end(),
+                                                0) /
+                                static_cast<double>(n_proc);
+      const double workload_imbalance =
+        std::accumulate(n_cells_on_leves_max.begin(),
+                        n_cells_on_leves_max.end(),
+                        0) /
+        ideal_work;
+
+      return workload_imbalance;
+    }
+
+
+
+    double
+    vertical_communication_efficiency(
+      const std::vector<
+        std::pair<types::global_dof_index, types::global_dof_index>> &cells,
+      const MPI_Comm                                                  comm)
+    {
+      std::vector<types::global_dof_index> cells_local(cells.size());
+      std::vector<types::global_dof_index> cells_remote(cells.size());
+
+      for (unsigned int i = 0; i < cells.size(); ++i)
+        {
+          cells_local[i]  = cells[i].first;
+          cells_remote[i] = cells[i].second;
+        }
+
+      std::vector<types::global_dof_index> cells_local_sum(cells_local.size());
+      Utilities::MPI::sum(cells_local, comm, cells_local_sum);
+
+      std::vector<types::global_dof_index> cells_remote_sum(
+        cells_remote.size());
+      Utilities::MPI::sum(cells_remote, comm, cells_remote_sum);
+
+      const auto n_cells_local =
+        std::accumulate(cells_local_sum.begin(), cells_local_sum.end(), 0);
+      const auto n_cells_remote =
+        std::accumulate(cells_remote_sum.begin(), cells_remote_sum.end(), 0);
+
+      return static_cast<double>(n_cells_local) /
+             (n_cells_local + n_cells_remote);
+    }
+  } // namespace internal
+
+
+
+  template <int dim, int spacedim>
+  std::vector<types::global_dof_index>
+  local_workload(const Triangulation<dim, spacedim> &tria)
+  {
+    if (const parallel::TriangulationBase<dim, spacedim> *tr =
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+            &tria))
+      Assert(
+        tr->is_multilevel_hierarchy_constructed(),
+        ExcMessage(
+          "We can only compute the workload imbalance if the multilevel hierarchy has been constructed!"));
+
+    const unsigned int n_global_levels = tria.n_global_levels();
+
+    std::vector<types::global_dof_index> n_cells_on_levels(n_global_levels);
+
+    for (unsigned int lvl = 0; lvl < n_global_levels; ++lvl)
+      for (const auto &cell : tria.cell_iterators_on_level(lvl))
+        if (cell->is_locally_owned_on_level())
+          ++n_cells_on_levels[lvl];
+
+    return n_cells_on_levels;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<types::global_dof_index>
+  local_workload(
+    const std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+      &trias)
+  {
+    const unsigned int n_global_levels = trias.size();
+
+    std::vector<types::global_dof_index> n_cells_on_levels(n_global_levels);
+
+    for (unsigned int lvl = 0; lvl < n_global_levels; ++lvl)
+      for (const auto &cell : trias[lvl]->active_cell_iterators())
+        if (cell->is_locally_owned())
+          ++n_cells_on_levels[lvl];
+
+    return n_cells_on_levels;
+  }
+
+
+
   template <int dim, int spacedim>
   double
   workload_imbalance(const Triangulation<dim, spacedim> &tria)
   {
-    double workload_imbalance = 1.0;
+    return internal::workload_imbalance(local_workload(tria),
+                                        tria.get_communicator());
+  }
 
-    // It is only necessary to calculate the imbalance
-    // on a distributed mesh. The imbalance is always
-    // 1.0 for the serial case.
-    if (const parallel::TriangulationBase<dim, spacedim> *tr =
-          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-            &tria))
+
+
+  template <int dim, int spacedim>
+  double
+  workload_imbalance(
+    const std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+      &trias)
+  {
+    return internal::workload_imbalance(local_workload(trias),
+                                        trias.back()->get_communicator());
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
+  local_vertical_communication_cost(const Triangulation<dim, spacedim> &tria)
+  {
+    const unsigned int n_global_levels = tria.n_global_levels();
+
+    std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
+      cells(n_global_levels);
+
+    const MPI_Comm communicator = tria.get_communicator();
+
+    const unsigned int my_rank = Utilities::MPI::this_mpi_process(communicator);
+
+    for (unsigned int lvl = 0; lvl < n_global_levels - 1; ++lvl)
+      for (const auto &cell : tria.cell_iterators_on_level(lvl))
+        if (cell->is_locally_owned_on_level() && cell->has_children())
+          for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell;
+               ++i)
+            {
+              const auto level_subdomain_id =
+                cell->child(i)->level_subdomain_id();
+              if (level_subdomain_id == my_rank)
+                ++cells[lvl + 1].first;
+              else if (level_subdomain_id != numbers::invalid_unsigned_int)
+                ++cells[lvl + 1].second;
+              else
+                AssertThrow(false, ExcNotImplemented());
+            }
+
+    return cells;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
+  local_vertical_communication_cost(
+    const std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+      &trias)
+  {
+    const unsigned int n_global_levels = trias.size();
+
+    std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
+      cells(n_global_levels);
+
+    const MPI_Comm communicator = trias.back()->get_communicator();
+
+    const unsigned int my_rank = Utilities::MPI::this_mpi_process(communicator);
+
+    for (unsigned int lvl = 0; lvl < n_global_levels - 1; ++lvl)
       {
-        Assert(
-          tr->is_multilevel_hierarchy_constructed(),
-          ExcMessage(
-            "We can only compute the workload imbalance if the multilevel hierarchy has been constructed!"));
+        const auto &tria_coarse = *trias[lvl];
+        const auto &tria_fine   = *trias[lvl + 1];
 
-        const unsigned int n_proc =
-          Utilities::MPI::n_mpi_processes(tr->get_communicator());
-        const unsigned int n_global_levels = tr->n_global_levels();
+        const unsigned int n_coarse_cells  = tria_fine.n_global_coarse_cells();
+        const unsigned int n_global_levels = tria_fine.n_global_levels();
 
-        // This value will represent the sum over the multigrid
-        // levels of the maximum number of cells owned by any
-        // one processesor on that level.
-        types::global_dof_index work_estimate = 0;
+        const dealii::internal::CellIDTranslator<dim> cell_id_translator(
+          n_coarse_cells, n_global_levels);
 
-        // Sum of all cells in the multigrid hierarchy
-        types::global_dof_index total_cells_in_hierarchy = 0;
+        IndexSet is_fine_owned(cell_id_translator.size());
+        IndexSet is_fine_required(cell_id_translator.size());
 
-        for (int lvl = n_global_levels - 1; lvl >= 0; --lvl)
-          {
-            // Number of cells this processor owns on this level
-            types::global_dof_index n_owned_cells_on_lvl = 0;
+        for (const auto &cell : tria_fine.active_cell_iterators())
+          if (!cell->is_artificial() && cell->is_locally_owned())
+            is_fine_owned.add_index(cell_id_translator.translate(cell));
 
-            for (const auto &cell : tr->cell_iterators_on_level(lvl))
-              if (cell->is_locally_owned_on_level())
-                ++n_owned_cells_on_lvl;
+        for (const auto &cell : tria_coarse.active_cell_iterators())
+          if (!cell->is_artificial() && cell->is_locally_owned())
+            {
+              if (cell->level() + 1u == tria_fine.n_global_levels())
+                continue;
 
-            work_estimate +=
-              dealii::Utilities::MPI::max(n_owned_cells_on_lvl,
-                                          tr->get_communicator());
+              for (unsigned int i = 0;
+                   i < GeometryInfo<dim>::max_children_per_cell;
+                   ++i)
+                is_fine_required.add_index(
+                  cell_id_translator.translate(cell, i));
+            }
 
-            total_cells_in_hierarchy +=
-              dealii::Utilities::MPI::sum(n_owned_cells_on_lvl,
-                                          tr->get_communicator());
-          }
+        std::vector<unsigned int> is_fine_required_ranks(
+          is_fine_required.n_elements());
 
-        const double ideal_work =
-          total_cells_in_hierarchy / static_cast<double>(n_proc);
-        workload_imbalance = work_estimate / ideal_work;
+        Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
+          process(is_fine_owned,
+                  is_fine_required,
+                  communicator,
+                  is_fine_required_ranks,
+                  false);
+
+        Utilities::MPI::ConsensusAlgorithms::Selector<
+          std::pair<types::global_cell_index, types::global_cell_index>,
+          unsigned int>
+          consensus_algorithm;
+        consensus_algorithm.run(process, communicator);
+
+        for (unsigned i = 0; i < is_fine_required.n_elements(); ++i)
+          if (is_fine_required_ranks[i] == my_rank)
+            ++cells[lvl + 1].first;
+          else if (is_fine_required_ranks[i] != numbers::invalid_unsigned_int)
+            ++cells[lvl + 1].second;
       }
 
-    return workload_imbalance;
+    return cells;
   }
+
+
+
+  template <int dim, int spacedim>
+  double
+  vertical_communication_efficiency(const Triangulation<dim, spacedim> &tria)
+  {
+    return internal::vertical_communication_efficiency(
+      local_vertical_communication_cost(tria), tria.get_communicator());
+  }
+
+
+
+  template <int dim, int spacedim>
+  double
+  vertical_communication_efficiency(
+    const std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
+      &trias)
+  {
+    return internal::vertical_communication_efficiency(
+      local_vertical_communication_cost(trias),
+      trias.back()->get_communicator());
+  }
+
 } // namespace MGTools
 
 
