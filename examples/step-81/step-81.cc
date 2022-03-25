@@ -19,8 +19,8 @@
 
 // @sect3{Include files}
 
-// The set of include files is quite standard. The most notable incluse is
-// the fe/fe_nedelec_sz.h file that allows us to use the FE_NedelecSZ elements.
+// The set of include files is quite standard. The most notable include is
+// the fe/fe_nedelec_sz.h file which allows us to use the FE_NedelecSZ elements.
 // This is an implementation of the $H^{curl}$ conforming Nédélec Elements
 // that resolves the sign conflict issues that arise from parametrization.
 
@@ -84,12 +84,12 @@ namespace Step81
   // More explanation on the use and inheritance from the ParameterAcceptor
   // can be found in step-60.
 
-  // epsilon is the Electric Permitivitty coefficient and it is a rank 2 tensor.
+  // epsilon is the Electric Permittivity coefficient and it is a rank 2 tensor.
   // Depending on the material, we assign the i^th diagonal element of the
   // tensor to the material epsilon value (one of the private epsilon_1_ or
   // epsilon_2_ variables).
   //
-  // mu_inv  is the inverese of the Magnetic Permiabillity coefficient and it is
+  // mu_inv  is the inverse of the Magnetic Permiability coefficient and it is
   // a complex number.
 
   // sigma is the Surface Conductivity coefficient between material left and
@@ -375,7 +375,7 @@ namespace Step81
   // At this point we are ready to instantiate all the major functions of
   // the finite element program and also a list of variables. Most of these
   // an exact copy of the functions in the tutorial programs. In addition,
-  // we instatiate the parameters and the perfectly matched layer. The
+  // we instantiate the parameters and the perfectly matched layer. The
   // default values of these parameters are set to show us a standing wave
   // with absorbing boundary conditions and a PML.
 
@@ -419,7 +419,7 @@ namespace Step81
 
   // @sect4{The Constructor}
   // The Constructor simply consists specifications for the mesh
-  // and the order of the fnite elements. These are editable through
+  // and the order of the finite elements. These are editable through
   // the .prm file. The absorbing_boundary boolean can be modified to
   // remove the absorbing boundary conditions (in which case our boundary
   // would be perfectly conducting).
@@ -601,7 +601,7 @@ namespace Step81
     // \f}
     // In doing so, we need test functions $\phi_i$ and $\phi_j$, and the curl
     // of these test variables. We must be careful with the signs of the
-    // imaginary parts of these comples test variables. Moreover, we have a
+    // imaginary parts of these complex test variables. Moreover, we have a
     // conditional that changes the parameters if the cell is in the PML region.
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
