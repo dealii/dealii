@@ -42,17 +42,15 @@ is described by
 <a href="https://en.wikipedia.org/wiki/Maxwell%27s_equations">Maxwell's
 equations</a>
 @cite Schwartz1972, @cite Monk2003 :
-@f[
-\begin{cases}
-\frac{\partial}{\partial t} \mathbf{H} + \nabla \times \mathbf{E} = -\mathbf{M}_a,
-\\
-\nabla \cdot \mathbf{H} = \rho,
-\\
-\frac{\partial}{\partial t} (\varepsilon\mathbf{E}) - \nabla\times(\mu^{-1}\mathbf{H}) = - \mathbf{J}_a,
-\\
-\nabla\cdot(\varepsilon\mathbf{E}) = \rho_m,
-\end{cases}
-@f]
+@f{align*}
+  \frac{\partial}{\partial t} \mathbf{H} + \nabla \times \mathbf{E} &= -\mathbf{M}_a,
+  \\
+  \nabla \cdot \mathbf{H} &= \rho,
+  \\
+  \frac{\partial}{\partial t} (\varepsilon\mathbf{E}) - \nabla\times(\mu^{-1}\mathbf{H}) &= - \mathbf{J}_a,
+  \\
+  \nabla\cdot(\varepsilon\mathbf{E}) &= \rho_m,
+@f}
 in which $\nabla\times$ is the curl operator, $\nabla\cdot$ is the divergence operator,
 $\varepsilon$ is the
 <a href="https://en.wikipedia.org/wiki/Permittivity">electric permittivity</a>,
@@ -84,18 +82,19 @@ $\tilde{\mathbf{F}}(\mathbf{x})$ is a corresponding complex-valued vector
 field (or density). Inserting this ansatz into Maxwell's equations,
 substituting the charge conservation equations and some minor algebra then
 yields the so-called <em>time-harmonic</em> Maxwell's equations:
-@f[
-\begin{cases}
--i\omega \tilde{\mathbf{H}} + \nabla \times \tilde{\mathbf{E}} =
--\tilde{\mathbf{M}}_a,\\
-\nabla \cdot \tilde{\mathbf{H}} = \frac{1}{i\omega}\nabla \cdot
-\tilde{\mathbf{M}}_a,\\
-i\omega\varepsilon\tilde{\mathbf{E}} +
-\nabla\times(\mu^{-1}\tilde{\mathbf{H}}) = \tilde{\mathbf{J}}_a,\\
-\nabla\cdot(\varepsilon\tilde{\mathbf{E}}) =
-\frac{1}{i\omega}\nabla\cdot\tilde{\mathbf{J}}_a.
-\end{cases}
-@f]
+@f{align*}
+  -i\omega \tilde{\mathbf{H}} + \nabla \times \tilde{\mathbf{E}} &=
+  -\tilde{\mathbf{M}}_a,
+  \\
+  \nabla \cdot \tilde{\mathbf{H}} &= \frac{1}{i\omega}\nabla \cdot
+  \tilde{\mathbf{M}}_a,
+  \\
+  i\omega\varepsilon\tilde{\mathbf{E}} +
+  \nabla\times(\mu^{-1}\tilde{\mathbf{H}}) &= \tilde{\mathbf{J}}_a,
+  \\
+  \nabla\cdot(\varepsilon\tilde{\mathbf{E}}) &=
+  \frac{1}{i\omega}\nabla\cdot\tilde{\mathbf{J}}_a.
+@f}
 
 For the sake of better readability we will now drop the tilde and simply
 write $\mathbf{E}(\mathbf{x})$, $\mathbf{H}(\mathbf{x})$, etc., when
@@ -139,14 +138,13 @@ law</a>:
 and then taking the limit of the upper and lower part of the line integral
 approaching the sheet. In contrast, the tangential part of the electric
 field is continuous. By fixing a unit normal $\mathbf{\nu}$ on the hypersurface
-$\Sigma$ both jump conditions read,
-@f[
-\begin{cases}
+$\Sigma$ both jump conditions are
+@f{align*}
 \mathbf{\nu} \times \left[(\mu^{-1}\mathbf{H})^+ - (\mu^{-1}\mathbf{H})^-\right]|_{\Sigma}
-= \sigma^{\Sigma}\left[(\mathbf{\nu}\times \mathbf{E}\times \mathbf{\nu})\right]|_{\Sigma},\\
-\mathbf{\nu} \times \left[\mathbf{E}^+ - \mathbf{E}^-\right]|_{\Sigma} = 0.
-\end{cases}
-@f]
+&= \sigma^{\Sigma}\left[(\mathbf{\nu}\times \mathbf{E}\times \mathbf{\nu})\right]|_{\Sigma},
+\\
+\mathbf{\nu} \times \left[\mathbf{E}^+ - \mathbf{E}^-\right]|_{\Sigma} &= 0.
+@f}
 The notation $\mathbf{F}^\pm$ indicates the limit values of the field
 when approaching the interface from above or below the interface:
 $\mathbf{F}^\pm(\mathbf{x})=\lim_{\delta\to0,\delta>0}\mathbf{F}(\mathbf{x}\pm\delta\mathbf{\nu})$.
@@ -198,18 +196,19 @@ Finally, the interface conductivity is rescaled as
 @f]
 
 Accordingly, our rescaled equations are
-@f[
-\begin{cases}
--i\mu_r \hat{\mathbf{H}} + \hat{\nabla} \times \hat{\mathbf{E}}
-= -\hat{\mathbf{M}}_a,\\
-\hat{\nabla} \cdot (\mu_r\hat{\mathbf{H}}) = \frac{1}{i}\hat{\nabla}
-\cdot \hat{\mathbf{M}}_a,\\
-i\varepsilon_r\hat{\mathbf{E}} + \nabla\times(\mu^{-1}\mathbf{H})
-= \mathbf{J}_a,\\
-\nabla\cdot(\varepsilon\mathbf{E}) = \frac{1}{i\omega}\hat{\nabla}
-\cdot\hat{\mathbf{J}}_a.
-\end{cases}
-@f]
+@f{align*}
+  -i\mu_r \hat{\mathbf{H}} + \hat{\nabla} \times \hat{\mathbf{E}}
+  &= -\hat{\mathbf{M}}_a,
+  \\
+  \hat{\nabla} \cdot (\mu_r\hat{\mathbf{H}}) &= \frac{1}{i}\hat{\nabla}
+  \cdot \hat{\mathbf{M}}_a,
+  \\
+  i\varepsilon_r\hat{\mathbf{E}} + \nabla\times(\mu^{-1}\mathbf{H})
+  &= \mathbf{J}_a,
+  \\
+  \nabla\cdot(\varepsilon\mathbf{E}) &= \frac{1}{i\omega}\hat{\nabla}
+  \cdot\hat{\mathbf{J}}_a.
+@f}
 
 We will omit the hat in further discussion for ease of notation.
 
@@ -314,11 +313,13 @@ F(\varphi) \dealcoloneq i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
 @f]
 
 Then, our rescaled weak formulation is:
-<p style="text-align:center">
-Find a unique $\mathbf{E} \in X(\Omega)$ such that, for all $\varphi \in X(\Omega)$,
-</p>
+
 @f[
-A(\mathbf{E},\varphi) = F(\varphi).
+  \text{Find a unique } \mathbf{E} \in X(\Omega) \text{ such that, for all } \varphi \in X(\Omega),
+@f]
+
+@f[
+  A(\mathbf{E},\varphi) = F(\varphi).
 @f]
 
 
@@ -368,8 +369,11 @@ F_i = i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi_i}\;\text{d}x
 @f]
 
 Then under the assumption of a sufficiently refined initial mesh
-the discretized variational problem is: Find a $\varphi_j \in X_h(\Omega)$ such
-that for all $\varphi_i \in X_h(\Omega)$:
+the discretized variational problem is:
+
+@f[
+  \text{Find a unique } \varphi_j \in X_h(\Omega) \text{ such that, for all } \varphi_i \in X_h(\Omega),
+@f]
 @f[
 A_{ij} = F_i
 @f]
@@ -407,36 +411,40 @@ x\;\;\;\;\;\;\;\;\;\text{otherwise}
 \end{cases}
 @f]
 
-where $r = e_r \cdot x$ and $s(\tau)$ is an appropriately chosen, nonnegative
-scaling function.<br />
+in which $r = e_r \cdot x$ and $s(\tau)$ is an appropriately chosen, nonnegative
+scaling function.
 
 We introduce the following $2\times2$ matrices
-@f[
-A = T_{e_xe_r}^{-1} \text{diag}\left(\frac{1}{\bar{d}^2},
-\frac{1}{d\bar{d}}\right)T_{e_xe_r},\qquad
-B = T_{e_xe_r}^{-1} \text{diag}\left(d,\bar{d}\right)T_{e_xe_r},\qquad
-C = T_{e_xe_r}^{-1} \text{diag}\left(\frac{1}{\bar{d}},\frac{1}{d}\right)
-T_{e_xe_r}.\qquad
-@f]
+@f{align*}
+  A &= T_{e_xe_r}^{-1} \text{diag}\left(\frac{1}{\bar{d}^2},
+       \frac{1}{d\bar{d}}\right)T_{e_xe_r}
+       \\
+  B &= T_{e_xe_r}^{-1} \text{diag}\left(d,\bar{d}\right)T_{e_xe_r}
+       \\
+  C &= T_{e_xe_r}^{-1} \text{diag}\left(\frac{1}{\bar{d}},\frac{1}{d}\right)
+       T_{e_xe_r}
+@f}
 
-where
+in which
 
-@f[
-d = 1 + is(r),\qquad
-\bar{d} = 1 + i/r \int\limits_{\rho}^{r}s(\tau)\text{d}\tau.
-@f]
+@f{align*}
+  d       &= 1 + is(r) \\
+  \bar{d} &= 1 + i/r \int\limits_{\rho}^{r}s(\tau)\text{d}\tau
+@f}
 
-and $T_{e_xe_r}$ is the rotation matrix that rotates $e_r$ onto $e_x$.<br />
+and $T_{e_xe_r}$ is the rotation matrix which rotates $e_r$ onto $e_x$.
+Thus, after applying the rescaling, we get the following modified parameters
+@f{align*}
+  \bar{\mu}_r^{-1}        &= \frac{\mu_r^{-1}}{d},
+  \\
+  \bar{\varepsilon}_r     &= A^{-1} \varepsilon_r B^{-1}, \text{ and }
+  \\
+  \bar{\sigma}^{\Sigma}_r &= C^{-1} \sigma^{\Sigma}_r B^{-1}.
+@f}
 
-Thus, after applying the rescaling we get the following modified parameters
-@f[
-\bar{\mu}_r^{-1} = \frac{\mu_r^{-1}}{d},\qquad
-\bar{\varepsilon}_r = A^{-1} \varepsilon_r B^{-1},\qquad
-\bar{\sigma}^{\Sigma}_r = C^{-1} \sigma^{\Sigma}_r B^{-1}.
-@f]
-
-These PML transformations are implement in our PMLParameters class. After the PML
+These PML transformations are implemented in our <tt>PerfectlyPatchedLayer</tt>
+class. After the PML
 is implemented, the electromagnetic wave essentially decays exponentially within
 the PML region near the boundary, therefore reducing reflection from the boundary
 of our finite domain. The decay function also depends on the strength of our PML,
-which can be adjusted to see more or less visible decaying in the PML region.<br />
+which can be adjusted to see more or less visible decaying in the PML region.
