@@ -155,19 +155,20 @@ $\mathbf{F}^\pm(\mathbf{x})=\lim_{\delta\to0,\delta>0}\mathbf{F}(\mathbf{x}\pm\d
 <h4> Rescaling </h4>
 
 We will be using a rescaled version of the Maxwell's equations described above.
-The rescaling has the following key differences:<br />
-1. Every length is rescaled by the free-space wavelength $2\pi k^{-1}
+The rescaling has the following key differences:
+<ol>
+<li>Every length is rescaled by the free-space wavelength $2\pi k^{-1}
 \dealcoloneq 2\pi(\omega\sqrt{\varepsilon_0\mu_0})^{-1}$, in which $\varepsilon_0$ and $\mu_0$
-denote the vacuum dielectric permittivity and magnetic permeability, respectively.
-<br />
-2. $\mathbf{E}$, $\mathbf{H}$, $\mathbf{J}_a$, $\mathbf{M}_a$ are all rescaled by
+denote the vacuum dielectric permittivity and magnetic permeability, respectively.</li>
+<li>$\mathbf{E}$, $\mathbf{H}$, $\mathbf{J}_a$, $\mathbf{M}_a$ are all rescaled by
 typical electric current strength $J_0$, i.e., the strength of the
 prescribed dipole source at location $a$ in the $e_i$ direction in Cartesian
 coordinates.
 @f[
 \mathbf{J}_a = J_0 e_i\delta(x-a)
 @f]
-<br />
+  </li>
+</ol>
 
 Accordingly, our electric permittivity and magnetic permeability are rescaled by
 $\varepsilon_0$ and $\mu_0$ as
@@ -218,7 +219,7 @@ Let $\Omega \subset \mathbb{R}^n$, $(n = 2,3)$ be a simply connected and bounded
 domain with Lipschitz-continuous and piecewise smooth boundary, $\partial\Omega$.
 Let $\Sigma$ be an oriented, Lipschitz-continuous, piecewise smooth hypersurface.
 Fix a normal field $\nu$ on $\Sigma$ and let $n$ denote the outer normal vector
-on $\partial\Omega$.<br />
+on $\partial\Omega$.
 
 In order to arrive at the variational form, we will substitute for $\mathbf{H}$ in
 the first equation and obtain
@@ -258,7 +259,7 @@ the Silver-Müller radiation condition, truncated at $\partial\Omega$.
 @f]
 We assume that $\mu_r^{-1}$ and $\varepsilon$ have well-defined square roots. In
 our numerical computation, we combine the above absorbing boundary condition
-with a PML. <br />
+with a PML.
 
 The jump condition can be expressed as a weak discontinuity as follows:
 @f[
@@ -284,7 +285,7 @@ and symmetric, and has a semidefinite real and complex part. Let $\varepsilon_r$
 be a smooth scalar function with $–\text{Im}(\varepsilon_r) = 0$, or
 $\text{Im}(\varepsilon_r)\ge c > 0$ in $\Omega$. $\mu_r^{-1}$ is a smooth scalar
 such that $\sqrt{\mu_r^{-1}\varepsilon_r}$ is real valued and strictly positive
-in $\partial\Omega$. <br />
+in $\partial\Omega$.
 
 $\mathbf{H}(curl;\Omega)$ is space of vector-valued, measurable and square
 integrable functions whose weak curl admits a representation by a
@@ -312,8 +313,10 @@ F(\varphi) \dealcoloneq i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
 - \int_\Omega \mu_r^{-1}\mathbf{M}_a \cdot (\nabla \times \bar{\varphi})\;\text{d}x.
 @f]
 
-Then, our rescaled weak formulation is:<br />
+Then, our rescaled weak formulation is:
+<p style="text-align:center">
 Find a unique $\mathbf{E} \in X(\Omega)$ such that, for all $\varphi \in X(\Omega)$,
+</p>
 @f[
 A(\mathbf{E},\varphi) = F(\varphi).
 @f]
@@ -371,25 +374,25 @@ that for all $\varphi_i \in X_h(\Omega)$:
 A_{ij} = F_i
 @f]
 
-<h3> Perfectly Matched Layer </h3>
+<h3>Perfectly Matched Layer</h3>
 The SPP amplitude is negatively effected by the absorbing boundary condition and
 this causes the solution image to be distorted. In order to reduce the resonance
 and distortion in our solutions, we are implementing a Perfectly Matched Layer
-(PML) in the scattering configuration. <br />
+(PML) in the scattering configuration.
 
 The concept of a PML was pioneered by Bérenger and it is is an indispensable tool
 for truncating unbounded domains for wave equations and often used in the
 numerical approximation of scattering problems. It is essentially a thin layer with
 modified material parameters placed near the boundary such that all outgoing
 electromagnetic waves decay exponentially with no “artificial” reflection due to
-truncation of the domain. <br />
+truncation of the domain.
 
 Our PML is essentially a concentric circle with modified material coefficients
 ($\varepsilon_r, \mu_r, \sigma$). It is located in a small region near the boundary
 $\partial\Omega$ and the transformation of the material coordinates is chosen to
 be a function of the radial distance $\rho$ from the origin $e_r$. The normal field
 $\nu$ of $\Sigma$ is orthogonal to the radial direction $e_r$, which makes
-$\mathbf{J}_a \equiv 0$ and $\mathbf{M}_a \equiv 0$ within the PML. <br />
+$\mathbf{J}_a \equiv 0$ and $\mathbf{M}_a \equiv 0$ within the PML.
 
 <p align="center">
   <img src = "https://www.dealii.org/images/steps/developer/step-81-PML.png">
