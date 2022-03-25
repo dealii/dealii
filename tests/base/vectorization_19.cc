@@ -27,7 +27,7 @@ template <typename Number1,
           typename Number2,
           std::size_t width2>
 using product_t = typename internal::
-  VectorizationProductType<Number1, width1, Number2, width2>::type;
+  VectorizationProductTypeImpl<Number1, width1, Number2, width2>::type;
 
 
 // Test 1: LHS = VectorizedArray; RHS = Scalar type
