@@ -6146,29 +6146,26 @@ namespace std
    * @relatesalso VectorizedArray
    */
   template <
-    typename Number,
+    typename Number1,
     typename Number2,
     std::size_t width,
     typename = typename std::enable_if<
       std::is_same<Number2,
                    typename ::dealii::EnableIfScalar<Number2>::type>::value &&
-      !std::is_same<Number, Number2>::value>::type>
-  inline ::dealii::VectorizedArray<
-    typename ::dealii::ProductType<Number, Number2>::type,
-    width>
-  pow(const ::dealii::VectorizedArray<Number, width> &x, const Number2 p)
+      !std::is_same<Number1, Number2>::value>::type>
+  inline auto
+  pow(const ::dealii::VectorizedArray<Number1, width> &x, const Number2 p)
   {
-    using ResultScalar_t =
-      typename ::dealii::ProductType<Number, Number2>::type;
-    static_assert(::dealii::VectorizedArray<Number, width>::size() <=
-                    ::dealii::VectorizedArray<ResultScalar_t, width>::size(),
-                  "VectorizedArray sizes do not match for mixed types.");
+    using VPT = ::dealii::internal::VectorizationProductType<
+      ::dealii::VectorizedArray<Number1, width>,
+      Number2>;
 
-    ResultScalar_t values[::dealii::VectorizedArray<Number, width>::size()];
-    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+    typename VPT::scalar_t values[VPT::width];
+    for (unsigned int i = 0;
+         i < ::dealii::VectorizedArray<Number1, width>::size();
          ++i)
       values[i] = std::pow(x[i], p);
-    ::dealii::VectorizedArray<ResultScalar_t, width> out;
+    typename VPT::type out;
     out.load(&values[0]);
     return out;
   }
@@ -6184,27 +6181,33 @@ namespace std
    *
    * @relatesalso VectorizedArray
    */
-  template <typename Number, typename Number2, std::size_t width>
-  inline ::dealii::VectorizedArray<
-    typename ::dealii::ProductType<Number, Number2>::type,
-    width>
-  pow(const ::dealii::VectorizedArray<Number, width> & x,
-      const ::dealii::VectorizedArray<Number2, width> &p)
+  template <typename Number1,
+            std::size_t width1,
+            typename Number2,
+            std::size_t width2>
+  inline auto
+  pow(const ::dealii::VectorizedArray<Number1, width1> &x,
+      const ::dealii::VectorizedArray<Number2, width2> &p)
   {
-    using ResultScalar_t =
-      typename ::dealii::ProductType<Number, Number2>::type;
-    static_assert(::dealii::VectorizedArray<Number, width>::size() ==
-                    ::dealii::VectorizedArray<Number2, width>::size(),
-                  "VectorizedArray sizes do not match for mixed types.");
-    static_assert(::dealii::VectorizedArray<Number, width>::size() <=
-                    ::dealii::VectorizedArray<ResultScalar_t, width>::size(),
-                  "VectorizedArray sizes do not match for mixed types.");
+    using VPT = ::dealii::internal::VectorizationProductType<
+      ::dealii::VectorizedArray<Number1, width1>,
+      ::dealii::VectorizedArray<Number2, width2>>;
 
-    ResultScalar_t values[::dealii::VectorizedArray<Number, width>::size()];
-    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
-         ++i)
+    static_assert(::dealii::VectorizedArray<Number1, width1>::size() <=
+                    VPT::width,
+                  "VectorizedArray sizes are incompatible for mixed types.");
+    static_assert(::dealii::VectorizedArray<Number2, width2>::size() <=
+                    VPT::width,
+                  "VectorizedArray sizes are incompatible for mixed types.");
+
+    constexpr const std::size_t loop_width =
+      std::min(::dealii::VectorizedArray<Number1, width1>::size(),
+               ::dealii::VectorizedArray<Number2, width2>::size());
+
+    typename VPT::scalar_t values[VPT::width];
+    for (unsigned int i = 0; i < loop_width; ++i)
       values[i] = std::pow(x[i], p[i]);
-    ::dealii::VectorizedArray<ResultScalar_t, width> out;
+    typename VPT::type out;
     out.load(&values[0]);
     return out;
   }
