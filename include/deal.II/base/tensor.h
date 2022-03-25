@@ -1332,7 +1332,7 @@ constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
 Tensor<rank_, dim, Number>::Tensor(
   const ArrayView<ElementType, MemorySpace> &initializer)
 {
-  //AssertDimension(initializer.size(), n_independent_components);
+  // AssertDimension(initializer.size(), n_independent_components);
 
   for (unsigned int i = 0; i < n_independent_components; ++i)
     (*this)[unrolled_to_component_indices(i)] = initializer[i];

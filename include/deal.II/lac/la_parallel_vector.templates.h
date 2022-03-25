@@ -438,32 +438,32 @@ namespace LinearAlgebra
 
           if (new_alloc_size > allocated_size)
             {
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
               Assert(((allocated_size > 0 && data.data() != nullptr) ||
                       data.data() == nullptr),
                      ExcInternalError());
-#else
-	             Assert(((allocated_size > 0 && data.values_dev != nullptr) ||
+#  else
+              Assert(((allocated_size > 0 && data.values_dev != nullptr) ||
                       data.values_dev == nullptr),
-                    ExcInternalError());
-#endif
+                     ExcInternalError());
+#  endif
 
               Number *new_val_dev;
               Utilities::CUDA::malloc(new_val_dev, new_alloc_size);
-#ifndef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifndef DEAL_II_WITH_KOKKOS_BACKEND
               data.values_dev.reset(new_val_dev);
-#else
+#  else
               Kokkos::resize(data.values, new_alloc_size);
-#endif
+#  endif
               allocated_size = new_alloc_size;
             }
           else if (new_alloc_size == 0)
             {
-#ifndef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifndef DEAL_II_WITH_KOKKOS_BACKEND
               data.values_dev.reset();
-#else
+#  else
               Kokkos::resize(data.values, 0);
-#endif
+#  endif
               allocated_size = 0;
             }
         }
@@ -570,19 +570,19 @@ namespace LinearAlgebra
 
           const int n_blocks = 1 + size / (::dealii::CUDAWrappers::chunk_size *
                                            ::dealii::CUDAWrappers::block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
             Number,
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::LInfty<Number>>
             <<<dim3(n_blocks, 1), dim3(::dealii::CUDAWrappers::block_size)>>>(
               result_device, data.data(), size);
-#else
-	           ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
+#  else
+          ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
             Number,
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::LInfty<Number>>
             <<<dim3(n_blocks, 1), dim3(::dealii::CUDAWrappers::block_size)>>>(
               result_device, data.values_dev.get(), size);
-#endif
+#  endif
 
           // Copy the result back to the host
           error_code = cudaMemcpy(&result,

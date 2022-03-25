@@ -2033,17 +2033,17 @@ namespace internal
       {
         if (operation == VectorOperation::insert)
           {
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
             cudaError_t cuda_error_code = cudaMemcpy(data.data(),
                                                      v_data.data(),
                                                      size * sizeof(Number),
                                                      cudaMemcpyDeviceToHost);
-#else
-	     cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
+#  else
+            cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
                                                      v_data.values_dev.get(),
                                                      size * sizeof(Number),
                                                      cudaMemcpyDeviceToHost);
-#endif
+#  endif
             AssertCuda(cuda_error_code);
           }
         else
@@ -2075,17 +2075,17 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-#ifndef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifndef DEAL_II_WITH_KOKKOS_BACKEND
         cudaError_t cuda_error_code = cudaMemcpy(data.values_dev.get(),
                                                  v_data.values_dev.get(),
                                                  size * sizeof(Number),
                                                  cudaMemcpyDeviceToDevice);
-#else
-	 cudaError_t cuda_error_code = cudaMemcpy(data.data(),
+#  else
+        cudaError_t cuda_error_code = cudaMemcpy(data.data(),
                                                  v_data.data(),
                                                  size * sizeof(Number),
                                                  cudaMemcpyDeviceToDevice);
-#endif
+#  endif
         AssertCuda(cuda_error_code);
       }
 
@@ -2098,13 +2098,13 @@ namespace internal
             &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::set<Number>
           <<<n_blocks, block_size>>>(data.data(), s, size);
-#else
-	::dealii::LinearAlgebra::CUDAWrappers::kernel::set<Number>
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::set<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), s, size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2119,19 +2119,16 @@ namespace internal
           &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
-          <<<n_blocks, block_size>>>(data.data(),
-                                     1.,
-                                     v_data.data(),
-                                     size);
-#else
-	::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
+          <<<n_blocks, block_size>>>(data.data(), 1., v_data.data(), size);
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(),
                                      1.,
                                      v_data.values_dev.get(),
                                      size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2146,19 +2143,16 @@ namespace internal
           &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
-          <<<n_blocks, block_size>>>(data.data(),
-                                     -1.,
-                                     v_data.data(),
-                                     size);
-#else
-	 ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
+          <<<n_blocks, block_size>>>(data.data(), -1., v_data.data(), size);
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(),
                                      -1.,
                                      v_data.values_dev.get(),
                                      size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2172,13 +2166,13 @@ namespace internal
           &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_add<Number>
           <<<n_blocks, block_size>>>(data.data(), a, size);
-#else
-	::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_add<Number>
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_add<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), a, size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2194,19 +2188,16 @@ namespace internal
           &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
-          <<<n_blocks, block_size>>>(data.data(),
-                                     a,
-                                     v_data.data(),
-                                     size);
-#else
-	       ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
+          <<<n_blocks, block_size>>>(data.data(), a, v_data.data(), size);
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(),
                                      a,
                                      v_data.values_dev.get(),
                                      size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2225,23 +2216,19 @@ namespace internal
           &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aVbW<Number>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.data(),
-                                                    a,
-                                                    v_data.data(),
-                                                    b,
-                                                    w_data.data(),
-                                                    size);
-#else
-	::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aVbW<Number>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(
+            data.data(), a, v_data.data(), b, w_data.data(), size);
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aVbW<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
                                                     a,
                                                     v_data.values_dev.get(),
                                                     b,
                                                     w_data.values_dev.get(),
                                                     size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2257,15 +2244,15 @@ namespace internal
           &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.data(), 1., v_data.data(), size);
-#else
-	 ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.values_dev.get(), 1., v_data.values_dev.get(), size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2282,15 +2269,15 @@ namespace internal
           &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.data(), a, v_data.data(), size);
-#else
-	 ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.values_dev.get(), a, v_data.values_dev.get(), size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2331,13 +2318,13 @@ namespace internal
           &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifndef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifndef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_scale<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), factor, size);
-#else
-	::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_scale<Number>
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_scale<Number>
           <<<n_blocks, block_size>>>(data.data(), factor, size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2352,17 +2339,17 @@ namespace internal
           &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::scale<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.data(),
                                                     v_data.data(),
                                                     size);
-#else
-	 ::dealii::LinearAlgebra::CUDAWrappers::kernel::scale<Number>
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::scale<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
                                                     v_data.values_dev.get(),
                                                     size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2378,19 +2365,19 @@ namespace internal
           &data)
       {
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifndef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifndef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
                                                     a,
                                                     v_data.values_dev.get(),
                                                     size);
-#else
-	   ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.data(),
                                                     a,
                                                     v_data.data(),
                                                     size);
-#endif
+#  endif
         AssertCudaKernel();
       }
 
@@ -2435,7 +2422,7 @@ namespace internal
         AssertCuda(error_code);
 
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::double_vector_reduction<
           Number,
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::DotProduct<Number>>
@@ -2444,8 +2431,8 @@ namespace internal
                                                     v_data.data(),
                                                     static_cast<unsigned int>(
                                                       size));
-#else
-	  ::dealii::LinearAlgebra::CUDAWrappers::kernel::double_vector_reduction<
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::double_vector_reduction<
           Number,
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::DotProduct<Number>>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
@@ -2453,7 +2440,7 @@ namespace internal
                                                     v_data.values_dev.get(),
                                                     static_cast<unsigned int>(
                                                       size));
-#endif
+#  endif
         AssertCudaKernel();
 
         // Copy the result back to the host
@@ -2498,21 +2485,21 @@ namespace internal
         error_code = cudaMemset(result_device, 0, sizeof(Number));
 
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
           Number,
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::ElemSum<Number>>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
                                                     data.data(),
                                                     size);
-#else
-	::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
           Number,
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::ElemSum<Number>>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
                                                     data.values_dev.get(),
                                                     size);
-#endif
+#  endif
 
         // Copy the result back to the host
         Number result;
@@ -2544,21 +2531,21 @@ namespace internal
         error_code = cudaMemset(result_device, 0, sizeof(Number));
 
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
           Number,
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::L1Norm<Number>>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
                                                     data.data(),
                                                     size);
-#else
-	   ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
           Number,
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::L1Norm<Number>>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(result_device,
                                                     data.values_dev.get(),
                                                     size);
-#endif
+#  endif
 
         // Copy the result back to the host
         error_code = cudaMemcpy(&sum,
@@ -2604,23 +2591,19 @@ namespace internal
         AssertCuda(error_code);
 
         const int n_blocks = 1 + size / (chunk_size * block_size);
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_and_dot<Number>
-          <<<dim3(n_blocks, 1), dim3(block_size)>>>(res_d,
-                                                    data.data(),
-                                                    v_data.data(),
-                                                    w_data.data(),
-                                                    a,
-                                                    size);
-#else
-	        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_and_dot<Number>
+          <<<dim3(n_blocks, 1), dim3(block_size)>>>(
+            res_d, data.data(), v_data.data(), w_data.data(), a, size);
+#  else
+        ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_and_dot<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(res_d,
                                                     data.values_dev.get(),
                                                     v_data.values_dev.get(),
                                                     w_data.values_dev.get(),
                                                     a,
                                                     size);
-#endif
+#  endif
 
         Number res;
         error_code =
@@ -2679,17 +2662,17 @@ namespace internal
       {
         if (operation == VectorOperation::insert)
           {
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
             cudaError_t cuda_error_code = cudaMemcpy(data.data(),
                                                      v_data.data(),
                                                      size * sizeof(Number),
                                                      cudaMemcpyHostToDevice);
-#else
-	             cudaError_t cuda_error_code = cudaMemcpy(data.values_dev.get(),
+#  else
+            cudaError_t cuda_error_code = cudaMemcpy(data.values_dev.get(),
                                                      v_data.values.get(),
                                                      size * sizeof(Number),
                                                      cudaMemcpyHostToDevice);
-#endif
+#  endif
             AssertCuda(cuda_error_code);
           }
         else

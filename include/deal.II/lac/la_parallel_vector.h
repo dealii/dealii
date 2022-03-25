@@ -1491,7 +1491,7 @@ namespace LinearAlgebra
       };
 
 
-#ifndef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifndef DEAL_II_WITH_KOKKOS_BACKEND
       template <typename Number>
       struct Policy<Number, ::dealii::MemorySpace::CUDA>
       {
@@ -1518,7 +1518,7 @@ namespace LinearAlgebra
           return data.values_dev.get();
         }
       };
-#else
+#  else
       template <typename Number>
       struct Policy<Number, ::dealii::MemorySpace::CUDA>
       {
@@ -1545,7 +1545,7 @@ namespace LinearAlgebra
           return data.data();
         }
       };
-#endif
+#  endif
     } // namespace internal
 
 
