@@ -77,13 +77,6 @@ TensorFunctionParser<rank, dim, Number>::TensorFunctionParser(
 }
 
 
-// We deliberately delay the definition of the default destructor
-// so that we don't need to include the definition of mu::Parser
-// in the header file.
-template <int rank, int dim, typename Number>
-TensorFunctionParser<rank, dim, Number>::~TensorFunctionParser() = default;
-
-
 #ifdef DEAL_II_WITH_MUPARSER
 
 template <int rank, int dim, typename Number>
@@ -141,6 +134,37 @@ TensorFunctionParser<rank, dim, Number>::initialize(
 
 
 
+namespace internal
+{
+  namespace TensorFunctionParserImplementation
+  {
+    namespace
+    {
+      /**
+       * PIMPL for mu::Parser.
+       */
+      class Parser : public internal::muParserBase
+      {
+      public:
+        operator mu::Parser &()
+        {
+          return parser;
+        }
+
+        operator const mu::Parser &() const
+        {
+          return parser;
+        }
+
+      protected:
+        mu::Parser parser;
+      };
+    } // namespace
+  }   // namespace TensorFunctionParserImplementation
+} // namespace internal
+
+
+
 template <int rank, int dim, typename Number>
 void
 TensorFunctionParser<rank, dim, Number>::init_muparser() const
@@ -156,57 +180,38 @@ TensorFunctionParser<rank, dim, Number>::init_muparser() const
   vars.get().resize(var_names.size());
   for (unsigned int component = 0; component < this->n_components; ++component)
     {
-      tfp.get().emplace_back(new mu::Parser());
+      tfp.get().emplace_back(
+        std::make_unique<
+          internal::TensorFunctionParserImplementation::Parser>());
+      mu::Parser &parser =
+        dynamic_cast<internal::TensorFunctionParserImplementation::Parser &>(
+          *tfp.get().back());
 
       for (const auto &constant : constants)
         {
-          tfp.get()[component]->DefineConst(constant.first, constant.second);
+          parser.DefineConst(constant.first, constant.second);
         }
 
       for (unsigned int iv = 0; iv < var_names.size(); ++iv)
-        tfp.get()[component]->DefineVar(var_names[iv], &vars.get()[iv]);
+        parser.DefineVar(var_names[iv], &vars.get()[iv]);
 
       // define some compatibility functions:
-      tfp.get()[component]->DefineFun("if",
-                                      internal::FunctionParser::mu_if,
-                                      true);
-      tfp.get()[component]->DefineOprt("|", internal::FunctionParser::mu_or, 1);
-      tfp.get()[component]->DefineOprt("&",
-                                       internal::FunctionParser::mu_and,
-                                       2);
-      tfp.get()[component]->DefineFun("int",
-                                      internal::FunctionParser::mu_int,
-                                      true);
-      tfp.get()[component]->DefineFun("ceil",
-                                      internal::FunctionParser::mu_ceil,
-                                      true);
-      tfp.get()[component]->DefineFun("cot",
-                                      internal::FunctionParser::mu_cot,
-                                      true);
-      tfp.get()[component]->DefineFun("csc",
-                                      internal::FunctionParser::mu_csc,
-                                      true);
-      tfp.get()[component]->DefineFun("floor",
-                                      internal::FunctionParser::mu_floor,
-                                      true);
-      tfp.get()[component]->DefineFun("sec",
-                                      internal::FunctionParser::mu_sec,
-                                      true);
-      tfp.get()[component]->DefineFun("log",
-                                      internal::FunctionParser::mu_log,
-                                      true);
-      tfp.get()[component]->DefineFun("pow",
-                                      internal::FunctionParser::mu_pow,
-                                      true);
-      tfp.get()[component]->DefineFun("erfc",
-                                      internal::FunctionParser::mu_erfc,
-                                      true);
-      tfp.get()[component]->DefineFun("rand_seed",
-                                      internal::FunctionParser::mu_rand_seed,
-                                      true);
-      tfp.get()[component]->DefineFun("rand",
-                                      internal::FunctionParser::mu_rand,
-                                      true);
+      parser.DefineFun("if", internal::FunctionParser::mu_if, true);
+      parser.DefineOprt("|", internal::FunctionParser::mu_or, 1);
+      parser.DefineOprt("&", internal::FunctionParser::mu_and, 2);
+      parser.DefineFun("int", internal::FunctionParser::mu_int, true);
+      parser.DefineFun("ceil", internal::FunctionParser::mu_ceil, true);
+      parser.DefineFun("cot", internal::FunctionParser::mu_cot, true);
+      parser.DefineFun("csc", internal::FunctionParser::mu_csc, true);
+      parser.DefineFun("floor", internal::FunctionParser::mu_floor, true);
+      parser.DefineFun("sec", internal::FunctionParser::mu_sec, true);
+      parser.DefineFun("log", internal::FunctionParser::mu_log, true);
+      parser.DefineFun("pow", internal::FunctionParser::mu_pow, true);
+      parser.DefineFun("erfc", internal::FunctionParser::mu_erfc, true);
+      parser.DefineFun("rand_seed",
+                       internal::FunctionParser::mu_rand_seed,
+                       true);
+      parser.DefineFun("rand", internal::FunctionParser::mu_rand, true);
 
       try
         {
@@ -251,7 +256,7 @@ TensorFunctionParser<rank, dim, Number>::init_muparser() const
             }
 
           // now use the transformed expression
-          tfp.get()[component]->SetExpr(transformed_expression);
+          parser.SetExpr(transformed_expression);
         }
       catch (mu::ParserError &e)
         {
@@ -307,7 +312,14 @@ TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &p) const
       for (Number *value_ptr = value.begin_raw(); value_ptr != value.end_raw();
            ++value_ptr)
         {
-          *value_ptr = tfp.get()[component]->Eval();
+          Assert(dynamic_cast<
+                   internal::TensorFunctionParserImplementation::Parser *>(
+                   tfp.get()[component].get()),
+                 ExcInternalError());
+          mu::Parser &parser = static_cast< // NOLINT
+            internal::TensorFunctionParserImplementation::Parser &>(
+            *tfp.get()[component]);
+          *value_ptr = parser.Eval();
           ++component;
         } // for
     }     // try

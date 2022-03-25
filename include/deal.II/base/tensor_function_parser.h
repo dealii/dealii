@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/function_parser.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_function.h>
@@ -28,11 +29,6 @@
 #include <map>
 #include <memory>
 #include <vector>
-
-namespace mu
-{
-  class Parser;
-}
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -143,11 +139,6 @@ public:
    * consequently this constructor is deleted.
    */
   TensorFunctionParser(TensorFunctionParser &&) = delete;
-
-  /**
-   * Destructor.
-   */
-  virtual ~TensorFunctionParser() override;
 
   /**
    * Copy operator. Objects of this type can not be copied, and
@@ -278,11 +269,11 @@ private:
   mutable Threads::ThreadLocalStorage<std::vector<double>> vars;
 
   /**
-   * The muParser objects for each thread (and one for each component). We are
-   * storing a unique_ptr so that we don't need to include the definition of
-   * mu::Parser in this header.
+   * The muParser objects (hidden with the PIMPL idiom) for each thread (and one
+   * for each component).
    */
-  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser>>>
+  mutable Threads::ThreadLocalStorage<
+    std::vector<std::unique_ptr<internal::muParserBase>>>
     tfp;
 
   /**

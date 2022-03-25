@@ -78,15 +78,6 @@ FunctionParser<dim>::FunctionParser(const std::string &expression,
 }
 
 
-
-// Note: we explicitly define the destructor here (instead of silently using
-// the default destructor by declaring nothing in the header) since we do not
-// expect muParser.h to be available in user projects: i.e., the destructor
-// must be defined in the source file.
-template <int dim>
-FunctionParser<dim>::~FunctionParser() = default;
-
-
 #ifdef DEAL_II_WITH_MUPARSER
 
 template <int dim>
@@ -130,6 +121,34 @@ FunctionParser<dim>::initialize(const std::string &             variables,
   initialized = true;
 }
 
+namespace internal
+{
+  namespace FunctionParserImplementation
+  {
+    namespace
+    {
+      /**
+       * PIMPL for mu::Parser.
+       */
+      class Parser : public internal::muParserBase
+      {
+      public:
+        operator mu::Parser &()
+        {
+          return parser;
+        }
+
+        operator const mu::Parser &() const
+        {
+          return parser;
+        }
+
+      protected:
+        mu::Parser parser;
+      };
+    } // namespace
+  }   // namespace FunctionParserImplementation
+} // namespace internal
 
 
 template <int dim>
@@ -147,58 +166,38 @@ FunctionParser<dim>::init_muparser() const
   vars.get().resize(var_names.size());
   for (unsigned int component = 0; component < this->n_components; ++component)
     {
-      fp.get().emplace_back(new mu::Parser());
+      fp.get().emplace_back(
+        std::make_unique<internal::FunctionParserImplementation::Parser>());
+      mu::Parser &parser =
+        dynamic_cast<internal::FunctionParserImplementation::Parser &>(
+          *fp.get().back());
 
       for (const auto &constant : constants)
         {
-          fp.get()[component]->DefineConst(constant.first, constant.second);
+          parser.DefineConst(constant.first, constant.second);
         }
 
       for (unsigned int iv = 0; iv < var_names.size(); ++iv)
-        fp.get()[component]->DefineVar(var_names[iv], &vars.get()[iv]);
+        parser.DefineVar(var_names[iv], &vars.get()[iv]);
 
       // define some compatibility functions:
-      fp.get()[component]->DefineFun("if",
-                                     internal::FunctionParser::mu_if,
-                                     true);
-      fp.get()[component]->DefineOprt("|", internal::FunctionParser::mu_or, 1);
-      fp.get()[component]->DefineOprt("&", internal::FunctionParser::mu_and, 2);
-      fp.get()[component]->DefineFun("int",
-                                     internal::FunctionParser::mu_int,
-                                     true);
-      fp.get()[component]->DefineFun("ceil",
-                                     internal::FunctionParser::mu_ceil,
-                                     true);
-      fp.get()[component]->DefineFun("cot",
-                                     internal::FunctionParser::mu_cot,
-                                     true);
-      fp.get()[component]->DefineFun("csc",
-                                     internal::FunctionParser::mu_csc,
-                                     true);
-      fp.get()[component]->DefineFun("floor",
-                                     internal::FunctionParser::mu_floor,
-                                     true);
-      fp.get()[component]->DefineFun("sec",
-                                     internal::FunctionParser::mu_sec,
-                                     true);
-      fp.get()[component]->DefineFun("log",
-                                     internal::FunctionParser::mu_log,
-                                     true);
-      fp.get()[component]->DefineFun("pow",
-                                     internal::FunctionParser::mu_pow,
-                                     true);
-      fp.get()[component]->DefineFun("erf",
-                                     internal::FunctionParser::mu_erf,
-                                     true);
-      fp.get()[component]->DefineFun("erfc",
-                                     internal::FunctionParser::mu_erfc,
-                                     true);
-      fp.get()[component]->DefineFun("rand_seed",
-                                     internal::FunctionParser::mu_rand_seed,
-                                     true);
-      fp.get()[component]->DefineFun("rand",
-                                     internal::FunctionParser::mu_rand,
-                                     true);
+      parser.DefineFun("if", internal::FunctionParser::mu_if, true);
+      parser.DefineOprt("|", internal::FunctionParser::mu_or, 1);
+      parser.DefineOprt("&", internal::FunctionParser::mu_and, 2);
+      parser.DefineFun("int", internal::FunctionParser::mu_int, true);
+      parser.DefineFun("ceil", internal::FunctionParser::mu_ceil, true);
+      parser.DefineFun("cot", internal::FunctionParser::mu_cot, true);
+      parser.DefineFun("csc", internal::FunctionParser::mu_csc, true);
+      parser.DefineFun("floor", internal::FunctionParser::mu_floor, true);
+      parser.DefineFun("sec", internal::FunctionParser::mu_sec, true);
+      parser.DefineFun("log", internal::FunctionParser::mu_log, true);
+      parser.DefineFun("pow", internal::FunctionParser::mu_pow, true);
+      parser.DefineFun("erf", internal::FunctionParser::mu_erf, true);
+      parser.DefineFun("erfc", internal::FunctionParser::mu_erfc, true);
+      parser.DefineFun("rand_seed",
+                       internal::FunctionParser::mu_rand_seed,
+                       true);
+      parser.DefineFun("rand", internal::FunctionParser::mu_rand, true);
 
       try
         {
@@ -243,7 +242,7 @@ FunctionParser<dim>::init_muparser() const
             }
 
           // now use the transformed expression
-          fp.get()[component]->SetExpr(transformed_expression);
+          parser.SetExpr(transformed_expression);
         }
       catch (mu::ParserError &e)
         {
@@ -293,7 +292,16 @@ FunctionParser<dim>::value(const Point<dim> & p,
 
   try
     {
-      return fp.get()[component]->Eval();
+      Assert(dynamic_cast<internal::FunctionParserImplementation::Parser *>(
+               fp.get()[component].get()),
+             ExcInternalError());
+      // using dynamic_cast in the next line is about 6% slower than
+      // static_cast, so use the assertion above for debugging and disable
+      // clang-tidy:
+      mu::Parser &parser =
+        static_cast<internal::FunctionParserImplementation::Parser &>( // NOLINT
+          *fp.get()[component]);
+      return parser.Eval();
     }
   catch (mu::ParserError &e)
     {
@@ -329,7 +337,17 @@ FunctionParser<dim>::vector_value(const Point<dim> &p,
     vars.get()[dim] = this->get_time();
 
   for (unsigned int component = 0; component < this->n_components; ++component)
-    values(component) = fp.get()[component]->Eval();
+    {
+      // Same comment in value() applies here too:
+      Assert(dynamic_cast<internal::FunctionParserImplementation::Parser *>(
+               fp.get()[component].get()),
+             ExcInternalError());
+      mu::Parser &parser =
+        static_cast<internal::FunctionParserImplementation::Parser &>( // NOLINT
+          *fp.get()[component]);
+
+      values(component) = parser.Eval();
+    }
 }
 
 #else
