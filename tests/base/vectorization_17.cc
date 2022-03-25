@@ -69,32 +69,29 @@ main()
 {
   initlog();
 
-  // #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
-  //   do_test(VectorizedArray<double, 8>(2.0), 3.0);
-  //   do_test(VectorizedArray<float, 16>(2.0), 3.0);
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
+  do_test(VectorizedArray<double, 8>(2.0), 3.0);
+  do_test(VectorizedArray<float, 16>(2.0), 3.0);
 
-  //   do_test(VectorizedArray<double, 8>(2.0), VectorizedArray<double,
-  //   8>(3.0)); do_test(VectorizedArray<float, 16>(2.0), VectorizedArray<float,
-  //   16>(3.0));
-  // #endif
+  do_test(VectorizedArray<double, 8>(2.0), VectorizedArray<double, 8>(3.0));
+  do_test(VectorizedArray<float, 16>(2.0), VectorizedArray<float, 16>(3.0));
+#endif
 
-  // #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
-  //   do_test(VectorizedArray<double, 4>(2.0), 3.0);
-  //   do_test(VectorizedArray<float, 8>(2.0), 3.0);
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
+  do_test(VectorizedArray<double, 4>(2.0), 3.0);
+  do_test(VectorizedArray<float, 8>(2.0), 3.0);
 
-  //   do_test(VectorizedArray<double, 4>(2.0), VectorizedArray<double,
-  //   4>(3.0)); do_test(VectorizedArray<float, 8>(2.0), VectorizedArray<float,
-  //   8>(3.0));
-  // #endif
+  do_test(VectorizedArray<double, 4>(2.0), VectorizedArray<double, 4>(3.0));
+  do_test(VectorizedArray<float, 8>(2.0), VectorizedArray<float, 8>(3.0));
+#endif
 
-  // #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
-  //   do_test(VectorizedArray<double, 2>(2.0), 3.0f);
-  //   do_test(VectorizedArray<float, 4>(2.0), 3.0f);
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
+  do_test(VectorizedArray<double, 2>(2.0), 3.0f);
+  do_test(VectorizedArray<float, 4>(2.0), 3.0f);
 
-  //   do_test(VectorizedArray<double, 2>(2.0), VectorizedArray<double,
-  //   2>(3.0)); do_test(VectorizedArray<float, 4>(2.0), VectorizedArray<float,
-  //   4>(3.0));
-  // #endif
+  do_test(VectorizedArray<double, 2>(2.0), VectorizedArray<double, 2>(3.0));
+  do_test(VectorizedArray<float, 4>(2.0), VectorizedArray<float, 4>(3.0));
+#endif
 
   do_test(VectorizedArray<double, 1>(2.0), 3.0f);
   do_test(VectorizedArray<double, 1>(2.0), std::complex<double>{3.0, 0.0});
