@@ -2691,6 +2691,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
         GridTools::invert_cells_with_negative_measure(vertices, cells);
       GridTools::consistently_order_cells(cells);
     }
+  else if (is_tria_or_tet_mesh)
+    {
+      if (dim == spacedim)
+        GridTools::invert_cells_with_negative_measure(vertices, cells);
+    }
   tria->create_triangulation(vertices, cells, subcelldata);
 
   // in 1d, we also have to attach boundary ids to vertices, which does not

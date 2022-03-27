@@ -872,34 +872,60 @@ namespace GridTools
     std::size_t n_negative_cells = 0;
     for (auto &cell : cells)
       {
-        Assert(cell.vertices.size() ==
-                 ReferenceCells::get_hypercube<dim>().n_vertices(),
-               ExcNotImplemented());
-        const ArrayView<const unsigned int> vertices(cell.vertices);
-        if (GridTools::cell_measure(all_vertices, vertices) < 0)
+        if (cell.vertices.size() ==
+            ReferenceCells::get_hypercube<dim>().n_vertices())
           {
-            ++n_negative_cells;
-
-            // TODO: this only works for quads and hexes
-            if (dim == 2)
+            const ArrayView<const unsigned int> vertices(cell.vertices);
+            if (GridTools::cell_measure(all_vertices, vertices) < 0)
               {
-                // flip the cell across the y = x line in 2D
-                std::swap(cell.vertices[1], cell.vertices[2]);
-              }
-            else if (dim == 3)
-              {
-                // swap the front and back faces in 3D
-                std::swap(cell.vertices[0], cell.vertices[2]);
-                std::swap(cell.vertices[1], cell.vertices[3]);
-                std::swap(cell.vertices[4], cell.vertices[6]);
-                std::swap(cell.vertices[5], cell.vertices[7]);
-              }
+                ++n_negative_cells;
 
-            // Check whether the resulting cell is now ok.
-            // If not, then the grid is seriously broken and
-            // we just give up.
-            AssertThrow(GridTools::cell_measure(all_vertices, vertices) > 0,
-                        ExcInternalError());
+                // TODO: this only works for quads and hexes
+                if (dim == 2)
+                  {
+                    // flip the cell across the y = x line in 2D
+                    std::swap(cell.vertices[1], cell.vertices[2]);
+                  }
+                else if (dim == 3)
+                  {
+                    // swap the front and back faces in 3D
+                    std::swap(cell.vertices[0], cell.vertices[2]);
+                    std::swap(cell.vertices[1], cell.vertices[3]);
+                    std::swap(cell.vertices[4], cell.vertices[6]);
+                    std::swap(cell.vertices[5], cell.vertices[7]);
+                  }
+
+                // Check whether the resulting cell is now ok.
+                // If not, then the grid is seriously broken and
+                // we just give up.
+                AssertThrow(GridTools::cell_measure(all_vertices, vertices) > 0,
+                            ExcInternalError());
+              }
+          }
+        else if (cell.vertices.size() ==
+                 ReferenceCells::get_simplex<dim>().n_vertices())
+          {
+            const ArrayView<const unsigned int> vertices(cell.vertices);
+            if (GridTools::cell_measure(all_vertices, vertices) < 0)
+              {
+                ++n_negative_cells;
+                if (dim == 2)
+                  {
+                    // Triangular mesh, swap any two vertices
+                    std::swap(cell.vertices[1], cell.vertices[2]);
+                    AssertThrow(GridTools::cell_measure(all_vertices,
+                                                        vertices) > 0,
+                                ExcInternalError());
+                  }
+                else
+                  {
+                    Assert(false, ExcNotImplemented());
+                  }
+              }
+          }
+        else
+          {
+            Assert(false, ExcNotImplemented());
           }
       }
     return n_negative_cells;
