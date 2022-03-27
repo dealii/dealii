@@ -4659,6 +4659,141 @@ private:
 #endif // DOXYGEN
 
 
+
+namespace internal
+{
+  /**
+   * A utility function to convert a scalar or complex scalar value to a
+   * vectorized array.
+   *
+   * @tparam ScalarTypeOut The scalar type of the output array.
+   * @tparam ScalarTypeIn The scalar type of the input array.
+   * @tparam width The number of elements in the array,
+   * @param input_array The input array that is to be converted.
+   * @return An array with the same data as the @p input_array, but converted to
+   *         the desired @p ScalarTypeOut.
+   */
+  template <typename ScalarTypeOut,
+            std::size_t widthOut,
+            typename ScalarTypeIn,
+            typename = typename std::enable_if<std::is_same<
+              ScalarTypeIn,
+              typename EnableIfScalar<ScalarTypeIn>::type>::value>::type>
+  VectorizedArray<ScalarTypeOut, widthOut>
+  convert_vectorized_array(const ScalarTypeIn &input_value)
+  {
+    return VectorizedArray<ScalarTypeOut, widthOut>(input_value);
+  }
+
+  /**
+   * A utility function to convert a vectorized array of one scalar type, to
+   * that of another scalar type.
+   *
+   * @tparam ScalarTypeOut The scalar type of the output array.
+   * @tparam ScalarTypeIn The scalar type of the input array.
+   * @tparam width The number of elements in the array,
+   * @param input_array The input array that is to be converted.
+   * @return An array with the same data as the @p input_array, but converted to
+   *         the desired @p ScalarTypeOut.
+   */
+  template <typename ScalarTypeOut,
+            std::size_t widthOut,
+            typename ScalarTypeIn,
+            std::size_t widthIn,
+            typename = typename std::enable_if<
+              !std::is_same<ScalarTypeOut, ScalarTypeIn>::value>::type>
+  VectorizedArray<ScalarTypeOut, widthOut>
+  convert_vectorized_array(
+    const VectorizedArray<ScalarTypeIn, widthIn> &input_array)
+  {
+    static_assert(
+      widthIn <= widthOut,
+      "Cannot convert vectorized array: Input array has more lanes than the output array.");
+    VectorizedArray<ScalarTypeOut, widthOut> output_array;
+
+    DEAL_II_OPENMP_SIMD_PRAGMA
+    for (unsigned int v = 0; v < widthIn; v++)
+      output_array[v] = input_array[v];
+
+    return output_array;
+  }
+
+  /**
+   * A utility function to convert a vectorized array of one scalar type, to
+   * that of another scalar type.
+   * This specialization is for the case that the @p ScalarTypeOut is the same as
+   * the @p ScalarTypeIn.
+   *
+   * @tparam ScalarTypeOut The scalar type of the output array.
+   * @tparam ScalarTypeIn The scalar type of the input array.
+   * @tparam width The number of elements in the array,
+   * @param input_array The input array that is to be converted.
+   * @return An array with the same data as the @p input_array, but converted to
+   *         the desired @p ScalarTypeOut.
+   */
+  template <typename ScalarTypeOut,
+            std::size_t width,
+            typename ScalarTypeIn,
+            typename = typename std::enable_if<
+              std::is_same<ScalarTypeOut, ScalarTypeIn>::value>::type>
+  const VectorizedArray<ScalarTypeIn, width> &
+  convert_vectorized_array(
+    const VectorizedArray<ScalarTypeIn, width> &input_array)
+  {
+    return input_array;
+  }
+
+
+  /**
+   * A class with some aliases that define the type returned when two numbers
+   * (one of which is a VectorizedArray) are used in the context of a binary
+   * math operation.
+   *
+   * @warning Under all circumstances, the resulting type must have the same
+   * @p width as the maximal width detected in @p T or @p U. This is because data
+   * integrity must be ensured -- a reduction in the number of vectorization
+   * lanes from the input to the output type equates to a loss of data. As a
+   * consequence, in some cases it is not possible to have the highest floating
+   * point precision in the output type. As an example, consider the following
+   * case:
+   * ```
+   * // Using SIMD / multiple lanes
+   * VectorizedArray<float, 4>                a = ...;
+   * VectorizedArray<std::complex<double>, 2> b = ...;
+   * std::complex<double>                     c = ...;
+   * auto d = a + b;
+   * auto e = a + c;
+   * ```
+   * In this instance, the type of both `d` and `e` will have to be a
+   * `VectorizedArray<std::complex<float>, 4>`. However, when `float` and
+   * `double` types are stored in a VectorizedArray with the same number of
+   * lanes
+   * ```
+   * // Using a single lane
+   * VectorizedArray<float, 1>                a = ...;
+   * VectorizedArray<std::complex<double>, 1> b = ...;
+   * std::complex<double>                     c = ...;
+   * auto d = a + b;
+   * auto e = a + c;
+   * ```
+   * then the precision of the result may be maintained, and the type of both
+   * `d` and `e` will be a
+   * `VectorizedArray<std::complex<double>, 1>`.
+   *
+   * @tparam T A scalar type, which can be either a VectorizedArray, floating
+   *         point number, or a complex floating point number.
+   * @tparam U A scalar type, which can be either a VectorizedArray, floating
+   *         point number, or a complex floating point number.
+   */
+  template <typename T, typename U>
+  struct VectorizationProductType;
+
+} // namespace internal
+
+
+#ifndef DOXYGEN
+
+
 namespace internal
 {
   template <typename Number1,
@@ -4813,53 +4948,6 @@ namespace internal
   };
 
 
-  // template<typename T>
-  // struct is_vectorized_array : public std::false_type {};
-
-
-  // template<typename Number, std::size_t width_>
-  // struct is_vectorized_array<VectorizedArray<Number,width_>> : public
-  // std::true_type {
-  //   using value_type = typename VectorizedArray<Number,width_>::value_type;
-  //   static constexpr const std::size_t width =
-  //   VectorizedArray<Number,width_>::size();
-  // };
-
-
-  // Specialization when one argument is a VectorizedArray, and the other is a
-  // (complex) scalar type.
-  // template <typename VectorizedArrayType, typename Number>
-  // struct VectorizationProductType<
-  //   typename is_vectorized_array<VectorizedArrayType>::value_type,
-  //   is_vectorized_array<VectorizedArrayType>::width,
-  //   Number,
-  //   1,
-  //   typename std::enable_if<
-  //     is_vectorized_array<VectorizedArrayType>::value &&
-  //     (std::is_floating_point<Number>::value ||
-  //      boost::is_complex<Number>::value)>::type>
-  // {
-  // private:
-  //   using VPT =
-  //     VectorizationProductType<typename VectorizedArrayType::value_type,
-  //                              VectorizedArrayType::size(),
-  //                              Number,
-  //                              1>;
-
-  // public:
-  //   static constexpr std::size_t width = VPT::width;
-
-  //   using scalar_t = typename VPT::scalar_t;
-
-  //   using type = typename VPT::type;
-  // };
-
-
-
-  template <typename T, typename U>
-  struct VectorizationProductType;
-
-
   template <typename Number1, std::size_t width1, typename Number2>
   struct VectorizationProductType<VectorizedArray<Number1, width1>, Number2>
   {
@@ -4908,145 +4996,11 @@ namespace internal
     using type = typename VPT::type;
   };
 
-
-  // // Specialization when one argument is (complex) scalar type, and the other
-  // // is a VectorizedArray.
-  // template <typename Number, typename VectorizedArrayType>
-  // struct VectorizationProductType<
-  //   Number,
-  //   1,
-  //   typename VectorizedArrayType::value_type,
-  //   VectorizedArrayType::size(),
-  //   typename std::enable_if<
-  //     is_vectorized_array<VectorizedArrayType>::value &&
-  //     (std::is_floating_point<Number>::value ||
-  //      boost::is_complex<Number>::value)>::type>
-  // {
-  // private:
-  //   using VPT =
-  //     VectorizationProductType<Number,
-  //                              1,
-  //                              typename VectorizedArrayType::value_type,
-  //                              VectorizedArrayType::size()>;
-
-  // public:
-  //   static constexpr std::size_t width = VPT::width;
-
-  //   using scalar_t = typename VPT::scalar_t;
-
-  //   using type = typename VPT::type;
-  // };
-
-
-  // // Specialization when both arguments are VectorizedArrays.
-  // template <typename VectorizedArrayType1, typename VectorizedArrayType2>
-  // struct VectorizationProductType<
-  //   typename VectorizedArrayType1::value_type,
-  //   VectorizedArrayType1::size(),
-  //   typename VectorizedArrayType2::value_type,
-  //   VectorizedArrayType2::size(),
-  //   typename std::enable_if<
-  //     is_vectorized_array<VectorizedArrayType1>::value &&
-  //     is_vectorized_array<VectorizedArrayType2>::value>::type>
-  // {
-  // private:
-  //   using VPT =
-  //     VectorizationProductType<typename VectorizedArrayType1::value_type,
-  //                              VectorizedArrayType1::size(),
-  //                              typename VectorizedArrayType2::value_type,
-  //                              VectorizedArrayType2::size()>;
-
-  // public:
-  //   static constexpr std::size_t width = VPT::width;
-
-  //   using scalar_t = typename VPT::scalar_t;
-
-  //   using type = typename VPT::type;
-  // };
-
-
-
-  /**
-   * A utility function to convert a scalar or complex scalar value to a
-   * vectorized array.
-   *
-   * @tparam ScalarTypeOut The scalar type of the output array.
-   * @tparam ScalarTypeIn The scalar type of the input array.
-   * @tparam width The number of elements in the array,
-   * @param input_array The input array that is to be converted.
-   * @return An array with the same data as the @p input_array, but converted to
-   *         the desired @p ScalarTypeOut.
-   */
-  template <typename ScalarTypeOut,
-            std::size_t widthOut,
-            typename ScalarTypeIn,
-            typename = typename std::enable_if<std::is_same<
-              ScalarTypeIn,
-              typename EnableIfScalar<ScalarTypeIn>::type>::value>::type>
-  VectorizedArray<ScalarTypeOut, widthOut>
-  convert_vectorized_array(const ScalarTypeIn &input_value)
-  {
-    return VectorizedArray<ScalarTypeOut, widthOut>(input_value);
-  }
-
-  /**
-   * A utility function to convert a vectorized array of one scalar type, to
-   * that of another scalar type.
-   *
-   * @tparam ScalarTypeOut The scalar type of the output array.
-   * @tparam ScalarTypeIn The scalar type of the input array.
-   * @tparam width The number of elements in the array,
-   * @param input_array The input array that is to be converted.
-   * @return An array with the same data as the @p input_array, but converted to
-   *         the desired @p ScalarTypeOut.
-   */
-  template <typename ScalarTypeOut,
-            std::size_t widthOut,
-            typename ScalarTypeIn,
-            std::size_t widthIn,
-            typename = typename std::enable_if<
-              !std::is_same<ScalarTypeOut, ScalarTypeIn>::value>::type>
-  VectorizedArray<ScalarTypeOut, widthOut>
-  convert_vectorized_array(
-    const VectorizedArray<ScalarTypeIn, widthIn> &input_array)
-  {
-    static_assert(
-      widthIn <= widthOut,
-      "Cannot convert vectorized array: Input array has more lanes than the output array.");
-    VectorizedArray<ScalarTypeOut, widthOut> output_array;
-
-    DEAL_II_OPENMP_SIMD_PRAGMA
-    for (unsigned int v = 0; v < widthIn; v++)
-      output_array[v] = input_array[v];
-
-    return output_array;
-  }
-
-  /**
-   * A utility function to convert a vectorized array of one scalar type, to
-   * that of another scalar type.
-   * This specialization is for the case that the @p ScalarTypeOut is the same as
-   * the @p ScalarTypeIn.
-   *
-   * @tparam ScalarTypeOut The scalar type of the output array.
-   * @tparam ScalarTypeIn The scalar type of the input array.
-   * @tparam width The number of elements in the array,
-   * @param input_array The input array that is to be converted.
-   * @return An array with the same data as the @p input_array, but converted to
-   *         the desired @p ScalarTypeOut.
-   */
-  template <typename ScalarTypeOut,
-            std::size_t width,
-            typename ScalarTypeIn,
-            typename = typename std::enable_if<
-              std::is_same<ScalarTypeOut, ScalarTypeIn>::value>::type>
-  const VectorizedArray<ScalarTypeIn, width> &
-  convert_vectorized_array(
-    const VectorizedArray<ScalarTypeIn, width> &input_array)
-  {
-    return input_array;
-  }
 } // namespace internal
+
+
+#endif // DOXYGEN
+
 
 
 /**
