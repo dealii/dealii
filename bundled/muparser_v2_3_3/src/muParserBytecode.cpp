@@ -113,9 +113,9 @@ namespace mu
 		// optimization does not apply
 		SToken tok;
 		tok.Cmd = cmVAR;
-		tok.Val.ptr = a_pVar;
-		tok.Val.data = 1;
-		tok.Val.data2 = 0;
+		tok.u.Val.ptr = a_pVar;
+		tok.u.Val.data = 1;
+		tok.u.Val.data2 = 0;
 		m_vRPN.push_back(tok);
 	}
 
@@ -140,9 +140,9 @@ namespace mu
 		// If optimization does not apply
 		SToken tok;
 		tok.Cmd = cmVAL;
-		tok.Val.ptr = nullptr;
-		tok.Val.data = 0;
-		tok.Val.data2 = a_fVal;
+		tok.u.Val.ptr = nullptr;
+		tok.u.Val.data = 0;
+		tok.u.Val.data2 = a_fVal;
 		m_vRPN.push_back(tok);
 	}
 
@@ -150,8 +150,8 @@ namespace mu
 	void ParserByteCode::ConstantFolding(ECmdCode a_Oprt)
 	{
 		std::size_t sz = m_vRPN.size();
-		value_type& x = m_vRPN[sz - 2].Val.data2;
-		value_type& y = m_vRPN[sz - 1].Val.data2;
+		value_type& x = m_vRPN[sz - 2].u.Val.data2;
+		value_type& y = m_vRPN[sz - 1].u.Val.data2;
 
 		switch (a_Oprt)
 		{
@@ -216,20 +216,20 @@ namespace mu
 					// Optimization for polynomials of low order
 					if (m_vRPN[sz - 2].Cmd == cmVAR && m_vRPN[sz - 1].Cmd == cmVAL)
 					{
-						if (m_vRPN[sz - 1].Val.data2 == 0)
+						if (m_vRPN[sz - 1].u.Val.data2 == 0)
 						{
 							m_vRPN[sz - 2].Cmd = cmVAL;
-							m_vRPN[sz - 2].Val.ptr = nullptr;
-							m_vRPN[sz - 2].Val.data = 0;
-							m_vRPN[sz - 2].Val.data2 = 1;
+							m_vRPN[sz - 2].u.Val.ptr = nullptr;
+							m_vRPN[sz - 2].u.Val.data = 0;
+							m_vRPN[sz - 2].u.Val.data2 = 1;
 						}
-						else if (m_vRPN[sz - 1].Val.data2 == 1)
+						else if (m_vRPN[sz - 1].u.Val.data2 == 1)
 							m_vRPN[sz - 2].Cmd = cmVAR;
-						else if (m_vRPN[sz - 1].Val.data2 == 2)
+						else if (m_vRPN[sz - 1].u.Val.data2 == 2)
 							m_vRPN[sz - 2].Cmd = cmVARPOW2;
-						else if (m_vRPN[sz - 1].Val.data2 == 3)
+						else if (m_vRPN[sz - 1].u.Val.data2 == 3)
 							m_vRPN[sz - 2].Cmd = cmVARPOW3;
-						else if (m_vRPN[sz - 1].Val.data2 == 4)
+						else if (m_vRPN[sz - 1].u.Val.data2 == 4)
 							m_vRPN[sz - 2].Cmd = cmVARPOW4;
 						else
 							break;
@@ -247,20 +247,20 @@ namespace mu
 						(m_vRPN[sz - 1].Cmd == cmVAL && m_vRPN[sz - 2].Cmd == cmVAR) ||
 						(m_vRPN[sz - 1].Cmd == cmVAL && m_vRPN[sz - 2].Cmd == cmVARMUL) ||
 						(m_vRPN[sz - 1].Cmd == cmVARMUL && m_vRPN[sz - 2].Cmd == cmVAL) ||
-						(m_vRPN[sz - 1].Cmd == cmVAR && m_vRPN[sz - 2].Cmd == cmVAR && m_vRPN[sz - 2].Val.ptr == m_vRPN[sz - 1].Val.ptr) ||
-						(m_vRPN[sz - 1].Cmd == cmVAR && m_vRPN[sz - 2].Cmd == cmVARMUL && m_vRPN[sz - 2].Val.ptr == m_vRPN[sz - 1].Val.ptr) ||
-						(m_vRPN[sz - 1].Cmd == cmVARMUL && m_vRPN[sz - 2].Cmd == cmVAR && m_vRPN[sz - 2].Val.ptr == m_vRPN[sz - 1].Val.ptr) ||
-						(m_vRPN[sz - 1].Cmd == cmVARMUL && m_vRPN[sz - 2].Cmd == cmVARMUL && m_vRPN[sz - 2].Val.ptr == m_vRPN[sz - 1].Val.ptr))
+						(m_vRPN[sz - 1].Cmd == cmVAR && m_vRPN[sz - 2].Cmd == cmVAR && m_vRPN[sz - 2].u.Val.ptr == m_vRPN[sz - 1].u.Val.ptr) ||
+						(m_vRPN[sz - 1].Cmd == cmVAR && m_vRPN[sz - 2].Cmd == cmVARMUL && m_vRPN[sz - 2].u.Val.ptr == m_vRPN[sz - 1].u.Val.ptr) ||
+						(m_vRPN[sz - 1].Cmd == cmVARMUL && m_vRPN[sz - 2].Cmd == cmVAR && m_vRPN[sz - 2].u.Val.ptr == m_vRPN[sz - 1].u.Val.ptr) ||
+						(m_vRPN[sz - 1].Cmd == cmVARMUL && m_vRPN[sz - 2].Cmd == cmVARMUL && m_vRPN[sz - 2].u.Val.ptr == m_vRPN[sz - 1].u.Val.ptr))
 					{
 						MUP_ASSERT(
-							(m_vRPN[sz - 2].Val.ptr == nullptr && m_vRPN[sz - 1].Val.ptr != nullptr) ||
-							(m_vRPN[sz - 2].Val.ptr != nullptr && m_vRPN[sz - 1].Val.ptr == nullptr) ||
-							(m_vRPN[sz - 2].Val.ptr == m_vRPN[sz - 1].Val.ptr));
+							(m_vRPN[sz - 2].u.Val.ptr == nullptr && m_vRPN[sz - 1].u.Val.ptr != nullptr) ||
+							(m_vRPN[sz - 2].u.Val.ptr != nullptr && m_vRPN[sz - 1].u.Val.ptr == nullptr) ||
+							(m_vRPN[sz - 2].u.Val.ptr == m_vRPN[sz - 1].u.Val.ptr));
 
 						m_vRPN[sz - 2].Cmd = cmVARMUL;
-						m_vRPN[sz - 2].Val.ptr = (value_type*)((long long)(m_vRPN[sz - 2].Val.ptr) | (long long)(m_vRPN[sz - 1].Val.ptr));    // variable
-						m_vRPN[sz - 2].Val.data2 += ((a_Oprt == cmSUB) ? -1 : 1) * m_vRPN[sz - 1].Val.data2;  // offset
-						m_vRPN[sz - 2].Val.data += ((a_Oprt == cmSUB) ? -1 : 1) * m_vRPN[sz - 1].Val.data;   // multiplicand
+						m_vRPN[sz - 2].u.Val.ptr = (value_type*)((long long)(m_vRPN[sz - 2].u.Val.ptr) | (long long)(m_vRPN[sz - 1].u.Val.ptr));    // variable
+						m_vRPN[sz - 2].u.Val.data2 += ((a_Oprt == cmSUB) ? -1 : 1) * m_vRPN[sz - 1].u.Val.data2;  // offset
+						m_vRPN[sz - 2].u.Val.data += ((a_Oprt == cmSUB) ? -1 : 1) * m_vRPN[sz - 1].u.Val.data;   // multiplicand
 						m_vRPN.pop_back();
 						bOptimized = true;
 					}
@@ -271,9 +271,9 @@ namespace mu
 						(m_vRPN[sz - 1].Cmd == cmVAL && m_vRPN[sz - 2].Cmd == cmVAR))
 					{
 						m_vRPN[sz - 2].Cmd = cmVARMUL;
-						m_vRPN[sz - 2].Val.ptr = (value_type*)((long long)(m_vRPN[sz - 2].Val.ptr) | (long long)(m_vRPN[sz - 1].Val.ptr));
-						m_vRPN[sz - 2].Val.data = m_vRPN[sz - 2].Val.data2 + m_vRPN[sz - 1].Val.data2;
-						m_vRPN[sz - 2].Val.data2 = 0;
+						m_vRPN[sz - 2].u.Val.ptr = (value_type*)((long long)(m_vRPN[sz - 2].u.Val.ptr) | (long long)(m_vRPN[sz - 1].u.Val.ptr));
+						m_vRPN[sz - 2].u.Val.data = m_vRPN[sz - 2].u.Val.data2 + m_vRPN[sz - 1].u.Val.data2;
+						m_vRPN[sz - 2].u.Val.data2 = 0;
 						m_vRPN.pop_back();
 						bOptimized = true;
 					}
@@ -283,23 +283,23 @@ namespace mu
 					{
 						// Optimization: 2*(3*b+1) or (3*b+1)*2 -> 6*b+2
 						m_vRPN[sz - 2].Cmd = cmVARMUL;
-						m_vRPN[sz - 2].Val.ptr = (value_type*)((long long)(m_vRPN[sz - 2].Val.ptr) | (long long)(m_vRPN[sz - 1].Val.ptr));
+						m_vRPN[sz - 2].u.Val.ptr = (value_type*)((long long)(m_vRPN[sz - 2].u.Val.ptr) | (long long)(m_vRPN[sz - 1].u.Val.ptr));
 						if (m_vRPN[sz - 1].Cmd == cmVAL)
 						{
-							m_vRPN[sz - 2].Val.data *= m_vRPN[sz - 1].Val.data2;
-							m_vRPN[sz - 2].Val.data2 *= m_vRPN[sz - 1].Val.data2;
+							m_vRPN[sz - 2].u.Val.data *= m_vRPN[sz - 1].u.Val.data2;
+							m_vRPN[sz - 2].u.Val.data2 *= m_vRPN[sz - 1].u.Val.data2;
 						}
 						else
 						{
-							m_vRPN[sz - 2].Val.data = m_vRPN[sz - 1].Val.data * m_vRPN[sz - 2].Val.data2;
-							m_vRPN[sz - 2].Val.data2 = m_vRPN[sz - 1].Val.data2 * m_vRPN[sz - 2].Val.data2;
+							m_vRPN[sz - 2].u.Val.data = m_vRPN[sz - 1].u.Val.data * m_vRPN[sz - 2].u.Val.data2;
+							m_vRPN[sz - 2].u.Val.data2 = m_vRPN[sz - 1].u.Val.data2 * m_vRPN[sz - 2].u.Val.data2;
 						}
 						m_vRPN.pop_back();
 						bOptimized = true;
 					}
 					else if (
 						m_vRPN[sz - 1].Cmd == cmVAR && m_vRPN[sz - 2].Cmd == cmVAR &&
-						m_vRPN[sz - 1].Val.ptr == m_vRPN[sz - 2].Val.ptr)
+						m_vRPN[sz - 1].u.Val.ptr == m_vRPN[sz - 2].u.Val.ptr)
 					{
 						// Optimization: a*a -> a^2
 						m_vRPN[sz - 2].Cmd = cmVARPOW2;
@@ -309,11 +309,11 @@ namespace mu
 					break;
 
 				case cmDIV:
-					if (m_vRPN[sz - 1].Cmd == cmVAL && m_vRPN[sz - 2].Cmd == cmVARMUL && m_vRPN[sz - 1].Val.data2 != 0)
+					if (m_vRPN[sz - 1].Cmd == cmVAL && m_vRPN[sz - 2].Cmd == cmVARMUL && m_vRPN[sz - 1].u.Val.data2 != 0)
 					{
 						// Optimization: 4*a/2 -> 2*a
-						m_vRPN[sz - 2].Val.data /= m_vRPN[sz - 1].Val.data2;
-						m_vRPN[sz - 2].Val.data2 /= m_vRPN[sz - 1].Val.data2;
+						m_vRPN[sz - 2].u.Val.data /= m_vRPN[sz - 1].u.Val.data2;
+						m_vRPN[sz - 2].u.Val.data2 /= m_vRPN[sz - 1].u.Val.data2;
 						m_vRPN.pop_back();
 						bOptimized = true;
 					}
@@ -361,7 +361,7 @@ namespace mu
 
 		SToken tok;
 		tok.Cmd = cmASSIGN;
-		tok.Oprt.ptr = a_pVar;
+		tok.u.Oprt.ptr = a_pVar;
 		m_vRPN.push_back(tok);
 	}
 
@@ -400,16 +400,16 @@ namespace mu
 			value_type val = 0;
 			switch (a_iArgc)
 			{
-			case 1:  val = a_pFun.call_fun<1>(m_vRPN[sz - 1].Val.data2); break;
-			case 2:  val = a_pFun.call_fun<2>(m_vRPN[sz - 2].Val.data2, m_vRPN[sz - 1].Val.data2); break;
-			case 3:  val = a_pFun.call_fun<3>(m_vRPN[sz - 3].Val.data2, m_vRPN[sz - 2].Val.data2, m_vRPN[sz - 1].Val.data2); break;
-			case 4:  val = a_pFun.call_fun<4>(m_vRPN[sz - 4].Val.data2, m_vRPN[sz - 3].Val.data2, m_vRPN[sz - 2].Val.data2, m_vRPN[sz - 1].Val.data2); break;
-			case 5:  val = a_pFun.call_fun<5>(m_vRPN[sz - 5].Val.data2, m_vRPN[sz - 4].Val.data2, m_vRPN[sz - 3].Val.data2, m_vRPN[sz - 2].Val.data2, m_vRPN[sz - 1].Val.data2); break;
-			case 6:  val = a_pFun.call_fun<6>(m_vRPN[sz - 6].Val.data2, m_vRPN[sz - 5].Val.data2, m_vRPN[sz - 4].Val.data2, m_vRPN[sz - 3].Val.data2, m_vRPN[sz - 2].Val.data2, m_vRPN[sz - 1].Val.data2); break;
-			case 7:  val = a_pFun.call_fun<7>(m_vRPN[sz - 7].Val.data2, m_vRPN[sz - 6].Val.data2, m_vRPN[sz - 5].Val.data2, m_vRPN[sz - 4].Val.data2, m_vRPN[sz - 3].Val.data2, m_vRPN[sz - 2].Val.data2, m_vRPN[sz - 1].Val.data2); break;
-			case 8:  val = a_pFun.call_fun<8>(m_vRPN[sz - 8].Val.data2, m_vRPN[sz - 7].Val.data2, m_vRPN[sz - 6].Val.data2, m_vRPN[sz - 5].Val.data2, m_vRPN[sz - 4].Val.data2, m_vRPN[sz - 3].Val.data2, m_vRPN[sz - 2].Val.data2, m_vRPN[sz - 1].Val.data2); break;
-			case 9:  val = a_pFun.call_fun<9>(m_vRPN[sz - 9].Val.data2, m_vRPN[sz - 8].Val.data2, m_vRPN[sz - 7].Val.data2, m_vRPN[sz - 6].Val.data2, m_vRPN[sz - 5].Val.data2, m_vRPN[sz - 4].Val.data2, m_vRPN[sz - 3].Val.data2, m_vRPN[sz - 2].Val.data2, m_vRPN[sz - 1].Val.data2); break;
-			case 10: val = a_pFun.call_fun<10>(m_vRPN[sz - 10].Val.data2, m_vRPN[sz - 9].Val.data2, m_vRPN[sz - 8].Val.data2, m_vRPN[sz - 7].Val.data2, m_vRPN[sz - 6].Val.data2, m_vRPN[sz - 5].Val.data2, m_vRPN[sz - 4].Val.data2, m_vRPN[sz - 3].Val.data2, m_vRPN[sz - 2].Val.data2, m_vRPN[sz - 1].Val.data2); break;
+			case 1:  val = a_pFun.call_fun<1>(m_vRPN[sz - 1].u.Val.data2); break;
+			case 2:  val = a_pFun.call_fun<2>(m_vRPN[sz - 2].u.Val.data2, m_vRPN[sz - 1].u.Val.data2); break;
+			case 3:  val = a_pFun.call_fun<3>(m_vRPN[sz - 3].u.Val.data2, m_vRPN[sz - 2].u.Val.data2, m_vRPN[sz - 1].u.Val.data2); break;
+			case 4:  val = a_pFun.call_fun<4>(m_vRPN[sz - 4].u.Val.data2, m_vRPN[sz - 3].u.Val.data2, m_vRPN[sz - 2].u.Val.data2, m_vRPN[sz - 1].u.Val.data2); break;
+			case 5:  val = a_pFun.call_fun<5>(m_vRPN[sz - 5].u.Val.data2, m_vRPN[sz - 4].u.Val.data2, m_vRPN[sz - 3].u.Val.data2, m_vRPN[sz - 2].u.Val.data2, m_vRPN[sz - 1].u.Val.data2); break;
+			case 6:  val = a_pFun.call_fun<6>(m_vRPN[sz - 6].u.Val.data2, m_vRPN[sz - 5].u.Val.data2, m_vRPN[sz - 4].u.Val.data2, m_vRPN[sz - 3].u.Val.data2, m_vRPN[sz - 2].u.Val.data2, m_vRPN[sz - 1].u.Val.data2); break;
+			case 7:  val = a_pFun.call_fun<7>(m_vRPN[sz - 7].u.Val.data2, m_vRPN[sz - 6].u.Val.data2, m_vRPN[sz - 5].u.Val.data2, m_vRPN[sz - 4].u.Val.data2, m_vRPN[sz - 3].u.Val.data2, m_vRPN[sz - 2].u.Val.data2, m_vRPN[sz - 1].u.Val.data2); break;
+			case 8:  val = a_pFun.call_fun<8>(m_vRPN[sz - 8].u.Val.data2, m_vRPN[sz - 7].u.Val.data2, m_vRPN[sz - 6].u.Val.data2, m_vRPN[sz - 5].u.Val.data2, m_vRPN[sz - 4].u.Val.data2, m_vRPN[sz - 3].u.Val.data2, m_vRPN[sz - 2].u.Val.data2, m_vRPN[sz - 1].u.Val.data2); break;
+			case 9:  val = a_pFun.call_fun<9>(m_vRPN[sz - 9].u.Val.data2, m_vRPN[sz - 8].u.Val.data2, m_vRPN[sz - 7].u.Val.data2, m_vRPN[sz - 6].u.Val.data2, m_vRPN[sz - 5].u.Val.data2, m_vRPN[sz - 4].u.Val.data2, m_vRPN[sz - 3].u.Val.data2, m_vRPN[sz - 2].u.Val.data2, m_vRPN[sz - 1].u.Val.data2); break;
+			case 10: val = a_pFun.call_fun<10>(m_vRPN[sz - 10].u.Val.data2, m_vRPN[sz - 9].u.Val.data2, m_vRPN[sz - 8].u.Val.data2, m_vRPN[sz - 7].u.Val.data2, m_vRPN[sz - 6].u.Val.data2, m_vRPN[sz - 5].u.Val.data2, m_vRPN[sz - 4].u.Val.data2, m_vRPN[sz - 3].u.Val.data2, m_vRPN[sz - 2].u.Val.data2, m_vRPN[sz - 1].u.Val.data2); break;
 			default:
 				// For now functions with unlimited number of arguments are not optimized
 				throw ParserError(ecINTERNAL_ERROR);
@@ -420,17 +420,17 @@ namespace mu
 
 			SToken tok;
 			tok.Cmd = cmVAL;
-			tok.Val.data = 0;
-			tok.Val.data2 = val;
-			tok.Val.ptr = nullptr;
+			tok.u.Val.data = 0;
+			tok.u.Val.data2 = val;
+			tok.u.Val.ptr = nullptr;
 			m_vRPN.push_back(tok);
 		}
 		else
 		{
 			SToken tok;
 			tok.Cmd = cmFUNC;
-			tok.Fun.argc = a_iArgc;
-			tok.Fun.cb = a_pFun;
+			tok.u.Fun.argc = a_iArgc;
+			tok.u.Fun.cb = a_pFun;
 			m_vRPN.push_back(tok);
 		}
 
@@ -452,8 +452,8 @@ namespace mu
 
 		SToken tok;
 		tok.Cmd = cmFUNC_BULK;
-		tok.Fun.argc = a_iArgc;
-		tok.Fun.cb = a_pFun;
+		tok.u.Fun.argc = a_iArgc;
+		tok.u.Fun.cb = a_pFun;
 		m_vRPN.push_back(tok);
 	}
 
@@ -471,9 +471,9 @@ namespace mu
 
 		SToken tok;
 		tok.Cmd = cmFUNC_STR;
-		tok.Fun.argc = a_iArgc;
-		tok.Fun.idx = a_iIdx;
-		tok.Fun.cb = a_pFun;
+		tok.u.Fun.argc = a_iArgc;
+		tok.u.Fun.idx = a_iIdx;
+		tok.u.Fun.cb = a_pFun;
 		m_vRPN.push_back(tok);
 
 		m_iMaxStackSize = std::max(m_iMaxStackSize, (size_t)m_iStackPos);
@@ -506,13 +506,13 @@ namespace mu
 				stElse.push(i);
 				idx = stIf.top();
 				stIf.pop();
-				m_vRPN[idx].Oprt.offset = i - idx;
+				m_vRPN[idx].u.Oprt.offset = i - idx;
 				break;
 
 			case cmENDIF:
 				idx = stElse.top();
 				stElse.pop();
-				m_vRPN[idx].Oprt.offset = i - idx;
+				m_vRPN[idx].u.Oprt.offset = i - idx;
 				break;
 
 			default:
@@ -560,44 +560,44 @@ namespace mu
 			switch (m_vRPN[i].Cmd)
 			{
 			case cmVAL:   mu::console() << _T("VAL \t");
-				mu::console() << _T("[") << m_vRPN[i].Val.data2 << _T("]\n");
+				mu::console() << _T("[") << m_vRPN[i].u.Val.data2 << _T("]\n");
 				break;
 
 			case cmVAR:   mu::console() << _T("VAR \t");
-				mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Val.ptr << _T("]\n");
+				mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Val.ptr << _T("]\n");
 				break;
 
 			case cmVARPOW2: mu::console() << _T("VARPOW2 \t");
-				mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Val.ptr << _T("]\n");
+				mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Val.ptr << _T("]\n");
 				break;
 
 			case cmVARPOW3: mu::console() << _T("VARPOW3 \t");
-				mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Val.ptr << _T("]\n");
+				mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Val.ptr << _T("]\n");
 				break;
 
 			case cmVARPOW4: mu::console() << _T("VARPOW4 \t");
-				mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Val.ptr << _T("]\n");
+				mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Val.ptr << _T("]\n");
 				break;
 
 			case cmVARMUL:  mu::console() << _T("VARMUL \t");
-				mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Val.ptr << _T("]");
-				mu::console() << _T(" * [") << m_vRPN[i].Val.data << _T("]");
-				mu::console() << _T(" + [") << m_vRPN[i].Val.data2 << _T("]\n");
+				mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Val.ptr << _T("]");
+				mu::console() << _T(" * [") << m_vRPN[i].u.Val.data << _T("]");
+				mu::console() << _T(" + [") << m_vRPN[i].u.Val.data2 << _T("]\n");
 				break;
 
 			case cmFUNC:  mu::console() << _T("CALL\t");
-				mu::console() << _T("[ARG:") << std::dec << m_vRPN[i].Fun.argc << _T("]");
-				mu::console() << _T("[ADDR: 0x") << std::hex << reinterpret_cast<void*>(m_vRPN[i].Fun.cb._pRawFun) << _T("]");
-				mu::console() << _T("[USERDATA: 0x") << std::hex << reinterpret_cast<void*>(m_vRPN[i].Fun.cb._pUserData) << _T("]");
+				mu::console() << _T("[ARG:") << std::dec << m_vRPN[i].u.Fun.argc << _T("]");
+				mu::console() << _T("[ADDR: 0x") << std::hex << reinterpret_cast<void*>(m_vRPN[i].u.Fun.cb._pRawFun) << _T("]");
+				mu::console() << _T("[USERDATA: 0x") << std::hex << reinterpret_cast<void*>(m_vRPN[i].u.Fun.cb._pUserData) << _T("]");
 				mu::console() << _T("\n");
 				break;
 
 			case cmFUNC_STR:
 				mu::console() << _T("CALL STRFUNC\t");
-				mu::console() << _T("[ARG:") << std::dec << m_vRPN[i].Fun.argc << _T("]");
-				mu::console() << _T("[IDX:") << std::dec << m_vRPN[i].Fun.idx << _T("]");
-				mu::console() << _T("[ADDR: 0x") << std::hex << reinterpret_cast<void*>(m_vRPN[i].Fun.cb._pRawFun) << _T("]");
-				mu::console() << _T("[USERDATA: 0x") << std::hex << reinterpret_cast<void*>(m_vRPN[i].Fun.cb._pUserData) << _T("]");
+				mu::console() << _T("[ARG:") << std::dec << m_vRPN[i].u.Fun.argc << _T("]");
+				mu::console() << _T("[IDX:") << std::dec << m_vRPN[i].u.Fun.idx << _T("]");
+				mu::console() << _T("[ADDR: 0x") << std::hex << reinterpret_cast<void*>(m_vRPN[i].u.Fun.cb._pRawFun) << _T("]");
+				mu::console() << _T("[USERDATA: 0x") << std::hex << reinterpret_cast<void*>(m_vRPN[i].u.Fun.cb._pUserData) << _T("]");
 				mu::console() << _T("\n");
 				break;
 
@@ -616,18 +616,18 @@ namespace mu
 			case cmPOW:   mu::console() << _T("POW\n"); break;
 
 			case cmIF:    mu::console() << _T("IF\t");
-				mu::console() << _T("[OFFSET:") << std::dec << m_vRPN[i].Oprt.offset << _T("]\n");
+				mu::console() << _T("[OFFSET:") << std::dec << m_vRPN[i].u.Oprt.offset << _T("]\n");
 				break;
 
 			case cmELSE:  mu::console() << _T("ELSE\t");
-				mu::console() << _T("[OFFSET:") << std::dec << m_vRPN[i].Oprt.offset << _T("]\n");
+				mu::console() << _T("[OFFSET:") << std::dec << m_vRPN[i].u.Oprt.offset << _T("]\n");
 				break;
 
 			case cmENDIF: mu::console() << _T("ENDIF\n"); break;
 
 			case cmASSIGN:
 				mu::console() << _T("ASSIGN\t");
-				mu::console() << _T("[ADDR: 0x") << m_vRPN[i].Oprt.ptr << _T("]\n");
+				mu::console() << _T("[ADDR: 0x") << m_vRPN[i].u.Oprt.ptr << _T("]\n");
 				break;
 
 			default:      mu::console() << _T("(unknown code: ") << m_vRPN[i].Cmd << _T(")\n");
