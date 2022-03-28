@@ -83,4 +83,4 @@ OPTION(DEAL_II_FORCE_BUNDLED_MUPARSER
   "Always use the bundled functionparser library instead of an external one."
   OFF)
 
-SET(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_2_4/")
+SET(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_3_3/")
