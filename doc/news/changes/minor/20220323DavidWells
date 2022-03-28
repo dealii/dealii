@@ -1,0 +1,4 @@
+Fixed: The functions in DoFRenumbering now work correctly (they do not deadlock)
+when a processor has zero locally owned degrees of freedom.
+<br>
+(David Wells, 2022/03/23)
