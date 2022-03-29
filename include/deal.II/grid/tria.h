@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2044,7 +2044,7 @@ public:
   };
 
   /**
-   * A structure used to accumulate the results of the cell_weights slot
+   * A structure used to accumulate the results of the `weight` signal slot
    * functions below. It takes an iterator range and returns the sum of
    * values.
    */
@@ -2173,9 +2173,7 @@ public:
 
     /**
      * This signal is triggered for each cell during every automatic or manual
-     * repartitioning. This signal is somewhat special in that it is only
-     * triggered for distributed parallel calculations and only if functions
-     * are connected to it. It is intended to allow a weighted repartitioning
+     * repartitioning. It is intended to allow a weighted repartitioning
      * of the domain to balance the computational load across processes in a
      * different way than balancing the number of cells. Any connected
      * function is expected to take an iterator to a cell, and a CellStatus
@@ -2183,23 +2181,189 @@ public:
      * coarsened or left untouched (see the documentation of the CellStatus
      * enum for more information). The function is expected to return an
      * unsigned integer, which is interpreted as the additional computational
-     * load of this cell. If this cell is going to be coarsened, the signal is
-     * called for the parent cell and you need to provide the weight of the
-     * future parent cell. If this cell is going to be refined the function
-     * should return a weight, which will be equally assigned to every future
-     * child cell of the current cell. As a reference a value of 1000 is added
-     * for every cell to the total weight. This means a signal return value of
-     * 1000 (resulting in a weight of 2000) means that it is twice as
-     * expensive for a process to handle this particular cell. If several
-     * functions are connected to this signal, their return values will be
-     * summed to calculate the final weight.
+     * load of this cell.
      *
-     * This function is used in step-68.
+     * In serial and parallel shared applications, partitioning happens after
+     * refinement. So all cells will have the `CELL_PERSIST` status.
+     *
+     * In parallel distributed applications, partitioning happens during
+     * refinement. If this cell is going to be coarsened, the signal is called
+     * for the parent cell and you need to provide the weight of the future
+     * parent cell. If this cell is going to be refined, the function is called
+     * on all children while `cell_iterator` refers to their parent cell. In
+     * this case, you need to pick a weight for each individual child based on
+     * information given by the parent cell.
+     *
+     * If several functions are connected to this signal, their return values
+     * will be summed to calculate the final weight of a cell. This allows
+     * different parts of a larger code base to have their own functions
+     * computing the weight of a cell; for example in a code that does both
+     * finite element and particle computations on each cell, the code could
+     * separate the computation of a cell's weight into two functions, each
+     * implemented in their respective files, that provide the finite
+     * element-based and the particle-based weights.
+     *
+     * This function is used in step-68 and implicitly in step-75 using the
+     * parallel::CellWeights class.
      */
     boost::signals2::signal<unsigned int(const cell_iterator &,
                                          const CellStatus),
                             CellWeightSum<unsigned int>>
-      cell_weight;
+      weight;
+
+    /**
+     * Constructor.
+     *
+     * Connects a deprecated signal to its successor.
+     */
+    Signals()
+      : cell_weight(weight)
+    {}
+
+    /**
+     * Legacy signal emulation to deprecate the old signal.
+     */
+    class LegacySignal
+    {
+    public:
+      using signature_type = unsigned int(const cell_iterator &,
+                                          const CellStatus);
+      using combiner_type  = CellWeightSum<unsigned int>;
+
+      using slot_function_type = boost::function<signature_type>;
+      using slot_type =
+        boost::signals2::slot<signature_type, slot_function_type>;
+
+      /**
+       * Constructor.
+       */
+      LegacySignal(
+        boost::signals2::signal<signature_type, combiner_type> &new_signal)
+        : new_signal(new_signal)
+      {}
+
+      /**
+       * Destructor.
+       */
+      ~LegacySignal()
+      {
+        base_weight.disconnect();
+      }
+
+      /**
+       * Connects a function to the signal.
+       *
+       * Connects an additional base weight function if signal was previously
+       * empty.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      boost::signals2::connection
+      connect(
+        const slot_type &                 slot,
+        boost::signals2::connect_position position = boost::signals2::at_back)
+      {
+        if (base_weight.connected() == false)
+          {
+            base_weight = new_signal.connect(
+              [](const cell_iterator &, const CellStatus) -> unsigned int {
+                return 1000;
+              });
+            Assert(base_weight.connected() && new_signal.num_slots() == 1,
+                   ExcInternalError());
+          }
+
+        return new_signal.connect(slot, position);
+      }
+
+      /**
+       * Returns the number of connected functions <em>without</em> the base
+       * weight.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      std::size_t
+      num_slots() const
+      {
+        return new_signal.num_slots() -
+               static_cast<std::size_t>(base_weight.connected());
+      }
+
+      /**
+       * Checks if there are any connected functions to the signal.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      bool
+      empty() const
+      {
+        if (num_slots() == 0)
+          {
+            Assert(new_signal.num_slots() == 0, ExcInternalError());
+            return true;
+          }
+        return false;
+      }
+
+      /**
+       * Disconnects a function from the signal.
+       *
+       * Also disconnects the base weight function if it is the last connected
+       * function.
+       */
+      template <typename S>
+      DEAL_II_DEPRECATED_EARLY void
+      disconnect(const S &connection)
+      {
+        new_signal.disconnect(connection);
+
+        if (num_slots() == 0)
+          {
+            Assert(base_weight.connected() && new_signal.num_slots() == 1,
+                   ExcInternalError());
+            new_signal.disconnect(base_weight);
+          }
+      }
+
+      /**
+       * Triggers the signal.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      unsigned int
+      operator()(const cell_iterator &iterator, const CellStatus status)
+      {
+        return new_signal(iterator, status);
+      }
+
+    private:
+      /**
+       * Monitors the connection of the base weight function.
+       */
+      boost::signals2::connection base_weight;
+
+      /**
+       * Reference to the successor signal.
+       */
+      boost::signals2::signal<signature_type, combiner_type> &new_signal;
+    };
+
+    /**
+     * @copydoc weight
+     *
+     * As a reference, a value of 1000 is added for every cell to the total
+     * weight. This means a signal return value of 1000 (resulting in a weight
+     * of 2000) means that it is twice as expensive for a process to handle this
+     * particular cell.
+     *
+     * @deprecated Use the `weight` signal instead which omits the base weight.
+     * You can invoke the old behavior by connecting a function to the signal
+     * that returns the base weight as follows. This function should be added
+     * <em>in addition</em> to the one that actually computes the weight.
+     * @code{.cc}
+     * triangulation.signals.weight.connect(
+     *   [](const typename Triangulation<dim>::cell_iterator &,
+     *      const typename Triangulation<dim>::CellStatus)
+     *     -> unsigned int { return 1000; });
+     * @endcode
+     */
+    LegacySignal cell_weight;
 
     /**
      * This signal is triggered at the beginning of execution of the

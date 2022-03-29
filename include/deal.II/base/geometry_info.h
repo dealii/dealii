@@ -3827,7 +3827,7 @@ GeometryInfo<3>::line_refinement_case(
   const unsigned int direction[lines_per_cell] = {
     1, 1, 0, 0, 1, 1, 0, 0, 2, 2, 2, 2};
 
-  return ((cell_refinement_case & cut_one[direction[line_no]]) != 0u ?
+  return ((cell_refinement_case & cut_one[direction[line_no]]) ?
             RefinementCase<1>::cut_x :
             RefinementCase<1>::no_refinement);
 }

@@ -1,0 +1,15 @@
+Changed: For weighted load balancing with parallel::distributed::Triangulation
+objects, an intial weight of `1000` will no longer be assigned to each cell.
+<br>
+The old signal Triangulation::Signals::cell_weight has been deprecated.
+Please use the new signal Triangulation::Signals::weight instead.
+<br>
+You can invoke the old behavior by connecting a function to the new
+signal that returns the base weight like this:
+@code{.cc}
+triangulation.signals.weight.connect(
+  [](const typename parallel::distributed::Triangulation<dim>::cell_iterator &,
+     const typename parallel::distributed::Triangulation<dim>::CellStatus)
+    -> unsigned int { return 1000; });
+@endcode
+(Marc Fehling, 2022/02/25)

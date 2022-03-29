@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2021 by the deal.II authors
+ * Copyright (C) 2021 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -191,7 +191,7 @@ namespace Step75
     double p_refine_fraction  = 0.9;
     double p_coarsen_fraction = 0.9;
 
-    double weighting_factor   = 1e6;
+    double weighting_factor   = 1.;
     double weighting_exponent = 1.;
   };
 
@@ -980,16 +980,13 @@ namespace Step75
     // for hp-adaptation and right before repartitioning for load balancing is
     // about to happen. Functions can be registered that will attach weights in
     // the form that $a (n_\text{dofs})^b$ with a provided pair of parameters
-    // $(a,b)$. We register such a function in the following. Every cell will be
-    // charged with a constant weight at creation, which is a value of 1000 (see
-    // Triangulation::Signals::cell_weight).
+    // $(a,b)$. We register such a function in the following.
     //
     // For load balancing, efficient solvers like the one we use should scale
-    // linearly with the number of degrees of freedom owned. Further, to
-    // increase the impact of the weights we would like to attach, make sure
-    // that the individual weight will exceed this base weight by orders of
-    // magnitude. We set the parameters for cell weighting correspondingly: A
-    // large weighting factor of $10^6$ and an exponent of $1$.
+    // linearly with the number of degrees of freedom owned. We set the
+    // parameters for cell weighting correspondingly: A weighting factor of $1$
+    // and an exponent of $1$ (see the definitions of the `weighting_factor` and
+    // `weighting_exponent` above).
     cell_weights = std::make_unique<parallel::CellWeights<dim>>(
       dof_handler,
       parallel::CellWeights<dim>::ndofs_weighting(
@@ -1050,9 +1047,12 @@ namespace Step75
   // remove one cell in every cell from the negative direction, but remove one
   // from the positive x-direction.
   //
-  // In the end, we supply the number of initial refinements that corresponds to
-  // the supplied minimal grid refinement level. Further, we set the initial
-  // active FE indices accordingly.
+  // On the coarse grid, we set the initial active FE indices and distribute the
+  // degrees of freedom once. We do that in order to assign the hp::FECollection
+  // to the DoFHandler, so that all cells know how many DoFs they are going to
+  // have. This step is mandatory for the weighted load balancing algorithm,
+  // which will be called implicitly in
+  // parallel::distributed::Triangulation::refine_global().
   template <int dim>
   void LaplaceProblem<dim>::initialize_grid()
   {
@@ -1080,12 +1080,14 @@ namespace Step75
     GridGenerator::subdivided_hyper_L(
       triangulation, repetitions, bottom_left, top_right, cells_to_remove);
 
-    triangulation.refine_global(prm.min_h_level);
-
     const unsigned int min_fe_index = prm.min_p_degree - 1;
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         cell->set_active_fe_index(min_fe_index);
+
+    dof_handler.distribute_dofs(fe_collection);
+
+    triangulation.refine_global(prm.min_h_level);
   }
 
 

@@ -262,7 +262,7 @@ FE_DGPNonparametric<dim, spacedim>::requires_update_flags(
 {
   UpdateFlags out = flags;
 
-  if ((flags & (update_values | update_gradients | update_hessians)) != 0u)
+  if (flags & (update_values | update_gradients | update_hessians))
     out |= update_quadrature_points;
 
   return out;

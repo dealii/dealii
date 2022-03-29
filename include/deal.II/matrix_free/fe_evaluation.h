@@ -3327,7 +3327,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             this->dof_info->hanging_node_constraint_masks.size() > 0 &&
             this->dof_info->hanging_node_constraint_masks_comp.size() > 0 &&
             this->dof_info->hanging_node_constraint_masks[cells[v]] !=
-              internal::MatrixFreeFunctions::ConstraintKinds::unconstrained &&
+              internal::MatrixFreeFunctions::
+                unconstrained_compressed_constraint_kind &&
             this->dof_info->hanging_node_constraint_masks_comp
               [this->active_fe_index][this->first_selected_component])
           has_hn_constraints = true;
@@ -3430,7 +3431,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           if (this->dof_info->hanging_node_constraint_masks.size() > 0 &&
               this->dof_info->hanging_node_constraint_masks_comp.size() > 0 &&
               this->dof_info->hanging_node_constraint_masks[cells[v]] !=
-                internal::MatrixFreeFunctions::ConstraintKinds::unconstrained &&
+                internal::MatrixFreeFunctions::
+                  unconstrained_compressed_constraint_kind &&
               this->dof_info->hanging_node_constraint_masks_comp
                 [this->active_fe_index][this->first_selected_component])
             has_hn_constraints = true;
@@ -3519,7 +3521,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
            ((this->dof_info->hanging_node_constraint_masks.size() > 0 &&
              this->dof_info->hanging_node_constraint_masks_comp.size() > 0 &&
              this->dof_info->hanging_node_constraint_masks[cell_index] !=
-               internal::MatrixFreeFunctions::ConstraintKinds::unconstrained) &&
+               internal::MatrixFreeFunctions::
+                 unconstrained_compressed_constraint_kind) &&
             this->dof_info->hanging_node_constraint_masks_comp
               [this->active_fe_index][this->first_selected_component])))
         {
@@ -4164,7 +4167,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     return; // nothing to do with faces
 
   constexpr unsigned int n_lanes = VectorizedArrayType::size();
-  std::array<internal::MatrixFreeFunctions::ConstraintKinds, n_lanes>
+  std::array<internal::MatrixFreeFunctions::compressed_constraint_kind, n_lanes>
     constraint_mask;
 
   bool hn_available = false;
@@ -4176,8 +4179,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     {
       if (cells[v] == numbers::invalid_unsigned_int)
         {
-          constraint_mask[v] =
-            internal::MatrixFreeFunctions::ConstraintKinds::unconstrained;
+          constraint_mask[v] = internal::MatrixFreeFunctions::
+            unconstrained_compressed_constraint_kind;
           continue;
         }
 
@@ -4186,8 +4189,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         this->dof_info->hanging_node_constraint_masks[cell_index];
       constraint_mask[v] = mask;
 
-      hn_available |=
-        (mask != internal::MatrixFreeFunctions::ConstraintKinds::unconstrained);
+      hn_available |= (mask != internal::MatrixFreeFunctions::
+                                 unconstrained_compressed_constraint_kind);
     }
 
   if (hn_available == false)
@@ -7194,11 +7197,11 @@ FEEvaluation<dim,
     }
 
 #  ifdef DEBUG
-  if ((evaluation_flag_actual & EvaluationFlags::values) != 0u)
+  if (evaluation_flag_actual & EvaluationFlags::values)
     this->values_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::gradients) != 0u)
+  if (evaluation_flag_actual & EvaluationFlags::gradients)
     this->gradients_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::hessians) != 0u)
+  if (evaluation_flag_actual & EvaluationFlags::hessians)
     this->hessians_quad_initialized = true;
 #  endif
 }
@@ -7430,10 +7433,10 @@ FEEvaluation<dim,
             const bool                             sum_into_values_array)
 {
 #  ifdef DEBUG
-  if ((integration_flag & EvaluationFlags::values) != 0u)
+  if (integration_flag & EvaluationFlags::values)
     Assert(this->values_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
-  if ((integration_flag & EvaluationFlags::gradients) != 0u)
+  if (integration_flag & EvaluationFlags::gradients)
     Assert(this->gradients_quad_submitted == true,
            internal::ExcAccessToUninitializedField());
   if ((integration_flag & EvaluationFlags::hessians) != 0u)
@@ -7987,9 +7990,9 @@ FEFaceEvaluation<dim,
       n_components, evaluation_flag_actual, values_array, *this);
 
 #  ifdef DEBUG
-  if ((evaluation_flag_actual & EvaluationFlags::values) != 0u)
+  if (evaluation_flag_actual & EvaluationFlags::values)
     this->values_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::gradients) != 0u)
+  if (evaluation_flag_actual & EvaluationFlags::gradients)
     this->gradients_quad_initialized = true;
   if ((evaluation_flag_actual & EvaluationFlags::hessians) != 0u)
     this->hessians_quad_initialized = true;
@@ -8096,7 +8099,7 @@ FEFaceEvaluation<dim,
                     "and EvaluationFlags::hessians are supported."));
 
   EvaluationFlags::EvaluationFlags integration_flag_actual = integration_flag;
-  if (((integration_flag & EvaluationFlags::hessians) != 0u) &&
+  if (integration_flag & EvaluationFlags::hessians &&
       (this->cell_type > internal::MatrixFreeFunctions::affine))
     {
       unsigned int size = n_components * dim * n_q_points;

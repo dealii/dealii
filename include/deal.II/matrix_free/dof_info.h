@@ -536,7 +536,7 @@ namespace internal
        * Masks indicating for each cell and component if the optimized
        * hanging-node constraint is applicable and if yes which type.
        */
-      std::vector<ConstraintKinds> hanging_node_constraint_masks;
+      std::vector<compressed_constraint_kind> hanging_node_constraint_masks;
 
       /**
        * This variable describes the position of constraints in terms of the

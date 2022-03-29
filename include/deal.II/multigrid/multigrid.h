@@ -238,6 +238,15 @@ public:
                     const MGMatrixBase<VectorType> &edge_in);
 
   /**
+   * Similar to the function above: however, only @p edge_in is set. This
+   * is useful if the matrix attached to this class ignores the edge
+   * constraints during vmult(), which is only used during the computation
+   * of the residual.
+   */
+  void
+  set_edge_in_matrix(const MGMatrixBase<VectorType> &edge_in);
+
+  /**
    * Set additional matrices to correct residual computation at refinement
    * edges. These matrices originate from discontinuous Galerkin methods (see
    * FE_DGQ etc.), where they correspond to the edge fluxes at the refinement

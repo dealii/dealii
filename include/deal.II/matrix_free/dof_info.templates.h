@@ -301,7 +301,8 @@ namespace internal
                                        refinement_configuration,
                                        dof_indices);
 
-      hanging_node_constraint_masks[cell_number] = refinement_configuration;
+      hanging_node_constraint_masks[cell_number] =
+        compress(refinement_configuration, dim);
 
       return true;
     }

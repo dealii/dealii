@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2021 by the deal.II authors
+// Copyright (C) 2001 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3816,7 +3816,7 @@ namespace GridTools
     std::vector<unsigned int> cell_weights;
 
     // Get cell weighting if a signal has been attached to the triangulation
-    if (!triangulation.signals.cell_weight.empty())
+    if (!triangulation.signals.weight.empty())
       {
         cell_weights.resize(triangulation.n_active_cells(), 0U);
 
@@ -3826,13 +3826,13 @@ namespace GridTools
         for (const auto &cell : triangulation.active_cell_iterators())
           if (cell->is_locally_owned())
             cell_weights[cell->active_cell_index()] =
-              triangulation.signals.cell_weight(
+              triangulation.signals.weight(
                 cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
 
         // If this is a parallel triangulation, we then need to also
         // get the weights for all other cells. We have asserted above
         // that this function can't be used for
-        // parallel::distribute::Triangulation objects, so the only
+        // parallel::distributed::Triangulation objects, so the only
         // ones we have to worry about here are
         // parallel::shared::Triangulation
         if (const auto shared_tria =
@@ -3841,6 +3841,13 @@ namespace GridTools
           Utilities::MPI::sum(cell_weights,
                               shared_tria->get_communicator(),
                               cell_weights);
+
+        // verify that the global sum of weights is larger than 0
+        Assert(std::accumulate(cell_weights.begin(),
+                               cell_weights.end(),
+                               std::uint64_t(0)) > 0,
+               ExcMessage("The global sum of weights over all active cells "
+                          "is zero. Please verify how you generate weights."));
       }
 
     // Call the other more general function
@@ -3910,7 +3917,7 @@ namespace GridTools
     std::vector<unsigned int> cell_weights;
 
     // Get cell weighting if a signal has been attached to the triangulation
-    if (!triangulation.signals.cell_weight.empty())
+    if (!triangulation.signals.weight.empty())
       {
         cell_weights.resize(triangulation.n_active_cells(), 0U);
 
@@ -3920,7 +3927,7 @@ namespace GridTools
         for (const auto &cell : triangulation.active_cell_iterators() |
                                   IteratorFilters::LocallyOwnedCell())
           cell_weights[cell->active_cell_index()] =
-            triangulation.signals.cell_weight(
+            triangulation.signals.weight(
               cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
 
         // If this is a parallel triangulation, we then need to also
@@ -3935,6 +3942,13 @@ namespace GridTools
           Utilities::MPI::sum(cell_weights,
                               shared_tria->get_communicator(),
                               cell_weights);
+
+        // verify that the global sum of weights is larger than 0
+        Assert(std::accumulate(cell_weights.begin(),
+                               cell_weights.end(),
+                               std::uint64_t(0)) > 0,
+               ExcMessage("The global sum of weights over all active cells "
+                          "is zero. Please verify how you generate weights."));
       }
 
     // Call the other more general function
@@ -4040,7 +4054,7 @@ namespace GridTools
                       "are already partitioned implicitly and can not be "
                       "partitioned again explicitly."));
     Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
-    Assert(triangulation.signals.cell_weight.empty(), ExcNotImplemented());
+    Assert(triangulation.signals.weight.empty(), ExcNotImplemented());
 
     // signal that partitioning is going to happen
     triangulation.signals.pre_partition();

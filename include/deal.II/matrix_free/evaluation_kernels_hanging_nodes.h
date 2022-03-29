@@ -181,13 +181,13 @@ namespace internal
   public:
     template <bool transpose>
     static void
-    run_internal(const unsigned int                            n_components,
-                 const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                 const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                  Number::size()> &            constraint_mask,
-                 Number *                                      values)
+    run_internal(
+      const unsigned int                            n_components,
+      const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+      const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                       Number::size()> &            constraint_mask,
+      Number *                                      values)
     {
-      using Kinds = MatrixFreeFunctions::ConstraintKinds;
       const unsigned int given_degree =
         fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
 
@@ -205,7 +205,7 @@ namespace internal
 
           for (unsigned int v = 0; v < Number::size(); ++v)
             {
-              const auto kind = static_cast<std::uint16_t>(constraint_mask[v]);
+              const auto kind      = constraint_mask[v];
               const bool subcell_x = (kind >> 0) & 1;
               const bool subcell_y = (kind >> 1) & 1;
               const bool face_x    = (kind >> 3) & 1;
@@ -278,16 +278,17 @@ namespace internal
 
           for (unsigned int v = 0; v < Number::size(); ++v)
             {
-              const auto kind = static_cast<std::uint16_t>(constraint_mask[v]);
+              const auto kind = constraint_mask[v];
+
               const bool subcell_x = (kind >> 0) & 1;
               const bool subcell_y = (kind >> 1) & 1;
               const bool subcell_z = (kind >> 2) & 1;
-              const bool face_x    = (kind >> 3) & 1;
-              const bool face_y    = (kind >> 4) & 1;
-              const bool face_z    = (kind >> 5) & 1;
-              const bool edge_x    = (kind >> 6) & 1;
-              const bool edge_y    = (kind >> 7) & 1;
-              const bool edge_z    = (kind >> 8) & 1;
+              const bool face_x    = ((kind >> 3) & 1) ? (kind >> 5) & 1 : 0;
+              const bool face_y    = ((kind >> 3) & 1) ? (kind >> 6) & 1 : 0;
+              const bool face_z    = ((kind >> 3) & 1) ? (kind >> 7) & 1 : 0;
+              const bool edge_x    = ((kind >> 4) & 1) ? (kind >> 5) & 1 : 0;
+              const bool edge_y    = ((kind >> 4) & 1) ? (kind >> 6) & 1 : 0;
+              const bool edge_z    = ((kind >> 4) & 1) ? (kind >> 7) & 1 : 0;
 
               if (subcell_x)
                 mask_weights[0][v] = 1;
@@ -471,11 +472,11 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
-    create(
-      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask,
-      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
-                         mask_new,
-      const unsigned int v)
+    create(const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                            T1::size()> mask,
+           const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                            T1::size()> mask_new,
+           const unsigned int           v)
     {
       (void)mask;
       (void)mask_new;
@@ -483,7 +484,8 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
-    do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    do_break(unsigned int                                           v,
+             const MatrixFreeFunctions::compressed_constraint_kind &kind)
     {
       (void)v;
       (void)kind;
@@ -491,17 +493,19 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
-    do_continue(unsigned int                                v,
-                const MatrixFreeFunctions::ConstraintKinds &kind)
+    do_continue(unsigned int                                           v,
+                const MatrixFreeFunctions::compressed_constraint_kind &kind)
     {
       (void)v;
-      return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
+      return kind ==
+             MatrixFreeFunctions::unconstrained_compressed_constraint_kind;
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE
-      std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+      std::array<MatrixFreeFunctions::compressed_constraint_kind, T1::size()>
       create_mask(
-        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask)
+        const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                         T1::size()> mask)
     {
       return mask;
     }
@@ -543,7 +547,8 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
-    do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    do_break(unsigned int                                           v,
+             const MatrixFreeFunctions::compressed_constraint_kind &kind)
     {
       (void)v;
       (void)kind;
@@ -551,19 +556,20 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
-    do_continue(unsigned int                                v,
-                const MatrixFreeFunctions::ConstraintKinds &kind)
+    do_continue(unsigned int                                           v,
+                const MatrixFreeFunctions::compressed_constraint_kind &kind)
     {
       (void)v;
-      return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
+      return kind ==
+             MatrixFreeFunctions::unconstrained_compressed_constraint_kind;
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE index_type
-    create(
-      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask,
-      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
-                         mask_new,
-      const unsigned int v)
+    create(const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                            T1::size()> mask,
+           const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                            T1::size()> mask_new,
+           const unsigned int           v)
     {
       (void)mask;
       (void)mask_new;
@@ -573,9 +579,10 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE
-      std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+      std::array<MatrixFreeFunctions::compressed_constraint_kind, T1::size()>
       create_mask(
-        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask)
+        const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                         T1::size()> mask)
     {
       return mask;
     }
@@ -608,26 +615,29 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
-    do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    do_break(unsigned int                                           v,
+             const MatrixFreeFunctions::compressed_constraint_kind &kind)
     {
       (void)v;
-      return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
+      return kind ==
+             MatrixFreeFunctions::unconstrained_compressed_constraint_kind;
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
-    do_continue(unsigned int                                v,
-                const MatrixFreeFunctions::ConstraintKinds &kind)
+    do_continue(unsigned int                                           v,
+                const MatrixFreeFunctions::compressed_constraint_kind &kind)
     {
       (void)v;
-      return kind == MatrixFreeFunctions::ConstraintKinds::unconstrained;
+      return kind ==
+             MatrixFreeFunctions::unconstrained_compressed_constraint_kind;
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE index_type
-    create(
-      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask,
-      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
-                         mask_new,
-      const unsigned int v)
+    create(const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                            T1::size()> mask,
+           const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                            T1::size()> mask_new,
+           const unsigned int           v)
     {
       T1 result;
 
@@ -638,16 +648,17 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE
-      std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+      std::array<MatrixFreeFunctions::compressed_constraint_kind, T1::size()>
       create_mask(
-        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask)
+        const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                         T1::size()> mask)
     {
       auto new_mask = mask;
 
       std::sort(new_mask.begin(), new_mask.end());
       std::fill(std::unique(new_mask.begin(), new_mask.end()),
                 new_mask.end(),
-                MatrixFreeFunctions::ConstraintKinds::unconstrained);
+                MatrixFreeFunctions::unconstrained_compressed_constraint_kind);
 
       return new_mask;
     }
@@ -680,15 +691,16 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
-    do_break(unsigned int v, const MatrixFreeFunctions::ConstraintKinds &kind)
+    do_break(unsigned int                                           v,
+             const MatrixFreeFunctions::compressed_constraint_kind &kind)
     {
       (void)kind;
       return v > 0;
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE bool
-    do_continue(unsigned int                                v,
-                const MatrixFreeFunctions::ConstraintKinds &kind)
+    do_continue(unsigned int                                           v,
+                const MatrixFreeFunctions::compressed_constraint_kind &kind)
     {
       (void)kind;
 
@@ -698,11 +710,11 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE T1
-    create(
-      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask,
-      const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
-                         mask_new,
-      const unsigned int v)
+    create(const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                            T1::size()> mask,
+           const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                            T1::size()> mask_new,
+           const unsigned int           v)
     {
       (void)mask;
       (void)mask_new;
@@ -711,9 +723,10 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE
-      std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()>
+      std::array<MatrixFreeFunctions::compressed_constraint_kind, T1::size()>
       create_mask(
-        const std::array<MatrixFreeFunctions::ConstraintKinds, T1::size()> mask)
+        const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                         T1::size()> mask)
     {
       return mask;
     }
@@ -1514,11 +1527,12 @@ namespace internal
   public:
     template <bool transpose>
     static void
-    run_internal(const unsigned int n_desired_components,
-                 const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                 const std::array<MatrixFreeFunctions::ConstraintKinds,
-                                  Number::size()> &            constraint_mask,
-                 Number *                                      values)
+    run_internal(
+      const unsigned int                            n_desired_components,
+      const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+      const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                       Number::size()> &            constraint_mask,
+      Number *                                      values)
     {
       const unsigned int given_degree =
         fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
@@ -1548,25 +1562,18 @@ namespace internal
 
               if (dim == 2) // 2D: only faces
                 {
-                  const auto is_set = [](const auto a, const auto b) -> bool {
-                    return (a & b) == b;
-                  };
+                  const bool subcell_x = (mask >> 0) & 1;
+                  const bool subcell_y = (mask >> 1) & 1;
+                  const bool face_x    = (mask >> 3) & 1;
+                  const bool face_y    = (mask >> 4) & 1;
 
                   // direction 0:
-                  if ((mask & MatrixFreeFunctions::ConstraintKinds::face_y) !=
-                      MatrixFreeFunctions::ConstraintKinds::unconstrained)
+                  if (face_y)
                     {
-                      const bool is_subface_0 =
-                        (mask &
-                         MatrixFreeFunctions::ConstraintKinds::subcell_x) ==
-                        MatrixFreeFunctions::ConstraintKinds::unconstrained;
-
                       const auto *weights =
-                        interpolation_matrices[is_subface_0].data();
+                        interpolation_matrices[!subcell_x].data();
 
-                      if (is_set(
-                            mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_y))
+                      if (subcell_y)
                         interpolate_2D<2, transpose>(given_degree,
                                                      vv,
                                                      weights,
@@ -1579,20 +1586,12 @@ namespace internal
                     }
 
                   // direction 1:
-                  if ((mask & MatrixFreeFunctions::ConstraintKinds::face_x) !=
-                      MatrixFreeFunctions::ConstraintKinds::unconstrained)
+                  if (face_x)
                     {
-                      const bool is_subface_0 =
-                        (mask &
-                         MatrixFreeFunctions::ConstraintKinds::subcell_y) ==
-                        MatrixFreeFunctions::ConstraintKinds::unconstrained;
-
                       const auto *weights =
-                        interpolation_matrices[is_subface_0].data();
+                        interpolation_matrices[!subcell_y].data();
 
-                      if (is_set(
-                            mask,
-                            MatrixFreeFunctions::ConstraintKinds::subcell_x))
+                      if (subcell_x)
                         interpolate_2D<0, transpose>(given_degree,
                                                      vv,
                                                      weights,
@@ -1606,13 +1605,14 @@ namespace internal
                 }
               else if (dim == 3) // 3D faces and edges
                 {
-                  const auto m = static_cast<std::uint16_t>(mask);
+                  const bool type_x = (mask >> 0) & 1;
+                  const bool type_y = (mask >> 1) & 1;
+                  const bool type_z = (mask >> 2) & 1;
 
-                  const bool type_x = (m >> 0) & 1;
-                  const bool type_y = (m >> 1) & 1;
-                  const bool type_z = (m >> 2) & 1;
-                  const auto faces  = (m >> 3) & 7;
-                  const auto edges  = (m >> 6);
+                  const auto flag_0 = (mask >> 3) & 3;
+                  const auto flag_1 = (mask >> 5) & 7;
+                  const auto faces  = (flag_0 & 0b01) ? flag_1 : 0;
+                  const auto edges  = (flag_0 & 0b10) ? flag_1 : 0;
 
                   Helper<fe_degree == -1 ? HelperType::dynamic :
                                            HelperType::constant,
@@ -1709,9 +1709,9 @@ namespace internal
     run(const unsigned int                            n_desired_components,
         const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
         const bool                                    transpose,
-        const std::array<MatrixFreeFunctions::ConstraintKinds, Number::size()>
-          &     c_mask,
-        Number *values)
+        const std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                         Number::size()> &            c_mask,
+        Number *                                      values)
     {
       using RunnerType =
         FEEvaluationImplHangingNodesRunner<used_runner_type<fe_degree>(),

@@ -689,7 +689,12 @@ namespace DoFRenumbering
                                             dof_handler.end(),
                                             component_order_arg,
                                             false);
-    if (result == 0)
+    (void)result;
+
+    // If we don't have a renumbering (i.e., when there is 1 component) then
+    // return
+    if (Utilities::MPI::max(renumbering.size(),
+                            dof_handler.get_communicator()) == 0)
       return;
 
     // verify that the last numbered
@@ -730,13 +735,13 @@ namespace DoFRenumbering
     const types::global_dof_index result =
       compute_component_wise<dim, spacedim>(
         renumbering, start, end, component_order_arg, true);
+    (void)result;
 
-    if (result == 0)
-      return;
+    Assert(result == 0 || result == dof_handler.n_dofs(level),
+           ExcInternalError());
 
-    Assert(result == dof_handler.n_dofs(level), ExcInternalError());
-
-    if (renumbering.size() != 0)
+    if (Utilities::MPI::max(renumbering.size(),
+                            dof_handler.get_communicator()) > 0)
       dof_handler.renumber_dofs(level, renumbering);
   }
 
@@ -967,22 +972,18 @@ namespace DoFRenumbering
     for (unsigned int component = 0; component < fe_collection.n_components();
          ++component)
       {
-        const typename std::vector<types::global_dof_index>::const_iterator
-          begin_of_component = component_to_dof_map[component].begin(),
-          end_of_component   = component_to_dof_map[component].end();
-
         next_free_index = shifts[component];
 
-        for (typename std::vector<types::global_dof_index>::const_iterator
-               dof_index = begin_of_component;
-             dof_index != end_of_component;
-             ++dof_index)
+        for (const types::global_dof_index dof_index :
+             component_to_dof_map[component])
           {
-            Assert(locally_owned_dofs.index_within_set(*dof_index) <
+            Assert(locally_owned_dofs.index_within_set(dof_index) <
                      new_indices.size(),
                    ExcInternalError());
-            new_indices[locally_owned_dofs.index_within_set(*dof_index)] =
-              next_free_index++;
+            new_indices[locally_owned_dofs.index_within_set(dof_index)] =
+              next_free_index;
+
+            ++next_free_index;
           }
       }
 
@@ -1048,13 +1049,13 @@ namespace DoFRenumbering
                                                                start,
                                                                end,
                                                                true);
+    (void)result;
 
-    if (result == 0)
-      return;
+    Assert(result == 0 || result == dof_handler.n_dofs(level),
+           ExcInternalError());
 
-    Assert(result == dof_handler.n_dofs(level), ExcInternalError());
-
-    if (renumbering.size() != 0)
+    if (Utilities::MPI::max(renumbering.size(),
+                            dof_handler.get_communicator()) > 0)
       dof_handler.renumber_dofs(level, renumbering);
   }
 

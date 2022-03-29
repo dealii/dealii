@@ -65,7 +65,7 @@
 <pre class="cmake">
 CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 
-FIND_PACKAGE(deal.II 10.0.0 REQUIRED
+FIND_PACKAGE(deal.II 9.4.0 REQUIRED
   HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
@@ -272,7 +272,7 @@ In this case the top level <code>CMakeLists.txt</code> file may be:
 <pre class="cmake">
 # top level CMakeLists.txt
 CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
-FIND_PACKAGE(deal.II 10.0.0 REQUIRED)
+FIND_PACKAGE(deal.II 9.4.0 REQUIRED)
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(myproject)
@@ -503,7 +503,7 @@ The <code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code> macro is responsible
 for setting up cached variables and has to invoked before the
 <code>PROJECT</code> call:
 <pre class="cmake">
-FIND_PACKAGE(deal.II 10.0.0 REQUIRED)
+FIND_PACKAGE(deal.II 9.4.0 REQUIRED)
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
@@ -647,7 +647,7 @@ INSTALL(DIRECTORY run DESTINATION share/mycode/run)
 </p>
 
 <pre class="cmake">
-FIND_PACKAGE(deal.II 10.0.0 REQUIRED
+FIND_PACKAGE(deal.II 9.4.0 REQUIRED
   HINTS
     ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
     # You can specify additional hints for search paths here, e.g.

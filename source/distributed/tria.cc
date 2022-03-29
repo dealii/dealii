@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// Copyright (C) 2008 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1453,7 +1453,7 @@ namespace
   {
   public:
     /**
-     * This constructor assumes the cell_weights are already sorted in the
+     * This constructor assumes the @p cell_weights are already sorted in the
      * order that p4est will encounter the cells, and they do not contain
      * ghost cells or artificial cells.
      */
@@ -3351,7 +3351,7 @@ namespace parallel
         {
           // partition the new mesh between all processors. If cell weights
           // have not been given balance the number of cells.
-          if (this->signals.cell_weight.num_slots() == 0)
+          if (this->signals.weight.empty())
             dealii::internal::p4est::functions<dim>::partition(
               parallel_forest,
               /* prepare coarsening */ 1,
@@ -3360,6 +3360,15 @@ namespace parallel
             {
               // get cell weights for a weighted repartitioning.
               const std::vector<unsigned int> cell_weights = get_cell_weights();
+
+              // verify that the global sum of weights is larger than 0
+              Assert(Utilities::MPI::sum(std::accumulate(cell_weights.begin(),
+                                                         cell_weights.end(),
+                                                         std::uint64_t(0)),
+                                         this->mpi_communicator) > 0,
+                     ExcMessage(
+                       "The global sum of weights over all active cells "
+                       "is zero. Please verify how you generate weights."));
 
               PartitionWeights<dim, spacedim> partition_weights(cell_weights);
 
@@ -3515,7 +3524,7 @@ namespace parallel
                         (parallel_forest->mpisize + 1));
         }
 
-      if (this->signals.cell_weight.num_slots() == 0)
+      if (this->signals.weight.empty())
         {
           // no cell weights given -- call p4est's 'partition' without a
           // callback for cell weights
@@ -3528,6 +3537,15 @@ namespace parallel
         {
           // get cell weights for a weighted repartitioning.
           const std::vector<unsigned int> cell_weights = get_cell_weights();
+
+          // verify that the global sum of weights is larger than 0
+          Assert(Utilities::MPI::sum(std::accumulate(cell_weights.begin(),
+                                                     cell_weights.end(),
+                                                     std::uint64_t(0)),
+                                     this->mpi_communicator) > 0,
+                 ExcMessage(
+                   "The global sum of weights over all active cells "
+                   "is zero. Please verify how you generate weights."));
 
           PartitionWeights<dim, spacedim> partition_weights(cell_weights);
 
@@ -4029,56 +4047,16 @@ namespace parallel
 
       // Iterate over p4est and Triangulation relations
       // to find refined/coarsened/kept
-      // cells. Then append cell_weight.
+      // cells. Then append weight.
       // Note that we need to follow the p4est ordering
-      // instead of the deal.II ordering to get the cell_weights
+      // instead of the deal.II ordering to get the weights
       // in the same order p4est will encounter them during repartitioning.
       for (const auto &cell_rel : this->local_cell_relations)
         {
           const auto &cell_it     = cell_rel.first;
           const auto &cell_status = cell_rel.second;
 
-          switch (cell_status)
-            {
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_PERSIST:
-                weights.push_back(1000);
-                weights.back() += this->signals.cell_weight(
-                  cell_it,
-                  parallel::distributed::Triangulation<dim,
-                                                       spacedim>::CELL_PERSIST);
-                break;
-
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_REFINE:
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_INVALID:
-                {
-                  // calculate weight of parent cell
-                  unsigned int parent_weight = 1000;
-                  parent_weight += this->signals.cell_weight(
-                    cell_it,
-                    parallel::distributed::Triangulation<dim, spacedim>::
-                      CELL_REFINE);
-                  // assign the weight of the parent cell equally to all
-                  // children
-                  weights.push_back(parent_weight);
-                  break;
-                }
-
-              case parallel::distributed::Triangulation<dim,
-                                                        spacedim>::CELL_COARSEN:
-                weights.push_back(1000);
-                weights.back() += this->signals.cell_weight(
-                  cell_it,
-                  parallel::distributed::Triangulation<dim,
-                                                       spacedim>::CELL_COARSEN);
-                break;
-
-              default:
-                Assert(false, ExcInternalError());
-                break;
-            }
+          weights.push_back(this->signals.weight(cell_it, cell_status));
         }
 
       return weights;

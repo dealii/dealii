@@ -114,7 +114,7 @@ namespace internal
   {
     // see which type we can cast to, then use this type to create
     // a default constructed object
-    struct GetDefaultValue : public boost::static_visitor<>
+    struct SetValueToDefault : public boost::static_visitor<>
     {
       template <typename T>
       void
@@ -131,7 +131,7 @@ namespace internal
   {
     TableEntry new_entry = *this;
 #ifndef DEAL_II_HAVE_CXX17
-    boost::apply_visitor(Local::GetDefaultValue(), new_entry.value);
+    boost::apply_visitor(Local::SetValueToDefault(), new_entry.value);
 #else
     // Let std::visit figure out which data type is actually stored,
     // and then set the object so stored to a default-constructed

@@ -442,8 +442,7 @@ private:
    * Weights for continuous elements, compressed into 3^dim doubles per
    * cell if possible.
    */
-  std::vector<std::array<VectorizedArray<Number>, Utilities::pow(3, dim)>>
-    weights_compressed;
+  AlignedVector<VectorizedArray<Number>> weights_compressed;
 
   /**
    * DoF indices of the fine cells, expressed in indices local to the MPI

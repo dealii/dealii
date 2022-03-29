@@ -100,9 +100,9 @@ namespace internal
       std::vector<typename Number::value_type> constraint_pool_data;
       std::vector<unsigned int>                constraint_pool_row_index;
 
-      std::vector<ShapeInfo<Number>> shape_infos;
-      std::vector<ConstraintKinds>   hanging_node_constraint_masks;
-      std::vector<unsigned int>      active_fe_indices;
+      std::vector<ShapeInfo<Number>>          shape_infos;
+      std::vector<compressed_constraint_kind> hanging_node_constraint_masks;
+      std::vector<unsigned int>               active_fe_indices;
 
     private:
       inline const typename Number::value_type *
@@ -231,7 +231,7 @@ namespace internal
           hanging_nodes->setup_constraints(
             cell, {}, lexicographic_numbering, local_dof_indices_lex, mask);
 
-          hanging_node_constraint_masks[cell_no] = mask[0];
+          hanging_node_constraint_masks[cell_no] = compress(mask[0], dim);
           active_fe_indices[cell_no]             = cell->active_fe_index();
         }
 
@@ -353,12 +353,12 @@ namespace internal
       dof_indices_per_cell.clear();
       constraint_indicator_per_cell.clear();
 
-      if (hanging_nodes && std::all_of(hanging_node_constraint_masks.begin(),
-                                       hanging_node_constraint_masks.end(),
-                                       [](const auto i) {
-                                         return i ==
-                                                ConstraintKinds::unconstrained;
-                                       }))
+      if (hanging_nodes &&
+          std::all_of(hanging_node_constraint_masks.begin(),
+                      hanging_node_constraint_masks.end(),
+                      [](const auto i) {
+                        return i == unconstrained_compressed_constraint_kind;
+                      }))
         hanging_node_constraint_masks.clear();
     }
 
@@ -459,7 +459,9 @@ namespace internal
       if (hanging_node_constraint_masks.size() == 0)
         return;
 
-      std::array<ConstraintKinds, Number::size()> constraint_mask;
+      std::array<MatrixFreeFunctions::compressed_constraint_kind,
+                 Number::size()>
+        constraint_mask;
 
       bool hn_available = false;
 
@@ -469,13 +471,13 @@ namespace internal
 
           constraint_mask[v] = mask;
 
-          hn_available |= (mask != ConstraintKinds::unconstrained);
+          hn_available |= (mask != unconstrained_compressed_constraint_kind);
         }
 
       if (hn_available == true)
         {
           for (unsigned int v = n_lanes_filled; v < Number::size(); ++v)
-            constraint_mask[v] = ConstraintKinds::unconstrained;
+            constraint_mask[v] = unconstrained_compressed_constraint_kind;
 
           for (unsigned int i = 1; i < n_lanes_filled; ++i)
             AssertDimension(active_fe_indices[first_cell],
