@@ -414,6 +414,8 @@ FUNCTION(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           ${CMAKE_CURRENT_BINARY_DIR}/${_target_short}/interrupt_guard.cc
           )
 
+        set_source_files_properties(${_source_file} PROPERTIES LANGUAGE CXX)
+
         SET_TARGET_PROPERTIES(${_target} PROPERTIES OUTPUT_NAME ${_target_short})
 
         DEAL_II_SETUP_TARGET(${_target} ${_build})
