@@ -1,0 +1,29 @@
+
+DEAL::Testing host ArrayView with host memory
+DEAL::Testing device ArrayView with host memory
+DEAL::
+--------------------------------------------------------
+An error occurred in file <array_view.h> in function
+    dealii::ArrayView<ElementType, MemorySpace>::ArrayView(dealii::ArrayView<ElementType, MemorySpace>::value_type*, std::size_t) [with ElementType = unsigned int; MemorySpaceType = Kokkos::CudaSpace; dealii::ArrayView<ElementType, MemorySpace>::value_type = unsigned int; std::size_t = long unsigned int]
+The violated condition was: 
+    n_elements == 0 || internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>( starting_element)
+Additional information: 
+    The memory space indicated by the template parameter and the one
+    derived from the pointer value do not match!
+--------------------------------------------------------
+
+DEAL::Testing host ArrayView with device memory
+DEAL::
+--------------------------------------------------------
+An error occurred in file <array_view.h> in function
+    dealii::ArrayView<ElementType, MemorySpace>::ArrayView(dealii::ArrayView<ElementType, MemorySpace>::value_type*, std::size_t) [with ElementType = unsigned int; MemorySpaceType = Kokkos::HostSpace; dealii::ArrayView<ElementType, MemorySpace>::value_type = unsigned int; std::size_t = long unsigned int]
+The violated condition was: 
+    n_elements == 0 || internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>( starting_element)
+Additional information: 
+    The memory space indicated by the template parameter and the one
+    derived from the pointer value do not match!
+--------------------------------------------------------
+
+DEAL::Testing device ArrayView with device memory
+DEAL::Testing host ArrayView to a nullptr with length 0
+DEAL::Testing device ArrayView to a nullptr with length 0
