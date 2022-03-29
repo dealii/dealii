@@ -216,9 +216,6 @@ for(int t = 0; t<=100; t++){
 
 This would generate 100 solution .vtk files, which can be opened in a group on Paraview and then can be saved as an animation. We used FFMPEG to generate gifs.
 
-<h4> Resulting videos </h4>
-Following are the resulting videos of our experiments. As we see, TODO
-
 <h3> Possibilities for Extension </h3>
 The current program doesn't allow for iterative solvers as the solutions will not converge with an iterative solver. One possible direction for future work is to implement an iterative solver and involve more preconditioners. An advantage of iterative solvers is the more efficient memory usage, and our current memory usage does not allow for a large number of DOFs.
-Another possible direction would be to perform Local Mesh Refinement (instead of Global Mesh Refinement). This will also help us visualize more DOFs in a more memory and time efficient way.
+Another possible direction would be to perform Local Mesh Refinement (instead of Global Mesh Refinement). This will also help us visualize more DOFs in a more memory and time efficient way. TODO

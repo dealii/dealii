@@ -161,7 +161,7 @@ denote the vacuum dielectric permittivity and magnetic permeability, respectivel
 <li>$\mathbf{E}$, $\mathbf{H}$, $\mathbf{J}_a$, $\mathbf{M}_a$ are all rescaled by
 typical electric current strength $J_0$, i.e., the strength of the
 prescribed dipole source at location $a$ in the $e_i$ direction in Cartesian
-coordinates.
+coordinates (here, $\delta$ is the Dirac delta operator).
 @f[
 \mathbf{J}_a = J_0 e_i\delta(x-a)
 @f]
@@ -234,8 +234,8 @@ in $\Omega\backslash\Sigma$.
 \int_\Omega (\mu_r^{-1}\nabla\times\mathbf{E})\cdot (\nabla\times\bar{\varphi})\;\text{d}x
 - \int_\Omega \varepsilon_r\mathbf{E} \cdot \bar{\varphi}\;\text{d}x
 - \int_\Sigma [\nu \times (\mu_r^{-1}\nabla\times\mathbf{E} +
-\mu^{-1}\mathbf{M}_a)]_{\Sigma}\cdot \bar{\varphi}_T\;\text{d}o_x
-- \int_{\partial\Omega} (\nu \times (\mu_r^{-1}\nabla\times\mathbf{E} +
+\mu^{-1}\mathbf{M}_a)]_{\Sigma}\cdot \bar{\varphi}_T\;\text{d}o_x\\
+\qquad - \int_{\partial\Omega} (\nu \times (\mu_r^{-1}\nabla\times\mathbf{E} +
 \mu^{-1}\mathbf{M}_a)) \cdot \bar{\varphi}_T\;\text{d}o_x =
 i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
 - \int_\Omega \mu_r^{-1}\mathbf{M}_a \cdot (\nabla \times \bar{\varphi})\;\text{d}x.
@@ -244,15 +244,15 @@ i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
 We use the subscript $T$ to denote the tangential part of the given vector
 and $[\cdot]_{\Sigma}$ to denote a jump over $\Sigma$, i.e.,
 @f[
-  F_T = (\nu\times F)\times\nu
+  \mathbf{F}_T = (\mathbf{\nu}\times \mathbf{F})\times\mathbf{\nu}
   \text{ and }
-  [F]_{\Sigma}(x) = \lim\limits_{s\searrow 0}(F(x+s\nu)-F(x-s\nu))
+  [\mathbf{F}]_{\Sigma}(\mathbf{x}) = \lim\limits_{s\searrow 0}(\mathbf{F}(\mathbf{x}+s\mathbf{\nu})-\mathbf{F}(\mathbf{x}-s\mathbf{\nu}))
 @f]
-for $x\in \Sigma$.
+for $\mathbf{x}\in \Sigma$.
 
 For the computational domain $\Omega$, we introduce the absorbing boundary condition
 at $\partial\Omega$, which is obtained by using a first-order approximation of
-the Silver-Müller radiation condition, truncated at $\partial\Omega$.
+the Silver-Müller radiation condition, truncated at $\partial\Omega$ @cite Monk2003.
 @f[
 \nu\times\mathbf{H}+\sqrt{\mu_r^{-1}\varepsilon_r}\mathbf{E}=0\qquad x\in\partial\Omega
 @f]
@@ -272,8 +272,8 @@ Combining, our weak form is as follows:
 @f[
 \int_\Omega (\mu_r^{-1}\nabla\times\mathbf{E})\cdot (\nabla\times\bar{\varphi})\;\text{d}x
 - \int_\Omega \varepsilon_r\mathbf{E} \cdot \bar{\varphi}\;\text{d}x
-- i\int_\Sigma (\sigma_r^{\Sigma}\mathbf{E}_T) \cdot \bar{\varphi}_T\;\text{d}o_x
-- i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}\mathbf{E}_T) \cdot
+- i\int_\Sigma (\sigma_r^{\Sigma}\mathbf{E}_T) \cdot \bar{\varphi}_T\;\text{d}o_x\\
+\qquad - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}\mathbf{E}_T) \cdot
 (\nabla\times\bar{\varphi}_T)\;\text{d}o_x.=
 i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
 - \int_\Omega \mu_r^{-1}\mathbf{M}_a \cdot (\nabla \times \bar{\varphi})\;\text{d}x.
@@ -346,21 +346,18 @@ is described at length below, and avoid the explicit use of the last condition.
 
 The variational form is discretized on a non-uniform quadrilateral mesh with
 higher-order, curl-conforming Nédélec elements implemented by the FE_NedelecSZ
-class. This way the interface with a weak discontinuity can be aligned with or
-away from the mesh and the convergence rate is high. Specifically, we use
-second-order Nédélec elements, which under our conditions will have a
-convergence rate $\mathcal{O}(\#\text{dofs})$.
+class. This way the interface with a weak discontinuity is optimal, and we get optimal convergence rates.
 
 Consider the finite element subspace $X_h(\Omega) \subset X(\Omega)$. Define
 the matrices
 @f[
-A_{ij} = \int_\Omega (\mu_r^{-1}\nabla \times \varphi_i) \cdot
-          (\nabla\times\bar{\varphi}_j)\;\text{d}x
-          - \int_\Omega \varepsilon_r\varphi_i \cdot \bar{\varphi}_j\;\text{d}x
-          - i\int_\Sigma (\sigma_r^{\Sigma}\varphi_{i_T}) \cdot
-          \bar{\varphi}_{j_T}\;\text{d}o_x
-          - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}\varphi_{i_T}
-          \cdot (\nabla\times \bar{\varphi}_{j_T})\;\text{d}o_x,
+A_{ij} = \int_\Omega (\mu_r^{-1}\nabla \times \varphi_j) \cdot
+          (\nabla\times\bar{\varphi}_i)\;\text{d}x
+          - \int_\Omega \varepsilon_r\varphi_j \cdot \bar{\varphi}_i\;\text{d}x
+          - i\int_\Sigma (\sigma_r^{\Sigma}\varphi_{j_T}) \cdot
+          \bar{\varphi}_{i_T}\;\text{d}o_x
+          - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}\varphi_{j_T})
+          \cdot (\nabla\times \bar{\varphi}_{i_T})\;\text{d}o_x,
 @f]
 @f[
 F_i = i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi_i}\;\text{d}x
@@ -372,7 +369,7 @@ Then under the assumption of a sufficiently refined initial mesh
 the discretized variational problem is:
 
 @f[
-  \text{Find a unique } \varphi_j \in X_h(\Omega) \text{ such that, for all } \varphi_i \in X_h(\Omega),
+  \text{Find a unique } \varphi_i \in X_h(\Omega) \text{ such that, for all } \varphi_j \in X_h(\Omega),
 @f]
 @f[
 A_{ij} = F_i
@@ -398,9 +395,11 @@ be a function of the radial distance $\rho$ from the origin $e_r$. The normal fi
 $\nu$ of $\Sigma$ is orthogonal to the radial direction $e_r$, which makes
 $\mathbf{J}_a \equiv 0$ and $\mathbf{M}_a \equiv 0$ within the PML.
 
+@htmlonly
 <p align="center">
   <img src = "https://www.dealii.org/images/steps/developer/step-81-PML.png">
 </p>
+@endhtmlonly
 
 Introduce a change of coordinates
 @f[
@@ -442,7 +441,7 @@ Thus, after applying the rescaling, we get the following modified parameters
   \bar{\sigma}^{\Sigma}_r &= C^{-1} \sigma^{\Sigma}_r B^{-1}.
 @f}
 
-These PML transformations are implemented in our <tt>PerfectlyPatchedLayer</tt>
+These PML transformations are implemented in our <tt>PerfectlyMatchedLayer</tt>
 class. After the PML
 is implemented, the electromagnetic wave essentially decays exponentially within
 the PML region near the boundary, therefore reducing reflection from the boundary

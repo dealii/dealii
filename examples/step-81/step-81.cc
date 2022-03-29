@@ -97,7 +97,11 @@ namespace Step81
   // the interface between two materials. If we are at an interface, we assign
   // the i^th diagonal element of the tensor to the private sigma_ value.
 
-  // J_a is the strength and orientation of the dipole. It is a rank 1 tensor
+  // J_a is the strength and orientation of the dipole. As mentioned in the rescaling,
+  // @f[
+  // \mathbf{J}_a = J_0 e_i\delta(x-a)
+  // @f]
+  // It is a rank 1 tensor
   // that depends on the private dipole_position_, dipole_radius_,
   // dipole_strength_, dipole_orientation_ variables.
 
@@ -547,13 +551,13 @@ namespace Step81
 
   // Assemble the stiffness matrix and the right-hand side:
   //\f{align*}{
-  // A_{ij} = \int_\Omega (\mu_r^{-1}\nabla \times \varphi_i) \cdot
-  // (\nabla\times\bar{\varphi}_j)\text{d}x
-  // - \int_\Omega \varepsilon_r\varphi_i \cdot \bar{\varphi}_j\text{d}x
-  // - i\int_\Sigma (\sigma_r^{\Sigma}(\varphi_i)_T) \cdot
-  // (\bar{\varphi}_j)_T\text{do}x
-  // - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}(\varphi_i)_T) \cdot
-  // (\nabla\times(\bar{\varphi}_j)_T)\text{d}x, \f} \f{align}{
+  // A_{ij} = \int_\Omega (\mu_r^{-1}\nabla \times \varphi_j) \cdot
+  // (\nabla\times\bar{\varphi}_i)\text{d}x
+  // - \int_\Omega \varepsilon_r\varphi_j \cdot \bar{\varphi}_i\text{d}x
+  // - i\int_\Sigma (\sigma_r^{\Sigma}(\varphi_j)_T) \cdot
+  // (\bar{\varphi}_i)_T\text{do}x
+  // - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}(\varphi_j)_T) \cdot
+  // (\nabla\times(\bar{\varphi}_i)_T)\text{d}x, \f} \f{align}{
   //  F_i = i\int_\Omega J_a \cdot \bar{\varphi_i}\text{d}x - \int_\Omega
   //  \mu_r^{-1} \cdot (\nabla \times \bar{\varphi_i}) \text{d}x.
   // \f}
@@ -589,7 +593,7 @@ namespace Step81
 
     // This is assembling the interior of the domain on the left hand side.
     // So we are assembling
-    // //\f{align*}{
+    // \f{align*}{
     // \int_\Omega (\mu_r^{-1}\nabla \times \varphi_i) \cdot
     // (\nabla\times\bar{\varphi}_j)\text{d}x
     // - \int_\Omega \varepsilon_r\varphi_i \cdot \bar{\varphi}_j\text{d}x
@@ -599,7 +603,7 @@ namespace Step81
     // i\int_\Omega J_a \cdot \bar{\varphi_i}\text{d}x
     // - \int_\Omega \mu_r^{-1} \cdot (\nabla \times \bar{\varphi_i}) \text{d}x.
     // \f}
-    // In doing so, we need test functions $\phi_i$ and $\phi_j$, and the curl
+    // In doing so, we need test functions $\varphi_i$ and $\varphi_j$, and the curl
     // of these test variables. We must be careful with the signs of the
     // imaginary parts of these complex test variables. Moreover, we have a
     // conditional that changes the parameters if the cell is in the PML region.
