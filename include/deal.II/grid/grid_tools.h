@@ -240,10 +240,13 @@ namespace GridTools
    * function also works for cells that do not exist except that you make it
    * up by naming its vertices from the list.
    *
-   * The parameter @p vertex_indices is expected to have
-   * GeometryInfo<dim>::vertices_per_cell entries. A std::vector is implicitly
-   * convertible to an ArrayView, so it can be passed directly. See the
-   * ArrayView class for more information.
+   * The size of @p vertex_indices, combined with `dim`, implicitly encodes
+   * the ReferenceCell type of the provided cell. For example, if `dim == 2` and
+   * `vertex_indices.size() == 3` then the cell is a triangle, but if
+   * `dim == 2` and `vertex_indices.size() == 4` then the cell is a
+   * quadrilateral. A std::vector is implicitly convertible to an ArrayView, so
+   * it can be passed directly to this function. See the ArrayView class for
+   * more information.
    *
    * @note This function is only implemented for codimension zero objects.
    */
