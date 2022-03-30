@@ -1167,6 +1167,15 @@ namespace LinearAlgebra
                                             64,
                                             sizeof(Number) * allocated_size);
 
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+          data.values_sm_ptr =  {new_val, [](Number *data) { std::free(data); }};
+
+          cudaError_t cuda_error_code =
+            cudaMemcpy(data.values_sm_ptr.get(),
+                       data.data(),
+                       allocated_size * sizeof(Number),
+                       cudaMemcpyDeviceToHost);
+#else
           data.values = {new_val, [](Number *data) { std::free(data); }};
 
           cudaError_t cuda_error_code =
@@ -1174,6 +1183,7 @@ namespace LinearAlgebra
                        data.values_dev.get(),
                        allocated_size * sizeof(Number),
                        cudaMemcpyDeviceToHost);
+#endif
           AssertCuda(cuda_error_code);
         }
 #  endif
@@ -1271,6 +1281,16 @@ namespace LinearAlgebra
       // move the data back to the device.
       if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
         {
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+          cudaError_t cuda_error_code =
+            cudaMemcpy(data.data(),
+                       data.values_sm_ptr.get(),
+                       allocated_size * sizeof(Number),
+                      cudaMemcpyHostToDevice);
+          AssertCuda(cuda_error_code);
+
+          data.values_sm_ptr.reset();
+#else
           cudaError_t cuda_error_code =
             cudaMemcpy(data.values_dev.get(),
                        data.values.get(),
@@ -1279,6 +1299,7 @@ namespace LinearAlgebra
           AssertCuda(cuda_error_code);
 
           data.values.reset();
+#endif
         }
 #  endif
 #else
@@ -1350,12 +1371,21 @@ namespace LinearAlgebra
                                         64,
                                         sizeof(Number) * allocated_size);
 
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+      data.values_sm_ptr = {new_val, [](Number *data) { std::free(data); }};
+
+      cudaError_t cuda_error_code = cudaMemcpy(data.values_sm_ptr.get(),
+                                               data.values.data(),
+                                               allocated_size * sizeof(Number),
+                                               cudaMemcpyDeviceToHost);
+#else
       data.values = {new_val, [](Number *data) { std::free(data); }};
 
       cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
                                                data.values_dev.get(),
                                                allocated_size * sizeof(Number),
                                                cudaMemcpyDeviceToHost);
+#endif
       AssertCuda(cuda_error_code);
 #  endif
 
@@ -1428,6 +1458,17 @@ namespace LinearAlgebra
       // move the data back to the device.
       if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
         {
+#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+          cudaError_t cuda_error_code =
+            cudaMemcpy(data.values.data() +
+                         partitioner->locally_owned_size(),
+                       data.values_sm_ptr.get() + partitioner->locally_owned_size(),
+                       partitioner->n_ghost_indices() * sizeof(Number),
+                       cudaMemcpyHostToDevice);
+          AssertCuda(cuda_error_code);
+
+          data.values_sm_ptr.reset();
+#else
           cudaError_t cuda_error_code =
             cudaMemcpy(data.values_dev.get() +
                          partitioner->locally_owned_size(),
@@ -1437,6 +1478,7 @@ namespace LinearAlgebra
           AssertCuda(cuda_error_code);
 
           data.values.reset();
+#endif
         }
 #  endif
 
