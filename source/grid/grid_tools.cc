@@ -864,6 +864,17 @@ namespace GridTools
     const std::vector<Point<spacedim>> &all_vertices,
     std::vector<CellData<dim>> &        cells)
   {
+    // This only works for quads and hexes,
+    // and triangules. From the examples we tested,
+    // tetrahedron meshes loaded from Gmsh don't have
+    // this problem, so we skip them for now.
+
+    // Since we use std::abs in computing the measures
+    // of tetrahdrons, the measures are always positive.
+    // But if the orientation is wrong, we may get negative
+    // determinants of the Jacobians in MappingFE, which
+    // will triger the assert there.
+
     if (dim == 1)
       return 0;
     if (dim == 2 && spacedim == 3)
@@ -872,15 +883,14 @@ namespace GridTools
     std::size_t n_negative_cells = 0;
     for (auto &cell : cells)
       {
+        const ArrayView<const unsigned int> vertices(cell.vertices);
         if (cell.vertices.size() ==
             ReferenceCells::get_hypercube<dim>().n_vertices())
           {
-            const ArrayView<const unsigned int> vertices(cell.vertices);
             if (GridTools::cell_measure(all_vertices, vertices) < 0)
               {
                 ++n_negative_cells;
 
-                // TODO: this only works for quads and hexes
                 if (dim == 2)
                   {
                     // flip the cell across the y = x line in 2D
@@ -894,18 +904,11 @@ namespace GridTools
                     std::swap(cell.vertices[4], cell.vertices[6]);
                     std::swap(cell.vertices[5], cell.vertices[7]);
                   }
-
-                // Check whether the resulting cell is now ok.
-                // If not, then the grid is seriously broken and
-                // we just give up.
-                AssertThrow(GridTools::cell_measure(all_vertices, vertices) > 0,
-                            ExcInternalError());
               }
           }
         else if (cell.vertices.size() ==
                  ReferenceCells::get_simplex<dim>().n_vertices())
           {
-            const ArrayView<const unsigned int> vertices(cell.vertices);
             if (GridTools::cell_measure(all_vertices, vertices) < 0)
               {
                 ++n_negative_cells;
@@ -913,20 +916,22 @@ namespace GridTools
                   {
                     // Triangular mesh, swap any two vertices
                     std::swap(cell.vertices[1], cell.vertices[2]);
-                    AssertThrow(GridTools::cell_measure(all_vertices,
-                                                        vertices) > 0,
-                                ExcInternalError());
                   }
                 else
                   {
-                    Assert(false, ExcNotImplemented());
+                    AssertThrow(false, ExcNotImplemented());
                   }
               }
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            AssertThrow(false, ExcNotImplemented());
           }
+        // Check whether the resulting cell is now ok.
+        // If not, then the grid is seriously broken and
+        // we just give up.
+        AssertThrow(GridTools::cell_measure(all_vertices, vertices) > 0,
+                    ExcInternalError());
       }
     return n_negative_cells;
   }
