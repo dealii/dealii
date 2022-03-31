@@ -864,16 +864,16 @@ namespace GridTools
     const std::vector<Point<spacedim>> &all_vertices,
     std::vector<CellData<dim>> &        cells)
   {
-    // This only works for quads and hexes,
-    // and triangules. From the examples we tested,
+    // This function only works for quads and hexes,
+    // and triangles. From the examples we tested,
     // tetrahedron meshes loaded from Gmsh don't have
-    // this problem, so we skip them for now.
+    // negative measures, so we skip them for now.
 
-    // Since we use std::abs in computing the measures
-    // of tetrahdrons, the measures are always positive.
-    // But if the orientation is wrong, we may get negative
-    // determinants of the Jacobians in MappingFE, which
-    // will triger the assert there.
+    // Since we use std::abs() in GridTools::cell_measure() to
+    // compute the measures of tetrahdra, the measures
+    // are always positive. But if the orientation is wrong,
+    // we may get negative determinants of the Jacobians in
+    // MappingFE, which will triger the assert there.
 
     if (dim == 1)
       return 0;
@@ -884,10 +884,12 @@ namespace GridTools
     for (auto &cell : cells)
       {
         const ArrayView<const unsigned int> vertices(cell.vertices);
-        if (cell.vertices.size() ==
-            ReferenceCells::get_hypercube<dim>().n_vertices())
+        if (GridTools::cell_measure(all_vertices, vertices) < 0)
           {
-            if (GridTools::cell_measure(all_vertices, vertices) < 0)
+            const unsigned int n_vertices = vertices.size();
+
+            if (ReferenceCell::n_vertices_to_type(dim, n_vertices)
+                  .is_hyper_cube())
               {
                 ++n_negative_cells;
 
@@ -905,11 +907,9 @@ namespace GridTools
                     std::swap(cell.vertices[5], cell.vertices[7]);
                   }
               }
-          }
-        else if (cell.vertices.size() ==
-                 ReferenceCells::get_simplex<dim>().n_vertices())
-          {
-            if (GridTools::cell_measure(all_vertices, vertices) < 0)
+
+            else if (ReferenceCell::n_vertices_to_type(dim, n_vertices)
+                       .is_simplex())
               {
                 ++n_negative_cells;
                 if (dim == 2)
@@ -922,16 +922,16 @@ namespace GridTools
                     AssertThrow(false, ExcNotImplemented());
                   }
               }
+            else
+              {
+                AssertThrow(false, ExcNotImplemented());
+              }
+            // Check whether the resulting cell is now ok.
+            // If not, then the grid is seriously broken and
+            // we just give up.
+            AssertThrow(GridTools::cell_measure(all_vertices, vertices) > 0,
+                        ExcInternalError());
           }
-        else
-          {
-            AssertThrow(false, ExcNotImplemented());
-          }
-        // Check whether the resulting cell is now ok.
-        // If not, then the grid is seriously broken and
-        // we just give up.
-        AssertThrow(GridTools::cell_measure(all_vertices, vertices) > 0,
-                    ExcInternalError());
       }
     return n_negative_cells;
   }
