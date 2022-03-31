@@ -239,7 +239,8 @@ namespace
           for (unsigned int j = 0; j < degree + 2; ++j)
             for (unsigned int i = 0; i < degree + 1; ++i)
               renumber_aniso[1][(k * (degree + 2) + j) * (degree + 1) + i] =
-                j + i * (degree + 2) + k * (degree + 2) * (degree + 1);
+                (dim > 2) ? j + k * (degree + 2) + i * (degree + 2) * (degree + 1) :
+                            j + i * (degree + 2);
       }
     if (dim > 2)
       {
