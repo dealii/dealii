@@ -231,20 +231,25 @@ namespace
     renumber_aniso[0].resize(n_pols);
     for (unsigned int i = 0; i < n_pols; ++i)
       renumber_aniso[0][i] = i;
-    if (dim > 1)
+    if (dim == 2)
       {
         // switch x and y component (i and j loops)
         renumber_aniso[1].resize(n_pols);
-        for (unsigned int k = 0; k < (dim > 2 ? degree + 1 : 1); ++k)
+        for (unsigned int j = 0; j < degree + 2; ++j)
+          for (unsigned int i = 0; i < degree + 1; ++i)
+            renumber_aniso[1][j * (degree + 1) + i] = j + i * (degree + 2);
+      }
+    if (dim == 3)
+      {
+        // switch x, y, and z component (i, j, k) -> (j, k, i)
+        renumber_aniso[1].resize(n_pols);
+        for (unsigned int k = 0; k < degree + 1; ++k)
           for (unsigned int j = 0; j < degree + 2; ++j)
             for (unsigned int i = 0; i < degree + 1; ++i)
               renumber_aniso[1][(k * (degree + 2) + j) * (degree + 1) + i] =
-                (dim > 2) ? j + k * (degree + 2) + i * (degree + 2) * (degree + 1) :
-                            j + i * (degree + 2);
-      }
-    if (dim > 2)
-      {
-        // switch x and z component (i and k loops)
+                j + k * (degree + 2) + i * (degree + 2) * (degree + 1);
+
+        // switch x, y, and z component (i, j, k) -> (k, i, j)
         renumber_aniso[2].resize(n_pols);
         for (unsigned int k = 0; k < degree + 2; ++k)
           for (unsigned int j = 0; j < degree + 1; ++j)
