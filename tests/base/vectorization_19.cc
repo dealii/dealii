@@ -26,8 +26,17 @@ template <typename Number1,
           std::size_t width1,
           typename Number2,
           std::size_t width2>
-using product_t = typename internal::
-  VectorizationProductTypeImpl<Number1, width1, Number2, width2>::type;
+using VPT = typename internal::
+  VectorizationProductTypeImpl<Number1, width1, Number2, width2>;
+
+
+template <typename Number1,
+          std::size_t width1,
+          typename Number2,
+          std::size_t width2>
+using product_t =
+  VectorizedArray<typename VPT<Number1, width1, Number2, width2>::value_type,
+                  VPT<Number1, width1, Number2, width2>::width>;
 
 
 // Test 1: LHS = VectorizedArray; RHS = Scalar type

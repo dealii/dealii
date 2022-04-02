@@ -4788,6 +4788,28 @@ namespace internal
   template <typename T, typename U>
   struct VectorizationProductType;
 
+
+
+  /**
+   * A class that helps determine some aliases that define the type returned
+   * when two numbers (one of which is a VectorizedArray) are used in the
+   * context of a binary math operation. This implementation class details
+   * specifically the types resulting from binary math operations.
+   *
+   * @tparam Number1 The floating point type associated with the first argument.
+   * @tparam width1 The vectorization width associated with the first argument.
+   * @tparam Number2 The floating point type associated with the second argument.
+   * @tparam width2 The vectorization width associated with the second argument.
+   * @tparam T An arbitrary type resulting from the application of
+   *         the SFINAE idiom to selectively specialize this class.
+   */
+  template <typename Number1,
+            std::size_t width1,
+            typename Number2,
+            std::size_t width2,
+            typename T = void>
+  struct VectorizationProductTypeImpl;
+
 } // namespace internal
 
 
@@ -4796,17 +4818,15 @@ namespace internal
 
 namespace internal
 {
-  template <typename Number1,
-            std::size_t width1,
-            typename Number2,
-            std::size_t width2,
-            typename T = void>
-  struct VectorizationProductTypeImpl;
-
-  // Vectorized Array scalar type and other scalar type are the same.
-  // The width is not necessarily the same though (consider a binary operation
-  // with a vectorized array as one operand and a floating point type as the
-  // other).
+  /**
+   * Specialization of VectorizationProductTypeImpl for when the two scalar
+   * types are the same.
+   *
+   * We also account for the case that the vectorization width associated with
+   * both scalar types is not necessarily the same. For example, consider a
+   * binary operation with a vectorized array as one operand and a floating
+   * point type as the other.
+   */
   template <typename Number1,
             std::size_t width1,
             typename Number2,
@@ -4818,16 +4838,22 @@ namespace internal
     width2,
     typename std::enable_if<std::is_same<Number1, Number2>::value>::type>
   {
+    /**
+     * The number of elements in the resultant array.
+     */
     static constexpr const std::size_t width = std::max(width1, width2);
 
-    using scalar_t = Number1;
-
-    using type = VectorizedArray<scalar_t, width>;
+    /**
+     * The type of the array elements.
+     */
+    using value_type = Number1;
   };
 
 
-  // Vectorized Array scalar type and other scalar type are the different.
-  // Specialization for when both input number types are not complex valued.
+  /**
+   * Specialization of VectorizationProductTypeImpl for when the two scalar
+   * types are different, and both input scalar types are not complex valued.
+   */
   template <typename Number1,
             std::size_t width1,
             typename Number2,
@@ -4841,28 +4867,37 @@ namespace internal
                             !boost::is_complex<Number1>::value &&
                             !boost::is_complex<Number2>::value>::type>
   {
+    /**
+     * The number of elements in the resultant array.
+     */
     static constexpr std::size_t width = std::max(width1, width2);
 
-    // If both scalar types are associated with a vectorized array type of
-    // the same width (e.g. as would  happen if the vectorization with is
-    // unity), then we allow promotion based on which scalar has the highest
-    // precision. If the scalars do not have the same vectorization width, then
-    // we are bound to respect the type with the largest width. That's the only
-    // way to ensure that no data is lost during the conversion (even if it
-    // means that we lose some precision).
-    using scalar_t = typename std::conditional<
+    /**
+     * The type of the array elements.
+     *
+     * If both scalar types are associated with a vectorized array type of
+     * the same width (e.g. as would  happen if the vectorization with is
+     * unity), then we allow promotion based on which scalar has the highest
+     * precision. If the scalars do not have the same vectorization width, then
+     * we are bound to respect the type with the largest width. That's the only
+     * way to ensure that no data is lost during the conversion (even if it
+     * means that we lose some precision).
+     */
+    using value_type = typename std::conditional<
       (width == width1 && width == width2),
       typename std::conditional<(sizeof(Number1) > sizeof(Number2)),
                                 Number1,
                                 Number2>::type,
       typename std::conditional<(width == width1), Number1, Number2>::type>::
       type;
-
-    using type = VectorizedArray<scalar_t, width>;
   };
 
 
-  // Specialization when the first input number type is complex
+  /**
+   * Specialization of VectorizationProductTypeImpl for when the two scalar
+   * types are different, and the first input scalar types is complex valued
+   * while the second is not.
+   */
   template <typename Number1,
             std::size_t width1,
             typename Number2,
@@ -4877,20 +4912,33 @@ namespace internal
                             !boost::is_complex<Number2>::value>::type>
   {
   private:
+    /**
+     * An intermediate type, used to resolve the vectorization product of two
+     * scalar types.
+     */
     using VPT = VectorizationProductTypeImpl<typename Number1::value_type,
                                              width1,
                                              Number2,
                                              width2>;
 
   public:
+    /**
+     * The number of elements in the resultant array.
+     */
     static constexpr std::size_t width = VPT::width;
 
-    using scalar_t = std::complex<typename VPT::scalar_t>;
-    using type     = VectorizedArray<scalar_t, width>;
+    /**
+     * The type of the array elements.
+     */
+    using value_type = std::complex<typename VPT::value_type>;
   };
 
 
-  // Specialization when the second input number type is complex
+  /**
+   * Specialization of VectorizationProductTypeImpl for when the two scalar
+   * types are different, and the second input scalar types is complex valued
+   * while the first is not.
+   */
   template <typename Number1,
             std::size_t width1,
             typename Number2,
@@ -4905,21 +4953,32 @@ namespace internal
                             boost::is_complex<Number2>::value>::type>
   {
   private:
+    /**
+     * An intermediate type, used to resolve the vectorization product of two
+     * scalar types, which may be different.
+     */
     using VPT = VectorizationProductTypeImpl<Number1,
                                              width1,
                                              typename Number2::value_type,
                                              width2>;
 
   public:
+    /**
+     * The number of elements in the resultant array.
+     */
     static constexpr std::size_t width = VPT::width;
 
-    using scalar_t = std::complex<typename VPT::scalar_t>;
-
-    using type = VectorizedArray<scalar_t, width>;
+    /**
+     * The type of the array elements.
+     */
+    using value_type = std::complex<typename VPT::value_type>;
   };
 
 
-  // Specialization when both input number types are complex
+  /**
+   * Specialization of VectorizationProductTypeImpl for when the two scalar
+   * types are different, and both input scalar types are complex valued.
+   */
   template <typename Number1,
             std::size_t width1,
             typename Number2,
@@ -4934,50 +4993,99 @@ namespace internal
                             boost::is_complex<Number2>::value>::type>
   {
   private:
+    /**
+     * An intermediate type, used to resolve the vectorization product of two
+     * scalar types, which may be different.
+     */
     using VPT = VectorizationProductTypeImpl<typename Number1::value_type,
                                              width1,
                                              typename Number2::value_type,
                                              width2>;
 
   public:
+    /**
+     * The number of elements in the resultant array.
+     */
     static constexpr std::size_t width = VPT::width;
 
-    using scalar_t = std::complex<typename VPT::scalar_t>;
-
-    using type = VectorizedArray<scalar_t, width>;
+    /**
+     * The type of the array elements.
+     */
+    using value_type = std::complex<typename VPT::value_type>;
   };
 
 
+
+  /**
+   * Specialization of VectorizationProductType, with the first argument being
+   * a VectorizedArray and the second a (complex) scalar type.
+   */
   template <typename Number1, std::size_t width1, typename Number2>
   struct VectorizationProductType<VectorizedArray<Number1, width1>, Number2>
   {
   private:
+    /**
+     * An intermediate type, used to resolve the vectorization product of a
+     * vectorized array with a scalar type. The scalar type and the underlying
+     * scalar type of the vectorized array need not be the same.
+     */
     using VPT = VectorizationProductTypeImpl<Number1, width1, Number2, 1>;
 
   public:
+    /**
+     * The number of elements in the resultant array.
+     */
     static constexpr std::size_t width = VPT::width;
 
-    using scalar_t = typename VPT::scalar_t;
+    /**
+     * The type of the array elements.
+     */
+    using value_type = typename VPT::value_type;
 
-    using type = typename VPT::type;
+    /**
+     * The concrete resultant array type.
+     */
+    using type = VectorizedArray<value_type, width>;
   };
 
 
+  /**
+   * Specialization of VectorizationProductType, with the first argument being
+   * a (complex) scalar type and the second a VectorizedArray.
+   */
   template <typename Number1, typename Number2, std::size_t width2>
   struct VectorizationProductType<Number1, VectorizedArray<Number2, width2>>
   {
   private:
+    /**
+     * An intermediate type, used to resolve the vectorization product of a
+     * vectorized array with a scalar type. The scalar type and the underlying
+     * scalar type of the vectorized array need not be the same.
+     */
     using VPT = VectorizationProductTypeImpl<Number1, 1, Number2, width2>;
 
   public:
+    /**
+     * The number of elements in the resultant array.
+     */
     static constexpr std::size_t width = VPT::width;
 
-    using scalar_t = typename VPT::scalar_t;
+    /**
+     * The type of the array elements.
+     */
+    using value_type = typename VPT::value_type;
 
-    using type = typename VPT::type;
+    /**
+     * The concrete resultant array type.
+     */
+    using type = VectorizedArray<value_type, width>;
   };
 
 
+  /**
+   * Specialization of VectorizationProductType, with both arguments being a
+   * VectorizedArray.
+   */
   template <typename Number1,
             std::size_t width1,
             typename Number2,
@@ -4986,14 +5094,27 @@ namespace internal
                                   VectorizedArray<Number2, width2>>
   {
   private:
+    /**
+     * An intermediate type, used to resolve the vectorization product of two
+     * vectorized arrays, potentially with different underlying scalar types.
+     */
     using VPT = VectorizationProductTypeImpl<Number1, width1, Number2, width2>;
 
   public:
+    /**
+     * The number of elements in the resultant array.
+     */
     static constexpr std::size_t width = VPT::width;
 
-    using scalar_t = typename VPT::scalar_t;
+    /**
+     * The type of the array elements.
+     */
+    using value_type = typename VPT::value_type;
 
-    using type = typename VPT::type;
+    /**
+     * The concrete resultant array type.
+     */
+    using type = VectorizedArray<value_type, width>;
   };
 
 } // namespace internal
@@ -5087,10 +5208,10 @@ operator*(const VectorizedArray<Number1, width1> &u,
   using VPT =
     internal::VectorizationProductType<VectorizedArray<Number1, width1>,
                                        VectorizedArray<Number2, width2>>;
-  return internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           u) *
-         internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           v);
+  return internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(u) *
+         internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(v);
 }
 
 /**
@@ -5126,10 +5247,10 @@ operator/(const VectorizedArray<Number1, width1> &u,
   using VPT =
     internal::VectorizationProductType<VectorizedArray<Number1, width1>,
                                        VectorizedArray<Number2, width2>>;
-  return internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           u) /
-         internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           v);
+  return internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(u) /
+         internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(v);
 }
 
 /**
@@ -5166,10 +5287,10 @@ operator+(const Number1 &u, const VectorizedArray<Number2, width> &v)
   using VPT =
     internal::VectorizationProductType<Number1,
                                        VectorizedArray<Number2, width>>;
-  return internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           u) +
-         internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           v);
+  return internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(u) +
+         internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(v);
 }
 
 /**
@@ -5270,10 +5391,10 @@ operator-(const Number1 &u, const VectorizedArray<Number2, width> &v)
   using VPT =
     internal::VectorizationProductType<Number1,
                                        VectorizedArray<Number2, width>>;
-  return internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           u) -
-         internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           v);
+  return internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(u) -
+         internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(v);
 }
 
 /**
@@ -5326,10 +5447,10 @@ operator-(const VectorizedArray<Number1, width> &v, const Number2 &u)
   using VPT =
     internal::VectorizationProductType<VectorizedArray<Number1, width>,
                                        Number2>;
-  return internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           v) -
-         internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           u);
+  return internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(v) -
+         internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(u);
 }
 
 /**
@@ -5382,10 +5503,10 @@ operator*(const Number1 &u, const VectorizedArray<Number2, width> &v)
   using VPT =
     internal::VectorizationProductType<Number1,
                                        VectorizedArray<Number2, width>>;
-  return internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           u) *
-         internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           v);
+  return internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(u) *
+         internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(v);
 }
 
 /**
@@ -5486,10 +5607,10 @@ operator/(const Number1 &u, const VectorizedArray<Number2, width> &v)
   using VPT =
     internal::VectorizationProductType<Number1,
                                        VectorizedArray<Number2, width>>;
-  return internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           u) /
-         internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           v);
+  return internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(u) /
+         internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(v);
 }
 
 /**
@@ -5542,10 +5663,10 @@ operator/(const VectorizedArray<Number1, width> &v, const Number2 &u)
   using VPT =
     internal::VectorizationProductType<VectorizedArray<Number1, width>,
                                        Number2>;
-  return internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           v) /
-         internal::convert_vectorized_array<typename VPT::scalar_t, VPT::width>(
-           u);
+  return internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(v) /
+         internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(u);
 }
 
 /**
@@ -6114,7 +6235,7 @@ namespace std
       ::dealii::VectorizedArray<Number1, width>,
       Number2>;
 
-    typename VPT::scalar_t values[VPT::width];
+    typename VPT::value_type values[VPT::width];
     for (unsigned int i = 0;
          i < ::dealii::VectorizedArray<Number1, width>::size();
          ++i)
@@ -6158,7 +6279,7 @@ namespace std
       std::min(::dealii::VectorizedArray<Number1, width1>::size(),
                ::dealii::VectorizedArray<Number2, width2>::size());
 
-    typename VPT::scalar_t values[VPT::width];
+    typename VPT::value_type values[VPT::width];
     for (unsigned int i = 0; i < loop_width; ++i)
       values[i] = std::pow(x[i], p[i]);
     typename VPT::type out;
