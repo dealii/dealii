@@ -25,12 +25,12 @@ template <typename VectorizedArrayBaseType, typename ExponentType>
 void
 do_test(const VectorizedArrayBaseType array, const ExponentType number)
 {
-  deallog << "  test " << VectorizedArrayBaseType::size() << " array elements"
-          << std::endl;
-
   const auto exponentiated_array = std::pow(array, number);
 
-  for (unsigned int i = 0; i < VectorizedArrayBaseType::size(); ++i)
+  using result_type = decltype(exponentiated_array);
+  deallog << "  test " << result_type::size() << " array elements" << std::endl;
+
+  for (unsigned int i = 0; i < result_type::size(); ++i)
     deallog << exponentiated_array[i] << ' ';
   deallog << std::endl;
 }
@@ -43,17 +43,29 @@ main()
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
   do_test(VectorizedArray<double, 8>(2.0), 3.0f);
+  do_test(VectorizedArray<float, 16>(2.0), 3.0);
+
+  do_test(VectorizedArray<double, 8>(2.0), VectorizedArray<float, 16>(3.0));
+  do_test(VectorizedArray<float, 16>(2.0), VectorizedArray<double, 8>(3.0));
 #endif
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
   do_test(VectorizedArray<double, 4>(2.0), 3.0f);
+  do_test(VectorizedArray<float, 8>(2.0), 3.0);
+
+  do_test(VectorizedArray<double, 4>(2.0), VectorizedArray<float, 8>(3.0));
+  do_test(VectorizedArray<float, 8>(2.0), VectorizedArray<double, 4>(3.0));
 #endif
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
   do_test(VectorizedArray<double, 2>(2.0), 3.0f);
+  do_test(VectorizedArray<float, 4>(2.0), 3.0);
+
+  do_test(VectorizedArray<double, 2>(2.0), VectorizedArray<float, 4>(3.0));
+  do_test(VectorizedArray<float, 4>(2.0), VectorizedArray<double, 2>(3.0));
 #endif
 
-  do_test(VectorizedArray<double, 1>(2.0), 3.0);
+  do_test(VectorizedArray<double, 1>(2.0), 3.0f);
   do_test(VectorizedArray<float, 1>(2.0f), 3.0);
 
   do_test(VectorizedArray<double, 1>(2.0), VectorizedArray<float, 1>(3.0f));
