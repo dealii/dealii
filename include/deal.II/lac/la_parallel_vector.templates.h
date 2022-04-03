@@ -643,14 +643,17 @@ namespace LinearAlgebra
       const MPI_Comm &                                          comm_sm)
     {
       clear_mpi_requests();
-      partitioner = partitioner_in;
 
       this->comm_sm = comm_sm;
 
       // set vector size and allocate memory
-      const size_type new_allocated_size =
-        partitioner->locally_owned_size() + partitioner->n_ghost_indices();
-      resize_val(new_allocated_size, comm_sm);
+      if (partitioner.get() != partitioner_in.get())
+        {
+          partitioner = partitioner_in;
+          const size_type new_allocated_size =
+            partitioner->locally_owned_size() + partitioner->n_ghost_indices();
+          resize_val(new_allocated_size, comm_sm);
+        }
 
       // initialize to zero
       *this = Number();
