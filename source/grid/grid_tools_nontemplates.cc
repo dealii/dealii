@@ -57,8 +57,8 @@ namespace GridTools
                              all_vertices[vertex_indices[1]](1),
                              all_vertices[vertex_indices[2]](1)};
 
-        return 0.5 * std::abs((x[0] - x[2]) * (y[1] - y[0]) -
-                              (x[0] - x[1]) * (y[2] - y[0]));
+        return 0.5 *
+               ((x[0] - x[2]) * (y[1] - y[0]) - (x[1] - x[0]) * (y[0] - y[2]));
       }
 
     AssertDimension(vertex_indices.size(), GeometryInfo<2>::vertices_per_cell);

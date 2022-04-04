@@ -864,6 +864,17 @@ namespace GridTools
     const std::vector<Point<spacedim>> &all_vertices,
     std::vector<CellData<dim>> &        cells)
   {
+    // This function only works for quads and hexes,
+    // and triangles. From the examples we tested,
+    // tetrahedron meshes loaded from Gmsh don't have
+    // negative measures, so we skip them for now.
+
+    // Since we use std::abs() in GridTools::cell_measure() to
+    // compute the measures of tetrahdra, the measures
+    // are always positive. But if the orientation is wrong,
+    // we may get negative determinants of the Jacobians in
+    // MappingFE, which will triger the assert there.
+
     if (dim == 1)
       return 0;
     if (dim == 2 && spacedim == 3)
@@ -872,29 +883,49 @@ namespace GridTools
     std::size_t n_negative_cells = 0;
     for (auto &cell : cells)
       {
-        Assert(cell.vertices.size() ==
-                 ReferenceCells::get_hypercube<dim>().n_vertices(),
-               ExcNotImplemented());
         const ArrayView<const unsigned int> vertices(cell.vertices);
         if (GridTools::cell_measure(all_vertices, vertices) < 0)
           {
-            ++n_negative_cells;
+            const unsigned int n_vertices = vertices.size();
 
-            // TODO: this only works for quads and hexes
-            if (dim == 2)
+            if (ReferenceCell::n_vertices_to_type(dim, n_vertices)
+                  .is_hyper_cube())
               {
-                // flip the cell across the y = x line in 2D
-                std::swap(cell.vertices[1], cell.vertices[2]);
-              }
-            else if (dim == 3)
-              {
-                // swap the front and back faces in 3D
-                std::swap(cell.vertices[0], cell.vertices[2]);
-                std::swap(cell.vertices[1], cell.vertices[3]);
-                std::swap(cell.vertices[4], cell.vertices[6]);
-                std::swap(cell.vertices[5], cell.vertices[7]);
+                ++n_negative_cells;
+
+                if (dim == 2)
+                  {
+                    // flip the cell across the y = x line in 2D
+                    std::swap(cell.vertices[1], cell.vertices[2]);
+                  }
+                else if (dim == 3)
+                  {
+                    // swap the front and back faces in 3D
+                    std::swap(cell.vertices[0], cell.vertices[2]);
+                    std::swap(cell.vertices[1], cell.vertices[3]);
+                    std::swap(cell.vertices[4], cell.vertices[6]);
+                    std::swap(cell.vertices[5], cell.vertices[7]);
+                  }
               }
 
+            else if (ReferenceCell::n_vertices_to_type(dim, n_vertices)
+                       .is_simplex())
+              {
+                ++n_negative_cells;
+                if (dim == 2)
+                  {
+                    // Triangular mesh, swap any two vertices
+                    std::swap(cell.vertices[1], cell.vertices[2]);
+                  }
+                else
+                  {
+                    AssertThrow(false, ExcNotImplemented());
+                  }
+              }
+            else
+              {
+                AssertThrow(false, ExcNotImplemented());
+              }
             // Check whether the resulting cell is now ok.
             // If not, then the grid is seriously broken and
             // we just give up.
