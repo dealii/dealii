@@ -44,9 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * For more information about the <tt>spacedim</tt> template parameter check
  * the documentation of FiniteElement or the one of Triangulation.
  *
- * For more information regarding this element see: Boffi, D., et al. "Local
- * Mass Conservation of Stokes Finite Elements." Journal of Scientific
- * Computing (2012): 1-18.
+ * For more information regarding this element see @cite Boffi2012 .
  *
  * <h3>Implementation</h3>
  *
