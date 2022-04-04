@@ -161,6 +161,14 @@ namespace Functions
       value(const Point<dim> & point,
             const unsigned int component = 0) const override;
 
+      /**
+       * Calculates the gradient of the signed distance function via the normal
+       * of the closest point on the ellipsoid.
+       */
+      Tensor<1, dim>
+      gradient(const Point<dim> &,
+               const unsigned int component = 0) const override;
+
     private:
       /**
        * Evaluates the ellipsoid function:
@@ -171,6 +179,27 @@ namespace Functions
        */
       double
       evaluate_ellipsoid(const Point<dim> &point) const;
+
+      /**
+       * Computes the closest point on the given ellipse for an arbitrary point.
+       */
+      Point<dim>
+      compute_closest_point_ellipse(const Point<dim> &point) const;
+
+      /**
+       * Computes the analytical normal vector of a origin centred ellipse at a
+       * given @p point according to:
+       *
+       *  /          \    / b x     a y  \
+       * | n_x , n_y | = | ----- , ----- |
+       * \          /    \   a       b  /
+       *
+       *
+       * @param point [x, y]
+       * @return [n_x , n_y]
+       */
+      Tensor<1, dim, double>
+      compute_analyical_normal_vector_on_ellipse(const Point<dim> &point) const;
 
       /**
        * Compute the signed distance to a 2D ellipsoid i.e. ellipse.
