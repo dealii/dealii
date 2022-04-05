@@ -653,7 +653,7 @@ namespace PETScWrappers
      * returns the number of entries in the sparsity pattern; if any of the
      * entries should happen to be zero, it is counted anyway.
      */
-    size_type
+    std::uint64_t
     n_nonzero_elements() const;
 
     /**

@@ -167,11 +167,16 @@ namespace TrilinosWrappers
 {
   namespace types
   {
+    /**
+     * Declare type of 64 bit integer used in the Epetra package of Trilinos.
+     */
+    using int64_type = long long int;
+
 #ifdef DEAL_II_WITH_64BIT_INDICES
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */
-    using int_type = long long int;
+    using int_type = int64_type;
 #else
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
