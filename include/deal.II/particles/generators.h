@@ -70,7 +70,12 @@ namespace Particles
       ParticleHandler<dim, spacedim> &    particle_handler,
       const Mapping<dim, spacedim> &      mapping =
         (ReferenceCells::get_hypercube<dim>()
-           .template get_default_linear_mapping<dim, spacedim>()));
+#ifndef _MSC_VER
+           .template get_default_linear_mapping<dim, spacedim>()
+#else
+           .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+           ));
 
     /**
      * A function that generates one particle at a random location in cell @p cell and with
@@ -109,7 +114,12 @@ namespace Particles
       std::mt19937 &                random_number_generator,
       const Mapping<dim, spacedim> &mapping =
         (ReferenceCells::get_hypercube<dim>()
-           .template get_default_linear_mapping<dim, spacedim>()));
+#ifndef _MSC_VER
+           .template get_default_linear_mapping<dim, spacedim>()
+#else
+           .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+           ));
 
     /**
      * A function that generates one particle at a random location in cell @p cell and with
@@ -126,7 +136,12 @@ namespace Particles
       ParticleHandler<dim, spacedim> &particle_handler,
       const Mapping<dim, spacedim> &  mapping =
         (ReferenceCells::get_hypercube<dim>()
-           .template get_default_linear_mapping<dim, spacedim>()));
+#ifndef _MSC_VER
+           .template get_default_linear_mapping<dim, spacedim>()
+#else
+           .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+           ));
 
     /**
      * A function that generates particles randomly in the domain with a
@@ -182,7 +197,11 @@ namespace Particles
       ParticleHandler<dim, spacedim> &    particle_handler,
       const Mapping<dim, spacedim> &      mapping =
         (ReferenceCells::get_hypercube<dim>()
+#ifndef _MSC_VER
            .template get_default_linear_mapping<dim, spacedim>()),
+#else
+           .ReferenceCell::get_default_linear_mapping<dim, spacedim>()),
+#endif
       const unsigned int random_number_seed = 5432);
 
 
@@ -229,7 +248,11 @@ namespace Particles
       ParticleHandler<dim, spacedim> &particle_handler,
       const Mapping<dim, spacedim> &  mapping =
         (ReferenceCells::get_hypercube<dim>()
+#ifndef _MSC_VER
            .template get_default_linear_mapping<dim, spacedim>()),
+#else
+           .ReferenceCell::get_default_linear_mapping<dim, spacedim>()),
+#endif
       const ComponentMask &                   components = ComponentMask(),
       const std::vector<std::vector<double>> &properties = {});
 
