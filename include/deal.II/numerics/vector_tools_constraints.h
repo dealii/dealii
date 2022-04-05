@@ -273,12 +273,12 @@ namespace VectorTools
   template <int dim, int spacedim>
   void
   compute_nonzero_normal_flux_constraints(
-    const DoFHandler<dim, spacedim> &   dof_handler,
+    const DoFHandler<dim, spacedim>    &dof_handler,
     const unsigned int                  first_vector_component,
     const std::set<types::boundary_id> &boundary_ids,
     const std::map<types::boundary_id, const Function<spacedim, double> *>
-      &                           function_map,
-    AffineConstraints<double> &   constraints,
+                                 &function_map,
+    AffineConstraints<double>    &constraints,
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
          .template get_default_linear_mapping<dim, spacedim>()));
@@ -295,16 +295,29 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
+#ifndef _MSC_VER
   template <int dim, int spacedim>
   void
   compute_no_normal_flux_constraints(
-    const DoFHandler<dim, spacedim> &   dof_handler,
+    const DoFHandler<dim, spacedim>    &dof_handler,
     const unsigned int                  first_vector_component,
     const std::set<types::boundary_id> &boundary_ids,
-    AffineConstraints<double> &         constraints,
-    const Mapping<dim, spacedim> &      mapping =
+    AffineConstraints<double>          &constraints,
+    const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
          .template get_default_linear_mapping<dim, spacedim>()));
+#else
+  template <int dim, int spacedim>
+  void
+  compute_no_normal_flux_constraints(
+    const DoFHandler<dim, spacedim>    &dof_handler,
+    const unsigned int                  first_vector_component,
+    const std::set<types::boundary_id> &boundary_ids,
+    AffineConstraints<double>          &constraints,
+    const Mapping<dim, spacedim>       &mapping =
+      (ReferenceCells::get_hypercube<dim>()
+         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()));
+#endif
 
   /**
    * Compute the constraints that correspond to boundary conditions of the
@@ -325,12 +338,12 @@ namespace VectorTools
   template <int dim, int spacedim>
   void
   compute_nonzero_tangential_flux_constraints(
-    const DoFHandler<dim, spacedim> &   dof_handler,
+    const DoFHandler<dim, spacedim>    &dof_handler,
     const unsigned int                  first_vector_component,
     const std::set<types::boundary_id> &boundary_ids,
     const std::map<types::boundary_id, const Function<spacedim, double> *>
-      &                           function_map,
-    AffineConstraints<double> &   constraints,
+                                 &function_map,
+    AffineConstraints<double>    &constraints,
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
          .template get_default_linear_mapping<dim, spacedim>()));
@@ -346,11 +359,11 @@ namespace VectorTools
   template <int dim, int spacedim>
   void
   compute_normal_flux_constraints(
-    const DoFHandler<dim, spacedim> &   dof_handler,
+    const DoFHandler<dim, spacedim>    &dof_handler,
     const unsigned int                  first_vector_component,
     const std::set<types::boundary_id> &boundary_ids,
-    AffineConstraints<double> &         constraints,
-    const Mapping<dim, spacedim> &      mapping =
+    AffineConstraints<double>          &constraints,
+    const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
          .template get_default_linear_mapping<dim, spacedim>()));
 
