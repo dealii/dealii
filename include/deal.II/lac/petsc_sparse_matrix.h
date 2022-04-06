@@ -27,6 +27,8 @@
 
 #    include <vector>
 
+#    include "petscis.h"
+
 DEAL_II_NAMESPACE_OPEN
 // forward declaration
 #    ifndef DOXYGEN
