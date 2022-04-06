@@ -957,6 +957,110 @@ namespace PETScWrappers
     AdditionalData additional_data;
   };
 
+    /**
+     * A class that implements the interface to use the BDDC preconditioner from
+     * PETSc.
+     *
+     * @ingroup PETScWrappers
+     * @author Nicolas Barnafi, 2022
+     */
+    class PreconditionBDDC : public PreconditionBase
+    {
+    public:
+      /**
+       * Standardized data struct to pipe additional flags to the
+       * preconditioner.
+       */
+      struct AdditionalData
+      {
+        /**
+         * Constructor. Note that BDDC offers a lot more options to set
+         * than what is exposed here.
+         */
+        AdditionalData(const bool use_vertices_ = true,
+                       const bool use_edges_    = false,
+                       const bool use_faces_    = false,
+                       const bool symmetric_    = false,
+                       const unsigned int coords_cdim_ = 0,
+                       const types::global_dof_index coords_n_ = 0,
+                       const PetscReal *coords_data_ = nullptr);
+
+        /**
+         * This flag sets the use of degrees of freedom in the vertices of the
+         * subdomain as primal variables.
+         */
+        bool use_vertices;
+
+        /**
+         * This flag sets the use of degrees of freedom in the edges of the
+         * subdomain as primal variables.
+         */
+        bool use_edges;
+
+        /**
+         * This flag sets the use of degrees of freedom in the faces of the
+         * subdomain as primal variables.
+         */
+        bool use_faces;
+
+        /**
+         * Set whether the matrix is symmetric or not.
+         */
+        bool symmetric;
+
+        /**
+         * Support for H1 problems
+         */
+        unsigned int coords_cdim;
+        types::global_dof_index coords_n;
+        const PetscReal *coords_data; /* not referenced, consumed at initialize time */
+      };
+
+      /**
+       * Empty Constructor. You need to call initialize() before using this
+       * object.
+       */
+      PreconditionBDDC() = default;
+
+      /**
+       * Constructor. Take the matrix which is used to form the preconditioner,
+       * and additional flags if there are any.
+       */
+      PreconditionBDDC(const MatrixBase &    matrix,
+                       const AdditionalData &additional_data = AdditionalData());
+
+      /**
+       * Same as above but without setting a matrix to form the preconditioner.
+       * Intended to be used with SLEPc objects.
+       */
+      PreconditionBDDC(const MPI_Comm        communicator,
+                       const AdditionalData &additional_data = AdditionalData());
+
+      /**
+       * Initialize the preconditioner object and calculate all data that is
+       * necessary for applying it in a solver. This function is automatically
+       * called when calling the constructor with the same arguments and is only
+       * used if you create the preconditioner without arguments.
+       */
+      void
+      initialize(const MatrixBase &    matrix,
+                 const AdditionalData &additional_data = AdditionalData());
+
+    protected:
+      /**
+       * Store a copy of the flags for this particular preconditioner.
+       */
+      AdditionalData additional_data;
+
+      /**
+       * Initialize the preconditioner object without knowing a particular
+       * matrix. This function sets up appropriate parameters to the underlying
+       * PETSc object after it has been created.
+       */
+      void
+      initialize();
+    };
+
   /**
    * Alias for backwards-compatibility.
    * @deprecated Use PETScWrappers::PreconditionBase instead.
