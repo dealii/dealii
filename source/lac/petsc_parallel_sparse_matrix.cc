@@ -449,7 +449,7 @@ namespace PETScWrappers
       Assert(local_rows.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
 
-    #  ifdef DEBUG
+#  ifdef DEBUG
       {
         // check indexsets
         types::global_dof_index row_owners =
@@ -472,7 +472,7 @@ namespace PETScWrappers
             " but sum(local_columns.n_elements())=" +
             std::to_string(col_owners) + ")"));
       }
-    #  endif
+#  endif
 
       // create the local to global mappings as arrays.
       IndexSet::size_type n_l2g_row = local_active_rows.n_elements();

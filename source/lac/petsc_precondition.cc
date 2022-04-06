@@ -852,100 +852,101 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionBDDC -------------------- */
 
-    PreconditionBDDC::AdditionalData::AdditionalData(const bool use_vertices_,
-                                                     const bool use_edges_,
-                                                     const bool use_faces_,
-                                                     const bool symmetric_,
-                                                     const unsigned int coords_cdim_,
-                                                     const types::global_dof_index coords_n_,
-                                                     const PetscReal *coords_data_)
-      : use_vertices(use_vertices_)
-      , use_edges(use_edges_)
-      , use_faces(use_faces_)
-      , symmetric(symmetric_)
-      , coords_cdim(coords_cdim_)
-      , coords_n(coords_n_)
-      , coords_data(coords_data_)
-    {}
+  PreconditionBDDC::AdditionalData::AdditionalData(
+    const bool                    use_vertices_,
+    const bool                    use_edges_,
+    const bool                    use_faces_,
+    const bool                    symmetric_,
+    const unsigned int            coords_cdim_,
+    const types::global_dof_index coords_n_,
+    const PetscReal *             coords_data_)
+    : use_vertices(use_vertices_)
+    , use_edges(use_edges_)
+    , use_faces(use_faces_)
+    , symmetric(symmetric_)
+    , coords_cdim(coords_cdim_)
+    , coords_n(coords_n_)
+    , coords_data(coords_data_)
+  {}
 
-    PreconditionBDDC::PreconditionBDDC(const MPI_Comm        comm,
-                                       const AdditionalData &additional_data_)
-    {
-      additional_data = additional_data_;
+  PreconditionBDDC::PreconditionBDDC(const MPI_Comm        comm,
+                                     const AdditionalData &additional_data_)
+  {
+    additional_data = additional_data_;
 
-      PetscErrorCode ierr = PCCreate(comm, &pc);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+    PetscErrorCode ierr = PCCreate(comm, &pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-      initialize();
-    }
+    initialize();
+  }
 
-    PreconditionBDDC::PreconditionBDDC(const MatrixBase &    matrix,
-                                       const AdditionalData &additional_data)
-    {
-      initialize(matrix, additional_data);
-    }
+  PreconditionBDDC::PreconditionBDDC(const MatrixBase &    matrix,
+                                     const AdditionalData &additional_data)
+  {
+    initialize(matrix, additional_data);
+  }
 
-    void
-    PreconditionBDDC::initialize()
-    {
-      PetscErrorCode ierr = PCSetType(pc, const_cast<char *>(PCBDDC));
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+  void
+  PreconditionBDDC::initialize()
+  {
+    PetscErrorCode ierr = PCSetType(pc, const_cast<char *>(PCBDDC));
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-      // TODO: Add BDDC options, in particular the additional primal nodes
-      std::stringstream ssStream;
+    // TODO: Add BDDC options, in particular the additional primal nodes
+    std::stringstream ssStream;
 
-      if (additional_data.use_vertices)
-        set_option_value("-pc_bddc_use_vertices", "true");
-      else
-        set_option_value("-pc_bddc_use_vertices", "false");
-      if (additional_data.use_edges)
-        set_option_value("-pc_bddc_use_edges", "true");
-      else
-        set_option_value("-pc_bddc_use_edges", "false");
-      if (additional_data.use_faces)
-        set_option_value("-pc_bddc_use_faces", "true");
-      else
-        set_option_value("-pc_bddc_use_faces", "false");
-      if (additional_data.symmetric)
-        set_option_value("-pc_bddc_symmetric", "true");
-      else
-        set_option_value("-pc_bddc_symmetric", "false");
-      if (additional_data.coords_cdim)
+    if (additional_data.use_vertices)
+      set_option_value("-pc_bddc_use_vertices", "true");
+    else
+      set_option_value("-pc_bddc_use_vertices", "false");
+    if (additional_data.use_edges)
+      set_option_value("-pc_bddc_use_edges", "true");
+    else
+      set_option_value("-pc_bddc_use_edges", "false");
+    if (additional_data.use_faces)
+      set_option_value("-pc_bddc_use_faces", "true");
+    else
+      set_option_value("-pc_bddc_use_faces", "false");
+    if (additional_data.symmetric)
+      set_option_value("-pc_bddc_symmetric", "true");
+    else
+      set_option_value("-pc_bddc_symmetric", "false");
+    if (additional_data.coords_cdim)
       {
         set_option_value("-pc_bddc_corner_selection", "true");
         ierr = PCSetCoordinates(pc,
                                 additional_data.coords_cdim,
                                 additional_data.coords_n,
-                                (PetscReal*)additional_data.coords_data);
+                                (PetscReal *)additional_data.coords_data);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
-      else
+    else
       {
         set_option_value("-pc_bddc_corner_selection", "false");
-        ierr = PCSetCoordinates(pc,0,0,NULL);
+        ierr = PCSetCoordinates(pc, 0, 0, NULL);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 
 
-      ierr = PCSetFromOptions(pc);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
-    }
+    ierr = PCSetFromOptions(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+  }
 
-    void
-    PreconditionBDDC::initialize(const MatrixBase &    matrix_,
-                                 const AdditionalData &additional_data_)
-    {
-      clear();
+  void
+  PreconditionBDDC::initialize(const MatrixBase &    matrix_,
+                               const AdditionalData &additional_data_)
+  {
+    clear();
 
-      matrix          = static_cast<Mat>(matrix_);
-      additional_data = additional_data_;
+    matrix          = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
 
-      create_pc();
-      initialize();
+    create_pc();
+    initialize();
 
-      PetscErrorCode ierr = PCSetUp(pc);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
-    }
+    PetscErrorCode ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+  }
 
 
 } // namespace PETScWrappers
