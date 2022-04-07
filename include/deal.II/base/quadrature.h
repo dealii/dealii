@@ -88,9 +88,10 @@ class Quadrature : public Subscriptor
 public:
   /**
    * Define an alias for a quadrature that acts on an object of one dimension
-   * less. For cells, this would then be a face quadrature.
+   * less. For cells, this would then be a face quadrature. A sub quadrature of
+   * a 0-dimensional quadrature is defined as still being 0-dimensional.
    */
-  using SubQuadrature = Quadrature<dim - 1>;
+  using SubQuadrature = Quadrature<dim == 0 ? 0 : dim - 1>;
 
   /**
    * Constructor.
@@ -483,7 +484,8 @@ Quadrature<dim>::serialize(Archive &ar, const unsigned int)
 template <>
 Quadrature<0>::Quadrature(const unsigned int);
 template <>
-Quadrature<0>::Quadrature(const Quadrature<-1> &, const Quadrature<1> &);
+Quadrature<0>::Quadrature(const Quadrature<0>::SubQuadrature &,
+                          const Quadrature<1> &);
 template <>
 Quadrature<0>::Quadrature(const Quadrature<1> &);
 template <>
