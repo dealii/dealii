@@ -82,7 +82,7 @@ namespace TrilinosWrappers
     /**
      * Declare type for container size.
      */
-    using size_type = dealii::types::global_dof_index;
+    using size_type = TrilinosWrappers::types::int_type;
 
     /**
      * This class implements a wrapper for accessing the Trilinos vector in
@@ -406,7 +406,7 @@ namespace TrilinosWrappers
        */
       using value_type      = TrilinosScalar;
       using real_type       = TrilinosScalar;
-      using size_type       = dealii::types::global_dof_index;
+      using size_type       = TrilinosWrappers::types::int_type;
       using iterator        = value_type *;
       using const_iterator  = const value_type *;
       using reference       = internal::VectorReference;

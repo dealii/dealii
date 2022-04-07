@@ -111,7 +111,7 @@ namespace TrilinosWrappers
       /**
        * Declare the type for container size.
        */
-      using size_type = dealii::types::global_dof_index;
+      using size_type = TrilinosWrappers::types::int_type;
 
       /**
        * Constructor.
@@ -355,13 +355,13 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      using size_type = dealii::types::global_dof_index;
+      using size_type = TrilinosWrappers::types::int_type;
 
       /**
        * A type that denotes what data types is used to express the difference
        * between two iterators.
        */
-      using difference_type = dealii::types::global_dof_index;
+      using difference_type = TrilinosWrappers::types::int_type;
 
       /**
        * An alias for the type you get when you dereference an iterator of the
@@ -549,7 +549,7 @@ namespace TrilinosWrappers
     /**
      * Declare the type for container size.
      */
-    using size_type = dealii::types::global_dof_index;
+    using size_type = TrilinosWrappers::types::int_type;
 
     /**
      * Exception

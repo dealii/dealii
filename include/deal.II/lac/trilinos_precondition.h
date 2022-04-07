@@ -79,7 +79,7 @@ namespace TrilinosWrappers
     /**
      * Declare the type for container size.
      */
-    using size_type = dealii::types::global_dof_index;
+    using size_type = TrilinosWrappers::types::int_type;
 
     /**
      * Standardized data struct to pipe additional flags to the
