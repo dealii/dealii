@@ -207,7 +207,7 @@ namespace Utilities
       const unsigned int i) const
     {
       AssertIndexRange(i, point_ptrs.size());
-      return (point_ptrs[i] - point_ptrs[i - 1]) > 0;
+      return (point_ptrs[i] - (i > 0) ? point_ptrs[i - 1] : 0) > 0;
     }
 
 
