@@ -7247,11 +7247,9 @@ namespace internal
             typename VectorizedArrayType,
             typename VectorType,
             typename EvaluatorType,
-            typename std::enable_if<
-              internal::has_begin<VectorType> &&
-                std::is_same<decltype(std::declval<VectorType>().begin()),
-                             Number *>::value,
-              VectorType>::type * = nullptr>
+            typename std::enable_if<internal::has_begin<VectorType> &&
+                                      !IsBlockVector<VectorType>::value,
+                                    VectorType>::type * = nullptr>
   VectorizedArrayType *
   check_vector_access_inplace(const EvaluatorType &fe_eval, VectorType &vector)
   {
@@ -7297,11 +7295,9 @@ namespace internal
             typename VectorizedArrayType,
             typename VectorType,
             typename EvaluatorType,
-            typename std::enable_if<
-              !internal::has_begin<VectorType> ||
-                !std::is_same<decltype(std::declval<VectorType>().begin()),
-                              Number *>::value,
-              VectorType>::type * = nullptr>
+            typename std::enable_if<!internal::has_begin<VectorType> ||
+                                      IsBlockVector<VectorType>::value,
+                                    VectorType>::type * = nullptr>
   VectorizedArrayType *
   check_vector_access_inplace(const EvaluatorType &, VectorType &)
   {
