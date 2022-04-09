@@ -243,6 +243,11 @@ namespace Utilities
       bool unique_mapping;
 
       /**
+       * Cache if all points passed in during reinit() have been found.
+       */
+      bool all_points_found_flag;
+
+      /**
        * Since for each point multiple or no results can be available, the
        * pointers in this vector indicate the first and last entry associated
        * with a point in a CRS-like fashion.
