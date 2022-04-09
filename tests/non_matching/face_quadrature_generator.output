@@ -1,4 +1,17 @@
 
+DEAL::test_1D
+DEAL::face = 0
+DEAL::Inside quadrature
+DEAL::1.00000
+DEAL::Outside quadrature
+DEAL::Surface quadrature
+DEAL::
+DEAL::face = 1
+DEAL::Inside quadrature
+DEAL::Outside quadrature
+DEAL::1.00000
+DEAL::Surface quadrature
+DEAL::
 DEAL::test_vertical_cuts_through_center
 DEAL::dim=2
 DEAL::plane direction = 0, face = 2

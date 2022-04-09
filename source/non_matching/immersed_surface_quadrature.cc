@@ -77,6 +77,7 @@ namespace NonMatching
   template class ImmersedSurfaceQuadrature<1, 1>;
   template class ImmersedSurfaceQuadrature<2, 2>;
   template class ImmersedSurfaceQuadrature<3, 3>;
+  template class ImmersedSurfaceQuadrature<0, 1>;
   template class ImmersedSurfaceQuadrature<1, 2>;
   template class ImmersedSurfaceQuadrature<2, 3>;
 

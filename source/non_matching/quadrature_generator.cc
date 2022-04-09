@@ -1448,6 +1448,83 @@ namespace NonMatching
   {
     return surface_quadrature;
   }
+
+
+
+  FaceQuadratureGenerator<1>::FaceQuadratureGenerator(
+    const hp::QCollection<1> &quadratures1D,
+    const AdditionalData &    additional_data)
+  {
+    (void)quadratures1D;
+    (void)additional_data;
+  }
+
+
+
+  void
+  FaceQuadratureGenerator<1>::generate(const Function<1> &   level_set,
+                                       const BoundingBox<1> &box,
+                                       const unsigned int    face_index)
+  {
+    AssertIndexRange(face_index, GeometryInfo<1>::faces_per_cell);
+
+    // The only vertex the 1D-face has.
+    const Point<1> vertex =
+      box.vertex(GeometryInfo<1>::face_to_cell_vertices(face_index, 0));
+
+    const unsigned int          n_points = 1;
+    const double                weight   = 1;
+    const std::vector<Point<0>> points(n_points);
+    const std::vector<double>   weights(n_points, weight);
+
+    const double level_set_value = level_set.value(vertex);
+    if (level_set_value < 0)
+      {
+        inside_quadrature  = Quadrature<0>(points, weights);
+        outside_quadrature = Quadrature<0>();
+      }
+    else if (level_set_value > 0)
+      {
+        inside_quadrature  = Quadrature<0>();
+        outside_quadrature = Quadrature<0>(points, weights);
+      }
+    else
+      {
+        inside_quadrature  = Quadrature<0>();
+        outside_quadrature = Quadrature<0>();
+      }
+  }
+
+
+
+  void
+  FaceQuadratureGenerator<1>::set_1D_quadrature(const unsigned int q_index)
+  {
+    (void)q_index;
+  }
+
+
+
+  const Quadrature<0> &
+  FaceQuadratureGenerator<1>::get_inside_quadrature() const
+  {
+    return inside_quadrature;
+  }
+
+
+  const Quadrature<0> &
+  FaceQuadratureGenerator<1>::get_outside_quadrature() const
+  {
+    return outside_quadrature;
+  }
+
+
+
+  const ImmersedSurfaceQuadrature<0, 1> &
+  FaceQuadratureGenerator<1>::get_surface_quadrature() const
+  {
+    return surface_quadrature;
+  }
 } // namespace NonMatching
 #include "quadrature_generator.inst"
 DEAL_II_NAMESPACE_CLOSE
