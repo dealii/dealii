@@ -707,9 +707,9 @@ MGTransferMatrixFree<dim, Number>::memory_consumption() const
 template <int dim, typename Number>
 MGTransferBlockMatrixFree<dim, Number>::MGTransferBlockMatrixFree(
   const MGConstrainedDoFs &mg_c)
-  : same_for_all(true)
 {
-  matrix_free_transfer_vector.emplace_back(mg_c);
+  this->same_for_all = true;
+  this->matrix_free_transfer_vector.emplace_back(mg_c);
 }
 
 
@@ -717,10 +717,10 @@ MGTransferBlockMatrixFree<dim, Number>::MGTransferBlockMatrixFree(
 template <int dim, typename Number>
 MGTransferBlockMatrixFree<dim, Number>::MGTransferBlockMatrixFree(
   const std::vector<MGConstrainedDoFs> &mg_c)
-  : same_for_all(false)
 {
+  this->same_for_all = false;
   for (const auto &constrained_block_dofs : mg_c)
-    matrix_free_transfer_vector.emplace_back(constrained_block_dofs);
+    this->matrix_free_transfer_vector.emplace_back(constrained_block_dofs);
 }
 
 
@@ -730,13 +730,13 @@ void
 MGTransferBlockMatrixFree<dim, Number>::initialize_constraints(
   const MGConstrainedDoFs &mg_c)
 {
-  Assert(same_for_all,
+  Assert(this->same_for_all,
          ExcMessage("This object was initialized with support for usage with "
                     "one DoFHandler for each block, but this method assumes "
                     "that the same DoFHandler is used for all the blocks!"));
-  AssertDimension(matrix_free_transfer_vector.size(), 1);
+  AssertDimension(this->matrix_free_transfer_vector.size(), 1);
 
-  matrix_free_transfer_vector[0].initialize_constraints(mg_c);
+  this->matrix_free_transfer_vector[0].initialize_constraints(mg_c);
 }
 
 
@@ -746,24 +746,15 @@ void
 MGTransferBlockMatrixFree<dim, Number>::initialize_constraints(
   const std::vector<MGConstrainedDoFs> &mg_c)
 {
-  Assert(!same_for_all,
+  Assert(!this->same_for_all,
          ExcMessage("This object was initialized with support for using "
                     "the same DoFHandler for all the blocks, but this "
                     "method assumes that there is a separate DoFHandler "
                     "for each block!"));
-  AssertDimension(matrix_free_transfer_vector.size(), mg_c.size());
+  AssertDimension(this->matrix_free_transfer_vector.size(), mg_c.size());
 
   for (unsigned int i = 0; i < mg_c.size(); ++i)
-    matrix_free_transfer_vector[i].initialize_constraints(mg_c[i]);
-}
-
-
-
-template <int dim, typename Number>
-void
-MGTransferBlockMatrixFree<dim, Number>::clear()
-{
-  matrix_free_transfer_vector.clear();
+    this->matrix_free_transfer_vector[i].initialize_constraints(mg_c[i]);
 }
 
 
@@ -773,8 +764,8 @@ void
 MGTransferBlockMatrixFree<dim, Number>::build(
   const DoFHandler<dim, dim> &dof_handler)
 {
-  AssertDimension(matrix_free_transfer_vector.size(), 1);
-  matrix_free_transfer_vector[0].build(dof_handler);
+  AssertDimension(this->matrix_free_transfer_vector.size(), 1);
+  this->matrix_free_transfer_vector[0].build(dof_handler);
 }
 
 
@@ -784,16 +775,37 @@ void
 MGTransferBlockMatrixFree<dim, Number>::build(
   const std::vector<const DoFHandler<dim, dim> *> &dof_handler)
 {
-  AssertDimension(matrix_free_transfer_vector.size(), dof_handler.size());
+  AssertDimension(this->matrix_free_transfer_vector.size(), dof_handler.size());
   for (unsigned int i = 0; i < dof_handler.size(); ++i)
-    matrix_free_transfer_vector[i].build(*dof_handler[i]);
+    this->matrix_free_transfer_vector[i].build(*dof_handler[i]);
+}
+
+
+
+template <int dim, typename Number>
+std::size_t
+MGTransferBlockMatrixFree<dim, Number>::memory_consumption() const
+{
+  std::size_t total_memory_consumption = 0;
+  for (const auto &el : this->matrix_free_transfer_vector)
+    total_memory_consumption += el.memory_consumption();
+  return total_memory_consumption;
 }
 
 
 
 template <int dim, typename Number>
 void
-MGTransferBlockMatrixFree<dim, Number>::prolongate(
+MGTransferBlockMatrixFree<dim, Number>::clear()
+{
+  this->matrix_free_transfer_vector.clear();
+}
+
+
+
+template <int dim, typename Number, typename TransferType>
+void
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::prolongate(
   const unsigned int                                     to_level,
   LinearAlgebra::distributed::BlockVector<Number> &      dst,
   const LinearAlgebra::distributed::BlockVector<Number> &src) const
@@ -815,9 +827,9 @@ MGTransferBlockMatrixFree<dim, Number>::prolongate(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename TransferType>
 void
-MGTransferBlockMatrixFree<dim, Number>::prolongate_and_add(
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::prolongate_and_add(
   const unsigned int                                     to_level,
   LinearAlgebra::distributed::BlockVector<Number> &      dst,
   const LinearAlgebra::distributed::BlockVector<Number> &src) const
@@ -839,9 +851,9 @@ MGTransferBlockMatrixFree<dim, Number>::prolongate_and_add(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename TransferType>
 void
-MGTransferBlockMatrixFree<dim, Number>::restrict_and_add(
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::restrict_and_add(
   const unsigned int                                     from_level,
   LinearAlgebra::distributed::BlockVector<Number> &      dst,
   const LinearAlgebra::distributed::BlockVector<Number> &src) const
@@ -859,18 +871,6 @@ MGTransferBlockMatrixFree<dim, Number>::restrict_and_add(
                                                                dst.block(b),
                                                                src.block(b));
     }
-}
-
-
-
-template <int dim, typename Number>
-std::size_t
-MGTransferBlockMatrixFree<dim, Number>::memory_consumption() const
-{
-  std::size_t total_memory_consumption = 0;
-  for (const auto &el : matrix_free_transfer_vector)
-    total_memory_consumption += el.memory_consumption();
-  return total_memory_consumption;
 }
 
 
