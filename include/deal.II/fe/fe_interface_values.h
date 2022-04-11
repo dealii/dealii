@@ -1954,6 +1954,126 @@ public:
    * @}
    */
 
+
+
+  /**
+   * @name Access to jumps in the function values and derivatives
+   * @{
+   */
+
+  /**
+   * Return the jump in the values of the
+   * finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
+   */
+  template <class InputVector>
+  void
+  get_jump_in_function_values(
+    const InputVector &                            fe_function,
+    std::vector<typename InputVector::value_type> &values) const;
+
+  /**
+   * Return the jump in the gradients of the
+   * finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   *
+   * @dealiiRequiresUpdateFlags{update_gradients}
+   */
+  template <class InputVector>
+  void
+  get_jump_in_function_gradients(
+    const InputVector &fe_function,
+    std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
+      &gradients) const;
+
+  /**
+   * Return the jump in the Hessians of the
+   * finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   * @dealiiRequiresUpdateFlags{update_hessians}
+   */
+  template <class InputVector>
+  void
+  get_jump_in_function_hessians(
+    const InputVector &fe_function,
+    std::vector<Tensor<2, spacedim, typename InputVector::value_type>>
+      &hessians) const;
+
+  /**
+   * Return the jump in the third derivatives of the
+   * the finite element function characterized by <tt>fe_function</tt> at
+   * the quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   *
+   * @dealiiRequiresUpdateFlags{update_third_derivatives}
+   */
+  template <class InputVector>
+  void
+  get_jump_in_function_third_derivatives(
+    const InputVector &fe_function,
+    std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
+      &third_derivatives) const;
+
+  //@}
+
+  /**
+   * @name Access to the average of the function values and derivatives
+   */
+  //@{
+
+  /**
+   * Return the average of the values of the
+   * finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
+   */
+  template <class InputVector>
+  void
+  get_average_of_function_values(
+    const InputVector &                            fe_function,
+    std::vector<typename InputVector::value_type> &values) const;
+
+  /**
+   * Return the average of the gradients of the
+   * the finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   * @dealiiRequiresUpdateFlags{update_gradients}
+   */
+  template <class InputVector>
+  void
+  get_average_of_function_gradients(
+    const InputVector &fe_function,
+    std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
+      &gradients) const;
+
+  /**
+   * Return the average of the Hessians of the
+   * the finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   * @dealiiRequiresUpdateFlags{update_hessians}
+   */
+  template <class InputVector>
+  void
+  get_average_of_function_hessians(
+    const InputVector &fe_function,
+    std::vector<Tensor<2, spacedim, typename InputVector::value_type>>
+      &hessians) const;
+
+  /**
+   * @}
+   */
+
+
+
   /**
    * @name Extractors Methods to extract individual components
    * @{
@@ -2711,6 +2831,184 @@ FEInterfaceValues<dim, spacedim>::jump_3rd_derivative(
   const unsigned int component) const
 {
   return jump_in_shape_3rd_derivatives(interface_dof_index, q_point, component);
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_jump_in_function_values(
+  const InputVector &                            fe_function,
+  std::vector<typename InputVector::value_type> &values) const
+{
+  AssertDimension(values.size(), n_quadrature_points);
+
+  std::vector<typename InputVector::value_type> values_0(n_quadrature_points);
+  std::vector<typename InputVector::value_type> values_1(n_quadrature_points);
+
+  get_fe_face_values(0).get_function_values(fe_function, values_0);
+  get_fe_face_values(1).get_function_values(fe_function, values_1);
+
+  for (unsigned int q = 0; q < n_quadrature_points; ++q)
+    {
+      values[q] = values_0[q] - values_1[q];
+    }
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_jump_in_function_gradients(
+  const InputVector &fe_function,
+  std::vector<Tensor<1, spacedim, typename InputVector::value_type>> &gradients)
+  const
+{
+  AssertDimension(gradients.size(), n_quadrature_points);
+
+  std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
+    gradients_0(n_quadrature_points);
+  std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
+    gradients_1(n_quadrature_points);
+
+  get_fe_face_values(0).get_function_gradients(fe_function, gradients_0);
+  get_fe_face_values(1).get_function_gradients(fe_function, gradients_1);
+
+  for (unsigned int q = 0; q < n_quadrature_points; ++q)
+    {
+      gradients[q] = gradients_0[q] - gradients_1[q];
+    }
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_jump_in_function_hessians(
+  const InputVector &fe_function,
+  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> &hessians)
+  const
+{
+  AssertDimension(hessians.size(), n_quadrature_points);
+
+  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> hessians_0(
+    n_quadrature_points);
+  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> hessians_1(
+    n_quadrature_points);
+
+  get_fe_face_values(0).get_function_hessians(fe_function, hessians_0);
+  get_fe_face_values(1).get_function_hessians(fe_function, hessians_1);
+
+  for (unsigned int q = 0; q < n_quadrature_points; ++q)
+    {
+      hessians[q] = (hessians_0[q] - hessians_1[q]);
+    }
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_jump_in_function_third_derivatives(
+  const InputVector &fe_function,
+  std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
+    &third_derivatives) const
+{
+  AssertDimension(third_derivatives.size(), n_quadrature_points);
+
+  std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
+    third_derivatives_0(n_quadrature_points);
+  std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
+    third_derivatives_1(n_quadrature_points);
+
+  get_fe_face_values(0).get_function_third_derivatives(fe_function,
+                                                       third_derivatives_0);
+  get_fe_face_values(1).get_function_third_derivatives(fe_function,
+                                                       third_derivatives_1);
+
+  for (unsigned int q = 0; q < n_quadrature_points; ++q)
+    {
+      third_derivatives[q] = (third_derivatives_0[q] - third_derivatives_1[q]);
+    }
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_average_of_function_values(
+  const InputVector &                            fe_function,
+  std::vector<typename InputVector::value_type> &values) const
+{
+  AssertDimension(values.size(), n_quadrature_points);
+
+  std::vector<typename InputVector::value_type> values_0(n_quadrature_points);
+  std::vector<typename InputVector::value_type> values_1(n_quadrature_points);
+
+  get_fe_face_values(0).get_function_values(fe_function, values_0);
+  get_fe_face_values(1).get_function_values(fe_function, values_1);
+
+  for (unsigned int q = 0; q < n_quadrature_points; ++q)
+    {
+      values[q] = (values_0[q] + values_1[q]) * 0.5;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_average_of_function_gradients(
+  const InputVector &fe_function,
+  std::vector<Tensor<1, spacedim, typename InputVector::value_type>> &gradients)
+  const
+{
+  AssertDimension(gradients.size(), n_quadrature_points);
+
+  std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
+    gradients_0(n_quadrature_points);
+  std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
+    gradients_1(n_quadrature_points);
+
+  get_fe_face_values(0).get_function_gradients(fe_function, gradients_0);
+  get_fe_face_values(1).get_function_gradients(fe_function, gradients_1);
+
+  for (unsigned int q = 0; q < n_quadrature_points; ++q)
+    {
+      gradients[q] = (gradients_0[q] + gradients_1[q]) * 0.5;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_average_of_function_hessians(
+  const InputVector &fe_function,
+  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> &hessians)
+  const
+{
+  AssertDimension(hessians.size(), n_quadrature_points);
+
+  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> hessians_0(
+    n_quadrature_points);
+  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> hessians_1(
+    n_quadrature_points);
+
+  get_fe_face_values(0).get_function_hessians(fe_function, hessians_0);
+  get_fe_face_values(1).get_function_hessians(fe_function, hessians_1);
+
+  for (unsigned int q = 0; q < n_quadrature_points; ++q)
+    {
+      hessians[q] = (hessians_0[q] + hessians_1[q]) * 0.5;
+    }
 }
 
 
