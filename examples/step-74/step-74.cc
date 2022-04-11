@@ -175,47 +175,6 @@ namespace Step74
 
 
   // @sect3{Auxiliary functions}
-  // The following two auxiliary functions are used to compute
-  // jump terms for $u_h$ and $\nabla u_h$ on a face,
-  // respectively.
-  template <int dim>
-  void get_function_jump(const FEInterfaceValues<dim> &fe_iv,
-                         const Vector<double> &        solution,
-                         std::vector<double> &         jump)
-  {
-    const unsigned int                 n_q = fe_iv.n_quadrature_points;
-    std::array<std::vector<double>, 2> face_values;
-    jump.resize(n_q);
-    for (unsigned int i = 0; i < 2; ++i)
-      {
-        face_values[i].resize(n_q);
-        fe_iv.get_fe_face_values(i).get_function_values(solution,
-                                                        face_values[i]);
-      }
-    for (unsigned int q = 0; q < n_q; ++q)
-      jump[q] = face_values[0][q] - face_values[1][q];
-  }
-
-
-
-  template <int dim>
-  void get_function_gradient_jump(const FEInterfaceValues<dim> &fe_iv,
-                                  const Vector<double> &        solution,
-                                  std::vector<Tensor<1, dim>> & gradient_jump)
-  {
-    const unsigned int          n_q = fe_iv.n_quadrature_points;
-    std::vector<Tensor<1, dim>> face_gradients[2];
-    gradient_jump.resize(n_q);
-    for (unsigned int i = 0; i < 2; ++i)
-      {
-        face_gradients[i].resize(n_q);
-        fe_iv.get_fe_face_values(i).get_function_gradients(solution,
-                                                           face_gradients[i]);
-      }
-    for (unsigned int q = 0; q < n_q; ++q)
-      gradient_jump[q] = face_gradients[0][q] - face_gradients[1][q];
-  }
-
   // This function computes the penalty $\sigma$.
   double get_penalty_factor(const unsigned int fe_degree,
                             const double       cell_extent_left,
@@ -705,10 +664,10 @@ namespace Step74
       const unsigned int n_q_points = q_points.size();
 
       std::vector<double> jump(n_q_points);
-      get_function_jump(fe_iv, solution, jump);
+      fe_iv.get_jump_in_function_values(solution, jump);
 
       std::vector<Tensor<1, dim>> grad_jump(n_q_points);
-      get_function_gradient_jump(fe_iv, solution, grad_jump);
+      fe_iv.get_jump_in_function_gradients(solution, grad_jump);
 
       const double h = cell->face(f)->diameter();
 
@@ -871,7 +830,7 @@ namespace Step74
       const unsigned int n_q_points = q_points.size();
 
       std::vector<double> jump(n_q_points);
-      get_function_jump(fe_iv, solution, jump);
+      fe_iv.get_jump_in_function_values(solution, jump);
 
       const double extent1 = cell->measure() / cell->face(f)->measure();
       const double extent2 = ncell->measure() / ncell->face(nf)->measure();
