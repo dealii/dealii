@@ -1481,7 +1481,8 @@ namespace internal
 
       // indices
       {
-        transfer.level_dof_indices_fine.resize(n_dof_indices_fine.back());
+        transfer.level_dof_indices_fine.resize(n_dof_indices_fine.back(),
+                                               numbers::invalid_unsigned_int);
 
         std::vector<types::global_dof_index> local_dof_indices(
           transfer.schemes[0].n_dofs_per_cell_coarse);
@@ -1525,7 +1526,9 @@ namespace internal
           dof_handler_coarse,
           transfer.schemes[0].n_coarse_cells +
             transfer.schemes[1].n_coarse_cells,
-          use_fast_hanging_node_algorithm(dof_handler_coarse, mg_level_coarse));
+          constraints_coarse.n_constraints() > 0 &&
+            use_fast_hanging_node_algorithm(dof_handler_coarse,
+                                            mg_level_coarse));
 
         process_cells(
           [&](const auto &cell_coarse, const auto &cell_fine) {
@@ -1574,9 +1577,20 @@ namespace internal
               for (unsigned int i = 0;
                    i < transfer.schemes[1].n_dofs_per_cell_coarse;
                    ++i)
-                level_dof_indices_fine_1[cell_local_children_indices[c][i]] =
-                  transfer.partitioner_fine->global_to_local(
+                {
+                  const auto index = transfer.partitioner_fine->global_to_local(
                     local_dof_indices[lexicographic_numbering_fine[i]]);
+
+                  Assert(level_dof_indices_fine_1
+                               [cell_local_children_indices[c][i]] ==
+                             numbers::invalid_unsigned_int ||
+                           level_dof_indices_fine_1
+                               [cell_local_children_indices[c][i]] == index,
+                         ExcInternalError());
+
+                  level_dof_indices_fine_1[cell_local_children_indices[c][i]] =
+                    index;
+                }
             }
 
             // move pointers (only once at the end)
@@ -1653,7 +1667,7 @@ namespace internal
                     for (unsigned int j = 0; j < fe->n_dofs_per_cell(); ++j)
                       transfer.schemes[1]
                         .restriction_matrix_1d[i * n_child_dofs_1d + j +
-                                               c * shift] =
+                                               c * shift] +=
                         matrix(renumbering[i], renumbering[j]);
                 }
             }
@@ -1694,7 +1708,7 @@ namespace internal
                       transfer.schemes[1].restriction_matrix
                         [i * n_dofs_per_cell *
                            GeometryInfo<dim>::max_children_per_cell +
-                         j + c * n_dofs_per_cell] = matrix(i, j);
+                         j + c * n_dofs_per_cell] += matrix(i, j);
                 }
             }
           }
@@ -2014,7 +2028,9 @@ namespace internal
         transfer.constraint_info.reinit(
           dof_handler_coarse,
           cell_no.back(),
-          use_fast_hanging_node_algorithm(dof_handler_coarse, mg_level_coarse));
+          constraints_coarse.n_constraints() > 0 &&
+            use_fast_hanging_node_algorithm(dof_handler_coarse,
+                                            mg_level_coarse));
 
         process_cells([&](const auto &cell_coarse, const auto &cell_fine) {
           const auto fe_pair_no =
