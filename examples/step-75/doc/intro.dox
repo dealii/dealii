@@ -13,6 +13,7 @@ Peter Munch would like to thank Timo Heister, Martin Kronbichler, and
 Laura Prieto Saavedra for many very interesting discussions.
 </i>
 
+@dealiiTutorialDOI{10.5281/zenodo.6423570,https://zenodo.org/badge/DOI/10.5281/zenodo.6423570.svg}
 
 @note As a prerequisite of this program, you need to have the p4est
 library and the Trilinos library installed. The installation of deal.II
