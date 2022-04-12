@@ -21,9 +21,6 @@ for (deal_II_dimension : DIMENSIONS)
 
 for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
   {
-    template class internal::FEValuesImplementation::
-      RefSpaceFEFieldFunction<deal_II_dimension, VEC>;
-
     template FEValues<deal_II_dimension>::FEValues(
       const hp::MappingCollection<deal_II_dimension> &,
       const hp::FECollection<deal_II_dimension> &,
