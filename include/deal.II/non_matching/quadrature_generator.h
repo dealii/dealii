@@ -27,6 +27,7 @@
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
+#include <deal.II/non_matching/ref_space_fe_field_function.h>
 
 #include <functional>
 
@@ -456,6 +457,95 @@ namespace NonMatching
      * This quadrature always contains zero points in 1D.
      */
     const ImmersedSurfaceQuadrature<0, 1> surface_quadrature;
+  };
+
+  template <int dim>
+  class DiscreteQuadratureGenerator : public QuadratureGenerator<dim>
+  {
+  public:
+    using AdditionalData = AdditionalQGeneratorData;
+
+    template <class VectorType>
+    DiscreteQuadratureGenerator(
+      const hp::QCollection<1> &quadratures1D,
+      const DoFHandler<dim> &   dof_handler,
+      const VectorType &        level_set,
+      const AdditionalData &    additional_data = AdditionalData());
+
+    /**
+     * Construct immersed quadratures rules for the initialized discrete level
+     * set vector over the cell. init_discrete_level_set() has to be called
+     * before.
+     */
+    template <bool level_dof_access>
+    void
+    generate(
+      const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell);
+
+  private:
+    /**
+     * Function that describes our level set function in reference space.
+     */
+    std::unique_ptr<CellWiseFunction<dim>> reference_space_level_set;
+  };
+
+  template <int dim>
+  class DiscreteFaceQuadratureGenerator : public FaceQuadratureGenerator<dim>
+  {
+  public:
+    using AdditionalData = AdditionalQGeneratorData;
+
+    template <class VectorType>
+    DiscreteFaceQuadratureGenerator(
+      const hp::QCollection<1> &quadratures1D,
+      const DoFHandler<dim> &   dof_handler,
+      const VectorType &        level_set,
+      const AdditionalData &    additional_data = AdditionalData());
+
+    /**
+     * Construct immersed quadratures rules for the initialized discrete level
+     * set vector over a face of the cell. init_discrete_level_set() has to be
+     * called before.
+     */
+    template <bool level_dof_access>
+    void
+    generate(
+      const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
+      const unsigned int face_index);
+
+  private:
+    /**
+     * Function that describes our level set function in reference space.
+     */
+    std::unique_ptr<CellWiseFunction<dim>> reference_space_level_set;
+  };
+
+  template <>
+  class DiscreteFaceQuadratureGenerator<1> : public FaceQuadratureGenerator<1>
+  {
+  public:
+    template <class VectorType>
+    DiscreteFaceQuadratureGenerator(
+      const hp::QCollection<1> &quadratures1D,
+      const DoFHandler<1> &     dof_handler,
+      const VectorType &        level_set,
+      const AdditionalData &    additional_data = AdditionalData());
+
+    /**
+     * Construct immersed quadratures rules for the initialized discrete level
+     * set vector over a face of the cell. init_discrete_level_set() has to be
+     * called before.
+     */
+    template <bool level_dof_access>
+    void
+    generate(const TriaIterator<DoFCellAccessor<1, 1, level_dof_access>> &cell,
+             const unsigned int face_index);
+
+  private:
+    /**
+     * Function that describes our level set function in reference space.
+     */
+    std::unique_ptr<CellWiseFunction<1>> reference_space_level_set;
   };
 
 

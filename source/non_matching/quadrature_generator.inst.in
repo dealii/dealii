@@ -76,3 +76,34 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
       UpThroughDimensionCreator<deal_II_dimension, deal_II_space_dimension>;
 #endif
   }
+
+
+for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
+  {
+    template NonMatching::DiscreteQuadratureGenerator<deal_II_dimension>::
+      DiscreteQuadratureGenerator(const hp::QCollection<1> &,
+                                  const DoFHandler<deal_II_dimension> &,
+                                  const VEC &,
+                                  const AdditionalData &);
+
+    template NonMatching::DiscreteFaceQuadratureGenerator<deal_II_dimension>::
+      DiscreteFaceQuadratureGenerator(const hp::QCollection<1> &,
+                                      const DoFHandler<deal_II_dimension> &,
+                                      const VEC &,
+                                      const AdditionalData &);
+  }
+
+// Template generate function
+for (deal_II_dimension : DIMENSIONS; lda : BOOL)
+  {
+    template void
+    NonMatching::DiscreteQuadratureGenerator<deal_II_dimension>::generate(
+      const TriaIterator<
+        DoFCellAccessor<deal_II_dimension, deal_II_dimension, lda>> &);
+
+    template void
+    NonMatching::DiscreteFaceQuadratureGenerator<deal_II_dimension>::generate(
+      const TriaIterator<
+        DoFCellAccessor<deal_II_dimension, deal_II_dimension, lda>> &,
+      const unsigned int);
+  }

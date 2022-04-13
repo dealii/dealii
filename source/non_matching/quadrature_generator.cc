@@ -17,6 +17,18 @@
 
 #include <deal.II/grid/reference_cell.h>
 
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/trilinos_epetra_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/non_matching/quadrature_generator.h>
 
 #include <boost/math/special_functions/relative_difference.hpp>
@@ -1525,6 +1537,92 @@ namespace NonMatching
   {
     return surface_quadrature;
   }
+
+  template <int dim>
+  template <class VectorType>
+  DiscreteQuadratureGenerator<dim>::DiscreteQuadratureGenerator(
+    const hp::QCollection<1> &quadratures1D,
+    const DoFHandler<dim> &   dof_handler,
+    const VectorType &        level_set,
+    const AdditionalData &    additional_data)
+    : QuadratureGenerator<dim>(quadratures1D, additional_data)
+    , reference_space_level_set(
+        std::make_unique<RefSpaceFEFieldFunction<dim, VectorType>>(dof_handler,
+                                                                   level_set))
+  {}
+
+
+
+  template <int dim>
+  template <bool level_dof_access>
+  void
+  DiscreteQuadratureGenerator<dim>::generate(
+    const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell)
+  {
+    Assert(reference_space_level_set != nullptr, ExcNotInitialized());
+    reference_space_level_set->set_active_cell(cell);
+    const BoundingBox<dim> unit_box = create_unit_bounding_box<dim>();
+    QuadratureGenerator<dim>::generate(*reference_space_level_set, unit_box);
+  }
+
+
+  template <int dim>
+  template <class VectorType>
+  DiscreteFaceQuadratureGenerator<dim>::DiscreteFaceQuadratureGenerator(
+    const hp::QCollection<1> &quadratures1D,
+    const DoFHandler<dim> &   dof_handler,
+    const VectorType &        level_set,
+    const AdditionalData &    additional_data)
+    : FaceQuadratureGenerator<dim>(quadratures1D, additional_data)
+    , reference_space_level_set(
+        std::make_unique<RefSpaceFEFieldFunction<dim, VectorType>>(dof_handler,
+                                                                   level_set))
+  {}
+
+
+  template <int dim>
+  template <bool level_dof_access>
+  void
+  DiscreteFaceQuadratureGenerator<dim>::generate(
+    const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
+    const unsigned int                                               face_index)
+  {
+    Assert(reference_space_level_set != nullptr, ExcNotInitialized());
+    reference_space_level_set->set_active_cell(cell);
+    const BoundingBox<dim> unit_box = create_unit_bounding_box<dim>();
+    FaceQuadratureGenerator<dim>::generate(*reference_space_level_set,
+                                           unit_box,
+                                           face_index);
+  }
+
+
+  template <class VectorType>
+  DiscreteFaceQuadratureGenerator<1>::DiscreteFaceQuadratureGenerator(
+    const hp::QCollection<1> &quadratures1D,
+    const DoFHandler<1> &     dof_handler,
+    const VectorType &        level_set,
+    const AdditionalData &    additional_data)
+    : FaceQuadratureGenerator<1>(quadratures1D, additional_data)
+    , reference_space_level_set(
+        std::make_unique<RefSpaceFEFieldFunction<1, VectorType>>(dof_handler,
+                                                                 level_set))
+  {}
+
+  template <bool level_dof_access>
+  void
+  DiscreteFaceQuadratureGenerator<1>::generate(
+    const TriaIterator<DoFCellAccessor<1, 1, level_dof_access>> &cell,
+    const unsigned int                                           face_index)
+  {
+    Assert(reference_space_level_set != nullptr, ExcNotInitialized());
+    reference_space_level_set->set_active_cell(cell);
+    const BoundingBox<1> unit_box = create_unit_bounding_box<1>();
+    FaceQuadratureGenerator<1>::generate(*reference_space_level_set,
+                                         unit_box,
+                                         face_index);
+  }
+
+
 } // namespace NonMatching
 #include "quadrature_generator.inst"
 DEAL_II_NAMESPACE_CLOSE
