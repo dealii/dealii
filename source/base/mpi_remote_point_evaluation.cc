@@ -130,12 +130,50 @@ namespace Utilities
           this->point_ptrs[std::get<1>(data.recv_components[i]) + 1]++;
         }
 
-      unique_mapping = true;
+      std::tuple<unsigned int, unsigned int> n_owning_processes_default{
+        numbers::invalid_unsigned_int, 0};
+      std::tuple<unsigned int, unsigned int> n_owning_processes_local =
+        n_owning_processes_default;
+
       for (unsigned int i = 0; i < points.size(); ++i)
         {
-          if (unique_mapping && this->point_ptrs[i + 1] != 1)
-            unique_mapping = false;
+          std::get<0>(n_owning_processes_local) =
+            std::min(std::get<0>(n_owning_processes_local),
+                     this->point_ptrs[i + 1]);
+          std::get<1>(n_owning_processes_local) =
+            std::max(std::get<1>(n_owning_processes_local),
+                     this->point_ptrs[i + 1]);
+
           this->point_ptrs[i + 1] += this->point_ptrs[i];
+        }
+
+      const auto n_owning_processes_global =
+        Utilities::MPI::all_reduce<std::tuple<unsigned int, unsigned int>>(
+          n_owning_processes_local,
+          tria.get_communicator(),
+          [&](const auto &a,
+              const auto &b) -> std::tuple<unsigned int, unsigned int> {
+            if (a == n_owning_processes_default)
+              return b;
+
+            if (b == n_owning_processes_default)
+              return a;
+
+            return std::tuple<unsigned int, unsigned int>{
+              std::min(std::get<0>(a), std::get<0>(b)),
+              std::max(std::get<1>(a), std::get<1>(b))};
+          });
+
+      if (n_owning_processes_global == n_owning_processes_default)
+        {
+          unique_mapping        = true;
+          all_points_found_flag = true;
+        }
+      else
+        {
+          unique_mapping = (std::get<0>(n_owning_processes_global) == 1) &&
+                           (std::get<1>(n_owning_processes_global) == 1);
+          all_points_found_flag = std::get<0>(n_owning_processes_global) > 0;
         }
 
       Assert(enforce_unique_mapping == false || unique_mapping,
@@ -189,15 +227,7 @@ namespace Utilities
     bool
     RemotePointEvaluation<dim, spacedim>::all_points_found() const
     {
-      if (is_map_unique())
-        return true;
-
-      if (point_ptrs.size() > 0)
-        for (unsigned int i = 0; i < point_ptrs.size() - 1; ++i)
-          if (point_found(i) == false)
-            return false;
-
-      return true;
+      return all_points_found_flag;
     }
 
 
@@ -208,7 +238,11 @@ namespace Utilities
       const unsigned int i) const
     {
       AssertIndexRange(i, point_ptrs.size() - 1);
-      return (point_ptrs[i + 1] - point_ptrs[i]) > 0;
+
+      if (all_points_found_flag)
+        return true;
+      else
+        return (point_ptrs[i + 1] - point_ptrs[i]) > 0;
     }
 
 
