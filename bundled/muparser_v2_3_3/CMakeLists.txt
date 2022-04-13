@@ -22,6 +22,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-switch)
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-nested-anon-types)
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-implicit-fallthrough)
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-cast-function-type)
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-float-conversion)
 
 INCLUDE_DIRECTORIES(
   include/
@@ -38,4 +39,8 @@ src/muParserTest.cpp
 src/muParserTokenReader.cpp
   )
 
-#DEAL_II_ADD_DEFINITIONS(obj_muparser "FP_USE_THREAD_SAFE_EVAL")
+# We do not support (yet) compiling DLLs with MSVC. By default, muParser will
+# try to set itself up correctly with __declspec(dllexport). Get around this by
+# instructing it to use static linkage, which will define (see muParserFixes.h)
+# AP_EXPORT_CXX to nothing.
+DEAL_II_ADD_DEFINITIONS(obj_muparser "MUPARSER_STATIC")
