@@ -39,6 +39,8 @@ using namespace std;
 	\brief This file contains the implementation of parser test cases.
 */
 
+namespace dealii
+{
 namespace mu
 {
 	namespace Test
@@ -1715,3 +1717,4 @@ namespace mu
 		}
 	} // namespace test
 } // namespace mu
+}

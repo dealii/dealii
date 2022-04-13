@@ -34,6 +34,8 @@
 	#pragma warning(disable : 26812) // MSVC wants to force me te use enum classes or bother me with pointless warnings
 #endif
 
+namespace dealii
+{
 namespace mu
 {
 	//------------------------------------------------------------------------------
@@ -329,6 +331,7 @@ namespace mu
 		return m_iErrc;
 	}
 } // namespace mu
+}
 
 #if defined(_MSC_VER)
 	#pragma warning(pop)

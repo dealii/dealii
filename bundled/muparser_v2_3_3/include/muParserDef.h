@@ -90,6 +90,8 @@
 #endif
 
 
+namespace dealii
+{
 namespace mu
 {
 #if defined(_UNICODE)
@@ -509,6 +511,7 @@ namespace mu
 	static const string_type ParserVersion = string_type(_T("2.3.3 (Release)"));
 	static const string_type ParserVersionDate = string_type(_T("20220122"));
 } // end of namespace
+}
 
 #if defined(_MSC_VER)
 	#pragma warning(pop)
