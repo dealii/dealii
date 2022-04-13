@@ -161,7 +161,7 @@ test()
   std::vector<Tensor<3, dim>> average_of_3rd_derivatives(n_face_q_points);
   std::vector<Tensor<3, dim>> exact_average_of_3rd_derivatives(n_face_q_points);
 
-  const double tol = 1e-11;
+  const double tol = 1e-15;
 
   typename DoFHandler<dim>::active_cell_iterator cell =
     dof_handler.begin_active();
@@ -244,15 +244,13 @@ main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
-
   deallog.push("Test jump in function values");
   {
     test_jump_function();
   }
   deallog.pop();
   deallog << "OK" << std::endl;
+
   deallog.push("Test all functions");
   {
     test();

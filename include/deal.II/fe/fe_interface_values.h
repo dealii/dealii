@@ -2844,16 +2844,8 @@ FEInterfaceValues<dim, spacedim>::get_jump_in_function_values(
 {
   AssertDimension(values.size(), n_quadrature_points);
 
-  std::vector<typename InputVector::value_type> values_0(n_quadrature_points);
-  std::vector<typename InputVector::value_type> values_1(n_quadrature_points);
-
-  get_fe_face_values(0).get_function_values(fe_function, values_0);
-  get_fe_face_values(1).get_function_values(fe_function, values_1);
-
-  for (unsigned int q = 0; q < n_quadrature_points; ++q)
-    {
-      values[q] = values_0[q] - values_1[q];
-    }
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_jump_in_function_values(fe_function, values);
 }
 
 
@@ -2868,18 +2860,9 @@ FEInterfaceValues<dim, spacedim>::get_jump_in_function_gradients(
 {
   AssertDimension(gradients.size(), n_quadrature_points);
 
-  std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
-    gradients_0(n_quadrature_points);
-  std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
-    gradients_1(n_quadrature_points);
-
-  get_fe_face_values(0).get_function_gradients(fe_function, gradients_0);
-  get_fe_face_values(1).get_function_gradients(fe_function, gradients_1);
-
-  for (unsigned int q = 0; q < n_quadrature_points; ++q)
-    {
-      gradients[q] = gradients_0[q] - gradients_1[q];
-    }
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_jump_in_function_gradients(fe_function,
+                                                          gradients);
 }
 
 
@@ -2894,18 +2877,8 @@ FEInterfaceValues<dim, spacedim>::get_jump_in_function_hessians(
 {
   AssertDimension(hessians.size(), n_quadrature_points);
 
-  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> hessians_0(
-    n_quadrature_points);
-  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> hessians_1(
-    n_quadrature_points);
-
-  get_fe_face_values(0).get_function_hessians(fe_function, hessians_0);
-  get_fe_face_values(1).get_function_hessians(fe_function, hessians_1);
-
-  for (unsigned int q = 0; q < n_quadrature_points; ++q)
-    {
-      hessians[q] = (hessians_0[q] - hessians_1[q]);
-    }
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_jump_in_function_hessians(fe_function, hessians);
 }
 
 
@@ -2920,20 +2893,9 @@ FEInterfaceValues<dim, spacedim>::get_jump_in_function_third_derivatives(
 {
   AssertDimension(third_derivatives.size(), n_quadrature_points);
 
-  std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
-    third_derivatives_0(n_quadrature_points);
-  std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
-    third_derivatives_1(n_quadrature_points);
-
-  get_fe_face_values(0).get_function_third_derivatives(fe_function,
-                                                       third_derivatives_0);
-  get_fe_face_values(1).get_function_third_derivatives(fe_function,
-                                                       third_derivatives_1);
-
-  for (unsigned int q = 0; q < n_quadrature_points; ++q)
-    {
-      third_derivatives[q] = (third_derivatives_0[q] - third_derivatives_1[q]);
-    }
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_jump_in_function_third_derivatives(
+    fe_function, third_derivatives);
 }
 
 
@@ -2947,16 +2909,8 @@ FEInterfaceValues<dim, spacedim>::get_average_of_function_values(
 {
   AssertDimension(values.size(), n_quadrature_points);
 
-  std::vector<typename InputVector::value_type> values_0(n_quadrature_points);
-  std::vector<typename InputVector::value_type> values_1(n_quadrature_points);
-
-  get_fe_face_values(0).get_function_values(fe_function, values_0);
-  get_fe_face_values(1).get_function_values(fe_function, values_1);
-
-  for (unsigned int q = 0; q < n_quadrature_points; ++q)
-    {
-      values[q] = (values_0[q] + values_1[q]) * 0.5;
-    }
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_average_of_function_values(fe_function, values);
 }
 
 
@@ -2971,18 +2925,9 @@ FEInterfaceValues<dim, spacedim>::get_average_of_function_gradients(
 {
   AssertDimension(gradients.size(), n_quadrature_points);
 
-  std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
-    gradients_0(n_quadrature_points);
-  std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
-    gradients_1(n_quadrature_points);
-
-  get_fe_face_values(0).get_function_gradients(fe_function, gradients_0);
-  get_fe_face_values(1).get_function_gradients(fe_function, gradients_1);
-
-  for (unsigned int q = 0; q < n_quadrature_points; ++q)
-    {
-      gradients[q] = (gradients_0[q] + gradients_1[q]) * 0.5;
-    }
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_average_of_function_gradients(fe_function,
+                                                             gradients);
 }
 
 
@@ -2997,18 +2942,9 @@ FEInterfaceValues<dim, spacedim>::get_average_of_function_hessians(
 {
   AssertDimension(hessians.size(), n_quadrature_points);
 
-  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> hessians_0(
-    n_quadrature_points);
-  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> hessians_1(
-    n_quadrature_points);
-
-  get_fe_face_values(0).get_function_hessians(fe_function, hessians_0);
-  get_fe_face_values(1).get_function_hessians(fe_function, hessians_1);
-
-  for (unsigned int q = 0; q < n_quadrature_points; ++q)
-    {
-      hessians[q] = (hessians_0[q] + hessians_1[q]) * 0.5;
-    }
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_average_of_function_hessians(fe_function,
+                                                            hessians);
 }
 
 
