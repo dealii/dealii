@@ -784,7 +784,7 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::set_property_pool(
     PropertyPool<dim, spacedim> &new_property_pool)
   {
-    Assert(&new_property_pool = property_pool, ExcInternalError());
+    Assert(&new_property_pool == property_pool, ExcInternalError());
     (void)new_property_pool;
   }
 
