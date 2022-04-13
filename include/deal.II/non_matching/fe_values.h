@@ -34,6 +34,7 @@
 #include <deal.II/non_matching/fe_immersed_values.h>
 #include <deal.II/non_matching/mesh_classifier.h>
 #include <deal.II/non_matching/quadrature_generator.h>
+#include <deal.II/non_matching/ref_space_fe_field_function.h>
 
 #include <deque>
 
@@ -41,16 +42,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace NonMatching
 {
-  namespace internal
-  {
-    namespace FEValuesImplementation
-    {
-      template <int dim>
-      class CellWiseFunction;
-    }
-  } // namespace internal
-
-
   /**
    * Struct storing UpdateFlags for the 3 regions of a cell, $K$, that is
    * defined by the sign of a level set function, $\psi$:
@@ -380,39 +371,8 @@ namespace NonMatching
     /**
      * Function that describes our level set function in reference space.
      */
-    const std::unique_ptr<
-      internal::FEValuesImplementation::CellWiseFunction<dim>>
-      reference_space_level_set;
+    const std::unique_ptr<CellWiseFunction<dim>> reference_space_level_set;
   };
-
-
-  namespace internal
-  {
-    namespace FEValuesImplementation
-    {
-      /**
-       * Interface for a scalar Function which has a
-       * set_active_cell(..)-function. That is, a function which we in some way
-       * need to associate with a given cell in order to evaluate.
-       */
-      template <int dim>
-      class CellWiseFunction : public Function<dim>
-      {
-      public:
-        /**
-         * Destructor. Declared to make it virtual.
-         */
-        virtual ~CellWiseFunction() = default;
-
-        /**
-         * Set the cell that the function should be evaluated on.
-         */
-        virtual void
-        set_active_cell(
-          const typename Triangulation<dim>::active_cell_iterator &cell) = 0;
-      };
-    } // namespace FEValuesImplementation
-  }   // namespace internal
 
 } // namespace NonMatching
 DEAL_II_NAMESPACE_CLOSE

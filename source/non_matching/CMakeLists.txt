@@ -16,6 +16,7 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
+  ref_space_fe_field_function.cc
   fe_immersed_values.cc
   fe_values.cc
   mesh_classifier.cc
@@ -25,6 +26,7 @@ SET(_src
   )
 
   SET(_inst
+  ref_space_fe_field_function.inst.in
   fe_immersed_values.inst.in
   fe_values.inst.in
   mesh_classifier.inst.in
