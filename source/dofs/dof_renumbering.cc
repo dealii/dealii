@@ -2296,8 +2296,21 @@ namespace DoFRenumbering
                                           std::vector<unsigned int>(),
                                           false);
 
-    const std::vector<types::global_dof_index> dofs_per_component =
-      DoFTools::count_dofs_per_fe_component(dof_handler, true);
+#ifdef DEBUG
+    {
+      const std::vector<types::global_dof_index> dofs_per_component =
+        DoFTools::count_dofs_per_fe_component(dof_handler, true);
+      for (const auto &dpc : dofs_per_component)
+        Assert(dofs_per_component[0] == dpc, ExcNotImplemented());
+    }
+#endif
+    const unsigned int n_components =
+      dof_handler.get_fe_collection().n_components();
+    Assert(dof_handler.n_dofs() % n_components == 0, ExcInternalError());
+    const types::global_dof_index dofs_per_component =
+      dof_handler.n_dofs() / n_components;
+    const types::global_dof_index local_dofs_per_component =
+      dof_handler.n_locally_owned_dofs() / n_components;
 
     // At this point we have no more communication to do - simplify things by
     // returning early if possible
@@ -2312,10 +2325,29 @@ namespace DoFRenumbering
     // This index set equals what dof_handler.locally_owned_dofs() would be if
     // we executed the componentwise renumbering.
     IndexSet component_renumbered_dofs(dof_handler.n_dofs());
-    component_renumbered_dofs.add_indices(component_renumbering.begin(),
-                                          component_renumbering.end());
-    for (const auto &dpc : dofs_per_component)
-      AssertThrow(dofs_per_component[0] == dpc, ExcNotImplemented());
+    // DoFs in each component are now consecutive, which IndexSet::add_indices()
+    // can exploit by avoiding calls to sort. Make use of that by adding DoFs
+    // one component at a time:
+    std::vector<types::global_dof_index> component_dofs(
+      local_dofs_per_component);
+    for (unsigned int component = 0; component < n_components; ++component)
+      {
+        for (std::size_t i = 0; i < local_dofs_per_component; ++i)
+          component_dofs[i] =
+            component_renumbering[n_components * i + component];
+        component_renumbered_dofs.add_indices(component_dofs.begin(),
+                                              component_dofs.end());
+      }
+    component_renumbered_dofs.compress();
+#ifdef DEBUG
+    {
+      IndexSet component_renumbered_dofs2(dof_handler.n_dofs());
+      component_renumbered_dofs2.add_indices(component_renumbering.begin(),
+                                             component_renumbering.end());
+      Assert(component_renumbered_dofs2 == component_renumbered_dofs,
+             ExcInternalError());
+    }
+#endif
     for (const FiniteElement<dim, spacedim> &fe :
          dof_handler.get_fe_collection())
       {
@@ -2382,7 +2414,7 @@ namespace DoFRenumbering
                       const auto local_index =
                         component_renumbered_dofs.index_within_set(
                           component_renumbered_cell_dofs[i] +
-                          dofs_per_component[0] * component);
+                          dofs_per_component * component);
 
                       if (component_to_nodal[local_index] ==
                           numbers::invalid_dof_index)
