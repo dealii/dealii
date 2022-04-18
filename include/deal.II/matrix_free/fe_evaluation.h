@@ -6958,7 +6958,7 @@ FEEvaluation<dim,
                       internal::MatrixFreeFunctions::GeometryType::affine)
                     {
                       // affine case: quadrature points are not available but
-                      // have to be computed from the the corner point and the
+                      // have to be computed from the corner point and the
                       // Jacobian
                       Point<dim, VectorizedArrayType> point =
                         this->mapping_data->quadrature_points

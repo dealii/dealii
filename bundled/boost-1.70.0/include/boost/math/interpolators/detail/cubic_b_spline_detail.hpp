@@ -170,7 +170,7 @@ cubic_b_spline_imp<Real>::cubic_b_spline_imp(BidiIterator f, BidiIterator end_p,
     // There are, in fact 5 diagonals, but they only differ from zero on the first and last row,
     // so we can patch up the tridiagonal row reduction algorithm to deal with two special rows.
     // See Kress, equations 8.41
-    // The the "tridiagonal" matrix is:
+    // the "tridiagonal" matrix is:
     // 1  0 -1
     // 1  4  1
     //    1  4  1

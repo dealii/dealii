@@ -202,7 +202,7 @@ public:
 //   }
 
   /*! Operator allows for adding dissimilar int_adapter types.
-   * The return type will match that of the the calling object's type */
+   * The return type will match that of the calling object's type */
   template<class rhs_type>
   inline
   int_adapter operator+(const int_adapter<rhs_type>& rhs) const
@@ -251,7 +251,7 @@ public:
   }
   
   /*! Operator allows for subtracting dissimilar int_adapter types.
-   * The return type will match that of the the calling object's type */
+   * The return type will match that of the calling object's type */
   template<class rhs_type>
   inline
   int_adapter operator-(const int_adapter<rhs_type>& rhs)const

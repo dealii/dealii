@@ -267,7 +267,7 @@ Arguments:
 	    (-Control [UMFPACK_ALLOC_INIT]).
 
 	    Regardless of the value of this parameter, a space equal to or
-	    greater than the the bare minimum amount of memory needed to start
+	    greater than the bare minimum amount of memory needed to start
 	    the factorization is always initially allocated.  The bare initial
 	    memory required is returned by umfpack_*_*symbolic in
 	    Info [UMFPACK_VARIABLE_INIT_ESTIMATE] (an exact value, not an

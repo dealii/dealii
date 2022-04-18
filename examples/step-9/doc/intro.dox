@@ -75,7 +75,7 @@ A standard approach to address this difficulty is the <em>"streamline-upwind
 Petrov-Galerkin"</em> (SUPG) method, sometimes also called the
 streamline diffusion method. A good explanation of the method can be
 found in @cite elman2005 . Formally, this method replaces the step
-in which we derive the the weak form of the differential equation from
+in which we derive the weak form of the differential equation from
 the strong form: Instead of multiplying the equation by a test
 function $v$ and integrating over the domain, we instead multiply
 by $v + \delta \beta\cdot\nabla v$, where $\delta$ is a

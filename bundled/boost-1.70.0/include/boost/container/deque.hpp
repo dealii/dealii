@@ -867,7 +867,7 @@ class deque : protected deque_base<typename real_allocator<T, Allocator>::type>
       this->assign(c_it(val, n), c_it());
    }
 
-   //! <b>Effects</b>: Assigns the the range [first, last) to *this.
+   //! <b>Effects</b>: Assigns the range [first, last) to *this.
    //!
    //! <b>Throws</b>: If memory allocation throws or
    //!   T's constructor from dereferencing InIt throws.
@@ -920,7 +920,7 @@ class deque : protected deque_base<typename real_allocator<T, Allocator>::type>
    #endif
 
 #if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
-   //! <b>Effects</b>: Assigns the the range [il.begin(), il.end()) to *this.
+   //! <b>Effects</b>: Assigns the range [il.begin(), il.end()) to *this.
    //!
    //! <b>Throws</b>: If memory allocation throws or
    //!   T's constructor from dereferencing std::initializer_list iterator throws.

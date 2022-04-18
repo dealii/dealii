@@ -1123,7 +1123,7 @@
  * may not even store all of the elements a non-ghosted vector would
  * store on the current processor. Consequently, for Trilinos vectors,
  * there is no notion of an 'owner' of vector elements in the way we
- * have it in the the non-ghost case view (or in the PETSc case) and
+ * have it in the non-ghost case view (or in the PETSc case) and
  * the name "ghost element" may be misleading since in this view,
  * every element we have available locally may or may not be stored
  * somewhere else as well, but even if it is, the local element is not

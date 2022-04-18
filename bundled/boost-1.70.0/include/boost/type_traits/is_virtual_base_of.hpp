@@ -35,7 +35,7 @@ namespace boost {
       //   (2) a Base* cannot be converted to Derived* (so the base class is either ambiguous or virtual)
       // With both conditions true, Base must be a virtual base of Derived.
       // The "is_base_of" is only needed so the compiler can (but is not required to) error out if the types are incomplete.
-      // This is in league with the the expected behaviour.
+      // This is in league with the expected behaviour.
 
       template<class T, class U>
       constexpr bool is_virtual_base_impl(...) { return true; }

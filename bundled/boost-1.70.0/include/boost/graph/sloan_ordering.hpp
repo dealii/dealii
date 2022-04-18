@@ -162,7 +162,7 @@ namespace boost {
       new_start = false;     //Setting the loop repetition status to false
       
       //step 2
-      //initialize the the disance std-vector with 0
+      //initialize the disance std-vector with 0
       for(typename std::vector<typename graph_traits<Graph>::vertices_size_type>::iterator iter = dist.begin(); iter != dist.end(); ++iter) *iter = 0;
       
       //generating the RLS (rooted level structure)

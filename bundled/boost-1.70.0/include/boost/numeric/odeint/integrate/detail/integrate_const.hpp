@@ -151,7 +151,7 @@ size_t integrate_const(
         
     }
     // last observation, if we are still in observation interval
-    // might happen due to finite precision problems when computing the the time
+    // might happen due to finite precision problems when computing the time
     if( less_eq_with_sign( time , end_time , dt ) )
     {
         st.calc_state( time , start_state );

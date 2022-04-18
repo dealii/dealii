@@ -537,7 +537,7 @@ namespace Step70
     // The next two functions initialize the
     // Particles::ParticleHandler objects used in this class. We have two such
     // objects: One represents passive tracers, used to plot the trajectories
-    // of fluid particles, while the the other represents material particles
+    // of fluid particles, while the other represents material particles
     // of the solid, which are placed at quadrature points of the solid grid.
     void setup_tracer_particles();
     void setup_solid_particles();
@@ -1905,7 +1905,7 @@ namespace Step70
 // exception of the handling of input parameter files. We allow the user to
 // specify an optional parameter file as an argument to the program. If
 // nothing is specified, we use the default file "parameters.prm", which is
-// created if non existent. The file name is scanned for the the string "23"
+// created if non existent. The file name is scanned for the string "23"
 // first, and "3" afterwards. If the filename contains the string "23", the
 // problem classes are instantiated with template arguments 2 and 3
 // respectively. If only the string "3" is found, then both template arguments

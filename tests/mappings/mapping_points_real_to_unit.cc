@@ -42,7 +42,7 @@ template <int dim, int spacedim>
 void
 test_real_to_unit_cell(const Mapping<dim, spacedim> &mapping)
 {
-  // define a boundary that fits the the vertices of the hyper cube we're
+  // define a boundary that fits the vertices of the hyper cube we're
   // going to create below
   SphericalManifold<dim, spacedim> boundary;
 

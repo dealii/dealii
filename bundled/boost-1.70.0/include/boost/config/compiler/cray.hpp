@@ -78,7 +78,7 @@
 // Cray employee), the release patch level is reported as "x". This gives
 // versions that look like e.g. "8.6.x".
 //
-// To accomplish this, the the Cray compiler preprocessor inserts:
+// To accomplish this, the Cray compiler preprocessor inserts:
 //
 // #define _RELEASE_PATCHLEVEL x
 //
@@ -227,8 +227,8 @@
 #define BOOST_MATH_DISABLE_STD_FPCLASSIFY
 //#define BOOST_HAS_FPCLASSIFY
 
-#define BOOST_SP_USE_PTHREADS 
-#define BOOST_AC_USE_PTHREADS 
+#define BOOST_SP_USE_PTHREADS
+#define BOOST_AC_USE_PTHREADS
 
 //
 // Everything that follows is working around what are thought to be
@@ -296,8 +296,8 @@
 #undef BOOST_NO_SFINAE_EXPR
 #undef BOOST_NO_TWO_PHASE_NAME_LOOKUP
 #undef BOOST_MATH_DISABLE_STD_FPCLASSIFY
-#undef BOOST_SP_USE_PTHREADS 
-#undef BOOST_AC_USE_PTHREADS 
+#undef BOOST_SP_USE_PTHREADS
+#undef BOOST_AC_USE_PTHREADS
 
 #define BOOST_HAS_VARIADIC_TMPL
 #define BOOST_HAS_UNISTD_H

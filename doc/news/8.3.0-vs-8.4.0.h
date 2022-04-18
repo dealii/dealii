@@ -941,7 +941,7 @@ inconvenience this causes.
 
   <li>New: Memory consumption during compilation has been reduced by splitting
   instantiation files. For this make_instantiations now supports additional
-  logic to split the the instantiations in .inst files into groups. This is
+  logic to split the instantiations in .inst files into groups. This is
   used in fe_values.cc, error_estimator.cc, and others.
   <br>
   (Timo Heister, 2015/09/05)

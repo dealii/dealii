@@ -2220,7 +2220,7 @@ namespace Step71
     //   \right]
     // @f}
     //
-    // Well, that escalated quickly -- although the the definition of $\psi_{0}$
+    // Well, that escalated quickly -- although the definition of $\psi_{0}$
     // and $f_{\mu_e}$ might have given some hints that the calculating
     // the kinetic fields and their linearization would take some effort, it is
     // likely that there's a little more complexity to the final definitions

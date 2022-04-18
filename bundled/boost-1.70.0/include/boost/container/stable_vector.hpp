@@ -905,7 +905,7 @@ class stable_vector
       this->assign(cvalue_iterator(t, n), cvalue_iterator());
    }
 
-   //! <b>Effects</b>: Assigns the the range [first, last) to *this.
+   //! <b>Effects</b>: Assigns the range [first, last) to *this.
    //!
    //! <b>Throws</b>: If memory allocation throws or
    //!   T's constructor from dereferencing InpIt throws.
@@ -933,7 +933,7 @@ class stable_vector
    }
 
 #if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
-   //! <b>Effects</b>: Assigns the the range [il.begin(), il.end()) to *this.
+   //! <b>Effects</b>: Assigns the range [il.begin(), il.end()) to *this.
    //!
    //! <b>Throws</b>: If memory allocation throws or
    //!   T's constructor from dereferencing initializer_list iterator throws.
