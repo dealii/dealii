@@ -7895,7 +7895,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const double                      cur_time,
   const MPI_Comm &                  comm) const
 {
-  unsigned int local_node_cell_count[2], global_node_cell_count[2];
+  std::uint64_t local_node_cell_count[2], global_node_cell_count[2];
 
 #ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make sure the compiler does not warn about
@@ -7919,7 +7919,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   int       ierr   = MPI_Allreduce(local_node_cell_count,
                            global_node_cell_count,
                            2,
-                           MPI_UNSIGNED,
+                           MPI_UINT64_T,
                            MPI_SUM,
                            comm);
   AssertThrowMPI(ierr);
@@ -9075,34 +9075,34 @@ XDMFEntry::XDMFEntry()
 
 
 
-XDMFEntry::XDMFEntry(const std::string &filename,
-                     const double       time,
-                     const unsigned int nodes,
-                     const unsigned int cells,
-                     const unsigned int dim)
+XDMFEntry::XDMFEntry(const std::string & filename,
+                     const double        time,
+                     const std::uint64_t nodes,
+                     const std::uint64_t cells,
+                     const unsigned int  dim)
   : XDMFEntry(filename, filename, time, nodes, cells, dim, dim)
 {}
 
 
 
-XDMFEntry::XDMFEntry(const std::string &mesh_filename,
-                     const std::string &solution_filename,
-                     const double       time,
-                     const unsigned int nodes,
-                     const unsigned int cells,
-                     const unsigned int dim)
+XDMFEntry::XDMFEntry(const std::string & mesh_filename,
+                     const std::string & solution_filename,
+                     const double        time,
+                     const std::uint64_t nodes,
+                     const std::uint64_t cells,
+                     const unsigned int  dim)
   : XDMFEntry(mesh_filename, solution_filename, time, nodes, cells, dim, dim)
 {}
 
 
 
-XDMFEntry::XDMFEntry(const std::string &mesh_filename,
-                     const std::string &solution_filename,
-                     const double       time,
-                     const unsigned int nodes,
-                     const unsigned int cells,
-                     const unsigned int dim,
-                     const unsigned int spacedim)
+XDMFEntry::XDMFEntry(const std::string & mesh_filename,
+                     const std::string & solution_filename,
+                     const double        time,
+                     const std::uint64_t nodes,
+                     const std::uint64_t cells,
+                     const unsigned int  dim,
+                     const unsigned int  spacedim)
   : valid(true)
   , h5_sol_filename(solution_filename)
   , h5_mesh_filename(mesh_filename)
