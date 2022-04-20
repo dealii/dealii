@@ -1286,10 +1286,22 @@ namespace deal_II_exceptions
    * still call abort(), e.g. when an exception is caught during exception
    * handling.
    *
+   * @see enable_abort_on_exception
    * @see Exceptions
    */
   void
   disable_abort_on_exception();
+
+  /**
+   * Calling this function switches on the use of <tt>std::abort()</tt> when
+   * an exception is created using the Assert() macro, instead of throwing it.
+   * This restores the standard behavior.
+   *
+   * @see disable_abort_on_exception
+   * @see Exceptions
+   */
+  void
+  enable_abort_on_exception();
 
   /**
    * The functions in this namespace are in connection with the Assert and
