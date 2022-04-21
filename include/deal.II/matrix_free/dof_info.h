@@ -174,8 +174,8 @@ namespace internal
                            const unsigned int fe_degree) const;
 
       /**
-       * Populate the vector @p locall_indices with locally owned degrees of freedom
-       * stored on the cell block @p cell.
+       * Populate the vector @p local_indices with locally owned degrees of freedom
+       * stored on the cell batch @p cell_batch.
        * If @p with_constraints is `true`, then the returned vector will contain indices
        * required to resolve constraints.
        *
@@ -193,8 +193,8 @@ namespace internal
        * `std::vector::erase()`.
        */
       void
-      get_dof_indices_on_cell_batch(std::vector<unsigned int> &locall_indices,
-                                    const unsigned int         cell,
+      get_dof_indices_on_cell_batch(std::vector<unsigned int> &local_indices,
+                                    const unsigned int         cell_batch,
                                     const bool with_constraints = true) const;
 
       /**
