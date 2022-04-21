@@ -27,7 +27,6 @@
 #  include <atomic>
 #  include <functional>
 #  include <future>
-#  include <iterator>
 #  include <list>
 #  include <memory>
 #  include <mutex>

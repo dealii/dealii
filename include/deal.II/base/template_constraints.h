@@ -22,7 +22,6 @@
 #include <deal.II/base/complex_overloads.h>
 
 #include <complex>
-#include <iterator>
 #include <utility>
 
 DEAL_II_NAMESPACE_OPEN

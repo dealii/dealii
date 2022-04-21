@@ -23,7 +23,6 @@
 #include <deal.II/base/utilities.h>
 
 #include <algorithm>
-#include <iterator>
 #include <vector>
 
 
