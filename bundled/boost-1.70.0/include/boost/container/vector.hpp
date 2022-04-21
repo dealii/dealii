@@ -1214,7 +1214,7 @@ private:
 
    #endif
 
-   //! <b>Effects</b>: Assigns the range [first, last) to *this.
+   //! <b>Effects</b>: Assigns the the range [first, last) to *this.
    //!
    //! <b>Throws</b>: If memory allocation throws or T's copy/move constructor/assignment or
    //!   T's constructor/assignment from dereferencing InpIt throws.
@@ -1253,7 +1253,7 @@ private:
    }
 
    #if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
-   //! <b>Effects</b>: Assigns the range [il.begin(), il.end()) to *this.
+   //! <b>Effects</b>: Assigns the the range [il.begin(), il.end()) to *this.
    //!
    //! <b>Throws</b>: If memory allocation throws or
    //!   T's constructor from dereferencing iniializer_list iterator throws.
@@ -1264,7 +1264,7 @@ private:
    }
    #endif
 
-   //! <b>Effects</b>: Assigns the range [first, last) to *this.
+   //! <b>Effects</b>: Assigns the the range [first, last) to *this.
    //!
    //! <b>Throws</b>: If memory allocation throws or T's copy/move constructor/assignment or
    //!   T's constructor/assignment from dereferencing InpIt throws.

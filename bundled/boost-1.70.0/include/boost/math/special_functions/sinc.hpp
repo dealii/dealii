@@ -28,7 +28,7 @@
 #include <boost/config.hpp>
 
 
-// These are the "Sinus Cardinal" functions.
+// These are the the "Sinus Cardinal" functions.
 
 namespace boost
 {

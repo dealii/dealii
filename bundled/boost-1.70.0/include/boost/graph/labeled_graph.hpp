@@ -52,7 +52,7 @@ namespace graph_detail {
     /**
      * @name Generate Label Map
      * These type generators are responsible for instantiating an associative
-     * container for the labeled graph. Note that the Selector must be
+     * container for the the labeled graph. Note that the Selector must be
      * select a pair associative container or a vecS, which is only valid if
      * Label is an integral type.
      */

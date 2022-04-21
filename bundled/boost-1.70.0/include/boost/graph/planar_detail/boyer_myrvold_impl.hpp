@@ -422,7 +422,7 @@ namespace boost
       // clean_up_embedding does some clean-up and fills in values that have
       // to be computed lazily during the actual execution of the algorithm
       // (for instance, whether or not a bicomp is flipped in the final
-      // embedding). It's dispatched on the StoreEmbeddingPolicy, since
+      // embedding). It's dispatched on the the StoreEmbeddingPolicy, since
       // it's not needed if an embedding isn't desired.
 
       typename vertex_vector_t::reverse_iterator vi, vi_end;

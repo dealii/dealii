@@ -18,7 +18,7 @@
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
 
-// note: this version incorporates the related code into the 
+// note: this version incorporates the related code into the the 
 // the same library as BOOST_ARCHIVE.  This could change some day in the
 // future
 

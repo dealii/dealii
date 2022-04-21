@@ -31,7 +31,7 @@ namespace date_time {
     operations (add, subtract) and storage (minimize space to represent)
     in a concrete class.  Thus, the date uses a count internally to
     represent a particular date.  The calendar parameter defines
-    the policies for converting the year-month-day and internal
+    the policies for converting the the year-month-day and internal
     counted form here.  Applications that need to perform heavy
     formatting of the same date repeatedly will perform better
     by using the year-month-day representation.

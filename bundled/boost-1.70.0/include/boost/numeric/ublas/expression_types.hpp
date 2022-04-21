@@ -21,7 +21,7 @@
 
 namespace boost { namespace numeric { namespace ublas {
 
-    /** \brief Base class for uBLAS statically derived expressions using the Barton Nackman trick
+    /** \brief Base class for uBLAS statically derived expressions using the the Barton Nackman trick
      *
      * This is a NonAssignable class
      * Directly implement nonassignable - simplifes debugging call trace!

@@ -225,7 +225,7 @@ Arguments:
 
 	Ax is optional; if Tx and/or Ax are not present (a (double *) NULL
 	pointer), then Ax is not computed.  If present, Ax holds the
-	numerical values of the real part of the sparse matrix A and Az
+	numerical values of the the real part of the sparse matrix A and Az
 	holds the imaginary parts.  The nonzero pattern (row indices) for
 	column j is stored in Ai [(Ap [j]) ... (Ap [j+1]-1)], and the
 	corresponding numerical values are stored in

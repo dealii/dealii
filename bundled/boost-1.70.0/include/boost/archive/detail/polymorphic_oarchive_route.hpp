@@ -50,7 +50,7 @@ class basic_pointer_oserializer;
 template<class ArchiveImplementation>
 class polymorphic_oarchive_route :
     public polymorphic_oarchive,
-    // note: gcc dynamic cross cast fails if the derivation below is
+    // note: gcc dynamic cross cast fails if the the derivation below is
     // not public.  I think this is a mistake.
     public /*protected*/ ArchiveImplementation
 {
@@ -181,7 +181,7 @@ public:
     }
     // register type function
     template<class T>
-    const basic_pointer_oserializer *
+    const basic_pointer_oserializer * 
     register_type(T * t = NULL){
         return ArchiveImplementation::register_type(t);
     }
