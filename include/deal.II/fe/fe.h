@@ -26,6 +26,7 @@
 #include <deal.II/fe/mapping.h>
 
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <memory>
 

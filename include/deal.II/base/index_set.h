@@ -22,8 +22,6 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
-#include <boost/serialization/vector.hpp>
-
 #include <algorithm>
 #include <iterator>
 #include <vector>

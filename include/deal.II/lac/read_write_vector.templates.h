@@ -25,9 +25,8 @@
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/read_write_vector.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
-
-#include <boost/io/ios_state.hpp>
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/lac/petsc_vector.h>
@@ -43,6 +42,8 @@
 #ifdef DEAL_II_WITH_CUDA
 #  include <deal.II/lac/cuda_vector.h>
 #endif
+
+#include <boost/io/ios_state.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 

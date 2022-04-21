@@ -22,7 +22,6 @@
 #include <deal.II/base/exceptions.h>
 
 #include <atomic>
-#include <cstring>
 #include <map>
 #include <mutex>
 #include <string>

@@ -25,7 +25,6 @@
 #  include <deal.II/base/template_constraints.h>
 
 #  include <atomic>
-#  include <condition_variable>
 #  include <functional>
 #  include <future>
 #  include <iterator>

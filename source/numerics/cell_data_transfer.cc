@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/cell_data_transfer.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
