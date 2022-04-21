@@ -220,6 +220,15 @@ DEAL_II_NAMESPACE_OPEN
  * (iterative or direct ones) on the numbering of the degrees of freedom.
  *
  *
+ * <h3>Renumbering DoFs for faster matrix-free computations</h3>
+ *
+ * The MatrixFree class provides optimized algorithms for interleaving
+ * operations on vectors before and after the access of the vector data in the
+ * respective loops. The algorithm matrix_free_data_locality() makes sure
+ * that all unknowns with a short distance between the first and last access
+ * are grouped together, in order to increase the spatial data locality.
+ *
+ *
  * <h3>A comparison of reordering strategies</h3>
  *
  * As a benchmark of comparison, let us consider what the different sparsity
@@ -1259,6 +1268,62 @@ namespace DoFRenumbering
   compute_support_point_wise(
     std::vector<types::global_dof_index> &new_dof_indices,
     const DoFHandler<dim, spacedim> &     dof_handler);
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Numberings for better performance with the MatrixFree infrastructure
+   * @{
+   */
+
+  /**
+   * Sort DoFs by their appearance in matrix-free loops in order to increase
+   * data locality. More specifically, this renumbering strategy will group
+   * DoFs touched only on a single group of cells (as traversed by a
+   * MatrixFree::cell_loop()) nearby, whereas DoFs touched far apart through
+   * the loop over cells are grouped separately. Obviously, also unknowns that
+   * are subject to ghost exchange will be treated as those with far reach,
+   * and will be grouped accordingly. Currently, this function only works for
+   * finite elements of type FE_Q as well as systems of a single FE_Q element.
+   *
+   * This function needs to be provided with an appropriate
+   * MatrixFree::AdditionalData structure that indicates whether level DoFs or
+   * active DoFs are to be renumbered through the variable
+   * MatrixFree::AdditionalData::mg_level, and with the options that determine
+   * the order cells are traversed in a matrix-free loop.
+   *
+   * Note that the argument `matrix_free` does not need to be initialized when
+   * calling this function. In case it is already set up, the unknowns stored
+   * in that data will be used. If it is not set up, the
+   * MatrixFree::AdditionalData is instead used to construct an object with
+   * the appropriate indices, which are then processed. In both cases, the
+   * content of MatrixFree is left untouched. However, both MatrixFree and the
+   * associated AffineConstraints object need to be computed again after
+   * changing the numbers of the degrees of freedom.
+   */
+  template <int dim, int spacedim, typename Number, typename MatrixFreeType>
+  void
+  matrix_free_data_locality(
+    DoFHandler<dim, spacedim> &                    dof_handler,
+    const AffineConstraints<Number> &              constraints,
+    const MatrixFreeType &                         matrix_free,
+    const typename MatrixFreeType::AdditionalData &matrix_free_data);
+
+  /**
+   * Compute the renumbering vector needed by the matrix_free_data_locality()
+   * function.
+   * Does not perform the renumbering on the @p DoFHandler dofs but returns the
+   * renumbering vector.
+   */
+  template <int dim, int spacedim, typename Number, typename MatrixFreeType>
+  std::vector<types::global_dof_index>
+  compute_matrix_free_data_locality(
+    const DoFHandler<dim, spacedim> &              dof_handler,
+    const AffineConstraints<Number> &              constraints,
+    const MatrixFreeType &                         matrix_free,
+    const typename MatrixFreeType::AdditionalData &matrix_free_data);
 
   /**
    * @}

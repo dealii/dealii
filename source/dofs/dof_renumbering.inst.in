@@ -235,3 +235,85 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     \}
 #endif
   }
+
+
+for (deal_II_dimension : DIMENSIONS;
+     deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
+  {
+    namespace DoFRenumbering
+    \{
+      template void
+      matrix_free_data_locality<
+        deal_II_dimension,
+        deal_II_dimension,
+        deal_II_scalar_vectorized::value_type,
+        MatrixFree<deal_II_dimension,
+                   deal_II_scalar_vectorized::value_type,
+                   deal_II_scalar_vectorized>>(
+        DoFHandler<deal_II_dimension, deal_II_dimension> &,
+        const AffineConstraints<deal_II_scalar_vectorized::value_type> &,
+        const MatrixFree<deal_II_dimension,
+                         deal_II_scalar_vectorized::value_type,
+                         deal_II_scalar_vectorized> &,
+        const typename MatrixFree<deal_II_dimension,
+                                  deal_II_scalar_vectorized::value_type,
+                                  deal_II_scalar_vectorized>::AdditionalData &);
+
+      template std::vector<types::global_dof_index>
+      compute_matrix_free_data_locality<
+        deal_II_dimension,
+        deal_II_dimension,
+        deal_II_scalar_vectorized::value_type,
+        MatrixFree<deal_II_dimension,
+                   deal_II_scalar_vectorized::value_type,
+                   deal_II_scalar_vectorized>>(
+        const DoFHandler<deal_II_dimension, deal_II_dimension> &,
+        const AffineConstraints<deal_II_scalar_vectorized::value_type> &,
+        const MatrixFree<deal_II_dimension,
+                         deal_II_scalar_vectorized::value_type,
+                         deal_II_scalar_vectorized> &,
+        const MatrixFree<deal_II_dimension,
+                         deal_II_scalar_vectorized::value_type,
+                         deal_II_scalar_vectorized>::AdditionalData &);
+    \}
+  }
+
+for (deal_II_dimension : DIMENSIONS;
+     deal_II_float_vectorized : FLOAT_VECTORIZED)
+  {
+    namespace DoFRenumbering
+    \{
+      template void
+      matrix_free_data_locality<deal_II_dimension,
+                                deal_II_dimension,
+                                double,
+                                MatrixFree<deal_II_dimension,
+                                           deal_II_float_vectorized::value_type,
+                                           deal_II_float_vectorized>>(
+        DoFHandler<deal_II_dimension, deal_II_dimension> &,
+        const AffineConstraints<double> &,
+        const MatrixFree<deal_II_dimension,
+                         deal_II_float_vectorized::value_type,
+                         deal_II_float_vectorized> &,
+        const typename MatrixFree<deal_II_dimension,
+                                  deal_II_float_vectorized::value_type,
+                                  deal_II_float_vectorized>::AdditionalData &);
+
+      template std::vector<types::global_dof_index>
+      compute_matrix_free_data_locality<
+        deal_II_dimension,
+        deal_II_dimension,
+        double,
+        MatrixFree<deal_II_dimension,
+                   deal_II_float_vectorized::value_type,
+                   deal_II_float_vectorized>>(
+        const DoFHandler<deal_II_dimension, deal_II_dimension> &,
+        const AffineConstraints<double> &,
+        const MatrixFree<deal_II_dimension,
+                         deal_II_float_vectorized::value_type,
+                         deal_II_float_vectorized> &,
+        const typename MatrixFree<deal_II_dimension,
+                                  deal_II_float_vectorized::value_type,
+                                  deal_II_float_vectorized>::AdditionalData &);
+    \}
+  }
