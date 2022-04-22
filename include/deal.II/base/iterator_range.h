@@ -21,9 +21,6 @@
 
 #include <deal.II/base/template_constraints.h>
 
-#include <iterator>
-
-
 DEAL_II_NAMESPACE_OPEN
 
 

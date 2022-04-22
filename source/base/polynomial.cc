@@ -19,6 +19,7 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/utilities.h>
 
 #include <algorithm>
 #include <cmath>

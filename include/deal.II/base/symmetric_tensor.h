@@ -24,9 +24,7 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor.h>
 
-#include <algorithm>
 #include <array>
-#include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -24,6 +24,8 @@
 
 #include <deal.II/particles/property_pool.h>
 
+#include <boost/serialization/array.hpp>
+
 #include <cstdint>
 
 DEAL_II_NAMESPACE_OPEN
