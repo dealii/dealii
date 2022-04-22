@@ -138,7 +138,7 @@ Test<dim>::test_discrete_quadrature_generator()
 {
   NonMatching::DiscreteQuadratureGenerator<dim> quadrature_generator(
     q_collection1D, dof_handler, level_set);
-  quadrature_generator.generate(dof_handler.begin_active());
+  quadrature_generator.generate(triangulation.begin_active());
 
   print_quadrature(quadrature_generator.get_inside_quadrature());
   print_quadrature(quadrature_generator.get_outside_quadrature());
@@ -154,7 +154,7 @@ Test<dim>::test_discrete_face_quadrature_generator()
   NonMatching::DiscreteFaceQuadratureGenerator<dim> face_quadrature_generator(
     q_collection1D, dof_handler, level_set);
 
-  const auto &cell = dof_handler.begin_active();
+  const auto &cell = triangulation.begin_active();
   for (const auto f : cell->face_indices())
     {
       face_quadrature_generator.generate(cell, f);
