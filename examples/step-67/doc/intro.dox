@@ -349,7 +349,7 @@ in time system compactly as
 \mathcal L_h(t, \mathbf{w}_h),
 @f]
 where we have taken the liberty to also denote the global solution
-vector by $\mathbf{w}_h$ (in addition to the the corresponding finite
+vector by $\mathbf{w}_h$ (in addition to the corresponding finite
 element function). Equivalently, the system above has the form
 @f[
 \frac{\partial \mathbf{w}_h}{\partial t} =

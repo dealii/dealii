@@ -91,7 +91,7 @@ namespace NonMatching
 
         /**
          * Return the active FE index of the DoFCellAccessor associated with the
-         * DoFHandler and the the incoming cell in the triangulation.
+         * DoFHandler and the incoming cell in the triangulation.
          */
         unsigned int
         active_fe_index(const typename Triangulation<dim>::active_cell_iterator
