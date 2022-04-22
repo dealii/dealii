@@ -18,11 +18,9 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_cartesian.h>
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/non_matching/mesh_classifier.h>
 #include <deal.II/non_matching/quadrature_generator.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -61,12 +59,9 @@ private:
   hp::FECollection<dim> fe_collection;
   DoFHandler<dim>       dof_handler;
 
-  hp::MappingCollection<dim> mapping_collection;
-  hp::QCollection<dim>       q_collection;
-  hp::QCollection<1>         q_collection1D;
+  hp::QCollection<1> q_collection1D;
 
-  Vector<double>                   level_set;
-  NonMatching::MeshClassifier<dim> mesh_classifier;
+  Vector<double> level_set;
 };
 
 
@@ -74,12 +69,9 @@ private:
 template <int dim>
 Test<dim>::Test()
   : dof_handler(triangulation)
-  , mesh_classifier(dof_handler, level_set)
 {
   fe_collection.push_back(FE_Q<dim>(1));
-  mapping_collection.push_back(MappingCartesian<dim>());
   const unsigned int n_quadrature_points = 1;
-  q_collection.push_back(QGauss<dim>(n_quadrature_points));
   q_collection1D.push_back(QGauss<1>(n_quadrature_points));
 }
 
@@ -92,7 +84,6 @@ Test<dim>::run()
   setup_mesh();
   dof_handler.distribute_dofs(fe_collection);
   setup_discrete_level_set();
-  mesh_classifier.reclassify();
   test_discrete_quadrature_generator();
   test_discrete_face_quadrature_generator();
 }
