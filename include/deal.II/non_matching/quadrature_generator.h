@@ -510,6 +510,9 @@ namespace NonMatching
     /**
      * Construct immersed quadratures rules based on the discrete level
      * set vector over the incoming cell.
+     *
+     * @note The cell needs to belong to the same triangulation as the one
+     * associated with the DoFHandler passed to the constructor.
      */
     void
     generate(const typename Triangulation<dim>::active_cell_iterator &cell);
@@ -563,6 +566,9 @@ namespace NonMatching
     /**
      * Construct immersed quadratures rules based on the discrete level
      * set vector over the incoming face described by cell and face index.
+     *
+     * @note The cell needs to belong to the same triangulation as the one
+     * associated with the DoFHandler passed to the constructor.
      */
     void
     generate(const typename Triangulation<dim>::active_cell_iterator &cell,
