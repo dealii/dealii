@@ -1887,10 +1887,9 @@ namespace NonMatching
 
 
   template <int dim>
-  template <bool level_dof_access>
   void
   DiscreteQuadratureGenerator<dim>::generate(
-    const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell)
+    const typename Triangulation<dim>::active_cell_iterator &cell)
   {
     reference_space_level_set->set_active_cell(cell);
     const BoundingBox<dim> unit_box = create_unit_bounding_box<dim>();
@@ -1917,11 +1916,10 @@ namespace NonMatching
 
 
   template <int dim>
-  template <bool level_dof_access>
   void
   DiscreteFaceQuadratureGenerator<dim>::generate(
-    const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
-    const unsigned int                                               face_index)
+    const typename Triangulation<dim>::active_cell_iterator &cell,
+    const unsigned int                                       face_index)
   {
     reference_space_level_set->set_active_cell(cell);
     const BoundingBox<dim> unit_box = create_unit_bounding_box<dim>();

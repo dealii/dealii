@@ -510,11 +510,12 @@ namespace NonMatching
     /**
      * Construct immersed quadratures rules based on the discrete level
      * set vector over the incoming cell.
+     *
+     * @note The cell needs to belong to the same triangulation as the one
+     * associated with the DoFHandler passed to the constructor.
      */
-    template <bool level_dof_access>
     void
-    generate(
-      const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell);
+    generate(const typename Triangulation<dim>::active_cell_iterator &cell);
 
   private:
     /**
@@ -565,12 +566,13 @@ namespace NonMatching
     /**
      * Construct immersed quadratures rules based on the discrete level
      * set vector over the incoming face described by cell and face index.
+     *
+     * @note The cell needs to belong to the same triangulation as the one
+     * associated with the DoFHandler passed to the constructor.
      */
-    template <bool level_dof_access>
     void
-    generate(
-      const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
-      const unsigned int face_index);
+    generate(const typename Triangulation<dim>::active_cell_iterator &cell,
+             const unsigned int face_index);
 
   private:
     /**
