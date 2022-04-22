@@ -24,6 +24,10 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/std_cxx17/optional.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
@@ -39,8 +43,15 @@ namespace NonMatching
     {
       template <int dim, int spacedim>
       class QGenerator;
-    }
-  } // namespace internal
+    } // namespace QuadratureGeneratorImplementation
+
+
+    namespace DiscreteQuadratureGeneratorImplementation
+    {
+      template <int dim>
+      class CellWiseFunction;
+    } // namespace DiscreteQuadratureGeneratorImplementation
+  }   // namespace internal
 
 
   /**
@@ -456,6 +467,118 @@ namespace NonMatching
      * This quadrature always contains zero points in 1D.
      */
     const ImmersedSurfaceQuadrature<0, 1> surface_quadrature;
+  };
+
+
+  /**
+   * This class generates the same type of immersed quadrature rules as those
+   * described in the QuadratureGenerator class. The difference is that this
+   * class handles the case when the the domain is a discrete level set
+   * function, i.e., when the level set function is described as a
+   * (DoFHandler, Vector) pair. The generate()-function of this class takes a
+   * cell in real space and constructs the immersed quadrature rules in
+   * reference space over this cell. These quadrature rules can then be obtained
+   * with one of the functions:
+   * get_inside_quadrature(),
+   * get_outside_quadrature(), and
+   * get_surface_quadrature().
+   *
+   * Internally, the quadrature generation is done by transforming the discrete
+   * level set function from real space to reference space and using the same
+   * algorithm as in the QuadratureGenerator class.
+   */
+  template <int dim>
+  class DiscreteQuadratureGenerator : public QuadratureGenerator<dim>
+  {
+  public:
+    using AdditionalData = AdditionalQGeneratorData;
+
+    /**
+     * Constructor, the discrete level set function is described by the
+     * incoming DoFHandler and Vector. Pointers to these are stored
+     * internally, so they must have a longer lifetime than the created this
+     * class. The hp::QCollection<1> and AdditionalData is passed to the
+     * QuadratureGenerator class.
+     */
+    template <class VectorType>
+    DiscreteQuadratureGenerator(
+      const hp::QCollection<1> &quadratures1D,
+      const DoFHandler<dim> &   dof_handler,
+      const VectorType &        level_set,
+      const AdditionalData &    additional_data = AdditionalData());
+
+    /**
+     * Construct immersed quadratures rules based on the discrete level
+     * set vector over the incoming cell.
+     */
+    template <bool level_dof_access>
+    void
+    generate(
+      const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell);
+
+  private:
+    /**
+     * Function that describes our level set function in reference space.
+     */
+    std::unique_ptr<internal::DiscreteQuadratureGeneratorImplementation::
+                      CellWiseFunction<dim>>
+      reference_space_level_set;
+  };
+
+  /**
+   * This class generates the same type of immersed quadrature rules as those
+   * described in the FaceQuadratureGenerator class. The difference is that this
+   * class handles the case when the the domain is a discrete level set
+   * function, i.e., when the level set function is described as a
+   * (DoFHandler, Vector) pair. The generate()-function of this class takes a
+   * cell in real space plus the respective face index and constructs the
+   * immersed quadrature rules in reference space over this face. These
+   * quadrature rules can then be obtained with one of the functions:
+   * get_inside_quadrature(),
+   * get_outside_quadrature(), and
+   * get_surface_quadrature().
+   *
+   * Internally, the quadrature generation is done by transforming the discrete
+   * level set function from real space to reference space and using the same
+   * algorithm as in the FaceQuadratureGenerator class.
+   */
+  template <int dim>
+  class DiscreteFaceQuadratureGenerator : public FaceQuadratureGenerator<dim>
+  {
+  public:
+    using AdditionalData = AdditionalQGeneratorData;
+
+    /**
+     * Constructor, the discrete level set function is described by the
+     * incoming DoFHandler and Vector. Pointers to these are stored
+     * internally, so they must have a longer lifetime than the created this
+     * class. The hp::QCollection<1> and AdditionalData is passed to the
+     * QuadratureGenerator class.
+     */
+    template <class VectorType>
+    DiscreteFaceQuadratureGenerator(
+      const hp::QCollection<1> &quadratures1D,
+      const DoFHandler<dim> &   dof_handler,
+      const VectorType &        level_set,
+      const AdditionalData &    additional_data = AdditionalData());
+
+    /**
+     * Construct immersed quadratures rules based on the discrete level
+     * set vector over the incoming face described by cell and face index.
+     */
+    template <bool level_dof_access>
+    void
+    generate(
+      const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
+      const unsigned int face_index);
+
+  private:
+    /**
+     * Function that describes our level set function in reference space.
+     */
+    std::unique_ptr<internal::DiscreteQuadratureGeneratorImplementation::
+                      CellWiseFunction<dim>>
+      reference_space_level_set;
   };
 
 
@@ -1247,6 +1370,33 @@ namespace NonMatching
         const std::vector<FunctionBounds<dim>> &all_function_bounds);
 
     } // namespace QuadratureGeneratorImplementation
+
+
+    namespace DiscreteQuadratureGeneratorImplementation
+    {
+      /**
+       * Interface for a scalar Function which has a
+       * set_active_cell(..)-function. That is, a function which we in some way
+       * need to associate with a given cell in order to evaluate.
+       */
+      template <int dim>
+      class CellWiseFunction : public Function<dim>
+      {
+      public:
+        /**
+         * Destructor. Declared to make it virtual.
+         */
+        virtual ~CellWiseFunction() = default;
+
+        /**
+         * Set the cell that the function should be evaluated on.
+         */
+        virtual void
+        set_active_cell(
+          const typename Triangulation<dim>::active_cell_iterator &cell) = 0;
+      };
+
+    } // namespace DiscreteQuadratureGeneratorImplementation
   }   // namespace internal
 
 } // namespace NonMatching
