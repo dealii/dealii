@@ -5852,6 +5852,63 @@ namespace GridTools
 
 
     template <int dim, int spacedim>
+    std::tuple<std::vector<unsigned int>,
+               std::vector<unsigned int>,
+               std::vector<unsigned int>>
+    guess_point_owner(
+      const parallel::distributed::Triangulation<dim, spacedim> &tria,
+      const std::vector<Point<spacedim>> &                       points,
+      const double                                               tolerance)
+    {
+      (void)tolerance;
+
+      // TODO: find_point_owner_rank() expects dim == spacedim
+      AssertDimension(dim, spacedim);
+
+      std::vector<Point<dim>> points_temp(points.size());
+      for (unsigned int i = 0; i < points.size(); ++i)
+        for (int d = 0; d < dim; ++d)
+          points_temp[i][d] = points[i][d];
+
+      const auto found_ranks = tria.find_point_owner_rank(points_temp);
+
+      std::vector<std::pair<unsigned int, unsigned int>> ranks_and_indices(
+        points.size());
+      ranks_and_indices.reserve(points.size());
+
+      for (unsigned int i = 0; i < points.size(); ++i)
+        ranks_and_indices[i] = {found_ranks[i], i};
+
+      // convert to CRS
+      std::sort(ranks_and_indices.begin(), ranks_and_indices.end());
+
+      std::vector<unsigned int> ranks;
+      std::vector<unsigned int> ptr;
+      std::vector<unsigned int> indices;
+
+      unsigned int dummy_rank = numbers::invalid_unsigned_int;
+
+      for (const auto &i : ranks_and_indices)
+        {
+          if (dummy_rank != i.first)
+            {
+              dummy_rank = i.first;
+              ranks.push_back(dummy_rank);
+              ptr.push_back(indices.size());
+            }
+
+          indices.push_back(i.second);
+        }
+      ptr.push_back(indices.size());
+
+      return std::make_tuple(std::move(ranks),
+                             std::move(ptr),
+                             std::move(indices));
+    }
+
+
+
+    template <int dim, int spacedim>
     std::vector<
       std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
                 Point<dim>>>
@@ -5950,8 +6007,25 @@ namespace GridTools
       auto &recv_ranks      = result.recv_ranks;
       auto &recv_ptrs       = result.recv_ptrs;
 
+      const auto pdt = dynamic_cast<
+        const parallel::distributed::Triangulation<dim, spacedim> *>(
+        &cache.get_triangulation());
+
+      const bool use_pdt =
+#ifndef P4EST_SEARCH_LOCAL
+        false &&
+#endif
+        (pdt != nullptr) && (enforce_unique_mapping && dim == spacedim) &&
+        pdt->are_vertices_communicated_to_p4est();
+
+      Assert(
+        ((use_pdt == false) || global_bboxes.empty()),
+        ExcMessage(
+          "For parallel::distributed::Triangulation objects you do not need to specify bounding boxes!"));
+
       const auto potential_owners =
-        internal::guess_point_owner(global_bboxes, points, tolerance);
+        use_pdt ? internal::guess_point_owner(*pdt, points, tolerance) :
+                  internal::guess_point_owner(global_bboxes, points, tolerance);
 
       const auto &potential_owners_ranks   = std::get<0>(potential_owners);
       const auto &potential_owners_ptrs    = std::get<1>(potential_owners);

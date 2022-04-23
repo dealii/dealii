@@ -3118,7 +3118,8 @@ namespace parallel
 
     template <int dim, int spacedim>
     types::subdomain_id
-    Triangulation<dim, spacedim>::find_point_owner_rank(const Point<dim> &p)
+    Triangulation<dim, spacedim>::find_point_owner_rank(
+      const Point<dim> &p) const
     {
       // Call the other function
       std::vector<Point<dim>>          point{p};
@@ -3132,7 +3133,7 @@ namespace parallel
     template <int dim, int spacedim>
     std::vector<types::subdomain_id>
     Triangulation<dim, spacedim>::find_point_owner_rank(
-      const std::vector<Point<dim>> &points)
+      const std::vector<Point<dim>> &points) const
     {
 #  ifndef P4EST_SEARCH_LOCAL
       (void)points;
@@ -4195,6 +4196,27 @@ namespace parallel
     Triangulation<1, spacedim>::update_cell_relations()
     {
       Assert(false, ExcNotImplemented());
+    }
+
+
+
+    template <int spacedim>
+    types::subdomain_id
+    Triangulation<1, spacedim>::find_point_owner_rank(const Point<1> &) const
+    {
+      Assert(false, ExcNotImplemented());
+      return {};
+    }
+
+
+
+    template <int spacedim>
+    std::vector<types::subdomain_id>
+    Triangulation<1, spacedim>::find_point_owner_rank(
+      const std::vector<Point<1>> &) const
+    {
+      Assert(false, ExcNotImplemented());
+      return {};
     }
 
   } // namespace distributed
