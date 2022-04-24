@@ -134,7 +134,7 @@ SolverGCR<VectorType>::solve(const MatrixType &        A,
   Asearch.reinit(x);
   p.reinit(x);
 
-  double res = 0.0;
+  typename VectorType::value_type res = 0.0;
 
   A.vmult(p, x);
   p.add(-1., b);
@@ -166,19 +166,19 @@ SolverGCR<VectorType>::solve(const MatrixType &        A,
 
       for (unsigned int i = 0; i < it - 1; ++i)
         {
-          const double temptest = (H_vec[i] * Asearch) / Hn_preloc[i];
+          const auto temptest = (H_vec[i] * Asearch) / Hn_preloc[i];
           Asearch.add(-temptest, H_vec[i]);
           search.add(-temptest, Hd_vec[i]);
         }
 
-      const double nAsearch_new = Asearch.norm_sqr();
-      Hn_preloc[it - 1]         = nAsearch_new;
-      H_vec[it - 1]             = Asearch;
-      Hd_vec[it - 1]            = search;
+      const auto nAsearch_new = Asearch.norm_sqr();
+      Hn_preloc[it - 1]       = nAsearch_new;
+      H_vec[it - 1]           = Asearch;
+      Hd_vec[it - 1]          = search;
 
       Assert(std::abs(nAsearch_new) != 0., ExcDivideByZero());
 
-      const double c_preloc = (Asearch * p) / nAsearch_new;
+      const auto c_preloc = (Asearch * p) / nAsearch_new;
       x.add(-c_preloc, search);
       p.add(-c_preloc, Asearch);
 
