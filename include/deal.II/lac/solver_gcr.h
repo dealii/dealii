@@ -56,10 +56,14 @@ public:
             const AdditionalData &data = AdditionalData())
     : SolverBase<VectorType>(solver_control)
     , max_n_tmp_vectors(data.max_n_tmp_vectors)
+    , use_default_residual(data.use_default_residual)
   {
     solver_control.set_max_steps(max_n_tmp_vectors);
   }
 
+  /**
+   *  Solve the linear system $Ax=b$ for x.
+   */
   template <typename MatrixType, typename PreconditionerType>
   void
   solve(const MatrixType &        A,
@@ -91,12 +95,18 @@ public:
     Asearch.reinit(x);
     p.reinit(x);
 
-    preconditioner.vmult(search, b);
-    double res = search.l2_norm();
+    double res = 0.0;
 
     A.vmult(p, x);
     p.add(-1., b);
+
+    if (use_default_residual)
+      res = p.l2_norm();
+
     preconditioner.vmult(search, p);
+
+    if (use_default_residual == false)
+      res = search.l2_norm();
 
     unsigned int it = 0;
 
@@ -133,9 +143,13 @@ public:
         x.add(-c_preloc, search);
         p.add(-c_preloc, Asearch);
 
+        if (use_default_residual)
+          res = p.l2_norm();
+
         preconditioner.vmult(search, p);
 
-        res = search.l2_norm();
+        if (use_default_residual == false)
+          res = search.l2_norm();
 
         conv = this->iteration_status(it, res, x);
       }
@@ -145,7 +159,15 @@ public:
   }
 
 private:
+  /**
+   * Maximum number of temporary vectors.
+   */
   const unsigned int max_n_tmp_vectors;
+
+  /**
+   * Flag for the default residual that is used to measure convergence.
+   */
+  const bool use_default_residual;
 };
 
 
