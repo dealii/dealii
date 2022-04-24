@@ -1064,8 +1064,7 @@ namespace internal
     std::vector<MatrixFreeFunctions::DoFInfo> &         dof_info,
     MatrixFreeFunctions::FaceSetup<dim> &               face_setup,
     MatrixFreeFunctions::ConstraintValues<double> &     constraint_values,
-    const bool use_vector_data_exchanger_full,
-    const bool use_fast_hanging_node_algorithm_in)
+    const bool use_vector_data_exchanger_full)
   {
     if (do_face_integrals)
       face_setup.initialize(dof_handler[0]->get_triangulation(),
@@ -1091,7 +1090,7 @@ namespace internal
 
     bool cell_categorization_enabled = !cell_vectorization_category.empty();
 
-    bool use_fast_hanging_node_algorithm = use_fast_hanging_node_algorithm_in;
+    bool use_fast_hanging_node_algorithm = true;
 
     if (use_fast_hanging_node_algorithm)
       {
@@ -1825,8 +1824,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
     dof_info,
     face_setup,
     constraint_values,
-    additional_data.communicator_sm != MPI_COMM_SELF,
-    additional_data.use_fast_hanging_node_algorithm);
+    additional_data.communicator_sm != MPI_COMM_SELF);
 
   // set constraint pool from the std::map and reorder the indices
   std::vector<const std::vector<double> *> constraints(
