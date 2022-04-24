@@ -20,6 +20,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * Implementation of the GCR Method. The stopping criterion is the norm of the
+ * residual.
+ */
 template <class VectorType = Vector<double>>
 class SolverGCR : public SolverBase<VectorType>
 {
@@ -33,10 +37,7 @@ public:
      * Constructor.
      */
     explicit AdditionalData(const unsigned int max_n_tmp_vectors    = 30,
-                            const bool         use_default_residual = true)
-      : max_n_tmp_vectors(max_n_tmp_vectors)
-      , use_default_residual(use_default_residual)
-    {}
+                            const bool         use_default_residual = true);
 
     /**
      * Maximum number of temporary vectors. This parameter controls the size
@@ -53,13 +54,7 @@ public:
   };
 
   SolverGCR(SolverControl &       solver_control,
-            const AdditionalData &data = AdditionalData())
-    : SolverBase<VectorType>(solver_control)
-    , max_n_tmp_vectors(data.max_n_tmp_vectors)
-    , use_default_residual(data.use_default_residual)
-  {
-    solver_control.set_max_steps(max_n_tmp_vectors);
-  }
+            const AdditionalData &data = AdditionalData());
 
   /**
    *  Solve the linear system $Ax=b$ for x.
@@ -69,94 +64,7 @@ public:
   solve(const MatrixType &        A,
         VectorType &              x,
         const VectorType &        b,
-        const PreconditionerType &preconditioner)
-  {
-    using number = typename VectorType::value_type;
-
-    SolverControl::State conv = SolverControl::iterate;
-
-    typename VectorMemory<VectorType>::Pointer search_pointer(this->memory);
-    typename VectorMemory<VectorType>::Pointer Asearch_pointer(this->memory);
-    typename VectorMemory<VectorType>::Pointer p_pointer(this->memory);
-
-    VectorType &search  = *search_pointer;
-    VectorType &Asearch = *Asearch_pointer;
-    VectorType &p       = *p_pointer;
-
-    std::vector<typename VectorType::value_type> Hn_preloc;
-    Hn_preloc.reserve(max_n_tmp_vectors);
-
-    internal::SolverGMRESImplementation::TmpVectors<VectorType> H_vec(
-      max_n_tmp_vectors, this->memory);
-    internal::SolverGMRESImplementation::TmpVectors<VectorType> Hd_vec(
-      max_n_tmp_vectors, this->memory);
-
-    search.reinit(x);
-    Asearch.reinit(x);
-    p.reinit(x);
-
-    double res = 0.0;
-
-    A.vmult(p, x);
-    p.add(-1., b);
-
-    if (use_default_residual)
-      res = p.l2_norm();
-
-    preconditioner.vmult(search, p);
-
-    if (use_default_residual == false)
-      res = search.l2_norm();
-
-    unsigned int it = 0;
-
-    conv = this->iteration_status(it, res, x);
-    if (conv != SolverControl::iterate)
-      return;
-
-    while (conv == SolverControl::iterate)
-      {
-        it++;
-
-        H_vec(it - 1, x);
-        Hd_vec(it - 1, x);
-
-        Hn_preloc.resize(it);
-
-        A.vmult(Asearch, search);
-
-        for (unsigned int i = 0; i < it - 1; ++i)
-          {
-            const double temptest = (H_vec[i] * Asearch) / Hn_preloc[i];
-            Asearch.add(-temptest, H_vec[i]);
-            search.add(-temptest, Hd_vec[i]);
-          }
-
-        const double nAsearch_new = Asearch.norm_sqr();
-        Hn_preloc[it - 1]         = nAsearch_new;
-        H_vec[it - 1]             = Asearch;
-        Hd_vec[it - 1]            = search;
-
-        Assert(std::abs(nAsearch_new) != 0., ExcDivideByZero());
-
-        const double c_preloc = (Asearch * p) / nAsearch_new;
-        x.add(-c_preloc, search);
-        p.add(-c_preloc, Asearch);
-
-        if (use_default_residual)
-          res = p.l2_norm();
-
-        preconditioner.vmult(search, p);
-
-        if (use_default_residual == false)
-          res = search.l2_norm();
-
-        conv = this->iteration_status(it, res, x);
-      }
-
-    if (conv != SolverControl::success)
-      AssertThrow(false, SolverControl::NoConvergence(it, res));
-  }
+        const PreconditionerType &preconditioner);
 
 private:
   /**
@@ -169,6 +77,125 @@ private:
    */
   const bool use_default_residual;
 };
+
+
+
+template <class VectorType>
+inline SolverGCR<VectorType>::AdditionalData::AdditionalData(
+  const unsigned int max_n_tmp_vectors,
+  const bool         use_default_residual)
+  : max_n_tmp_vectors(max_n_tmp_vectors)
+  , use_default_residual(use_default_residual)
+{}
+
+
+
+template <class VectorType>
+inline SolverGCR<VectorType>::SolverGCR(SolverControl &       solver_control,
+                                        const AdditionalData &data)
+  : SolverBase<VectorType>(solver_control)
+  , max_n_tmp_vectors(data.max_n_tmp_vectors)
+  , use_default_residual(data.use_default_residual)
+{
+  solver_control.set_max_steps(max_n_tmp_vectors);
+}
+
+
+
+template <class VectorType>
+template <typename MatrixType, typename PreconditionerType>
+inline void
+SolverGCR<VectorType>::solve(const MatrixType &        A,
+                             VectorType &              x,
+                             const VectorType &        b,
+                             const PreconditionerType &preconditioner)
+{
+  using number = typename VectorType::value_type;
+
+  SolverControl::State conv = SolverControl::iterate;
+
+  typename VectorMemory<VectorType>::Pointer search_pointer(this->memory);
+  typename VectorMemory<VectorType>::Pointer Asearch_pointer(this->memory);
+  typename VectorMemory<VectorType>::Pointer p_pointer(this->memory);
+
+  VectorType &search  = *search_pointer;
+  VectorType &Asearch = *Asearch_pointer;
+  VectorType &p       = *p_pointer;
+
+  std::vector<typename VectorType::value_type> Hn_preloc;
+  Hn_preloc.reserve(max_n_tmp_vectors);
+
+  internal::SolverGMRESImplementation::TmpVectors<VectorType> H_vec(
+    max_n_tmp_vectors, this->memory);
+  internal::SolverGMRESImplementation::TmpVectors<VectorType> Hd_vec(
+    max_n_tmp_vectors, this->memory);
+
+  search.reinit(x);
+  Asearch.reinit(x);
+  p.reinit(x);
+
+  double res = 0.0;
+
+  A.vmult(p, x);
+  p.add(-1., b);
+
+  if (use_default_residual == true)
+    res = p.l2_norm();
+
+  preconditioner.vmult(search, p);
+
+  if (use_default_residual == false)
+    res = search.l2_norm();
+
+  unsigned int it = 0;
+
+  conv = this->iteration_status(it, res, x);
+  if (conv != SolverControl::iterate)
+    return;
+
+  while (conv == SolverControl::iterate)
+    {
+      it++;
+
+      H_vec(it - 1, x);
+      Hd_vec(it - 1, x);
+
+      Hn_preloc.resize(it);
+
+      A.vmult(Asearch, search);
+
+      for (unsigned int i = 0; i < it - 1; ++i)
+        {
+          const double temptest = (H_vec[i] * Asearch) / Hn_preloc[i];
+          Asearch.add(-temptest, H_vec[i]);
+          search.add(-temptest, Hd_vec[i]);
+        }
+
+      const double nAsearch_new = Asearch.norm_sqr();
+      Hn_preloc[it - 1]         = nAsearch_new;
+      H_vec[it - 1]             = Asearch;
+      Hd_vec[it - 1]            = search;
+
+      Assert(std::abs(nAsearch_new) != 0., ExcDivideByZero());
+
+      const double c_preloc = (Asearch * p) / nAsearch_new;
+      x.add(-c_preloc, search);
+      p.add(-c_preloc, Asearch);
+
+      if (use_default_residual == true)
+        res = p.l2_norm();
+
+      preconditioner.vmult(search, p);
+
+      if (use_default_residual == false)
+        res = search.l2_norm();
+
+      conv = this->iteration_status(it, res, x);
+    }
+
+  if (conv != SolverControl::success)
+    AssertThrow(false, SolverControl::NoConvergence(it, res));
+}
 
 
 DEAL_II_NAMESPACE_CLOSE
