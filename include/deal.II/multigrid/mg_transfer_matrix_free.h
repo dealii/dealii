@@ -321,6 +321,10 @@ class MGTransferBlockMatrixFreeBase
   : public MGTransferBase<LinearAlgebra::distributed::BlockVector<Number>>
 {
 public:
+  MGTransferBlockMatrixFreeBase(const bool same_for_all)
+    : same_for_all(same_for_all)
+  {}
+
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
    * <tt>to_level</tt> using the embedding matrices of the underlying finite
@@ -428,15 +432,17 @@ public:
 
 protected:
   /**
-   * Non-block matrix-free versions of transfer operation.
+   * Return the right non-block transfer operator. Has to be implemented by
+   * the derived class.
    */
-  std::vector<TransferType> matrix_free_transfer_vector;
+  virtual const TransferType &
+  get_matrix_free_transfer(const unsigned int b) const = 0;
 
   /**
    * A flag to indicate whether the same DoFHandler is used for all
    * the components or if each block has its own DoFHandler.
    */
-  bool same_for_all;
+  const bool same_for_all;
 };
 
 
@@ -520,6 +526,16 @@ public:
    */
   std::size_t
   memory_consumption() const;
+
+protected:
+  const MGTransferMatrixFree<dim, Number> &
+  get_matrix_free_transfer(const unsigned int b) const override;
+
+private:
+  /**
+   * Non-block matrix-free versions of transfer operation.
+   */
+  std::vector<MGTransferMatrixFree<dim, Number>> matrix_free_transfer_vector;
 };
 
 
@@ -631,7 +647,6 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
   MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
   const LinearAlgebra::distributed::BlockVector<Number2> &        src) const
 {
-  AssertDimension(matrix_free_transfer_vector.size(), 1);
   Assert(same_for_all,
          ExcMessage(
            "This object was initialized with support for usage with one "
@@ -673,9 +688,8 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
   for (unsigned int b = 0; b < n_blocks; ++b)
     {
       const unsigned int data_block = same_for_all ? 0 : b;
-      matrix_free_transfer_vector[data_block].copy_to_mg(*dof_handler[b],
-                                                         dst_non_block,
-                                                         src.block(b));
+      get_matrix_free_transfer(data_block)
+        .copy_to_mg(*dof_handler[b], dst_non_block, src.block(b));
 
       for (unsigned int l = min_level; l <= max_level; ++l)
         dst[l].block(b) = dst_non_block[l];
@@ -694,7 +708,11 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
   const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
   const
 {
-  AssertDimension(matrix_free_transfer_vector.size(), 1);
+  Assert(same_for_all,
+         ExcMessage(
+           "This object was initialized with support for usage with one "
+           "DoFHandler for each block, but this method assumes that "
+           "the same DoFHandler is used for all the blocks!"));
   const std::vector<const DoFHandler<dim, spacedim> *> mg_dofs(dst.n_blocks(),
                                                                &dof_handler);
 
@@ -734,9 +752,8 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
           src_non_block[l] = src[l].block(b);
         }
       const unsigned int data_block = same_for_all ? 0 : b;
-      matrix_free_transfer_vector[data_block].copy_from_mg(*dof_handler[b],
-                                                           dst.block(b),
-                                                           src_non_block);
+      get_matrix_free_transfer(data_block)
+        .copy_from_mg(*dof_handler[b], dst.block(b), src_non_block);
     }
 }
 
