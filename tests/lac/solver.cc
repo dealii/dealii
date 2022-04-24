@@ -20,6 +20,7 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/solver_fire.h>
+#include <deal.II/lac/solver_gcr.h>
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/solver_minres.h>
 #include <deal.II/lac/solver_qmrs.h>
@@ -94,6 +95,7 @@ main()
   SolverGMRES<>                 gmres(control, mem, data1);
   SolverGMRES<>::AdditionalData data2(8, true);
   SolverGMRES<>                 gmresright(control, mem, data2);
+  SolverGCR<>                   gcr(control);
   SolverMinRes<>                minres(control, mem);
   SolverBicgstab<>              bicgstab(control, mem);
   SolverRichardson<>            rich(control, mem);
@@ -169,6 +171,7 @@ main()
           check_solve(bicgstab, A, u, f, prec_no);
           check_solve(gmres, A, u, f, prec_no);
           check_solve(gmresright, A, u, f, prec_no);
+          check_solve(gcr, A, u, f, prec_psor);
           //    check_solve(minres,A,u,f,prec_no);
           check_solve(qmrs, A, u, f, prec_no);
 
@@ -187,6 +190,7 @@ main()
           check_solve(bicgstab, A, u, f, prec_no);
           check_solve(gmres, A, u, f, prec_no);
           check_solve(gmresright, A, u, f, prec_no);
+          check_solve(gcr, A, u, f, prec_psor);
           check_solve(qmrs, A, u, f, prec_no);
           check_solve(fire, A, u, f, prec_no);
           rich.set_omega(1.);
@@ -201,6 +205,7 @@ main()
           check_solve(bicgstab, A, u, f, prec_richardson);
           check_solve(gmres, A, u, f, prec_richardson);
           check_solve(gmresright, A, u, f, prec_richardson);
+          check_solve(gcr, A, u, f, prec_psor);
           check_solve(qmrs, A, u, f, prec_richardson);
           check_solve(fire, A, u, f, prec_richardson);
           rich.set_omega(1.);
@@ -215,6 +220,7 @@ main()
           check_solve(bicgstab, A, u, f, prec_ssor);
           check_solve(gmres, A, u, f, prec_ssor);
           check_solve(gmresright, A, u, f, prec_ssor);
+          check_solve(gcr, A, u, f, prec_psor);
           check_solve(qmrs, A, u, f, prec_ssor);
           check_solve(fire, A, u, f, prec_ssor);
 
@@ -228,6 +234,7 @@ main()
           check_solve(bicgstab, A, u, f, prec_sor);
           check_solve(gmres, A, u, f, prec_sor);
           check_solve(gmresright, A, u, f, prec_sor);
+          check_solve(gcr, A, u, f, prec_psor);
           check_solve(fire, A, u, f, prec_sor);
 
           deallog.pop();
@@ -240,6 +247,7 @@ main()
           check_solve(bicgstab, A, u, f, prec_psor);
           check_solve(gmres, A, u, f, prec_psor);
           check_solve(gmresright, A, u, f, prec_psor);
+          check_solve(gcr, A, u, f, prec_psor);
           check_solve(fire, A, u, f, prec_psor);
 
           deallog.pop();

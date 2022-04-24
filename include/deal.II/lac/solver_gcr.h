@@ -1,102 +1,154 @@
-#pragma once
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2022 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
 
-#include <deal.II/lac/solver.h>
+#ifndef dealii_solver_gcr_h
+#define dealii_solver_gcr_h
 
-namespace dealii
+#include <deal.II/lac/solver_gmres.h>
+
+DEAL_II_NAMESPACE_OPEN
+
+template <class VectorType = Vector<double>>
+class SolverGCR : public SolverBase<VectorType>
 {
-  template <typename VectorType>
-  class SolverGCR : public SolverBase<VectorType>
+public:
+  /**
+   * Standardized data struct to pipe additional data to the solver.
+   */
+  struct AdditionalData
   {
-  public:
-    SolverGCR(SolverControl &solver_control, const unsigned int GCRmaxit = 40)
-      : SolverBase<VectorType>(solver_control)
-      , GCRmaxit(GCRmaxit)
-    {
-      H_vec.reserve(GCRmaxit);
-      Hd_vec.reserve(GCRmaxit);
-    }
+    /**
+     * Constructor.
+     */
+    explicit AdditionalData(const unsigned int max_n_tmp_vectors    = 30,
+                            const bool         use_default_residual = true)
+      : max_n_tmp_vectors(max_n_tmp_vectors)
+      , use_default_residual(use_default_residual)
+    {}
 
-    template <typename MatrixType, typename PreconditionerType>
-    void
-    solve(const MatrixType &        A,
-          VectorType &              x,
-          const VectorType &        b,
-          const PreconditionerType &preconditioner)
-    {
-      using number = typename VectorType::value_type;
+    /**
+     * Maximum number of temporary vectors. This parameter controls the size
+     * of the Arnoldi basis, which for historical reasons is
+     * #max_n_tmp_vectors-2. SolverGMRES assumes that there are at least three
+     * temporary vectors, so this value must be greater than or equal to three.
+     */
+    unsigned int max_n_tmp_vectors;
 
-      SolverControl::State conv = SolverControl::iterate;
-
-      search.reinit(x);
-      Asearch.reinit(x);
-      p.reinit(x);
-
-      A.vmult(p, x);
-      p.add(-1., b);
-      preconditioner.vmult(search, p);
-
-      double res = search.l2_norm();
-
-      unsigned int it = 0;
-
-      conv = this->iteration_status(it, res, x);
-      if (conv != SolverControl::iterate)
-        return;
-
-      while (conv == SolverControl::iterate)
-        {
-          AssertIndexRange(it, GCRmaxit);
-
-          it++;
-
-          if (H_vec.size() < it)
-            {
-              H_vec.resize(H_vec.size() + 1);
-              Hd_vec.resize(Hd_vec.size() + 1);
-              Hn_preloc.resize(Hn_preloc.size() + 1);
-
-              H_vec.back().reinit(x);
-              Hd_vec.back().reinit(x);
-            }
-
-          A.vmult(Asearch, search);
-
-          for (unsigned int i = 0; i < it - 1; ++i)
-            {
-              const double temptest = (H_vec[i] * Asearch) / Hn_preloc[i];
-              Asearch.add(-temptest, H_vec[i]);
-              search.add(-temptest, Hd_vec[i]);
-            }
-
-          const double nAsearch_new = Asearch.norm_sqr();
-          Hn_preloc[it - 1]         = nAsearch_new;
-          H_vec[it - 1]             = Asearch;
-          Hd_vec[it - 1]            = search;
-
-          const double c_preloc = (Asearch * p) / nAsearch_new;
-          x.add(c_preloc, search);
-          p.add(-c_preloc, Asearch);
-
-          preconditioner.vmult(search, p);
-          res = search.l2_norm();
-
-          conv = this->iteration_status(it, res, x);
-        }
-
-      if (conv != SolverControl::success)
-        AssertThrow(false, SolverControl::NoConvergence(it, res));
-    }
-
-  private:
-    const unsigned int GCRmaxit;
-
-    mutable VectorType search;
-    mutable VectorType Asearch;
-    mutable VectorType p;
-
-    mutable std::vector<typename VectorType::value_type> Hn_preloc;
-    mutable std::vector<VectorType>                      H_vec;
-    mutable std::vector<VectorType>                      Hd_vec;
+    /**
+     * Flag for the default residual that is used to measure convergence.
+     */
+    bool use_default_residual;
   };
 
-} // namespace dealii
+  SolverGCR(SolverControl &       solver_control,
+            const AdditionalData &data = AdditionalData())
+    : SolverBase<VectorType>(solver_control)
+    , max_n_tmp_vectors(data.max_n_tmp_vectors)
+  {
+    solver_control.set_max_steps(max_n_tmp_vectors);
+  }
+
+  template <typename MatrixType, typename PreconditionerType>
+  void
+  solve(const MatrixType &        A,
+        VectorType &              x,
+        const VectorType &        b,
+        const PreconditionerType &preconditioner)
+  {
+    using number = typename VectorType::value_type;
+
+    SolverControl::State conv = SolverControl::iterate;
+
+    typename VectorMemory<VectorType>::Pointer search_pointer(this->memory);
+    typename VectorMemory<VectorType>::Pointer Asearch_pointer(this->memory);
+    typename VectorMemory<VectorType>::Pointer p_pointer(this->memory);
+
+    VectorType &search  = *search_pointer;
+    VectorType &Asearch = *Asearch_pointer;
+    VectorType &p       = *p_pointer;
+
+    std::vector<typename VectorType::value_type> Hn_preloc;
+    Hn_preloc.reserve(max_n_tmp_vectors);
+
+    internal::SolverGMRESImplementation::TmpVectors<VectorType> H_vec(
+      max_n_tmp_vectors, this->memory);
+    internal::SolverGMRESImplementation::TmpVectors<VectorType> Hd_vec(
+      max_n_tmp_vectors, this->memory);
+
+    search.reinit(x);
+    Asearch.reinit(x);
+    p.reinit(x);
+
+    preconditioner.vmult(search, b);
+    double res = search.l2_norm();
+
+    A.vmult(p, x);
+    p.add(-1., b);
+    preconditioner.vmult(search, p);
+
+    unsigned int it = 0;
+
+    conv = this->iteration_status(it, res, x);
+    if (conv != SolverControl::iterate)
+      return;
+
+    while (conv == SolverControl::iterate)
+      {
+        it++;
+
+        H_vec(it - 1, x);
+        Hd_vec(it - 1, x);
+
+        Hn_preloc.resize(it);
+
+        A.vmult(Asearch, search);
+
+        for (unsigned int i = 0; i < it - 1; ++i)
+          {
+            const double temptest = (H_vec[i] * Asearch) / Hn_preloc[i];
+            Asearch.add(-temptest, H_vec[i]);
+            search.add(-temptest, Hd_vec[i]);
+          }
+
+        const double nAsearch_new = Asearch.norm_sqr();
+        Hn_preloc[it - 1]         = nAsearch_new;
+        H_vec[it - 1]             = Asearch;
+        Hd_vec[it - 1]            = search;
+
+        Assert(std::abs(nAsearch_new) != 0., ExcDivideByZero());
+
+        const double c_preloc = (Asearch * p) / nAsearch_new;
+        x.add(-c_preloc, search);
+        p.add(-c_preloc, Asearch);
+
+        preconditioner.vmult(search, p);
+
+        res = search.l2_norm();
+
+        conv = this->iteration_status(it, res, x);
+      }
+
+    if (conv != SolverControl::success)
+      AssertThrow(false, SolverControl::NoConvergence(it, res));
+  }
+
+private:
+  const unsigned int max_n_tmp_vectors;
+};
+
+
+DEAL_II_NAMESPACE_CLOSE
+
+#endif
