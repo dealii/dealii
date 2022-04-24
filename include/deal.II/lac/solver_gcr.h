@@ -122,8 +122,7 @@ SolverGCR<VectorType>::solve(const MatrixType &        A,
   VectorType &Asearch = *Asearch_pointer;
   VectorType &p       = *p_pointer;
 
-  std::vector<typename VectorType::value_type> Hn_preloc;
-  Hn_preloc.reserve(max_n_tmp_vectors);
+  std::vector<typename VectorType::value_type> Hn_preloc(max_n_tmp_vectors);
 
   internal::SolverGMRESImplementation::TmpVectors<VectorType> H_vec(
     max_n_tmp_vectors, this->memory);
@@ -157,14 +156,14 @@ SolverGCR<VectorType>::solve(const MatrixType &        A,
     {
       it++;
 
-      H_vec(it - 1, x);
-      Hd_vec(it - 1, x);
+      const unsigned int it_ = ((it - 1) % max_n_tmp_vectors) + 1; // restart
 
-      Hn_preloc.resize(it);
+      H_vec(it_ - 1, x);
+      Hd_vec(it_ - 1, x);
 
       A.vmult(Asearch, search);
 
-      for (unsigned int i = 0; i < it - 1; ++i)
+      for (unsigned int i = 0; i < it_ - 1; ++i)
         {
           const auto temptest = (H_vec[i] * Asearch) / Hn_preloc[i];
           Asearch.add(-temptest, H_vec[i]);
@@ -172,9 +171,9 @@ SolverGCR<VectorType>::solve(const MatrixType &        A,
         }
 
       const auto nAsearch_new = Asearch.norm_sqr();
-      Hn_preloc[it - 1]       = nAsearch_new;
-      H_vec[it - 1]           = Asearch;
-      Hd_vec[it - 1]          = search;
+      Hn_preloc[it_ - 1]      = nAsearch_new;
+      H_vec[it_ - 1]          = Asearch;
+      Hd_vec[it_ - 1]         = search;
 
       Assert(std::abs(nAsearch_new) != 0., ExcDivideByZero());
 

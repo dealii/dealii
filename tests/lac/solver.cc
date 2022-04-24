@@ -95,9 +95,9 @@ main()
   SolverGMRES<>                 gmres(control, mem, data1);
   SolverGMRES<>::AdditionalData data2(8, true);
   SolverGMRES<>                 gmresright(control, mem, data2);
-  SolverGCR<>::AdditionalData   gcr_data_1(40, true);
+  SolverGCR<>::AdditionalData   gcr_data_1(6, true);
   SolverGCR<>                   gcr_1(control, gcr_data_1);
-  SolverGCR<>::AdditionalData   gcr_data_2(40, false);
+  SolverGCR<>::AdditionalData   gcr_data_2(6, false);
   SolverGCR<>                   gcr_2(control, gcr_data_2);
   SolverMinRes<>                minres(control, mem);
   SolverBicgstab<>              bicgstab(control, mem);
