@@ -30,6 +30,10 @@ before output arguments of a function call. They also simplify reading code
 because some things become clear already by looking at the style a piece of
 code is written, without having to look up the exact definition of something.
 
+<h3>Notes on deal.II indentation</h3>
+
+See deal.II's wiki on github: <a href="https://github.com/dealii/dealii/wiki/Indentation">Indentation</a>
+
 <h3>Style issues</h3>
 
 <ol>
