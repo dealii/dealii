@@ -29,6 +29,20 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       const FullMatrix<double> &,
       const std::vector<unsigned int> &,
       const double);
+    template void DoFTools::make_periodicity_constraints(
+      const DoFHandler<deal_II_dimension,
+                       deal_II_space_dimension>::face_iterator &,
+      const DoFHandler<deal_II_dimension,
+                       deal_II_space_dimension>::face_iterator &,
+      AffineConstraints<float> &,
+      const ComponentMask &,
+      bool,
+      bool,
+      bool,
+      const FullMatrix<double> &,
+      const std::vector<unsigned int> &,
+      const float);
+
 
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
     template void DoFTools::make_periodicity_constraints(
@@ -85,6 +99,16 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       AffineConstraints<double> &,
       const ComponentMask &,
       const double);
+
+    template void DoFTools::make_periodicity_constraints(
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+      const types::boundary_id,
+      const types::boundary_id,
+      const unsigned int,
+      AffineConstraints<float> &,
+      const ComponentMask &,
+      const float);
+
 
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
     template void DoFTools::make_periodicity_constraints(
