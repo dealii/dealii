@@ -98,6 +98,12 @@ public:
   operator[](const unsigned int level) const;
 
   /**
+   * Return object on level max.
+   */
+  const Object &
+  back() const;
+
+  /**
    * Delete all previous contents of this object and reset its size according
    * to the values of @p new_minlevel and @p new_maxlevel.
    *
@@ -227,6 +233,14 @@ MGLevelObject<Object>::operator[](const unsigned int i) const
   Assert((i >= minlevel) && (i < minlevel + objects.size()),
          ExcIndexRange(i, minlevel, minlevel + objects.size()));
   return *objects[i - minlevel];
+}
+
+
+template <class Object>
+const Object &
+MGLevelObject<Object>::back() const
+{
+  return this->operator[](this->max_level());
 }
 
 
