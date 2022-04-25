@@ -3321,33 +3321,33 @@ public:
    * cases where <code>solution_filename == mesh_filename</code>, and
    * <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string &filename,
-            const double       time,
-            const unsigned int nodes,
-            const unsigned int cells,
-            const unsigned int dim);
+  XDMFEntry(const std::string & filename,
+            const double        time,
+            const std::uint64_t nodes,
+            const std::uint64_t cells,
+            const unsigned int  dim);
 
   /**
    * Simplified constructor that calls the complete constructor for
    * cases where <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string &mesh_filename,
-            const std::string &solution_filename,
-            const double       time,
-            const unsigned int nodes,
-            const unsigned int cells,
-            const unsigned int dim);
+  XDMFEntry(const std::string & mesh_filename,
+            const std::string & solution_filename,
+            const double        time,
+            const std::uint64_t nodes,
+            const std::uint64_t cells,
+            const unsigned int  dim);
 
   /**
    * Constructor that sets all members to provided parameters.
    */
-  XDMFEntry(const std::string &mesh_filename,
-            const std::string &solution_filename,
-            const double       time,
-            const unsigned int nodes,
-            const unsigned int cells,
-            const unsigned int dim,
-            const unsigned int spacedim);
+  XDMFEntry(const std::string & mesh_filename,
+            const std::string & solution_filename,
+            const double        time,
+            const std::uint64_t nodes,
+            const std::uint64_t cells,
+            const unsigned int  dim,
+            const unsigned int  spacedim);
 
   /**
    * Record an attribute and associated dimensionality.
@@ -3411,12 +3411,12 @@ private:
   /**
    * The number of data nodes.
    */
-  unsigned int num_nodes;
+  std::uint64_t num_nodes;
 
   /**
    * The number of data cells.
    */
-  unsigned int num_cells;
+  std::uint64_t num_cells;
 
   /**
    * The dimension associated with the data.
