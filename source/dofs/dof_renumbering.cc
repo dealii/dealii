@@ -2440,18 +2440,34 @@ namespace DoFRenumbering
 
 
 
-  template <int dim, int spacedim, typename Number, typename MatrixFreeType>
+  template <int dim,
+            int spacedim,
+            typename Number,
+            typename VectorizedArrayType>
   void
   matrix_free_data_locality(
-    DoFHandler<dim, spacedim> &                    dof_handler,
-    const AffineConstraints<Number> &              constraints,
-    const MatrixFreeType &                         matrix_free,
-    const typename MatrixFreeType::AdditionalData &matrix_free_data)
+    DoFHandler<dim, spacedim> &                         dof_handler,
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free)
+  {
+    const std::vector<types::global_dof_index> new_global_numbers =
+      compute_matrix_free_data_locality(dof_handler, matrix_free);
+    if (matrix_free.get_mg_level() == dealii::numbers::invalid_unsigned_int)
+      dof_handler.renumber_dofs(new_global_numbers);
+    else
+      dof_handler.renumber_dofs(matrix_free.get_mg_level(), new_global_numbers);
+  }
+
+
+
+  template <int dim, int spacedim, typename Number, typename AdditionalDataType>
+  void
+  matrix_free_data_locality(DoFHandler<dim, spacedim> &      dof_handler,
+                            const AffineConstraints<Number> &constraints,
+                            const AdditionalDataType &       matrix_free_data)
   {
     const std::vector<types::global_dof_index> new_global_numbers =
       compute_matrix_free_data_locality(dof_handler,
                                         constraints,
-                                        matrix_free,
                                         matrix_free_data);
     if (matrix_free_data.mg_level == dealii::numbers::invalid_unsigned_int)
       dof_handler.renumber_dofs(new_global_numbers);
@@ -2461,9 +2477,36 @@ namespace DoFRenumbering
 
 
 
+  template <int dim, int spacedim, typename Number, typename AdditionalDataType>
+  std::vector<types::global_dof_index>
+  compute_matrix_free_data_locality(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const AffineConstraints<Number> &constraints,
+    const AdditionalDataType &       matrix_free_data)
+  {
+    AdditionalDataType my_mf_data    = matrix_free_data;
+    my_mf_data.initialize_mapping    = false;
+    my_mf_data.tasks_parallel_scheme = AdditionalDataType::none;
+
+    typename AdditionalDataType::MatrixFreeType separate_matrix_free;
+    separate_matrix_free.reinit(dealii::MappingQ1<dim>(),
+                                dof_handler,
+                                constraints,
+                                dealii::QGauss<1>(2),
+                                my_mf_data);
+    return compute_matrix_free_data_locality(dof_handler, separate_matrix_free);
+  }
+
+
+
   // Implementation details for matrix-free renumbering
   namespace
   {
+    // Compute a vector of lists with number of unknowns of the same category
+    // in terms of influence from other MPI processes, starting with unknowns
+    // touched only by the local process and finally a new set of indices
+    // going to different MPI neighbors. Later passes of the algorithm will
+    // re-order unknowns within each of these sets.
     std::vector<std::vector<unsigned int>>
     group_dofs_by_rank_access(
       const dealii::Utilities::MPI::Partitioner &partitioner)
@@ -2540,28 +2583,40 @@ namespace DoFRenumbering
 
 
 
+    // Compute two vectors, the first indicating the best numbers for a
+    // MatrixFree::cell_loop and the second the count of how often a DoF is
+    // touched by different cell groups, in order to later figure out DoFs
+    // with far reach and those with only local influence.
     template <int dim, typename Number, typename VectorizedArrayType>
     std::pair<std::vector<unsigned int>, std::vector<unsigned char>>
-    compute_mf_numbering(const MatrixFree<dim, Number, VectorizedArrayType> &mf,
-                         const unsigned int component)
+    compute_mf_numbering(
+      const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const unsigned int                                  component)
     {
-      IndexSet owned_dofs =
-        mf.get_dof_info(component).vector_partitioner->locally_owned_range();
+      const IndexSet &owned_dofs = matrix_free.get_dof_info(component)
+                                     .vector_partitioner->locally_owned_range();
       const unsigned int n_comp =
-        mf.get_dof_handler(component).get_fe().n_components();
-      Assert(mf.get_dof_handler(component).get_fe().n_base_elements() == 1,
-             ExcNotImplemented());
+        matrix_free.get_dof_handler(component).get_fe().n_components();
+      Assert(
+        matrix_free.get_dof_handler(component).get_fe().n_base_elements() == 1,
+        ExcNotImplemented());
       Assert(dynamic_cast<const FE_Q_Base<dim> *>(
-               &mf.get_dof_handler(component).get_fe().base_element(0)),
+               &matrix_free.get_dof_handler(component).get_fe().base_element(
+                 0)),
              ExcNotImplemented("Matrix-free renumbering only works for "
                                "FE_Q elements"));
 
       const unsigned int fe_degree =
-        mf.get_dof_handler(component).get_fe().degree;
+        matrix_free.get_dof_handler(component).get_fe().degree;
       const unsigned int nn = fe_degree - 1;
 
       // Data structure used further down for the identification of various
-      // entities in the hierarchical numbering of unknowns
+      // entities in the hierarchical numbering of unknowns. The first number
+      // indicates the offset from which a given object starts its range of
+      // numbers in the hierarchical DoF numbering of FE_Q, and the second the
+      // number of unknowns per component on that particular component. The
+      // numbers are group by the 3^dim possible objects, listed in
+      // lexicographic order.
       std::array<std::pair<unsigned int, unsigned int>,
                  dealii::Utilities::pow(3, dim)>
         dofs_on_objects;
@@ -2637,7 +2692,7 @@ namespace DoFRenumbering
       unsigned int                         counter_dof_numbers = 0;
       std::vector<unsigned int>            local_dofs, dofs_extracted;
       std::vector<types::global_dof_index> dof_indices(
-        mf.get_dof_handler(component).get_fe().dofs_per_cell);
+        matrix_free.get_dof_handler(component).get_fe().dofs_per_cell);
 
       // We now define a lambda function that does two things: (a) determine
       // DoF numbers in a way that fit with the order a MatrixFree loop
@@ -2672,12 +2727,12 @@ namespace DoFRenumbering
                    ++v)
                 {
                   // get the indices for the dofs in cell_batch
-                  if (mf.get_mg_level() == numbers::invalid_unsigned_int)
-                    data.get_cell_iterator(cell, v)->get_dof_indices(
-                      dof_indices);
+                  if (data.get_mg_level() == numbers::invalid_unsigned_int)
+                    data.get_cell_iterator(cell, v, component)
+                      ->get_dof_indices(dof_indices);
                   else
-                    data.get_cell_iterator(cell, v)->get_mg_dof_indices(
-                      dof_indices);
+                    data.get_cell_iterator(cell, v, component)
+                      ->get_mg_dof_indices(dof_indices);
 
                   for (unsigned int a = 0; a < dofs_on_objects.size(); ++a)
                     {
@@ -2723,14 +2778,13 @@ namespace DoFRenumbering
         };
 
       // Finally run the matrix-free loop.
-      Assert(mf.get_task_info().scheme ==
+      Assert(matrix_free.get_task_info().scheme ==
                dealii::internal::MatrixFreeFunctions::TaskInfo::none,
              ExcNotImplemented("Renumbering only available for non-threaded "
                                "version of MatrixFree::cell_loop"));
 
-      mf.template cell_loop<unsigned int, unsigned int>(operation_on_cell_range,
-                                                        counter_dof_numbers,
-                                                        counter_dof_numbers);
+      matrix_free.template cell_loop<unsigned int, unsigned int>(
+        operation_on_cell_range, counter_dof_numbers, counter_dof_numbers);
 
       AssertDimension(counter_dof_numbers, owned_dofs.n_elements());
 
@@ -2741,48 +2795,48 @@ namespace DoFRenumbering
 
 
 
-  template <int dim, int spacedim, typename Number, typename MatrixFreeType>
+  template <int dim,
+            int spacedim,
+            typename Number,
+            typename VectorizedArrayType>
   std::vector<types::global_dof_index>
   compute_matrix_free_data_locality(
-    const DoFHandler<dim, spacedim> &              dof_handler,
-    const AffineConstraints<Number> &              constraints,
-    const MatrixFreeType &                         matrix_free,
-    const typename MatrixFreeType::AdditionalData &matrix_free_data)
+    const DoFHandler<dim, spacedim> &                   dof_handler,
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free)
   {
-    typename MatrixFreeType::AdditionalData my_mf_data = matrix_free_data;
-    my_mf_data.initialize_mapping                      = false;
-    my_mf_data.tasks_parallel_scheme = MatrixFreeType::AdditionalData::none;
+    Assert(matrix_free.indices_initialized(),
+           ExcMessage("You need to set up indices in MatrixFree "
+                      "to be able to compute a renumbering!"));
 
     // try to locate the `DoFHandler` within the given MatrixFree object.
     unsigned int component = 0;
     for (; component < matrix_free.n_components(); ++component)
-      if (&matrix_free.get_dof_handler(component) == &dof_handler &&
-          matrix_free.indices_initialized())
+      if (&matrix_free.get_dof_handler(component) == &dof_handler)
         break;
 
-    // if not found construct a new one
-    const MatrixFreeType *chosen_matrix_free = &matrix_free;
-    MatrixFreeType        separate_matrix_free;
-    if (component == matrix_free.n_components())
-      {
-        separate_matrix_free.reinit(dealii::MappingQ1<dim>(),
-                                    dof_handler,
-                                    constraints,
-                                    dealii::QGauss<1>(2),
-                                    my_mf_data);
-        chosen_matrix_free = &separate_matrix_free;
-        component          = 0;
-      }
+    Assert(component < matrix_free.n_components(),
+           ExcMessage("Could not locate the given DoFHandler in MatrixFree"));
+
+    // Summary of the algorithm below:
+    // (a) renumber each DoF in order the corresponding object appears in the
+    //     mf loop
+    // (b) determine by how many cell groups (call-back places in the loop) a
+    //     dof is touched -> first type of category
+    // (c) determine by how many MPI processes a dof is touched -> second type
+    //     of category
+    // (d) combine both category types (second, first) and sort the indices
+    //     according to this new category type but also keeping the order
+    //     within the other category.
 
     const std::vector<std::vector<unsigned int>> dofs_by_rank_access =
       group_dofs_by_rank_access(
-        *chosen_matrix_free->get_dof_info(component).vector_partitioner);
+        *matrix_free.get_dof_info(component).vector_partitioner);
 
     const std::pair<std::vector<unsigned int>, std::vector<unsigned char>>
-      local_numbering = compute_mf_numbering(*chosen_matrix_free, component);
+      local_numbering = compute_mf_numbering(matrix_free, component);
 
     // Now construct the new numbering
-    const IndexSet &owned_dofs = chosen_matrix_free->get_dof_info(component)
+    const IndexSet &owned_dofs = matrix_free.get_dof_info(component)
                                    .vector_partitioner->locally_owned_range();
     std::vector<unsigned int> new_numbers;
     new_numbers.reserve(owned_dofs.n_elements());

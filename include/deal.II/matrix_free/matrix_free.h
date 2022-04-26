@@ -179,6 +179,11 @@ public:
   struct AdditionalData
   {
     /**
+     * Provide the type of the surrounding MatrixFree class.
+     */
+    using MatrixFreeType = MatrixFree<dim, Number, VectorizedArrayType>;
+
+    /**
      * Collects options for task parallelism. See the documentation of the
      * member variable MatrixFree::AdditionalData::tasks_parallel_scheme for a
      * thorough description.

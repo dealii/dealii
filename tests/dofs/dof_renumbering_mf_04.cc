@@ -52,7 +52,6 @@ test(const unsigned int degree)
   using MatrixFreeType = MatrixFree<dim, float, VectorizedArray<float, 1>>;
   typename MatrixFreeType::AdditionalData mf_data;
   mf_data.tasks_parallel_scheme = MatrixFreeType::AdditionalData::none;
-  MatrixFreeType mf;
 
   AffineConstraints<double> constraints;
   for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
@@ -60,8 +59,10 @@ test(const unsigned int degree)
       mf_data.mg_level = level;
 
       {
-        const auto renumber = DoFRenumbering::compute_matrix_free_data_locality(
-          dof, constraints, mf, mf_data);
+        const auto renumber =
+          DoFRenumbering::compute_matrix_free_data_locality(dof,
+                                                            constraints,
+                                                            mf_data);
 
         deallog << "Level " << level << std::endl;
         deallog << "Renumbering no constraints: " << std::endl;
@@ -74,7 +75,7 @@ test(const unsigned int degree)
         deallog << std::endl;
       }
 
-      DoFRenumbering::matrix_free_data_locality(dof, constraints, mf, mf_data);
+      DoFRenumbering::matrix_free_data_locality(dof, constraints, mf_data);
       std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
       deallog << "New dof indices on cells: " << std::endl;
       for (const auto &cell : dof.mg_cell_iterators_on_level(level))
