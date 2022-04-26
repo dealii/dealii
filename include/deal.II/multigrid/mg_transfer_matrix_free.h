@@ -662,61 +662,9 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
   const unsigned int min_level = dst.min_level();
   const unsigned int max_level = dst.max_level();
 
-  // this function is normally called within the Multigrid class with
-  // dst == defect level block vector. At first run this vector is not
-  // initialized. Do this below:
-  {
-    const parallel::TriangulationBase<dim, spacedim> *tria =
-      (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-        &(dof_handler[0]->get_triangulation())));
-    for (unsigned int i = 1; i < n_blocks; ++i)
-      AssertThrow(
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-           &(dof_handler[0]->get_triangulation())) == tria),
-        ExcMessage("The DoFHandler use different Triangulations!"));
-
-    MGLevelObject<bool> do_reinit;
-    do_reinit.resize(min_level, max_level);
-    for (unsigned int level = min_level; level <= max_level; ++level)
-      {
-        do_reinit[level] = false;
-        if (dst[level].n_blocks() != n_blocks)
-          {
-            do_reinit[level] = true;
-            continue; // level
-          }
-        for (unsigned int b = 0; b < n_blocks; ++b)
-          {
-            LinearAlgebra::distributed::Vector<Number> &v = dst[level].block(b);
-            if (v.size() !=
-                  dof_handler[b]->locally_owned_mg_dofs(level).size() ||
-                v.locally_owned_size() !=
-                  dof_handler[b]->locally_owned_mg_dofs(level).n_elements())
-              {
-                do_reinit[level] = true;
-                break; // b
-              }
-          }
-      }
-
-    for (unsigned int level = min_level; level <= max_level; ++level)
-      {
-        if (do_reinit[level])
-          {
-            dst[level].reinit(n_blocks);
-            for (unsigned int b = 0; b < n_blocks; ++b)
-              {
-                LinearAlgebra::distributed::Vector<Number> &v =
-                  dst[level].block(b);
-                v.reinit(dof_handler[b]->locally_owned_mg_dofs(level),
-                         dof_handler[b]->get_communicator());
-              }
-            dst[level].collect_sizes();
-          }
-        else
-          dst[level] = 0;
-      }
-  }
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    if (dst[level].n_blocks() != n_blocks)
+      dst[level].reinit(n_blocks);
 
   // FIXME: this a quite ugly as we need a temporary object:
   MGLevelObject<LinearAlgebra::distributed::Vector<Number>> dst_non_block(
@@ -724,8 +672,6 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
 
   for (unsigned int b = 0; b < n_blocks; ++b)
     {
-      for (unsigned int l = min_level; l <= max_level; ++l)
-        dst_non_block[l].reinit(dst[l].block(b));
       const unsigned int data_block = same_for_all ? 0 : b;
       matrix_free_transfer_vector[data_block].copy_to_mg(*dof_handler[b],
                                                          dst_non_block,
@@ -734,6 +680,9 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
       for (unsigned int l = min_level; l <= max_level; ++l)
         dst[l].block(b) = dst_non_block[l];
     }
+
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    dst[level].collect_sizes();
 }
 
 template <int dim, typename Number, typename TransferType>
