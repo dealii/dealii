@@ -1,0 +1,19 @@
+
+DEAL:2d::Testing FE_RaviartThomasNodal<2>(1)
+DEAL:2d::Number of cells: 4
+DEAL:2d::Number of degrees of freedom: 40
+DEAL:2d::
+DEAL:2d::Norm of difference: 3.44596e-16
+DEAL:2d::
+DEAL:2d::Testing FE_RaviartThomasNodal<2>(2)
+DEAL:2d::Number of cells: 4
+DEAL:2d::Number of degrees of freedom: 84
+DEAL:2d::
+DEAL:2d::Norm of difference: 3.47432e-15
+DEAL:2d::
+DEAL:3d::Testing FE_RaviartThomasNodal<3>(1)
+DEAL:3d::Number of cells: 8
+DEAL:3d::Number of degrees of freedom: 240
+DEAL:3d::
+DEAL:3d::Norm of difference: 2.28531e-15
+DEAL:3d::

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,9 +18,15 @@ for (deal_II_dimension : DIMENSIONS;
      deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
   {
     template struct dealii::internal::
-      FEEvaluationFactory<deal_II_dimension, deal_II_scalar_vectorized>;
+      FEFaceEvaluationFactory<deal_II_dimension, deal_II_scalar_vectorized>;
 
-    // inverse mass
-    template struct dealii::internal::
-      CellwiseInverseMassFactory<deal_II_dimension, deal_II_scalar_vectorized>;
+    template struct dealii::internal::FEFaceEvaluationGatherFactory<
+      deal_II_dimension,
+      double,
+      deal_II_scalar_vectorized>;
+
+    template struct dealii::internal::FEFaceEvaluationGatherFactory<
+      deal_II_dimension,
+      float,
+      deal_II_scalar_vectorized>;
   }

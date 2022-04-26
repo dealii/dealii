@@ -147,67 +147,6 @@ namespace
   }
 
 
-
-  // set up the numbering of the rt polynomials
-  std::vector<unsigned int>
-  compute_rt_hierarchic_to_lexicographic(const unsigned int dim,
-                                         const unsigned int degree)
-  {
-    const unsigned int n_pols =
-      (degree + 2) * Utilities::pow(degree + 1, dim - 1);
-
-    std::vector<unsigned int> hierarchic_to_lexicographic;
-
-    // dofs on faces
-    for (unsigned int face_no = 0; face_no < 2 * dim; ++face_no)
-      {
-        const unsigned int stride_x = face_no < 2 ? degree + 2 : 1;
-        const unsigned int stride_y =
-          face_no < 4 ? (degree + 2) * (degree + 1) : degree + 1;
-        const unsigned int offset =
-          (face_no % 2) * Utilities::pow(degree + 1, 1 + face_no / 2);
-        for (unsigned int j = 0; j < (dim > 2 ? degree + 1 : 1); ++j)
-          for (unsigned int i = 0; i < degree + 1; ++i)
-            hierarchic_to_lexicographic.push_back(
-              (face_no / 2) * n_pols + offset + i * stride_x + j * stride_y);
-      }
-    // dofs on cells, starting with x component...
-    for (unsigned int k = 0; k < (dim > 2 ? degree + 1 : 1); ++k)
-      for (unsigned int j = 0; j < (dim > 1 ? degree + 1 : 1); ++j)
-        for (unsigned int i = 1; i < degree + 1; ++i)
-          hierarchic_to_lexicographic.push_back(
-            k * (degree + 1) * (degree + 2) + j * (degree + 2) + i);
-    // ... then y component ...
-    if (dim > 1)
-      for (unsigned int k = 0; k < (dim > 2 ? degree + 1 : 1); ++k)
-        for (unsigned int j = 1; j < degree + 1; ++j)
-          for (unsigned int i = 0; i < degree + 1; ++i)
-            hierarchic_to_lexicographic.push_back(
-              n_pols + k * (degree + 1) * (degree + 2) + j * (degree + 1) + i);
-    // ... and finally z component
-    if (dim > 2)
-      for (unsigned int k = 1; k < degree + 1; ++k)
-        for (unsigned int j = 0; j < degree + 1; ++j)
-          for (unsigned int i = 0; i < degree + 1; ++i)
-            hierarchic_to_lexicographic.push_back(
-              2 * n_pols + k * (degree + 1) * (degree + 1) + j * (degree + 1) +
-              i);
-
-    AssertDimension(hierarchic_to_lexicographic.size(), n_pols * dim);
-
-#ifdef DEBUG
-    // assert that we have a valid permutation
-    std::vector<unsigned int> copy(hierarchic_to_lexicographic);
-    std::sort(copy.begin(), copy.end());
-    for (unsigned int i = 0; i < copy.size(); ++i)
-      AssertDimension(i, copy[i]);
-#endif
-
-    return hierarchic_to_lexicographic;
-  }
-
-
-
   template <int dim>
   PolynomialsRaviartThomasNodal<dim>::PolynomialsRaviartThomasNodal(
     const unsigned int degree)
@@ -219,11 +158,11 @@ namespace
     // actual order required by the finite element class with unknowns on
     // faces placed first
     const unsigned int n_pols = polynomial_space.n();
-    hierarchic_to_lexicographic =
-      compute_rt_hierarchic_to_lexicographic(dim, degree);
-
     lexicographic_to_hierarchic =
-      Utilities::invert_permutation(hierarchic_to_lexicographic);
+      internal::get_lexicographic_numbering_rt_nodal<dim>(degree + 1);
+
+    hierarchic_to_lexicographic =
+      Utilities::invert_permutation(lexicographic_to_hierarchic);
 
     // since we only store an anisotropic polynomial for the first component,
     // we set up a second numbering to switch out the actual coordinate
@@ -432,7 +371,61 @@ namespace
   }
 } // namespace
 
+namespace internal
+{
+  template <int dim>
+  std::vector<unsigned int>
+  get_lexicographic_numbering_rt_nodal(const unsigned int degree)
+  {
+    const unsigned int        n_dofs_face = Utilities::pow(degree, dim - 1);
+    std::vector<unsigned int> lexicographic_numbering;
+    // component 1
+    for (unsigned int j = 0; j < n_dofs_face; j++)
+      {
+        lexicographic_numbering.push_back(j);
+        for (unsigned int i = n_dofs_face * 2 * dim;
+             i < n_dofs_face * 2 * dim + degree - 1;
+             i++)
+          lexicographic_numbering.push_back(i + j * (degree - 1));
+        lexicographic_numbering.push_back(n_dofs_face + j);
+      }
 
+    // component 2
+    unsigned int layers = (dim == 3) ? degree : 1;
+    for (unsigned int k = 0; k < layers; k++)
+      {
+        unsigned int k_add = k * degree;
+        for (unsigned int j = n_dofs_face * 2; j < n_dofs_face * 2 + degree;
+             j++)
+          lexicographic_numbering.push_back(j + k_add);
+
+        for (unsigned int i = n_dofs_face * (2 * dim + (degree - 1));
+             i < n_dofs_face * (2 * dim + (degree - 1)) + (degree - 1) * degree;
+             i++)
+          {
+            lexicographic_numbering.push_back(i + k_add * (degree - 1));
+          }
+        for (unsigned int j = n_dofs_face * 3; j < n_dofs_face * 3 + degree;
+             j++)
+          lexicographic_numbering.push_back(j + k_add);
+      }
+
+    // component 3
+    if (dim == 3)
+      {
+        for (unsigned int i = 4 * n_dofs_face; i < 5 * n_dofs_face; i++)
+          lexicographic_numbering.push_back(i);
+        for (unsigned int i = 6 * n_dofs_face + n_dofs_face * 2 * (degree - 1);
+             i < 6 * n_dofs_face + n_dofs_face * 3 * (degree - 1);
+             i++)
+          lexicographic_numbering.push_back(i);
+        for (unsigned int i = 5 * n_dofs_face; i < 6 * n_dofs_face; i++)
+          lexicographic_numbering.push_back(i);
+      }
+
+    return lexicographic_numbering;
+  }
+} // namespace internal
 
 // --------------------- actual implementation of element --------------------
 
