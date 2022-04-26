@@ -13,10 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-// A version of step-44 that checks that some of the definitions for standard
-// tensors and kinematic quantities for elasticity are computed correctly
-// Here the material is defined using referential quantities which are then
-// pushed forward through the predefined transformations
+// This is a copy of step-44 (git rev 3f7e617) to use as a base-line for
+// results produced via different approaches to be compared to.
+//
+// This variant of the test uses the FE_DGPMonomial class to discretize the
+// pressure and dilatation fields, as was originally done in commit 3f7e617.
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
@@ -32,7 +33,7 @@
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgp_monomial.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
@@ -59,10 +60,6 @@
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
-
-#include <deal.II/physics/elasticity/kinematics.h>
-#include <deal.II/physics/elasticity/standard_tensors.h>
-#include <deal.II/physics/transformations.h>
 
 #include <iostream>
 
@@ -356,6 +353,26 @@ namespace Step44
       Time::parse_parameters(prm);
     }
   } // namespace Parameters
+  template <int dim>
+  class StandardTensors
+  {
+  public:
+    static const SymmetricTensor<2, dim> I;
+    static const SymmetricTensor<4, dim> IxI;
+    static const SymmetricTensor<4, dim> II;
+    static const SymmetricTensor<4, dim> dev_P;
+  };
+  template <int dim>
+  const SymmetricTensor<2, dim>
+    StandardTensors<dim>::I = unit_symmetric_tensor<dim>();
+  template <int dim>
+  const SymmetricTensor<4, dim> StandardTensors<dim>::IxI = outer_product(I, I);
+  template <int dim>
+  const SymmetricTensor<4, dim>
+    StandardTensors<dim>::II = identity_tensor<dim>();
+  template <int dim>
+  const SymmetricTensor<4, dim>
+    StandardTensors<dim>::dev_P = deviator_tensor<dim>();
   class Time
   {
   public:
@@ -407,172 +424,35 @@ namespace Step44
     Material_Compressible_Neo_Hook_Three_Field(const double mu, const double nu)
       : kappa((2.0 * mu * (1.0 + nu)) / (3.0 * (1.0 - 2.0 * nu)))
       , c_1(mu / 2.0)
+      , det_F(1.0)
       , p_tilde(0.0)
       , J_tilde(1.0)
-      , det_F(1.0)
-      , F(Physics::Elasticity::StandardTensors<dim>::I)
-      , C_inv(Physics::Elasticity::StandardTensors<dim>::I)
+      , b_bar(StandardTensors<dim>::I)
     {
       Assert(kappa > 0, ExcInternalError());
     }
     ~Material_Compressible_Neo_Hook_Three_Field()
     {}
     void
-    update_material_data(const Tensor<2, dim> &F_in,
+    update_material_data(const Tensor<2, dim> &F,
                          const double          p_tilde_in,
                          const double          J_tilde_in)
     {
-      F                          = F_in;
-      det_F                      = determinant(F);
-      const Tensor<2, dim> F_iso = Physics::Elasticity::Kinematics::F_iso(F);
-      C_inv                      = symmetrize(invert(transpose(F) * F));
-      p_tilde                    = p_tilde_in;
-      J_tilde                    = J_tilde_in;
+      det_F   = determinant(F);
+      b_bar   = std::pow(det_F, -2.0 / dim) * symmetrize(F * transpose(F));
+      p_tilde = p_tilde_in;
+      J_tilde = J_tilde_in;
       Assert(det_F > 0, ExcInternalError());
     }
     SymmetricTensor<2, dim>
-    get_tau() const
+    get_tau()
     {
-      // Zero strain --> zero stress
-      if (std::abs(det_F - 1.0) > 1e-9)
-        {
-          static const double tol = 1e-12;
-
-          // Verify the push-forward transformation
-          Assert((Physics::Transformations::Contravariant::push_forward(
-                    get_S_vol(), F) -
-                  get_tau_vol())
-                       .norm() /
-                     get_tau_vol().norm() <
-                   tol,
-                 ExcInternalError());
-          Assert((Physics::Transformations::Contravariant::push_forward(
-                    get_S_iso(), F) -
-                  get_tau_iso())
-                       .norm() /
-                     get_tau_iso().norm() <
-                   tol,
-                 ExcInternalError());
-
-          // Verify the pull-back transformation
-          Assert((Physics::Transformations::Contravariant::pull_back(
-                    get_tau_vol(), F) -
-                  get_S_vol())
-                       .norm() /
-                     get_S_vol().norm() <
-                   tol,
-                 ExcInternalError());
-          Assert((Physics::Transformations::Contravariant::pull_back(
-                    get_tau_iso(), F) -
-                  get_S_iso())
-                       .norm() /
-                     get_S_iso().norm() <
-                   tol,
-                 ExcInternalError());
-        }
-      else
-        {
-          static const double tol = 1e-9;
-
-          // Verify the push-forward transformation
-          Assert((Physics::Transformations::Contravariant::push_forward(
-                    get_S_vol(), F) -
-                  get_tau_vol())
-                     .norm() < tol,
-                 ExcInternalError());
-          Assert((Physics::Transformations::Contravariant::push_forward(
-                    get_S_iso(), F) -
-                  get_tau_iso())
-                     .norm() < tol,
-                 ExcInternalError());
-
-          // Verify the pull-back transformation
-          Assert((Physics::Transformations::Contravariant::pull_back(
-                    get_tau_vol(), F) -
-                  get_S_vol())
-                     .norm() < tol,
-                 ExcInternalError());
-          Assert((Physics::Transformations::Contravariant::pull_back(
-                    get_tau_iso(), F) -
-                  get_S_iso())
-                     .norm() < tol,
-                 ExcInternalError());
-        }
-
-      return Physics::Transformations::Contravariant::push_forward(
-        get_S_iso() + get_S_vol(), F);
+      return get_tau_iso() + get_tau_vol();
     }
     SymmetricTensor<4, dim>
     get_Jc() const
     {
-      // Zero strain --> zero stress
-      if (std::abs(det_F - 1.0) > 1e-9)
-        {
-          static const double tol = 1e-9;
-
-          // Verify the push-forward transformation
-          Assert((Physics::Transformations::Contravariant::push_forward(
-                    get_H_vol(), F) -
-                  get_Jc_vol())
-                       .norm() /
-                     get_Jc_vol().norm() <
-                   tol,
-                 ExcInternalError());
-          Assert((Physics::Transformations::Contravariant::push_forward(
-                    get_H_iso(), F) -
-                  get_Jc_iso())
-                       .norm() /
-                     get_Jc_iso().norm() <
-                   tol,
-                 ExcInternalError());
-
-          // Verify the pull-back transformation
-          Assert((Physics::Transformations::Contravariant::pull_back(
-                    get_Jc_vol(), F) -
-                  get_H_vol())
-                       .norm() /
-                     get_H_vol().norm() <
-                   tol,
-                 ExcInternalError());
-          Assert((Physics::Transformations::Contravariant::pull_back(
-                    get_Jc_iso(), F) -
-                  get_H_iso())
-                       .norm() /
-                     get_H_iso().norm() <
-                   tol,
-                 ExcInternalError());
-        }
-      else
-        {
-          static const double tol = 1e-6;
-
-          // Verify the push-forward transformation
-          Assert((Physics::Transformations::Contravariant::push_forward(
-                    get_H_vol(), F) -
-                  get_Jc_vol())
-                     .norm() < tol,
-                 ExcInternalError());
-          Assert((Physics::Transformations::Contravariant::push_forward(
-                    get_H_iso(), F) -
-                  get_Jc_iso())
-                     .norm() < tol,
-                 ExcInternalError());
-
-          // Verify the pull-back transformation
-          Assert((Physics::Transformations::Contravariant::pull_back(
-                    get_Jc_vol(), F) -
-                  get_H_vol())
-                     .norm() < tol,
-                 ExcInternalError());
-          Assert((Physics::Transformations::Contravariant::pull_back(
-                    get_Jc_iso(), F) -
-                  get_H_iso())
-                     .norm() < tol,
-                 ExcInternalError());
-        }
-
-      return Physics::Transformations::Contravariant::push_forward(
-        get_H_vol() + get_H_iso(), F);
+      return get_Jc_vol() + get_Jc_iso();
     }
     double
     get_dPsi_vol_dJ() const
@@ -603,93 +483,30 @@ namespace Step44
   protected:
     const double            kappa;
     const double            c_1;
+    double                  det_F;
     double                  p_tilde;
     double                  J_tilde;
-    double                  det_F;
-    Tensor<2, dim>          F;
-    SymmetricTensor<2, dim> C_inv;
-    SymmetricTensor<2, dim>
-    get_S_vol() const
-    {
-      // See Wriggers2008 equ 3.304 (3.126 == one field)
-      return p_tilde * det_F * C_inv;
-    }
-    SymmetricTensor<2, dim>
-    get_S_iso() const
-    {
-      // Expansion of stress definition via chain rule
-      return get_S_bar() * Physics::Elasticity::StandardTensors<dim>::Dev_P(F);
-    }
-    SymmetricTensor<2, dim>
-    get_S_bar() const
-    {
-      // Derived from energy function
-      return 2.0 * c_1 * Physics::Elasticity::StandardTensors<dim>::I;
-    }
-    SymmetricTensor<4, dim>
-    get_H_vol() const
-    {
-      const SymmetricTensor<4, dim> C_inv_x_C_inv = outer_product(C_inv, C_inv);
-      return p_tilde * det_F *
-             (C_inv_x_C_inv +
-              (2.0 * Physics::Elasticity::StandardTensors<dim>::dC_inv_dC(F)));
-    }
-    SymmetricTensor<4, dim>
-    get_H_iso() const
-    {
-      // See Wriggers2008 (equ 3.253 == one field)
-      const SymmetricTensor<2, dim> C = Physics::Elasticity::Kinematics::C(F);
-      const SymmetricTensor<4, dim> C_inv_x_C_inv = outer_product(C_inv, C_inv);
-      const SymmetricTensor<2, dim> S_bar         = get_S_bar();
-      const SymmetricTensor<2, dim> S_iso         = get_S_iso();
-      const SymmetricTensor<4, dim> S_iso_x_C_inv = outer_product(S_iso, C_inv);
-      const SymmetricTensor<4, dim> C_inv_x_S_iso = outer_product(C_inv, S_iso);
-      const SymmetricTensor<4, dim> H_bar         = get_H_bar();
-
-      // Note: The is an unfortunate mistake in Wriggers2008 equ 3.253 relating
-      // to the first term here (the second term in the Wriggers2008 equation).
-      // --> The reference formula has the wrong sign for this term.
-      // See Pelteret2013 equ A.37 for the correct expression
-      // https://open.uct.ac.za/handle/11427/9519
-      // http://jean-paul.pelteret.co.za/wp-content/papercite-data/pdf/pelteret2013b-phd_thesis.pdf
-      return -(2.0 / dim) * (S_bar * (std::pow(det_F, -2.0 / dim) * C)) *
-               ((1.0 / dim) * C_inv_x_C_inv +
-                Physics::Elasticity::StandardTensors<dim>::dC_inv_dC(F)) -
-             (2.0 / dim) * (S_iso_x_C_inv + C_inv_x_S_iso) +
-             Physics::Elasticity::StandardTensors<dim>::Dev_P_T(F) * H_bar *
-               Physics::Elasticity::StandardTensors<dim>::Dev_P(F);
-    }
-    SymmetricTensor<4, dim>
-    get_H_bar() const
-    {
-      return SymmetricTensor<4, dim>();
-    }
-
-    //=== ALTERNATIVE IMPLEMENTATION ===
+    SymmetricTensor<2, dim> b_bar;
     SymmetricTensor<2, dim>
     get_tau_vol() const
     {
-      return p_tilde * det_F * Physics::Elasticity::StandardTensors<dim>::I;
+      return p_tilde * det_F * StandardTensors<dim>::I;
     }
     SymmetricTensor<2, dim>
     get_tau_iso() const
     {
-      return Physics::Elasticity::StandardTensors<dim>::dev_P * get_tau_bar();
+      return StandardTensors<dim>::dev_P * get_tau_bar();
     }
     SymmetricTensor<2, dim>
     get_tau_bar() const
     {
-      const Tensor<2, dim> F_iso = Physics::Elasticity::Kinematics::F_iso(F);
-      const SymmetricTensor<2, dim> b_bar =
-        Physics::Elasticity::Kinematics::b(F_iso);
       return 2.0 * c_1 * b_bar;
     }
     SymmetricTensor<4, dim>
     get_Jc_vol() const
     {
       return p_tilde * det_F *
-             (Physics::Elasticity::StandardTensors<dim>::IxI -
-              (2.0 * Physics::Elasticity::StandardTensors<dim>::S));
+             (StandardTensors<dim>::IxI - (2.0 * StandardTensors<dim>::II));
     }
     SymmetricTensor<4, dim>
     get_Jc_iso() const
@@ -697,15 +514,13 @@ namespace Step44
       const SymmetricTensor<2, dim> tau_bar = get_tau_bar();
       const SymmetricTensor<2, dim> tau_iso = get_tau_iso();
       const SymmetricTensor<4, dim> tau_iso_x_I =
-        outer_product(tau_iso, Physics::Elasticity::StandardTensors<dim>::I);
+        outer_product(tau_iso, StandardTensors<dim>::I);
       const SymmetricTensor<4, dim> I_x_tau_iso =
-        outer_product(Physics::Elasticity::StandardTensors<dim>::I, tau_iso);
+        outer_product(StandardTensors<dim>::I, tau_iso);
       const SymmetricTensor<4, dim> c_bar = get_c_bar();
-      return (2.0 / dim) * trace(tau_bar) *
-               Physics::Elasticity::StandardTensors<dim>::dev_P -
+      return (2.0 / dim) * trace(tau_bar) * StandardTensors<dim>::dev_P -
              (2.0 / dim) * (tau_iso_x_I + I_x_tau_iso) +
-             Physics::Elasticity::StandardTensors<dim>::dev_P * c_bar *
-               Physics::Elasticity::StandardTensors<dim>::dev_P;
+             StandardTensors<dim>::dev_P * c_bar * StandardTensors<dim>::dev_P;
     }
     SymmetricTensor<4, dim>
     get_c_bar() const
@@ -718,7 +533,7 @@ namespace Step44
   {
   public:
     PointHistory()
-      : F_inv(Physics::Elasticity::StandardTensors<dim>::I)
+      : F_inv(StandardTensors<dim>::I)
       , tau(SymmetricTensor<2, dim>())
       , d2Psi_vol_dJ2(0.0)
       , dPsi_vol_dJ(0.0)
@@ -739,7 +554,8 @@ namespace Step44
                   const double          p_tilde,
                   const double          J_tilde)
     {
-      const Tensor<2, dim> F = Physics::Elasticity::Kinematics::F(Grad_u_n);
+      const Tensor<2, dim> F =
+        (Tensor<2, dim>(StandardTensors<dim>::I) + Grad_u_n);
       material->update_material_data(F, p_tilde, J_tilde);
       F_inv         = invert(F);
       tau           = material->get_tau();
@@ -964,9 +780,9 @@ namespace Step44
     , degree(parameters.poly_degree)
     , fe(FE_Q<dim>(parameters.poly_degree),
          dim, // displacement
-         FE_DGP<dim>(parameters.poly_degree - 1),
+         FE_DGPMonomial<dim>(parameters.poly_degree - 1),
          1, // pressure
-         FE_DGP<dim>(parameters.poly_degree - 1),
+         FE_DGPMonomial<dim>(parameters.poly_degree - 1),
          1)
     , // dilatation
     dof_handler_ref(triangulation)
@@ -1723,9 +1539,7 @@ namespace Step44
                   {
                     data.cell_matrix(i, j) +=
                       N[i] * det_F *
-                      (symm_grad_Nx[j] *
-                       Physics::Elasticity::StandardTensors<dim>::I) *
-                      JxW;
+                      (symm_grad_Nx[j] * StandardTensors<dim>::I) * JxW;
                   }
                 else if ((i_group == J_dof) && (j_group == p_dof))
                   data.cell_matrix(i, j) -= N[i] * N[j] * JxW;
@@ -1794,7 +1608,7 @@ namespace Step44
          scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
-        for (unsigned int k = 0; k < dofs_per_cell; ++k)
+        for (const unsigned int k : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int k_group = fe.system_to_base_index(k).first.first;
             if (k_group == u_dof)
