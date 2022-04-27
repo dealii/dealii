@@ -196,6 +196,36 @@ DataPostprocessorTensor<dim>::get_needed_update_flags() const
 
 
 
+namespace DataPostprocessors
+{
+  template <int dim>
+  BoundaryIds<dim>::BoundaryIds()
+    : DataPostprocessorScalar<dim>("boundary_id", update_quadrature_points)
+  {}
+
+
+  template <int dim>
+  void
+  BoundaryIds<dim>::evaluate_scalar_field(
+    const DataPostprocessorInputs::Scalar<dim> &inputs,
+    std::vector<Vector<double>> &               computed_quantities) const
+  {
+    AssertDimension(computed_quantities.size(), inputs.solution_values.size());
+
+    const typename DoFHandler<dim>::active_cell_iterator cell =
+      inputs.template get_cell<dim>();
+    const unsigned int face = inputs.get_face_number();
+
+    for (auto &output : computed_quantities)
+      {
+        AssertDimension(output.size(), 1);
+        output(0) = cell->face(face)->boundary_id();
+      }
+  }
+} // namespace DataPostprocessors
+
+
+
 // explicit instantiation
 #include "data_postprocessor.inst"
 
