@@ -38,9 +38,3 @@ src/muParserInt.cpp
 src/muParserTest.cpp
 src/muParserTokenReader.cpp
   )
-
-# We do not support (yet) compiling DLLs with MSVC. By default, muParser will
-# try to set itself up correctly with __declspec(dllexport). Get around this by
-# instructing it to use static linkage, which will define (see muParserFixes.h)
-# AP_EXPORT_CXX to nothing.
-DEAL_II_ADD_DEFINITIONS(obj_muparser "MUPARSER_STATIC")
