@@ -5378,6 +5378,30 @@ operator+(const VectorizedArray<float, width> &v, const double u)
 }
 
 /**
+ * Addition of two vectorized arrays with different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          std::size_t width1,
+          typename Number2,
+          std::size_t width2,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE auto
+operator+(const VectorizedArray<Number1, width1> &u,
+          const VectorizedArray<Number2, width2> &v)
+{
+  using VPT =
+    internal::VectorizationProductType<VectorizedArray<Number1, width1>,
+                                       VectorizedArray<Number2, width2>>;
+  return internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(u) +
+         internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(v);
+}
+
+/**
  * Subtraction of a vectorized array from a scalar (expanded to a vectorized
  * array with @p size() equal entries).
  *
@@ -5471,6 +5495,31 @@ operator-(const VectorizedArray<Number1, width> &v, const Number2 &u)
                                             VPT::width>(v) -
          internal::convert_vectorized_array<typename VPT::value_type,
                                             VPT::width>(u);
+}
+
+/**
+ * Subtraction of one vectorized array from another, both of which have
+ * different underlying types.
+ *
+ * @relatesalso VectorizedArray
+ */
+template <typename Number1,
+          std::size_t width1,
+          typename Number2,
+          std::size_t width2,
+          typename = typename std::enable_if<
+            !std::is_same<Number1, Number2>::value>::type>
+inline DEAL_II_ALWAYS_INLINE auto
+operator-(const VectorizedArray<Number1, width1> &u,
+          const VectorizedArray<Number2, width2> &v)
+{
+  using VPT =
+    internal::VectorizationProductType<VectorizedArray<Number1, width1>,
+                                       VectorizedArray<Number2, width2>>;
+  return internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(u) -
+         internal::convert_vectorized_array<typename VPT::value_type,
+                                            VPT::width>(v);
 }
 
 /**
