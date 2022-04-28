@@ -20,7 +20,11 @@
 
 #ifdef DEAL_II_WITH_CGAL
 #  include <CGAL/Cartesian.h>
+#  include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#  include <CGAL/Exact_predicates_exact_constructions_kernel_with_sqrt.h>
+#  include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #  include <CGAL/Simple_cartesian.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 /**
