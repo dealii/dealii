@@ -67,6 +67,7 @@
 
 
 // @sect3{Class Template Declarations}
+//
 // We begin our actual implementation by declaring all classes with their
 // data structures and methods upfront.
 
@@ -97,13 +98,14 @@ namespace Step81
   // the interface between two materials. If we are at an interface, we assign
   // the i^th diagonal element of the tensor to the private sigma_ value.
 
-  // J_a is the strength and orientation of the dipole. As mentioned in the rescaling,
+  // J_a is the strength and orientation of the dipole. As mentioned in the
+  // rescaling,
   // @f[
   // \mathbf{J}_a = J_0 e_i\delta(x-a)
   // @f]
   // It is a rank 1 tensor
-  // that depends on the private dipole_position_, dipole_radius_,
-  // dipole_strength_, dipole_orientation_ variables.
+  // that depends on the private dipole_position, dipole_radius,
+  // dipole_strength, dipole_orientation variables.
 
   template <int dim>
   class Parameters : public ParameterAcceptor
@@ -233,15 +235,16 @@ namespace Step81
   }
 
   // @sect4{PerfectlyMatchedLayer Class}
-  // The PerfectlyMatchedLayer class inherits ParameterAcceptor,
-  // and it modifies our coefficients from Parameters.
-  // The radii and the strength of the PML is specified, and the
-  // coefficients will be modified using transformation
-  // matrices within the PML region. The radii and strength of
-  // the PML are editable through a .prm file
-  // The rotation function is the $T_{exer}$ mentioned in the
-  // perfectly matched layer section of the introduction.
-  // Moreover, the matrices A, B and C are defined as mentioned
+  // The PerfectlyMatchedLayer class inherits ParameterAcceptor as well. It
+  // implements the transformation matrices used to modify the permittivity
+  // and permeability tensors supplied from the Parameters class. The
+  // actual transformation of the material tensors will be done in the
+  // assembly loop. The radii and the strength of the PML is specified, and
+  // the coefficients will be modified using transformation matrices within
+  // the PML region. The radii and strength of the PML are editable through
+  // a .prm file. The rotation function $T_{exer}$ is the same as
+  // introduced in the perfectly matched layer section of the introduction.
+  // Similarly, the matrices A, B and C are defined as follows
   // @f[
   // A = T_{e_xe_r}^{-1}
   // \text{diag}\left(\frac{1}{\bar{d}^2},\frac{1}{d\bar{d}}\right)T_{e_xe_r},\qquad
@@ -376,12 +379,13 @@ namespace Step81
 
 
   // @sect4{Maxwell Class}
-  // At this point we are ready to instantiate all the major functions of
-  // the finite element program and also a list of variables. Most of these
-  // an exact copy of the functions in the tutorial programs. In addition,
-  // we instantiate the parameters and the perfectly matched layer. The
-  // default values of these parameters are set to show us a standing wave
-  // with absorbing boundary conditions and a PML.
+  // At this point we are ready to declare all the major building blocks of
+  // the finite element program which consists of the usual setup and
+  // assembly routines. Most of the structure has already been introduced
+  // in previous tutorial programs. The Maxwell class also holds private
+  // instances of the Parameters and PerfectlyMatchedLayers classes
+  // introduced above. The default values of these parameters are set to
+  // show us a standing wave with absorbing boundary conditions and a PML.
 
   template <int dim>
   class Maxwell : public ParameterAcceptor
@@ -420,13 +424,20 @@ namespace Step81
     Vector<double>            system_rhs;
   };
 
-
+  // @sect3{Class Template Definitions and Implementation}
+  //
   // @sect4{The Constructor}
-  // The Constructor simply consists specifications for the mesh
-  // and the order of the finite elements. These are editable through
-  // the .prm file. The absorbing_boundary boolean can be modified to
-  // remove the absorbing boundary conditions (in which case our boundary
-  // would be perfectly conducting).
+  // The Constructor simply consists of default initialization a number of
+  // discretization parameters (such as the domain size, mesh refinement,
+  // and the order of finite elements and quadrature) and declaring a
+  // corresponding entry via ParameterAcceptor::add_parameter(). All of
+  // these can be modified by editing the .prm file. Absorbing boundary
+  // conditions can be controlled with the absorbing_boundary boolean. If
+  // absorbing boundary conditions are disabled we simply enforce
+  // homogeneous Dirichlet conditions on the tangential component of the
+  // electric field. In the context of time-harmonic Maxwell's equations
+  // these are also known as \emph{perfectly conducting boundary
+  // conditions}.
 
   template <int dim>
   Maxwell<dim>::Maxwell()
@@ -465,10 +476,11 @@ namespace Step81
     fe = std::make_unique<FESystem<dim>>(FE_NedelecSZ<dim>(fe_order), 2);
   }
 
-  // Make the mesh for the domain and generate the triangulation required.
-  // Additionally, there is an interface added here to visualize
-  // a standing wave. To generate a solution without any interface,
-  // comment out lines 455-459.
+  // The Maxwell::make_grid() routine creates the mesh for the
+  // computational domain which in our case is a scaled square domain.
+  // Additionally, a material interface is introduced by setting the
+  // material id of the upper half ($y>0$) to 1 and of the lower half
+  // ($y<0$) of the computational domain to 2.
 
   template <int dim>
   void Maxwell<dim>::make_grid()
@@ -494,8 +506,9 @@ namespace Step81
               << std::endl;
   }
 
-  // Enumerate all the degrees of freedom and set up matrix and vector
-  // objects to hold the system data. Enumerating is done by using
+  // The Maxwell::setup_system() routine follows the usual routine of
+  // enumerating all the degrees of freedom and setting up the matrix and
+  // vector objects to hold the system data. Enumerating is done by using
   // DoFHandler::distribute_dofs().
 
   template <int dim>
@@ -670,7 +683,7 @@ namespace Step81
 
         // Now we assemble the face and the boundary. The following loops will
         // assemble
-        // //\f{align*}{
+        // \f{align*}{
         // - i\int_\Sigma (\sigma_r^{\Sigma}(\varphi_i)_T) \cdot
         // (\bar{\varphi}_j)_T\text{do}x \f} and \f{align}{
         //  - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}(\varphi_i)_T)

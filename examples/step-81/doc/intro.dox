@@ -2,8 +2,8 @@
 
 <h1> Introduction </h1>
 
-A surface plasmon-polariton (SPP) is a slowly decaying electromagnetic
-wave, confined near a metal-air (or similar) interface. SPP structures on
+A surface plasmon-polariton (SPP) is a slowly decaying electromagnetic wave
+that is confined near a metal-air (or similar) interface. SPP structures on
 novel "2D" materials such as graphene, a monoatomic layer of carbon atoms
 arranged in a hexagonal lattice, typically have wavelengths much shorter
 than the wavelength of the free-space radiation. This scale separation
@@ -49,10 +49,10 @@ equations</a>
   \\
   \frac{\partial}{\partial t} (\varepsilon\mathbf{E}) - \nabla\times(\mu^{-1}\mathbf{H}) &= - \mathbf{J}_a,
   \\
-  \nabla\cdot(\varepsilon\mathbf{E}) &= \rho_m,
+  \nabla\cdot(\varepsilon\mathbf{E}) &= \rho_m.
 @f}
-in which $\nabla\times$ is the curl operator, $\nabla\cdot$ is the divergence operator,
-$\varepsilon$ is the
+Here, $\nabla\times$ is the curl operator, $\nabla\cdot$ is the divergence
+operator, $\varepsilon$ is the
 <a href="https://en.wikipedia.org/wiki/Permittivity">electric permittivity</a>,
 $\mu$ is the
 <a href="https://en.wikipedia.org/wiki/Permeability">magnetic permeability</a>,
@@ -286,11 +286,11 @@ $\text{Im}(\varepsilon_r)\ge c > 0$ in $\Omega$. $\mu_r^{-1}$ is a smooth scalar
 such that $\sqrt{\mu_r^{-1}\varepsilon_r}$ is real valued and strictly positive
 in $\partial\Omega$.
 
-$\mathbf{H}(curl;\Omega)$ is space of vector-valued, measurable and square
+$\mathbf{H}(\text{curl};\Omega)$ is space of vector-valued, measurable and square
 integrable functions whose weak curl admits a representation by a
 square integrable function. Define a Hilbert space
 @f[
-X(\Omega) = \{\varphi \in \mathbf{H}(curl;\Omega)\;\;:\;\; \varphi_T|_{\Sigma}
+X(\Omega) = \{\varphi \in \mathbf{H}(\text{curl};\Omega)\;\;:\;\; \varphi_T|_{\Sigma}
 \in L^2(\Sigma)^2,\;\varphi_T|_{\partial\Omega} \in L^2(\partial\Omega)^2\}
 @f]
 equipped with the norm
@@ -369,10 +369,11 @@ Then under the assumption of a sufficiently refined initial mesh
 the discretized variational problem is:
 
 @f[
-  \text{Find a unique } \varphi_i \in X_h(\Omega) \text{ such that, for all } \varphi_j \in X_h(\Omega),
+  \text{Find a unique } \mathbf{E}_h = \sum_j U_j\mathbf{\varphi}_j \in
+  X_h(\Omega) \text{ such that}
 @f]
 @f[
-A_{ij} = F_i
+\sum_jA_{ij}U_j = F_i\qquad\text{for all }i.
 @f]
 
 <h3>Perfectly Matched Layer</h3>
