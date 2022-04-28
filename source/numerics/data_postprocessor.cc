@@ -219,7 +219,15 @@ namespace DataPostprocessors
     for (auto &output : computed_quantities)
       {
         AssertDimension(output.size(), 1);
-        output(0) = cell->face(face)->boundary_id();
+
+        // By default, DataOutFaces is only run on faces at the boundary of the
+        // domain. But one can instruct it to also run on internal faces, and in
+        // that case we cannot ask for the boundary id. Rather, we output -1, as
+        // described in the documentation.
+        if (cell->at_boundary(face))
+          output(0) = cell->face(face)->boundary_id();
+        else
+          output(0) = -1;
       }
   }
 } // namespace DataPostprocessors

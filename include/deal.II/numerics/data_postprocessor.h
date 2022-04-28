@@ -1293,6 +1293,15 @@ namespace DataPostprocessors
    * @note This class is intended for use with DataOutFaces, not DataOut.
    *   This is because it provides information about the *faces* of a
    *   triangulation, not about cell-based information.
+   *
+   * By default, the DataOutFaces class function only generates
+   * output for faces that lie on the boundary of the domain, and on these
+   * faces, boundary indicators are available. But one can also
+   * instruct DataOutFaces to run on internal faces as
+   * well (by providing an argument to the constructor of the class).
+   * At these internal faces, no boundary indicator is available because,
+   * of course, the face is not actually at the boundary. For these
+   * faces, the current class then outputs -1 as an indicator.
    */
   template <int dim>
   class BoundaryIds : public DataPostprocessorScalar<dim>
