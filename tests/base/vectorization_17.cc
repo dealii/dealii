@@ -23,8 +23,9 @@
 
 template <typename VectorizedArrayType>
 void
-print(const VectorizedArrayType &array)
+print(const std::string &msg, const VectorizedArrayType &array)
 {
+  deallog << msg << "  ";
   for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     deallog << array[i] << ' ';
   deallog << std::endl;
@@ -41,26 +42,26 @@ do_test(const VectorizedArrayType array, const NumberType2 number)
   const auto addition_1 = array + number;
   const auto addition_2 = number + array;
 
-  print(addition_1);
-  print(addition_2);
+  print("add 1", addition_1);
+  print("add 2", addition_2);
 
   const auto subtraction_1 = array - number;
   const auto subtraction_2 = number - array;
 
-  print(subtraction_1);
-  print(subtraction_2);
+  print("sub 1", subtraction_1);
+  print("sub 2", subtraction_2);
 
   const auto multiplication_1 = array * number;
   const auto multiplication_2 = number * array;
 
-  print(multiplication_1);
-  print(multiplication_2);
+  print("mult 1", multiplication_1);
+  print("mult 2", multiplication_2);
 
   const auto division_1 = array / number;
   const auto division_2 = number / array;
 
-  print(division_1);
-  print(division_2);
+  print("div 1", division_1);
+  print("div 2", division_2);
 }
 
 
@@ -70,27 +71,30 @@ main()
   initlog();
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
-  do_test(VectorizedArray<double, 8>(2.0), 3.0);
+  do_test(VectorizedArray<double, 8>(2.0), 3.0f);
   do_test(VectorizedArray<float, 16>(2.0), 3.0);
 
-  do_test(VectorizedArray<double, 8>(2.0), VectorizedArray<double, 8>(3.0));
-  do_test(VectorizedArray<float, 16>(2.0), VectorizedArray<float, 16>(3.0));
+  do_test(VectorizedArray<double, 8>(2.0), VectorizedArray<float, 16>(3.0));
+  do_test(VectorizedArray<float, 16>(2.0), VectorizedArray<double, 8>(3.0));
+  deallog << std::endl;
 #endif
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
-  do_test(VectorizedArray<double, 4>(2.0), 3.0);
+  do_test(VectorizedArray<double, 4>(2.0), 3.0f);
   do_test(VectorizedArray<float, 8>(2.0), 3.0);
 
-  do_test(VectorizedArray<double, 4>(2.0), VectorizedArray<double, 4>(3.0));
-  do_test(VectorizedArray<float, 8>(2.0), VectorizedArray<float, 8>(3.0));
+  do_test(VectorizedArray<double, 4>(2.0), VectorizedArray<float, 8>(3.0));
+  do_test(VectorizedArray<float, 8>(2.0), VectorizedArray<double, 4>(3.0));
+  deallog << std::endl;
 #endif
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
   do_test(VectorizedArray<double, 2>(2.0), 3.0f);
-  do_test(VectorizedArray<float, 4>(2.0), 3.0f);
+  do_test(VectorizedArray<float, 4>(2.0), 3.0);
 
-  do_test(VectorizedArray<double, 2>(2.0), VectorizedArray<double, 2>(3.0));
-  do_test(VectorizedArray<float, 4>(2.0), VectorizedArray<float, 4>(3.0));
+  do_test(VectorizedArray<double, 2>(2.0), VectorizedArray<float, 4>(3.0));
+  do_test(VectorizedArray<float, 4>(2.0), VectorizedArray<double, 2>(3.0));
+  deallog << std::endl;
 #endif
 
   do_test(VectorizedArray<double, 1>(2.0), 3.0f);
