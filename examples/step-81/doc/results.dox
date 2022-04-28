@@ -1,6 +1,8 @@
 <h1>Results</h1>
 
-The solution is written to a .vtk file with four components. These are the real and imaginary parts of the $E_x$ and $E_y$ solution waves. With the current setup, the output should read
+The solution is written to a .vtk file with four components. These are the
+real and imaginary parts of the $E_x$ and $E_y$ solution waves. With the
+current setup, the output should read
 
 @code
 Number of active cells: 4096
@@ -10,7 +12,14 @@ Program ended with exit code: 0
 
 <h3> Absorbing boundary conditions and the PML </h3>
 
-The following images are the outputs for the imaginary $E_x$ without the interface and with the dipole centered at $(0,0)$. In order to remove the interface, the surface conductivity is set to 0. First, we turn off the absorbing boundary conditions and the PML. Second, we want to see the effect of the PML when absorbing boundary conditions apply. So we set absorbing boundary conditions to true and leave the PML strength to 0. Lastly, we increase the strength of the PML to 4. Change the following in the .prm file:
+The following images are the outputs for the imaginary $E_x$ without the
+interface and with the dipole centered at $(0,0)$. In order to remove the
+interface, the surface conductivity is set to 0. First, we turn off the
+absorbing boundary conditions and the PML. Second, we want to see the
+effect of the PML when absorbing boundary conditions apply. So we set
+absorbing boundary conditions to true and leave the PML strength to 0.
+Lastly, we increase the strength of the PML to 4. Change the following in
+the .prm file:
 
 @code
 # use absorbing boundary conditions?
@@ -47,10 +56,16 @@ Following are the output images:
   </tr>
 </table>
 
-We observe that with absorbing boundary conditions and in absence of the PML, there is a lot of distortion and resonance (the real parts will not be generated without a PML). This is, as we stipulated, due to reflection from infinity. As we see, a much more coherent image is generated with an appropriate PML.
+We observe that with absorbing boundary conditions and in absence of the
+PML, there is a lot of distortion and resonance (the real parts will not be
+generated without a PML). This is, as we stipulated, due to reflection from
+infinity. As we see, a much more coherent image is generated with an
+appropriate PML.
 
 <h3> Surface Plasmon Polariton </h3>
-Now, let's generate a standing wave by adding an interface at the center. In order to observe this effect, we offset the center of the dipole to $(0, 0.8)$ and set the surface conductivity back to $(0.001, 0.2)$:
+Now, let's generate a standing wave by adding an interface at the center.
+In order to observe this effect, we offset the center of the dipole to $(0,
+0.8)$ and set the surface conductivity back to $(0.001, 0.2)$:
 
 @code
 # position of the dipole
@@ -60,7 +75,10 @@ Now, let's generate a standing wave by adding an interface at the center. In ord
   set sigma              = 0.001, 0.2; 0, 0| 0, 0; 0.001, 0.2
 @endcode
 
-Once again, we will visualize the output with absorbing boundary conditions and PML strength 0 and with absorbing boundary conditions and PML strength 4. The following tables are the imaginary part of $E_x$ and the real part of $E_x$.
+Once again, we will visualize the output with absorbing boundary conditions
+and PML strength 0 and with absorbing boundary conditions and PML strength
+4. The following tables are the imaginary part of $E_x$ and the real part
+of $E_x$.
 
 <table width="80%" align="center">
   <tr>
@@ -101,7 +119,13 @@ Once again, we will visualize the output with absorbing boundary conditions and 
   </tr>
 </table>
 
-The SPP is confined near the interface that we created, however without absorbing boundary conditions, we don't observe a dissipation effect. On adding the absorbing boundary conditions, we observe distortion and resonance and we still don't notice any dissipation. As expected, the PML removes the distortion and resonance. The standing wave is also dissipating and getting absorbed within the PML, and as we increase the PML strength, the standing wave will dissipate more within the PML ring.
+The SPP is confined near the interface that we created, however without
+absorbing boundary conditions, we don't observe a dissipation effect. On
+adding the absorbing boundary conditions, we observe distortion and
+resonance and we still don't notice any dissipation. As expected, the PML
+removes the distortion and resonance. The standing wave is also dissipating
+and getting absorbed within the PML, and as we increase the PML strength,
+the standing wave will dissipate more within the PML ring.
 
 Here are some animations to demonstrate the effect of the PML
 <table width="80%" align="center">
@@ -146,19 +170,27 @@ Here are some animations to demonstrate the effect of the PML
 <h3> Notes </h3>
 
 <h4> Real and Complex Matrices </h4>
-As is evident from the results, we are splitting our solution matrices into the real and the imaginary components. We started off using the $H^{curl}$ conforming Nédélec Elements, and we made two copies of the Finite Elements in order
-to represent the real and the imaginary components of our input (FE_NedelecSZ was used instead of FE_Nedelec to avoid the sign conflicts issues present in traditional Nédélec elements). In the assembly, we create two vectors of dimension $dim$ that assist us in extracting the real and the imaginary components of our finite elements.
+As is evident from the results, we are splitting our solution matrices into
+the real and the imaginary components. We started off using the $H^{curl}$
+conforming Nédélec Elements, and we made two copies of the Finite Elements
+in order to represent the real and the imaginary components of our input
+(FE_NedelecSZ was used instead of FE_Nedelec to avoid the sign conflicts
+issues present in traditional Nédélec elements). In the assembly, we create
+two vectors of dimension $dim$ that assist us in extracting the real and
+the imaginary components of our finite elements.
 
 
 <h4> Rotations and Scaling </h4>
-As we see in our assembly, our finite element is rotated and scaled as follows:
+As we see in our assembly, our finite element is rotated and scaled as
+follows:
 
 @code
 const auto phi_i = real_part.value(i, q_point) - 1.0i * imag_part.value(i, q_point);
 @endcode
 
-
-This $\phi_i$ variable doesn't need to be scaled in this way, we may choose any arbitrary scaling consents $a$ and $b$. If we choose this scaling, the $\phi_j$ must also be modified with the same scaling, as follows:
+This $\phi_i$ variable doesn't need to be scaled in this way, we may choose
+any arbitrary scaling consents $a$ and $b$. If we choose this scaling, the
+$\phi_j$ must also be modified with the same scaling, as follows:
 
 @code
 const auto phi_i = a*real_part.value(i, q_point) -
@@ -168,7 +200,12 @@ const auto phi_j = a*real_part.value(i, q_point) +
                                    bi * imag_part.value(i, q_point);
 @endcode
 
-Moreover, the cell_rhs need not be the real part of the rhs_value. Say if we modify to take the imaginary part of the computed rhs_value, we must also modify the cell_matrix accordingly to take the imaginary part of temp. However, making these changes to both sides of the equation will not affect our solution, and we will still be able to generate the surface plasmon polariton.
+Moreover, the cell_rhs need not be the real part of the rhs_value. Say if
+we modify to take the imaginary part of the computed rhs_value, we must
+also modify the cell_matrix accordingly to take the imaginary part of temp.
+However, making these changes to both sides of the equation will not affect
+our solution, and we will still be able to generate the surface plasmon
+polariton.
 
 @code
 cell_rhs(i) += rhs_value.imag();
@@ -177,45 +214,84 @@ cell_matrix(i) += temp.imag();
 @endcode
 
 <h4> Postprocessing </h4>
-We will create a video demonstrating the wave in motion, which is essentially an implementation of $e^{-i\omega t}(Re(E) + i*Im(E))$ as we increment time. This is done by slightly changing the output function to generate a series of .vtk files, which will represent out solution wave as we increment time. Introduce an input variable $t$ in the output_results() class as output_results(unsigned int t). Then change the class itself to the following:
+We will create a video demonstrating the wave in motion, which is
+essentially an implementation of $e^{-i\omega t}(Re(E) + i*Im(E))$ as we
+increment time. This is done by slightly changing the output function to
+generate a series of .vtk files, which will represent out solution wave as
+we increment time. Introduce an input variable $t$ in the output_results()
+class as output_results(unsigned int t). Then change the class itself to
+the following:
 
 @code
 template <int dim>
 void Maxwell<dim>::output_results(unsigned int t)
 {
-    std::cout << "Running step:" << t << std::endl;
-    DataOut<2> data_out;
-    data_out.attach_dof_handler(dof_handler);
-    Vector<double> postprocessed;
-    postprocessed.reinit(solution);
-    for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i) {
-      if (i%4 == 0){
-          postprocessed[i] = std::cos(2*M_PI* 0.04* t)*solution[i]
-                                   - std::sin(2*M_PI * 0.04 * t)*solution[i+1];
-      } else if (i%4 == 2) {
-          postprocessed[i] = std::cos(2*M_PI * 0.04 * t)*solution[i]
-                                    - std::sin(2*M_PI * 0.04 * t)*solution[i+1];
-      }
+  std::cout << "Running step:" << t << std::endl;
+  DataOut<2> data_out;
+  data_out.attach_dof_handler(dof_handler);
+  Vector<double> postprocessed;
+  postprocessed.reinit(solution);
+  for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
+    {
+      if (i % 4 == 0)
+        {
+          postprocessed[i] = std::cos(2 * M_PI * 0.04 * t) * solution[i] -
+                             std::sin(2 * M_PI * 0.04 * t) * solution[i + 1];
+        }
+      else if (i % 4 == 2)
+        {
+          postprocessed[i] = std::cos(2 * M_PI * 0.04 * t) * solution[i] -
+                             std::sin(2 * M_PI * 0.04 * t) * solution[i + 1];
+        }
     }
-    data_out.add_data_vector(postprocessed, {"E_x","E_y","null0","null1"});
-    data_out.build_patches();
-    const std::string filename =
-               "solution-" + Utilities::int_to_string(t) + ".vtk";
-    std::ofstream output(filename);
-    data_out.write_vtk(output);
-    std::cout << "Done running step:" << t << std::endl;
-
+  data_out.add_data_vector(postprocessed, {"E_x", "E_y", "null0", "null1"});
+  data_out.build_patches();
+  const std::string filename =
+    "solution-" + Utilities::int_to_string(t) + ".vtk";
+  std::ofstream output(filename);
+  data_out.write_vtk(output);
+  std::cout << "Done running step:" << t << std::endl;
+}
 @endcode
 
 Finally, in the run() function, replace output_results() with
 @code
-for(int t = 0; t<=100; t++){
-	output_results(t);
-}
+for (int t = 0; t <= 100; t++)
+  {
+    output_results(t);
+  }
 @endcode
 
-This would generate 100 solution .vtk files, which can be opened in a group on Paraview and then can be saved as an animation. We used FFMPEG to generate gifs.
+This would generate 100 solution .vtk files, which can be opened in a group
+on Paraview and then can be saved as an animation. We used FFMPEG to
+generate gifs.
 
 <h3> Possibilities for Extension </h3>
-The current program doesn't allow for iterative solvers as the solutions will not converge with an iterative solver. One possible direction for future work is to implement an iterative solver and involve more preconditioners. An advantage of iterative solvers is the more efficient memory usage, and our current memory usage does not allow for a large number of DOFs.
-Another possible direction would be to perform Local Mesh Refinement (instead of Global Mesh Refinement). This will also help us visualize more DOFs in a more memory and time efficient way. TODO
+
+The example step could be extended in a number of different directions.
+<ul>
+  <li>
+    The current program uses a direct solver to solve the linear system.
+    This is efficient for two spatial dimensions where scattering problems
+    up to a few millions degrees of freedom can be solved. In 3D, however,
+    the increased stencil size of the Nedelec element pose a severe
+    limiting factor on the problem size that can be computed. As an
+    alternative, the idea to use iterative solvers can be entertained.
+    This, however requires specialized preconditioners. For example, just
+    using an iterative Krylov space solver (such as SolverGMRES) on above
+    problem will requires many thousands of iterations to converge.
+    Unfortunately, time-harmonic Maxwell's equations lack the usual notion
+    of local smoothing properties, which renders the usual suspects, such
+    as a geometric multigrid (see the Multigrid class), largely useless. A
+    possible extension would be to implement a Schwarz preconditioner
+    (based on domain decomposition), or a sweeping preconditioner.
+  </li>
+  <li>
+    Another possible extension of the current program is to introduce local
+    mesh refinement (either based on a residual estimator, or based on the
+    dual weighted residual method, see step-14). This is in particular of
+    interest to counter the increased computational cost caused by the
+    scale separation between the SPP and the dipole.
+  </li>
+</ul>
+
