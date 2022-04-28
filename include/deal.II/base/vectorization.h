@@ -5247,10 +5247,30 @@ operator/(const VectorizedArray<Number1, width1> &u,
   using VPT =
     internal::VectorizationProductType<VectorizedArray<Number1, width1>,
                                        VectorizedArray<Number2, width2>>;
-  return internal::convert_vectorized_array<typename VPT::value_type,
-                                            VPT::width>(u) /
-         internal::convert_vectorized_array<typename VPT::value_type,
-                                            VPT::width>(v);
+
+  // Prevent division by zero when the denominator has a smaller loop width
+  // that the numerator.
+  if (width2 < VPT::width)
+    {
+      constexpr const std::size_t loop_width =
+        std::min(::dealii::VectorizedArray<Number1, width1>::size(),
+                 ::dealii::VectorizedArray<Number2, width2>::size());
+
+      typename VPT::value_type values[VPT::width];
+      DEAL_II_OPENMP_SIMD_PRAGMA
+      for (unsigned int i = 0; i < loop_width; ++i)
+        values[i] = u[i] / v[i];
+      typename VPT::type out;
+      out.load(&values[0]);
+      return out;
+    }
+  else
+    {
+      return internal::convert_vectorized_array<typename VPT::value_type,
+                                                VPT::width>(u) /
+             internal::convert_vectorized_array<typename VPT::value_type,
+                                                VPT::width>(v);
+    }
 }
 
 /**
