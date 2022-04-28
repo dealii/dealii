@@ -287,6 +287,10 @@ namespace Particles
         // into a new one (keeping alive the possibly large vectors with
         // particles on cells) into a new container.
         particle_container sorted_particles;
+
+        // note that this call updates owned_particles_end, so that
+        // particle_container_owned_end() below already points to the
+        // new container
         reset_particle_container(sorted_particles);
 
         // iterate over cells and insert the entries in the new order
@@ -295,9 +299,12 @@ namespace Particles
             if (cells_to_particle_cache[cell->active_cell_index()] !=
                 particles.end())
               {
+                // before we move the sorted_particles into particles
+                // particle_container_ghost_end() still points to the
+                // old particles container. Therefore this condition looks quirky.
                 typename particle_container::iterator insert_position =
                   cell->is_locally_owned() ? particle_container_owned_end() :
-                                             particle_container_ghost_end();
+                                             --sorted_particles.end();
                 typename particle_container::iterator new_entry =
                   sorted_particles.insert(
                     insert_position, typename particle_container::value_type());
