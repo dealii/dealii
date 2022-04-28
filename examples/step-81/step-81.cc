@@ -616,8 +616,8 @@ namespace Step81
     // i\int_\Omega J_a \cdot \bar{\varphi_i}\text{d}x
     // - \int_\Omega \mu_r^{-1} \cdot (\nabla \times \bar{\varphi_i}) \text{d}x.
     // \f}
-    // In doing so, we need test functions $\varphi_i$ and $\varphi_j$, and the curl
-    // of these test variables. We must be careful with the signs of the
+    // In doing so, we need test functions $\varphi_i$ and $\varphi_j$, and the
+    // curl of these test variables. We must be careful with the signs of the
     // imaginary parts of these complex test variables. Moreover, we have a
     // conditional that changes the parameters if the cell is in the PML region.
     for (const auto &cell : dof_handler.active_cell_iterators())
