@@ -301,7 +301,8 @@ namespace Particles
               {
                 // before we move the sorted_particles into particles
                 // particle_container_ghost_end() still points to the
-                // old particles container. Therefore this condition looks quirky.
+                // old particles container. Therefore this condition looks
+                // quirky.
                 typename particle_container::iterator insert_position =
                   cell->is_locally_owned() ? particle_container_owned_end() :
                                              --sorted_particles.end();

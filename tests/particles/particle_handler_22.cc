@@ -14,13 +14,11 @@
  * ---------------------------------------------------------------------
 
  * This test case is an extremely simplified version of step-68.
- * A ball made of 48 particles is generated. This ball is moved down slightly.
- * The particles remain in the simulation domain and they should not disappear.
- * At the moment of the creation of this test, a bug in the particle_handler
- would
- * make one particle disappear and the number would decrease from 48 to 47 at
- the
- * second time step.
+ * A ball made of 48 particles is generated and the test is run on
+ * multiple MPI ranks. After particle movement ghost particles are
+ * exchanged between the ranks. This test was created to reproduce a
+ * bug that would delete ghost particles when sorting particles into
+ * their new cells after movement.
  */
 
 // Include files
@@ -117,8 +115,7 @@ template <int dim>
 void
 ParticleTracking<dim>::generate_particles()
 {
-  // We create an hyper ball triangulation which we globally refine. The bug
-  // that this test tries to reproduce only occured in curevd geometry.
+  // We create an hyper ball triangulation which we globally refine.
   Point<dim> center_of_triangulation;
   center_of_triangulation[0] = 0.;
   center_of_triangulation[1] = 0.;
@@ -137,9 +134,7 @@ ParticleTracking<dim>::generate_particles()
   // We create a particle triangulation which is solely used to generate
   // the points which will be used to insert the particles. This
   // triangulation is a hyper shell which is in the center
-  // of the domain to generate ghost particles. We generate enough particle to
-  // reproduce the bug.
-
+  // of the domain to generate ghost particles.
   Point<dim> center_of_particles;
   center_of_particles[0] = 0.0;
   center_of_particles[1] = 0.0;
@@ -235,10 +230,42 @@ ParticleTracking<dim>::run()
 
       euler_step_analytical(discrete_time.get_previous_step_size());
 
-      unsigned int n_part_before_sort = particle_handler.n_global_particles();
+      unsigned int n_ghost_particles = 0;
+      for (auto ghost_particle = particle_handler.begin_ghost();
+           ghost_particle != particle_handler.end_ghost();
+           ++ghost_particle)
+        {
+          ++n_ghost_particles;
+        }
+
+      deallog << "Number of ghost particles before sort: "
+              << std::to_string(n_ghost_particles) << std::endl;
 
       particle_handler.sort_particles_into_subdomains_and_cells();
+
+      n_ghost_particles = 0;
+      for (auto ghost_particle = particle_handler.begin_ghost();
+           ghost_particle != particle_handler.end_ghost();
+           ++ghost_particle)
+        {
+          ++n_ghost_particles;
+        }
+
+      deallog << "Number of ghost particles after sort: "
+              << std::to_string(n_ghost_particles) << std::endl;
+
       particle_handler.exchange_ghost_particles(false);
+
+      n_ghost_particles = 0;
+      for (auto ghost_particle = particle_handler.begin_ghost();
+           ghost_particle != particle_handler.end_ghost();
+           ++ghost_particle)
+        {
+          ++n_ghost_particles;
+        }
+
+      deallog << "Number of ghost particles after exchange: "
+              << std::to_string(n_ghost_particles) << std::endl;
 
       unsigned int n_part_after_sort = particle_handler.n_global_particles();
     }
