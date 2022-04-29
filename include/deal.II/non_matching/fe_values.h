@@ -345,7 +345,7 @@ namespace NonMatching
 
     /**
      * FEValues object created with a quadrature rule integrating over the
-     * inside region, $\{x \in B : \psi(x) > 0 \}$, that was generated in the
+     * outside region, $\{x \in B : \psi(x) > 0 \}$, that was generated in the
      * last call to reinit(..). If the cell in the last call was not intersected
      * or if 0 quadrature points were generated, this optional will not contain
      * a value.
