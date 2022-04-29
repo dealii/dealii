@@ -1,4 +1,0 @@
-New: Added function CGALWrappers::to_cgal_mesh() to convert a deal.II cell
-into a CGAL::Surface_mesh.
-<br>
-(Marco Feder, Luca Heltai, 2022/04/28)

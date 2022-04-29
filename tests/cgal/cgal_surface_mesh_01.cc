@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Convert a deal.II cell to a cgal Surface_mesh
+// Convert a deal.II cell to a cgal Surface_mesh.
 
 #include <deal.II/base/config.h>
 
@@ -38,21 +38,26 @@ void
 test()
 {
   deallog << "dim= " << dim << ",\t spacedim= " << spacedim << std::endl;
-  std::vector<std::vector<unsigned int>> d2t = {{}, {2}, {3, 4}, {4, 5, 6, 8}};
-  for (const auto nv : d2t[dim])
+  using namespace ReferenceCells;
+  std::vector<std::vector<ReferenceCell>> ref_cells = {
+    {},
+    {Line},
+    {Triangle, Quadrilateral},
+    {Tetrahedron, Pyramid, Wedge, Hexahedron}};
+  for (const auto r_cell : ref_cells[dim])
     {
       Triangulation<dim, spacedim>  tria;
       CGAL::Surface_mesh<CGALPoint> mesh;
 
-      const auto ref     = ReferenceCell::n_vertices_to_type(dim, nv);
-      const auto mapping = ref.template get_default_mapping<dim, spacedim>(1);
-      GridGenerator::reference_cell(tria, ref);
+      const auto mapping =
+        r_cell.template get_default_mapping<dim, spacedim>(1);
+      GridGenerator::reference_cell(tria, r_cell);
 
       const auto cell = tria.begin_active();
-      to_cgal_mesh(cell, *mapping, mesh);
+      convert_to_cgal_surface_mesh(cell, *mapping, mesh);
 
       Assert(mesh.is_valid(), dealii::ExcMessage("The CGAL mesh is not valid"));
-      deallog << "deal vertices: " << nv << ", cgal vertices "
+      deallog << "deal vertices: " << cell->n_vertices() << ", cgal vertices "
               << mesh.num_vertices() << std::endl;
       deallog << "deal faces: " << cell->n_faces() << ", cgal faces "
               << mesh.num_faces() << std::endl;

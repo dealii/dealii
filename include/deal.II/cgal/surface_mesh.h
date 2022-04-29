@@ -44,7 +44,7 @@ namespace CGALWrappers
    * More information on this class is available at
    * https://doc.cgal.org/latest/Surface_mesh/index.html
    *
-   * The function will throw an exception in dimension one. In dimension two it
+   * The function will throw an exception in dimension one. In dimension two, it
    * generates a surface mesh of the quadrilateral cell or of the triangle cell,
    * while in dimension three it will generate the surface mesh of the cell,
    * i.e., a polyhedral mesh containing the faces of the input cell.
@@ -62,7 +62,7 @@ namespace CGALWrappers
    */
   template <typename CGALPointType, int dim, int spacedim>
   void
-  to_cgal_mesh(
+  convert_to_cgal_surface_mesh(
     const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
     const dealii::Mapping<dim, spacedim> &                              mapping,
     CGAL::Surface_mesh<CGALPointType> &                                 mesh);

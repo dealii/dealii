@@ -35,7 +35,6 @@ namespace
     const unsigned                                nv = face->n_vertices();
     std::vector<typename CGAL_Mesh::Vertex_index> indices;
 
-
     switch (nv)
       {
         case 2:
@@ -80,11 +79,16 @@ namespace CGALWrappers
 {
   template <typename CGALPointType, int dim, int spacedim>
   void
-  to_cgal_mesh(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-               const Mapping<dim, spacedim> &     mapping,
-               CGAL::Surface_mesh<CGALPointType> &mesh)
+  convert_to_cgal_surface_mesh(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const Mapping<dim, spacedim> &                              mapping,
+    CGAL::Surface_mesh<CGALPointType> &                         mesh)
   {
     Assert(dim > 1, ExcImpossibleInDim(dim));
+    Assert(
+      mesh.is_empty(),
+      ExcMessage(
+        "The CGAL::Surface_mesh object must be empty upon calling this function."));
     using Mesh           = CGAL::Surface_mesh<CGALPointType>;
     using Vertex_index   = typename Mesh::Vertex_index;
     const auto &vertices = mapping.get_vertices(cell);
@@ -108,6 +112,7 @@ namespace CGALWrappers
                   mesh,
                   (f % 2 == 0 || cell->n_vertices() != 8));
   }
+
   // explicit instantiations
 #    include "surface_mesh.inst"
 
