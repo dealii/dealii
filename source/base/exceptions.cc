@@ -82,6 +82,14 @@ namespace deal_II_exceptions
   {
     internals::allow_abort_on_exception = false;
   }
+
+
+
+  void
+  enable_abort_on_exception()
+  {
+    internals::allow_abort_on_exception = true;
+  }
 } // namespace deal_II_exceptions
 
 
