@@ -65,6 +65,7 @@ jobs:
             libp4est-dev \
             trilinos-all-dev \
             petsc-dev \
+            libcgal-dev \
             libmetis-dev \
             libhdf5-mpi-dev
     - name: info
