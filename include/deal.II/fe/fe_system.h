@@ -1049,6 +1049,39 @@ public:
   virtual std::size_t
   memory_consumption() const override;
 
+  /**
+   * Computing values on a cell requires copying values between the
+   * FEValuesImplementation::FiniteElementRelatedData objects owned by the
+   * present object and its subelements. The indexing for this is fairly
+   * complicated since each shape function in the nonprimitive base element may
+   * have a different number of nonzero components (e.g., a Taylor-Hood pair
+   * base element): we also need offsets into both the base element and present
+   * element's arrays. To this end, we will create a table with all the
+   * necessary information for each shape function in the nonprimitive base
+   * element.
+   */
+  struct BaseOffsets
+  {
+    /**
+     * Number of nonzero components for the current base element shape function.
+     */
+    unsigned int n_nonzero_components;
+
+    /**
+     * Index into the base element's
+     * FEValuesImplementation::FiniteElementRelatedData arrays for the current
+     * base element shape function.
+     */
+    unsigned int in_index;
+
+    /**
+     * Index into the present element's
+     * FEValuesImplementation::FiniteElementRelatedData arrays for the current
+     * base element shape function.
+     */
+    unsigned int out_index;
+  };
+
 protected:
   virtual std::unique_ptr<
     typename FiniteElement<dim, spacedim>::InternalDataBase>
@@ -1161,6 +1194,22 @@ private:
    * Value to indicate that a given face or subface number is invalid.
    */
   static const unsigned int invalid_face_number = numbers::invalid_unsigned_int;
+
+  /**
+   * Lookup tables for indexing primitive elements.
+   *
+   * These tables store, for each primitive base element, the array indices into
+   * which we will write values. One can think of these indices as a combination
+   * of the system index and the number of nonzero components per shape
+   * function. This data is needed to copy values from base element value
+   * reinitialization to the present element's value reinitialization.
+   */
+  std::vector<Table<2, unsigned int>> primitive_offset_tables;
+
+  /**
+   * Lookup tables for indexing nonprimitive elements.
+   */
+  std::vector<std::vector<BaseOffsets>> nonprimitive_offset_tables;
 
   /**
    * Pointers to underlying finite element objects.
