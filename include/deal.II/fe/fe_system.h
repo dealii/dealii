@@ -14,32 +14,25 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_fe_system_h
-#  define dealii_fe_system_h
+#define dealii_fe_system_h
 
+#include <deal.II/base/config.h>
 
-/*----------------------------   fe_system.h     ---------------------------*/
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_tools.h>
 
-
-#  include <deal.II/base/config.h>
-
-#  include <deal.II/base/thread_management.h>
-
-#  include <deal.II/fe/fe.h>
-#  include <deal.II/fe/fe_tools.h>
-
-#  include <memory>
-#  include <type_traits>
-#  include <utility>
-#  include <vector>
-
+#include <memory>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declaration
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 class FE_Enriched;
-#  endif
+#endif
 
 /**
  * This class provides an interface to group several elements together into
@@ -498,7 +491,7 @@ public:
   FESystem(const std::vector<const FiniteElement<dim, spacedim> *> &fes,
            const std::vector<unsigned int> &multiplicities);
 
-#  if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
+#if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
   /**
    * Constructor taking an arbitrary number of parameters of type
    * <code>std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned
@@ -567,7 +560,7 @@ public:
     const std::initializer_list<
       std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>
       &fe_systems);
-#  endif
+#endif
 
   /**
    * Copy constructor. This constructor is deleted, i.e., copying
@@ -1302,7 +1295,7 @@ private:
 
 //------------------------variadic template constructor------------------------
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 namespace internal
 {
   namespace FESystemImplementation
@@ -1351,7 +1344,7 @@ namespace internal
 
 
 
-#    if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
+#  if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
 // We are just forwarding/delegating to the constructor taking a
 // std::initializer_list. If we decide to remove the deprecated constructors, we
 // might just use the variadic constructor with a suitable static_assert instead
@@ -1396,11 +1389,9 @@ FESystem<dim, spacedim>::FESystem(
 
   initialize(fes, multiplicities);
 }
-#    endif
-
-#  endif // DOXYGEN
+#  endif
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-/*----------------------------  fe_system.h  ---------------------------*/
