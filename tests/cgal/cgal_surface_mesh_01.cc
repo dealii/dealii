@@ -44,7 +44,7 @@ test()
     {Line},
     {Triangle, Quadrilateral},
     {Tetrahedron, Pyramid, Wedge, Hexahedron}};
-  for (const auto r_cell : ref_cells[dim])
+  for (const auto &r_cell : ref_cells[dim])
     {
       Triangulation<dim, spacedim>  tria;
       CGAL::Surface_mesh<CGALPoint> mesh;
