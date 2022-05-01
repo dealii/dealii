@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,9 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-
-
-#include <deal.II/base/patterns.h>
+#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/surface_mesh.h>
 
@@ -25,28 +23,29 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-  template <typename dealiiFace, typename Container, typename CGAL_Mesh>
+  template <typename dealiiFace, typename CGAL_Mesh>
   void
-  add_facet(const dealiiFace &face,
-            const Container & deal2cgal,
-            CGAL_Mesh &       mesh,
-            const bool        clockwise_ordering = true)
+  add_facet(
+    const dealiiFace &                                              face,
+    const std::map<unsigned int, typename CGAL_Mesh::Vertex_index> &deal2cgal,
+    CGAL_Mesh &                                                     mesh,
+    const bool clockwise_ordering = true)
   {
-    const unsigned                                nv = face->n_vertices();
+    const auto reference_cell_type = face->reference_cell();
     std::vector<typename CGAL_Mesh::Vertex_index> indices;
 
-    switch (nv)
+    switch (reference_cell_type)
       {
-        case 2:
+        case ReferenceCells::Line:
           mesh.add_edge(deal2cgal.at(face->vertex_index(0)),
                         deal2cgal.at(face->vertex_index(1)));
           break;
-        case 3:
+        case ReferenceCells::Triangle:
           indices = {deal2cgal.at(face->vertex_index(0)),
                      deal2cgal.at(face->vertex_index(1)),
                      deal2cgal.at(face->vertex_index(2))};
           break;
-        case 4:
+        case ReferenceCells::Quadrilateral:
           indices = {deal2cgal.at(face->vertex_index(0)),
                      deal2cgal.at(face->vertex_index(1)),
                      deal2cgal.at(face->vertex_index(3)),
@@ -56,15 +55,11 @@ namespace
           Assert(false, ExcInternalError());
           break;
       }
-    auto f = mesh.null_face();
-    if (clockwise_ordering)
-      f = mesh.add_face(indices);
-    else
-      {
-        std::reverse(indices.begin(), indices.end());
-        f = mesh.add_face(indices);
-      }
-    Assert(f != mesh.null_face(),
+    if (clockwise_ordering == false)
+      std::reverse(indices.begin(), indices.end());
+
+    [[maybe_unused]] const auto new_face = mesh.add_face(indices);
+    Assert(new_face != mesh.null_face(),
            ExcInternalError("While trying to build a CGAL facet, "
                             "CGAL encountered a orientation problem that it "
                             "was not able to solve."));
@@ -90,27 +85,33 @@ namespace CGALWrappers
       ExcMessage(
         "The CGAL::Surface_mesh object must be empty upon calling this function."));
     using Mesh           = CGAL::Surface_mesh<CGALPointType>;
-    using Vertex_index   = typename Mesh::Vertex_index;
     const auto &vertices = mapping.get_vertices(cell);
+    std::map<unsigned int, typename Mesh::Vertex_index> deal2cgal;
 
-    std::map<unsigned int, Vertex_index> deal2cgal;
     // Add all vertices to the mesh
     // Store CGAL ordering
     for (const auto &i : cell->vertex_indices())
-      deal2cgal[cell->vertex_index(i)] =
-        mesh.add_vertex(CGALWrappers::to_cgal<CGALPointType>(vertices[i]));
+      deal2cgal[cell->vertex_index(i)] = mesh.add_vertex(
+        CGALWrappers::dealii_point_to_cgal_point<CGALPointType>(vertices[i]));
 
     // Add faces
     if (dim < 3)
-      // simplices and quads
+      // simplices and quads are allowable faces for CGAL
       add_facet(cell, deal2cgal, mesh);
     else
-      // faces of 3d cells
+      // in 3d, we build a surface mesh containing all the faces of the 3d cell.
+      // Simplices, Tetrahedrons, and Pyramids have their faces numbered in the
+      // same way as CGAL does (all faces are numbered clockwise). Hexahedrons,
+      // instead, have their faces numbered lexicographically, and one cannot
+      // deduce the direction of the normals by just looking at the vertices.
+      // In order for CGAL to be able to produce the right orientation, we need
+      // to revers the order of the vertices for faces with even index.
       for (const auto &f : cell->face_indices())
         add_facet(cell->face(f),
                   deal2cgal,
                   mesh,
-                  (f % 2 == 0 || cell->n_vertices() != 8));
+                  cell->reference_cell() != ReferenceCells::Hexahedron ||
+                    (f % 2 == 0));
   }
 
   // explicit instantiations
