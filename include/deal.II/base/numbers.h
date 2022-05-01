@@ -142,7 +142,9 @@ DEAL_II_NAMESPACE_CLOSE
 // import the whole Sacado header at this point to get the math
 // functions imported into the standard namespace.
 #ifdef DEAL_II_TRILINOS_WITH_SACADO
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Sacado.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 namespace std
