@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,18 +47,19 @@ namespace CGALWrappers
    */
   template <typename CGALPointType, int dim>
   inline CGALPointType
-  to_cgal(const dealii::Point<dim> &p);
+  dealii_point_to_cgal_point(const dealii::Point<dim> &p);
 
   /**
    * Convert from various CGAL point types to deal.II Point.
+   *
    * @tparam dim Dimension of the point
    * @tparam CGALPointType Any of the CGAL point types
-   * @param p
-   * @return dealii::Point<dim>
+   * @param p An input CGAL point type
+   * @return dealii::Point<dim> The corresponding deal.II point.
    */
   template <int dim, typename CGALPointType>
   inline dealii::Point<dim>
-  to_dealii(const CGALPointType &p);
+  cgal_point_to_dealii_point(const CGALPointType &p);
 } // namespace CGALWrappers
 
 #  ifndef DOXYGEN
@@ -67,7 +68,7 @@ namespace CGALWrappers
 {
   template <typename CGALPointType, int dim>
   inline CGALPointType
-  to_cgal(const dealii::Point<dim> &p)
+  dealii_point_to_cgal_point(const dealii::Point<dim> &p)
   {
     constexpr int cdim = CGALPointType::Ambient_dimension::value;
     static_assert(dim <= cdim, "Only dim <= cdim supported");
@@ -86,7 +87,7 @@ namespace CGALWrappers
 
   template <int dim, typename CGALPointType>
   inline dealii::Point<dim>
-  to_dealii(const CGALPointType &p)
+  cgal_point_to_dealii_point(const CGALPointType &p)
   {
     constexpr int cdim = CGALPointType::Ambient_dimension::value;
     if constexpr (dim == 1)

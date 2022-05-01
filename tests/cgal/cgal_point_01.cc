@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,15 +32,15 @@ main()
   using CGALPoint = CGAL::Point_3<CGAL::Simple_cartesian<double>>;
   // Test conversion from deal.II Point to CGAL Point
   {
-    const Point<3> p(1.0, 2.0, 3.0);
-    const auto     cgal_point = to_cgal<CGALPoint>(p);
+    const Point<3> dealii_point(1.0, 2.0, 3.0);
+    const auto cgal_point = dealii_point_to_cgal_point<CGALPoint>(dealii_point);
     deallog << "CGAL Point: " << cgal_point << std::endl;
   }
 
   // Test conversion from CGAL Point to deal.II Point
   {
     const CGALPoint cgal_point(1.0, 2.0, 3.0);
-    const auto      deal_ii_point = to_dealii<3>(cgal_point);
-    deallog << "deal.II Point: " << deal_ii_point << std::endl;
+    const auto      dealii_point = cgal_point_to_dealii_point<3>(cgal_point);
+    deallog << "deal.II Point: " << dealii_point << std::endl;
   }
 }
