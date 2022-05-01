@@ -738,7 +738,7 @@ namespace FETools
       interpolation_difference(dof1, u1, dof2.get_fe(), u1_difference);
     else
       {
-        internal::interpolation_difference(
+        internal::interpolation_difference<dim, InVector, OutVector, spacedim>(
           dof1, constraints1, u1, dof2, constraints2, u1_difference);
       }
   }

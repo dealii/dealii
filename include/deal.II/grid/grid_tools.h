@@ -176,7 +176,12 @@ namespace GridTools
   volume(const Triangulation<dim, spacedim> &tria,
          const Mapping<dim, spacedim> &      mapping =
            (ReferenceCells::get_hypercube<dim>()
-              .template get_default_linear_mapping<dim, spacedim>()));
+#ifndef _MSC_VER
+              .template get_default_linear_mapping<dim, spacedim>()
+#else
+              .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+              ));
 
   /**
    * Return an approximation of the diameter of the smallest active cell of a
@@ -194,7 +199,12 @@ namespace GridTools
     const Triangulation<dim, spacedim> &triangulation,
     const Mapping<dim, spacedim> &      mapping =
       (ReferenceCells::get_hypercube<dim>()
-         .template get_default_linear_mapping<dim, spacedim>()));
+#ifndef _MSC_VER
+         .template get_default_linear_mapping<dim, spacedim>()
+#else
+         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+         ));
 
   /**
    * Return an approximation of the diameter of the largest active cell of a
@@ -212,7 +222,12 @@ namespace GridTools
     const Triangulation<dim, spacedim> &triangulation,
     const Mapping<dim, spacedim> &      mapping =
       (ReferenceCells::get_hypercube<dim>()
-         .template get_default_linear_mapping<dim, spacedim>()));
+#ifndef _MSC_VER
+         .template get_default_linear_mapping<dim, spacedim>()
+#else
+         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+         ));
 
   /**
    * Given a list of vertices (typically obtained using
@@ -1243,7 +1258,12 @@ namespace GridTools
     const Triangulation<dim, spacedim> &container,
     const Mapping<dim, spacedim> &      mapping =
       (ReferenceCells::get_hypercube<dim>()
-         .template get_default_linear_mapping<dim, spacedim>()));
+#ifndef _MSC_VER
+         .template get_default_linear_mapping<dim, spacedim>()
+#else
+         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+         ));
 
   /**
    * Find and return the index of the closest vertex to a given point in the
@@ -2069,7 +2089,12 @@ namespace GridTools
     const Point<spacedim> &                                            position,
     const Mapping<dim, spacedim> &                                     mapping =
       (ReferenceCells::get_hypercube<dim>()
-         .template get_default_linear_mapping<dim, spacedim>()));
+#ifndef _MSC_VER
+         .template get_default_linear_mapping<dim, spacedim>()
+#else
+         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+         ));
 
   /**
    * Compute a globally unique index for each vertex and hanging node
@@ -4358,10 +4383,13 @@ namespace GridTools
       for (const auto ghost_owner : ghost_owners)
         neighbor_cell_list[ghost_owner] = {};
 
-      process_cells([&](const auto &cell, const auto key) {
+      process_cells([&](const auto &cell, const auto key) -> void {
         if (cell_filter(cell))
-          neighbor_cell_list[key].emplace_back(
-            cell->id().template to_binary<spacedim>());
+          {
+            constexpr int spacedim = MeshType::space_dimension;
+            neighbor_cell_list[key].emplace_back(
+              cell->id().template to_binary<spacedim>());
+          }
       });
 
       Assert(ghost_owners.size() == neighbor_cell_list.size(),
