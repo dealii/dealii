@@ -199,8 +199,13 @@ namespace MemorySpace
     Assert(n_elements <= values.extent(0),
            ExcMessage("n_elements greater than the size of values."));
     using ExecutionSpace = typename MemorySpace::execution_space;
-    Kokkos::View<T*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> begin_view(begin, n_elements);
-    Kokkos::deep_copy(ExecutionSpace{}, begin_view, Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)));
+    Kokkos::
+      View<T *, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+        begin_view(begin, n_elements);
+    Kokkos::deep_copy(
+      ExecutionSpace{},
+      begin_view,
+      Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)));
     ExecutionSpace{}.fence();
   }
 
@@ -214,9 +219,15 @@ namespace MemorySpace
     Assert(n_elements <= values.extent(0),
            ExcMessage("n_elements greater than the size of values."));
     using ExecutionSpace = typename MemorySpace::execution_space;
-    Kokkos::View<const T*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> begin_view(begin, n_elements);
-    Kokkos::deep_copy(ExecutionSpace{}, Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)), begin_view);
-    ExecutionSpace{}.fence(); 
+    Kokkos::View<const T *,
+                 Kokkos::HostSpace,
+                 Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+      begin_view(begin, n_elements);
+    Kokkos::deep_copy(
+      ExecutionSpace{},
+      Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)),
+      begin_view);
+    ExecutionSpace{}.fence();
   }
 
 
