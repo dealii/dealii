@@ -198,10 +198,10 @@ namespace MemorySpace
   {
     Assert(n_elements <= values.extent(0),
            ExcMessage("n_elements greater than the size of values."));
-    Kokkos::parallel_for(
-      "MemorySpaceData::copy_to",
-      Kokkos::RangePolicy<typename MemorySpace::execution_space>(0, n_elements),
-      KOKKOS_LAMBDA(const int i) { *(begin + i) = values(i); });
+    using ExecutionSpace = typename MemorySpace::execution_space;
+    Kokkos::View<T*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> begin_view(begin, n_elements);
+    Kokkos::deep_copy(ExecutionSpace{}, begin_view, Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)));
+    ExecutionSpace{}.fence();
   }
 
 
@@ -213,10 +213,10 @@ namespace MemorySpace
   {
     Assert(n_elements <= values.extent(0),
            ExcMessage("n_elements greater than the size of values."));
-    Kokkos::parallel_for(
-      "MemorySpaceData::copy_from",
-      Kokkos::RangePolicy<typename MemorySpace::execution_space>(0, n_elements),
-      KOKKOS_LAMBDA(const int i) { values(i) = *(begin + i); });
+    using ExecutionSpace = typename MemorySpace::execution_space;
+    Kokkos::View<const T*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> begin_view(begin, n_elements);
+    Kokkos::deep_copy(ExecutionSpace{}, Kokkos::subview(values, Kokkos::make_pair(std::size_t(0), n_elements)), begin_view);
+    ExecutionSpace{}.fence(); 
   }
 
 
