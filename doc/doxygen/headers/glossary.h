@@ -1304,7 +1304,13 @@
  * either explicitly specify the material id, or if they don't, then GridIn
  * simply sets them to zero. Because the material of a cell is intended
  * to pertain to a particular region of the domain, material ids are inherited
- * by child cells from their parent upon mesh refinement.
+ * by child cells from their parent upon mesh refinement. However, if material
+ * ids are being assigned in a parallel distributed computation, any
+ * refinement or coarsening step will disregard the id assignments when
+ * a cell is moved to another process. So one must be careful when a mesh
+ * has more than one material id and one plans on using multiple processors
+ * with refinement. It is however safe to assign material ids consistently to
+ * all coarse cells on all MPI ranks before executing any refinement.
  *
  * The material id is set and queried using the CellAccessor::material_id,
  * CellAccessor::set_material_id and CellAccessor::recursively_set_material_id
