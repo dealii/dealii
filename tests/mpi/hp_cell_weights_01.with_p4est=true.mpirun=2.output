@@ -3,25 +3,25 @@ DEAL:0:2d::Number of cells before repartitioning: 8
 DEAL:0:2d::  Cumulative dofs per cell: 64
 DEAL:0:2d::Number of cells after repartitioning: 4
 DEAL:0:2d::  Cumulative dofs per cell: 48
-DEAL:0:2d::Triangulation changed
+DEAL:0:2d::ExcMessage("Triangulation associated with the DoFHandler has changed!")
 DEAL:0:2d::OK
 DEAL:0:3d::Number of cells before repartitioning: 32
 DEAL:0:3d::  Cumulative dofs per cell: 464
-DEAL:0:3d::Number of cells after repartitioning: 24
-DEAL:0:3d::  Cumulative dofs per cell: 400
-DEAL:0:3d::Triangulation changed
+DEAL:0:3d::Number of cells after repartitioning: 16
+DEAL:0:3d::  Cumulative dofs per cell: 336
+DEAL:0:3d::ExcMessage("Triangulation associated with the DoFHandler has changed!")
 DEAL:0:3d::OK
 
 DEAL:1:2d::Number of cells before repartitioning: 8
 DEAL:1:2d::  Cumulative dofs per cell: 32
 DEAL:1:2d::Number of cells after repartitioning: 12
 DEAL:1:2d::  Cumulative dofs per cell: 48
-DEAL:1:2d::Triangulation changed
+DEAL:1:2d::ExcMessage("Triangulation associated with the DoFHandler has changed!")
 DEAL:1:2d::OK
 DEAL:1:3d::Number of cells before repartitioning: 32
 DEAL:1:3d::  Cumulative dofs per cell: 256
-DEAL:1:3d::Number of cells after repartitioning: 40
-DEAL:1:3d::  Cumulative dofs per cell: 320
-DEAL:1:3d::Triangulation changed
+DEAL:1:3d::Number of cells after repartitioning: 48
+DEAL:1:3d::  Cumulative dofs per cell: 384
+DEAL:1:3d::ExcMessage("Triangulation associated with the DoFHandler has changed!")
 DEAL:1:3d::OK
 

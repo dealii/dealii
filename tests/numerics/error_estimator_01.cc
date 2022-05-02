@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,7 @@ check()
   tr.execute_coarsening_and_refinement();
 
 
-  FE_Q<dim, spacedim>       element(QIterated<1>(QTrapez<1>(), 3));
+  FE_Q<dim, spacedim>       element(QIterated<1>(QTrapezoid<1>(), 3));
   DoFHandler<dim, spacedim> dof(tr);
   dof.distribute_dofs(element);
 

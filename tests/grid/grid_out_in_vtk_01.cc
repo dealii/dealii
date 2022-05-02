@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,7 @@ check(Triangulation<dim, spacedim> &tria)
   gi.attach_triangulation(tria2);
   gi.read_vtk(infile);
 
-  deallog << "Testing Triangulation<" << dim << "," << spacedim << ">"
+  deallog << "Testing Triangulation<" << dim << ',' << spacedim << '>'
           << std::endl;
   AssertDimension(tria.n_vertices(), tria2.n_vertices());
   AssertDimension(tria.n_active_cells(), tria2.n_active_cells());

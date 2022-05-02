@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,11 +20,12 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -40,7 +41,7 @@ test()
 
   FE_Q<dim>             fe(2);
   hp::FECollection<dim> fe_coll(fe);
-  hp::DoFHandler<dim>   dof_handler(triangulation);
+  DoFHandler<dim>       dof_handler(triangulation);
 
   dof_handler.distribute_dofs(fe_coll);
 

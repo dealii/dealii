@@ -1,0 +1,355 @@
+
+DEAL::Testing 2D with point -0.1498310826 0.7854420410
+DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
+DEAL::Exact inverse:                   1.679734433 2.008122260
+DEAL::Affine approximation:            1.294871897 6.963559088
+DEAL::Inverse quadratic approximation: 1.644896745 2.003800318
+DEAL::
+DEAL::Testing on cell 0_1:1 with center 5.817072296e-17 0.9500000000
+DEAL::Exact inverse:                   0.6800000317 2.003947473
+DEAL::Affine approximation:            0.6577169290 0.9304965238
+DEAL::Inverse quadratic approximation: 0.6639670426 1.893521583
+DEAL::
+DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
+DEAL::Exact inverse:                   1.679734435 1.008122258
+DEAL::Affine approximation:            1.388386238 5.963559088
+DEAL::Inverse quadratic approximation: 1.780446266 1.113104041
+DEAL::
+DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
+DEAL::Exact inverse:                   0.6800000317 1.003947473
+DEAL::Affine approximation:            0.6762718619 -0.06950347624
+DEAL::Inverse quadratic approximation: 0.6705854753 0.9955246392
+DEAL::
+DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
+DEAL::Exact inverse:                   -0.3199797939 2.004105574
+DEAL::Affine approximation:            -0.1371549678 3.966937436
+DEAL::Inverse quadratic approximation: -0.2909091648 1.929190316
+DEAL::
+DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
+DEAL::Exact inverse:                   -1.321431986 2.123538296
+DEAL::Affine approximation:            -0.2948718968 13.03644091
+DEAL::Inverse quadratic approximation: -0.9655241914 2.275064795
+DEAL::
+DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
+DEAL::Exact inverse:                   -0.3199797942 1.004105575
+DEAL::Affine approximation:            -0.2121143758 2.966937436
+DEAL::Inverse quadratic approximation: -0.3588753056 1.026324172
+DEAL::
+DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
+DEAL::Exact inverse:                   -1.321431983 1.123539113
+DEAL::Affine approximation:            -0.3883862377 12.03644091
+DEAL::Inverse quadratic approximation: -1.203941726 1.460747557
+DEAL::
+DEAL::
+DEAL::Testing 2D with point -0.1591955252 0.8345321686
+DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
+DEAL::Exact inverse:                   1.679734435 1.508629900
+DEAL::Affine approximation:            1.344551390 6.773781531
+DEAL::Inverse quadratic approximation: 1.705806959 1.564309847
+DEAL::
+DEAL::Testing on cell 0_1:1 with center 5.817072296e-17 0.9500000000
+DEAL::Exact inverse:                   0.6800000317 1.504194190
+DEAL::Affine approximation:            0.6675742371 0.3636525565
+DEAL::Inverse quadratic approximation: 0.6679057071 1.457711038
+DEAL::
+DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
+DEAL::Exact inverse:                   1.679734435 0.5086298996
+DEAL::Affine approximation:            1.443910378 5.773781531
+DEAL::Inverse quadratic approximation: 1.846412785 0.6214152525
+DEAL::
+DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
+DEAL::Exact inverse:                   0.6800000317 0.5041941900
+DEAL::Affine approximation:            0.6872888532 -0.6363474435
+DEAL::Inverse quadratic approximation: 0.6729135650 0.5116134621
+DEAL::
+DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
+DEAL::Exact inverse:                   -0.3199797942 1.504362173
+DEAL::Affine approximation:            -0.1769771533 3.589871026
+DEAL::Inverse quadratic approximation: -0.3233858788 1.488970865
+DEAL::
+DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
+DEAL::Exact inverse:                   -1.321431986 1.631260249
+DEAL::Affine approximation:            -0.3445513904 13.22621847
+DEAL::Inverse quadratic approximation: -1.067765287 1.852528354
+DEAL::
+DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
+DEAL::Exact inverse:                   -0.3199797942 0.5043621731
+DEAL::Affine approximation:            -0.2566215243 2.589871026
+DEAL::Inverse quadratic approximation: -0.3901601371 0.5348403961
+DEAL::
+DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
+DEAL::Exact inverse:                   -1.321431983 0.6312603085
+DEAL::Affine approximation:            -0.4439103775 12.22621847
+DEAL::Inverse quadratic approximation: -1.324499457 0.9907864881
+DEAL::
+DEAL::
+DEAL::Testing 2D with point -0.1685599679 0.8836222961
+DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
+DEAL::Exact inverse:                   1.679734435 1.009137541
+DEAL::Affine approximation:            1.394230884 6.584003974
+DEAL::Inverse quadratic approximation: 1.765464721 1.098697349
+DEAL::
+DEAL::Testing on cell 0_1:1 with center 5.817072296e-17 0.9500000000
+DEAL::Exact inverse:                   0.6800000317 1.004440907
+DEAL::Affine approximation:            0.6774315452 -0.2031914108
+DEAL::Inverse quadratic approximation: 0.6711021038 0.9970222699
+DEAL::
+DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
+DEAL::Exact inverse:                   1.679734435 0.009137540713
+DEAL::Affine approximation:            1.499434517 5.584003974
+DEAL::Inverse quadratic approximation: 1.910725025 0.1005855588
+DEAL::
+DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
+DEAL::Exact inverse:                   0.6800000317 0.004440907068
+DEAL::Affine approximation:            0.6983058446 -1.203191411
+DEAL::Inverse quadratic approximation: 0.6742612427 0.0003409477391
+DEAL::
+DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
+DEAL::Exact inverse:                   -0.3199797942 1.004618772
+DEAL::Affine approximation:            -0.2167993388 3.212804616
+DEAL::Inverse quadratic approximation: -0.3538678741 1.023092227
+DEAL::
+DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
+DEAL::Exact inverse:                   -1.321431983 1.138981502
+DEAL::Affine approximation:            -0.3942308840 13.41599603
+DEAL::Inverse quadratic approximation: -1.171258833 1.403869886
+DEAL::
+DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
+DEAL::Exact inverse:                   -0.3199797942 0.004618771512
+DEAL::Affine approximation:            -0.3011286728 2.212804616
+DEAL::Inverse quadratic approximation: -0.4188102773 0.01487792182
+DEAL::
+DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
+DEAL::Exact inverse:                   -1.321431983 0.1389815030
+DEAL::Affine approximation:            -0.4994345174 12.41599603
+DEAL::Inverse quadratic approximation: -1.446711466 0.4916845141
+DEAL::
+DEAL::
+DEAL::Testing 2D with point -0.1779244106 0.9327124237
+DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
+DEAL::Exact inverse:                   1.679734435 0.5096451819
+DEAL::Affine approximation:            1.443910378 6.394226417
+DEAL::Inverse quadratic approximation: 1.823870032 0.6069628230
+DEAL::
+DEAL::Testing on cell 0_1:1 with center 5.817072296e-17 0.9500000000
+DEAL::Exact inverse:                   0.6800000317 0.5046876241
+DEAL::Affine approximation:            0.6872888532 -0.7700353780
+DEAL::Inverse quadratic approximation: 0.6735562329 0.5114552797
+DEAL::
+DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
+DEAL::Exact inverse:                   1.679734434 -0.4903548182
+DEAL::Affine approximation:            1.554958657 5.394226417
+DEAL::Inverse quadratic approximation: 1.973382985 -0.4493850397
+DEAL::
+DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
+DEAL::Exact inverse:                   0.6800000317 -0.4953123759
+DEAL::Affine approximation:            0.7093228359 -1.770035378
+DEAL::Inverse quadratic approximation: 0.6746285084 -0.5382929038
+DEAL::
+DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
+DEAL::Exact inverse:                   -0.3199797942 0.5048753699
+DEAL::Affine approximation:            -0.2566215243 2.835738205
+DEAL::Inverse quadratic approximation: -0.3823551506 0.5315544008
+DEAL::
+DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
+DEAL::Exact inverse:                   -1.321431983 0.6467026977
+DEAL::Affine approximation:            -0.4439103775 13.60577358
+DEAL::Inverse quadratic approximation: -1.276004830 0.9290893899
+DEAL::
+DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
+DEAL::Exact inverse:                   -0.3199797942 -0.4951246301
+DEAL::Affine approximation:            -0.3456358213 1.835738205
+DEAL::Inverse quadratic approximation: -0.4448257264 -0.5335632508
+DEAL::
+DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
+DEAL::Exact inverse:                   -1.321431983 -0.3532973076
+DEAL::Affine approximation:            -0.5549586572 12.60577358
+DEAL::Inverse quadratic approximation: -1.570577755 -0.03655836468
+DEAL::
+DEAL::
+DEAL::Testing 2D with point -0.1872888532 0.9818025513
+DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
+DEAL::Exact inverse:                   1.679734435 0.01015282301
+DEAL::Affine approximation:            1.493589871 6.204448860
+DEAL::Inverse quadratic approximation: 1.881022893 0.08910626957
+DEAL::
+DEAL::Testing on cell 0_1:1 with center 5.817072296e-17 0.9500000000
+DEAL::Exact inverse:                   0.6800000317 0.004934341186
+DEAL::Affine approximation:            0.6971461613 -1.336879345
+DEAL::Inverse quadratic approximation: 0.6752680942 0.001010067356
+DEAL::
+DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
+DEAL::Exact inverse:                   1.679734433 -0.9898471760
+DEAL::Affine approximation:            1.610482797 5.204448860
+DEAL::Inverse quadratic approximation: 2.034386667 -1.028496543
+DEAL::
+DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
+DEAL::Exact inverse:                   0.6800000317 -0.9950656588
+DEAL::Affine approximation:            0.7203398273 -2.336879345
+DEAL::Inverse quadratic approximation: 0.8115480065 1.507109783
+DEAL::
+DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
+DEAL::Exact inverse:                   -0.3199797942 0.005131968346
+DEAL::Affine approximation:            -0.2964437098 2.458671795
+DEAL::Inverse quadratic approximation: -0.4088477085 0.01435738807
+DEAL::
+DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
+DEAL::Exact inverse:                   -1.321431983 0.1544238922
+DEAL::Affine approximation:            -0.4935898711 13.79555114
+DEAL::Inverse quadratic approximation: -1.382003278 0.4281868663
+DEAL::
+DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
+DEAL::Exact inverse:                   -0.3199797941 -0.9948680324
+DEAL::Affine approximation:            -0.3901429698 1.458671795
+DEAL::Inverse quadratic approximation: -0.4269023613 -0.4705876412
+DEAL::
+DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
+DEAL::Exact inverse:                   -1.321431974 -0.8455762606
+DEAL::Affine approximation:            -0.6104827971 12.79555114
+DEAL::Inverse quadratic approximation: -1.696098323 -0.5939421483
+DEAL::
+DEAL::
+DEAL::Testing 3D with point -0.1498310826 0.7854420410 0.02512860726
+DEAL::Testing on cell 4_0: with center -1.334478803e-17 -0.9000000000 0.000000000
+DEAL::Exact inverse:                   0.6173118684 9.000405545 0.4801846852
+DEAL::Affine approximation:            0.3558249736 11.80212761 0.5241800136
+DEAL::Inverse quadratic approximation: 0.1534157163 1.178704386 0.5581266597
+DEAL::
+DEAL::Testing on cell 5_0: with center -5.358086410e-17 0.9000000000 0.000000000
+DEAL::Exact inverse:                   0.9995944549 0.3826881316 0.5198153148
+DEAL::Affine approximation:            -1.802127607 0.3558249736 0.5241800136
+DEAL::Inverse quadratic approximation: 0.9864508017 0.3984630214 0.5170290624
+DEAL::
+DEAL::
+DEAL::Testing 3D with point -0.1591955252 0.8345321686 0.02669914522
+DEAL::Testing on cell 4_0: with center -1.334478803e-17 -0.9000000000 0.000000000
+DEAL::Exact inverse:                   0.6173118684 9.250430892 0.4801846852
+DEAL::Affine approximation:            0.3468140344 12.22726058 0.5256912645
+DEAL::Inverse quadratic approximation: 0.1236178622 0.9629093195 0.5631241446
+DEAL::
+DEAL::Testing on cell 5_0: with center -5.358086410e-17 0.9000000000 0.000000000
+DEAL::Exact inverse:                   0.7495691083 0.3826881316 0.5198153148
+DEAL::Affine approximation:            -2.227260583 0.3468140344 0.5256912645
+DEAL::Inverse quadratic approximation: 0.7586398860 0.4002532966 0.5167288102
+DEAL::
+DEAL::
+DEAL::Testing 3D with point -0.1685599679 0.8836222961 0.02826968317
+DEAL::Testing on cell 4_0: with center -1.334478803e-17 -0.9000000000 0.000000000
+DEAL::Exact inverse:                   0.6173118684 9.500456238 0.4801846852
+DEAL::Affine approximation:            0.3378030953 12.65239356 0.5272025153
+DEAL::Inverse quadratic approximation: 0.09286279217 0.7336716472 0.5682821670
+DEAL::
+DEAL::Testing on cell 5_0: with center -5.358086410e-17 0.9000000000 0.000000000
+DEAL::Exact inverse:                   0.4995437617 0.3826881316 0.5198153148
+DEAL::Affine approximation:            -2.652393558 0.3378030953 0.5272025153
+DEAL::Inverse quadratic approximation: 0.5173863647 0.4030007878 0.5162680204
+DEAL::
+DEAL::
+DEAL::Testing 3D with point -0.1779244106 0.9327124237 0.02984022112
+DEAL::Testing on cell 4_0: with center -1.334478803e-17 -0.9000000000 0.000000000
+DEAL::Exact inverse:                   0.6173118684 9.750481585 0.4801846852
+DEAL::Affine approximation:            0.3287921561 13.07752653 0.5287137662
+DEAL::Inverse quadratic approximation: 0.06115050607 0.4909913695 0.5736007268
+DEAL::
+DEAL::Testing on cell 5_0: with center -5.358086410e-17 0.9000000000 0.000000000
+DEAL::Exact inverse:                   0.2495184151 0.3826881316 0.5198153148
+DEAL::Affine approximation:            -3.077526534 0.3287921561 0.5287137662
+DEAL::Inverse quadratic approximation: 0.2626902379 0.4067054950 0.5156466932
+DEAL::
+DEAL::
+DEAL::Testing 3D with point -0.1872888532 0.9818025513 0.03141075908
+DEAL::Testing on cell 4_0: with center -1.334478803e-17 -0.9000000000 0.000000000
+DEAL::Exact inverse:                   0.6173118684 10.00050693 0.4801846852
+DEAL::Affine approximation:            0.3197812170 13.50265951 0.5302250170
+DEAL::Inverse quadratic approximation: 0.02848100392 0.2348684862 0.5790798242
+DEAL::
+DEAL::Testing on cell 5_0: with center -5.358086410e-17 0.9000000000 0.000000000
+DEAL::Exact inverse:                   -0.0005069314277 0.3826881316 0.5198153148
+DEAL::Affine approximation:            -3.502659509 0.3197812170 0.5302250170
+DEAL::Inverse quadratic approximation: -0.005448494407 0.4113674182 0.5148648284
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.04694448799 0.06461354454 0.7960033322
+DEAL::Testing on cell 0_0: with center -9.723960037e-18 -9.723960037e-18 -0.9000000000
+DEAL::Exact inverse:                   0.4633821073 0.4496318287 9.000130204
+DEAL::Affine approximation:            0.5451723546 0.5621744122 11.89359107
+DEAL::Inverse quadratic approximation: 0.6091066156 0.6501723730 1.181455366
+DEAL::
+DEAL::Testing on cell 2_0: with center -1.696561603e-17 0.000000000 0.9000000000
+DEAL::Exact inverse:                   0.5366178927 0.9998697959 0.5503681713
+DEAL::Affine approximation:            0.5451723546 -1.893591072 0.5621744122
+DEAL::Inverse quadratic approximation: 0.5312969833 0.9866166821 0.5430766020
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.04890050833 0.06730577556 0.8291701377
+DEAL::Testing on cell 0_0: with center -9.723960037e-18 -9.723960037e-18 -0.9000000000
+DEAL::Exact inverse:                   0.4633821073 0.4496318287 9.166802296
+DEAL::Affine approximation:            0.5470545361 0.5647650127 12.18082403
+DEAL::Inverse quadratic approximation: 0.6153413016 0.6587536822 1.039263536
+DEAL::
+DEAL::Testing on cell 2_0: with center -1.696561603e-17 0.000000000 0.9000000000
+DEAL::Exact inverse:                   0.5366178927 0.8331977041 0.5503681713
+DEAL::Affine approximation:            0.5470545361 -2.180824033 0.5647650127
+DEAL::Inverse quadratic approximation: 0.5309124472 0.8363065727 0.5425473335
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.05085652866 0.06999800658 0.8623369432
+DEAL::Testing on cell 0_0: with center -9.723960037e-18 -9.723960037e-18 -0.9000000000
+DEAL::Exact inverse:                   0.4633821073 0.4496318287 9.333474388
+DEAL::Affine approximation:            0.5489367175 0.5673556132 12.46805699
+DEAL::Inverse quadratic approximation: 0.6217110739 0.6675209216 0.8911022773
+DEAL::
+DEAL::Testing on cell 2_0: with center -1.696561603e-17 0.000000000 0.9000000000
+DEAL::Exact inverse:                   0.5366178927 0.6665256123 0.5503681713
+DEAL::Affine approximation:            0.5489367175 -2.468056995 0.5673556132
+DEAL::Inverse quadratic approximation: 0.5303928249 0.6800270360 0.5418321347
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.05281254899 0.07269023761 0.8955037488
+DEAL::Testing on cell 0_0: with center -9.723960037e-18 -9.723960037e-18 -0.9000000000
+DEAL::Exact inverse:                   0.4633821073 0.4496318287 9.500146479
+DEAL::Affine approximation:            0.5508188990 0.5699462137 12.75528996
+DEAL::Inverse quadratic approximation: 0.6282159323 0.6764740911 0.7369715917
+DEAL::
+DEAL::Testing on cell 2_0: with center -1.696561603e-17 0.000000000 0.9000000000
+DEAL::Exact inverse:                   0.5366178927 0.4998535204 0.5503681713
+DEAL::Affine approximation:            0.5508188990 -2.755289956 0.5699462137
+DEAL::Inverse quadratic approximation: 0.5297381165 0.5177780719 0.5409310059
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.05476856932 0.07538246863 0.9286705543
+DEAL::Testing on cell 0_0: with center -9.723960037e-18 -9.723960037e-18 -0.9000000000
+DEAL::Exact inverse:                   0.4633821073 0.4496318287 9.666818571
+DEAL::Affine approximation:            0.5527010804 0.5725368143 13.04252292
+DEAL::Inverse quadratic approximation: 0.6348558768 0.6856131907 0.5768714788
+DEAL::
+DEAL::Testing on cell 2_0: with center -1.696561603e-17 0.000000000 0.9000000000
+DEAL::Exact inverse:                   0.5366178927 0.3331814286 0.5503681713
+DEAL::Affine approximation:            0.5527010804 -3.042522917 0.5725368143
+DEAL::Inverse quadratic approximation: 0.5289483219 0.3495596805 0.5398439468
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.05672458966 0.07807469965 0.9618373598
+DEAL::Testing on cell 0_0: with center -9.723960037e-18 -9.723960037e-18 -0.9000000000
+DEAL::Exact inverse:                   0.4633821073 0.4496318287 9.833490662
+DEAL::Affine approximation:            0.5545832618 0.5751274148 13.32975588
+DEAL::Inverse quadratic approximation: 0.6416309076 0.6949382206 0.4108019385
+DEAL::
+DEAL::Testing on cell 2_0: with center -1.696561603e-17 0.000000000 0.9000000000
+DEAL::Exact inverse:                   0.5366178927 0.1665093367 0.5503681713
+DEAL::Affine approximation:            0.5545832618 -3.329755879 0.5751274148
+DEAL::Inverse quadratic approximation: 0.5280234411 0.1753718617 0.5385709576
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.05868060999 0.08076693067 0.9950041653
+DEAL::Testing on cell 0_0: with center -9.723960037e-18 -9.723960037e-18 -0.9000000000
+DEAL::Exact inverse:                   0.4633821073 0.4496318287 10.00016275
+DEAL::Affine approximation:            0.5564654433 0.5777180153 13.61698884
+DEAL::Inverse quadratic approximation: 0.6485410245 0.7044491805 0.2387629709
+DEAL::
+DEAL::Testing on cell 2_0: with center -1.696561603e-17 0.000000000 0.9000000000
+DEAL::Exact inverse:                   0.5366178927 -0.0001627550900 0.5503681713
+DEAL::Affine approximation:            0.5564654433 -3.616988840 0.5777180153
+DEAL::Inverse quadratic approximation: 0.5269634741 -0.004785384458 0.5371120383
+DEAL::
+DEAL::

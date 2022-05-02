@@ -1,0 +1,67 @@
+
+DEAL:0:2d::pre_adaptation
+DEAL:0:2d::post_adaptation
+DEAL:0:2d:: cell:0_0: predicted:40.0000
+DEAL:0:2d::OK
+DEAL:0:3d::pre_adaptation
+DEAL:0:3d::post_adaptation
+DEAL:0:3d:: cell:0_0: predicted:56.5685
+DEAL:0:3d::OK
+
+DEAL:1:2d::pre_adaptation
+DEAL:1:2d:: cell:0_1:0 fe_deg:1 error:10.0000 coarsening
+DEAL:1:2d:: cell:0_1:1 fe_deg:1 error:10.0000 coarsening
+DEAL:1:2d:: cell:0_1:2 fe_deg:1 error:10.0000 coarsening
+DEAL:1:2d:: cell:0_1:3 fe_deg:1 error:10.0000 coarsening
+DEAL:1:2d::post_adaptation
+DEAL:1:2d:: cell:1_1:0 predicted:2.50000
+DEAL:1:2d:: cell:1_1:1 predicted:2.50000
+DEAL:1:2d:: cell:1_1:2 predicted:2.50000
+DEAL:1:2d:: cell:1_1:3 predicted:2.50000
+DEAL:1:2d::OK
+DEAL:1:3d::pre_adaptation
+DEAL:1:3d:: cell:0_1:0 fe_deg:1 error:10.0000 coarsening
+DEAL:1:3d:: cell:0_1:1 fe_deg:1 error:10.0000 coarsening
+DEAL:1:3d:: cell:0_1:2 fe_deg:1 error:10.0000 coarsening
+DEAL:1:3d:: cell:0_1:3 fe_deg:1 error:10.0000 coarsening
+DEAL:1:3d:: cell:0_1:4 fe_deg:1 error:10.0000 coarsening
+DEAL:1:3d:: cell:0_1:5 fe_deg:1 error:10.0000 coarsening
+DEAL:1:3d:: cell:0_1:6 fe_deg:1 error:10.0000 coarsening
+DEAL:1:3d:: cell:0_1:7 fe_deg:1 error:10.0000 coarsening
+DEAL:1:3d::post_adaptation
+DEAL:1:3d:: cell:1_1:0 predicted:1.76777
+DEAL:1:3d:: cell:1_1:1 predicted:1.76777
+DEAL:1:3d:: cell:1_1:2 predicted:1.76777
+DEAL:1:3d:: cell:1_1:3 predicted:1.76777
+DEAL:1:3d:: cell:1_1:4 predicted:1.76777
+DEAL:1:3d:: cell:1_1:5 predicted:1.76777
+DEAL:1:3d:: cell:1_1:6 predicted:1.76777
+DEAL:1:3d:: cell:1_1:7 predicted:1.76777
+DEAL:1:3d::OK
+
+
+DEAL:2:2d::pre_adaptation
+DEAL:2:2d:: cell:1_0: fe_deg:1 error:10.0000 refining
+DEAL:2:2d::post_adaptation
+DEAL:2:2d::OK
+DEAL:2:3d::pre_adaptation
+DEAL:2:3d::post_adaptation
+DEAL:2:3d::OK
+
+
+DEAL:3:2d::pre_adaptation
+DEAL:3:2d:: cell:2_0: fe_deg:1 error:10.0000 future_fe_deg:3
+DEAL:3:2d:: cell:3_0: fe_deg:1 error:10.0000
+DEAL:3:2d::post_adaptation
+DEAL:3:2d:: cell:2_0: predicted:2.50000
+DEAL:3:2d:: cell:3_0: predicted:10.0000
+DEAL:3:2d::OK
+DEAL:3:3d::pre_adaptation
+DEAL:3:3d:: cell:1_0: fe_deg:1 error:10.0000 refining
+DEAL:3:3d:: cell:2_0: fe_deg:1 error:10.0000 future_fe_deg:3
+DEAL:3:3d:: cell:3_0: fe_deg:1 error:10.0000
+DEAL:3:3d::post_adaptation
+DEAL:3:3d:: cell:2_0: predicted:2.50000
+DEAL:3:3d:: cell:3_0: predicted:10.0000
+DEAL:3:3d::OK
+

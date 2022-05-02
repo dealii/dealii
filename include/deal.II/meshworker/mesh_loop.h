@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/types.h>
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/grid/filtered_iterator.h>
@@ -98,6 +99,45 @@ namespace MeshWorker
     };
   } // namespace internal
 
+#ifdef DOXYGEN
+  /**
+   * This alias introduces a friendly and short name for the function type
+   * for the cell worker used in mesh_loop().
+   */
+  using CellWorkerFunctionType = std::function<
+    void(const CellIteratorBaseType &, ScratchData &, CopyData &)>;
+
+  /**
+   * This alias introduces a friendly and short name for the function type
+   * for the cell worker used in mesh_loop().
+   */
+  using CopierFunctionType = std::function<void(const CopyData &)>;
+
+  /**
+   * This alias introduces a friendly and short name for the function type
+   * for the boundary worker used in mesh_loop().
+   */
+  using BoundaryWorkerFunctionType =
+    std::function<void(const CellIteratorBaseType &,
+                       const unsigned int,
+                       ScratchData &,
+                       CopyData &)>;
+
+  /**
+   * This alias introduces a friendly and short name for the function type
+   * for the face worker used in mesh_loop().
+   */
+  using FaceWorkerFunctionType =
+    std::function<void(const CellIteratorBaseType &,
+                       const unsigned int,
+                       const unsigned int,
+                       const CellIteratorBaseType &,
+                       const unsigned int,
+                       const unsigned int,
+                       ScratchData &,
+                       CopyData &)>;
+#endif
+
   /**
    * This function extends the WorkStream concept to work on meshes
    * (cells and/or faces) and handles the complicated logic for
@@ -105,7 +145,9 @@ namespace MeshWorker
    * and parallel computation (work on faces to ghost neighbors for example).
    * The @p mesh_loop can be used to simplify operations on cells (for example
    * assembly), on boundaries (Neumann type boundary conditions), or on
-   * interior faces (for example in discontinuous Galerkin methods).
+   * interior faces (for example in discontinuous Galerkin methods). The
+   * function is used in a number of tutorials, including step-12, step-16,
+   * and step-47, to name just a few.
    *
    * For uniformly refined meshes, it would be relatively easy to use
    * WorkStream::run() with a @p cell_worker that also loops over faces, and
@@ -162,7 +204,55 @@ namespace MeshWorker
    * `copier` on one cell and the `cell_worker`/`face_worker`/`boundary_worker`
    * functions on the next cell, and user code needs not reset the copy
    * object either at the beginning of the cell integration or end of the
-   * copy operation.
+   * copy operation. Resetting the state of the `copier ` inside of a
+   * `face_worker` or `boundary_worker` constitutes a bug, and may lead to
+   * some unexpected results. The following example shows what is not
+   * permissible, as the copier is potentially shared among numerous faces
+   * on a cell:
+   * @code
+   *
+   * using ScratchData      = MeshWorker::ScratchData<dim, spacedim>;
+   * using CopyData         = MeshWorker::CopyData<1, 1, 1>;
+   * using CellIteratorType = decltype(dof_handler.begin_active());
+   *
+   * ScratchData            scratch(...);
+   * CopyData               copy(...);
+   *
+   * std::function<void(const CellIteratorType &, ScratchData &, CopyData &)>
+   *   empty_cell_worker;
+   *
+   * auto boundary_worker = [...] (
+   *   const CellIteratorType &cell,
+   *   const unsigned int      face,
+   *   ScratchData            &scratch_data,
+   *   CopyData               &copy_data)
+   * {
+   *  const auto &fe_face_values = scratch_data.reinit(cell, face);
+   *  copy_data = CopyData(...); // This is an error, as we lose the
+   *                             // accumulation that has been performed on
+   *                             // other boundary faces of the same cell.
+   *
+   *  for (unsigned int q_point = 0;
+   *       q_point < fe_face_values.n_quadrature_points;
+   *       ++q_point)
+   *    {
+   *      copy_data.vectors[0][0] += 1.0 * fe_face_values.JxW(q_point);
+   *    }
+   * };
+   *
+   * double value = 0;
+   * auto copier = [...](const CopyData &copy_data)
+   * {
+   *   value += copy_data.vectors[0][0]; // Contributions from some faces may
+   *                                     // be missing.
+   * };
+   *
+   * MeshWorker::mesh_loop(dof_handler.active_cell_iterators(),
+   *                       empty_cell_worker, copier,
+   *                       scratch, copy,
+   *                       MeshWorker::assemble_boundary_faces,
+   *                       boundary_worker);
+   * @endcode
    *
    * The queue_length argument indicates the number of items that can be live at
    * any given time. Each item consists of chunk_size elements of the input
@@ -173,12 +263,15 @@ namespace MeshWorker
    * helpful to keep in mind that queue_length copies of the ScratchData object
    * and `queue_length*chunk_size` copies of the CopyData object are generated.
    *
+   * @note The types of the function arguments and the default values (empty worker functions)
+   * displayed in the Doxygen documentation here are slightly simplified
+   * compared to the real types.
+   *
    * @note More information about requirements on template types and meaning
    * of @p queue_length and @p chunk_size can be found in the documentation of the
    * WorkStream namespace and its members.
    *
    * @ingroup MeshWorker
-   * @author Luca Heltai and Timo Heister, 2017
    */
   template <class CellIteratorType,
             class ScratchData,
@@ -187,6 +280,25 @@ namespace MeshWorker
               typename internal::CellIteratorBaseType<CellIteratorType>::type>
   void
   mesh_loop(
+#ifdef DOXYGEN
+    const CellIteratorType &begin,
+    const CellIteratorType &end,
+
+    const CellWorkerFunctionType &cell_worker,
+    const CopierType &            copier,
+
+    const ScratchData &sample_scratch_data,
+    const CopyData &   sample_copy_data,
+
+    const AssembleFlags flags = assemble_own_cells,
+
+    const BoundaryWorkerFunctionType &boundary_worker =
+      BoundaryWorkerFunctionType(),
+
+    const FaceWorkerFunctionType &face_worker = FaceWorkerFunctionType(),
+    const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
+    const unsigned int chunk_size   = 8
+#else
     const CellIteratorType &                         begin,
     const typename identity<CellIteratorType>::type &end,
 
@@ -228,40 +340,61 @@ namespace MeshWorker
                                         CopyData &)>(),
 
     const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-    const unsigned int chunk_size   = 8)
+    const unsigned int chunk_size   = 8
+#endif
+  )
   {
     Assert(
       (!cell_worker) == !(flags & work_on_cells),
       ExcMessage(
-        "If you specify a cell_worker, you need to set assemble_own_cells or assemble_ghost_cells."));
+        "If you provide a cell worker function, you also need to request "
+        "that work should be done on cells by setting the 'work_on_cells' flag. "
+        "Conversely, if you don't provide a cell worker function, you "
+        "cannot set the 'work_on_cells' flag. One of these two "
+        "conditions is not satisfied."));
 
-    Assert(
-      (flags &
-       (assemble_own_interior_faces_once | assemble_own_interior_faces_both)) !=
-        (assemble_own_interior_faces_once | assemble_own_interior_faces_both),
-      ExcMessage(
-        "You can only specify assemble_own_interior_faces_once OR assemble_own_interior_faces_both."));
+    Assert((flags & (assemble_own_interior_faces_once |
+                     assemble_own_interior_faces_both)) !=
+             (assemble_own_interior_faces_once |
+              assemble_own_interior_faces_both),
+           ExcMessage(
+             "If you provide a face worker function, you also need to request "
+             "that work should be done on interior faces by setting either the "
+             "'assemble_own_interior_faces_once' flag or the "
+             "'assemble_own_interior_faces_both' flag. "
+             "Conversely, if you don't provide a face worker function, you "
+             "cannot set either of these two flags. One of these two "
+             "conditions is not satisfied."));
 
-    Assert(
-      (flags & (assemble_ghost_faces_once | assemble_ghost_faces_both)) !=
-        (assemble_ghost_faces_once | assemble_ghost_faces_both),
-      ExcMessage(
-        "You can only specify assemble_ghost_faces_once OR assemble_ghost_faces_both."));
+    Assert((flags & (assemble_ghost_faces_once | assemble_ghost_faces_both)) !=
+             (assemble_ghost_faces_once | assemble_ghost_faces_both),
+           ExcMessage(
+             "You can only 'specify assemble_ghost_faces_once' "
+             "OR 'assemble_ghost_faces_both', but not both of these flags."));
 
     Assert(
       !(flags & cells_after_faces) ||
         (flags & (assemble_own_cells | assemble_ghost_cells)),
       ExcMessage(
-        "The option cells_after_faces only makes sense if you assemble on cells."));
+        "The option 'cells_after_faces' only makes sense if you assemble on cells."));
 
-    Assert((!face_worker) == !(flags & work_on_faces),
-           ExcMessage(
-             "If you specify a face_worker, assemble_face_* needs to be set."));
+    Assert(
+      (!face_worker) == !(flags & work_on_faces),
+      ExcMessage(
+        "If you provide a face worker function, you also need to request "
+        "that work should be done on faces by setting the 'work_on_faces' flag. "
+        "Conversely, if you don't provide a face worker function, you "
+        "cannot set the 'work_on_faces' flag. One of these two "
+        "conditions is not satisfied."));
 
     Assert(
       (!boundary_worker) == !(flags & assemble_boundary_faces),
       ExcMessage(
-        "If you specify a boundary_worker, assemble_boundary_faces needs to be set."));
+        "If you provide a boundary face worker function, you also need to request "
+        "that work should be done on boundary faces by setting the 'assemble_boundary_faces' flag. "
+        "Conversely, if you don't provide a boundary face worker function, you "
+        "cannot set the 'assemble_boundary_faces' flag. One of these two "
+        "conditions is not satisfied."));
 
     auto cell_action = [&](const CellIteratorBaseType &cell,
                            ScratchData &               scratch,
@@ -269,6 +402,9 @@ namespace MeshWorker
       // First reset the CopyData class to the empty copy_data given by the
       // user.
       copy = sample_copy_data;
+
+      // Store the dimension in which we are working for later use
+      const auto dim = cell->get_triangulation().dimension;
 
       const bool ignore_subdomain =
         (cell->get_triangulation().locally_owned_subdomain() ==
@@ -293,9 +429,7 @@ namespace MeshWorker
         cell_worker(cell, scratch, copy);
 
       if (flags & (work_on_faces | work_on_boundary))
-        for (const unsigned int face_no :
-             GeometryInfo<CellIteratorBaseType::AccessorType::Container::
-                            dimension>::face_indices())
+        for (const unsigned int face_no : cell->face_indices())
           {
             if (cell->at_boundary(face_no) &&
                 !cell->has_periodic_neighbor(face_no))
@@ -345,13 +479,14 @@ namespace MeshWorker
                 const bool periodic_neighbor =
                   cell->has_periodic_neighbor(face_no);
 
-                if ((!periodic_neighbor &&
-                     cell->neighbor_is_coarser(face_no)) ||
-                    (periodic_neighbor &&
-                     cell->periodic_neighbor_is_coarser(face_no)))
+                if (dim > 1 && ((!periodic_neighbor &&
+                                 cell->neighbor_is_coarser(face_no) &&
+                                 neighbor->is_active()) ||
+                                (periodic_neighbor &&
+                                 cell->periodic_neighbor_is_coarser(face_no) &&
+                                 neighbor->is_active())))
                   {
                     Assert(cell->is_active(), ExcInternalError());
-                    Assert(neighbor->is_active(), ExcInternalError());
 
                     // skip if only one processor needs to assemble the face
                     // to a ghost cell and the fine cell is not ours.
@@ -390,6 +525,41 @@ namespace MeshWorker
                                     copy);
                       }
                   }
+                else if (dim == 1 && cell->level() > neighbor->level())
+                  {
+                    // In one dimension, there is no other check to do
+                    const unsigned int neighbor_face_no =
+                      periodic_neighbor ?
+                        cell->periodic_neighbor_face_no(face_no) :
+                        cell->neighbor_face_no(face_no);
+                    Assert(periodic_neighbor ||
+                             neighbor->face(neighbor_face_no) ==
+                               cell->face(face_no),
+                           ExcInternalError());
+
+                    face_worker(cell,
+                                face_no,
+                                numbers::invalid_unsigned_int,
+                                neighbor,
+                                neighbor_face_no,
+                                numbers::invalid_unsigned_int,
+                                scratch,
+                                copy);
+
+                    if (flags & assemble_own_interior_faces_both)
+                      {
+                        // If own faces are to be assembled from both sides,
+                        // call the faceworker again with swapped arguments.
+                        face_worker(neighbor,
+                                    neighbor_face_no,
+                                    numbers::invalid_unsigned_int,
+                                    cell,
+                                    face_no,
+                                    numbers::invalid_unsigned_int,
+                                    scratch,
+                                    copy);
+                      }
+                  }
                 else
                   {
                     // If iterator is active and neighbor is refined, skip
@@ -398,8 +568,9 @@ namespace MeshWorker
                         neighbor->has_children())
                       continue;
 
-                    // Now neighbor is on same level, double-check this:
-                    Assert(cell->level() == neighbor->level(),
+                    // Now neighbor is on the same refinement level.
+                    // Double check.
+                    Assert(!cell->neighbor_is_coarser(face_no),
                            ExcInternalError());
 
                     // If we own both cells only do faces from one side (unless
@@ -597,7 +768,7 @@ namespace MeshWorker
   }
 
   /**
-   * This is a variant of the mesh_loop() function, that can be used for worker
+   * This is a variant of the mesh_loop() function that can be used for worker
    * and copier functions that are member functions of a class.
    *
    * The argument passed as @p end must be convertible to the same type as @p
@@ -654,7 +825,6 @@ namespace MeshWorker
    * @endcode
    *
    * @ingroup MeshWorker
-   * @author Luca Heltai, 2019
    */
   template <class CellIteratorType,
             class ScratchData,
@@ -741,19 +911,20 @@ namespace MeshWorker
                                   copy_data);
       };
 
-    mesh_loop(begin,
-              end,
-              f_cell_worker,
-              [&main_class, copier](const CopyData &copy_data) {
-                (main_class.*copier)(copy_data);
-              },
-              sample_scratch_data,
-              sample_copy_data,
-              flags,
-              f_boundary_worker,
-              f_face_worker,
-              queue_length,
-              chunk_size);
+    mesh_loop(
+      begin,
+      end,
+      f_cell_worker,
+      [&main_class, copier](const CopyData &copy_data) {
+        (main_class.*copier)(copy_data);
+      },
+      sample_scratch_data,
+      sample_copy_data,
+      flags,
+      f_boundary_worker,
+      f_face_worker,
+      queue_length,
+      chunk_size);
   }
 
   /**

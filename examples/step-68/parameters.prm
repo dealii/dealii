@@ -1,0 +1,21 @@
+# Listing of Parameters
+# ---------------------
+subsection Particle Tracking Problem
+  # End time of the simulation
+  set Final time                    = 4
+
+  # Refinement level of the fluid domain
+  set Fluid refinement              = 4
+  set Output directory              = ./
+
+  # Iteration frequency at which output results are written
+  set Output frequency              = 10
+
+  # Refinement of the volumetric mesh used to insert the particles
+  set Particle insertion refinement = 3
+
+  # Iteration frequency at which the mesh is load balanced
+  set Repartition frequency         = 5
+  set Time step                     = 0.002
+  set Velocity degree               = 1
+end

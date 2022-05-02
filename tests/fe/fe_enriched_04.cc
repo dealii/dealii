@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_enriched.h>
@@ -30,7 +31,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -130,7 +130,7 @@ test3()
       fe_values.get_function_values(solution_pou, solution_values_pou);
       fe_values.get_function_values(solution, solution_values);
 
-      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+      for (const auto q_point : fe_values.quadrature_point_indices())
         deallog << " qp=" << q_points[q_point]
                 << " f(qp)=" << function.value(q_points[q_point])
                 << " U_fe(qp)=" << solution_values_fe[q_point]
@@ -155,7 +155,7 @@ plot_shape_function()
 
   std::vector<Vector<double>> shape_functions(dof_handler.n_dofs());
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < shape_functions.size(); s++)
+  for (unsigned int s = 0; s < shape_functions.size(); ++s)
     {
       names.push_back(std::string("N_") + dealii::Utilities::int_to_string(s));
 
@@ -175,7 +175,7 @@ plot_shape_function()
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     {
       data_out.add_data_vector(shape_functions[i], names[i]);
     }

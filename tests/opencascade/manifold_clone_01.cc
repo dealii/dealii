@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,6 @@
 // checks that the renamed manifolds are not just aliases but, when cloned,
 // give the correct object type.
 
-#include <deal.II/opencascade/boundary_lib.h>
 #include <deal.II/opencascade/manifold_lib.h>
 
 #include <boost/core/demangle.hpp>
@@ -53,12 +52,6 @@ main()
     Handle(Geom_Circle) circle = make_circle.Value();
     TopoDS_Edge edge           = BRepBuilderAPI_MakeEdge(circle);
 
-    NormalProjectionBoundary<2, 3>  manifold_b(edge);
-    std::unique_ptr<Manifold<2, 3>> clone_b       = manifold_b.clone();
-    const auto &                    deref_clone_b = *clone_b;
-    deallog << "typeid of NormalProjectionBoundary<2, 3> is "
-            << boost::core::demangle(typeid(deref_clone_b).name()) << std::endl;
-
     NormalProjectionManifold<2, 3>  manifold_m(edge);
     std::unique_ptr<Manifold<2, 3>> clone_m       = manifold_m.clone();
     const auto &                    deref_clone_m = *clone_m;
@@ -81,17 +74,9 @@ main()
 
     TopoDS_Face face = BRepFill::Face(edge1, edge2);
 
-    DirectionalProjectionBoundary<2, 3> manifold_b(face, Point<3>(0, 0, 1));
-
-    std::unique_ptr<Manifold<2, 3>> clone_b       = manifold_b.clone();
-    const auto &                    deref_clone_b = *clone_b;
-    deallog << "typeid of DirectionalProjectionBoundary<2, 3> is "
-            << boost::core::demangle(typeid(deref_clone_b).name()) << std::endl;
-
     DirectionalProjectionManifold<2, 3> manifold_m(face, Point<3>(0, 0, 1));
-
-    std::unique_ptr<Manifold<2, 3>> clone_m       = manifold_m.clone();
-    const auto &                    deref_clone_m = *clone_m;
+    std::unique_ptr<Manifold<2, 3>>     clone_m       = manifold_m.clone();
+    const auto &                        deref_clone_m = *clone_m;
     deallog << "typeid of DirectionalProjectionManifold<2, 3> is "
             << boost::core::demangle(typeid(deref_clone_m).name()) << std::endl;
   }
@@ -110,13 +95,6 @@ main()
     TopoDS_Edge edge2 = interpolation_curve(pts);
 
     TopoDS_Face face = BRepFill::Face(edge1, edge2);
-
-    NormalToMeshProjectionBoundary<1, 3> manifold_b(face);
-
-    std::unique_ptr<Manifold<1, 3>> clone_b       = manifold_b.clone();
-    const auto &                    deref_clone_b = *clone_b;
-    deallog << "typeid of NormalProjectionBoundary<2, 3> is "
-            << boost::core::demangle(typeid(deref_clone_b).name()) << std::endl;
 
     NormalToMeshProjectionManifold<1, 3> manifold_m(face);
     std::unique_ptr<Manifold<1, 3>>      clone_m       = manifold_m.clone();

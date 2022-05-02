@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,7 @@ main()
                    1,
                    FE_Q<dim>(1),
                    1,
-                   FE_Nedelec<dim>(2),
+                   FE_Nedelec<dim>(1),
                    2,
                    FESystem<dim>(FE_Q<dim>(1), dim),
                    1);

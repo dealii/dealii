@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,8 +61,6 @@ class ParameterHandler;
  * not be achieved or at least was not achieved within the given maximal
  * number of iterations.
  * </ul>
- *
- * @author Guido Kanschat
  */
 class SolverControl : public Subscriptor
 {
@@ -92,7 +90,6 @@ public:
    * the last step are stored in this object and can be recovered upon
    * catching an exception of this class.
    */
-
   class NoConvergence : public dealii::ExceptionBase
   {
   public:
@@ -149,10 +146,10 @@ public:
    * specifies the whether the final result is logged to @p deallog. Default
    * is yes.
    */
-  SolverControl(const unsigned int n           = 100,
-                const double       tol         = 1.e-10,
-                const bool         log_history = false,
-                const bool         log_result  = true);
+  explicit SolverControl(const unsigned int n           = 100,
+                         const double       tol         = 1.e-10,
+                         const bool         log_history = false,
+                         const bool         log_result  = true);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
@@ -324,7 +321,7 @@ public:
 
   /**
    * This exception is thrown if a function operating on the vector of history
-   * data of a SolverControl object id called, but storage of history data was
+   * data of a SolverControl object is called, but storage of history data was
    * not enabled by enable_history_data().
    */
   DeclException0(ExcHistoryDataRequired);
@@ -421,8 +418,6 @@ protected:
  * is 1% and the tolerance is 0.1%. The initial residual is 2.5. The process
  * will break if 20 iteration are completed or the new residual is less then
  * 2.5*1% or if it is less then 0.1%.
- *
- * @author Guido Kanschat
  */
 class ReductionControl : public SolverControl
 {
@@ -432,11 +427,11 @@ public:
    * have the same meaning as those of the constructor of the SolverControl
    * constructor.
    */
-  ReductionControl(const unsigned int maxiter     = 100,
-                   const double       tolerance   = 1.e-10,
-                   const double       reduce      = 1.e-2,
-                   const bool         log_history = false,
-                   const bool         log_result  = true);
+  explicit ReductionControl(const unsigned int maxiter     = 100,
+                            const double       tolerance   = 1.e-10,
+                            const double       reduce      = 1.e-2,
+                            const bool         log_history = false,
+                            const bool         log_result  = true);
 
   /**
    * Initialize with a SolverControl object. The result will emulate
@@ -511,8 +506,6 @@ protected:
  * class and the solver terminates similarly when one of the given tolerance
  * or the maximum iteration count were reached. The only difference to
  * SolverControl is that the solver returns success in the latter case.
- *
- * @author Martin Kronbichler
  */
 class IterationNumberControl : public SolverControl
 {
@@ -521,10 +514,10 @@ public:
    * Constructor.  Provide exactly the same arguments as the constructor of
    * the SolverControl class.
    */
-  IterationNumberControl(const unsigned int maxiter     = 100,
-                         const double       tolerance   = 1e-12,
-                         const bool         log_history = false,
-                         const bool         log_result  = true);
+  explicit IterationNumberControl(const unsigned int maxiter     = 100,
+                                  const double       tolerance   = 1e-12,
+                                  const bool         log_history = false,
+                                  const bool         log_result  = true);
 
   /**
    * Initialize with a SolverControl object. The result will emulate
@@ -566,8 +559,6 @@ public:
  * the tolerance is 0.2. The ConsecutiveControl will return
  * SolverControl::State::success only at the last step in the sequence 0.5,
  * 0.0005, 1.0, 0.05, 0.01.
- *
- * @author Denis Davydov, 2017
  */
 class ConsecutiveControl : public SolverControl
 {
@@ -578,11 +569,11 @@ public:
    * convergence. Other arguments have the same meaning as those of the
    * constructor of the SolverControl.
    */
-  ConsecutiveControl(const unsigned int maxiter                  = 100,
-                     const double       tolerance                = 1.e-10,
-                     const unsigned int n_consecutive_iterations = 2,
-                     const bool         log_history              = false,
-                     const bool         log_result               = false);
+  explicit ConsecutiveControl(const unsigned int maxiter   = 100,
+                              const double       tolerance = 1.e-10,
+                              const unsigned int n_consecutive_iterations = 2,
+                              const bool         log_history = false,
+                              const bool         log_result  = false);
 
   /**
    * Initialize with a SolverControl object. The result will emulate

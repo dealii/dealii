@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,7 @@ DeclException5(ExcEl,
                double,
                double,
                double,
-               << "Error in element (" << arg1 << "," << arg2 << "): " << arg3
+               << "Error in element (" << arg1 << ',' << arg2 << "): " << arg3
                << " != " << arg4 << " delta=" << arg5);
 
 template <typename NumberType>
@@ -44,7 +44,7 @@ test(const unsigned int m,
      const unsigned int k,
      const NumberType   eps)
 {
-  deallog << m << " " << n << " " << k << " " << std::endl;
+  deallog << m << ' ' << n << ' ' << k << ' ' << std::endl;
   FullMatrix<NumberType>       A(k, m), B(k, n), C(m, n), D(k, k);
   LAPACKFullMatrix<NumberType> AL(k, m), BL(k, n), CL(m, n);
   Vector<NumberType>           DL(k);
@@ -112,14 +112,14 @@ main()
   initlog();
   deallog.get_file_stream().precision(3);
 
-  const std::vector<std::array<unsigned int, 3>> sizes = {{3, 3, 3},
-                                                          {7, 7, 7},
-                                                          {51, 51, 51},
-                                                          {320, 320, 320},
-                                                          {3, 5, 9},
-                                                          {7, 7, 9},
-                                                          {10, 5, 10},
-                                                          {320, 320, 120}};
+  const std::vector<std::array<unsigned int, 3>> sizes = {{{3, 3, 3}},
+                                                          {{7, 7, 7}},
+                                                          {{51, 51, 51}},
+                                                          {{320, 320, 320}},
+                                                          {{3, 5, 9}},
+                                                          {{7, 7, 9}},
+                                                          {{10, 5, 10}},
+                                                          {{320, 320, 120}}};
 
   deallog.push("double");
   for (auto el : sizes)

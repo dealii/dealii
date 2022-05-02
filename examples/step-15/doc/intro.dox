@@ -14,8 +14,9 @@ is by him.
 <h3>Foreword</h3>
 
 This program deals with an example of a non-linear elliptic partial
-differential equation, the minimal
-surface equation. You can imagine the solution of this equation to describe
+differential equation, the
+[minimal surface equation](https://en.wikipedia.org/wiki/Minimal_surface).
+You can imagine the solution of this equation to describe
 the surface spanned by a soap film that is enclosed by a
 closed wire loop. We imagine the wire to not just be a planar loop, but in
 fact curved. The surface tension of the soap film will then reduce the surface
@@ -50,7 +51,7 @@ $\Omega$ is the domain we get by projecting the wire's positions into $x-y$
 space. In this example, we choose $\Omega$ as the unit disk.
 
 As described above, we solve this equation using Newton's method in which we
-compute the $n$th approximate solution from the $n$th$-1$ one, and use
+compute the $n$th approximate solution from the $(n-1)$th one, and use
 a damping parameter $\alpha^n$ to get better global convergence behavior:
   @f{align*}
     F'(u^{n},\delta u^{n})&=- F(u^{n})
@@ -72,12 +73,12 @@ we have to solve a linear elliptic PDE in every Newton step, with $\delta u^n$
 as the solution of:
 
   @f[
-  - \nabla \cdot \left( \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla
+  - \nabla \cdot \left( \frac{1}{\left(1+|\nabla u^{n}|^{2}\right)^{\frac{1}{2}}}\nabla
   \delta u^{n} \right) +
   \nabla \cdot \left( \frac{\nabla u^{n} \cdot
-  \nabla \delta u^{n}}{(1+|\nabla u^{n}|^{2})^{\frac{3}{2}}} \nabla u^{n}
+  \nabla \delta u^{n}}{\left(1+|\nabla u^{n}|^{2}\right)^{\frac{3}{2}}} \nabla u^{n}
   \right)  =
-  -\left( - \nabla \cdot \left( \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}
+  -\left( - \nabla \cdot \left( \frac{1}{\left(1+|\nabla u^{n}|^{2}\right)^{\frac{1}{2}}}
   \nabla u^{n} \right) \right)
   @f]
 
@@ -94,16 +95,24 @@ condition to the solution $u^{1}$.
 Summing up, we have to solve the PDE above with the boundary condition $\delta
 u^{0}=g$ in the first step and with $\delta u^{n}=0$ in all the following steps.
 
+@note In some sense, one may argue that if the program already
+  implements $F(u)$, it is duplicative to also have to implement
+  $F'(u,\delta)$. As always, duplication tempts bugs and we would like
+  to avoid it. While we do not explore this issue in this program, we
+  will come back to it at the end of the <a
+  href="#extensions">Possibilities for extensions</a> section below,
+  and specifically in step-72.
+
 
 <h3>Weak formulation of the problem</h3>
 
 Starting with the strong formulation above, we get the weak formulation by multiplying
 both sides of the PDE with a test function $\varphi$ and integrating by parts on both sides:
   @f[
-  \left( \nabla \varphi , \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}}\nabla
+  \left( \nabla \varphi , \frac{1}{\left(1+|\nabla u^{n}|^{2}\right)^{\frac{1}{2}}}\nabla
   \delta u^{n} \right)-\left(\nabla \varphi ,\frac{\nabla u^{n} \cdot \nabla
-  \delta u^{n}}{(1+|\nabla u^{n}|^{2})^{\frac{3}{2}}}\nabla u^{n}  \right)
-  = -\left(\nabla \varphi , \frac{1}{(1+|\nabla u^{n}|^{2})^{\frac{1}{2}}} \nabla u^{n}
+  \delta u^{n}}{\left(1+|\nabla u^{n}|^{2}\right)^{\frac{3}{2}}}\nabla u^{n}  \right)
+  = -\left(\nabla \varphi , \frac{1}{\left(1+|\nabla u^{n}|^{2}\right)^{\frac{1}{2}}} \nabla u^{n}
    \right).
   @f]
 Here the solution $\delta u^{n}$ is a function in $H^{1}(\Omega)$, subject to
@@ -241,7 +250,8 @@ full step lengths we forego the rapid, quadratic convergence that
 makes Newton's method so appealing. Obviously, this is a point one
 eventually has to address if the program was made into one that is
 meant to solve more realistic problems. We will comment on this issue
-some more in the <a href="#Results">results section</a>.
+some more in the <a href="#Results">results section</a>, and use an
+even better approach in step-77.
 
 
 <h3> Summary of the algorithm and testcase </h3>
@@ -270,6 +280,11 @@ follows:
   $\alpha^n=0.1$. To make things easier to extend later on, this
   happens in a function of its own, namely in
   <code>MinimalSurfaceProblem::determine_step_length</code>.
+  (The strategy of always choosing $\alpha^n=0.1$ is of course not
+  optimal -- we should choose a step length that works for a given
+  search direction -- but it requires a bit of work to do that. In the
+  end, we leave these sorts of things to external packages: step-77
+  does that.)
 </li>
 
 <li>

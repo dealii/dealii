@@ -1,8 +1,0 @@
-New: ParticleHandler::insert_global_particles() allows one to pass to a ParticleHandler object a vector
-of positions and a vector of properties to insert. Differently from the other insert* methods, 
-this one allows particles to fall within artificial cells. In this case, the method infers who
-should receive the positions and the properties, and sends this information to that process.
-This is useful when constructing particles from non-matching triangulations, where the
-distribution of the particle positions is arbitrary, and possibly not related to the locally owned cells.
-<br>
-(Luca Heltai, 2019/11/25)

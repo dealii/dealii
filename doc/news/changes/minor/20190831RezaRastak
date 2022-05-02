@@ -1,5 +1,0 @@
-Fixed: Reading the variable <code>debug</code> using ParameterHandler for the class
-Algorithms::Newton<VectorType> is fixed within the method
-Algorithms::Newton<VectorType>::parse_parameters().
-<br>
-(Reza Rastak, 2019/08/31)

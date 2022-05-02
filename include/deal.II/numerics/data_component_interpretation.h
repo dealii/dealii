@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,8 +43,6 @@ namespace DataComponentInterpretation
    *
    * See the step-22 tutorial program for an example on how this information
    * can be used in practice.
-   *
-   * @author Wolfgang Bangerth, 2007
    */
   enum DataComponentInterpretation
   {

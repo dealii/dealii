@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +23,6 @@
 
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/sparsity_pattern.h>
-#  include <deal.II/lac/trilinos_index_access.h>
 
 #  include <Epetra_Export.h>
 
@@ -84,49 +83,14 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern()
   {
     column_space_map =
-      std_cxx14::make_unique<Epetra_Map>(TrilinosWrappers::types::int_type(0),
-                                         TrilinosWrappers::types::int_type(0),
-                                         Utilities::Trilinos::comm_self());
-    graph = std_cxx14::make_unique<Epetra_FECrsGraph>(View,
-                                                      *column_space_map,
-                                                      *column_space_map,
-                                                      0);
+      std::make_unique<Epetra_Map>(TrilinosWrappers::types::int_type(0),
+                                   TrilinosWrappers::types::int_type(0),
+                                   Utilities::Trilinos::comm_self());
+    graph = std::make_unique<Epetra_FECrsGraph>(View,
+                                                *column_space_map,
+                                                *column_space_map,
+                                                0);
     graph->FillComplete();
-  }
-
-
-  SparsityPattern::SparsityPattern(const Epetra_Map &input_map,
-                                   const size_type   n_entries_per_row)
-  {
-    reinit(input_map, input_map, n_entries_per_row);
-  }
-
-
-
-  SparsityPattern::SparsityPattern(
-    const Epetra_Map &            input_map,
-    const std::vector<size_type> &n_entries_per_row)
-  {
-    reinit(input_map, input_map, n_entries_per_row);
-  }
-
-
-
-  SparsityPattern::SparsityPattern(const Epetra_Map &input_row_map,
-                                   const Epetra_Map &input_col_map,
-                                   const size_type   n_entries_per_row)
-  {
-    reinit(input_row_map, input_col_map, n_entries_per_row);
-  }
-
-
-
-  SparsityPattern::SparsityPattern(
-    const Epetra_Map &            input_row_map,
-    const Epetra_Map &            input_col_map,
-    const std::vector<size_type> &n_entries_per_row)
-  {
-    reinit(input_row_map, input_col_map, n_entries_per_row);
   }
 
 
@@ -291,7 +255,19 @@ namespace TrilinosWrappers
 
       nonlocal_graph.reset();
       graph.reset();
-      column_space_map = std_cxx14::make_unique<Epetra_Map>(col_map);
+      column_space_map = std::make_unique<Epetra_Map>(col_map);
+
+      AssertThrow((TrilinosWrappers::max_my_gid(row_map) -
+                   TrilinosWrappers::min_my_gid(row_map)) *
+                      std::uint64_t(n_entries_per_row) <
+                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
+                  ExcMessage("The TrilinosWrappers use Epetra internally which "
+                             "uses 'signed int' to represent local indices. "
+                             "Therefore, only 2,147,483,647 nonzero matrix "
+                             "entries can be stored on a single process, "
+                             "but you are requesting more than that. "
+                             "If possible, use more MPI processes."));
+
 
       // for more than one processor, need to specify only row map first and
       // let the matrix entries decide about the column map (which says which
@@ -302,7 +278,7 @@ namespace TrilinosWrappers
       // require building a non-local graph which gives us thread-safe
       // initialization.
       if (row_map.Comm().NumProc() > 1)
-        graph = std_cxx14::make_unique<Epetra_FECrsGraph>(
+        graph = std::make_unique<Epetra_FECrsGraph>(
           Copy, row_map, n_entries_per_row, false
           // TODO: Check which new Trilinos version supports this...
           // Remember to change tests/trilinos/assemble_matrix_parallel_07, too.
@@ -311,7 +287,7 @@ namespace TrilinosWrappers
           //#endif
         );
       else
-        graph = std_cxx14::make_unique<Epetra_FECrsGraph>(
+        graph = std::make_unique<Epetra_FECrsGraph>(
           Copy, row_map, col_map, n_entries_per_row, false);
     }
 
@@ -338,7 +314,10 @@ namespace TrilinosWrappers
       AssertDimension(n_entries_per_row.size(),
                       TrilinosWrappers::n_global_elements(row_map));
 
-      column_space_map = std_cxx14::make_unique<Epetra_Map>(col_map);
+      column_space_map = std::make_unique<Epetra_Map>(col_map);
+
+      // Translate the vector of row lengths into one that only stores
+      // those entries that related to the locally stored rows of the matrix:
       std::vector<int> local_entries_per_row(
         TrilinosWrappers::max_my_gid(row_map) -
         TrilinosWrappers::min_my_gid(row_map));
@@ -346,8 +325,19 @@ namespace TrilinosWrappers
         local_entries_per_row[i] =
           n_entries_per_row[TrilinosWrappers::min_my_gid(row_map) + i];
 
+      AssertThrow(std::accumulate(local_entries_per_row.begin(),
+                                  local_entries_per_row.end(),
+                                  std::uint64_t(0)) <
+                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
+                  ExcMessage("The TrilinosWrappers use Epetra internally which "
+                             "uses 'signed int' to represent local indices. "
+                             "Therefore, only 2,147,483,647 nonzero matrix "
+                             "entries can be stored on a single process, "
+                             "but you are requesting more than that. "
+                             "If possible, use more MPI processes."));
+
       if (row_map.Comm().NumProc() > 1)
-        graph = std_cxx14::make_unique<Epetra_FECrsGraph>(
+        graph = std::make_unique<Epetra_FECrsGraph>(
           Copy, row_map, local_entries_per_row.data(), false
           // TODO: Check which new Trilinos version supports this...
           // Remember to change tests/trilinos/assemble_matrix_parallel_07, too.
@@ -356,7 +346,7 @@ namespace TrilinosWrappers
           //#endif
         );
       else
-        graph = std_cxx14::make_unique<Epetra_FECrsGraph>(
+        graph = std::make_unique<Epetra_FECrsGraph>(
           Copy, row_map, col_map, local_entries_per_row.data(), false);
     }
 
@@ -380,7 +370,7 @@ namespace TrilinosWrappers
       AssertDimension(sp.n_cols(),
                       TrilinosWrappers::n_global_elements(col_map));
 
-      column_space_map = std_cxx14::make_unique<Epetra_Map>(col_map);
+      column_space_map = std::make_unique<Epetra_Map>(col_map);
 
       Assert(row_map.LinearMap() == true,
              ExcMessage(
@@ -396,11 +386,24 @@ namespace TrilinosWrappers
         n_entries_per_row[row - first_row] =
           static_cast<int>(sp.row_length(row));
 
+      AssertThrow(std::accumulate(n_entries_per_row.begin(),
+                                  n_entries_per_row.end(),
+                                  std::uint64_t(0)) <
+                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
+                  ExcMessage("The TrilinosWrappers use Epetra internally which "
+                             "uses 'signed int' to represent local indices. "
+                             "Therefore, only 2,147,483,647 nonzero matrix "
+                             "entries can be stored on a single process, "
+                             "but you are requesting more than that. "
+                             "If possible, use more MPI processes."));
+
       if (row_map.Comm().NumProc() > 1)
-        graph = std_cxx14::make_unique<Epetra_FECrsGraph>(
-          Copy, row_map, n_entries_per_row.data(), false);
+        graph = std::make_unique<Epetra_FECrsGraph>(Copy,
+                                                    row_map,
+                                                    n_entries_per_row.data(),
+                                                    false);
       else
-        graph = std_cxx14::make_unique<Epetra_FECrsGraph>(
+        graph = std::make_unique<Epetra_FECrsGraph>(
           Copy, row_map, col_map, n_entries_per_row.data(), false);
 
       AssertDimension(sp.n_rows(), n_global_rows(*graph));
@@ -470,63 +473,6 @@ namespace TrilinosWrappers
       AssertThrow(ierr == 0, ExcTrilinosError(ierr));
     }
   } // namespace
-
-
-  void
-  SparsityPattern::reinit(const Epetra_Map &input_map,
-                          const size_type   n_entries_per_row)
-  {
-    reinit_sp(input_map,
-              input_map,
-              n_entries_per_row,
-              column_space_map,
-              graph,
-              nonlocal_graph);
-  }
-
-
-
-  void
-  SparsityPattern::reinit(const Epetra_Map &input_row_map,
-                          const Epetra_Map &input_col_map,
-                          const size_type   n_entries_per_row)
-  {
-    reinit_sp(input_row_map,
-              input_col_map,
-              n_entries_per_row,
-              column_space_map,
-              graph,
-              nonlocal_graph);
-  }
-
-
-
-  void
-  SparsityPattern::reinit(const Epetra_Map &            input_map,
-                          const std::vector<size_type> &n_entries_per_row)
-  {
-    reinit_sp(input_map,
-              input_map,
-              n_entries_per_row,
-              column_space_map,
-              graph,
-              nonlocal_graph);
-  }
-
-
-
-  void
-  SparsityPattern::reinit(const Epetra_Map &            input_row_map,
-                          const Epetra_Map &            input_col_map,
-                          const std::vector<size_type> &n_entries_per_row)
-  {
-    reinit_sp(input_row_map,
-              input_col_map,
-              n_entries_per_row,
-              column_space_map,
-              graph,
-              nonlocal_graph);
-  }
 
 
 
@@ -632,7 +578,7 @@ namespace TrilinosWrappers
         Epetra_Map nonlocal_map =
           nonlocal_partitioner.make_trilinos_map(communicator, true);
         nonlocal_graph =
-          std_cxx14::make_unique<Epetra_CrsGraph>(Copy, nonlocal_map, 0);
+          std::make_unique<Epetra_CrsGraph>(Copy, nonlocal_map, 0);
       }
     else
       Assert(nonlocal_partitioner.n_elements() == 0, ExcInternalError());
@@ -685,42 +631,6 @@ namespace TrilinosWrappers
 
 
 
-  template <typename SparsityPatternType>
-  void
-  SparsityPattern::reinit(const Epetra_Map &         input_map,
-                          const SparsityPatternType &sp,
-                          const bool                 exchange_data)
-  {
-    reinit_sp(input_map,
-              input_map,
-              sp,
-              exchange_data,
-              column_space_map,
-              graph,
-              nonlocal_graph);
-  }
-
-
-
-  template <typename SparsityPatternType>
-  void
-  SparsityPattern::reinit(const Epetra_Map &         input_row_map,
-                          const Epetra_Map &         input_col_map,
-                          const SparsityPatternType &sp,
-                          const bool                 exchange_data)
-  {
-    reinit_sp(input_row_map,
-              input_col_map,
-              sp,
-              exchange_data,
-              column_space_map,
-              graph,
-              nonlocal_graph);
-    compress();
-  }
-
-
-
   SparsityPattern &
   SparsityPattern::operator=(const SparsityPattern &)
   {
@@ -733,12 +643,11 @@ namespace TrilinosWrappers
   void
   SparsityPattern::copy_from(const SparsityPattern &sp)
   {
-    column_space_map = std_cxx14::make_unique<Epetra_Map>(*sp.column_space_map);
-    graph            = std_cxx14::make_unique<Epetra_FECrsGraph>(*sp.graph);
+    column_space_map = std::make_unique<Epetra_Map>(*sp.column_space_map);
+    graph            = std::make_unique<Epetra_FECrsGraph>(*sp.graph);
 
     if (sp.nonlocal_graph.get() != nullptr)
-      nonlocal_graph =
-        std_cxx14::make_unique<Epetra_CrsGraph>(*sp.nonlocal_graph);
+      nonlocal_graph = std::make_unique<Epetra_CrsGraph>(*sp.nonlocal_graph);
     else
       nonlocal_graph.reset();
   }
@@ -769,13 +678,13 @@ namespace TrilinosWrappers
     // the pointer and generate an
     // empty sparsity pattern.
     column_space_map =
-      std_cxx14::make_unique<Epetra_Map>(TrilinosWrappers::types::int_type(0),
-                                         TrilinosWrappers::types::int_type(0),
-                                         Utilities::Trilinos::comm_self());
-    graph = std_cxx14::make_unique<Epetra_FECrsGraph>(View,
-                                                      *column_space_map,
-                                                      *column_space_map,
-                                                      0);
+      std::make_unique<Epetra_Map>(TrilinosWrappers::types::int_type(0),
+                                   TrilinosWrappers::types::int_type(0),
+                                   Utilities::Trilinos::comm_self());
+    graph = std::make_unique<Epetra_FECrsGraph>(View,
+                                                *column_space_map,
+                                                *column_space_map,
+                                                0);
     graph->FillComplete();
 
     nonlocal_graph.reset();
@@ -838,7 +747,25 @@ namespace TrilinosWrappers
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
 
-    ierr = graph->OptimizeStorage();
+    try
+      {
+        ierr = graph->OptimizeStorage();
+      }
+    catch (const int error_code)
+      {
+        AssertThrow(
+          false,
+          ExcMessage(
+            "The Epetra_CrsGraph::OptimizeStorage() function "
+            "has thrown an error with code " +
+            std::to_string(error_code) +
+            ". You will have to look up the exact meaning of this error "
+            "in the Trilinos source code, but oftentimes, this function "
+            "throwing an error indicates that you are trying to allocate "
+            "more than 2,147,483,647 nonzero entries in the sparsity "
+            "pattern on the local process; this will not work because "
+            "Epetra indexes entries with a simple 'signed int'."));
+      }
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
@@ -1067,50 +994,13 @@ namespace TrilinosWrappers
 
 
 
-  const Epetra_Map &
-  SparsityPattern::row_partitioner() const
-  {
-    // TODO A dynamic_cast fails here, this is suspicious.
-    const auto &row_map =
-      static_cast<const Epetra_Map &>(graph->RowMap()); // NOLINT
-    return row_map;
-  }
-
-
-
-  const Epetra_Map &
-  SparsityPattern::col_partitioner() const
-  {
-    // TODO A dynamic_cast fails here, this is suspicious.
-    const auto &col_map =
-      static_cast<const Epetra_Map &>(graph->ColMap()); // NOLINT
-    return col_map;
-  }
-
-
-
-  const Epetra_Comm &
-  SparsityPattern::trilinos_communicator() const
-  {
-    return graph->RangeMap().Comm();
-  }
-
-
-
   MPI_Comm
   SparsityPattern::get_mpi_communicator() const
   {
-#  ifdef DEAL_II_WITH_MPI
-
     const Epetra_MpiComm *mpi_comm =
       dynamic_cast<const Epetra_MpiComm *>(&graph->RangeMap().Comm());
     Assert(mpi_comm != nullptr, ExcInternalError());
     return mpi_comm->Comm();
-#  else
-
-    return MPI_COMM_SELF;
-
-#  endif
   }
 
 
@@ -1148,7 +1038,7 @@ namespace TrilinosWrappers
           }
       }
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -1180,7 +1070,7 @@ namespace TrilinosWrappers
               << std::endl;
       }
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
   // TODO: Implement!
@@ -1199,28 +1089,6 @@ namespace TrilinosWrappers
   SparsityPattern::copy_from(const dealii::SparsityPattern &);
   template void
   SparsityPattern::copy_from(const dealii::DynamicSparsityPattern &);
-
-
-  template void
-  SparsityPattern::reinit(const Epetra_Map &,
-                          const dealii::SparsityPattern &,
-                          bool);
-  template void
-  SparsityPattern::reinit(const Epetra_Map &,
-                          const dealii::DynamicSparsityPattern &,
-                          bool);
-
-  template void
-  SparsityPattern::reinit(const Epetra_Map &,
-                          const Epetra_Map &,
-                          const dealii::SparsityPattern &,
-                          bool);
-  template void
-  SparsityPattern::reinit(const Epetra_Map &,
-                          const Epetra_Map &,
-                          const dealii::DynamicSparsityPattern &,
-                          bool);
-
 
   template void
   SparsityPattern::reinit(const IndexSet &,

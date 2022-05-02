@@ -1,4 +1,0 @@
-Fixed: AffineConstraints::set_zero() can be used with
-LinearAlgebra::distributed::Vector with MemorySpace::CUDA.
-<br>
-(Daniel Arndt, 2019/07/28)

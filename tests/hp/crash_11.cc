@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,12 +16,13 @@
 
 
 // a test where a degree of freedom was constrained multiple times,
-// but with different weights. see the hp paper for more on this
+// but with different weights. see the hp-paper for more on this
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -32,8 +33,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
@@ -71,10 +70,10 @@ main()
   hp::FECollection<3> fe;
   fe.push_back(FE_Q<3>(1));
   fe.push_back(FE_Q<3>(2));
-  fe.push_back(FE_Q<3>(QIterated<1>(QTrapez<1>(), 3)));
-  fe.push_back(FE_Q<3>(QIterated<1>(QTrapez<1>(), 4)));
+  fe.push_back(FE_Q<3>(QIterated<1>(QTrapezoid<1>(), 3)));
+  fe.push_back(FE_Q<3>(QIterated<1>(QTrapezoid<1>(), 4)));
 
-  hp::DoFHandler<3> dof_handler(triangulation);
+  DoFHandler<3> dof_handler(triangulation);
 
   // assign polynomial degrees like this:
   //
@@ -84,7 +83,7 @@ main()
   // | 4 | 3 |
   // *---*---*
   //
-  hp::DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
+  DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
   cell->set_active_fe_index(0);
   ++cell;
   cell->set_active_fe_index(1);
@@ -99,12 +98,11 @@ main()
   // out the numbers of the dofs that
   // belong to the shared edge
   // (that's the one that has four
-  // different fe indices associated
+  // different FE indices associated
   // with it). note that there is
   // only one such line so we can
   // quit the loop once we find it
-  for (hp::DoFHandler<3>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)

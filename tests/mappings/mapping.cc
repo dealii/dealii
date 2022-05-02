@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ plot_transformation(Mapping<dim> &                           mapping,
 {
   const unsigned int div = 7;
 
-  QTrapez<1>     q_trapez;
+  QTrapezoid<1>  q_trapez;
   QIterated<dim> q(q_trapez, div);
   FEValues<dim>  fe_values(
     mapping, fe, q, UpdateFlags(update_quadrature_points | update_JxW_values));
@@ -177,19 +177,21 @@ plot_subfaces(Mapping<dim> &                           mapping,
 
 
 template <>
-inline void plot_faces(Mapping<1> &,
-                       FiniteElement<1> &,
-                       DoFHandler<1>::cell_iterator &,
-                       const std::string &)
+inline void
+plot_faces(Mapping<1> &,
+           FiniteElement<1> &,
+           DoFHandler<1>::cell_iterator &,
+           const std::string &)
 {}
 
 
 
 template <>
-inline void plot_subfaces(Mapping<1> &,
-                          FiniteElement<1> &,
-                          DoFHandler<1>::cell_iterator &,
-                          const std::string &)
+inline void
+plot_subfaces(Mapping<1> &,
+              FiniteElement<1> &,
+              DoFHandler<1>::cell_iterator &,
+              const std::string &)
 {}
 
 
@@ -228,9 +230,10 @@ unsigned int                           mapping_size;
 
 
 template <>
-void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
-                           std::vector<Manifold<1> *> &,
-                           std::vector<double> &exact_areas)
+void
+create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
+                      std::vector<Manifold<1> *> &,
+                      std::vector<double> &exact_areas)
 {
   show.resize(1, std::vector<unsigned int>(mapping_size, 0));
   Triangulation<1> *tria = new Triangulation<1>();
@@ -245,9 +248,10 @@ void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
 
 
 template <>
-void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
-                           std::vector<Manifold<2> *> &     boundary_ptr,
-                           std::vector<double> &            exact_areas)
+void
+create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
+                      std::vector<Manifold<2> *> &     boundary_ptr,
+                      std::vector<double> &            exact_areas)
 {
   Triangulation<2> *tria;
   show.clear();
@@ -358,9 +362,10 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
 
 
 template <>
-void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
-                           std::vector<Manifold<3> *> &     boundary_ptr,
-                           std::vector<double> &            exact_areas)
+void
+create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
+                      std::vector<Manifold<3> *> &     boundary_ptr,
+                      std::vector<double> &            exact_areas)
 {
   Triangulation<3> *tria;
   show.clear();
@@ -435,7 +440,7 @@ mapping_test()
   std::vector<std::string>    mapping_strings;
 
   MappingCartesian<dim> cart;
-  MappingQGeneric<dim>  q1_old(1);
+  MappingQ<dim>         q1_old(1);
   MappingQ<dim>         q1tmp(1);
   MappingQ<dim>         q2tmp(2);
   MappingQ<dim>         q3tmp(3);
@@ -474,7 +479,7 @@ mapping_test()
       dof.distribute_dofs(fe_q4);
       typename DoFHandler<dim>::cell_iterator cell = dof.begin_active();
 
-      deallog << "Triangulation" << i << ":" << std::endl;
+      deallog << "Triangulation" << i << ':' << std::endl;
 
       deallog << "exact_area=" << exact_areas[i] << std::endl;
       for (unsigned int j = 0; j < mapping_size; ++j)

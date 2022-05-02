@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -199,7 +199,7 @@ test(const unsigned int n_ref = 0)
 
   MGTransferMatrixFree<dim, LevelNumberType> mg_transfer_euler(
     mg_constrained_dofs_euler);
-  mg_transfer_euler.build(dof_handler);
+  mg_transfer_euler.build(dof_handler_euler);
 
   // now the core of the test:
   const unsigned int max_level =
@@ -207,6 +207,21 @@ test(const unsigned int n_ref = 0)
   const unsigned int min_level = 0;
   MGLevelObject<LinearAlgebra::distributed::Vector<LevelNumberType>>
     displacement_level(min_level, max_level);
+
+  // Important! This preallocation of the displacement vectors with
+  // all relevant ghost indices is required to certain meshes.
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    {
+      IndexSet relevant_mg_dofs;
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler_euler,
+                                                    level,
+                                                    relevant_mg_dofs);
+      displacement_level[level].reinit(dof_handler_euler.locally_owned_mg_dofs(
+                                         level),
+                                       relevant_mg_dofs,
+                                       mpi_communicator);
+    }
+
   mg_transfer_euler.interpolate_to_mg(dof_handler_euler,
                                       displacement_level,
                                       displacement);
@@ -237,8 +252,8 @@ test(const unsigned int n_ref = 0)
         matrix_free_euler);
       FEEvaluation<dim, fe_degree, n_q_points, 1, NumberType> fe_eval(
         matrix_free);
-      const unsigned int n_cells = matrix_free_euler.n_macro_cells();
-      Assert(matrix_free_euler.n_macro_cells() == matrix_free.n_macro_cells(),
+      const unsigned int n_cells = matrix_free_euler.n_cell_batches();
+      Assert(matrix_free_euler.n_cell_batches() == matrix_free.n_cell_batches(),
              ExcInternalError());
       const unsigned int nqp = fe_eval.n_q_points;
       for (unsigned int cell = 0; cell < n_cells; ++cell)
@@ -315,8 +330,8 @@ test(const unsigned int n_ref = 0)
           mg_level_euler);
         FEEvaluation<dim, fe_degree, n_q_points, 1, NumberType> fe_eval(
           mg_level);
-        const unsigned int n_cells = mg_level_euler.n_macro_cells();
-        Assert(mg_level_euler.n_macro_cells() == mg_level.n_macro_cells(),
+        const unsigned int n_cells = mg_level_euler.n_cell_batches();
+        Assert(mg_level_euler.n_cell_batches() == mg_level.n_cell_batches(),
                ExcInternalError());
         const unsigned int nqp = fe_eval.n_q_points;
         for (unsigned int cell = 0; cell < n_cells; ++cell)

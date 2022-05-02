@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -351,7 +351,7 @@ BEM<spacedim>::solve()
   tangential_derivative.reinit(tria.n_active_cells());
   error.reinit(tria.n_active_cells());
   QMidpoint<spacedim - 1>       q_midpoint;
-  QTrapez<spacedim - 1>         q_trapez;
+  QTrapezoid<spacedim - 1>      q_trapez;
   const QIterated<spacedim - 1> q_iterated(q_midpoint, 1);
 
   FEValues<spacedim - 1, spacedim> fe_values_q(
@@ -406,17 +406,15 @@ template <int spacedim>
 void
 BEM<spacedim>::output_results()
 {
-  DataOut<spacedim - 1, DoFHandler<spacedim - 1, spacedim>> dataout;
+  DataOut<spacedim - 1, spacedim> dataout;
   dataout.attach_dof_handler(dof_handler_q);
   dataout.add_data_vector(dof_handler_q, smooth_solution, "linear_potential");
-  dataout.add_data_vector(
-    tangential_derivative,
-    "tangential_velocity",
-    DataOut<spacedim - 1, DoFHandler<spacedim - 1, spacedim>>::type_cell_data);
-  dataout.add_data_vector(
-    error,
-    "error",
-    DataOut<spacedim - 1, DoFHandler<spacedim - 1, spacedim>>::type_cell_data);
+  dataout.add_data_vector(tangential_derivative,
+                          "tangential_velocity",
+                          DataOut<spacedim - 1, spacedim>::type_cell_data);
+  dataout.add_data_vector(error,
+                          "error",
+                          DataOut<spacedim - 1, spacedim>::type_cell_data);
   dataout.build_patches();
   dataout.write_vtk(deallog.get_file_stream());
 }

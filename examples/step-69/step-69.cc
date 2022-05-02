@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2019 - 2020 by the deal.II authors
+ * Copyright (C) 2019 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -46,6 +46,7 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/work_stream.h>
 
+#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -78,15 +79,16 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
-// The last two boost header files are for creating custom iterator ranges
+// The last two header files are for creating custom iterator ranges
 // over integer intervals.
-#include <boost/range/irange.hpp>
+#include <deal.II/base/std_cxx20/iota_view.h>
 #include <boost/range/iterator_range.hpp>
 
 // For std::isnan, std::isinf, std::ifstream, std::async, and std::future
 #include <cmath>
 #include <fstream>
 #include <future>
+
 
 // @sect3{Class template declarations}
 //
@@ -161,6 +163,8 @@ namespace Step69
     const QGauss<dim>     quadrature;
     const QGauss<dim - 1> face_quadrature;
 
+    unsigned int refinement;
+
   private:
     TimerOutput &computing_timer;
 
@@ -168,8 +172,6 @@ namespace Step69
     double height;
     double disk_position;
     double disk_diameter;
-
-    unsigned int refinement;
   };
 
   // @sect4{The <code>OfflineData</code> class}
@@ -367,7 +369,7 @@ namespace Step69
   // <code>U</code> and a time point <code>t</code> (as input arguments)
   // computes the updated solution, stores it in the vector
   // <code>temp</code>, swaps its contents with the vector <code>U</code>,
-  // and returns the chosen \step-size $\tau$.
+  // and returns the chosen step-size $\tau$.
   //
   // The other important method is <code>prepare()</code> which primarily
   // sets the proper partition and sparsity pattern for the temporary
@@ -482,11 +484,15 @@ namespace Step69
   private:
     vector_type interpolate_initial_values(const double t = 0);
 
+    void checkpoint(const vector_type &U,
+                    const std::string &name,
+                    double             t,
+                    unsigned int       cycle);
+
     void output(const vector_type &U,
                 const std::string &name,
                 double             t,
-                unsigned int       cycle,
-                bool               checkpoint = false);
+                unsigned int       cycle);
 
     const MPI_Comm     mpi_communicator;
     std::ostringstream timer_output;
@@ -591,7 +597,7 @@ namespace Step69
 
     triangulation.clear();
 
-    Triangulation<dim> tria1, tria2, tria3, tria4;
+    Triangulation<dim> tria1, tria2, tria3, tria4, tria5, tria6;
 
     GridGenerator::hyper_cube_with_cylindrical_hole(
       tria1, disk_diameter / 2., disk_diameter, 0.5, 1, false);
@@ -610,14 +616,27 @@ namespace Step69
 
     GridGenerator::subdivided_hyper_rectangle(
       tria4,
-      {6, 4},
-      Point<2>(disk_diameter, -height / 2.),
+      {6, 2},
+      Point<2>(disk_diameter, -disk_diameter),
+      Point<2>(length - disk_position, disk_diameter));
+
+    GridGenerator::subdivided_hyper_rectangle(
+      tria5,
+      {6, 1},
+      Point<2>(disk_diameter, disk_diameter),
       Point<2>(length - disk_position, height / 2.));
 
-    GridGenerator::merge_triangulations({&tria1, &tria2, &tria3, &tria4},
-                                        triangulation,
-                                        1.e-12,
-                                        true);
+    GridGenerator::subdivided_hyper_rectangle(
+      tria6,
+      {6, 1},
+      Point<2>(disk_diameter, -height / 2.),
+      Point<2>(length - disk_position, -disk_diameter));
+
+    GridGenerator::merge_triangulations(
+      {&tria1, &tria2, &tria3, &tria4, &tria5, &tria6},
+      triangulation,
+      1.e-12,
+      true);
 
     triangulation.set_manifold(0, PolarManifold<2>(Point<2>()));
 
@@ -630,7 +649,7 @@ namespace Step69
 
     for (const auto &cell : triangulation.active_cell_iterators())
       {
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        for (const auto v : cell->vertex_indices())
           {
             if (cell->vertex(v)[0] <= -disk_diameter + 1.e-6)
               cell->vertex(v)[0] = -disk_position;
@@ -639,7 +658,7 @@ namespace Step69
 
     for (const auto &cell : triangulation.active_cell_iterators())
       {
-        for (auto f : GeometryInfo<dim>::face_indices())
+        for (const auto f : cell->face_indices())
           {
             const auto face = cell->face(f);
 
@@ -656,8 +675,6 @@ namespace Step69
               }
           }
       }
-
-    triangulation.refine_global(refinement);
   }
 
   // @sect4{Assembly of offline matrices}
@@ -671,6 +688,7 @@ namespace Step69
                                 const Discretization<dim> &discretization,
                                 const std::string &        subsection)
     : ParameterAcceptor(subsection)
+    , dof_handler(discretization.triangulation)
     , mpi_communicator(mpi_communicator)
     , computing_timer(computing_timer)
     , discretization(&discretization)
@@ -690,13 +708,12 @@ namespace Step69
       TimerOutput::Scope scope(computing_timer,
                                "offline_data - distribute dofs");
 
-      dof_handler.initialize(discretization->triangulation,
-                             discretization->finite_element);
+      dof_handler.distribute_dofs(discretization->finite_element);
 
       locally_owned   = dof_handler.locally_owned_dofs();
       n_locally_owned = locally_owned.n_elements();
 
-      DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant);
+      locally_relevant   = DoFTools::extract_locally_relevant_dofs(dof_handler);
       n_locally_relevant = locally_relevant.n_elements();
 
       partitioner =
@@ -767,7 +784,8 @@ namespace Step69
 
       DynamicSparsityPattern dsp(n_locally_relevant, n_locally_relevant);
 
-      const auto dofs_per_cell = discretization->finite_element.dofs_per_cell;
+      const auto dofs_per_cell =
+        discretization->finite_element.n_dofs_per_cell();
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
 
       for (const auto &cell : dof_handler.active_cell_iterators())
@@ -991,20 +1009,14 @@ namespace Step69
   //
   // @f{align*}
   // \widehat{\boldsymbol{\nu}}_i \dealcoloneq
-  // \frac{\boldsymbol{\nu}_i}{|\boldsymbol{\nu}_i|} \ \text{ where }
-  // \boldsymbol{\nu}_i \dealcoloneq \sum_{T \subset \text{supp}(\phi_i)}
-  // \sum_{F \subset \partial T \cap \partial \Omega}
-  // \sum_{\mathbf{x}_{q,F}} \nu(\mathbf{x}_{q,F})
-  // \phi_i(\mathbf{x}_{q,F}).
+  //  \frac{\int_{\partial\Omega} \phi_i \widehat{\boldsymbol{\nu}} \,
+  //  \, \mathrm{d}\mathbf{s}}{\big|\int_{\partial\Omega} \phi_i
+  //  \widehat{\boldsymbol{\nu}} \, \mathrm{d}\mathbf{s}\big|}
   // @f}
   //
-  // Here $T$ denotes elements,
-  // $\text{supp}(\phi_i)$ the support of the shape function $\phi_i$,
-  // $F$ are faces of the element $T$, and $\mathbf{x}_{q,F}$
-  // are quadrature points on such face. Note that this formula for
-  // $\widehat{\boldsymbol{\nu}}_i$ is nothing else than some form of
-  // weighted averaging. Other more sophisticated definitions for $\nu_i$
-  // are possible but none of them have much influence in theory or practice.
+  // We will compute the numerator of this expression first and store it in
+  // <code>OfflineData<dim>::BoundaryNormalMap</code>. We will normalize these
+  // vectors in a posterior loop.
 
   template <int dim>
   void OfflineData<dim>::assemble()
@@ -1016,8 +1028,9 @@ namespace Step69
     for (auto &matrix : nij_matrix)
       matrix = 0.;
 
-    unsigned int dofs_per_cell = discretization->finite_element.dofs_per_cell;
-    unsigned int n_q_points    = discretization->quadrature.size();
+    unsigned int dofs_per_cell =
+      discretization->finite_element.n_dofs_per_cell();
+    unsigned int n_q_points = discretization->quadrature.size();
 
     // What follows is the initialization of the scratch data required by
     // WorkStream
@@ -1088,7 +1101,7 @@ namespace Step69
           // Now we have to compute the boundary normals. Note that the
           // following loop does not do much unless the element has faces on
           // the boundary of the domain.
-          for (auto f : GeometryInfo<dim>::face_indices())
+          for (const auto f : cell->face_indices())
             {
               const auto face = cell->face(f);
               const auto id   = face->boundary_id();
@@ -1124,9 +1137,7 @@ namespace Step69
                   const auto index = copy.local_dof_indices[j];
 
                   Point<dim> position;
-                  for (unsigned int v = 0;
-                       v < GeometryInfo<dim>::vertices_per_cell;
-                       ++v)
+                  for (const auto v : cell->vertex_indices())
                     if (cell->vertex_dof_index(v, 0) ==
                         partitioner->local_to_global(index))
                       {
@@ -1225,7 +1236,8 @@ namespace Step69
     // defined by the <code>indices.begin()</code> and
     // <code>indices.end()</code> iterators into subranges (we want to be
     // able to read any entry in those subranges with constant complexity).
-    // In order to provide such iterators we resort to boost::irange.
+    // In order to provide such iterators we resort to
+    // std_cxx20::ranges::iota_view.
     //
     // The bulk of the following piece of code is spent defining
     // the "worker" <code>on_subranges</code>: i.e. the  operation applied at
@@ -1249,26 +1261,18 @@ namespace Step69
     // to carry out (computation and storage of normals, and normalization
     // of the $\mathbf{c}_{ij}$ of entries) threads cannot conflict
     // attempting to write the same entry (we do not need a scheduler).
-    //
-    // We have one more difficulty to overcome: In order to implement the
-    // <code>on_subranges</code> lambda we need to name the iterator type
-    // of the object returned by <code>boost::irange%<unsigned
-    // int%>()</code>. This is unfortunately a very convoluted name exposing
-    // implementation details about <code>boost::irange</code>. For this
-    // reason we resort to the <a
-    // href="https://en.cppreference.com/w/cpp/language/decltype"><code>decltype</code></a>
-    // specifier, a C++11 feature that returns the type of an entity, or
-    // expression.
     {
       TimerOutput::Scope scope(computing_timer,
                                "offline_data - compute |c_ij|, and n_ij");
 
-      const auto indices = boost::irange<unsigned int>(0, n_locally_relevant);
+      const std_cxx20::ranges::iota_view<unsigned int, unsigned int> indices(
+        0, n_locally_relevant);
 
       const auto on_subranges = //
-        [&](typename decltype(indices)::iterator       i1,
-            const typename decltype(indices)::iterator i2) {
-          for (const auto row_index : boost::make_iterator_range(i1, i2))
+        [&](const auto i1, const auto i2) {
+          for (const auto row_index :
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
+                                                                        *i2))
             {
               // First column-loop: we compute and store the entries of the
               // matrix norm_matrix and write normalized entries into the
@@ -1302,122 +1306,6 @@ namespace Step69
           normal /= (normal.norm() + std::numeric_limits<double>::epsilon());
         }
     }
-
-    // As commented in the introduction (see section titled "Stable boundary
-    // conditions and conservation properties") we use three different types of
-    // boundary conditions: essential-like boundary conditions (we prescribe a
-    // state in the left portion of our domain), outflow boundary conditions
-    // (also called "do-nothing" boundary conditions) in the right portion of
-    // the domain, and "reflecting" boundary conditions (also called "free
-    // slip" boundary conditions). With these boundary conditions we should
-    // not expect any form of conservation to hold.
-    //
-    // However, if we were to use reflecting boundary conditions
-    // $\mathbf{m} \cdot \boldsymbol{\nu}_i =0$ on the entirety of the
-    // boundary we should preserve the density and total (mechanical)
-    // energy. This requires us to modify the $\mathbf{c}_{ij}$ vectors at
-    // the boundary as follows @cite GuermondEtAl2018 :
-    //
-    // @f{align*}
-    // \mathbf{c}_{ij} \, +\!\!= \int_{\partial \Omega}
-    // (\boldsymbol{\nu}_j - \boldsymbol{\nu}(\mathbf{s})) \phi_i \phi_j \,
-    // \mathrm{d}\mathbf{s} \ \text{whenever} \ \mathbf{x}_i \text{ and }
-    // \mathbf{x}_j \text{ lie in the boundary.}
-    // @f}
-    //
-    // The ideas repeat themselves: we use WorkStream in order to compute
-    // this correction, most of the following code is about the definition
-    // of the worker <code>local_assemble_system()</code>.
-    {
-      TimerOutput::Scope scope(computing_timer,
-                               "offline_data - fix slip boundary c_ij");
-
-      const auto local_assemble_system = //
-        [&](const typename DoFHandler<dim>::cell_iterator &cell,
-            MeshWorker::ScratchData<dim> &                 scratch,
-            CopyData<dim> &                                copy) {
-          copy.is_artificial = cell->is_artificial();
-
-          if (copy.is_artificial)
-            return;
-
-          for (auto &matrix : copy.cell_cij_matrix)
-            matrix.reinit(dofs_per_cell, dofs_per_cell);
-
-          copy.local_dof_indices.resize(dofs_per_cell);
-          cell->get_dof_indices(copy.local_dof_indices);
-          std::transform(copy.local_dof_indices.begin(),
-                         copy.local_dof_indices.end(),
-                         copy.local_dof_indices.begin(),
-                         [&](types::global_dof_index index) {
-                           return partitioner->global_to_local(index);
-                         });
-
-          for (auto &matrix : copy.cell_cij_matrix)
-            matrix = 0.;
-
-          for (auto f : GeometryInfo<dim>::face_indices())
-            {
-              const auto face = cell->face(f);
-              const auto id   = face->boundary_id();
-
-              if (!face->at_boundary())
-                continue;
-
-              if (id != Boundaries::free_slip)
-                continue;
-
-              const auto &fe_face_values = scratch.reinit(cell, f);
-
-              const unsigned int n_face_q_points =
-                fe_face_values.get_quadrature().size();
-
-              for (unsigned int q = 0; q < n_face_q_points; ++q)
-                {
-                  const auto JxW      = fe_face_values.JxW(q);
-                  const auto normal_q = fe_face_values.normal_vector(q);
-
-                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    {
-                      if (!discretization->finite_element.has_support_on_face(
-                            j, f))
-                        continue;
-
-                      const auto &normal_j = std::get<0>(
-                        boundary_normal_map[copy.local_dof_indices[j]]);
-
-                      const auto value_JxW =
-                        fe_face_values.shape_value(j, q) * JxW;
-
-                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                        {
-                          const auto value = fe_face_values.shape_value(i, q);
-
-                          /* This is the correction of the boundary c_ij */
-                          for (unsigned int d = 0; d < dim; ++d)
-                            copy.cell_cij_matrix[d](i, j) +=
-                              (normal_j[d] - normal_q[d]) * (value * value_JxW);
-                        } /* i */
-                    }     /* j */
-                }         /* q */
-            }             /* f */
-        };
-
-      const auto copy_local_to_global = [&](const CopyData<dim> &copy) {
-        if (copy.is_artificial)
-          return;
-
-        for (int k = 0; k < dim; ++k)
-          cij_matrix[k].add(copy.local_dof_indices, copy.cell_cij_matrix[k]);
-      };
-
-      WorkStream::run(dof_handler.begin_active(),
-                      dof_handler.end(),
-                      local_assemble_system,
-                      copy_local_to_global,
-                      scratch_data,
-                      CopyData<dim>());
-    }
   }
 
   // At this point we are very much done with anything related to offline data.
@@ -1444,7 +1332,7 @@ namespace Step69
   ProblemDescription<dim>::momentum(const state_type &U)
   {
     Tensor<1, dim> result;
-    std::copy(&U[1], &U[1 + dim], &result[0]);
+    std::copy_n(&U[1], dim, &result[0]);
     return result;
   }
 
@@ -1797,7 +1685,7 @@ namespace Step69
     // velocity $u$, and pressure $p$) into a conserved n-dimensional state
     // (density $\rho$, momentum $\mathbf{m}$, and total energy $E$).
 
-    initial_state = [=](const Point<dim> & /*point*/, double /*t*/) {
+    initial_state = [this](const Point<dim> & /*point*/, double /*t*/) {
       const double            rho   = initial_1d_state[0];
       const double            u     = initial_1d_state[1];
       const double            p     = initial_1d_state[2];
@@ -1870,9 +1758,10 @@ namespace Step69
     const auto &n_locally_owned    = offline_data->n_locally_owned;
     const auto &n_locally_relevant = offline_data->n_locally_relevant;
 
-    const auto indices_owned = boost::irange<unsigned int>(0, n_locally_owned);
-    const auto indices_relevant =
-      boost::irange<unsigned int>(0, n_locally_relevant);
+    const std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+      indices_owned(0, n_locally_owned);
+    const std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+      indices_relevant(0, n_locally_relevant);
 
     const auto &sparsity = offline_data->sparsity_pattern;
 
@@ -1926,9 +1815,10 @@ namespace Step69
                                "time_stepping - 1 compute d_ij");
 
       const auto on_subranges = //
-        [&](typename decltype(indices_relevant)::iterator       i1,
-            const typename decltype(indices_relevant)::iterator i2) {
-          for (const auto i : boost::make_iterator_range(i1, i2))
+        [&](const auto i1, const auto i2) {
+          for (const auto i :
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
+                                                                        *i2))
             {
               const auto U_i = gather(U, i);
 
@@ -2021,11 +1911,12 @@ namespace Step69
       // locally.
 
       const auto on_subranges = //
-        [&](typename decltype(indices_relevant)::iterator       i1,
-            const typename decltype(indices_relevant)::iterator i2) {
+        [&](const auto i1, const auto i2) {
           double tau_max_on_subrange = std::numeric_limits<double>::infinity();
 
-          for (const auto i : boost::make_iterator_range(i1, i2))
+          for (const auto i :
+               std_cxx20::ranges::iota_view<unsigned int, unsigned int>(*i1,
+                                                                        *i2))
             {
               double d_sum = 0.;
 
@@ -2105,9 +1996,8 @@ namespace Step69
       TimerOutput::Scope scope(computing_timer,
                                "time_stepping - 3 perform update");
 
-      const auto on_subranges =
-        [&](typename decltype(indices_owned)::iterator       i1,
-            const typename decltype(indices_owned)::iterator i2) {
+      const auto on_subranges = //
+        [&](const auto i1, const auto i2) {
           for (const auto i : boost::make_iterator_range(i1, i2))
             {
               Assert(i < n_locally_owned, ExcInternalError());
@@ -2309,7 +2199,7 @@ namespace Step69
   // The second thing to note is that we have to compute global minimum and
   // maximum $\max_j |\nabla r_j|$ and $\min_j |\nabla r_j|$. Following the
   // same ideas used to compute the time step size in the class member
-  // <code>%TimeStepping%<dim%>::%step()</code> we define $\max_j |\nabla r_j|$
+  // <code>%TimeStepping\<dim>::%step()</code> we define $\max_j |\nabla r_j|$
   // and $\min_j |\nabla r_j|$ as atomic doubles in order to resolve any
   // conflicts between threads. As usual, we use
   // <code>Utilities::MPI::max()</code> and
@@ -2344,7 +2234,9 @@ namespace Step69
     const auto &boundary_normal_map = offline_data->boundary_normal_map;
     const auto &n_locally_owned     = offline_data->n_locally_owned;
 
-    const auto indices = boost::irange<unsigned int>(0, n_locally_owned);
+    const auto indices =
+      std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0,
+                                                               n_locally_owned);
 
     // We define the r_i_max and r_i_min in the current MPI process as
     // atomic doubles in order to avoid race conditions between threads:
@@ -2355,8 +2247,7 @@ namespace Step69
     // global maxima and minima of the gradients.
     {
       const auto on_subranges = //
-        [&](typename decltype(indices)::iterator       i1,
-            const typename decltype(indices)::iterator i2) {
+        [&](const auto i1, const auto i2) {
           double r_i_max_on_subrange = 0.;
           double r_i_min_on_subrange = std::numeric_limits<double>::infinity();
 
@@ -2440,8 +2331,7 @@ namespace Step69
 
     {
       const auto on_subranges = //
-        [&](typename decltype(indices)::iterator       i1,
-            const typename decltype(indices)::iterator i2) {
+        [&](const auto i1, const auto i2) {
           for (const auto i : boost::make_iterator_range(i1, i2))
             {
               Assert(i < n_locally_owned, ExcInternalError());
@@ -2466,7 +2356,7 @@ namespace Step69
   //
   // With all classes implemented it is time to create an instance of
   // <code>Discretization<dim></code>, <code>OfflineData<dim></code>,
-  // <code>InitialValues<dim></code>, <code>TimeStepping<dim></code>, and
+  // <code>InitialValues<dim></code>, <code>%TimeStepping\<dim></code>, and
   // <code>SchlierenPostprocessor<dim></code>, and run the forward Euler
   // step in a loop.
   //
@@ -2512,11 +2402,7 @@ namespace Step69
                   output_granularity,
                   "time interval for output");
 
-#ifdef DEAL_II_WITH_THREADS
     asynchronous_writeback = true;
-#else
-    asynchronous_writeback = false;
-#endif
     add_parameter("asynchronous writeback",
                   asynchronous_writeback,
                   "Write out solution in a background thread performing IO");
@@ -2581,11 +2467,19 @@ namespace Step69
     pcout << "done" << std::endl;
 
     // Next we create the triangulation, assemble all matrices, set up
-    // scratch space, and initialize the DataOut<dim> object:
+    // scratch space, and initialize the DataOut<dim> object. All of these
+    // operations are pretty standard and discussed in detail in the
+    // Discretization and OfflineData classes.
 
     {
       print_head(pcout, "create triangulation");
+
       discretization.setup();
+
+      if (resume)
+        discretization.triangulation.load(base_name + "-checkpoint.mesh");
+      else
+        discretization.triangulation.refine_global(discretization.refinement);
 
       pcout << "Number of active cells:       "
             << discretization.triangulation.n_global_active_cells()
@@ -2609,8 +2503,9 @@ namespace Step69
     double       t            = 0.;
     unsigned int output_cycle = 0;
 
-    print_head(pcout, "interpolate initial values");
-    vector_type U = interpolate_initial_values();
+    vector_type U;
+    for (auto &it : U)
+      it.reinit(offline_data.partitioner);
 
     // @sect5{Resume}
     //
@@ -2619,36 +2514,48 @@ namespace Step69
     // <code>resume==true</code> we indicate that we have indeed an
     // interrupted computation and the program shall restart by reading in
     // an old state consisting of <code>t</code>,
-    // <code>output_cycle</code>, and <code>U</code> from a checkpoint
-    // file. These checkpoint files will be created in the
-    // <code>output()</code> routine discussed below.
+    // <code>output_cycle</code>, and the state vector <code>U</code> from
+    // checkpoint files.
+    //
+    // A this point we have already read in the stored refinement history
+    // of our parallel distributed mesh. What is missing are the actual
+    // state vector <code>U</code>, the time and output cycle. We use the
+    // SolutionTransfer class in combination with the
+    // distributed::Triangulation::load() /
+    // distributed::Triangulation::save() mechanism to read in the state
+    // vector. A separate <code>boost::archive</code> is used to retrieve
+    // <code>t</code> and <code>output_cycle</code>. The checkpoint files
+    // will be created in the <code>output()</code> routine discussed
+    // below.
 
     if (resume)
       {
-        print_head(pcout, "restore interrupted computation");
+        print_head(pcout, "resume interrupted computation");
 
-        const unsigned int i =
-          discretization.triangulation.locally_owned_subdomain();
+        parallel::distributed::
+          SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+            solution_transfer(offline_data.dof_handler);
 
-        const std::string name = base_name + "-checkpoint-" +
-                                 Utilities::int_to_string(i, 4) + ".archive";
-        std::ifstream file(name, std::ios::binary);
+        std::vector<LinearAlgebra::distributed::Vector<double> *> vectors;
+        std::transform(U.begin(),
+                       U.end(),
+                       std::back_inserter(vectors),
+                       [](auto &it) { return &it; });
+        solution_transfer.deserialize(vectors);
 
-        // We use a <code>boost::archive</code> to store and read in the
-        // contents the checkpointed state.
+        for (auto &it : U)
+          it.update_ghost_values();
+
+        std::ifstream file(base_name + "-checkpoint.metadata",
+                           std::ios::binary);
 
         boost::archive::binary_iarchive ia(file);
         ia >> t >> output_cycle;
-
-        for (auto &it1 : U)
-          {
-            // <code>it1</code> iterates over all components of the state
-            // vector <code>U</code>. We read in every entry of the
-            // component in sequence and update the ghost layer afterwards:
-            for (auto &it2 : it1)
-              ia >> it2;
-            it1.update_ghost_values();
-          }
+      }
+    else
+      {
+        print_head(pcout, "interpolate initial values");
+        U = interpolate_initial_values();
       }
 
     // With either the initial state set up, or an interrupted state
@@ -2688,7 +2595,8 @@ namespace Step69
 
         if (t > output_cycle * output_granularity)
           {
-            output(U, base_name, t, output_cycle, true);
+            checkpoint(U, base_name, t, output_cycle);
+            output(U, base_name, t, output_cycle);
             ++output_cycle;
           }
       }
@@ -2710,7 +2618,7 @@ namespace Step69
   typename MainLoop<dim>::vector_type
   MainLoop<dim>::interpolate_initial_values(const double t)
   {
-    pcout << "MainLoop<dim>::interpolate_initial_values(t = " << t << ")"
+    pcout << "MainLoop<dim>::interpolate_initial_values(t = " << t << ')'
           << std::endl;
     TimerOutput::Scope scope(computing_timer,
                              "main_loop - setup scratch space");
@@ -2746,7 +2654,41 @@ namespace Step69
   }
 
   // @sect5{Output and checkpointing}
-  //
+
+  // We checkpoint the current state by doing the precise inverse
+  // operation to what we discussed for the <a href="Resume">resume
+  // logic</a>:
+
+  template <int dim>
+  void MainLoop<dim>::checkpoint(const typename MainLoop<dim>::vector_type &U,
+                                 const std::string &name,
+                                 const double       t,
+                                 const unsigned int cycle)
+  {
+    print_head(pcout, "checkpoint computation");
+
+    parallel::distributed::
+      SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+        solution_transfer(offline_data.dof_handler);
+
+    std::vector<const LinearAlgebra::distributed::Vector<double> *> vectors;
+    std::transform(U.begin(),
+                   U.end(),
+                   std::back_inserter(vectors),
+                   [](auto &it) { return &it; });
+
+    solution_transfer.prepare_for_serialization(vectors);
+
+    discretization.triangulation.save(name + "-checkpoint.mesh");
+
+    if (dealii::Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+      {
+        std::ofstream file(name + "-checkpoint.metadata", std::ios::binary);
+        boost::archive::binary_oarchive oa(file);
+        oa << t << cycle;
+      }
+  }
+
   // Writing out the final vtk files is quite an IO intensive task that can
   // stall the main loop for a while. In order to avoid this we use an <a
   // href="https://en.wikipedia.org/wiki/Asynchronous_I/O">asynchronous
@@ -2764,11 +2706,9 @@ namespace Step69
   void MainLoop<dim>::output(const typename MainLoop<dim>::vector_type &U,
                              const std::string &                        name,
                              const double                               t,
-                             const unsigned int                         cycle,
-                             const bool checkpoint)
+                             const unsigned int                         cycle)
   {
-    pcout << "MainLoop<dim>::output(t = " << t
-          << ", checkpoint = " << checkpoint << ")" << std::endl;
+    pcout << "MainLoop<dim>::output(t = " << t << ')' << std::endl;
 
     // If the asynchronous writeback option is set we launch a background
     // thread performing all the slow IO to disc. In that case we have to
@@ -2829,27 +2769,7 @@ namespace Step69
     // the <code>this</code> pointer as well as most of the arguments of
     // the output function by value so that we have access to them inside
     // the lambda function.
-    const auto output_worker = [this, name, t, cycle, checkpoint, data_out]() {
-      if (checkpoint)
-        {
-          // We checkpoint the current state by doing the precise inverse
-          // operation to what we discussed for the <a href="Resume">resume
-          // logic</a>:
-
-          const unsigned int i =
-            discretization.triangulation.locally_owned_subdomain();
-          std::string filename =
-            name + "-checkpoint-" + Utilities::int_to_string(i, 4) + ".archive";
-
-          std::ofstream file(filename, std::ios::binary | std::ios::trunc);
-
-          boost::archive::binary_oarchive oa(file);
-          oa << t << cycle;
-          for (const auto &it1 : output_vector)
-            for (const auto &it2 : it1)
-              oa << it2;
-        }
-
+    const auto output_worker = [this, name, t, cycle, data_out]() {
       DataOutBase::VtkFlags flags(t,
                                   cycle,
                                   true,
@@ -2872,15 +2792,7 @@ namespace Step69
     // run in the background.
     if (asynchronous_writeback)
       {
-#ifdef DEAL_II_WITH_THREADS
         background_thread_state = std::async(std::launch::async, output_worker);
-#else
-        AssertThrow(
-          false,
-          ExcMessage(
-            "\"asynchronous_writeback\" was set to true but deal.II was built "
-            "without thread support (\"DEAL_II_WITH_THREADS=false\")."));
-#endif
       }
     else
       {

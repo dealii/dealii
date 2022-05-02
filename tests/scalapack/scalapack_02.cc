@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,8 +56,8 @@ test(const unsigned int size,
   ScaLAPACKMatrix<NumberType> scalapack_matrix(
     size, grid, block_size, LAPACKSupport::Property::symmetric);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
-        << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << ' ' << block_size << ' ' << grid->get_process_grid_rows()
+        << ' ' << grid->get_process_grid_columns() << std::endl;
 
   create_spd(full_in);
 

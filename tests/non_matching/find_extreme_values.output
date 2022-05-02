@@ -1,0 +1,8 @@
+
+DEAL::test_extreme_values_initialized_to_first
+DEAL::min = 1.00000
+DEAL::max = 2.00000
+DEAL::
+DEAL::test_extreme_values_are_found
+DEAL::min = -1.00000
+DEAL::max = 3.00000

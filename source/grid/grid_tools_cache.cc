@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -142,60 +142,80 @@ namespace GridTools
   }
 
 
-#ifdef DEAL_II_WITH_NANOFLANN
+
   template <int dim, int spacedim>
-  const KDTree<spacedim> &
-  Cache<dim, spacedim>::get_vertex_kdtree() const
+  const RTree<
+    std::pair<BoundingBox<spacedim>,
+              typename Triangulation<dim, spacedim>::active_cell_iterator>> &
+  Cache<dim, spacedim>::get_locally_owned_cell_bounding_boxes_rtree() const
   {
-    if (update_flags & update_vertex_kdtree)
+    if (update_flags & update_locally_owned_cell_bounding_boxes_rtree)
       {
-        vertex_kdtree.set_points(tria->get_vertices());
-        update_flags = update_flags & ~update_vertex_kdtree;
+        std::vector<std::pair<
+          BoundingBox<spacedim>,
+          typename Triangulation<dim, spacedim>::active_cell_iterator>>
+          boxes;
+        boxes.reserve(tria->n_active_cells());
+        for (const auto &cell : tria->active_cell_iterators() |
+                                  IteratorFilters::LocallyOwnedCell())
+          boxes.emplace_back(mapping->get_bounding_box(cell), cell);
+
+        locally_owned_cell_bounding_boxes_rtree = pack_rtree(boxes);
+        update_flags =
+          update_flags & ~update_locally_owned_cell_bounding_boxes_rtree;
       }
-    return vertex_kdtree;
+    return locally_owned_cell_bounding_boxes_rtree;
   }
-#endif
 
 
 
   template <int dim, int spacedim>
   const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &
-  Cache<dim, spacedim>::get_covering_rtree() const
+  Cache<dim, spacedim>::get_covering_rtree(const unsigned int level) const
   {
-    if (update_flags & update_covering_rtree)
+    if (update_flags & update_covering_rtree ||
+        covering_rtree.find(level) == covering_rtree.end())
       {
-        // TO DO: the locally owned portion of the domain
-        // might consists of more separate pieces: a single
-        // bounding box might not always be the best choice.
+        const auto boxes =
+          extract_rtree_level(get_locally_owned_cell_bounding_boxes_rtree(),
+                              level);
 
-        // Note: we create the local variable ptr here, because gcc 4.8.5
-        // fails to compile if we pass the variable directly.
-        IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
-        std::function<bool(
-          const typename Triangulation<dim, spacedim>::active_cell_iterator &)>
-          ptr(locally_owned_cell_predicate);
-
-        const BoundingBox<spacedim> bbox =
-          GridTools::compute_bounding_box(get_triangulation(), ptr);
-
-
-        std::vector<BoundingBox<spacedim>> bbox_v(1, bbox);
         if (const auto tria_mpi =
               dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &(*tria)))
           {
-            covering_rtree = GridTools::build_global_description_tree(
-              bbox_v, tria_mpi->get_communicator());
+            covering_rtree[level] = GridTools::build_global_description_tree(
+              boxes, tria_mpi->get_communicator());
           }
         else
           {
-            covering_rtree =
-              GridTools::build_global_description_tree(bbox_v, MPI_COMM_SELF);
+            covering_rtree[level] =
+              GridTools::build_global_description_tree(boxes, MPI_COMM_SELF);
           }
         update_flags = update_flags & ~update_covering_rtree;
       }
 
-    return covering_rtree;
+    return covering_rtree[level];
+  }
+
+  template <int dim, int spacedim>
+  const std::vector<std::set<unsigned int>> &
+  Cache<dim, spacedim>::get_vertex_to_neighbor_subdomain() const
+  {
+    if (update_flags & update_vertex_to_neighbor_subdomain)
+      {
+        vertex_to_neighbor_subdomain.clear();
+        vertex_to_neighbor_subdomain.resize(tria->n_vertices());
+        for (const auto &cell : tria->active_cell_iterators())
+          {
+            if (cell->is_ghost())
+              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+                vertex_to_neighbor_subdomain[cell->vertex_index(v)].insert(
+                  cell->subdomain_id());
+          }
+        update_flags = update_flags & ~update_vertex_to_neighbor_subdomain;
+      }
+    return vertex_to_neighbor_subdomain;
   }
 
 #include "grid_tools_cache.inst"

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,8 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  *                        locally_relevant_dofs,
  *                        mpi_communicator);
  * @endcode
- *
- * @author Martin Kronbichler, 2016
  */
 template <typename VectorType = Vector<double>>
 class DiagonalMatrix : public Subscriptor

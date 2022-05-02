@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,19 +40,19 @@ main()
   part.push_back(a);
   BlockDynamicSparsityPattern csp(part);
 
-  deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols()
+  deallog << "blocks: " << csp.n_block_rows() << 'x' << csp.n_block_cols()
           << std::endl;
-  deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
-  deallog << "size block(1,0):" << csp.block(1, 0).n_rows() << "x"
+  deallog << "size: " << csp.n_rows() << 'x' << csp.n_cols() << std::endl;
+  deallog << "size block(1,0):" << csp.block(1, 0).n_rows() << 'x'
           << csp.block(1, 0).n_cols() << std::endl;
 
   part.pop_back();
   csp.reinit(part); // also check the reinit variant.
 
-  deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols()
+  deallog << "blocks: " << csp.n_block_rows() << 'x' << csp.n_block_cols()
           << std::endl;
-  deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
-  deallog << "size block(1,0):" << csp.block(1, 0).n_rows() << "x"
+  deallog << "size: " << csp.n_rows() << 'x' << csp.n_cols() << std::endl;
+  deallog << "size block(1,0):" << csp.block(1, 0).n_rows() << 'x'
           << csp.block(1, 0).n_cols() << std::endl;
 
   for (int i = 0; i < 13; ++i)

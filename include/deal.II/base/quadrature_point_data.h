@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,8 +57,6 @@ DEAL_II_NAMESPACE_OPEN
  * However, within the cell this class stores a vector of objects of a single
  * data type. For this reason, this class may not be sufficiently flexible when,
  * for example, adopting a level-set approach to describe material behavior.
- *
- * @author Denis Davydov, Jean-Paul Pelteret, 2016
  */
 template <typename CellIteratorType, typename DataType>
 class CellDataStorage : public Subscriptor
@@ -273,8 +271,6 @@ private:
  *
  * To store and access instances of classes derived from this class, see the
  * CellDataStorage class.
- *
- * @author Denis Davydov, Jean-Paul Pelteret, 2016
  */
 class TransferableQuadraturePointData
 {
@@ -436,8 +432,6 @@ namespace parallel
      * yield over and undershoots that, once evaluated at a different set of
      * quadrature points (on child or parent cells) results in values that will
      * not make much sense.
-     *
-     * @author Denis Davydov, Jean-Paul Pelteret, 2016
      */
     template <int dim, typename DataType>
     class ContinuousQuadratureDataTransfer
@@ -626,7 +620,7 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
       // will end with a single same T object stored in each element of the
       // vector:
       const auto it = map.find(key);
-      for (unsigned int q = 0; q < n_q_points; q++)
+      for (unsigned int q = 0; q < n_q_points; ++q)
         it->second[q] = std::make_shared<T>();
     }
 }
@@ -641,7 +635,7 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
   const CellIteratorType &cell_end,
   const unsigned int      number)
 {
-  for (CellIteratorType it = cell_start; it != cell_end; it++)
+  for (CellIteratorType it = cell_start; it != cell_end; ++it)
     if (it->is_locally_owned())
       initialize<T>(it, number);
 }
@@ -657,7 +651,7 @@ CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
   if (it == map.end())
     return false;
   Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
-  for (unsigned int i = 0; i < it->second.size(); i++)
+  for (unsigned int i = 0; i < it->second.size(); ++i)
     {
       Assert(
         it->second[i].unique(),
@@ -681,7 +675,7 @@ CellDataStorage<CellIteratorType, DataType>::clear()
   while (it != map.end())
     {
       // loop over all objects and see if no one is using them
-      for (unsigned int i = 0; i < it->second.size(); i++)
+      for (unsigned int i = 0; i < it->second.size(); ++i)
         {
           Assert(
             it->second[i].unique(),
@@ -713,7 +707,7 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
   // fully) specialized. Thus, stick with copying of shared pointers even when
   // the T==DataType:
   std::vector<std::shared_ptr<T>> res(it->second.size());
-  for (unsigned int q = 0; q < res.size(); q++)
+  for (unsigned int q = 0; q < res.size(); ++q)
     {
       res[q] = std::dynamic_pointer_cast<T>(it->second[q]);
       Assert(res[q], ExcCellDataTypeMismatch());
@@ -740,7 +734,7 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
   // T==DataType as we need to return shared_ptr<const T> to make sure the user
   // does not modify the content of QP objects
   std::vector<std::shared_ptr<const T>> res(it->second.size());
-  for (unsigned int q = 0; q < res.size(); q++)
+  for (unsigned int q = 0; q < res.size(); ++q)
     {
       res[q] = std::dynamic_pointer_cast<const T>(it->second[q]);
       Assert(res[q], ExcCellDataTypeMismatch());
@@ -766,7 +760,7 @@ CellDataStorage<CellIteratorType, DataType>::try_get_data(
       // shared_ptr<const T> to make sure the user
       // does not modify the content of QP objects
       std::vector<std::shared_ptr<T>> result(it->second.size());
-      for (unsigned int q = 0; q < result.size(); q++)
+      for (unsigned int q = 0; q < result.size(); ++q)
         {
           result[q] = std::dynamic_pointer_cast<T>(it->second[q]);
           Assert(result[q], ExcCellDataTypeMismatch());
@@ -797,7 +791,7 @@ CellDataStorage<CellIteratorType, DataType>::try_get_data(
       // shared_ptr<const T> to make sure the user
       // does not modify the content of QP objects
       std::vector<std::shared_ptr<const T>> result(it->second.size());
-      for (unsigned int q = 0; q < result.size(); q++)
+      for (unsigned int q = 0; q < result.size(); ++q)
         {
           result[q] = std::dynamic_pointer_cast<const T>(it->second[q]);
           Assert(result[q], ExcCellDataTypeMismatch());
@@ -903,8 +897,8 @@ namespace parallel
           std::unique_ptr<const FiniteElement<dim>>(projection_fe_.clone()))
       , data_size_in_bytes(0)
       , n_q_points(rhs_quadrature.size())
-      , project_to_fe_matrix(projection_fe->dofs_per_cell, n_q_points)
-      , project_to_qp_matrix(n_q_points, projection_fe->dofs_per_cell)
+      , project_to_fe_matrix(projection_fe->n_dofs_per_cell(), n_q_points)
+      , project_to_qp_matrix(n_q_points, projection_fe->n_dofs_per_cell())
       , handle(numbers::invalid_unsigned_int)
       , data_storage(nullptr)
       , triangulation(nullptr)
@@ -1020,7 +1014,7 @@ namespace parallel
         {
           // we need to first use prolongation matrix to get dofvalues on child
           // cells based on dofvalues stored in the parent's data_store
-          matrix_dofs_child.reinit(projection_fe->dofs_per_cell,
+          matrix_dofs_child.reinit(projection_fe->n_dofs_per_cell(),
                                    number_of_values);
           for (unsigned int child = 0; child < cell->n_children(); ++child)
             if (cell->child(child)->is_locally_owned())

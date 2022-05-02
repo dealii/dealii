@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,7 +58,7 @@ namespace Utilities
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
 
       if (n_import_targets > 0)
-        AssertDimension(locally_owned_array.size(), local_size());
+        AssertDimension(locally_owned_array.size(), locally_owned_size());
 
       Assert(requests.size() == 0,
              ExcMessage("Another operation seems to still be running. "
@@ -88,7 +88,7 @@ namespace Utilities
                            n_ghost_indices() :
                          ghost_array.data();
 
-      for (unsigned int i = 0; i < n_ghost_targets; i++)
+      for (unsigned int i = 0; i < n_ghost_targets; ++i)
         {
           // allow writing into ghost indices even though we are in a
           // const function
@@ -117,7 +117,7 @@ namespace Utilities
         initialize_import_indices_plain_dev();
 #    endif
 
-      for (unsigned int i = 0; i < n_import_targets; i++)
+      for (unsigned int i = 0; i < n_import_targets; ++i)
         {
 #    if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
       defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
@@ -226,7 +226,7 @@ namespace Utilities
                     }
                   else
                     {
-#    if defined(DEAL_II_COMPILER_CUDA_AWARE)
+#    ifdef DEAL_II_COMPILER_CUDA_AWARE
                       cudaError_t cuda_error =
                         cudaMemcpy(ghost_array.data() + ghost_range.first,
                                    ghost_array.data() + offset,
@@ -315,7 +315,7 @@ namespace Utilities
 
       // initiate the receive operations
       Number *temp_array_ptr = temporary_storage.data();
-      for (unsigned int i = 0; i < n_import_targets; i++)
+      for (unsigned int i = 0; i < n_import_targets; ++i)
         {
           AssertThrow(
             static_cast<std::size_t>(import_targets_data[i].second) *
@@ -342,7 +342,7 @@ namespace Utilities
       // move the data to send to the front of the array
       AssertIndexRange(n_ghost_indices(), n_ghost_indices_in_larger_set + 1);
       Number *ghost_array_ptr = ghost_array.data();
-      for (unsigned int i = 0; i < n_ghost_targets; i++)
+      for (unsigned int i = 0; i < n_ghost_targets; ++i)
         {
           // in case we only sent a subset of indices, we now need to move the
           // data to the correct positions and delete the old content
@@ -376,7 +376,7 @@ namespace Utilities
                         }
                       else
                         {
-#    if defined(DEAL_II_COMPILER_CUDA_AWARE)
+#    ifdef DEAL_II_COMPILER_CUDA_AWARE
                           cudaError_t cuda_error =
                             cudaMemcpy(ghost_array_ptr + offset,
                                        ghost_array.data() + my_ghosts->first,
@@ -525,7 +525,7 @@ namespace Utilities
                    "import_from_ghosted_array_start as is passed "
                    "to import_from_ghosted_array_finish."));
 
-#      if defined(DEAL_II_COMPILER_CUDA_AWARE)
+#      ifdef DEAL_II_COMPILER_CUDA_AWARE
           if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
             {
               cudaMemset(ghost_array.data(),
@@ -535,7 +535,7 @@ namespace Utilities
           else
 #      endif
             {
-#      ifdef DEAL_II_WITH_CXX17
+#      ifdef DEAL_II_HAVE_CXX17
               if constexpr (std::is_trivial<Number>::value)
 #      else
             if (std::is_trivial<Number>::value)
@@ -576,7 +576,7 @@ namespace Utilities
       // first wait for the receive to complete
       if (requests.size() > 0 && n_import_targets > 0)
         {
-          AssertDimension(locally_owned_array.size(), local_size());
+          AssertDimension(locally_owned_array.size(), locally_owned_size());
           const int ierr =
             MPI_Waitall(n_import_targets, requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
@@ -629,7 +629,7 @@ namespace Utilities
                              100000. *
                              std::numeric_limits<typename numbers::NumberTraits<
                                Number>::real_type>::epsilon(),
-                       typename LinearAlgebra::distributed::Vector<
+                       typename dealii::LinearAlgebra::distributed::Vector<
                          Number>::ExcNonMatchingElements(*read_position,
                                                          locally_owned_array[j],
                                                          my_pid));
@@ -738,7 +738,7 @@ namespace Utilities
           else
 #    endif
             {
-#    ifdef DEAL_II_WITH_CXX17
+#    ifdef DEAL_II_HAVE_CXX17
               if constexpr (std::is_trivial<Number>::value)
 #    else
             if (std::is_trivial<Number>::value)

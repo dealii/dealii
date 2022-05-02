@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,8 +24,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 
 #include "../tests.h"
@@ -33,7 +31,7 @@
 // check
 //   DoFTools::
 //   map_dofs_to_support_points(...);
-// for the hp case
+// for the hp-case
 
 
 using namespace std;
@@ -55,35 +53,24 @@ test()
   MappingQ<dim>              mapping(2);
   hp::MappingCollection<dim> mapping_collection(mapping);
 
-  hp::FECollection<dim> fe_collection;
-  fe_collection.push_back(fe_system);
-
-  hp::DoFHandler<dim> hp_dof_handler(triangulation);
-  DoFHandler<dim>     dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   // distribute dofs
-  hp_dof_handler.distribute_dofs(fe_collection);
   dof_handler.distribute_dofs(fe_system);
-
-  // basically, dof_handler and hp_dof_handler are the same
-  // so they should contain the same number of dofs.
-  Assert(hp_dof_handler.n_dofs() == dof_handler.n_dofs(), ExcInternalError());
 
   // now map the dofs to the support points and show them on the screen
   std::vector<Point<dim>> map(dof_handler.n_dofs());
-  std::vector<Point<dim>> hp_map(hp_dof_handler.n_dofs());
+  std::vector<Point<dim>> hp_map(dof_handler.n_dofs());
 
   DoFTools::map_dofs_to_support_points(mapping, dof_handler, map);
-  DoFTools::map_dofs_to_support_points(mapping_collection,
-                                       hp_dof_handler,
-                                       hp_map);
+  DoFTools::map_dofs_to_support_points(mapping_collection, dof_handler, hp_map);
 
   // output the elements
-  for (unsigned int i = 0; i < hp_map.size(); i++)
+  for (unsigned int i = 0; i < hp_map.size(); ++i)
     {
       // both maps should contain the same
       Assert(hp_map[i] == map[i], ExcInternalError());
-      deallog << hp_map[i] << " ";
+      deallog << hp_map[i] << ' ';
     }
   deallog << std::endl;
 }

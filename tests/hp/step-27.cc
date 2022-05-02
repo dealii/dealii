@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2018 by the deal.II authors
+ * Copyright (C) 2006 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -26,6 +26,7 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -37,8 +38,9 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
+#include <deal.II/hp/q_collection.h>
+#include <deal.II/hp/refinement.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -51,6 +53,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/smoothness_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include <complex>
@@ -84,21 +87,14 @@ namespace Step27
     void
     create_coarse_grid();
     void
-    estimate_smoothness(Vector<float> &smoothness_indicators);
-    void
     postprocess(const unsigned int cycle);
 
     Triangulation<dim> triangulation;
 
-    hp::DoFHandler<dim>      dof_handler;
+    DoFHandler<dim>          dof_handler;
     hp::FECollection<dim>    fe_collection;
     hp::QCollection<dim>     quadrature_collection;
     hp::QCollection<dim - 1> face_quadrature_collection;
-
-    hp::QCollection<dim>                    fourier_q_collection;
-    std::shared_ptr<FESeries::Fourier<dim>> fourier;
-    std::vector<double>                     ln_k;
-    Table<dim, std::complex<double>>        fourier_coefficients;
 
     AffineConstraints<double> constraints;
 
@@ -108,7 +104,9 @@ namespace Step27
     Vector<double> solution;
     Vector<double> system_rhs;
 
-    const unsigned int max_degree;
+    const unsigned int                      max_degree;
+    hp::QCollection<dim>                    fourier_q_collection;
+    std::unique_ptr<FESeries::Fourier<dim>> fourier;
   };
 
 
@@ -138,13 +136,6 @@ namespace Step27
   }
 
 
-  template <typename T>
-  void resize(Table<2, T> &coeff, const unsigned int N)
-  {
-    coeff.reinit(N, N);
-  }
-
-
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem()
     : dof_handler(triangulation)
@@ -157,17 +148,17 @@ namespace Step27
         face_quadrature_collection.push_back(QGauss<dim - 1>(degree + 1));
       }
 
-    const unsigned int N = max_degree;
-
     QGauss<1>      base_quadrature(2);
-    QIterated<dim> quadrature(base_quadrature, N);
-    for (unsigned int i = 0; i < fe_collection.size(); i++)
+    QIterated<dim> quadrature(base_quadrature, max_degree);
+    for (unsigned int i = 0; i < fe_collection.size(); ++i)
       fourier_q_collection.push_back(quadrature);
 
-    fourier = std::make_shared<FESeries::Fourier<dim>>(N,
-                                                       fe_collection,
-                                                       fourier_q_collection);
-    resize(fourier_coefficients, N);
+    const std::vector<unsigned int> n_coefficients_per_direction(
+      fe_collection.size(), max_degree);
+    fourier =
+      std::make_unique<FESeries::Fourier<dim>>(n_coefficients_per_direction,
+                                               fe_collection,
+                                               fourier_q_collection);
   }
 
 
@@ -222,9 +213,9 @@ namespace Step27
 
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -295,16 +286,33 @@ namespace Step27
       solution,
       estimated_error_per_cell);
 
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.03);
 
-    Vector<float> smoothness_indicators(triangulation.n_active_cells());
-    estimate_smoothness(smoothness_indicators);
+    Vector<float> smoothness_indicators;
+    SmoothnessEstimator::Fourier::coefficient_decay(
+      *fourier,
+      dof_handler,
+      solution,
+      smoothness_indicators,
+      /*regression_strategy=*/VectorTools::Linfty_norm,
+      /*smallest_abs_coefficient=*/1e-10,
+      /*only_flagged_cells=*/true);
+
+    hp::Refinement::p_adaptivity_from_relative_threshold(dof_handler,
+                                                         smoothness_indicators,
+                                                         0.5,
+                                                         0);
+    hp::Refinement::choose_p_over_h(dof_handler);
 
     // Output to VTK
     if (false)
       {
         Vector<float> fe_degrees(triangulation.n_active_cells());
         {
-          typename hp::DoFHandler<dim>::active_cell_iterator
+          typename DoFHandler<dim>::active_cell_iterator
             cell = dof_handler.begin_active(),
             endc = dof_handler.end();
           for (; cell != endc; ++cell)
@@ -312,7 +320,7 @@ namespace Step27
               fe_collection[cell->active_fe_index()].degree;
         }
 
-        DataOut<dim, hp::DoFHandler<dim>> data_out;
+        DataOut<dim> data_out;
 
         data_out.attach_dof_handler(dof_handler);
         data_out.add_data_vector(solution, "solution");
@@ -327,50 +335,7 @@ namespace Step27
         data_out.write_vtk(output);
       }
 
-    {
-      GridRefinement::refine_and_coarsen_fixed_number(triangulation,
-                                                      estimated_error_per_cell,
-                                                      0.3,
-                                                      0.03);
-
-      float max_smoothness = *std::min_element(smoothness_indicators.begin(),
-                                               smoothness_indicators.end()),
-            min_smoothness = *std::max_element(smoothness_indicators.begin(),
-                                               smoothness_indicators.end());
-      {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
-        for (; cell != endc; ++cell)
-          if (cell->refine_flag_set())
-            {
-              max_smoothness =
-                std::max(max_smoothness,
-                         smoothness_indicators(cell->active_cell_index()));
-              min_smoothness =
-                std::min(min_smoothness,
-                         smoothness_indicators(cell->active_cell_index()));
-            }
-      }
-      const float threshold_smoothness = (max_smoothness + min_smoothness) / 2;
-
-      {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
-        for (; cell != endc; ++cell)
-          if (cell->refine_flag_set() &&
-              (smoothness_indicators(cell->active_cell_index()) >
-               threshold_smoothness) &&
-              (cell->active_fe_index() + 1 < fe_collection.size()))
-            {
-              cell->clear_refine_flag();
-              cell->set_active_fe_index(cell->active_fe_index() + 1);
-            }
-      }
-
-      triangulation.execute_coarsening_and_refinement();
-    }
+    triangulation.execute_coarsening_and_refinement();
   }
 
 
@@ -457,192 +422,6 @@ namespace Step27
         solve();
         postprocess(cycle);
       }
-  }
-
-  template <int dim>
-  std::pair<bool, unsigned int>
-  predicate_ind(const TableIndices<dim> &ind);
-
-  template <>
-  std::pair<bool, unsigned int>
-  predicate_ind<2>(const TableIndices<2> &ind)
-  {
-    const unsigned int v = ind[0] * ind[0] + ind[1] * ind[1];
-    if (v > 0 && v < 7 * 7)
-      return std::make_pair(true, v);
-    else
-      return std::make_pair(false, v);
-  }
-
-  template <int dim>
-  void
-  LaplaceProblem<dim>::estimate_smoothness(Vector<float> &smoothness_indicators)
-  {
-#ifdef OLD
-    const unsigned int N = max_degree;
-
-    std::vector<Tensor<1, dim>> k_vectors;
-    std::vector<unsigned int>   k_vectors_magnitude;
-    switch (dim)
-      {
-        case 2:
-          {
-            for (unsigned int i = 0; i < N; ++i)
-              for (unsigned int j = 0; j < N; ++j)
-                if (!((i == 0) && (j == 0)) && (i * i + j * j < N * N))
-                  {
-                    k_vectors.push_back(
-                      Point<dim>(2. * numbers::PI * i, 2. * numbers::PI * j));
-                    k_vectors_magnitude.push_back(i * i + j * j);
-                  }
-
-            break;
-          }
-
-        case 3:
-          {
-            for (unsigned int i = 0; i < N; ++i)
-              for (unsigned int j = 0; j < N; ++j)
-                for (unsigned int k = 0; k < N; ++k)
-                  if (!((i == 0) && (j == 0) && (k == 0)) &&
-                      (i * i + j * j + k * k < N * N))
-                    {
-                      k_vectors.push_back(Point<dim>(2. * numbers::PI * i,
-                                                     2. * numbers::PI * j,
-                                                     2. * numbers::PI * k));
-                      k_vectors_magnitude.push_back(i * i + j * j + k * k);
-                    }
-
-            break;
-          }
-
-        default:
-          Assert(false, ExcNotImplemented());
-      }
-
-    const unsigned      n_fourier_modes = k_vectors.size();
-    std::vector<double> ln_k(n_fourier_modes);
-    for (unsigned int i = 0; i < n_fourier_modes; ++i)
-      ln_k[i] = std::log(k_vectors[i].norm());
-
-
-    std::vector<Table<2, std::complex<double>>> fourier_transform_matrices(
-      fe_collection.size());
-
-    QGauss<1>      base_quadrature(2);
-    QIterated<dim> quadrature(base_quadrature, N);
-
-
-    for (unsigned int fe = 0; fe < fe_collection.size(); ++fe)
-      {
-        fourier_transform_matrices[fe].reinit(n_fourier_modes,
-                                              fe_collection[fe].dofs_per_cell);
-
-        for (unsigned int k = 0; k < n_fourier_modes; ++k)
-          for (unsigned int j = 0; j < fe_collection[fe].dofs_per_cell; ++j)
-            {
-              std::complex<double> sum = 0;
-              for (unsigned int q = 0; q < quadrature.size(); ++q)
-                {
-                  const Point<dim> x_q = quadrature.point(q);
-                  sum += std::exp(std::complex<double>(0, 1) *
-                                  (k_vectors[k] * x_q)) *
-                         fe_collection[fe].shape_value(j, x_q) *
-                         quadrature.weight(q);
-                }
-              fourier_transform_matrices[fe](k, j) = sum;
-            }
-      }
-
-    std::vector<std::complex<double>> fourier_coefficients(n_fourier_modes);
-    Vector<double>                    local_dof_values;
-
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
-    for (; cell != endc; ++cell)
-      {
-        local_dof_values.reinit(cell->get_fe().dofs_per_cell);
-        cell->get_dof_values(solution, local_dof_values);
-
-        for (unsigned int f = 0; f < n_fourier_modes; ++f)
-          {
-            fourier_coefficients[f] = 0;
-
-            for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
-              fourier_coefficients[f] +=
-                fourier_transform_matrices[cell->active_fe_index()](f, i) *
-                local_dof_values(i);
-          }
-
-        std::map<unsigned int, double> k_to_max_U_map;
-        for (unsigned int f = 0; f < n_fourier_modes; ++f)
-          if ((k_to_max_U_map.find(k_vectors_magnitude[f]) ==
-               k_to_max_U_map.end()) ||
-              (k_to_max_U_map[k_vectors_magnitude[f]] <
-               std::abs(fourier_coefficients[f])))
-            k_to_max_U_map[k_vectors_magnitude[f]] =
-              std::abs(fourier_coefficients[f]);
-
-        double sum_1 = 0, sum_ln_k = 0, sum_ln_k_square = 0, sum_ln_U = 0,
-               sum_ln_U_ln_k = 0;
-        for (unsigned int f = 0; f < n_fourier_modes; ++f)
-          if (k_to_max_U_map[k_vectors_magnitude[f]] ==
-              std::abs(fourier_coefficients[f]))
-            {
-              sum_1 += 1;
-              sum_ln_k += ln_k[f];
-              sum_ln_k_square += ln_k[f] * ln_k[f];
-              sum_ln_U += std::log(std::abs(fourier_coefficients[f]));
-              sum_ln_U_ln_k +=
-                std::log(std::abs(fourier_coefficients[f])) * ln_k[f];
-            }
-
-        const double mu =
-          (1. / (sum_1 * sum_ln_k_square - sum_ln_k * sum_ln_k) *
-           (sum_ln_k * sum_ln_U - sum_1 * sum_ln_U_ln_k));
-
-        smoothness_indicators(cell->active_cell_index()) = mu - 1. * dim / 2;
-      }
-#else
-    Vector<double> local_dof_values;
-
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
-    for (; cell != endc; ++cell)
-      {
-        local_dof_values.reinit(cell->get_fe().dofs_per_cell);
-        cell->get_dof_values(solution, local_dof_values);
-
-        fourier->calculate(local_dof_values,
-                           cell->active_fe_index(),
-                           fourier_coefficients);
-
-        std::pair<std::vector<unsigned int>, std::vector<double>> res =
-          FESeries::process_coefficients<dim>(fourier_coefficients,
-                                              predicate_ind<dim>,
-                                              VectorTools::Linfty_norm);
-
-        Assert(res.first.size() == res.second.size(), ExcInternalError());
-
-        if (ln_k.size() == 0)
-          {
-            ln_k.resize(res.first.size(), 0);
-            for (unsigned int f = 0; f < ln_k.size(); f++)
-              ln_k[f] =
-                std::log(2.0 * numbers::PI * std::sqrt(1. * res.first[f]));
-          }
-
-        for (unsigned int f = 0; f < res.second.size(); f++)
-          res.second[f] = std::log(res.second[f]);
-
-        std::pair<double, double> fit =
-          FESeries::linear_regression(ln_k, res.second);
-        smoothness_indicators(cell->active_cell_index()) =
-          -fit.first - 1. * dim / 2;
-      }
-#endif
   }
 } // namespace Step27
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
@@ -124,17 +125,47 @@ namespace Utilities
     }
 
     /**
+     * Copy the device ArrayView @p in to the host ArrayView @p out.
+     */
+    template <typename T>
+    inline void
+    copy_to_host(const ArrayView<const T, MemorySpace::CUDA> &in,
+                 ArrayView<T, MemorySpace::Host> &            out)
+    {
+      AssertDimension(in.size(), out.size());
+      cudaError_t cuda_error_code = cudaMemcpy(out.data(),
+                                               in.data(),
+                                               in.size() * sizeof(T),
+                                               cudaMemcpyDeviceToHost);
+      AssertCuda(cuda_error_code);
+    }
+
+    /**
+     * Copy the host ArrayView @p in to the device ArrayView @p out.
+     */
+    template <typename T>
+    inline void
+    copy_to_dev(const ArrayView<const T, MemorySpace::Host> &in,
+                ArrayView<T, MemorySpace::CUDA> &            out)
+    {
+      AssertDimension(in.size(), out.size());
+      cudaError_t cuda_error_code = cudaMemcpy(out.data(),
+                                               in.data(),
+                                               in.size() * sizeof(T),
+                                               cudaMemcpyHostToDevice);
+      AssertCuda(cuda_error_code);
+    }
+
+    /**
      * Copy the elements in @p pointer_dev to the host in @p vector_host.
      */
     template <typename T>
     inline void
     copy_to_host(const T *pointer_dev, std::vector<T> &vector_host)
     {
-      cudaError_t cuda_error_code = cudaMemcpy(vector_host.data(),
-                                               pointer_dev,
-                                               vector_host.size() * sizeof(T),
-                                               cudaMemcpyDeviceToHost);
-      AssertCuda(cuda_error_code);
+      ArrayView<const T, MemorySpace::CUDA> in(pointer_dev, vector_host.size());
+      auto                                  out = make_array_view(vector_host);
+      copy_to_host(in, out);
     }
 
     /**
@@ -145,11 +176,9 @@ namespace Utilities
     inline void
     copy_to_dev(const std::vector<T> &vector_host, T *pointer_dev)
     {
-      cudaError_t cuda_error_code = cudaMemcpy(pointer_dev,
-                                               vector_host.data(),
-                                               vector_host.size() * sizeof(T),
-                                               cudaMemcpyHostToDevice);
-      AssertCuda(cuda_error_code);
+      auto                            in = make_array_view(vector_host);
+      ArrayView<T, MemorySpace::CUDA> out(pointer_dev, vector_host.size());
+      copy_to_dev(in, out);
     }
   } // namespace CUDA
 } // namespace Utilities

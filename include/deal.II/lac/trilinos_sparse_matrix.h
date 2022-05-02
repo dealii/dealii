@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,19 +38,16 @@
 #    include <Epetra_Export.h>
 #    include <Epetra_FECrsMatrix.h>
 #    include <Epetra_Map.h>
+#    include <Epetra_MpiComm.h>
 #    include <Epetra_MultiVector.h>
 #    include <Epetra_Operator.h>
+#    include <mpi.h>
 
 #    include <cmath>
+#    include <iterator>
 #    include <memory>
 #    include <type_traits>
 #    include <vector>
-#    ifdef DEAL_II_WITH_MPI
-#      include <Epetra_MpiComm.h>
-#      include <mpi.h>
-#    else
-#      include <Epetra_SerialComm.h>
-#    endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -107,9 +104,6 @@ namespace TrilinosWrappers
      * For a regular dealii::SparseMatrix, we would use an accessor for the
      * sparsity pattern. For Trilinos matrices, this does not seem so simple,
      * therefore, we write a little base class here.
-     *
-     * @author Guido Kanschat
-     * @date 2012
      */
     class AccessorBase
     {
@@ -215,6 +209,8 @@ namespace TrilinosWrappers
       TrilinosScalar &
       value();
     };
+
+
 
     /**
      * The specialization for a const Accessor.
@@ -351,7 +347,6 @@ namespace TrilinosWrappers
      * the elements.
      *
      * @ingroup TrilinosWrappers
-     * @author Martin Kronbichler, Wolfgang Bangerth, 2008
      */
     template <bool Constness>
     class Iterator
@@ -361,6 +356,18 @@ namespace TrilinosWrappers
        * Declare type for container size.
        */
       using size_type = dealii::types::global_dof_index;
+
+      /**
+       * A type that denotes what data types is used to express the difference
+       * between two iterators.
+       */
+      using difference_type = dealii::types::global_dof_index;
+
+      /**
+       * An alias for the type you get when you dereference an iterator of the
+       * current kind.
+       */
+      using value_type = TrilinosScalar;
 
       /**
        * Typedef for the matrix type (including constness) we are to operate
@@ -395,12 +402,14 @@ namespace TrilinosWrappers
       /**
        * Dereferencing operator.
        */
-      const Accessor<Constness> &operator*() const;
+      const Accessor<Constness> &
+      operator*() const;
 
       /**
        * Dereferencing operator.
        */
-      const Accessor<Constness> *operator->() const;
+      const Accessor<Constness> *
+      operator->() const;
 
       /**
        * Comparison. True, if both iterators point to the same matrix
@@ -449,8 +458,31 @@ namespace TrilinosWrappers
     };
 
   } // namespace SparseMatrixIterators
+} // namespace TrilinosWrappers
+
+DEAL_II_NAMESPACE_CLOSE
+
+namespace std
+{
+  template <bool Constness>
+  struct iterator_traits<
+    dealii::TrilinosWrappers::SparseMatrixIterators::Iterator<Constness>>
+  {
+    using iterator_category = forward_iterator_tag;
+    using value_type =
+      typename dealii::TrilinosWrappers::SparseMatrixIterators::Iterator<
+        Constness>::value_type;
+    using difference_type =
+      typename dealii::TrilinosWrappers::SparseMatrixIterators::Iterator<
+        Constness>::difference_type;
+  };
+} // namespace std
+
+DEAL_II_NAMESPACE_OPEN
 
 
+namespace TrilinosWrappers
+{
   /**
    * This class implements a wrapper to use the Trilinos distributed sparse
    * matrix class Epetra_FECrsMatrix. This is precisely the kind of matrix we
@@ -510,7 +542,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Matrix1
-   * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
    */
   class SparseMatrix : public Subscriptor
   {
@@ -699,188 +730,7 @@ namespace TrilinosWrappers
     void
     reinit(const Epetra_CrsMatrix &input_matrix, const bool copy_values = true);
     //@}
-    /**
-     * @name Constructors and initialization using an Epetra_Map description
-     */
-    //@{
-    /**
-     * Constructor using an Epetra_Map to describe the %parallel partitioning.
-     * The parameter @p n_max_entries_per_row sets the number of nonzero
-     * entries in each row that will be allocated. Note that this number does
-     * not need to be exact, and it is even allowed that the actual matrix
-     * structure has more nonzero entries than specified in the constructor.
-     * However it is still advantageous to provide good estimates here since
-     * this will considerably increase the performance of the matrix setup.
-     * However, there is no effect in the performance of matrix-vector
-     * products, since Trilinos reorganizes the matrix memory prior to use (in
-     * the compress() step).
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    DEAL_II_DEPRECATED
-    SparseMatrix(const Epetra_Map &parallel_partitioning,
-                 const size_type   n_max_entries_per_row = 0);
 
-    /**
-     * Same as before, but now set a value of nonzeros for each matrix row.
-     * Since we know the number of elements in the matrix exactly in this
-     * case, we can already allocate the right amount of memory, which makes
-     * the creation process including the insertion of nonzero elements by the
-     * respective SparseMatrix::reinit call considerably faster.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    DEAL_II_DEPRECATED
-    SparseMatrix(const Epetra_Map &               parallel_partitioning,
-                 const std::vector<unsigned int> &n_entries_per_row);
-
-    /**
-     * This constructor is similar to the one above, but it now takes two
-     * different Epetra maps for rows and columns. This interface is meant to
-     * be used for generating rectangular matrices, where one map describes
-     * the %parallel partitioning of the dofs associated with the matrix rows
-     * and the other one the partitioning of dofs in the matrix columns. Note
-     * that there is no real parallelism along the columns &ndash; the
-     * processor that owns a certain row always owns all the column elements,
-     * no matter how far they might be spread out. The second Epetra_Map is
-     * only used to specify the number of columns and for internal
-     * arrangements when doing matrix-vector products with vectors based on
-     * that column map.
-     *
-     * The integer input @p n_max_entries_per_row defines the number of
-     * columns entries per row that will be allocated.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    DEAL_II_DEPRECATED
-    SparseMatrix(const Epetra_Map &row_parallel_partitioning,
-                 const Epetra_Map &col_parallel_partitioning,
-                 const size_type   n_max_entries_per_row = 0);
-
-    /**
-     * This constructor is similar to the one above, but it now takes two
-     * different Epetra maps for rows and columns. This interface is meant to
-     * be used for generating rectangular matrices, where one map specifies
-     * the %parallel distribution of degrees of freedom associated with matrix
-     * rows and the second one specifies the %parallel distribution the dofs
-     * associated with columns in the matrix. The second map also provides
-     * information for the internal arrangement in matrix vector products
-     * (i.e., the distribution of vector this matrix is to be multiplied
-     * with), but is not used for the distribution of the columns &ndash;
-     * rather, all column elements of a row are stored on the same processor
-     * in any case. The vector <tt>n_entries_per_row</tt> specifies the number
-     * of entries in each row of the newly generated matrix.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    DEAL_II_DEPRECATED
-    SparseMatrix(const Epetra_Map &               row_parallel_partitioning,
-                 const Epetra_Map &               col_parallel_partitioning,
-                 const std::vector<unsigned int> &n_entries_per_row);
-
-    /**
-     * This function is initializes the Trilinos Epetra matrix according to
-     * the specified sparsity_pattern, and also reassigns the matrix rows to
-     * different processes according to a user-supplied Epetra map. In
-     * programs following the style of the tutorial programs, this function
-     * (and the respective call for a rectangular matrix) are the natural way
-     * to initialize the matrix size, its distribution among the MPI processes
-     * (if run in %parallel) as well as the location of non-zero elements.
-     * Trilinos stores the sparsity pattern internally, so it won't be needed
-     * any more after this call, in contrast to the deal.II own object. The
-     * optional argument @p exchange_data can be used for reinitialization
-     * with a sparsity pattern that is not fully constructed. This feature is
-     * only implemented for input sparsity patterns of type
-     * DynamicSparsityPattern. If the flag is not set, each processor just
-     * sets the elements in the sparsity pattern that belong to its rows.
-     *
-     * If the sparsity pattern given to this function is of type
-     * DynamicSparsity pattern, then a matrix will be created that allows
-     * several threads to write into different rows of the matrix at the same
-     * also with MPI, as opposed to most other reinit() methods.
-     *
-     * This is a collective operation that needs to be called on all
-     * processors in order to avoid a dead lock.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    template <typename SparsityPatternType>
-    DEAL_II_DEPRECATED void
-    reinit(const Epetra_Map &         parallel_partitioning,
-           const SparsityPatternType &sparsity_pattern,
-           const bool                 exchange_data = false);
-
-    /**
-     * This function is similar to the other initialization function above,
-     * but now also reassigns the matrix rows and columns according to two
-     * user-supplied Epetra maps.  To be used for rectangular matrices. The
-     * optional argument @p exchange_data can be used for reinitialization
-     * with a sparsity pattern that is not fully constructed. This feature is
-     * only implemented for input sparsity patterns of type
-     * DynamicSparsityPattern.
-     *
-     * This is a collective operation that needs to be called on all
-     * processors in order to avoid a dead lock.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    template <typename SparsityPatternType>
-    DEAL_II_DEPRECATED void
-    reinit(const Epetra_Map &         row_parallel_partitioning,
-           const Epetra_Map &         col_parallel_partitioning,
-           const SparsityPatternType &sparsity_pattern,
-           const bool                 exchange_data = false);
-
-    /**
-     * This function initializes the Trilinos matrix using the deal.II sparse
-     * matrix and the entries stored therein. It uses a threshold to copy only
-     * elements with modulus larger than the threshold (so zeros in the
-     * deal.II matrix can be filtered away). In contrast to the other reinit
-     * function with deal.II sparse matrix argument, this function takes a
-     * %parallel partitioning specified by the user instead of internally
-     * generating it.
-     *
-     * The optional parameter <tt>copy_values</tt> decides whether only the
-     * sparsity structure of the input matrix should be used or the matrix
-     * entries should be copied, too.
-     *
-     * This is a collective operation that needs to be called on all
-     * processors in order to avoid a dead lock.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    template <typename number>
-    DEAL_II_DEPRECATED void
-    reinit(const Epetra_Map &                    parallel_partitioning,
-           const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-           const double                          drop_tolerance    = 1e-13,
-           const bool                            copy_values       = true,
-           const ::dealii::SparsityPattern *     use_this_sparsity = nullptr);
-
-    /**
-     * This function is similar to the other initialization function with
-     * deal.II sparse matrix input above, but now takes Epetra maps for both
-     * the rows and the columns of the matrix. Chosen for rectangular
-     * matrices.
-     *
-     * The optional parameter <tt>copy_values</tt> decides whether only the
-     * sparsity structure of the input matrix should be used or the matrix
-     * entries should be copied, too.
-     *
-     * This is a collective operation that needs to be called on all
-     * processors in order to avoid a dead lock.
-     *
-     * @deprecated Use the respective method with IndexSet argument instead.
-     */
-    template <typename number>
-    DEAL_II_DEPRECATED void
-    reinit(const Epetra_Map &                    row_parallel_partitioning,
-           const Epetra_Map &                    col_parallel_partitioning,
-           const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-           const double                          drop_tolerance    = 1e-13,
-           const bool                            copy_values       = true,
-           const ::dealii::SparsityPattern *     use_this_sparsity = nullptr);
-    //@}
     /**
      * @name Constructors and initialization using an IndexSet description
      */
@@ -990,7 +840,9 @@ namespace TrilinosWrappers
      * processors in order to avoid a dead lock.
      */
     template <typename SparsityPatternType>
-    void
+    typename std::enable_if<
+      !std::is_same<SparsityPatternType,
+                    dealii::SparseMatrix<double>>::value>::type
     reinit(const IndexSet &           row_parallel_partitioning,
            const IndexSet &           col_parallel_partitioning,
            const SparsityPatternType &sparsity_pattern,
@@ -1820,52 +1672,6 @@ namespace TrilinosWrappers
     const Epetra_CrsGraph &
     trilinos_sparsity_pattern() const;
 
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the domain space of this matrix, i.e., the
-     * partitioning of the vectors this matrix has to be multiplied with.
-     *
-     * @deprecated Use locally_owned_domain_indices() instead.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    domain_partitioner() const;
-
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the range space of this matrix, i.e., the
-     * partitioning of the vectors that are result from matrix-vector
-     * products.
-     *
-     * @deprecated Use locally_owned_range_indices() instead.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    range_partitioner() const;
-
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the matrix rows. Equal to the partitioning of
-     * the range.
-     *
-     * @deprecated Use locally_owned_range_indices() instead.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    row_partitioner() const;
-
-    /**
-     * Return a const reference to the underlying Trilinos Epetra_Map that
-     * sets the partitioning of the matrix columns. This is in general not
-     * equal to the partitioner Epetra_Map for the domain because of overlap
-     * in the matrix.
-     *
-     * @deprecated Usually not necessary. If desired, access it via the
-     * Epetra_CrsMatrix.
-     */
-    DEAL_II_DEPRECATED
-    const Epetra_Map &
-    col_partitioner() const;
     //@}
 
     /**
@@ -2018,16 +1824,36 @@ namespace TrilinosWrappers
     //@}
     /**
      * @addtogroup Exceptions
-     *
      */
     //@{
     /**
      * Exception
      */
-    DeclException1(ExcTrilinosError,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while calling a Trilinos function");
+    DeclException1(
+      ExcTrilinosError,
+      int,
+      << "An error with error number " << arg1
+      << " occurred while calling a Trilinos function. "
+         "\n\n"
+         "For historical reasons, many Trilinos functions express "
+         "errors by returning specific integer values to indicate "
+         "certain errors. Unfortunately, different Trilinos functions "
+         "often use the same integer values for different kinds of "
+         "errors, and in most cases it is also not documented what "
+         "each error code actually means. As a consequence, it is often "
+         "difficult to say what a particular error (in this case, "
+         "the error with integer code '"
+      << arg1
+      << "') represents and how one should fix a code to avoid it. "
+         "The best one can often do is to look up the call stack to "
+         "see which deal.II function generated the error, and which "
+         "Trilinos function the error code had originated from; "
+         "then look up the Trilinos source code of that function (for "
+         "example on github) to see what code path set that error "
+         "code. Short of going through all of that, the only other "
+         "option is to guess the cause of the error from "
+         "the context in which the error appeared.");
+
 
     /**
      * Exception
@@ -2059,11 +1885,11 @@ namespace TrilinosWrappers
                    size_type,
                    size_type,
                    size_type,
-                   << "You tried to access element (" << arg1 << "/" << arg2
-                   << ")"
-                   << " of a distributed matrix, but only rows " << arg3
-                   << " through " << arg4
-                   << " are stored locally and can be accessed.");
+                   << "You tried to access element (" << arg1 << '/' << arg2
+                   << ')'
+                   << " of a distributed matrix, but only rows in range ["
+                   << arg3 << ',' << arg4
+                   << "] are stored locally and can be accessed.");
 
     /**
      * Exception
@@ -2071,9 +1897,8 @@ namespace TrilinosWrappers
     DeclException2(ExcAccessToNonPresentElement,
                    size_type,
                    size_type,
-                   << "You tried to access element (" << arg1 << "/" << arg2
-                   << ")"
-                   << " of a sparse matrix, but it appears to not"
+                   << "You tried to access element (" << arg1 << '/' << arg2
+                   << ')' << " of a sparse matrix, but it appears to not"
                    << " exist in the Trilinos sparsity pattern.");
     //@}
 
@@ -2230,11 +2055,10 @@ namespace TrilinosWrappers
        * TrilinosWrappers::PreconditionBase that this payload wraps is passed by
        * reference to the <tt>vmult</tt> and <tt>Tvmult</tt> functions. This
        * object is not thread-safe when the transpose flag is set on it or the
-       * Trilinos object to which it refers. See the docuemtation for the
+       * Trilinos object to which it refers. See the documentation for the
        * TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload::SetUseTranspose()
        * function for further details.
        *
-       * @author Jean-Paul Pelteret, 2016
        *
        * @ingroup TrilinosWrappers
        */
@@ -2277,6 +2101,12 @@ namespace TrilinosWrappers
                         const TrilinosWrappers::SparseMatrix &matrix);
 
         /**
+         * Constructor for a sparse matrix based on an exemplary payload
+         */
+        TrilinosPayload(const TrilinosPayload &               payload_exemplar,
+                        const TrilinosWrappers::SparseMatrix &matrix);
+
+        /**
          * Constructor for a preconditioner based on an exemplary matrix
          */
         TrilinosPayload(
@@ -2288,6 +2118,13 @@ namespace TrilinosWrappers
          */
         TrilinosPayload(
           const TrilinosWrappers::PreconditionBase &preconditioner_exemplar,
+          const TrilinosWrappers::PreconditionBase &preconditioner);
+
+        /**
+         * Constructor for a preconditioner based on an exemplary payload
+         */
+        TrilinosPayload(
+          const TrilinosPayload &                   payload_exemplar,
           const TrilinosWrappers::PreconditionBase &preconditioner);
 
         /**
@@ -2571,6 +2408,23 @@ namespace TrilinosWrappers
 
       private:
         /**
+         * A generic constructor.
+         *
+         * This constructor allows the payload to be configured from any
+         * objects that can be cast to an Epetra operation. The
+         * @p supports_inverse_operations flag indicates that the
+         * @p op can be used to compute inverse operations; preconditioners
+         * have such a facility.
+         */
+        template <typename EpetraOpType>
+        TrilinosPayload(EpetraOpType &  op,
+                        const bool      supports_inverse_operations,
+                        const bool      use_transpose,
+                        const MPI_Comm &mpi_communicator,
+                        const IndexSet &locally_owned_domain_indices,
+                        const IndexSet &locally_owned_range_indices);
+
+        /**
          * A flag recording whether the operator is to perform standard
          * matrix-vector multiplication, or the transpose operation.
          */
@@ -2580,11 +2434,7 @@ namespace TrilinosWrappers
          * Internal communication pattern in case the matrix needs to be copied
          * from deal.II format.
          */
-#    ifdef DEAL_II_WITH_MPI
         Epetra_MpiComm communicator;
-#    else
-        Epetra_SerialComm communicator;
-#    endif
 
         /**
          * Epetra_Map that sets the partitioning of the domain space of
@@ -2632,8 +2482,9 @@ namespace TrilinosWrappers
        * Return an operator that returns a payload configured to support the
        * multiplication of two LinearOperators
        */
-      TrilinosPayload operator*(const TrilinosPayload &first_op,
-                                const TrilinosPayload &second_op);
+      TrilinosPayload
+      operator*(const TrilinosPayload &first_op,
+                const TrilinosPayload &second_op);
 
     } // namespace LinearOperatorImplementation
   }   /* namespace internal */
@@ -2838,7 +2689,8 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
-    inline const Accessor<Constness> &Iterator<Constness>::operator*() const
+    inline const Accessor<Constness> &
+    Iterator<Constness>::operator*() const
     {
       return accessor;
     }
@@ -2846,7 +2698,8 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
-    inline const Accessor<Constness> *Iterator<Constness>::operator->() const
+    inline const Accessor<Constness> *
+    Iterator<Constness>::operator->() const
     {
       return &accessor;
     }
@@ -3090,13 +2943,15 @@ namespace TrilinosWrappers
         // TODO: fix this (do not run compress here, but fail)
         if (last_action == Insert)
           {
+#      ifdef DEBUG
             int ierr;
-            ierr = matrix->GlobalAssemble(*column_space_map,
-                                          matrix->RowMap(),
-                                          false);
+            ierr =
+#      endif
+              matrix->GlobalAssemble(*column_space_map,
+                                     matrix->RowMap(),
+                                     false);
 
             Assert(ierr == 0, ExcTrilinosError(ierr));
-            (void)ierr; // removes -Wunused-but-set-variable in optimized mode
           }
 
         last_action = Add;
@@ -3260,6 +3115,104 @@ namespace TrilinosWrappers
   {
     namespace LinearOperatorImplementation
     {
+      template <typename EpetraOpType>
+      TrilinosPayload::TrilinosPayload(
+        EpetraOpType &  op,
+        const bool      supports_inverse_operations,
+        const bool      use_transpose,
+        const MPI_Comm &mpi_communicator,
+        const IndexSet &locally_owned_domain_indices,
+        const IndexSet &locally_owned_range_indices)
+        : use_transpose(use_transpose)
+        , communicator(mpi_communicator)
+        , domain_map(
+            locally_owned_domain_indices.make_trilinos_map(communicator.Comm()))
+        , range_map(
+            locally_owned_range_indices.make_trilinos_map(communicator.Comm()))
+      {
+        vmult = [&op](Range &tril_dst, const Domain &tril_src) {
+          // Duplicated from TrilinosWrappers::PreconditionBase::vmult
+          // as well as from TrilinosWrappers::SparseMatrix::Tvmult
+          Assert(&tril_src != &tril_dst,
+                 TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+          internal::check_vector_map_equality(op,
+                                              tril_src,
+                                              tril_dst,
+                                              op.UseTranspose());
+
+          const int ierr = op.Apply(tril_src, tril_dst);
+          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        };
+
+        Tvmult = [&op](Domain &tril_dst, const Range &tril_src) {
+          // Duplicated from TrilinosWrappers::PreconditionBase::vmult
+          // as well as from TrilinosWrappers::SparseMatrix::Tvmult
+          Assert(&tril_src != &tril_dst,
+                 TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+          internal::check_vector_map_equality(op,
+                                              tril_src,
+                                              tril_dst,
+                                              !op.UseTranspose());
+
+          op.SetUseTranspose(!op.UseTranspose());
+          const int ierr = op.Apply(tril_src, tril_dst);
+          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+          op.SetUseTranspose(!op.UseTranspose());
+        };
+
+        if (supports_inverse_operations)
+          {
+            inv_vmult = [&op](Domain &tril_dst, const Range &tril_src) {
+              // Duplicated from TrilinosWrappers::PreconditionBase::vmult
+              // as well as from TrilinosWrappers::SparseMatrix::Tvmult
+              Assert(
+                &tril_src != &tril_dst,
+                TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+              internal::check_vector_map_equality(op,
+                                                  tril_src,
+                                                  tril_dst,
+                                                  !op.UseTranspose());
+
+              const int ierr = op.ApplyInverse(tril_src, tril_dst);
+              AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+            };
+
+            inv_Tvmult = [&op](Range &tril_dst, const Domain &tril_src) {
+              // Duplicated from TrilinosWrappers::PreconditionBase::vmult
+              // as well as from TrilinosWrappers::SparseMatrix::Tvmult
+              Assert(
+                &tril_src != &tril_dst,
+                TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+              internal::check_vector_map_equality(op,
+                                                  tril_src,
+                                                  tril_dst,
+                                                  op.UseTranspose());
+
+              op.SetUseTranspose(!op.UseTranspose());
+              const int ierr = op.ApplyInverse(tril_src, tril_dst);
+              AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+              op.SetUseTranspose(!op.UseTranspose());
+            };
+          }
+        else
+          {
+            inv_vmult = [](Domain &, const Range &) {
+              Assert(false,
+                     ExcMessage(
+                       "Uninitialized TrilinosPayload::inv_vmult called. "
+                       "The operator does not support inverse operations."));
+            };
+
+            inv_Tvmult = [](Range &, const Domain &) {
+              Assert(false,
+                     ExcMessage(
+                       "Uninitialized TrilinosPayload::inv_Tvmult called. "
+                       "The operator does not support inverse operations."));
+            };
+          }
+      }
+
+
       template <typename Solver, typename Preconditioner>
       typename std::enable_if<
         std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&

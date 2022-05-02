@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,11 @@ test(unsigned int n_points)
   deallog << "Testing for dim = " << dim << std::endl;
 
   // Creating a grid in the square [0,1]x[0,1]
-  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::none,
+    false,
+    parallel::shared::Triangulation<dim>::Settings::partition_zoltan);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(std::max(8 - dim, 3));
 

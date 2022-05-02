@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2019 by the deal.II authors
+ * Copyright (C) 1999 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -20,9 +20,6 @@
 // The most fundamental class in the library is the Triangulation class, which
 // is declared here:
 #include <deal.II/grid/tria.h>
-// We need the following two includes for loops over cells and/or faces:
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 // Here are some functions to generate standard grids:
 #include <deal.II/grid/grid_generator.h>
 // Output of grids in various graphics formats:
@@ -31,7 +28,7 @@
 // This is needed for C++ output:
 #include <iostream>
 #include <fstream>
-// And this for the declarations of the `sqrt` and `fabs` functions:
+// And this for the declarations of the `std::sqrt` and `std::fabs` functions:
 #include <cmath>
 
 // The final step in importing deal.II is this: All deal.II functions and
@@ -199,29 +196,52 @@ void second_grid()
           // classes used in deal.II, and @ref CPP11 for more information about
           // range-based for loops and the `auto` keyword.
           //
-          // Next, we want to loop over all vertices of the cells. Since we are
-          // in 2d, we know that each cell has exactly four vertices. However,
-          // instead of penning down a 4 in the loop bound, we make a first
-          // attempt at writing it in a dimension-independent way by which we
-          // find out about the number of vertices of a cell. Using the
-          // GeometryInfo class, we will later have an easier time getting the
-          // program to also run in 3d: we only have to change all occurrences
-          // of <code>&lt;2&gt;</code> to <code>&lt;3&gt;</code>, and do not
-          // have to audit our code for the hidden appearance of magic numbers
-          // like a 4 that needs to be replaced by an 8:
-          for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+          // Next, we loop over all vertices of the cells. For that purpose
+          // we query an iterator over the vertex indices (in 2d, this is an
+          // array that contains the elements `{0,1,2,3}`, but since
+          // `cell->vertex_indices()` knows the dimension the cell lives in, the
+          // array so returned is correct in all dimensions and this enables
+          // this code to be correct whether we run it in 2d or 3d, i.e., it
+          // enables "dimension-independent programming" -- a big part of what
+          // we will discuss in step-4).
+          for (const auto v : cell->vertex_indices())
             {
               // If this cell is at the inner boundary, then at least one of its
               // vertices must sit on the inner ring and therefore have a radial
               // distance from the center of exactly 0.5, up to floating point
-              // accuracy. Compute this distance, and if we have found a vertex
-              // with this property flag this cell for later refinement. We can
-              // then also break the loop over all vertices and move on to the
-              // next cell.
+              // accuracy. So we compute this distance, and if we find a vertex
+              // with this property, we flag this cell for later refinement. We
+              // can then also break the loop over all vertices and move on to
+              // the next cell.
+              //
+              // Because the distance from the center is computed as a floating
+              // point number, we have to expect that whatever we compute is
+              // only accurate to within
+              // [round-off](https://en.wikipedia.org/wiki/Round-off_error). As
+              // a consequence, we can never expect to compare the distance
+              // with the inner radius by equality: A statement such as
+              // `if (distance_from_center == inner_radius)` will fail
+              // unless we get exceptionally lucky. Rather, we need to do this
+              // comparison with a certain tolerance, and the usual way to do
+              // this is to write it as `if (std::abs(distance_from_center -
+              // inner_radius) <= tolerance)`
+              // where `tolerance` is some small number larger
+              // than round-off. The question is how to choose it: We could just
+              // pick, say, `1e-10`, but this is only appropriate if the objects
+              // we compare are of size one. If we had created a mesh with cells
+              // of size `1e+10`, then `1e-10` would be far lower than round-off
+              // and, as before, the comparison will only succeed if we get
+              // exceptionally lucky. Rather, it is almost always useful to make
+              // the tolerance *relative* to a typical "scale" of the objects
+              // being compared. Here, the "scale" would be the inner radius, or
+              // maybe the diameter of cells. We choose the former and set the
+              // tolerance equal to $10^{-6}$ times the inner radius of the
+              // annulus.
               const double distance_from_center =
                 center.distance(cell->vertex(v));
 
-              if (std::fabs(distance_from_center - inner_radius) < 1e-10)
+              if (std::fabs(distance_from_center - inner_radius) <=
+                  1e-6 * inner_radius)
                 {
                   cell->set_refine_flag();
                   break;

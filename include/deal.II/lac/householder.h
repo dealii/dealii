@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,8 +74,6 @@ class Vector;
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Guido Kanschat, 2005
  */
 template <typename number>
 class Householder

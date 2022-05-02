@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,10 +21,10 @@ public:
   class MPI
   {
   public:
-    typedef LinearAlgebraPETSc::MPI::Vector            Vector;
-    typedef LinearAlgebraPETSc::MPI::SparseMatrix      SparseMatrix;
-    typedef LinearAlgebraPETSc::MPI::BlockVector       BlockVector;
-    typedef LinearAlgebraPETSc::MPI::BlockSparseMatrix BlockSparseMatrix;
+    using Vector            = LinearAlgebraPETSc::MPI::Vector;
+    using SparseMatrix      = LinearAlgebraPETSc::MPI::SparseMatrix;
+    using BlockVector       = LinearAlgebraPETSc::MPI::BlockVector;
+    using BlockSparseMatrix = LinearAlgebraPETSc::MPI::BlockSparseMatrix;
   };
 };
 
@@ -34,10 +34,10 @@ public:
   class MPI
   {
   public:
-    typedef LinearAlgebraTrilinos::MPI::Vector            Vector;
-    typedef LinearAlgebraTrilinos::MPI::SparseMatrix      SparseMatrix;
-    typedef LinearAlgebraTrilinos::MPI::BlockVector       BlockVector;
-    typedef LinearAlgebraTrilinos::MPI::BlockSparseMatrix BlockSparseMatrix;
+    using Vector            = LinearAlgebraTrilinos::MPI::Vector;
+    using SparseMatrix      = LinearAlgebraTrilinos::MPI::SparseMatrix;
+    using BlockVector       = LinearAlgebraTrilinos::MPI::BlockVector;
+    using BlockSparseMatrix = LinearAlgebraTrilinos::MPI::BlockSparseMatrix;
   };
 };
 

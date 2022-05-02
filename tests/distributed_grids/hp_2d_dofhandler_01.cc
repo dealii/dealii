@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -35,7 +36,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <fstream>
@@ -58,10 +58,10 @@ test()
 
   hp::FECollection<dim> fe;
   fe.push_back(FE_Q<dim>(2));
-  hp::DoFHandler<dim> dofh(tr);
+  DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dofh.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator cell = dofh.begin_active();
 
   const unsigned int dofs_per_cell = dofh.get_fe(0).dofs_per_cell;
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
@@ -73,7 +73,7 @@ test()
       cell->get_dof_indices(local_dof_indices);
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        deallog << local_dof_indices[i] << " ";
+        deallog << local_dof_indices[i] << ' ';
 
       deallog << std::endl;
     }

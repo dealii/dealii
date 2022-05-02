@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,7 @@
 // A test by Krzysztof Bzowski that verifies something in SolutionTransfer
 // that didn't work for a few days
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -25,7 +26,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/solution_transfer.h>
@@ -48,11 +48,11 @@ main()
   fe_collection.push_back(FE_Q<2>(1));
   fe_collection.push_back(FE_Nothing<2>());
 
-  hp::DoFHandler<2> dof_handler(triangulation);
+  DoFHandler<2> dof_handler(triangulation);
 
   // Assign FEQ to all cells
-  hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
-  hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
+  DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
 
 
 
@@ -98,8 +98,7 @@ main()
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solultion_trans(
-    dof_handler);
+  SolutionTransfer<2, Vector<double>> solultion_trans(dof_handler);
   solultion_trans.prepare_for_coarsening_and_refinement(solution);
 
   triangulation.execute_coarsening_and_refinement();

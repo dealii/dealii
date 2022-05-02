@@ -103,7 +103,7 @@ Matrixfree<dim>::vmult (Vector<double>       &dst,
                            update_gradients | update_JxW_values|
                            update_quadrature_points);
 
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   dofs_per_cell = fe.n_dofs_per_cell();
   const unsigned int   n_q_points    = quadrature_formula.size();
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
@@ -114,10 +114,7 @@ Matrixfree<dim>::vmult (Vector<double>       &dst,
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  for (const auto & cell : dof_handler.active_cell_iterators())
     {
       cell_matrix = 0;
       fe_values.reinit (cell);
@@ -257,7 +254,6 @@ v = \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
 v_\mathrm{cell}.
 @f}
 @code
-...
   FEValues<dim> fe_values_reference (fe, quadrature_formula,
                                      update_gradients);
   Triangulation<dim> reference_cell;
@@ -268,7 +264,7 @@ v_\mathrm{cell}.
                            update_inverse_jacobians | update_JxW_values |
                            update_quadrature_points);
 
-  for (; cell!=endc; ++cell)
+  for (const auto & cell : dof_handler.active_cell_iterators())
     {
       fe_values.reinit (cell);
       coefficient.value_list(fe_values.get_quadrature_points(),
@@ -366,7 +362,7 @@ interpolation operation over the completely regular data fields of the
 reference cell. We illustrate the process of complexity reduction in two space
 dimensions, but the same technique can be used in higher dimensions. On the
 reference cell, the basis functions are of the tensor product form
-$\phi(x,y,z) = \varphi_i(x) \varphi_j(y)$. The part of the matrix
+$\phi(x,y) = \varphi_i(x) \varphi_j(y)$. The part of the matrix
 <i>B</i><sub>ref_cell</sub> that computes the first component has the form
 $B_\mathrm{sub\_cell}^x = B_\mathrm{grad,x} \otimes B_\mathrm{val,y}$, where
 <i>B</i><sub>grad,x</sub> and <i>B</i><sub>val,y</sub> contain the evaluation

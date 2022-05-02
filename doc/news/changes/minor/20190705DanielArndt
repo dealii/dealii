@@ -1,4 +1,0 @@
-Improved: All member functions and free functions related to Point
-that can be used in CUDA code so far have been annotated accordingly.
-<br>
-(Daniel Arndt, 2019/07/05)

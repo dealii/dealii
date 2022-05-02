@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,7 +75,7 @@ public:
           deallog << "Active level (with max_level="
                   << tria.n_global_levels() - 1 << "):" << std::endl;
         else
-          deallog << "Multigrid level " << level << ":" << std::endl;
+          deallog << "Multigrid level " << level << ':' << std::endl;
 
         AffineConstraints<Number> constraint;
 
@@ -85,6 +85,8 @@ public:
         additional_data.mapping_update_flags_inner_faces    = update_values;
         additional_data.mapping_update_flags_boundary_faces = update_values;
         additional_data.mg_level                            = level;
+        additional_data.tasks_parallel_scheme =
+          MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData::none;
 
         MatrixFree<dim, Number, VectorizedArrayType> matrix_free;
         matrix_free.reinit(
@@ -106,7 +108,7 @@ public:
           deallog << "cell:      " << cell.to_string() << std::endl;
 
         for (const auto &face : faces)
-          deallog << "face:      " << face.first.to_string() << " "
+          deallog << "face:      " << face.first.to_string() << ' '
                   << face.second.to_string() << std::endl;
 
         for (const auto boundary : boundaries)
@@ -127,7 +129,7 @@ private:
                  const VectorType &,
                  const std::pair<unsigned int, unsigned int> &pair) const
   {
-    for (auto cell = pair.first; cell < pair.second; cell++)
+    for (auto cell = pair.first; cell < pair.second; ++cell)
       for (auto lane = 0u; lane < data.n_active_entries_per_cell_batch(cell);
            lane++)
         cells.emplace(data.get_cell_iterator(cell, lane)->id());
@@ -139,7 +141,7 @@ private:
                  const VectorType &,
                  const std::pair<unsigned int, unsigned int> &pair) const
   {
-    for (auto face = pair.first; face < pair.second; face++)
+    for (auto face = pair.first; face < pair.second; ++face)
       for (auto lane = 0u; lane < data.n_active_entries_per_face_batch(face);
            lane++)
         {
@@ -161,7 +163,7 @@ private:
                      const VectorType &,
                      const std::pair<unsigned int, unsigned int> &pair) const
   {
-    for (auto face = pair.first; face < pair.second; face++)
+    for (auto face = pair.first; face < pair.second; ++face)
       for (auto lane = 0u; lane < data.n_active_entries_per_face_batch(face);
            lane++)
         boundaries.emplace(

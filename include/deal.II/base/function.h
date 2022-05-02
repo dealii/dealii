@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,7 @@ class TensorFunction;
  * // return all components at one point
  * void
  * vector_value(const Point<dim> &p,
- *              Vector<double> &  value) const;
+ *              Vector<double>   &value) const;
  * @endcode
  *
  * For more efficiency, there are other functions returning one or all
@@ -72,13 +72,13 @@ class TensorFunction;
  * // access to one component at several points
  * void
  * value_list(const std::vector<Point<dim>> &point_list,
- *            std::vector<double> &          value_list,
+ *            std::vector<double>           &value_list,
  *            const unsigned int             component = 0) const;
  *
  * // return all components at several points
  * void
  * vector_value_list(const std::vector<Point<dim>> &point_list,
- *                   std::vector<Vector<double>> &  value_list) const;
+ *                   std::vector<Vector<double>>   &value_list) const;
  * @endcode
  *
  * Furthermore, there are functions returning the gradient of the function or
@@ -132,6 +132,7 @@ class TensorFunction;
  * argument of this class: it describes the scalar type to be used for each
  * component of your return values. It defaults to @p double, but in the
  * example above, it could be set to <code>std::complex@<double@></code>.
+ * step-58 is an example of this.
  *
  * @tparam dim The space dimension of the range space within which the domain
  *   $\Omega$ of the function lies. Consequently, the function will be
@@ -144,7 +145,6 @@ class TensorFunction;
  *   argument.
  *
  * @ingroup functions
- * @author Wolfgang Bangerth, 1998, 1999, Luca Heltai 2014
  */
 template <int dim, typename RangeNumberType = double>
 class Function : public FunctionTime<
@@ -156,7 +156,7 @@ public:
    * Export the value of the template parameter as a static member constant.
    * Sometimes useful for some expression template programming.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Number of vector components.
@@ -174,8 +174,8 @@ public:
    * (which defaults to one, i.e. a scalar function), and the time variable,
    * which defaults to zero.
    */
-  Function(const unsigned int n_components = 1,
-           const time_type    initial_time = 0.0);
+  explicit Function(const unsigned int n_components = 1,
+                    const time_type    initial_time = 0.0);
 
   /**
    * Copy constructor.
@@ -390,10 +390,10 @@ public:
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
-   * This is not exact (but will usually be close) because calculating the
-   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+   *
+   * This function is virtual and can be overloaded by derived classes.
    */
-  std::size_t
+  virtual std::size_t
   memory_consumption() const;
 };
 
@@ -405,7 +405,6 @@ namespace Functions
    * constructor.
    *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 1998, 1999, Lei Qiao, 2015
    */
   template <int dim, typename RangeNumberType = double>
   class ConstantFunction : public Function<dim, RangeNumberType>
@@ -415,22 +414,22 @@ namespace Functions
      * Constructor; set values of all components to the provided one. The
      * default number of components is one.
      */
-    ConstantFunction(const RangeNumberType value,
-                     const unsigned int    n_components = 1);
+    explicit ConstantFunction(const RangeNumberType value,
+                              const unsigned int    n_components = 1);
 
     /**
      * Constructor; takes an <tt>std::vector<RangeNumberType></tt> object as an
      * argument. The number of components is determined by
      * <tt>values.size()</tt>.
      */
-    ConstantFunction(const std::vector<RangeNumberType> &values);
+    explicit ConstantFunction(const std::vector<RangeNumberType> &values);
 
     /**
      * Constructor; takes an <tt>Vector<RangeNumberType></tt> object as an
      * argument. The number of components is determined by
      * <tt>values.size()</tt>.
      */
-    ConstantFunction(const Vector<RangeNumberType> &values);
+    explicit ConstantFunction(const Vector<RangeNumberType> &values);
 
     /**
      * Constructor; uses whatever stores in [begin_ptr, begin_ptr+n_components)
@@ -476,8 +475,16 @@ namespace Functions
       std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients)
       const override;
 
-    std::size_t
-    memory_consumption() const;
+    virtual SymmetricTensor<2, dim, RangeNumberType>
+    hessian(const Point<dim> & point,
+            const unsigned int component = 0) const override;
+
+    virtual RangeNumberType
+    laplacian(const Point<dim> & point,
+              const unsigned int component = 0) const override;
+
+    virtual std::size_t
+    memory_consumption() const override;
 
   protected:
     /**
@@ -498,7 +505,6 @@ namespace Functions
    * conditions, or zero initial conditions.
    *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 1998, 1999
    */
   template <int dim, typename RangeNumberType = double>
   class ZeroFunction : public ConstantFunction<dim, RangeNumberType>
@@ -507,9 +513,55 @@ namespace Functions
     /**
      * Constructor. The number of components is preset to one.
      */
-    ZeroFunction(const unsigned int n_components = 1);
+    explicit ZeroFunction(const unsigned int n_components = 1);
   };
 
+  /**
+   * A function whose output is also its input. One possible application of this
+   * function is interpolating or projecting a finite element field that
+   * represents spatial coordinates: e.g., one can set up a finite element field
+   * to interpolate the positions of a Triangulation's cells with this function
+   * (via VectorTools::interpolate()), which is useful when doing calculations
+   * in a Lagrangian reference frame.
+   *
+   * @ingroup functions
+   */
+  template <int dim, typename RangeNumberType = double>
+  class IdentityFunction : public Function<dim, RangeNumberType>
+  {
+  public:
+    /**
+     * Constructor. The number of components is set to dim.
+     */
+    IdentityFunction();
+
+    /**
+     * @copydoc Function::value()
+     */
+    virtual RangeNumberType
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::gradient()
+     */
+    virtual Tensor<1, dim, RangeNumberType>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::laplacian()
+     */
+    virtual RangeNumberType
+    laplacian(const Point<dim> & p,
+              const unsigned int component = 0) const override;
+
+    /**
+     * @copydoc Function::hessian()
+     */
+    virtual SymmetricTensor<2, dim, RangeNumberType>
+    hessian(const Point<dim> & p,
+            const unsigned int component = 0) const override;
+  };
 } // namespace Functions
 
 /**
@@ -545,10 +597,10 @@ using ZeroFunction DEAL_II_DEPRECATED =
  * See the step-20 tutorial program for a detailed explanation and a use case.
  *
  * @ingroup functions
- * @author Guido Kanschat, 2000, Wolfgang Bangerth 2006
  */
 template <int dim, typename RangeNumberType = double>
-class ComponentSelectFunction : public ConstantFunction<dim, RangeNumberType>
+class ComponentSelectFunction
+  : public Functions::ConstantFunction<dim, RangeNumberType>
 {
 public:
   /**
@@ -615,11 +667,9 @@ public:
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
-   * This is not exact (but will usually be close) because calculating the
-   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
-  std::size_t
-  memory_consumption() const;
+  virtual std::size_t
+  memory_consumption() const override;
 
 protected:
   /**
@@ -711,8 +761,63 @@ protected:
  * @endcode
  * The savings in work to write this are apparent.
  *
+ * Finally, these lambda functions can be used as a way to map points in
+ * different ways. As an example, let us assume that we have computed
+ * the solution to a one-dimensional problem and that that solution
+ * resides in the following variables:
+ * @code
+ *   DoFHandler<1>  dof_handler_1d;
+ *   Vector<double> solution_1d;
+ * @endcode
+ * We will denote this solution function described by this DoFHandler
+ * and vector object by $u_h(x)$ where $x$ is a vector with just one
+ * component, and consequently is not shown in boldface. Then assume
+ * that we want this $u_h(x)$ to be used as a boundary condition for a 2d
+ * problem at the line $y=0$. Let's say that this line corresponds to
+ * @ref GlossBoundaryIndicator "boundary indicator" 123.
+ * If we say that the 2d problem is associated with
+ * @code
+ *   DoFHandler<2> dof_handler_2d;
+ * @endcode
+ * then in order to evaluate the boundary conditions for this 2d problem,
+ * we would want to call VectorTools::interpolate_boundary_values()
+ * via
+ * @code
+ *   AffineConstraints<double> boundary_values_2d;
+ *   VectorTools::interpolate_boundary_values (dof_handler_2d,
+ *                                             123,
+ *                                             ???,
+ *                                             boundary_values_2d);
+ * @endcode
+ * The question here is what to use as the Function object that can be passed
+ * as third argument. It needs to be a Function<2> object, i.e., it
+ * receives a 2d input point and is supposed to return the value at that
+ * point. What we *want* it to do is to just take the $x$ component of the
+ * input point and evaluate the 1d solution at that point, knowing that at
+ * the boundary with indicator 123, the $y$ component of the input point
+ * must be zero. This all can be achieved via the following function
+ * object:
+ * @code
+ *   Functions::FEFieldFunction<1>
+ *     solution_1d_as_function_object (dof_handler_1d, solution_1d);
+ *   auto boundary_evaluator
+ *     = [&] (const Point<2> &p)
+ *       {
+ *          // First extract the x component of the input point:
+ *          const Point<1> point_on_axis (p[0]);
+ *
+ *          // Then evaluate the 1d solution at that point:
+ *          return solution_1d_as_function_object.value(point_on_axis);
+ *       }
+ *
+ *   AffineConstraints<double> boundary_values_2d;
+ *   VectorTools::interpolate_boundary_values (dof_handler_2d,
+ *                                             123,
+ *                                             ScalarFunctionFromFunctionObject<2>(boundary_evaluator),
+ *                                             boundary_values_2d);
+ * @endcode
+ *
  * @ingroup functions
- * @author Wolfgang Bangerth, 2011
  */
 template <int dim, typename RangeNumberType = double>
 class ScalarFunctionFromFunctionObject : public Function<dim, RangeNumberType>
@@ -723,7 +828,7 @@ public:
    * value, convert this into an object that matches the Function<dim,
    * RangeNumberType> interface.
    */
-  ScalarFunctionFromFunctionObject(
+  explicit ScalarFunctionFromFunctionObject(
     const std::function<RangeNumberType(const Point<dim> &)> &function_object);
 
   /**
@@ -780,7 +885,6 @@ private:
  * component.
  *
  * @ingroup functions
- * @author Wolfgang Bangerth, 2011
  */
 template <int dim, typename RangeNumberType = double>
 class VectorFunctionFromScalarFunctionObject
@@ -869,8 +973,6 @@ private:
  *     custom_function({&first_component, &second_component},
  *                     {&zero_gradient, &zero_gradient});
  * @endcode
- *
- * @author Luca Heltai, 2019
  */
 template <int dim, typename RangeNumberType = double>
 class FunctionFromFunctionObjects : public Function<dim, RangeNumberType>
@@ -895,7 +997,7 @@ public:
    * method will trigger an exception, unless you first call the
    * set_function_gradients() method.
    */
-  FunctionFromFunctionObjects(
+  explicit FunctionFromFunctionObjects(
     const std::vector<std::function<RangeNumberType(const Point<dim> &)>>
       &          values,
     const double initial_time = 0.0);
@@ -1007,7 +1109,6 @@ private:
  * into the first <code>dim</code> components of the function object.
  *
  * @ingroup functions
- * @author Spencer Patty, 2013
  */
 template <int dim, typename RangeNumberType = double>
 class VectorFunctionFromTensorFunction : public Function<dim, RangeNumberType>
@@ -1029,7 +1130,7 @@ public:
    * the first argument.  This should be such that the entire tensor_function
    * fits inside the <tt>n_component</tt> length return vector.
    */
-  VectorFunctionFromTensorFunction(
+  explicit VectorFunctionFromTensorFunction(
     const TensorFunction<1, dim, RangeNumberType> &tensor_function,
     const unsigned int                             selected_component = 0,
     const unsigned int                             n_components       = dim);

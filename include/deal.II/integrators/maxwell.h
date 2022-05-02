@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,8 +61,6 @@ namespace LocalIntegrators
    * @f]
    *
    * @ingroup Integrators
-   * @author Guido Kanschat
-   * @date 2010
    */
   namespace Maxwell
   {
@@ -88,9 +86,6 @@ namespace LocalIntegrators
      *
      * @note The third tensor argument is not used in two dimensions and can
      * for instance duplicate one of the previous.
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     Tensor<1, dim>
@@ -125,9 +120,6 @@ namespace LocalIntegrators
      *
      * @note The third tensor argument is not used in two dimensions and can
      * for instance duplicate one of the previous.
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     Tensor<1, dim>
@@ -165,9 +157,6 @@ namespace LocalIntegrators
      * \nabla \times v \,dx
      * @f]
      * in weak form.
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -221,9 +210,6 @@ namespace LocalIntegrators
      * This is the standard curl operator in 3D and the scalar curl in 2D. The
      * vector curl operator can be obtained by exchanging test and trial
      * functions.
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -273,9 +259,6 @@ namespace LocalIntegrators
      * n)(\nu \nabla\times u)
      * \biggr)
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -339,9 +322,6 @@ namespace LocalIntegrators
      * \int_F (u\times n)(v\times n)
      * \, ds.
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -399,9 +379,6 @@ namespace LocalIntegrators
      * n\}\{\nu \nabla\times u\}
      * \biggr)\;dx
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     inline void
@@ -415,7 +392,7 @@ namespace LocalIntegrators
                    const double             factor1 = 1.,
                    const double             factor2 = -1.)
     {
-      const unsigned int n_dofs = fe1.dofs_per_cell;
+      const unsigned int n_dofs = fe1.n_dofs_per_cell();
 
       AssertDimension(fe1.get_fe().n_components(), dim);
       AssertDimension(fe2.get_fe().n_components(), dim);

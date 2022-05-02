@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2018 by the deal.II authors
+## Copyright (C) 2013 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -27,18 +27,44 @@
 #     TEST_LIBRARIES
 #     TEST_LIBRARIES_DEBUG
 #     TEST_LIBRARIES_RELEASE
-#       - specifying additional libraries (and targets) to link against.
+#       - Specify additional libraries (and targets) to link against.
 #
 #     TEST_TARGET or
 #     TEST_TARGET_DEBUG and TEST_TARGET_RELEASE
-#       - specifying a test target to be executed for a parameter run.
+#       - Specifies a test target to be executed for a parameter run.
 #
 #     TEST_TIME_LIMIT
 #       - Specifies the maximal wall clock time in seconds a test is
 #         allowed to run. Defaults to 600.
+#     TEST_MPI_RANK_LIMIT
+#       - Specifies the maximal number of MPI ranks that can be used. If a
+#         test variant configures a larger number of MPI ranks (via
+#         .mpirun=N. in the output file) than this limit the test will be
+#         dropped. The special value 0 enforces no limit. Defaults to 0.
+#     TEST_THREAD_LIMIT
+#       - Specifies the maximal number of worker threads that can should be
+#         used by the threading backend. If a test variant configures a
+#         larger number of threads (via .threads=N. in the output file)
+#         than this limit the test will be dropped. Note that individual
+#         tests might exceed this limit by calling
+#         MultithreadInfo::set_thread_limit(), or by manually creating
+#         additional threads. The special value 0 enforces no limit.
+#         Defaults to 0.
+#
 #     TEST_PICKUP_REGEX
 #       - A regular expression to select only a subset of tests during setup.
 #         An empty string is interpreted as a catchall (this is the default).
+#
+#     ENABLE_PERFORMANCE_TESTS
+#       - If defined and set to true the execution of performance tests
+#         will be enabled.
+#
+#     TESTING_ENVIRONMENT
+#       - Specifies the performance test testing environment. Valid options
+#         are:
+#          * "light":  mobile laptop, >=2 physical cores, >=8GB RAM
+#          * "medium": workstation, >=8 physical cores, >=32GB RAM
+#          * "heavy":  compute node, >=32 physical cores, >=128GB RAM
 #
 # numdiff is used for the comparison of test results. Its location can be
 # specified with NUMDIFF_DIR.
@@ -46,7 +72,6 @@
 # Usage:
 #     DEAL_II_PICKUP_TESTS()
 #
-
 
 #
 # Two very small macros that are used below:
@@ -82,10 +107,18 @@ MACRO(DEAL_II_PICKUP_TESTS)
   #
   # Necessary external interpreters and programs:
   #
+  IF(${DEAL_II_WITH_MPI})
+    IF("${DEAL_II_MPIEXEC}" STREQUAL "" OR
+       "${DEAL_II_MPIEXEC}" STREQUAL "MPIEXEC_EXECUTABLE-NOTFOUND")
+      MESSAGE(FATAL_ERROR "Could not find an MPI launcher program, which is required "
+"for running the testsuite. Please explicitly specify MPIEXEC_EXECUTABLE to CMake "
+"as a full path to the MPI launcher program.")
+    ENDIF()
+  ENDIF()
 
   IF(DEAL_II_WITH_CUDA)
     FIND_PACKAGE(CUDA)
-    SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++11 -arch=sm_35 -Xcompiler ${OpenMP_CXX_FLAGS})
+    SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++14 -arch=sm_35 -Xcompiler ${OpenMP_CXX_FLAGS})
   ENDIF()
 
   FIND_PACKAGE(Perl REQUIRED)
@@ -162,11 +195,28 @@ MACRO(DEAL_II_PICKUP_TESTS)
   ENDIF()
 
   #
-  # Set time limit:
+  # Set various limits:
   #
 
   SET_IF_EMPTY(TEST_TIME_LIMIT "$ENV{TEST_TIME_LIMIT}")
   SET_IF_EMPTY(TEST_TIME_LIMIT 600)
+
+  SET_IF_EMPTY(TEST_MPI_RANK_LIMIT "$ENV{TEST_MPI_RANK_LIMIT}")
+  SET_IF_EMPTY(TEST_MPI_RANK_LIMIT 0)
+
+  SET_IF_EMPTY(TEST_THREAD_LIMIT "$ENV{TEST_THREAD_LIMIT}")
+  SET_IF_EMPTY(TEST_THREAD_LIMIT 0)
+
+  #
+  # Other variables:
+  #
+
+  SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
+
+  SET_IF_EMPTY(ENABLE_PERFORMANCE_TESTS "$ENV{ENABLE_PERFORMANCE_TESTS}")
+
+  SET_IF_EMPTY(TESTING_ENVIRONMENT "$ENV{TESTING_ENVIRONMENT}")
+  SET_IF_EMPTY(TESTING_ENVIRONMENT "light")
 
   #
   # ... and finally pick up tests:
@@ -174,12 +224,15 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   ENABLE_TESTING()
 
-  SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
-  GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+  IF("${ARGN}" STREQUAL "")
+    GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+  ELSE()
+    SET(_category "${ARGN}")
+  ENDIF()
 
   SET(DEAL_II_SOURCE_DIR) # avoid a bogus warning
 
-  FILE(GLOB _tests "*.output")
+  FILE(GLOB _tests "*.output" "*.run_only")
   FOREACH(_test ${_tests})
     SET(_comparison ${_test})
     GET_FILENAME_COMPONENT(_test ${_test} NAME)
@@ -193,22 +246,20 @@ MACRO(DEAL_II_PICKUP_TESTS)
     # (and including) the first period ("."):
     #
     STRING(REGEX REPLACE "\\..*$" "" _regex_name "${_category}/${_test}")
-    IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
-        "${_regex_name}" MATCHES "${TEST_PICKUP_REGEX}" )
-      SET(_define_test TRUE)
-    ELSE()
-      SET(_define_test FALSE)
+    IF( NOT ("${TEST_PICKUP_REGEX}" STREQUAL "" OR
+             "${_regex_name}" MATCHES "${TEST_PICKUP_REGEX}" ))
+      CONTINUE()  # next test
     ENDIF()
 
     # Disable tests using mpirun if MPI is not enabled
     STRING(REGEX MATCH "mpirun=" _matches ${_test})
     IF (_matches AND NOT DEAL_II_WITH_MPI)
-      SET(_define_test FALSE)
+      CONTINUE()  # next test
     ENDIF()
 
     #
     # Query configuration and check whether we support it. Otherwise
-    # set _define_test to FALSE:
+    # skip the test.
     #
 
     SET(_op_regex "=|\\.geq\\.|\\.leq\\.|\\.ge\\.|\\.le\\.")
@@ -218,6 +269,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
       _matches ${_test}
       )
 
+    SET(_skip_test FALSE)
     FOREACH(_match ${_matches})
       #
       # Extract feature name, comparison operator, (a possible) boolean and
@@ -241,7 +293,8 @@ MACRO(DEAL_II_PICKUP_TESTS)
           # If a variable is undefined, assume that we cannot configure a
           # given test
           #
-          SET(_define_test FALSE)
+          SET(_skip_test TRUE)
+          CONTINUE() # drop out of "FOREACH(_match ${_matches})"
         ENDIF()
       ENDIF()
 
@@ -260,7 +313,8 @@ Comparison operator \"=\" expected for boolean match.\n"
         # This is why I hate CMake :-/
         IF( (${_variable} AND NOT ${_boolean}) OR
             (NOT ${_variable} AND ${_boolean}) )
-          SET(_define_test FALSE)
+          SET(_skip_test TRUE)
+          CONTINUE() # drop out of "FOREACH(_match ${_matches})"
         ENDIF()
       ENDIF()
 
@@ -280,15 +334,22 @@ Comparison operator \"=\" expected for boolean match.\n"
               "${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}" ) OR
             ( "${_operator}" STREQUAL ".leq." AND
               "${DEAL_II_${_feature}_VERSION}" VERSION_GREATER "${_version}" ) )
-          SET(_define_test FALSE)
+          SET(_skip_test TRUE)
+          CONTINUE() # drop out of "FOREACH(_match ${_matches})"
         ENDIF()
       ENDIF()
     ENDFOREACH()
 
-    IF(_define_test)
-      STRING(REGEX REPLACE "\\..*" "" _test ${_test})
-      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison})
+    IF(_skip_test)
+      CONTINUE() # next test
     ENDIF()
+
+    #
+    # We've made it all the way to here, which means that we actually
+    # want to define the test
+    #
+    STRING(REGEX REPLACE "\\..*" "" _test ${_test})
+    DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison})
 
   ENDFOREACH()
 ENDMACRO()

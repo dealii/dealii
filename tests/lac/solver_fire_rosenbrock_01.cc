@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,7 +89,7 @@ check_value(const unsigned int N, const double tol)
   inv_mass.reinit(X);
 
   // Set initial guess.
-  for (unsigned int i = 0; i < N / 2; i++)
+  for (unsigned int i = 0; i < N / 2; ++i)
     {
       X(2 * i)     = -1.2;
       X(2 * i + 1) = 1.0;

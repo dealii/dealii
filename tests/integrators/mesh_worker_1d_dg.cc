@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,7 +64,7 @@ namespace Advection
     run();
 
   private:
-    const MappingQGeneric<dim> mapping;
+    const MappingQ<dim> mapping;
 
     void
     setup_system();
@@ -410,7 +410,7 @@ namespace Advection
 
     data_out.add_data_vector(solution,
                              solution_names,
-                             DataOut<dim, DoFHandler<dim>>::type_dof_data,
+                             DataOut<dim>::type_dof_data,
                              interpretation);
 
     data_out.build_patches(fe.degree);

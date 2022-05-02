@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,9 +55,6 @@ DEAL_II_NAMESPACE_OPEN
  * The solve() function of this class uses the mechanism described in the
  * Solver base class to determine convergence. This mechanism can also be used
  * to observe the progress of the iteration.
- *
- *
- * @author Ralf Hartmann
  */
 template <class VectorType = Vector<double>>
 class SolverRichardson : public SolverBase<VectorType>
@@ -200,7 +197,7 @@ SolverRichardson<VectorType>::solve(const MatrixType &        A,
 {
   SolverControl::State conv = SolverControl::iterate;
 
-  double last_criterion = -std::numeric_limits<double>::max();
+  double last_criterion = std::numeric_limits<double>::lowest();
 
   unsigned int iter = 0;
 
@@ -256,7 +253,7 @@ SolverRichardson<VectorType>::Tsolve(const MatrixType &        A,
                                      const PreconditionerType &preconditioner)
 {
   SolverControl::State conv           = SolverControl::iterate;
-  double               last_criterion = -std::numeric_limits<double>::max();
+  double               last_criterion = std::numeric_limits<double>::lowest();
 
   unsigned int iter = 0;
 

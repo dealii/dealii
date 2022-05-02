@@ -1,7 +1,0 @@
-Deprecated: The CellAccessor::active() function did not satisfy the
-usual naming scheme of that class in which functions are called
-CellAccessor::is_ghost(), CellAccessor::is_locally_owned(), etc. As a
-consequence, there is now a new function CellAccessor::is_active(),
-with the old function deprecated.
-<br>
-(Wolfgang Bangerth, 2020/01/16)

@@ -43,8 +43,8 @@ DEAL::Detected shape info type for FE_DGQHermite<2>(25): 1
 DEAL::Detected shape info type for FE_DGQHermite<2>(25): 1
 DEAL::Detected shape info type for FE_DGQHermite<2>(45): 1
 DEAL::Detected shape info type for FE_DGQ<2>(1): 2
-DEAL::Detected shape info type for FE_DGQArbitraryNodes<3>(QIterated(QTrapez(),6)): 2
-DEAL::Detected shape info type for FE_DGQArbitraryNodes<2>(QIterated(QTrapez(),13)): 2
+DEAL::Detected shape info type for FE_DGQArbitraryNodes<3>(QIterated(QTrapezoid(),6)): 2
+DEAL::Detected shape info type for FE_DGQArbitraryNodes<2>(QIterated(QTrapezoid(),13)): 2
 DEAL::Detected shape info type for FE_DGQArbitraryNodes<2>(QGauss(8)): 0
 DEAL::Detected shape info type for FE_DGQArbitraryNodes<2>(QGauss(6)): 2
 DEAL::Detected shape info type for FE_DGP<2>(1): 4

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -91,7 +91,7 @@ print(const ImplicitQR<VectorType> &qr, const unsigned int col_size)
       {
         deallog.get_file_stream() << std::setw(9) << A[j](i);
         if (j < size - 1)
-          deallog.get_file_stream() << " ";
+          deallog.get_file_stream() << ' ';
         else
           deallog.get_file_stream() << std::endl;
       }
@@ -101,14 +101,14 @@ template <typename number>
 void
 test()
 {
-  typedef Vector<number> VectorType;
+  using VectorType = Vector<number>;
   ImplicitQR<VectorType> qr;
 
   auto print_givens = [](const unsigned int           i,
                          const unsigned int           j,
                          const std::array<number, 3> &csr) {
-    deallog.get_file_stream() << "Givens " << i << " " << j << ": " << csr[0]
-                              << " " << csr[1] << " " << csr[2] << std::endl;
+    deallog.get_file_stream() << "Givens " << i << ' ' << j << ": " << csr[0]
+                              << ' ' << csr[1] << ' ' << csr[2] << std::endl;
   };
   qr.connect_givens_slot(print_givens);
 

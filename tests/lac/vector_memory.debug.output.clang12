@@ -1,0 +1,25 @@
+
+DEAL::GrowingVectorMemory:Overall allocated vectors: 10
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 6
+DEAL::Exception: StandardExceptions::ExcMemoryLeak(current_alloc)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <vector_memory.templates.h> in function
+    virtual dealii::GrowingVectorMemory<>::~GrowingVectorMemory() [VectorType = dealii::Vector<double>]
+The violated condition was: 
+    current_alloc == 0
+Additional information: 
+    Destroying memory handler while 1 objects are still allocated.
+--------------------------------------------------------
+
+DEAL::Exception: StandardExceptions::ExcMemoryLeak(current_alloc)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <vector_memory.templates.h> in function
+    virtual dealii::GrowingVectorMemory<dealii::Vector<float>>::~GrowingVectorMemory() [VectorType = dealii::Vector<float>]
+The violated condition was: 
+    current_alloc == 0
+Additional information: 
+    Destroying memory handler while 1 objects are still allocated.
+--------------------------------------------------------
+

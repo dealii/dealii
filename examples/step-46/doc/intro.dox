@@ -181,7 +181,7 @@ comes in: it describes a finite dimensional function space of
 functions that are constant zero. A particular property of this
 peculiar linear vector space is that it has no degrees of freedom: it
 isn't just finite dimensional, it is in fact zero dimensional, and
-consequently for objects of this type, FiniteElement::dofs_per_cell
+consequently for objects of this type, FiniteElement::n_dofs_per_cell()
 will return zero. For discussion below, let us give this space a
 proper symbol:
 @f[
@@ -248,15 +248,15 @@ the two elements are just variations of each other in that they have the same
 number of vector components but have different polynomial degrees &mdash; this
 smells very much like what one would do in $hp$ finite element methods, and it
 is exactly what we are going to do here: we are going to (ab)use the classes
-and facilities of the hp namespace to assign different elements to different
+and facilities of the hp-namespace to assign different elements to different
 cells. In other words, we will use collect the two finite elements in an
 hp::FECollection, will integrate with an appropriate hp::QCollection using an
-hp::FEValues object, and our DoF handler will be of type hp::DoFHandler. You
+hp::FEValues object, and our DoFHandler will be in <i>hp</i>-mode. You
 may wish to take a look at step-27 for an overview of all of these concepts.
 
 Before going on describing the testcase, let us clarify a bit <i>why</i> this
 approach of extending the functions by zero to the entire domain and then
-mapping the problem on to the hp framework makes sense:
+mapping the problem on to the hp-framework makes sense:
 
 - It makes things uniform: On all cells, the number of vector components is
   the same (here, <code>2*dim+1</code>). This makes all sorts of
@@ -468,7 +468,7 @@ solid cell is refined, yielding the following code:
 std::vector<unsigned int> local_face_dof_indices (stokes_fe.dofs_per_face);
 for (const auto &cell: dof_handler.active_cell_iterators())
   if (cell_is_in_fluid_domain (cell))
-    for (unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const auto f : cell->face_indices())
       if (!cell->at_boundary(f))
         {
           bool face_is_on_interface = false;
@@ -580,15 +580,16 @@ alternative: we define an <code>enum</code> with symbolic names for
 material_id numbers and will use them to identify which part of the domain a
 cell is on.
 
-Secondly, we use an object of type hp::DoFHandler. This class needs to know
-which cells will use the Stokes and which the elasticity finite element. At
-the beginning of each refinement cycle we will therefore have to walk over
-all cells and set the (in hp parlance) active FE index to whatever is
-appropriate in the current situation. While we can use symbolic names for the
-material id, the active FE index is in fact a number that will frequently be
-used to index into collections of objects (e.g. of type hp::FECollection and
-hp::QCollection); that means that the active FE index actually has to have
-value zero for the fluid and one for the elastic part of the domain.
+Secondly, we use an object of type DoFHandler operating in <i>hp</i>-mode. This
+class needs to know which cells will use the Stokes and which the elasticity
+finite element. At the beginning of each refinement cycle we will therefore
+have to walk over all cells and set the (in hp-parlance) active FE index to
+whatever is appropriate in the current situation. While we can use symbolic
+names for the material id, the active FE index is in fact a number that will
+frequently be used to index into collections of objects (e.g. of type
+hp::FECollection and hp::QCollection); that means that the active FE index
+actually has to have value zero for the fluid and one for the elastic part of
+the domain.
 
 
 <h4>Linear solvers</h4>
@@ -656,9 +657,9 @@ the jump in the solution's gradient around the faces of each cell. This jump
 is likely to be very large at the locations where the solution is
 discontinuous and extended by zero; it also doesn't become smaller as the mesh
 is refined. The KellyErrorEstimator class can't just ignore the interface
-because it essentially only sees an hp::DoFHandler where the element type
-changes from one cell to another &mdash; precisely the thing that the
-hp::DoFHandler was designed for, the interface in the current program looks no
+because it essentially only sees a DoFHandler in <i>hp</i>-mode where the element
+type changes from one cell to another &mdash; precisely the thing that the
+<i>hp</i>-mode was designed for, the interface in the current program looks no
 different than the interfaces in step-27, for example, and certainly no less
 legitimate. Be that as it may, the end results is that there is a layer of
 cells on both sides of the interface between the two subdomains where error
@@ -680,4 +681,3 @@ to a reasonably refined mesh.
 
 While this is clearly a suboptimal solution, it works for now and leaves room
 for future improvement.
-

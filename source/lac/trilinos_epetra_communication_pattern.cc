@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,19 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  ifdef DEAL_II_WITH_MPI
+#  include <deal.II/base/index_set.h>
 
-#    include <deal.II/base/index_set.h>
+#  include <Epetra_Map.h>
 
-#    include <Epetra_Map.h>
-
-#    include <memory>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -63,8 +59,8 @@ namespace LinearAlgebra
       // Target map is read_write_vector_map
       // Source map is vector_space_vector_map. This map must have uniquely
       // owned GID.
-      import = std_cxx14::make_unique<Epetra_Import>(read_write_vector_map,
-                                                     vector_space_vector_map);
+      importer = std::make_unique<Epetra_Import>(read_write_vector_map,
+                                                 vector_space_vector_map);
     }
 
 
@@ -80,13 +76,11 @@ namespace LinearAlgebra
     const Epetra_Import &
     CommunicationPattern::get_epetra_import() const
     {
-      return *import;
+      return *importer;
     }
   } // namespace EpetraWrappers
 } // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
-
-#  endif
 
 #endif

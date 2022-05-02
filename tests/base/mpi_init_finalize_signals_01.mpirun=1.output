@@ -1,0 +1,6 @@
+
+DEAL::before MPI initialization
+DEAL::called via MPI_InitFinalize::signals.at_mpi_init
+DEAL::after MPI initialization
+DEAL::called via MPI_InitFinalize::signals.at_mpi_finalize
+DEAL::after MPI finalization

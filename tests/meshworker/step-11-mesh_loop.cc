@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table_handler.h>
 
@@ -220,7 +221,7 @@ namespace Step11
   void
   LaplaceProblem<dim>::assemble_and_solve()
   {
-    typedef decltype(dof_handler.begin_active()) Iterator;
+    using Iterator = decltype(dof_handler.begin_active());
 
     auto cell_worker = [](const Iterator &  cell,
                           ScratchData<dim> &scratch_data,
@@ -238,8 +239,8 @@ namespace Step11
 
       scratch_data.fe_values.reinit(cell);
 
-      std::vector<double>   rhs_values(n_q_points);
-      ConstantFunction<dim> right_hand_side(-2.0);
+      std::vector<double>              rhs_values(n_q_points);
+      Functions::ConstantFunction<dim> right_hand_side(-2.0);
       right_hand_side.value_list(scratch_data.fe_values.get_quadrature_points(),
                                  rhs_values);
 
@@ -269,8 +270,8 @@ namespace Step11
       const unsigned int n_face_q_points =
         scratch_data.fe_face_values.get_quadrature().size();
 
-      std::vector<double>   face_boundary_values(n_face_q_points);
-      ConstantFunction<dim> boundary_values(1.0);
+      std::vector<double>              face_boundary_values(n_face_q_points);
+      Functions::ConstantFunction<dim> boundary_values(1.0);
 
       scratch_data.fe_face_values.reinit(cell, face_no);
       boundary_values.value_list(
@@ -333,7 +334,7 @@ namespace Step11
     VectorTools::integrate_difference(mapping,
                                       dof_handler,
                                       solution,
-                                      ZeroFunction<dim>(),
+                                      Functions::ZeroFunction<dim>(),
                                       norm_per_cell,
                                       QGauss<dim>(gauss_degree + 1),
                                       VectorTools::H1_seminorm);
@@ -348,8 +349,7 @@ namespace Step11
     // Last task -- generate output:
     output_table.add_value("cells", triangulation.n_active_cells());
     output_table.add_value("|u|_1", norm);
-    output_table.add_value("error",
-                           std::fabs(norm - std::sqrt(3.14159265358 / 2)));
+    output_table.add_value("error", std::fabs(norm - std::sqrt(numbers::PI_2)));
   }
 
 

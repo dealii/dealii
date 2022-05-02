@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,17 +33,14 @@ namespace LocalIntegrators
 {
   /**
    * @brief Integrators writing patches with values in quadrature points
-   *
-   * @author Guido Kanschat
-   * @date 2011
    */
   namespace Patches
   {
     template <int dim>
     inline void
-      points_and_values(Table<2, double> &                          result,
-                        const FEValuesBase<dim> &                   fe,
-                        const ArrayView<const std::vector<double>> &input)
+    points_and_values(Table<2, double> &                          result,
+                      const FEValuesBase<dim> &                   fe,
+                      const ArrayView<const std::vector<double>> &input)
     {
       const unsigned int n_comp = fe.get_fe().n_components();
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);

@@ -1,0 +1,28 @@
+
+DEAL:Serialization:Float::f: x*y
+DEAL:Serialization:Float::g: x/y
+DEAL:Serialization:Float::f(x,y): 20.00000000
+DEAL:Serialization:Float::g(x,y): 5.000000000
+DEAL:Serialization:Float::
+DEAL:Serialization:Float::Serializing...
+DEAL:Serialization:Float::Deserializing...
+DEAL:Serialization:Float::f: x*y
+DEAL:Serialization:Float::g: x/y
+DEAL:Serialization:Float::f(x,y): 20.00000000
+DEAL:Serialization:Float::g(x,y): 5.000000000
+DEAL:Serialization:Float::
+DEAL:Serialization:Float::OK
+DEAL:Serialization:Double::f: x*y
+DEAL:Serialization:Double::g: x/y
+DEAL:Serialization:Double::f(x,y): 20.00000000
+DEAL:Serialization:Double::g(x,y): 5.000000000
+DEAL:Serialization:Double::
+DEAL:Serialization:Double::Serializing...
+DEAL:Serialization:Double::Deserializing...
+DEAL:Serialization:Double::f: x*y
+DEAL:Serialization:Double::g: x/y
+DEAL:Serialization:Double::f(x,y): 20.00000000
+DEAL:Serialization:Double::g(x,y): 5.000000000
+DEAL:Serialization:Double::
+DEAL:Serialization:Double::OK
+DEAL::OK

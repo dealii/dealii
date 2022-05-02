@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// check correct behaviour of Trilinos ghosted vectors
+// check correct behavior of Trilinos ghosted vectors
 // check if assignment from a normal vector works correctly and updates the
 // ghost values
 
@@ -74,8 +74,8 @@ test()
 
   if (myid == 0)
     {
-      deallog << myid * 2 << ":" << v(myid * 2) << std::endl;
-      deallog << myid * 2 + 1 << ":" << v(myid * 2 + 1) << std::endl;
+      deallog << myid * 2 << ':' << v(myid * 2) << std::endl;
+      deallog << myid * 2 + 1 << ':' << v(myid * 2 + 1) << std::endl;
     }
 
   if (myid == 0)

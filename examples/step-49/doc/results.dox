@@ -28,7 +28,7 @@ to use a curved geometry. The way to do this requires three steps:
 - Create an object that describes the desired geometry. This object will be
   queried when refining the Triangulation for new point placement. It will also
   be used to calculate shape function values if a high degree mapping, like
-  MappingQ or MappingQGeneric, is used during system assembly.
+  MappingQ, is used during system assembly.
   In deal.II the Manifold class and classes inheriting from it (e.g.,
   PolarManifold and FlatManifold) perform these calculations.
 - Notify the Triangulation object which Manifold classes to use. By default, a
@@ -91,7 +91,7 @@ void create_2d_grid(
   std::vector<CellData<2>> cells(vertex_indices.size());
   for (unsigned int i = 0; i < cells.size(); ++i)
     {
-      for (unsigned int j = 0; j < GeometryInfo<2>::vertices_per_cell; ++j)
+      for (unsigned int j = 0; j < vertex_indices[i].size(); ++j)
         cells[i].vertices[j] = vertex_indices[i][j];
     }
 
@@ -334,7 +334,7 @@ the nice detail of the boundary fitted mesh if we refine two more times:
      alt="" width="400" height="355">
 
 
-<h3> Possible extensions </h3>
+<h3> Possibilities for extensions </h3>
 
 <h4> Assigning different boundary ids </h4>
 

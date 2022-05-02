@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,13 +22,13 @@
  * function if cell and color of the function are provided.
  */
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_enriched.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <map>
 
@@ -90,9 +90,9 @@ main(int argc, char **argv)
   MPILogInitAll                    all;
 
   // Make basic grid
-  const unsigned int  dim = 2;
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  const unsigned int dim = 2;
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler(triangulation);
   GridGenerator::hyper_cube(triangulation, -2, 2);
   triangulation.refine_global(2);
 
@@ -130,8 +130,9 @@ main(int argc, char **argv)
   for (unsigned int i = 0; i < vec_predicates.size(); ++i)
     {
       // constant function is chosen as enrichment function
-      ConstantFunction<dim> func(i);
-      vec_enrichments.push_back(std::make_shared<ConstantFunction<dim>>(func));
+      Functions::ConstantFunction<dim> func(i);
+      vec_enrichments.push_back(
+        std::make_shared<Functions::ConstantFunction<dim>>(func));
     }
 
   // Construct container for color enrichment functions needed
@@ -156,7 +157,7 @@ main(int argc, char **argv)
       unsigned int cell_id = cell->index();
       deallog << cell_id << ":predicates=";
       for (auto predicate : vec_predicates)
-        deallog << predicate(cell) << ":";
+        deallog << predicate(cell) << ':';
 
       /*
        * Check if a color and enrichment index map exists for the cell.

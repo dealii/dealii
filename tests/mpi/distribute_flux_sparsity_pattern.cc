@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,11 +63,9 @@ namespace LinearAdvectionTest
     assemble_system();
     void
     calculate_flux_terms(
-      const TriaActiveIterator<DoFCellAccessor<DoFHandler<dim>, false>>
-        &                current_cell,
-      FEFaceValues<dim> &current_face_values,
-      const TriaIterator<DoFCellAccessor<DoFHandler<dim>, false>>
-        &                 neighbor_cell,
+      const TriaActiveIterator<DoFCellAccessor<dim, dim, false>> &current_cell,
+      FEFaceValues<dim> &                                   current_face_values,
+      const TriaIterator<DoFCellAccessor<dim, dim, false>> &neighbor_cell,
       FEFaceValues<dim> & neighbor_face_values,
       FullMatrix<double> &current_to_current_flux,
       FullMatrix<double> &current_to_neighbor_flux,
@@ -146,11 +144,10 @@ namespace LinearAdvectionTest
   template <int dim>
   void
   AdvectionProblem<dim>::calculate_flux_terms(
-    const TriaActiveIterator<DoFCellAccessor<DoFHandler<dim>, false>>
-      &                current_cell,
-    FEFaceValues<dim> &current_face_values,
-    const TriaIterator<DoFCellAccessor<DoFHandler<dim>, false>> &neighbor_cell,
-    FEFaceValues<dim> & neighbor_face_values,
+    const TriaActiveIterator<DoFCellAccessor<dim, dim, false>> &current_cell,
+    FEFaceValues<dim> &                                   current_face_values,
+    const TriaIterator<DoFCellAccessor<dim, dim, false>> &neighbor_cell,
+    FEFaceValues<dim> &                                   neighbor_face_values,
     FullMatrix<double> &current_to_current_flux,
     FullMatrix<double> &current_to_neighbor_flux,
     FullMatrix<double> &neighbor_to_current_flux,

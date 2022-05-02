@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,7 @@
 #include <boost/python.hpp>
 
 #include <cell_accessor_wrapper.h>
+#include <reference_cell_wrapper.h>
 #include <triangulation_wrapper.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -150,6 +151,26 @@ namespace python
     " for activity of a cell).                                           \n";
 
 
+
+  const char reference_cell_docstring[] =
+    " Reference cell of the current cell).                               \n";
+
+
+
+  const char n_vertices_docstring[] =
+    " Number of vertices.                                                \n";
+
+
+
+  const char n_lines_docstring[] =
+    " Number of lines.                                                   \n";
+
+
+
+  const char n_faces_docstring[] =
+    " Number of faces.                                                   \n";
+
+
   void
   export_cell_accessor()
   {
@@ -238,7 +259,23 @@ namespace python
       .def("vertex_index",
            &CellAccessorWrapper::vertex_index,
            vertex_index_docstring,
-           boost::python::args("self", "vertex"));
+           boost::python::args("self", "vertex"))
+      .def("reference_cell",
+           &CellAccessorWrapper::reference_cell,
+           reference_cell_docstring,
+           boost::python::args("self"))
+      .def("n_vertices",
+           &CellAccessorWrapper::n_vertices,
+           n_vertices_docstring,
+           boost::python::args("self"))
+      .def("n_lines",
+           &CellAccessorWrapper::n_lines,
+           n_lines_docstring,
+           boost::python::args("self"))
+      .def("n_faces",
+           &CellAccessorWrapper::n_faces,
+           n_faces_docstring,
+           boost::python::args("self"));
   }
 } // namespace python
 

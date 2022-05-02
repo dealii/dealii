@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,7 +43,6 @@ namespace Functions
    * derived classes.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2007
    */
   template <int dim>
   class FlowFunction : public Function<dim>
@@ -115,8 +114,11 @@ namespace Functions
     vector_laplacian_list(const std::vector<Point<dim>> &points,
                           std::vector<Vector<double>> &  values) const override;
 
-    std::size_t
-    memory_consumption() const;
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
 
   protected:
     /**
@@ -147,7 +149,6 @@ namespace Functions
    * is used to scale the pressure properly for a Navier-Stokes problem.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2007
    */
   template <int dim>
   class PoisseuilleFlow : public FlowFunction<dim>
@@ -157,7 +158,7 @@ namespace Functions
      * Construct an object for the given channel radius <tt>r</tt> and the
      * Reynolds number <tt>Re</tt>.
      */
-    PoisseuilleFlow<dim>(const double r, const double Re);
+    PoisseuilleFlow(const double r, const double Re);
 
     virtual ~PoisseuilleFlow() override = default;
 
@@ -189,7 +190,6 @@ namespace Functions
    * \sin x\cos x\sin y\cos y\end{array}\right)
    * @f]
    * @ingroup functions
-   * @author Guido Kanschat, 2007
    */
   template <int dim>
   class StokesCosine : public FlowFunction<dim>
@@ -242,7 +242,6 @@ namespace Functions
    * Taken from Houston, Sch&ouml;tzau, Wihler, proceeding ENUMATH 2003.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2007
    */
   class StokesLSingularity : public FlowFunction<2>
   {
@@ -296,7 +295,6 @@ namespace Functions
    * This function is valid on the half plane right of the line <i>x=1/2</i>.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2007
    */
   class Kovasznay : public FlowFunction<2>
   {

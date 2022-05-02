@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,8 +55,8 @@ main(int argc, char **argv)
   triangulation.refine_global(5);
 
   FE_Q<2>       fe_q(1);
-  DoFHandler<2> dof_handler;
-  dof_handler.initialize(triangulation, fe_q);
+  DoFHandler<2> dof_handler(triangulation);
+  dof_handler.distribute_dofs(fe_q);
 
   QGauss<2> quadrature(2);
 

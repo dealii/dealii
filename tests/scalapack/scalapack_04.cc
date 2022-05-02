@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,8 +56,8 @@ test(const unsigned int size,
                                           block_size,
                                           LAPACKSupport::Property::symmetric);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
-        << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << ' ' << block_size << ' ' << grid->get_process_grid_rows()
+        << ' ' << grid->get_process_grid_columns() << std::endl;
 
   create_spd(full_A);
 
@@ -80,9 +80,9 @@ test(const unsigned int size,
     dealii::Utilities::MPI::sum(s_frobenius, mpi_communicator) /
     n_mpi_processes;
 
-  pcout << l1 << " " << s_l1 << " " << as_l1 << std::endl
-        << linfty << " " << s_linfty << " " << as_linfty << std::endl
-        << frobenius << " " << s_frobenius << " " << as_frobenius << std::endl;
+  pcout << l1 << ' ' << s_l1 << ' ' << as_l1 << std::endl
+        << linfty << ' ' << s_linfty << ' ' << as_linfty << std::endl
+        << frobenius << ' ' << s_frobenius << ' ' << as_frobenius << std::endl;
 
   AssertThrow(std::abs(l1 - as_l1) < tol * std::abs(l1),
               dealii::ExcInternalError());

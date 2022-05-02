@@ -1,19 +1,10 @@
 
-DEAL::DoFs in the 0. component for classical FE: 17
-DEAL::DoFs in the 0. component for hp FE: 17
-DEAL::DoFs in the 1. component for classical FE: 17
-DEAL::DoFs in the 1. component for hp FE: 17
-DEAL::DoFs in the 2. component for classical FE: 9
-DEAL::DoFs in the 2. component for hp FE: 9
-DEAL::DoFs in the 0. component for classical FE: 289
-DEAL::DoFs in the 0. component for hp FE: 289
-DEAL::DoFs in the 1. component for classical FE: 289
-DEAL::DoFs in the 1. component for hp FE: 289
-DEAL::DoFs in the 2. component for classical FE: 81
-DEAL::DoFs in the 2. component for hp FE: 81
-DEAL::DoFs in the 0. component for classical FE: 4913
-DEAL::DoFs in the 0. component for hp FE: 4913
-DEAL::DoFs in the 1. component for classical FE: 4913
-DEAL::DoFs in the 1. component for hp FE: 4913
-DEAL::DoFs in the 2. component for classical FE: 729
-DEAL::DoFs in the 2. component for hp FE: 729
+DEAL::DoFs in the 0. component: 17
+DEAL::DoFs in the 1. component: 17
+DEAL::DoFs in the 2. component: 9
+DEAL::DoFs in the 0. component: 289
+DEAL::DoFs in the 1. component: 289
+DEAL::DoFs in the 2. component: 81
+DEAL::DoFs in the 0. component: 4913
+DEAL::DoFs in the 1. component: 4913
+DEAL::DoFs in the 2. component: 729

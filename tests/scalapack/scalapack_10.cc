@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,7 +68,7 @@ test(const unsigned int size, const unsigned int block_size)
   scalapack_matrix_copy.copy_to(copy);
   copy.add(-1, full);
 
-  pcout << size << " " << block_size << std::endl;
+  pcout << size << ' ' << block_size << std::endl;
 
   if (copy.frobenius_norm() > 1e-12)
     pcout << "norm of difference: " << copy.frobenius_norm() << std::endl;

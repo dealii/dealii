@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ test(const unsigned int degree)
   typename DoFHandler<dim>::cell_iterator c = dof.begin();
   dof.distribute_dofs(fe_rt);
 
-  QTrapez<1>         q_trapez;
+  QTrapezoid<1>      q_trapez;
   const unsigned int div = 4;
   QIterated<dim>     q(q_trapez, div);
   FEValues<dim>      fe(fe_rt, q, update_values | update_JxW_values);

@@ -1,0 +1,150 @@
+<h1>Results</h1>
+
+Since there was no change to the physics of the problem that has first been analyzed
+in step-15, there is nothing to report about that. The only outwardly noticeable
+difference between them is that, by default, this program will only run 9 mesh
+refinement steps (as opposed to step-15, which executes 11 refinements).
+This will be observable in the simulation status that appears between the
+header text that prints which assembly method is being used, and the final
+timings. (All timings reported below were obtained in release mode.)
+
+@code
+Mesh refinement step 0
+  Initial residual: 1.53143
+  Residual: 1.08746
+  Residual: 0.966748
+  Residual: 0.859602
+  Residual: 0.766462
+  Residual: 0.685475
+
+...
+
+Mesh refinement step 9
+  Initial residual: 0.00924594
+  Residual: 0.00831928
+  Residual: 0.0074859
+  Residual: 0.0067363
+  Residual: 0.00606197
+  Residual: 0.00545529
+@endcode
+
+So what is interesting for us to compare is how long the assembly process takes
+for the three different implementations, and to put that into some greater context.
+Below is the output for the hand linearization (as computed on a circa 2012
+four core, eight thread laptop -- but we're only really interested in the
+relative time between the different implementations):
+@code
+******** Assembly approach ********
+Unassisted implementation (full hand linearization).
+
+...
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      35.1s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble                        |        50 |      1.56s |       4.5% |
+| Solve                           |        50 |      30.8s |        88% |
++---------------------------------+-----------+------------+------------+
+@endcode
+And for the implementation that linearizes the residual in an automated
+manner using the Sacado dynamic forward AD number type:
+@code
+******** Assembly approach ********
+Automated linearization of the finite element residual.
+
+...
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      40.1s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble                        |        50 |       8.8s |        22% |
+| Solve                           |        50 |      28.6s |        71% |
++---------------------------------+-----------+------------+------------+
+@endcode
+And, lastly, for the implementation that computes both the residual and
+its linearization directly from an energy functional (using nested Sacado
+dynamic forward AD numbers):
+@code
+******** Assembly approach ********
+Automated computation of finite element residual and linearization using a variational formulation.
+
+...
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      48.8s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble                        |        50 |      16.7s |        34% |
+| Solve                           |        50 |      29.3s |        60% |
++---------------------------------+-----------+------------+------------+
+@endcode
+
+It's evident that the more work that is passed off to the automatic differentiation
+framework to perform, the more time is spent during the assembly process. Accumulated
+over all refinement steps, using one level of automatic differentiation resulted
+in $5.65 \times$ more computational time being spent in the assembly stage when
+compared to unassisted assembly, while assembling the discrete linear system took
+$10.7 \times$ longer when deriving directly from the energy functional.
+Unsurprisingly, the overall time spent solving the linear system remained unchanged.
+This means that the proportion of time spent in the solve phase to the assembly phase
+shifted significantly as the number of times automated differentiation was performed
+at the finite element level. For many, this might mean that leveraging higher-order
+differentiation (at the finite element level) in production code leads to an
+unacceptable overhead, but it may still be useful during the prototyping phase.
+A good compromise between the two may, therefore, be the automated linearization
+of the finite element residual, which offers a lot of convenience at a measurable,
+but perhaps not unacceptable, cost. Alternatively, one could consider
+not re-building the Newton matrix in every step -- a topic that is
+explored in substantial depth in step-77.
+
+Of course, in practice the actual overhead is very much dependent on the problem being evaluated
+(e.g., how many components there are in the solution, what the nature of the function
+being differentiated is, etc.). So the exact results presented here should be
+interpreted within the context of this scalar problem alone, and when it comes to
+other problems, some preliminary investigation by the user is certainly warranted.
+
+
+<h3> Possibilities for extensions </h3>
+
+Like step-71, there are a few items related to automatic differentiation that could
+be evaluated further:
+- The use of other AD frameworks should be investigated, with the outlook that
+  alternative implementations may provide performance benefits.
+- It is also worth evaluating AD number types other than those that have been
+  hard-coded into this tutorial. With regard to twice differentiable types
+  employed at the finite-element level, mixed differentiation modes ("RAD-FAD")
+  should in principle be more computationally efficient than the single
+  mode ("FAD-FAD") types employed here. The reason that the RAD-FAD type was not
+  selected by default is that, at the time of writing, there remain some
+  bugs in its implementation within the Sacado library that lead to memory leaks.
+  This is documented in the @ref auto_symb_diff module.
+- It might be the case that using reduced precision types (i.e., `float`) as the
+  scalar types for the AD numbers could render a reduction in computational
+  expense during assembly. Using `float` as the data type for the
+  matrix and the residual is not unreasonable, given that the Newton
+  update is only meant to get us closer to the solution, but not
+  actually *to* the solution; as a consequence, it makes sense to
+  consider using reduced-precision data types for computing these
+  updates, and then accumulating these updates in a solution vector
+  that uses the full `double` precision accuracy.
+- One further method of possibly reducing resources during assembly is to frame
+  the AD implementations as a constitutive model. This would be similar to the
+  approach adopted in step-71, and pushes the starting point for the automatic
+  differentiation one level higher up the chain of computations. This, in turn,
+  means that less operations are tracked by the AD library, thereby reducing the
+  cost of differentiating (even though one would perform the differentiation at
+  each cell quadrature point).
+- step-77 is yet another variation of step-15 that addresses a very
+  different part of the problem: Line search and whether it is
+  necessary to re-build the Newton matrix in every nonlinear
+  iteration. Given that the results above show that using automatic
+  differentiation comes at a cost, the techniques in step-77 have the
+  potential to offset these costs to some degree. It would therefore
+  be quite interesting to combine the current program with the
+  techniques in step-77. For production codes, this would certainly be
+  the way to go.

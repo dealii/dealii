@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,7 @@
 
 #include <deal.II/distributed/shared_tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -38,7 +39,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/q_collection.h>
 
@@ -86,13 +86,13 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
     false,
     parallel::shared::Triangulation<dim>::partition_metis);
   GridGenerator::hyper_cube(tria);
-  tria.refine_global(3);
+  tria.refine_global(2);
 
   hp::FECollection<dim> fe;
   fe.push_back(FESystem<dim>(FE_Q<dim>(4), dim));
   fe.push_back(FESystem<dim>(FE_Q<dim>(5), dim));
   fe.push_back(FESystem<dim>(FE_Q<dim>(6), dim));
-  hp::DoFHandler<dim> dofh(tria);
+  DoFHandler<dim> dofh(tria);
 
   // assign FEs mostly randomly to each cell
   for (auto &cell : dofh.active_cell_iterators())
@@ -112,9 +112,9 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
 
   Vector<double>       cellwise_errors(tria.n_active_cells());
   hp::QCollection<dim> quadrature;
-  quadrature.push_back(QIterated<dim>(QTrapez<1>(), 5));
-  quadrature.push_back(QIterated<dim>(QTrapez<1>(), 6));
-  quadrature.push_back(QIterated<dim>(QTrapez<1>(), 7));
+  quadrature.push_back(QIterated<dim>(QTrapezoid<1>(), 5));
+  quadrature.push_back(QIterated<dim>(QTrapezoid<1>(), 6));
+  quadrature.push_back(QIterated<dim>(QTrapezoid<1>(), 7));
 
   const dealii::Function<dim, double> *w = nullptr;
   VectorTools::integrate_difference(dofh,
@@ -186,5 +186,6 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
+  deallog << std::setprecision(10) << std::endl;
   test<3>();
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,7 @@ public:
 class EmptyInfoBox
 {
 public:
-  typedef EmptyInfo CellInfo;
+  using CellInfo = EmptyInfo;
   template <int dim, class DOFINFO>
   void
   post_cell(const MeshWorker::DoFInfoBox<dim, DOFINFO> &)

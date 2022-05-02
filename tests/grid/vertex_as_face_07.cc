@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,9 +16,10 @@
 
 // verify that we can do things like cell->face() in 1d as well. here:
 // test cell->face(0)->get_dof_indices()
-// compared to _06, we now test for an hp DoFHandler
+// compared to _06, we now test for an hp-DoFHandler
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
@@ -28,7 +29,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -37,9 +37,9 @@
 
 template <int spacedim>
 void
-print_dofs(const typename hp::DoFHandler<1, spacedim>::face_iterator &i,
-           const unsigned int                                         fe_index,
-           const unsigned int                                         n)
+print_dofs(const typename DoFHandler<1, spacedim>::face_iterator &i,
+           const unsigned int                                     fe_index,
+           const unsigned int                                     n)
 {
   std::vector<types::global_dof_index> dof_indices(n);
   i->get_dof_indices(dof_indices, fe_index);
@@ -52,8 +52,8 @@ print_dofs(const typename hp::DoFHandler<1, spacedim>::face_iterator &i,
 
 template <int spacedim>
 void
-print_dofs(const typename hp::DoFHandler<1, spacedim>::cell_iterator &i,
-           const unsigned int                                         n)
+print_dofs(const typename DoFHandler<1, spacedim>::cell_iterator &i,
+           const unsigned int                                     n)
 {
   std::vector<types::global_dof_index> dof_indices(n);
   i->get_dof_indices(dof_indices);
@@ -77,7 +77,7 @@ test()
   fe_collection.push_back(fe1);
   fe_collection.push_back(fe2);
 
-  hp::DoFHandler<1, spacedim> dof_handler(tria);
+  DoFHandler<1, spacedim> dof_handler(tria);
   dof_handler.begin_active()->set_active_fe_index(0);
   dof_handler.distribute_dofs(fe_collection);
 
@@ -92,7 +92,7 @@ test()
   tria.refine_global(2);
   {
     unsigned int index = 0;
-    for (typename hp::DoFHandler<1, spacedim>::active_cell_iterator cell =
+    for (typename DoFHandler<1, spacedim>::active_cell_iterator cell =
            dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell, index = (index + 1) % fe_collection.size())
@@ -100,7 +100,7 @@ test()
   }
   dof_handler.distribute_dofs(fe_collection);
 
-  for (typename hp::DoFHandler<1, spacedim>::active_cell_iterator cell =
+  for (typename DoFHandler<1, spacedim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)

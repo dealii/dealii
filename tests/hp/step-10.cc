@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
@@ -33,7 +34,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
 #include <iostream>
@@ -107,7 +107,7 @@ compute_pi_by_area()
 
       const hp::FECollection<dim> dummy_fe(FE_Q<dim>(1));
 
-      hp::DoFHandler<dim> dof_handler(triangulation);
+      DoFHandler<dim> dof_handler(triangulation);
 
       hp::FEValues<dim> x_fe_values(mapping,
                                     dummy_fe,
@@ -125,7 +125,7 @@ compute_pi_by_area()
 
           long double area = 0;
 
-          typename hp::DoFHandler<dim>::active_cell_iterator
+          typename DoFHandler<dim>::active_cell_iterator
             cell = dof_handler.begin_active(),
             endc = dof_handler.end();
           for (; cell != endc; ++cell)
@@ -173,7 +173,7 @@ compute_pi_by_perimeter()
       const hp::MappingCollection<dim> mapping(m);
       const hp::FECollection<dim>      fe(FE_Q<dim>(1));
 
-      hp::DoFHandler<dim> dof_handler(triangulation);
+      DoFHandler<dim> dof_handler(triangulation);
 
       hp::FEFaceValues<dim> x_fe_face_values(mapping,
                                              fe,
@@ -188,7 +188,7 @@ compute_pi_by_perimeter()
 
           dof_handler.distribute_dofs(fe);
 
-          typename hp::DoFHandler<dim>::active_cell_iterator
+          typename DoFHandler<dim>::active_cell_iterator
             cell                = dof_handler.begin_active(),
             endc                = dof_handler.end();
           long double perimeter = 0;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,15 +68,15 @@ main(int argc, char **argv)
 
         // check
         // TrilinosWrappers::SparseMatrix
-        const unsigned int n_jobs = Utilities::Trilinos::get_n_mpi_processes(
-          Utilities::Trilinos::comm_world());
+        const unsigned int n_jobs =
+          Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+        const unsigned int my_id =
+          Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
         Assert(n_dofs % n_jobs == 0, ExcInternalError());
         const unsigned int n_local_dofs = n_dofs / n_jobs;
-        Epetra_Map map(static_cast<TrilinosWrappers::types::int_type>(n_dofs),
-                       static_cast<TrilinosWrappers::types::int_type>(
-                         n_local_dofs),
-                       Utilities::Trilinos::comm_world());
-        TrilinosWrappers::SparseMatrix v2(map, 5);
+        IndexSet           local_rows(n_dofs);
+        local_rows.add_range(n_local_dofs * my_id, n_local_dofs * (my_id + 1));
+        TrilinosWrappers::SparseMatrix v2(local_rows, MPI_COMM_WORLD, 5);
         test(v2);
       }
     }

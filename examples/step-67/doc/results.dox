@@ -373,7 +373,7 @@ If we switch to the Harten-Lax-van Leer flux, the results are as follows:
 </table>
 
 The tables show that we get optimal $\mathcal O\left(h^{p+1}\right)$
-convergence rates for both numerical fluxes. The errors are slighly smaller
+convergence rates for both numerical fluxes. The errors are slightly smaller
 for the Lax--Friedrichs flux for $p=2$, but the picture is reversed for
 $p=3$; in any case, the differences on this testcase are relatively
 small.
@@ -455,6 +455,20 @@ by increasing resolution. Apart from this effect, the rich wave structure is
 the result of the transport accuracy of the high-order DG method.
 
 <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_elevated.jpg" alt="" width="40%">
+
+If we run the program with degree 2 and 6 levels of global refinements (410k
+cells, 14.7M unknowns), we get the following evolution of the pressure
+(elevation plot, colored by the value of the density):
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/ivxCLiSdQpc"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
 
 With 2 levels of global refinement with 1,600 cells, the mesh and its
 partitioning on 40 MPI processes looks as follows:
@@ -657,7 +671,7 @@ Time:       2, dt:  5.6e-05, norm rho:    0.01189, rho * u:    0.03145, energy: 
 +-------------------------------------------+------------------+------------+------------------+
 | compute errors                |        41 |     2.632s   178 |     7.221s |     16.56s     0 |
 | compute transport speed       |      7072 |       714s   193 |      1553s |      3351s     0 |
-| output                        |     35350 |      8065s   176 |      8070s |      8079s     0 |
+| output                        |        41 |      8065s   176 |      8070s |      8079s     0 |
 | rk time stepping total        |     35350 |  4.25e+04s     0 |  4.43e+04s | 4.515e+04s   193 |
 | rk_stage - integrals L_h      |    176750 | 2.936e+04s   134 | 3.222e+04s |  3.67e+04s    99 |
 | rk_stage - inv mass + vec upd |    176750 |      7004s    99 | 1.207e+04s |  1.55e+04s   132 |
@@ -725,6 +739,10 @@ convective form $(\mathbf v, \tilde{\mathbf{F}}(\mathbf w)\nabla
 the equation and the integration formula, and can in some cases by understood
 by special skew-symmetric finite difference schemes.
 
+To get started, interested readers could take a look at
+https://github.com/kronbichler/advection_miniapp, where a
+skew-symmetric DG formulation is implemented with deal.II for a simple advection
+equation.
 
 <h4>Equipping the code for supersonic calculations</h4>
 
@@ -791,7 +809,7 @@ matched layers</a> -- where the solution is damped without reflection
 -- are common.
 
 
-<h4>Extension to the compressible Navier-Stokes equation</h4>
+<h4>Extension to the compressible Navier-Stokes equations</h4>
 
 The solver presented in this tutorial program can also be extended to the
 compressible Navier--Stokes equations by adding viscous terms, as described in
@@ -799,3 +817,19 @@ compressible Navier--Stokes equations by adding viscous terms, as described in
 here despite the additional cost of elliptic terms, e.g. via an interior
 penalty method, one can switch the basis from FE_DGQ to FE_DGQHermite like in
 the step-59 tutorial program.
+
+
+<h4>Using cell-centric loops and shared memory</h4>
+
+In this tutorial, we used face-centric loops. Here, cell and face integrals
+are treated in separate loops, resulting in multiple writing accesses into the
+result vector, which is relatively expensive on modern hardware since writing
+operations generally result also in an implicit read operation. Element-centric
+loops, on the other hand, are processing a cell and in direct succession
+processing all its 2d faces. Although this kind of loop implies that fluxes have
+to be computed twice (for each side of an interior face), the fact that the
+result vector has to accessed only once might - and the fact that the resulting
+algorithm is free of race-conditions and as such perfectly suitable for
+shared memory - already give a performance boost. If you are interested in these
+advanced topics, you can take a look at step-76 where we take the present
+tutorial and modify it so that we can use these features.

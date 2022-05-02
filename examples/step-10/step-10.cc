@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2018 by the deal.II authors
+ * Copyright (C) 2001 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -23,13 +23,10 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_values.h>
 
 // This include file is new. Even if we are not solving a PDE in this tutorial,
@@ -51,24 +48,14 @@ namespace Step10
 {
   using namespace dealii;
 
-  // Now, as we want to compute the value of $\pi$, we have to compare to
-  // something. These are the first few digits of $\pi$, which we define
-  // beforehand for later use. Since we would like to compute the difference
-  // between two numbers which are quite accurate, with the accuracy of the
-  // computed approximation to $\pi$ being in the range of the number of
-  // digits which a double variable can hold, we rather declare the reference
-  // value as a <code>long double</code> and give it a number of extra digits:
-  const long double pi = 3.141592653589793238462643L;
-
-
-
   // Then, the first task will be to generate some output. Since this program
   // is so small, we do not employ object oriented techniques in it and do not
   // declare classes (although, of course, we use the object oriented features
   // of the library). Rather, we just pack the functionality into separate
   // functions. We make these functions templates on the number of space
   // dimensions to conform to usual practice when using deal.II, although we
-  // will only use them for two space dimensions.
+  // will only use them for two space dimensions and throw an exception when
+  // attempted to use for any other spatial dimension.
   //
   // The first of these functions just generates a triangulation of a circle
   // (hyperball) and outputs the $Q_p$ mapping of its cells for different values
@@ -165,14 +152,14 @@ namespace Step10
   // the triangulation, with $w(x_i)$ being the weight of quadrature point
   // $x_i$. The integrals on each cell are approximated by numerical
   // quadrature, hence the only additional ingredient we need is to set up a
-  // FEValues object that provides the corresponding `JxW' values of each
-  // cell. (Note that `JxW' is meant to abbreviate <i>Jacobian determinant
+  // FEValues object that provides the corresponding `JxW` values of each
+  // cell. (Note that `JxW` is meant to abbreviate <i>Jacobian determinant
   // times weight</i>; since in numerical quadrature the two factors always
   // occur at the same places, we only offer the combined quantity, rather
   // than two separate ones.) We note that here we won't use the FEValues
   // object in its original purpose, i.e. for the computation of values of
   // basis functions of a specific finite element at certain quadrature
-  // points. Rather, we use it only to gain the `JxW' at the quadrature
+  // points. Rather, we use it only to gain the `JxW` at the quadrature
   // points, irrespective of the (dummy) finite element we will give to the
   // constructor of the FEValues object. The actual finite element given to
   // the FEValues object is not used at all, so we could give any.
@@ -208,7 +195,7 @@ namespace Step10
 
         // We now create a finite element. Unlike the rest of the example
         // programs, we do not actually need to do any computations with shape
-        // functions; we only need the `JxW' values from an FEValues
+        // functions; we only need the `JxW` values from an FEValues
         // object. Hence we use the special finite element class FE_Nothing
         // which has exactly zero degrees of freedom per cell (as the name
         // implies, the local basis on each cell is the empty set). A more
@@ -216,14 +203,14 @@ namespace Step10
         const FE_Nothing<dim> fe;
 
         // Likewise, we need to create a DoFHandler object. We do not actually
-        // use it, but it will provide us with `active_cell_iterators' that
+        // use it, but it will provide us with `active_cell_iterators` that
         // are needed to reinitialize the FEValues object on each cell of the
         // triangulation.
         DoFHandler<dim> dof_handler(triangulation);
 
         // Now we set up the FEValues object, giving the Mapping, the dummy
         // finite element and the quadrature object to the constructor,
-        // together with the update flags asking for the `JxW' values at the
+        // together with the update flags asking for the `JxW` values at the
         // quadrature points only. This tells the FEValues object that it
         // needs not compute other quantities upon calling the
         // <code>reinit</code> function, thus saving computation time.
@@ -249,7 +236,7 @@ namespace Step10
           {
             // In this loop we first add the number of active cells of the
             // current triangulation to the table. This function automatically
-            // creates a table column with superscription `cells', in case
+            // creates a table column with superscription `cells`, in case
             // this column was not created before.
             table.add_value("cells", triangulation.n_active_cells());
 
@@ -260,37 +247,27 @@ namespace Step10
             // function below.
             dof_handler.distribute_dofs(fe);
 
-            // We define the variable area as `long double' like we did for
-            // the pi variable before.
-            long double area = 0;
-
             // Now we loop over all cells, reinitialize the FEValues object
-            // for each cell, and add up all the `JxW' values for this cell to
-            // `area'...
+            // for each cell, and add up all the `JxW` values for this cell to
+            // `area`...
+            double area = 0;
             for (const auto &cell : dof_handler.active_cell_iterators())
               {
                 fe_values.reinit(cell);
                 for (unsigned int i = 0; i < fe_values.n_quadrature_points; ++i)
-                  area += static_cast<long double>(fe_values.JxW(i));
+                  area += fe_values.JxW(i);
               }
 
             // ...and store the resulting area values and the errors in the
-            // table. We need a static cast to double as there is no
-            // add_value(string, long double) function implemented. Note that
-            // this also concerns the second call as the <code>fabs</code>
-            // function in the <code>std</code> namespace is overloaded on its
-            // argument types, so there exists a version taking and returning
-            // a <code>long double</code>, in contrast to the global namespace
-            // where only one such function is declared (which takes and
-            // returns a double).
-            table.add_value("eval.pi", static_cast<double>(area));
-            table.add_value("error", static_cast<double>(std::fabs(area - pi)));
+            // table:
+            table.add_value("eval.pi", area);
+            table.add_value("error", std::fabs(area - numbers::PI));
           }
 
-        // We want to compute the convergence rates of the `error'
+        // We want to compute the convergence rates of the `error`
         // column. Therefore we need to omit the other columns from the
         // convergence rate evaluation before calling
-        // `evaluate_all_convergence_rates'
+        // `evaluate_all_convergence_rates`
         table.omit_column_from_convergence_rate_evaluation("cells");
         table.omit_column_from_convergence_rate_evaluation("eval.pi");
         table.evaluate_all_convergence_rates(
@@ -319,7 +296,7 @@ namespace Step10
     std::cout << "Computation of Pi by the perimeter:" << std::endl
               << "===================================" << std::endl;
 
-    // We take the same order of quadrature but this time a `dim-1'
+    // We take the same order of quadrature but this time a `dim-1`
     // dimensional quadrature as we will integrate over (boundary) lines
     // rather than over cells.
     const QGauss<dim - 1> quadrature(4);
@@ -355,9 +332,9 @@ namespace Step10
             dof_handler.distribute_dofs(fe);
 
             // Now we run over all cells and over all faces of each cell. Only
-            // the contributions of the `JxW' values on boundary faces are
-            // added to the long double variable `perimeter'.
-            long double perimeter = 0;
+            // the contributions of the `JxW` values on boundary faces are
+            // added to the variable `perimeter`.
+            double perimeter = 0;
             for (const auto &cell : dof_handler.active_cell_iterators())
               for (const auto &face : cell->face_iterators())
                 if (face->at_boundary())
@@ -368,13 +345,11 @@ namespace Step10
                     for (unsigned int i = 0;
                          i < fe_face_values.n_quadrature_points;
                          ++i)
-                      perimeter +=
-                        static_cast<long double>(fe_face_values.JxW(i));
+                      perimeter += fe_face_values.JxW(i);
                   }
             // Then store the evaluated values in the table...
-            table.add_value("eval.pi", static_cast<double>(perimeter / 2.0L));
-            table.add_value(
-              "error", static_cast<double>(std::fabs(perimeter / 2.0L - pi)));
+            table.add_value("eval.pi", static_cast<double>(perimeter / 2.0));
+            table.add_value("error", std::fabs(perimeter / 2.0 - numbers::PI));
           }
 
         // ...and end this function as we did in the previous one:
@@ -403,10 +378,12 @@ int main()
     {
       std::cout.precision(16);
 
-      Step10::gnuplot_output<2>();
+      const unsigned int dim = 2;
 
-      Step10::compute_pi_by_area<2>();
-      Step10::compute_pi_by_perimeter<2>();
+      Step10::gnuplot_output<dim>();
+
+      Step10::compute_pi_by_area<dim>();
+      Step10::compute_pi_by_perimeter<dim>();
     }
   catch (std::exception &exc)
     {

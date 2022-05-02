@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,6 +73,11 @@ namespace PETScWrappers
           else
             {
               // ghost entry
+              Assert(vector.ghost_indices.is_element(index),
+                     ExcMessage(
+                       "You are trying to access an element of a vector "
+                       "that is neither a locally owned element nor a "
+                       "ghost element of the vector."));
               const size_type ghostidx =
                 vector.ghost_indices.index_within_set(index);
 
@@ -258,6 +263,18 @@ namespace PETScWrappers
 
 
   VectorBase::size_type
+  VectorBase::locally_owned_size() const
+  {
+    PetscInt             sz;
+    const PetscErrorCode ierr = VecGetLocalSize(vector, &sz);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    return sz;
+  }
+
+
+
+  VectorBase::size_type
   VectorBase::local_size() const
   {
     PetscInt             sz;
@@ -325,7 +342,8 @@ namespace PETScWrappers
 
 
 
-  PetscScalar VectorBase::operator*(const VectorBase &vec) const
+  PetscScalar
+  VectorBase::operator*(const VectorBase &vec) const
   {
     Assert(size() == vec.size(), ExcDimensionMismatch(size(), vec.size()));
 
@@ -594,8 +612,9 @@ namespace PETScWrappers
     PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    const PetscScalar *ptr = start_ptr, *eptr = start_ptr + local_size();
-    bool               flag = true;
+    const PetscScalar *ptr  = start_ptr,
+                      *eptr = start_ptr + locally_owned_size();
+    bool flag               = true;
     while (ptr != eptr)
       {
         if (*ptr != value_type())
@@ -647,8 +666,9 @@ namespace PETScWrappers
     PetscErrorCode ierr = VecGetArray(vector, &start_ptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    const PetscScalar *ptr = start_ptr, *eptr = start_ptr + local_size();
-    bool               flag = true;
+    const PetscScalar *ptr  = start_ptr,
+                      *eptr = start_ptr + locally_owned_size();
+    bool flag               = true;
     while (ptr != eptr)
       {
         if (!internal::is_non_negative(*ptr))
@@ -849,7 +869,7 @@ namespace PETScWrappers
                     const bool         scientific,
                     const bool         across) const
   {
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     // get a representation of the vector and
     // loop over all the elements
@@ -869,10 +889,10 @@ namespace PETScWrappers
       out.setf(std::ios::fixed, std::ios::floatfield);
 
     if (across)
-      for (size_type i = 0; i < local_size(); ++i)
+      for (size_type i = 0; i < locally_owned_size(); ++i)
         out << val[i] << ' ';
     else
-      for (size_type i = 0; i < local_size(); ++i)
+      for (size_type i = 0; i < locally_owned_size(); ++i)
         out << val[i] << std::endl;
     out << std::endl;
 
@@ -885,7 +905,7 @@ namespace PETScWrappers
     ierr = VecRestoreArray(vector, &val);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 
@@ -915,7 +935,7 @@ namespace PETScWrappers
     // TH: I am relatively sure that PETSc is
     // storing the local data in a contiguous
     // block without indices:
-    mem += local_size() * sizeof(PetscScalar);
+    mem += locally_owned_size() * sizeof(PetscScalar);
     // assume that PETSc is storing one index
     // and one double per ghost element
     if (ghosted)

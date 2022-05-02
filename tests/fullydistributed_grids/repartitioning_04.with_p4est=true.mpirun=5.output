@@ -1,0 +1,369 @@
+
+DEAL:0:true_false::n_levels:                  7
+DEAL:0:true_false::n_cells:                   465
+DEAL:0:true_false::n_active_cells:            349
+DEAL:0:true_false::has_hanging_nodes:         true
+DEAL:0:true_false::
+DEAL:0:true_false::n_dofs:                             4813
+DEAL:0:true_false::n_locally_owned_dofs:               993
+DEAL:0:true_false::has_hanging_nodes:                  true
+DEAL:0:true_false::
+DEAL:0:true_false::n_levels:                  7
+DEAL:0:true_false::n_cells:                   465
+DEAL:0:true_false::n_active_cells:            349
+DEAL:0:true_false::has_hanging_nodes:         true
+DEAL:0:true_false::
+DEAL:0:true_false::n_dofs:                             4813
+DEAL:0:true_false::n_locally_owned_dofs:               993
+DEAL:0:true_false::has_hanging_nodes:                  true
+DEAL:0:true_false::
+DEAL:0:true_true::n_levels:                  7
+DEAL:0:true_true::n_cells:                   465
+DEAL:0:true_true::n_active_cells:            349
+DEAL:0:true_true::has_hanging_nodes:         true
+DEAL:0:true_true::
+DEAL:0:true_true::n_dofs:                             4813
+DEAL:0:true_true::n_locally_owned_dofs:               993
+DEAL:0:true_true::has_hanging_nodes:                  true
+DEAL:0:true_true::
+DEAL:0:true_true::n_levels:                  7
+DEAL:0:true_true::n_cells:                   465
+DEAL:0:true_true::n_active_cells:            349
+DEAL:0:true_true::has_hanging_nodes:         true
+DEAL:0:true_true::
+DEAL:0:true_true::n_dofs:                             4813
+DEAL:0:true_true::n_locally_owned_dofs:               993
+DEAL:0:true_true::has_hanging_nodes:                  true
+DEAL:0:true_true::
+DEAL:0:false_false::n_levels:                  1
+DEAL:0:false_false::n_cells:                   1
+DEAL:0:false_false::n_active_cells:            1
+DEAL:0:false_false::has_hanging_nodes:         false
+DEAL:0:false_false::
+DEAL:0:false_false::n_dofs:                             9
+DEAL:0:false_false::n_locally_owned_dofs:               0
+DEAL:0:false_false::has_hanging_nodes:                  false
+DEAL:0:false_false::
+DEAL:0:false_false::n_levels:                  7
+DEAL:0:false_false::n_cells:                   465
+DEAL:0:false_false::n_active_cells:            349
+DEAL:0:false_false::has_hanging_nodes:         true
+DEAL:0:false_false::
+DEAL:0:false_false::n_dofs:                             4813
+DEAL:0:false_false::n_locally_owned_dofs:               993
+DEAL:0:false_false::has_hanging_nodes:                  true
+DEAL:0:false_false::
+DEAL:0:false_true::n_levels:                  1
+DEAL:0:false_true::n_cells:                   1
+DEAL:0:false_true::n_active_cells:            1
+DEAL:0:false_true::has_hanging_nodes:         false
+DEAL:0:false_true::
+DEAL:0:false_true::n_dofs:                             9
+DEAL:0:false_true::n_locally_owned_dofs:               0
+DEAL:0:false_true::has_hanging_nodes:                  false
+DEAL:0:false_true::
+DEAL:0:false_true::n_levels:                  7
+DEAL:0:false_true::n_cells:                   465
+DEAL:0:false_true::n_active_cells:            349
+DEAL:0:false_true::has_hanging_nodes:         true
+DEAL:0:false_true::
+DEAL:0:false_true::n_dofs:                             4813
+DEAL:0:false_true::n_locally_owned_dofs:               993
+DEAL:0:false_true::has_hanging_nodes:                  true
+DEAL:0:false_true::
+
+DEAL:1:true_false::n_levels:                  7
+DEAL:1:true_false::n_cells:                   577
+DEAL:1:true_false::n_active_cells:            433
+DEAL:1:true_false::has_hanging_nodes:         true
+DEAL:1:true_false::
+DEAL:1:true_false::n_dofs:                             4813
+DEAL:1:true_false::n_locally_owned_dofs:               944
+DEAL:1:true_false::has_hanging_nodes:                  true
+DEAL:1:true_false::
+DEAL:1:true_false::n_levels:                  7
+DEAL:1:true_false::n_cells:                   577
+DEAL:1:true_false::n_active_cells:            433
+DEAL:1:true_false::has_hanging_nodes:         true
+DEAL:1:true_false::
+DEAL:1:true_false::n_dofs:                             4813
+DEAL:1:true_false::n_locally_owned_dofs:               944
+DEAL:1:true_false::has_hanging_nodes:                  true
+DEAL:1:true_false::
+DEAL:1:true_true::n_levels:                  7
+DEAL:1:true_true::n_cells:                   577
+DEAL:1:true_true::n_active_cells:            433
+DEAL:1:true_true::has_hanging_nodes:         true
+DEAL:1:true_true::
+DEAL:1:true_true::n_dofs:                             4813
+DEAL:1:true_true::n_locally_owned_dofs:               944
+DEAL:1:true_true::has_hanging_nodes:                  true
+DEAL:1:true_true::
+DEAL:1:true_true::n_levels:                  7
+DEAL:1:true_true::n_cells:                   577
+DEAL:1:true_true::n_active_cells:            433
+DEAL:1:true_true::has_hanging_nodes:         true
+DEAL:1:true_true::
+DEAL:1:true_true::n_dofs:                             4813
+DEAL:1:true_true::n_locally_owned_dofs:               944
+DEAL:1:true_true::has_hanging_nodes:                  true
+DEAL:1:true_true::
+DEAL:1:false_false::n_levels:                  1
+DEAL:1:false_false::n_cells:                   1
+DEAL:1:false_false::n_active_cells:            1
+DEAL:1:false_false::has_hanging_nodes:         false
+DEAL:1:false_false::
+DEAL:1:false_false::n_dofs:                             9
+DEAL:1:false_false::n_locally_owned_dofs:               0
+DEAL:1:false_false::has_hanging_nodes:                  false
+DEAL:1:false_false::
+DEAL:1:false_false::n_levels:                  7
+DEAL:1:false_false::n_cells:                   577
+DEAL:1:false_false::n_active_cells:            433
+DEAL:1:false_false::has_hanging_nodes:         true
+DEAL:1:false_false::
+DEAL:1:false_false::n_dofs:                             4813
+DEAL:1:false_false::n_locally_owned_dofs:               944
+DEAL:1:false_false::has_hanging_nodes:                  true
+DEAL:1:false_false::
+DEAL:1:false_true::n_levels:                  1
+DEAL:1:false_true::n_cells:                   1
+DEAL:1:false_true::n_active_cells:            1
+DEAL:1:false_true::has_hanging_nodes:         false
+DEAL:1:false_true::
+DEAL:1:false_true::n_dofs:                             9
+DEAL:1:false_true::n_locally_owned_dofs:               0
+DEAL:1:false_true::has_hanging_nodes:                  false
+DEAL:1:false_true::
+DEAL:1:false_true::n_levels:                  7
+DEAL:1:false_true::n_cells:                   577
+DEAL:1:false_true::n_active_cells:            433
+DEAL:1:false_true::has_hanging_nodes:         true
+DEAL:1:false_true::
+DEAL:1:false_true::n_dofs:                             4813
+DEAL:1:false_true::n_locally_owned_dofs:               944
+DEAL:1:false_true::has_hanging_nodes:                  true
+DEAL:1:false_true::
+
+
+DEAL:2:true_false::n_levels:                  7
+DEAL:2:true_false::n_cells:                   665
+DEAL:2:true_false::n_active_cells:            499
+DEAL:2:true_false::has_hanging_nodes:         true
+DEAL:2:true_false::
+DEAL:2:true_false::n_dofs:                             4813
+DEAL:2:true_false::n_locally_owned_dofs:               960
+DEAL:2:true_false::has_hanging_nodes:                  true
+DEAL:2:true_false::
+DEAL:2:true_false::n_levels:                  7
+DEAL:2:true_false::n_cells:                   665
+DEAL:2:true_false::n_active_cells:            499
+DEAL:2:true_false::has_hanging_nodes:         true
+DEAL:2:true_false::
+DEAL:2:true_false::n_dofs:                             4813
+DEAL:2:true_false::n_locally_owned_dofs:               960
+DEAL:2:true_false::has_hanging_nodes:                  true
+DEAL:2:true_false::
+DEAL:2:true_true::n_levels:                  7
+DEAL:2:true_true::n_cells:                   665
+DEAL:2:true_true::n_active_cells:            499
+DEAL:2:true_true::has_hanging_nodes:         true
+DEAL:2:true_true::
+DEAL:2:true_true::n_dofs:                             4813
+DEAL:2:true_true::n_locally_owned_dofs:               960
+DEAL:2:true_true::has_hanging_nodes:                  true
+DEAL:2:true_true::
+DEAL:2:true_true::n_levels:                  7
+DEAL:2:true_true::n_cells:                   665
+DEAL:2:true_true::n_active_cells:            499
+DEAL:2:true_true::has_hanging_nodes:         true
+DEAL:2:true_true::
+DEAL:2:true_true::n_dofs:                             4813
+DEAL:2:true_true::n_locally_owned_dofs:               960
+DEAL:2:true_true::has_hanging_nodes:                  true
+DEAL:2:true_true::
+DEAL:2:false_false::n_levels:                  1
+DEAL:2:false_false::n_cells:                   1
+DEAL:2:false_false::n_active_cells:            1
+DEAL:2:false_false::has_hanging_nodes:         false
+DEAL:2:false_false::
+DEAL:2:false_false::n_dofs:                             9
+DEAL:2:false_false::n_locally_owned_dofs:               0
+DEAL:2:false_false::has_hanging_nodes:                  false
+DEAL:2:false_false::
+DEAL:2:false_false::n_levels:                  7
+DEAL:2:false_false::n_cells:                   665
+DEAL:2:false_false::n_active_cells:            499
+DEAL:2:false_false::has_hanging_nodes:         true
+DEAL:2:false_false::
+DEAL:2:false_false::n_dofs:                             4813
+DEAL:2:false_false::n_locally_owned_dofs:               960
+DEAL:2:false_false::has_hanging_nodes:                  true
+DEAL:2:false_false::
+DEAL:2:false_true::n_levels:                  1
+DEAL:2:false_true::n_cells:                   1
+DEAL:2:false_true::n_active_cells:            1
+DEAL:2:false_true::has_hanging_nodes:         false
+DEAL:2:false_true::
+DEAL:2:false_true::n_dofs:                             9
+DEAL:2:false_true::n_locally_owned_dofs:               0
+DEAL:2:false_true::has_hanging_nodes:                  false
+DEAL:2:false_true::
+DEAL:2:false_true::n_levels:                  7
+DEAL:2:false_true::n_cells:                   665
+DEAL:2:false_true::n_active_cells:            499
+DEAL:2:false_true::has_hanging_nodes:         true
+DEAL:2:false_true::
+DEAL:2:false_true::n_dofs:                             4813
+DEAL:2:false_true::n_locally_owned_dofs:               960
+DEAL:2:false_true::has_hanging_nodes:                  true
+DEAL:2:false_true::
+
+
+DEAL:3:true_false::n_levels:                  7
+DEAL:3:true_false::n_cells:                   657
+DEAL:3:true_false::n_active_cells:            493
+DEAL:3:true_false::has_hanging_nodes:         true
+DEAL:3:true_false::
+DEAL:3:true_false::n_dofs:                             4813
+DEAL:3:true_false::n_locally_owned_dofs:               912
+DEAL:3:true_false::has_hanging_nodes:                  true
+DEAL:3:true_false::
+DEAL:3:true_false::n_levels:                  7
+DEAL:3:true_false::n_cells:                   657
+DEAL:3:true_false::n_active_cells:            493
+DEAL:3:true_false::has_hanging_nodes:         true
+DEAL:3:true_false::
+DEAL:3:true_false::n_dofs:                             4813
+DEAL:3:true_false::n_locally_owned_dofs:               912
+DEAL:3:true_false::has_hanging_nodes:                  true
+DEAL:3:true_false::
+DEAL:3:true_true::n_levels:                  7
+DEAL:3:true_true::n_cells:                   657
+DEAL:3:true_true::n_active_cells:            493
+DEAL:3:true_true::has_hanging_nodes:         true
+DEAL:3:true_true::
+DEAL:3:true_true::n_dofs:                             4813
+DEAL:3:true_true::n_locally_owned_dofs:               912
+DEAL:3:true_true::has_hanging_nodes:                  true
+DEAL:3:true_true::
+DEAL:3:true_true::n_levels:                  7
+DEAL:3:true_true::n_cells:                   657
+DEAL:3:true_true::n_active_cells:            493
+DEAL:3:true_true::has_hanging_nodes:         true
+DEAL:3:true_true::
+DEAL:3:true_true::n_dofs:                             4813
+DEAL:3:true_true::n_locally_owned_dofs:               912
+DEAL:3:true_true::has_hanging_nodes:                  true
+DEAL:3:true_true::
+DEAL:3:false_false::n_levels:                  1
+DEAL:3:false_false::n_cells:                   1
+DEAL:3:false_false::n_active_cells:            1
+DEAL:3:false_false::has_hanging_nodes:         false
+DEAL:3:false_false::
+DEAL:3:false_false::n_dofs:                             9
+DEAL:3:false_false::n_locally_owned_dofs:               0
+DEAL:3:false_false::has_hanging_nodes:                  false
+DEAL:3:false_false::
+DEAL:3:false_false::n_levels:                  7
+DEAL:3:false_false::n_cells:                   657
+DEAL:3:false_false::n_active_cells:            493
+DEAL:3:false_false::has_hanging_nodes:         true
+DEAL:3:false_false::
+DEAL:3:false_false::n_dofs:                             4813
+DEAL:3:false_false::n_locally_owned_dofs:               912
+DEAL:3:false_false::has_hanging_nodes:                  true
+DEAL:3:false_false::
+DEAL:3:false_true::n_levels:                  1
+DEAL:3:false_true::n_cells:                   1
+DEAL:3:false_true::n_active_cells:            1
+DEAL:3:false_true::has_hanging_nodes:         false
+DEAL:3:false_true::
+DEAL:3:false_true::n_dofs:                             9
+DEAL:3:false_true::n_locally_owned_dofs:               0
+DEAL:3:false_true::has_hanging_nodes:                  false
+DEAL:3:false_true::
+DEAL:3:false_true::n_levels:                  7
+DEAL:3:false_true::n_cells:                   657
+DEAL:3:false_true::n_active_cells:            493
+DEAL:3:false_true::has_hanging_nodes:         true
+DEAL:3:false_true::
+DEAL:3:false_true::n_dofs:                             4813
+DEAL:3:false_true::n_locally_owned_dofs:               912
+DEAL:3:false_true::has_hanging_nodes:                  true
+DEAL:3:false_true::
+
+
+DEAL:4:true_false::n_levels:                  7
+DEAL:4:true_false::n_cells:                   541
+DEAL:4:true_false::n_active_cells:            406
+DEAL:4:true_false::has_hanging_nodes:         true
+DEAL:4:true_false::
+DEAL:4:true_false::n_dofs:                             4813
+DEAL:4:true_false::n_locally_owned_dofs:               1004
+DEAL:4:true_false::has_hanging_nodes:                  true
+DEAL:4:true_false::
+DEAL:4:true_false::n_levels:                  7
+DEAL:4:true_false::n_cells:                   541
+DEAL:4:true_false::n_active_cells:            406
+DEAL:4:true_false::has_hanging_nodes:         true
+DEAL:4:true_false::
+DEAL:4:true_false::n_dofs:                             4813
+DEAL:4:true_false::n_locally_owned_dofs:               1004
+DEAL:4:true_false::has_hanging_nodes:                  true
+DEAL:4:true_false::
+DEAL:4:true_true::n_levels:                  7
+DEAL:4:true_true::n_cells:                   541
+DEAL:4:true_true::n_active_cells:            406
+DEAL:4:true_true::has_hanging_nodes:         true
+DEAL:4:true_true::
+DEAL:4:true_true::n_dofs:                             4813
+DEAL:4:true_true::n_locally_owned_dofs:               1004
+DEAL:4:true_true::has_hanging_nodes:                  true
+DEAL:4:true_true::
+DEAL:4:true_true::n_levels:                  7
+DEAL:4:true_true::n_cells:                   541
+DEAL:4:true_true::n_active_cells:            406
+DEAL:4:true_true::has_hanging_nodes:         true
+DEAL:4:true_true::
+DEAL:4:true_true::n_dofs:                             4813
+DEAL:4:true_true::n_locally_owned_dofs:               1004
+DEAL:4:true_true::has_hanging_nodes:                  true
+DEAL:4:true_true::
+DEAL:4:false_false::n_levels:                  1
+DEAL:4:false_false::n_cells:                   1
+DEAL:4:false_false::n_active_cells:            1
+DEAL:4:false_false::has_hanging_nodes:         false
+DEAL:4:false_false::
+DEAL:4:false_false::n_dofs:                             9
+DEAL:4:false_false::n_locally_owned_dofs:               9
+DEAL:4:false_false::has_hanging_nodes:                  false
+DEAL:4:false_false::
+DEAL:4:false_false::n_levels:                  7
+DEAL:4:false_false::n_cells:                   541
+DEAL:4:false_false::n_active_cells:            406
+DEAL:4:false_false::has_hanging_nodes:         true
+DEAL:4:false_false::
+DEAL:4:false_false::n_dofs:                             4813
+DEAL:4:false_false::n_locally_owned_dofs:               1004
+DEAL:4:false_false::has_hanging_nodes:                  true
+DEAL:4:false_false::
+DEAL:4:false_true::n_levels:                  1
+DEAL:4:false_true::n_cells:                   1
+DEAL:4:false_true::n_active_cells:            1
+DEAL:4:false_true::has_hanging_nodes:         false
+DEAL:4:false_true::
+DEAL:4:false_true::n_dofs:                             9
+DEAL:4:false_true::n_locally_owned_dofs:               9
+DEAL:4:false_true::has_hanging_nodes:                  false
+DEAL:4:false_true::
+DEAL:4:false_true::n_levels:                  7
+DEAL:4:false_true::n_cells:                   541
+DEAL:4:false_true::n_active_cells:            406
+DEAL:4:false_true::has_hanging_nodes:         true
+DEAL:4:false_true::
+DEAL:4:false_true::n_dofs:                             4813
+DEAL:4:false_true::n_locally_owned_dofs:               1004
+DEAL:4:false_true::has_hanging_nodes:                  true
+DEAL:4:false_true::
+

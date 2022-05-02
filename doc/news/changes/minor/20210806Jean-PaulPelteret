@@ -1,0 +1,5 @@
+New: The functions FEFaceValuesBase::face_number(), FEInterfaceValues::get_cell()
+and FEInterfaceValues::face_number() have been implemented to provide
+introspection as to which entities these objects have been initialized for.
+<br>
+(Jean-Paul Pelteret, 2021/08/06)

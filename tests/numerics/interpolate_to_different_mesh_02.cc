@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,12 +17,13 @@
 
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -52,7 +53,7 @@ template <unsigned int spacedim>
 void
 check(const unsigned int refinement_1, const unsigned int refinement_2)
 {
-  MappingQGeneric<spacedim> mapping(1);
+  MappingQ<spacedim> mapping(1);
 
   Triangulation<spacedim> tria_1, tria_2;
   GridGenerator::hyper_cube(tria_1);
@@ -61,8 +62,8 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
   tria_1.refine_global(refinement_1);
   tria_2.refine_global(refinement_2);
 
-  hp::DoFHandler<spacedim> dof_handler_1(tria_1);
-  hp::DoFHandler<spacedim> dof_handler_2(tria_2);
+  DoFHandler<spacedim> dof_handler_1(tria_1);
+  DoFHandler<spacedim> dof_handler_2(tria_2);
 
   hp::FECollection<spacedim> fe_collection;
   fe_collection.push_back(FE_Q<spacedim>(2));
@@ -101,7 +102,7 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
           unit_support_point = cell->get_fe().unit_support_point(shapefun);
           support_point =
             mapping.transform_unit_to_real_cell(cell, unit_support_point);
-          deallog << " " << support_point << ":\n "
+          deallog << ' ' << support_point << ":\n "
                   << u_1[local_dof_indices_1[shapefun]] << endl
                   << endl;
         }
@@ -117,7 +118,7 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
           unit_support_point = cell->get_fe().unit_support_point(shapefun);
           support_point =
             mapping.transform_unit_to_real_cell(cell, unit_support_point);
-          deallog << " " << support_point << ":\n "
+          deallog << ' ' << support_point << ":\n "
                   << u_2[local_dof_indices_2[shapefun]] << endl
                   << endl;
         }

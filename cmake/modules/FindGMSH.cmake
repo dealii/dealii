@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 - 2018 by the deal.II authors
+## Copyright (C) 2017 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -19,18 +19,52 @@
 # This module exports
 #
 #   GMSH_EXECUTABLE
+#   GMSH_LIBRARY
+#   GMSH_INCLUDE_DIR
+#   GMSH_WITH_API
 #
 
 SET(GMSH_DIR "" CACHE PATH "An optional hint to a Gmsh installation containing the gmsh executable")
 SET_IF_EMPTY(GMSH_DIR "$ENV{GMSH_DIR}")
+
+SET(GMSH_LIBRARY_DIR "" CACHE PATH "An optional hint to a Gmsh SDK installation")
+SET_IF_EMPTY(GMSH_LIBRARY_DIR "${GMSH_DIR}")
 
 DEAL_II_FIND_PROGRAM(GMSH_EXE gmsh${CMAKE_EXECUTABLE_SUFFIX}
   HINTS ${GMSH_DIR}
   PATH_SUFFIXES bin
   )
 
+DEAL_II_FIND_LIBRARY(GMSH_LIBRARY
+  NAMES gmsh
+  HINTS ${GMSH_LIBRARY_DIR}
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
+  )
+
+DEAL_II_FIND_PATH(GMSH_INCLUDE_DIR gmsh.h
+  HINTS ${GMSH_LIBRARY_DIR}
+  PATH_SUFFIXES include
+  )
+
+IF(GMSH_LIBRARY MATCHES "-NOTFOUND" OR 
+   GMSH_INCLUDE_DIR MATCHES "-NOTFOUND")
+  SET(GMSH_WITH_API FALSE)
+ELSE()
+  SET(GMSH_WITH_API TRUE)
+ENDIF()
+
 DEAL_II_PACKAGE_HANDLE(GMSH
-  EXECUTABLE REQUIRED GMSH_EXE
+  EXECUTABLE 
+    REQUIRED GMSH_EXE
+  LIBRARIES
+    OPTIONAL GMSH_LIBRARY
+  INCLUDE_DIRS 
+    OPTIONAL GMSH_INCLUDE_DIR
+  USER_INCLUDE_DIRS 
+    OPTIONAL GMSH_INCLUDE_DIR
   CLEAR
-    GMSH_EXE
+    GMSH_EXE 
+    GMSH_LIBRARY 
+    GMSH_INCLUDE_DIR 
+    GMSH_WITH_API
   )

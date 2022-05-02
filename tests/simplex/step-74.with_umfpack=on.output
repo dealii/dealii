@@ -1,0 +1,30 @@
+
+DEAL::Cycle 0
+DEAL::  Number of active cells       : 1536
+DEAL::  Number of degrees of freedom : 9216
+DEAL::  Error in the L2 norm         : 0.000101269
+DEAL::  Error in the H1 seminorm     : 0.0222535
+DEAL::  Error in the energy norm     : 0.0343502
+DEAL::  Estimated error              : 0.117254
+DEAL::
+DEAL::Cycle 1
+DEAL::  Number of active cells       : 6144
+DEAL::  Number of degrees of freedom : 36864
+DEAL::  Error in the L2 norm         : 3.19139e-05
+DEAL::  Error in the H1 seminorm     : 0.0140189
+DEAL::  Error in the energy norm     : 0.0216394
+DEAL::  Estimated error              : 0.0738553
+DEAL::
+DEAL::Cycle 2
+DEAL::  Number of active cells       : 24576
+DEAL::  Number of degrees of freedom : 147456
+DEAL::  Error in the L2 norm         : 1.00600e-05
+DEAL::  Error in the H1 seminorm     : 0.00883139
+DEAL::  Error in the energy norm     : 0.0136320
+DEAL::  Estimated error              : 0.0465224
+DEAL::
+DEAL::degree = 2
+| cycle | cells | dofs   | L2        | H1        | Energy    | Estimator | 
+| 0     | 1536  | 9216   | 1.013e-04 | 2.225e-02 | 3.435e-02 | 1.173e-01 | 
+| 1     | 6144  | 36864  | 3.191e-05 | 1.402e-02 | 2.164e-02 | 7.386e-02 | 
+| 2     | 24576 | 147456 | 1.006e-05 | 8.831e-03 | 1.363e-02 | 4.652e-02 | 

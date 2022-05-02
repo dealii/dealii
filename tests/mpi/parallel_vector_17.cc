@@ -63,43 +63,43 @@ test()
   v6.reinit(local_owned_b, newcomm);
 
   deallog << "local compatibility  v1-v2: "
-          << v1.partitioners_are_compatible(*v2.get_partitioner()) << " "
+          << v1.partitioners_are_compatible(*v2.get_partitioner()) << ' '
           << v2.partitioners_are_compatible(*v1.get_partitioner()) << std::endl;
   deallog << "global compatibility v1-v2: "
           << v1.partitioners_are_globally_compatible(*v2.get_partitioner())
-          << " "
+          << ' '
           << v2.partitioners_are_globally_compatible(*v1.get_partitioner())
           << std::endl;
   deallog << "local compatibility  v2-v3: "
-          << v2.partitioners_are_compatible(*v3.get_partitioner()) << " "
+          << v2.partitioners_are_compatible(*v3.get_partitioner()) << ' '
           << v3.partitioners_are_compatible(*v2.get_partitioner()) << std::endl;
   deallog << "global compatibility v2-v3: "
           << v2.partitioners_are_globally_compatible(*v3.get_partitioner())
-          << " "
+          << ' '
           << v3.partitioners_are_globally_compatible(*v2.get_partitioner())
           << std::endl;
   deallog << "local compatibility  v3-v4: "
-          << v4.partitioners_are_compatible(*v3.get_partitioner()) << " "
+          << v4.partitioners_are_compatible(*v3.get_partitioner()) << ' '
           << v3.partitioners_are_compatible(*v4.get_partitioner()) << std::endl;
   deallog << "global compatibility v3-v4: "
           << v4.partitioners_are_globally_compatible(*v3.get_partitioner())
-          << " "
+          << ' '
           << v3.partitioners_are_globally_compatible(*v4.get_partitioner())
           << std::endl;
   deallog << "local compatibility  v4-v5: "
-          << v4.partitioners_are_compatible(*v5.get_partitioner()) << " "
+          << v4.partitioners_are_compatible(*v5.get_partitioner()) << ' '
           << v5.partitioners_are_compatible(*v4.get_partitioner()) << std::endl;
   deallog << "global compatibility v4-v5: "
           << v4.partitioners_are_globally_compatible(*v5.get_partitioner())
-          << " "
+          << ' '
           << v5.partitioners_are_globally_compatible(*v4.get_partitioner())
           << std::endl;
   deallog << "local compatibility  v5-v6: "
-          << v6.partitioners_are_compatible(*v5.get_partitioner()) << " "
+          << v6.partitioners_are_compatible(*v5.get_partitioner()) << ' '
           << v5.partitioners_are_compatible(*v6.get_partitioner()) << std::endl;
   deallog << "global compatibility v5-v6: "
           << v6.partitioners_are_globally_compatible(*v5.get_partitioner())
-          << " "
+          << ' '
           << v5.partitioners_are_globally_compatible(*v6.get_partitioner())
           << std::endl;
 }

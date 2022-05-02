@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -169,7 +169,7 @@
  *   number of them. It also gives them a global numbering.
  *
  *   A different viewpoint is this: While the mesh and finite element describe
- *   abstract properties of the the finite dimensional space $V_h$ in which we
+ *   abstract properties of the finite dimensional space $V_h$ in which we
  *   seek the discrete solution, the %DoFHandler classes enumerate a concrete
  *   basis of this space so that we can represent the discrete solution as
  *   $u_h(\mathbf x)= \sum_j U_j \varphi_i(\mathbf x)$ by an ordered set of
@@ -201,7 +201,7 @@
  *
  *   The DoFHandler class and its associates are described in the @ref
  *   dofs module. In addition, there are specialized versions that can
- *   handle multilevel and hp discretizations. These are described in
+ *   handle multilevel and hp-discretizations. These are described in
  *   the @ref mg and @ref hp modules. Finite element methods frequently
  *   imply constraints on degrees of freedom, such as for hanging nodes
  *   or nodes at which boundary conditions apply; dealing with such

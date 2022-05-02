@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2019 by the deal.II authors
+ * Copyright (C) 2007 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -34,14 +34,11 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -582,7 +579,7 @@ namespace Step31
   // on each cell. To this end, recall that if we had a single $Q_1$ field
   // (rather than the vector-valued field of higher order) then the maximum
   // would be attained at a vertex of the mesh. In other words, we should use
-  // the QTrapez class that has quadrature points only at the vertices of
+  // the QTrapezoid class that has quadrature points only at the vertices of
   // cells.
   //
   // For higher order shape functions, the situation is more complicated: the
@@ -600,15 +597,15 @@ namespace Step31
   // FiniteElement::get_unit_support_points() function, reduce the output to a
   // unique set of points to avoid duplicate function evaluations, and create
   // a Quadrature object using these points. Another option, chosen here, is
-  // to use the QTrapez class and combine it with the QIterated class that
-  // repeats the QTrapez formula on a number of sub-cells in each coordinate
+  // to use the QTrapezoid class and combine it with the QIterated class that
+  // repeats the QTrapezoid formula on a number of sub-cells in each coordinate
   // direction. To cover all support points, we need to iterate it
   // <code>stokes_degree+1</code> times since this is the polynomial degree of
   // the Stokes element in use:
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_maximal_velocity() const
   {
-    const QIterated<dim> quadrature_formula(QTrapez<1>(), stokes_degree + 1);
+    const QIterated<dim> quadrature_formula(QTrapezoid<1>(), stokes_degree + 1);
     const unsigned int   n_q_points = quadrature_formula.size();
 
     FEValues<dim> fe_values(stokes_fe, quadrature_formula, update_values);
@@ -661,7 +658,8 @@ namespace Step31
   std::pair<double, double>
   BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range() const
   {
-    const QIterated<dim> quadrature_formula(QTrapez<1>(), temperature_degree);
+    const QIterated<dim> quadrature_formula(QTrapezoid<1>(),
+                                            temperature_degree);
     const unsigned int   n_q_points = quadrature_formula.size();
 
     FEValues<dim> fe_values(temperature_fe, quadrature_formula, update_values);
@@ -869,9 +867,9 @@ namespace Step31
     const std::vector<types::global_dof_index> stokes_dofs_per_block =
       DoFTools::count_dofs_per_fe_block(stokes_dof_handler, stokes_sub_blocks);
 
-    const unsigned int n_u = stokes_dofs_per_block[0],
-                       n_p = stokes_dofs_per_block[1],
-                       n_T = temperature_dof_handler.n_dofs();
+    const types::global_dof_index n_u = stokes_dofs_per_block[0],
+                                  n_p = stokes_dofs_per_block[1],
+                                  n_T = temperature_dof_handler.n_dofs();
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << " (on " << triangulation.n_levels() << " levels)" << std::endl
@@ -921,14 +919,8 @@ namespace Step31
     {
       stokes_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(2, 2);
-
-      dsp.block(0, 0).reinit(n_u, n_u);
-      dsp.block(0, 1).reinit(n_u, n_p);
-      dsp.block(1, 0).reinit(n_p, n_u);
-      dsp.block(1, 1).reinit(n_p, n_p);
-
-      dsp.collect_sizes();
+      BlockDynamicSparsityPattern dsp(stokes_dofs_per_block,
+                                      stokes_dofs_per_block);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
 
@@ -950,14 +942,8 @@ namespace Step31
       Mp_preconditioner.reset();
       stokes_preconditioner_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(2, 2);
-
-      dsp.block(0, 0).reinit(n_u, n_u);
-      dsp.block(0, 1).reinit(n_u, n_p);
-      dsp.block(1, 0).reinit(n_p, n_u);
-      dsp.block(1, 1).reinit(n_p, n_p);
-
-      dsp.collect_sizes();
+      BlockDynamicSparsityPattern dsp(stokes_dofs_per_block,
+                                      stokes_dofs_per_block);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
       for (unsigned int c = 0; c < dim + 1; ++c)
@@ -1045,7 +1031,7 @@ namespace Step31
                                    update_JxW_values | update_values |
                                      update_gradients);
 
-    const unsigned int dofs_per_cell = stokes_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = stokes_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
@@ -1135,8 +1121,8 @@ namespace Step31
 
     Amg_preconditioner = std::make_shared<TrilinosWrappers::PreconditionAMG>();
 
-    std::vector<std::vector<bool>> constant_modes;
-    FEValuesExtractors::Vector     velocity_components(0);
+    std::vector<std::vector<bool>>   constant_modes;
+    const FEValuesExtractors::Vector velocity_components(0);
     DoFTools::extract_constant_modes(stokes_dof_handler,
                                      stokes_fe.component_mask(
                                        velocity_components),
@@ -1250,7 +1236,7 @@ namespace Step31
                                         quadrature_formula,
                                         update_values);
 
-    const unsigned int dofs_per_cell = stokes_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = stokes_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
@@ -1414,7 +1400,7 @@ namespace Step31
                                         update_values | update_gradients |
                                           update_JxW_values);
 
-    const unsigned int dofs_per_cell = temperature_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = temperature_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> local_mass_matrix(dofs_per_cell, dofs_per_cell);
@@ -1522,7 +1508,7 @@ namespace Step31
                                    quadrature_formula,
                                    update_values);
 
-    const unsigned int dofs_per_cell = temperature_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = temperature_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     Vector<double> local_rhs(dofs_per_cell);

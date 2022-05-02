@@ -1,0 +1,64 @@
+
+DEAL:0::Number of particles inserted: 24
+DEAL:0::Repartitioning triangulation after particle generation
+DEAL:0::Writing particle output file: analytical-particles-0
+DEAL:0::Writing particle output file: analytical-particles-1000
+DEAL:0::Writing particle output file: analytical-particles-2000
+DEAL:0::Particles location
+DEAL:0::0.406412 0.734191
+DEAL:0::0.431983 0.684517
+DEAL:0::0.475595 0.747746
+DEAL:0::0.479874 0.652444
+DEAL:0::0.486369 0.728375
+DEAL:0::0.406474 0.787612
+DEAL:0::0.433208 0.833310
+DEAL:0::0.480928 0.859777
+DEAL:0::0.475771 0.769133
+DEAL:0::0.486655 0.787079
+DEAL:0::0.529232 0.714603
+DEAL:0::0.549978 0.724169
+DEAL:0::0.540635 0.648620
+DEAL:0::0.561942 0.742488
+DEAL:0::0.595944 0.672859
+DEAL:0::0.505864 0.716196
+DEAL:0::0.627051 0.720283
+DEAL:0::0.528847 0.796079
+DEAL:0::0.549447 0.784270
+DEAL:0::0.561753 0.764590
+DEAL:0::0.538993 0.858949
+DEAL:0::0.592056 0.829624
+DEAL:0::0.505916 0.796997
+DEAL:0::0.624984 0.778592
+DEAL:0::Number of particles inserted: 24
+DEAL:0::Repartitioning triangulation after particle generation
+DEAL:0::Writing particle output file: interpolated-particles-0
+DEAL:0::Writing background field file: background-0
+DEAL:0::Writing particle output file: interpolated-particles-1000
+DEAL:0::Writing background field file: background-1000
+DEAL:0::Writing particle output file: interpolated-particles-2000
+DEAL:0::Writing background field file: background-2000
+DEAL:0::Particles location
+DEAL:0::0.400130 0.731196
+DEAL:0::0.429540 0.682369
+DEAL:0::0.469064 0.746158
+DEAL:0::0.481181 0.651665
+DEAL:0::0.480772 0.726826
+DEAL:0::0.405024 0.786934
+DEAL:0::0.430296 0.832760
+DEAL:0::0.478813 0.859498
+DEAL:0::0.474379 0.768388
+DEAL:0::0.484713 0.786526
+DEAL:0::0.524473 0.713858
+DEAL:0::0.544304 0.724010
+DEAL:0::0.592865 0.672731
+DEAL:0::0.555643 0.742845
+DEAL:0::0.501301 0.714975
+DEAL:0::0.541116 0.647681
+DEAL:0::0.621474 0.721859
+DEAL:0::0.526482 0.795790
+DEAL:0::0.547001 0.784040
+DEAL:0::0.589307 0.829611
+DEAL:0::0.536869 0.858844
+DEAL:0::0.559416 0.764401
+DEAL:0::0.503905 0.796598
+DEAL:0::0.622637 0.778386

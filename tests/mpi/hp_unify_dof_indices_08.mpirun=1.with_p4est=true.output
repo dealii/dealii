@@ -1,9 +1,7 @@
 
-DEAL:0:2d::Processor: 0
-DEAL:0:2d::  n_globally_active_cells: 29035
-DEAL:0:2d::  n_locally_owned_dofs: 485573
-DEAL:0:2d::  n_global_dofs: 485573
-DEAL:0:3d::Processor: 0
-DEAL:0:3d::  n_globally_active_cells: 13824
-DEAL:0:3d::  n_locally_owned_dofs: 1125219
-DEAL:0:3d::  n_global_dofs: 1125219
+DEAL:0:2d::n_globally_active_cells: 29035
+DEAL:0:2d::n_locally_owned_dofs: 485573
+DEAL:0:2d::n_global_dofs: 485573
+DEAL:0:3d::n_globally_active_cells: 13824
+DEAL:0:3d::n_locally_owned_dofs: 1125219
+DEAL:0:3d::n_global_dofs: 1125219

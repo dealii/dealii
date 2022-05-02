@@ -1,0 +1,224 @@
+<h1>Results</h1>
+
+When this program is run, it produces output that looks as follows:
+```
+Timestep 1
+  Field degrees of freedom:                                 4989
+  Total number of particles in simulation:  20
+  Number of particles lost this time step:  0
+
+  Now at t=2.12647e-07, dt=2.12647e-07.
+
+Timestep 2
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  24
+  Number of particles lost this time step:  0
+
+  Now at t=4.14362e-07, dt=2.01715e-07.
+
+Timestep 3
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  28
+  Number of particles lost this time step:  0
+
+  Now at t=5.96019e-07, dt=1.81657e-07.
+
+Timestep 4
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  32
+  Number of particles lost this time step:  0
+
+  Now at t=7.42634e-07, dt=1.46614e-07.
+
+
+...
+
+
+  Timestep 1000
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  44
+  Number of particles lost this time step:  6
+  Fraction of particles lost through anode: 0.0601266
+
+  Now at t=4.93276e-05, dt=4.87463e-08.
+
+Timestep 1001
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  44
+  Number of particles lost this time step:  0
+  Fraction of particles lost through anode: 0.0601266
+
+  Now at t=4.93759e-05, dt=4.82873e-08.
+
+
+...
+
+
+Timestep 2091
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  44
+  Number of particles lost this time step:  0
+  Fraction of particles lost through anode: 0.0503338
+
+  Now at t=9.99237e-05, dt=4.26254e-08.
+
+Timestep 2092
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  44
+  Number of particles lost this time step:  0
+  Fraction of particles lost through anode: 0.0503338
+
+  Now at t=9.99661e-05, dt=4.24442e-08.
+
+Timestep 2093
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  44
+  Number of particles lost this time step:  2
+  Fraction of particles lost through anode: 0.050308
+
+  Now at t=0.0001, dt=3.38577e-08.
+```
+
+Picking a random few time steps, we can visualize the solution in the
+form of streamlines for the electric field and dots for the electrons:
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.0000.png"
+         alt="The solution at time step 0 (t=0 seconds)."
+         width="500">
+    <br>
+    Solution at time step 0 (t=0 seconds).
+    <br>
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.1400.png"
+         alt="The solution at time step 1400 (t=0.000068 seconds)."
+         width="500">
+    <br>
+    Solution at time step 1400 (t=0.000068 seconds).
+    <br>
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.0700.png"
+         alt="The solution at time step 700 (t=0.000035 seconds)."
+         width="500">
+    <br>
+    Solution at time step 700 (t=0.000035 seconds).
+    <br>
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-19.solution.2092.png"
+         alt="The solution at time step 2092 (t=0.0001 seconds)."
+         width="500">
+    <br>
+    Solution at time step 2092 (t=0.0001 seconds).
+    <br>
+  </div>
+</div>
+
+That said, a more appropriate way to visualize the results of this
+program are by creating a video that shows how these electrons move, and how
+the electric field changes in response to their motion:
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/HwUtE7xuteE"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+What you can see here is how the "focus element" of the boundary with its negative
+voltage repels the electrons and makes sure that they do not just fly away
+perpendicular from the cathode (as they do in the initial part of their
+trajectories). It also shows how the electric field lines
+move around over time, in response to the charges flying by -- in other words,
+the feedback the particles have on the electric field that itself drives the
+motion of the electrons.
+
+The movie suggests that electrons move in "bunches" or "bursts". One element of
+this appearance is an artifact of how the movie was created: Every frame of the
+movie corresponds to one time step, but the time step length varies. More specifically,
+the fastest particle moving through the smallest cell determines the length of the
+time step (see the discussion in the introduction), and consequently time steps
+are small whenever a (fast) particle moves through the small cells at the right
+edge of the domain; time steps are longer again once the particle has left
+the domain. This slowing-accelerating effect can easily be visualized by plotting
+the time step length shown in the screen output.
+
+The second part of this is real, however: The simulation creates a large group
+of particles in the beginning, and fewer after about the 300th time step. This
+is probably because of the negative charge of the particles in the simulation:
+They reduce the magnitude of the electric field at the (also negatively charged
+electrode) and consequently reduce the number of points on the cathode at which
+the magnitude exceeds the threshold necessary to draw an electron out of the
+electrode.
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+
+<h4> More statistics about electrons </h4>
+
+The program already computes the fraction of the electrons that leave the
+domain through the hole in the anode. But there are other quantities one might be
+interested in. For example, the average velocity of these particles. It would
+not be very difficult to obtain each particle's velocity from its properties,
+in the same way as we do in the `move_particles()` function, and compute
+statistics from it.
+
+
+<h4> A better-synchronized visualization </h4>
+
+As discussed above, there is a varying time difference between different frames
+of the video because we create output for every time step. A better way to
+create movies would be to generate a new output file in fixed time intervals,
+regardless of how many time steps lie between each such point.
+
+
+<h4> A better time integrator </h4>
+
+The problem we are considering in this program is a coupled, multiphysics
+problem. But the way we solve it is by first computing the (electric) potential
+field and then update the particle locations. This is what is called an
+"operator-splitting method", a concept we will investigate in more detail
+in step-58.
+
+While it is awkward to think of a way to solve this problem that does not involve
+splitting the problem into a PDE piece and a particles piece, one
+*can* (and probably should!) think of a better way to update the particle
+locations. Specifically, the equations we use to update the particle location
+are
+@f{align*}{
+  \frac{{\mathbf v}_i^{(n)}-{\mathbf v}_i^{(n-1)}}{\Delta t} &= \frac{e\nabla V^{(n)}}{m}
+  \\
+  \frac{{\mathbf x}_i^{(n)}-{\mathbf x}_i^{(n-1)}}{\Delta t} &= {\mathbf v}_i^{(n)}.
+@f}
+This corresponds to a simple forward-Euler time discretization -- a method of
+first order accuracy in the time step size $\Delta t$ that we know we should
+avoid because we can do better. Rather, one might want to consider a scheme such
+as the
+[leapfrog scheme](https://en.wikipedia.org/wiki/Leapfrog_integration)
+or more generally
+[symplectic integrators](https://en.wikipedia.org/wiki/Symplectic_integrator)
+such as the
+[Verlet scheme](https://en.wikipedia.org/wiki/Verlet_integration).
+
+
+<h4> Parallelization </h4>
+
+In release mode, the program runs in about 3.5 minutes on one of the author's
+laptops at the time of writing this. That's acceptable. But what if we wanted
+to make the simulation three-dimensional? If we wanted to not use a maximum
+of around 100 particles at any given time (as happens with the parameters
+used here) but 100,000? If we needed a substantially finer mesh?
+
+In those cases, one would want to run the program not just on a single processor,
+but in fact on as many as one has available. This requires parallelization
+both the PDE solution as well as over particles. In practice, while there
+are substantial challenges to making this efficient and scale well, these
+challenges are all addressed in deal.II itself. For example, step-40 shows
+how to parallelize the finite element part, and step-70 shows how one can
+then also parallelize the particles part.

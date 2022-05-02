@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,7 +84,6 @@ namespace MeshWorker
    * efficient.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   namespace Assembler
   {
@@ -107,7 +106,6 @@ namespace MeshWorker
      * @todo Comprehensive model currently not implemented.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename VectorType>
     class ResidualLocalBlocksToGlobalBlocks
@@ -207,7 +205,6 @@ namespace MeshWorker
      * correct matrix block by this object.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename MatrixType, typename number = double>
     class MatrixLocalBlocksToGlobalBlocks
@@ -323,7 +320,6 @@ namespace MeshWorker
      * matrices automatically.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename MatrixType, typename number = double>
     class MGMatrixLocalBlocksToGlobalBlocks

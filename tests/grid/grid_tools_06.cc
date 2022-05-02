@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,8 @@
  */
 
 /* The 2D case */
-void generate_grid(Triangulation<2> &triangulation, int orientation)
+void
+generate_grid(Triangulation<2> &triangulation, int orientation)
 {
   Point<2> vertices_1[] = {
     Point<2>(-1., -3.),
@@ -91,7 +92,8 @@ void generate_grid(Triangulation<2> &triangulation, int orientation)
 
 
 /* The 3D case */
-void generate_grid(Triangulation<3> &triangulation, int orientation)
+void
+generate_grid(Triangulation<3> &triangulation, int orientation)
 {
   Point<3>              vertices_1[] = {Point<3>(-1., -1., -3.),
                            Point<3>(+1., -1., -3.),
@@ -201,9 +203,9 @@ main()
 
       generate_grid(triangulation, i);
 
-      typedef Triangulation<2>::cell_iterator CellIterator;
-      typedef std::vector<GridTools::PeriodicFacePair<CellIterator>> FaceVector;
-      FaceVector                                                     test;
+      using CellIterator = Triangulation<2>::cell_iterator;
+      using FaceVector = std::vector<GridTools::PeriodicFacePair<CellIterator>>;
+      FaceVector test;
       GridTools::collect_periodic_faces(
         triangulation, 42, 43, 1, test, dealii::Tensor<1, 2>());
 
@@ -224,9 +226,9 @@ main()
 
       generate_grid(triangulation, i);
 
-      typedef Triangulation<3>::cell_iterator CellIterator;
-      typedef std::vector<GridTools::PeriodicFacePair<CellIterator>> FaceVector;
-      FaceVector                                                     test;
+      using CellIterator = Triangulation<3>::cell_iterator;
+      using FaceVector = std::vector<GridTools::PeriodicFacePair<CellIterator>>;
+      FaceVector test;
       GridTools::collect_periodic_faces(
         triangulation, 42, 43, 2, test, dealii::Tensor<1, 3>());
 

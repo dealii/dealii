@@ -1,0 +1,30 @@
+
+<svg width="1000" height="1000" xmlns="http://www.w3.org/2000/svg" version="1.1">
+
+
+<!-- internal style sheet -->
+<style type="text/css"><![CDATA[
+ rect.background{fill:white}
+ rect{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+ text{font-family:Helvetica; text-anchor:middle; fill:rgb(25,25,25)}
+ line{stroke:rgb(25,25,25); stroke-width:4}
+ path{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+ circle{fill:white; stroke:black; stroke-width:2}
+
+ path.p0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
+ path.ps0{fill:rgb(0,77,191); stroke:rgb(20,20,20); stroke-width:2}
+ rect.r0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
+]]></style>
+
+ <rect class="background" width="1000" height="1000"/>
+  <!-- cells -->
+  <path class="p0" d="M 80 920 L 920 920 L 500 500 L 80 920"/>
+  <line x1="80" y1="920" x2="920" y2="920"/>
+  <path class="p0" d="M 80 80 L 80 920 L 500 500 L 80 80"/>
+  <line x1="80" y1="80" x2="80" y2="920"/>
+  <path class="p0" d="M 920 920 L 920 80 L 500 500 L 920 920"/>
+  <line x1="920" y1="920" x2="920" y2="80"/>
+  <path class="p0" d="M 920 80 L 80 80 L 500 500 L 920 80"/>
+  <line x1="920" y1="80" x2="80" y2="80"/>
+
+</svg>DEAL:triangluar_elements_dim2_spacedim2: ::OK!

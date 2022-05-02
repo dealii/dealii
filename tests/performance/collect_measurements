@@ -1,0 +1,99 @@
+#!/bin/bash
+## ---------------------------------------------------------------------
+##
+## Copyright (C) 2022 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## The deal.II library is free software; you can use it, redistribute
+## it, and/or modify it under the terms of the GNU Lesser General
+## Public License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
+##
+## ---------------------------------------------------------------------
+
+#
+# Performance tests record timing/sensor statistics in the output file
+# "output".
+#
+# This script collects all individual measurements from these files and
+# pretty prints a parsable table to stdout.
+#
+
+#
+# First, collect some metatadata:
+#
+
+site="${1}"
+shift
+
+branch="$(sed -n -e 's/.*Branch: \+\(.*\)/\1/p' revision.log)"
+revision="$(sed -n -e 's/.*Revision: \+\(.*\)/\1/p' revision.log)"
+timestamp="$(sed -n -e 's/.*Timestamp: \+\(.*\)/\1/p' revision.log)"
+
+#
+# Now collect all output files and postprocess them into a tab-separated
+# list of values:
+#
+
+output="$(for i in \
+  tests/performance/*/output \
+  tests/performance/*/mpirun*/output \
+  tests/performance/*/mpirun*/threads*/output \
+  tests/performance/*/threads*/output
+do
+  # Skip output files that have fewer than 3 lines
+  if [[ "$(wc -l $i 2> /dev/null | awk '{ print $1 }')" -le 2 ]]; then
+    continue
+  fi
+
+  # Recover test name from full file path stored in ${i}
+  test_name=${i##tests/performance/}
+  test_name=${test_name%%/output}
+  test_name=${test_name/.release/}
+  test_name=${test_name/.debug/}
+
+  # Some minor cleanup:
+  test_name=${test_name/mpirun_0-/}
+  test_name=${test_name/-threads_0/}
+
+  {
+    read -r test_type # first line of output file contains test type
+    read -r           # skip second line
+
+    # iterate over all remaining lines and output a table:
+    while read -r line
+    do
+      echo -e "$test_name\t$test_type\t${line}"
+    done
+  } < "${i}"
+done | sort | tr $'\t' ',')"
+
+#
+# Output a test results as a comma separated list of values (CSV) to
+# performance.csv for easier parsing:
+#
+
+(
+  echo "# Date:      $(date -u --rfc-3339=s)"
+  echo "# Site:      ${site}"
+  echo "# Branch:    ${branch}"
+  echo "# Revision:  ${revision}"
+  echo "# Timestamp: ${timestamp}"
+) > performance.csv
+
+(
+  echo "test_name,test_type,sensor,min/value,max,mean,std_dev,samples"
+  echo "${output}"
+) >> performance.csv
+
+#
+# Also save and print a nicely formatted table of the test results in
+# performance.log and to stdout:
+#
+
+echo "${output}" | column -s ',' -t \
+  -N "test_name,test_type,sensor,min/value,max,mean,std_dev,samples" |
+  tee performance.log

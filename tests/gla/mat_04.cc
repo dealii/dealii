@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,7 +85,8 @@ test()
                                     MPI_COMM_WORLD));
   SparsityTools::distribute_sparsity_pattern(
     sp,
-    dof_handler.compute_n_locally_owned_dofs_per_processor(),
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.n_locally_owned_dofs()),
     MPI_COMM_WORLD,
     relevant);
   sp.compress();
@@ -106,7 +107,7 @@ template <int dim>
 void
 test_trilinos_alternative()
 {
-  typedef LA_Trilinos LA;
+  using LA = LA_Trilinos;
 
   unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);

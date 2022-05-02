@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,7 +72,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                                                          scalar_values);
       deallog << "component=" << c << std::endl;
 
-      for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+      for (const auto q : fe_values.quadrature_point_indices())
         {
           for (unsigned int d = 0; d < dim; ++d)
             deallog << scalar_values[q][d] << (d < dim - 1 ? " " : "");

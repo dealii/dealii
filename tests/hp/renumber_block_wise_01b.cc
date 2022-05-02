@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,7 @@
 #include <deal.II/base/function_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 
 #include <deal.II/fe/fe_dgq.h>
@@ -38,7 +39,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/vector.h>
@@ -63,10 +63,10 @@ check()
   fe_collection.push_back(FE_Q<dim>(2));
   fe_collection.push_back(FE_Q<dim>(1));
 
-  hp::DoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   {
     bool coin = false;
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+    for (typename DoFHandler<dim>::active_cell_iterator cell =
            dof.begin_active();
          cell != dof.end();
          ++cell)
@@ -79,8 +79,7 @@ check()
 
   std::vector<bool>                    touched(dof.n_dofs(), false);
   std::vector<types::global_dof_index> local_dof_indices;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof.begin_active();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
     {

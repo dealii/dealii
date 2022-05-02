@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,13 +19,14 @@
 
 
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -45,7 +46,7 @@ check()
   for (unsigned int i = 1; i <= tria.n_active_cells(); ++i)
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(i), dim));
 
-  hp::DoFHandler<dim> dof(tria);
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe_collection);
   Point<dim> orientation;
   Point<dim> p(tria.begin_active()->center());

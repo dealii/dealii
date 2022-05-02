@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,18 +44,66 @@ namespace CUDAWrappers
 
 
     void
-    csrmv(cusparseHandle_t         handle,
-          bool                     transpose,
-          int                      m,
-          int                      n,
-          int                      nnz,
-          const cusparseMatDescr_t descr,
-          const float *            A_val_dev,
-          const int *              A_row_ptr_dev,
-          const int *              A_column_index_dev,
-          const float *            x,
-          bool                     add,
-          float *                  y)
+    create_sp_mat_descr(int                   m,
+                        int                   n,
+                        int                   nnz,
+                        const float *         A_val_dev,
+                        const int *           A_row_ptr_dev,
+                        const int *           A_column_index_dev,
+                        cusparseSpMatDescr_t &sp_descr)
+    {
+      cusparseStatus_t error_code = cusparseCreateCsr(
+        &sp_descr,
+        m,
+        n,
+        nnz,
+        reinterpret_cast<void *>(const_cast<int *>(A_row_ptr_dev)),
+        reinterpret_cast<void *>(const_cast<int *>(A_column_index_dev)),
+        reinterpret_cast<void *>(const_cast<float *>(A_val_dev)),
+        CUSPARSE_INDEX_32I,
+        CUSPARSE_INDEX_32I,
+        CUSPARSE_INDEX_BASE_ZERO,
+        CUDA_R_32F);
+      AssertCusparse(error_code);
+    }
+
+
+
+    void
+    create_sp_mat_descr(int                   m,
+                        int                   n,
+                        int                   nnz,
+                        const double *        A_val_dev,
+                        const int *           A_row_ptr_dev,
+                        const int *           A_column_index_dev,
+                        cusparseSpMatDescr_t &sp_descr)
+    {
+      cusparseStatus_t error_code = cusparseCreateCsr(
+        &sp_descr,
+        m,
+        n,
+        nnz,
+        reinterpret_cast<void *>(const_cast<int *>(A_row_ptr_dev)),
+        reinterpret_cast<void *>(const_cast<int *>(A_column_index_dev)),
+        reinterpret_cast<void *>(const_cast<double *>(A_val_dev)),
+        CUSPARSE_INDEX_32I,
+        CUSPARSE_INDEX_32I,
+        CUSPARSE_INDEX_BASE_ZERO,
+        CUDA_R_64F);
+      AssertCusparse(error_code);
+    }
+
+
+
+    void
+    csrmv(cusparseHandle_t           handle,
+          bool                       transpose,
+          int                        m,
+          int                        n,
+          const cusparseSpMatDescr_t sp_descr,
+          const float *              x,
+          bool                       add,
+          float *                    y)
     {
       float               alpha = 1.;
       float               beta  = add ? 1. : 0.;
@@ -63,38 +111,72 @@ namespace CUDAWrappers
         transpose ? CUSPARSE_OPERATION_TRANSPOSE :
                     CUSPARSE_OPERATION_NON_TRANSPOSE;
 
+      // Move the data to cuSPARSE data type
+      cusparseDnVecDescr_t x_cuvec;
+      cusparseStatus_t     error_code =
+        cusparseCreateDnVec(&x_cuvec,
+                            n,
+                            reinterpret_cast<void *>(const_cast<float *>(x)),
+                            CUDA_R_32F);
+      AssertCusparse(error_code);
+
+      cusparseDnVecDescr_t y_cuvec;
+      error_code =
+        cusparseCreateDnVec(&y_cuvec,
+                            m,
+                            reinterpret_cast<void *>(const_cast<float *>(y)),
+                            CUDA_R_32F);
+      AssertCusparse(error_code);
+
       // This function performs y = alpha*op(A)*x + beta*y
-      cusparseStatus_t error_code = cusparseScsrmv(handle,
-                                                   cusparse_operation,
-                                                   m,
-                                                   n,
-                                                   nnz,
-                                                   &alpha,
-                                                   descr,
-                                                   A_val_dev,
-                                                   A_row_ptr_dev,
-                                                   A_column_index_dev,
-                                                   x,
-                                                   &beta,
-                                                   y);
+      size_t buffer_size = 0;
+      error_code         = cusparseSpMV_bufferSize(handle,
+                                           cusparse_operation,
+                                           &alpha,
+                                           sp_descr,
+                                           x_cuvec,
+                                           &beta,
+                                           y_cuvec,
+                                           CUDA_R_32F,
+                                           CUSPARSE_MV_ALG_DEFAULT,
+                                           &buffer_size);
+
+      void *      buffer          = nullptr;
+      cudaError_t cuda_error_code = cudaMalloc(&buffer, buffer_size);
+      AssertCuda(cuda_error_code);
+
+      // execute SpMV
+      error_code = cusparseSpMV(handle,
+                                cusparse_operation,
+                                &alpha,
+                                sp_descr,
+                                x_cuvec,
+                                &beta,
+                                y_cuvec,
+                                CUDA_R_32F,
+                                CUSPARSE_MV_ALG_DEFAULT,
+                                buffer);
+      AssertCusparse(error_code);
+
+      cuda_error_code = cudaFree(buffer);
+      AssertCuda(cuda_error_code);
+      error_code = cusparseDestroyDnVec(x_cuvec);
+      AssertCusparse(error_code);
+      error_code = cusparseDestroyDnVec(y_cuvec);
       AssertCusparse(error_code);
     }
 
 
 
     void
-    csrmv(cusparseHandle_t         handle,
-          bool                     transpose,
-          int                      m,
-          int                      n,
-          int                      nnz,
-          const cusparseMatDescr_t descr,
-          const double *           A_val_dev,
-          const int *              A_row_ptr_dev,
-          const int *              A_column_index_dev,
-          const double *           x,
-          bool                     add,
-          double *                 y)
+    csrmv(cusparseHandle_t           handle,
+          bool                       transpose,
+          int                        m,
+          int                        n,
+          const cusparseSpMatDescr_t sp_descr,
+          const double *             x,
+          bool                       add,
+          double *                   y)
     {
       double              alpha = 1.;
       double              beta  = add ? 1. : 0.;
@@ -102,20 +184,58 @@ namespace CUDAWrappers
         transpose ? CUSPARSE_OPERATION_TRANSPOSE :
                     CUSPARSE_OPERATION_NON_TRANSPOSE;
 
+      // Move the data to cuSPARSE data type
+      cusparseDnVecDescr_t x_cuvec;
+      cusparseStatus_t     error_code =
+        cusparseCreateDnVec(&x_cuvec,
+                            n,
+                            reinterpret_cast<void *>(const_cast<double *>(x)),
+                            CUDA_R_64F);
+      AssertCusparse(error_code);
+
+      cusparseDnVecDescr_t y_cuvec;
+      error_code =
+        cusparseCreateDnVec(&y_cuvec,
+                            m,
+                            reinterpret_cast<void *>(const_cast<double *>(y)),
+                            CUDA_R_64F);
+      AssertCusparse(error_code);
+
       // This function performs y = alpha*op(A)*x + beta*y
-      cusparseStatus_t error_code = cusparseDcsrmv(handle,
-                                                   cusparse_operation,
-                                                   m,
-                                                   n,
-                                                   nnz,
-                                                   &alpha,
-                                                   descr,
-                                                   A_val_dev,
-                                                   A_row_ptr_dev,
-                                                   A_column_index_dev,
-                                                   x,
-                                                   &beta,
-                                                   y);
+      size_t buffer_size = 0;
+      error_code         = cusparseSpMV_bufferSize(handle,
+                                           cusparse_operation,
+                                           &alpha,
+                                           sp_descr,
+                                           x_cuvec,
+                                           &beta,
+                                           y_cuvec,
+                                           CUDA_R_64F,
+                                           CUSPARSE_MV_ALG_DEFAULT,
+                                           &buffer_size);
+
+      void *      buffer          = nullptr;
+      cudaError_t cuda_error_code = cudaMalloc(&buffer, buffer_size);
+      AssertCuda(cuda_error_code);
+
+      // execute SpMV
+      error_code = cusparseSpMV(handle,
+                                cusparse_operation,
+                                &alpha,
+                                sp_descr,
+                                x_cuvec,
+                                &beta,
+                                y_cuvec,
+                                CUDA_R_64F,
+                                CUSPARSE_MV_ALG_DEFAULT,
+                                buffer);
+      AssertCusparse(error_code);
+
+      cuda_error_code = cudaFree(buffer);
+      AssertCuda(cuda_error_code);
+      error_code = cusparseDestroyDnVec(x_cuvec);
+      AssertCusparse(error_code);
+      error_code = cusparseDestroyDnVec(y_cuvec);
       AssertCusparse(error_code);
     }
 
@@ -135,8 +255,7 @@ namespace CUDAWrappers
       if (row < n_rows)
         {
           for (int j = row_ptr_dev[row]; j < row_ptr_dev[row + 1]; ++j)
-            dealii::LinearAlgebra::CUDAWrappers::atomicAdd_wrapper(
-              &sums[column_index_dev[j]], abs(val_dev[j]));
+            atomicAdd(&sums[column_index_dev[j]], abs(val_dev[j]));
         }
     }
 
@@ -172,6 +291,7 @@ namespace CUDAWrappers
     , column_index_dev(nullptr, Utilities::CUDA::delete_device_data<int>)
     , row_ptr_dev(nullptr, Utilities::CUDA::delete_device_data<int>)
     , descr(nullptr)
+    , sp_descr(nullptr)
   {}
 
 
@@ -184,6 +304,7 @@ namespace CUDAWrappers
     , column_index_dev(nullptr, Utilities::CUDA::delete_device_data<int>)
     , row_ptr_dev(nullptr, Utilities::CUDA::delete_device_data<int>)
     , descr(nullptr)
+    , sp_descr(nullptr)
   {
     reinit(handle, sparse_matrix_host);
   }
@@ -200,11 +321,13 @@ namespace CUDAWrappers
     , column_index_dev(std::move(other.column_index_dev))
     , row_ptr_dev(std::move(other.row_ptr_dev))
     , descr(other.descr)
+    , sp_descr(other.sp_descr)
   {
-    other.nnz    = 0;
-    other.n_rows = 0;
-    other.n_cols = 0;
-    other.descr  = nullptr;
+    other.nnz      = 0;
+    other.n_rows   = 0;
+    other.n_cols   = 0;
+    other.descr    = nullptr;
+    other.sp_descr = nullptr;
   }
 
 
@@ -218,6 +341,14 @@ namespace CUDAWrappers
           cusparseDestroyMatDescr(descr);
         AssertNothrowCusparse(cusparse_error_code);
         descr = nullptr;
+      }
+
+    if (sp_descr != nullptr)
+      {
+        const cusparseStatus_t cusparse_error_code =
+          cusparseDestroySpMat(sp_descr);
+        AssertNothrowCusparse(cusparse_error_code);
+        sp_descr = nullptr;
       }
 
     nnz    = 0;
@@ -238,11 +369,13 @@ namespace CUDAWrappers
     column_index_dev = std::move(other.column_index_dev);
     row_ptr_dev      = std::move(other.row_ptr_dev);
     descr            = other.descr;
+    sp_descr         = other.sp_descr;
 
-    other.nnz    = 0;
-    other.n_rows = 0;
-    other.n_cols = 0;
-    other.descr  = nullptr;
+    other.nnz      = 0;
+    other.n_rows   = 0;
+    other.n_cols   = 0;
+    other.descr    = nullptr;
+    other.sp_descr = nullptr;
 
     return *this;
   }
@@ -330,6 +463,15 @@ namespace CUDAWrappers
     cusparse_error_code =
       cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
     AssertCusparse(cusparse_error_code);
+
+    // Create the sparse matrix descriptor
+    internal::create_sp_mat_descr(n_rows,
+                                  n_cols,
+                                  nnz,
+                                  val_dev.get(),
+                                  row_ptr_dev.get(),
+                                  column_index_dev.get(),
+                                  sp_descr);
   }
 
 
@@ -342,13 +484,7 @@ namespace CUDAWrappers
     const int n_blocks = 1 + (nnz - 1) / block_size;
     internal::scale<Number>
       <<<n_blocks, block_size>>>(val_dev.get(), factor, nnz);
-
-#  ifdef DEBUG
-    // Check that the kernel was launched correctly
-    AssertCuda(cudaGetLastError());
-    // Check that there was no problem during the execution of the kernel
-    AssertCuda(cudaDeviceSynchronize());
-#  endif
+    AssertCudaKernel();
 
     return *this;
   }
@@ -364,13 +500,7 @@ namespace CUDAWrappers
     const int n_blocks = 1 + (nnz - 1) / block_size;
     internal::scale<Number>
       <<<n_blocks, block_size>>>(val_dev.get(), 1. / factor, nnz);
-
-#  ifdef DEBUG
-    // Check that the kernel was launched correctly
-    AssertCuda(cudaGetLastError());
-    // Check that there was no problem during the execution of the kernel
-    AssertCuda(cudaDeviceSynchronize());
-#  endif
+    AssertCudaKernel();
 
     return *this;
   }
@@ -387,11 +517,7 @@ namespace CUDAWrappers
                     false,
                     n_rows,
                     n_cols,
-                    nnz,
-                    descr,
-                    val_dev.get(),
-                    row_ptr_dev.get(),
-                    column_index_dev.get(),
+                    sp_descr,
                     src.get_values(),
                     false,
                     dst.get_values());
@@ -409,11 +535,7 @@ namespace CUDAWrappers
                     true,
                     n_rows,
                     n_cols,
-                    nnz,
-                    descr,
-                    val_dev.get(),
-                    row_ptr_dev.get(),
-                    column_index_dev.get(),
+                    sp_descr,
                     src.get_values(),
                     false,
                     dst.get_values());
@@ -431,11 +553,7 @@ namespace CUDAWrappers
                     false,
                     n_rows,
                     n_cols,
-                    nnz,
-                    descr,
-                    val_dev.get(),
-                    row_ptr_dev.get(),
-                    column_index_dev.get(),
+                    sp_descr,
                     src.get_values(),
                     true,
                     dst.get_values());
@@ -453,11 +571,7 @@ namespace CUDAWrappers
                     true,
                     n_rows,
                     n_cols,
-                    nnz,
-                    descr,
-                    val_dev.get(),
-                    row_ptr_dev.get(),
-                    column_index_dev.get(),
+                    sp_descr,
                     src.get_values(),
                     true,
                     dst.get_values());
@@ -519,13 +633,7 @@ namespace CUDAWrappers
                                  column_index_dev.get(),
                                  row_ptr_dev.get(),
                                  column_sums.get_values());
-
-#  ifdef DEBUG
-    // Check that the kernel was launched correctly
-    AssertCuda(cudaGetLastError());
-    // Check that there was no problem during the execution of the kernel
-    AssertCuda(cudaDeviceSynchronize());
-#  endif
+    AssertCudaKernel();
 
     return column_sums.linfty_norm();
   }
@@ -544,13 +652,7 @@ namespace CUDAWrappers
                                  column_index_dev.get(),
                                  row_ptr_dev.get(),
                                  row_sums.get_values());
-
-#  ifdef DEBUG
-    // Check that the kernel was launched correctly
-    AssertCuda(cudaGetLastError());
-    // Check that there was no problem during the execution of the kernel
-    AssertCuda(cudaDeviceSynchronize());
-#  endif
+    AssertCudaKernel();
 
     return row_sums.linfty_norm();
   }
@@ -573,13 +675,14 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  std::tuple<Number *, int *, int *, cusparseMatDescr_t>
+  std::tuple<Number *, int *, int *, cusparseMatDescr_t, cusparseSpMatDescr_t>
   SparseMatrix<Number>::get_cusparse_matrix() const
   {
     return std::make_tuple(val_dev.get(),
                            column_index_dev.get(),
                            row_ptr_dev.get(),
-                           descr);
+                           descr,
+                           sp_descr);
   }
 
 

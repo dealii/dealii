@@ -1,0 +1,57 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       20
+DEAL::Number of degrees of freedom: 25   L0: 8   L1: 25
+DEAL::   Number of degrees of freedom: 25 (by level: 8, 25)
+DEAL:cg::Starting value 0.5107
+DEAL:cg::Convergence step 7 value 0
+DEAL::   7 CG iterations needed to obtain convergence.
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       44
+DEAL::Number of degrees of freedom: 57   L0: 8   L1: 25   L2: 48
+DEAL::   Number of degrees of freedom: 57 (by level: 8, 25, 48)
+DEAL:cg::Starting value 0.4679
+DEAL:cg::Convergence step 8 value 0
+DEAL::   8 CG iterations needed to obtain convergence.
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       92
+DEAL::Number of degrees of freedom: 117   L0: 8   L1: 25   L2: 80   L3: 60
+DEAL::   Number of degrees of freedom: 117 (by level: 8, 25, 80, 60)
+DEAL:cg::Starting value 0.3390
+DEAL:cg::Convergence step 9 value 0
+DEAL::   9 CG iterations needed to obtain convergence.
+DEAL::Cycle 3:
+DEAL::   Number of active cells:       188
+DEAL::Number of degrees of freedom: 221   L0: 8   L1: 25   L2: 80   L3: 200
+DEAL::   Number of degrees of freedom: 221 (by level: 8, 25, 80, 200)
+DEAL:cg::Starting value 0.2689
+DEAL:cg::Convergence step 12 value 0
+DEAL::   12 CG iterations needed to obtain convergence.
+DEAL::Cycle 4:
+DEAL::   Number of active cells:       392
+DEAL::Number of degrees of freedom: 453   L0: 8   L1: 25   L2: 89   L3: 288   L4: 240
+DEAL::   Number of degrees of freedom: 453 (by level: 8, 25, 89, 288, 240)
+DEAL:cg::Starting value 0.1854
+DEAL:cg::Convergence step 13 value 0
+DEAL::   13 CG iterations needed to obtain convergence.
+DEAL::Cycle 5:
+DEAL::   Number of active cells:       752
+DEAL::Number of degrees of freedom: 865   L0: 8   L1: 25   L2: 89   L3: 288   L4: 760   L5: 60
+DEAL::   Number of degrees of freedom: 865 (by level: 8, 25, 89, 288, 760, 60)
+DEAL:cg::Starting value 0.1471
+DEAL:cg::Convergence step 14 value 0
+DEAL::   14 CG iterations needed to obtain convergence.
+DEAL::Cycle 6:
+DEAL::   Number of active cells:       1532
+DEAL::Number of degrees of freedom: 1741   L0: 8   L1: 25   L2: 89   L3: 304   L4: 1000   L5: 984   L6: 72
+DEAL::   Number of degrees of freedom: 1741 (by level: 8, 25, 89, 304, 1000, 984, 72)
+DEAL:cg::Starting value 0.1188
+DEAL:cg::Convergence step 14 value 0
+DEAL::   14 CG iterations needed to obtain convergence.
+DEAL::Cycle 7:
+DEAL::   Number of active cells:       3020
+DEAL::Number of degrees of freedom: 3417   L0: 8   L1: 25   L2: 89   L3: 328   L4: 1032   L5: 1976   L6: 1360
+DEAL::   Number of degrees of freedom: 3417 (by level: 8, 25, 89, 328, 1032, 1976, 1360)
+DEAL:cg::Starting value 0.09316
+DEAL:cg::Convergence step 19 value 0
+DEAL::   19 CG iterations needed to obtain convergence.

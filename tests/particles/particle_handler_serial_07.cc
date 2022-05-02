@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,9 +79,6 @@ main(int argc, char *argv[])
 
   deallog.push("2d/2d");
   test<2, 2>();
-  deallog.pop();
-  deallog.push("2d/3d");
-  test<2, 3>();
   deallog.pop();
   deallog.push("3d/3d");
   test<3, 3>();

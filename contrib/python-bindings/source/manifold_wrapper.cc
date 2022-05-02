@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,12 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/grid/manifold_lib.h>
 
 #include <manifold_wrapper.h>
 #include <point_wrapper.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -91,8 +91,8 @@ namespace python
                              boost::python::object &pull_back)
     {
       return new FunctionManifold<dim, spacedim>(
-        std_cxx14::make_unique<FunctionWrapper<dim>>(push_forward, spacedim),
-        std_cxx14::make_unique<FunctionWrapper<spacedim>>(pull_back, dim));
+        std::make_unique<FunctionWrapper<dim>>(push_forward, spacedim),
+        std::make_unique<FunctionWrapper<spacedim>>(pull_back, dim));
     }
 
 

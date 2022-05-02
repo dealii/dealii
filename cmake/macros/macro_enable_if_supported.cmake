@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -22,19 +22,7 @@
 #
 
 MACRO(ENABLE_IF_SUPPORTED _variable _flag)
-  #
-  # Clang is too conservative when reporting unsupported compiler flags.
-  # Therefore, we promote all warnings for an unsupported compiler flag to
-  # actual errors with the -Werror switch:
-  #
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    SET(_werror_string "-Werror ")
-  ELSE()
-    SET(_werror_string "")
-  ENDIF()
-
   STRING(STRIP "${_flag}" _flag_stripped)
-  SET(_flag_stripped_orig "${_flag_stripped}")
 
   #
   # Gcc does not emit a warning if testing -Wno-... flags which leads to
@@ -43,21 +31,19 @@ MACRO(ENABLE_IF_SUPPORTED _variable _flag)
   # compilation unit.
   # Therefore we invert the test for -Wno-... flags:
   #
+  SET(_flag_sanitized "${_flag_stripped}")
   IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    STRING(REPLACE "-Wno-" "-W" _flag_stripped "${_flag_stripped}")
+    STRING(REPLACE "-Wno-" "-W" _flag_sanitized "${_flag_stripped}")
   ENDIF()
 
   IF(NOT "${_flag_stripped}" STREQUAL "")
     STRING(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
-    STRING(REPLACE "," "" _flag_name "${_flag_name}")
-    STRING(REPLACE "-" "_" _flag_name "${_flag_name}")
-    STRING(REPLACE "+" "_" _flag_name "${_flag_name}")
-    CHECK_CXX_COMPILER_FLAG(
-      "${_werror_string}${_flag_stripped}"
-      DEAL_II_HAVE_FLAG_${_flag_name}
-      )
+    STRING(REGEX REPLACE "\[-+,\]" "_" _flag_name "${_flag_name}")
+
+    CHECK_CXX_COMPILER_FLAG("${_flag_sanitized}" DEAL_II_HAVE_FLAG_${_flag_name})
+
     IF(DEAL_II_HAVE_FLAG_${_flag_name})
-      SET(${_variable} "${${_variable}} ${_flag_stripped_orig}")
+      SET(${_variable} "${${_variable}} ${_flag_stripped}")
       STRING(STRIP "${${_variable}}" ${_variable})
     ENDIF()
   ENDIF()

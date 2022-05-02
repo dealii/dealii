@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,8 +20,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -51,11 +49,11 @@ test()
 
   tria[2].refine_global(3);
 
-  hp::DoFHandler<dim> dh0(tria[0]);
-  hp::DoFHandler<dim> dh1(tria[1]);
-  hp::DoFHandler<dim> dh2(tria[2]);
+  DoFHandler<dim> dh0(tria[0]);
+  DoFHandler<dim> dh1(tria[1]);
+  DoFHandler<dim> dh2(tria[2]);
 
-  hp::DoFHandler<dim> *dof_handler[3] = {&dh0, &dh1, &dh2};
+  DoFHandler<dim> *dof_handler[3] = {&dh0, &dh1, &dh2};
 
   for (unsigned int i = 0; i < 3; ++i)
     for (unsigned int j = 0; j < 3; ++j)

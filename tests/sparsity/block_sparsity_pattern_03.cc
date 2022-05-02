@@ -54,7 +54,7 @@ main()
       for (types::global_dof_index c = 0; c < rlen; ++c)
         {
           types::global_dof_index column = csp.column_number(row, c);
-          deallog << row << "," << column << std::endl;
+          deallog << row << ',' << column << std::endl;
         }
     }
 

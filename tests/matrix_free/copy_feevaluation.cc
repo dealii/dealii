@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,8 +56,8 @@ template <int dim, int degree_p, typename VectorType>
 class MatrixFreeTest
 {
 public:
-  typedef typename DoFHandler<dim>::active_cell_iterator CellIterator;
-  typedef double                                         Number;
+  using CellIterator = typename DoFHandler<dim>::active_cell_iterator;
+  using Number       = double;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};
@@ -68,7 +68,7 @@ public:
               const VectorType &                           src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    typedef VectorizedArray<Number> vector_t;
+    using vector_t = VectorizedArray<Number>;
     // allocate FEEvaluation. This test will test proper alignment
     AlignedVector<FEEvaluation<dim, degree_p + 1, degree_p + 2, dim, Number>>
       velocity;
@@ -84,10 +84,10 @@ public:
       {
         velocity[0].reinit(cell);
         velocity[0].read_dof_values(src.block(0));
-        velocity[0].evaluate(false, true, false);
+        velocity[0].evaluate(EvaluationFlags::gradients);
         pressure2.reinit(cell);
         pressure2.read_dof_values(src.block(1));
-        pressure2.evaluate(true, false, false);
+        pressure2.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < velocity[0].n_q_points; ++q)
           {
@@ -104,9 +104,9 @@ public:
             velocity[0].submit_symmetric_gradient(sym_grad_u, q);
           }
 
-        velocity[0].integrate(false, true);
+        velocity[0].integrate(EvaluationFlags::gradients);
         velocity[0].distribute_local_to_global(dst.block(0));
-        pressure2.integrate(true, false);
+        pressure2.integrate(EvaluationFlags::values);
         pressure2.distribute_local_to_global(dst.block(1));
       }
   }

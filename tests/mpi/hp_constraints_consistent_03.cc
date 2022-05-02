@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,14 +34,15 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -79,39 +80,39 @@ test(const unsigned int degree_center,
   fe_collection.push_back(FESystem<dim>(FE_Q<dim>(degree_center), dim));
 
   // prepare DoFHandler
-  hp::DoFHandler<dim> dh(tria);
+  DoFHandler<dim> dh(tria);
 
-  for (const auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        if (cell->id().to_string() == "1_0:")
-          {
-            // set different fe on center cell
-            cell->set_active_fe_index(1);
+  for (const auto &cell :
+       dh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      if (cell->id().to_string() == "1_0:")
+        {
+          // set different FE on center cell
+          cell->set_active_fe_index(1);
 
 #ifdef DEBUG
-            // verify that our scenario is initialized correctly
-            // by checking the number of neighbors of the center cell
-            unsigned int n_neighbors = 0;
-            for (const unsigned int i : GeometryInfo<dim>::face_indices())
-              if (static_cast<unsigned int>(cell->neighbor_index(i)) !=
-                  numbers::invalid_unsigned_int)
-                ++n_neighbors;
-            Assert(n_neighbors == 3, ExcInternalError());
+          // verify that our scenario is initialized correctly
+          // by checking the number of neighbors of the center cell
+          unsigned int n_neighbors = 0;
+          for (const unsigned int i : GeometryInfo<dim>::face_indices())
+            if (static_cast<unsigned int>(cell->neighbor_index(i)) !=
+                numbers::invalid_unsigned_int)
+              ++n_neighbors;
+          Assert(n_neighbors == 3, ExcInternalError());
 #endif
-          }
-        else if (cell->id().to_string() == "0_0:")
-          {
-            // set different boundary id on leftmost cell
-            for (const unsigned int f : GeometryInfo<dim>::face_indices())
-              if (cell->face(f)->at_boundary())
-                cell->face(f)->set_boundary_id(1);
+        }
+      else if (cell->id().to_string() == "0_0:")
+        {
+          // set different boundary id on leftmost cell
+          for (const unsigned int f : GeometryInfo<dim>::face_indices())
+            if (cell->face(f)->at_boundary())
+              cell->face(f)->set_boundary_id(1);
 
-            // verify that our scenario is initialized correctly
-            // by checking the cell's location
-            Assert(cell->center()[0] < 0, ExcInternalError());
-          }
-      }
+          // verify that our scenario is initialized correctly
+          // by checking the cell's location
+          Assert(cell->center()[0] < 0, ExcInternalError());
+        }
+    }
 
   dh.distribute_dofs(fe_collection);
 
@@ -134,6 +135,9 @@ test(const unsigned int degree_center,
   constraints.close();
 
   // ------ verify -----
+  std::vector<IndexSet> locally_owned_dofs_per_processor =
+    Utilities::MPI::all_gather(dh.get_communicator(), dh.locally_owned_dofs());
+
   IndexSet locally_active_dofs;
   DoFTools::extract_locally_active_dofs(dh, locally_active_dofs);
 
@@ -142,13 +146,13 @@ test(const unsigned int degree_center,
       deallog << "constraints:" << std::endl;
       constraints.print(deallog.get_file_stream());
     }
-  deallog << "consistent? "
-          << constraints.is_consistent_in_parallel(
-               dh.locally_owned_dofs_per_processor(),
-               locally_active_dofs,
-               MPI_COMM_WORLD,
-               true)
-          << std::endl;
+  deallog
+    << "consistent? "
+    << constraints.is_consistent_in_parallel(locally_owned_dofs_per_processor,
+                                             locally_active_dofs,
+                                             MPI_COMM_WORLD,
+                                             true)
+    << std::endl;
 
   deallog << "OK" << std::endl;
 }

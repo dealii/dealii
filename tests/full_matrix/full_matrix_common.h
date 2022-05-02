@@ -173,9 +173,9 @@ display_matrix(FullMatrix<number> M)
 {
   const number tolerance = 100. * std::numeric_limits<number>::epsilon();
   deallog << M.m() << "x" << M.n() << " matrix" << std::endl;
-  for (unsigned int i = 0; i < M.m(); i++)
+  for (unsigned int i = 0; i < M.m(); ++i)
     {
-      for (unsigned int j = 0; j < M.n(); j++)
+      for (unsigned int j = 0; j < M.n(); ++j)
         deallog << filter_out_small_numbers(M(i, j), tolerance) << " ";
       deallog << std::endl;
     }
@@ -187,9 +187,9 @@ display_matrix(FullMatrix<std::complex<number>> M)
 {
   const number tolerance = 100. * std::numeric_limits<number>::epsilon();
   deallog << M.m() << "x" << M.n() << " matrix" << std::endl;
-  for (unsigned int i = 0; i < M.m(); i++)
+  for (unsigned int i = 0; i < M.m(); ++i)
     {
-      for (unsigned int j = 0; j < M.n(); j++)
+      for (unsigned int j = 0; j < M.n(); ++j)
         deallog << filter_out_small_numbers(M(i, j), tolerance) << " ";
       deallog << std::endl;
     }
@@ -200,8 +200,8 @@ template <typename number>
 void
 fill_matrix(FullMatrix<number> &A)
 {
-  for (unsigned int i = 0; i < A.m(); i++)
-    for (unsigned int j = 0; j < A.n(); j++)
+  for (unsigned int i = 0; i < A.m(); ++i)
+    for (unsigned int j = 0; j < A.n(); ++j)
       A(i, j) = number(i * A.n() + j + 1);
 }
 

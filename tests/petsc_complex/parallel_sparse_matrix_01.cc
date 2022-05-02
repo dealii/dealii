@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -145,7 +145,7 @@ test(const unsigned int poly_degree = 1)
     mass_matrix.compress(VectorOperation::add);
   }
 
-  for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); i++)
+  for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
     {
       double re = 0, im = 0;
       if (i % 2)

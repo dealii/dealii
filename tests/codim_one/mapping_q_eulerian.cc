@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,7 +64,7 @@ test(std::string filename, unsigned int degree)
   grid_out.set_flags(GridOutFlags::Ucd(true));
   grid_out.write_ucd(tria, deallog.get_file_stream());
 
-  QTrapez<dim>                                    quad;
+  QTrapezoid<dim>                                 quad;
   MappingQEulerian<dim, Vector<double>, spacedim> mapping(degree,
                                                           shift_dh,
                                                           shift);

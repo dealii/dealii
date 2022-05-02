@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,8 +50,6 @@ DEAL_II_NAMESPACE_OPEN
  * ghost vector in AdditionalData::temp_ghost_vector.
  *
  * @ingroup Preconditioners
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
@@ -92,7 +90,7 @@ public:
       const bool   invert_diagonal = true,
       const bool   same_diagonal   = false,
       const typename PreconditionBlockBase<InverseNumberType>::Inversion
-                   inversion = PreconditionBlockBase<InverseNumberType>::gauss_jordan,
+        inversion = PreconditionBlockBase<InverseNumberType>::gauss_jordan,
       const double threshold         = 0.,
       VectorType * temp_ghost_vector = nullptr);
 
@@ -282,8 +280,6 @@ private:
  * expected by Solver objects.
  *
  * @ingroup Preconditioners
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
@@ -380,8 +376,6 @@ public:
  * expected by Solver objects.
  *
  * @ingroup Preconditioners
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
@@ -478,8 +472,6 @@ public:
  * preconditioner interface expected by Solver objects.
  *
  * @ingroup Preconditioners
- * @author Guido Kanschat
- * @date 2010
  */
 template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,

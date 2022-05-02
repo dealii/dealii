@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2019 by the deal.II authors
+ * Copyright (C) 2008 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -32,7 +32,6 @@
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/sparse_direct.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -300,7 +299,7 @@ namespace Step57
     // remain satisfied during Newton's iteration, zero boundary conditions are
     // used for the update $\delta u^k$. Therefore we set up two different
     // constraint objects.
-    FEValuesExtractors::Vector velocities(0);
+    const FEValuesExtractors::Vector velocities(0);
     {
       nonzero_constraints.clear();
 
@@ -376,7 +375,7 @@ namespace Step57
                             update_values | update_quadrature_points |
                               update_JxW_values | update_gradients);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     const FEValuesExtractors::Vector velocities(0);
@@ -564,7 +563,7 @@ namespace Step57
   void StationaryNavierStokes<dim>::refine_mesh()
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
-    FEValuesExtractors::Vector velocity(0);
+    const FEValuesExtractors::Vector velocity(0);
     KellyErrorEstimator<dim>::estimate(
       dof_handler,
       QGauss<dim - 1>(degree + 1),
@@ -708,7 +707,7 @@ namespace Step57
   //
   // This function will provide us with an initial guess by using a
   // continuation method as we discussed in the introduction. The Reynolds
-  // number is increased \step-by-step until we reach the target value. By
+  // number is increased step-by-step until we reach the target value. By
   // experiment, the solution to Stokes is good enough to be the initial guess
   // of NSE with Reynolds number 1000 so we start there.  To make sure the
   // solution from previous problem is close enough to the next one, the step
@@ -787,8 +786,8 @@ namespace Step57
         VectorTools::point_value(dof_handler, present_solution, p, tmp_vector);
         f << p(dim - 1);
 
-        for (int j = 0; j < dim; j++)
-          f << " " << tmp_vector(j);
+        for (int j = 0; j < dim; ++j)
+          f << ' ' << tmp_vector(j);
         f << std::endl;
       }
   }

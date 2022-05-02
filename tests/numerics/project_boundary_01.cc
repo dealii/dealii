@@ -102,7 +102,7 @@ write_map(const std::map<types::global_dof_index, double> &bv)
        i != bv.end();
        ++i)
     // also output log of value to also display small numbers
-    deallog << i->first << ' ' << i->second << " "
+    deallog << i->first << ' ' << i->second << ' '
             << (std::abs(i->second) > 0 ? std::log(std::abs(i->second)) :
                                           -10000)
             << std::endl;

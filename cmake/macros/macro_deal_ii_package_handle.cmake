@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 - 2018 by the deal.II authors
+## Copyright (C) 2014 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -45,7 +45,7 @@
 # search.
 #
 
-MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
+MACRO(DEAL_II_PACKAGE_HANDLE _feature)
 
   IF(DEFINED ${_feature}_VERSION)
     MESSAGE(STATUS "  ${_feature}_VERSION: ${${_feature}_VERSION}")
@@ -60,72 +60,79 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
     SET(${_feature}_FOUND TRUE)
   ENDIF()
 
-  SET(_variable ${_var})
-  SET(${_feature}_${_variable} "")
+  #
+  # Clear temporary variables
+  #
+  FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
+    set(_temp_${_suffix} "")
+  ENDFOREACH()
+
+  #
+  # State variables for parsing keywords and arguments. We store the
+  # currently encountered keyword in ${_current_suffix} and store the fact
+  # whether we encountered an "OPTIONAL" or "REQUIRED" keyword in
+  # ${_required}
+  #
+  SET(_current_suffix "")
   SET(_required TRUE)
-  SET(_fine TRUE)
-  SET(_fill_clear FALSE)
-  SET(_clear "")
+
+  #
+  # A temporary list accumulating all variables that should be "cleared"
+  # when the feature gets disabled.
+  #
+  SET(_clear_variables_list "")
 
   FOREACH(_arg ${ARGN})
-    IF(_arg MATCHES "^LIBRARIES(|_DEBUG|_RELEASE)$"
-       OR _arg MATCHES "^(|BUNDLED_|USER_)INCLUDE_DIRS$"
-       OR _arg MATCHES "^(|USER_)DEFINITIONS(|_DEBUG|_RELEASE)$"
-       OR _arg MATCHES "^CXX_FLAGS(|_DEBUG|_RELEASE)"
-       OR _arg MATCHES "^LINKER_FLAGS(|_DEBUG|_RELEASE)"
-       OR _arg MATCHES "^EXECUTABLE(|_DEBUG|_RELEASE)")
-
-      IF(_fine)
-        IF(_variable MATCHES "^CXX_FLAGS(|_DEBUG|_RELEASE)"
-           OR _variable MATCHES "^LINKER_FLAGS(|_DEBUG|_RELEASE)")
-          TO_STRING(${_feature}_${_variable} ${${_feature}_${_variable}})
-        ENDIF()
-        MESSAGE(STATUS "  ${_feature}_${_variable}: ${${_feature}_${_variable}}")
-      ENDIF()
-
+    IF(("${_arg}" IN_LIST DEAL_II_LIST_SUFFIXES) OR
+       ("${_arg}" IN_LIST DEAL_II_STRING_SUFFIXES) OR
+       ("${_arg}" STREQUAL "CLEAR"))
       #
-      # *Yay* a new keyword.
+      # We encountered a new keyword.
       #
-      SET(_variable ${_arg})
-      SET(${_feature}_${_variable} "")
-      SET(_required TRUE)
-      SET(_fine TRUE)
+      SET(_current_suffix "${_arg}")
 
     ELSEIF("${_arg}" STREQUAL "REQUIRED")
       SET(_required TRUE)
+
     ELSEIF("${_arg}" STREQUAL "OPTIONAL")
       SET(_required FALSE)
+
     ELSEIF(_arg MATCHES "^(optimized|debug|general)$"
-            AND "${_variable}" STREQUAL "LIBRARIES")
-      #
-      # Keywords are special...
-      #
-      LIST(APPEND ${_feature}_${_variable} ${_arg})
-    ELSEIF("${_arg}" STREQUAL "CLEAR")
-      SET(_fill_clear TRUE)
+            AND "${_current_suffix}" STREQUAL "LIBRARIES")
+      LIST(APPEND _temp_${_current_suffix} ${_arg})
+
     ELSE()
+      IF ("${_current_suffix}" STREQUAL "")
+        MESSAGE(FATAL_ERROR
+          "Internal configuration error: the second "
+          "argument to DEAL_II_PACKAGE_HANDLE must be a keyword"
+          )
+      ENDIF()
+
       MARK_AS_ADVANCED(${_arg})
-      IF(_fill_clear)
+
+      IF("${_current_suffix}" STREQUAL "CLEAR")
         IF(NOT _arg MATCHES "^(optimized|debug|general)$")
-          LIST(APPEND _clear ${_arg})
+          LIST(APPEND _clear_variables_list ${_arg})
         ENDIF()
+
       ELSE()
+
         IF("${${_arg}}" MATCHES "^\\s*$" OR "${${_arg}}" MATCHES "-NOTFOUND")
-          IF(_required AND _fine)
+          IF(_required)
             IF("${${_arg}}" MATCHES "^\\s*$")
               MESSAGE(STATUS
-                "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" empty ***"
+                "  ${_feature}_${_current_suffix}: *** Required variable \"${_arg}\" empty ***"
                 )
             ELSE()
               MESSAGE(STATUS
-                "  ${_feature}_${_variable}: *** Required variable \"${_arg}\" set to NOTFOUND ***"
+                "  ${_feature}_${_current_suffix}: *** Required variable \"${_arg}\" set to NOTFOUND ***"
                 )
             ENDIF()
             SET(${_feature}_FOUND FALSE)
-            SET(_fine FALSE)
           ENDIF()
         ELSE()
-          LIST(APPEND ${_feature}_${_variable} ${${_arg}})
+          LIST(APPEND _temp_${_current_suffix} ${${_arg}})
         ENDIF()
       ENDIF()
     ENDIF()
@@ -133,23 +140,43 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
 
   SET(${_feature}_CLEAR_VARIABLES ${_clear} CACHE INTERNAL "")
 
-  IF(_fine)
-    IF(_variable MATCHES "^CXX_FLAGS(|_DEBUG|_RELEASE)"
-       OR _variable MATCHES "^LINKER_FLAGS(|_DEBUG|_RELEASE)")
-      TO_STRING(${_feature}_${_variable} ${${_feature}_${_variable}})
-    ENDIF()
-    MESSAGE(STATUS "  ${_feature}_${_variable}: ${${_feature}_${_variable}}")
-  ENDIF()
-
   IF(${_feature}_FOUND)
     #
-    # Deduplicate entries:
+    # Deduplicate and stringify entries:
     #
     FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES})
       IF(_suffix MATCHES "INCLUDE_DIRS$")
-        REMOVE_DUPLICATES(${_feature}_${_suffix})
+        REMOVE_DUPLICATES(_temp_${_suffix})
       ELSE()
-        REMOVE_DUPLICATES(${_feature}_${_suffix} REVERSE)
+        REMOVE_DUPLICATES(_temp_${_suffix} REVERSE)
+      ENDIF()
+    ENDFOREACH()
+    FOREACH(_suffix ${_DEAL_II_STRING_SUFFIXES})
+      TO_STRING(_temp_${_suffix} ${_temp_${_suffix}})
+    ENDFOREACH()
+
+    #
+    # Write back into global variables:
+    #
+    CLEAR_FEATURE(${_feature})
+    FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES} ${DEAL_II_STRING_SUFFIXES})
+      IF(NOT "${_temp_${_suffix}}" STREQUAL "")
+        set(${_feature}_${_suffix} "${_temp_${_suffix}}")
+        MESSAGE(STATUS "  ${_feature}_${_suffix}: ${${_feature}_${_suffix}}")
+      ENDIF()
+    ENDFOREACH()
+
+    #
+    # Remove certain system libraries from the link interface. This is
+    # purely cosmetic (we always implicitly link against the C library, and
+    # we always set up threading by linking against libpthread.so if
+    # necessary).
+    #
+    FOREACH(_suffix LIBRARIES LIBRARIES_DEBUG LIBRARIES_RELEASE)
+      IF(NOT "${${_feature}_${_suffix}}" STREQUAL "")
+        LIST(REMOVE_ITEM ${_feature}_${_suffix}
+          "pthread" "-pthread" "-lpthread" "c" "-lc"
+          )
       ENDIF()
     ENDFOREACH()
 

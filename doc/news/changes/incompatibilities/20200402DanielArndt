@@ -1,5 +1,0 @@
-Removed: The deprecated classes PointerMatrixBase, PointerMatrix,
-PointerMatrixVector and PointerMatrixAux and the related function
-new_pointer_matrix_base() have been removed. Use LinearOperator instead.
-<br>
-(Daniel Arndt, 2020/04/02)

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -313,9 +313,9 @@ SET(src_umfpack_DL_AND_ZL
   # Files that originate in $(UMF), which is really just $(UMFCH) for our
   # purposes:
   umf_assemble.cc umf_blas3_update.cc umf_build_tuples.cc umf_create_element.cc
-  umf_dump umf_extend_front.cc umf_garbage_collection.cc umf_get_memory.cc
-  umf_init_front umf_kernel.cc umf_kernel_init.cc umf_kernel_wrapup.cc
-  umf_local_search umf_lsolve.cc umf_ltsolve umf_mem_alloc_element.cc
+  umf_dump.cc umf_extend_front.cc umf_garbage_collection.cc umf_get_memory.cc
+  umf_init_front.cc umf_kernel.cc umf_kernel_init.cc umf_kernel_wrapup.cc
+  umf_local_search.cc umf_lsolve.cc umf_ltsolve.cc umf_mem_alloc_element.cc
   umf_mem_alloc_head_block.cc umf_mem_alloc_tail_block.cc
   umf_mem_free_tail_block.cc umf_mem_init_memoryspace.cc
   umf_report_vector.cc umf_row_search.cc umf_scale_column.cc
@@ -329,7 +329,7 @@ SET(src_umfpack_DL_AND_ZL
   umfpack_free_symbolic.cc umfpack_get_numeric.cc umfpack_get_lunz.cc
   umfpack_get_symbolic.cc umfpack_get_determinant.cc umfpack_numeric.cc
   umfpack_qsymbolic.cc umfpack_report_control.cc umfpack_report_info.cc
-  umfpack_report_matrix.cc umfpack_report_numeric umfpack_report_perm.cc
+  umfpack_report_matrix.cc umfpack_report_numeric.cc umfpack_report_perm.cc
   umfpack_report_status.cc umfpack_report_symbolic.cc umfpack_report_triplet.cc
   umfpack_report_vector.cc umfpack_solve.cc umfpack_symbolic.cc
   umfpack_transpose.cc umfpack_triplet_to_col.cc umfpack_scale.cc

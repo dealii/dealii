@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,6 +30,7 @@
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_description.h>
 
@@ -60,7 +61,7 @@ template <int dim,
 class LaplaceOperator : public Subscriptor
 {
 public:
-  typedef number value_type;
+  using value_type = number;
 
   LaplaceOperator(){};
 
@@ -214,10 +215,10 @@ private:
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(false, true, false);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(phi.get_gradient(q), q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -226,7 +227,7 @@ private:
   compute_inverse_diagonal()
   {
     data.initialize_dof_vector(inverse_diagonal_entries);
-    unsigned int dummy;
+    unsigned int dummy = 0;
     data.cell_loop(&LaplaceOperator::local_diagonal_cell,
                    this,
                    inverse_diagonal_entries,
@@ -259,10 +260,10 @@ private:
             for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
               phi.begin_dof_values()[j] = VectorizedArray<number>();
             phi.begin_dof_values()[i] = 1.;
-            phi.evaluate(false, true, false);
+            phi.evaluate(EvaluationFlags::gradients);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_gradient(phi.get_gradient(q), q);
-            phi.integrate(false, true);
+            phi.integrate(EvaluationFlags::gradients);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];
           }
         for (unsigned int i = 0; i < phi.tensor_dofs_per_cell; ++i)
@@ -365,8 +366,8 @@ do_test(const DoFHandler<dim> &dof)
   in = 1.;
 
   // set up multigrid in analogy to step-37
-  typedef LaplaceOperator<dim, fe_degree, n_q_points_1d, number>
-    LevelMatrixType;
+  using LevelMatrixType =
+    LaplaceOperator<dim, fe_degree, n_q_points_1d, number>;
 
   MGLevelObject<LevelMatrixType> mg_matrices;
   mg_matrices.resize(0, dof.get_triangulation().n_global_levels() - 1);
@@ -377,11 +378,9 @@ do_test(const DoFHandler<dim> &dof)
       mg_matrices[level].initialize(mapping, dof, dirichlet_boundaries, level);
     }
 
-  MGConstrainedDoFs                                   mg_constrained_dofs;
-  Functions::ZeroFunction<dim>                        zero_function;
-  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-  dirichlet_boundary[0] = &zero_function;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  MGConstrainedDoFs mg_constrained_dofs;
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
   MGTransferPrebuiltMF<dim, LevelMatrixType> mg_transfer(mg_matrices,
                                                          mg_constrained_dofs);
@@ -390,9 +389,9 @@ do_test(const DoFHandler<dim> &dof)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,
-                                LinearAlgebra::distributed::Vector<number>>
-    SMOOTHER;
+  using SMOOTHER =
+    PreconditionChebyshev<LevelMatrixType,
+                          LinearAlgebra::distributed::Vector<number>>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::Vector<number>>
@@ -457,7 +456,10 @@ test()
 
       // extract relevant information form pdt
       auto construction_data = TriangulationDescription::Utilities::
-        create_description_from_triangulation(tria, MPI_COMM_WORLD, true);
+        create_description_from_triangulation(
+          tria,
+          MPI_COMM_WORLD,
+          TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
       // actually create triangulation
       tria_pft.create_triangulation(construction_data);
@@ -485,7 +487,10 @@ test()
 
         // extract relevant information form pdt
         auto construction_data = TriangulationDescription::Utilities::
-          create_description_from_triangulation(tria, MPI_COMM_WORLD, true);
+          create_description_from_triangulation(
+            tria,
+            MPI_COMM_WORLD,
+            TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
         // actually create triangulation
         tria_pft.create_triangulation(construction_data);

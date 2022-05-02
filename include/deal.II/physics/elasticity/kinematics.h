@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,16 +34,13 @@ namespace Physics
     /**
      * A collection of tensor definitions for deformation and strain measures,
      * as well as a few special transformations, that conform to notation used
-     in
-     * standard scientific literature, in particular the books of
+     * in standard scientific literature, in particular the books of
      * Holzapfel (2007) and Wriggers (2008). The citation for these references,
      * as well as other notation used here, can be found in the description for
      * the Physics::Elasticity namespace.
 
-     * @note These hold specifically for the codimension
-     * 0 case, where the metric tensor is the identity tensor.
-     *
-     * @author Jean-Paul Pelteret, Andrew McBride, 2016
+     * @note These hold specifically for the codimension 0 case,
+     * where the metric tensor is the identity tensor.
      */
     namespace Kinematics
     {
@@ -291,7 +288,9 @@ template <int dim, typename Number>
 inline Tensor<2, dim, Number>
 Physics::Elasticity::Kinematics::F_iso(const Tensor<2, dim, Number> &F)
 {
-  return std::pow(determinant(F), -1.0 / dim) * F;
+  return internal::NumberType<Number>::value(
+           std::pow(determinant(F), -1.0 / dim)) *
+         F;
 }
 
 

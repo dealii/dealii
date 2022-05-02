@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,13 +28,14 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
@@ -58,12 +59,12 @@ test()
   for (unsigned int deg = 1; deg <= max_degree; ++deg)
     fe_dgq.push_back(FE_DGQ<dim>(deg));
 
-  hp::DoFHandler<dim> dgq_dof_handler(tria);
+  DoFHandler<dim> dgq_dof_handler(tria);
 
-  // randomly assign fes
-  for (const auto &cell : dgq_dof_handler.active_cell_iterators())
-    if (cell->is_locally_owned())
-      cell->set_active_fe_index(Testing::rand() % max_degree);
+  // randomly assign FEs
+  for (const auto &cell : dgq_dof_handler.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
+    cell->set_active_fe_index(Testing::rand() % max_degree);
   dgq_dof_handler.distribute_dofs(fe_dgq);
 
   // prepare index sets
@@ -77,14 +78,16 @@ test()
   // prepare dof_values
   LinearAlgebra::distributed::Vector<double> dgq_solution;
   dgq_solution.reinit(dgq_locally_owned_dofs, dgq_ghost_dofs, MPI_COMM_WORLD);
-  VectorTools::interpolate(dgq_dof_handler, ZeroFunction<dim>(), dgq_solution);
+  VectorTools::interpolate(dgq_dof_handler,
+                           Functions::ZeroFunction<dim>(),
+                           dgq_solution);
   dgq_solution.update_ghost_values();
 
-  parallel::distributed::SolutionTransfer<
-    dim,
-    LinearAlgebra::distributed::Vector<double>,
-    hp::DoFHandler<dim>>
-    dgq_soltrans(dgq_dof_handler);
+  parallel::distributed::
+    SolutionTransfer<dim, LinearAlgebra::distributed::Vector<double>>
+
+
+      dgq_soltrans(dgq_dof_handler);
   dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_solution);
 
   // refine and transfer

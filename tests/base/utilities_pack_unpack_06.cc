@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -149,7 +149,7 @@ check(const double (&array)[N], const Point<dim>(&point))
                                       point_uncompressed.cend(),
                                       true);
     }
-  catch (const boost::archive::archive_exception &)
+  catch (const boost::iostreams::gzip_error &)
     {
       deallog << "unpacking uncompressed point with decompression failed!"
               << std::endl;
@@ -162,7 +162,7 @@ check(const double (&array)[N], const Point<dim>(&point))
                         forbidden,
                         true);
     }
-  catch (const boost::archive::archive_exception &)
+  catch (const boost::iostreams::gzip_error &)
     {
       deallog << "unpacking uncompressed array with decompression failed!"
               << std::endl;

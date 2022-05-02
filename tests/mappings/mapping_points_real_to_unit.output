@@ -1,0 +1,17 @@
+
+DEAL::dim=1, spacedim=1
+DEAL::MappingQ(1): OK
+DEAL::MappingQ(4): OK
+DEAL::MappingFEField(FESystem(FE_Q(4))): OK
+DEAL::dim=2, spacedim=2
+DEAL::MappingQ(1): OK
+DEAL::MappingQ(4): OK
+DEAL::MappingFEField(FESystem(FE_Q(4))): OK
+DEAL::dim=3, spacedim=3
+DEAL::MappingQ(1): OK
+DEAL::MappingQ(4): OK
+DEAL::MappingFEField(FESystem(FE_Q(4))): OK
+DEAL::dim=1, spacedim=2
+DEAL::MappingQ(1): OK
+DEAL::MappingQ(4): OK
+DEAL::MappingFEField(FESystem(FE_Q(4))): OK

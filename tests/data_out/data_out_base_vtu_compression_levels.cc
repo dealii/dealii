@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ check_all(std::ostream &log)
             Assert(false, ExcInternalError());
         }
       log << "==============================\n"
-          << dim << spacedim << "-" << flags.compression_level << ".vtu"
+          << dim << spacedim << '-' << flags.compression_level << ".vtu"
           << "\n==============================\n";
       check<dim, spacedim>(flags, log);
     }

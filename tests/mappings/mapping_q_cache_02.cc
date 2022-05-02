@@ -13,14 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-// Test MappingQCache by comparison with MappingQGeneric in parallel
+// Test MappingQCache by comparison with MappingQ in parallel
 
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q_cache.h>
-#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 
@@ -38,8 +38,8 @@ do_test(const unsigned int degree)
 
   tria.refine_global(1);
 
-  MappingQGeneric<dim> mapping(degree);
-  MappingQCache<dim>   mapping_cache(degree);
+  MappingQ<dim>      mapping(degree);
+  MappingQCache<dim> mapping_cache(degree);
   mapping_cache.initialize(tria, mapping);
 
   Point<dim> p1;
@@ -49,7 +49,7 @@ do_test(const unsigned int degree)
   for (unsigned int d = 0; d < dim; ++d)
     p2[d] = 0.5;
 
-  deallog << "Testing degree " << degree << " in " << dim << "D" << std::endl;
+  deallog << "Testing degree " << degree << " in " << dim << 'D' << std::endl;
   for (const auto &cell : tria.active_cell_iterators())
     {
       deallog << "cell " << cell->id() << ": "

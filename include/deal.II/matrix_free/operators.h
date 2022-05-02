@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,6 +29,7 @@
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/tools.h>
 
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
@@ -40,7 +41,7 @@ namespace MatrixFreeOperators
 {
   namespace BlockHelper
   {
-    // workaroud for unifying non-block vector and block vector implementations
+    // workaround for unifying non-block vector and block vector implementations
     // a non-block vector has one block and the only subblock is the vector
     // itself
     template <typename VectorType>
@@ -181,8 +182,6 @@ namespace MatrixFreeOperators
    * system_rhs *= -1.;
    * // proceed with other terms from right hand side...
    * @endcode
-   *
-   * @author Denis Davydov, Daniel Arndt, Martin Kronbichler, 2016, 2017
    */
   template <int dim,
             typename VectorType = LinearAlgebra::distributed::Vector<double>,
@@ -359,6 +358,11 @@ namespace MatrixFreeOperators
      * A derived class needs to implement this function and resize and fill
      * the protected member inverse_diagonal_entries and/or diagonal_entries
      * accordingly.
+     *
+     * @note Since the diagonal is frequently used as a smoother or
+     * preconditioner, entries corresponding to constrained DoFs are set to 1
+     * (instead of the correct value of 0) so that the diagonal matrix is
+     * invertible.
      */
     virtual void
     compute_diagonal() = 0;
@@ -380,7 +384,6 @@ namespace MatrixFreeOperators
      */
     const std::shared_ptr<DiagonalMatrix<VectorType>> &
     get_matrix_diagonal() const;
-
 
     /**
      * Apply the Jacobi preconditioner, which multiplies every element of the
@@ -477,7 +480,7 @@ namespace MatrixFreeOperators
     bool have_interface_matrices;
 
     /**
-     * Function which implements vmult_add (@p transpose = false) and
+     * %Function which implements vmult_add (@p transpose = false) and
      * Tvmult_add (@p transpose = true).
      */
     void
@@ -532,8 +535,6 @@ namespace MatrixFreeOperators
    * Note that the vmult_interface_down is used during the restriction phase of
    * the multigrid V-cycle, whereas vmult_interface_up is used during the
    * prolongation phase.
-   *
-   * @author Martin Kronbichler, 2016
    */
   template <typename OperatorType>
   class MGInterfaceOperator : public Subscriptor
@@ -613,8 +614,6 @@ namespace MatrixFreeOperators
    * to provide an array for the inverse of the local coefficient (this class
    * provide a helper method 'fill_inverse_JxW_values' to get the inverse of a
    * constant-coefficient operator).
-   *
-   * @author Martin Kronbichler, 2014
    */
   template <int dim,
             int fe_degree,
@@ -684,7 +683,7 @@ namespace MatrixFreeOperators
      * @code
      * for (unsigned int q=0; q<phi.n_q_points; ++q)
      *   phi.submit_value(array[q], q);
-     * phi.integrate(true, false);
+     * phi.integrate(EvaluationFlags::values);
      * inverse_mass.apply(coefficients, 1, phi.begin_dof_values(),
      *                    phi.begin_dof_values());
      * @endcode
@@ -734,8 +733,6 @@ namespace MatrixFreeOperators
    * Note that this class only supports the non-blocked vector variant of the
    * Base operator because only a single FEEvaluation object is used in the
    * apply function.
-   *
-   * @author Daniel Arndt, 2016
    */
   template <int dim,
             int fe_degree,
@@ -765,11 +762,40 @@ namespace MatrixFreeOperators
     MassOperator();
 
     /**
-     * For preconditioning, we store a lumped mass matrix at the diagonal
-     * entries.
+     * Same as the base class.
      */
     virtual void
     compute_diagonal() override;
+
+    /**
+     * Compute the lumped mass matrix. This is equal to the mass matrix times a
+     * vector of all ones and is equivalent to approximating the mass matrix
+     * with a nodal quadrature rule.
+     *
+     * The lumped mass matrix is an excellent preconditioner for mass matrices
+     * corresponding to FE_Q elements on axis-aligned cells. However, some
+     * elements (like FE_SimplexP with degrees higher than 1) have basis
+     * functions whose integrals are zero or negative (and therefore their
+     * lumped mass matrix entries are zero or negative). For such elements a
+     * lumped mass matrix is a very poor approximation of the operator - the
+     * diagonal should be used instead. If you are interested in using mass
+     * lumping with simplices then use FE_SimplexP_Bubbles instead of
+     * FE_SimplexP.
+     */
+    void
+    compute_lumped_diagonal();
+
+    /**
+     * Get read access to the lumped diagonal of this operator.
+     */
+    const std::shared_ptr<DiagonalMatrix<VectorType>> &
+    get_matrix_lumped_diagonal() const;
+
+    /**
+     * Get read access to the inverse lumped diagonal of this operator.
+     */
+    const std::shared_ptr<DiagonalMatrix<VectorType>> &
+    get_matrix_lumped_diagonal_inverse() const;
 
   private:
     /**
@@ -789,6 +815,18 @@ namespace MatrixFreeOperators
       VectorType &                                            dst,
       const VectorType &                                      src,
       const std::pair<unsigned int, unsigned int> &           cell_range) const;
+
+    /**
+     * A shared pointer to a diagonal matrix that stores the
+     * lumped diagonal elements as a vector.
+     */
+    std::shared_ptr<DiagonalMatrix<VectorType>> lumped_diagonal_entries;
+
+    /**
+     * A shared pointer to a diagonal matrix that stores the inverse of
+     * lumped diagonal elements as a vector.
+     */
+    std::shared_ptr<DiagonalMatrix<VectorType>> inverse_lumped_diagonal_entries;
   };
 
 
@@ -802,8 +840,6 @@ namespace MatrixFreeOperators
    * Note that this class only supports the non-blocked vector variant of the
    * Base operator because only a single FEEvaluation object is used in the
    * apply function.
-   *
-   * @author Denis Davydov, 2016
    */
   template <int dim,
             int fe_degree,
@@ -839,19 +875,23 @@ namespace MatrixFreeOperators
      * approximation to be used in preconditioners.
      */
     virtual void
-    compute_diagonal();
+    compute_diagonal() override;
 
     /**
-     * Set the heterogeneous scalar coefficient @p scalar_coefficient to be used at
-     * the quadrature points. The Table should be of correct size, consistent
-     * with the total number of quadrature points in
-     * <code>dim</code>-dimensions,
-     * controlled by the @p n_q_points_1d template parameter. Here,
-     * <code>(*scalar_coefficient)(cell,q)</code> corresponds to the value of
-     * the coefficient, where <code>cell</code> is an index into a set of cell
-     * batches as administered by the MatrixFree framework (which does not work
-     * on individual cells, but instead of batches of cells at once), and
-     * <code>q</code> is the number of the quadrature point within this batch.
+     * Set the heterogeneous scalar coefficient @p scalar_coefficient to be
+     * used at the quadrature points. The Table needs to have as many rows as
+     * there are cell batches in the underlying MatrixFree object,
+     * MatrixFree::n_cell_batches(). The number of batches is related to the
+     * fact that the matrix-free operators do not work on individual cells,
+     * but instead of batches of cells at once due to vectorization. The Table
+     * can take two different numbers of columns.  One case is to select it
+     * equal to the total number of quadrature points in `dim` dimensions,
+     * which is the `dim`th power of the `n_q_points_1d` template
+     * parameter. Here, `(*scalar_coefficient)(cell,q)` corresponds to the
+     * value of the coefficient on cell batch `cell` and quadrature point
+     * index `q`. The second supported variant is a Table with a single
+     * column, in which case the same variable coefficient value is used at
+     * all quadrature points of a cell.
      *
      * Such tables can be initialized by
      * @code
@@ -859,7 +899,7 @@ namespace MatrixFreeOperators
      * coefficient = std::make_shared<Table<2, VectorizedArray<double> > >();
      * {
      *   FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(mf_data);
-     *   const unsigned int n_cells = mf_data.n_macro_cells();
+     *   const unsigned int n_cells = mf_data.n_cell_batches();
      *   const unsigned int n_q_points = fe_eval.n_q_points;
      *   coefficient->reinit(n_cells, n_q_points);
      *   for (unsigned int cell=0; cell<n_cells; ++cell)
@@ -891,8 +931,12 @@ namespace MatrixFreeOperators
     set_coefficient(
       const std::shared_ptr<Table<2, VectorizedArrayType>> &scalar_coefficient);
 
+    /**
+     * Resets all data structures back to the same state as for a newly
+     * constructed object.
+     */
     virtual void
-    clear();
+    clear() override;
 
     /**
      * Read/Write access to coefficients to be used in Laplace operator.
@@ -910,7 +954,7 @@ namespace MatrixFreeOperators
      * using initialize_dof_vector().
      */
     virtual void
-    apply_add(VectorType &dst, const VectorType &src) const;
+    apply_add(VectorType &dst, const VectorType &src) const override;
 
     /**
      * Applies the Laplace operator on a cell.
@@ -993,8 +1037,7 @@ namespace MatrixFreeOperators
            ExcMessage(
              "Expected diagonal to be a multiple of scalar dof per cells"));
 
-    // temporarily reduce size of inverse_jxw to dofs_per_cell to get JxW values
-    // from fe_eval (will not reallocate any memory)
+    // compute values for the first component
     for (unsigned int q = 0; q < dofs_per_component_on_cell; ++q)
       inverse_jxw[q] = 1. / fe_eval.JxW(q);
     // copy values to rest of vector
@@ -1019,11 +1062,12 @@ namespace MatrixFreeOperators
     VectorizedArrayType>::apply(const VectorizedArrayType *in_array,
                                 VectorizedArrayType *      out_array) const
   {
-    internal::CellwiseInverseMassMatrixImpl<
-      dim,
-      fe_degree,
-      n_components,
-      VectorizedArrayType>::apply(fe_eval, in_array, out_array);
+    if (fe_degree > -1)
+      internal::CellwiseInverseMassMatrixImplBasic<dim, VectorizedArrayType>::
+        template run<fe_degree>(n_components, fe_eval, in_array, out_array);
+    else
+      internal::CellwiseInverseMassFactory<dim, VectorizedArrayType>::apply(
+        n_components, fe_eval, in_array, out_array);
   }
 
 
@@ -1044,15 +1088,25 @@ namespace MatrixFreeOperators
           const VectorizedArrayType *               in_array,
           VectorizedArrayType *                     out_array) const
   {
-    internal::CellwiseInverseMassMatrixImpl<dim,
-                                            fe_degree,
-                                            n_components,
-                                            VectorizedArrayType>::
-      apply(fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
-            inverse_coefficients,
-            n_actual_components,
-            in_array,
-            out_array);
+    const unsigned int given_degree =
+      fe_eval.get_shape_info().data[0].fe_degree;
+    if (fe_degree > -1)
+      internal::CellwiseInverseMassMatrixImplFlexible<dim,
+                                                      VectorizedArrayType>::
+        template run<fe_degree>(
+          n_actual_components,
+          fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
+          inverse_coefficients,
+          in_array,
+          out_array);
+    else
+      internal::CellwiseInverseMassFactory<dim, VectorizedArrayType>::apply(
+        n_actual_components,
+        given_degree,
+        fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
+        inverse_coefficients,
+        in_array,
+        out_array);
   }
 
 
@@ -1072,15 +1126,22 @@ namespace MatrixFreeOperators
                                      const VectorizedArrayType *in_array,
                                      VectorizedArrayType *      out_array) const
   {
-    internal::CellwiseInverseMassMatrixImpl<dim,
-                                            fe_degree,
-                                            n_components,
-                                            VectorizedArrayType>::
-      transform_from_q_points_to_basis(
-        fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
-        n_actual_components,
-        in_array,
-        out_array);
+    const auto n_q_points_1d = fe_eval.get_shape_info().data[0].n_q_points_1d;
+
+    if (fe_degree > -1 && (fe_degree + 1 == n_q_points_1d))
+      internal::CellwiseInverseMassMatrixImplTransformFromQPoints<
+        dim,
+        VectorizedArrayType>::template run<fe_degree,
+                                           fe_degree + 1>(n_actual_components,
+                                                          fe_eval,
+                                                          in_array,
+                                                          out_array);
+    else
+      internal::CellwiseInverseMassFactory<dim, VectorizedArrayType>::
+        transform_from_q_points_to_basis(n_actual_components,
+                                         fe_eval,
+                                         in_array,
+                                         out_array);
   }
 
 
@@ -1283,7 +1344,7 @@ namespace MatrixFreeOperators
 
     for (unsigned int j = 0; j < selected_rows.size(); ++j)
       {
-        if (data_->n_macro_cells() > 0)
+        if (data_->n_cell_batches() > 0)
           {
             AssertDimension(level, data_->get_cell_iterator(0, 0, j)->level());
           }
@@ -1384,18 +1445,22 @@ namespace MatrixFreeOperators
 
         // If not, assert that the local ranges are the same and reset to the
         // current partitioner
-        Assert(
-          BlockHelper::subblock(src, i).get_partitioner()->local_size() ==
-            data->get_dof_info(mf_component).vector_partitioner->local_size(),
-          ExcMessage("The vector passed to the vmult() function does not have "
-                     "the correct size for compatibility with MatrixFree."));
+        Assert(BlockHelper::subblock(src, i)
+                   .get_partitioner()
+                   ->locally_owned_size() ==
+                 data->get_dof_info(mf_component)
+                   .vector_partitioner->locally_owned_size(),
+               ExcMessage(
+                 "The vector passed to the vmult() function does not have "
+                 "the correct size for compatibility with MatrixFree."));
 
         // copy the vector content to a temporary vector so that it does not get
         // lost
         LinearAlgebra::distributed::Vector<Number> copy_vec(
           BlockHelper::subblock(src, i));
-        BlockHelper::subblock(const_cast<VectorType &>(src), i)
-          .reinit(data->get_dof_info(mf_component).vector_partitioner);
+        this->data->initialize_dof_vector(
+          BlockHelper::subblock(const_cast<VectorType &>(src), i),
+          mf_component);
         BlockHelper::subblock(const_cast<VectorType &>(src), i)
           .copy_locally_owned_data_from(copy_vec);
       }
@@ -1534,7 +1599,7 @@ namespace MatrixFreeOperators
               .local_element(edge_constrained_indices[j][i]) =
               edge_constrained_values[j][i].first;
           }
-        for (; c < BlockHelper::subblock(dst, j).local_size(); ++c)
+        for (; c < BlockHelper::subblock(dst, j).locally_owned_size(); ++c)
           BlockHelper::subblock(dst, j).local_element(c) = 0.;
       }
   }
@@ -1568,7 +1633,7 @@ namespace MatrixFreeOperators
               BlockHelper::subblock(src_cpy, j).local_element(c) = 0.;
             ++c;
           }
-        for (; c < BlockHelper::subblock(src_cpy, j).local_size(); ++c)
+        for (; c < BlockHelper::subblock(src_cpy, j).locally_owned_size(); ++c)
           BlockHelper::subblock(src_cpy, j).local_element(c) = 0.;
       }
 
@@ -1788,6 +1853,9 @@ namespace MatrixFreeOperators
       typename Base<dim, VectorType, VectorizedArrayType>::value_type;
     Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
            ExcNotInitialized());
+    Assert(this->selected_rows == this->selected_columns,
+           ExcMessage("This function is only implemented for square (not "
+                      "rectangular) operators."));
 
     this->inverse_diagonal_entries =
       std::make_shared<DiagonalMatrix<VectorType>>();
@@ -1797,19 +1865,153 @@ namespace MatrixFreeOperators
     VectorType &diagonal_vector = this->diagonal_entries->get_vector();
     this->initialize_dof_vector(inverse_diagonal_vector);
     this->initialize_dof_vector(diagonal_vector);
-    inverse_diagonal_vector = Number(1.);
-    apply_add(diagonal_vector, inverse_diagonal_vector);
 
+    // Set up the action of the mass matrix in a way that's compatible with
+    // MatrixFreeTools::compute_diagonal:
+    auto diagonal_evaluation = [](auto &integrator) {
+      integrator.evaluate(EvaluationFlags::values);
+      for (unsigned int q = 0; q < integrator.n_q_points; ++q)
+        integrator.submit_value(integrator.get_value(q), q);
+      integrator.integrate(EvaluationFlags::values);
+    };
+
+    std::function<void(
+      FEEvaluation<
+        dim,
+        fe_degree,
+        n_q_points_1d,
+        n_components,
+        typename Base<dim, VectorType, VectorizedArrayType>::value_type,
+        VectorizedArrayType> &)>
+      diagonal_evaluation_f(diagonal_evaluation);
+
+    Assert(this->selected_rows.size() > 0, ExcInternalError());
+    for (unsigned int block_n = 0; block_n < this->selected_rows.size();
+         ++block_n)
+      MatrixFreeTools::compute_diagonal(*this->data,
+                                        BlockHelper::subblock(diagonal_vector,
+                                                              block_n),
+                                        diagonal_evaluation_f,
+                                        this->selected_rows[block_n]);
+
+    // Constrained entries will create zeros on the main diagonal, which we
+    // don't want
     this->set_constrained_entries_to_one(diagonal_vector);
+
     inverse_diagonal_vector = diagonal_vector;
 
-    const unsigned int local_size = inverse_diagonal_vector.local_size();
-    for (unsigned int i = 0; i < local_size; ++i)
-      inverse_diagonal_vector.local_element(i) =
-        Number(1.) / inverse_diagonal_vector.local_element(i);
+    for (unsigned int i = 0; i < inverse_diagonal_vector.locally_owned_size();
+         ++i)
+      {
+        Assert(diagonal_vector.local_element(i) > Number(0),
+               ExcInternalError());
+        inverse_diagonal_vector.local_element(i) =
+          1. / inverse_diagonal_vector.local_element(i);
+      }
 
     inverse_diagonal_vector.update_ghost_values();
     diagonal_vector.update_ghost_values();
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename VectorType,
+            typename VectorizedArrayType>
+  void
+  MassOperator<dim,
+               fe_degree,
+               n_q_points_1d,
+               n_components,
+               VectorType,
+               VectorizedArrayType>::compute_lumped_diagonal()
+  {
+    using Number =
+      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
+    Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
+           ExcNotInitialized());
+    Assert(this->selected_rows == this->selected_columns,
+           ExcMessage("This function is only implemented for square (not "
+                      "rectangular) operators."));
+
+    inverse_lumped_diagonal_entries =
+      std::make_shared<DiagonalMatrix<VectorType>>();
+    lumped_diagonal_entries = std::make_shared<DiagonalMatrix<VectorType>>();
+    VectorType &inverse_lumped_diagonal_vector =
+      inverse_lumped_diagonal_entries->get_vector();
+    VectorType &lumped_diagonal_vector = lumped_diagonal_entries->get_vector();
+    this->initialize_dof_vector(inverse_lumped_diagonal_vector);
+    this->initialize_dof_vector(lumped_diagonal_vector);
+
+    // Re-use the inverse_lumped_diagonal_vector as the vector of 1s
+    inverse_lumped_diagonal_vector = Number(1.);
+    apply_add(lumped_diagonal_vector, inverse_lumped_diagonal_vector);
+    this->set_constrained_entries_to_one(lumped_diagonal_vector);
+
+    const size_type locally_owned_size =
+      inverse_lumped_diagonal_vector.locally_owned_size();
+    // A caller may request a lumped diagonal matrix when it doesn't make sense
+    // (e.g., an element with negative-mean basis functions). Avoid division by
+    // zero so we don't cause a floating point exception but permit negative
+    // entries here.
+    for (size_type i = 0; i < locally_owned_size; ++i)
+      {
+        if (lumped_diagonal_vector.local_element(i) == Number(0.))
+          inverse_lumped_diagonal_vector.local_element(i) = Number(1.);
+        else
+          inverse_lumped_diagonal_vector.local_element(i) =
+            Number(1.) / lumped_diagonal_vector.local_element(i);
+      }
+
+    inverse_lumped_diagonal_vector.update_ghost_values();
+    lumped_diagonal_vector.update_ghost_values();
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename VectorType,
+            typename VectorizedArrayType>
+  const std::shared_ptr<DiagonalMatrix<VectorType>> &
+  MassOperator<dim,
+               fe_degree,
+               n_q_points_1d,
+               n_components,
+               VectorType,
+               VectorizedArrayType>::get_matrix_lumped_diagonal_inverse() const
+  {
+    Assert(inverse_lumped_diagonal_entries.get() != nullptr &&
+             inverse_lumped_diagonal_entries->m() > 0,
+           ExcNotInitialized());
+    return inverse_lumped_diagonal_entries;
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename VectorType,
+            typename VectorizedArrayType>
+  const std::shared_ptr<DiagonalMatrix<VectorType>> &
+  MassOperator<dim,
+               fe_degree,
+               n_q_points_1d,
+               n_components,
+               VectorType,
+               VectorizedArrayType>::get_matrix_lumped_diagonal() const
+  {
+    Assert(lumped_diagonal_entries.get() != nullptr &&
+             lumped_diagonal_entries->m() > 0,
+           ExcNotInitialized());
+    return lumped_diagonal_entries;
   }
 
 
@@ -1870,10 +2072,10 @@ namespace MatrixFreeOperators
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(true, false, false);
+        phi.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_value(phi.get_value(q), q);
-        phi.integrate(true, false);
+        phi.integrate(EvaluationFlags::values);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -1995,7 +2197,8 @@ namespace MatrixFreeOperators
 
     inverse_diagonal_vector = diagonal_vector;
 
-    for (unsigned int i = 0; i < inverse_diagonal_vector.local_size(); ++i)
+    for (unsigned int i = 0; i < inverse_diagonal_vector.locally_owned_size();
+         ++i)
       if (std::abs(inverse_diagonal_vector.local_element(i)) >
           std::sqrt(std::numeric_limits<Number>::epsilon()))
         inverse_diagonal_vector.local_element(i) =
@@ -2066,16 +2269,34 @@ namespace MatrixFreeOperators
         typename Base<dim, VectorType, VectorizedArrayType>::value_type> &phi,
       const unsigned int cell) const
   {
-    phi.evaluate(false, true, false);
+    phi.evaluate(EvaluationFlags::gradients);
     if (scalar_coefficient.get())
       {
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        Assert(scalar_coefficient->size(1) == 1 ||
+                 scalar_coefficient->size(1) == phi.n_q_points,
+               ExcMessage("The number of columns in the coefficient table must "
+                          "be either 1 or the number of quadrature points " +
+                          std::to_string(phi.n_q_points) +
+                          ", but the given value was " +
+                          std::to_string(scalar_coefficient->size(1))));
+        if (scalar_coefficient->size(1) == phi.n_q_points)
+          for (unsigned int q = 0; q < phi.n_q_points; ++q)
+            {
+              Assert(Implementation::non_negative(
+                       (*scalar_coefficient)(cell, q)),
+                     ExcMessage("Coefficient must be non-negative"));
+              phi.submit_gradient((*scalar_coefficient)(cell, q) *
+                                    phi.get_gradient(q),
+                                  q);
+            }
+        else
           {
-            Assert(Implementation::non_negative((*scalar_coefficient)(cell, q)),
+            Assert(Implementation::non_negative((*scalar_coefficient)(cell, 0)),
                    ExcMessage("Coefficient must be non-negative"));
-            phi.submit_gradient((*scalar_coefficient)(cell, q) *
-                                  phi.get_gradient(q),
-                                q);
+            const VectorizedArrayType coefficient =
+              (*scalar_coefficient)(cell, 0);
+            for (unsigned int q = 0; q < phi.n_q_points; ++q)
+              phi.submit_gradient(coefficient * phi.get_gradient(q), q);
           }
       }
     else
@@ -2085,7 +2306,7 @@ namespace MatrixFreeOperators
             phi.submit_gradient(phi.get_gradient(q), q);
           }
       }
-    phi.integrate(false, true);
+    phi.integrate(EvaluationFlags::gradients);
   }
 
 

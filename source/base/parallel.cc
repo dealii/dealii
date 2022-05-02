@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,7 +53,7 @@ namespace parallel
 {
   namespace internal
   {
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
     TBBPartitioner::TBBPartitioner()
       : my_partitioner(std::make_shared<tbb::affinity_partitioner>())
       , in_use(false)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,9 +49,9 @@ template <int dim, typename NumberType>
 void
 test_tensor()
 {
-  typedef SD::Expression                       SD_number_t;
-  typedef Tensor<2, dim, SD_number_t>          SD_tensor_t;
-  typedef SymmetricTensor<2, dim, SD_number_t> SD_symm_tensor_t;
+  using SD_number_t      = SD::Expression;
+  using SD_tensor_t      = Tensor<2, dim, SD_number_t>;
+  using SD_symm_tensor_t = SymmetricTensor<2, dim, SD_number_t>;
 
   // --- Values ---
   deallog.push("Initialize");

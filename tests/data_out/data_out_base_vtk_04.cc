@@ -20,7 +20,7 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -44,8 +44,8 @@ check(std::ostream &log, unsigned cell_order)
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  Vector<double>       vec(dof_handler.n_dofs());
-  MappingQGeneric<dim> mapping(cell_order);
+  Vector<double> vec(dof_handler.n_dofs());
+  MappingQ<dim>  mapping(cell_order);
 
   VectorTools::interpolate(mapping,
                            dof_handler,

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -117,8 +117,8 @@ test()
       AssertThrow(correct_constraints.is_constrained(i) ==
                     library_constraints.is_constrained(i),
                   ExcInternalError());
-      typedef const std::vector<std::pair<types::global_dof_index, double>>
-        &constraint_format;
+      using constraint_format =
+        const std::vector<std::pair<types::global_dof_index, double>> &;
       if (correct_constraints.is_constrained(i))
         {
           constraint_format correct =

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,11 +62,11 @@ namespace Utilities
           /// Triangulation<dim, spacedim>::communicate_locally_moved_vertices()
           triangulation_communicate_locally_moved_vertices,
 
-          /// dof_handler_policy.cc: communicate_mg_ghost_cells()
-          dofhandler_communicate_mg_ghost_cells,
+          /// grid_tools.h: exchange_cell_ghosts()
+          exchange_cell_data_request,
 
-          /// dof_handler_policy.cc: communicate_mg_ghost_cells()
-          dofhandler_communicate_mg_ghost_cells_reply,
+          /// grid_tools.h: exchange_cell_ghosts()
+          exchange_cell_data_reply,
 
           /// mg_transfer_internal.cc: fill_copy_indices()
           mg_transfer_fill_copy_indices,
@@ -109,6 +109,8 @@ namespace Utilities
           /// ParticleHandler<dim, spacedim>::send_recv_particles
           particle_handler_send_recv_particles_setup,
           /// ParticleHandler<dim, spacedim>::send_recv_particles
+          particle_handler_send_recv_particles_cache_setup,
+          /// ParticleHandler<dim, spacedim>::send_recv_particles
           particle_handler_send_recv_particles_send,
 
           /// ScaLAPACKMatrix<NumberType>::copy_to
@@ -130,10 +132,26 @@ namespace Utilities
           partitioner_export_end = partitioner_export_start + 200,
 
           /// NoncontiguousPartitioner::update_values
-          noncontiguous_partitioner_update_values,
+          noncontiguous_partitioner_update_ghost_values_start,
+          noncontiguous_partitioner_update_ghost_values_end =
+            noncontiguous_partitioner_update_ghost_values_start + 10,
 
           // Utilities::MPI::compute_union
           compute_union,
+
+          // Utilities::MPI::RemotePointEvaluation
+          remote_point_evaluation,
+
+          // internal::FineDoFHandlerView::FineDoFHandlerView::reinit() for mg
+          // global coarsening transfer
+          fine_dof_handler_view_reinit,
+
+          // GridTools::internal::distributed_compute_point_locations
+          distributed_compute_point_locations,
+
+          // AffineConstraints::make_consistent_in_parallel()
+          affine_constraints_make_consistent_in_parallel_0,
+          affine_constraints_make_consistent_in_parallel_1,
 
         };
       } // namespace Tags

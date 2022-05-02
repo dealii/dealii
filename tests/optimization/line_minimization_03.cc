@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2018 by the deal.II authors
+//    Copyright (C) 2018 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -105,7 +105,7 @@ test()
           0.001);
 
         const auto fgi = func(res.first);
-        deallog << res.second << " " << res.first << " " << fgi.second
+        deallog << res.second << ' ' << res.first << ' ' << fgi.second
                 << std::endl;
       }
   }
@@ -133,7 +133,7 @@ test()
           0.1);
 
         const auto fgi = func(res.first);
-        deallog << res.second << " " << res.first << " " << fgi.second
+        deallog << res.second << ' ' << res.first << ' ' << fgi.second
                 << std::endl;
       }
   }
@@ -145,7 +145,7 @@ test()
     unsigned int ind = 4;
     for (auto p : params)
       {
-        deallog << "Table " << ind++ << ":" << std::endl;
+        deallog << "Table " << ind++ << ':' << std::endl;
         const double b1 = p.first;
         const double b2 = p.second;
 
@@ -175,7 +175,7 @@ test()
               0.001);
 
             const auto fgi = func(res.first);
-            deallog << res.second << " " << res.first << " " << fgi.second
+            deallog << res.second << ' ' << res.first << ' ' << fgi.second
                     << std::endl;
           }
       }

@@ -1,0 +1,234 @@
+
+DEAL:0:grid_policy_default::n_levels:                  7
+DEAL:0:grid_policy_default::n_cells:                   465
+DEAL:0:grid_policy_default::n_active_cells:            349
+DEAL:0:grid_policy_default::has_hanging_nodes:         true
+DEAL:0:grid_policy_default::
+DEAL:0:grid_policy_default::n_dofs:                             4813
+DEAL:0:grid_policy_default::n_locally_owned_dofs:               993
+DEAL:0:grid_policy_default::has_hanging_nodes:                  true
+DEAL:0:grid_policy_default::
+DEAL:0:grid_policy_first::n_levels:                  7
+DEAL:0:grid_policy_first::n_cells:                   465
+DEAL:0:grid_policy_first::n_active_cells:            349
+DEAL:0:grid_policy_first::has_hanging_nodes:         true
+DEAL:0:grid_policy_first::
+DEAL:0:grid_policy_first::n_dofs:                             4813
+DEAL:0:grid_policy_first::n_locally_owned_dofs:               993
+DEAL:0:grid_policy_first::has_hanging_nodes:                  true
+DEAL:0:grid_policy_first::
+DEAL:0:grid_policy_minimal_4::n_levels:                  7
+DEAL:0:grid_policy_minimal_4::n_cells:                   465
+DEAL:0:grid_policy_minimal_4::n_active_cells:            349
+DEAL:0:grid_policy_minimal_4::has_hanging_nodes:         true
+DEAL:0:grid_policy_minimal_4::
+DEAL:0:grid_policy_minimal_4::n_dofs:                             4813
+DEAL:0:grid_policy_minimal_4::n_locally_owned_dofs:               993
+DEAL:0:grid_policy_minimal_4::has_hanging_nodes:                  true
+DEAL:0:grid_policy_minimal_4::
+DEAL:0:grid_policy_minimal_100::n_levels:                  7
+DEAL:0:grid_policy_minimal_100::n_cells:                   465
+DEAL:0:grid_policy_minimal_100::n_active_cells:            349
+DEAL:0:grid_policy_minimal_100::has_hanging_nodes:         true
+DEAL:0:grid_policy_minimal_100::
+DEAL:0:grid_policy_minimal_100::n_dofs:                             4813
+DEAL:0:grid_policy_minimal_100::n_locally_owned_dofs:               993
+DEAL:0:grid_policy_minimal_100::has_hanging_nodes:                  true
+DEAL:0:grid_policy_minimal_100::
+DEAL:0:grid_policy_minimal_500::n_levels:                  7
+DEAL:0:grid_policy_minimal_500::n_cells:                   1001
+DEAL:0:grid_policy_minimal_500::n_active_cells:            751
+DEAL:0:grid_policy_minimal_500::has_hanging_nodes:         true
+DEAL:0:grid_policy_minimal_500::
+DEAL:0:grid_policy_minimal_500::n_dofs:                             4813
+DEAL:0:grid_policy_minimal_500::n_locally_owned_dofs:               2417
+DEAL:0:grid_policy_minimal_500::has_hanging_nodes:                  true
+DEAL:0:grid_policy_minimal_500::
+
+DEAL:1:grid_policy_default::n_levels:                  7
+DEAL:1:grid_policy_default::n_cells:                   577
+DEAL:1:grid_policy_default::n_active_cells:            433
+DEAL:1:grid_policy_default::has_hanging_nodes:         true
+DEAL:1:grid_policy_default::
+DEAL:1:grid_policy_default::n_dofs:                             4813
+DEAL:1:grid_policy_default::n_locally_owned_dofs:               944
+DEAL:1:grid_policy_default::has_hanging_nodes:                  true
+DEAL:1:grid_policy_default::
+DEAL:1:grid_policy_first::n_levels:                  7
+DEAL:1:grid_policy_first::n_cells:                   577
+DEAL:1:grid_policy_first::n_active_cells:            433
+DEAL:1:grid_policy_first::has_hanging_nodes:         true
+DEAL:1:grid_policy_first::
+DEAL:1:grid_policy_first::n_dofs:                             4813
+DEAL:1:grid_policy_first::n_locally_owned_dofs:               944
+DEAL:1:grid_policy_first::has_hanging_nodes:                  true
+DEAL:1:grid_policy_first::
+DEAL:1:grid_policy_minimal_4::n_levels:                  7
+DEAL:1:grid_policy_minimal_4::n_cells:                   577
+DEAL:1:grid_policy_minimal_4::n_active_cells:            433
+DEAL:1:grid_policy_minimal_4::has_hanging_nodes:         true
+DEAL:1:grid_policy_minimal_4::
+DEAL:1:grid_policy_minimal_4::n_dofs:                             4813
+DEAL:1:grid_policy_minimal_4::n_locally_owned_dofs:               944
+DEAL:1:grid_policy_minimal_4::has_hanging_nodes:                  true
+DEAL:1:grid_policy_minimal_4::
+DEAL:1:grid_policy_minimal_100::n_levels:                  7
+DEAL:1:grid_policy_minimal_100::n_cells:                   577
+DEAL:1:grid_policy_minimal_100::n_active_cells:            433
+DEAL:1:grid_policy_minimal_100::has_hanging_nodes:         true
+DEAL:1:grid_policy_minimal_100::
+DEAL:1:grid_policy_minimal_100::n_dofs:                             4813
+DEAL:1:grid_policy_minimal_100::n_locally_owned_dofs:               944
+DEAL:1:grid_policy_minimal_100::has_hanging_nodes:                  true
+DEAL:1:grid_policy_minimal_100::
+DEAL:1:grid_policy_minimal_500::n_levels:                  7
+DEAL:1:grid_policy_minimal_500::n_cells:                   977
+DEAL:1:grid_policy_minimal_500::n_active_cells:            733
+DEAL:1:grid_policy_minimal_500::has_hanging_nodes:         true
+DEAL:1:grid_policy_minimal_500::
+DEAL:1:grid_policy_minimal_500::n_dofs:                             4813
+DEAL:1:grid_policy_minimal_500::n_locally_owned_dofs:               2396
+DEAL:1:grid_policy_minimal_500::has_hanging_nodes:                  true
+DEAL:1:grid_policy_minimal_500::
+
+
+DEAL:2:grid_policy_default::n_levels:                  7
+DEAL:2:grid_policy_default::n_cells:                   665
+DEAL:2:grid_policy_default::n_active_cells:            499
+DEAL:2:grid_policy_default::has_hanging_nodes:         true
+DEAL:2:grid_policy_default::
+DEAL:2:grid_policy_default::n_dofs:                             4813
+DEAL:2:grid_policy_default::n_locally_owned_dofs:               960
+DEAL:2:grid_policy_default::has_hanging_nodes:                  true
+DEAL:2:grid_policy_default::
+DEAL:2:grid_policy_first::n_levels:                  7
+DEAL:2:grid_policy_first::n_cells:                   665
+DEAL:2:grid_policy_first::n_active_cells:            499
+DEAL:2:grid_policy_first::has_hanging_nodes:         true
+DEAL:2:grid_policy_first::
+DEAL:2:grid_policy_first::n_dofs:                             4813
+DEAL:2:grid_policy_first::n_locally_owned_dofs:               960
+DEAL:2:grid_policy_first::has_hanging_nodes:                  true
+DEAL:2:grid_policy_first::
+DEAL:2:grid_policy_minimal_4::n_levels:                  7
+DEAL:2:grid_policy_minimal_4::n_cells:                   665
+DEAL:2:grid_policy_minimal_4::n_active_cells:            499
+DEAL:2:grid_policy_minimal_4::has_hanging_nodes:         true
+DEAL:2:grid_policy_minimal_4::
+DEAL:2:grid_policy_minimal_4::n_dofs:                             4813
+DEAL:2:grid_policy_minimal_4::n_locally_owned_dofs:               960
+DEAL:2:grid_policy_minimal_4::has_hanging_nodes:                  true
+DEAL:2:grid_policy_minimal_4::
+DEAL:2:grid_policy_minimal_100::n_levels:                  7
+DEAL:2:grid_policy_minimal_100::n_cells:                   665
+DEAL:2:grid_policy_minimal_100::n_active_cells:            499
+DEAL:2:grid_policy_minimal_100::has_hanging_nodes:         true
+DEAL:2:grid_policy_minimal_100::
+DEAL:2:grid_policy_minimal_100::n_dofs:                             4813
+DEAL:2:grid_policy_minimal_100::n_locally_owned_dofs:               960
+DEAL:2:grid_policy_minimal_100::has_hanging_nodes:                  true
+DEAL:2:grid_policy_minimal_100::
+DEAL:2:grid_policy_minimal_500::n_levels:                  1
+DEAL:2:grid_policy_minimal_500::n_cells:                   1
+DEAL:2:grid_policy_minimal_500::n_active_cells:            1
+DEAL:2:grid_policy_minimal_500::has_hanging_nodes:         true
+DEAL:2:grid_policy_minimal_500::
+DEAL:2:grid_policy_minimal_500::n_dofs:                             4813
+DEAL:2:grid_policy_minimal_500::n_locally_owned_dofs:               0
+DEAL:2:grid_policy_minimal_500::has_hanging_nodes:                  true
+DEAL:2:grid_policy_minimal_500::
+
+
+DEAL:3:grid_policy_default::n_levels:                  7
+DEAL:3:grid_policy_default::n_cells:                   657
+DEAL:3:grid_policy_default::n_active_cells:            493
+DEAL:3:grid_policy_default::has_hanging_nodes:         true
+DEAL:3:grid_policy_default::
+DEAL:3:grid_policy_default::n_dofs:                             4813
+DEAL:3:grid_policy_default::n_locally_owned_dofs:               912
+DEAL:3:grid_policy_default::has_hanging_nodes:                  true
+DEAL:3:grid_policy_default::
+DEAL:3:grid_policy_first::n_levels:                  7
+DEAL:3:grid_policy_first::n_cells:                   657
+DEAL:3:grid_policy_first::n_active_cells:            493
+DEAL:3:grid_policy_first::has_hanging_nodes:         true
+DEAL:3:grid_policy_first::
+DEAL:3:grid_policy_first::n_dofs:                             4813
+DEAL:3:grid_policy_first::n_locally_owned_dofs:               912
+DEAL:3:grid_policy_first::has_hanging_nodes:                  true
+DEAL:3:grid_policy_first::
+DEAL:3:grid_policy_minimal_4::n_levels:                  7
+DEAL:3:grid_policy_minimal_4::n_cells:                   657
+DEAL:3:grid_policy_minimal_4::n_active_cells:            493
+DEAL:3:grid_policy_minimal_4::has_hanging_nodes:         true
+DEAL:3:grid_policy_minimal_4::
+DEAL:3:grid_policy_minimal_4::n_dofs:                             4813
+DEAL:3:grid_policy_minimal_4::n_locally_owned_dofs:               912
+DEAL:3:grid_policy_minimal_4::has_hanging_nodes:                  true
+DEAL:3:grid_policy_minimal_4::
+DEAL:3:grid_policy_minimal_100::n_levels:                  7
+DEAL:3:grid_policy_minimal_100::n_cells:                   657
+DEAL:3:grid_policy_minimal_100::n_active_cells:            493
+DEAL:3:grid_policy_minimal_100::has_hanging_nodes:         true
+DEAL:3:grid_policy_minimal_100::
+DEAL:3:grid_policy_minimal_100::n_dofs:                             4813
+DEAL:3:grid_policy_minimal_100::n_locally_owned_dofs:               912
+DEAL:3:grid_policy_minimal_100::has_hanging_nodes:                  true
+DEAL:3:grid_policy_minimal_100::
+DEAL:3:grid_policy_minimal_500::n_levels:                  1
+DEAL:3:grid_policy_minimal_500::n_cells:                   1
+DEAL:3:grid_policy_minimal_500::n_active_cells:            1
+DEAL:3:grid_policy_minimal_500::has_hanging_nodes:         true
+DEAL:3:grid_policy_minimal_500::
+DEAL:3:grid_policy_minimal_500::n_dofs:                             4813
+DEAL:3:grid_policy_minimal_500::n_locally_owned_dofs:               0
+DEAL:3:grid_policy_minimal_500::has_hanging_nodes:                  true
+DEAL:3:grid_policy_minimal_500::
+
+
+DEAL:4:grid_policy_default::n_levels:                  7
+DEAL:4:grid_policy_default::n_cells:                   541
+DEAL:4:grid_policy_default::n_active_cells:            406
+DEAL:4:grid_policy_default::has_hanging_nodes:         true
+DEAL:4:grid_policy_default::
+DEAL:4:grid_policy_default::n_dofs:                             4813
+DEAL:4:grid_policy_default::n_locally_owned_dofs:               1004
+DEAL:4:grid_policy_default::has_hanging_nodes:                  true
+DEAL:4:grid_policy_default::
+DEAL:4:grid_policy_first::n_levels:                  7
+DEAL:4:grid_policy_first::n_cells:                   541
+DEAL:4:grid_policy_first::n_active_cells:            406
+DEAL:4:grid_policy_first::has_hanging_nodes:         true
+DEAL:4:grid_policy_first::
+DEAL:4:grid_policy_first::n_dofs:                             4813
+DEAL:4:grid_policy_first::n_locally_owned_dofs:               1004
+DEAL:4:grid_policy_first::has_hanging_nodes:                  true
+DEAL:4:grid_policy_first::
+DEAL:4:grid_policy_minimal_4::n_levels:                  7
+DEAL:4:grid_policy_minimal_4::n_cells:                   541
+DEAL:4:grid_policy_minimal_4::n_active_cells:            406
+DEAL:4:grid_policy_minimal_4::has_hanging_nodes:         true
+DEAL:4:grid_policy_minimal_4::
+DEAL:4:grid_policy_minimal_4::n_dofs:                             4813
+DEAL:4:grid_policy_minimal_4::n_locally_owned_dofs:               1004
+DEAL:4:grid_policy_minimal_4::has_hanging_nodes:                  true
+DEAL:4:grid_policy_minimal_4::
+DEAL:4:grid_policy_minimal_100::n_levels:                  7
+DEAL:4:grid_policy_minimal_100::n_cells:                   541
+DEAL:4:grid_policy_minimal_100::n_active_cells:            406
+DEAL:4:grid_policy_minimal_100::has_hanging_nodes:         true
+DEAL:4:grid_policy_minimal_100::
+DEAL:4:grid_policy_minimal_100::n_dofs:                             4813
+DEAL:4:grid_policy_minimal_100::n_locally_owned_dofs:               1004
+DEAL:4:grid_policy_minimal_100::has_hanging_nodes:                  true
+DEAL:4:grid_policy_minimal_100::
+DEAL:4:grid_policy_minimal_500::n_levels:                  1
+DEAL:4:grid_policy_minimal_500::n_cells:                   1
+DEAL:4:grid_policy_minimal_500::n_active_cells:            1
+DEAL:4:grid_policy_minimal_500::has_hanging_nodes:         true
+DEAL:4:grid_policy_minimal_500::
+DEAL:4:grid_policy_minimal_500::n_dofs:                             4813
+DEAL:4:grid_policy_minimal_500::n_locally_owned_dofs:               0
+DEAL:4:grid_policy_minimal_500::has_hanging_nodes:                  true
+DEAL:4:grid_policy_minimal_500::
+

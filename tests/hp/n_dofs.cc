@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
@@ -34,8 +35,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -54,7 +53,7 @@ test(const FiniteElement<dim> &fe)
 
   const hp::FECollection<dim> fe_collection(fe);
 
-  hp::DoFHandler<dim> hp_dof_handler(tria);
+  DoFHandler<dim> hp_dof_handler(tria);
   hp_dof_handler.distribute_dofs(fe_collection);
 
   DoFHandler<dim> dof_handler(tria);

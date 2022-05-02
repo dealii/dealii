@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,16 +56,16 @@ template <int dim, typename number_t, enum AD::NumberTypes ad_type_code>
 void
 test_AD_vector_jacobian()
 {
-  typedef AD::VectorFunction<dim, ad_type_code, number_t> ADHelper;
-  typedef typename ADHelper::ad_type                      ADNumberType;
-  typedef typename ADHelper::scalar_type                  ScalarNumberType;
+  using ADHelper         = AD::VectorFunction<dim, ad_type_code, number_t>;
+  using ADNumberType     = typename ADHelper::ad_type;
+  using ScalarNumberType = typename ADHelper::scalar_type;
 
   std::cout << "*** Test variables: Variables: 1 independent, 1 dependent, "
             << "dim = " << Utilities::to_string(dim) << ", "
             << "Type code: " << static_cast<int>(ad_type_code) << std::endl;
 
   // Function and its derivatives
-  typedef FunctionsTestScalar<dim, ADNumberType> func_ad;
+  using func_ad = FunctionsTestScalar<dim, ADNumberType>;
 
   // Setup the variable components and choose a value at which to
   // evaluate the tape
@@ -143,8 +143,8 @@ test_AD_vector_jacobian()
   Dfuncs.print_formatted(std::cout, 3, true, 0, "0.0");
 
   // Verify the result
-  typedef FunctionsTestScalar<dim, ScalarNumberType> func;
-  static const ScalarNumberType                      tol =
+  using func = FunctionsTestScalar<dim, ScalarNumberType>;
+  static const ScalarNumberType tol =
     1e5 * std::numeric_limits<ScalarNumberType>::epsilon();
   std::cout << "funcs[0]: " << funcs[0]
             << "\t func::f0(s[0])): " << func::f0(s[0]) << std::endl;

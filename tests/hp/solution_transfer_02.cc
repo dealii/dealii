@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,7 @@
 
 
 // SolutionTransfer wanted to compute interpolation matrices between
-// all pairs of elements used on a mesh in the hp case. unfortunately,
+// all pairs of elements used on a mesh in the hp-case. unfortunately,
 // not all pairs are actually supported, e.g. between FE_Nothing and
 // FE_Q, but that shouldn't matter as long as these combinations are
 // never exercised on actual cells
@@ -61,7 +61,7 @@ transfer(std::ostream &out)
   // create a DoFHandler on which we
   // have both cells with FE_Q as
   // well as FE_Nothing
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
   dof_handler.begin(0)->child(0)->set_active_fe_index(1);
 
   Vector<double>            solution;
@@ -74,8 +74,8 @@ transfer(std::ostream &out)
   for (unsigned int i = 0; i < solution.size(); ++i)
     solution(i) = i;
 
-  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim>> soltrans(
-    dof_handler);
+  SolutionTransfer<dim, Vector<double>> soltrans(dof_handler);
+
 
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();

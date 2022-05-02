@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -135,15 +135,15 @@ do_test(const DoFHandler<dim> &dof)
 
   // set up multigrid in analogy to step-37
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
-  typedef MatrixFreeOperators::LaplaceOperator<
+  using LevelMatrixType = MatrixFreeOperators::LaplaceOperator<
     dim,
     fe_degree,
     n_q_points_1d,
     1,
-    LinearAlgebra::distributed::Vector<number>>
-    LevelMatrixType;
+    LinearAlgebra::distributed::Vector<number>>;
 
   MGLevelObject<LevelMatrixType>                          mg_matrices;
   MGLevelObject<std::shared_ptr<MatrixFree<dim, number>>> mg_level_data;
@@ -157,7 +157,7 @@ do_test(const DoFHandler<dim> &dof)
       mg_additional_data.tasks_parallel_scheme =
         MatrixFree<dim, number>::AdditionalData::none;
       mg_additional_data.tasks_block_size = 3;
-      mg_additional_data.level_mg_handler = level;
+      mg_additional_data.mg_level         = level;
 
       AffineConstraints<double> level_constraints;
       IndexSet                  relevant_dofs;
@@ -190,9 +190,9 @@ do_test(const DoFHandler<dim> &dof)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionChebyshev<LevelMatrixType,
-                                LinearAlgebra::distributed::Vector<number>>
-    SMOOTHER;
+  using SMOOTHER =
+    PreconditionChebyshev<LevelMatrixType,
+                          LinearAlgebra::distributed::Vector<number>>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::Vector<number>>

@@ -1,0 +1,577 @@
+
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 0   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 1   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 2   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 3   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 4   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 5   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 6   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 7   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 0   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 1   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 2   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 3   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 4   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 5   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 6   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 7   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 2   *******   orientation case 0   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(2)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 2   *******   orientation case 1   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(2)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 2   *******   orientation case 2   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(2)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 2   *******   orientation case 3   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(2)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 2   *******   orientation case 4   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(2)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 2   *******   orientation case 5   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(2)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 2   *******   orientation case 6   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(2)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 2   *******   orientation case 7   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_RaviartThomas<3>(2)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::   n_components         : 3
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   

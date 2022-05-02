@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2019 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,15 +15,16 @@
 
 
 
-// check if future fe indices will be set correctly
+// check if future FE indices will be set correctly
 
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -41,7 +42,7 @@ test()
   fe_collection.push_back(FE_Q<dim>(1));
   fe_collection.push_back(FE_Q<dim>(1));
 
-  hp::DoFHandler<dim> dh(tria);
+  DoFHandler<dim> dh(tria);
   dh.distribute_dofs(fe_collection);
 
   // check if indices are initialized correctly

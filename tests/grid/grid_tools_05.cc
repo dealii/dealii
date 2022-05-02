@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,11 +30,11 @@
  * Generate a grid consisting of two disjoint cells, colorize the two
  * outermost faces. They will be matched via collect_periodic_faces.
  * Only default orientation is available for this function.
- *
  */
 
 /* The 2D case */
-void generate_grid(Triangulation<2> &triangulation)
+void
+generate_grid(Triangulation<2> &triangulation)
 {
   Point<2> vertices_1[] = {
     Point<2>(-1., -3.),
@@ -87,7 +87,8 @@ void generate_grid(Triangulation<2> &triangulation)
 
 
 /* The 3D case */
-void generate_grid(Triangulation<3> &triangulation)
+void
+generate_grid(Triangulation<3> &triangulation)
 {
   Point<3>              vertices_1[] = {Point<3>(-1., -1., -3.),
                            Point<3>(+1., -1., -3.),
@@ -188,9 +189,9 @@ main()
 
   generate_grid(triangulation2);
 
-  typedef Triangulation<2>::cell_iterator                         CellIterator2;
-  typedef std::vector<GridTools::PeriodicFacePair<CellIterator2>> FaceVector2;
-  FaceVector2                                                     test2;
+  using CellIterator2 = Triangulation<2>::cell_iterator;
+  using FaceVector2   = std::vector<GridTools::PeriodicFacePair<CellIterator2>>;
+  FaceVector2 test2;
   GridTools::collect_periodic_faces(
     triangulation2, 42, 1, test2, dealii::Tensor<1, 2>());
 
@@ -207,9 +208,9 @@ main()
 
   generate_grid(triangulation3);
 
-  typedef Triangulation<3>::cell_iterator                         CellIterator3;
-  typedef std::vector<GridTools::PeriodicFacePair<CellIterator3>> FaceVector3;
-  FaceVector3                                                     test3;
+  using CellIterator3 = Triangulation<3>::cell_iterator;
+  using FaceVector3   = std::vector<GridTools::PeriodicFacePair<CellIterator3>>;
+  FaceVector3 test3;
   GridTools::collect_periodic_faces(
     triangulation3, 42, 2, test3, dealii::Tensor<1, 3>());
 

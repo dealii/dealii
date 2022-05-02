@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,22 +106,22 @@ test()
         deallog << N << std::endl;
 
       Assert(dof_handler.n_locally_owned_dofs() <= N, ExcInternalError());
-      for (unsigned int i = 0;
-           i < dof_handler.compute_n_locally_owned_dofs_per_processor().size();
-           ++i)
-        AssertThrow(
-          dof_handler.compute_n_locally_owned_dofs_per_processor()[i] <= N,
-          ExcInternalError());
       const std::vector<types::global_dof_index>
         n_locally_owned_dofs_per_processor =
-          dof_handler.compute_n_locally_owned_dofs_per_processor();
+          Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                     dof_handler.n_locally_owned_dofs());
+      for (unsigned int i = 0; i < n_locally_owned_dofs_per_processor.size();
+           ++i)
+        AssertThrow(n_locally_owned_dofs_per_processor[i] <= N,
+                    ExcInternalError());
       AssertThrow(std::accumulate(n_locally_owned_dofs_per_processor.begin(),
                                   n_locally_owned_dofs_per_processor.end(),
                                   0U) == N,
                   ExcInternalError());
 
       const std::vector<IndexSet> locally_owned_dofs_per_processor =
-        dof_handler.compute_locally_owned_dofs_per_processor();
+        Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                   dof_handler.locally_owned_dofs());
       IndexSet all(N), really_all(N);
       // poor man's union operation
       for (unsigned int i = 0; i < n_locally_owned_dofs_per_processor.size();

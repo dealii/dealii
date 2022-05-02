@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2018 by the deal.II authors
+ * Copyright (C) 2016 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -21,7 +21,6 @@
  * We test that the computed vectors are eigenvectors and mass-orthonormal, i.e.
  * a) (A*x_i-\lambda*B*x_i).L2() == 0
  * b) x_j*B*x_i = \delta_{i,j}
- *
  */
 
 #include <deal.II/base/index_set.h>
@@ -138,7 +137,7 @@ test()
     // set up iterative inverse
     static ReductionControl inner_control_c(dof_handler.n_dofs(), 0.0, 1.e-13);
 
-    typedef LinearAlgebra::distributed::Vector<double> VectorType;
+    using VectorType = LinearAlgebra::distributed::Vector<double>;
     SolverCG<VectorType> solver_c(inner_control_c);
     PreconditionIdentity preconditioner;
     const auto           shift_and_invert =
@@ -148,10 +147,11 @@ test()
 
     const unsigned int num_arnoldi_vectors = 2 * eigenvalues.size() + 2;
     PArpackSolver<LinearAlgebra::distributed::Vector<double>>::AdditionalData
-    additional_data(num_arnoldi_vectors,
-                    PArpackSolver<LinearAlgebra::distributed::Vector<double>>::
-                      largest_magnitude,
-                    true);
+      additional_data(
+        num_arnoldi_vectors,
+        PArpackSolver<
+          LinearAlgebra::distributed::Vector<double>>::largest_magnitude,
+        true);
 
     SolverControl solver_control(dof_handler.n_dofs(),
                                  1e-9,
@@ -180,10 +180,10 @@ test()
                       eigenvalues.size());
     deallog.depth_file(previous_depth);
 
-    for (unsigned int i = 0; i < lambda.size(); i++)
+    for (unsigned int i = 0; i < lambda.size(); ++i)
       eigenvalues[i] = lambda[i].real();
 
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       deallog << eigenvalues[i] << std::endl;
 
     // make sure that we have eigenvectors and they are mass-orthonormal:
@@ -197,7 +197,7 @@ test()
         {
           mass.vmult(Bx, eigenfunctions[i]);
 
-          for (unsigned int j = 0; j < eigenfunctions.size(); j++)
+          for (unsigned int j = 0; j < eigenfunctions.size(); ++j)
             Assert(std::abs(eigenfunctions[j] * Bx - (i == j)) < precision,
                    ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
                               " and " + Utilities::int_to_string(j) +

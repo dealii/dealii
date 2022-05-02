@@ -30,7 +30,7 @@ template <int dim>
 void
 test(const unsigned int degree)
 {
-  deallog << "FE_RT_Bubbles<" << dim << "> (" << degree << ")" << std::endl;
+  deallog << "FE_RT_Bubbles<" << dim << "> (" << degree << ')' << std::endl;
 
   FE_RT_Bubbles<dim>        fe_rt_bubbles(degree);
   const FullMatrix<double> &constraints = fe_rt_bubbles.constraints();

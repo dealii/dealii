@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,7 @@ test(std::string filename, unsigned int degree = 1)
 
   // finite elements used for the
   // projection
-  const FE_Q<dim, spacedim>     fe(QIterated<1>(QTrapez<1>(), degree));
+  const FE_Q<dim, spacedim>     fe(QIterated<1>(QTrapezoid<1>(), degree));
   const MappingQ<dim, spacedim> mapping(degree);
 
   DoFHandler<dim, spacedim> dof_handler(triangulation);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -68,7 +69,6 @@ DEAL_II_NAMESPACE_CLOSE
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/lac/block_sparsity_pattern.h>
 #  include <deal.II/lac/petsc_block_sparse_matrix.h>
 #  include <deal.II/lac/petsc_precondition.h>
 #  include <deal.II/lac/petsc_solver.h>
@@ -162,7 +162,6 @@ DEAL_II_NAMESPACE_CLOSE
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  include <deal.II/lac/block_sparsity_pattern.h>
 #  include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_precondition.h>
 #  include <deal.II/lac/trilinos_solver.h>

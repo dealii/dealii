@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,6 +32,7 @@
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
@@ -49,7 +50,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double number;
+  using number = double;
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
@@ -139,6 +140,18 @@ test()
 
   mf.vmult(out, in);
 
+  // Check that things work with LinearOperator too. This verifies that the
+  // detection mechanism for initialize_dof_vector() works.
+  {
+    LinearAlgebra::distributed::Vector<number> out2;
+    mf.initialize_dof_vector(out2);
+
+    const auto op_mf = linear_operator<decltype(out2)>(mf);
+    op_mf.vmult(out2, in);
+
+    out2 -= out;
+    AssertThrow(out2.l2_norm() == 0.0, ExcInternalError());
+  }
 
   // assemble trilinos sparse matrix with
   // (v, u) for reference
@@ -194,8 +207,21 @@ test()
 
   sparse_matrix.vmult(ref, in);
   out -= ref;
-  const double diff_norm = out.linfty_norm();
 
+  // For completeness, try again with LinearOperator for the same detection
+  // reasons as above:
+  {
+    LinearAlgebra::distributed::Vector<number> out2;
+    mf.initialize_dof_vector(out2);
+
+    const auto op_mf = linear_operator<decltype(out2)>(sparse_matrix);
+    op_mf.vmult(out2, in);
+
+    out2 -= ref;
+    AssertThrow(out2.l2_norm() == 0.0, ExcInternalError());
+  }
+
+  const double diff_norm = out.linfty_norm();
   deallog << "Norm of difference: " << diff_norm << std::endl << std::endl;
 }
 
@@ -203,32 +229,18 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  deallog.push(Utilities::int_to_string(myid));
+  mpi_initlog();
+  deallog.push("0");
 
-  if (myid == 0)
-    {
-      initlog();
-      deallog << std::setprecision(4);
+  deallog.push("2d");
+  test<2, 1>();
+  test<2, 2>();
+  deallog.pop();
 
-      deallog.push("2d");
-      test<2, 1>();
-      test<2, 2>();
-      deallog.pop();
-
-      deallog.push("3d");
-      test<3, 1>();
-      test<3, 2>();
-      deallog.pop();
-    }
-  else
-    {
-      test<2, 1>();
-      test<2, 2>();
-      test<3, 1>();
-      test<3, 2>();
-    }
+  deallog.push("3d");
+  test<3, 1>();
+  test<3, 2>();
+  deallog.pop();
 }

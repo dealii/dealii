@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,7 +83,7 @@ test()
     ghost[i] = 0.;
 
   if (rank == 0)
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 8; ++i)
       owned[i] = i;
 
   // update ghost values
@@ -110,10 +110,10 @@ test()
   auto print = [&]() {
     deallog << "owned:" << std::endl;
     for (auto el : owned)
-      deallog << el << " ";
+      deallog << el << ' ';
     deallog << std::endl << "ghost:" << std::endl;
     for (auto el : ghost)
-      deallog << el << " ";
+      deallog << el << ' ';
     deallog << std::endl;
   };
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,9 +52,9 @@
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // create sparsity pattern
   SparsityPattern sp(dof_handler.n_dofs(),
@@ -71,7 +71,7 @@ check_this(const DoFHandlerType &dof_handler)
   for (unsigned int l = 0; l < sp.n_rows(); ++l)
     {
       for (unsigned int c = 0; c < sp.row_length(l); ++c)
-        deallog << sp.column_number(l, c) << " ";
+        deallog << sp.column_number(l, c) << ' ';
       deallog << std::endl;
     }
 
@@ -83,8 +83,9 @@ check_this(const DoFHandlerType &dof_handler)
   unsigned int hash = 0;
   for (unsigned int l = 0; l < sp.n_rows(); ++l)
     hash +=
-      l * (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
-           (sp.row_length(l) > 1 ? ++sp.begin(l) : sp.begin(l))->column());
+      l *
+      (sp.row_length(l) + (sp.begin(l) - sp.begin()) +
+       (sp.row_length(l) > 1 ? std::next(sp.begin(l)) : sp.begin(l))->column());
   deallog << hash << std::endl;
 }
 
@@ -110,7 +111,7 @@ check_this()
   DoFHandler<dim> dof_handler(tr);
   dof_handler.distribute_dofs(fe);
 
-  check_this<DoFHandler<dim>>(dof_handler);
+  check_this(dof_handler);
 }
 
 

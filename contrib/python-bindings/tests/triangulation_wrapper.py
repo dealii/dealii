@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------
 #
-# Copyright (C) 2016 - 2017 by the deal.II authors
+# Copyright (C) 2016 - 2021 by the deal.II authors
 #
 # This file is part of the deal.II library.
 #
@@ -356,10 +356,21 @@ class TestTriangulationWrapper(unittest.TestCase):
             else:
                 triangulation_2.shift([1., 0., 0.])
             triangulation = Triangulation(dim[0], dim[1])
-            triangulation.merge_triangulations(triangulation_1,
-                                               triangulation_2)
+            triangulation.merge_triangulations([triangulation_1,
+                                                triangulation_2])
             n_cells = triangulation.n_active_cells()
             self.assertEqual(n_cells, 2)
+
+    def test_replicate(self):
+        for dim in self.restricted_dim:
+            triangulation_in = self.build_hyper_cube_triangulation(dim)
+            triangulation_out = Triangulation(dim[0])
+            if (dim[0] == '2D'):
+                triangulation_out.replicate_triangulation(triangulation_in, [3, 2]);
+            else:
+                triangulation_out.replicate_triangulation(triangulation_in, [3, 2, 1]);
+            n_cells = triangulation_out.n_active_cells()
+            self.assertEqual(n_cells, 6)
 
     def test_flatten(self):
         for dim in self.dim:
@@ -425,6 +436,18 @@ class TestTriangulationWrapper(unittest.TestCase):
             for cell in triangulation.active_cells():
                 cell_ret = triangulation.find_active_cell_around_point(cell.center())
                 self.assertTrue(cell.center().distance(cell_ret.center()) < 1e-8)
+
+
+    def test_simplex(self):
+        for dim in self.dim:
+            triangulation_hex = self.build_hyper_cube_triangulation(dim)
+            triangulation_simplex = Triangulation(dim[0], dim[1])
+            triangulation_hex.convert_hypercube_to_simplex_mesh(triangulation_simplex)
+
+            if dim[0] == '3D':
+                self.assertTrue(triangulation_simplex.n_active_cells() == 24)
+            else:
+                self.assertTrue(triangulation_simplex.n_active_cells() == 8)
 
 
     def test_save_load(self):

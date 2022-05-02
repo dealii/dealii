@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II Authors
+// Copyright (C) 2015 - 2020 by the deal.II Authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,8 +35,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include "../tests.h"
@@ -45,15 +43,15 @@
 // Call the make_flux_sparsity_pattern with a lambda specifying that only the
 // face at x = 0 should have a flux coupling. Print the constructed sparsity
 // pattern to deallog.
-template <int dim, class DoFHandlerType>
+template <int dim>
 void
-create_and_print_pattern(const DoFHandlerType &dof_handler)
+create_and_print_pattern(const DoFHandler<dim> &dof_handler)
 {
   DynamicSparsityPattern dynamic_pattern(dof_handler.n_dofs());
 
   auto face_has_flux_coupling =
-    [](const typename DoFHandlerType::active_cell_iterator &cell,
-       const unsigned int                                   face_index) {
+    [](const typename DoFHandler<dim>::active_cell_iterator &cell,
+       const unsigned int                                    face_index) {
       // Only add a flux coupling if the face is at x = 0.
       const Point<dim> &center = cell->face(face_index)->center();
       return std::abs(center[0]) < 1e-3;
@@ -109,16 +107,17 @@ test_with_both_dof_handlers(const Triangulation<dim> &triangulation)
   deallog << "hp::DoFHandler" << std::endl;
   {
     hp::FECollection<dim> fe_collection(element);
-    hp::DoFHandler<dim>   dof_handler(triangulation);
+    DoFHandler<dim>       dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_collection);
-    create_and_print_pattern<dim>(dof_handler);
+    create_and_print_pattern(dof_handler);
   }
 }
 
 
 
 //  Create the 3-cell-triangulation described at the top.
-void create_3_cell_triangulation(Triangulation<1> &triangulation)
+void
+create_3_cell_triangulation(Triangulation<1> &triangulation)
 {
   const unsigned int n_elements = 3;
   const double       left       = -1;

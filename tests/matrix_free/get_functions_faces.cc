@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018-2014 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,11 +70,11 @@ private:
   {
     FEFaceEvaluation<dim, fe_degree, fe_degree + 1, 1, number> fe_eval(data,
                                                                        true);
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
         // Only one vectorization component is filled in this case because we
         // only have one cell (otherwise the output will not be stable among
@@ -82,7 +82,7 @@ private:
         deallog << "Face " << face << ": ";
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
-            deallog << fe_eval.get_value(q)[0] << " "
+            deallog << fe_eval.get_value(q)[0] << ' '
                     << fe_eval.get_normal_derivative(q)[0] << "   ";
           }
         deallog << std::endl;

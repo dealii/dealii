@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,6 @@ namespace PETScWrappers
    * specific type differ, and are implemented in this particular class.
    *
    * @ingroup Matrix1
-   * @author Wolfgang Bangerth, 2004
    */
   class FullMatrix : public MatrixBase
   {

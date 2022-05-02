@@ -185,6 +185,15 @@ are worthwhile browsing through before you start any large-scale programming:
   do I debug scientific computing codes?" or "Can I train myself to write code
   that has fewer bugs?".
 
+- You will benefit from becoming a better programmer. An excellent
+  resource to this end is the book
+  [Code Complete](https://en.wikipedia.org/wiki/Code_Complete)
+  by Steve McConnell @cite CodeComplete . It's already
+  a few years old, with the last edition published in 2004, but it has
+  lost none of its appeal as a guide to good programming practices,
+  and some of the principal developers use it as a group reading
+  project with every generation of their research group members.
+
 - The <a href="http://software-carpentry.org/">Software Carpentry project</a>
   that provides introductions to many topics that are important to dealing
   with software, such as version control, make files, testing, etc. It is

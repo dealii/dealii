@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,7 +65,7 @@ main(int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        typedef PETScWrappers::SparseMatrix::size_type size_type;
+        using size_type = PETScWrappers::SparseMatrix::size_type;
 
         std::vector<size_type> row_lengths(5, 3U);
         row_lengths.back() = 2;

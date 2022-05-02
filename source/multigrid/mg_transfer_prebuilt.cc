@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,15 +85,20 @@ MGTransferPrebuilt<VectorType>::prolongate(const unsigned int to_level,
   Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
          ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
 
-#ifdef DEBUG
-  if (this->mg_constrained_dofs != nullptr)
-    Assert(this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
-               .get_local_lines()
-               .size() == 0,
-           ExcNotImplemented());
-#endif
-
-  prolongation_matrices[to_level - 1]->vmult(dst, src);
+  if (this->mg_constrained_dofs != nullptr &&
+      this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+          .get_local_lines()
+          .size() > 0)
+    {
+      VectorType copy_src(src);
+      this->mg_constrained_dofs->get_user_constraint_matrix(to_level - 1)
+        .distribute(copy_src);
+      prolongation_matrices[to_level - 1]->vmult(dst, copy_src);
+    }
+  else
+    {
+      prolongation_matrices[to_level - 1]->vmult(dst, src);
+    }
 }
 
 
@@ -147,9 +152,16 @@ void
 MGTransferPrebuilt<VectorType>::build(
   const DoFHandler<dim, spacedim> &dof_handler)
 {
+  Assert(dof_handler.has_level_dofs(),
+         ExcMessage(
+           "The underlying DoFHandler object has not had its "
+           "distribute_mg_dofs() function called, but this is a prerequisite "
+           "for multigrid transfers. You will need to call this function, "
+           "probably close to where you already call distribute_dofs()."));
+
   const unsigned int n_levels =
     dof_handler.get_triangulation().n_global_levels();
-  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+  const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
   this->sizes.resize(n_levels);
   for (unsigned int l = 0; l < n_levels; ++l)
@@ -203,17 +215,11 @@ MGTransferPrebuilt<VectorType>::build(
       DoFTools::extract_locally_relevant_level_dofs(dof_handler,
                                                     level + 1,
                                                     level_p1_relevant_dofs);
-      DynamicSparsityPattern                  dsp(this->sizes[level + 1],
+      DynamicSparsityPattern dsp(this->sizes[level + 1],
                                  this->sizes[level],
                                  level_p1_relevant_dofs);
-      typename DoFHandler<dim>::cell_iterator cell,
-        endc = dof_handler.end(level);
-      for (cell = dof_handler.begin(level); cell != endc; ++cell)
-        if (cell->has_children() &&
-            (dof_handler.get_triangulation().locally_owned_subdomain() ==
-               numbers::invalid_subdomain_id ||
-             cell->level_subdomain_id() ==
-               dof_handler.get_triangulation().locally_owned_subdomain()))
+      for (const auto &cell : dof_handler.cell_iterators_on_level(level))
+        if (cell->has_children() && cell->is_locally_owned_on_level())
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
@@ -261,20 +267,11 @@ MGTransferPrebuilt<VectorType>::build(
           // complete sparsity patterns on their own, the sparsity pattern must
           // be manually distributed.
 
-          // Retrieve communicator from triangulation if it is parallel
-          const parallel::TriangulationBase<dim, spacedim> *dist_tria =
-            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-              &(dof_handler.get_triangulation()));
-
-          MPI_Comm communicator = dist_tria != nullptr ?
-                                    dist_tria->get_communicator() :
-                                    MPI_COMM_SELF;
-
           // Distribute sparsity pattern
           ::dealii::SparsityTools::distribute_sparsity_pattern(
             dsp,
             dof_handler.locally_owned_mg_dofs(level + 1),
-            communicator,
+            dof_handler.get_communicator(),
             dsp.row_index_set());
         }
 #endif
@@ -298,12 +295,8 @@ MGTransferPrebuilt<VectorType>::build(
       FullMatrix<typename VectorType::value_type> prolongation;
 
       // now actually build the matrices
-      for (cell = dof_handler.begin(level); cell != endc; ++cell)
-        if (cell->has_children() &&
-            (dof_handler.get_triangulation().locally_owned_subdomain() ==
-               numbers::invalid_subdomain_id ||
-             cell->level_subdomain_id() ==
-               dof_handler.get_triangulation().locally_owned_subdomain()))
+      for (const auto &cell : dof_handler.cell_iterators_on_level(level))
+        if (cell->has_children() && cell->is_locally_owned_on_level())
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
@@ -345,17 +338,6 @@ MGTransferPrebuilt<VectorType>::build(
     }
 
   this->fill_and_communicate_copy_indices(dof_handler);
-}
-
-
-
-template <typename VectorType>
-template <int dim, int spacedim>
-void
-MGTransferPrebuilt<VectorType>::build_matrices(
-  const DoFHandler<dim, spacedim> &dof_handler)
-{
-  build(dof_handler);
 }
 
 

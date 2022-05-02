@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2019 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -439,7 +439,17 @@ process_instantiations()
   //   for (X:Y; A:B) { INST }
   while (whole_file.size() != 0)
     {
+      // skip space, tabs, comments:
       skip_space(whole_file);
+
+      // output preprocessor defines as is:
+      if (has_prefix(whole_file, "#"))
+        {
+          std::cout << get_substring_with_delim(whole_file, "\n") << '\n';
+          skip_space(whole_file);
+          continue;
+        }
+
       if (!has_prefix(whole_file, "for"))
         {
           std::cerr << "Invalid instantiation list: missing 'for'" << std::endl;

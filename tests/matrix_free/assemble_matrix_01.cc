@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -100,13 +100,15 @@ do_test(const DoFHandler<dim> &dof)
             for (unsigned int v = 0; v < n_items; ++v)
               fe_eval.begin_dof_values()[i + v][v] = 1.;
 
-            fe_eval.evaluate(true, true);
+            fe_eval.evaluate(EvaluationFlags::values |
+                             EvaluationFlags::gradients);
             for (unsigned int q = 0; q < n_q_points; ++q)
               {
                 fe_eval.submit_value(10. * fe_eval.get_value(q), q);
                 fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
               }
-            fe_eval.integrate(true, true);
+            fe_eval.integrate(EvaluationFlags::values |
+                              EvaluationFlags::gradients);
 
             for (unsigned int v = 0; v < n_items; ++v)
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
@@ -115,7 +117,7 @@ do_test(const DoFHandler<dim> &dof)
                   fe_eval.begin_dof_values()[j][v];
           }
         test_matrix.add(-1., cell_matrix);
-        deallog << test_matrix.frobenius_norm() << " ";
+        deallog << test_matrix.frobenius_norm() << ' ';
       }
     deallog << std::endl;
   }

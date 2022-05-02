@@ -113,14 +113,14 @@ _symengine_feature_check(LLVM "#define.*HAVE_SYMENGINE_LLVM")
 
 STRING(REGEX REPLACE
   "(lib64|lib)\\/cmake\\/symengine\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
-  _symengine_include_dirs "${SYMENGINE_INCLUDE_DIRS}"
+  SYMENGINE_INCLUDE_DIRS  "${SYMENGINE_INCLUDE_DIRS}"
   )
-REMOVE_DUPLICATES(_symengine_include_dirs)
+REMOVE_DUPLICATES(SYMENGINE_INCLUDE_DIRS)
 
 #
-# Get the full path for the SYMENGINE_LIBRARIES. Some of these libraries are 
+# Get the full path for the SYMENGINE_LIBRARIES. Some of these libraries are
 # CMake targets, so we can query them directly for this information.
-# 
+#
 FOREACH(SYMENGINE_LIBRARY_NAME ${SYMENGINE_LIBRARIES})
    IF (TARGET ${SYMENGINE_LIBRARY_NAME})
        GET_PROPERTY(SYMENGINE_LIBRARY TARGET ${SYMENGINE_LIBRARY_NAME} PROPERTY LOCATION)
@@ -130,11 +130,11 @@ FOREACH(SYMENGINE_LIBRARY_NAME ${SYMENGINE_LIBRARIES})
 
   SET(_symengine_libraries ${_symengine_libraries} ${SYMENGINE_LIBRARY})
 ENDFOREACH()
-
+SET(SYMENGINE_LIBRARIES ${_symengine_libraries})
 
 DEAL_II_PACKAGE_HANDLE(SYMENGINE
-  LIBRARIES REQUIRED _symengine_libraries
-  INCLUDE_DIRS REQUIRED _symengine_include_dirs
-  USER_INCLUDE_DIRS REQUIRED  _symengine_include_dirs
+  LIBRARIES REQUIRED SYMENGINE_LIBRARIES
+  INCLUDE_DIRS REQUIRED SYMENGINE_INCLUDE_DIRS
+  USER_INCLUDE_DIRS REQUIRED SYMENGINE_INCLUDE_DIRS
   CLEAR SYMENGINE_SETTINGS_H SYMENGINE_SKIP_DEPENDENCIES SymEngine_DIR
 )

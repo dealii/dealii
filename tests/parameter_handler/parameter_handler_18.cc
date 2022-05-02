@@ -34,7 +34,7 @@ test()
   foo.declare_entry("val", "1.0", dealii::Patterns::Double(), "");
   foo.leave_subsection();
 
-  foo.parse_input(SOURCE_DIR "/parameter_handler_18.prm");
+  foo.parse_input(SOURCE_DIR "/parameter_handler_18_in.prm");
 
   foo.enter_subsection("bar");
   deallog << foo.get("val") << std::endl;

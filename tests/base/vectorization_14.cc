@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,7 @@ do_test()
           << std::endl;
 
   VectorizedArrayType left;
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     left[i] = i + 1.;
 
   VectorizedArrayType right(3.);

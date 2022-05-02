@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,12 +75,12 @@ test()
   if (myid == 0)
     deallog << "w has ghost elements: " << w.has_ghost_elements() << std::endl;
 
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   w = v;
   if (myid == 0)
     deallog << "w has ghost elements: " << w.has_ghost_elements() << std::endl;
 
-  w.zero_out_ghosts();
+  w.zero_out_ghost_values();
   w = v;
   if (myid == 0)
     deallog << "w has ghost elements: " << w.has_ghost_elements() << std::endl;
@@ -90,7 +90,7 @@ test()
   if (myid == 0)
     deallog << "x has ghost elements: " << x.has_ghost_elements() << std::endl;
 
-  x.zero_out_ghosts();
+  x.zero_out_ghost_values();
   if (myid == 0)
     deallog << "x has ghost elements: " << x.has_ghost_elements() << std::endl;
 

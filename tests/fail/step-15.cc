@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,10 +16,6 @@
 
 
 // a un-hp-ified version of hp/step-15
-
-
-#include "../tests.h"
-std::ofstream logfile("output");
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -389,8 +385,8 @@ MinimizationProblem<1>::refine_grid()
 
   Vector<float> error_indicators(triangulation.n_active_cells());
 
-  QTrapez<dim>  quadrature;
-  FEValues<dim> fe_values(fe,
+  QTrapezoid<dim> quadrature;
+  FEValues<dim>   fe_values(fe,
                           quadrature,
                           update_values | update_gradients | update_hessians |
                             update_quadrature_points | update_JxW_values);
@@ -581,6 +577,7 @@ MinimizationProblem<dim>::run()
 int
 main()
 {
+  std::ofstream logfile("output");
   try
     {
       deallog << std::setprecision(2);
@@ -592,7 +589,7 @@ main()
       for (unsigned int realization = 0; realization < n_realizations;
            ++realization)
         {
-          deallog << "Realization " << realization << ":" << std::endl;
+          deallog << "Realization " << realization << ':' << std::endl;
 
           MinimizationProblem<1> minimization_problem_1d(realization);
           minimization_problem_1d.run();

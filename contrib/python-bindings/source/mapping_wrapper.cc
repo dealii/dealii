@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,8 +30,8 @@ namespace python
                                 void *cell_accessor_ptr,
                                 void *point_ptr)
     {
-      const MappingQGeneric<dim, spacedim> *mapping =
-        static_cast<const MappingQGeneric<dim, spacedim> *>(mapping_ptr);
+      const MappingQ<dim, spacedim> *mapping =
+        static_cast<const MappingQ<dim, spacedim> *>(mapping_ptr);
 
       const CellAccessor<dim, spacedim> *cell_accessor =
         static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor_ptr);
@@ -61,8 +61,8 @@ namespace python
                                 void *cell_accessor_ptr,
                                 void *point_ptr)
     {
-      const MappingQGeneric<dim, spacedim> *mapping =
-        static_cast<const MappingQGeneric<dim, spacedim> *>(mapping_ptr);
+      const MappingQ<dim, spacedim> *mapping =
+        static_cast<const MappingQ<dim, spacedim> *>(mapping_ptr);
 
       const CellAccessor<dim, spacedim> *cell_accessor =
         static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor_ptr);
@@ -93,8 +93,8 @@ namespace python
                                              const unsigned int face_no,
                                              void *             point_ptr)
     {
-      const MappingQGeneric<dim, spacedim> *mapping =
-        static_cast<const MappingQGeneric<dim, spacedim> *>(mapping_ptr);
+      const MappingQ<dim, spacedim> *mapping =
+        static_cast<const MappingQ<dim, spacedim> *>(mapping_ptr);
 
       const CellAccessor<dim, spacedim> *cell_accessor =
         static_cast<const CellAccessor<dim, spacedim> *>(cell_accessor_ptr);
@@ -124,7 +124,7 @@ namespace python
 
 
 
-  MappingQGenericWrapper::MappingQGenericWrapper()
+  MappingQWrapper::MappingQWrapper()
     : dim(-1)
     , spacedim(-1)
     , degree(-1)
@@ -133,24 +133,24 @@ namespace python
 
 
 
-  MappingQGenericWrapper::MappingQGenericWrapper(const int dim,
-                                                 const int spacedim,
-                                                 const int degree)
+  MappingQWrapper::MappingQWrapper(const int dim,
+                                   const int spacedim,
+                                   const int degree)
     : dim(dim)
     , spacedim(spacedim)
     , degree(degree)
   {
     if ((dim == 2) && (spacedim == 2))
       {
-        mapping_ptr = new MappingQGeneric<2, 2>(degree);
+        mapping_ptr = new MappingQ<2, 2>(degree);
       }
     else if ((dim == 2) && (spacedim == 3))
       {
-        mapping_ptr = new MappingQGeneric<2, 3>(degree);
+        mapping_ptr = new MappingQ<2, 3>(degree);
       }
     else if ((dim == 3) && (spacedim == 3))
       {
-        mapping_ptr = new MappingQGeneric<3, 3>(degree);
+        mapping_ptr = new MappingQ<3, 3>(degree);
       }
     else
       AssertThrow(false, ExcMessage("Wrong dim-spacedim combination."));
@@ -158,8 +158,7 @@ namespace python
 
 
 
-  MappingQGenericWrapper::MappingQGenericWrapper(
-    const MappingQGenericWrapper &other)
+  MappingQWrapper::MappingQWrapper(const MappingQWrapper &other)
   {
     dim      = other.dim;
     spacedim = other.spacedim;
@@ -170,15 +169,15 @@ namespace python
 
     if ((dim == 2) && (spacedim == 2))
       {
-        mapping_ptr = new MappingQGeneric<2, 2>(other.degree);
+        mapping_ptr = new MappingQ<2, 2>(other.degree);
       }
     else if ((dim == 2) && (spacedim == 3))
       {
-        mapping_ptr = new MappingQGeneric<2, 3>(other.degree);
+        mapping_ptr = new MappingQ<2, 3>(other.degree);
       }
     else if ((dim == 3) && (spacedim == 3))
       {
-        mapping_ptr = new MappingQGeneric<3, 3>(other.degree);
+        mapping_ptr = new MappingQ<3, 3>(other.degree);
       }
     else
       AssertThrow(false, ExcMessage("Wrong dim-spacedim combination."));
@@ -186,7 +185,7 @@ namespace python
 
 
 
-  MappingQGenericWrapper::~MappingQGenericWrapper()
+  MappingQWrapper::~MappingQWrapper()
   {
     if (dim != -1)
       {
@@ -194,20 +193,17 @@ namespace python
           {
             // We cannot call delete on a void pointer so cast the void pointer
             // back first.
-            MappingQGeneric<2, 2> *tmp =
-              static_cast<MappingQGeneric<2, 2> *>(mapping_ptr);
+            MappingQ<2, 2> *tmp = static_cast<MappingQ<2, 2> *>(mapping_ptr);
             delete tmp;
           }
         else if ((dim == 2) && (spacedim == 3))
           {
-            MappingQGeneric<2, 3> *tmp =
-              static_cast<MappingQGeneric<2, 3> *>(mapping_ptr);
+            MappingQ<2, 3> *tmp = static_cast<MappingQ<2, 3> *>(mapping_ptr);
             delete tmp;
           }
         else
           {
-            MappingQGeneric<3, 3> *tmp =
-              static_cast<MappingQGeneric<3, 3> *>(mapping_ptr);
+            MappingQ<3, 3> *tmp = static_cast<MappingQ<3, 3> *>(mapping_ptr);
             delete tmp;
           }
 
@@ -221,8 +217,8 @@ namespace python
 
 
   PointWrapper
-  MappingQGenericWrapper::transform_unit_to_real_cell(CellAccessorWrapper &cell,
-                                                      PointWrapper &       p)
+  MappingQWrapper::transform_unit_to_real_cell(CellAccessorWrapper &cell,
+                                               PointWrapper &       p)
   {
     AssertThrow(
       dim == p.get_dim(),
@@ -246,8 +242,8 @@ namespace python
 
 
   PointWrapper
-  MappingQGenericWrapper::transform_real_to_unit_cell(CellAccessorWrapper &cell,
-                                                      PointWrapper &       p)
+  MappingQWrapper::transform_real_to_unit_cell(CellAccessorWrapper &cell,
+                                               PointWrapper &       p)
   {
     AssertThrow(
       spacedim == p.get_dim(),
@@ -271,7 +267,7 @@ namespace python
 
 
   PointWrapper
-  MappingQGenericWrapper::project_real_point_to_unit_point_on_face(
+  MappingQWrapper::project_real_point_to_unit_point_on_face(
     CellAccessorWrapper &cell,
     const unsigned int   face_no,
     PointWrapper &       p)
@@ -295,7 +291,7 @@ namespace python
 
 
   void *
-  MappingQGenericWrapper::get_mapping() const
+  MappingQWrapper::get_mapping() const
   {
     return mapping_ptr;
   }

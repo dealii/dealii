@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2018 by the deal.II authors
+## Copyright (C) 2013 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,7 +21,7 @@
 #    prune_tests    - remove all testsuite subprojects
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 
 MACRO(SET_IF_EMPTY _variable)
   IF("${${_variable}}" STREQUAL "")
@@ -38,7 +38,7 @@ SET_IF_EMPTY(DEAL_II_DIR $ENV{DEAL_II_DIR})
 #
 
 IF(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
-  FIND_PACKAGE(deal.II 9.2.0 REQUIRED HINTS ${DEAL_II_DIR})
+  FIND_PACKAGE(deal.II 9.3.0 REQUIRED HINTS ${DEAL_II_DIR})
   DEAL_II_INITIALIZE_CACHED_VARIABLES()
   PROJECT(TESTSUITE CXX)
   FILE(WRITE ${CMAKE_BINARY_DIR}/detailed.log
@@ -90,7 +90,7 @@ ELSE()
       )
   ENDIF()
 
-  FIND_PACKAGE(deal.II 9.2.0 REQUIRED HINTS ${DEAL_II_DIR} $ENV{DEAL_II_DIR})
+  FIND_PACKAGE(deal.II 9.3.0 REQUIRED HINTS ${DEAL_II_DIR} $ENV{DEAL_II_DIR})
   PROJECT(testsuite NONE)
   SET(_options "-DDEAL_II_DIR=${DEAL_II_PATH}")
 ENDIF()
@@ -100,7 +100,11 @@ FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
 #
 # Always undefine the following variables in the setup_tests target:
 #
-FOREACH(_var DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT)
+FOREACH(_var
+    DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT
+    TEST_MPI_RANK_LIMIT TEST_THREAD_LIMIT ENABLE_PERFORMANCE_TESTS
+    TESTING_ENVIRONMENT
+    )
   LIST(APPEND _options "-U${_var}")
   IF(NOT "${${_var}}" STREQUAL "")
     LIST(APPEND _options "-D${_var}=${${_var}}")

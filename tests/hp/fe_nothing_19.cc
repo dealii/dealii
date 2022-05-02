@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 #include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -28,7 +29,6 @@
 #include <deal.II/grid/grid_generator.h> //standard functions to generate grid
 #include <deal.II/grid/tria.h>           //triangulation class
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <iostream>
@@ -49,8 +49,8 @@ test()
   fe.push_back(elasticity_fe);
   fe.push_back(elasticity_w_lagrange_fe);
 
-  hp::DoFHandler<dim>                                dof_handler(triangulation);
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  DoFHandler<dim>                                dof_handler(triangulation);
+  typename DoFHandler<dim>::active_cell_iterator cell =
     dof_handler.begin_active();
   cell->set_active_fe_index(0);
   (++cell)->set_active_fe_index(1);

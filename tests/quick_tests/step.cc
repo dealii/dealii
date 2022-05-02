@@ -19,6 +19,7 @@
 
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table_handler.h>
 
@@ -93,7 +94,7 @@ LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree)
   , mapping(mapping_degree)
   , last_error(std::numeric_limits<double>::max())
 {
-  deallog << "Using mapping with degree " << mapping_degree << ":" << std::endl
+  deallog << "Using mapping with degree " << mapping_degree << ':' << std::endl
           << "============================" << std::endl;
 }
 
@@ -177,10 +178,9 @@ LaplaceProblem<dim>::assemble_and_solve()
 
   output_table.add_value("cells", triangulation.n_active_cells());
   output_table.add_value("|u|_1", norm);
-  output_table.add_value("error",
-                         std::fabs(norm - std::sqrt(3.14159265358 / 2)));
+  output_table.add_value("error", std::fabs(norm - std::sqrt(numbers::PI_2)));
 
-  last_error = std::fabs(norm - std::sqrt(3.14159265358 / 2));
+  last_error = std::fabs(norm - std::sqrt(numbers::PI_2));
 }
 
 

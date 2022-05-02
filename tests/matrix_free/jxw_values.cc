@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,7 @@ test()
   QGauss<dim>          quad(2);
   FEValues<dim>        fe_values(fe, quad, update_JxW_values);
   FEEvaluation<dim, 1> fe_eval(mf_data);
-  for (unsigned int cell = 0; cell < mf_data.n_macro_cells(); ++cell)
+  for (unsigned int cell = 0; cell < mf_data.n_cell_batches(); ++cell)
     {
       fe_eval.reinit(cell);
       for (unsigned int v = 0; v < mf_data.n_components_filled(cell); ++v)

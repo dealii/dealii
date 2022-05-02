@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,7 @@
 
 //
 // Test GeometryInfo<dim>::face_to_cell_vertices
-// for correct behaviour under face_orientation face_flip and face_rotation
+// for correct behavior under face_orientation face_flip and face_rotation
 //
 
 
@@ -34,14 +34,14 @@ test_vertices()
 
   for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
-      deallog << "face " << i << ":" << std::endl;
+      deallog << "face " << i << ':' << std::endl;
 
       for (unsigned int o = 0; o < 8; ++o)
         {
           const std::bitset<3> orientation = o;
 
           deallog << "orientation " << orientation[0] << ", flip "
-                  << orientation[1] << ", rotation " << orientation[2] << ":"
+                  << orientation[1] << ", rotation " << orientation[2] << ':'
                   << std::endl
                   << "    ";
 
@@ -67,14 +67,14 @@ test_lines()
 
   for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
-      deallog << "face " << i << ":" << std::endl;
+      deallog << "face " << i << ':' << std::endl;
 
       for (unsigned int o = 0; o < 8; ++o)
         {
           const std::bitset<3> orientation = o;
 
           deallog << "orientation " << orientation[0] << ", flip "
-                  << orientation[1] << ", rotation " << orientation[2] << ":"
+                  << orientation[1] << ", rotation " << orientation[2] << ':'
                   << std::endl
                   << "    ";
 

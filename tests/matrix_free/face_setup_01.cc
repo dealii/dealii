@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,8 +81,8 @@ main(int argc, char **argv)
           << " n_ghosts="
           << matrix_free.get_dof_info().vector_partitioner->n_ghost_indices()
           << std::endl;
-  for (auto &p : matrix_free.get_dof_info().vector_partitioner_face_variants)
+  for (auto &p : matrix_free.get_dof_info().vector_exchanger_face_variants)
     deallog << "partitioner: size=" << p->size()
-            << " local_size=" << p->local_size()
+            << " local_size=" << p->locally_owned_size()
             << " n_ghosts=" << p->n_ghost_indices() << std::endl;
 }

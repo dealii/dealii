@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,7 @@ test()
     deallog << fe.get_name() << std::endl;
     for (auto it : fe.get_generalized_support_points())
       {
-        deallog << "(" << it[0] << "," << it[1] << ") ";
+        deallog << '(' << it[0] << ',' << it[1] << ") ";
       }
     deallog << std::endl;
   };

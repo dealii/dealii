@@ -108,7 +108,7 @@ test()
   v.export_to_ghosted_array_finish(make_array_view(ghosts), requests);
   deallog << "All ghosts: ";
   for (unsigned int i = 0; i < ghosts.size(); ++i)
-    deallog << ghosts[i] << " ";
+    deallog << ghosts[i] << ' ';
   deallog << std::endl;
 
   // send only the array in w
@@ -136,7 +136,7 @@ test()
   w.export_to_ghosted_array_finish(make_array_view(ghosts), requests);
   deallog << "Ghosts on reduced 1: ";
   for (unsigned int i = 0; i < ghosts.size(); ++i)
-    deallog << ghosts[i] << " ";
+    deallog << ghosts[i] << ' ';
   deallog << std::endl;
 
   std::fill(ghosts.begin(), ghosts.end(), 0);
@@ -150,13 +150,13 @@ test()
   x.export_to_ghosted_array_finish(make_array_view(ghosts), requests);
   deallog << "Ghosts on reduced 2: ";
   for (unsigned int i = 0; i < ghosts.size(); ++i)
-    deallog << ghosts[i] << " ";
+    deallog << ghosts[i] << ' ';
   deallog << std::endl;
 
   x.export_to_ghosted_array_finish(make_array_view(ghosts2), requests2);
   deallog << "Ghosts on reduced 2 without excess entries: ";
   for (unsigned int i = 0; i < ghosts2.size(); ++i)
-    deallog << ghosts2[i] << " ";
+    deallog << ghosts2[i] << ' ';
   deallog << std::endl;
 
   x.export_to_ghosted_array_start(3,
@@ -167,7 +167,7 @@ test()
   x.export_to_ghosted_array_finish(make_array_view(ghosts), requests);
   deallog << "Ghosts on reduced 2: ";
   for (unsigned int i = 0; i < ghosts.size(); ++i)
-    deallog << ghosts[i] << " ";
+    deallog << ghosts[i] << ' ';
   deallog << std::endl;
 }
 

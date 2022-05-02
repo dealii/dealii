@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -125,7 +125,6 @@ FIND_UMFPACK_LIBRARY(SuiteSparse_config suitesparseconfig)
 # by ldd :-( ):
 #
 FIND_SYSTEM_LIBRARY(rt_LIBRARY NAMES rt)
-MARK_AS_ADVANCED(rt_LIBRARY)
 
 DEAL_II_PACKAGE_HANDLE(UMFPACK
   LIBRARIES

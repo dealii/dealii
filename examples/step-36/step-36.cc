@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2019 by the deal.II authors
+ * Copyright (C) 2009 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -32,10 +32,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -244,7 +241,7 @@ namespace Step36
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_stiffness_matrix(dofs_per_cell, dofs_per_cell);
@@ -327,9 +324,9 @@ namespace Step36
           max_spurious_eigenvalue = std::max(max_spurious_eigenvalue, ev);
         }
 
-    std::cout << "   Spurious eigenvalues are all in the interval "
-              << "[" << min_spurious_eigenvalue << ","
-              << max_spurious_eigenvalue << "]" << std::endl;
+    std::cout << "   Spurious eigenvalues are all in the interval " << '['
+              << min_spurious_eigenvalue << ',' << max_spurious_eigenvalue
+              << ']' << std::endl;
   }
 
 

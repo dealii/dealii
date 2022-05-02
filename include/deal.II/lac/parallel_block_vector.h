@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,6 @@ namespace parallel
      *
      * @see
      * @ref GlossBlockLA "Block (linear algebra)"
-     * @author Katharina Kormann, Martin Kronbichler, 2011
      *
      * @deprecated Use LinearAlgebra::distributed::BlockVector instead.
      */

@@ -1,0 +1,11 @@
+
+DEAL::---- Creating outer table
+DEAL::default constructor. Object number 0
+DEAL::---- Cloning outer table
+DEAL::copy constructor from 0. Object number 1
+DEAL::---- Destroying the clone
+DEAL::destructor. Object number 1
+DEAL::---- Destroying the source table
+DEAL::destructor. Object number 0
+DEAL::Objects created: 2
+DEAL::Objects destroyed: 2

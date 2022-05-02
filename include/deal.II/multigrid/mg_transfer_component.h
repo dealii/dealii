@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,8 +57,6 @@ class DoFHandler;
  * @note MGTransferBlockBase is probably the more logical class. Still
  * eventually, a class should be developed allowing to select multiple
  * components.
- *
- * @author Guido Kanschat, 2001-2003
  */
 class MGTransferComponentBase
 {
@@ -84,23 +82,6 @@ protected:
   template <int dim, int spacedim>
   void
   build(const DoFHandler<dim, spacedim> &dof_handler);
-
-  /**
-   * Actually build the prolongation matrices for each level.
-   *
-   * This function is only called by derived classes. These can also set the
-   * member variables <code>selected_component</code> and
-   * <code>mg_selected_component</code> member variables to restrict the
-   * transfer matrices to certain components. Furthermore, they use
-   * <code>target_component</code> and <code>mg_target_component</code> for
-   * re-ordering and grouping of components.
-   *
-   * @deprecated Use build() instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  build_matrices(const DoFHandler<dim, spacedim> &dof,
-                 const DoFHandler<dim, spacedim> &mg_dof);
 
   /**
    * Flag of selected components.
@@ -187,8 +168,6 @@ protected:
  *
  * See MGTransferBase to find out which of the transfer classes is best for
  * your needs.
- *
- * @author Guido Kanschat, 2001, 2002, 2003
  */
 template <typename number>
 class MGTransferSelect : public MGTransferBase<Vector<number>>,
@@ -212,47 +191,6 @@ public:
   virtual ~MGTransferSelect() override = default;
 
   // TODO: rewrite docs; make sure defaulted args are actually allowed
-  /**
-   * Actually build the prolongation matrices for grouped components.
-   *
-   * This function is a front-end for the same function in
-   * MGTransferComponentBase.
-   *
-   * @arg selected: Number of the block of the global vector to be copied from
-   * and to the multilevel vector. This number refers to the renumbering by
-   * <tt>target_component</tt>.
-   *
-   * @arg mg_selected: Number of the block for which the transfer matrices
-   * should be built.
-   *
-   * If <tt>mg_target_component</tt> is present, this refers to the renumbered
-   * components.
-   *
-   * @arg target_component: this argument allows grouping and renumbering of
-   * components in the fine-level vector (see DoFRenumbering::component_wise).
-   *
-   * @arg mg_target_component: this argument allows grouping and renumbering
-   * of components in the level vectors (see DoFRenumbering::component_wise).
-   * It also affects the behavior of the <tt>selected</tt> argument
-   *
-   * @arg boundary_indices: holds the boundary indices on each level.
-   *
-   * @deprecated Use build() instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  build_matrices(
-    const DoFHandler<dim, spacedim> &dof,
-    const DoFHandler<dim, spacedim> &mg_dof,
-    unsigned int                     selected,
-    unsigned int                     mg_selected,
-    const std::vector<unsigned int> &target_component =
-      std::vector<unsigned int>(),
-    const std::vector<unsigned int> &mg_target_component =
-      std::vector<unsigned int>(),
-    const std::vector<std::set<types::global_dof_index>> &boundary_indices =
-      std::vector<std::set<types::global_dof_index>>());
-
   /**
    * Actually build the prolongation matrices for grouped components.
    *

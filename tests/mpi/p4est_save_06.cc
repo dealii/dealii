@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,7 @@ test()
 
       tr.execute_coarsening_and_refinement();
 
-      hp::DoFHandler<dim>   dh(tr);
+      DoFHandler<dim>       dh(tr);
       hp::FECollection<dim> fe_collection;
 
       // prepare FECollection with arbitrary number of entries
@@ -92,9 +92,8 @@ test()
                                        locally_relevant_dofs,
                                        com_small);
 
-      parallel::distributed::
-        SolutionTransfer<dim, PETScWrappers::MPI::Vector, hp::DoFHandler<dim>>
-          soltrans(dh);
+      parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
+        soltrans(dh);
 
       for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
         {
@@ -126,7 +125,7 @@ test()
     GridGenerator::hyper_cube(tr);
     tr.load("file");
 
-    hp::DoFHandler<dim>   dh(tr);
+    DoFHandler<dim>       dh(tr);
     hp::FECollection<dim> fe_collection;
 
     // prepare FECollection with arbitrary number of entries
@@ -134,7 +133,7 @@ test()
     for (unsigned int i = 0; i < max_degree; ++i)
       fe_collection.push_back(FE_Q<dim>(max_degree - i));
 
-    dh.set_fe(fe_collection);
+
     dh.deserialize_active_fe_indices();
     dh.distribute_dofs(fe_collection);
 
@@ -146,9 +145,8 @@ test()
     PETScWrappers::MPI::Vector solution(locally_owned_dofs, com_all);
     solution = PetscScalar();
 
-    parallel::distributed::
-      SolutionTransfer<dim, PETScWrappers::MPI::Vector, hp::DoFHandler<dim>>
-        soltrans(dh);
+    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector>
+      soltrans(dh);
 
     soltrans.deserialize(solution);
 

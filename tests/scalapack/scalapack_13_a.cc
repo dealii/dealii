@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
     std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,
                                                   proc_rows,
                                                   proc_columns);
-  pcout << "2D process grid: " << grid->get_process_grid_rows() << "x"
+  pcout << "2D process grid: " << grid->get_process_grid_rows() << 'x'
         << grid->get_process_grid_columns() << std::endl
         << std::endl;
 
@@ -86,8 +86,8 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
   scalapack_A.copy_to(tmp_full_A);
 
   pcout << "   computing A = alpha A + beta B with"
-        << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << ") and"
-        << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ")"
+        << " A in R^(" << scalapack_A.m() << 'x' << scalapack_A.n() << ") and"
+        << " B in R^(" << scalapack_B.m() << 'x' << scalapack_B.n() << ')'
         << std::endl;
   pcout << "   norms: " << tmp_full_A.frobenius_norm() << " & "
         << full_A.frobenius_norm() << "  for " << typeid(NumberType).name()

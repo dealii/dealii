@@ -1,6 +1,0 @@
-Added: Python wrappers for the CellAccessor's methods: active, level,
-index, vertex_index, neighbor_is_coarser, neighbor_of_neighbor and
-GridTools' methods: find_cells_adjacent_to_vertex, minimal_cell_diameter,
-maximal_cell_diameter, and Mapping::project_real_point_to_unit_point_on_face
-<br>
-(Alexander Grayver, 2020/01/06)

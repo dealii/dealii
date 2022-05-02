@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,12 +17,13 @@
 
 // this function tests the correctness of the implementation of matrix free
 // matrix-vector products by comparing with the result of deal.II sparse
-// matrix for hp DoFHandler on a hyperball mesh with hanging nodes and finite
+// matrix for hp-DoFHandler on a hyperball mesh with hanging nodes and finite
 // elements orders distributed randomly.
 
 #include <deal.II/base/function.h>
 
-#include <deal.II/hp/dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/hp/fe_values.h>
 
 #include "../tests.h"
@@ -110,7 +111,7 @@ test()
   if (fe_degree > 1)
     return;
 
-  typedef double               number;
+  using number = double;
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
@@ -142,6 +143,9 @@ test()
   hp::QCollection<dim>  quadrature_collection;
   hp::QCollection<1>    quadrature_collection_mf;
 
+  fe_collection.push_back(FE_Nothing<dim>());
+  quadrature_collection.push_back(QGauss<dim>(1));
+  quadrature_collection_mf.push_back(QGauss<1>(1));
   for (unsigned int deg = 1; deg <= max_degree; ++deg)
     {
       fe_collection.push_back(FE_Q<dim>(QGaussLobatto<1>(deg + 1)));
@@ -149,17 +153,21 @@ test()
       quadrature_collection_mf.push_back(QGauss<1>(deg + 1));
     }
 
-  hp::DoFHandler<dim> dof(tria);
+  DoFHandler<dim> dof(tria);
   // set the active FE index in a random order
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator cell =
-                                                         dof.begin_active(),
-                                                       endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+                                                   endc = dof.end();
     for (; cell != endc; ++cell)
       {
         const unsigned int fe_index = Testing::rand() % max_degree;
-        cell->set_active_fe_index(fe_index);
+        cell->set_active_fe_index(fe_index + 1);
       }
+    // We cannot set random cells to FE_Nothing. We get the following error
+    // The violated condition was: dominating_fe.n_dofs_per_face(face) <=
+    // subface_fe.n_dofs_per_face(face)
+    cell = dof.begin_active();
+    cell->set_active_fe_index(0);
   }
 
   // setup DoFs
@@ -199,9 +207,8 @@ test()
     FullMatrix<double>                   cell_matrix;
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell =
-                                                         dof.begin_active(),
-                                                       endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+                                                   endc = dof.end();
     for (; cell != endc; ++cell)
       {
         const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;

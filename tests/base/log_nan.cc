@@ -34,7 +34,7 @@ main()
   // unusable since we can no longer detect whether something is a
   // NaN. that said, to make the test work in these cases, simply
   // switch off floating point exceptions for invalid arguments
-#if defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
   fedisableexcept(FE_INVALID);
 #endif
 

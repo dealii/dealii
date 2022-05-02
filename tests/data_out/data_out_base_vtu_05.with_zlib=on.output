@@ -26,7 +26,8 @@ AQAAAAYAAAAGAAAACwAAAA==eNrz8AABAAXuAbE=
   </Cells>
   <PointData Scalars="scalars">
     <DataArray type="Float32" Name="square_function" format="binary">
-AQAAAAAGAAAABgAAWwEAAA==eNrrSY2wZ7112v6fkJTD3GeeDrd2yNrXau+zd3yl4HByYgQGvwdNvWChtf2kvLX2rjpMDl7sWg6Xurnsz7Avsl9xn91hloMZBh9dfdVWHfuJ8tPsu5fftjfYxuuwbjqrfQ9Dr/2EY0/sF9eKY/DR1R8z0rFnetsKdM8u+7nPXtrn3uEDurcO6N4D9icn/sDgo6sH+QHkLxAGsUFuArkThEFskB0ge0EYxAbpAZkDwhB2hAProjIwBrFB+hT8/MEYxAbpK+3QBmMQG6SPKZDbAYQh5lCmn1L3E4pPQuGNnj7Q4xs9/tDjg1L9lLofpB+kB6QOJAdyD8gNIHtBdqHzCanfcl/U7m6YpN3UjaF2b8uX2qHzCZlPqn5K3T8a/6jhATILpB+kB6JOygFkFkg/RI8nPF/B/I8cviC/gNwPcjPEnQoOIL+A3A9xcwQ8X8P8T4l+St0PAE27ff8=    </DataArray>
+AQAAAAAGAAAABgAAWwEAAA==eNrrSY2wZ7112v6fkJTD3GeeDrd2yNrXau+zd3yl4HByYgQGvwdNvWChtf2kvLX2rjpMDl7sWg6Xurnsz7Avsl9xn91hloMZBh9dfdVWHfuJ8tPsu5fftjfYxuuwbjqrfQ9Dr/2EY0/sF9eKY/DR1R8z0rFnetsKdM8u+7nPXtrn3uEDurcO6N4D9icn/sDgo6sH+QHkLxAGsUFuArkThEFskB0ge0EYxAbpAZkDwhB2hAProjIwBrFB+hT8/MEYxAbpK+3QBmMQG6SPKZDbAYQh5lCmn1L3E4pPQuGNnj7Q4xs9/tDjg1L9lLofpB+kB6QOJAdyD8gNIHtBdqHzCanfcl/U7m6YpN3UjaF2b8uX2qHzCZlPqn5K3T8a/6jhATILpB+kB6JOygFkFkg/RI8nPF/B/I8cviC/gNwPcjPEnQoOIL+A3A9xcwQ8X8P8T4l+St0PAE27ff8=
+    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>

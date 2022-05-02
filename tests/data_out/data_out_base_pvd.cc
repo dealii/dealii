@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// write the pvd master record for parallel visualization through the
+// write the pvd primary record for parallel visualization through the
 // vtu file format
 
 #include <deal.II/base/data_out_base.h>

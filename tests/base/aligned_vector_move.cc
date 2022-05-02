@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,7 @@
 void
 test()
 {
-  typedef AlignedVector<unsigned int> VEC;
+  using VEC = AlignedVector<unsigned int>;
 
   VEC a(4, 2);
 
@@ -37,7 +37,7 @@ test()
 
   deallog << "Contents of new VEC: ";
   for (unsigned int i = 0; i < b.size(); ++i)
-    deallog << b[i] << " ";
+    deallog << b[i] << ' ';
   deallog << std::endl;
 
   a.resize(6, 42);
@@ -46,7 +46,7 @@ test()
 
   deallog << "Contents of new VEC: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   a = std::move(b);

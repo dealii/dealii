@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,10 +59,8 @@ test()
   AffineConstraints<PetscScalar> constraints(locally_relevant_dofs);
   constraints.clear();
   {
-    IndexSet boundary_dofs(dof_handler.n_dofs());
-    DoFTools::extract_boundary_dofs(dof_handler,
-                                    std::vector<bool>(1, true),
-                                    boundary_dofs);
+    const IndexSet boundary_dofs =
+      DoFTools::extract_boundary_dofs(dof_handler, std::vector<bool>(1, true));
 
     unsigned int first_nboundary_dof = 0;
     while (boundary_dofs.is_element(first_nboundary_dof))

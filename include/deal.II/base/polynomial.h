@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,8 @@ namespace Polynomials
    * must be used. In case a manipulation is done that changes the roots, the
    * representation is switched to the coefficient form.
    *
-   * @author Ralf Hartmann, Guido Kanschat, 2000, 2006, Martin Kronbichler, 2011, 2017
+   * This class is a typical example of a possible template argument for the
+   * TensorProductPolynomials class.
    */
   template <typename number>
   class Polynomial : public Subscriptor
@@ -95,9 +96,11 @@ namespace Polynomials
     /**
      * Return the value of this polynomial at the given point.
      *
-     * This function uses the Horner scheme for numerical stability of the
-     * evaluation for polynomials in the coefficient form or the product of
-     * terms involving the roots if that representation is used.
+     * This function uses the most numerically stable evaluation
+     * algorithm for the provided form of the polynomial. If the
+     * polynomial is in the product form of roots, the evaluation is
+     * based on products of the form (x - x_i), whereas the Horner
+     * scheme is used for polynomials in the coefficient form.
      */
     number
     value(const number x) const;
@@ -122,14 +125,22 @@ namespace Polynomials
      * determined by @p n_derivatives and @p values has to provide sufficient
      * space for @p n_derivatives + 1 values.
      *
-     * This function uses the Horner scheme for numerical stability of the
-     * evaluation for polynomials in the coefficient form or the product of
-     * terms involving the roots if that representation is used.
+     * This function uses the most numerically stable evaluation
+     * algorithm for the provided form of the polynomial. If the
+     * polynomial is in the product form of roots, the evaluation is
+     * based on products of the form (x - x_i), whereas the Horner
+     * scheme is used for polynomials in the coefficient form.
+     *
+     * The template type `Number2` must implement arithmetic
+     * operations such as additions or multiplication with the type
+     * `number` of the polynomial, and must be convertible from
+     * `number` by `operator=`.
      */
+    template <typename Number2>
     void
-    value(const number       x,
+    value(const Number2      x,
           const unsigned int n_derivatives,
-          number *           values) const;
+          Number2 *          values) const;
 
     /**
      * Degree of the polynomial. This is the degree reflected by the number of
@@ -219,7 +230,8 @@ namespace Polynomials
 
     /**
      * Write or read the data of this object to or from a stream for the
-     * purpose of serialization.
+     * purpose of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -292,8 +304,6 @@ namespace Polynomials
   /**
    * Class generates Polynomial objects representing a monomial of degree n,
    * that is, the function $x^n$.
-   *
-   * @author Guido Kanschat, 2004
    */
   template <typename number>
   class Monomial : public Polynomial<number>
@@ -337,8 +347,6 @@ namespace Polynomials
    * entire space of polynomials of degree less than or equal <tt>degree</tt>.
    *
    * The Lagrange polynomials are implemented up to degree 10.
-   *
-   * @author Ralf Hartmann, 2000
    */
   class LagrangeEquidistant : public Polynomial<double>
   {
@@ -397,8 +405,6 @@ namespace Polynomials
    * interval $[-1,1]$. (ii) The polynomials have been scaled in such a way
    * that they are orthonormal, not just orthogonal; consequently, the
    * polynomials do not necessarily have boundary values equal to one.
-   *
-   * @author Guido Kanschat, 2000
    */
   class Legendre : public Polynomial<double>
   {
@@ -436,8 +442,6 @@ namespace Polynomials
    *
    * These polynomials are used for the construction of the shape functions of
    * N&eacute;d&eacute;lec elements of arbitrary order.
-   *
-   * @author Markus B&uuml;rg, 2009
    */
   class Lobatto : public Polynomial<double>
   {
@@ -501,8 +505,6 @@ namespace Polynomials
    * concept of a polynomial degree, if the given argument is zero, it does
    * <b>not</b> return the linear polynomial described above, but rather a
    * constant polynomial.
-   *
-   * @author Brian Carnes, 2002
    */
   class Hierarchical : public Polynomial<double>
   {
@@ -580,9 +582,6 @@ namespace Polynomials
    * \ldots & \ldots \\
    * p_k(x) &= x^2(x-1)^2 L_{k-4}(x)
    * @f}
-   *
-   * @author Guido Kanschat
-   * @date 2012
    */
   class HermiteInterpolation : public Polynomial<double>
   {
@@ -704,9 +703,6 @@ namespace Polynomials
    * but gives better condition numbers of interpolation, which improves the
    * performance of some iterative schemes like conjugate gradients with
    * point-Jacobi. This polynomial is used in FE_DGQHermite.
-   *
-   * @author Martin Kronbichler
-   * @date 2018
    */
   class HermiteLikeInterpolation : public Polynomial<double>
   {
@@ -821,6 +817,141 @@ namespace Polynomials
         value *= lagrange_weight;
         return value;
       }
+  }
+
+
+
+  template <typename number>
+  template <typename Number2>
+  inline void
+  Polynomial<number>::value(const Number2      x,
+                            const unsigned int n_derivatives,
+                            Number2 *          values) const
+  {
+    // evaluate Lagrange polynomial and derivatives
+    if (in_lagrange_product_form == true)
+      {
+        // to compute the value and all derivatives of a polynomial of the
+        // form (x-x_1)*(x-x_2)*...*(x-x_n), expand the derivatives like
+        // automatic differentiation does.
+        const unsigned int n_supp = lagrange_support_points.size();
+        const number       weight = lagrange_weight;
+        switch (n_derivatives)
+          {
+            default:
+              values[0] = 1.;
+              for (unsigned int d = 1; d <= n_derivatives; ++d)
+                values[d] = 0.;
+              for (unsigned int i = 0; i < n_supp; ++i)
+                {
+                  const Number2 v = x - lagrange_support_points[i];
+
+                  // multiply by (x-x_i) and compute action on all derivatives,
+                  // too (inspired from automatic differentiation: implement the
+                  // product rule for the old value and the new variable 'v',
+                  // i.e., expand value v and derivative one). since we reuse a
+                  // value from the next lower derivative from the steps before,
+                  // need to start from the highest derivative
+                  for (unsigned int k = n_derivatives; k > 0; --k)
+                    values[k] = (values[k] * v + values[k - 1]);
+                  values[0] *= v;
+                }
+              // finally, multiply by the weight in the Lagrange
+              // denominator. Could be done instead of setting values[0] = 1
+              // above, but that gives different accumulation of round-off
+              // errors (multiplication is not associative) compared to when we
+              // computed the weight, and hence a basis function might not be
+              // exactly one at the center point, which is nice to have. We also
+              // multiply derivatives by k! to transform the product p_n =
+              // p^(n)(x)/k! into the actual form of the derivative
+              {
+                number k_factorial = 1;
+                for (unsigned int k = 0; k <= n_derivatives; ++k)
+                  {
+                    values[k] *= k_factorial * weight;
+                    k_factorial *= static_cast<number>(k + 1);
+                  }
+              }
+              break;
+
+            // manually implement case 0 (values only), case 1 (value + first
+            // derivative), and case 2 (up to second derivative) since they
+            // might be called often. then, we can unroll the inner loop and
+            // keep the temporary results as local variables to help the
+            // compiler with the pointer aliasing analysis.
+            case 0:
+              {
+                Number2 value = 1.;
+                for (unsigned int i = 0; i < n_supp; ++i)
+                  {
+                    const Number2 v = x - lagrange_support_points[i];
+                    value *= v;
+                  }
+                values[0] = weight * value;
+                break;
+              }
+
+            case 1:
+              {
+                Number2 value      = 1.;
+                Number2 derivative = 0.;
+                for (unsigned int i = 0; i < n_supp; ++i)
+                  {
+                    const Number2 v = x - lagrange_support_points[i];
+                    derivative      = derivative * v + value;
+                    value *= v;
+                  }
+                values[0] = weight * value;
+                values[1] = weight * derivative;
+                break;
+              }
+
+            case 2:
+              {
+                Number2 value      = 1.;
+                Number2 derivative = 0.;
+                Number2 second     = 0.;
+                for (unsigned int i = 0; i < n_supp; ++i)
+                  {
+                    const Number2 v = x - lagrange_support_points[i];
+                    second          = second * v + derivative;
+                    derivative      = derivative * v + value;
+                    value *= v;
+                  }
+                values[0] = weight * value;
+                values[1] = weight * derivative;
+                values[2] = static_cast<number>(2) * weight * second;
+                break;
+              }
+          }
+        return;
+      }
+
+    Assert(coefficients.size() > 0, ExcEmptyObject());
+
+    // if derivatives are needed, then do it properly by the full
+    // Horner scheme
+    const unsigned int   m = coefficients.size();
+    std::vector<Number2> a(coefficients.size());
+    std::copy(coefficients.begin(), coefficients.end(), a.begin());
+    unsigned int j_factorial = 1;
+
+    // loop over all requested derivatives. note that derivatives @p{j>m} are
+    // necessarily zero, as they differentiate the polynomial more often than
+    // the highest power is
+    const unsigned int min_valuessize_m = std::min(n_derivatives + 1, m);
+    for (unsigned int j = 0; j < min_valuessize_m; ++j)
+      {
+        for (int k = m - 2; k >= static_cast<int>(j); --k)
+          a[k] += x * a[k + 1];
+        values[j] = static_cast<number>(j_factorial) * a[j];
+
+        j_factorial *= j + 1;
+      }
+
+    // fill higher derivatives by zero
+    for (unsigned int j = min_valuessize_m; j <= n_derivatives; ++j)
+      values[j] = 0.;
   }
 
 

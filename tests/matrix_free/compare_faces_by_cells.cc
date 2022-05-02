@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,7 @@
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -51,7 +51,7 @@ template <int dim,
 class LaplaceOperator : public Subscriptor
 {
 public:
-  typedef number value_type;
+  using value_type = number;
 
   LaplaceOperator(){};
 
@@ -97,7 +97,7 @@ public:
     LinearAlgebra::distributed::Vector<number> &result) const
   {
     int dummy;
-    result.zero_out_ghosts();
+    result.zero_out_ghost_values();
     data.cell_loop(&LaplaceOperator::local_diagonal_by_cell,
                    this,
                    result,
@@ -131,7 +131,7 @@ private:
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phi_outer(data,
                                                                          false);
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         phi.reinit(face);
         phi_outer.reinit(face);
@@ -149,13 +149,14 @@ private:
         // Compute phi part
         for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
           phi_outer.begin_dof_values()[j] = VectorizedArray<number>();
-        phi_outer.evaluate(true, true);
+        phi_outer.evaluate(EvaluationFlags::values |
+                           EvaluationFlags::gradients);
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
               phi.begin_dof_values()[j] = VectorizedArray<number>();
             phi.begin_dof_values()[i] = 1.;
-            phi.evaluate(true, true);
+            phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
@@ -169,7 +170,7 @@ private:
                 phi.submit_normal_derivative(-average_value, q);
                 phi.submit_value(average_valgrad, q);
               }
-            phi.integrate(true, true);
+            phi.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];
           }
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -182,13 +183,14 @@ private:
                  (number)(std::max(fe_degree, 1) * (fe_degree + 1.0)) * 2.0;
         for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
           phi.begin_dof_values()[j] = VectorizedArray<number>();
-        phi.evaluate(true, true);
+        phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
           {
             for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
               phi_outer.begin_dof_values()[j] = VectorizedArray<number>();
             phi_outer.begin_dof_values()[i] = 1.;
-            phi_outer.evaluate(true, true);
+            phi_outer.evaluate(EvaluationFlags::values |
+                               EvaluationFlags::gradients);
 
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
@@ -202,7 +204,8 @@ private:
                 phi_outer.submit_normal_derivative(-average_value, q);
                 phi_outer.submit_value(-average_valgrad, q);
               }
-            phi_outer.integrate(true, true);
+            phi_outer.integrate(EvaluationFlags::values |
+                                EvaluationFlags::gradients);
             local_diagonal_vector[i] = phi_outer.begin_dof_values()[i];
           }
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -220,7 +223,7 @@ private:
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, 1, number> phi(data);
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         phi.reinit(face);
 
@@ -235,7 +238,7 @@ private:
             for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
               phi.begin_dof_values()[j] = VectorizedArray<number>();
             phi.begin_dof_values()[i] = 1.;
-            phi.evaluate(true, true);
+            phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
@@ -246,7 +249,7 @@ private:
                 phi.submit_normal_derivative(-average_value, q);
                 phi.submit_value(average_valgrad, q);
               }
-            phi.integrate(true, true);
+            phi.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];
           }
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -279,7 +282,7 @@ private:
               (number)(std::max(1, fe_degree) * (fe_degree + 1.0)) * 2.;
 
             std::array<types::boundary_id, VectorizedArray<number>::size()>
-                                    boundary_ids = data.get_faces_by_cells_boundary_id(cell, face);
+              boundary_ids = data.get_faces_by_cells_boundary_id(cell, face);
             VectorizedArray<number> factor_boundary;
             for (unsigned int v = 0; v < VectorizedArray<number>::size(); ++v)
               // interior face
@@ -293,7 +296,8 @@ private:
                 for (unsigned int j = 0; j < phif.dofs_per_cell; ++j)
                   phif.begin_dof_values()[j] = VectorizedArray<number>();
                 phif.begin_dof_values()[i] = 1.;
-                phif.evaluate(true, true);
+                phif.evaluate(EvaluationFlags::values |
+                              EvaluationFlags::gradients);
                 for (unsigned int q = 0; q < phif.n_q_points; ++q)
                   {
                     VectorizedArray<number> average_value =
@@ -305,7 +309,8 @@ private:
                     phif.submit_normal_derivative(-average_value, q);
                     phif.submit_value(average_valgrad, q);
                   }
-                phif.integrate(true, true);
+                phif.integrate(EvaluationFlags::values |
+                               EvaluationFlags::gradients);
                 local_diagonal_vector[i] += phif.begin_dof_values()[i];
               }
           }
@@ -337,7 +342,7 @@ test()
   dof.distribute_mg_dofs();
   deallog << "Number of DoFs: " << dof.n_dofs() << std::endl;
 
-  MappingQGeneric<dim>                                   mapping(fe_degree + 1);
+  MappingQ<dim>                                          mapping(fe_degree + 1);
   LaplaceOperator<dim, fe_degree, n_q_points_1d, number> fine_matrix;
   fine_matrix.initialize(mapping, dof);
 

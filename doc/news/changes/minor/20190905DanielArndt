@@ -1,4 +1,0 @@
-Fixed: Implementing LinearAlgebra::Vector::has_ghost_elements() improves compatibility
-between vector types.
-<br>
-(Daniel Arndt, 2019/09/05)

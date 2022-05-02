@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -229,7 +229,7 @@ namespace Differentiation
               typename SymbolicType,
               typename... Args>
     types::substitution_map
-    make_symbol_map(const SymbolicType &symbol, const Args &... other_symbols);
+    make_symbol_map(const SymbolicType &symbol, const Args &...other_symbols);
 
     /**
      * A convenience function for adding an empty entry, with the key value
@@ -417,7 +417,7 @@ namespace Differentiation
     void
     add_to_symbol_map(types::substitution_map &symbol_map,
                       const SymbolicType &     symbol,
-                      const Args &... other_symbols);
+                      const Args &...other_symbols);
 
     /**
      * Find the entry for @p symbol in the @p substitution_map and set its
@@ -551,7 +551,7 @@ namespace Differentiation
     set_value_in_symbol_map(
       types::substitution_map &                 substitution_map,
       const std::pair<SymbolicType, ValueType> &symbol_value,
-      const Args &... other_symbol_values);
+      const Args &...other_symbol_values);
 
     /**
      * Find the entries for @p symbols in the @p substitution_map and set their
@@ -780,7 +780,7 @@ namespace Differentiation
     types::substitution_map
     make_substitution_map(
       const std::pair<ExpressionType, ValueType> &symbol_value,
-      const Args &... other_symbol_values);
+      const Args &...other_symbol_values);
 
     //@}
 
@@ -1121,7 +1121,7 @@ namespace Differentiation
     add_to_substitution_map(
       types::substitution_map &                   substitution_map,
       const std::pair<ExpressionType, ValueType> &symbol_value,
-      const Args &... other_symbol_values);
+      const Args &...other_symbol_values);
 
     /**
      * Concatenate two symbolic maps, merging a second map @p substitution_map_in
@@ -1148,7 +1148,7 @@ namespace Differentiation
     void
     merge_substitution_maps(types::substitution_map &      substitution_map_out,
                             const types::substitution_map &substitution_map_in,
-                            const Args &... other_substitution_maps_in);
+                            const Args &...other_substitution_maps_in);
 
     /**
      * Concatenate multiple symbolic maps, merging the maps @p substitution_map_in
@@ -1160,7 +1160,7 @@ namespace Differentiation
     template <typename... Args>
     types::substitution_map
     merge_substitution_maps(const types::substitution_map &substitution_map_in,
-                            const Args &... other_substitution_maps_in);
+                            const Args &...other_substitution_maps_in);
 
     //@}
 
@@ -1198,7 +1198,7 @@ namespace Differentiation
      *
      * Example:
      * If <tt>map["a"] -> 1</tt> and
-     * <tt>map["b"] -> "a"+ 2</tt>, then then the function $f(a,b(a)) = a+b$
+     * <tt>map["b"] -> "a"+ 2</tt>, then the function $f(a,b(a)) = a+b$
      * will be evaluated and the result $f\vert_{a=1,b=a+2} = 3+a$ is determined
      * upon the completion of the first sweep. A second sweep is therefore
      * necessary to resolve the final symbol, and the returned value is
@@ -1355,7 +1355,7 @@ namespace Differentiation
      */
     template <typename ExpressionType, typename... Args>
     ExpressionType
-    substitute(const ExpressionType &expression, const Args &... symbol_values);
+    substitute(const ExpressionType &expression, const Args &...symbol_values);
 
     /**
      * Perform a single substitution sweep of a set of symbols into the given
@@ -1421,7 +1421,7 @@ namespace Differentiation
     template <typename ValueType, typename... Args>
     ValueType
     substitute_and_evaluate(const Expression &expression,
-                            const Args &... symbol_values);
+                            const Args &...symbol_values);
 
     //@}
 
@@ -1459,7 +1459,7 @@ namespace Differentiation
               typename SymbolicType,
               typename... Args>
     types::substitution_map
-    make_symbol_map(const SymbolicType &symbol, const Args &... other_symbols)
+    make_symbol_map(const SymbolicType &symbol, const Args &...other_symbols)
     {
       types::substitution_map symbol_map;
       add_to_symbol_map<ignore_invalid_symbols, ValueType>(symbol_map,
@@ -1541,7 +1541,7 @@ namespace Differentiation
     void
     add_to_symbol_map(types::substitution_map &symbol_map,
                       const SymbolicType &     symbol,
-                      const Args &... other_symbols)
+                      const Args &...other_symbols)
     {
       add_to_symbol_map<ignore_invalid_symbols, ValueType>(symbol_map, symbol);
       add_to_symbol_map<ignore_invalid_symbols, ValueType>(symbol_map,
@@ -1601,7 +1601,7 @@ namespace Differentiation
     set_value_in_symbol_map(
       types::substitution_map &                 substitution_map,
       const std::pair<SymbolicType, ValueType> &symbol_value,
-      const Args &... other_symbol_values)
+      const Args &...other_symbol_values)
     {
       set_value_in_symbol_map(substitution_map, symbol_value);
       set_value_in_symbol_map(substitution_map, other_symbol_values...);
@@ -1670,7 +1670,7 @@ namespace Differentiation
     types::substitution_map
     make_substitution_map(
       const std::pair<ExpressionType, ValueType> &symbol_value,
-      const Args &... other_symbol_values)
+      const Args &...other_symbol_values)
     {
       types::substitution_map substitution_map;
       add_to_substitution_map(substitution_map,
@@ -1834,7 +1834,7 @@ namespace Differentiation
     add_to_substitution_map(
       types::substitution_map &                   substitution_map,
       const std::pair<ExpressionType, ValueType> &symbol_value,
-      const Args &... other_symbol_values)
+      const Args &...other_symbol_values)
     {
       add_to_substitution_map<ignore_invalid_symbols>(substitution_map,
                                                       symbol_value);
@@ -1847,7 +1847,7 @@ namespace Differentiation
     types::substitution_map
     merge_substitution_maps(
       const types::substitution_map &substitution_map_in_1,
-      const Args &... other_substitution_maps_in)
+      const Args &...other_substitution_maps_in)
     {
       types::substitution_map substitution_map_out = substitution_map_in_1;
       merge_substitution_maps(substitution_map_out,
@@ -1861,7 +1861,7 @@ namespace Differentiation
     merge_substitution_maps(
       types::substitution_map &      substitution_map_out,
       const types::substitution_map &substitution_map_in_1,
-      const Args &... other_substitution_maps_in)
+      const Args &...other_substitution_maps_in)
     {
       merge_substitution_maps(substitution_map_out, substitution_map_in_1);
       merge_substitution_maps(substitution_map_out,
@@ -1895,7 +1895,7 @@ namespace Differentiation
 
     template <typename ExpressionType, typename... Args>
     ExpressionType
-    substitute(const ExpressionType &expression, const Args &... symbol_values)
+    substitute(const ExpressionType &expression, const Args &...symbol_values)
     {
       // Call other function
       return substitute(expression, make_substitution_map(symbol_values...));
@@ -1914,7 +1914,7 @@ namespace Differentiation
     template <typename ValueType, typename... Args>
     ValueType
     substitute_and_evaluate(const Expression &expression,
-                            const Args &... symbol_values)
+                            const Args &...symbol_values)
     {
       // Call other function
       return substitute_and_evaluate<ValueType>(

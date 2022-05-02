@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -64,9 +64,6 @@ MACRO(DEAL_II_SETUP_TARGET _target)
     INCLUDE(${DEAL_II_TARGET_CONFIG})
     SET(DEAL_II_TARGET_CONFIG_INCLUDED TRUE)
   ENDIF()
-
-  # Necessary for setting INCLUDE_DIRECTORIES via SET_PROPERTY
-  CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
   #
   # Set build type with the help of the specified keyword, or

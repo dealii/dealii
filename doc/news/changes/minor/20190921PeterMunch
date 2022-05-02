@@ -1,5 +1,0 @@
-Improved: Unify compute_vertices_with_ghost_neighbors in 
-parallel::TriangulationBase, parallel::distributed::Triangulation, 
-and parallel::fullydistributed::Triangulation..
-<br>
-(Peter Munch, 2019/09/21

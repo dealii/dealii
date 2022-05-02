@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,7 @@ template <int dim>
 void
 test()
 {
-  deallog << "Checking in " << dim << "d" << std::endl;
+  deallog << "Checking in " << dim << 'd' << std::endl;
 
   // check phi_i(v_j) = delta_{ij}
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())

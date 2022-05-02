@@ -1,0 +1,52 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2020 - 2021 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+
+for (deal_II_dimension : DIMENSIONS; S1 : REAL_SCALARS)
+  {
+    template class MGTwoLevelTransfer<deal_II_dimension,
+                                      LinearAlgebra::distributed::Vector<S1>>;
+  }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template std::vector<std::shared_ptr<
+      const Triangulation<deal_II_dimension, deal_II_space_dimension>>>
+    MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension>
+        &fine_triangulation_in);
+
+    template std::vector<std::shared_ptr<
+      const Triangulation<deal_II_dimension, deal_II_space_dimension>>>
+    MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence(
+      Triangulation<deal_II_dimension, deal_II_space_dimension> &
+        fine_triangulation_in,
+      const RepartitioningPolicyTools::Base<deal_II_dimension,
+                                            deal_II_space_dimension> &policy,
+      const bool keep_fine_triangulation,
+      const bool repartition_fine_triangulation);
+
+    template std::vector<std::shared_ptr<
+      const Triangulation<deal_II_dimension, deal_II_space_dimension>>>
+    MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension>
+        &fine_triangulation_in,
+      const RepartitioningPolicyTools::Base<deal_II_dimension,
+                                            deal_II_space_dimension> &policy,
+      const bool repartition_fine_triangulation);
+#endif
+  }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,8 @@
 
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   MappingQ<3> map(3);
 
@@ -41,7 +42,7 @@ void check(Triangulation<3> &tria)
 
   deallog << cell.first << std::endl;
   for (const unsigned int v : GeometryInfo<3>::vertex_indices())
-    deallog << "<" << cell.first->vertex(v) << "> " << std::endl;
+    deallog << '<' << cell.first->vertex(v) << "> " << std::endl;
   deallog << "[ " << cell.second << "] ";
 
   deallog << std::endl << std::endl;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,14 +25,12 @@ for (deal_II_dimension : DIMENSIONS;
     template struct internal::MatrixFreeFunctions::MappingInfoStorage<
       deal_II_dimension,
       deal_II_dimension,
-      deal_II_scalar_vectorized::value_type,
       deal_II_scalar_vectorized>;
 
 #if deal_II_dimension > 1
     template struct internal::MatrixFreeFunctions::MappingInfoStorage<
       deal_II_dimension - 1,
       deal_II_dimension,
-      deal_II_scalar_vectorized::value_type,
       deal_II_scalar_vectorized>;
 #endif
 

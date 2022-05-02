@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,8 @@ check_parallelepiped(std::ostream &logfile)
 
   Point<dim> origin;
 
-  Triangulation<dim>        triangulation;
+  Triangulation<dim> triangulation(Triangulation<dim>::MeshSmoothing::none,
+                                   /*check_for_distorted_cells*/ true);
   std::vector<unsigned int> subdivisions;
 
   try

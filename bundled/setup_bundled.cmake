@@ -30,6 +30,18 @@ OPTION(DEAL_II_FORCE_BUNDLED_BOOST
 
 SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.70.0")
 
+#
+# Taskflow
+#
+
+SET(FEATURE_TASKFLOW_HAVE_BUNDLED TRUE)
+
+OPTION(DEAL_II_FORCE_BUNDLED_TASKFLOW
+  "Always use the bundled taskflow header library instead of an external one."
+  OFF)
+
+SET(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/taskflow-2.5.0")
+
 
 #
 # Threading Building Blocks library
@@ -40,9 +52,9 @@ IF( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
   #
   # Cygwin is unsupported by tbb, Windows due to the way we compile tbb...
   #
-  SET(FEATURE_THREADS_HAVE_BUNDLED TRUE)
+  SET(FEATURE_TBB_HAVE_BUNDLED TRUE)
 
-  OPTION(DEAL_II_FORCE_BUNDLED_THREADS
+  OPTION(DEAL_II_FORCE_BUNDLED_TBB
     "Always use the bundled tbb library instead of an external one."
     OFF)
 
@@ -71,4 +83,4 @@ OPTION(DEAL_II_FORCE_BUNDLED_MUPARSER
   "Always use the bundled functionparser library instead of an external one."
   OFF)
 
-SET(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_2_4/")
+SET(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_3_3/")

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,8 +45,7 @@ constexpr std::array<int, GeometryInfo<dim>::faces_per_cell>
   GeometryInfo<dim>::unit_normal_orientation;
 
 template <int dim>
-constexpr std::array<std::array<unsigned int, dim>,
-                     GeometryInfo<dim>::vertices_per_cell>
+constexpr ndarray<unsigned int, GeometryInfo<dim>::vertices_per_cell, dim>
   GeometryInfo<dim>::vertex_to_face;
 
 template <int dim>
@@ -58,8 +57,8 @@ constexpr std::array<Tensor<1, dim>, GeometryInfo<dim>::faces_per_cell>
   GeometryInfo<dim>::unit_normal_vector;
 
 template <int dim>
-constexpr std::array<std::array<Tensor<1, dim>, dim - 1>,
-                     GeometryInfo<dim>::faces_per_cell>
+constexpr ndarray<Tensor<1, dim>, GeometryInfo<dim>::faces_per_cell, dim - 1>
+
   GeometryInfo<dim>::unit_tangential_vectors;
 
 template <int dim>
@@ -87,7 +86,7 @@ template struct GeometryInfo<4>;
 
 template void
 GeometryInfo<1>::alternating_form_at_vertices
-#ifndef DEAL_II_CONSTEXPR_BUG
+#ifndef DEAL_II_CXX14_CONSTEXPR_BUG
   (const Point<1> (&)[vertices_per_cell],
    Tensor<1 - 1, 1> (&)[vertices_per_cell])
 #else
@@ -97,7 +96,7 @@ GeometryInfo<1>::alternating_form_at_vertices
 
 template void
 GeometryInfo<1>::alternating_form_at_vertices
-#ifndef DEAL_II_CONSTEXPR_BUG
+#ifndef DEAL_II_CXX14_CONSTEXPR_BUG
   (const Point<2> (&)[vertices_per_cell],
    Tensor<2 - 1, 2> (&)[vertices_per_cell])
 #else
@@ -107,7 +106,7 @@ GeometryInfo<1>::alternating_form_at_vertices
 
 template void
 GeometryInfo<2>::alternating_form_at_vertices
-#ifndef DEAL_II_CONSTEXPR_BUG
+#ifndef DEAL_II_CXX14_CONSTEXPR_BUG
   (const Point<2> (&vertices)[vertices_per_cell],
    Tensor<2 - 2, 2> (&forms)[vertices_per_cell])
 #else
@@ -117,7 +116,7 @@ GeometryInfo<2>::alternating_form_at_vertices
 
 template void
 GeometryInfo<2>::alternating_form_at_vertices
-#ifndef DEAL_II_CONSTEXPR_BUG
+#ifndef DEAL_II_CXX14_CONSTEXPR_BUG
   (const Point<3> (&vertices)[vertices_per_cell],
    Tensor<3 - 2, 3> (&forms)[vertices_per_cell])
 #else
@@ -128,7 +127,7 @@ GeometryInfo<2>::alternating_form_at_vertices
 
 template void
 GeometryInfo<3>::alternating_form_at_vertices
-#ifndef DEAL_II_CONSTEXPR_BUG
+#ifndef DEAL_II_CXX14_CONSTEXPR_BUG
   (const Point<3> (&vertices)[vertices_per_cell],
    Tensor<3 - 3, 3> (&forms)[vertices_per_cell])
 #else

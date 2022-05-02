@@ -100,7 +100,7 @@ TestMap1<dim>::vector_value(const Point<dim> &p,
          ExcDimensionMismatch(return_value.size(), this->n_components));
 
   // Parabolic inflow profile
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -154,7 +154,7 @@ TestDef1<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -205,7 +205,7 @@ TestDef2<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -257,7 +257,7 @@ TestDef3<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -267,9 +267,10 @@ TestDef3<dim>::vector_value(const Point<dim> &p,
  * Integrate the function value over the element.
  */
 
-double EvaluateArea(Mapping<2> &    mapping,
-                    DoFHandler<2> * dof_handler,
-                    Vector<double> &solution)
+double
+EvaluateArea(Mapping<2> &    mapping,
+             DoFHandler<2> * dof_handler,
+             Vector<double> &solution)
 {
   // Use a high order quadrature.
   QGauss<2>   quad(6);

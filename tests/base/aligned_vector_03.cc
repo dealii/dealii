@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,11 +24,11 @@
 void
 test()
 {
-  typedef AlignedVector<bool> VEC;
-  VEC                         a(4);
+  using VEC = AlignedVector<bool>;
+  VEC a(4);
   deallog << "Constructor: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   a[2] = true;
@@ -41,25 +41,25 @@ test()
 
   deallog << "Insertion: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   a.resize(4);
   deallog << "Shrinking: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   a.reserve(100);
   deallog << "Reserve: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   a = b;
   deallog << "Assignment: ";
   for (unsigned int i = 0; i < a.size(); ++i)
-    deallog << a[i] << " ";
+    deallog << a[i] << ' ';
   deallog << std::endl;
 
   // check setting elements for large vectors

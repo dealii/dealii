@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -184,7 +184,12 @@ namespace polytest
     SimplePolynomial<dim> boundary_function;
 
     VectorTools::project_boundary_values_curl_conforming_l2(
-      dof_handler, 0, boundary_function, 0, constraints);
+      dof_handler,
+      0,
+      boundary_function,
+      0,
+      constraints,
+      StaticMappingQ1<dim>::mapping);
     constraints.close();
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler,
@@ -250,7 +255,7 @@ namespace polytest
 
         right_hand_side.rhs_value_list(fe_values.get_quadrature_points(),
                                        rhs_value_list);
-        for (unsigned int q = 0; q < n_q_points; ++q)
+        for (const auto q : fe_values.quadrature_point_indices())
           {
             Tensor<1, dim> rhs_value;
             for (unsigned int d = 0; d < dim; ++d)

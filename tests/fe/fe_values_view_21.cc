@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -109,7 +109,7 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
   std::vector<unsigned int> block_component(n_stress_components +
                                               n_gamma_components,
                                             1);
-  for (unsigned int ii = 0; ii < n_stress_components; ii++)
+  for (unsigned int ii = 0; ii < n_stress_components; ++ii)
     block_component[ii] = 0;
 
   DoFRenumbering::component_wise(dof_handler);
@@ -125,7 +125,7 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
           << std::endl
           << "Total number of cells: " << triangulation.n_cells() << std::endl
           << "Number of degrees of freedom: " << dof_handler.n_dofs() << " = ("
-          << n_stress_dof << " + " << n_gamma_dof << ")" << std::endl;
+          << n_stress_dof << " + " << n_gamma_dof << ')' << std::endl;
 
   // following step-22 use of simple
   // compressed block sparsity

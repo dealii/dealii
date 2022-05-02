@@ -1,4 +1,4 @@
-FIND_PACKAGE(deal.II 9.2.0 REQUIRED
+FIND_PACKAGE(deal.II 9.4.0 REQUIRED
   HINTS
     ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
     # You can specify additional hints for search paths here, e.g.
@@ -35,7 +35,7 @@ SET(TARGET_RUN
   # a custom command line, e.g. mpirun -np 2 ${TARGET}
   )
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET} CXX)
 DEAL_II_INVOKE_AUTOPILOT()

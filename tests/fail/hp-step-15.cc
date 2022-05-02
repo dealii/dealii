@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -118,8 +118,8 @@ private:
   refine_grid();
 
   static double
-  energy(const hp::DoFHandler<dim> &dof_handler,
-         const Vector<double> &     function);
+  energy(const DoFHandler<dim> &dof_handler, const Vector<double> &function);
+
 
 
   const unsigned int run_number;
@@ -127,7 +127,7 @@ private:
   Triangulation<dim> triangulation;
 
   hp::FECollection<dim> fe;
-  hp::DoFHandler<dim>   dof_handler;
+  DoFHandler<dim>       dof_handler;
 
   AffineConstraints<double> hanging_node_constraints;
 
@@ -157,7 +157,7 @@ MinimizationProblem<1>::initialize_solution()
                            InitializationValues(),
                            present_solution);
 
-  hp::DoFHandler<1>::cell_iterator cell;
+  DoFHandler<1>::cell_iterator cell;
   cell = dof_handler.begin(0);
   while (cell->at_boundary(0) == false)
     cell = cell->neighbor(0);
@@ -219,9 +219,9 @@ MinimizationProblem<dim>::assemble_step()
   std::vector<double>         local_solution_values(n_q_points);
   std::vector<Tensor<1, dim>> local_solution_grads(n_q_points);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       cell_matrix = 0;
@@ -377,7 +377,7 @@ template <int dim>
 void
 MinimizationProblem<dim>::output_results() const
 {
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(present_solution, "solution");
   data_out.build_patches();
@@ -398,7 +398,7 @@ MinimizationProblem<1>::refine_grid()
 
   Vector<float> error_indicators(triangulation.n_active_cells());
 
-  QTrapez<dim>         q;
+  QTrapezoid<dim>      q;
   hp::QCollection<dim> quadrature(q);
   hp::FEValues<dim>    fe_values(fe,
                               quadrature,
@@ -412,8 +412,8 @@ MinimizationProblem<1>::refine_grid()
   std::vector<Tensor<1, dim>> local_gradients(quadrature[0].size());
   std::vector<Tensor<2, dim>> local_2nd_derivs(quadrature[0].size());
 
-  hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-                                            endc = dof_handler.end();
+  DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                        endc = dof_handler.end();
   for (unsigned int cell_index = 0; cell != endc; ++cell, ++cell_index)
     {
       fe_values.reinit(cell);
@@ -459,7 +459,7 @@ MinimizationProblem<1>::refine_grid()
 
       if (cell->at_boundary(0) == false)
         {
-          hp::DoFHandler<dim>::cell_iterator left_neighbor = cell->neighbor(0);
+          DoFHandler<dim>::cell_iterator left_neighbor = cell->neighbor(0);
           while (left_neighbor->has_children())
             left_neighbor = left_neighbor->child(1);
 
@@ -478,7 +478,7 @@ MinimizationProblem<1>::refine_grid()
 
       if (cell->at_boundary(1) == false)
         {
-          hp::DoFHandler<dim>::cell_iterator right_neighbor = cell->neighbor(1);
+          DoFHandler<dim>::cell_iterator right_neighbor = cell->neighbor(1);
           while (right_neighbor->has_children())
             right_neighbor = right_neighbor->child(0);
 
@@ -523,8 +523,8 @@ MinimizationProblem<1>::refine_grid()
 
 template <int dim>
 double
-MinimizationProblem<dim>::energy(const hp::DoFHandler<dim> &dof_handler,
-                                 const Vector<double> &     function)
+MinimizationProblem<dim>::energy(const DoFHandler<dim> &dof_handler,
+                                 const Vector<double> & function)
 {
   hp::QCollection<dim> quadrature_formula(QGauss<dim>(4));
   hp::FEValues<dim>    fe_values(dof_handler.get_fe(),
@@ -539,9 +539,9 @@ MinimizationProblem<dim>::energy(const hp::DoFHandler<dim> &dof_handler,
 
   double energy = 0.;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       fe_values.reinit(cell);
@@ -611,7 +611,7 @@ main()
       for (unsigned int realization = 0; realization < n_realizations;
            ++realization)
         {
-          deallog << "Realization " << realization << ":" << std::endl;
+          deallog << "Realization " << realization << ':' << std::endl;
 
           MinimizationProblem<1> minimization_problem_1d(realization);
           minimization_problem_1d.run();

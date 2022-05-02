@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -23,6 +23,7 @@ SET(_unity_include_src
   manifold.cc
   manifold_lib.cc
   persistent_tria.cc
+  reference_cell.cc
   tria_accessor.cc
   tria_description.cc
   tria_faces.cc
@@ -35,8 +36,8 @@ SET(_separate_src
   grid_in.cc
   grid_out.cc
   grid_generator.cc
+  grid_generator_pipe_junction.cc
   grid_tools.cc
-  grid_tools_2.cc
   grid_tools_cache.cc
   grid_tools_nontemplates.cc
   grid_tools_dof_handlers.cc
@@ -56,6 +57,7 @@ SET(_inst
   cell_id.inst.in
   grid_generator.inst.in
   grid_generator_from_name.inst.in
+  grid_generator_pipe_junction.inst.in
   grid_in.inst.in
   grid_out.inst.in
   grid_refinement.inst.in
@@ -65,6 +67,7 @@ SET(_inst
   intergrid_map.inst.in
   manifold.inst.in
   manifold_lib.inst.in
+  reference_cell.inst.in
   tria_accessor.inst.in
   tria_description.inst.in
   tria.inst.in

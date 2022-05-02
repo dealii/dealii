@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,7 @@ main()
   //      arbitrary point
   double evalutation_number = 12.123;
 
-  for (unsigned int pp = 0; pp < p_dim; pp++)
+  for (unsigned int pp = 0; pp < p_dim; ++pp)
     {
       coefficients_a.push_back(pp);
 

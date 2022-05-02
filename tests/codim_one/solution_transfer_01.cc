@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,14 +69,14 @@ main()
   solution = 1.0;
 
   deallog << "Old values:" << std::endl;
-  for (unsigned int i = 0; i < solution.size(); i++)
+  for (unsigned int i = 0; i < solution.size(); ++i)
     deallog << solution(i) << std::endl;
 
 
   // Do some refinement
   boundary_mesh.begin_active()->set_refine_flag();
 
-  SolutionTransfer<dim, Vector<double>, DoFHandler<dim, spacedim>> soltrans(dh);
+  SolutionTransfer<dim, Vector<double>, spacedim> soltrans(dh);
 
   boundary_mesh.prepare_coarsening_and_refinement();
 
@@ -92,7 +92,7 @@ main()
   soltrans.interpolate(solution, tmp);
 
   deallog << "New values:" << std::endl;
-  for (unsigned int i = 0; i < tmp.size(); i++)
+  for (unsigned int i = 0; i < tmp.size(); ++i)
     deallog << tmp(i) << std::endl;
 
   return 0;

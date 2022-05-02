@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -35,12 +34,8 @@
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
+#include <memory>
 #include <sstream>
-
-// TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
-// adjust_line_dof_index_for_line_orientation_table fields, and write tests
-// similar to bits/face_orientation_and_fe_q_*
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -67,6 +62,10 @@ namespace internal
 } // namespace internal
 
 
+// TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+// adjust_line_dof_index_for_line_orientation_table fields, and write tests
+// similar to bits/face_orientation_and_fe_q_*
+
 template <int dim>
 FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
   : FE_PolyTensor<dim>(
@@ -85,7 +84,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
 
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
-  const unsigned int n_dofs = this->dofs_per_cell;
+  const unsigned int n_dofs = this->n_dofs_per_cell();
 
   this->mapping_kind = {mapping_nedelec};
   // First, initialize the
@@ -108,8 +107,14 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
 #endif
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
 
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
-    face_embeddings[i].reinit(this->dofs_per_face, this->dofs_per_face);
+    face_embeddings[i].reinit(this->n_dofs_per_face(face_no),
+                              this->n_dofs_per_face(face_no));
 
   FETools::compute_face_embedding_matrices<dim, double>(
     *this,
@@ -128,31 +133,32 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
 
       case 2:
         {
-          this->interface_constraints.reinit(2 * this->dofs_per_face,
-                                             this->dofs_per_face);
+          this->interface_constraints.reinit(2 * this->n_dofs_per_face(face_no),
+                                             this->n_dofs_per_face(face_no));
 
           for (unsigned int i = 0; i < GeometryInfo<2>::max_children_per_face;
                ++i)
-            for (unsigned int j = 0; j < this->dofs_per_face; ++j)
-              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
-                this->interface_constraints(i * this->dofs_per_face + j, k) =
-                  face_embeddings[i](j, k);
+            for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
+                this->interface_constraints(i * this->n_dofs_per_face(face_no) +
+                                              j,
+                                            k) = face_embeddings[i](j, k);
 
           break;
         }
 
       case 3:
         {
-          this->interface_constraints.reinit(4 * (this->dofs_per_face -
-                                                  this->degree),
-                                             this->dofs_per_face);
+          this->interface_constraints.reinit(
+            4 * (this->n_dofs_per_face(face_no) - this->degree),
+            this->n_dofs_per_face(face_no));
 
           unsigned int target_row = 0;
 
           for (unsigned int i = 0; i < 2; ++i)
             for (unsigned int j = this->degree; j < 2 * this->degree;
                  ++j, ++target_row)
-              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
                 this->interface_constraints(target_row, k) =
                   face_embeddings[2 * i](j, k);
 
@@ -160,7 +166,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
             for (unsigned int j = 3 * this->degree;
                  j < GeometryInfo<3>::lines_per_face * this->degree;
                  ++j, ++target_row)
-              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
                 this->interface_constraints(target_row, k) =
                   face_embeddings[i](j, k);
 
@@ -169,7 +175,8 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
               for (unsigned int k = i * this->degree;
                    k < (i + 1) * this->degree;
                    ++k, ++target_row)
-                for (unsigned int l = 0; l < this->dofs_per_face; ++l)
+                for (unsigned int l = 0; l < this->n_dofs_per_face(face_no);
+                     ++l)
                   this->interface_constraints(target_row, l) =
                     face_embeddings[i + 2 * j](k, l);
 
@@ -178,7 +185,8 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
               for (unsigned int k = (i + 2) * this->degree;
                    k < (i + 3) * this->degree;
                    ++k, ++target_row)
-                for (unsigned int l = 0; l < this->dofs_per_face; ++l)
+                for (unsigned int l = 0; l < this->n_dofs_per_face(face_no);
+                     ++l)
                   this->interface_constraints(target_row, l) =
                     face_embeddings[2 * i + j](k, l);
 
@@ -186,9 +194,9 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
                ++i)
             for (unsigned int j =
                    GeometryInfo<3>::lines_per_face * this->degree;
-                 j < this->dofs_per_face;
+                 j < this->n_dofs_per_face(face_no);
                  ++j, ++target_row)
-              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+              for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
                 this->interface_constraints(target_row, k) =
                   face_embeddings[i](j, k);
 
@@ -198,8 +206,24 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
       default:
         Assert(false, ExcNotImplemented());
     }
+
+  // We need to initialize the dof permutation table and the one for the sign
+  // change.
+  initialize_quad_dof_index_permutation_and_sign_change();
 }
 
+
+template <int dim>
+void
+FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+{
+  // for 1D and 2D, do nothing
+  if (dim < 3)
+    return;
+
+  // TODO: Implement this for this class
+  return;
+}
 
 
 template <int dim>
@@ -224,7 +248,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_Nedelec<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Nedelec<dim>>(*this);
+  return std::make_unique<FE_Nedelec<dim>>(*this);
 }
 
 //---------------------------------------------------------------------------
@@ -254,6 +278,11 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
 {
   const int dim = 2;
 
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   // Create polynomial basis.
   const std::vector<Polynomials::Polynomial<double>> &lobatto_polynomials =
     Polynomials::Lobatto::generate_complete_basis(order + 1);
@@ -270,13 +299,14 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
   const unsigned int    n_boundary_points =
     GeometryInfo<dim>::lines_per_cell * n_edge_points;
   const Quadrature<dim> edge_quadrature =
-    QProjector<dim>::project_to_all_faces(reference_edge_quadrature);
+    QProjector<dim>::project_to_all_faces(this->reference_cell(),
+                                          reference_edge_quadrature);
 
-  this->generalized_face_support_points.resize(n_edge_points);
+  this->generalized_face_support_points[face_no].resize(n_edge_points);
 
   // Create face support points.
   for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
-    this->generalized_face_support_points[q_point] =
+    this->generalized_face_support_points[face_no][q_point] =
       reference_edge_quadrature.point(q_point);
 
   if (order > 0)
@@ -296,15 +326,20 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
           for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_cell;
                ++line)
             this->generalized_support_points[line * n_edge_points + q_point] =
-              edge_quadrature.point(QProjector<dim>::DataSetDescriptor::face(
-                                      line, true, false, false, n_edge_points) +
-                                    q_point);
+              edge_quadrature.point(
+                QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
+                                                         line,
+                                                         true,
+                                                         false,
+                                                         false,
+                                                         n_edge_points) +
+                q_point);
 
           for (unsigned int i = 0; i < order; ++i)
             boundary_weights(q_point, i) =
               reference_edge_quadrature.weight(q_point) *
               lobatto_polynomials_grad[i + 1].value(
-                this->generalized_face_support_points[q_point](0));
+                this->generalized_face_support_points[face_no][q_point](0));
         }
 
       for (unsigned int q_point = 0; q_point < n_interior_points; ++q_point)
@@ -322,9 +357,14 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
            ++line)
         for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
           this->generalized_support_points[line * n_edge_points + q_point] =
-            edge_quadrature.point(QProjector<dim>::DataSetDescriptor::face(
-                                    line, true, false, false, n_edge_points) +
-                                  q_point);
+            edge_quadrature.point(
+              QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
+                                                       line,
+                                                       true,
+                                                       false,
+                                                       false,
+                                                       n_edge_points) +
+              q_point);
     }
 }
 
@@ -335,6 +375,11 @@ void
 FE_Nedelec<3>::initialize_support_points(const unsigned int order)
 {
   const int dim = 3;
+
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
 
   // Create polynomial basis.
   const std::vector<Polynomials::Polynomial<double>> &lobatto_polynomials =
@@ -350,7 +395,8 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
   const QGauss<1>            reference_edge_quadrature(order + 1);
   const unsigned int         n_edge_points = reference_edge_quadrature.size();
   const Quadrature<dim - 1> &edge_quadrature =
-    QProjector<dim - 1>::project_to_all_faces(reference_edge_quadrature);
+    QProjector<dim - 1>::project_to_all_faces(
+      ReferenceCells::get_hypercube<dim - 1>(), reference_edge_quadrature);
 
   if (order > 0)
     {
@@ -367,8 +413,8 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
 
       boundary_weights.reinit(n_edge_points + n_face_points,
                               2 * (order + 1) * order);
-      this->generalized_face_support_points.resize(4 * n_edge_points +
-                                                   n_face_points);
+      this->generalized_face_support_points[face_no].resize(4 * n_edge_points +
+                                                            n_face_points);
       this->generalized_support_points.resize(n_boundary_points +
                                               n_interior_points);
 
@@ -378,11 +424,17 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
           for (unsigned int line = 0;
                line < GeometryInfo<dim - 1>::lines_per_cell;
                ++line)
-            this->generalized_face_support_points[line * n_edge_points +
-                                                  q_point] =
+            this
+              ->generalized_face_support_points[face_no][line * n_edge_points +
+                                                         q_point] =
               edge_quadrature.point(
                 QProjector<dim - 1>::DataSetDescriptor::face(
-                  line, true, false, false, n_edge_points) +
+                  ReferenceCells::get_hypercube<dim - 1>(),
+                  line,
+                  true,
+                  false,
+                  false,
+                  n_edge_points) +
                 q_point);
 
           for (unsigned int i = 0; i < 2; ++i)
@@ -403,13 +455,14 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
             boundary_weights(q_point, i) =
               reference_edge_quadrature.weight(q_point) *
               lobatto_polynomials_grad[i + 1].value(
-                this->generalized_face_support_points[q_point](1));
+                this->generalized_face_support_points[face_no][q_point](1));
         }
 
       // Create support points on faces.
       for (unsigned int q_point = 0; q_point < n_face_points; ++q_point)
         {
-          this->generalized_face_support_points[q_point + 4 * n_edge_points] =
+          this->generalized_face_support_points[face_no]
+                                               [q_point + 4 * n_edge_points] =
             reference_face_quadrature.point(q_point);
 
           for (unsigned int i = 0; i <= order; ++i)
@@ -418,29 +471,26 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
                 boundary_weights(q_point + n_edge_points, 2 * (i * order + j)) =
                   reference_face_quadrature.weight(q_point) *
                   lobatto_polynomials_grad[i].value(
-                    this->generalized_face_support_points[q_point +
-                                                          4 * n_edge_points](
-                      0)) *
+                    this->generalized_face_support_points
+                      [face_no][q_point + 4 * n_edge_points](0)) *
                   lobatto_polynomials[j + 2].value(
-                    this->generalized_face_support_points[q_point +
-                                                          4 * n_edge_points](
-                      1));
+                    this->generalized_face_support_points
+                      [face_no][q_point + 4 * n_edge_points](1));
                 boundary_weights(q_point + n_edge_points,
                                  2 * (i * order + j) + 1) =
                   reference_face_quadrature.weight(q_point) *
                   lobatto_polynomials_grad[i].value(
-                    this->generalized_face_support_points[q_point +
-                                                          4 * n_edge_points](
-                      1)) *
+                    this->generalized_face_support_points
+                      [face_no][q_point + 4 * n_edge_points](1)) *
                   lobatto_polynomials[j + 2].value(
-                    this->generalized_face_support_points[q_point +
-                                                          4 * n_edge_points](
-                      0));
+                    this->generalized_face_support_points
+                      [face_no][q_point + 4 * n_edge_points](0));
               }
         }
 
       const Quadrature<dim> &face_quadrature =
-        QProjector<dim>::project_to_all_faces(reference_face_quadrature);
+        QProjector<dim>::project_to_all_faces(this->reference_cell(),
+                                              reference_face_quadrature);
 
       for (const unsigned int face : GeometryInfo<dim>::face_indices())
         for (unsigned int q_point = 0; q_point < n_face_points; ++q_point)
@@ -448,9 +498,14 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
             this->generalized_support_points[face * n_face_points + q_point +
                                              GeometryInfo<dim>::lines_per_cell *
                                                n_edge_points] =
-              face_quadrature.point(QProjector<dim>::DataSetDescriptor::face(
-                                      face, true, false, false, n_face_points) +
-                                    q_point);
+              face_quadrature.point(
+                QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
+                                                         face,
+                                                         true,
+                                                         false,
+                                                         false,
+                                                         n_face_points) +
+                q_point);
           }
 
       // Create support points in the interior.
@@ -461,7 +516,7 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
 
   else
     {
-      this->generalized_face_support_points.resize(4 * n_edge_points);
+      this->generalized_face_support_points[face_no].resize(4 * n_edge_points);
       this->generalized_support_points.resize(
         GeometryInfo<dim>::lines_per_cell * n_edge_points);
 
@@ -470,11 +525,17 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
           for (unsigned int line = 0;
                line < GeometryInfo<dim - 1>::lines_per_cell;
                ++line)
-            this->generalized_face_support_points[line * n_edge_points +
-                                                  q_point] =
+            this
+              ->generalized_face_support_points[face_no][line * n_edge_points +
+                                                         q_point] =
               edge_quadrature.point(
                 QProjector<dim - 1>::DataSetDescriptor::face(
-                  line, true, false, false, n_edge_points) +
+                  ReferenceCells::get_hypercube<dim - 1>(),
+                  line,
+                  true,
+                  false,
+                  false,
+                  n_edge_points) +
                 q_point);
 
           for (unsigned int i = 0; i < 2; ++i)
@@ -534,7 +595,7 @@ FE_Nedelec<dim>::initialize_restriction()
           // functions of the child cells
           // to the lowest order shape
           // functions of the parent cell.
-          for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+          for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
                  ++q_point)
               {
@@ -626,7 +687,7 @@ FE_Nedelec<dim>::initialize_restriction()
               FullMatrix<double> system_rhs(this->degree - 1, 4);
               Vector<double>     tmp(4);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
                 for (unsigned int i = 0; i < 2; ++i)
                   {
                     system_rhs = 0.0;
@@ -801,7 +862,7 @@ FE_Nedelec<dim>::initialize_restriction()
               system_rhs.reinit(system_matrix_inv.m(), 8);
               tmp.reinit(8);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
                 {
                   system_rhs = 0.0;
 
@@ -963,7 +1024,7 @@ FE_Nedelec<dim>::initialize_restriction()
           // functions of the child cells
           // to the lowest order shape
           // functions of the parent cell.
-          for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+          for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
                  ++q_point)
               {
@@ -1068,7 +1129,8 @@ FE_Nedelec<dim>::initialize_restriction()
 
               for (unsigned int i = 0; i < 2; ++i)
                 for (unsigned int j = 0; j < 2; ++j)
-                  for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+                  for (unsigned int dof = 0; dof < this->n_dofs_per_cell();
+                       ++dof)
                     {
                       system_rhs = 0.0;
 
@@ -1300,7 +1362,7 @@ FE_Nedelec<dim>::initialize_restriction()
               tmp.reinit(24);
 
               for (unsigned int i = 0; i < 2; ++i)
-                for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+                for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
                   {
                     system_rhs = 0.0;
 
@@ -1641,7 +1703,7 @@ FE_Nedelec<dim>::initialize_restriction()
               system_rhs.reinit(system_matrix_inv.m(), 24);
               tmp.reinit(24);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_cell; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_cell(); ++dof)
                 {
                   system_rhs = 0.0;
 
@@ -1998,20 +2060,21 @@ template <int dim>
 std::vector<unsigned int>
 FE_Nedelec<dim>::get_dpo_vector(const unsigned int degree, bool dg)
 {
-  std::vector<unsigned int> dpo(dim + 1);
+  std::vector<unsigned int> dpo;
 
   if (dg)
     {
+      dpo.resize(dim + 1);
       dpo[dim] = PolynomialsNedelec<dim>::n_polynomials(degree);
     }
   else
     {
-      dpo[0] = 0;
-      dpo[1] = degree + 1;
-      dpo[2] = 2 * degree * (degree + 1);
-
-      if (dim == 3)
-        dpo[3] = 3 * degree * degree * (degree + 1);
+      dpo.push_back(0);
+      dpo.push_back(degree + 1);
+      if (dim > 1)
+        dpo.push_back(2 * degree * (degree + 1));
+      if (dim > 2)
+        dpo.push_back(3 * degree * degree * (degree + 1));
     }
 
   return dpo;
@@ -2035,7 +2098,7 @@ bool
 FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
                                      const unsigned int face_index) const
 {
-  AssertIndexRange(shape_index, this->dofs_per_cell);
+  AssertIndexRange(shape_index, this->n_dofs_per_cell());
   AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
 
   const unsigned int deg = this->degree - 1;
@@ -2365,8 +2428,8 @@ FE_Nedelec<dim>::hp_line_dof_identities(
 
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int>>
-FE_Nedelec<dim>::hp_quad_dof_identities(
-  const FiniteElement<dim> &fe_other) const
+FE_Nedelec<dim>::hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
+                                        const unsigned int) const
 {
   // we can presently only compute
   // these identities if both FEs are
@@ -2421,18 +2484,22 @@ template <int dim>
 void
 FE_Nedelec<dim>::get_face_interpolation_matrix(
   const FiniteElement<dim> &source,
-  FullMatrix<double> &      interpolation_matrix) const
+  FullMatrix<double> &      interpolation_matrix,
+  const unsigned int        face_no) const
 {
+  (void)face_no;
   // this is only implemented, if the
   // source FE is also a
   // Nedelec element
   AssertThrow((source.get_name().find("FE_Nedelec<") == 0) ||
                 (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
               (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
-  Assert(interpolation_matrix.m() == source.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(), source.dofs_per_face));
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
+  Assert(interpolation_matrix.m() == source.n_dofs_per_face(face_no),
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              source.n_dofs_per_face(face_no)));
+  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+         ExcDimensionMismatch(interpolation_matrix.n(),
+                              this->n_dofs_per_face(face_no)));
 
   // ok, source is a Nedelec element, so
   // we will be able to do the work
@@ -2448,9 +2515,9 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
   // satisfied. But the matrices
   // produced in that case might
   // lead to problems in the
-  // hp procedures, which use this
+  // hp-procedures, which use this
   // method.
-  Assert(this->dofs_per_face <= source_fe.dofs_per_face,
+  Assert(this->n_dofs_per_face(face_no) <= source_fe.n_dofs_per_face(face_no),
          (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
   interpolation_matrix = 0;
 
@@ -2496,7 +2563,8 @@ template <>
 void
 FE_Nedelec<1>::get_subface_interpolation_matrix(const FiniteElement<1, 1> &,
                                                 const unsigned int,
-                                                FullMatrix<double> &) const
+                                                FullMatrix<double> &,
+                                                const unsigned int) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -2524,7 +2592,8 @@ void
 FE_Nedelec<dim>::get_subface_interpolation_matrix(
   const FiniteElement<dim> &source,
   const unsigned int        subface,
-  FullMatrix<double> &      interpolation_matrix) const
+  FullMatrix<double> &      interpolation_matrix,
+  const unsigned int        face_no) const
 {
   // this is only implemented, if the
   // source FE is also a
@@ -2532,10 +2601,12 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   AssertThrow((source.get_name().find("FE_Nedelec<") == 0) ||
                 (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
               typename FiniteElement<dim>::ExcInterpolationNotImplemented());
-  Assert(interpolation_matrix.m() == source.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(), source.dofs_per_face));
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
+  Assert(interpolation_matrix.m() == source.n_dofs_per_face(face_no),
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              source.n_dofs_per_face(face_no)));
+  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+         ExcDimensionMismatch(interpolation_matrix.n(),
+                              this->n_dofs_per_face(face_no)));
 
   // ok, source is a Nedelec element, so
   // we will be able to do the work
@@ -2551,9 +2622,9 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   // satisfied. But the matrices
   // produced in that case might
   // lead to problems in the
-  // hp procedures, which use this
+  // hp-procedures, which use this
   // method.
-  Assert(this->dofs_per_face <= source_fe.dofs_per_face,
+  Assert(this->n_dofs_per_face(face_no) <= source_fe.n_dofs_per_face(face_no),
          (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
   interpolation_matrix = 0.0;
   // Perform projection-based interpolation
@@ -2567,7 +2638,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
     {
       case 2:
         {
-          for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+          for (unsigned int dof = 0; dof < this->n_dofs_per_face(face_no);
+               ++dof)
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
                  ++q_point)
               {
@@ -2615,7 +2687,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
               Vector<double> solution(source_fe.degree - 1);
               Vector<double> system_rhs(source_fe.degree - 1);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_face(face_no);
+                   ++dof)
                 {
                   system_rhs = 0.0;
 
@@ -2662,7 +2735,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                                        {0.0, 1.0},
                                        {1.0, 1.0}};
 
-          for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+          for (unsigned int dof = 0; dof < this->n_dofs_per_face(face_no);
+               ++dof)
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
                  ++q_point)
               {
@@ -2731,7 +2805,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                                             GeometryInfo<dim>::lines_per_face);
               Vector<double>     tmp(GeometryInfo<dim>::lines_per_face);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_face(face_no);
+                   ++dof)
                 {
                   system_rhs = 0.0;
 
@@ -2854,7 +2929,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
               system_rhs.reinit(system_matrix_inv.m(), 2);
               tmp.reinit(2);
 
-              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+              for (unsigned int dof = 0; dof < this->n_dofs_per_face(face_no);
+                   ++dof)
                 {
                   system_rhs = 0.0;
 
@@ -2970,7 +3046,7 @@ FE_Nedelec<dim>::get_prolongation_matrix(
 
       // if matrix got updated while waiting for the lock
       if (this->prolongation[refinement_case - 1][child].n() ==
-          this->dofs_per_cell)
+          this->n_dofs_per_cell())
         return this->prolongation[refinement_case - 1][child];
 
       // now do the work. need to get a non-const version of data in order to
@@ -3026,7 +3102,7 @@ FE_Nedelec<dim>::get_restriction_matrix(
 
       // if matrix got updated while waiting for the lock...
       if (this->restriction[refinement_case - 1][child].n() ==
-          this->dofs_per_cell)
+          this->n_dofs_per_cell())
         return this->restriction[refinement_case - 1][child];
 
       // now do the work. need to get a non-const version of data in order to
@@ -3074,6 +3150,11 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   const unsigned int deg = this->degree - 1;
   Assert(support_point_values.size() == this->generalized_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
@@ -3081,8 +3162,8 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
   Assert(support_point_values[0].size() == this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
   std::fill(nodal_values.begin(), nodal_values.end(), 0.0);
 
   switch (dim)
@@ -3091,7 +3172,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
         {
           // Let us begin with the
           // interpolation part.
-          const QGauss<dim - 1> reference_edge_quadrature(this->degree);
+          const QGauss<1>    reference_edge_quadrature(this->degree);
           const unsigned int n_edge_points = reference_edge_quadrature.size();
 
           for (unsigned int i = 0; i < 2; ++i)
@@ -3111,17 +3192,17 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                   nodal_values[(i + 2 * j) * this->degree] = 0.0;
               }
 
-          // If the degree is greater
-          // than 0, then we have still
-          // some higher order edge
-          // shape functions to
-          // consider.
-          // Here the projection part
-          // starts. The dof support_point_values
-          // are obtained by solving
+          // If the Nedelec element degree is greater
+          // than 0 (i.e., the polynomial degree is greater than 1),
+          // then we have still some higher order edge
+          // shape functions to consider.
+          // Note that this->degree returns the polynomial
+          // degree.
+          // Here the projection part starts.
+          // The dof support_point_values are obtained by solving
           // a linear system of
           // equations.
-          if (this->degree - 1 > 1)
+          if (this->degree > 1)
             {
               // We start with projection
               // on the higher order edge
@@ -3148,7 +3229,8 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                     system_matrix(i, j) +=
                       boundary_weights(q_point, j) *
                       lobatto_polynomials_grad[i + 1].value(
-                        this->generalized_face_support_points[q_point](0));
+                        this->generalized_face_support_points[face_no][q_point](
+                          0));
 
               FullMatrix<double> system_matrix_inv(this->degree - 1,
                                                    this->degree - 1);
@@ -3156,7 +3238,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
               system_matrix_inv.invert(system_matrix);
 
               const unsigned int
-                             line_coordinate[GeometryInfo<2>::lines_per_cell] = {1, 1, 0, 0};
+                line_coordinate[GeometryInfo<2>::lines_per_cell] = {1, 1, 0, 0};
               Vector<double> system_rhs(system_matrix.m());
               Vector<double> solution(system_rhs.size());
 
@@ -3427,7 +3509,8 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                     system_matrix(i, j) +=
                       boundary_weights(q_point, j) *
                       lobatto_polynomials_grad[i + 1].value(
-                        this->generalized_face_support_points[q_point](1));
+                        this->generalized_face_support_points[face_no][q_point](
+                          1));
 
               FullMatrix<double> system_matrix_inv(this->degree - 1,
                                                    this->degree - 1);
@@ -3506,10 +3589,10 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                                            2 * (k * (this->degree - 1) + l)) *
                           legendre_polynomials[i].value(
                             this->generalized_face_support_points
-                              [q_point + 4 * n_edge_points](0)) *
+                              [face_no][q_point + 4 * n_edge_points](0)) *
                           lobatto_polynomials[j + 2].value(
                             this->generalized_face_support_points
-                              [q_point + 4 * n_edge_points](1));
+                              [face_no][q_point + 4 * n_edge_points](1));
 
               system_matrix_inv.reinit(system_matrix.m(), system_matrix.m());
               system_matrix_inv.invert(system_matrix);
@@ -4018,9 +4101,9 @@ template <int dim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_Nedelec<dim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(dim, this->dofs_per_cell);
+  Table<2, bool> constant_modes(dim, this->n_dofs_per_cell());
   for (unsigned int d = 0; d < dim; ++d)
-    for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+    for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
       constant_modes(d, i) = true;
   std::vector<unsigned int> components;
   for (unsigned int d = 0; d < dim; ++d)

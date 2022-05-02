@@ -1,0 +1,64 @@
+
+DEAL::n_dofs = 32 n_dofs(0)= 8 n_dofs(1)= 32
+DEAL::** interface between cell 0 and 1 on level 0: **
+cell 0: 0 1 2 3 
+cell 1: 4 5 6 7 
+at_boundary(): 0
+n_current_interface_dofs(): 8
+interface_dof_indices: 0 1 2 3 4 5 6 7 
+  index 0 global_dof_index:0:
+    dof indices: 0 | -1
+  index 1 global_dof_index:1:
+    dof indices: 1 | -1
+  index 2 global_dof_index:2:
+    dof indices: 2 | -1
+  index 3 global_dof_index:3:
+    dof indices: 3 | -1
+  index 4 global_dof_index:4:
+    dof indices: -1 | 0
+  index 5 global_dof_index:5:
+    dof indices: -1 | 1
+  index 6 global_dof_index:6:
+    dof indices: -1 | 2
+  index 7 global_dof_index:7:
+    dof indices: -1 | 3
+
+
+DEAL::** interface on level 1: **
+cell 0: 0 1 2 3 
+cell 1: 4 5 6 7 
+at_boundary(): 0
+n_current_interface_dofs(): 8
+interface_dof_indices: 0 1 2 3 4 5 6 7 
+  index 0 global_dof_index:0:
+    dof indices: 0 | -1
+  index 1 global_dof_index:1:
+    dof indices: 1 | -1
+  index 2 global_dof_index:2:
+    dof indices: 2 | -1
+  index 3 global_dof_index:3:
+    dof indices: 3 | -1
+  index 4 global_dof_index:4:
+    dof indices: -1 | 0
+  index 5 global_dof_index:5:
+    dof indices: -1 | 1
+  index 6 global_dof_index:6:
+    dof indices: -1 | 2
+  index 7 global_dof_index:7:
+    dof indices: -1 | 3
+
+
+DEAL::** boundary interface on cell 1 **
+at_boundary(): 1
+n_current_interface_dofs(): 4
+interface_dof_indices: 4 5 6 7 
+  index 0 global_dof_index:4:
+    dof indices: 0 | -1
+  index 1 global_dof_index:5:
+    dof indices: 1 | -1
+  index 2 global_dof_index:6:
+    dof indices: 2 | -1
+  index 3 global_dof_index:7:
+    dof indices: 3 | -1
+
+

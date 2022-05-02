@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -127,7 +127,7 @@ check_fe(FiniteElement<dim> &fe)
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
   dofh.distribute_mg_dofs();
-  typedef TrilinosWrappers::MPI::Vector vector_t;
+  using vector_t = TrilinosWrappers::MPI::Vector;
   {}
   MGTransferPrebuilt<vector_t> transfer;
   transfer.build(dofh);
@@ -157,7 +157,7 @@ check_fe(FiniteElement<dim> &fe)
     for (unsigned int i = 0; i < dofh.locally_owned_dofs().n_elements(); ++i)
       {
         unsigned int index = dofh.locally_owned_dofs().nth_index_in_set(i);
-        deallog << v[index] << " ";
+        deallog << v[index] << ' ';
       }
   }
   // v.print(deallog.get_file_stream());

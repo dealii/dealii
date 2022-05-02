@@ -1,0 +1,4 @@
+
+DEAL::   Number of active cells:       200
+DEAL::   Number of degrees of freedom: 242 (by partition: 74+58+58+52)
+DEAL::Solver stopped within 26 - 30 iterations

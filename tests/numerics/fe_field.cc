@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,12 +22,13 @@
 
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/vector.h>
@@ -50,7 +51,7 @@ check()
   for (unsigned int i = 1; i <= triangulation.n_active_cells(); ++i)
     fe_collection.push_back(FE_Q<dim>(i));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   dof_handler.distribute_dofs(fe_collection);
 
@@ -59,9 +60,8 @@ check()
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
     vector(i) = i;
 
-  Functions::FEFieldFunction<dim, hp::DoFHandler<dim>> fe_field(dof_handler,
-                                                                vector);
-  QGauss<dim>                                          quadrature(5);
+  Functions::FEFieldFunction<dim> fe_field(dof_handler, vector);
+  QGauss<dim>                     quadrature(5);
 
   deallog << "values:" << std::endl;
 

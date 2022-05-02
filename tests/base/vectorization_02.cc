@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,11 +24,11 @@
 void
 test()
 {
-  typedef VectorizedArray<double> vector_t;
-  const unsigned int              n_vectors = VectorizedArray<double>::size();
-  typedef AlignedVector<vector_t> VEC;
-  std::vector<double>             a_ref(4), b_ref;
-  VEC                             a(4);
+  using vector_t               = VectorizedArray<double>;
+  const unsigned int n_vectors = VectorizedArray<double>::size();
+  using VEC                    = AlignedVector<vector_t>;
+  std::vector<double> a_ref(4), b_ref;
+  VEC                 a(4);
   deallog << "Constructor: ";
   for (unsigned int i = 0; i < a.size(); ++i)
     for (unsigned int d = 0; d < n_vectors; ++d)

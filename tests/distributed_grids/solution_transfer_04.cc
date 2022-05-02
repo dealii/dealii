@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,8 +95,8 @@ test(std::ostream & /*out*/)
 
   deallog << "#dofs:" << dofh.n_dofs() << std::endl;
 
-  deallog << "norm: " << interpolated_solution1.l2_norm() << " "
-          << interpolated_solution2.l2_norm() << " "
+  deallog << "norm: " << interpolated_solution1.l2_norm() << ' '
+          << interpolated_solution2.l2_norm() << ' '
           << interpolated_solution.l2_norm() << std::endl;
 }
 

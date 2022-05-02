@@ -1,0 +1,246 @@
+<br>
+
+<i>
+This program was contributed by Wolfgang Bangerth, Colorado State University.
+
+This material is based upon work partially supported by National Science
+Foundation grants OAC-1835673, DMS-1821210, and EAR-1925595;
+and by the Computational Infrastructure in
+Geodynamics initiative (CIG), through the National Science Foundation under
+Award No. EAR-1550901 and The University of California-Davis.
+</i>
+<br>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+The step-15 program solved the following, nonlinear equation
+describing the minimal surface problem:
+@f{align*}{
+    -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right) &= 0 \qquad
+    \qquad &&\textrm{in} ~ \Omega
+    \\
+    u&=g \qquad\qquad &&\textrm{on} ~ \partial \Omega.
+@f}
+step-15 uses a Newton method, and
+Newton's method works by repeatedly solving a *linearized* problem for
+an update $\delta u_k$ -- called the "search direction" --, computing a
+"step length"
+$\alpha_k$, and then combining them to compute the new
+guess for the solution via
+@f{align*}{
+    u_{k+1} = u_k + \alpha_k \, \delta u_k.
+@f}
+
+In the course of the discussions in step-15, we found that it is
+awkward to compute the step length, and so just settled for simple
+choice: Always choose $\alpha_k=0.1$. This is of course not efficient:
+We know that we can only realize Newton's quadratic convergence rate
+if we eventually are able to choose $\alpha_k=1$, though we may have
+to choose it smaller for the first few iterations where we are still
+too far away to use this long a step length.
+
+Among the goals of this program is therefore to address this
+shortcoming. Since line search algorithms are not entirely trivial to
+implement, one does as one should do anyway: Import complicated
+functionality from an external library. To this end, we will make use
+of the interfaces deal.II has to one of the big nonlinear solver
+packages, namely the
+[KINSOL](https://computing.llnl.gov/projects/sundials/kinsol)
+sub-package of the
+[SUNDIALS](https://computing.llnl.gov/projects/sundials)
+suite. %SUNDIALS is, at its heart, a package meant to solve complex
+ordinary differential equations (ODEs) and differential-algebraic
+equations (DAEs), and the deal.II interfaces allow for this via the
+classes in the SUNDIALS namespace: Notably the SUNDIALS::ARKode and
+SUNDIALS::IDA classes. But, because that is an important step in the
+solution of ODEs and DAEs with implicit methods, %SUNDIALS also has a
+solver for nonlinear problems called KINSOL, and deal.II has an
+interface to it in the form of the SUNDIALS::KINSOL class. This is
+what we will use for the solution of our problem.
+
+But %SUNDIALS isn't just a convenient way for us to avoid writing a
+line search algorithm. In general, the solution of nonlinear problems
+is quite expensive, and one typically wants to save as much compute
+time as possible. One way one can achieve this is as follows: The
+algorithm in step-15 discretizes the problem and then in every
+iteration solves a linear system of the form
+@f{align*}{
+  J_k \, \delta U_k = -F_k
+@f}
+where $F_k$ is the residual vector computed using the current vector
+of nodal values $U_k$, $J_k$ is its derivative (called the
+"Jacobian"), and $\delta U_k$ is the update vector that corresponds to
+the function $\delta u_k$ mentioned above. The construction of
+$J_k,F_k$ has been thoroughly discussed in step-15, as has the way to
+solve the linear system in each Newton iteration. So let us focus on
+another aspect of the nonlinear solution procedure: Computing $F_k$ is
+expensive, and assembling the matrix $J_k$ even more so. Do we
+actually need to do that in every iteration? It turns out that in many
+applications, this is not actually necessary: These methods often converge
+even if we replace $J_k$ by an approximation $\tilde J_k$ and solve
+@f{align*}{
+  \tilde J_k \, \widetilde{\delta U}_k = -F_k
+@f}
+instead, then update
+@f{align*}{
+    U_{k+1} = U_k + \alpha_k \, \widetilde{\delta U}_k.
+@f}
+This may require an iteration or two more because our update
+$\widetilde{\delta U}_k$ is not quite as good as $\delta U_k$, but it
+may still be a win because we don't have to assemble $J_k$ quite as
+often.
+
+What kind of approximation $\tilde J_k$ would we like for $J_k$? Theory
+says that as $U_k$ converges to the exact solution $U^\ast$, we need to
+ensure that $\tilde J_k$ needs to converge to $J^\ast = \nabla F(U^\ast)$.
+In particular, since $J_k\rightarrow J^\ast$, a valid choice is
+$\tilde J_k = J_k$. But so is choosing $\tilde J_k = J_k$ every, say,
+fifth iteration $k=0,5,10,\ldots$ and for the other iterations, we choose
+$\tilde J_k$ equal to the last computed $J_{k'}$. This is what we will do
+here: we will just re-use $\tilde J_{k-1}$ from the
+previous iteration, which may again be what we had used in the
+iteration before that, $\tilde J_{k-2}$.
+
+This scheme becomes even more interesting if, for the solution of the
+linear system with $J_k$, we don't just have to assemble a matrix, but
+also compute a good preconditioner. For example, if we were to use a
+sparse LU decomposition via the SparseDirectUMFPACK class, or used a
+geometric or algebraic multigrid. In those cases, we would also not
+have to update the preconditioner, whose computation may have taken
+about as long or longer than the assembly of the matrix in the first
+place. Indeed, with this mindset, we should probably think about using
+the *best* preconditioner we can think of, even though their
+construction is typically quite expensive: We will hope to amortize
+the cost of computing this preconditioner by applying it to more than
+one just one linear solve.
+
+The big question is, of course: By what criterion do we decide whether
+we can get away with the approximation $\tilde J_k$ based on a
+previously computed Jacobian matrix $J_{k-s}$ that goes back $s$
+steps, or whether we need to -- at least in this iteration -- actually
+re-compute the Jacobian $J_k$ and the corresponding preconditioner?
+This is, like the issue with line search, one that requires a
+non-trivial amount of code that monitors the convergence of the
+overall algorithm. We *could* implement these sorts of things
+ourselves, but we probably *shouldn't*: KINSOL already does that for
+us. It will tell our code when to "update" the Jacobian matrix.
+
+One last consideration if we were to use an iterative solver instead of
+the sparse direct one mentioned above: Not only is it possible to get
+away with replacing $J_k$ by some approximation $\tilde J_k$ when
+solving for the update $\delta U_k$, but one can also ask whether it
+is necessary to solve the linear system
+@f{align*}{
+  \tilde J_k \widetilde{\delta U}_k = -F_k
+@f}
+to high accuracy. The thinking goes like this: While our current solution
+$U_k$ is still far away from $U^\ast$, why would we solve this linear
+system particularly accurately? The update
+$U_{k+1}=U_k + \widetilde{\delta U}_k$ is likely still going to be far away
+from the exact solution, so why spend much time on solving the linear system
+to great accuracy? This is the kind of thinking that underlies algorithms
+such as the "Eisenstat-Walker trick" @cite eiwa96 in which one is given
+a tolerance to which the linear system above in iteration $k$ has to be
+solved, with this tolerance dependent on the progress in the overall
+nonlinear solver. As before, one could try to implement this oneself,
+but KINSOL already provides this kind of information for us -- though we
+will not use it in this program since we use a direct solver that requires
+no solver tolerance and just solves the linear system exactly up to
+round-off.
+
+As a summary of all of these considerations, we could say the
+following: There is no need to reinvent the wheel. Just like deal.II
+provides a vast amount of finite-element functionality, %SUNDIALS'
+KINSOL package provides a vast amount of nonlinear solver
+functionality, and we better use it.
+
+
+<h3> How deal.II interfaces with KINSOL </h3>
+
+KINSOL, like many similar packages, works in a pretty abstract way. At
+its core, it sees a nonlinear problem of the form
+@f{align*}{
+    F(U) = 0
+@f}
+and constructs a sequence of iterates $U_k$ which, in general, are
+vectors of the same length as the vector returned by the function
+$F$. To do this, there are a few things it needs from the user:
+- A way to resize a given vector to the correct size.
+- A way to evaluate, for a given vector $U$, the function $F(U)$. This
+  function is generally called the "residual" operation because the
+  goal is of course to find a point $U^\ast$ for which $F(U^\ast)=0$;
+  if $F(U)$ returns a nonzero vector, then this is the
+  <a href="https://en.wikipedia.org/wiki/Residual_(numerical_analysis)">"residual"</a>
+  (i.e., the "rest", or whatever is "left over"). The function
+  that will do this is in essence the same as the computation of
+  the right hand side vector in step-15, but with an important difference:
+  There, the right hand side denoted the *negative* of the residual,
+  so we have to switch a sign.
+- A way to compute the matrix $J_k$ if that is necessary in the
+  current iteration, along with possibly a preconditioner or other
+  data structures (e.g., a sparse decomposition via
+  SparseDirectUMFPACK if that's what we choose to use to solve a
+  linear system). This operation will generally be called the
+  "setup" operation.
+- A way to solve a linear system $\tilde J_k x = b$ with whatever
+  matrix $\tilde J_k$ was last computed. This operation will generally
+  be called the "solve" operation.
+
+All of these operations need to be provided to KINSOL by
+[std::function](https://en.cppreference.com/w/cpp/utility/functional/function)
+objects that take the appropriate set of arguments and that generally
+return an integer that indicates success (a zero return value) or
+failure (a nonzero return value). Specifically, the objects we will
+access are the
+SUNDIALS::KINSOL::reinit_vector,
+SUNDIALS::KINSOL::residual,
+SUNDIALS::KINSOL::setup_jacobian, and
+SUNDIALS::KINSOL::solve_jacobian_system
+member variables. (See the documentation of these variables for their
+details.) In our implementation, we will use
+[lambda functions](https://en.cppreference.com/w/cpp/language/lambda)
+to implement these "callbacks" that in turn can call member functions;
+KINSOL will then call these callbacks whenever its internal algorithms
+think it is useful.
+
+
+<h3> Details of the implementation </h3>
+
+The majority of the code of this tutorial program is as in step-15,
+and we will not comment on it in much detail. There is really just one
+aspect one has to pay some attention to, namely how to compute $F(U)$
+given a vector $U$ on the one hand, and $J(U)$ given a vector $U$
+separately. At first, this seems trivial: We just take the
+`assemble_system()` function and in the one case throw out all code
+that deals with the matrix and in the other case with the right hand
+side vector. There: Problem solved.
+
+But it isn't quite as simple. That's because the two are not
+independent if we have nonzero Dirichlet boundary values, as we do
+here. The linear system we want to solve contains both interior and
+boundary degrees of freedom, and when eliminating those degrees of
+freedom from those that are truly "free", using for example
+AffineConstraints::distribute_local_to_global(), we need to know the
+matrix when assembling the right hand side vector.
+
+Of course, this completely contravenes the original intent: To *not*
+assemble the matrix if we can get away without it. We solve this
+problem as follows:
+- We set the starting guess for the solution vector, $U_0$, to one
+  where boundary degrees of freedom already have their correct values.
+- This implies that all updates can have zero updates for these
+  degrees of freedom, and we can build both residual vectors $F(U_k)$
+  and Jacobian matrices $J_k$ that corresponds to linear systems whose
+  solutions are zero in these vector components. For this special
+  case, the assembly of matrix and right hand side vectors is
+  independent, and can be broken into separate functions.
+
+There is an assumption here that whenever KINSOL asks for a linear
+solver with the (approximation of the) Jacobian, that this will be for
+for an update $\delta U$ (which has zero boundary values), a multiple
+of which will be added to the solution (which already has the right
+boundary values).  This may not be true and if so, we might have to
+rethink our approach. That said, it turns out that in practice this is
+exactly what KINSOL does when using a Newton method, and so our
+approach is successful.

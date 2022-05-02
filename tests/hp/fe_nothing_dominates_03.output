@@ -1,0 +1,49 @@
+
+DEAL:1d::(FE_Nothing(true)xFE_Q, FE_QxFE_Nothing(false))
+DEAL:1d::constraints:
+DEAL:1d::dof values:
+DEAL:1d:: cell 0: 1 1
+DEAL:1d:: cell 1: 1 1
+DEAL:1d::OK
+DEAL:1d::(FE_QxFE_Nothing(false), FE_Nothing(true)xFE_Q)
+DEAL:1d::constraints:
+DEAL:1d::dof values:
+DEAL:1d:: cell 0: 1 1
+DEAL:1d:: cell 1: 1 1
+DEAL:1d::OK
+DEAL:2d::(FE_Nothing(true)xFE_Q, FE_QxFE_Nothing(false))
+DEAL:2d::constraints:
+    4 = 0
+    6 = 0
+DEAL:2d::dof values:
+DEAL:2d:: cell 0: 1 1 1 1
+DEAL:2d:: cell 1: 0 1.5 0 1.5
+DEAL:2d::OK
+DEAL:2d::(FE_QxFE_Nothing(false), FE_Nothing(true)xFE_Q)
+DEAL:2d::constraints:
+    1 = 0
+    3 = 0
+DEAL:2d::dof values:
+DEAL:2d:: cell 0: 1.5 0 1.5 0
+DEAL:2d:: cell 1: 1 1 1 1
+DEAL:2d::OK
+DEAL:3d::(FE_Nothing(true)xFE_Q, FE_QxFE_Nothing(false))
+DEAL:3d::constraints:
+    8 = 0
+    10 = 0
+    12 = 0
+    14 = 0
+DEAL:3d::dof values:
+DEAL:3d:: cell 0: 1 1 1 1 1 1 1 1
+DEAL:3d:: cell 1: 0 1.5 0 1.5 0 1.5 0 1.5
+DEAL:3d::OK
+DEAL:3d::(FE_QxFE_Nothing(false), FE_Nothing(true)xFE_Q)
+DEAL:3d::constraints:
+    1 = 0
+    3 = 0
+    5 = 0
+    7 = 0
+DEAL:3d::dof values:
+DEAL:3d:: cell 0: 1.5 0 1.5 0 1.5 0 1.5 0
+DEAL:3d:: cell 1: 1 1 1 1 1 1 1 1
+DEAL:3d::OK

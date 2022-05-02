@@ -1,0 +1,39 @@
+
+DEAL:0:2d/2d::Particle id : 0 location : 0.475000 0.475000 property : 10.0000 and 100.000 is local on process : 0
+DEAL:0:2d/2d::Particle id : 1 location : 0.525000 0.525000 property : 11.0000 and 101.000 is ghost on process : 0
+DEAL:0:2d/2d::Modifying particles positions and properties
+DEAL:0:2d/2d::Particle id : 0 location : 0.575000 0.475000 property : 20.0000 and 200.000 is local on process : 0
+DEAL:0:2d/2d::Particle id : 1 location : 0.625000 0.525000 property : 21.0000 and 201.000 is ghost on process : 0
+DEAL:0:2d/2d::OK
+DEAL:0:2d/3d::Particle id : 0 location : 0.475000 0.475000 0.00000 property : 10.0000 and 100.000 is local on process : 0
+DEAL:0:2d/3d::Particle id : 1 location : 0.525000 0.525000 0.00000 property : 11.0000 and 101.000 is ghost on process : 0
+DEAL:0:2d/3d::Modifying particles positions and properties
+DEAL:0:2d/3d::Particle id : 0 location : 0.575000 0.475000 0.00000 property : 20.0000 and 200.000 is local on process : 0
+DEAL:0:2d/3d::Particle id : 1 location : 0.625000 0.525000 0.00000 property : 21.0000 and 201.000 is ghost on process : 0
+DEAL:0:2d/3d::OK
+DEAL:0:3d/3d::Particle id : 0 location : 0.475000 0.475000 0.475000 property : 10.0000 and 100.000 is local on process : 0
+DEAL:0:3d/3d::Particle id : 1 location : 0.525000 0.525000 0.525000 property : 11.0000 and 101.000 is ghost on process : 0
+DEAL:0:3d/3d::Modifying particles positions and properties
+DEAL:0:3d/3d::Particle id : 0 location : 0.575000 0.475000 0.475000 property : 20.0000 and 200.000 is local on process : 0
+DEAL:0:3d/3d::Particle id : 1 location : 0.625000 0.525000 0.525000 property : 21.0000 and 201.000 is ghost on process : 0
+DEAL:0:3d/3d::OK
+
+DEAL:1:2d/2d::Particle id : 1 location : 0.525000 0.525000 property : 11.0000 and 101.000 is local on process : 1
+DEAL:1:2d/2d::Particle id : 0 location : 0.475000 0.475000 property : 10.0000 and 100.000 is ghost on process : 1
+DEAL:1:2d/2d::Modifying particles positions and properties
+DEAL:1:2d/2d::Particle id : 1 location : 0.625000 0.525000 property : 21.0000 and 201.000 is local on process : 1
+DEAL:1:2d/2d::Particle id : 0 location : 0.575000 0.475000 property : 20.0000 and 200.000 is ghost on process : 1
+DEAL:1:2d/2d::OK
+DEAL:1:2d/3d::Particle id : 1 location : 0.525000 0.525000 0.00000 property : 11.0000 and 101.000 is local on process : 1
+DEAL:1:2d/3d::Particle id : 0 location : 0.475000 0.475000 0.00000 property : 10.0000 and 100.000 is ghost on process : 1
+DEAL:1:2d/3d::Modifying particles positions and properties
+DEAL:1:2d/3d::Particle id : 1 location : 0.625000 0.525000 0.00000 property : 21.0000 and 201.000 is local on process : 1
+DEAL:1:2d/3d::Particle id : 0 location : 0.575000 0.475000 0.00000 property : 20.0000 and 200.000 is ghost on process : 1
+DEAL:1:2d/3d::OK
+DEAL:1:3d/3d::Particle id : 1 location : 0.525000 0.525000 0.525000 property : 11.0000 and 101.000 is local on process : 1
+DEAL:1:3d/3d::Particle id : 0 location : 0.475000 0.475000 0.475000 property : 10.0000 and 100.000 is ghost on process : 1
+DEAL:1:3d/3d::Modifying particles positions and properties
+DEAL:1:3d/3d::Particle id : 1 location : 0.625000 0.525000 0.525000 property : 21.0000 and 201.000 is local on process : 1
+DEAL:1:3d/3d::Particle id : 0 location : 0.575000 0.475000 0.475000 property : 20.0000 and 200.000 is ghost on process : 1
+DEAL:1:3d/3d::OK
+

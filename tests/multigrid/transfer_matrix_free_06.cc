@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,7 +43,7 @@ check(const unsigned int fe_degree)
   deallog << "FE: " << fe.get_name() << std::endl;
 
   // run a few different sizes...
-  unsigned int sizes[] = {1, 3};
+  unsigned int sizes[] = {1, 2};
   for (unsigned int cycle = 0; cycle < sizeof(sizes) / sizeof(unsigned int);
        ++cycle)
     {
@@ -56,7 +56,7 @@ check(const unsigned int fe_degree)
             n_subdiv /= 2;
           }
       n_refinements += 6 - 2 * dim;
-      if (fe_degree < 3)
+      if (fe_degree == 1)
         n_refinements += 1;
 
       parallel::distributed::Triangulation<dim> tr(
@@ -98,11 +98,9 @@ check(const unsigned int fe_degree)
       mgdof.distribute_dofs(fe);
       mgdof.distribute_mg_dofs();
 
-      MGConstrainedDoFs                                   mg_constrained_dofs;
-      Functions::ZeroFunction<dim>                        zero_function;
-      std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-      dirichlet_boundary[0] = &zero_function;
-      mg_constrained_dofs.initialize(mgdof, dirichlet_boundary);
+      MGConstrainedDoFs mg_constrained_dofs;
+      mg_constrained_dofs.initialize(mgdof);
+      mg_constrained_dofs.make_zero_boundary_constraints(mgdof, {0});
 
       // build reference
       MGTransferPrebuilt<LinearAlgebra::distributed::Vector<double>>

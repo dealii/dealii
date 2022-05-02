@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,7 +85,7 @@ namespace internal
  * Bicgstab algorithm by van der Vorst.
  *
  * For the requirements on matrices and vectors in order to work with this
- * class, see the documentation of the Solver base class.
+ * class, see the documentation of the SolverBase base class.
  *
  * Like all other solver classes, this class has a local structure called @p
  * AdditionalData which is used to pass additional parameters to the solver,
@@ -95,10 +95,11 @@ namespace internal
  * classes much easier and guarantees that these will continue to work even if
  * number or type of the additional parameters for a certain solver changes.
  *
- * The Bicgstab-method has two additional parameters: the first is a boolean,
+ * The Bicgstab method has two additional parameters found in the
+ * SolverBicgstab::AdditionalData struct: the first, @p exact_residual is a boolean,
  * deciding whether to compute the actual residual in each step (@p true) or
  * to use the length of the computed orthogonal residual (@p false). Note that
- * computing the residual causes a third matrix-vector-multiplication, though
+ * computing the residual causes a third matrix-vector multiplication, though
  * no additional preconditioning, in each step. The reason for doing this is,
  * that the size of the orthogonalized residual computed during the iteration
  * may be larger by orders of magnitude than the true residual. This is due to
@@ -108,7 +109,7 @@ namespace internal
  * works reasonably as well, the flag should be set to @p false in order to
  * increase the performance of the solver.
  *
- * The second parameter is the size of a breakdown criterion. It is difficult
+ * The second parameter @p breakdown is the size of a breakdown criterion. It is difficult
  * to find a general good criterion, so if things do not work for you, try to
  * change this value.
  *
@@ -118,7 +119,6 @@ namespace internal
  * The solve() function of this class uses the mechanism described in the
  * Solver base class to determine convergence. This mechanism can also be used
  * to observe the progress of the iteration.
- *
  */
 template <typename VectorType = Vector<double>>
 class SolverBicgstab : public SolverBase<VectorType>,
@@ -141,10 +141,13 @@ public:
      * Constructor.
      *
      * The default is to perform an exact residual computation and breakdown
-     * parameter 1e-10.
+     * parameter is the minimum finite value representable by the value_type of
+     * VectorType.
      */
-    explicit AdditionalData(const bool   exact_residual = true,
-                            const double breakdown      = 1.e-10)
+    explicit AdditionalData(
+      const bool   exact_residual = true,
+      const double breakdown =
+        std::numeric_limits<typename VectorType::value_type>::min())
       : exact_residual(exact_residual)
       , breakdown(breakdown)
     {}
@@ -189,7 +192,7 @@ public:
 
 protected:
   /**
-   * Auxiliary vector.
+   * A pointer to the solution vector passed to solve().
    */
   VectorType *Vx;
 
@@ -229,7 +232,7 @@ protected:
   typename VectorMemory<VectorType>::Pointer Vv;
 
   /**
-   * Right hand side vector.
+   * A pointer to the right hand side vector passed to solve().
    */
   const VectorType *Vb;
 
@@ -257,13 +260,6 @@ protected:
   AdditionalData additional_data;
 
 private:
-  /**
-   * Everything before the iteration loop.
-   */
-  template <typename MatrixType>
-  SolverControl::State
-  start(const MatrixType &A);
-
   /**
    * A structure returned by the iterate() function representing what it found
    * is happening during the iteration.
@@ -350,20 +346,6 @@ SolverBicgstab<VectorType>::criterion(const MatrixType &A,
 
 
 template <typename VectorType>
-template <typename MatrixType>
-SolverControl::State
-SolverBicgstab<VectorType>::start(const MatrixType &A)
-{
-  A.vmult(*Vr, *Vx);
-  Vr->sadd(-1., 1., *Vb);
-  res = Vr->l2_norm();
-
-  return this->iteration_status(step, res, *Vx);
-}
-
-
-
-template <typename VectorType>
 void
 SolverBicgstab<VectorType>::print_vectors(const unsigned int,
                                           const VectorType &,
@@ -379,9 +361,14 @@ typename SolverBicgstab<VectorType>::IterationResult
 SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
                                     const PreconditionerType &preconditioner)
 {
-  // TODO:[GK] Implement "use the length of the computed orthogonal residual" in
-  // the BiCGStab method.
-  SolverControl::State state = SolverControl::iterate;
+  A.vmult(*Vr, *Vx);
+  Vr->sadd(-1., 1., *Vb);
+  res = Vr->l2_norm();
+
+  SolverControl::State state = this->iteration_status(step, res, *Vx);
+  if (state == SolverControl::State::success)
+    return IterationResult(false, state, step, res);
+
   alpha = omega = rho = 1.;
 
   VectorType &r    = *Vr;
@@ -400,8 +387,12 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
       ++step;
 
       rhobar = r * rbar;
-      beta   = rhobar * alpha / (rho * omega);
-      rho    = rhobar;
+      if (std::fabs(rhobar) < additional_data.breakdown)
+        {
+          return IterationResult(true, state, step, res);
+        }
+      beta = rhobar * alpha / (rho * omega);
+      rho  = rhobar;
       if (startup == true)
         {
           p       = r;
@@ -416,13 +407,12 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
       preconditioner.vmult(y, p);
       A.vmult(v, y);
       rhobar = rbar * v;
+      if (std::fabs(rhobar) < additional_data.breakdown)
+        {
+          return IterationResult(true, state, step, res);
+        }
 
       alpha = rho / rhobar;
-
-      // TODO:[?] Find better breakdown criterion
-
-      if (std::fabs(alpha) > 1.e10)
-        return IterationResult(true, state, step, res);
 
       res = std::sqrt(r.add_and_dot(-alpha, v, r));
 
@@ -441,8 +431,13 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
 
       preconditioner.vmult(z, r);
       A.vmult(t, z);
-      rhobar = t * r;
-      omega  = rhobar / (t * t);
+      rhobar         = t * r;
+      auto t_squared = t * t;
+      if (t_squared < additional_data.breakdown)
+        {
+          return IterationResult(true, state, step, res);
+        }
+      omega = rhobar / (t * t);
       Vx->add(alpha, y, omega, z);
 
       if (additional_data.exact_residual)
@@ -457,8 +452,10 @@ SolverBicgstab<VectorType>::iterate(const MatrixType &        A,
       print_vectors(step, *Vx, r, y);
     }
   while (state == SolverControl::iterate);
+
   return IterationResult(false, state, step, res);
 }
+
 
 
 template <typename VectorType>
@@ -470,6 +467,8 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
                                   const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("Bicgstab");
+
+  // Allocate temporary memory.
   Vr    = typename VectorMemory<VectorType>::Pointer(this->memory);
   Vrbar = typename VectorMemory<VectorType>::Pointer(this->memory);
   Vp    = typename VectorMemory<VectorType>::Pointer(this->memory);
@@ -492,27 +491,27 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
   step = 0;
 
   IterationResult state(false, SolverControl::failure, 0, 0);
-
-  // iterate while the inner iteration returns a breakdown
   do
     {
-      if (step != 0)
-        deallog << "Restart step " << step << std::endl;
-      if (start(A) == SolverControl::success)
-        {
-          state.state = SolverControl::success;
-          break;
-        }
       state = iterate(A, preconditioner);
-      ++step;
     }
-  while (state.breakdown == true);
+  while (state.state == SolverControl::iterate);
 
-  // in case of failure: throw exception
+
+  // Release the temporary memory again.
+  Vr.reset();
+  Vrbar.reset();
+  Vp.reset();
+  Vy.reset();
+  Vz.reset();
+  Vt.reset();
+  Vv.reset();
+
+  // In case of failure: throw exception
   AssertThrow(state.state == SolverControl::success,
               SolverControl::NoConvergence(state.last_step,
                                            state.last_residual));
-  // otherwise exit as normal
+  // Otherwise exit as normal
 }
 
 #endif // DOXYGEN

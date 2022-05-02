@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -23,7 +23,6 @@
  * We test that the computed vectors are eigenvectors and mass-orthonormal, i.e.
  * a) (A*x_i-\lambda*B*x_i).L2() == 0
  * b) x_j*B*x_i = \delta_{i,j}
- *
  */
 
 #include <deal.II/base/function.h>
@@ -199,7 +198,7 @@ namespace Step36
 
 
     double min_spurious_eigenvalue = std::numeric_limits<double>::max(),
-           max_spurious_eigenvalue = -std::numeric_limits<double>::max();
+           max_spurious_eigenvalue = std::numeric_limits<double>::lowest();
 
     for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
       if (constraints.is_constrained(i))
@@ -223,12 +222,15 @@ namespace Step36
     ArpackSolver::AdditionalData additional_data(
       num_arnoldi_vectors, ArpackSolver::largest_magnitude, true);
     ArpackSolver eigensolver(solver_control, additional_data);
-    eigensolver.solve(stiffness_matrix,
-                      mass_matrix,
-                      inverse,
-                      eigenvalues,
-                      eigenfunctions,
-                      eigenvalues.size());
+    check_solver_within_range(eigensolver.solve(stiffness_matrix,
+                                                mass_matrix,
+                                                inverse,
+                                                eigenvalues,
+                                                eigenfunctions,
+                                                eigenvalues.size()),
+                              solver_control.last_step(),
+                              2,
+                              10);
 
     // make sure that we have eigenvectors and they are mass-orthonormal:
     // a) (A*x_i-\lambda*B*x_i).L2() == 0
@@ -239,7 +241,7 @@ namespace Step36
         {
           mass_matrix.vmult(Bx, eigenfunctions[i]);
 
-          for (unsigned int j = 0; j < eigenfunctions.size(); j++)
+          for (unsigned int j = 0; j < eigenfunctions.size(); ++j)
             if (std::abs(eigenfunctions[j] * Bx - (i == j)) > 1e-8)
               deallog << "Eigenvectors " + Utilities::int_to_string(i) +
                            " and " + Utilities::int_to_string(j) +
@@ -313,8 +315,6 @@ namespace Step36
     assemble_system();
 
     const std::pair<unsigned int, double> res = solve();
-
-    deallog << res.first << " iterations used" << std::endl;
 
     std::sort(eigenvalues.begin(), eigenvalues.end(), my_compare);
 

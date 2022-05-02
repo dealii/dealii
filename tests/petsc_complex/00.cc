@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -122,7 +122,7 @@ make_petsc_complex()
   deallog << "OK" << std::endl;
 }
 
-// Initialize a PETSc complex number directly only, check he is
+// Initialize a PETSc complex number directly only, check that it is
 // initialised to 0+0i.
 void
 init_petsc_complex()

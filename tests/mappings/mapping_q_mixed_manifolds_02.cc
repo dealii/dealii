@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,7 +25,7 @@
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -56,7 +56,8 @@ const double Y_C = 0.2; // center
 const unsigned int MANIFOLD_ID = 1;
 
 
-void create_triangulation(Triangulation<2> &tria)
+void
+create_triangulation(Triangulation<2> &tria)
 {
   AssertThrow(std::abs((X_2 - X_1) - 2.0 * (X_C - X_1)) < 1.0e-12,
               ExcMessage("Geometry parameters X_1,X_2,X_C invalid!"));
@@ -165,7 +166,8 @@ void create_triangulation(Triangulation<2> &tria)
     }
 }
 
-void create_triangulation(Triangulation<3> &tria)
+void
+create_triangulation(Triangulation<3> &tria)
 {
   Triangulation<2> tria_2d;
   create_triangulation(tria_2d);
@@ -224,10 +226,10 @@ test()
   FE_Nothing<dim> fe;
   for (unsigned int degree = 1; degree < 7; ++degree)
     {
-      MappingQGeneric<dim> mapping(degree);
-      QGauss<dim>          quad(degree + 1);
-      FEValues<dim>        fe_values(mapping, fe, quad, update_JxW_values);
-      double               sum = 0.;
+      MappingQ<dim> mapping(degree);
+      QGauss<dim>   quad(degree + 1);
+      FEValues<dim> fe_values(mapping, fe, quad, update_JxW_values);
+      double        sum = 0.;
       for (typename Triangulation<dim>::active_cell_iterator cell =
              tria.begin_active();
            cell != tria.end();

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2019 by the deal.II authors
+ * Copyright (C) 2010 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -42,13 +42,10 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -188,8 +185,7 @@ namespace Step43
     void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
                                    std::vector<Tensor<2, dim>> &  values) const
     {
-      Assert(points.size() == values.size(),
-             ExcDimensionMismatch(points.size(), values.size()));
+      AssertDimension(points.size(), values.size());
 
       for (unsigned int p = 0; p < points.size(); ++p)
         {
@@ -430,7 +426,7 @@ namespace Step43
 
   // The definition of the class that defines the top-level logic of solving
   // the time-dependent advection-dominated two-phase flow problem (or
-  // Buckley-Leverett problem [Buckley 1942]) is mainly based on tutorial
+  // Buckley-Leverett problem @cite Buckley1942) is mainly based on tutorial
   // programs step-21 and step-33, and in particular on step-31 where we have
   // used basically the same general structure as done here. As in step-31,
   // the key routines to look for in the implementation below are the
@@ -558,8 +554,9 @@ namespace Step43
     const double porosity;
     const double AOS_threshold;
 
-    std::shared_ptr<TrilinosWrappers::PreconditionIC> Amg_preconditioner;
-    std::shared_ptr<TrilinosWrappers::PreconditionIC> Mp_preconditioner;
+    std::shared_ptr<TrilinosWrappers::PreconditionIC> top_left_preconditioner;
+    std::shared_ptr<TrilinosWrappers::PreconditionIC>
+      bottom_right_preconditioner;
 
     bool rebuild_saturation_matrix;
 
@@ -680,7 +677,7 @@ namespace Step43
     {
       darcy_preconditioner_constraints.clear();
 
-      FEValuesExtractors::Scalar pressure(dim);
+      const FEValuesExtractors::Scalar pressure(dim);
 
       DoFTools::make_hanging_node_constraints(darcy_dof_handler,
                                               darcy_preconditioner_constraints);
@@ -696,9 +693,9 @@ namespace Step43
     const std::vector<types::global_dof_index> darcy_dofs_per_block =
       DoFTools::count_dofs_per_fe_block(darcy_dof_handler,
                                         darcy_block_component);
-    const unsigned int n_u = darcy_dofs_per_block[0],
-                       n_p = darcy_dofs_per_block[1],
-                       n_s = saturation_dof_handler.n_dofs();
+    const types::global_dof_index n_u = darcy_dofs_per_block[0],
+                                  n_p = darcy_dofs_per_block[1],
+                                  n_s = saturation_dof_handler.n_dofs();
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << " (on " << triangulation.n_levels() << " levels)" << std::endl
@@ -709,17 +706,10 @@ namespace Step43
     {
       darcy_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(2, 2);
-
-      dsp.block(0, 0).reinit(n_u, n_u);
-      dsp.block(0, 1).reinit(n_u, n_p);
-      dsp.block(1, 0).reinit(n_p, n_u);
-      dsp.block(1, 1).reinit(n_p, n_p);
-
-      dsp.collect_sizes();
+      BlockDynamicSparsityPattern dsp(darcy_dofs_per_block,
+                                      darcy_dofs_per_block);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
-
       for (unsigned int c = 0; c < dim + 1; ++c)
         for (unsigned int d = 0; d < dim + 1; ++d)
           if (!((c == dim) && (d == dim)))
@@ -735,18 +725,12 @@ namespace Step43
     }
 
     {
-      Amg_preconditioner.reset();
-      Mp_preconditioner.reset();
+      top_left_preconditioner.reset();
+      bottom_right_preconditioner.reset();
       darcy_preconditioner_matrix.clear();
 
-      BlockDynamicSparsityPattern dsp(2, 2);
-
-      dsp.block(0, 0).reinit(n_u, n_u);
-      dsp.block(0, 1).reinit(n_u, n_p);
-      dsp.block(1, 0).reinit(n_p, n_u);
-      dsp.block(1, 1).reinit(n_p, n_p);
-
-      dsp.collect_sizes();
+      BlockDynamicSparsityPattern dsp(darcy_dofs_per_block,
+                                      darcy_dofs_per_block);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
       for (unsigned int c = 0; c < dim + 1; ++c)
@@ -777,23 +761,19 @@ namespace Step43
       saturation_matrix.reinit(dsp);
     }
 
-    std::vector<IndexSet> darcy_partitioning(2);
-    darcy_partitioning[0] = complete_index_set(n_u);
-    darcy_partitioning[1] = complete_index_set(n_p);
+    const std::vector<IndexSet> darcy_partitioning = {complete_index_set(n_u),
+                                                      complete_index_set(n_p)};
+
     darcy_solution.reinit(darcy_partitioning, MPI_COMM_WORLD);
-    darcy_solution.collect_sizes();
 
     last_computed_darcy_solution.reinit(darcy_partitioning, MPI_COMM_WORLD);
-    last_computed_darcy_solution.collect_sizes();
 
     second_last_computed_darcy_solution.reinit(darcy_partitioning,
                                                MPI_COMM_WORLD);
-    second_last_computed_darcy_solution.collect_sizes();
 
     darcy_rhs.reinit(darcy_partitioning, MPI_COMM_WORLD);
-    darcy_rhs.collect_sizes();
 
-    IndexSet saturation_partitioning = complete_index_set(n_s);
+    const IndexSet saturation_partitioning = complete_index_set(n_s);
     saturation_solution.reinit(saturation_partitioning, MPI_COMM_WORLD);
     old_saturation_solution.reinit(saturation_partitioning, MPI_COMM_WORLD);
     old_old_saturation_solution.reinit(saturation_partitioning, MPI_COMM_WORLD);
@@ -864,7 +844,7 @@ namespace Step43
                                        quadrature_formula,
                                        update_values);
 
-    const unsigned int dofs_per_cell = darcy_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = darcy_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     std::vector<Tensor<2, dim>> k_inverse_values(n_q_points);
@@ -951,11 +931,15 @@ namespace Step43
   {
     assemble_darcy_preconditioner();
 
-    Amg_preconditioner = std::make_shared<TrilinosWrappers::PreconditionIC>();
-    Amg_preconditioner->initialize(darcy_preconditioner_matrix.block(0, 0));
+    top_left_preconditioner =
+      std::make_shared<TrilinosWrappers::PreconditionIC>();
+    top_left_preconditioner->initialize(
+      darcy_preconditioner_matrix.block(0, 0));
 
-    Mp_preconditioner = std::make_shared<TrilinosWrappers::PreconditionIC>();
-    Mp_preconditioner->initialize(darcy_preconditioner_matrix.block(1, 1));
+    bottom_right_preconditioner =
+      std::make_shared<TrilinosWrappers::PreconditionIC>();
+    bottom_right_preconditioner->initialize(
+      darcy_preconditioner_matrix.block(1, 1));
   }
 
 
@@ -1008,7 +992,7 @@ namespace Step43
                                              update_quadrature_points |
                                              update_JxW_values);
 
-    const unsigned int dofs_per_cell = darcy_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = darcy_fe.n_dofs_per_cell();
 
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
@@ -1198,7 +1182,7 @@ namespace Step43
                                        quadrature_formula,
                                        update_values | update_JxW_values);
 
-    const unsigned int dofs_per_cell = saturation_fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = saturation_fe.n_dofs_per_cell();
 
     const unsigned int n_q_points = quadrature_formula.size();
 
@@ -1282,7 +1266,7 @@ namespace Step43
       saturation_fe, face_quadrature_formula, update_values);
 
     const unsigned int dofs_per_cell =
-      saturation_dof_handler.get_fe().dofs_per_cell;
+      saturation_dof_handler.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const double                    global_max_u_F_prime = get_max_u_F_prime();
@@ -1494,12 +1478,12 @@ namespace Step43
           const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
                                              TrilinosWrappers::PreconditionIC>
             mp_inverse(darcy_preconditioner_matrix.block(1, 1),
-                       *Mp_preconditioner);
+                       *bottom_right_preconditioner);
 
           const LinearSolvers::BlockSchurPreconditioner<
             TrilinosWrappers::PreconditionIC,
             TrilinosWrappers::PreconditionIC>
-            preconditioner(darcy_matrix, mp_inverse, *Amg_preconditioner);
+            preconditioner(darcy_matrix, mp_inverse, *top_left_preconditioner);
 
           SolverControl solver_control(darcy_matrix.m(),
                                        1e-16 * darcy_rhs.l2_norm());
@@ -1753,11 +1737,11 @@ namespace Step43
 
     {
       std::vector<types::global_dof_index> local_joint_dof_indices(
-        joint_fe.dofs_per_cell);
+        joint_fe.n_dofs_per_cell());
       std::vector<types::global_dof_index> local_darcy_dof_indices(
-        darcy_fe.dofs_per_cell);
+        darcy_fe.n_dofs_per_cell());
       std::vector<types::global_dof_index> local_saturation_dof_indices(
-        saturation_fe.dofs_per_cell);
+        saturation_fe.n_dofs_per_cell());
 
       auto       joint_cell      = joint_dof_handler.begin_active();
       const auto joint_endc      = joint_dof_handler.end();
@@ -1771,7 +1755,7 @@ namespace Step43
           darcy_cell->get_dof_indices(local_darcy_dof_indices);
           saturation_cell->get_dof_indices(local_saturation_dof_indices);
 
-          for (unsigned int i = 0; i < joint_fe.dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < joint_fe.n_dofs_per_cell(); ++i)
             if (joint_fe.system_to_base_index(i).first.first == 0)
               {
                 Assert(joint_fe.system_to_base_index(i).second <

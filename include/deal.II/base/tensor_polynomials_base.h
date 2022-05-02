@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,8 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 
+#include <memory>
+#include <string>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -55,8 +57,6 @@ DEAL_II_NAMESPACE_OPEN
  * </ul>
  *
  * @ingroup Polynomials
- * @author Graham Harper
- * @date 2019
  */
 template <int dim>
 class TensorPolynomialsBase

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -48,9 +47,9 @@
  * Call the version of make_flux_sparsity_pattern that takes both cell and face
  * integral couplings. Print the constructed sparsity pattern to deallog.
  */
-template <class DoFHandlerType>
+template <int dim>
 void
-create_and_print_flux_sparsity_pattern(const DoFHandlerType &dof_handler)
+create_and_print_flux_sparsity_pattern(const DoFHandler<dim> &dof_handler)
 {
   AffineConstraints<double> constraints;
   constraints.close();
@@ -85,7 +84,8 @@ create_and_print_flux_sparsity_pattern(const DoFHandlerType &dof_handler)
  * Create the 3-cells-triangulation (described at the top) by first creating 2
  * cells one the same level and then refining the right one.
  */
-void create_3_elements_on_2_different_levels(Triangulation<1> &triangulation)
+void
+create_3_elements_on_2_different_levels(Triangulation<1> &triangulation)
 {
   const unsigned int n_elements = 3;
   GridGenerator::subdivided_hyper_cube(triangulation, n_elements - 1);
@@ -120,7 +120,7 @@ main()
   deallog << "hp::DoFHandler" << std::endl;
   {
     hp::FECollection<dim> fe_collection(element);
-    hp::DoFHandler<dim>   dof_handler(triangulation);
+    DoFHandler<dim>       dof_handler(triangulation);
     dof_handler.distribute_dofs(fe_collection);
     create_and_print_flux_sparsity_pattern(dof_handler);
   }

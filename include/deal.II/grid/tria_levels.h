@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,7 @@
 
 #include <deal.II/base/point.h>
 
-#include <deal.II/grid/tria_object.h>
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_objects.h>
 
 #include <boost/serialization/utility.hpp>
@@ -51,13 +51,33 @@ namespace internal
      * Likewise, in 3d, we need boundary indicators for lines and quads (we
      * need to know how to refine a line if the two adjacent faces have
      * different boundary indicators), and material data for cells.
-     *
-     * @author Wolfgang Bangerth, Guido Kanschat, 1998, 2007
      */
-    template <int dim>
     class TriaLevel
     {
     public:
+      /**
+       * Constructor.
+       *
+       * @param dim Dimension of the Triangulation.
+       */
+      TriaLevel(const unsigned int dim)
+        : dim(dim)
+        , cells(dim)
+      {}
+
+      /**
+       * Default constructor (needed by Boost).
+       */
+      TriaLevel()
+        : dim(numbers::invalid_unsigned_int)
+        , cells(numbers::invalid_unsigned_int)
+      {}
+
+      /**
+       * Dimension of the Triangulation.
+       */
+      unsigned int dim;
+
       /**
        * @p RefinementCase<dim>::Type flags for the cells to be refined with
        * or not (RefinementCase<dim>::no_refinement). The meaning what a cell
@@ -83,6 +103,16 @@ namespace internal
       std::vector<unsigned int> active_cell_indices;
 
       /**
+       * Global cell index of each active cell.
+       */
+      std::vector<types::global_cell_index> global_active_cell_indices;
+
+      /**
+       * Global cell index of each cell on the given level.
+       */
+      std::vector<types::global_cell_index> global_level_cell_indices;
+
+      /**
        * Levels and indices of the neighbors of the cells. Convention is, that
        * the neighbors of the cell with index @p i are stored in the fields
        * following $i*(2*real\_space\_dimension)$, e.g. in one spatial
@@ -92,7 +122,7 @@ namespace internal
        * and so on.
        *
        * In neighbors, <tt>neighbors[i].first</tt> is the level, while
-       * <tt>neighbors[i].first</tt> is the index of the neighbor.
+       * <tt>neighbors[i].second</tt> is the index of the neighbor.
        *
        * If a neighbor does not exist (cell is at the boundary),
        * <tt>level=index=-1</tt> is set.
@@ -159,32 +189,48 @@ namespace internal
       /**
        * The object containing the data on lines and related functions
        */
-      TriaObjects<TriaObject<dim>> cells;
-
+      TriaObjects cells;
 
       /**
-       * Reserve enough space to accommodate @p total_cells cells on this
-       * level. Since there are no @p used flags on this level, you have to
-       * give the total number of cells, not only the number of newly to
-       * accommodate ones, like in the <tt>TriaLevel<N>::reserve_space</tt>
-       * functions, with <tt>N>0</tt>.
+       * For edges, we enforce a standard convention that opposite
+       * edges should be parallel. Now, that's enforceable in most
+       * cases, and we have code that makes sure that if a mesh allows
+       * this to happen, that we have this convention. We also know
+       * that it is always possible to have opposite faces have
+       * parallel normal vectors. (For both things, see the paper by
+       * Agelek, Anderson, Bangerth, Barth in the ACM Transactions on
+       * Mathematical Software mentioned in the documentation of the
+       * GridReordering class.)
        *
-       * Since the number of neighbors per cell depends on the dimensions, you
-       * have to pass that additionally.
+       * The problem is that we originally had another condition, namely that
+       * faces 0, 2 and 4 have normals that point into the cell, while the
+       * other faces have normals that point outward. It turns out that this
+       * is not always possible. In effect, we have to store whether the
+       * normal vector of each face of each cell follows this convention or
+       * not. If this is so, then this variable stores a @p true value,
+       * otherwise a @p false value.
+       *
+       * In effect, this field has <code>6*n_cells</code> elements, being the
+       * number of cells times the six faces each has.
+       *
+       * @note Only needed for dim=3.
        */
-
-      void
-      reserve_space(const unsigned int total_cells,
-                    const unsigned int dimension,
-                    const unsigned int space_dimension);
+      std::vector<unsigned char> face_orientations;
 
       /**
-       * Check the memory consistency of the different containers. Should only
-       * be called with the preprocessor flag @p DEBUG set. The function
-       * should be called from the functions of the higher TriaLevel classes.
+       * Reference cell type of each cell.
+       *
+       * @note Used only for dim=2 and dim=3.
        */
-      void
-      monitor_memory(const unsigned int true_dimension) const;
+      std::vector<dealii::ReferenceCell> reference_cell;
+
+      /**
+       * A cache for the vertex indices of the cells (`structdim == dim`), in
+       * order to more quickly retrieve these frequently accessed quantities.
+       * For simplified addressing, the information is indexed by the maximum
+       * number of vertices possible for a cell (quadrilateral/hexahedron).
+       */
+      std::vector<unsigned int> cell_vertex_indices_cache;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
@@ -195,91 +241,26 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        */
       template <class Archive>
       void
       serialize(Archive &ar, const unsigned int version);
-
-      /**
-       * Exception
-       */
-      DeclException2(ExcMemoryInexact,
-                     int,
-                     int,
-                     << "The containers have sizes " << arg1 << " and " << arg2
-                     << ", which is not as expected.");
-    };
-
-    // TODO: Replace TriaObjectsHex to avoid this specialization
-
-    /**
-     * Specialization of TriaLevels for 3D. Since we need TriaObjectsHex
-     * instead of TriaObjects. Refer to the documentation of the general class
-     * template for details.
-     */
-    template <>
-    class TriaLevel<3>
-    {
-    public:
-      std::vector<std::uint8_t>        refine_flags;
-      std::vector<bool>                coarsen_flags;
-      std::vector<unsigned int>        active_cell_indices;
-      std::vector<std::pair<int, int>> neighbors;
-      std::vector<types::subdomain_id> subdomain_ids;
-      std::vector<types::subdomain_id> level_subdomain_ids;
-      std::vector<int>                 parents;
-
-      // The following is not used
-      // since we don't support
-      // codim=1 meshes in 3d; only
-      // needed to allow
-      // compilation
-      // TODO[TH]: this is no longer true and might be a bug.
-      std::vector<bool> direction_flags;
-
-      TriaObjectsHex cells;
-
-
-      void
-      reserve_space(const unsigned int total_cells,
-                    const unsigned int dimension,
-                    const unsigned int space_dimension);
-      void
-      monitor_memory(const unsigned int true_dimension) const;
-      std::size_t
-      memory_consumption() const;
-
-      /**
-       * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
-       */
-      template <class Archive>
-      void
-      serialize(Archive &ar, const unsigned int version);
-
-      /**
-       * Exception
-       */
-      DeclException2(ExcMemoryInexact,
-                     int,
-                     int,
-                     << "The containers have sizes " << arg1 << " and " << arg2
-                     << ", which is not as expected.");
     };
 
 
-
-    template <int dim>
     template <class Archive>
     void
-    TriaLevel<dim>::serialize(Archive &ar, const unsigned int)
+    TriaLevel::serialize(Archive &ar, const unsigned int)
     {
+      ar &dim;
+
       ar &refine_flags &coarsen_flags;
 
-      // do not serialize 'active_cell_indices' here. instead of storing them
-      // to the stream and re-reading them again later, we just rebuild them
-      // in Triangulation::load()
+      // do not serialize `active_cell_indices` and `vertex_indices_cache`
+      // here. instead of storing them to the stream and re-reading them again
+      // later, we just rebuild them in Triangulation::load()
 
       ar &neighbors;
       ar &subdomain_ids;
@@ -287,32 +268,12 @@ namespace internal
       ar &parents;
       ar &direction_flags;
       ar &cells;
-    }
-
-
-
-    template <class Archive>
-    void
-    TriaLevel<3>::serialize(Archive &ar, const unsigned int)
-    {
-      ar &refine_flags &coarsen_flags;
-
-      // do not serialize 'active_cell_indices' here. instead of storing them
-      // to the stream and re-reading them again later, we just rebuild them
-      // in Triangulation::load()
-
-      ar &neighbors;
-      ar &subdomain_ids;
-      ar &level_subdomain_ids;
-      ar &parents;
-      ar &direction_flags;
-      ar &cells;
+      ar &face_orientations;
+      ar &reference_cell;
     }
 
   } // namespace TriangulationImplementation
 } // namespace internal
-
-
 
 DEAL_II_NAMESPACE_CLOSE
 

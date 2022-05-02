@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2019 by the deal.II authors
+ * Copyright (C) 2008 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -75,8 +75,9 @@ set_periodicity(parallel::distributed::Triangulation<dim> &triangulation,
 }
 
 /* The 2D case */
-void generate_grid(parallel::distributed::Triangulation<2> &triangulation,
-                   int                                      orientation)
+void
+generate_grid(parallel::distributed::Triangulation<2> &triangulation,
+              int                                      orientation)
 {
   Point<2> vertices_1[] = {
     Point<2>(-1., -3.),
@@ -115,8 +116,9 @@ void generate_grid(parallel::distributed::Triangulation<2> &triangulation,
 
 
 /* The 3D case */
-void generate_grid(parallel::distributed::Triangulation<3> &triangulation,
-                   int                                      orientation)
+void
+generate_grid(parallel::distributed::Triangulation<3> &triangulation,
+              int                                      orientation)
 {
   Point<3>              vertices_1[] = {Point<3>(-1., -1., -3.),
                            Point<3>(+1., -1., -3.),
@@ -205,7 +207,8 @@ check(const unsigned int orientation, bool reverse)
   constraints.print(deallog.get_file_stream());
 
   const std::vector<IndexSet> locally_owned_dofs_vector =
-    dof_handler.compute_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               dof_handler.locally_owned_dofs());
   IndexSet locally_active_dofs;
   DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
   AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs_vector,
@@ -217,7 +220,7 @@ check(const unsigned int orientation, bool reverse)
   unsigned int n_local_constraints = 0;
 
   std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(MappingQGeneric<dim>(1),
+  DoFTools::map_dofs_to_support_points(MappingQ<dim>(1),
                                        dof_handler,
                                        support_points);
   IndexSet constraints_lines = constraints.get_local_lines();
@@ -257,8 +260,8 @@ check(const unsigned int orientation, bool reverse)
 
   triangulation.execute_coarsening_and_refinement();
 
-  typedef std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>
-    CellFace;
+  using CellFace =
+    std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>;
   const typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>
     &face_map = triangulation.get_periodic_face_map();
   typename std::map<CellFace,

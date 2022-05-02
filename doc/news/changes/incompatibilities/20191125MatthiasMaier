@@ -1,5 +1,0 @@
-Removed: The typedefs DataOut::active_cell_iterator and
-DataOut_DoFData::active_cell_iterator have been removed. These typedefs are
-an implementational detail that should have never exposed in the interface.
-<br>
-(Matthias Maier, 2019/11/25)

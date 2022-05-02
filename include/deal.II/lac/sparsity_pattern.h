@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,6 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/linear_index_iterator.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 
 // boost::serialization::make_array used to be in array.hpp, but was
@@ -37,6 +36,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -127,9 +127,6 @@ namespace SparsityPatternIterators
    * row and column number (or alternatively the index within the complete
    * sparsity pattern). It does not allow modifying the sparsity pattern
    * itself.
-   *
-   * @author Wolfgang Bangerth
-   * @date 2004
    */
   class Accessor
   {
@@ -309,22 +306,21 @@ namespace SparsityPatternIterators
 
 
 /**
- * A class that can store which elements of a matrix are nonzero (or, in fact,
- * <i>may</i> be nonzero) and for which we have to allocate memory to store
- * their values. This class is an example of the "static" type of sparsity
- * patters (see
+ * A class that can store which elements of a matrix are nonzero (or, to be
+ * precise, <i>may</i> be nonzero) and for which we have to allocate memory to
+ * store their values. This class is an example of the "static" type of sparsity
+ * patterns (see
  * @ref Sparsity).
  * It uses the <a
  * href="https://en.wikipedia.org/wiki/Sparse_matrix">compressed row storage
  * (CSR)</a> format to store data, and is used as the basis for the
- * derived SparsityPattern class and SparseMatrix class.
+ * derived SparsityPattern class, which is in turn used by the SparseMatrix
+ * class.
  *
  * The elements of a SparsityPatternBase, corresponding to the places where
  * SparseMatrix objects can store nonzero entries, are stored row-by-row.
  * The ordering of non-zero elements within each row (i.e. increasing
  * column index order) depends on the derived classes.
- *
- * @author Wolfgang Bangerth, Guido Kanschat and others
  */
 class SparsityPatternBase : public Subscriptor
 {
@@ -370,8 +366,10 @@ public:
    *
    * Constructors, destructor, functions initializing, copying and filling an
    * object.
+   *
+   * @{
    */
-  // @{
+
   /**
    * Initialize the matrix empty, that is with no memory allocated. This is
    * useful if you want such objects as member variables in other classes. You
@@ -439,12 +437,15 @@ public:
   void
   add(const size_type i, const size_type j);
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @name Iterators
+   *
+   * @{
    */
-  // @{
 
   /**
    * Iterator starting at the first entry of the matrix. The resulting
@@ -489,12 +490,15 @@ public:
   end(const size_type r) const;
 
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @name Querying information
+   *
+   * @{
    */
-  // @{
 
   /**
    * Test for equality of two SparsityPatterns.
@@ -579,12 +583,15 @@ public:
   std::size_t
   memory_consumption() const;
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @name Accessing entries
+   *
+   * @{
    */
-  // @{
 
   /**
    * Access to column number field.  Return the column number of the
@@ -623,12 +630,15 @@ public:
   std::pair<size_type, size_type>
   matrix_position(const std::size_t global_index) const;
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @name Input/Output
+   *
+   * @{
    */
-  // @{
 
   /**
    * Print the sparsity of the matrix. The output consists of one line per row
@@ -666,7 +676,8 @@ public:
 
   /**
    * Write the data of this object to a stream for the purpose of
-   * serialization
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -674,18 +685,35 @@ public:
 
   /**
    * Read the data of this object from a stream for the purpose of
-   * serialization
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
   load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @addtogroup Exceptions
+   *
    * @{
    */
 
@@ -718,7 +746,9 @@ public:
     "The operation you attempted changes the structure of the SparsityPattern "
     "and is not possible after compress() has been called.");
 
-  // @}
+  /**
+   * @}
+   */
 
 
 protected:
@@ -840,7 +870,7 @@ protected:
  * is square (the first item will be the diagonal, followed by the other
  * entries sorted by column index).
  *
- * @note While this class forms the basis upon which SparseMatrix objects base
+ * While this class forms the basis upon which SparseMatrix objects base
  * their storage format, and thus plays a central role in setting up linear
  * systems, it is rarely set up directly due to the way it stores its
  * information. Rather, one typically goes through an intermediate format
@@ -848,7 +878,12 @@ protected:
  * documentation module
  * @ref Sparsity.
  *
- * @author Wolfgang Bangerth, Guido Kanschat and others
+ * You can iterate over entries in the pattern using begin(), end(),
+ * begin(row), and end(row). These functions return an iterator of type
+ * SparsityPatternIterators::Iterator. When dereferencing an iterator @p it,
+ * you have access to the member functions in
+ * SparsityPatternIterators::Accessor, like <tt>it->column()</tt> and
+ * <tt>it->row()</tt>.
  */
 class SparsityPattern : public SparsityPatternBase
 {
@@ -886,7 +921,10 @@ public:
    * Constructors, destructor, functions initializing, copying and filling an
    * object.
    */
-  // @{
+  /**
+   * @{
+   */
+
   /**
    * Initialize the matrix empty, that is with no memory allocated. This is
    * useful if you want such objects as member variables in other classes. You
@@ -1123,6 +1161,13 @@ public:
    *
    * Previous content of this object is lost, and the sparsity pattern is in
    * compressed mode afterwards.
+   *
+   * Once you have built a sparsity pattern with this function, you
+   * probably want to attach a SparseMatrix object to it. The original
+   * `matrix` object can then be copied into this SparseMatrix object
+   * using the version of SparseMatrix::copy_from() that takes a
+   * FullMatrix object as argument. Through this procedure, you can
+   * convert a FullMatrix into a SparseMatrix.
    */
   template <typename number>
   void
@@ -1141,13 +1186,18 @@ public:
               ForwardIterator end,
               const bool      indices_are_sorted = false);
 
-  // @}
+  /**
+   * @}
+   */
 
 
   /**
    * @name Querying information
    */
-  // @{
+  /**
+   * @{
+   */
+
   /**
    * Test for equality of two SparsityPatterns.
    */
@@ -1176,11 +1226,16 @@ public:
   std::size_t
   memory_consumption() const;
 
-  // @}
+  /**
+   * @}
+   */
+
   /**
    * @name Accessing entries
+   *
+   * @{
    */
-  // @{
+
   /**
    * Return the index of the matrix element with row number <tt>i</tt> and
    * column number <tt>j</tt>. If the matrix element is not a nonzero one,
@@ -1206,11 +1261,16 @@ public:
   size_type
   operator()(const size_type i, const size_type j) const;
 
-  // @}
+  /**
+   * @}
+   */
+
   /**
    * @name Input/Output
    */
-  // @{
+  /**
+   * @{
+   */
 
   /**
    * Write the data of this object en bloc to a file. This is done in a binary
@@ -1257,12 +1317,27 @@ public:
   void
   load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization.
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
-  // @}
+  /**
+   * @}
+   */
 
   /**
    * @addtogroup Exceptions
+   *
    * @{
    */
   /**
@@ -1280,7 +1355,9 @@ public:
                  int,
                  << "The number of partitions you gave is " << arg1
                  << ", but must be greater than zero.");
-  //@}
+  /**
+   * @}
+   */
 private:
   /**
    * Is special treatment of diagonals enabled?
@@ -1307,7 +1384,9 @@ private:
 };
 
 
-/*@}*/
+/**
+ * @}
+ */
 /*---------------------- Inline functions -----------------------------------*/
 
 #ifndef DOXYGEN
@@ -1394,8 +1473,6 @@ namespace SparsityPatternIterators
   inline bool
   Accessor::operator==(const Accessor &other) const
   {
-    Assert(container != nullptr, DummyAccessor());
-    Assert(other.container != nullptr, DummyAccessor());
     return (container == other.container && linear_index == other.linear_index);
   }
 
@@ -1556,8 +1633,15 @@ SparsityPatternBase::save(Archive &ar, const unsigned int) const
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 
-  ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
-  ar &boost::serialization::make_array(colnums.get(), max_vec_len);
+  if (max_dim != 0)
+    ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
+  else
+    Assert(rowstart.get() == nullptr, ExcInternalError());
+
+  if (max_vec_len != 0)
+    ar &boost::serialization::make_array(colnums.get(), max_vec_len);
+  else
+    Assert(colnums.get() == nullptr, ExcInternalError());
 }
 
 
@@ -1571,11 +1655,21 @@ SparsityPatternBase::load(Archive &ar, const unsigned int)
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 
-  rowstart = std_cxx14::make_unique<std::size_t[]>(max_dim + 1);
-  colnums  = std_cxx14::make_unique<size_type[]>(max_vec_len);
+  if (max_dim != 0)
+    {
+      rowstart = std::make_unique<std::size_t[]>(max_dim + 1);
+      ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
+    }
+  else
+    rowstart.reset();
 
-  ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
-  ar &boost::serialization::make_array(colnums.get(), max_vec_len);
+  if (max_vec_len != 0)
+    {
+      colnums = std::make_unique<size_type[]>(max_vec_len);
+      ar &boost::serialization::make_array(colnums.get(), max_vec_len);
+    }
+  else
+    colnums.reset();
 }
 
 
@@ -1612,13 +1706,15 @@ SparsityPatternBase::operator==(const SparsityPatternBase &sp2) const
   if (rows != sp2.rows || cols != sp2.cols || compressed != sp2.compressed)
     return false;
 
-  for (size_type i = 0; i < rows + 1; ++i)
-    if (rowstart[i] != sp2.rowstart[i])
-      return false;
+  if (rows > 0)
+    for (size_type i = 0; i < rows + 1; ++i)
+      if (rowstart[i] != sp2.rowstart[i])
+        return false;
 
-  for (size_type i = 0; i < rowstart[rows]; ++i)
-    if (colnums[i] != sp2.colnums[i])
-      return false;
+  if (rows > 0)
+    for (size_type i = 0; i < rowstart[rows]; ++i)
+      if (colnums[i] != sp2.colnums[i])
+        return false;
 
   return true;
 }

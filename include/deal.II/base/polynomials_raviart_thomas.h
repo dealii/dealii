@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,9 @@
 #include <deal.II/base/tensor_polynomials_base.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
+#include <mutex>
 #include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -43,8 +45,6 @@ DEAL_II_NAMESPACE_OPEN
  * Q<sub>k,k+1,k</sub>, Q<sub>k,k,k+1</sub>)</i> in 2D and 3D, resp.
  *
  * @ingroup Polynomials
- * @author Guido Kanschat
- * @date 2005
  */
 template <int dim>
 class PolynomialsRaviartThomas : public TensorPolynomialsBase<dim>
@@ -59,6 +59,11 @@ public:
    * contains.
    */
   PolynomialsRaviartThomas(const unsigned int k);
+
+  /**
+   * Copy constructor.
+   */
+  PolynomialsRaviartThomas(const PolynomialsRaviartThomas &other);
 
   /**
    * Compute the value and the first and second derivatives of each Raviart-
@@ -95,7 +100,7 @@ public:
   n_polynomials(const unsigned int degree);
 
   /**
-   * @copydoc TensorPolynomialsBase<dim>::clone()
+   * @copydoc TensorPolynomialsBase::clone()
    */
   virtual std::unique_ptr<TensorPolynomialsBase<dim>>
   clone() const override;
@@ -113,7 +118,26 @@ private:
    */
   static std::vector<std::vector<Polynomials::Polynomial<double>>>
   create_polynomials(const unsigned int k);
+
+  /**
+   * A mutex with which to guard access to the following `mutable`
+   * variables.
+   */
+  mutable std::mutex scratch_arrays_mutex;
+
+  /**
+   * The following arrays are used as scratch data in the evaluate() function.
+   * Since that function is `const`, they have to be marked as `mutable`, and
+   * since we want that function to be thread-safe, access to these scratch
+   * arrays is guarded by the mutex above.
+   */
+  mutable std::vector<double>         scratch_values;
+  mutable std::vector<Tensor<1, dim>> scratch_grads;
+  mutable std::vector<Tensor<2, dim>> scratch_grad_grads;
+  mutable std::vector<Tensor<3, dim>> scratch_third_derivatives;
+  mutable std::vector<Tensor<4, dim>> scratch_fourth_derivatives;
 };
+
 
 
 template <int dim>

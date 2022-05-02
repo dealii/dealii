@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -204,10 +204,6 @@ check_simple(const FiniteElement<dim> &fe)
 
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tr, -1, 1);
-  std::map<types::boundary_id, const Function<dim> *>
-                               dirichlet_boundary_functions;
-  Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
-  dirichlet_boundary_functions[0] = &homogeneous_dirichlet_bc;
 
   tr.refine_global(1);
   refine_mesh(tr);
@@ -234,11 +230,13 @@ check_simple(const FiniteElement<dim> &fe)
     DoFRenumbering::component_wise(mgdof_renumbered, level, block_component);
 
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(mgdof, dirichlet_boundary_functions);
+  mg_constrained_dofs.initialize(mgdof);
+  mg_constrained_dofs.make_zero_boundary_constraints(mgdof, {0});
 
   MGConstrainedDoFs mg_constrained_dofs_renumbered;
-  mg_constrained_dofs_renumbered.initialize(mgdof_renumbered,
-                                            dirichlet_boundary_functions);
+  mg_constrained_dofs_renumbered.initialize(mgdof_renumbered);
+  mg_constrained_dofs_renumbered.make_zero_boundary_constraints(
+    mgdof_renumbered, {0});
 
   MGTransferPrebuilt<Vector<double>> transfer(mg_constrained_dofs);
   transfer.build(mgdof);

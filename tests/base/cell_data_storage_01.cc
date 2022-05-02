@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -108,7 +108,7 @@ check_qph(Triangulation<dim> &tr,
           qpd_const_optional = manager_const.try_get_data(cell);
         AssertThrow(qpd_optional, ExcInternalError());
         AssertThrow(qpd_const_optional, ExcInternalError());
-        for (unsigned int q = 0; q < q_points.size(); q++)
+        for (unsigned int q = 0; q < q_points.size(); ++q)
           {
             const double correct_value = func.value(q_points[q]);
             const double value         = qpd[q]->value;
@@ -167,7 +167,7 @@ test()
           data_storage.initialize(cell, rhs.size());
           std::vector<std::shared_ptr<MyQData>> qpd =
             data_storage.get_data(cell);
-          for (unsigned int q = 0; q < rhs.size(); q++)
+          for (unsigned int q = 0; q < rhs.size(); ++q)
             qpd[q]->value = my_func.value(q_points[q]);
           {
             // before initialization of the next cell, try_get_data must

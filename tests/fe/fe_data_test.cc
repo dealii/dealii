@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,7 +89,8 @@ test_2d_3d(std::vector<FiniteElement<dim> *> &fe_datas)
 
 
 
-void test_2d_3d(std::vector<FiniteElement<1> *> &fe_datas)
+void
+test_2d_3d(std::vector<FiniteElement<1> *> &fe_datas)
 {}
 
 
@@ -116,7 +117,7 @@ test_fe_datas()
   fe_datas.push_back(new FE_DGQ<dim>(2));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(
-    new FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(), 4)));
+    new FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapezoid<1>(), 4)));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGQ<dim>(4));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;

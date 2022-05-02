@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,8 +82,8 @@ class Vector;
  *         << " @ " << point
  *         << " is: "
  *         << std::endl
- *         << result[0][0] << " " << result[0][1] << std::endl
- *         << result[1][0] << " " << result[1][1]
+ *         << result[0][0] << ' ' << result[0][1] << std::endl
+ *         << result[1][0] << ' ' << result[1][1]
  *         << std::endl;
  * @endcode
  *
@@ -106,7 +106,6 @@ class Vector;
  *
  *
  * @ingroup functions
- * @author Konrad Simon, 2019
  */
 template <int rank, int dim, typename Number = double>
 class TensorFunctionParser : public TensorFunction<rank, dim, Number>

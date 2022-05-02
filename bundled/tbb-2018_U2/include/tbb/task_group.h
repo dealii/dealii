@@ -114,7 +114,12 @@ public:
 
     ~task_group_base() __TBB_NOEXCEPT(false) {
         if( my_root->ref_count() > 1 ) {
+#    if __cpp_lib_uncaught_exceptions >= 201411
+        // std::uncaught_exception() is deprecated in c++17
+            bool stack_unwinding_in_progress = (std::uncaught_exceptions() > 0);
+#    else
             bool stack_unwinding_in_progress = std::uncaught_exception();
+#    endif
             // Always attempt to do proper cleanup to avoid inevitable memory corruption
             // in case of missing wait (for the sake of better testability & debuggability)
             if ( !is_canceling() )

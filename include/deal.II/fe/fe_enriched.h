@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -118,7 +118,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * In most applications it is beneficial to introduce enrichments only in
  * some part of the domain (e.g. around a crack tip) and use standard FE (e.g.
- * FE_Q) elsewhere. This can be achieved by using the hp finite element
+ * FE_Q) elsewhere. This can be achieved by using the hp-finite element
  * framework in deal.II that allows for the use of different elements on
  * different cells. To make the resulting space $C^0$ continuous, it is then
  * necessary for the DoFHandler class and
@@ -144,47 +144,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>References</h3>
  *
- * When using this class, please cite
- * @code{.bib}
- * @article{Davydov2017,
- *   author  = {Denis Davydov and Tymofiy Gerasimov and Jean-Paul Pelteret and
- *              Paul Steinmann},
- *   title   = {Convergence study of the h-adaptive PUM and the hp-adaptive FEM
- *              applied to eigenvalue problems in quantum mechanics},
- *   journal = {Advanced Modeling and Simulation in Engineering Sciences},
- *   year    = {2017},
- *   volume  = {4},
- *   number  = {1},
- *   pages   = {7},
- *   month   = {Dec},
- *   issn    = {2213-7467},
- *   day     = {12},
- *   doi     = {10.1186/s40323-017-0093-0},
- *   url     = {https://doi.org/10.1186/s40323-017-0093-0},
- * }
- * @endcode
- * The PUM was introduced in
- * @code{.bib}
- * @article{Melenk1996,
- *   title   = {The partition of unity finite element method: Basic theory and
- *              applications},
- *   author  = {Melenk, J.M. and Babu\v{s}ka, I.},
- *   journal = {Computer Methods in Applied Mechanics and Engineering},
- *   year    = {1996},
- *   number  = {1--4},
- *   pages   = {289 -- 314},
- *   volume  = {139},
- * }
- * @article{Babuska1997,
- *   title   = {The partition of unity method},
- *   author  = {Babu\v{s}ka, I. and Melenk, J. M.},
- *   journal = {International Journal for Numerical Methods in Engineering},
- *   year    = {1997},
- *   number  = {4},
- *   pages   = {727--758},
- *   volume  = {40},
- * }
- * @endcode
+ * When using this class, please cite @cite davydov2017hp .
+ * The PUM was introduced in @cite melenk1996 and @cite babuska1997 .
  *
  * <h3>Implementation</h3>
  *
@@ -209,8 +170,6 @@ DEAL_II_NAMESPACE_OPEN
  * and the @p restriction matrices are taken from the FESystem class.
  *
  * @ingroup fe
- *
- * @author Denis Davydov, 2016.
  */
 template <int dim, int spacedim = dim>
 class FE_Enriched : public FiniteElement<dim, spacedim>
@@ -232,10 +191,10 @@ public:
    * As for the enriched finite element space, FE_Nothing is used.
    * Continuity constraints will be automatically generated when
    * this non-enriched element is used in conjunction with enriched finite
-   * element within the hp::DoFHandler.
+   * element within a DoFHandler with hp-capabilities.
    *
    * See the discussion in the class documentation on how to use this element
-   * in the context of hp finite element methods.
+   * in the context of hp-finite element methods.
    */
   FE_Enriched(const FiniteElement<dim, spacedim> &fe_base);
 
@@ -377,7 +336,7 @@ public:
    */
 
   /**
-   * Return whether this element implements hp constraints.
+   * Return whether this element implements hp-constraints.
    *
    * This function returns @p true if and only if all its base elements return @p true
    * for this function.
@@ -399,7 +358,8 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &                matrix,
+                                const unsigned int face_no = 0) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the
@@ -414,12 +374,14 @@ public:
    * will get propagated out from this element.
    */
   virtual void
-  get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                   const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim, spacedim> &source,
+    const unsigned int                  subface,
+    FullMatrix<double> &                matrix,
+    const unsigned int                  face_no = 0) const override;
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.
@@ -428,10 +390,10 @@ public:
    * reference to a finite element object representing one of the other finite
    * elements active on this particular vertex. The function computes which of
    * the degrees of freedom of the two finite element objects are equivalent,
-   * both numbered between zero and the corresponding value of dofs_per_vertex
-   * of the two finite elements. The first index of each pair denotes one of
-   * the vertex dofs of the present element, whereas the second is the
-   * corresponding index of the other finite element.
+   * both numbered between zero and the corresponding value of
+   * n_dofs_per_vertex() of the two finite elements. The first index of each
+   * pair denotes one of the vertex dofs of the present element, whereas the
+   * second is the corresponding index of the other finite element.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_vertex_dof_identities(
@@ -450,8 +412,8 @@ public:
    * of freedom on quads.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int face_no = 0) const override;
 
   /**
    * @copydoc FiniteElement::compare_for_domination()
@@ -613,12 +575,14 @@ protected:
                                                                        spacedim>
       &output_data) const override;
 
+  using FiniteElement<dim, spacedim>::get_face_data;
+
   virtual std::unique_ptr<
     typename FiniteElement<dim, spacedim>::InternalDataBase>
   get_face_data(
-    const UpdateFlags             update_flags,
-    const Mapping<dim, spacedim> &mapping,
-    const Quadrature<dim - 1> &   quadrature,
+    const UpdateFlags               update_flags,
+    const Mapping<dim, spacedim> &  mapping,
+    const hp::QCollection<dim - 1> &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
       &output_data) const override;
@@ -648,11 +612,13 @@ protected:
                                                                        spacedim>
       &output_data) const override;
 
+  using FiniteElement<dim, spacedim>::fill_fe_face_values;
+
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -715,7 +681,7 @@ private:
 /**
  * This namespace consists of a class needed to create a collection
  * of FE_Enriched finite elements (hp::FECollection)
- * to be used with hp::DoFHandler in a domain with multiple, possibly
+ * to be used with DoFHandler in hp-mode on a domain with multiple, possibly
  * overlapping, sub-domains with individual enrichment functions.
  *
  * To create hp::FECollection, a graph coloring algorithm is used to assign
@@ -740,7 +706,7 @@ namespace ColorEnriched
   {
     /**
      * Returns true if there is a connection between subdomains in the mesh
-     * associated with @p hp::DoFHandler i.e., if the subdomains share at least
+     * associated with @p dof_handler i.e., if the subdomains share at least
      * a vertex. The two subdomains are defined by predicates provided by
      * @p predicate_1 and @p predicate_2. A predicate is a function (or
      * object of a type with an operator()) which takes in a cell iterator and
@@ -777,7 +743,7 @@ namespace ColorEnriched
      *  predicate<dim>(Point<dim>(2,2), 1));
      * @endcode
      *
-     * @param[in] hp::DoFHandler object
+     * @param[in] dof_handler DoFHandler object
      * @param[in] predicate_1 A function (or object of a type with an
      * operator()) defining the subdomain 1. The function takes in a cell and
      * returns a boolean.
@@ -787,7 +753,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     bool
     find_connection_between_subdomains(
-      const hp::DoFHandler<dim, spacedim> &    dof_handler,
+      const DoFHandler<dim, spacedim> &        dof_handler,
       const predicate_function<dim, spacedim> &predicate_1,
       const predicate_function<dim, spacedim> &predicate_2);
 
@@ -798,7 +764,7 @@ namespace ColorEnriched
      * subdomain
      * is defined using a predicate function of @p predicates.
      *
-     * @param[in] dof_handler a hp::DoFHandler object
+     * @param[in] dof_handler a DoFHandler object
      * @param[in] predicates predicates defining the subdomains
      * @param[out] predicate_colors Colors (unsigned int) associated with each
      * subdomain.
@@ -806,13 +772,13 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     unsigned int
     color_predicates(
-      const hp::DoFHandler<dim, spacedim> &                 dof_handler,
+      const DoFHandler<dim, spacedim> &                     dof_handler,
       const std::vector<predicate_function<dim, spacedim>> &predicates,
       std::vector<unsigned int> &                           predicate_colors);
 
     /**
      * Used to construct data members @p cellwise_color_predicate_map and
-     * @p fe_sets of Helper class. Inputs are hp::DoFHandler object,
+     * @p fe_sets of Helper class. Inputs are DoFHandler object,
      * vector of predicates and colors associated with them. Before calling
      * this function, colors can be assigned to predicates (i.e subdomains)
      * using the function color_predicates.
@@ -840,7 +806,7 @@ namespace ColorEnriched
      * the map will insert pairs (1, 4) and (2, 5) at key 100 (i.e unique id
      * of cell is mapped with a map which associates color with predicate id).
      *
-     * @param[in] dof_handler hp::DoFHandler object
+     * @param[in] dof_handler DoFHandler object
      * @param[in] predicates vector of predicates defining the subdomains.
      * <code>@p predicates[i]</code> returns true for a cell if it
      * belongs to subdomain with index i.
@@ -853,7 +819,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     void
     set_cellwise_color_set_and_fe_index(
-      hp::DoFHandler<dim, spacedim> &                       dof_handler,
+      DoFHandler<dim, spacedim> &                           dof_handler,
       const std::vector<predicate_function<dim, spacedim>> &predicates,
       const std::vector<unsigned int> &                     predicate_colors,
       std::map<unsigned int, std::map<unsigned int, unsigned int>>
@@ -930,7 +896,7 @@ namespace ColorEnriched
 
   /**
    * ColorEnriched::Helper class creates a collection of FE_Enriched finite
-   * elements (hp::FECollection) to be used with hp::DoFHandler in a domain
+   * elements (hp::FECollection) to be used with DoFHandler in a domain
    * with multiple, possibly overlapping, sub-domains with individual
    * enrichment functions. Note that the overlapping regions may have
    * multiple enrichment functions associated with them. This is implemented
@@ -1002,9 +968,9 @@ namespace ColorEnriched
    * enrichment functions), a vector of predicate
    * functions (used to define sub-domains) as well as the corresponding
    * enrichment functions. The FECollection object, a collection of FE_Enriched
-   * objects to be used with an hp::DoFHandler object, can be retrieved
+   * objects to be used with a DoFHandler object, can be retrieved
    * using the member function build_fe_collection which also modifies the
-   * active FE indices of the hp::DoFHandler object (provided as an argument
+   * active FE indices of the DoFHandler object (provided as an argument
    * to the build_fe_collection function).
    *
    * <h3>Simple example</h3>
@@ -1083,8 +1049,8 @@ namespace ColorEnriched
    * std::vector< predicate_function<dim> > predicates;
    * std::vector< std::shared_ptr<Function<dim>> > enrichments;
    *
-   * Triangulation<dim>  triangulation;
-   * hp::DoFHandler<dim> dof_handler(triangulation);
+   * Triangulation<dim> triangulation;
+   * DoFHandler<dim>    dof_handler(triangulation);
    *
    * static ColorEnriched::Helper<dim> FE_helper(fe_base,
    *                                             fe_enriched,
@@ -1093,8 +1059,6 @@ namespace ColorEnriched
    * const hp::FECollection<dim>&
    * fe_collection(FE_helper.build_fe_collection(dof_handler));
    * @endcode
-   *
-   * @authors Nivesh Dommaraju, Denis Davydov, 2018
    */
   template <int dim, int spacedim = dim>
   struct Helper
@@ -1115,21 +1079,21 @@ namespace ColorEnriched
            const std::vector<std::shared_ptr<Function<spacedim>>> &enrichments);
 
     /**
-     * Prepares an hp::DoFHandler object. The active FE indices of
+     * Prepares a DoFHandler object. The active FE indices of
      * mesh cells are initialized to work with
      * ColorEnriched::Helper<dim,spacedim>::fe_collection.
      *
-     * @param dof_handler an hp::DoFHandler object
+     * @param dof_handler a DoFHandler object
      * @return hp::FECollection, a collection of
      * finite elements needed by @p dof_handler.
      */
     const hp::FECollection<dim, spacedim> &
-    build_fe_collection(hp::DoFHandler<dim, spacedim> &dof_handler);
+    build_fe_collection(DoFHandler<dim, spacedim> &dof_handler);
 
   private:
     /**
-     * Contains a collection of FiniteElement objects needed by an
-     * hp::DoFHandler object.
+     * Contains a collection of FiniteElement objects needed by a DoFHandler
+     * object.
      */
     hp::FECollection<dim, spacedim> fe_collection;
 
@@ -1211,7 +1175,7 @@ namespace ColorEnriched
 
     /**
      * A vector of different possible color sets for a given set of
-     * predicates and hp::DoFHandler object
+     * predicates and DoFHandler object
      */
     std::vector<std::set<unsigned int>> fe_sets;
   };

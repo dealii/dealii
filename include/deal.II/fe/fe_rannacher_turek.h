@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,11 +77,9 @@ DEAL_II_NAMESPACE_OPEN
  * constructor.
  *
  * @ingroup fe
- * @author Patrick Esser
- * @date 2015
  */
 template <int dim>
-class FE_RannacherTurek : public FE_Poly<PolynomialsRannacherTurek<dim>, dim>
+class FE_RannacherTurek : public FE_Poly<dim>
 {
 public:
   /**

@@ -64,8 +64,8 @@ main()
 
   Point<2> center(0.0, 1.0);
 
-  out << center << " " << sp[0] << std::endl
-      << center << " " << sp[1] << std::endl;
+  out << center << ' ' << sp[0] << std::endl
+      << center << ' ' << sp[1] << std::endl;
 
   for (unsigned int i = 0; i < n_intermediates + 1; ++i)
     {
@@ -77,10 +77,10 @@ main()
       Tensor<1, spacedim> t1 = manifold.get_tangent_vector(ip, sp[0]);
       Tensor<1, spacedim> t2 = manifold.get_tangent_vector(ip, sp[1]);
 
-      out << ip << " " << t2 << std::endl;
+      out << ip << ' ' << t2 << std::endl;
     }
 
-  out << "e" << std::endl;
+  out << 'e' << std::endl;
 
   return 0;
 }

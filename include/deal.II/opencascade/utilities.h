@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,7 @@ DEAL_II_NAMESPACE_OPEN
  * This is done by inheriting abstract topology classes from the TopoDS
  * package by those implementing a boundary representation model (from the
  * BRep package). Only 3 types of topological objects have geometric
- * representations – vertex, edge, and face.
+ * representations - vertex, edge, and face.
  *
  * Every TopoDS_Shape can be queried to figure out what type of shape it is,
  * and actual geometrical objects, like surfaces, curves or points, can be
@@ -97,8 +97,6 @@ DEAL_II_NAMESPACE_OPEN
  * If you wish to use these tools when the dimension of the space is two, then
  * make sure your CAD files are actually flat and that all z coordinates are
  * equal to zero, as otherwise you will get many exceptions.
- *
- * @author Luca Heltai, Andrea Mola, 2011--2017.
  */
 namespace OpenCASCADE
 {
@@ -146,7 +144,7 @@ namespace OpenCASCADE
    * shape and the mesh, to control the shape and regularity of the triangles
    * you should use other meshing softwares. The two arguments `deflection` and
    * `angular_deflection` select the accuracy of the created triangulation with
-   * respect to the orginal topological shape. The argument
+   * respect to the original topological shape. The argument
    * `sew_different_faces` gives the possibility to use a Sewer from OpenCASCADE
    * to create a watertight closed STL using the argument `sewer_tolerance`. The
    * argument `is_relative` specifies if distance are relative and `in_parallel`
@@ -289,8 +287,6 @@ namespace OpenCASCADE
    * @param[in] mapping Optional input mapping
    * @return An std::vector of TopoDS_Edge objects representing the smooth
    *  interpolation of the boundary of the `triangulation`
-   *
-   * @author Dirk Peschka, Luca Heltai, 2017.
    */
   template <int spacedim>
   std::vector<TopoDS_Edge>

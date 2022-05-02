@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,12 +36,18 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 /**
- * Tensor product of given polynomials and bubble functions of form
- * $(2*x_j-1)^{degree-1}\prod_{i=0}^{dim-1}(x_i(1-x_i))$. This class inherits
- * most of its functionality from TensorProductPolynomials. The bubble
- * enrichments are added for the last indices. index.
+ * A class that represents a space of tensor product polynomials, augmented
+ * by $dim$ (non-normalized) bubble functions of form
+ * $\varphi_j(\mathbf x)
+ * = 2^{\text{degree}-1}\left(x_j-frac 12\right)^{\text{degree}-1}
+ * \left[\prod_{i=0}^{dim-1}(x_i(1-x_i))\right]$
+ * for $j=0,\ldots,dim-1$. If `degree` is one, then the first factor
+ * disappears and one receives the usual bubble function centered
+ * at the mid-point of the cell.
  *
- * @author Daniel Arndt, 2015
+ * This class inherits
+ * most of its functionality from TensorProductPolynomials. The bubble
+ * enrichments are added for the last index.
  */
 template <int dim>
 class TensorProductPolynomialsBubbles : public ScalarPolynomialsBase<dim>
@@ -51,7 +57,7 @@ public:
    * Access to the dimension of this object, for checking and automatic
    * setting of dimension in other classes.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Constructor. <tt>pols</tt> is a vector of objects that should be derived
@@ -120,7 +126,7 @@ public:
    * polynomials all at once and in a much more efficient way.
    */
   double
-  compute_value(const unsigned int i, const Point<dim> &p) const;
+  compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the order @p order derivative of the <tt>i</tt>th tensor product
@@ -139,6 +145,34 @@ public:
   compute_derivative(const unsigned int i, const Point<dim> &p) const;
 
   /**
+   * @copydoc ScalarPolynomialsBase::compute_1st_derivative()
+   */
+  virtual Tensor<1, dim>
+  compute_1st_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
+   */
+  virtual Tensor<2, dim>
+  compute_2nd_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
+   */
+  virtual Tensor<3, dim>
+  compute_3rd_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
+   */
+  virtual Tensor<4, dim>
+  compute_4th_derivative(const unsigned int i,
+                         const Point<dim> & p) const override;
+
+  /**
    * Compute the grad of the <tt>i</tt>th tensor product polynomial at
    * <tt>unit_point</tt>. Here <tt>i</tt> is given in tensor product
    * numbering.
@@ -151,7 +185,7 @@ public:
    * polynomials all at once and in a much more efficient way.
    */
   Tensor<1, dim>
-  compute_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
@@ -166,7 +200,7 @@ public:
    * polynomials all at once and in a much more efficient way.
    */
   Tensor<2, dim>
-  compute_grad_grad(const unsigned int i, const Point<dim> &p) const;
+  compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * Return the number of tensor product polynomials plus the bubble
@@ -185,7 +219,7 @@ public:
   name() const override;
 
   /**
-   * @copydoc ScalarPolynomialsBase<dim>::clone()
+   * @copydoc ScalarPolynomialsBase::clone()
    */
   virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
   clone() const override;
@@ -426,6 +460,49 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
     }
 }
 
+
+
+template <int dim>
+inline Tensor<1, dim>
+TensorProductPolynomialsBubbles<dim>::compute_1st_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
+{
+  return compute_derivative<1>(i, p);
+}
+
+
+
+template <int dim>
+inline Tensor<2, dim>
+TensorProductPolynomialsBubbles<dim>::compute_2nd_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
+{
+  return compute_derivative<2>(i, p);
+}
+
+
+
+template <int dim>
+inline Tensor<3, dim>
+TensorProductPolynomialsBubbles<dim>::compute_3rd_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
+{
+  return compute_derivative<3>(i, p);
+}
+
+
+
+template <int dim>
+inline Tensor<4, dim>
+TensorProductPolynomialsBubbles<dim>::compute_4th_derivative(
+  const unsigned int i,
+  const Point<dim> & p) const
+{
+  return compute_derivative<4>(i, p);
+}
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE

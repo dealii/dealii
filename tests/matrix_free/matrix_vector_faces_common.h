@@ -1,6 +1,6 @@
 //------------------  matrix_vector_faces_common.h  ------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -107,10 +107,10 @@ private:
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(false, true, false);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(phi.get_gradient(q), q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -136,24 +136,25 @@ private:
                      number,
                      VectorizedArrayType>
       fe_eval_neighbor(data, false);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
+                                VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval_neighbor.reinit(face);
 
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
         fe_eval_neighbor.read_dof_values(src);
-        fe_eval_neighbor.evaluate(true, true);
+        fe_eval_neighbor.evaluate(EvaluationFlags::values |
+                                  EvaluationFlags::gradients);
         VectorizedArrayType sigmaF =
           (std::abs((fe_eval.get_normal_vector(0) *
                      fe_eval.inverse_jacobian(0))[dim - 1]) +
@@ -178,9 +179,10 @@ private:
             fe_eval.submit_value(average_valgrad, q);
             fe_eval_neighbor.submit_value(-average_valgrad, q);
           }
-        fe_eval.integrate(true, true);
+        fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
         fe_eval.distribute_local_to_global(dst);
-        fe_eval_neighbor.integrate(true, true);
+        fe_eval_neighbor.integrate(EvaluationFlags::values |
+                                   EvaluationFlags::gradients);
         fe_eval_neighbor.distribute_local_to_global(dst);
       }
   }
@@ -200,19 +202,19 @@ private:
                      number,
                      VectorizedArrayType>
       fe_eval(data, true);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
+                                VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
         VectorizedArrayType sigmaF =
           2.0 *
           std::abs((fe_eval.get_normal_vector(0) *
@@ -228,7 +230,7 @@ private:
             fe_eval.submit_value(average_valgrad, q);
           }
 
-        fe_eval.integrate(true, true);
+        fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
         fe_eval.distribute_local_to_global(dst);
       }
   }
@@ -310,10 +312,10 @@ private:
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
-        phi.gather_evaluate(src, false, true);
+        phi.gather_evaluate(src, EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(phi.get_gradient(q), q);
-        phi.integrate_scatter(false, true, dst);
+        phi.integrate_scatter(EvaluationFlags::gradients, dst);
       }
   }
 
@@ -338,22 +340,26 @@ private:
                      number,
                      VectorizedArrayType>
       fe_eval_neighbor(data, false, 0, 0, start_vector_component);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
+                                VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
         fe_eval_neighbor.reinit(face);
 
-        fe_eval.gather_evaluate(src, true, true);
-        fe_eval_neighbor.gather_evaluate(src, true, true);
+        fe_eval.gather_evaluate(src,
+                                EvaluationFlags::values |
+                                  EvaluationFlags::gradients);
+        fe_eval_neighbor.gather_evaluate(src,
+                                         EvaluationFlags::values |
+                                           EvaluationFlags::gradients);
 
         VectorizedArrayType sigmaF =
           (std::abs((fe_eval.get_normal_vector(0) *
@@ -379,8 +385,12 @@ private:
             fe_eval.submit_value(average_valgrad, q);
             fe_eval_neighbor.submit_value(-average_valgrad, q);
           }
-        fe_eval.integrate_scatter(true, true, dst);
-        fe_eval_neighbor.integrate_scatter(true, true, dst);
+        fe_eval.integrate_scatter(EvaluationFlags::values |
+                                    EvaluationFlags::gradients,
+                                  dst);
+        fe_eval_neighbor.integrate_scatter(EvaluationFlags::values |
+                                             EvaluationFlags::gradients,
+                                           dst);
       }
   }
 
@@ -398,18 +408,20 @@ private:
                      number,
                      VectorizedArrayType>
       fe_eval(data, true, 0, 0, start_vector_component);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
+                                VectorizedArrayType>::value_type;
     const int actual_degree = data.get_dof_handler().get_fe().degree;
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
-        fe_eval.gather_evaluate(src, true, true);
+        fe_eval.gather_evaluate(src,
+                                EvaluationFlags::values |
+                                  EvaluationFlags::gradients);
         VectorizedArrayType sigmaF =
           std::abs((fe_eval.get_normal_vector(0) *
                     fe_eval.inverse_jacobian(0))[dim - 1]) *
@@ -424,7 +436,9 @@ private:
             fe_eval.submit_value(average_valgrad, q);
           }
 
-        fe_eval.integrate_scatter(true, true, dst);
+        fe_eval.integrate_scatter(EvaluationFlags::values |
+                                    EvaluationFlags::gradients,
+                                  dst);
       }
   }
 
@@ -534,12 +548,12 @@ private:
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
-        phi.gather_evaluate(src, true, false);
+        phi.gather_evaluate(src, EvaluationFlags::values);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(multiply_by_advection(advection,
                                                     phi.get_value(q)),
                               q);
-        phi.integrate_scatter(false, true, dst);
+        phi.integrate_scatter(EvaluationFlags::gradients, dst);
       }
   }
 
@@ -564,20 +578,20 @@ private:
                      number,
                      VectorizedArrayType>
       phi_p(data, false, 0, 0, start_vector_component);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
+                                VectorizedArrayType>::value_type;
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         phi_m.reinit(face);
-        phi_m.gather_evaluate(src, true, false);
+        phi_m.gather_evaluate(src, EvaluationFlags::values);
         phi_p.reinit(face);
-        phi_p.gather_evaluate(src, true, false);
+        phi_p.gather_evaluate(src, EvaluationFlags::values);
 
         for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
           {
@@ -593,8 +607,8 @@ private:
             phi_p.submit_value(flux_times_normal, q);
           }
 
-        phi_m.integrate_scatter(true, false, dst);
-        phi_p.integrate_scatter(true, false, dst);
+        phi_m.integrate_scatter(EvaluationFlags::values, dst);
+        phi_p.integrate_scatter(EvaluationFlags::values, dst);
       }
   }
 
@@ -612,20 +626,21 @@ private:
                      number,
                      VectorizedArrayType>
       fe_eval(data, true, 0, 0, start_vector_component);
-    typedef
+    using value_type =
       typename FEFaceEvaluation<dim,
                                 fe_degree,
                                 n_q_points_1d,
                                 n_components,
                                 number,
-                                VectorizedArrayType>::value_type value_type;
-    value_type                                                   u_plus;
-    u_plus = make_vectorized_array<number, VectorizedArrayType::size()>(1.3);
+                                VectorizedArrayType>::value_type;
+    value_type u_plus = {};
+    for (unsigned int d = 0; d < n_components; ++d)
+      u_plus[d] = 1.3;
 
-    for (unsigned int face = face_range.first; face < face_range.second; face++)
+    for (unsigned int face = face_range.first; face < face_range.second; ++face)
       {
         fe_eval.reinit(face);
-        fe_eval.gather_evaluate(src, true, false);
+        fe_eval.gather_evaluate(src, EvaluationFlags::values);
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
@@ -639,7 +654,7 @@ private:
             fe_eval.submit_value(-flux_times_normal, q);
           }
 
-        fe_eval.integrate_scatter(true, false, dst);
+        fe_eval.integrate_scatter(EvaluationFlags::values, dst);
       }
   }
 
@@ -708,13 +723,13 @@ MatrixIntegrator<dim>::face(
               info1.fe_values(0).normal_vector(0)));
   double penalty = 0.5 * (normal_volume_fraction1 + normal_volume_fraction2) *
                    std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace ::ip_matrix(dinfo1.matrix(0, false).matrix,
-                                        dinfo1.matrix(0, true).matrix,
-                                        dinfo2.matrix(0, true).matrix,
-                                        dinfo2.matrix(0, false).matrix,
-                                        info1.fe_values(0),
-                                        info2.fe_values(0),
-                                        penalty);
+  LocalIntegrators::Laplace::ip_matrix(dinfo1.matrix(0, false).matrix,
+                                       dinfo1.matrix(0, true).matrix,
+                                       dinfo2.matrix(0, true).matrix,
+                                       dinfo2.matrix(0, false).matrix,
+                                       info1.fe_values(0),
+                                       info2.fe_values(0),
+                                       penalty);
 }
 
 
@@ -733,9 +748,9 @@ MatrixIntegrator<dim>::boundary(
                 [GeometryInfo<dim>::unit_normal_direction[dinfo.face_number]] *
               info.fe_values(0).normal_vector(0)));
   double penalty = normal_volume_fraction * std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace ::nitsche_matrix(dinfo.matrix(0, false).matrix,
-                                             info.fe_values(0),
-                                             penalty);
+  LocalIntegrators::Laplace::nitsche_matrix(dinfo.matrix(0, false).matrix,
+                                            info.fe_values(0),
+                                            penalty);
 }
 
 
@@ -760,7 +775,7 @@ do_test(const DoFHandler<dim> &          dof,
   // of degrees of freedom: " << dof.n_dofs() << std::endl; std::cout << "Number
   // of constraints: " << constraints.n_constraints() << std::endl;
 
-  MappingQGeneric<dim> mapping(dof.get_fe().degree + 1);
+  MappingQ<dim> mapping(dof.get_fe().degree + 1);
 
   Vector<number> in(dof.n_dofs()), out(dof.n_dofs());
   Vector<number> out_dist(out);

@@ -60,6 +60,8 @@ ALL_SCALAR_TYPES := {
 
 // scalar types that have a corresponding MPI datatype and that we can
 // therefore use in calls like MPI_Allreduce
+//
+// Since many of our MPI calls use std::vector we cannot include bool here
 MPI_SCALARS     := { int;
                      long int;
                      unsigned int;
@@ -208,30 +210,28 @@ GENERAL_CONTAINER_TYPES := { std::vector;
                              ArrayView
                            }
 
-// DoFHandler and hp::DoFHandler templates
-DOFHANDLER_TEMPLATES := { DoFHandler;
-                          hp::DoFHandler }
-
 // Triangulation and DoFHandler templates
 TRIANGULATION_AND_DOFHANDLER_TEMPLATES := { Triangulation;
                                             parallel::shared::Triangulation;
                                             parallel::distributed::Triangulation;
-                                            DoFHandler;
-                                            hp::DoFHandler }
+                                            DoFHandler }
+
+// concrete sequential Triangulation and DoFHandler with hard-coded
+// <deal_II_dimension, deal_II_space_dimension> (for iterators!)
+SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
+                                             DoFHandler<deal_II_dimension, deal_II_space_dimension> }
 
 // concrete sequential Triangulation and DoFHandler types with hard-coded
 // <deal_II_dimension, deal_II_space_dimension>
 SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
-                                              DoFHandler<deal_II_dimension, deal_II_space_dimension>;
-                                              hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> }
+                                              DoFHandler<deal_II_dimension, deal_II_space_dimension> }
 
 // concrete Triangulation and DoFHandler types (all types you can iterate over cells from)
 // with hard-coded <deal_II_dimension, deal_II_space_dimension>
 TRIANGULATION_AND_DOFHANDLERS := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
                                    parallel::shared::Triangulation<deal_II_dimension, deal_II_space_dimension>;
                                    parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>;
-                                   DoFHandler<deal_II_dimension, deal_II_space_dimension>;
-                                   hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> }
+                                   DoFHandler<deal_II_dimension, deal_II_space_dimension> }
 
 // concrete Triangulation types (all types you can iterate over cells from)
 // with hard-coded <deal_II_dimension, deal_II_space_dimension>

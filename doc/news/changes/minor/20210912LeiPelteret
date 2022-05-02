@@ -1,0 +1,6 @@
+Fixed: The payload for Trilinos-based linear operators is now able to use its
+own type as an examplar operator. This means that one can now use linear
+operators based on Trilinos matrices as exampler operators when initializing
+a LinearOperator for a Trilinos preconditioner.
+<br>
+(Wenyu Lei, Jean-Paul Pelteret, 2021/09/12)

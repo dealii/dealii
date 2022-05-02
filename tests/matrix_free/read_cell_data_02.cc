@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,7 +94,7 @@ private:
     unsigned int n_cells = data.n_cell_batches() + data.n_ghost_cell_batches();
     cell_ids.resize(n_cells);
 
-    for (unsigned int cell = 0; cell < n_cells; cell++)
+    for (unsigned int cell = 0; cell < n_cells; ++cell)
       for (auto lane = 0u; lane < data.n_active_entries_per_cell_batch(cell);
            lane++)
         cell_ids[cell][lane] = data.get_cell_iterator(cell, lane)->id();
@@ -110,7 +110,7 @@ private:
     FEFaceEvaluation<dim, 1> fe_eval_m(data, true);
     FEFaceEvaluation<dim, 1> fe_eval_p(data, false);
 
-    for (auto cell = pair.first; cell < pair.second; cell++)
+    for (auto cell = pair.first; cell < pair.second; ++cell)
       {
         for (auto lane = 0u; lane < data.n_active_entries_per_cell_batch(cell);
              lane++)
@@ -130,7 +130,7 @@ private:
                 Assert(cell_data_m[lane] ==
                          data.get_cell_iterator(cell, lane)->id(),
                        ExcInternalError());
-                // deallog << "m" << cell_data_m[lane] << std::endl;
+                // deallog << 'm' << cell_data_m[lane] << std::endl;
 
                 const auto bids =
                   data.get_faces_by_cells_boundary_id(cell, face);

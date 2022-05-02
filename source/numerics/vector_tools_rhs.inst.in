@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                              deal_II_space_dimension,
                              Vector<double>>(
         const hp::MappingCollection<deal_II_dimension> &,
-        const hp::DoFHandler<deal_II_dimension> &,
+        const DoFHandler<deal_II_dimension> &,
         const hp::QCollection<deal_II_dimension> &,
         const Function<deal_II_space_dimension, Vector<double>::value_type> &,
         Vector<double> &,
@@ -64,7 +64,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       create_right_hand_side<deal_II_dimension,
                              deal_II_space_dimension,
                              Vector<double>>(
-        const hp::DoFHandler<deal_II_dimension> &,
+        const DoFHandler<deal_II_dimension> &,
         const hp::QCollection<deal_II_dimension> &,
         const Function<deal_II_space_dimension, Vector<double>::value_type> &,
         Vector<double> &,
@@ -99,7 +99,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                                       deal_II_space_dimension,
                                       Vector<double>>(
         const hp::MappingCollection<deal_II_dimension> &,
-        const hp::DoFHandler<deal_II_dimension> &,
+        const DoFHandler<deal_II_dimension> &,
         const hp::QCollection<deal_II_dimension - 1> &,
         const Function<deal_II_space_dimension, Vector<double>::value_type> &,
         Vector<double> &,
@@ -110,7 +110,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       create_boundary_right_hand_side<deal_II_dimension,
                                       deal_II_space_dimension,
                                       Vector<double>>(
-        const hp::DoFHandler<deal_II_dimension> &,
+        const DoFHandler<deal_II_dimension> &,
         const hp::QCollection<deal_II_dimension - 1> &,
         const Function<deal_II_space_dimension, Vector<double>::value_type> &,
         Vector<double> &,

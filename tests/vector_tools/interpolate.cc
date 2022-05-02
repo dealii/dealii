@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,6 @@ run(const dealii::Triangulation<dim> &triangulation)
   const unsigned int          degree_coarse = 2;
   const dealii::FE_Q<dim>     fe_q_coarse(degree_coarse);
   const dealii::FESystem<dim> fe_system_coarse(fe_q_coarse, dim);
-  dof_handler_coarse.initialize(triangulation, fe_system_coarse);
   dof_handler_coarse.distribute_dofs(fe_system_coarse);
 
   Vector           solution_coarse;
@@ -90,7 +89,6 @@ run(const dealii::Triangulation<dim> &triangulation)
 
   const dealii::FE_Q<dim>     fe_q_fine(degree_fine);
   const dealii::FESystem<dim> fe_system_fine(fe_q_fine, dim);
-  dof_handler_fine.initialize(triangulation, fe_system_fine);
   dof_handler_fine.distribute_dofs(fe_system_fine);
 
   Vector           solution_fine;

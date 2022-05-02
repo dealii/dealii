@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 
 // a un-hp-ified version of hp/step-2
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -29,8 +30,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/lac/sparse_matrix.h>
 
 #include "../tests.h"
@@ -40,7 +39,8 @@
 std::ofstream logfile("output");
 
 
-void make_grid(Triangulation<2> &triangulation)
+void
+make_grid(Triangulation<2> &triangulation)
 {
   const Point<2> center(1, 0);
   const double   inner_radius = 0.5, outer_radius = 1.0;
@@ -76,7 +76,8 @@ void make_grid(Triangulation<2> &triangulation)
 }
 
 
-void distribute_dofs(DoFHandler<2> &dof_handler)
+void
+distribute_dofs(DoFHandler<2> &dof_handler)
 {
   static const FE_Q<2> finite_element(1);
   dof_handler.distribute_dofs(finite_element);
@@ -93,7 +94,8 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
 
 
 
-void renumber_dofs(DoFHandler<2> &dof_handler)
+void
+renumber_dofs(DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee(dof_handler);
   SparsityPattern sparsity_pattern(dof_handler.n_dofs(), dof_handler.n_dofs());

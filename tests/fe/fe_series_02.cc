@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,9 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx17/cmath.h>
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_series.h>
@@ -25,14 +28,11 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
-
-#include <gsl/gsl_sf_legendre.h>
 
 #include <iostream>
 
@@ -74,12 +74,12 @@ LegendreFunction<dim>::value(const dealii::Point<dim> &point,
 
   double f = 0.0;
 
-  for (int l = 0; l < int(coefficients.size()); l++)
+  for (unsigned int l = 0; l < coefficients.size(); ++l)
     {
       const double m = 0.5;                // mid-point
       const double h = 0.5;                // half-length
       const double x = (point[0] - m) / h; // 1D only
-      f += sqrt(1.0 / h) * gsl_sf_legendre_Pl(l, x) * coefficients[l];
+      f += sqrt(1.0 / h) * std_cxx17::legendre(l, x) * coefficients[l];
     }
 
   return f;
@@ -90,7 +90,7 @@ void
 test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
 {
   Triangulation<dim>    triangulation;
-  hp::DoFHandler<dim>   dof_handler(triangulation);
+  DoFHandler<dim>       dof_handler(triangulation);
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(dealii::FE_Q<dim>(poly_degree));
 
@@ -106,15 +106,19 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
 
   VectorTools::interpolate(dof_handler, func, values);
 
-  const unsigned int      N = poly_degree + 1;
-  FESeries::Legendre<dim> legendre(N, fe_collection, quadrature_formula);
+  const unsigned int              N = poly_degree + 1;
+  const std::vector<unsigned int> n_coefficients_per_direction(
+    fe_collection.size(), N);
+  FESeries::Legendre<dim> legendre(n_coefficients_per_direction,
+                                   fe_collection,
+                                   quadrature_formula);
 
   const std::vector<double> &coeff_in = func.get_coefficients();
   Table<1, double>           coeff_out(N);
 
   Vector<double> local_dof_values;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  typename DoFHandler<dim>::active_cell_iterator cell =
     dof_handler.begin_active();
 
   {
@@ -127,13 +131,13 @@ test(const LegendreFunction<dim> &func, const unsigned int poly_degree)
     legendre.calculate(local_dof_values, cell_active_fe_index, coeff_out);
   }
 
-  for (unsigned int i = 0; i < coeff_in.size(); i++)
-    deallog << coeff_in[i] << " ";
+  for (unsigned int i = 0; i < coeff_in.size(); ++i)
+    deallog << coeff_in[i] << ' ';
 
   deallog << std::endl;
 
-  for (unsigned int i = 0; i < N; i++)
-    deallog << coeff_out[i] << " ";
+  for (unsigned int i = 0; i < N; ++i)
+    deallog << coeff_out[i] << ' ';
 
   deallog << std::endl;
 

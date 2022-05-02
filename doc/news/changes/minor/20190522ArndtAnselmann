@@ -1,3 +1,0 @@
-Fixed: TrilinosWrappers::SparsityPattern can deal with empty column maps.
-<br>
-(Daniel Arndt, Mathias Anselmann, 2019/05/22)

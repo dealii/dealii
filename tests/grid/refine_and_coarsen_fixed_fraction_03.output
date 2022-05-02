@@ -1,0 +1,3 @@
+
+DEAL::l1-norm: n_refine_flags: 3, n_coarsen_flags: 10
+DEAL::l2-norm: n_refine_flags: 1, n_coarsen_flags: 8

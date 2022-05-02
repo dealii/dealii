@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,7 +106,7 @@ template <int dim>
 std::unique_ptr<Manifold<dim>>
 Geometry<dim>::clone() const
 {
-  return std_cxx14::make_unique<Geometry<dim>>();
+  return std::make_unique<Geometry<dim>>();
 }
 
 template <int dim>
@@ -193,7 +193,7 @@ test(const FiniteElement<dim> &fe)
 
   for (unsigned mapping_p = 1; mapping_p <= 5; ++mapping_p)
     {
-      MappingQ<dim> mapping(mapping_p, true);
+      MappingQ<dim> mapping(mapping_p);
 
       AffineConstraints<double> constraints;
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);

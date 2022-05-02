@@ -1,0 +1,9 @@
+
+DEAL::root_true:1
+DEAL::root_false:0
+DEAL::group_name: test_group
+DEAL::group_true:1
+DEAL::group_false:0
+DEAL::dataset_name: test_dataset
+DEAL::dataset_true:1
+DEAL::dataset_false:0

@@ -85,7 +85,7 @@ test2()
   Assert(c == result[1], ExcInternalError());
 
   // Output the evaluated function
-  deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"
+  deallog << "Function '" << expressions[0] << ',' << expressions[1] << "'"
           << " @ " << point << " is " << result << std::endl;
 }
 

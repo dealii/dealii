@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,7 @@ namespace python
 {
   class PointWrapper;
   class TriangulationWrapper;
+  class ReferenceCellWrapper;
 
   class CellAccessorWrapper
   {
@@ -184,6 +185,26 @@ namespace python
     unsigned int
     vertex_index(const unsigned int i) const;
 
+    /*! @copydoc TriaAccessor::reference_cell
+     */
+    ReferenceCellWrapper
+    reference_cell() const;
+
+    /*! @copydoc TriaAccessor::n_vertices
+     */
+    unsigned int
+    n_vertices() const;
+
+    /*! @copydoc TriaAccessor::n_lines
+     */
+    unsigned int
+    n_lines() const;
+
+    /*! @copydoc TriaAccessor::n_faces
+     */
+    unsigned int
+    n_faces() const;
+
     /**
      * Exception.
      */
@@ -221,7 +242,7 @@ namespace python
      */
     void *cell_accessor;
 
-    friend class MappingQGenericWrapper;
+    friend class MappingQWrapper;
   };
 
 

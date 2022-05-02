@@ -46,7 +46,7 @@ pipeline
       {
         docker
         {
-          image 'tjhei/candi-base-clang'
+          image 'tjhei/candi-base:clang10'
         }
       }
 
@@ -57,10 +57,13 @@ pipeline
         stage("check")
         {
           when {
-            allOf {
-              not {branch 'master'}
+            not {
+	      anyOf {
+	        branch 'master'
+	        branch pattern: "dealii-*", comparator: "GLOB"
+	      }
             }
-          }
+	  }
 
           steps
           {
@@ -102,6 +105,10 @@ pipeline
 
           post
           {
+            always
+            {
+              archiveArtifacts artifacts: 'build/clang-tidy.log', fingerprint: true
+            }
             failure
             {
               githubNotify context: 'tidy', description: 'build failed',  status: 'FAILURE'

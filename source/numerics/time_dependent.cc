@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -226,13 +226,13 @@ TimeDependent::start_sweep(const unsigned int s)
 void
 TimeDependent::end_sweep()
 {
-  parallel::apply_to_subranges(0U,
-                               timesteps.size(),
-                               [this](const unsigned int begin,
-                                      const unsigned int end) {
-                                 this->end_sweep(begin, end);
-                               },
-                               1);
+  parallel::apply_to_subranges(
+    0U,
+    timesteps.size(),
+    [this](const unsigned int begin, const unsigned int end) {
+      this->end_sweep(begin, end);
+    },
+    1);
 }
 
 
@@ -816,7 +816,7 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
   // refinement; in this case it often
   // happens that the number of cells
   // does not grow between sweeps, which
-  // clearly is not the wanted behaviour)
+  // clearly is not the wanted behavior)
   //
   // however, if we do not do anything, we
   // can get into trouble somewhen later.

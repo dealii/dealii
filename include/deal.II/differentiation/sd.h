@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
 #  include <deal.II/differentiation/sd/symengine_math.h>
 #  include <deal.II/differentiation/sd/symengine_number_traits.h>
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
+#  include <deal.II/differentiation/sd/symengine_optimizer.h>
 #  include <deal.II/differentiation/sd/symengine_product_types.h>
 #  include <deal.II/differentiation/sd/symengine_scalar_operations.h>
 #  include <deal.II/differentiation/sd/symengine_tensor_operations.h>
@@ -41,7 +42,14 @@ namespace Differentiation
    * @ingroup auto_symb_diff
    */
   namespace SD
-  {}
+  {
+    /**
+     * This namespace defines the classes and functions that help provide a
+     * structured interface to symbolic numbers and operations.
+     */
+    namespace internal
+    {}
+  } // namespace SD
 } // namespace Differentiation
 
 DEAL_II_NAMESPACE_CLOSE

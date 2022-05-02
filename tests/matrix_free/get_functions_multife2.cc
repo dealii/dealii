@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  typedef std::vector<Vector<Number>> VectorType;
+  using VectorType = std::vector<Vector<Number>>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in)
@@ -92,15 +92,18 @@ public:
       {
         fe_eval0.reinit(cell);
         fe_eval0.read_dof_values(src[0]);
-        fe_eval0.evaluate(true, true, true);
+        fe_eval0.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians);
 
         fe_eval1.reinit(cell);
         fe_eval1.read_dof_values(src[1]);
-        fe_eval1.evaluate(true, true, true);
+        fe_eval1.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians);
 
         fe_eval2.reinit(cell);
         fe_eval2.read_dof_values(src[2]);
-        fe_eval2.evaluate(true, true, true);
+        fe_eval2.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians);
 
         // compare values with the ones the FEValues
         // gives us. Those are seen as reference
@@ -112,7 +115,7 @@ public:
             fe_val0.get_function_gradients(src[0], reference_grads0);
             fe_val0.get_function_hessians(src[0], reference_hess0);
 
-            for (int q = 0; q < (int)fe_eval0.n_q_points; q++)
+            for (int q = 0; q < (int)fe_eval0.n_q_points; ++q)
               {
                 errors[0] +=
                   std::fabs(fe_eval0.get_value(q)[j] - reference_values0[q]);
@@ -133,7 +136,7 @@ public:
             fe_val1.get_function_gradients(src[1], reference_grads1);
             fe_val1.get_function_hessians(src[1], reference_hess1);
 
-            for (int q = 0; q < (int)fe_eval1.n_q_points; q++)
+            for (int q = 0; q < (int)fe_eval1.n_q_points; ++q)
               {
                 errors[3] +=
                   std::fabs(fe_eval1.get_value(q)[j] - reference_values1[q]);
@@ -154,7 +157,7 @@ public:
             fe_val2.get_function_gradients(src[2], reference_grads2);
             fe_val2.get_function_hessians(src[2], reference_hess2);
 
-            for (int q = 0; q < (int)fe_eval2.n_q_points; q++)
+            for (int q = 0; q < (int)fe_eval2.n_q_points; ++q)
               {
                 errors[6] +=
                   std::fabs(fe_eval2.get_value(q)[j] - reference_values2[q]);
@@ -244,7 +247,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double     number;
+  using number = double;
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);

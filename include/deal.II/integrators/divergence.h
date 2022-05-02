@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,8 +40,6 @@ namespace LocalIntegrators
    * trace.
    *
    * @ingroup Integrators
-   * @author Guido Kanschat
-   * @date 2010
    */
   namespace Divergence
   {
@@ -50,9 +48,6 @@ namespace LocalIntegrators
      * \f[ \int_Z v\nabla \cdot \mathbf u \,dx \f] This is the strong
      * divergence operator and the trial space should be at least
      * <b>H</b><sup>div</sup>. The test functions may be discontinuous.
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -92,9 +87,6 @@ namespace LocalIntegrators
      *
      * The function cell_matrix() is the Frechet derivative of this function
      * with respect to the test functions.
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim, typename number>
     void
@@ -128,9 +120,6 @@ namespace LocalIntegrators
      *
      * @todo Verify: The function cell_matrix() is the Frechet derivative of
      * this function with respect to the test functions.
-     *
-     * @author Guido Kanschat
-     * @date 2013
      */
     template <int dim, typename number>
     void
@@ -162,9 +151,6 @@ namespace LocalIntegrators
      *
      * This is the strong gradient and the trial space should be at least in
      * <i>H</i><sup>1</sup>. The test functions can be discontinuous.
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -205,9 +191,6 @@ namespace LocalIntegrators
      *
      * The function gradient_matrix() is the Frechet derivative of this
      * function with respect to the test functions.
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim, typename number>
     void
@@ -241,9 +224,6 @@ namespace LocalIntegrators
      *
      * @todo Verify: The function gradient_matrix() is the Frechet derivative
      * of this function with respect to the test functions.
-     *
-     * @author Guido Kanschat
-     * @date 2013
      */
     template <int dim, typename number>
     void
@@ -273,9 +253,6 @@ namespace LocalIntegrators
      * The trace of the divergence operator, namely the product of the normal
      * component of the vector valued trial space and the test space.
      * @f[ \int_F (\mathbf u\cdot \mathbf n) v \,ds @f]
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -309,9 +286,6 @@ namespace LocalIntegrators
      * @f[
      * \int_F (\mathbf u\cdot \mathbf n) v \,ds
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim, typename number>
     void
@@ -344,9 +318,6 @@ namespace LocalIntegrators
      * @f[
      * \int_F u (\mathbf v\cdot \mathbf n) \,ds
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2013
      */
     template <int dim, typename number>
     void
@@ -381,9 +352,6 @@ namespace LocalIntegrators
      * \int_F (\mathbf u_1\cdot \mathbf n_1 + \mathbf u_2 \cdot \mathbf n_2)
      * \frac{v_1+v_2}{2} \,ds
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -436,44 +404,6 @@ namespace LocalIntegrators
     }
 
     /**
-     * @deprecated Use LocalIntegrators::GradDiv::cell_matrix() instead.
-     */
-    template <int dim>
-    DEAL_II_DEPRECATED void
-    grad_div_matrix(FullMatrix<double> &     M,
-                    const FEValuesBase<dim> &fe,
-                    const double             factor = 1.);
-
-    template <int dim>
-    void
-    grad_div_matrix(FullMatrix<double> &     M,
-                    const FEValuesBase<dim> &fe,
-                    const double             factor)
-    {
-      GradDiv::cell_matrix(M, fe, factor);
-    }
-
-    /**
-     * @deprecated Use LocalIntegrators::GradDiv::cell_residual() instead.
-     */
-    template <int dim, typename number>
-    DEAL_II_DEPRECATED void
-    grad_div_residual(Vector<number> &         result,
-                      const FEValuesBase<dim> &fetest,
-                      const ArrayView<const std::vector<Tensor<1, dim>>> &input,
-                      const double factor = 1.);
-
-    template <int dim, typename number>
-    void
-    grad_div_residual(Vector<number> &         result,
-                      const FEValuesBase<dim> &fetest,
-                      const ArrayView<const std::vector<Tensor<1, dim>>> &input,
-                      const double factor)
-    {
-      GradDiv::cell_residual(result, fetest, input, factor);
-    }
-
-    /**
      * The jump of the normal component
      * @f[
      * \int_F
@@ -481,9 +411,6 @@ namespace LocalIntegrators
      *  (\mathbf v_1\cdot \mathbf n_1 + \mathbf v_2 \cdot \mathbf n_2)
      * \,ds
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -539,9 +466,6 @@ namespace LocalIntegrators
      * The vector is expected to consist of dim vectors of length equal to the
      * number of quadrature points. The number of components of the finite
      * element has to be equal to the space dimension.
-     *
-     * @author Guido Kanschat
-     * @date 2013
      */
     template <int dim>
     double

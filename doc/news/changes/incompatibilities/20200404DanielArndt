@@ -1,4 +1,0 @@
-Removed: The deprecated class PArpackSolver::Shift has been removed.
-Use LinearOperator instead.
-<br>
-(Daniel Arndt, 2020/04/04)

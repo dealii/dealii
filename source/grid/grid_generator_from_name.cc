@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,7 @@ namespace GridGenerator
   namespace
   {
     /**
-     * Given a GridGenerator function pointer, a  string containig a text
+     * Given a GridGenerator function pointer, a  string containing a text
      * version of the function arguments and an empty Triangulation, calls the
      * corresponding function, after parsing the arguments from the given
      * string.
@@ -111,7 +111,7 @@ namespace GridGenerator
                          double,
                          double,
                          double,
-                         const Point<dim>,
+                         const Point<dim> &,
                          types::manifold_id,
                          types::manifold_id,
                          double,
@@ -129,6 +129,9 @@ namespace GridGenerator
         parse_and_create<dim, dim, const Point<dim> &, double, bool>(hyper_ball,
                                                                      arguments,
                                                                      tria);
+      else if (name == "hyper_ball_balanced")
+        parse_and_create<dim, dim, const Point<dim> &, double>(
+          hyper_ball_balanced, arguments, tria);
 
       else if (name == "quarter_hyper_ball")
         parse_and_create<dim, dim, const Point<dim> &, double>(
@@ -142,10 +145,21 @@ namespace GridGenerator
       else if (name == "cylinder")
         parse_and_create<dim, dim, double, double>(cylinder, arguments, tria);
 
+      else if (name == "subdivided_cylinder")
+        parse_and_create<dim, dim, unsigned int, double, double>(
+          subdivided_cylinder, arguments, tria);
+
       else if (name == "truncated_cone")
         parse_and_create<dim, dim, double, double, double>(truncated_cone,
                                                            arguments,
                                                            tria);
+
+      else if (name == "pipe_junction")
+        parse_and_create<dim,
+                         dim,
+                         const std::vector<std::pair<Point<dim>, double>> &,
+                         const std::pair<Point<dim>, double> &,
+                         double>(pipe_junction, arguments, tria);
 
       else if (name == "hyper_L")
         parse_and_create<dim, dim, double, double, bool>(hyper_L,
@@ -183,6 +197,15 @@ namespace GridGenerator
                          double,
                          unsigned int,
                          bool>(quarter_hyper_shell, arguments, tria);
+
+      else if (name == "eccentric_hyper_shell")
+        parse_and_create<dim,
+                         dim,
+                         const Point<dim> &,
+                         const Point<dim> &,
+                         double,
+                         double,
+                         unsigned int>(eccentric_hyper_shell, arguments, tria);
 
       else if (name == "cylinder_shell")
         parse_and_create<dim,

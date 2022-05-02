@@ -1,0 +1,185 @@
+
+Process #0
+Local range: [0, 9), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 3.000e+00 
+DEAL:0::5.50757
+Process #0
+Local range: [0, 9), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 3.000e+00 
+DEAL:0::5.50757
+Process #0
+Local range: [0, 9), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 3.000e+00 
+DEAL:0::5.50757
+Process #0
+Local range: [0, 18), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 3.000e+00 3.000e+00 
+DEAL:0::7.78888
+Process #0
+Local range: [0, 18), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 3.000e+00 3.000e+00 
+DEAL:0::7.78888
+Process #0
+Local range: [0, 18), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 3.000e+00 3.000e+00 
+DEAL:0::7.78888
+Process #0
+Local range: [0, 9), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 3.000e+00 
+DEAL:0::5.50757
+Process #0
+Local range: [0, 9), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 3.000e+00 
+DEAL:0::5.50757
+Process #0
+Local range: [0, 9), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 3.000e+00 
+DEAL:0::5.50757
+Process #0
+Local range: [0, 18), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 3.000e+00 3.000e+00 
+DEAL:0::7.78888
+Process #0
+Local range: [0, 18), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 3.000e+00 3.000e+00 
+DEAL:0::7.78888
+Process #0
+Local range: [0, 18), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 3.000e+00 3.000e+00 
+DEAL:0::7.78888
+
+Process #1
+Local range: [9, 11), global size: 18
+Vector data:
+0.000e+00 0.000e+00 
+DEAL:1::5.50757
+Process #1
+Local range: [9, 11), global size: 18
+Vector data:
+0.000e+00 0.000e+00 
+DEAL:1::5.50757
+Process #1
+Local range: [9, 11), global size: 18
+Vector data:
+0.000e+00 0.000e+00 
+DEAL:1::5.50757
+Process #1
+Local range: [18, 22), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:1::7.78888
+Process #1
+Local range: [18, 22), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:1::7.78888
+Process #1
+Local range: [18, 22), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:1::7.78888
+Process #1
+Local range: [9, 11), global size: 18
+Vector data:
+0.000e+00 0.000e+00 
+DEAL:1::5.50757
+Process #1
+Local range: [9, 11), global size: 18
+Vector data:
+0.000e+00 0.000e+00 
+DEAL:1::5.50757
+Process #1
+Local range: [9, 11), global size: 18
+Vector data:
+0.000e+00 0.000e+00 
+DEAL:1::5.50757
+Process #1
+Local range: [18, 22), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:1::7.78888
+Process #1
+Local range: [18, 22), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:1::7.78888
+Process #1
+Local range: [18, 22), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:1::7.78888
+
+
+Process #2
+Local range: [11, 18), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::5.50757
+Process #2
+Local range: [11, 18), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::5.50757
+Process #2
+Local range: [11, 18), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::5.50757
+Process #2
+Local range: [22, 36), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::7.78888
+Process #2
+Local range: [22, 36), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::7.78888
+Process #2
+Local range: [22, 36), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::7.78888
+Process #2
+Local range: [11, 18), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::5.50757
+Process #2
+Local range: [11, 18), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::5.50757
+Process #2
+Local range: [11, 18), global size: 18
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::5.50757
+Process #2
+Local range: [22, 36), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::7.78888
+Process #2
+Local range: [22, 36), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::7.78888
+Process #2
+Local range: [22, 36), global size: 36
+Vector data:
+0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 2.667e+00 2.667e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 0.000e+00 
+DEAL:2::7.78888
+

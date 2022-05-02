@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,8 +29,8 @@ void
 test()
 {
   {
-    const unsigned int      n_properties_per_particle = 3;
-    Particles::PropertyPool pool(n_properties_per_particle);
+    const unsigned int           n_properties_per_particle = 3;
+    Particles::PropertyPool<dim> pool(n_properties_per_particle);
 
     Point<2> position;
     position(0) = 0.3;

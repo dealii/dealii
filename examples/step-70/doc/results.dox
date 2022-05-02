@@ -1,0 +1,485 @@
+<h1>Results</h1>
+
+The directory in which this program is run contains a number of sample
+parameter files that you can use to reproduce the results presented in this
+section. If you do not specify a parameter file as an argument on the command
+line, the program will try to read the file "`parameters.prm`" by default, and
+will execute the two dimensional version of the code. As explained in
+the discussion of the source code, if
+your file name contains the string "23", then the program will run a three
+dimensional problem, with immersed solid of co-dimension one. If it contains
+the string "3", it will run a three dimensional problem, with immersed solid of
+co-dimension zero, otherwise it will run a two dimensional problem with
+immersed solid of co-dimension zero.
+
+Regardless of the specific parameter file name, if the specified file does not
+exist, when you execute the program you will get an exception that no such file
+can be found:
+
+@code
+----------------------------------------------------
+Exception on processing:
+
+--------------------------------------------------------
+An error occurred in line <74> of file <../source/base/parameter_acceptor.cc> in function
+    static void dealii::ParameterAcceptor::initialize(const std::string &, const std::string &, const ParameterHandler::OutputStyle, dealii::ParameterHandler &)
+The violated condition was:
+    false
+Additional information:
+    You specified <parameters.prm> as input parameter file, but it does not exist. We created it for you.
+--------------------------------------------------------
+
+Aborting!
+----------------------------------------------------
+@endcode
+
+However, as the error message already states, the code that triggers the
+exception will also generate the specified file ("`parameters.prm`" in this case)
+that simply contains the default values for all parameters this program cares
+about (for the correct dimension and co-dimension, according to the whether a
+string "23" or "3" is contained in the file name). By inspection of the default
+parameter file, we see the following:
+
+@code
+# Listing of Parameters
+# ---------------------
+subsection Stokes Immersed Problem
+  set Final time                            = 1
+  # Extraction level of the rtree used to construct global bounding boxes
+  set Fluid bounding boxes extraction level = 1
+
+  # Boundary Ids over which homogeneous Dirichlet boundary conditions are
+  # applied
+  set Homogeneous Dirichlet boundary ids    = 0
+
+  # Initial mesh refinement used for the fluid domain Omega
+  set Initial fluid refinement              = 5
+
+  # Initial mesh refinement used for the solid domain Gamma
+  set Initial solid refinement              = 5
+  set Nitsche penalty term                  = 100
+  set Number of time steps                  = 501
+  set Output directory                      = .
+  set Output frequency                      = 1
+
+  # Refinement of the volumetric mesh used to insert the particles
+  set Particle insertion refinement         = 3
+  set Velocity degree                       = 2
+  set Viscosity                             = 1
+
+
+  subsection Angular velocity
+    # Sometimes it is convenient to use symbolic constants in the expression
+    # that describes the function, rather than having to use its numeric value
+    # everywhere the constant appears. These values can be defined using this
+    # parameter, in the form `var1=value1, var2=value2, ...'.
+    #
+    # A typical example would be to set this runtime parameter to
+    # `pi=3.1415926536' and then use `pi' in the expression of the actual
+    # formula. (That said, for convenience this class actually defines both
+    # `pi' and `Pi' by default, but you get the idea.)
+    set Function constants  =
+
+    # The formula that denotes the function you want to evaluate for
+    # particular values of the independent variables. This expression may
+    # contain any of the usual operations such as addition or multiplication,
+    # as well as all of the common functions such as `sin' or `cos'. In
+    # addition, it may contain expressions like `if(x>0, 1, -1)' where the
+    # expression evaluates to the second argument if the first argument is
+    # true, and to the third argument otherwise. For a full overview of
+    # possible expressions accepted see the documentation of the muparser
+    # library at http://muparser.beltoforion.de/.
+    #
+    # If the function you are describing represents a vector-valued function
+    # with multiple components, then separate the expressions for individual
+    # components by a semicolon.
+    set Function expression = t < .500001 ? 6.283185 : -6.283185 # default: 0
+
+    # The names of the variables as they will be used in the function,
+    # separated by commas. By default, the names of variables at which the
+    # function will be evaluated are `x' (in 1d), `x,y' (in 2d) or `x,y,z' (in
+    # 3d) for spatial coordinates and `t' for time. You can then use these
+    # variable names in your function expression and they will be replaced by
+    # the values of these variables at which the function is currently
+    # evaluated. However, you can also choose a different set of names for the
+    # independent variables at which to evaluate your function expression. For
+    # example, if you work in spherical coordinates, you may wish to set this
+    # input parameter to `r,phi,theta,t' and then use these variable names in
+    # your function expression.
+    set Variable names      = x,y,t
+  end
+
+  subsection Grid generation
+    set Fluid grid generator              = hyper_cube
+    set Fluid grid generator arguments    = -1: 1: false
+    set Particle grid generator           = hyper_ball
+    set Particle grid generator arguments = 0.3, 0.3: 0.1: false
+    set Solid grid generator              = hyper_rectangle
+    set Solid grid generator arguments    = -.5, -.1: .5, .1: false
+  end
+
+  subsection Refinement and remeshing
+    set Maximum number of cells        = 20000
+    set Refinement coarsening fraction = 0.3
+    set Refinement fraction            = 0.3
+    set Refinement maximal level       = 8
+    set Refinement minimal level       = 5
+    set Refinement step frequency      = 5
+    set Refinement strategy            = fixed_fraction
+  end
+
+  subsection Right hand side
+    # Sometimes it is convenient to use symbolic constants in the expression
+    # that describes the function, rather than having to use its numeric value
+    # everywhere the constant appears. These values can be defined using this
+    # parameter, in the form `var1=value1, var2=value2, ...'.
+    #
+    # A typical example would be to set this runtime parameter to
+    # `pi=3.1415926536' and then use `pi' in the expression of the actual
+    # formula. (That said, for convenience this class actually defines both
+    # `pi' and `Pi' by default, but you get the idea.)
+    set Function constants  =
+
+    # The formula that denotes the function you want to evaluate for
+    # particular values of the independent variables. This expression may
+    # contain any of the usual operations such as addition or multiplication,
+    # as well as all of the common functions such as `sin' or `cos'. In
+    # addition, it may contain expressions like `if(x>0, 1, -1)' where the
+    # expression evaluates to the second argument if the first argument is
+    # true, and to the third argument otherwise. For a full overview of
+    # possible expressions accepted see the documentation of the muparser
+    # library at http://muparser.beltoforion.de/.
+    #
+    # If the function you are describing represents a vector-valued function
+    # with multiple components, then separate the expressions for individual
+    # components by a semicolon.
+    set Function expression = 0; 0; 0
+
+    # The names of the variables as they will be used in the function,
+    # separated by commas. By default, the names of variables at which the
+    # function will be evaluated are `x' (in 1d), `x,y' (in 2d) or `x,y,z' (in
+    # 3d) for spatial coordinates and `t' for time. You can then use these
+    # variable names in your function expression and they will be replaced by
+    # the values of these variables at which the function is currently
+    # evaluated. However, you can also choose a different set of names for the
+    # independent variables at which to evaluate your function expression. For
+    # example, if you work in spherical coordinates, you may wish to set this
+    # input parameter to `r,phi,theta,t' and then use these variable names in
+    # your function expression.
+    set Variable names      = x,y,t
+  end
+
+end
+@endcode
+
+If you now run the program, you will get a file called `parameters_22.prm` in
+the directory specified by the parameter `Output directory` (which defaults to
+the current directory) containing a shorter version of the above parameters
+(without comments and documentation), documenting all parameters that were used
+to run your program:
+
+@code
+subsection Stokes Immersed Problem
+  set Final time                            = 1
+  set Fluid bounding boxes extraction level = 1
+  set Homogeneous Dirichlet boundary ids    = 0
+  set Initial fluid refinement              = 5
+  set Initial solid refinement              = 5
+  set Nitsche penalty term                  = 100
+  set Number of time steps                  = 501
+  set Output directory                      = .
+  set Output frequency                      = 1
+  set Particle insertion refinement         = 3
+  set Velocity degree                       = 2
+  set Viscosity                             = 1
+  subsection Angular velocity
+    set Function constants  =
+    set Function expression = t < .500001 ? 6.283185 : -6.283185
+    set Variable names      = x,y,t
+  end
+  subsection Grid generation
+    set Fluid grid generator              = hyper_cube
+    set Fluid grid generator arguments    = -1: 1: false
+    set Particle grid generator           = hyper_ball
+    set Particle grid generator arguments = 0.3, 0.3: 0.1: false
+    set Solid grid generator              = hyper_rectangle
+    set Solid grid generator arguments    = -.5, -.1: .5, .1: false
+  end
+  subsection Refinement and remeshing
+    set Maximum number of cells        = 20000
+    set Refinement coarsening fraction = 0.3
+    set Refinement fraction            = 0.3
+    set Refinement maximal level       = 8
+    set Refinement minimal level       = 5
+    set Refinement step frequency      = 5
+    set Refinement strategy            = fixed_fraction
+  end
+  subsection Right hand side
+    set Function constants  =
+    set Function expression = 0; 0; 0
+    set Variable names      = x,y,t
+  end
+end
+@endcode
+
+The rationale behind creating first `parameters.prm` file (the first time the
+program is run) and then a `output/parameters_22.prm` (every time you
+run the program with an existing input file), is because you may want
+to leave most parameters to their
+default values, and only modify a handful of them, while still beeing able to
+reproduce the results and inspect what parameters were used for a specific
+simulation. It is generally good scientific practice to store the
+parameter file you used for a simulation along with the simulation
+output so that you can repeat the exact same run at a later time if necessary.
+
+Another reason is because the input file may only contain those
+parameters that differ from their defaults.
+For example, you could use the following (perfectly valid) parameter file with
+this tutorial program:
+@code
+subsection Stokes Immersed Problem
+  set Final time                         = 1
+  set Nitsche penalty term               = 10
+  set Number of time steps               = 101
+  set Velocity degree                    = 3
+end
+@endcode
+and you would run the program with Q3/Q2 Taylor-Hood finite elements, for 101
+steps, using a Nitsche penalty of `10`, and leaving all the other parameters to
+their default value. The output directory then contains a record of
+not just these parameters, but indeed all parameters used in the
+simulation. You can inspect all the other parameters in the
+produced file `parameters_22.prm`.
+
+
+<h3> Two dimensional test case </h3>
+
+The default problem generates a co-dimension zero impeller, consisting of a
+rotating rectangular grid, where the rotation is for half a time unit in one
+direction, and half a time unit in the opposite direction, with constant angular
+velocity equal to $\approx 2\pi \frac{\text{rad}}{\text{time unit}}$. Consequently, the impeller does half a
+rotation and returns to its original position. The following animation
+displays the velocity magnitude, the motion of the solid impeller and of the
+tracer particles.
+
+
+<p align="center">
+   <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-70.2d_tracing.gif"
+           alt = ""
+           width="500">
+    </div>
+</p>
+
+On one core, the output of the program will look like the following:
+
+@code
+bash$ mpirun -np 1 ./step-70 test.prm
+Running StokesImmersedProblem<2> using Trilinos.
+Cycle 0:
+Time : 0, time step: 0.002
+   Number of degrees of freedom: 9539 (8450+1089 -- 0+0)
+Tracer particles: 337
+Solid particles: 9216
+   Solved in 158 iterations.
+   Number of degrees of freedom: 9845 (8722+1123 -- 9216+337)
+Cycle 1:
+Time : 0.002, time step: 0.002
+   Solved in 142 iterations.
+Cycle 2:
+Time : 0.004, time step: 0.002
+   Solved in 121 iterations.
+Cycle 3:
+Time : 0.006, time step: 0.002
+   Solved in 121 iterations.
+
+...
+
+Cycle 499:
+Time : 0.998, time step: 0.002
+   Solved in 199 iterations.
+Cycle 500:
+Time : 1, time step: 0.002
+   Solved in 196 iterations.
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |       302s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble Nitsche terms          |       501 |      43.3s |        14% |
+| Assemble Stokes terms           |       501 |      21.5s |       7.1% |
+| Initial setup                   |         1 |  0.000792s |         0% |
+| Output fluid                    |       502 |      31.8s |        11% |
+| Output solid particles          |       502 |      32.2s |        11% |
+| Output tracer particles         |       502 |      0.61s |       0.2% |
+| Refine                          |       100 |      4.68s |       1.5% |
+| Set solid particle position     |       500 |      3.34s |       1.1% |
+| Set tracer particle motion      |       501 |     0.729s |      0.24% |
+| Setup dofs                      |       101 |       2.2s |      0.73% |
+| Solve                           |       501 |       164s |        54% |
++---------------------------------+-----------+------------+------------+
+@endcode
+
+You may notice that assembling the coupling system is more expensive than
+assembling the Stokes part. This depends highly on the number of Gauss points
+(solid particles) that are used to apply the Nitsche restriction.
+In the present case, a relatively low number of tracer particles are used.
+Consequently, tracking their motion is relatively cheap.
+
+The following movie shows the evolution of the solution over time:
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/y4Gypj2jpXw"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+The movie shows the rotating obstacle in gray (actually a
+superposition of the solid particles plotted with large enough dots
+that they overlap), <a
+href="https://en.wikipedia.org/wiki/Streamlines,_streaklines,_and_pathlines">streamlines
+of the fluid flow</a> in light colors (including the corner vertices
+that form at specific times during the simulation), and the tracer particles in
+bluish tones.
+
+The simulation shows that at the end time,
+the tracer particles have somewhat returned to their
+original position, although they have been distorted by the flow field. The
+following image compares the initial and the final position of the particles
+after one time unit of flow.
+
+<p align="center">
+   <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-70.tracer_comparison.png"
+           alt = ""
+           width="500">
+    </div>
+</p>
+
+In this case, we see that the tracer particles that were outside of the swept
+volume of the impeller have returned very close to their initial position,
+whereas those in the swept volume were slightly more deformed. This deformation
+is non-physical. It is caused by the numerical error induced by the explicit
+Euler scheme used to advect the particles, by the loss of accuracy due to the
+fictitious domain and, finally, by the discretization error on the Stokes
+equations. The first two errors are the leading cause of this deformation and
+they could be alleviated by the use of a finer mesh and a lower time step.
+
+
+<h3> Three dimensional test case </h3>
+
+To play around a little bit, we complicate the fictitious domain (taken from
+https://grabcad.com/library/lungstors-blower-1), and run a co-dimension one
+simulation in three space dimensions, using the following
+"`parameters_23.prm`" file:
+
+@code
+subsection Stokes Immersed Problem
+  set Final time                            = 1
+  set Homogeneous Dirichlet boundary ids    = 0
+  set Fluid bounding boxes extraction level = 1
+  set Initial fluid refinement              = 3
+  set Initial solid refinement              = 0
+  set Nitsche penalty term                  = 10
+  set Number of time steps                  = 101
+  set Output frequency                      = 1
+  set Particle insertion refinement         = 3
+  set Velocity degree                       = 2
+  set Viscosity                             = 1
+  subsection Angular velocity
+    set Function constants  =
+    set Function expression = t < .500001 ? 5 : -5
+    set Variable names      = x,y,z,t
+  end
+  subsection Grid generation
+    set Fluid grid generator              = hyper_rectangle
+    set Fluid grid generator arguments    = -50,-50, -10: 50, 50, 40: false
+    set Solid grid generator              = impeller.vtk
+    set Solid grid generator arguments    = 1:impeller.step
+    set Particle grid generator           = hyper_ball
+    set Particle grid generator arguments = 30, 30, 20: 10: false
+  end
+  subsection Refinement and remeshing
+    set Maximum number of cells        = 100000
+    set Refinement coarsening fraction = 0.3
+    set Refinement fraction            = 0.3
+    set Refinement maximal level       = 6
+    set Refinement step frequency      = 5
+    set Refinement strategy            = fixed_fraction
+  end
+  subsection Right hand side
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+end
+@endcode
+
+In this case, the timing outputs are a bit different:
+
+@code
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |  5.54e+03s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble Nitsche terms          |       101 |       111s |         2% |
+| Assemble Stokes terms           |       101 |       208s |       3.8% |
+| Initial setup                   |         1 |   0.00187s |         0% |
+| Output fluid                    |       102 |      15.5s |      0.28% |
+| Output solid particles          |       102 |      2.63s |         0% |
+| Output tracer particles         |       102 |      2.49s |         0% |
+| Refine                          |        20 |      18.4s |      0.33% |
+| Set solid particle position     |       100 |       6.1s |      0.11% |
+| Set tracer particle motion      |       101 |      10.8s |       0.2% |
+| Setup dofs                      |        21 |      13.9s |      0.25% |
+| Solve                           |       101 |  5.16e+03s |        93% |
++---------------------------------+-----------+------------+------------+
+@endcode
+
+Now, the solver is taking most of the solution time in three dimensions,
+and the particle motion and Nitsche assembly remain relatively
+unimportant as far as run time is concerned.
+
+
+@htmlonly
+<p align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/Srwq7zyR9mg"
+   frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+   allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+The current tutorial program shows a one-way coupling between the fluid and the
+solid, where the solid motion is imposed (and not solved for), and read in the
+solid domain by exploiting the location and the weights of the solid quadrature
+points.
+
+The structure of the code already allows one to implement a two-way coupling,
+by exploiting the possibility to read values of the fluid velocity on the
+quadrature points of the solid grid. For this to be more efficient in terms of
+MPI communication patterns, one should maintain ownership of the quadrature
+points on the solid processor that owns the cells where they have been created.
+In the current code, it is sufficient to define the IndexSet of the vectors
+used to exchange information of the quadrature points by using the solid
+partition instead of the initial fluid partition.
+
+This allows the combination of the technique used in this tutorial program with
+those presented in the tutorial step-60 to solve a fluid structure interaction
+problem with distributed Lagrange multipliers, on
+parallel::distributed::Triangulation objects.
+
+The timings above show that the current preconditioning strategy does not work
+well for Nitsche penalization, and we should come up with a better
+preconditioner if we want to aim at larger problems. Moreover, a checkpoint
+restart strategy should be implemented to allow for longer simulations to be
+interrupted and restored, as it is done for example in the step-69 tutorial.

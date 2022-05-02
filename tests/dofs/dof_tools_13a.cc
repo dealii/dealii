@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,7 +19,6 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::distribute_cell_to_dof_vector
@@ -32,9 +31,9 @@
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // this doesn't make much sense if
   // the element is not primitive
@@ -66,7 +65,7 @@ check_this(const DoFHandlerType &dof_handler)
   DoFTools::distribute_cell_to_dof_vector(dof_handler, cell_data, dof_data);
   // output every third element
   for (unsigned int i = 0; i < dof_data.size(); i += 3)
-    deallog << dof_data(i) << " ";
+    deallog << dof_data(i) << ' ';
   deallog << std::endl;
 
   // check that no other values were
@@ -98,7 +97,7 @@ check_this(const DoFHandlerType &dof_handler)
   DoFTools::distribute_cell_to_dof_vector(
     dof_handler, cell_data, dof_data, dof_handler.get_fe().n_components() - 1);
   for (unsigned int i = 0; i < dof_data.size(); i += 3)
-    deallog << dof_data(i) << " ";
+    deallog << dof_data(i) << ' ';
   deallog << std::endl;
 
   // check that no other values were

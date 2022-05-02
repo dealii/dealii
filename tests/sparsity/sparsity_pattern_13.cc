@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,7 +75,7 @@ public:
       {
         vec_len     = 1;
         max_vec_len = vec_len;
-        colnums     = std_cxx14::make_unique<size_type[]>(max_vec_len);
+        colnums     = std::make_unique<size_type[]>(max_vec_len);
       }
 
     max_row_length =
@@ -94,14 +94,14 @@ public:
     if (rows > max_dim)
       {
         max_dim  = rows;
-        rowstart = std_cxx14::make_unique<std::size_t[]>(max_dim + 1);
+        rowstart = std::make_unique<std::size_t[]>(max_dim + 1);
       }
 
     // allocate memory for the column numbers if necessary
     if (vec_len > max_vec_len)
       {
         max_vec_len = vec_len;
-        colnums     = std_cxx14::make_unique<size_type[]>(max_vec_len);
+        colnums     = std::make_unique<size_type[]>(max_vec_len);
       }
 
     // set the rowstart array

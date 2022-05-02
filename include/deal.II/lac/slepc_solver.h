@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -127,12 +127,6 @@ DEAL_II_NAMESPACE_OPEN
  * on which they depend.
  *
  * @ingroup SLEPcWrappers
- *
- * @author Toby D. Young 2008, 2009, 2010, 2011, 2013; and Rickard Armiento
- * 2008; and Denis Davydov 2015.
- *
- * @note Various tweaks and enhancements contributed by Eloy Romero and Jose
- * E. Roman 2009, 2010.
  */
 namespace SLEPcWrappers
 {
@@ -142,6 +136,12 @@ namespace SLEPcWrappers
    * basically all the actual solver calls happen in this class, and derived
    * classes simply set the right flags to select one solver or another, or to
    * set certain parameters for individual solvers.
+   *
+   * For examples of how this and its derived classes can be used, including
+   * how to provide preconditioners to the matrix of which eigenvalues are
+   * to be computed, see the documentation of the SolverBase class as well
+   * as the extensive discussions in the documentation of the SLEPcWrappers
+   * namespace.
    */
   class SolverBase
   {
@@ -209,13 +209,6 @@ namespace SLEPcWrappers
           std::vector<OutputVector> &      real_eigenvectors,
           std::vector<OutputVector> &      imag_eigenvectors,
           const unsigned int               n_eigenpairs = 1);
-
-    /**
-     * Set the initial vector for the solver.
-     */
-    DEAL_II_DEPRECATED
-    void
-    set_initial_vector(const PETScWrappers::VectorBase &this_initial_vector);
 
     /**
      * Set the initial vector space for the solver.
@@ -320,7 +313,7 @@ namespace SLEPcWrappers
     /**
      * Access the real parts of solutions for a solved eigenvector problem,
      * pair index solutions, $\text{index}\,\in\,0\dots
-     * \text{n\_converged}-1$.
+     * \mathrm{n\_converged}-1$.
      */
     void
     get_eigenpair(const unsigned int         index,
@@ -330,7 +323,7 @@ namespace SLEPcWrappers
     /**
      * Access the real and imaginary parts of solutions for a solved
      * eigenvector problem, pair index solutions, $\text{index}\,\in\,0\dots
-     * \text{n\_converged}-1$.
+     * \mathrm{n\_converged}-1$.
      */
     void
     get_eigenpair(const unsigned int         index,
@@ -382,13 +375,19 @@ namespace SLEPcWrappers
                      void *      solver_control);
   };
 
+
+
   /**
    * An implementation of the solver interface using the SLEPc Krylov-Schur
    * solver. Usage: All spectrum, all problem types, complex.
    *
-   * @ingroup SLEPcWrappers
+   * For examples of how this and its sibling classes can be used, including
+   * how to provide preconditioners to the matrix of which eigenvalues are
+   * to be computed, see the documentation of the SolverBase class as well
+   * as the extensive discussions in the documentation of the SLEPcWrappers
+   * namespace.
    *
-   * @author Toby D. Young 2008
+   * @ingroup SLEPcWrappers
    */
   class SolverKrylovSchur : public SolverBase
   {
@@ -403,7 +402,7 @@ namespace SLEPcWrappers
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
      * computations are parallelized. By default, this carries the same
-     * behaviour as the PETScWrappers, but you can change that.
+     * behavior as the PETScWrappers, but you can change that.
      */
     SolverKrylovSchur(SolverControl &       cn,
                       const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
@@ -416,13 +415,19 @@ namespace SLEPcWrappers
     const AdditionalData additional_data;
   };
 
+
+
   /**
    * An implementation of the solver interface using the SLEPc Arnoldi solver.
    * Usage: All spectrum, all problem types, complex.
    *
-   * @ingroup SLEPcWrappers
+   * For examples of how this and its sibling classes can be used, including
+   * how to provide preconditioners to the matrix of which eigenvalues are
+   * to be computed, see the documentation of the SolverBase class as well
+   * as the extensive discussions in the documentation of the SLEPcWrappers
+   * namespace.
    *
-   * @author Toby D. Young 2008, 2011
+   * @ingroup SLEPcWrappers
    */
   class SolverArnoldi : public SolverBase
   {
@@ -448,7 +453,7 @@ namespace SLEPcWrappers
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
      * computations are parallelized. By default, this carries the same
-     * behaviour as the PETScWrappers, but you can change that.
+     * behavior as the PETScWrappers, but you can change that.
      */
     SolverArnoldi(SolverControl &       cn,
                   const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
@@ -461,13 +466,19 @@ namespace SLEPcWrappers
     const AdditionalData additional_data;
   };
 
+
+
   /**
    * An implementation of the solver interface using the SLEPc Lanczos solver.
    * Usage: All spectrum, all problem types, complex.
    *
-   * @ingroup SLEPcWrappers
+   * For examples of how this and its sibling classes can be used, including
+   * how to provide preconditioners to the matrix of which eigenvalues are
+   * to be computed, see the documentation of the SolverBase class as well
+   * as the extensive discussions in the documentation of the SLEPcWrappers
+   * namespace.
    *
-   * @author Toby D. Young 2009; and Denis Davydov 2015;
+   * @ingroup SLEPcWrappers
    */
   class SolverLanczos : public SolverBase
   {
@@ -494,7 +505,7 @@ namespace SLEPcWrappers
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
      * computations are parallelized. By default, this carries the same
-     * behaviour as the PETScWrappers, but you can change that.
+     * behavior as the PETScWrappers, but you can change that.
      */
     SolverLanczos(SolverControl &       cn,
                   const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
@@ -507,13 +518,19 @@ namespace SLEPcWrappers
     const AdditionalData additional_data;
   };
 
+
+
   /**
    * An implementation of the solver interface using the SLEPc Power solver.
    * Usage: Largest values of spectrum only, all problem types, complex.
    *
-   * @ingroup SLEPcWrappers
+   * For examples of how this and its sibling classes can be used, including
+   * how to provide preconditioners to the matrix of which eigenvalues are
+   * to be computed, see the documentation of the SolverBase class as well
+   * as the extensive discussions in the documentation of the SLEPcWrappers
+   * namespace.
    *
-   * @author Toby D. Young 2010
+   * @ingroup SLEPcWrappers
    */
   class SolverPower : public SolverBase
   {
@@ -528,7 +545,7 @@ namespace SLEPcWrappers
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
      * computations are parallelized. By default, this carries the same
-     * behaviour as the PETScWrappers, but you can change that.
+     * behavior as the PETScWrappers, but you can change that.
      */
     SolverPower(SolverControl &       cn,
                 const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
@@ -541,13 +558,19 @@ namespace SLEPcWrappers
     const AdditionalData additional_data;
   };
 
+
+
   /**
    * An implementation of the solver interface using the SLEPc Davidson
    * solver. Usage: All problem types.
    *
-   * @ingroup SLEPcWrappers
+   * For examples of how this and its sibling classes can be used, including
+   * how to provide preconditioners to the matrix of which eigenvalues are
+   * to be computed, see the documentation of the SolverBase class as well
+   * as the extensive discussions in the documentation of the SLEPcWrappers
+   * namespace.
    *
-   * @author Toby D. Young 2010; Denis Davydov 2015
+   * @ingroup SLEPcWrappers
    */
   class SolverGeneralizedDavidson : public SolverBase
   {
@@ -572,7 +595,7 @@ namespace SLEPcWrappers
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
      * computations are parallelized. By default, this carries the same
-     * behaviour as the PETScWrappers, but you can change that.
+     * behavior as the PETScWrappers, but you can change that.
      */
     SolverGeneralizedDavidson(
       SolverControl &       cn,
@@ -586,13 +609,19 @@ namespace SLEPcWrappers
     const AdditionalData additional_data;
   };
 
+
+
   /**
    * An implementation of the solver interface using the SLEPc Jacobi-Davidson
    * solver. Usage: All problem types.
    *
-   * @ingroup SLEPcWrappers
+   * For examples of how this and its sibling classes can be used, including
+   * how to provide preconditioners to the matrix of which eigenvalues are
+   * to be computed, see the documentation of the SolverBase class as well
+   * as the extensive discussions in the documentation of the SLEPcWrappers
+   * namespace.
    *
-   * @author Toby D. Young 2013
+   * @ingroup SLEPcWrappers
    */
   class SolverJacobiDavidson : public SolverBase
   {
@@ -607,7 +636,7 @@ namespace SLEPcWrappers
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
      * computations are parallelized. By default, this carries the same
-     * behaviour as the PETScWrappers, but you can change that.
+     * behavior as the PETScWrappers, but you can change that.
      */
     SolverJacobiDavidson(SolverControl & cn,
                          const MPI_Comm &mpi_communicator = PETSC_COMM_SELF,
@@ -621,13 +650,18 @@ namespace SLEPcWrappers
   };
 
 
+
   /**
    * An implementation of the solver interface using the SLEPc LAPACK direct
    * solver.
    *
-   * @ingroup SLEPcWrappers
+   * For examples of how this and its sibling classes can be used, including
+   * how to provide preconditioners to the matrix of which eigenvalues are
+   * to be computed, see the documentation of the SolverBase class as well
+   * as the extensive discussions in the documentation of the SLEPcWrappers
+   * namespace.
    *
-   * @author Toby D. Young 2013
+   * @ingroup SLEPcWrappers
    */
   class SolverLAPACK : public SolverBase
   {
@@ -642,7 +676,7 @@ namespace SLEPcWrappers
     /**
      * SLEPc solvers will want to have an MPI communicator context over which
      * computations are parallelized. By default, this carries the same
-     * behaviour as the PETScWrappers, but you can change that.
+     * behavior as the PETScWrappers, but you can change that.
      */
     SolverLAPACK(SolverControl &       cn,
                  const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
@@ -654,6 +688,8 @@ namespace SLEPcWrappers
      */
     const AdditionalData additional_data;
   };
+
+
 
   // --------------------------- inline and template functions -----------
   /**
@@ -795,7 +831,7 @@ namespace SLEPcWrappers
   {
     std::vector<Vec> vecs(this_initial_space.size());
 
-    for (unsigned int i = 0; i < this_initial_space.size(); i++)
+    for (unsigned int i = 0; i < this_initial_space.size(); ++i)
       {
         Assert(this_initial_space[i].l2_norm() > 0.0,
                ExcMessage("Initial vectors should be nonzero."));

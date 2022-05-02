@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@
  *   are $x_{28}$ and $x_{40}$. Then, requiring that the finite element
  *   function be continuous is equivalent to requiring that $x_{12}=
  *   \frac 12 (x_{28}+x_{40})$. A similar situation occurs in the
- *   context of hp adaptive finite element methods.
+ *   context of hp-adaptive finite element methods.
  *   For example, when using Q1 and Q2 elements (i.e. using
  *   FE_Q(1) and FE_Q(2)) on the two marked cells of the mesh
  *       @image html hp-refinement-simple.png
@@ -99,7 +99,7 @@
  * This scheme of first building a linear system and then eliminating
  * constrained degrees of freedom is inefficient, and a bottleneck if there
  * are many constraints and matrices are full, i.e. especially for 3d and/or
- * higher order or hp finite elements. Furthermore, it is impossible to
+ * higher order or hp-finite elements. Furthermore, it is impossible to
  * implement for %parallel computations where a process may not have access
  * to elements of the matrix. We therefore offer a second way of
  * building linear systems, using the
@@ -204,8 +204,8 @@
  * Condensation is an expensive operation, in particular if there
  * are many constraints and/or if the matrix has many nonzero entries. Both
  * is typically the case for 3d, or high polynomial degree computations, as
- * well as for hp finite element methods, see for example the @ref hp_paper
- * "hp paper". This is the case discussed in the hp tutorial program, @ref
+ * well as for hp-finite element methods, see for example the @ref hp_paper
+ * "hp-paper". This is the case discussed in the hp-tutorial program, @ref
  * step_27 "step-27", as well as in step-22 and @ref step_31
  * "step-31".
  *

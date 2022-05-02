@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2018 by the deal.II authors
+ * Copyright (C) 1999 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -222,7 +222,7 @@ Step3<dim>::assemble_system(unsigned int i)
       cell_rhs    = 0;
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           {
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               cell_matrix(i, j) +=
@@ -292,7 +292,7 @@ Step3<dim>::output_results(unsigned int i) const
                                     QGauss<dim>(m_degree + 2),
                                     VectorTools::H1_seminorm);
   const double         H1_error = difference_per_cell.l2_norm();
-  const QTrapez<1>     q_trapez;
+  const QTrapezoid<1>  q_trapez;
   const QIterated<dim> q_iterated(q_trapez, 5);
   VectorTools::integrate_difference(dof_handler,
                                     solution,
@@ -303,7 +303,7 @@ Step3<dim>::output_results(unsigned int i) const
   const double Linfty_error = difference_per_cell.linfty_norm();
 
   deallog << std::endl
-          << fe->get_name() << " " << i << std::endl
+          << fe->get_name() << ' ' << i << std::endl
           << "L2_error: " << L2_error << std::endl
           << "H1_error: " << H1_error << std::endl
           << "Linfty_error: " << Linfty_error << std::endl

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,8 +51,6 @@ namespace LAPACKSupport
    * columns represent the eigenvectors of the original content of the matrix.
    * The elements of this enumeration are therefore used to track what is
    * currently being stored by this object.
-   *
-   * @author Guido Kanschat, 2005
    */
   enum State
   {
@@ -75,7 +73,7 @@ namespace LAPACKSupport
   };
 
   /**
-   * Function printing the name of a State.
+   * %Function printing the name of a State.
    */
   inline const char *
   state_name(State s)
@@ -124,7 +122,7 @@ namespace LAPACKSupport
   };
 
   /**
-   * Function printing the name of a Property.
+   * %Function printing the name of a Property.
    */
   inline const char *
   property_name(const Property s)
@@ -157,6 +155,10 @@ namespace LAPACKSupport
    * Character constant.
    */
   static const char N = 'N';
+  /**
+   * Character constant.
+   */
+  static const char O = 'O';
   /**
    * Character constant.
    */

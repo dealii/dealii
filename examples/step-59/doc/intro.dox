@@ -288,4 +288,3 @@ the diagonal (a point-Jacobi scheme), where FE_DGQ and FE_DGQHermite do indeed
 behave differently and FE_DGQ needs 2-5 less iterations than FE_DGQHermite,
 despite the modification made to the Hermite-like shape functions to ensure a
 good conditioning.
-

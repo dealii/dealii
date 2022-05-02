@@ -1,0 +1,5 @@
+
+DEAL::Time step size: 0.0201493, minimal h: 0.312500, initial transport scaling: 0.0759880
+DEAL::
+DEAL::Time:0.00    , dt: 0.020   , error rho: 0.0002405 , rho * u: 0.0006317 , energy:0.001196  
+DEAL::Time:1.01    , dt: 0.020   , error rho: 0.001495  , rho * u: 0.003348  , energy:0.005830  

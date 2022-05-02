@@ -1,0 +1,235 @@
+name: github-linux
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{github.event_name == 'pull_request'}}
+
+jobs:
+  linux-release-serial:
+    # simple serial release build using g++
+
+    name: linux release serial
+    runs-on: [ubuntu-20.04]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        ./contrib/utilities/download_clang_format
+    - name: info
+      run: |
+        g++ -v
+        cmake --version
+    - name: modules
+      run: |
+        sudo apt-get install g++-10
+    - name: Build Boost
+      id: boost
+      uses: egor-tensin/build-boost@v1
+      with:
+        version: 1.74.0
+        libraries: container iostreams python serialization system thread
+        platform: x64
+        configuration: Release
+    - name: configure
+      run: |
+        cmake -D BOOST_DIR=/home/runner/work/dealii/boost -D BOOST_INCLUDEDIR=/home/runner/work/dealii/boost -D BOOST_LIBRARYDIR=/home/runner/work/dealii/boost/stage/x64/Release/lib -D CMAKE_BUILD_TYPE=Release -D CMAKE_CXX_COMPILER=g++-10 -D DEAL_II_CXX_FLAGS='-Werror -std=c++20' -D DEAL_II_EARLY_DEPRECATIONS=ON -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON .
+    - name: archive
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux-serial-detailed.log
+        path: detailed.log
+    - name: build
+      run: |
+        make -j 2
+    - name: quicktest
+      run: make test
+
+  linux-debug-parallel-simplex:
+    # simple parallel debug build using g++ with simplex configuration enabled
+
+    name: linux debug parallel simplex
+    runs-on: [ubuntu-18.04]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: modules
+      run: |
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository ppa:ginggs/deal.ii-9.2.0-backports
+        sudo apt-get update
+        sudo apt-get install -yq --no-install-recommends \
+            numdiff \
+            libp4est-dev \
+            trilinos-all-dev \
+            petsc-dev \
+            libcgal-dev \
+            libmetis-dev \
+            libhdf5-mpi-dev
+    - name: info
+      run: |
+        mpicc -v
+        cmake --version
+    - name: configure
+      run: |
+        mkdir build
+        cd build
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D DEAL_II_CXX_FLAGS='-Werror -std=c++17' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_MPI="ON" \
+              -D DEAL_II_WITH_TRILINOS="ON" \
+              -D DEAL_II_WITH_PETSC="ON" \
+              -D DEAL_II_WITH_METIS="ON" \
+              -D DEAL_II_WITH_HDF5="ON" \
+              -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
+              ..
+    - name: archive
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux-simplex-detailed.log
+        path: build/detailed.log
+    - name: build
+      run: |
+        cd build
+        make -j 2
+    - name: test
+      run: |
+        # Remove warning: "A high-performance Open MPI point-to-point
+        # messaging module was unable to find any relevant network
+        # interfaces."
+        export OMPI_MCA_btl_base_warn_component_unused='0'
+        
+        cd build
+        make -j 2 setup_tests_simplex
+        ctest --output-on-failure -j 2
+    - name: failed test log
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-log
+        path: |
+          build/tests/**/*output*
+          build/tests/**/*stdout*
+
+
+  linux-debug-cuda-10:
+    # simple parallel debug build using cuda-10
+
+    name: linux debug cuda-10
+    runs-on: [ubuntu-18.04]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: modules
+      run: |
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
+        sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        wget http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda-repo-ubuntu1804-10-2-local-10.2.89-440.33.01_1.0-1_amd64.deb
+        sudo dpkg -i cuda-repo-ubuntu1804-10-2-local-10.2.89-440.33.01_1.0-1_amd64.deb
+        sudo apt-key add /var/cuda-repo-10-2-local-10.2.89-440.33.01/7fa2af80.pub
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository ppa:ginggs/deal.ii-9.2.0-backports
+        sudo apt-get update
+        apt search cuda
+        sudo apt-get install -yq --no-install-recommends \
+            cuda-toolkit-10-2 \
+            libp4est-dev \
+            libopenmpi-dev \
+            openmpi-bin
+    - name: info
+      run: |
+        mpicc -v
+        cmake --version
+    - name: configure
+      run: |
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D DEAL_II_CUDA_FLAGS='-arch=sm_70' \
+              -D DEAL_II_CXX_FLAGS='-Werror -Wno-non-template-friend' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_CUDA="ON" \
+              -D DEAL_II_WITH_MPI="ON" \
+              -D DEAL_II_WITH_P4EST="ON" \
+              -D DEAL_II_COMPONENT_EXAMPLES="ON" \
+              .
+    - name: archive
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux-cuda-detailed.log
+        path: detailed.log
+    - name: build
+      run: |
+        make -j 2
+
+
+  linux-debug-intel-oneapi:
+    # parallel debug build with Intel oneAPI including MPI and MKL
+    #
+    # Based on https://github.com/oneapi-src/oneapi-ci
+    # For a list of Intel packages see https://oneapi-src.github.io/oneapi-ci/#linux-apt
+
+    name: linux debug intel oneapi
+    runs-on: [ubuntu-18.04]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup apt repo
+      run: |
+        # oneapi-ci/scripts/setup_apt_repo_linux.sh
+        wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo apt-get update -o Dir::Etc::sourcelist="sources.list.d/oneAPI.list" -o APT::Get::List-Cleanup="0"
+    - name: collect versioned dependencies of apt packages
+      run : |
+        # oneapi-ci/scripts/apt_depends.sh
+        apt-cache depends intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
+                          intel-oneapi-mpi-devel \
+                          intel-oneapi-mkl-devel \
+                          intel-oneapi-tbb-devel | tee dependencies.txt
+    - name: cache install
+      id: cache-install
+      uses: actions/cache@v2
+      with:
+        path: /opt/intel/oneapi
+        key: install-${{ hashFiles('**/dependencies.txt') }}
+    - name: install
+      if: steps.cache-install.outputs.cache-hit != 'true'
+      run: |
+        # oneapi-ci/scripts/install_linux_apt.sh
+        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
+                                intel-oneapi-mpi-devel \
+                                intel-oneapi-mkl-devel \
+                                intel-oneapi-tbb-devel
+        sudo apt-get clean
+    - name: info
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        mpiicpc -v
+        cmake --version
+    - name: configure
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D CMAKE_CXX_COMPILER=icpc \
+              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_MPI=ON \
+              -D DEAL_II_WITH_LAPACK=ON \
+              -D DEAL_II_WITH_TBB=ON \
+              -D MPI_DIR=${I_MPI_ROOT} \
+              -D BLAS_DIR=${MKLROOT} \
+              -D LAPACK_DIR=${MKLROOT} \
+              -D TBB_DIR=${TBBROOT} \
+              .
+    - name: archive
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux-intel-detailed.log
+        path: detailed.log
+    - name: build
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        make -j 2

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,6 @@ operator==(const T &lhs, const T &rhs)
          lhs.mapping_update_flags_faces_by_cells ==
            rhs.mapping_update_flags_faces_by_cells &&
          lhs.mg_level == rhs.mg_level &&
-         lhs.level_mg_handler == rhs.level_mg_handler &&
          lhs.store_plain_indices == rhs.store_plain_indices &&
          lhs.initialize_indices == rhs.initialize_indices &&
          lhs.initialize_mapping == rhs.initialize_mapping &&
@@ -64,7 +63,6 @@ main()
   ad.mapping_update_flags_boundary_faces  = update_values;
   ad.mapping_update_flags_inner_faces     = update_values;
   ad.mapping_update_flags_faces_by_cells  = update_values;
-  ad.mg_level                             = 10;
   ad.store_plain_indices                  = false;
   ad.initialize_indices                   = false;
   ad.initialize_mapping                   = false;

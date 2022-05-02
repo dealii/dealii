@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,16 +41,16 @@ test()
       // different numbers of base elements
       // and multiplicities
       fe_collection.push_back(
-        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)), 3));
+        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)), 3));
       fe_collection.push_back(
-        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)),
+        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)),
                       2,
-                      FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)),
+                      FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)),
                       1));
       fe_collection.push_back(
-        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)),
+        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)),
                       1,
-                      FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)),
+                      FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)),
                       2));
     }
 

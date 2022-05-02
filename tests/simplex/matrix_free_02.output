@@ -1,0 +1,17 @@
+
+DEAL::mesh=P : dim=2 degree=1 Type=Possion   : Convergence step 32 value 1.97679e-06 max 0.0733790 norm 0.0410935.
+DEAL::mesh=Q : dim=2 degree=1 Type=Possion   : Convergence step 23 value 2.31438e-06 max 0.0735643 norm 0.0412027.
+DEAL::mesh=M : dim=2 degree=1 Type=Possion   : Convergence step 37 value 2.47295e-06 max 0.0735235 norm 0.0411386.
+DEAL::
+DEAL::mesh=P : dim=2 degree=1 Type=Helmholtz : Convergence step 32 value 1.84146e-06 max 0.0695486 norm 0.0391345.
+DEAL::mesh=Q : dim=2 degree=1 Type=Helmholtz : Convergence step 23 value 2.11901e-06 max 0.0697145 norm 0.0392337.
+DEAL::mesh=M : dim=2 degree=1 Type=Helmholtz : Convergence step 33 value 3.66201e-06 max 0.0696810 norm 0.0391757.
+DEAL::
+DEAL::mesh=P : dim=2 degree=2 Type=Possion   : Convergence step 76 value 1.83468e-06 max 0.0736712 norm 0.0412614.
+DEAL::mesh=Q : dim=2 degree=2 Type=Possion   : Convergence step 64 value 2.13749e-06 max 0.0736712 norm 0.0412615.
+DEAL::mesh=M : dim=2 degree=2 Type=Possion   : Convergence step 77 value 1.77910e-06 max 0.0736712 norm 0.0412614.
+DEAL::
+DEAL::mesh=P : dim=2 degree=2 Type=Helmholtz : Convergence step 76 value 1.76851e-06 max 0.0698084 norm 0.0392874.
+DEAL::mesh=Q : dim=2 degree=2 Type=Helmholtz : Convergence step 64 value 1.95880e-06 max 0.0698084 norm 0.0392875.
+DEAL::mesh=M : dim=2 degree=2 Type=Helmholtz : Convergence step 76 value 2.21571e-06 max 0.0698084 norm 0.0392875.
+DEAL::

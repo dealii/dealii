@@ -1,0 +1,121 @@
+
+DEAL::particle 0 quantities: 0.0852954 1.00000 
+DEAL::expected quantities: 0.0852954  1
+DEAL::
+DEAL::particle 1 quantities: 0.168328 1.00000 
+DEAL::expected quantities: 0.168328  1
+DEAL::
+DEAL::particle 2 quantities: 0.214947 1.00000 
+DEAL::expected quantities: 0.214947  1
+DEAL::
+DEAL::particle 3 quantities: 0.500433 1.00000 
+DEAL::expected quantities: 0.500433  1
+DEAL::
+DEAL::particle 4 quantities: 0.504079 1.00000 
+DEAL::expected quantities: 0.504079  1
+DEAL::
+DEAL::particle 5 quantities: 0.719071 1.00000 
+DEAL::expected quantities: 0.719071  1
+DEAL::
+DEAL::particle 6 quantities: 0.807063 1.00000 
+DEAL::expected quantities: 0.807063  1
+DEAL::
+DEAL::particle 7 quantities: 0.803011 1.00000 
+DEAL::expected quantities: 0.803011  1
+DEAL::
+DEAL::particle 8 quantities: 0.790705 1.00000 
+DEAL::expected quantities: 0.790705  1
+DEAL::
+DEAL::particle 9 quantities: 0.846552 1.00000 
+DEAL::expected quantities: 0.846552  1
+DEAL::
+DEAL::Particle 0: 0.0852954 1.00000 
+DEAL::Particle 1: 0.168328 1.00000 
+DEAL::Particle 2: 0.214947 1.00000 
+DEAL::Particle 3: 0.500433 1.00000 
+DEAL::Particle 4: 0.504079 1.00000 
+DEAL::Particle 5: 0.719071 1.00000 
+DEAL::Particle 6: 0.807063 1.00000 
+DEAL::Particle 7: 0.803011 1.00000 
+DEAL::Particle 8: 0.790705 1.00000 
+DEAL::Particle 9: 0.846552 1.00000 
+DEAL::particle 0 quantities: 0.429045 0.0120785 1.00000 
+DEAL::expected quantities: 0.429045 0.0120785  1
+DEAL::
+DEAL::particle 1 quantities: 0.0586967 0.437933 1.00000 
+DEAL::expected quantities: 0.0586967 0.437933  1
+DEAL::
+DEAL::particle 2 quantities: 0.285329 0.344071 1.00000 
+DEAL::expected quantities: 0.285329 0.344071  1
+DEAL::
+DEAL::particle 3 quantities: 0.0258127 0.553011 1.00000 
+DEAL::expected quantities: 0.0258127 0.553011  1
+DEAL::
+DEAL::particle 4 quantities: 0.0719550 0.596552 1.00000 
+DEAL::expected quantities: 0.0719550 0.596552  1
+DEAL::
+DEAL::particle 5 quantities: 0.402536 0.943924 1.00000 
+DEAL::expected quantities: 0.402536 0.943924  1
+DEAL::
+DEAL::particle 6 quantities: 0.526290 0.731799 1.00000 
+DEAL::expected quantities: 0.526290 0.731799  1
+DEAL::
+DEAL::particle 7 quantities: 0.706285 0.683962 1.00000 
+DEAL::expected quantities: 0.706285 0.683962  1
+DEAL::
+DEAL::particle 8 quantities: 0.735413 0.726612 1.00000 
+DEAL::expected quantities: 0.735413 0.726612  1
+DEAL::
+DEAL::particle 9 quantities: 0.919473 0.708549 1.00000 
+DEAL::expected quantities: 0.919473 0.708549  1
+DEAL::
+DEAL::Particle 0: 0.429045 0.0120785 1.00000 
+DEAL::Particle 1: 0.0586967 0.437933 1.00000 
+DEAL::Particle 2: 0.285329 0.344071 1.00000 
+DEAL::Particle 3: 0.0258127 0.553011 1.00000 
+DEAL::Particle 4: 0.0719550 0.596552 1.00000 
+DEAL::Particle 5: 0.402536 0.943924 1.00000 
+DEAL::Particle 6: 0.526290 0.731799 1.00000 
+DEAL::Particle 7: 0.706285 0.683962 1.00000 
+DEAL::Particle 8: 0.735413 0.726612 1.00000 
+DEAL::Particle 9: 0.919473 0.708549 1.00000 
+DEAL::particle 0 quantities: 0.304045 0.105828 0.371197 1.00000 
+DEAL::expected quantities: 0.304045 0.105828 0.371197  1
+DEAL::
+DEAL::particle 1 quantities: 0.562933 0.285329 0.187821 1.00000 
+DEAL::expected quantities: 0.562933 0.285329 0.187821  1
+DEAL::
+DEAL::particle 2 quantities: 0.713313 0.115511 0.478205 1.00000 
+DEAL::expected quantities: 0.713313 0.115511 0.478205  1
+DEAL::
+DEAL::particle 3 quantities: 0.127802 0.0275357 0.506424 1.00000 
+DEAL::expected quantities: 0.127802 0.0275357 0.506424  1
+DEAL::
+DEAL::particle 4 quantities: 0.213790 0.200549 0.675035 1.00000 
+DEAL::expected quantities: 0.213790 0.200549 0.675035  1
+DEAL::
+DEAL::particle 5 quantities: 0.808962 0.297913 0.914112 1.00000 
+DEAL::expected quantities: 0.808962 0.297913 0.914112  1
+DEAL::
+DEAL::particle 6 quantities: 0.231973 0.802299 0.625691 1.00000 
+DEAL::expected quantities: 0.231973 0.802299 0.625691  1
+DEAL::
+DEAL::particle 7 quantities: 0.433349 0.949109 0.539495 1.00000 
+DEAL::expected quantities: 0.433349 0.949109 0.539495  1
+DEAL::
+DEAL::particle 8 quantities: 0.498559 0.970271 0.721360 1.00000 
+DEAL::expected quantities: 0.498559 0.970271 0.721360  1
+DEAL::
+DEAL::particle 9 quantities: 0.369338 0.824100 0.986548 1.00000 
+DEAL::expected quantities: 0.369338 0.824100 0.986548  1
+DEAL::
+DEAL::Particle 0: 0.304045 0.105828 0.371197 1.00000 
+DEAL::Particle 1: 0.562933 0.285329 0.187821 1.00000 
+DEAL::Particle 2: 0.713313 0.115511 0.478205 1.00000 
+DEAL::Particle 3: 0.127802 0.0275357 0.506424 1.00000 
+DEAL::Particle 4: 0.213790 0.200549 0.675035 1.00000 
+DEAL::Particle 5: 0.808962 0.297913 0.914112 1.00000 
+DEAL::Particle 6: 0.231973 0.802299 0.625691 1.00000 
+DEAL::Particle 7: 0.433349 0.949109 0.539495 1.00000 
+DEAL::Particle 8: 0.498559 0.970271 0.721360 1.00000 
+DEAL::Particle 9: 0.369338 0.824100 0.986548 1.00000 

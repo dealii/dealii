@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -167,7 +167,7 @@ check()
 
       // Print constraint matrix
       deallog << "  Constraint matrix:" << std::endl;
-      constrained_dofs.get_level_constraint_matrix(level).print(
+      constrained_dofs.get_level_constraints(level).print(
         deallog.get_file_stream());
     }
 }

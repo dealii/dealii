@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,7 +68,7 @@ test(const unsigned int degree)
       DoFHandler<dim> dof(tr);
       dof.distribute_dofs(fe_rt);
 
-      QTrapez<dim - 1> quadrature;
+      QTrapezoid<dim - 1> quadrature;
 
       FESubfaceValues<dim> fe_values(fe_rt, quadrature, update_gradients);
       fe_values.reinit(dof.begin_active(), 0, 0);

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2018 by the deal.II authors
+ * Copyright (C) 2008 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -374,9 +374,8 @@ namespace Step45
       owned_partitioning.push_back(locally_owned_dofs.get_view(n_u, n_u + n_p));
 
       relevant_partitioning.clear();
-      IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                              locally_relevant_dofs);
+      const IndexSet locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof_handler);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
       relevant_partitioning.push_back(
         locally_relevant_dofs.get_view(n_u, n_u + n_p));
@@ -384,7 +383,7 @@ namespace Step45
       constraints.clear();
       constraints.reinit(locally_relevant_dofs);
 
-      FEValuesExtractors::Vector velocities(0);
+      const FEValuesExtractors::Vector velocities(0);
 
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       VectorTools::interpolate_boundary_values(mapping,
@@ -457,24 +456,11 @@ namespace Step45
       // After setting up all the information in periodicity_vector all we have
       // to do is to tell make_periodicity_constraints to create the desired
       // constraints.
-      DoFTools::make_periodicity_constraints<DoFHandler<dim>>(
-        periodicity_vector,
-        constraints,
-        fe.component_mask(velocities),
-        first_vector_components);
-
-      VectorTools::interpolate_boundary_values(mapping,
-                                               dof_handler,
-                                               0,
-                                               BoundaryValues<dim>(),
-                                               constraints,
-                                               fe.component_mask(velocities));
-      VectorTools::interpolate_boundary_values(mapping,
-                                               dof_handler,
-                                               1,
-                                               BoundaryValues<dim>(),
-                                               constraints,
-                                               fe.component_mask(velocities));
+      DoFTools::make_periodicity_constraints<dim, dim>(periodicity_vector,
+                                                       constraints,
+                                                       fe.component_mask(
+                                                         velocities),
+                                                       first_vector_components);
     }
 
     constraints.close();
@@ -560,7 +546,7 @@ namespace Step45
                             update_values | update_quadrature_points |
                               update_JxW_values | update_gradients);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
     const unsigned int n_q_points = quadrature_formula.size();
 
@@ -747,7 +733,7 @@ namespace Step45
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    FEValuesExtractors::Scalar pressure(dim);
+    const FEValuesExtractors::Scalar pressure(dim);
     KellyErrorEstimator<dim>::estimate(
       dof_handler,
       QGauss<dim - 1>(degree + 1),

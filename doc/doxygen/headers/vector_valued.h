@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2016 by the deal.II authors
+// Copyright (C) 2008 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -677,7 +677,6 @@
   \right)_\Omega
   +
   2
-  \sum_{i,j}
   \left(
   \mu \varepsilon(\mathbf u), \varepsilon(\mathbf v)
   \right)_\Omega,
@@ -1106,4 +1105,3 @@
  *
  * @ingroup feall feaccess
  */
-

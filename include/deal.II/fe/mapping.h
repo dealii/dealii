@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,10 @@
 
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/hp/q_collection.h>
+
+#include <deal.II/non_matching/immersed_surface_quadrature.h>
+
 #include <array>
 #include <cmath>
 #include <memory>
@@ -46,6 +50,11 @@ template <int dim, int spacedim>
 class FEFaceValues;
 template <int dim, int spacedim>
 class FESubfaceValues;
+namespace NonMatching
+{
+  template <int dim>
+  class FEImmersedSurfaceValues;
+}
 
 
 /**
@@ -296,7 +305,6 @@ enum MappingKind
  * by Ronald H. W. Hoppe, University of Houston, Chapter 7.
  *
  * @ingroup mapping
- * @author Guido Kanschat, Ralf Hartmann 2000, 2001
  */
 template <int dim, int spacedim = dim>
 class Mapping : public Subscriptor
@@ -333,7 +341,8 @@ public:
    * information stored by the triangulation, i.e.,
    * <code>cell-@>vertex(v)</code>.
    */
-  virtual std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  virtual boost::container::small_vector<Point<spacedim>,
+                                         GeometryInfo<dim>::vertices_per_cell>
   get_vertices(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
@@ -359,8 +368,6 @@ public:
    * for the computation of the cell center from
    * transform_unit_to_real_cell() applied to the center of the reference cell
    * to computing the vertex averages.
-   *
-   * @author Luca Heltai, 2019.
    */
   virtual Point<spacedim>
   get_center(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -375,15 +382,13 @@ public:
    * displacements or choose completely different locations, e.g.,
    * MappingQEulerian, MappingQ1Eulerian, or MappingFEField.
    *
-   * This function returns the bounding box containing all the vertices of the
-   * cell, as returned by the get_vertices() method. Beware of the fact that
-   * for higher order mappings this bounding box is only an approximation of the
-   * true bounding box, since it does not take into account curved faces, and it
-   * may be smaller than the true bounding box.
+   * For linear mappings, this function returns the bounding box containing all
+   * the vertices of the cell, as returned by the get_vertices() method. For
+   * higher order mappings defined through support points, the bounding box is
+   * only guaranteed to contain all the support points, and it is, in general,
+   * only an approximation of the true bounding box, which may be larger.
    *
    * @param[in] cell The cell for which you want to compute the bounding box
-   *
-   * @author Luca Heltai, 2019.
    */
   virtual BoundingBox<spacedim>
   get_bounding_box(
@@ -397,11 +402,18 @@ public:
    * triangulation).
    *
    * For example, implementations in derived classes return @p true for
-   * MappingQ, MappingQGeneric, MappingCartesian, but @p false for
-   * MappingQEulerian, MappingQ1Eulerian, and MappingFEField.
+   * MappingQ, MappingCartesian, but @p false for MappingQEulerian,
+   * MappingQ1Eulerian, and MappingFEField.
    */
   virtual bool
   preserves_vertex_locations() const = 0;
+
+  /**
+   * Returns if this instance of Mapping is compatible with the type of cell
+   * in @p reference_cell.
+   */
+  virtual bool
+  is_compatible_with(const ReferenceCell &reference_cell) const = 0;
 
   /**
    * @name Mapping points between reference and real cells
@@ -456,6 +468,23 @@ public:
   transform_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const Point<spacedim> &                                     p) const = 0;
+
+  /**
+   * Map multiple points from the real point locations to points in reference
+   * locations. The functionality is essentially the same as looping over all
+   * points and calling the Mapping::transform_real_to_unit_cell() function
+   * for each point individually, but it can be much faster for certain
+   * mappings that implement a more specialized version such as
+   * MappingQ. The only difference in behavior is that this function
+   * will never throw an ExcTransformationFailed() exception. If the
+   * transformation fails for `real_points[i]`, the returned `unit_points[i]`
+   * contains std::numeric_limits<double>::infinity() as the first entry.
+   */
+  virtual void
+  transform_points_real_to_unit_cell(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const ArrayView<const Point<spacedim>> &                    real_points,
+    const ArrayView<Point<dim>> &unit_points) const;
 
   /**
    * Transform the point @p p on the real @p cell to the corresponding point
@@ -517,7 +546,7 @@ public:
                  << arg1 << "] is distorted. The cell geometry or the "
                  << "mapping are invalid, giving a non-positive volume "
                  << "fraction of " << arg2 << " in quadrature point " << arg3
-                 << ".");
+                 << '.');
 
   /**
    * @}
@@ -744,8 +773,15 @@ protected:
    * the returned object, knowing its real (derived) type.
    */
   virtual std::unique_ptr<InternalDataBase>
+  get_face_data(const UpdateFlags               update_flags,
+                const hp::QCollection<dim - 1> &quadrature) const;
+
+  /**
+   * @deprecated Use the version taking a hp::QCollection argument.
+   */
+  virtual std::unique_ptr<InternalDataBase>
   get_face_data(const UpdateFlags          update_flags,
-                const Quadrature<dim - 1> &quadrature) const = 0;
+                const Quadrature<dim - 1> &quadrature) const;
 
   /**
    * Like get_data() and get_face_data(), but in preparation for later calls
@@ -899,10 +935,22 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
     dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &output_data) const = 0;
+      &output_data) const;
+
+  /**
+   * @deprecated Use the version taking a hp::QCollection argument.
+   */
+  virtual void
+  fill_fe_face_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const Quadrature<dim - 1> &                                 quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
 
   /**
    * This function is the equivalent to Mapping::fill_fe_values(), but for
@@ -939,6 +987,20 @@ protected:
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
     dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const = 0;
+
+  /**
+   * The equivalent of Mapping::fill_fe_values(), but for the case that the
+   * quadrature is an ImmersedSurfaceQuadrature. See there for a comprehensive
+   * description of the input parameters. This function is called by
+   * FEImmersedSurfaceValues::reinit().
+   */
+  virtual void
+  fill_fe_immersed_surface_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
 
   /**
    * @}
@@ -1241,7 +1303,20 @@ public:
   friend class FEValues<dim, spacedim>;
   friend class FEFaceValues<dim, spacedim>;
   friend class FESubfaceValues<dim, spacedim>;
+  friend class NonMatching::FEImmersedSurfaceValues<dim>;
 };
+
+
+/**
+ * Return a default linear mapping that works for the given triangulation.
+ * Internally, this function calls the function above for the reference
+ * cell used by the given triangulation, assuming that the triangulation
+ * uses only a single cell type. If the triangulation uses mixed cell
+ * types, then this function will trigger an exception.
+ */
+template <int dim, int spacedim>
+const Mapping<dim, spacedim> &
+get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation);
 
 
 DEAL_II_NAMESPACE_CLOSE

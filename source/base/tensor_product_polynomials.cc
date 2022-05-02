@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,12 +16,15 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomials_piecewise.h>
-#include <deal.II/base/std_cxx14/memory.h>
+#include <deal.II/base/table.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <array>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -94,6 +97,18 @@ TensorProductPolynomials<dim, PolynomialType>::compute_index(
 
 
 
+template <>
+inline void
+TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_index(
+  const unsigned int,
+  std::array<unsigned int, 0> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+}
+
+
+
 template <int dim, typename PolynomialType>
 void
 TensorProductPolynomials<dim, PolynomialType>::output_indices(
@@ -108,6 +123,17 @@ TensorProductPolynomials<dim, PolynomialType>::output_indices(
         out << ix[d] << " ";
       out << std::endl;
     }
+}
+
+
+
+template <>
+void
+TensorProductPolynomials<0, Polynomials::Polynomial<double>>::output_indices(
+  std::ostream &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
 }
 
 
@@ -128,13 +154,12 @@ TensorProductPolynomials<dim, PolynomialType>::set_numbering(
 
 
 template <>
-double
-TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_value(
-  const unsigned int,
-  const Point<0> &) const
+void
+TensorProductPolynomials<0, Polynomials::Polynomial<double>>::set_numbering(
+  const std::vector<unsigned int> &)
 {
-  Assert(false, ExcNotImplemented());
-  return 0;
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
 }
 
 
@@ -159,6 +184,20 @@ TensorProductPolynomials<dim, PolynomialType>::compute_value(
 
 
 
+template <>
+double
+TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_value(
+  const unsigned int,
+  const Point<0> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+
+  return {};
+}
+
+
+
 template <int dim, typename PolynomialType>
 Tensor<1, dim>
 TensorProductPolynomials<dim, PolynomialType>::compute_grad(
@@ -171,8 +210,8 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad(
   // compute values and
   // uni-directional derivatives at
   // the given point in each
-  // co-ordinate direction
-  std::array<std::array<double, 2>, dim> v;
+  // coordinate direction
+  ndarray<double, dim, 2> v;
   {
     std::vector<double> tmp(2);
     for (unsigned int d = 0; d < dim; ++d)
@@ -202,7 +241,10 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_grad(
   const unsigned int,
   const Point<0> &) const
 {
-  return Tensor<1, 0>();
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+
+  return {};
 }
 
 
@@ -216,7 +258,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad_grad(
   std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
-  std::array<std::array<double, 3>, dim> v;
+  ndarray<double, dim, 3> v;
   {
     std::vector<double> tmp(3);
     for (unsigned int d = 0; d < dim; ++d)
@@ -258,7 +300,7 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_grad_grad(
   const unsigned int,
   const Point<0> &) const
 {
-  return Tensor<2, 0>();
+  return {};
 }
 
 
@@ -311,8 +353,8 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   // coordinate direction. Once we have those values, we perform the
   // multiplications for the tensor product in the arbitrary dimension.
   const unsigned int n_polynomials = polynomials.size();
-  boost::container::small_vector<std::array<std::array<double, 5>, dim>, 20>
-    values_1d(n_polynomials);
+  boost::container::small_vector<ndarray<double, dim, 5>, 20> values_1d(
+    n_polynomials);
   if (n_values_and_derivatives == 1)
     for (unsigned int i = 0; i < n_polynomials; ++i)
       for (unsigned int d = 0; d < dim; ++d)
@@ -340,7 +382,7 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
       else
         for (indices[0] = 0; indices[0] < n_polynomials; ++indices[0], ++ind)
           {
-            unsigned int i = index_map_inverse[ind];
+            const unsigned int i = index_map_inverse[ind];
 
             if (update_values)
               {
@@ -426,12 +468,27 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
 
 
 
+template <>
+void
+TensorProductPolynomials<0, Polynomials::Polynomial<double>>::evaluate(
+  const Point<0> &,
+  std::vector<double> &,
+  std::vector<Tensor<1, 0>> &,
+  std::vector<Tensor<2, 0>> &,
+  std::vector<Tensor<3, 0>> &,
+  std::vector<Tensor<4, 0>> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+}
+
+
+
 template <int dim, typename PolynomialType>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 TensorProductPolynomials<dim, PolynomialType>::clone() const
 {
-  return std_cxx14::make_unique<TensorProductPolynomials<dim, PolynomialType>>(
-    *this);
+  return std::make_unique<TensorProductPolynomials<dim, PolynomialType>>(*this);
 }
 
 
@@ -447,6 +504,16 @@ TensorProductPolynomials<dim, PolynomialType>::memory_consumption() const
 
 
 
+template <int dim, typename PolynomialType>
+std::vector<PolynomialType>
+TensorProductPolynomials<dim, PolynomialType>::get_underlying_polynomials()
+  const
+{
+  return polynomials;
+}
+
+
+
 /* ------------------- AnisotropicPolynomials -------------- */
 
 
@@ -457,10 +524,13 @@ AnisotropicPolynomials<dim>::AnisotropicPolynomials(
   , polynomials(pols)
 {
   Assert(pols.size() == dim, ExcDimensionMismatch(pols.size(), dim));
-  for (unsigned int d = 0; d < dim; ++d)
-    Assert(pols[d].size() > 0,
-           ExcMessage("The number of polynomials must be larger than zero "
-                      "for all coordinate directions."));
+  for (const auto &pols_d : pols)
+    {
+      (void)pols_d;
+      Assert(pols_d.size() > 0,
+             ExcMessage("The number of polynomials must be larger than zero "
+                        "for all coordinate directions."));
+    }
 }
 
 
@@ -479,8 +549,7 @@ AnisotropicPolynomials<dim>::compute_index(
 #endif
 
   if (dim == 0)
-    {
-    }
+    {}
   else if (dim == 1)
     internal::compute_tensor_index(i,
                                    polynomials[0].size(),
@@ -491,6 +560,17 @@ AnisotropicPolynomials<dim>::compute_index(
                                    polynomials[0].size(),
                                    polynomials[1].size(),
                                    indices);
+}
+
+
+
+template <>
+void
+AnisotropicPolynomials<0>::compute_index(const unsigned int,
+                                         std::array<unsigned int, 0> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
 }
 
 
@@ -511,6 +591,20 @@ AnisotropicPolynomials<dim>::compute_value(const unsigned int i,
 }
 
 
+
+template <>
+double
+AnisotropicPolynomials<0>::compute_value(const unsigned int,
+                                         const Point<0> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+
+  return {};
+}
+
+
+
 template <int dim>
 Tensor<1, dim>
 AnisotropicPolynomials<dim>::compute_grad(const unsigned int i,
@@ -522,10 +616,10 @@ AnisotropicPolynomials<dim>::compute_grad(const unsigned int i,
   // compute values and
   // uni-directional derivatives at
   // the given point in each
-  // co-ordinate direction
-  std::vector<std::vector<double>> v(dim, std::vector<double>(2));
+  // coordinate direction
+  ndarray<double, dim, 2> v;
   for (unsigned int d = 0; d < dim; ++d)
-    polynomials[d][indices[d]].value(p(d), v[d]);
+    polynomials[d][indices[d]].value(p(d), 1, v[d].data());
 
   Tensor<1, dim> grad;
   for (unsigned int d = 0; d < dim; ++d)
@@ -539,6 +633,20 @@ AnisotropicPolynomials<dim>::compute_grad(const unsigned int i,
 }
 
 
+
+template <>
+Tensor<1, 0>
+AnisotropicPolynomials<0>::compute_grad(const unsigned int,
+                                        const Point<0> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+
+  return {};
+}
+
+
+
 template <int dim>
 Tensor<2, dim>
 AnisotropicPolynomials<dim>::compute_grad_grad(const unsigned int i,
@@ -547,9 +655,9 @@ AnisotropicPolynomials<dim>::compute_grad_grad(const unsigned int i,
   std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
-  std::vector<std::vector<double>> v(dim, std::vector<double>(3));
+  ndarray<double, dim, 3> v;
   for (unsigned int d = 0; d < dim; ++d)
-    polynomials[d][indices[d]].value(p(d), v[d]);
+    polynomials[d][indices[d]].value(p(d), 2, v[d].data());
 
   Tensor<2, dim> grad_grad;
   for (unsigned int d1 = 0; d1 < dim; ++d1)
@@ -571,6 +679,19 @@ AnisotropicPolynomials<dim>::compute_grad_grad(const unsigned int i,
       }
 
   return grad_grad;
+}
+
+
+
+template <>
+Tensor<2, 0>
+AnisotropicPolynomials<0>::compute_grad_grad(const unsigned int,
+                                             const Point<0> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+
+  return {};
 }
 
 
@@ -622,16 +743,17 @@ AnisotropicPolynomials<dim>::evaluate(
   // derivatives, if necessary) of
   // all polynomials at this
   // evaluation point
-  std::vector<std::vector<std::vector<double>>> v(dim);
+  std::size_t max_n_polynomials = 0;
   for (unsigned int d = 0; d < dim; ++d)
-    {
-      v[d].resize(polynomials[d].size());
-      for (unsigned int i = 0; i < polynomials[d].size(); ++i)
-        {
-          v[d][i].resize(n_values_and_derivatives, 0.);
-          polynomials[d][i].value(p(d), v[d][i]);
-        }
-    }
+    max_n_polynomials = std::max(max_n_polynomials, polynomials[d].size());
+
+  // 5 is enough to store values and derivatives in all supported cases
+  Table<2, std::array<double, 5>> v(dim, max_n_polynomials);
+  for (unsigned int d = 0; d < dim; ++d)
+    for (unsigned int i = 0; i < polynomials[d].size(); ++i)
+      polynomials[d][i].value(p(d),
+                              n_values_and_derivatives - 1,
+                              v(d, i).data());
 
   for (unsigned int i = 0; i < this->n(); ++i)
     {
@@ -646,7 +768,7 @@ AnisotropicPolynomials<dim>::evaluate(
         {
           values[i] = 1;
           for (unsigned int x = 0; x < dim; ++x)
-            values[i] *= v[x][indices[x]][0];
+            values[i] *= v(x, indices[x])[0];
         }
 
       if (update_grads)
@@ -654,7 +776,7 @@ AnisotropicPolynomials<dim>::evaluate(
           {
             grads[i][d] = 1.;
             for (unsigned int x = 0; x < dim; ++x)
-              grads[i][d] *= v[x][indices[x]][d == x ? 1 : 0];
+              grads[i][d] *= v(x, indices[x])[d == x ? 1 : 0];
           }
 
       if (update_grad_grads)
@@ -670,7 +792,7 @@ AnisotropicPolynomials<dim>::evaluate(
                   if (d2 == x)
                     ++derivative;
 
-                  grad_grads[i][d1][d2] *= v[x][indices[x]][derivative];
+                  grad_grads[i][d1][d2] *= v(x, indices[x])[derivative];
                 }
             }
 
@@ -691,7 +813,7 @@ AnisotropicPolynomials<dim>::evaluate(
                       ++derivative;
 
                     third_derivatives[i][d1][d2][d3] *=
-                      v[x][indices[x]][derivative];
+                      v(x, indices[x])[derivative];
                   }
               }
 
@@ -715,11 +837,27 @@ AnisotropicPolynomials<dim>::evaluate(
                         ++derivative;
 
                       fourth_derivatives[i][d1][d2][d3][d4] *=
-                        v[x][indices[x]][derivative];
+                        v(x, indices[x])[derivative];
                     }
                 }
     }
 }
+
+
+
+template <>
+void
+AnisotropicPolynomials<0>::evaluate(const Point<0> &,
+                                    std::vector<double> &,
+                                    std::vector<Tensor<1, 0>> &,
+                                    std::vector<Tensor<2, 0>> &,
+                                    std::vector<Tensor<3, 0>> &,
+                                    std::vector<Tensor<4, 0>> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+}
+
 
 
 template <int dim>
@@ -734,11 +872,25 @@ AnisotropicPolynomials<dim>::get_n_tensor_pols(
 }
 
 
+
+template <>
+unsigned int
+AnisotropicPolynomials<0>::get_n_tensor_pols(
+  const std::vector<std::vector<Polynomials::Polynomial<double>>> &)
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
+
+  return {};
+}
+
+
+
 template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 AnisotropicPolynomials<dim>::clone() const
 {
-  return std_cxx14::make_unique<AnisotropicPolynomials<dim>>(*this);
+  return std::make_unique<AnisotropicPolynomials<dim>>(*this);
 }
 
 

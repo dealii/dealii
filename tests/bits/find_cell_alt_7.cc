@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,12 +33,13 @@
 
 
 
-void check(Triangulation<2> &tria)
+void
+check(Triangulation<2> &tria)
 {
   MappingQ<2> map(5);
 
   // Test for a number of points, every ten degrees
-  for (unsigned int i = 0; i < 200; i++)
+  for (unsigned int i = 0; i < 200; ++i)
     {
       Point<2> p(std::sin((double)i / 100. * numbers::PI),
                  std::cos((double)i / 100. * numbers::PI));

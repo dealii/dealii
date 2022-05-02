@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,6 @@ namespace MeshWorker
      *
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename number = double>
     class Functional
@@ -102,7 +101,6 @@ namespace MeshWorker
      * appropriately before using this class.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename number = double>
     class CellsAndFaces

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,14 +25,22 @@ namespace Utilities
     {
       template class Process<unsigned int, unsigned int>;
 
+      template class Interface<unsigned int, unsigned int>;
+
       template class NBX<unsigned int, unsigned int>;
 
       template class PEX<unsigned int, unsigned int>;
+
+      template class Serial<unsigned int, unsigned int>;
 
       template class Selector<unsigned int, unsigned int>;
 
 
       template class Process<
+        std::pair<types::global_dof_index, types::global_dof_index>,
+        unsigned int>;
+
+      template class Interface<
         std::pair<types::global_dof_index, types::global_dof_index>,
         unsigned int>;
 
@@ -44,9 +52,39 @@ namespace Utilities
         std::pair<types::global_dof_index, types::global_dof_index>,
         unsigned int>;
 
+      template class Serial<
+        std::pair<types::global_dof_index, types::global_dof_index>,
+        unsigned int>;
+
       template class PEX<
         std::pair<types::global_dof_index, types::global_dof_index>,
         unsigned int>;
+
+#ifdef DEAL_II_WITH_64BIT_INDICES
+      template class Process<types::global_dof_index, unsigned int>;
+
+      template class Interface<types::global_dof_index, unsigned int>;
+
+      template class NBX<types::global_dof_index, unsigned int>;
+
+      template class Serial<types::global_dof_index, unsigned int>;
+
+      template class PEX<types::global_dof_index, unsigned int>;
+
+      template class Selector<types::global_dof_index, unsigned int>;
+#endif
+
+      template class Process<char, char>;
+
+      template class Interface<char, char>;
+
+      template class NBX<char, char>;
+
+      template class PEX<char, char>;
+
+      template class Serial<char, char>;
+
+      template class Selector<char, char>;
 
     } // namespace ConsensusAlgorithms
   }   // end of namespace MPI

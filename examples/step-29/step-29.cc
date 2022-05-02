@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2019 by the deal.II authors
+ * Copyright (C) 2007 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -33,12 +33,9 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -105,7 +102,7 @@ namespace Step29
     virtual void vector_value(const Point<dim> & /*p*/,
                               Vector<double> &values) const override
     {
-      Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
+      AssertDimension(values.size(), 2);
 
       values(0) = 1;
       values(1) = 0;
@@ -115,8 +112,7 @@ namespace Step29
     vector_value_list(const std::vector<Point<dim>> &points,
                       std::vector<Vector<double>> &  value_list) const override
     {
-      Assert(value_list.size() == points.size(),
-             ExcDimensionMismatch(value_list.size(), points.size()));
+      AssertDimension(value_list.size(), points.size());
 
       for (unsigned int p = 0; p < points.size(); ++p)
         DirichletBoundaryValues<dim>::vector_value(points[p], value_list[p]);
@@ -329,9 +325,7 @@ namespace Step29
     const DataPostprocessorInputs::Vector<dim> &inputs,
     std::vector<Vector<double>> &               computed_quantities) const
   {
-    Assert(computed_quantities.size() == inputs.solution_values.size(),
-           ExcDimensionMismatch(computed_quantities.size(),
-                                inputs.solution_values.size()));
+    AssertDimension(computed_quantities.size(), inputs.solution_values.size());
 
     // The computation itself is straightforward: We iterate over each
     // entry in the output vector and compute $|u|$ from the
@@ -342,12 +336,10 @@ namespace Step29
     // should return the <i>square</i> of the absolute value --
     // thereby not satisfying the properties mathematicians require of
     // something called a "norm".)
-    for (unsigned int i = 0; i < computed_quantities.size(); i++)
+    for (unsigned int i = 0; i < computed_quantities.size(); ++i)
       {
-        Assert(computed_quantities[i].size() == 1,
-               ExcDimensionMismatch(computed_quantities[i].size(), 1));
-        Assert(inputs.solution_values[i].size() == 2,
-               ExcDimensionMismatch(inputs.solution_values[i].size(), 2));
+        AssertDimension(computed_quantities[i].size(), 1);
+        AssertDimension(inputs.solution_values[i].size(), 2);
 
         const std::complex<double> u(inputs.solution_values[i](0),
                                      inputs.solution_values[i](1));
@@ -414,7 +406,7 @@ namespace Step29
   {
     // First we generate some logging output and start a timer so we can
     // compute execution time when this function is done:
-    deallog << "Generating grid... ";
+    std::cout << "Generating grid... ";
     Timer timer;
 
     // Then we query the values for the focal distance of the transducer lens
@@ -475,10 +467,10 @@ namespace Step29
     // query the number of CPU seconds elapsed since the beginning of the
     // function:
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
 
-    deallog << "  Number of active cells:  " << triangulation.n_active_cells()
-            << std::endl;
+    std::cout << "  Number of active cells:  " << triangulation.n_active_cells()
+              << std::endl;
   }
 
 
@@ -491,7 +483,7 @@ namespace Step29
   template <int dim>
   void UltrasoundProblem<dim>::setup_system()
   {
-    deallog << "Setting up system... ";
+    std::cout << "Setting up system... ";
     Timer timer;
 
     dof_handler.distribute_dofs(fe);
@@ -505,10 +497,10 @@ namespace Step29
     solution.reinit(dof_handler.n_dofs());
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
 
-    deallog << "  Number of degrees of freedom: " << dof_handler.n_dofs()
-            << std::endl;
+    std::cout << "  Number of degrees of freedom: " << dof_handler.n_dofs()
+              << std::endl;
   }
 
 
@@ -519,7 +511,7 @@ namespace Step29
   template <int dim>
   void UltrasoundProblem<dim>::assemble_system()
   {
-    deallog << "Assembling system matrix... ";
+    std::cout << "Assembling system matrix... ";
     Timer timer;
 
     // First we query wavespeed and frequency from the ParameterHandler object
@@ -541,7 +533,7 @@ namespace Step29
 
     const unsigned int n_q_points      = quadrature_formula.size(),
                        n_face_q_points = face_quadrature_formula.size(),
-                       dofs_per_cell   = fe.dofs_per_cell;
+                       dofs_per_cell   = fe.n_dofs_per_cell();
 
     // The FEValues objects will evaluate the shape functions for us.  For the
     // part of the bilinear form that involves integration on $\Omega$, we'll
@@ -651,7 +643,7 @@ namespace Step29
         // is at the boundary, and second has the correct boundary indicator
         // associated with $\Gamma_2$, the part of the boundary where we have
         // absorbing boundary conditions:
-        for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const auto face_no : cell->face_indices())
           if (cell->face(face_no)->at_boundary() &&
               (cell->face(face_no)->boundary_id() == 0))
             {
@@ -734,7 +726,7 @@ namespace Step29
                                        system_rhs);
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
   }
 
 
@@ -756,7 +748,7 @@ namespace Step29
   template <int dim>
   void UltrasoundProblem<dim>::solve()
   {
-    deallog << "Solving linear system... ";
+    std::cout << "Solving linear system... ";
     Timer timer;
 
     // The code to solve the linear system is short: First, we allocate an
@@ -774,7 +766,7 @@ namespace Step29
     A_direct.vmult(solution, system_rhs);
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
   }
 
 
@@ -790,7 +782,7 @@ namespace Step29
   template <int dim>
   void UltrasoundProblem<dim>::output_results() const
   {
-    deallog << "Generating output... ";
+    std::cout << "Generating output... ";
     Timer timer;
 
     // Define objects of our <code>ComputeIntensity</code> class and a DataOut
@@ -841,7 +833,7 @@ namespace Step29
     data_out.write(output);
 
     timer.stop();
-    deallog << "done (" << timer.cpu_time() << "s)" << std::endl;
+    std::cout << "done (" << timer.cpu_time() << "s)" << std::endl;
   }
 
 
@@ -876,8 +868,6 @@ int main()
     {
       using namespace dealii;
       using namespace Step29;
-
-      deallog.depth_console(5);
 
       ParameterHandler prm;
       ParameterReader  param(prm);

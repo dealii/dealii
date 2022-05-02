@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,7 @@ test()
   auto cell = tria.begin_active();
   auto endc = tria.end();
 
-  typedef decltype(cell) Iterator;
+  using Iterator = decltype(cell);
 
 
 

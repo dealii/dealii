@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,8 +69,8 @@ namespace Evaluation
     set_refinement_cycle(const unsigned int refinement_cycle);
 
     virtual void
-    operator()(const hp::DoFHandler<dim> &dof_handler,
-               const Vector<double> &     solution) const = 0;
+    operator()(const DoFHandler<dim> &dof_handler,
+               const Vector<double> & solution) const = 0;
 
   protected:
     unsigned int refinement_cycle;
@@ -100,8 +100,8 @@ namespace Evaluation
                          TableHandler &    results_table);
 
     virtual void
-    operator()(const hp::DoFHandler<dim> &dof_handler,
-               const Vector<double> &     solution) const;
+    operator()(const DoFHandler<dim> &dof_handler,
+               const Vector<double> & solution) const;
 
     DeclException1(ExcEvaluationPointNotFound,
                    Point<dim>,
@@ -126,15 +126,15 @@ namespace Evaluation
 
   template <int dim>
   void
-  PointValueEvaluation<dim>::operator()(const hp::DoFHandler<dim> &dof_handler,
-                                        const Vector<double> &solution) const
+  PointValueEvaluation<dim>::operator()(const DoFHandler<dim> &dof_handler,
+                                        const Vector<double> & solution) const
   {
     double point_value = 1e20;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
-    bool evaluation_point_found                             = false;
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
+    bool evaluation_point_found                         = false;
     for (; (cell != endc) && !evaluation_point_found; ++cell)
       for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(vertex) == evaluation_point)
@@ -163,8 +163,8 @@ namespace Evaluation
                    const DataOutBase::OutputFormat output_format);
 
     virtual void
-    operator()(const hp::DoFHandler<dim> &dof_handler,
-               const Vector<double> &     solution) const;
+    operator()(const DoFHandler<dim> &dof_handler,
+               const Vector<double> & solution) const;
 
   private:
     const std::string               output_name_base;
@@ -183,16 +183,16 @@ namespace Evaluation
 
   template <int dim>
   void
-  SolutionOutput<dim>::operator()(const hp::DoFHandler<dim> &dof_handler,
-                                  const Vector<double> &     solution) const
+  SolutionOutput<dim>::operator()(const DoFHandler<dim> &dof_handler,
+                                  const Vector<double> & solution) const
   {
-    DataOut<dim, hp::DoFHandler<dim>> data_out;
+    DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches();
 
     std::ostringstream filename;
-    filename << output_name_base << "-" << this->refinement_cycle
+    filename << output_name_base << '-' << this->refinement_cycle
              << data_out.default_suffix(output_format) << std::ends;
 
     data_out.write(deallog.get_file_stream(), output_format);
@@ -261,7 +261,7 @@ namespace LaplaceSolver
   protected:
     const SmartPointer<const hp::FECollection<dim>> fe;
     const SmartPointer<const hp::QCollection<dim>>  quadrature;
-    hp::DoFHandler<dim>                             dof_handler;
+    DoFHandler<dim>                                 dof_handler;
     Vector<double>                                  solution;
     const SmartPointer<const Function<dim>>         boundary_values;
 
@@ -271,7 +271,7 @@ namespace LaplaceSolver
   private:
     struct LinearSystem
     {
-      LinearSystem(const hp::DoFHandler<dim> &dof_handler);
+      LinearSystem(const DoFHandler<dim> &dof_handler);
 
       void
       solve(Vector<double> &solution) const;
@@ -287,10 +287,10 @@ namespace LaplaceSolver
 
     void
     assemble_matrix(
-      LinearSystem &                                            linear_system,
-      const typename hp::DoFHandler<dim>::active_cell_iterator &begin_cell,
-      const typename hp::DoFHandler<dim>::active_cell_iterator &end_cell,
-      Threads::Mutex &                                          mutex) const;
+      LinearSystem &                                        linear_system,
+      const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
+      const typename DoFHandler<dim>::active_cell_iterator &end_cell,
+      Threads::Mutex &                                      mutex) const;
   };
 
 
@@ -349,8 +349,8 @@ namespace LaplaceSolver
   void
   Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
   {
-    typedef
-      typename hp::DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
+
 
     const unsigned int n_threads = MultithreadInfo::n_threads();
     std::vector<std::pair<active_cell_iterator, active_cell_iterator>>
@@ -392,10 +392,10 @@ namespace LaplaceSolver
   template <int dim>
   void
   Solver<dim>::assemble_matrix(
-    LinearSystem &                                            linear_system,
-    const typename hp::DoFHandler<dim>::active_cell_iterator &begin_cell,
-    const typename hp::DoFHandler<dim>::active_cell_iterator &end_cell,
-    Threads::Mutex &                                          mutex) const
+    LinearSystem &                                        linear_system,
+    const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
+    const typename DoFHandler<dim>::active_cell_iterator &end_cell,
+    Threads::Mutex &                                      mutex) const
   {
     hp::FEValues<dim> fe_values(*fe,
                                 *quadrature,
@@ -408,7 +408,7 @@ namespace LaplaceSolver
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell = begin_cell;
+    for (typename DoFHandler<dim>::active_cell_iterator cell = begin_cell;
          cell != end_cell;
          ++cell)
       {
@@ -438,12 +438,12 @@ namespace LaplaceSolver
 
 
   template <int dim>
-  Solver<dim>::LinearSystem::LinearSystem(
-    const hp::DoFHandler<dim> &dof_handler)
+  Solver<dim>::LinearSystem::LinearSystem(const DoFHandler<dim> &dof_handler)
+
   {
     hanging_node_constraints.clear();
 
-    void (*mhnc_p)(const hp::DoFHandler<dim> &, AffineConstraints<double> &) =
+    void (*mhnc_p)(const DoFHandler<dim> &, AffineConstraints<double> &) =
       &DoFTools::make_hanging_node_constraints;
 
     Threads::Thread<> mhnc_thread =
@@ -528,9 +528,10 @@ namespace LaplaceSolver
     std::vector<double>                  rhs_values(n_q_points);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename hp::DoFHandler<dim>::active_cell_iterator
-      cell = this->dof_handler.begin_active(),
-      endc = this->dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = this->dof_handler
+                                                            .begin_active(),
+                                                   endc =
+                                                     this->dof_handler.end();
     for (; cell != endc; ++cell)
       {
         cell_rhs = 0;
@@ -727,7 +728,7 @@ run_simulation(
 
   for (unsigned int step = 0; true; ++step)
     {
-      deallog << step << " " << std::flush;
+      deallog << step << ' ' << std::flush;
 
       solver.solve_problem();
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,7 +66,7 @@ class BlockIndices;
  * <h4>ITERATOR</h4>
  *
  * Any object that has an <tt>operator++()</tt> and points to a
- * TriaObjectAccessor.
+ * TriaAccessor or derived class.
  *
  * <h4>DOFINFO</h4>
  *
@@ -107,7 +107,7 @@ class BlockIndices;
  * DOFINFO objects are gathered in a DoFInfoBox. In those objects, we store
  * the results of local operations on each cell and its faces. Once all this
  * information has been gathered, an ASSEMBLER is used to assemble it into
- * golbal data.
+ * global data.
  *
  * <h4>INFOBOX</h4>
  *
@@ -175,8 +175,6 @@ class BlockIndices;
  *
  * @ingroup MeshWorker
  * @ingroup Integrators
- * @author Guido Kanschat
- * @date 2009
  */
 namespace MeshWorker
 {
@@ -220,7 +218,6 @@ namespace MeshWorker
    * assembled into the global system by Assembler classes.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <typename number>
   class LocalResults
@@ -678,10 +675,10 @@ namespace MeshWorker
     os << "M: " << M1.size() << " face " << M2.size() << std::endl;
     for (unsigned int i = 0; i < M1.size(); ++i)
       {
-        os << "  " << M1[i].row << "," << M1[i].column << " "
+        os << "  " << M1[i].row << ',' << M1[i].column << ' '
            << M1[i].matrix.m() << 'x' << M1[i].matrix.n();
         if (i < M2.size())
-          os << " face " << M2[i].row << "," << M2[i].column << " "
+          os << " face " << M2[i].row << ',' << M2[i].column << ' '
              << M2[i].matrix.m() << 'x' << M2[i].matrix.n();
         os << std::endl;
       }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 
 #include <deal.II/base/template_constraints.h>
+
+#include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
@@ -34,6 +36,131 @@
 #include <numeric>
 
 DEAL_II_NAMESPACE_OPEN
+
+namespace
+{
+  /**
+   * Fixed fraction algorithm without a specified vector norm.
+   *
+   * Entries of the criteria vector and fractions are taken as is, so this
+   * function basically evaluates norms on the vector or its subsets as
+   * l1-norms.
+   */
+  template <int dim, int spacedim, typename Number>
+  void
+  refine_and_coarsen_fixed_fraction_via_l1_norm(
+    Triangulation<dim, spacedim> &tria,
+    const Vector<Number> &        criteria,
+    const double                  top_fraction,
+    const double                  bottom_fraction,
+    const unsigned int            max_n_cells)
+  {
+    // sort the criteria in descending order in an auxiliary vector, which we
+    // have to sum up and compare with @p{fraction_of_error*total_error}
+    Vector<Number> criteria_sorted = criteria;
+    std::sort(criteria_sorted.begin(),
+              criteria_sorted.end(),
+              std::greater<double>());
+
+    const double total_error = criteria_sorted.l1_norm();
+
+    // compute thresholds
+    typename Vector<Number>::const_iterator pp = criteria_sorted.begin();
+    for (double sum = 0;
+         (sum < top_fraction * total_error) && (pp != criteria_sorted.end());
+         ++pp)
+      sum += *pp;
+    double top_threshold =
+      (pp != criteria_sorted.begin() ? (*pp + *(pp - 1)) / 2 : *pp);
+
+    typename Vector<Number>::const_iterator qq = criteria_sorted.end() - 1;
+    for (double sum = 0; (sum < bottom_fraction * total_error) &&
+                         (qq != criteria_sorted.begin() - 1);
+         --qq)
+      sum += *qq;
+    double bottom_threshold =
+      ((qq != criteria_sorted.end() - 1) ? (*qq + *(qq + 1)) / 2 : 0.);
+
+    // we now have an idea how many cells we
+    // are going to refine and coarsen. we use
+    // this information to see whether we are
+    // over the limit and if so use a function
+    // that knows how to deal with this
+    // situation
+
+    // note, that at this point, we have no
+    // information about anisotropically refined
+    // cells, thus use the situation of purely
+    // isotropic refinement as guess for a mixed
+    // refinemnt as well.
+    const unsigned int refine_cells  = pp - criteria_sorted.begin(),
+                       coarsen_cells = criteria_sorted.end() - 1 - qq;
+
+    if (static_cast<unsigned int>(
+          tria.n_active_cells() +
+          refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1) -
+          (coarsen_cells * (GeometryInfo<dim>::max_children_per_cell - 1) /
+           GeometryInfo<dim>::max_children_per_cell)) > max_n_cells)
+      {
+        GridRefinement::refine_and_coarsen_fixed_number(tria,
+                                                        criteria,
+                                                        1. * refine_cells /
+                                                          criteria.size(),
+                                                        1. * coarsen_cells /
+                                                          criteria.size(),
+                                                        max_n_cells);
+        return;
+      }
+
+    // in some rare cases it may happen that
+    // both thresholds are the same (e.g. if
+    // there are many cells with the same
+    // error indicator). That would mean that
+    // all cells will be flagged for
+    // refinement or coarsening, but some will
+    // be flagged for both, namely those for
+    // which the indicator equals the
+    // thresholds. This is forbidden, however.
+    //
+    // In some rare cases with very few cells
+    // we also could get integer round off
+    // errors and get problems with
+    // the top and bottom fractions.
+    //
+    // In these case we arbitrarily reduce the
+    // bottom threshold by one permille below
+    // the top threshold
+    //
+    // Finally, in some cases
+    // (especially involving symmetric
+    // solutions) there are many cells
+    // with the same error indicator
+    // values. if there are many with
+    // indicator equal to the top
+    // threshold, no refinement will
+    // take place below; to avoid this
+    // case, we also lower the top
+    // threshold if it equals the
+    // largest indicator and the
+    // top_fraction!=1
+    const double max_criterion = *(criteria_sorted.begin()),
+                 min_criterion = *(criteria_sorted.end() - 1);
+
+    if ((top_threshold == max_criterion) && (top_fraction != 1))
+      top_threshold *= 0.999;
+
+    if (bottom_threshold >= top_threshold)
+      bottom_threshold = 0.999 * top_threshold;
+
+    // actually flag cells
+    if (top_threshold < max_criterion)
+      GridRefinement::refine(tria, criteria, top_threshold, refine_cells);
+
+    if (bottom_threshold > min_criterion)
+      GridRefinement::coarsen(tria, criteria, bottom_threshold);
+  }
+} // namespace
+
 
 
 template <int dim, typename Number, int spacedim>
@@ -71,7 +198,10 @@ GridRefinement::refine(Triangulation<dim, spacedim> &tria,
 
   unsigned int marked = 0;
   for (const auto &cell : tria.active_cell_iterators())
-    if (std::fabs(criteria(cell->active_cell_index())) >= new_threshold)
+    if ((dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
+           &tria) == nullptr ||
+         cell->is_locally_owned()) &&
+        std::fabs(criteria(cell->active_cell_index())) >= new_threshold)
       {
         if (max_to_mark != numbers::invalid_unsigned_int &&
             marked >= max_to_mark)
@@ -94,7 +224,10 @@ GridRefinement::coarsen(Triangulation<dim, spacedim> &tria,
   Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
   for (const auto &cell : tria.active_cell_iterators())
-    if (std::fabs(criteria(cell->active_cell_index())) <= threshold)
+    if ((dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
+           &tria) == nullptr ||
+         cell->is_locally_owned()) &&
+        std::fabs(criteria(cell->active_cell_index())) <= threshold)
       if (!cell->refine_flag_set())
         cell->set_coarsen_flag();
 }
@@ -221,7 +354,7 @@ GridRefinement::refine_and_coarsen_fixed_number(
       if (refine_cells)
         {
           if (static_cast<size_t>(refine_cells) == criteria.size())
-            refine(tria, criteria, -std::numeric_limits<double>::max());
+            refine(tria, criteria, std::numeric_limits<double>::lowest());
           else
             {
               std::nth_element(tmp.begin(),
@@ -259,10 +392,10 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
   const Vector<Number> &        criteria,
   const double                  top_fraction,
   const double                  bottom_fraction,
-  const unsigned int            max_n_cells)
+  const unsigned int            max_n_cells,
+  const VectorTools::NormType   norm_type)
 {
-  // correct number of cells is
-  // checked in @p{refine}
+  // correct number of cells is checked in @p{refine}
   Assert((top_fraction >= 0) && (top_fraction <= 1),
          ExcInvalidParameterValue());
   Assert((bottom_fraction >= 0) && (bottom_fraction <= 1),
@@ -272,108 +405,43 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
          ExcInvalidParameterValue());
   Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
-  // let tmp be the cellwise square of the
-  // error, which is what we have to sum
-  // up and compare with
-  // @p{fraction_of_error*total_error}.
-  Vector<Number> tmp;
-  tmp                      = criteria;
-  const double total_error = tmp.l1_norm();
+  switch (norm_type)
+    {
+      case VectorTools::NormType::L1_norm:
+        // evaluate norms on subsets and compare them as
+        //   c_0 + c_1 + ... < fraction * l1-norm(c)
+        refine_and_coarsen_fixed_fraction_via_l1_norm(
+          tria, criteria, top_fraction, bottom_fraction, max_n_cells);
+        break;
 
-  // sort the largest criteria to the
-  // beginning of the vector
-  std::sort(tmp.begin(), tmp.end(), std::greater<double>());
+      case VectorTools::NormType::L2_norm:
+        {
+          // we do not want to evaluate norms on subsets as:
+          //   sqrt(c_0^2 + c_1^2 + ...) < fraction * l2-norm(c)
+          // instead take the square of both sides of the equation
+          // and evaluate:
+          //   c_0^2 + c_1^2 + ... < fraction^2 * l1-norm(c.c)
+          // we adjust all parameters accordingly
+          Vector<Number> criteria_squared(criteria.size());
+          std::transform(criteria.begin(),
+                         criteria.end(),
+                         criteria_squared.begin(),
+                         [](Number c) { return c * c; });
 
-  // compute thresholds
-  typename Vector<Number>::const_iterator pp = tmp.begin();
-  for (double sum = 0; (sum < top_fraction * total_error) && (pp != tmp.end());
-       ++pp)
-    sum += *pp;
-  double top_threshold = (pp != tmp.begin() ? (*pp + *(pp - 1)) / 2 : *pp);
-  typename Vector<Number>::const_iterator qq = (tmp.end() - 1);
-  for (double sum = 0;
-       (sum < bottom_fraction * total_error) && (qq != tmp.begin() - 1);
-       --qq)
-    sum += *qq;
-  double bottom_threshold = (qq != (tmp.end() - 1) ? (*qq + *(qq + 1)) / 2 : 0);
+          refine_and_coarsen_fixed_fraction_via_l1_norm(tria,
+                                                        criteria_squared,
+                                                        top_fraction *
+                                                          top_fraction,
+                                                        bottom_fraction *
+                                                          bottom_fraction,
+                                                        max_n_cells);
+        }
+        break;
 
-  // we now have an idea how many cells we
-  // are going to refine and coarsen. we use
-  // this information to see whether we are
-  // over the limit and if so use a function
-  // that knows how to deal with this
-  // situation
-
-  // note, that at this point, we have no
-  // information about anisotropically refined
-  // cells, thus use the situation of purely
-  // isotropic refinement as guess for a mixed
-  // refinemnt as well.
-  {
-    const unsigned int refine_cells  = pp - tmp.begin(),
-                       coarsen_cells = tmp.end() - 1 - qq;
-
-    if (static_cast<unsigned int>(
-          tria.n_active_cells() +
-          refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1) -
-          (coarsen_cells * (GeometryInfo<dim>::max_children_per_cell - 1) /
-           GeometryInfo<dim>::max_children_per_cell)) > max_n_cells)
-      {
-        refine_and_coarsen_fixed_number(tria,
-                                        criteria,
-                                        1. * refine_cells / criteria.size(),
-                                        1. * coarsen_cells / criteria.size(),
-                                        max_n_cells);
-        return;
-      }
-  }
-
-
-  // in some rare cases it may happen that
-  // both thresholds are the same (e.g. if
-  // there are many cells with the same
-  // error indicator). That would mean that
-  // all cells will be flagged for
-  // refinement or coarsening, but some will
-  // be flagged for both, namely those for
-  // which the indicator equals the
-  // thresholds. This is forbidden, however.
-  //
-  // In some rare cases with very few cells
-  // we also could get integer round off
-  // errors and get problems with
-  // the top and bottom fractions.
-  //
-  // In these case we arbitrarily reduce the
-  // bottom threshold by one permille below
-  // the top threshold
-  //
-  // Finally, in some cases
-  // (especially involving symmetric
-  // solutions) there are many cells
-  // with the same error indicator
-  // values. if there are many with
-  // indicator equal to the top
-  // threshold, no refinement will
-  // take place below; to avoid this
-  // case, we also lower the top
-  // threshold if it equals the
-  // largest indicator and the
-  // top_fraction!=1
-  const auto minmax_element =
-    std::minmax_element(criteria.begin(), criteria.end());
-  if ((top_threshold == *minmax_element.second) && (top_fraction != 1))
-    top_threshold *= 0.999;
-
-  if (bottom_threshold >= top_threshold)
-    bottom_threshold = 0.999 * top_threshold;
-
-  // actually flag cells
-  if (top_threshold < *minmax_element.second)
-    refine(tria, criteria, top_threshold, pp - tmp.begin());
-
-  if (bottom_threshold > *minmax_element.first)
-    coarsen(tria, criteria, bottom_threshold);
+      default:
+        Assert(false, ExcNotImplemented());
+        break;
+    }
 }
 
 

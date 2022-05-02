@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,7 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_integrate_difference.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -131,8 +131,6 @@ DEAL_II_NAMESPACE_OPEN
  *  Volume = {7},
  *  Year = {2018}}
  * @endcode
- *
- * @author Luca Heltai, 2019.
  */
 class ParsedConvergenceTable
 {
@@ -200,7 +198,7 @@ public:
    * output_table() also writes in this file in the format deduced from its
    * extension;
    * @param precision How many digits to use when writing the error;
-   * @param compute_error Control wether the filling of the table is enabled
+   * @param compute_error Control whether the filling of the table is enabled
    * or not. This flag may be used to disable at run time any error computation;
    *
    * The parameters you specify with this constructor can be written to a
@@ -272,26 +270,23 @@ public:
    * components does not coincide with the number of components of the
    * underlying finite element space.
    */
-  template <typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  error_from_exact(
-    const DoFHandlerType &                           vspace,
-    const VectorType &                               solution,
-    const Function<DoFHandlerType::space_dimension> &exact,
-    const Function<DoFHandlerType::space_dimension> *weight = nullptr);
+  error_from_exact(const DoFHandler<dim, spacedim> &vspace,
+                   const VectorType &               solution,
+                   const Function<spacedim> &       exact,
+                   const Function<spacedim> *       weight = nullptr);
 
   /**
    * Same as above, with a different mapping.
    */
-  template <typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  error_from_exact(
-    const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
-      &                                              mapping,
-    const DoFHandlerType &                           vspace,
-    const VectorType &                               solution,
-    const Function<DoFHandlerType::space_dimension> &exact,
-    const Function<DoFHandlerType::space_dimension> *weight = nullptr);
+  error_from_exact(const Mapping<dim, spacedim> &   mapping,
+                   const DoFHandler<dim, spacedim> &vspace,
+                   const VectorType &               solution,
+                   const Function<spacedim> &       exact,
+                   const Function<spacedim> *       weight = nullptr);
 
   /**
    * Add an additional column (with name @p column_name) to the table, by invoking
@@ -350,7 +345,7 @@ public:
    *
    *
    * @param column_name Name of the column to add;
-   * @param custom_function Function that will be called to fill the given
+   * @param custom_function %Function that will be called to fill the given
    * entry. You need to make sure that the scope of this function is valid
    * up to the call to error_from_exact() or difference();
    * @param compute_rate If set to true, then this column will be included in
@@ -367,24 +362,23 @@ public:
   /**
    * Difference between two solutions in the same vector space.
    */
-  template <typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  difference(const DoFHandlerType &,
+  difference(const DoFHandler<dim, spacedim> &,
              const VectorType &,
              const VectorType &,
-             const Function<DoFHandlerType::space_dimension> *weight = nullptr);
+             const Function<spacedim> *weight = nullptr);
 
   /**
    * Same as above, with a non default mapping.
    */
-  template <typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  difference(const Mapping<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &mapping,
-             const DoFHandlerType &,
+  difference(const Mapping<dim, spacedim> &mapping,
+             const DoFHandler<dim, spacedim> &,
              const VectorType &,
              const VectorType &,
-             const Function<DoFHandlerType::space_dimension> *weight = nullptr);
+             const Function<spacedim> *weight = nullptr);
 
   /**
    * Write the error table to the @p out stream (in text format), and
@@ -484,61 +478,56 @@ private:
 // ============================================================
 // Template functions
 // ============================================================
-template <typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename VectorType>
 void
-ParsedConvergenceTable::difference(
-  const DoFHandlerType &                           dh,
-  const VectorType &                               solution1,
-  const VectorType &                               solution2,
-  const Function<DoFHandlerType::space_dimension> *weight)
+ParsedConvergenceTable::difference(const DoFHandler<dim, spacedim> &dh,
+                                   const VectorType &               solution1,
+                                   const VectorType &               solution2,
+                                   const Function<spacedim> *       weight)
 {
   AssertThrow(solution1.size() == solution2.size(),
               ExcDimensionMismatch(solution1.size(), solution2.size()));
   VectorType solution(solution1);
   solution -= solution2;
-  error_from_exact(dh,
-                   solution,
-                   ConstantFunction<DoFHandlerType::space_dimension>(
-                     0, component_names.size()),
-                   weight);
+  error_from_exact(
+    dh,
+    solution,
+    Functions::ConstantFunction<spacedim>(0.0, component_names.size()),
+    weight);
 }
 
 
 
-template <typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename VectorType>
 void
-ParsedConvergenceTable::difference(
-  const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
-    &                                              mapping,
-  const DoFHandlerType &                           dh,
-  const VectorType &                               solution1,
-  const VectorType &                               solution2,
-  const Function<DoFHandlerType::space_dimension> *weight)
+ParsedConvergenceTable::difference(const Mapping<dim, spacedim> &   mapping,
+                                   const DoFHandler<dim, spacedim> &dh,
+                                   const VectorType &               solution1,
+                                   const VectorType &               solution2,
+                                   const Function<spacedim> *       weight)
 {
   AssertThrow(solution1.size() == solution2.size(),
               ExcDimensionMismatch(solution1.size(), solution2.size()));
   VectorType solution(solution1);
   solution -= solution2;
-  error_from_exact(mapping,
-                   dh,
-                   solution,
-                   ConstantFunction<DoFHandlerType::space_dimension>(
-                     0, component_names.size()),
-                   weight);
+  error_from_exact(
+    mapping,
+    dh,
+    solution,
+    Functions::ConstantFunction<spacedim>(0.0, component_names.size()),
+    weight);
 }
 
 
 
-template <typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename VectorType>
 void
-ParsedConvergenceTable::error_from_exact(
-  const DoFHandlerType &                           dh,
-  const VectorType &                               solution,
-  const Function<DoFHandlerType::space_dimension> &exact,
-  const Function<DoFHandlerType::space_dimension> *weight)
+ParsedConvergenceTable::error_from_exact(const DoFHandler<dim, spacedim> &dh,
+                                         const VectorType &        solution,
+                                         const Function<spacedim> &exact,
+                                         const Function<spacedim> *weight)
 {
-  error_from_exact(StaticMappingQ1<DoFHandlerType::dimension,
-                                   DoFHandlerType::space_dimension>::mapping,
+  error_from_exact(get_default_linear_mapping(dh.get_triangulation()),
                    dh,
                    solution,
                    exact,
@@ -547,18 +536,14 @@ ParsedConvergenceTable::error_from_exact(
 
 
 
-template <typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename VectorType>
 void
-ParsedConvergenceTable::error_from_exact(
-  const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
-    &                                              mapping,
-  const DoFHandlerType &                           dh,
-  const VectorType &                               solution,
-  const Function<DoFHandlerType::space_dimension> &exact,
-  const Function<DoFHandlerType::space_dimension> *weight)
+ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
+                                         const DoFHandler<dim, spacedim> &dh,
+                                         const VectorType &        solution,
+                                         const Function<spacedim> &exact,
+                                         const Function<spacedim> *weight)
 {
-  const int  dim          = DoFHandlerType::dimension;
-  const int  spacedim     = DoFHandlerType::space_dimension;
   const auto n_components = component_names.size();
 
   if (compute_error)

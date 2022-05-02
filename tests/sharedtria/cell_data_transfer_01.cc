@@ -21,6 +21,7 @@
 
 #include <deal.II/distributed/shared_tria.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/petsc_vector.h>
@@ -62,14 +63,14 @@ test()
   // ----- gather -----
   // store parent id of all locally owned cells
   Vector<PetscScalar> cell_ids_pre(tria.n_active_cells());
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        const std::string  parent_cellid = cell->parent()->id().to_string();
-        const unsigned int parent_coarse_cell_id =
-          static_cast<unsigned int>(std::stoul(parent_cellid));
-        cell_ids_pre(cell->active_cell_index()) = parent_coarse_cell_id;
-      }
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      const std::string  parent_cellid = cell->parent()->id().to_string();
+      const unsigned int parent_coarse_cell_id =
+        static_cast<unsigned int>(std::stoul(parent_cellid));
+      cell_ids_pre(cell->active_cell_index()) = parent_coarse_cell_id;
+    }
 
   // distribute local vector (as presented in step-18)
   PETScWrappers::MPI::Vector distributed_cell_ids_pre(
@@ -77,10 +78,10 @@ test()
     tria.n_active_cells(),
     tria.n_locally_owned_active_cells());
 
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      distributed_cell_ids_pre(cell->active_cell_index()) =
-        cell_ids_pre(cell->active_cell_index());
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    distributed_cell_ids_pre(cell->active_cell_index()) =
+      cell_ids_pre(cell->active_cell_index());
   distributed_cell_ids_pre.compress(VectorOperation::insert);
 
   cell_ids_pre = distributed_cell_ids_pre;

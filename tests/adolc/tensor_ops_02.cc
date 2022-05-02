@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,11 +34,11 @@ template <int dim,
 void
 test_tensor()
 {
-  typedef typename Differentiation::AD::NumberTraits<number_t,
-                                                     ad_number_enum>::ad_type
-                                      ad_number_t;
-  typedef Tensor<2, dim, ad_number_t> AD_Tensor;
-  typedef Tensor<2, dim, number_t>    NonAD_Tensor;
+  using ad_number_t =
+    typename Differentiation::AD::NumberTraits<number_t,
+                                               ad_number_enum>::ad_type;
+  using AD_Tensor    = Tensor<2, dim, ad_number_t>;
+  using NonAD_Tensor = Tensor<2, dim, number_t>;
 
   AD_Tensor adt1;
   for (unsigned int i = 0; i < NonAD_Tensor::n_independent_components; ++i)
@@ -55,13 +55,13 @@ template <int dim,
 void
 test_symmetric_tensor()
 {
-  typedef typename Differentiation::AD::NumberTraits<number_t,
-                                                     ad_number_enum>::ad_type
-                                               ad_number_t;
-  typedef SymmetricTensor<2, dim, ad_number_t> AD_STensor2;
-  typedef SymmetricTensor<4, dim, ad_number_t> AD_STensor4;
-  typedef SymmetricTensor<2, dim, number_t>    NonAD_STensor2;
-  typedef SymmetricTensor<4, dim, number_t>    NonAD_STensor4;
+  using ad_number_t =
+    typename Differentiation::AD::NumberTraits<number_t,
+                                               ad_number_enum>::ad_type;
+  using AD_STensor2    = SymmetricTensor<2, dim, ad_number_t>;
+  using AD_STensor4    = SymmetricTensor<4, dim, ad_number_t>;
+  using NonAD_STensor2 = SymmetricTensor<2, dim, number_t>;
+  using NonAD_STensor4 = SymmetricTensor<4, dim, number_t>;
 
   // Constructors
   AD_STensor2 adt1;

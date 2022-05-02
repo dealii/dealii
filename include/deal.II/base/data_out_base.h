@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,8 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/table.h>
+
+#include <deal.II/grid/reference_cell.h>
 
 #include <deal.II/numerics/data_component_interpretation.h>
 
@@ -215,8 +217,6 @@ class XDMFEntry;
  * </ul>
  *
  * @ingroup output
- * @author Wolfgang Bangerth, Guido Kanschat 1999, 2000, 2001, 2002, 2005,
- * 2006.
  */
 namespace DataOutBase
 {
@@ -241,8 +241,6 @@ namespace DataOutBase
    * <tt>2<sup>dim</sup></tt>.
    *
    * @ingroup output
-   *
-   * @author Wolfgang Bangerth, Guido Kanschat
    */
   template <int dim, int spacedim = dim>
   struct Patch
@@ -298,7 +296,7 @@ namespace DataOutBase
      * output point <tt>j</tt>, where <tt>j</tt> denotes the usual
      * lexicographic ordering in deal.II. This is also the order of points as
      * provided by the <tt>QIterated</tt> class when used with the
-     * <tt>QTrapez</tt> class as subquadrature.
+     * <tt>QTrapezoid</tt> class as subquadrature.
      *
      * Since the number of data vectors is usually the same for all patches to
      * be printed, <tt>data.size()</tt> should yield the same value for all
@@ -322,6 +320,11 @@ namespace DataOutBase
      * in the Patch structure.
      */
     bool points_are_available;
+
+    /**
+     * Reference-cell type of the underlying cell of this patch.
+     */
+    ReferenceCell reference_cell;
 
     /**
      * Default constructor. Sets #n_subdivisions to one, #points_are_available
@@ -390,8 +393,6 @@ namespace DataOutBase
    * member variable that make no sense for zero-dimensional patches because
    * points have no natural neighbors across their non-existent faces, nor
    * can they reasonably be subdivided.
-   *
-   * @author Wolfgang Bangerth, 2017.
    */
   template <int spacedim>
   struct Patch<0, spacedim>
@@ -432,7 +433,7 @@ namespace DataOutBase
      * this variable is not used but exists only to allow access
      * from general code in a generic fashion.
      */
-    static unsigned int n_subdivisions;
+    static const unsigned int n_subdivisions;
 
     /**
      * Data vectors. The format is as follows: <tt>data(i,.)</tt> denotes the
@@ -471,6 +472,13 @@ namespace DataOutBase
     bool points_are_available;
 
     /**
+     * Reference-cell type of the underlying cell of this patch. Since for
+     * zero-dimensional objects, a patch can only refer to a vertex, this
+     * field is always equal to ReferenceCells::Vertex and can not be changed.
+     */
+    static const ReferenceCell reference_cell;
+
+    /**
      * Default constructor. Sets #points_are_available
      * to false, and #patch_index to #no_neighbor.
      */
@@ -495,7 +503,8 @@ namespace DataOutBase
     /**
      * Swap the current object's contents with those of the given argument.
      */
-    void swap(Patch<0, spacedim> &other_patch);
+    void
+    swap(Patch<0, spacedim> &other_patch);
 
     /**
      * Value to be used if this patch has no neighbor on one side.
@@ -1047,15 +1056,6 @@ namespace DataOutBase
   struct TecplotFlags : public OutputFlagsBase<TecplotFlags>
   {
     /**
-     * This variable is needed to hold the output file name when using the
-     * Tecplot API to write binary files.  If the user doesn't set the file
-     * name with this variable only ASCII Tecplot output will be produced.
-     *
-     * @deprecated Using Tecplot binary output is deprecated.
-     */
-    DEAL_II_DEPRECATED const char *tecplot_binary_file_name;
-
-    /**
      * Tecplot allows to assign names to zones. This variable stores this
      * name.
      */
@@ -1070,14 +1070,9 @@ namespace DataOutBase
 
     /**
      * Constructor.
-     *
-     * @deprecated Using this constructor is deprecated. Set the member variables
-     * directly instead.
      */
-    DEAL_II_DEPRECATED
-    TecplotFlags(const char * tecplot_binary_file_name = nullptr,
-                 const char * zone_name                = nullptr,
-                 const double solution_time            = -1.0);
+    TecplotFlags(const char * zone_name     = nullptr,
+                 const double solution_time = -1.0);
 
     /**
      * Return an estimate for the memory consumption, in bytes, of this
@@ -1166,26 +1161,51 @@ namespace DataOutBase
      *
      * @note The ability to write data that corresponds to higher order
      * polynomials rather than simply linear or bilinear is a feature that was
-     * only introduced in VTK sometime in 2017 or 2018. You will need at least
-     * Paraview version 5.5 (released in the spring of 2018) or a similarly
-     * recent version of VisIt for this feature to work (for example,
-     * VisIt 2.13.2, released in May 2018, does not yet support this feature).
-     * Older versions of these programs are likely going to result in errors
-     * when trying to read files generated with this flag set to @p true.
-     * Experience with these programs shows that these error messages are likely
-     * going to be rather less descriptive and more obscure.
+     * only introduced in VTK 8.1.0 in December 2017. You will need at least
+     * Paraview version 5.5.0 released in April 2018 or a similarly recent
+     * version of VisIt for this feature to work (for example, VisIt 3.1.1,
+     * released in February 2020, does not yet support this feature). Older
+     * versions of these programs are likely going to result in errors when
+     * trying to read files generated with this flag set to true. Experience
+     * with these programs shows that these error messages are likely going to
+     * be rather less descriptive and more obscure.
      */
     bool write_higher_order_cells;
 
     /**
-     * Constructor.
+     * A map that describes for (some or all) of the output quantities what
+     * the physical units are. This field is ignored for VTK file format, but
+     * used for VTU format where it is attached to the individual scalar,
+     * vector, or tensor fields for use by visualization or other postprocessing
+     * tools. The default is to not attach any physical units to fields at all,
+     * i.e., an empty map.
+     *
+     * If the map does not contain an entry for a specific output variable, then
+     * no unit will be written into the output file. In other words, it is not
+     * an error to provide units for only some variables.
+     *
+     * step-19, step-44 and step-69 all demonstrate how to use this variable.
+     *
+     * @note While the functions that make use of this information do not care
+     *   about how physical units are specified, downstream postprocessing tools
+     *   should and do. As a consequence, these units should be specified in a
+     *   format that is understandable to these postprocessing tools. As an
+     *   example, the [unyt project](https://unyt.readthedocs.io/en/stable/)
+     *   describes a standard for describing and converting units.
+     */
+    std::map<std::string, std::string> physical_units;
+
+    /**
+     * Constructor. Initializes the member variables with names corresponding
+     * to the argument names of this function.
      */
     VtkFlags(
       const double       time  = std::numeric_limits<double>::min(),
       const unsigned int cycle = std::numeric_limits<unsigned int>::min(),
       const bool         print_date_and_time              = true,
       const ZlibCompressionLevel compression_level        = best_compression,
-      const bool                 write_higher_order_cells = false);
+      const bool                 write_higher_order_cells = false,
+      const std::map<std::string, std::string> &physical_units = {});
   };
 
 
@@ -1263,14 +1283,15 @@ namespace DataOutBase
   };
 
   /**
-   * Flags controlling the DataOutFilter.
+   * Flags controlling the behavior of the DataOutFilter class.
    *
    * @ingroup output
    */
   struct DataOutFilterFlags
   {
     /**
-     * Filter duplicate vertices and associated values. This will drastically
+     * Whether or not to filter out duplicate vertices and associated values.
+     * Setting this value to `true` will drastically
      * reduce the output data size but will result in an output file that
      * does not faithfully represent the actual data if the data corresponds
      * to discontinuous fields. In particular, along subdomain boundaries
@@ -1318,23 +1339,33 @@ namespace DataOutBase
   /**
    * DataOutFilter provides a way to remove redundant vertices and values
    * generated by the deal.II output. By default, DataOutBase and the classes
-   * that build on it output data at each corner of each cell. This means that
-   * data is output multiple times for each vertex of the mesh. The purpose of
+   * that build on it output data at each vertex of each cell. This means that
+   * data is output multiple times for each vertex of the mesh, once for each
+   * cell adjacent to the vertex. The purpose of
    * this scheme is to support output of discontinuous quantities, either
    * because the finite element space is discontinuous or because the quantity
    * that is output is computed from a solution field and is discontinuous
-   * across faces.
+   * across faces (for example for quantities computed via DataPostprocessor;
+   * typical cases where output quantities are discontinuous are when a
+   * postprocessor computes a quantity using the *gradient* of the solution,
+   * which is generally discontinuous even if the element itself is
+   * continuous). Other cases where the output is discontinuous are if the
+   * data to be output is not a finite element field but, for example,
+   * results from a class such as MatrixOut.
    *
    * This class is an attempt to rein in the amount of data that is written.
    * If the fields that are written to files are indeed discontinuous, the
    * only way to faithfully represent them is indeed to write multiple values
-   * for each vertex (this is typically done by writing multiple node
-   * locations for the same vertex and defining data at these nodes). However,
+   * for each vertex (this is typically done by creating multiple logical nodes
+   * in the output file, all of which have the same physical location; data is
+   * then associated to nodes, allowing to have multiple values associated
+   * with the same location). However,
    * for fine meshes, one may not necessarily be interested in an exact
    * representation of output fields that will likely only have small
    * discontinuities. Rather, it may be sufficient to just output one value
    * per vertex, which may be chosen arbitrarily from among those that are
-   * defined at this vertex from any of the adjacent cells.
+   * defined at this vertex, i.e., chosen arbitrarily from any of the
+   * adjacent cells.
    */
   class DataOutFilter
   {
@@ -1345,7 +1376,7 @@ namespace DataOutBase
     DataOutFilter();
 
     /**
-     * Destructor with a given set of flags. See DataOutFilterFlags for
+     * Constructor with a given set of flags. See DataOutFilterFlags for
      * possible flags.
      */
     DataOutFilter(const DataOutBase::DataOutFilterFlags &flags);
@@ -1369,6 +1400,16 @@ namespace DataOutBase
                const unsigned int d1,
                const unsigned int d2,
                const unsigned int d3);
+
+    /**
+     * Record a single deal.II cell without subdivisions (e.g. simplex) in the
+     * internal reordered format.
+     */
+    void
+    write_cell_single(const unsigned int   index,
+                      const unsigned int   start,
+                      const unsigned int   n_points,
+                      const ReferenceCell &reference_cell);
 
     /**
      * Filter and record a data set. If there are multiple values at a given
@@ -1495,12 +1536,9 @@ namespace DataOutBase
     unsigned int node_dim;
 
     /**
-     * The number of vertices per cell. Equal to
-     * GeometryInfo<node_dim>::vertices_per_cell. We need to store
-     * it as a run-time variable here because the dimension
-     * node_dim is also a run-time variable.
+     * The number of cells stored in @ref filtered_cells.
      */
-    unsigned int vertices_per_cell;
+    unsigned int num_cells;
 
     /**
      * Map of points to an internal index.
@@ -1779,15 +1817,14 @@ namespace DataOutBase
    * therefore 12 lines for each subcells of a patch.
    *
    * Given the lines as described above, a cut through this data in Gnuplot
-   * can then be achieved like this (& stands for the dollar sign in the
-   * following):
+   * can then be achieved like this:
    * @verbatim
    *   set data style lines
-   *   splot [:][:][0:] "T" using 1:2:(&3==.5 ? &4 : -1)
+   *   splot [:][:][0:] "T" using 1:2:(\$3==.5 ? \$4 : -1)
    * @endverbatim
    *
-   * This command plots data in x- and y-direction unbounded, but in
-   * z-direction only those data points which are above the x-y-plane (we
+   * This command plots data in $x$- and $y$-direction unbounded, but in
+   * $z$-direction only those data points which are above the $x$-$y$-plane (we
    * assume here a positive solution, if it has negative values, you might
    * want to decrease the lower bound). Furthermore, it only takes the data
    * points with z-values (<tt>&3</tt>) equal to 0.5, i.e. a cut through the
@@ -1894,41 +1931,6 @@ namespace DataOutBase
     std::ostream &      out);
 
   /**
-   * Write the given list of patches to the output stream in Tecplot binary
-   * format.
-   *
-   * For this to work properly <tt>./configure</tt> checks for the Tecplot API
-   * at build time. To write Tecplot binary files directly make sure that the
-   * TECHOME environment variable points to the Tecplot installation
-   * directory, and that the files \$TECHOME/include/TECIO.h and
-   * \$TECHOME/lib/tecio.a are readable. If these files are not available (or
-   * in the case of 1D) this function will simply call write_tecplot() and
-   * thus larger ASCII data files will be produced rather than more efficient
-   * Tecplot binary files.
-   *
-   * @warning TecplotFlags::tecplot_binary_file_name indicates the name of the
-   * file to be written.  If the file name is not set ASCII output is
-   * produced.
-   *
-   * For more information consult the Tecplot Users and Reference manuals.
-   *
-   * @deprecated Using Tecplot binary output is deprecated.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  write_tecplot_binary(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<
-      std::tuple<unsigned int,
-                 unsigned int,
-                 std::string,
-                 DataComponentInterpretation::DataComponentInterpretation>>
-      &                 nonscalar_data_ranges,
-    const TecplotFlags &flags,
-    std::ostream &      out);
-
-  /**
    * Write the given list of patches to the output stream in UCD format
    * described in the AVS developer's guide (now AVS). Due to limitations in
    * the present format, only node based data can be output, which in one
@@ -2005,11 +2007,11 @@ namespace DataOutBase
    * Some visualization programs, such as ParaView, can read several separate
    * VTU files to parallelize visualization. In that case, you need a
    * <code>.pvtu</code> file that describes which VTU files form a group. The
-   * DataOutInterface::write_pvtu_record() function can generate such a master
-   * record. Likewise, DataOutInterface::write_visit_record() does the same
-   * for VisIt (although VisIt can also read <code>pvtu</code> records since
-   * version 2.5.1). Finally, for time dependent problems, you may also want
-   * to look at DataOutInterface::write_pvd_record()
+   * DataOutInterface::write_pvtu_record() function can generate such a
+   * centralized record. Likewise, DataOutInterface::write_visit_record() does
+   * the same for VisIt (although VisIt can also read <code>pvtu</code> records
+   * since version 2.5.1). Finally, for time dependent problems, you may also
+   * want to look at DataOutInterface::write_pvd_record()
    *
    * The use of this function is explained in step-40.
    */
@@ -2070,7 +2072,7 @@ namespace DataOutBase
    * parallelize visualization. In that case, you need a
    * <code>.pvtu</code> file that describes which VTU files (written, for
    * example, through the DataOutInterface::write_vtu() function) form a group.
-   * The current function can generate such a master record.
+   * The current function can generate such a centralized record.
    *
    * This function is typically not called by itself from user space, but
    * you may want to call it through DataOutInterface::write_pvtu_record()
@@ -2078,7 +2080,7 @@ namespace DataOutBase
    * would have to provide to the current function by hand.
    *
    * In any case, whether this function is called directly or via
-   * DataOutInterface::write_pvtu_record(), the master record file so
+   * DataOutInterface::write_pvtu_record(), the central record file so
    * written contains a list of (scalar or vector) fields that describes which
    * fields can actually be found in the individual files that comprise the set
    * of parallel VTU files along with the names of these files. This function
@@ -2115,7 +2117,8 @@ namespace DataOutBase
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &nonscalar_data_ranges);
+      &             nonscalar_data_ranges,
+    const VtkFlags &flags);
 
   /**
    * In ParaView it is possible to visualize time-dependent data tagged with
@@ -2164,8 +2167,6 @@ namespace DataOutBase
    * references other files. For example, it could be the name for a
    * <code>.pvtu</code> file that references multiple parts of a parallel
    * computation.
-   *
-   * @author Marco Engelhard, 2012
    */
   void
   write_pvd_record(
@@ -2204,7 +2205,7 @@ namespace DataOutBase
    * piece_names[2].emplace_back("subdomain_01.time_step_2.vtk");
    * piece_names[2].emplace_back("subdomain_02.time_step_2.vtk");
    *
-   * std::ofstream visit_output ("master_file.visit");
+   * std::ofstream visit_output ("solution.visit");
    *
    * DataOutBase::write_visit_record(visit_output, piece_names);
    * @endcode
@@ -2240,7 +2241,7 @@ namespace DataOutBase
    * times_and_piece_names[2].second.emplace_back("subdomain_01.time_step_2.vtk");
    * times_and_piece_names[2].second.emplace_back("subdomain_02.time_step_2.vtk");
    *
-   * std::ofstream visit_output ("master_file.visit");
+   * std::ofstream visit_output ("solution.visit");
    *
    * DataOutBase::write_visit_record(visit_output, times_and_piece_names);
    * @endcode
@@ -2350,7 +2351,7 @@ namespace DataOutBase
   write_hdf5_parallel(const std::vector<Patch<dim, spacedim>> &patches,
                       const DataOutFilter &                    data_filter,
                       const std::string &                      filename,
-                      MPI_Comm                                 comm);
+                      const MPI_Comm &                         comm);
 
   /**
    * Write the data in @p data_filter to HDF5 file(s). If @p write_mesh_file is
@@ -2366,7 +2367,7 @@ namespace DataOutBase
                       const bool                               write_mesh_file,
                       const std::string &                      mesh_filename,
                       const std::string &solution_filename,
-                      MPI_Comm           comm);
+                      const MPI_Comm &   comm);
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of
@@ -2496,8 +2497,8 @@ namespace DataOutBase
  * This class is thought as a base class to classes actually generating data
  * for output. It has two abstract virtual functions, get_patches() and
  * get_dataset_names() produce the data which is actually needed. These are
- * the only functions that need to be overloaded by a derived class.  In
- * additional to that, it has a function for each output format supported by
+ * the only functions that need to be overloaded by a derived class. In
+ * addition to that, it has a function for each output format supported by
  * the underlying base class which gets the output data using these two
  * virtual functions and passes them to the raw output functions.
  *
@@ -2592,7 +2593,6 @@ namespace DataOutBase
  * name can be obtained by <tt>default_suffix</tt> without arguments.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 1999, Denis Davydov, 2018
  */
 template <int dim, int spacedim = dim>
 class DataOutInterface
@@ -2652,17 +2652,6 @@ public:
   write_tecplot(std::ostream &out) const;
 
   /**
-   * Obtain data through get_patches() and write it in the Tecplot binary
-   * output format. Note that the name of the output file must be specified
-   * through the TecplotFlags interface.
-   *
-   * @deprecated Using Tecplot binary output is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  void
-  write_tecplot_binary(std::ostream &out) const;
-
-  /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in UCD
    * format for AVS. See DataOutBase::write_ucd.
    */
@@ -2690,9 +2679,9 @@ public:
    * Some visualization programs, such as ParaView, can read several separate
    * VTU files to parallelize visualization. In that case, you need a
    * <code>.pvtu</code> file that describes which VTU files form a group. The
-   * DataOutInterface::write_pvtu_record() function can generate such a master
-   * record. Likewise, DataOutInterface::write_visit_record() does the same
-   * for older versions of VisIt (although VisIt can also read
+   * DataOutInterface::write_pvtu_record() function can generate such a
+   * centralized record. Likewise, DataOutInterface::write_visit_record() does
+   * the same for older versions of VisIt (although VisIt can also read
    * <code>pvtu</code> records since version 2.5.1). Finally,
    * DataOutInterface::write_pvd_record() can be used to group together the
    * files that jointly make up a time dependent simulation.
@@ -2709,7 +2698,8 @@ public:
    * DataOutInterface::write_vtu().
    */
   void
-  write_vtu_in_parallel(const std::string &filename, MPI_Comm comm) const;
+  write_vtu_in_parallel(const std::string &filename,
+                        const MPI_Comm &   comm) const;
 
   /**
    * Some visualization programs, such as ParaView, can read several separate
@@ -2717,9 +2707,9 @@ public:
    * parallelize visualization. In that case, you need a
    * <code>.pvtu</code> file that describes which VTU files (written, for
    * example, through the DataOutInterface::write_vtu() function) form a group.
-   * The current function can generate such a master record.
+   * The current function can generate such a centralized record.
    *
-   * The master record file generated by this function
+   * The central record file generated by this function
    * contains a list of (scalar or vector) fields that describes which
    * fields can actually be found in the individual files that comprise the set
    * of parallel VTU files along with the names of these files. This function
@@ -2764,7 +2754,7 @@ public:
    * output/solution_0003.pvtu
    * @endcode
    * where the `.0.vtu` file contains the output of the first half of the
-   * proceses grouped together, and the `.1.vtu` the data from the remaining
+   * processes grouped together, and the `.1.vtu` the data from the remaining
    * half.
    *
    * A specified @p directory and a @p filename_without_extension
@@ -2795,7 +2785,8 @@ public:
    * generate the .pvtu file, where processor zero is chosen to take over this
    * job.
    *
-   * The return value is the filename of the master file for the pvtu record.
+   * The return value is the filename of the centralized file for the pvtu
+   * record.
    *
    * @note The code simply combines the strings @p directory and
    * @p filename_without_extension, i.e., the user has to make sure that
@@ -2804,8 +2795,6 @@ public:
    *
    * @note Use an empty string "" for the first argument if output is to be
    * written in the current working directory.
-   *
-   * @author Niklas Fehn, Martin Kronbichler, 2019
    */
   std::string
   write_vtu_with_pvtu_record(
@@ -2845,7 +2834,7 @@ public:
   create_xdmf_entry(const DataOutBase::DataOutFilter &data_filter,
                     const std::string &               h5_filename,
                     const double                      cur_time,
-                    MPI_Comm                          comm) const;
+                    const MPI_Comm &                  comm) const;
 
   /**
    * Create an XDMFEntry based on the data in the data_filter. This assumes
@@ -2857,7 +2846,7 @@ public:
                     const std::string &               h5_mesh_filename,
                     const std::string &               h5_solution_filename,
                     const double                      cur_time,
-                    MPI_Comm                          comm) const;
+                    const MPI_Comm &                  comm) const;
 
   /**
    * Write an XDMF file based on the provided vector of XDMFEntry objects.
@@ -2886,7 +2875,7 @@ public:
   void
   write_xdmf_file(const std::vector<XDMFEntry> &entries,
                   const std::string &           filename,
-                  MPI_Comm                      comm) const;
+                  const MPI_Comm &              comm) const;
 
   /**
    * Write the data in @p data_filter to a single HDF5 file containing both the
@@ -2905,7 +2894,7 @@ public:
   void
   write_hdf5_parallel(const DataOutBase::DataOutFilter &data_filter,
                       const std::string &               filename,
-                      MPI_Comm                          comm) const;
+                      const MPI_Comm &                  comm) const;
 
   /**
    * Write the data in data_filter to HDF5 file(s). If write_mesh_file is
@@ -2919,7 +2908,7 @@ public:
                       const bool                        write_mesh_file,
                       const std::string &               mesh_filename,
                       const std::string &               solution_filename,
-                      MPI_Comm                          comm) const;
+                      const MPI_Comm &                  comm) const;
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of
@@ -3182,7 +3171,6 @@ private:
  * was used for writing.
  *
  * @ingroup input output
- * @author Wolfgang Bangerth, 2005
  */
 template <int dim, int spacedim = dim>
 class DataOutReader : public DataOutInterface<dim, spacedim>
@@ -3333,33 +3321,33 @@ public:
    * cases where <code>solution_filename == mesh_filename</code>, and
    * <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string &filename,
-            const double       time,
-            const unsigned int nodes,
-            const unsigned int cells,
-            const unsigned int dim);
+  XDMFEntry(const std::string & filename,
+            const double        time,
+            const std::uint64_t nodes,
+            const std::uint64_t cells,
+            const unsigned int  dim);
 
   /**
    * Simplified constructor that calls the complete constructor for
    * cases where <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string &mesh_filename,
-            const std::string &solution_filename,
-            const double       time,
-            const unsigned int nodes,
-            const unsigned int cells,
-            const unsigned int dim);
+  XDMFEntry(const std::string & mesh_filename,
+            const std::string & solution_filename,
+            const double        time,
+            const std::uint64_t nodes,
+            const std::uint64_t cells,
+            const unsigned int  dim);
 
   /**
    * Constructor that sets all members to provided parameters.
    */
-  XDMFEntry(const std::string &mesh_filename,
-            const std::string &solution_filename,
-            const double       time,
-            const unsigned int nodes,
-            const unsigned int cells,
-            const unsigned int dim,
-            const unsigned int spacedim);
+  XDMFEntry(const std::string & mesh_filename,
+            const std::string & solution_filename,
+            const double        time,
+            const std::uint64_t nodes,
+            const std::uint64_t cells,
+            const unsigned int  dim,
+            const unsigned int  spacedim);
 
   /**
    * Record an attribute and associated dimensionality.
@@ -3368,7 +3356,9 @@ public:
   add_attribute(const std::string &attr_name, const unsigned int dimension);
 
   /**
-   * Read or write the data of this object for serialization
+   * Read or write the data of this object for serialization using the
+   * [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -3381,9 +3371,21 @@ public:
   /**
    * Get the XDMF content associated with this entry.
    * If the entry is not valid, this returns an empty string.
+   *
+   * @deprecated Use the overload taking an `unsigned int` and a
+   * `const ReferenceCell &` instead.
    */
+  DEAL_II_DEPRECATED
   std::string
   get_xdmf_content(const unsigned int indent_level) const;
+
+  /**
+   * Get the XDMF content associated with this entry.
+   * If the entry is not valid, this returns an empty string.
+   */
+  std::string
+  get_xdmf_content(const unsigned int   indent_level,
+                   const ReferenceCell &reference_cell) const;
 
 private:
   /**
@@ -3409,12 +3411,12 @@ private:
   /**
    * The number of data nodes.
    */
-  unsigned int num_nodes;
+  std::uint64_t num_nodes;
 
   /**
    * The number of data cells.
    */
-  unsigned int num_cells;
+  std::uint64_t num_cells;
 
   /**
    * The dimension associated with the data.
@@ -3453,8 +3455,6 @@ namespace DataOutBase
    * operator dumps the intermediate graphics format represented by the patch
    * data structure. It may later be converted into regular formats for a
    * number of graphics programs.
-   *
-   * @author Wolfgang Bangerth, 2005
    */
   template <int dim, int spacedim>
   std::ostream &
@@ -3467,8 +3467,6 @@ namespace DataOutBase
    * operator reads the intermediate graphics format represented by the patch
    * data structure, using the format in which it was written using the
    * operator<<.
-   *
-   * @author Wolfgang Bangerth, 2005
    */
   template <int dim, int spacedim>
   std::istream &

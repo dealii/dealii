@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 
@@ -30,7 +31,6 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
 #  ifndef DOXYGEN
-class CommunicationPatternBase;
 template <typename Number>
 class ReadWriteVector;
 #  endif
@@ -50,7 +50,6 @@ namespace LinearAlgebra
      *
      * @see CUDAWrappers
      * @ingroup Vectors
-     * @author Karl Ljungkvist, Bruno Turcksin, Daniel Arndt, 2016, 2018
      */
     template <typename Number>
     class Vector : public VectorSpaceVector<Number>
@@ -142,11 +141,10 @@ namespace LinearAlgebra
        * copy a vector to the GPU.
        */
       virtual void
-      import(
-        const ReadWriteVector<Number> &                 V,
-        VectorOperation::values                         operation,
-        std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-          std::shared_ptr<const CommunicationPatternBase>()) override;
+      import(const ReadWriteVector<Number> &V,
+             VectorOperation::values        operation,
+             std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+               communication_pattern = {}) override;
 
       /**
        * Sets all elements of the vector to the scalar @p s. This operation is
@@ -356,7 +354,6 @@ namespace LinearAlgebra
  * exchanges the data of the two vectors.
  *
  * @relatesalso Vector
- * @author Daniel Arndt, 2018
  */
 template <typename Number>
 inline void

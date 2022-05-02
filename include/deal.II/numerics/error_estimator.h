@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,8 +22,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
 
-#include <deal.II/dofs/deprecated_function_map.h>
-
 #include <deal.II/fe/component_mask.h>
 
 #include <map>
@@ -32,6 +30,8 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
 #ifndef DOXYGEN
+template <int, int>
+class DoFHandler;
 template <int, int>
 class Mapping;
 template <int>
@@ -47,9 +47,9 @@ namespace hp
 
 /**
  * Implementation of the error indicator by Kelly, De S. R. Gago, Zienkiewicz
- * and Babuska and its modification for the hp-FEM. This error indicator tries
- * to approximate the error per cell by integration of the jump of the
- * gradient of the solution along the faces of each cell.  It can be
+ * and Babuska (see @cite KGZB83) and its modification for the hp-FEM. This
+ * error indicator tries to approximate the error per cell by integration of the
+ * jump of the gradient of the solution along the faces of each cell.  It can be
  * understood as a gradient recovery estimator; see the survey of Ainsworth
  * and Oden, "A Posteriori Error Estimation in Finite Element Analysis"
  * (Wiley, 2000) for a complete discussion.
@@ -79,33 +79,33 @@ namespace hp
  * This vector contains elements of data type @p float, rather than @p double,
  * since accuracy is not important in the current context.
  *
- * The full reference for the paper in which this error estimator is defined
- * is as follows:
- * @code{.bib}
- * @article{KGZB83,
- *   author  = {Kelly, D. W. and {De S. R. Gago}, J. P. and Zienkiewicz, O. C.
- *              and Babu\v{s}ka, I.},
- *   title   = {A posteriori error analysis and adaptive processes in the
- *              finite element method: Part {I}--Error Analysis},
- *   journal = {Int. J. Num. Meth. Engrg.},
- *   year    = {1983},
- *   volume  = {19},
- *   pages   = {1593--1619}
- * }
- * @endcode
- *
  *
  * <h3>Implementation</h3>
  *
- * In principle, the implementation of the error estimation is simple: let \f[
- * \eta_K^2 = \sum_{F\in\partial K} c_F \int_{\partial K_F} \left[a
- * \frac{\partial u_h}{\partial n}\right]^2 do \f] be the error estimator for
- * cell $K$. $[\cdot]$ denotes the jump of the argument at the face. In the
- * paper of Ainsworth $ c_F=\frac {h_K}{24} $, but this factor is a bit
+ * In principle, the implementation of the error estimation is simple: let
+ * @f[
+ *   \eta_K^2
+ *   =
+ *   \sum_{F\in\partial K}
+ *     c_F \int_{\partial K_F} \jump{a \frac{\partial u_h}{\partial n}}^2
+ * @f]
+ * be the error estimator for cell $K$. $\jump{\cdot}$ denotes the jump of the
+ * function in square brackets at the face, and $c_F$ is a factor discussed
+ * below. This is the general form of the interface terms of the error
+ * estimator derived by Kelly et al. in the paper referenced above. The overall
+ * error estimate is then computed as
+ * @f[
+ *   \eta^2 = \sum_K \eta_K^2
+ * @f]
+ * so that $\eta \approx \|\nabla (u-u_h)\|$ for the Laplace equation. The
+ * functions of this class compute a vector of values that corresponds to
+ * $\eta_K$ (i.e., the square root of the quantity above).
+ *
+ * In the paper of Ainsworth $ c_F=\frac {h_K}{24} $, but this factor is a bit
  * esoteric, stemming from interpolation estimates and stability constants which
  * may hold for the Poisson problem, but may not hold for more general
- * situations. Alternatively, we consider the case when $ c_F=\frac {h_F}{2p_F}
- * $, where $ h_F $ is face diagonal and $ p_F=max(p^+,p^-) $ is the maximum
+ * situations. Alternatively, we consider the case when $c_F=\frac {h_F}{2p_F}$,
+ * where $h_F$ is the diameter of the face and $p_F=max(p^+,p^-)$ is the maximum
  * polynomial degree of adjacent elements; or $c_F=h_K$. The choice between
  * these factors is done by means of the enumerator, provided as the last
  * argument in all functions.
@@ -255,8 +255,6 @@ namespace hp
  * that accepts several in- and output vectors at the same time.
  *
  * @ingroup numerics
- * @author Wolfgang Bangerth, 1998, 1999, 2000, 2004, 2006, Denis Davydov,
- * 2015; parallelization by Thomas Richter, 2000
  */
 template <int dim, int spacedim = dim>
 class KellyErrorEstimator
@@ -337,12 +335,12 @@ public:
    * cell in the mesh as reported by
    * parallel::distributed::Triangulation::n_locally_owned_active_cells().
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<dim, spacedim> &mapping,
-    const DoFHandlerType &        dof,
-    const Quadrature<dim - 1> &   quadrature,
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const Quadrature<dim - 1> &      quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -357,13 +355,13 @@ public:
 
   /**
    * Call the @p estimate function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &     dof,
-    const Quadrature<dim - 1> &quadrature,
+    const DoFHandler<dim, spacedim> &dof,
+    const Quadrature<dim - 1> &      quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -389,12 +387,12 @@ public:
    * construct of vector of references, so we had to use a vector of
    * pointers.)
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<dim, spacedim> &mapping,
-    const DoFHandlerType &        dof,
-    const Quadrature<dim - 1> &   quadrature,
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const Quadrature<dim - 1> &      quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -409,13 +407,13 @@ public:
 
   /**
    * Call the @p estimate function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &     dof,
-    const Quadrature<dim - 1> &quadrature,
+    const DoFHandler<dim, spacedim> &dof,
+    const Quadrature<dim - 1> &      quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -431,14 +429,14 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<dim, spacedim> &  mapping,
-    const DoFHandlerType &          dof,
-    const hp::QCollection<dim - 1> &quadrature,
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim - 1> & quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -454,13 +452,13 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &          dof,
-    const hp::QCollection<dim - 1> &quadrature,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim - 1> & quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -476,14 +474,14 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<dim, spacedim> &  mapping,
-    const DoFHandlerType &          dof,
-    const hp::QCollection<dim - 1> &quadrature,
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim - 1> & quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -499,13 +497,13 @@ public:
 
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &          dof,
-    const hp::QCollection<dim - 1> &quadrature,
+    const DoFHandler<dim, spacedim> &dof,
+    const hp::QCollection<dim - 1> & quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -581,8 +579,6 @@ public:
  * to compute the jump terms differently. However, this class offers exactly
  * the same public functions as the general template, so that a user will not
  * see any difference.
- *
- * @author Wolfgang Bangerth, 1998, 2004.
  */
 template <int spacedim>
 class KellyErrorEstimator<1, spacedim>
@@ -602,6 +598,8 @@ public:
     //! Kelly error estimator with the factor $h_K$.
     cell_diameter
   };
+
+
 
   /**
    * Implementation of the error estimator described above. You may give a
@@ -625,12 +623,12 @@ public:
    * respective parameter for compatibility with the function signature in the
    * general case.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<1, spacedim> &mapping,
-    const DoFHandlerType &      dof,
-    const Quadrature<0> &       quadrature,
+    const Mapping<1, spacedim> &   mapping,
+    const DoFHandler<1, spacedim> &dof,
+    const Quadrature<0> &          quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -643,15 +641,17 @@ public:
     const types::material_id  material_id    = numbers::invalid_material_id,
     const Strategy            strategy       = cell_diameter_over_24);
 
+
+
   /**
    * Call the @p estimate function, see above, with
-   * <tt>mapping=MappingQGeneric1<1>()</tt>.
+   * <tt>mapping=MappingQ1<1>()</tt>.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &dof,
-    const Quadrature<0> & quadrature,
+    const DoFHandler<1, spacedim> &dof,
+    const Quadrature<0> &          quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -663,6 +663,8 @@ public:
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
     const types::material_id  material_id    = numbers::invalid_material_id,
     const Strategy            strategy       = cell_diameter_over_24);
+
+
 
   /**
    * Same function as above, but accepts more than one solution vectors and
@@ -677,12 +679,12 @@ public:
    * construct of vector of references, so we had to use a vector of
    * pointers.)
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<1, spacedim> &mapping,
-    const DoFHandlerType &      dof,
-    const Quadrature<0> &       quadrature,
+    const Mapping<1, spacedim> &   mapping,
+    const DoFHandler<1, spacedim> &dof,
+    const Quadrature<0> &          quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -694,16 +696,18 @@ public:
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,
     const Strategy            strategy     = cell_diameter_over_24);
+
+
 
   /**
    * Call the @p estimate function, see above, with
-   * <tt>mapping=MappingQGeneric1<1>()</tt>.
+   * <tt>mapping=MappingQ1<1>()</tt>.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &dof,
-    const Quadrature<0> & quadrature,
+    const DoFHandler<1, spacedim> &dof,
+    const Quadrature<0> &          quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -717,16 +721,17 @@ public:
     const Strategy            strategy     = cell_diameter_over_24);
 
 
+
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<1, spacedim> &mapping,
-    const DoFHandlerType &      dof,
-    const hp::QCollection<0> &  quadrature,
+    const Mapping<1, spacedim> &   mapping,
+    const DoFHandler<1, spacedim> &dof,
+    const hp::QCollection<0> &     quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -740,15 +745,16 @@ public:
     const Strategy            strategy       = cell_diameter_over_24);
 
 
+
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &    dof,
-    const hp::QCollection<0> &quadrature,
+    const DoFHandler<1, spacedim> &dof,
+    const hp::QCollection<0> &     quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                       neumann_bc,
@@ -762,16 +768,17 @@ public:
     const Strategy            strategy       = cell_diameter_over_24);
 
 
+
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const Mapping<1, spacedim> &mapping,
-    const DoFHandlerType &      dof,
-    const hp::QCollection<0> &  quadrature,
+    const Mapping<1, spacedim> &   mapping,
+    const DoFHandler<1, spacedim> &dof,
+    const hp::QCollection<0> &     quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -785,15 +792,16 @@ public:
     const Strategy            strategy     = cell_diameter_over_24);
 
 
+
   /**
    * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp finite element dof handlers.
+   * quadrature collection for hp-finite element dof handlers.
    */
-  template <typename InputVector, typename DoFHandlerType>
+  template <typename InputVector>
   static void
   estimate(
-    const DoFHandlerType &    dof,
-    const hp::QCollection<0> &quadrature,
+    const DoFHandler<1, spacedim> &dof,
+    const hp::QCollection<0> &     quadrature,
     const std::map<types::boundary_id,
                    const Function<spacedim, typename InputVector::value_type> *>
       &                                     neumann_bc,
@@ -805,6 +813,8 @@ public:
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,
     const Strategy            strategy     = cell_diameter_over_24);
+
+
 
   /**
    * Exception
@@ -817,6 +827,7 @@ public:
                    "of vector components of the finite element in use "
                    "by the DoFHandler object. In the latter case, at "
                    "least one component needs to be selected.");
+
   /**
    * Exception
    */
@@ -828,6 +839,7 @@ public:
     "scalar (has one vector component) or has as many vector "
     "components as there are in the finite element used by "
     "the DoFHandler argument.");
+
   /**
    * Exception
    */
@@ -841,6 +853,7 @@ public:
                     "element in use has "
                  << arg3
                  << " components, and these two numbers need to match.");
+
   /**
    * Exception
    */
@@ -851,6 +864,7 @@ public:
                  << " needs to be equal to the number of output vectors, "
                  << arg2
                  << ". This is not the case in your call of this function.");
+
   /**
    * Exception
    */
@@ -858,7 +872,6 @@ public:
                    "You need to specify at least one solution vector as "
                    "input.");
 };
-
 
 
 DEAL_II_NAMESPACE_CLOSE

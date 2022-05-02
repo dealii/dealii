@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,8 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+
+#include <deal.II/grid/reference_cell.h>
 
 #include <deal.II/lac/block_indices.h>
 
@@ -44,9 +46,9 @@ namespace FiniteElementDomination
    * Q(k') if $k\le k'$.
    *
    * This enum is used in the FiniteElement::compare_for_domination() function
-   * that is used in the context of hp finite element methods when determining
+   * that is used in the context of hp-finite element methods when determining
    * what to do at faces where two different finite elements meet (see the
-   * @ref hp_paper "hp paper"
+   * @ref hp_paper "hp-paper"
    * for a more detailed description of the following). In that case, the
    * degrees of freedom of one side need to be constrained to those on the
    * other side. The determination which side is which is based on the outcome
@@ -54,7 +56,7 @@ namespace FiniteElementDomination
    * to the dominating one.
    *
    * Note that there are situations where neither side dominates. The
-   * @ref hp_paper "hp paper"
+   * @ref hp_paper "hp-paper"
    * lists two case, with the simpler one being that a $Q_2\times Q_1$ vector-
    * valued element (i.e. a <code>FESystem(FE_Q(2),1,FE_Q(1),1)</code>) meets
    * a $Q_1\times Q_2$ element: here, for each of the two vector-components,
@@ -78,7 +80,7 @@ namespace FiniteElementDomination
    * could also be used by discontinuous elements, for example.
    *
    * More details on domination can be found in the
-   * @ref hp_paper "hp paper".
+   * @ref hp_paper "hp-paper".
    */
   enum Domination
   {
@@ -123,9 +125,75 @@ namespace FiniteElementDomination
    * <code>other_element_dominates</code>, then the returned value is
    * <code>neither_element_dominates</code>.
    */
-  inline Domination operator&(const Domination d1, const Domination d2);
+  inline Domination
+  operator&(const Domination d1, const Domination d2);
 } // namespace FiniteElementDomination
 
+namespace internal
+{
+  /**
+   * Internal data structure for setting up FiniteElementData. It stores for
+   * each object the (inclusive/exclusive) number of degrees of freedoms, as
+   * well as, the index of its first degree of freedom within a cell and the
+   * index of the first d-dimensional object within each face.
+   *
+   * The information is saved as a vector of vectors. One can query the
+   * inclusive number of dofs of the i-th d-dimensional object via:
+   * dofs_per_object_inclusive[d][i].
+   *
+   * As an example, the data is shown for a quadratic wedge. Which consists of
+   * 6 vertices, 9 lines, and 5 faces (two triangles and three quadrilaterals).
+   * @code
+   *              vertices                  lines                  faces cell
+   * dpo_excl  1  1  1  1  1  1 | 1  1  1  1  1  1  1  1  1 |  0  0  1  1  1 |  0
+   * dpo_incl  1  1  1  1  1  1 | 3  3  3  3  3  3  3  3  3 |  6  6  9  9  9 | 18
+   * obj_index 0  1  2  3  4  5 | 6  7  8  9 10 11 12 13 14 | 15 15 15 16 17 | 18
+   * @endcode
+   *
+   * Since the above table looks as follows for:
+   *
+   * - a triangle:
+   * @code
+   * dpo_excl  1  1  1 | 1  1  1 |  0
+   * obj_index 0  1  2 | 3  4  5 |  6
+   * @endcode
+   *
+   * - quadrilateral:
+   * @code
+   * dpo_excl  1  1  1  1 | 1  1  1  1 |  1
+   * obj_index 0  1  2  3 | 4  5  6  7 |  8
+   * @endcode
+   *
+   * The index of the first d-dimensional object within each face results as:
+   * @code
+   *                         vertices      lines       face
+   * first_obj_index_on_face 0 0 0 0 0 | 3 3 4 4 4 | 6 6 8 8 8
+   * @endcode
+   *
+   */
+  struct GenericDoFsPerObject
+  {
+    /**
+     * Exclusive number of degrees of freedom per object.
+     */
+    std::vector<std::vector<unsigned int>> dofs_per_object_exclusive;
+
+    /**
+     * Inclusive number of degrees of freedom per object.
+     */
+    std::vector<std::vector<unsigned int>> dofs_per_object_inclusive;
+
+    /**
+     * First index of an object.
+     */
+    std::vector<std::vector<unsigned int>> object_index;
+
+    /**
+     * First index of an object within a face.
+     */
+    std::vector<std::vector<unsigned int>> first_object_index_on_face;
+  };
+} // namespace internal
 
 /**
  * A class that declares a number of scalar constant variables that describe
@@ -140,8 +208,6 @@ namespace FiniteElementDomination
  * more information.
  *
  * @ingroup febase
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003,
- * 2005
  */
 template <int dim>
 class FiniteElementData
@@ -217,8 +283,27 @@ public:
    * The dimension of the finite element, which is the template parameter
    * <tt>dim</tt>
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
+private:
+  /**
+   * Reference cell type.
+   */
+  const ReferenceCell reference_cell_kind;
+
+  /**
+   * Number of unique quads. If all quads have the same type, the value is
+   * one; else it equals the number of quads.
+   */
+  const unsigned int number_unique_quads;
+
+  /**
+   * Number of unique faces. If all faces have the same type, the value is
+   * one; else it equals the number of faces.
+   */
+  const unsigned int number_unique_faces;
+
+public:
   /**
    * Number of degrees of freedom on a vertex.
    */
@@ -230,12 +315,27 @@ public:
    */
   const unsigned int dofs_per_line;
 
+private:
+  /**
+   * Number of degrees of freedom on quads. If all quads have the same
+   * number of degrees freedoms the values equal dofs_per_quad.
+   */
+  const std::vector<unsigned int> n_dofs_on_quad;
+
+public:
   /**
    * Number of degrees of freedom in a quadrilateral; not including the
    * degrees of freedom on the lines and vertices of the quadrilateral.
    */
   const unsigned int dofs_per_quad;
 
+private:
+  /**
+   * Maximum number of degrees of freedom on any quad.
+   */
+  const unsigned int dofs_per_quad_max;
+
+public:
   /**
    * Number of degrees of freedom in a hexahedron; not including the degrees
    * of freedom on the quadrilaterals, lines and vertices of the hexahedron.
@@ -247,6 +347,15 @@ public:
    */
   const unsigned int first_line_index;
 
+private:
+  /**
+   * First index of a quad. If all quads have the same number of degrees of
+   * freedom, only the first index of the first quad is stored since the
+   * indices of the others can be simply recomputed.
+   */
+  const std::vector<unsigned int> first_index_of_quads;
+
+public:
   /**
    * First index of dof on a quad.
    */
@@ -257,16 +366,38 @@ public:
    */
   const unsigned int first_hex_index;
 
+private:
+  /**
+   * Index of the first line of all faces.
+   */
+  const std::vector<unsigned int> first_line_index_of_faces;
+
+public:
   /**
    * First index of dof on a line for face data.
    */
   const unsigned int first_face_line_index;
 
+private:
+  /**
+   * Index of the first quad of all faces.
+   */
+  const std::vector<unsigned int> first_quad_index_of_faces;
+
+public:
   /**
    * First index of dof on a quad for face data.
    */
   const unsigned int first_face_quad_index;
 
+private:
+  /**
+   * Number of degrees of freedom on faces. If all faces have the same
+   * number of degrees freedoms the values equal dofs_per_quad.
+   */
+  const std::vector<unsigned int> n_dofs_on_face;
+
+public:
   /**
    * Number of degrees of freedom on a face. This is the accumulated number of
    * degrees of freedom on all the objects of dimension up to <tt>dim-1</tt>
@@ -274,6 +405,13 @@ public:
    */
   const unsigned int dofs_per_face;
 
+private:
+  /**
+   * Maximum number of degrees of freedom on any face.
+   */
+  const unsigned int dofs_per_face_max;
+
+public:
   /**
    * Total number of degrees of freedom on a cell. This is the accumulated
    * number of degrees of freedom on all the objects of dimension up to
@@ -354,6 +492,52 @@ public:
                     const BlockIndices &block_indices = BlockIndices());
 
   /**
+   * The same as above but with the difference that also the type of the
+   * underlying geometric entity can be specified.
+   */
+  FiniteElementData(const std::vector<unsigned int> &dofs_per_object,
+                    const ReferenceCell              reference_cell,
+                    const unsigned int               n_components,
+                    const unsigned int               degree,
+                    const Conformity                 conformity = unknown,
+                    const BlockIndices &block_indices = BlockIndices());
+
+  /**
+   * The same as above but instead of passing a vector containing the degrees
+   * of freedoms per object a struct of type GenericDoFsPerObject. This allows
+   * that 2D objects might have different number of degrees of freedoms, which
+   * is particular useful for cells with triangles and quadrilaterals as faces.
+   */
+  FiniteElementData(const internal::GenericDoFsPerObject &data,
+                    const ReferenceCell                   reference_cell,
+                    const unsigned int                    n_components,
+                    const unsigned int                    degree,
+                    const Conformity                      conformity = unknown,
+                    const BlockIndices &block_indices = BlockIndices());
+
+  /**
+   * Return the kind of reference cell this element is defined on: For
+   * example, whether the element's reference cell is a square or
+   * triangle, or similar choices in higher dimensions.
+   */
+  ReferenceCell
+  reference_cell() const;
+
+  /**
+   * Number of unique quads. If all quads have the same type, the value is
+   * one; else it equals the number of quads.
+   */
+  unsigned int
+  n_unique_quads() const;
+
+  /**
+   * Number of unique faces. If all faces have the same type, the value is
+   * one; else it equals the number of faces.
+   */
+  unsigned int
+  n_unique_faces() const;
+
+  /**
    * Number of dofs per vertex.
    */
   unsigned int
@@ -369,7 +553,14 @@ public:
    * Number of dofs per quad. Not including dofs on lower dimensional objects.
    */
   unsigned int
-  n_dofs_per_quad() const;
+  n_dofs_per_quad(unsigned int face_no = 0) const;
+
+  /**
+   * Maximum number of dofs per quad. Not including dofs on lower dimensional
+   * objects.
+   */
+  unsigned int
+  max_dofs_per_quad() const;
 
   /**
    * Number of dofs per hex. Not including dofs on lower dimensional objects.
@@ -382,7 +573,14 @@ public:
    * dimensional objects.
    */
   unsigned int
-  n_dofs_per_face() const;
+  n_dofs_per_face(unsigned int face_no = 0, unsigned int child = 0) const;
+
+  /**
+   * Maximum number of dofs per face, accumulating degrees of freedom of all
+   * lower dimensional objects.
+   */
+  unsigned int
+  max_dofs_per_face() const;
 
   /**
    * Number of dofs per cell, accumulating degrees of freedom of all lower
@@ -401,7 +599,7 @@ public:
    */
   template <int structdim>
   unsigned int
-  n_dofs_per_object() const;
+  n_dofs_per_object(const unsigned int i = 0) const;
 
   /**
    * Number of components. See
@@ -448,7 +646,49 @@ public:
    */
   bool
   operator==(const FiniteElementData &) const;
+
+  /**
+   * Return first index of dof on a line.
+   */
+  unsigned int
+  get_first_line_index() const;
+
+  /**
+   * Return first index of dof on a quad.
+   */
+  unsigned int
+  get_first_quad_index(const unsigned int quad_no = 0) const;
+
+  /**
+   * Return first index of dof on a hexahedron.
+   */
+  unsigned int
+  get_first_hex_index() const;
+
+  /**
+   * Return first index of dof on a line for face data.
+   */
+  unsigned int
+  get_first_face_line_index(const unsigned int face_no = 0) const;
+
+  /**
+   * Return first index of dof on a quad for face data.
+   */
+  unsigned int
+  get_first_face_quad_index(const unsigned int face_no = 0) const;
 };
+
+namespace internal
+{
+  /**
+   * Utility function to convert "dofs per object" information
+   * of a @p dim dimensional reference cell @p reference_cell.
+   */
+  internal::GenericDoFsPerObject
+  expand(const unsigned int               dim,
+         const std::vector<unsigned int> &dofs_per_object,
+         const dealii::ReferenceCell      reference_cell);
+} // namespace internal
 
 
 
@@ -459,7 +699,8 @@ public:
 
 namespace FiniteElementDomination
 {
-  inline Domination operator&(const Domination d1, const Domination d2)
+  inline Domination
+  operator&(const Domination d1, const Domination d2)
   {
     // go through the entire list of possibilities. note that if we were into
     // speed, obfuscation and cared enough, we could implement this operator
@@ -506,6 +747,33 @@ namespace FiniteElementDomination
 
 
 template <int dim>
+inline ReferenceCell
+FiniteElementData<dim>::reference_cell() const
+{
+  return reference_cell_kind;
+}
+
+
+
+template <int dim>
+inline unsigned int
+FiniteElementData<dim>::n_unique_quads() const
+{
+  return number_unique_quads;
+}
+
+
+
+template <int dim>
+inline unsigned int
+FiniteElementData<dim>::n_unique_faces() const
+{
+  return number_unique_faces;
+}
+
+
+
+template <int dim>
 inline unsigned int
 FiniteElementData<dim>::n_dofs_per_vertex() const
 {
@@ -525,9 +793,18 @@ FiniteElementData<dim>::n_dofs_per_line() const
 
 template <int dim>
 inline unsigned int
-FiniteElementData<dim>::n_dofs_per_quad() const
+FiniteElementData<dim>::n_dofs_per_quad(unsigned int face_no) const
 {
-  return dofs_per_quad;
+  return n_dofs_on_quad[n_dofs_on_quad.size() == 1 ? 0 : face_no];
+}
+
+
+
+template <int dim>
+inline unsigned int
+FiniteElementData<dim>::max_dofs_per_quad() const
+{
+  return dofs_per_quad_max;
 }
 
 
@@ -543,9 +820,21 @@ FiniteElementData<dim>::n_dofs_per_hex() const
 
 template <int dim>
 inline unsigned int
-FiniteElementData<dim>::n_dofs_per_face() const
+FiniteElementData<dim>::n_dofs_per_face(unsigned int face_no,
+                                        unsigned int child_no) const
 {
-  return dofs_per_face;
+  (void)child_no;
+
+  return n_dofs_on_face[n_dofs_on_face.size() == 1 ? 0 : face_no];
+}
+
+
+
+template <int dim>
+inline unsigned int
+FiniteElementData<dim>::max_dofs_per_face() const
+{
+  return dofs_per_face_max;
 }
 
 
@@ -562,18 +851,18 @@ FiniteElementData<dim>::n_dofs_per_cell() const
 template <int dim>
 template <int structdim>
 inline unsigned int
-FiniteElementData<dim>::n_dofs_per_object() const
+FiniteElementData<dim>::n_dofs_per_object(const unsigned int i) const
 {
   switch (structdim)
     {
       case 0:
-        return dofs_per_vertex;
+        return n_dofs_per_vertex();
       case 1:
-        return dofs_per_line;
+        return n_dofs_per_line();
       case 2:
-        return dofs_per_quad;
+        return n_dofs_per_quad((structdim == 2 && dim == 3) ? i : 0);
       case 3:
-        return dofs_per_hex;
+        return n_dofs_per_hex();
       default:
         Assert(false, ExcInternalError());
     }
@@ -622,6 +911,52 @@ inline bool
 FiniteElementData<dim>::conforms(const Conformity space) const
 {
   return ((space & conforming_space) == space);
+}
+
+
+
+template <int dim>
+unsigned int
+FiniteElementData<dim>::get_first_line_index() const
+{
+  return first_line_index;
+}
+
+template <int dim>
+unsigned int
+FiniteElementData<dim>::get_first_quad_index(const unsigned int quad_no) const
+{
+  if (first_index_of_quads.size() == 1)
+    return first_index_of_quads[0] + quad_no * n_dofs_per_quad(0);
+  else
+    return first_index_of_quads[quad_no];
+}
+
+template <int dim>
+unsigned int
+FiniteElementData<dim>::get_first_hex_index() const
+{
+  return first_hex_index;
+}
+
+template <int dim>
+unsigned int
+FiniteElementData<dim>::get_first_face_line_index(
+  const unsigned int face_no) const
+{
+  return first_line_index_of_faces[first_line_index_of_faces.size() == 1 ?
+                                     0 :
+                                     face_no];
+}
+
+template <int dim>
+unsigned int
+FiniteElementData<dim>::get_first_face_quad_index(
+  const unsigned int face_no) const
+{
+  return first_quad_index_of_faces[first_quad_index_of_faces.size() == 1 ?
+                                     0 :
+                                     face_no];
 }
 
 

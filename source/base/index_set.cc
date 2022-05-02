@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -160,7 +160,8 @@ IndexSet::do_compress() const
 
 
 #ifndef DOXYGEN
-IndexSet IndexSet::operator&(const IndexSet &is) const
+IndexSet
+IndexSet::operator&(const IndexSet &is) const
 {
   Assert(size() == is.size(), ExcDimensionMismatch(size(), is.size()));
 
@@ -243,14 +244,21 @@ IndexSet::split_by_block(
 
   partitioned.reserve(n_blocks);
   types::global_dof_index start = 0;
-  types::global_dof_index sum   = 0;
   for (const auto n_block_indices : n_indices_per_block)
     {
       partitioned.push_back(this->get_view(start, start + n_block_indices));
       start += n_block_indices;
-      sum += partitioned.back().size();
+    }
+
+#ifdef DEBUG
+  types::global_dof_index sum = 0;
+  for (const auto &partition : partitioned)
+    {
+      sum += partition.size();
     }
   AssertDimension(sum, this->size());
+#endif
+
   return partitioned;
 }
 
@@ -262,7 +270,7 @@ IndexSet::subtract_set(const IndexSet &other)
   is_compressed = false;
 
 
-  // we save new ranges to be added to our IndexSet in an temporary vector and
+  // we save all new ranges to our IndexSet in an temporary vector and
   // add all of them in one go at the end.
   std::vector<Range> new_ranges;
 
@@ -274,6 +282,7 @@ IndexSet::subtract_set(const IndexSet &other)
       // advance own iterator until we get an overlap
       if (own_it->end <= other_it->begin)
         {
+          new_ranges.push_back(*own_it);
           ++own_it;
           continue;
         }
@@ -306,15 +315,11 @@ IndexSet::subtract_set(const IndexSet &other)
       // next.
     }
 
-  // Now delete all empty ranges we might
-  // have created.
-  for (std::vector<Range>::iterator it = ranges.begin(); it != ranges.end();)
-    {
-      if (it->begin >= it->end)
-        it = ranges.erase(it);
-      else
-        ++it;
-    }
+  // make sure to take over the remaining ranges
+  for (; own_it != ranges.end(); ++own_it)
+    new_ranges.push_back(*own_it);
+
+  ranges.clear();
 
   // done, now add the temporary ranges
   const std::vector<Range>::iterator end = new_ranges.end();
@@ -450,7 +455,7 @@ IndexSet::write(std::ostream &out) const
 void
 IndexSet::read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   size_type    s;
   unsigned int n_ranges;
@@ -460,7 +465,7 @@ IndexSet::read(std::istream &in)
   set_size(s);
   for (unsigned int i = 0; i < n_ranges; ++i)
     {
-      AssertThrow(in, ExcIO());
+      AssertThrow(in.fail() == false, ExcIO());
 
       size_type b, e;
       in >> b >> e;
@@ -472,7 +477,7 @@ IndexSet::read(std::istream &in)
 void
 IndexSet::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   out.write(reinterpret_cast<const char *>(&index_space_size),
             sizeof(index_space_size));
   std::size_t n_ranges = ranges.size();
@@ -480,7 +485,7 @@ IndexSet::block_write(std::ostream &out) const
   if (ranges.empty() == false)
     out.write(reinterpret_cast<const char *>(&*ranges.begin()),
               ranges.size() * sizeof(Range));
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 void
@@ -494,7 +499,7 @@ IndexSet::block_read(std::istream &in)
   ranges.clear();
   set_size(size);
   ranges.resize(n_ranges, Range(0, 0));
-  if (n_ranges)
+  if (n_ranges != 0u)
     in.read(reinterpret_cast<char *>(&*ranges.begin()),
             ranges.size() * sizeof(Range));
 
@@ -671,6 +676,9 @@ IndexSet::is_ascending_and_one_to_one(const MPI_Comm &communicator) const
     Utilities::MPI::sum(n_elements(), communicator);
   if (n_global_elements != size())
     return false;
+
+  if (n_global_elements == 0)
+    return true;
 
 #ifdef DEAL_II_WITH_MPI
   // Non-contiguous IndexSets can't be linear.

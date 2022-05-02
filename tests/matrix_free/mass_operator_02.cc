@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double number;
+  using number = double;
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
@@ -96,7 +96,7 @@ test()
     mf;
   mf.initialize(mf_data);
   mf.compute_diagonal();
-  const LinearAlgebra::distributed::Vector<double> &diagonal =
+  const LinearAlgebra::distributed::Vector<double> &inverse_diagonal =
     mf.get_matrix_diagonal_inverse()->get_vector();
 
   LinearAlgebra::distributed::Vector<number> in, out, ref;
@@ -113,7 +113,7 @@ test()
     }
 
   in.update_ghost_values();
-  out = diagonal;
+  out = inverse_diagonal;
 
   // assemble trilinos sparse matrix with
   // (v, u) for reference
@@ -168,11 +168,31 @@ test()
   }
   sparse_matrix.compress(VectorOperation::add);
 
-  sparse_matrix.vmult(ref, in);
-
+  // Check the diagonal:
   for (unsigned int i = 0; i < ref.local_size(); ++i)
     {
-      const unsigned int glob_index = owned_set.nth_index_in_set(i);
+      const auto glob_index = owned_set.nth_index_in_set(i);
+      if (constraints.is_constrained(glob_index))
+        ref.local_element(i) = 1.;
+      else
+        ref.local_element(i) = 1. / sparse_matrix(glob_index, glob_index);
+    }
+  ref.compress(VectorOperation::insert);
+
+  out -= ref;
+
+  deallog << "Norm of difference: " << out.linfty_norm() << std::endl;
+  deallog << "l2_norm: " << ref.l2_norm() << std::endl;
+  deallog << "l1_norm: " << ref.l1_norm() << std::endl;
+  deallog << "linfty_norm: " << ref.linfty_norm() << std::endl << std::endl;
+
+  // Check the lumped diagonal:
+  mf.compute_lumped_diagonal();
+  out = mf.get_matrix_lumped_diagonal_inverse()->get_vector();
+  sparse_matrix.vmult(ref, in);
+  for (unsigned int i = 0; i < ref.local_size(); ++i)
+    {
+      const auto glob_index = owned_set.nth_index_in_set(i);
       if (constraints.is_constrained(glob_index))
         ref.local_element(i) = 1.;
       else
@@ -181,21 +201,18 @@ test()
   ref.compress(VectorOperation::insert);
 
   out -= ref;
-  const double diff_norm = out.linfty_norm();
 
-  deallog << "Norm of difference: " << diff_norm << std::endl;
-  deallog << "l2_norm: " << diagonal.l2_norm() << std::endl;
-  deallog << "l1_norm: " << diagonal.l1_norm() << std::endl;
-  deallog << "linfty_norm: " << diagonal.linfty_norm() << std::endl
-          << std::endl;
+  deallog << "Norm of difference: " << out.linfty_norm() << std::endl;
+  deallog << "l2_norm: " << ref.l2_norm() << std::endl;
+  deallog << "l1_norm: " << ref.l1_norm() << std::endl;
+  deallog << "linfty_norm: " << ref.linfty_norm() << std::endl << std::endl;
 }
 
 
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   mpi_initlog();
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -123,7 +123,7 @@ do_test(const DoFHandler<dim> &dof)
             for (unsigned int v = 0; v < n_items; ++v)
               phi_u.begin_dof_values()[i + v][v] = 1.;
 
-            phi_u.evaluate(false, true);
+            phi_u.evaluate(EvaluationFlags::gradients);
             for (unsigned int q = 0; q < n_q_points; ++q)
               {
                 VectorizedArray<double> div_u = phi_u.get_divergence(q);
@@ -131,8 +131,8 @@ do_test(const DoFHandler<dim> &dof)
                                                 q);
                 phi_p.submit_value(-div_u, q);
               }
-            phi_u.integrate(false, true);
-            phi_p.integrate(true, false);
+            phi_u.integrate(EvaluationFlags::gradients);
+            phi_p.integrate(EvaluationFlags::values);
 
             for (unsigned int v = 0; v < n_items; ++v)
               {
@@ -159,12 +159,12 @@ do_test(const DoFHandler<dim> &dof)
             for (unsigned int v = 0; v < n_items; ++v)
               phi_p.begin_dof_values()[i + v][v] = 1.;
 
-            phi_p.evaluate(true, false);
+            phi_p.evaluate(EvaluationFlags::values);
             for (unsigned int q = 0; q < n_q_points; ++q)
               {
                 phi_u.submit_divergence(-phi_p.get_value(q), q);
               }
-            phi_u.integrate(false, true);
+            phi_u.integrate(EvaluationFlags::gradients);
 
             for (unsigned int v = 0; v < n_items; ++v)
               for (unsigned int j = 0; j < dofs_per_cell_u; ++j)
@@ -173,7 +173,7 @@ do_test(const DoFHandler<dim> &dof)
                   phi_u.begin_dof_values()[j][v];
           }
         test_matrix.add(-1., cell_matrix);
-        deallog << test_matrix.frobenius_norm() << " ";
+        deallog << test_matrix.frobenius_norm() << ' ';
       }
     deallog << std::endl;
   }

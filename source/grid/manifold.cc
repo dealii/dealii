@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,24 +13,25 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
 
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/manifold.h>
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 #include <cmath>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
-
-using namespace Manifolds;
 
 /* -------------------------- Manifold --------------------- */
 template <int dim, int spacedim>
@@ -40,7 +41,7 @@ Manifold<dim, spacedim>::project_to_manifold(
   const Point<spacedim> &) const
 {
   Assert(false, ExcPureFunctionCalled());
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -302,7 +303,7 @@ Manifold<dim, spacedim>::get_normals_at_vertices(
   const typename Triangulation<dim, spacedim>::face_iterator &face,
   FaceVertexNormals &                                         n) const
 {
-  for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
+  for (unsigned int v = 0; v < face->reference_cell().n_vertices(); ++v)
     {
       n[v] = normal_vector(face, face->vertex(v));
       n[v] /= n[v].norm();
@@ -316,7 +317,7 @@ Point<spacedim>
 Manifold<dim, spacedim>::get_new_point_on_line(
   const typename Triangulation<dim, spacedim>::line_iterator &line) const
 {
-  const auto points_weights = get_default_points_and_weights(line);
+  const auto points_weights = Manifolds::get_default_points_and_weights(line);
   return get_new_point(make_array_view(points_weights.first.begin(),
                                        points_weights.first.end()),
                        make_array_view(points_weights.second.begin(),
@@ -330,7 +331,7 @@ Point<spacedim>
 Manifold<dim, spacedim>::get_new_point_on_quad(
   const typename Triangulation<dim, spacedim>::quad_iterator &quad) const
 {
-  const auto points_weights = get_default_points_and_weights(quad);
+  const auto points_weights = Manifolds::get_default_points_and_weights(quad);
   return get_new_point(make_array_view(points_weights.first.begin(),
                                        points_weights.first.end()),
                        make_array_view(points_weights.second.begin(),
@@ -354,7 +355,7 @@ Manifold<dim, spacedim>::get_new_point_on_face(
         return get_new_point_on_quad(face);
     }
 
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -374,7 +375,7 @@ Manifold<dim, spacedim>::get_new_point_on_cell(
         return get_new_point_on_hex(cell);
     }
 
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -451,7 +452,7 @@ Manifold<dim, spacedim>::get_new_point_on_hex(
   const typename Triangulation<dim, spacedim>::hex_iterator & /*hex*/) const
 {
   Assert(false, ExcImpossibleInDim(dim));
-  return Point<spacedim>();
+  return {};
 }
 
 
@@ -461,7 +462,8 @@ Point<3>
 Manifold<3, 3>::get_new_point_on_hex(
   const Triangulation<3, 3>::hex_iterator &hex) const
 {
-  const auto points_weights = get_default_points_and_weights(hex, true);
+  const auto points_weights =
+    Manifolds::get_default_points_and_weights(hex, true);
   return get_new_point(make_array_view(points_weights.first.begin(),
                                        points_weights.first.end()),
                        make_array_view(points_weights.second.begin(),
@@ -527,8 +529,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 FlatManifold<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FlatManifold<dim, spacedim>>(periodicity,
-                                                             tolerance);
+  return std::make_unique<FlatManifold<dim, spacedim>>(periodicity, tolerance);
 }
 
 
@@ -761,10 +762,10 @@ FlatManifold<2>::get_normals_at_vertices(
   Manifold<2, 2>::FaceVertexNormals &    face_vertex_normals) const
 {
   const Tensor<1, 2> tangent = face->vertex(1) - face->vertex(0);
-  for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_face;
-       ++vertex)
+  // We're in 2d. Faces are edges:
+  for (const unsigned int vertex : ReferenceCells::Line.vertex_indices())
     // compute normals from tangent
-    face_vertex_normals[vertex] = Point<2>(tangent[1], -tangent[0]);
+    face_vertex_normals[vertex] = Tensor<1, 2>({tangent[1], -tangent[0]});
 }
 
 
@@ -893,8 +894,19 @@ FlatManifold<dim, spacedim>::normal_vector(
   const unsigned int facedim = dim - 1;
 
   Point<facedim> xi;
-  for (unsigned int i = 0; i < facedim; ++i)
-    xi[i] = 1. / 2;
+
+  const auto face_reference_cell = face->reference_cell();
+
+  if (face_reference_cell == ReferenceCells::get_hypercube<facedim>())
+    {
+      for (unsigned int i = 0; i < facedim; ++i)
+        xi[i] = 1. / 2;
+    }
+  else
+    {
+      for (unsigned int i = 0; i < facedim; ++i)
+        xi[i] = 1. / 3;
+    }
 
   const double        eps = 1e-12;
   Tensor<1, spacedim> grad_F[facedim];
@@ -902,17 +914,17 @@ FlatManifold<dim, spacedim>::normal_vector(
   while (true)
     {
       Point<spacedim> F;
-      for (const unsigned int v : GeometryInfo<facedim>::vertex_indices())
-        F += face->vertex(v) *
-             GeometryInfo<facedim>::d_linear_shape_function(xi, v);
+      for (const unsigned int v : face->vertex_indices())
+        F +=
+          face->vertex(v) * face_reference_cell.d_linear_shape_function(xi, v);
 
       for (unsigned int i = 0; i < facedim; ++i)
         {
           grad_F[i] = 0;
-          for (const unsigned int v : GeometryInfo<facedim>::vertex_indices())
+          for (const unsigned int v : face->vertex_indices())
             grad_F[i] +=
               face->vertex(v) *
-              GeometryInfo<facedim>::d_linear_shape_function_gradient(xi, v)[i];
+              face_reference_cell.d_linear_shape_function_gradient(xi, v)[i];
         }
 
       Tensor<1, facedim> J;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,7 +59,7 @@ SparseLUDecomposition<number>::clear()
 
   SparseMatrix<number>::clear();
 
-  if (own_sparsity)
+  if (own_sparsity != nullptr)
     {
       delete own_sparsity;
       own_sparsity = nullptr;
@@ -150,7 +150,7 @@ SparseLUDecomposition<number>::prebuild_lower_bound()
 
   prebuilt_lower_bound.resize(N);
 
-  for (size_type row = 0; row < N; row++)
+  for (size_type row = 0; row < N; ++row)
     {
       prebuilt_lower_bound[row] =
         Utilities::lower_bound(&column_numbers[rowstart_indices[row] + 1],

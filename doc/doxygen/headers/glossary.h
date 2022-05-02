@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -336,23 +336,6 @@
  * also be appropriate to call TriaAccessor::set_all_boundary_ids instead
  * on each of the selected faces. To query the boundary indicator of a particular
  * face or edge, use TriaAccessor::boundary_id.
- *
- * In older versions of the library (prior to 8.2), if you wanted also
- * to change the way the Triangulation class treated the boundary for
- * the purposes of mesh refinement, you could call
- * Triangulation::set_boundary to associate a boundary object with a
- * particular boundary indicator. This method is still supported, and
- * it allows the Triangulation object to use a different method of
- * finding new points on faces and edges to be refined; the default is
- * to use a FlatManifold object for all faces and edges. The
- * results section of step-49 has a worked example that shows all of
- * this in action.
- *
- * The suggested method from version 8.2 onwards, is to split the
- * geometrical description of the boundary from its physical meaning,
- * by using separately manifold_ids and boundary_ids. The former are
- * used to describe how the geometry changes, and the latter are used
- * to identify the boundary conditions.
  *
  * Many of the functions in namespaces DoFTools and VectorTools take
  * arguments that specify which part of the boundary to work on, and
@@ -1128,9 +1111,9 @@
  * that are owned by other processors. In other words, for each element
  * there is a clear owner among all of the processors and those elements
  * that the current processor stores but does not own (i.e., the
- * "ghost elements") are simply mirror images of a master value somewhere
+ * "ghost elements") are simply mirror images of a primary value somewhere
  * else -- thus, the name "ghost". This is also the case for the
- * parallel::distributed::Vector class.
+ * LinearAlgebra::distributed::Vector class.
  *
  * On the other hand, in Trilinos (and consequently in
  * TrilinosWrappers::MPI::Vector), a ghosted vector is simply a view
@@ -1140,11 +1123,11 @@
  * may not even store all of the elements a non-ghosted vector would
  * store on the current processor. Consequently, for Trilinos vectors,
  * there is no notion of an 'owner' of vector elements in the way we
- * have it in the the non-ghost case view (or in the PETSc case) and
+ * have it in the non-ghost case view (or in the PETSc case) and
  * the name "ghost element" may be misleading since in this view,
  * every element we have available locally may or may not be stored
  * somewhere else as well, but even if it is, the local element is not
- * a mirror value of a master location as there is no owner of each
+ * a mirror value of a primary location as there is no owner of each
  * element.
  *
  * @note The @ref distributed documentation module provides a brief
@@ -1153,12 +1136,12 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor hp_paper <b>%hp paper</b></dt>
- * <dd>The "hp paper" is a paper by W. Bangerth and O. Kayser-Herold, titled
+ * <dt class="glossary">@anchor hp_paper <b>%hp-paper</b></dt>
+ * <dd>The "hp-paper" is a paper by W. Bangerth and O. Kayser-Herold, titled
  * "Data Structures and Requirements for hp Finite Element Software", that
  * describes many of the algorithms and data structures used in the implementation
- * of the hp framework of deal.II. In particular, it summarizes many of the
- * tricky points that have to be considered for %hp finite elements using continuous
+ * of the hp-framework of deal.II. In particular, it summarizes many of the
+ * tricky points that have to be considered for %hp-finite elements using continuous
  * elements.
  *
  * The full reference for this paper is as follows:

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,9 @@ test(int n_refinements, const int n_subdivisions, MPI_Comm comm)
   // extract relevant information form pdt
   auto construction_data =
     TriangulationDescription::Utilities::create_description_from_triangulation(
-      tria_pdt, comm, true);
+      tria_pdt,
+      comm,
+      TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
   // actually create triangulation
   tria_pft.create_triangulation(construction_data);
@@ -61,8 +63,8 @@ test(int n_refinements, const int n_subdivisions, MPI_Comm comm)
   for (auto &cell : tria_pft.active_cell_iterators())
     {
       CellId id        = cell->id();
-      auto   cell_base = id.to_cell(tria_pdt);
-      for (unsigned int d = 0; d < dim; d++)
+      auto   cell_base = tria_pdt.create_cell_iterator(id);
+      for (unsigned int d = 0; d < dim; ++d)
         Assert(std::abs(cell->center()[d] - cell_base->center()[d]) < 1e-9,
                ExcMessage("Cells do not match"));
     }

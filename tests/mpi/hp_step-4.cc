@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
@@ -40,8 +41,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/trilinos_precondition.h>
@@ -83,7 +82,7 @@ namespace Step4
 
     parallel::distributed::Triangulation<dim> triangulation;
     hp::FECollection<dim>                     fe;
-    hp::DoFHandler<dim>                       dof_handler;
+    DoFHandler<dim>                           dof_handler;
     hp::QCollection<dim>                      q_collection;
 
     IndexSet locally_owned_dofs;
@@ -199,17 +198,21 @@ namespace Step4
     DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
 
 #ifdef DEBUG
-    // We did not think about hp constraints on ghost cells yet.
+    // We did not think about hp-constraints on ghost cells yet.
     // Thus, we are content with verifying their consistency for now.
+    const std::vector<IndexSet> locally_owned_dofs_per_processor =
+      Utilities::MPI::all_gather(communicator,
+                                 dof_handler.locally_owned_dofs());
+
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
-    AssertThrow(constraints.is_consistent_in_parallel(
-                  dof_handler.locally_owned_dofs_per_processor(),
-                  locally_active_dofs,
-                  communicator,
-                  /*verbose=*/true),
-                ExcMessage(
-                  "AffineConstraints object contains inconsistencies!"));
+
+    AssertThrow(
+      constraints.is_consistent_in_parallel(locally_owned_dofs_per_processor,
+                                            locally_active_dofs,
+                                            communicator,
+                                            /*verbose=*/true),
+      ExcMessage("AffineConstraints object contains inconsistencies!"));
 #endif
 
     constraints.close();

@@ -30,7 +30,7 @@ test(const std::string &name, const std::string &arguments)
   Triangulation<dim, spacedim> tria;
 
   deallog << "Generating Triangulation<" << dim << ", " << spacedim
-          << "> : " << name << "(" << arguments << ")" << std::endl;
+          << "> : " << name << '(' << arguments << ')' << std::endl;
 
   GridGenerator::generate_from_name_and_arguments(tria, name, arguments);
 
@@ -68,4 +68,7 @@ main()
   test<2, 2>("hyper_cube", "0: 1: true");
   test<2, 3>("hyper_cube", "0: 1: true");
   test<3, 3>("hyper_cube", "0: 1: true");
+
+  test<2, 2>("eccentric_hyper_shell", "0, 0, : 0.2, 0 : 0.5 : 1 : 10");
+  test<3, 3>("eccentric_hyper_shell", "0, 0, 0 : 0.2, 0, 0: 0.5 : 1 : 12");
 }

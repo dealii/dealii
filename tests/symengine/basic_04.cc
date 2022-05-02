@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ main(int argc, char *argv[])
 
   SE::map_basic_basic dict;
   std::vector<double> vals(v.size());
-  for (unsigned i = 0; i < v.size(); i++)
+  for (unsigned i = 0; i < v.size(); ++i)
     {
       dict[v[i]] = SE::real_double(i);
       vals[i]    = i;
@@ -90,9 +90,9 @@ main(int argc, char *argv[])
   // Standard substitution
 
   auto t1 = std::chrono::high_resolution_clock::now();
-  for (unsigned j = 0; j < n_runs; j++)
+  for (unsigned j = 0; j < n_runs; ++j)
     {
-      res += static_cast<const SE::RealDouble &>(*h->subs(dict)).i;
+      res += SE::eval_double(*h->subs(dict));
     }
   auto         t2 = std::chrono::high_resolution_clock::now();
   const double diff_symm_subs =
@@ -118,7 +118,7 @@ main(int argc, char *argv[])
     << " us" << std::endl;
 
   t1 = std::chrono::high_resolution_clock::now();
-  for (unsigned j = 0; j < n_runs; j++)
+  for (unsigned j = 0; j < n_runs; ++j)
     {
       res1 += l.call(vals);
     }
@@ -150,7 +150,7 @@ main(int argc, char *argv[])
     << " us" << std::endl;
 
   t1 = std::chrono::high_resolution_clock::now();
-  for (unsigned j = 0; j < n_runs; j++)
+  for (unsigned j = 0; j < n_runs; ++j)
     {
       res2 += l2.call(vals);
     }

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -72,6 +72,7 @@ ADD_SUBDIRECTORY(physics)
 ADD_SUBDIRECTORY(optimization/rol)
 ADD_SUBDIRECTORY(non_matching)
 ADD_SUBDIRECTORY(sundials)
+ADD_SUBDIRECTORY(arborx)
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${build} build_lowercase)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,9 +59,9 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
   ScaLAPACKMatrix<NumberType> scalapack_matrix(
     size, size, grid, block_size_i, block_size_i);
 
-  pcout << "2D grid matrix: dim=" << scalapack_matrix.m() << "x"
-        << scalapack_matrix.n() << ";  blocks=" << block_size_i << "x"
-        << block_size_i << ";  grid=" << grid->get_process_grid_rows() << "x"
+  pcout << "2D grid matrix: dim=" << scalapack_matrix.m() << 'x'
+        << scalapack_matrix.n() << ";  blocks=" << block_size_i << 'x'
+        << block_size_i << ";  grid=" << grid->get_process_grid_rows() << 'x'
         << grid->get_process_grid_columns() << std::endl
         << std::endl;
 

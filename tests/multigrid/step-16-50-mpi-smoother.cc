@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2018 by the deal.II authors
+ * Copyright (C) 2016 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -16,7 +16,7 @@
 
 // Same as step-16-50, but use Jacobi smoother at the coarsest grid via
 // MGCoarseGridApplySmoother. In this particular case, the number of iterations
-// until convergence is exactly the same as for MGCoarseGridLACIteration.
+// until convergence is exactly the same as for MGCoarseGridIterativeSolver.
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
@@ -103,8 +103,8 @@ namespace Step50
     FE_Q<dim>                                 fe;
     DoFHandler<dim>                           mg_dof_handler;
 
-    typedef LA::MPI::SparseMatrix matrix_t;
-    typedef LA::MPI::Vector       vector_t;
+    using matrix_t = LA::MPI::SparseMatrix;
+    using vector_t = LA::MPI::Vector;
 
     matrix_t system_matrix;
 
@@ -221,8 +221,8 @@ namespace Step50
 
 
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
-
+    mg_constrained_dofs.initialize(mg_dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
 
     const unsigned int n_levels = triangulation.n_global_levels();
 
@@ -407,8 +407,7 @@ namespace Step50
                          local_dof_indices[j]) // ( boundary(i) && boundary(j)
                                                // && i==j )
                    ))
-                {
-                }
+                {}
               else
                 {
                   cell_matrix(i, j) = 0;
@@ -438,7 +437,7 @@ namespace Step50
     mg_transfer.build(mg_dof_handler);
 
     // pre and post smoothers:
-    typedef LA::MPI::PreconditionJacobi                  Smoother;
+    using Smoother = LA::MPI::PreconditionJacobi;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);

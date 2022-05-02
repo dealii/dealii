@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,16 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_mpi_noncontiguous_vector_h
-#define dealii_mpi_noncontiguous_vector_h
+#ifndef dealii_mpi_noncontiguous_partitioner_h
+#define dealii_mpi_noncontiguous_partitioner_h
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/mpi_tags.h>
 
-#include <deal.II/lac/communication_pattern_base.h>
 #include <deal.II/lac/vector_space_vector.h>
 
 
@@ -35,12 +35,9 @@ namespace Utilities
     /**
      * A flexible Partitioner class, which does not impose restrictions
      * regarding the order of the underlying index sets.
-     *
-     * @author Peter Munch, 2020
      */
-    template <typename Number = double>
     class NoncontiguousPartitioner
-      : public LinearAlgebra::CommunicationPatternBase
+      : public Utilities::MPI::CommunicationPatternBase
     {
     public:
       /**
@@ -51,16 +48,16 @@ namespace Utilities
 
       /**
        * Constructor. Set up point-to-point communication pattern based on the
-       * IndexSets arguments @p indexset_has and @p indexset_want for the MPI
+       * IndexSets arguments @p indexset_locally_owned and @p indexset_ghost for the MPI
        * communicator @p communicator.
        */
-      NoncontiguousPartitioner(const IndexSet &indexset_has,
-                               const IndexSet &indexset_want,
+      NoncontiguousPartitioner(const IndexSet &indexset_locally_owned,
+                               const IndexSet &indexset_ghost,
                                const MPI_Comm &communicator);
 
       /**
-       * Constructor. Same as above but for vectors of indices @p indices_has
-       * and @p indices_want. This allows the indices to not be sorted and the
+       * Constructor. Same as above but for vectors of indices @p indices_locally_owned
+       * and @p indices_ghost. This allows the indices to not be sorted and the
        * values are read and written automatically at the right position of
        * the vector during update_values(), update_values_start(), and
        * update_values_finish(). It is allowed to include entries with the
@@ -68,49 +65,114 @@ namespace Utilities
        * exchange but are present in the data vectors as padding.
        */
       NoncontiguousPartitioner(
-        const std::vector<types::global_dof_index> &indices_has,
-        const std::vector<types::global_dof_index> &indices_want,
+        const std::vector<types::global_dof_index> &indices_locally_owned,
+        const std::vector<types::global_dof_index> &indices_ghost,
         const MPI_Comm &                            communicator);
 
       /**
-       * Fill the vector @p dst according to the precomputed communication
-       * pattern with values from @p src.
+       * Fill the vector @p ghost_array according to the precomputed communication
+       * pattern with values from @p locally_owned_array.
        *
        * @pre The vectors only have to provide a method begin(), which allows
        *   to access their raw data.
+       *
+       * @pre The size of both vectors must be at least as large as the number
+       *   of entries in the index sets passed to the constructors or the
+       *   reinit() functions.
        *
        * @note This function calls the methods update_values_start() and
        *   update_values_finish() in sequence. Users can call these two
        *   functions separately and hereby overlap communication and
        *   computation.
        */
-      template <typename VectorType>
+      template <typename Number>
       void
-      update_values(VectorType &dst, const VectorType &src) const;
+      export_to_ghosted_array(
+        const ArrayView<const Number> &locally_owned_array,
+        const ArrayView<Number> &      ghost_array) const;
+
+      /**
+       * Same as above but with an interface similar to
+       * Utilities::MPI::Partitioner::export_to_ghosted_array_start and
+       * Utilities::MPI::Partitioner::export_to_ghosted_array_finish. In this
+       * function, the user can provide the temporary data structures to be
+       * used.
+       *
+       * @pre The size of the @p temporary_storage vector has to be at least
+       *   temporary_storage_size. The reason for this is that this vector is
+       *   used as buffer for both sending and receiving data.
+       *
+       * @note Any value less than 10 is a valid value of
+       *   @p communication_channel.
+       */
+      template <typename Number>
+      void
+      export_to_ghosted_array(
+        const unsigned int             communication_channel,
+        const ArrayView<const Number> &locally_owned_array,
+        const ArrayView<Number> &      temporary_storage,
+        const ArrayView<Number> &      ghost_array,
+        std::vector<MPI_Request> &     requests) const;
 
       /**
        * Start update: Data is packed, non-blocking send and receives
        * are started.
+       *
+       * @note In contrast to the function
+       *   Utilities::MPI::Partitioner::export_to_ghosted_array_start, the user
+       *   does not pass a reference to the destination vector, since the data
+       *   is received into a designated part of the buffer @p temporary_storage. This
+       *   allows for padding and other post-processing of the received data.
+       *
+       * @pre The required size of the vectors are the same as in the functions
+       *   above.
+       *
+       * @note Any value less than 10 is a valid value of
+       *   @p communication_channel.
        */
-      template <typename VectorType>
+      template <typename Number>
       void
-      update_values_start(const VectorType &src, const unsigned int tag) const;
+      export_to_ghosted_array_start(
+        const unsigned int             communication_channel,
+        const ArrayView<const Number> &locally_owned_array,
+        const ArrayView<Number> &      temporary_storage,
+        std::vector<MPI_Request> &     requests) const;
 
       /**
        * Finish update. The method waits until all data has been sent and
        * received. Once data from any process is received it is processed and
        * placed at the right position of the vector @p dst.
+       *
+       * @note In contrast to the function
+       *   Utilities::MPI::Partitioner::export_to_ghosted_array_finish, the user
+       *   also has to pass a reference to the buffer @p temporary_storage,
+       *   since the data has been received into the buffer and not into the
+       *   destination vector.
+       *
+       * @pre The required size of the vectors are the same as in the functions
+       *   above.
        */
-      template <typename VectorType>
+      template <typename Number>
       void
-      update_values_finish(VectorType &dst, const unsigned int tag) const;
+      export_to_ghosted_array_finish(
+        const ArrayView<const Number> &temporary_storage,
+        const ArrayView<Number> &      ghost_array,
+        std::vector<MPI_Request> &     requests) const;
 
       /**
        * Returns the number of processes this process sends data to and the
        * number of processes this process receives data from.
        */
       std::pair<unsigned int, unsigned int>
-      n_targets();
+      n_targets() const;
+
+      /**
+       * Return the size of the temporary storage needed by the
+       * export_to_ghosted_array() functions, if the temporary storage is
+       * handled by the user code.
+       */
+      unsigned int
+      temporary_storage_size() const;
 
       /**
        * Return memory consumption in Byte.
@@ -128,16 +190,16 @@ namespace Utilities
        * Initialize the inner data structures.
        */
       void
-      reinit(const IndexSet &indexset_has,
-             const IndexSet &indexset_want,
+      reinit(const IndexSet &indexset_locally_owned,
+             const IndexSet &indexset_ghost,
              const MPI_Comm &communicator) override;
 
       /**
        * Initialize the inner data structures.
        */
       void
-      reinit(const std::vector<types::global_dof_index> &indices_has,
-             const std::vector<types::global_dof_index> &indices_want,
+      reinit(const std::vector<types::global_dof_index> &indices_locally_owned,
+             const std::vector<types::global_dof_index> &indices_ghost,
              const MPI_Comm &                            communicator);
 
     private:
@@ -167,16 +229,6 @@ namespace Utilities
       std::vector<types::global_dof_index> send_indices;
 
       /**
-       *  Buffer containing the values sorted accoding to the ranks.
-       */
-      mutable std::vector<Number> send_buffers;
-
-      /**
-       * MPI requests for sending.
-       */
-      mutable std::vector<MPI_Request> send_requests;
-
-      /**
        * The ranks this process receives data from.
        */
       std::vector<unsigned int> recv_ranks;
@@ -197,14 +249,22 @@ namespace Utilities
       std::vector<types::global_dof_index> recv_indices;
 
       /**
-       * Buffer containing the values sorted by rank.
+       * Buffer containing the values sorted by rank for sending and receiving.
+       *
+       * @note Only allocated if not provided externally by user.
+       *
+       * @note At this place we do not know the type of the data to be sent. So
+       *   we use an arbitrary type of size 1 byte. The type is cast to the
+       *   requested type in the relevant functions.
        */
-      mutable std::vector<Number> recv_buffers;
+      mutable std::vector<uint8_t> buffers;
 
       /**
-       * MPI requests for receiving.
+       * MPI requests for sending and receiving.
+       *
+       * @note Only allocated if not provided externally by user.
        */
-      mutable std::vector<MPI_Request> recv_requests;
+      mutable std::vector<MPI_Request> requests;
     };
 
   } // namespace MPI

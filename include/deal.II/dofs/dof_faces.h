@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,8 +63,6 @@ namespace internal
      * setter functions. Knowledge of the actual data format is therefore
      * encapsulated to the present hierarchy of classes as well as the
      * dealii::DoFHandler class.
-     *
-     * @author Tobias Leicht, 2006
      */
     template <int dim>
     class DoFFaces
@@ -80,8 +78,6 @@ namespace internal
     /**
      * Store the indices of degrees of freedom on faces in 1D. As these would
      * be vertices, which are treated separately, don't do anything.
-     *
-     * @author Tobias Leicht, 2006
      */
     template <>
     class DoFFaces<1>
@@ -96,7 +92,9 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+       *
        */
       template <class Archive>
       void
@@ -106,8 +104,6 @@ namespace internal
     /**
      * Store the indices of degrees of freedom on faces in 2D, which are
      * lines.
-     *
-     * @author Tobias Leicht, 2006
      */
     template <>
     class DoFFaces<2>
@@ -127,7 +123,8 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        */
       template <class Archive>
       void
@@ -137,8 +134,6 @@ namespace internal
     /**
      * Store the indices of degrees of freedom on faces in 3D, which are
      * quads, additionally also on lines.
-     *
-     * @author Tobias Leicht, 2006
      */
     template <>
     class DoFFaces<3>
@@ -163,7 +158,8 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        */
       template <class Archive>
       void

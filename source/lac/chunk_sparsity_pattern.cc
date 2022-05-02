@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -458,7 +458,7 @@ ChunkSparsityPattern::print(std::ostream &out) const
            (sparsity_pattern.colnums != nullptr),
          ExcEmptyObject());
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   for (size_type i = 0; i < sparsity_pattern.rows; ++i)
     for (size_type d = 0; (d < chunk_size) && (i * chunk_size + d < n_rows());
@@ -477,7 +477,7 @@ ChunkSparsityPattern::print(std::ostream &out) const
         out << ']' << std::endl;
       }
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -489,7 +489,7 @@ ChunkSparsityPattern::print_gnuplot(std::ostream &out) const
            (sparsity_pattern.colnums != nullptr),
          ExcEmptyObject());
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // for each entry in the underlying sparsity pattern, repeat everything
   // chunk_size x chunk_size times
@@ -511,7 +511,7 @@ ChunkSparsityPattern::print_gnuplot(std::ostream &out) const
             out << sparsity_pattern.colnums[j] * chunk_size + d << " "
                 << -static_cast<signed int>(i * chunk_size + e) << std::endl;
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -545,7 +545,7 @@ ChunkSparsityPattern::stores_only_added_elements() const
 void
 ChunkSparsityPattern::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // first the simple objects, bracketed in [...]
   out << '[' << rows << ' ' << cols << ' ' << chunk_size << ' ' << "][";
@@ -553,7 +553,7 @@ ChunkSparsityPattern::block_write(std::ostream &out) const
   sparsity_pattern.block_write(out);
   out << ']';
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -561,7 +561,7 @@ ChunkSparsityPattern::block_write(std::ostream &out) const
 void
 ChunkSparsityPattern::block_read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   char c;
 

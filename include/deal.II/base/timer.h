@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -114,7 +114,6 @@ struct CPUClock
  * exceed the wall times.
  *
  * @ingroup utilities
- * @author G. Kanschat, W. Bangerth, M. Kronbichler, D. Wells
  */
 class Timer
 {
@@ -138,7 +137,7 @@ public:
    * communicator occurs; the extra cost of the synchronization is not
    * measured.
    */
-  Timer(MPI_Comm mpi_communicator, const bool sync_lap_times = false);
+  Timer(const MPI_Comm &mpi_communicator, const bool sync_lap_times = false);
 
   /**
    * Return a reference to the data structure containing basic statistics on
@@ -362,7 +361,13 @@ private:
  * entered several times. By changing the options in OutputFrequency and
  * OutputType, the user can choose whether output should be generated every
  * time a section is joined or just in the end of the program. Moreover, it is
- * possible to show CPU times, wall times or both.
+ * possible to show CPU times, wall times, or both.
+ *
+ * The class is used in a substantial number of tutorial programs that collect
+ * timing data. step-77 is an example of a relatively simple sequential program
+ * that uses it. step-40 and several others mentioned below use it for parallel
+ * computations.
+ *
  *
  * <h3>Usage</h3>
  *
@@ -541,7 +546,6 @@ private:
  * additional insight into the statistical distribution.
  *
  * @ingroup utilities
- * @author M. Kronbichler, 2009.
  */
 class TimerOutput
 {
@@ -708,7 +712,7 @@ public:
    * <code>MPI_Barrier</code> call before starting and stopping the timer for
    * each section.
    */
-  TimerOutput(MPI_Comm              mpi_comm,
+  TimerOutput(const MPI_Comm &      mpi_comm,
               std::ostream &        stream,
               const OutputFrequency output_frequency,
               const OutputType      output_type);
@@ -736,7 +740,7 @@ public:
    * <code>MPI_Barrier</code> call before starting and stopping the timer for
    * each section.)
    */
-  TimerOutput(MPI_Comm              mpi_comm,
+  TimerOutput(const MPI_Comm &      mpi_comm,
               ConditionalOStream &  stream,
               const OutputFrequency output_frequency,
               const OutputType      output_type);
@@ -755,27 +759,11 @@ public:
   enter_subsection(const std::string &section_name);
 
   /**
-   * Same as @p enter_subsection.
-   *
-   * @deprecated Use enter_subsection() instead.
-   */
-  DEAL_II_DEPRECATED void
-  enter_section(const std::string &section_name);
-
-  /**
    * Leave a section. If no name is given, the last section that was entered
    * is left.
    */
   void
   leave_subsection(const std::string &section_name = "");
-
-  /**
-   * Same as @p leave_subsection.
-   *
-   * @deprecated Use leave_subsection() instead.
-   */
-  DEAL_II_DEPRECATED void
-  exit_section(const std::string &section_name = "");
 
   /**
    * Get a map with the collected data of the specified type for each subsection
@@ -808,8 +796,8 @@ public:
    * median is given).
    */
   void
-  print_wall_time_statistics(const MPI_Comm mpi_comm,
-                             const double   print_quantile = 0.) const;
+  print_wall_time_statistics(const MPI_Comm &mpi_comm,
+                             const double    print_quantile = 0.) const;
 
   /**
    * By calling this function, all output can be disabled. This function
@@ -884,7 +872,7 @@ private:
   /**
    * A list of the sections that have been entered and not exited. The list is
    * kept in the order in which sections have been entered, but elements may
-   * be removed in the middle if an argument is given to the exit_section()
+   * be removed in the middle if an argument is given to the leave_subsection()
    * function.
    */
   std::list<std::string> active_sections;
@@ -947,7 +935,7 @@ template <class StreamType>
 inline void
 Timer::print_accumulated_wall_time_data(StreamType &stream) const
 {
-  const Utilities::MPI::MinMaxAvg statistic = get_accumulated_wall_time_data();
+  const Utilities::MPI::MinMaxAvg &statistic = get_accumulated_wall_time_data();
   stream << statistic.max << " wall,"
          << " max @" << statistic.max_index << ", min=" << statistic.min << " @"
          << statistic.min_index << ", avg=" << statistic.avg << std::endl;
@@ -955,27 +943,13 @@ Timer::print_accumulated_wall_time_data(StreamType &stream) const
 
 
 
-inline void
-TimerOutput::enter_section(const std::string &section_name)
-{
-  enter_subsection(section_name);
-}
-
-
-
-inline void
-TimerOutput::exit_section(const std::string &section_name)
-{
-  leave_subsection(section_name);
-}
-
 inline TimerOutput::Scope::Scope(dealii::TimerOutput &timer_,
                                  const std::string &  section_name_)
   : timer(timer_)
   , section_name(section_name_)
   , in(true)
 {
-  timer.enter_section(section_name);
+  timer.enter_subsection(section_name);
 }
 
 
@@ -987,7 +961,7 @@ TimerOutput::Scope::stop()
     return;
   in = false;
 
-  timer.exit_section(section_name);
+  timer.leave_subsection(section_name);
 }
 
 

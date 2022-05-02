@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,9 +39,10 @@
 
 
 
-void check(Triangulation<2> &tria)
+void
+check(Triangulation<2> &tria)
 {
-  for (unsigned i = 0; i < tria.n_vertices(); i++)
+  for (unsigned i = 0; i < tria.n_vertices(); ++i)
     {
       std::vector<Triangulation<2>::active_cell_iterator> cells =
         GridTools::find_cells_adjacent_to_vertex(tria, i);
@@ -49,10 +50,10 @@ void check(Triangulation<2> &tria)
       deallog << "Vertex " << i << " at " << tria.get_vertices()[i] << ": "
               << cells.size() << " cells" << std::endl;
 
-      for (unsigned c = 0; c < cells.size(); c++)
+      for (unsigned c = 0; c < cells.size(); ++c)
         {
           for (const unsigned int v : GeometryInfo<2>::vertex_indices())
-            deallog << "<" << cells[c]->vertex(v) << "> ";
+            deallog << '<' << cells[c]->vertex(v) << "> ";
           deallog << std::endl;
         }
     }

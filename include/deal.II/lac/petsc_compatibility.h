@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,7 +65,6 @@ namespace PETScWrappers
    * semantics in the PETSc wrappers, this function will not throw an
    * exception if an error occurs, but instead just returns the error code
    * given by MatDestroy.
-   *
    */
   inline PetscErrorCode
   destroy_matrix(Mat &matrix)

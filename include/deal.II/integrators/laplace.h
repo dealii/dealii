@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,8 +37,6 @@ namespace LocalIntegrators
    * @brief Local integrators related to the Laplacian and its DG formulations
    *
    * @ingroup Integrators
-   * @author Guido Kanschat
-   * @date 2010
    */
   namespace Laplace
   {
@@ -48,9 +46,6 @@ namespace LocalIntegrators
      *
      * The FiniteElement in <tt>fe</tt> may be scalar or vector valued. In the
      * latter case, the Laplacian is applied to each component separately.
-     *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim>
     void
@@ -156,9 +151,6 @@ namespace LocalIntegrators
      *
      * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed with
      * compute_penalty().
-     *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim>
     void
@@ -175,8 +167,8 @@ namespace LocalIntegrators
 
       for (unsigned int k = 0; k < fe.n_quadrature_points; ++k)
         {
-          const double         dx = fe.JxW(k) * factor;
-          const Tensor<1, dim> n  = fe.normal_vector(k);
+          const double          dx = fe.JxW(k) * factor;
+          const Tensor<1, dim> &n  = fe.normal_vector(k);
           for (unsigned int i = 0; i < n_dofs; ++i)
             for (unsigned int j = 0; j < n_dofs; ++j)
               for (unsigned int d = 0; d < n_comp; ++d)
@@ -200,9 +192,6 @@ namespace LocalIntegrators
      *
      * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed with
      * compute_penalty().
-     *
-     * @author Guido Kanschat
-     * @date 2017
      */
     template <int dim>
     void
@@ -266,9 +255,6 @@ namespace LocalIntegrators
      * are given in the arguments <tt>input</tt> and <tt>Dinput</tt>,
      * respectively. <i>g</i> is the inhomogeneous boundary value in the
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
-     *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim>
     void
@@ -316,9 +302,6 @@ namespace LocalIntegrators
      * are given in the arguments <tt>input</tt> and <tt>Dinput</tt>,
      * respectively. <i>g</i> is the inhomogeneous boundary value in the
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
-     *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim>
     void
@@ -370,9 +353,6 @@ namespace LocalIntegrators
      * If <tt>factor2</tt> is missing or negative, the factor is assumed the
      * same on both sides. If factors differ, note that the penalty parameter
      * has to be computed accordingly.
-     *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim>
     void
@@ -402,8 +382,8 @@ namespace LocalIntegrators
 
       for (unsigned int k = 0; k < fe1.n_quadrature_points; ++k)
         {
-          const double         dx = fe1.JxW(k);
-          const Tensor<1, dim> n  = fe1.normal_vector(k);
+          const double          dx = fe1.JxW(k);
+          const Tensor<1, dim> &n  = fe1.normal_vector(k);
           for (unsigned int d = 0; d < fe1.get_fe().n_components(); ++d)
             {
               for (unsigned int i = 0; i < n_dofs; ++i)
@@ -446,9 +426,6 @@ namespace LocalIntegrators
      * @f]
      *
      * @warning This function is still under development!
-     *
-     * @author Bärbel Janssen, Guido Kanschat
-     * @date 2013, 2017
      */
     template <int dim>
     void
@@ -561,9 +538,6 @@ namespace LocalIntegrators
      * \int_F \Bigl( \gamma [u][v] - \{\nabla u\}[v\mathbf n] - [u\mathbf
      * n]\{\nabla v\} \Bigr) \; ds.
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2012
      */
     template <int dim>
     void
@@ -631,9 +605,6 @@ namespace LocalIntegrators
      * - \{\nabla \mathbf u\}[\mathbf v\otimes \mathbf n]
      * - [\mathbf u\otimes \mathbf n]\{\nabla \mathbf v\} \Bigr) \; ds.
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2012
      */
     template <int dim>
     void
@@ -708,9 +679,6 @@ namespace LocalIntegrators
      * <i>p<sub>i</sub></i> is the polynomial degree on cell
      * <i>Z<sub>i</sub></i> and <i>h<sub>i</sub></i> is the length of
      * <i>Z<sub>i</sub></i> orthogonal to the current face.
-     *
-     * @author Guido Kanschat
-     * @date 2010
      */
     template <int dim, int spacedim, typename number>
     double

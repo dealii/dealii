@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,12 +45,11 @@
 
 
 
-template <typename DoFHandlerType>
+template <int dim, int spacedim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim, spacedim> &dof_handler)
 {
-  Functions::CosineFunction<DoFHandlerType::dimension> test_func(
-    dof_handler.get_fe().n_components());
+  Functions::CosineFunction<dim> test_func(dof_handler.get_fe().n_components());
 
   AffineConstraints<double> cm;
 
@@ -64,7 +63,7 @@ check_this(const DoFHandlerType &dof_handler)
   deallog << cm.n_constraints() << std::endl;
   deallog << cm.max_constraint_indirections() << std::endl;
 
-  QGauss<DoFHandlerType::dimension> quadrature(6);
+  QGauss<dim> quadrature(6);
 
   Vector<double> unconstrained(dof_handler.n_dofs());
   Vector<double> constrained(dof_handler.n_dofs());

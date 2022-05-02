@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ namespace Step48
 
 
 
-  template <int dim, int fe_degree>
+  template <int dim>
   class SineGordonOperation
   {
   public:
@@ -83,8 +83,8 @@ namespace Step48
 
 
 
-  template <int dim, int fe_degree>
-  SineGordonOperation<dim, fe_degree>::SineGordonOperation(
+  template <int dim>
+  SineGordonOperation<dim>::SineGordonOperation(
     const MatrixFree<dim, double> &data_in,
     const double                   time_step)
     : data(data_in)
@@ -94,15 +94,15 @@ namespace Step48
 
     data.initialize_dof_vector(inv_mass_matrix);
 
-    FEEvaluation<dim, fe_degree> fe_eval(data);
-    const unsigned int           n_q_points = fe_eval.n_q_points;
+    FEEvaluation<dim, -1> fe_eval(data);
+    const unsigned int    n_q_points = fe_eval.n_q_points;
 
-    for (unsigned int cell = 0; cell < data.n_macro_cells(); ++cell)
+    for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
       {
         fe_eval.reinit(cell);
         for (unsigned int q = 0; q < n_q_points; ++q)
           fe_eval.submit_value(one, q);
-        fe_eval.integrate(true, false);
+        fe_eval.integrate(EvaluationFlags::values);
         fe_eval.distribute_local_to_global(inv_mass_matrix);
       }
 
@@ -117,16 +117,16 @@ namespace Step48
 
 
 
-  template <int dim, int fe_degree>
+  template <int dim>
   void
-  SineGordonOperation<dim, fe_degree>::local_apply(
+  SineGordonOperation<dim>::local_apply(
     const MatrixFree<dim> &                                          data,
     LinearAlgebra::distributed::Vector<double> &                     dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     AssertDimension(src.size(), 2);
-    FEEvaluation<dim, fe_degree> current(data), old(data);
+    FEEvaluation<dim, -1> current(data), old(data);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         current.reinit(cell);
@@ -135,8 +135,8 @@ namespace Step48
         current.read_dof_values(*src[0]);
         old.read_dof_values(*src[1]);
 
-        current.evaluate(true, true, false);
-        old.evaluate(true, false, false);
+        current.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
+        old.evaluate(EvaluationFlags::values);
 
         for (unsigned int q = 0; q < current.n_q_points; ++q)
           {
@@ -149,24 +149,21 @@ namespace Step48
             current.submit_gradient(-delta_t_sqr * current.get_gradient(q), q);
           }
 
-        current.integrate(true, true);
+        current.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
         current.distribute_local_to_global(dst);
       }
   }
 
 
 
-  template <int dim, int fe_degree>
+  template <int dim>
   void
-  SineGordonOperation<dim, fe_degree>::apply(
+  SineGordonOperation<dim>::apply(
     LinearAlgebra::distributed::Vector<double> &                     dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src) const
   {
     dst = 0;
-    data.cell_loop(&SineGordonOperation<dim, fe_degree>::local_apply,
-                   this,
-                   dst,
-                   src);
+    data.cell_loop(&SineGordonOperation<dim>::local_apply, this, dst, src);
     dst.scale(inv_mass_matrix);
   }
 
@@ -374,8 +371,7 @@ namespace Step48
     previous_solutions.push_back(&old_solution);
     previous_solutions.push_back(&old_old_solution);
 
-    SineGordonOperation<dim, fe_degree> sine_gordon_op(matrix_free_data,
-                                                       time_step);
+    SineGordonOperation<dim> sine_gordon_op(matrix_free_data, time_step);
 
     unsigned int timestep_number = 1;
 

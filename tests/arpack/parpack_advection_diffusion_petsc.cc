@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -20,7 +20,6 @@
  * We test that the computed vectors are eigenvectors and mass-normal, i.e.
  * a) (A*x_i-\lambda*B*x_i).L2() == 0
  * b) x_i*B*x_i = 1
- *
  */
 
 #include <deal.II/base/index_set.h>
@@ -57,9 +56,9 @@ const unsigned int dim = 2; // run in 2d to save time
 
 const double eps = 1e-10;
 
-template <typename DoFHandlerType>
+template <int dim>
 std::vector<dealii::IndexSet>
-locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
+locally_owned_dofs_per_subdomain(const DoFHandler<dim> &dof_handler)
 {
   std::vector<dealii::types::subdomain_id> subdomain_association(
     dof_handler.n_dofs());
@@ -103,7 +102,7 @@ locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
       index_sets[this_subdomain].add_range(i_min, subdomain_association.size());
     }
 
-  for (unsigned int i = 0; i < n_subdomains; i++)
+  for (unsigned int i = 0; i < n_subdomains; ++i)
     index_sets[i].compress();
 
   return index_sets;
@@ -208,7 +207,7 @@ test()
                                           /* keep constrained dofs */ true);
   std::vector<dealii::types::global_dof_index> n_locally_owned_dofs(
     n_mpi_processes);
-  for (unsigned int i = 0; i < n_mpi_processes; i++)
+  for (unsigned int i = 0; i < n_mpi_processes; ++i)
     n_locally_owned_dofs[i] = locally_owned_dofs_per_processor[i].n_elements();
 
   dealii::SparsityTools::distribute_sparsity_pattern(csp,
@@ -311,7 +310,7 @@ test()
   {
     std::vector<std::complex<double>> lambda(eigenfunctions.size());
 
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       eigenfunctions[i] = PetscScalar();
 
     dealii::SolverControl solver_control(dof_handler.n_dofs(),
@@ -357,7 +356,7 @@ test()
           }
       }
 
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       dealii::deallog << eigenvalues[i] << std::endl;
 
     // make sure that we have eigenvectors and they are mass-normal:

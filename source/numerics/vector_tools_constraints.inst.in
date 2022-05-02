@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,29 +35,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Mapping<deal_II_dimension> &mapping);
 
       template void
-      compute_nonzero_normal_flux_constraints(
-        const hp::DoFHandler<deal_II_dimension> &dof_handler,
-        const unsigned int                       first_vector_component,
-        const std::set<types::boundary_id> &     boundary_ids,
-        const std::map<types::boundary_id, const Function<deal_II_dimension> *>
-          &                               function_map,
-        AffineConstraints<double> &       constraints,
-        const Mapping<deal_II_dimension> &mapping);
-
-      template void
       compute_nonzero_tangential_flux_constraints(
         const DoFHandler<deal_II_dimension> &dof_handler,
         const unsigned int                   first_vector_component,
         const std::set<types::boundary_id> & boundary_ids,
-        const std::map<types::boundary_id, const Function<deal_II_dimension> *>
-          &                               function_map,
-        AffineConstraints<double> &       constraints,
-        const Mapping<deal_II_dimension> &mapping);
-      template void
-      compute_nonzero_tangential_flux_constraints(
-        const hp::DoFHandler<deal_II_dimension> &dof_handler,
-        const unsigned int                       first_vector_component,
-        const std::set<types::boundary_id> &     boundary_ids,
         const std::map<types::boundary_id, const Function<deal_II_dimension> *>
           &                               function_map,
         AffineConstraints<double> &       constraints,
@@ -72,28 +53,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Mapping<deal_II_dimension> &   mapping);
 
       template void
-      compute_no_normal_flux_constraints(
-        const hp::DoFHandler<deal_II_dimension> &dof_handler,
-        const unsigned int                       first_vector_component,
-        const std::set<types::boundary_id> &     boundary_ids,
-        AffineConstraints<double> &              constraints,
-        const Mapping<deal_II_dimension> &       mapping);
-
-      template void
       compute_normal_flux_constraints(
         const DoFHandler<deal_II_dimension> &dof_handler,
         const unsigned int                   first_vector_component,
         const std::set<types::boundary_id> & boundary_ids,
         AffineConstraints<double> &          constraints,
         const Mapping<deal_II_dimension> &   mapping);
-
-      template void
-      compute_normal_flux_constraints(
-        const hp::DoFHandler<deal_II_dimension> &dof_handler,
-        const unsigned int                       first_vector_component,
-        const std::set<types::boundary_id> &     boundary_ids,
-        AffineConstraints<double> &              constraints,
-        const Mapping<deal_II_dimension> &       mapping);
 #  endif
 #endif
     \}

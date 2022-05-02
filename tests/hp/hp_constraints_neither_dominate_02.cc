@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -41,7 +42,6 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -81,7 +81,7 @@ struct less_than_key
     const Point<dim> &p1        = pair1.first;
     const Point<dim> &p2        = pair2.first;
 
-    for (unsigned int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; ++d)
       {
         const bool is_equal = (std::abs(p1[d] - p2[d]) < precision);
         if (!is_equal)
@@ -108,7 +108,7 @@ test2cells(const FiniteElement<dim> &fe_0,
   Triangulation<dim> triangulation;
   {
     Point<dim> p1, p2;
-    for (unsigned int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; ++d)
       p2[d] = 1.0;
     p1[0] = -1.0;
     std::vector<unsigned int> repetitoins(dim, 1);
@@ -119,7 +119,7 @@ test2cells(const FiniteElement<dim> &fe_0,
                                               p2);
   }
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(fe_0);
@@ -127,7 +127,7 @@ test2cells(const FiniteElement<dim> &fe_0,
   fe_collection.push_back(fe_2);
   fe_collection.push_back(fe_common);
 
-  const QIterated<dim - 1> quad_formula(QTrapez<1>(), 2);
+  const QIterated<dim - 1> quad_formula(QTrapezoid<1>(), 2);
 
   hp::QCollection<dim - 1> q_face_collection;
   q_face_collection.push_back(quad_formula);
@@ -143,7 +143,7 @@ test2cells(const FiniteElement<dim> &fe_0,
   triangulation.begin_active()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -170,7 +170,7 @@ test2cells(const FiniteElement<dim> &fe_0,
   counter++;
   std::vector<Vector<double>> shape_functions;
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < dof_handler.n_dofs(); s++)
+  for (unsigned int s = 0; s < dof_handler.n_dofs(); ++s)
     {
       Vector<double> shape_function;
       shape_function.reinit(dof_handler.n_dofs());
@@ -192,21 +192,21 @@ test2cells(const FiniteElement<dim> &fe_0,
       shape_functions.push_back(shape_function);
     }
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
   Vector<float> fe_index(triangulation.n_active_cells());
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (unsigned int index = 0; cell != endc; ++cell, ++index)
     {
       fe_index[index] = cell->active_fe_index();
     }
   data_out.add_data_vector(fe_index, "fe_index");
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(0);
@@ -220,7 +220,7 @@ test2cells(const FiniteElement<dim> &fe_0,
 
   // fill some vector
   Vector<double> solution(dof_handler.n_dofs());
-  for (unsigned int dof = 0; dof < dof_handler.n_dofs(); dof++)
+  for (unsigned int dof = 0; dof < dof_handler.n_dofs(); ++dof)
     solution[dof] = 1.5 * (dof % 7) + 0.5 * dim + 2.0 * (dof % 3);
 
   constraints.distribute(solution);
@@ -235,7 +235,7 @@ test2cells(const FiniteElement<dim> &fe_0,
 
   std::vector<std::pair<Point<dim>, Vector<double>>> pairs_point_value;
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -258,18 +258,18 @@ test2cells(const FiniteElement<dim> &fe_0,
             const std::vector<dealii::Point<dim>> &q_points =
               fe_face_values.get_quadrature_points();
 
-            for (unsigned int q = 0; q < n_q_points; q++)
+            for (unsigned int q = 0; q < n_q_points; ++q)
               {
                 // since our face is [0,1]^{dim-1}, the quadrature rule
                 // will coincide with quadrature points on mother face.
                 // Use that to limit output of sub-faces at the same quadrature
                 // points only.
                 Point<dim - 1> qpt;
-                for (unsigned int d = 0; d < dim - 1; d++)
+                for (unsigned int d = 0; d < dim - 1; ++d)
                   qpt[d] = q_points[q][d + 1];
 
                 unsigned int q_found = 0;
-                for (; q_found < quad_formula.size(); q_found++)
+                for (; q_found < quad_formula.size(); ++q_found)
                   if (quad_formula.point(q_found).distance(qpt) < 1e-5)
                     break;
 
@@ -277,11 +277,11 @@ test2cells(const FiniteElement<dim> &fe_0,
                   {
                     pairs_point_value.push_back(
                       std::make_pair(q_points[q], values[q]));
-                    //                      deallog << "@"<<q_points[q]<<" u =
+                    //                      deallog << '@'<<q_points[q]<<" u =
                     //                      {"<<values[q][0]; for (unsigned int
                     //                      c = 1; c < n_comp; c++)
-                    //                        deallog << ","<<values[q][c];
-                    //                      deallog << "}"<<std::endl;
+                    //                        deallog << ','<<values[q][c];
+                    //                      deallog << '}'<<std::endl;
                   }
               }
           }
@@ -291,16 +291,16 @@ test2cells(const FiniteElement<dim> &fe_0,
   std::sort(pairs_point_value.begin(),
             pairs_point_value.end(),
             less_than_key<dim>());
-  for (unsigned int p = 0; p < pairs_point_value.size(); p++)
+  for (unsigned int p = 0; p < pairs_point_value.size(); ++p)
     {
       const Point<dim> &    pt  = pairs_point_value[p].first;
       const Vector<double> &val = pairs_point_value[p].second;
 
       Assert(val.size() == n_comp, ExcInternalError());
-      deallog << "@" << pt << " u = {" << val[0];
-      for (unsigned int c = 1; c < n_comp; c++)
-        deallog << "," << val[c];
-      deallog << "}" << std::endl;
+      deallog << '@' << pt << " u = {" << val[0];
+      for (unsigned int c = 1; c < n_comp; ++c)
+        deallog << ',' << val[c];
+      deallog << '}' << std::endl;
     }
 
   dof_handler.clear();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,9 +20,9 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/point.h>
-
-#include <boost/range/irange.hpp>
+#include <deal.II/base/std_cxx20/iota_view.h>
 
 #include <array>
 #include <cstdint>
@@ -68,7 +68,7 @@ namespace internal
         return {{Tensor<1, 1>{{-1}}, Tensor<1, 1>{{1}}}};
       }
 
-      static constexpr std::array<std::array<Tensor<1, 1>, 0>, 2>
+      static constexpr dealii::ndarray<Tensor<1, 1>, 2, 0>
       unit_tangential_vectors()
       {
         return {{{{}}, {{}}}};
@@ -86,7 +86,7 @@ namespace internal
         return {{0, 1}};
       }
 
-      static constexpr std::array<std::array<unsigned int, 1>, 2>
+      static constexpr dealii::ndarray<unsigned int, 2, 1>
       vertex_to_face()
       {
         return {{{{0}}, {{1}}}};
@@ -123,7 +123,7 @@ namespace internal
                  Tensor<1, 2>{{0., 1.}}}};
       }
 
-      static constexpr std::array<std::array<Tensor<1, 2>, 1>, 4>
+      static constexpr dealii::ndarray<Tensor<1, 2>, 4, 1>
       unit_tangential_vectors()
       {
         return {{{{Tensor<1, 2>{{0, -1}}}},
@@ -144,7 +144,7 @@ namespace internal
         return {{0, 2, 1, 3}};
       }
 
-      static constexpr std::array<std::array<unsigned int, 2>, 4>
+      static constexpr dealii::ndarray<unsigned int, 4, 2>
       vertex_to_face()
       {
         return {{{{0, 2}}, {{1, 2}}, {{0, 3}}, {{1, 3}}}};
@@ -183,7 +183,7 @@ namespace internal
                  Tensor<1, 3>{{0, 0, 1}}}};
       }
 
-      static constexpr std::array<std::array<Tensor<1, 3>, 2>, 6>
+      static constexpr dealii::ndarray<Tensor<1, 3>, 6, 2>
       unit_tangential_vectors()
       {
         return {{{{Tensor<1, 3>{{0, -1, 0}}, Tensor<1, 3>{{0, 0, 1}}}},
@@ -206,7 +206,7 @@ namespace internal
         return {{0, 4, 2, 6, 1, 5, 3, 7}};
       }
 
-      static constexpr std::array<std::array<unsigned int, 3>, 8>
+      static constexpr dealii::ndarray<unsigned int, 8, 3>
       vertex_to_face()
       {
         return {{{{0, 2, 4}},
@@ -269,7 +269,7 @@ namespace internal
                  Tensor<1, 4>{{0, 0, 0, 1}}}};
       }
 
-      static constexpr std::array<std::array<Tensor<1, 4>, 3>, 8>
+      static constexpr dealii::ndarray<Tensor<1, 4>, 8, 3>
       unit_tangential_vectors()
       {
         return {{{{Tensor<1, 4>{{0, -1, 0, 0}},
@@ -325,7 +325,7 @@ namespace internal
                  numbers::invalid_unsigned_int}};
       }
 
-      static constexpr std::array<std::array<unsigned int, 4>, 16>
+      static constexpr dealii::ndarray<unsigned int, 16, 4>
       vertex_to_face()
       {
         return {{{{numbers::invalid_unsigned_int,
@@ -413,8 +413,6 @@ namespace internal
  * Since the ability to identify such objects with the integral dimension of
  * the object represented, this class provides conversion operators to and
  * from unsigned integers.
- *
- * @author Wolfgang Bangerth, 2014
  */
 class GeometryPrimitive
 {
@@ -484,7 +482,6 @@ private:
  * <code>RefinementPossibilities@<3@></code>.
  *
  * @ingroup aniso
- * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
  */
 template <int dim>
 struct RefinementPossibilities
@@ -555,7 +552,6 @@ struct RefinementPossibilities
  * refinement in x-direction.
  *
  * @ingroup aniso
- * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
  */
 template <>
 struct RefinementPossibilities<1>
@@ -622,7 +618,6 @@ struct RefinementPossibilities<1>
  * refinement in both directions at the same time.
  *
  * @ingroup aniso
- * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
  */
 template <>
 struct RefinementPossibilities<2>
@@ -698,7 +693,6 @@ struct RefinementPossibilities<2>
  * these and isotropic refinement in all directions at the same time.
  *
  * @ingroup aniso
- * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
  */
 template <>
 struct RefinementPossibilities<3>
@@ -790,7 +784,6 @@ struct RefinementPossibilities<3>
  * more information.
  *
  * @ingroup aniso
- * @author Ralf Hartmann, 2005, Wolfgang Bangerth, 2007
  */
 template <int dim>
 class RefinementCase : public RefinementPossibilities<dim>
@@ -839,7 +832,8 @@ public:
    * Return the intersection of the refinement flags represented by the
    * current object and the one given as argument.
    */
-  RefinementCase operator&(const RefinementCase &r) const;
+  RefinementCase
+  operator&(const RefinementCase &r) const;
 
   /**
    * Return the negation of the refinement flags represented by the current
@@ -868,7 +862,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -913,7 +908,6 @@ namespace internal
    * <code>SubfacePossibilities@<3@></code>.
    *
    * @ingroup aniso
-   * @author Tobias Leicht 2007, Ralf Hartmann, 2008
    */
   template <int dim>
   struct SubfacePossibilities
@@ -943,7 +937,6 @@ namespace internal
    * For <code>dim=0</code> we provide a dummy implementation only.
    *
    * @ingroup aniso
-   * @author Ralf Hartmann, 2008
    */
   template <>
   struct SubfacePossibilities<0>
@@ -977,7 +970,6 @@ namespace internal
    * possibilities.
    *
    * @ingroup aniso
-   * @author Ralf Hartmann, 2008
    */
   template <>
   struct SubfacePossibilities<1>
@@ -1012,7 +1004,6 @@ namespace internal
    * (<code>case_x</code>) or not refined (<code>case_no</code>).
    *
    * @ingroup aniso
-   * @author Ralf Hartmann, 2008
    */
   template <>
   struct SubfacePossibilities<2>
@@ -1132,7 +1123,6 @@ namespace internal
    * @endcode
    *
    * @ingroup aniso
-   * @author Tobias Leicht 2007, Ralf Hartmann, 2008
    */
   template <>
   struct SubfacePossibilities<3>
@@ -1167,7 +1157,6 @@ namespace internal
    * dimension @p dim) might be subdivided into subfaces.
    *
    * @ingroup aniso
-   * @author Ralf Hartmann, 2008
    */
   template <int dim>
   class SubfaceCase : public SubfacePossibilities<dim>
@@ -1227,6 +1216,9 @@ struct GeometryInfo;
 
 
 /**
+ * This class provides a description of zero-dimensional cells. It has been
+ * superseded by the ReferenceCell class -- see there for more information.
+ *
  * Topological description of zero dimensional cells, i.e. points. This class
  * might not look too useful but often is if in a certain dimension we would
  * like to enquire information about objects with dimension one lower than the
@@ -1241,7 +1233,6 @@ struct GeometryInfo;
  * neighbors and so on, since it can be used dimension independently.
  *
  * @ingroup grid geomprimitives aniso
- * @author Wolfgang Bangerth, 1998
  */
 template <>
 struct GeometryInfo<0>
@@ -1323,6 +1314,57 @@ struct GeometryInfo<0>
   vertex_indices();
 
   /**
+   * Map face vertex number to cell vertex number, i.e. give the cell vertex
+   * number of the <tt>vertex</tt>th vertex of face <tt>face</tt>, e.g.
+   * <tt>GeometryInfo<2>::face_to_cell_vertices(3,0)=2</tt>, see the image
+   * under point N4 in the 2d section of this class's documentation.
+   *
+   * Through the <tt>face_orientation</tt>, <tt>face_flip</tt> and
+   * <tt>face_rotation</tt> arguments this function handles faces oriented in
+   * the standard and non-standard orientation. <tt>face_orientation</tt>
+   * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
+   * default to <tt>false</tt> (standard orientation). In 2d only
+   * <tt>face_flip</tt> is considered. See this
+   * @ref GlossFaceOrientation "glossary"
+   * article for more information.
+   *
+   * As the children of a cell are ordered according to the vertices of the
+   * cell, this call is passed down to the child_cell_on_face() function.
+   * Hence this function is simply a wrapper of child_cell_on_face() giving it
+   * a suggestive name.
+   *
+   * Of course, since this class is for the case `dim==0`, this function
+   * is not implemented.
+   */
+  static unsigned int
+  face_to_cell_vertices(const unsigned int face,
+                        const unsigned int vertex,
+                        const bool         face_orientation = true,
+                        const bool         face_flip        = false,
+                        const bool         face_rotation    = false);
+
+  /**
+   * Map face line number to cell line number, i.e. give the cell line number
+   * of the <tt>line</tt>th line of face <tt>face</tt>, e.g.
+   * <tt>GeometryInfo<3>::face_to_cell_lines(5,0)=4</tt>.
+   *
+   * Through the <tt>face_orientation</tt>, <tt>face_flip</tt> and
+   * <tt>face_rotation</tt> arguments this function handles faces oriented in
+   * the standard and non-standard orientation. <tt>face_orientation</tt>
+   * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
+   * default to <tt>false</tt> (standard orientation) and has no effect in 2d.
+   *
+   * Of course, since this class is for the case `dim==0`, this function
+   * is not implemented.
+   */
+  static unsigned int
+  face_to_cell_lines(const unsigned int face,
+                     const unsigned int line,
+                     const bool         face_orientation = true,
+                     const bool         face_flip        = false,
+                     const bool         face_rotation    = false);
+
+  /**
    * Number of vertices each face has. Since this is not useful in one
    * dimension, we provide a useless number (in the hope that a compiler may
    * warn when it sees constructs like <tt>for (i=0; i<vertices_per_face;
@@ -1396,6 +1438,9 @@ struct GeometryInfo<0>
  * This class provides dimension independent information to all topological
  * structures that make up the unit, or
  * @ref GlossReferenceCell "reference cell".
+ * This class has been
+ * superseded by the ReferenceCell class -- see there for more information.
+ *
  *
  * It is the one central point in the library where information about the
  * numbering of vertices, lines, or faces of the reference cell is collected.
@@ -1914,7 +1959,6 @@ struct GeometryInfo<0>
  * in the manual).
  *
  * @ingroup grid geomprimitives aniso
- * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005, Tobias Leicht, 2007
  */
 template <int dim>
 struct GeometryInfo
@@ -1946,8 +1990,10 @@ struct GeometryInfo
    * Here, we are looping over all faces of all cells, with `face_index`
    * taking on all valid indices for faces (zero and one in 1d, zero
    * through three in 2d, and zero through 5 in 3d).
+   *
+   * @see CPP11
    */
-  static boost::integer_range<unsigned int>
+  static std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   face_indices();
 
   /**
@@ -1977,8 +2023,10 @@ struct GeometryInfo
    * @endcode
    * Here, we are looping over all vertices of all cells, with `vertex_index`
    * taking on all valid indices.
+   *
+   * @see CPP11
    */
-  static boost::integer_range<unsigned int>
+  static std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   vertex_indices();
 
   /**
@@ -2076,7 +2124,7 @@ struct GeometryInfo
    * bounds the reference cell in <i>x</i> direction, the second in <i>y</i>
    * direction, and so on.
    */
-  static constexpr std::array<std::array<unsigned int, dim>, vertices_per_cell>
+  static constexpr ndarray<unsigned int, vertices_per_cell, dim>
     vertex_to_face =
       internal::GeometryInfoHelper::Initializers<dim>::vertex_to_face();
 
@@ -2310,6 +2358,45 @@ struct GeometryInfo
                              const bool         face_rotation    = false);
 
   /**
+   * Map the vertex index @p vertex of a line in standard orientation to one of a
+   * face with arbitrary @p line_orientation. The value of this flag default to
+   * <tt>true</tt>.
+   */
+  static unsigned int
+  standard_to_real_line_vertex(const unsigned int vertex,
+                               const bool         line_orientation = true);
+
+  /**
+   * Decompose the vertex index in a quad into a pair of a line index and a
+   * vertex index within this line.
+   *
+   * @note Which line is selected is not of importance (and not exposed on
+   *   purpose).
+   */
+  static std::array<unsigned int, 2>
+  standard_quad_vertex_to_line_vertex_index(const unsigned int vertex);
+
+  /**
+   * Decompose the vertex index in a hex into a pair of a quad index and a
+   * vertex index within this quad.
+   *
+   * @note Which quad is selected is not of importance (and not exposed on
+   *   purpose).
+   */
+  static std::array<unsigned int, 2>
+  standard_hex_vertex_to_quad_vertex_index(const unsigned int vertex);
+
+  /**
+   * Decompose the line index in a hex into a pair of a quad index and a line
+   * index within this quad.
+   *
+   * @note Which quad is selected is not of importance (and not exposed on
+   *   purpose).
+   */
+  static std::array<unsigned int, 2>
+  standard_hex_line_to_quad_line_index(const unsigned int line);
+
+  /**
    * Map the line index @p line of a face with arbitrary @p face_orientation,
    * @p face_flip and @p face_rotation to a face in standard orientation. The
    * values of these three flags default to <tt>true</tt>, <tt>false</tt> and
@@ -2393,8 +2480,9 @@ struct GeometryInfo
    * Projects a given point onto the unit cell, i.e. each coordinate outside
    * [0..1] is modified to lie within that interval.
    */
-  static Point<dim>
-  project_to_unit_cell(const Point<dim> &p);
+  template <typename Number = double>
+  static Point<dim, Number>
+  project_to_unit_cell(const Point<dim, Number> &p);
 
   /**
    * Return the infinity norm of the vector between a given point @p p
@@ -2472,7 +2560,7 @@ struct GeometryInfo
   template <int spacedim>
   static void
   alternating_form_at_vertices
-#ifndef DEAL_II_CONSTEXPR_BUG
+#ifndef DEAL_II_CXX14_CONSTEXPR_BUG
     (const Point<spacedim> (&vertices)[vertices_per_cell],
      Tensor<spacedim - dim, spacedim> (&forms)[vertices_per_cell]);
 #else
@@ -2538,8 +2626,7 @@ struct GeometryInfo
    * @ref GlossFaceOrientation "glossary"
    * entry on face orientation.
    */
-  static constexpr std::array<std::array<Tensor<1, dim>, dim - 1>,
-                              faces_per_cell>
+  static constexpr ndarray<Tensor<1, dim>, faces_per_cell, dim - 1>
     unit_tangential_vectors = internal::GeometryInfoHelper::Initializers<
       dim>::unit_tangential_vectors();
 
@@ -2740,8 +2827,8 @@ RefinementCase<dim>::operator|(const RefinementCase<dim> &r) const
 
 
 template <int dim>
-inline RefinementCase<dim> RefinementCase<dim>::
-                           operator&(const RefinementCase<dim> &r) const
+inline RefinementCase<dim>
+RefinementCase<dim>::operator&(const RefinementCase<dim> &r) const
 {
   return RefinementCase<dim>(static_cast<std::uint8_t>(value & r.value));
 }
@@ -2833,19 +2920,19 @@ GeometryInfo<0>::vertex_indices()
 
 
 template <int dim>
-inline boost::integer_range<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 GeometryInfo<dim>::face_indices()
 {
-  return boost::irange(0U, faces_per_cell);
+  return {0U, faces_per_cell};
 }
 
 
 
 template <int dim>
-inline boost::integer_range<unsigned int>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 GeometryInfo<dim>::vertex_indices()
 {
-  return boost::irange(0U, vertices_per_cell);
+  return {0U, vertices_per_cell};
 }
 
 
@@ -2856,7 +2943,7 @@ GeometryInfo<dim>::unit_cell_vertex(const unsigned int)
 {
   Assert(false, ExcNotImplemented());
 
-  return Point<dim>();
+  return {};
 }
 
 
@@ -3042,7 +3129,7 @@ GeometryInfo<dim>::cell_to_child_coordinates(
 
 {
   Assert(false, ExcNotImplemented());
-  return Point<dim>();
+  return {};
 }
 
 
@@ -3178,7 +3265,7 @@ GeometryInfo<dim>::child_to_cell_coordinates(
   const RefinementCase<dim> /*refine_case*/)
 {
   Assert(false, ExcNotImplemented());
-  return Point<dim>();
+  return {};
 }
 
 
@@ -3792,8 +3879,8 @@ GeometryInfo<2>::min_cell_refinement_case_for_face_refinement(
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
   if (face_refinement_case == RefinementCase<dim>::cut_x)
-    return (face_no / 2) ? RefinementCase<dim>::cut_x :
-                           RefinementCase<dim>::cut_y;
+    return (face_no / 2) != 0u ? RefinementCase<dim>::cut_x :
+                                 RefinementCase<dim>::cut_y;
   else
     return RefinementCase<dim>::no_refinement;
 }
@@ -3888,7 +3975,8 @@ GeometryInfo<2>::min_cell_refinement_case_for_line_refinement(
   (void)dim;
   AssertIndexRange(line_no, GeometryInfo<dim>::lines_per_cell);
 
-  return (line_no / 2) ? RefinementCase<2>::cut_x : RefinementCase<2>::cut_y;
+  return (line_no / 2) != 0u ? RefinementCase<2>::cut_x :
+                               RefinementCase<2>::cut_y;
 }
 
 
@@ -4044,6 +4132,117 @@ GeometryInfo<dim>::standard_to_real_face_line(const unsigned int line,
 {
   Assert(false, ExcNotImplemented());
   return line;
+}
+
+
+
+template <>
+inline unsigned int
+GeometryInfo<2>::standard_to_real_line_vertex(const unsigned int vertex,
+                                              const bool line_orientation)
+{
+  return line_orientation ? vertex : (1 - vertex);
+}
+
+
+
+template <int dim>
+inline unsigned int
+GeometryInfo<dim>::standard_to_real_line_vertex(const unsigned int vertex,
+                                                const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return vertex;
+}
+
+
+
+template <>
+inline std::array<unsigned int, 2>
+GeometryInfo<2>::standard_quad_vertex_to_line_vertex_index(
+  const unsigned int vertex)
+{
+  return {{vertex % 2, vertex / 2}};
+}
+
+
+
+template <int dim>
+inline std::array<unsigned int, 2>
+GeometryInfo<dim>::standard_quad_vertex_to_line_vertex_index(
+  const unsigned int vertex)
+{
+  Assert(false, ExcNotImplemented());
+  (void)vertex;
+  return {{0, 0}};
+}
+
+
+
+template <>
+inline std::array<unsigned int, 2>
+GeometryInfo<3>::standard_hex_line_to_quad_line_index(const unsigned int i)
+{
+  // set up a table that for each
+  // line describes a) from which
+  // quad to take it, b) which line
+  // therein it is if the face is
+  // oriented correctly
+  static const unsigned int lookup_table[GeometryInfo<3>::lines_per_cell][2] = {
+    {4, 0}, // take first four lines from bottom face
+    {4, 1},
+    {4, 2},
+    {4, 3},
+
+    {5, 0}, // second four lines from top face
+    {5, 1},
+    {5, 2},
+    {5, 3},
+
+    {0, 0}, // the rest randomly
+    {1, 0},
+    {0, 1},
+    {1, 1}};
+
+  return {{lookup_table[i][0], lookup_table[i][1]}};
+}
+
+
+
+template <int dim>
+inline std::array<unsigned int, 2>
+GeometryInfo<dim>::standard_hex_line_to_quad_line_index(const unsigned int line)
+{
+  Assert(false, ExcNotImplemented());
+  (void)line;
+  return {{0, 0}};
+}
+
+
+
+template <>
+inline std::array<unsigned int, 2>
+GeometryInfo<3>::standard_hex_vertex_to_quad_vertex_index(
+  const unsigned int vertex)
+{
+  // get the corner indices by asking either the bottom or the top face for its
+  // vertices. handle non-standard faces by calling the vertex reordering
+  // function from GeometryInfo
+
+  // bottom face (4) for first four vertices, top face (5) for the rest
+  return {{4 + vertex / 4, vertex % 4}};
+}
+
+
+
+template <int dim>
+inline std::array<unsigned int, 2>
+GeometryInfo<dim>::standard_hex_vertex_to_quad_vertex_index(
+  const unsigned int vertex)
+{
+  Assert(false, ExcNotImplemented());
+  (void)vertex;
+  return {{0, 0}};
 }
 
 
@@ -4454,6 +4653,19 @@ GeometryInfo<3>::face_to_cell_lines(const unsigned int face,
 
 
 
+inline unsigned int
+GeometryInfo<0>::face_to_cell_lines(const unsigned int,
+                                    const unsigned int,
+                                    const bool,
+                                    const bool,
+                                    const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
 template <int dim>
 inline unsigned int
 GeometryInfo<dim>::face_to_cell_lines(const unsigned int,
@@ -4486,16 +4698,27 @@ GeometryInfo<dim>::face_to_cell_vertices(const unsigned int face,
 
 
 
-template <int dim>
-inline Point<dim>
-GeometryInfo<dim>::project_to_unit_cell(const Point<dim> &q)
+inline unsigned int
+GeometryInfo<0>::face_to_cell_vertices(const unsigned int,
+                                       const unsigned int,
+                                       const bool,
+                                       const bool,
+                                       const bool)
 {
-  Point<dim> p = q;
-  for (unsigned int i = 0; i < dim; i++)
-    if (p[i] < 0.)
-      p[i] = 0.;
-    else if (p[i] > 1.)
-      p[i] = 1.;
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int dim>
+template <typename Number>
+inline Point<dim, Number>
+GeometryInfo<dim>::project_to_unit_cell(const Point<dim, Number> &q)
+{
+  Point<dim, Number> p;
+  for (unsigned int i = 0; i < dim; ++i)
+    p[i] = std::min(std::max(q[i], Number(0.)), Number(1.));
 
   return p;
 }
@@ -4508,11 +4731,11 @@ GeometryInfo<dim>::distance_to_unit_cell(const Point<dim> &p)
 {
   double result = 0.0;
 
-  for (unsigned int i = 0; i < dim; i++)
-    if ((-p[i]) > result)
-      result = -p[i];
-    else if ((p[i] - 1.) > result)
-      result = (p[i] - 1.);
+  for (unsigned int i = 0; i < dim; ++i)
+    {
+      result = std::max(result, -p[i]);
+      result = std::max(result, p[i] - 1.);
+    }
 
   return result;
 }
@@ -4741,7 +4964,7 @@ template <int dim>
 template <int spacedim>
 inline void
 GeometryInfo<dim>::alternating_form_at_vertices
-#  ifndef DEAL_II_CONSTEXPR_BUG
+#  ifndef DEAL_II_CXX14_CONSTEXPR_BUG
   (const Point<spacedim> (&vertices)[vertices_per_cell],
    Tensor<spacedim - dim, spacedim> (&forms)[vertices_per_cell])
 #  else

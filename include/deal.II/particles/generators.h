@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,13 @@ namespace Particles
       const std::vector<Point<dim>> &     particle_reference_locations,
       ParticleHandler<dim, spacedim> &    particle_handler,
       const Mapping<dim, spacedim> &      mapping =
-        StaticMappingQ1<dim, spacedim>::mapping);
+        (ReferenceCells::get_hypercube<dim>()
+#ifndef _MSC_VER
+           .template get_default_linear_mapping<dim, spacedim>()
+#else
+           .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+           ));
 
     /**
      * A function that generates one particle at a random location in cell @p cell and with
@@ -107,7 +113,35 @@ namespace Particles
       const types::particle_index                                        id,
       std::mt19937 &                random_number_generator,
       const Mapping<dim, spacedim> &mapping =
-        StaticMappingQ1<dim, spacedim>::mapping);
+        (ReferenceCells::get_hypercube<dim>()
+#ifndef _MSC_VER
+           .template get_default_linear_mapping<dim, spacedim>()
+#else
+           .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+           ));
+
+    /**
+     * A function that generates one particle at a random location in cell @p cell and with
+     * index @p id. This version of the function above immediately inserts the generated
+     * particle into the @p particle_handler and returns a iterator to it instead of
+     * a particle object. This avoids unnecessary copies of the particle.
+     */
+    template <int dim, int spacedim = dim>
+    ParticleIterator<dim, spacedim>
+    random_particle_in_cell_insert(
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+      const types::particle_index                                        id,
+      std::mt19937 &                  random_number_generator,
+      ParticleHandler<dim, spacedim> &particle_handler,
+      const Mapping<dim, spacedim> &  mapping =
+        (ReferenceCells::get_hypercube<dim>()
+#ifndef _MSC_VER
+           .template get_default_linear_mapping<dim, spacedim>()
+#else
+           .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+#endif
+           ));
 
     /**
      * A function that generates particles randomly in the domain with a
@@ -162,7 +196,12 @@ namespace Particles
       const types::particle_index         n_particles_to_create,
       ParticleHandler<dim, spacedim> &    particle_handler,
       const Mapping<dim, spacedim> &      mapping =
-        StaticMappingQ1<dim, spacedim>::mapping,
+        (ReferenceCells::get_hypercube<dim>()
+#ifndef _MSC_VER
+           .template get_default_linear_mapping<dim, spacedim>()),
+#else
+           .ReferenceCell::get_default_linear_mapping<dim, spacedim>()),
+#endif
       const unsigned int random_number_seed = 5432);
 
 
@@ -175,6 +214,8 @@ namespace Particles
      * triangulation and whose components are within the ComponentMask.
      * This function uses insert_global_particles and consequently may induce
      * considerable mpi communication overhead.
+     *
+     * This function is used in step-70.
      *
      * @param[in] dof_handler A DOF handler that may live on another
      * triangulation that is used to establsh the positions of the particles.
@@ -195,17 +236,25 @@ namespace Particles
      * @param[in] components Component mask that decides which subset of the
      * support points of the dof_handler are used to generate the particles.
      *
-     * @author Bruno Blais, Luca Heltai, 2019
+     * @param[in] properties An optional vector of vector of properties
+     * for each particle to be inserted.
      */
     template <int dim, int spacedim = dim>
     void
-    dof_support_points(const DoFHandler<dim, spacedim> &dof_handler,
-                       const std::vector<std::vector<BoundingBox<spacedim>>>
-                         &                             global_bounding_boxes,
-                       ParticleHandler<dim, spacedim> &particle_handler,
-                       const Mapping<dim, spacedim> &  mapping =
-                         StaticMappingQ1<dim, spacedim>::mapping,
-                       const ComponentMask &components = ComponentMask());
+    dof_support_points(
+      const DoFHandler<dim, spacedim> &dof_handler,
+      const std::vector<std::vector<BoundingBox<spacedim>>>
+        &                             global_bounding_boxes,
+      ParticleHandler<dim, spacedim> &particle_handler,
+      const Mapping<dim, spacedim> &  mapping =
+        (ReferenceCells::get_hypercube<dim>()
+#ifndef _MSC_VER
+           .template get_default_linear_mapping<dim, spacedim>()),
+#else
+           .ReferenceCell::get_default_linear_mapping<dim, spacedim>()),
+#endif
+      const ComponentMask &                   components = ComponentMask(),
+      const std::vector<std::vector<double>> &properties = {});
 
     /**
      * A function that generates particles at the locations of the quadrature
@@ -235,17 +284,21 @@ namespace Particles
      * the quadrature locations. If no mapping is provided a MappingQ1 is
      * assumed.
      *
-     * @author Bruno Blais, Luca Heltai, 2019
+     * @param[in] properties An optional vector of vector of properties
+     * for each particle to be inserted.
      */
     template <int dim, int spacedim = dim>
     void
-    quadrature_points(const Triangulation<dim, spacedim> &triangulation,
-                      const Quadrature<dim> &             quadrature,
-                      const std::vector<std::vector<BoundingBox<spacedim>>>
-                        &                             global_bounding_boxes,
-                      ParticleHandler<dim, spacedim> &particle_handler,
-                      const Mapping<dim, spacedim> &  mapping =
-                        StaticMappingQ1<dim, spacedim>::mapping);
+    quadrature_points(
+      const Triangulation<dim, spacedim> &triangulation,
+      const Quadrature<dim> &             quadrature,
+      const std::vector<std::vector<BoundingBox<spacedim>>>
+        &                             global_bounding_boxes,
+      ParticleHandler<dim, spacedim> &particle_handler,
+      const Mapping<dim, spacedim> &  mapping =
+        (ReferenceCells::get_hypercube<dim>()
+           .template get_default_linear_mapping<dim, spacedim>()),
+      const std::vector<std::vector<double>> &properties = {});
   } // namespace Generators
 } // namespace Particles
 

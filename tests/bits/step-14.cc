@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,6 @@
 
 
 // a un-hp-ified version of hp/step-14
-
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -182,13 +177,13 @@ namespace Evaluation
 
   template <int dim>
   void
-  PointXDerivativeEvaluation<dim>::
-  operator()(const DoFHandler<dim> &dof_handler,
-             const Vector<double> & solution) const
+  PointXDerivativeEvaluation<dim>::operator()(
+    const DoFHandler<dim> &dof_handler,
+    const Vector<double> & solution) const
   {
     double point_derivative = 0;
 
-    QTrapez<dim>                vertex_quadrature;
+    QTrapezoid<dim>             vertex_quadrature;
     FEValues<dim>               fe_values(dof_handler.get_fe(),
                             vertex_quadrature,
                             update_gradients | update_quadrature_points);
@@ -253,7 +248,7 @@ namespace Evaluation
                               const Vector<double> & /*solution*/) const
   {
     std::ostringstream filename;
-    filename << output_name_base << "-" << this->refinement_cycle << ".eps"
+    filename << output_name_base << '-' << this->refinement_cycle << ".eps"
              << std::ends;
 
     GridOut().write_eps(dof_handler.get_triangulation(),
@@ -434,7 +429,7 @@ namespace LaplaceSolver
   void
   Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
   {
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
     const unsigned int n_threads = MultithreadInfo::n_threads();
     std::vector<std::pair<active_cell_iterator, active_cell_iterator>>
@@ -1020,7 +1015,7 @@ namespace Data
   template <int dim>
   struct Exercise_2_3
   {
-    typedef Functions::ZeroFunction<dim> BoundaryValues;
+    using BoundaryValues = Functions::ZeroFunction<dim>;
 
     class RightHandSide : public Functions::ConstantFunction<dim>
     {
@@ -1036,7 +1031,8 @@ namespace Data
 
 
   template <>
-  void Exercise_2_3<2>::create_coarse_grid(Triangulation<2> &coarse_grid)
+  void
+  Exercise_2_3<2>::create_coarse_grid(Triangulation<2> &coarse_grid)
   {
     const unsigned int dim = 2;
 
@@ -1359,10 +1355,10 @@ namespace LaplaceSolver
     void
     solve_dual_problem();
 
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
-    typedef typename std::map<typename DoFHandler<dim>::face_iterator, double>
-      FaceIntegrals;
+    using FaceIntegrals =
+      typename std::map<typename DoFHandler<dim>::face_iterator, double>;
 
     struct CellData
     {
@@ -1691,8 +1687,7 @@ namespace LaplaceSolver
     for (unsigned int t = 0;
          (t < this_thread) && (cell != dual_solver.dof_handler.end());
          ++t, ++cell)
-      {
-      }
+      {}
 
 
     if (cell == dual_solver.dof_handler.end())
@@ -1744,8 +1739,7 @@ namespace LaplaceSolver
         for (unsigned int t = 0;
              ((t < n_threads) && (cell != dual_solver.dof_handler.end()));
              ++t, ++cell, ++cell_index)
-          {
-          }
+          {}
 
         if (cell == dual_solver.dof_handler.end())
           break;
@@ -1906,8 +1900,8 @@ template <int dim>
 struct Framework
 {
 public:
-  typedef Evaluation::EvaluationBase<dim> Evaluator;
-  typedef std::list<Evaluator *>          EvaluatorList;
+  using Evaluator     = Evaluation::EvaluationBase<dim>;
+  using EvaluatorList = std::list<Evaluator *>;
 
 
   struct ProblemDescription
@@ -2060,6 +2054,7 @@ Framework<dim>::run(const ProblemDescription &descriptor)
 int
 main()
 {
+  std::ofstream logfile("output");
   try
     {
       deallog << std::setprecision(2);

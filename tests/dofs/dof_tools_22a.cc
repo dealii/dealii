@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 //
 // This test was written by Sam Cox.
 
-// Tests the behaviour of DoFTools::make_flux_sparsity_pattern (DoFHandler,
+// Tests the behavior of DoFTools::make_flux_sparsity_pattern (DoFHandler,
 //                          SparsityPattern, AffineConstraints<double>, bool,
 //                          coupling, flux_coupling, subdomain_id)
 

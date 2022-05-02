@@ -1,4 +1,0 @@
-New: MappingFEField can now also be initialized on multigrid levels by handing
-in an appropriately sized vector of position vectors for the levels.
-<br>
-(Martin Kronbichler, Johannes Heinz, 2019/07/22)

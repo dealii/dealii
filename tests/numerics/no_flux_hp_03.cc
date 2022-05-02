@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,8 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -24,7 +26,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -40,7 +41,7 @@ template <int dim>
 void
 test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
 {
-  hp::DoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   deallog << "FE=" << fe[0].get_name() << std::endl;
@@ -71,7 +72,7 @@ test_hyper_sphere()
   for (unsigned int degree = 1; degree < 4; ++degree)
     {
       hp::FECollection<dim> fe(
-        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), degree)), dim));
+        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), degree)), dim));
       test(tr, fe);
     }
 }

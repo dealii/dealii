@@ -1,7 +1,0 @@
-Changed: Various classes implementing tensor polynomials had a
-function `compute()`. This function has been renamed to `evaluate()`
-since this name more adequately represents the fact that the function
-does not in fact compute the polynomial, but only evaluates it for a
-given value of the unknown variable.
-<br>
-(Wolfgang Bangerth, 2019/08/21)

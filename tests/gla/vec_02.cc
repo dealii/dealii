@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,9 +70,9 @@ test()
   // check local values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      deallog << myid * 2 << ":" << get_real_assert_zero_imag(v(myid * 2))
+      deallog << myid * 2 << ':' << get_real_assert_zero_imag(v(myid * 2))
               << std::endl;
-      deallog << myid * 2 + 1 << ":"
+      deallog << myid * 2 + 1 << ':'
               << get_real_assert_zero_imag(v(myid * 2 + 1)) << std::endl;
     }
 

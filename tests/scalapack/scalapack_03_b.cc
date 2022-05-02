@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,8 +64,8 @@ test(const unsigned int size, const unsigned int block_size)
   ScaLAPACKMatrix<NumberType> scalapack_matrix(
     size, grid, block_size, LAPACKSupport::Property::general);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
-        << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << ' ' << block_size << ' ' << grid->get_process_grid_rows()
+        << ' ' << grid->get_process_grid_columns() << std::endl;
 
   // add a skew-symmetric matrix to the s.p.d matrix
   // the positive definiteness is inherited from the symmetric part

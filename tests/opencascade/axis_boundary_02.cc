@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,13 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-// Test the class DirectionalProjectionBoundary
+// Test the class DirectionalProjectionManifold
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/manifold_lib.h>
 #include <deal.II/opencascade/utilities.h>
 
 #include <BRepFill.hxx>
@@ -53,7 +53,7 @@ main()
 
   TopoDS_Face face = BRepFill::Face(edge1, edge2);
 
-  DirectionalProjectionBoundary<2, 3> manifold(face, Point<3>(0, 0, 1));
+  DirectionalProjectionManifold<2, 3> manifold(face, Point<3>(0, 0, 1));
 
   Triangulation<2, 3> tria;
   GridGenerator::hyper_cube(tria);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,7 @@
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_dgp_monomial.h>
+#include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
@@ -964,9 +964,9 @@ namespace Step44
     , degree(parameters.poly_degree)
     , fe(FE_Q<dim>(parameters.poly_degree),
          dim, // displacement
-         FE_DGPMonomial<dim>(parameters.poly_degree - 1),
+         FE_DGP<dim>(parameters.poly_degree - 1),
          1, // pressure
-         FE_DGPMonomial<dim>(parameters.poly_degree - 1),
+         FE_DGP<dim>(parameters.poly_degree - 1),
          1)
     , // dilatation
     dof_handler_ref(triangulation)
@@ -1426,7 +1426,8 @@ namespace Step44
       scratch.solution_total, scratch.solution_values_p_total);
     scratch.fe_values_ref[J_fe].get_function_values(
       scratch.solution_total, scratch.solution_values_J_total);
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       lqph[q_point]->update_values(scratch.solution_grads_u_total[q_point],
                                    scratch.solution_values_p_total[q_point],
                                    scratch.solution_values_J_total[q_point]);
@@ -1437,7 +1438,7 @@ namespace Step44
   {
     pcout << std::endl
           << "Timestep " << time.get_timestep() << " @ " << time.current()
-          << "s" << std::endl;
+          << 's' << std::endl;
     BlockVector<double> newton_update(dofs_per_block);
     error_residual.reset();
     error_residual_0.reset();
@@ -1449,7 +1450,7 @@ namespace Step44
     unsigned int newton_iteration = 0;
     for (; newton_iteration < parameters.max_iterations_NR; ++newton_iteration)
       {
-        pcout << " " << std::setw(2) << newton_iteration << " " << std::flush;
+        pcout << ' ' << std::setw(2) << newton_iteration << ' ' << std::flush;
         tangent_matrix = 0.0;
         system_rhs     = 0.0;
         assemble_system_rhs();
@@ -1494,14 +1495,14 @@ namespace Step44
   {
     static const unsigned int l_width = 155;
     for (unsigned int i = 0; i < l_width; ++i)
-      pcout << "_";
+      pcout << '_';
     pcout << std::endl;
     pcout << "                 SOLVER STEP                  "
           << " |  LIN_IT   LIN_RES    RES_NORM    "
           << " RES_U     RES_P      RES_J     NU_NORM     "
           << " NU_U       NU_P       NU_J " << std::endl;
     for (unsigned int i = 0; i < l_width; ++i)
-      pcout << "_";
+      pcout << '_';
     pcout << std::endl;
   }
   template <int dim>
@@ -1510,7 +1511,7 @@ namespace Step44
   {
     static const unsigned int l_width = 155;
     for (unsigned int i = 0; i < l_width; ++i)
-      pcout << "_";
+      pcout << '_';
     pcout << std::endl;
     const std::pair<double, double> error_dil = get_error_dilation();
     pcout << "Relative errors:" << std::endl
@@ -1535,7 +1536,8 @@ namespace Step44
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
         Assert(lqph.size() == n_q_points, ExcInternalError());
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const unsigned int q_point :
+             fe_values_ref.quadrature_point_indices())
           {
             const double det_F_qp = lqph[q_point]->get_det_F();
             const double JxW      = fe_values_ref.JxW(q_point);
@@ -1560,7 +1562,8 @@ namespace Step44
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
         Assert(lqph.size() == n_q_points, ExcInternalError());
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const unsigned int q_point :
+             fe_values_ref.quadrature_point_indices())
           {
             const double det_F_qp   = lqph[q_point]->get_det_F();
             const double J_tilde_qp = lqph[q_point]->get_J_tilde();
@@ -1658,10 +1661,11 @@ namespace Step44
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
     Assert(lqph.size() == n_q_points, ExcInternalError());
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
-        for (unsigned int k = 0; k < dofs_per_cell; ++k)
+        for (const unsigned int k : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int k_group = fe.system_to_base_index(k).first.first;
             if (k_group == u_dof)
@@ -1681,7 +1685,8 @@ namespace Step44
               Assert(k_group <= J_dof, ExcInternalError());
           }
       }
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim>          tau = lqph[q_point]->get_tau();
         const SymmetricTensor<4, dim> Jc  = lqph[q_point]->get_Jc();
@@ -1692,12 +1697,13 @@ namespace Step44
           scratch.symm_grad_Nx[q_point];
         const std::vector<Tensor<2, dim>> &grad_Nx = scratch.grad_Nx[q_point];
         const double JxW = scratch.fe_values_ref.JxW(q_point);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
             const unsigned int i_group = fe.system_to_base_index(i).first.first;
-            for (unsigned int j = 0; j <= i; ++j)
+            for (const unsigned int j :
+                 scratch.fe_values_ref.dof_indices_ending_at(i))
               {
                 const unsigned int component_j =
                   fe.system_to_component_index(j).first;
@@ -1731,8 +1737,9 @@ namespace Step44
               }
           }
       }
-    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-      for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
+    for (const unsigned int i : scratch.fe_values_ref.dof_indices())
+      for (const unsigned int j :
+           scratch.fe_values_ref.dof_indices_starting_at(i + 1))
         data.cell_matrix(i, j) = data.cell_matrix(j, i);
   }
   template <int dim>
@@ -1783,7 +1790,8 @@ namespace Step44
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
     Assert(lqph.size() == n_q_points, ExcInternalError());
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
         for (unsigned int k = 0; k < dofs_per_cell; ++k)
@@ -1802,7 +1810,8 @@ namespace Step44
               Assert(k_group <= J_dof, ExcInternalError());
           }
       }
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values_ref.quadrature_point_indices())
       {
         const SymmetricTensor<2, dim> tau     = lqph[q_point]->get_tau();
         const double                  det_F   = lqph[q_point]->get_det_F();
@@ -1813,7 +1822,7 @@ namespace Step44
         const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
           scratch.symm_grad_Nx[q_point];
         const double JxW = scratch.fe_values_ref.JxW(q_point);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : scratch.fe_values_ref.dof_indices())
           {
             const unsigned int i_group = fe.system_to_base_index(i).first.first;
             if (i_group == u_dof)
@@ -1831,8 +1840,8 @@ namespace Step44
           cell->face(face)->boundary_id() == 6)
         {
           scratch.fe_face_values_ref.reinit(cell, face);
-          for (unsigned int f_q_point = 0; f_q_point < n_q_points_f;
-               ++f_q_point)
+          for (const unsigned int f_q_point :
+               scratch.fe_face_values_ref.quadrature_point_indices())
             {
               const Tensor<1, dim> &N =
                 scratch.fe_face_values_ref.normal_vector(f_q_point);
@@ -1841,7 +1850,7 @@ namespace Step44
               const double         time_ramp = (time.current() / time.end());
               const double         pressure  = p0 * parameters.p_p0 * time_ramp;
               const Tensor<1, dim> traction  = pressure * N;
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              for (const unsigned int i : scratch.fe_values_ref.dof_indices())
                 {
                   const unsigned int i_group =
                     fe.system_to_base_index(i).first.first;

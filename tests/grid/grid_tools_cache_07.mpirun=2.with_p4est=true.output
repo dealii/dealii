@@ -1,0 +1,9 @@
+
+DEAL:0::Query point: 0.840188 0.394383
+DEAL:0::Processor 1 may own the point 0.840188 0.394383: it is within 0.316342 0.283171; 0.923880 0.923880
+DEAL:0::Processor 1 may own the point 0.840188 0.394383: it is within 0.372129 -1.11022e-16; 1.00000 0.417474
+
+DEAL:1::Query point: 0.840188 0.394383
+DEAL:1::Processor 1 may own the point 0.840188 0.394383: it is within 0.316342 0.283171; 0.923880 0.923880
+DEAL:1::Processor 1 may own the point 0.840188 0.394383: it is within 0.372129 -1.11022e-16; 1.00000 0.417474
+

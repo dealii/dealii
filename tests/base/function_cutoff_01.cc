@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,8 @@
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -106,7 +108,7 @@ test()
 int
 main()
 {
-  initlog(1);
+  initlog(true);
 
   test<1, Functions::CutOffFunctionLinfty>();
   test<2, Functions::CutOffFunctionLinfty>();

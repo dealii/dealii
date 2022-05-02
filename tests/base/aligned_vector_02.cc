@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,17 +21,17 @@
 #include "../tests.h"
 
 
-typedef AlignedVector<unsigned int> VEC;
-typedef AlignedVector<VEC>          VECVEC;
+using VEC    = AlignedVector<unsigned int>;
+using VECVEC = AlignedVector<VEC>;
 void
 print_vec(VECVEC &v)
 {
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      deallog << "[";
+      deallog << '[';
       for (unsigned int j = 0; j < v[i].size(); ++j)
-        deallog << v[i][j] << " ";
-      deallog << "]";
+        deallog << v[i][j] << ' ';
+      deallog << ']';
     }
   deallog << std::endl;
 }
@@ -39,8 +39,8 @@ print_vec(VECVEC &v)
 void
 test()
 {
-  typedef AlignedVector<unsigned int> VEC;
-  VEC                                 a(4);
+  using VEC = AlignedVector<unsigned int>;
+  VEC a(4);
   a[0] = 2;
   a[1] = 1;
   a[2] = 42;

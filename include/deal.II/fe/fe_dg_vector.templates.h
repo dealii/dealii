@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,11 +20,11 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_dg_vector.h>
 #include <deal.II/fe/fe_tools.h>
 
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -61,8 +61,7 @@ template <class PolynomialType, int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_DGVector<PolynomialType, dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_DGVector<PolynomialType, dim, spacedim>>(
-    *this);
+  return std::make_unique<FE_DGVector<PolynomialType, dim, spacedim>>(*this);
 }
 
 
@@ -71,8 +70,8 @@ std::string
 FE_DGVector<PolynomialType, dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_DGVector_" << this->poly_space->name() << "<" << dim << ">("
-          << this->degree - 1 << ")";
+  namebuf << "FE_DGVector_" << this->poly_space->name() << '<' << dim << ">("
+          << this->degree - 1 << ')';
   return namebuf.str();
 }
 
@@ -97,7 +96,6 @@ FE_DGVector<PolynomialType, dim, spacedim>::has_support_on_face(
 {
   return true;
 }
-
 
 
 template <class PolynomialType, int dim, int spacedim>

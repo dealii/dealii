@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,7 @@ test(const unsigned int size,
     std::make_shared<Utilities::MPI::ProcessGrid>(
       mpi_communicator, size, size, block_size, block_size);
 
-  pcout << size << " " << block_size << std::endl;
+  pcout << size << ' ' << block_size << std::endl;
 
   // Create s.p.d matrices of requested size:
   FullMatrix<NumberType> full_A(size);

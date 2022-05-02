@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3263,10 +3263,10 @@ test()
   {
     const double tolerance = 1e-8;
 
-    typedef SolverBicgstab<> Solver;
-    SolverControl            solver_control(N, tolerance);
-    PrimitiveVectorMemory<>  vector_memory;
-    Solver                   solver(solver_control, vector_memory);
+    using Solver = SolverBicgstab<>;
+    SolverControl           solver_control(N, tolerance);
+    PrimitiveVectorMemory<> vector_memory;
+    Solver                  solver(solver_control, vector_memory);
 
     PreconditionSSOR<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(sm, 1.2);

@@ -1,0 +1,4 @@
+
+DEAL:parameters::A map using the default pattern: 2=3 : 4, 3=1 : 2
+DEAL:parameters::A map with custom separators: 2:3 , 4; 3:1 , 2
+DEAL:parameters::A map with explicitly stated default separators: 2=3 : 4, 3=1 : 2

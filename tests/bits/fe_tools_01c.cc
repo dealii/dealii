@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,7 +57,7 @@ check(const FE_Q<dim> &fe, const std::string &name)
       Assert(n1[n2[i]] == i, ExcInternalError());
       Assert(n2[n1[i]] == i, ExcInternalError());
 
-      deallog << n1[n2[i]] << " ";
+      deallog << n1[n2[i]] << ' ';
     }
   deallog << std::endl;
 }

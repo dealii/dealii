@@ -356,26 +356,6 @@
 
 
 #
-# Netcdf:
-#
-# SET(DEAL_II_WITH_NETCDF ON CACHE BOOL
-#   "Build deal.II with support for netcdf"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(NETCDF_DIR "/.../..." CACHE PATH "")
-#
-# Manual setup:
-#
-# SET(NETCDF_FOUND TRUE CACHE BOOL "")
-# SET(NETCDF_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(NETCDF_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-#
-
-
-#
 # P4EST:
 #
 # SET(DEAL_II_WITH_P4EST ON CACHE BOOL
@@ -457,13 +437,13 @@
 
 
 #
-# Threading support:
+# TBB support:
 #
-# SET(DEAL_II_WITH_THREADS ON CACHE BOOL
-#   "Build deal.II with support for threads"
+# SET(DEAL_II_WITH_TBB ON CACHE BOOL
+#   "Build deal.II with support for threads via TBB"
 #   )
 #
-# SET(DEAL_II_FORCE_BUNDLED_THREADS TRUE CACHE BOOL
+# SET(DEAL_II_FORCE_BUNDLED_TBB TRUE CACHE BOOL
 #   "Always use the bundled tbb library instead of an external one."
 #   )
 #
@@ -565,18 +545,6 @@
 #                         Advanced Configuration:                         #
 #                                                                         #
 ###########################################################################
-
-#
-# C++14 support:
-#
-# SET(DEAL_II_WITH_CXX14 ON CACHE BOOL
-#   "deal.II using C++14 language standard"
-#   )
-#
-# A custom C++14 flag can be set by setting
-#
-#   SET(DEAL_II_CXX_VERSION_FLAG "-std=c++1y" CACHE STRING "")
-#
 
 
 #

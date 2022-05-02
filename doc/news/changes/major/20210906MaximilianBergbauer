@@ -1,0 +1,4 @@
+Added: Evaluation and integration of hessians both on cells and on faces is now
+available in the matrix-free framework.
+<br>
+(Maximilian Bergbauer, Martin Kronbichler, Peter Munch, 2021/09/06)

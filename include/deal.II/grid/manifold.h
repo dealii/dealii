@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,53 +65,6 @@ namespace Manifolds
              hexes_per_cell -
            1; // don't count the cell itself, just the bounding objects
   }
-
-  /**
-   * Given a general mesh iterator, construct a quadrature object that
-   * contains the following points:
-   * - If the iterator points to a line, then the quadrature points
-   *   are the two vertices of the line. This results in a quadrature
-   *   object with two points.
-   * - If the iterator points to a quad, then the quadrature points
-   *   are the vertices and line mid-points. This results in a quadrature
-   *   object with eight (4+4) points.
-   * - If the iterator points to a hex, then the quadrature points
-   *   are the vertices, the line mid-points, and the face mid-points.
-   *   This results in a quadrature object with 26 (8+12+6) points.
-   *
-   * The quadrature weights for these points are either chosen identically and
-   * equal to one over the number of quadrature points (if @p
-   * with_interpolation is @p false), or in a way that gives points closer to
-   * the cell center (measured on the reference cell) a higher weight. These
-   * weights correspond to the weights applied to lines and vertices in
-   * transfinite interpolation (see TransfiniteInterpolationManifold for a
-   * more thorough description) if @p with_interpolation is @p true.
-   *
-   * The function is primarily used to construct the input argument
-   * for the Manifold::get_new_point() function, which computes a new
-   * point on a manifold based on a weighted average of "surrounding"
-   * points represented by the quadrature points and weights stored in a
-   * Quadrature object. This function creates such an object based on
-   * the points that "surround" a cell, face, or edge, and weights
-   * are chosen in a way appropriate for computing the new "mid-point"
-   * of the object pointed to. An example of where this is necessary
-   * is for mesh refinement, where (using the 2d situation as an example)
-   * we need to first create new edge mid-points, and then a new cell-point.
-   *
-   * @param[in] iterator A mesh iterator that points to either a line, quad,
-   *   or hex.
-   * @param[in] with_interpolation Whether or not to compute the quadrature
-   * weights from transfinite interpolation, as discussed above.
-   * @tparam MeshIteratorType An iterator type that corresponds to either
-   *   Triangulation::cell_iterator (or variants such as
-   *   Triangulation::active_cell_iterator or DoFHandler::cell_iterator) or
-   *   that is the result of statements such as
-   *   <code>cell-@>face(f)</code> or <code>cell-@>line(l)</code>.
-   */
-  template <typename MeshIteratorType>
-  DEAL_II_DEPRECATED Quadrature<MeshIteratorType::AccessorType::space_dimension>
-                     get_default_quadrature(const MeshIteratorType &iterator,
-                                            const bool              with_interpolation = false);
 
   /**
    * Given a general mesh iterator, construct arrays of quadrature points and
@@ -328,7 +281,6 @@ namespace Manifolds
  *
  *
  * @ingroup manifold
- * @author Luca Heltai, Wolfgang Bangerth, 2014, 2016
  */
 template <int dim, int spacedim = dim>
 class Manifold : public Subscriptor
@@ -426,7 +378,7 @@ public:
    * In its default implementation, this function simply calls get_new_point()
    * on each row of @p weights and writes those points into the output array
    * @p new_points. However, this function is more efficient if multiple new
-   * points need to be generated like in MappingQGeneric and the manifold does
+   * points need to be generated like in MappingQ and the manifold does
    * expensive transformations between a chart space and the physical space,
    * such as ChartManifold. For this function, the surrounding points need to
    * be transformed back to the chart sparse only once, rather than for every
@@ -465,7 +417,7 @@ public:
    * boundary (the lines therefore is also on the boundary).
    *
    * The default implementation of this function passes its argument to the
-   * Manifolds::get_default_quadrature() function, and then calls the
+   * Manifolds::get_default_points_and_weights() function, and then calls the
    * Manifold<dim,spacedim>::get_new_point() function. User derived classes
    * can overload Manifold<dim,spacedim>::get_new_point() or
    * Manifold<dim,spacedim>::project_to_manifold(), which is called by the
@@ -486,7 +438,7 @@ public:
    * <tt>quad->line(i)->child(j)</tt>, <tt>i=0...3</tt>, <tt>j=0,1</tt>.
    *
    * The default implementation of this function passes its argument to the
-   * Manifolds::get_default_quadrature() function, and then calls the
+   * Manifolds::get_default_points_and_weights() function, and then calls the
    * Manifold<dim,spacedim>::get_new_point() function. User derived classes
    * can overload Manifold<dim,spacedim>::get_new_point() or
    * Manifold<dim,spacedim>::project_to_manifold(), which is called by the
@@ -508,7 +460,7 @@ public:
    * <tt>j=0...3</tt>, <tt>k=0,1</tt>.
    *
    * The default implementation of this function passes its argument to the
-   * Manifolds::get_default_quadrature() function, and then calls the
+   * Manifolds::get_default_points_and_weights() function, and then calls the
    * Manifold<dim,spacedim>::get_new_point() function. User derived classes
    * can overload Manifold<dim,spacedim>::get_new_point() or
    * Manifold<dim,spacedim>::project_to_manifold(), which is called by the
@@ -675,8 +627,6 @@ public:
  * FlatManifold<dim,spacedim>::project_to_manifold() is the identity function.
  *
  * @ingroup manifold
- *
- * @author Luca Heltai, 2014
  */
 template <int dim, int spacedim = dim>
 class FlatManifold : public Manifold<dim, spacedim>
@@ -944,8 +894,6 @@ private:
  * chartdim is 2.
  *
  * @ingroup manifold
- *
- * @author Luca Heltai, 2013, 2014
  */
 template <int dim, int spacedim = dim, int chartdim = dim>
 class ChartManifold : public Manifold<dim, spacedim>
@@ -1185,23 +1133,6 @@ Manifold<3, 3>::get_new_point_on_hex(
 
 namespace Manifolds
 {
-  template <typename MeshIteratorType>
-  Quadrature<MeshIteratorType::AccessorType::space_dimension>
-  get_default_quadrature(const MeshIteratorType &iterator,
-                         const bool              with_interpolation)
-  {
-    const auto points_and_weights =
-      get_default_points_and_weights(iterator, with_interpolation);
-    static const int spacedim = MeshIteratorType::AccessorType::space_dimension;
-    return Quadrature<spacedim>(
-      std::vector<Point<spacedim>>(points_and_weights.first.begin(),
-                                   points_and_weights.first.end()),
-      std::vector<double>(points_and_weights.second.begin(),
-                          points_and_weights.second.end()));
-  }
-
-
-
   template <typename MeshIteratorType>
   std::pair<std::array<Point<MeshIteratorType::AccessorType::space_dimension>,
                        n_default_points_per_cell<MeshIteratorType>()>,

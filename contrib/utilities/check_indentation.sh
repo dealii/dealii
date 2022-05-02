@@ -1,7 +1,7 @@
 #!/bin/sh
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 - 2018 by the deal.II authors
+## Copyright (C) 2014 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -24,12 +24,6 @@
 # pull request if this script returns a failure, so the return value of this
 # script is important.
 #
-
-if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then 
-	echo "Running indentation test on master merge."
-else 
-	echo "Running indentation test on Pull Request #${TRAVIS_PULL_REQUEST}"
-fi
 
 # Run indent-all and fail if script fails:
 ./contrib/utilities/indent-all || exit $?

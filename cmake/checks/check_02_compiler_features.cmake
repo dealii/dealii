@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -28,9 +28,7 @@
 #   DEAL_II_HAVE_GLIBC_STACKTRACE
 #   DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION
-#   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE
-#   DEAL_II_DEPRECATED
 #   DEAL_II_ALWAYS_INLINE
 #   DEAL_II_RESTRICT
 #   DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
@@ -38,25 +36,12 @@
 #
 
 #
-# A couple of test results depend on compiler flags and the C++ mode. Rerun
-# these tests if necessary
+# A couple of test results depend on compiler flags and the C++ mode.
+# Nota Bene: If your test depends on the value of compile flags set in
+# ${DEAL_II_CXX_FLAGS} it is probably a language feature and should go into
+# check_01_cxx_features.cmake
 #
 
-UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
-  "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
-  DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
-  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
-  )
-
-#
-# MSVC needs different compiler flags to turn warnings into errors
-# additionally a suitable exception handling model is required
-#
-IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  SET(_werror_flag "/WX /EHsc")
-ELSE()
-  SET(_werror_flag "-Werror")
-ENDIF()
 
 #
 # Check whether the compiler allows to use arithmetic operations
@@ -126,8 +111,7 @@ CHECK_CXX_COMPILER_BUG(
 #
 # - Matthias Maier, rewritten 2012
 #
-IF(NOT(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND
-       DEAL_II_HAVE_CXX14_CONSTEXPR))
+IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel")
   CHECK_CXX_SOURCE_COMPILES(
     "
     bool f() { return true; }
@@ -253,7 +237,6 @@ IF(NOT DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION)
   ELSE()
     SET(__PRETTY_FUNCTION__ "\"(not available)\"")
   ENDIF()
-
 ENDIF()
 
 
@@ -289,96 +272,6 @@ ENDIF()
 
 
 #
-# GCC and some other compilers have an attribute of the form
-# __attribute__((deprecated)) that can be used to make the
-# compiler warn whenever a deprecated function is used. C++14
-# provides a standardized attribute of the form [[deprecated]
-# with the exact same functionality.
-# See if one of these attribute is available.
-#
-# If it is, set the variable DEAL_II_DEPRECATED to its value. If
-# it isn't, set it to an empty string (actually, to a single
-# space, since the empty string causes CMAKE to #undef the
-# variable in config.h), i.e., to something the compiler will
-# ignore
-#
-# - Wolfgang Bangerth, 2012
-#
-
-# Some compilers swallow the deprecation attribute, but emit a warning saying
-# that it is actually not supported such as:
-# "warning: use of the 'deprecated' attribute is a C++14 extension" (clang in c++11 mode)
-# "warning #1292: unknown attribute "deprecated"" (icc)
-# Hence, we treat warnings as errors:
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
-IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-ENDIF()
-
-# first see if the compiler accepts the attribute
-CHECK_CXX_SOURCE_COMPILES(
-  "
-          [[deprecated]] int old_fn ();
-          int old_fn () { return 0; }
-
-          struct [[deprecated]] bob
-          {
-            [[deprecated]] bob(int i);
-            [[deprecated]] void test();
-          };
-
-          enum color
-          {
-            red [[deprecated]]
-          };
-
-          template <int dim>
-          struct foo {};
-          using bar [[deprecated]] = foo<2>;
-
-          int main () {}
-  "
-  DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
-  )
-
-CHECK_CXX_SOURCE_COMPILES(
-  "
-          __attribute__((deprecated)) int old_fn ();
-          int old_fn () { return 0; }
-
-          struct __attribute__((deprecated)) bob
-          {
-            __attribute__((deprecated)) bob(int i);
-            __attribute__((deprecated)) void test();
-          };
-
-          enum color
-          {
-            red __attribute__((deprecated))
-          };
-
-          template <int dim>
-          struct foo {};
-          using bar __attribute__((deprecated)) = foo<2>;
-
-          int main () {}
-  "
-  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
-  )
-
-RESET_CMAKE_REQUIRED()
-
-IF(DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED)
-  SET(DEAL_II_DEPRECATED "[[deprecated]]")
-ELSEIF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED AND NOT DEAL_II_WITH_CUDA)
-  SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
-ELSE()
-  SET(DEAL_II_DEPRECATED " ")
-ENDIF()
-
-
-#
 # Do a similar check with the always_inline attribute on functions.
 #
 CHECK_CXX_SOURCE_COMPILES(
@@ -394,6 +287,7 @@ IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE)
 ELSE()
   SET(DEAL_II_ALWAYS_INLINE " ")
 ENDIF()
+
 
 #
 # Check whether the compiler understands the __restrict keyword.

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2017 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -390,5 +390,3 @@ levels, and accessors for objects of lower dimensionality do not have a
  * @defgroup Accessors Accessor classes of the mesh iterators
  * @ingroup Iterators
  */
-
-

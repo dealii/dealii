@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,8 @@
 
 #include "../tests.h"
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   Point<3> p(0.75, 0, 0);
 
@@ -39,7 +40,7 @@ void check(Triangulation<3> &tria)
 
   deallog << cell << std::endl;
   for (const unsigned int v : GeometryInfo<3>::vertex_indices())
-    deallog << "<" << cell->vertex(v) << "> ";
+    deallog << '<' << cell->vertex(v) << "> ";
   deallog << std::endl;
 
   // Transform back and forth

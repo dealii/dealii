@@ -1,4 +1,0 @@
-Changed: The complex operator overloads for multiplication and division are
-restricted to floating point types.
-<br>
-(Daniel Arndt, 2019/08/21)

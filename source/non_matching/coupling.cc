@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
@@ -54,7 +55,7 @@ namespace NonMatching
      * Mapping and quadrature are those of this second triangulation.
      *
      * If the triangulation inside @p cache is parallel, only points lying over
-     * locally onwed cells are returned. This is why a vector of unsigned int
+     * locally owned cells are returned. This is why a vector of unsigned int
      * is returned: it describes the indices of cells from the immersed
      * triangulation which have been used (relative to a loop over al cells). If
      * embedding triangulation is not parallel, all cells shall be used.
@@ -181,7 +182,8 @@ namespace NonMatching
     const ComponentMask &             space_comps,
     const ComponentMask &             immersed_comps,
     const Mapping<dim0, spacedim> &   space_mapping,
-    const Mapping<dim1, spacedim> &   immersed_mapping)
+    const Mapping<dim1, spacedim> &   immersed_mapping,
+    const AffineConstraints<number> & immersed_constraints)
   {
     GridTools::Cache<dim0, spacedim> cache(space_dh.get_triangulation(),
                                            space_mapping);
@@ -193,7 +195,8 @@ namespace NonMatching
                                      constraints,
                                      space_comps,
                                      immersed_comps,
-                                     immersed_mapping);
+                                     immersed_mapping,
+                                     immersed_constraints);
   }
 
 
@@ -213,7 +216,8 @@ namespace NonMatching
     const AffineConstraints<number> &       constraints,
     const ComponentMask &                   space_comps,
     const ComponentMask &                   immersed_comps,
-    const Mapping<dim1, spacedim> &         immersed_mapping)
+    const Mapping<dim1, spacedim> &         immersed_mapping,
+    const AffineConstraints<number> &       immersed_constraints)
   {
     AssertDimension(sparsity.n_rows(), space_dh.n_dofs());
     AssertDimension(sparsity.n_cols(), immersed_dh.n_dofs());
@@ -231,8 +235,8 @@ namespace NonMatching
     const auto &immersed_fe = immersed_dh.get_fe();
 
     // Dof indices
-    std::vector<types::global_dof_index> dofs(immersed_fe.dofs_per_cell);
-    std::vector<types::global_dof_index> odofs(space_fe.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs(immersed_fe.n_dofs_per_cell());
+    std::vector<types::global_dof_index> odofs(space_fe.n_dofs_per_cell());
 
     // Take care of components
     const ComponentMask space_c =
@@ -275,14 +279,14 @@ namespace NonMatching
     // the version with the dof_mask, this should be uncommented.
     //
     // // Construct a dof_mask, used to distribute entries to the sparsity
-    // able< 2, bool > dof_mask(space_fe.dofs_per_cell,
-    //                          immersed_fe.dofs_per_cell);
+    // able< 2, bool > dof_mask(space_fe.n_dofs_per_cell(),
+    //                          immersed_fe.n_dofs_per_cell());
     // of_mask.fill(false);
-    // or (unsigned int i=0; i<space_fe.dofs_per_cell; ++i)
+    // or (unsigned int i=0; i<space_fe.n_dofs_per_cell(); ++i)
     //  {
     //    const auto comp_i = space_fe.system_to_component_index(i).first;
     //    if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
-    //      for (unsigned int j=0; j<immersed_fe.dofs_per_cell; ++j)
+    //      for (unsigned int j=0; j<immersed_fe.n_dofs_per_cell(); ++j)
     //        {
     //          const auto comp_j =
     //          immersed_fe.system_to_component_index(j).first; if
@@ -349,7 +353,10 @@ namespace NonMatching
                 // for the case of non-trivial dof_mask, we should
                 // uncomment the missing part.
                 constraints.add_entries_local_to_global(
-                  odofs, dofs, sparsity); //, true, dof_mask);
+                  odofs,
+                  immersed_constraints,
+                  dofs,
+                  sparsity); //, true, dof_mask);
               }
           }
         ++i;
@@ -369,7 +376,8 @@ namespace NonMatching
     const ComponentMask &                                 space_comps,
     const ComponentMask &                                 immersed_comps,
     const Mapping<dim0, spacedim> &                       space_mapping,
-    const Mapping<dim1, spacedim> &                       immersed_mapping)
+    const Mapping<dim1, spacedim> &                       immersed_mapping,
+    const AffineConstraints<typename Matrix::value_type> &immersed_constraints)
   {
     GridTools::Cache<dim0, spacedim> cache(space_dh.get_triangulation(),
                                            space_mapping);
@@ -381,7 +389,8 @@ namespace NonMatching
                                 constraints,
                                 space_comps,
                                 immersed_comps,
-                                immersed_mapping);
+                                immersed_mapping,
+                                immersed_constraints);
   }
 
 
@@ -397,7 +406,8 @@ namespace NonMatching
     const AffineConstraints<typename Matrix::value_type> &constraints,
     const ComponentMask &                                 space_comps,
     const ComponentMask &                                 immersed_comps,
-    const Mapping<dim1, spacedim> &                       immersed_mapping)
+    const Mapping<dim1, spacedim> &                       immersed_mapping,
+    const AffineConstraints<typename Matrix::value_type> &immersed_constraints)
   {
     AssertDimension(matrix.m(), space_dh.n_dofs());
     AssertDimension(matrix.n(), immersed_dh.n_dofs());
@@ -416,8 +426,8 @@ namespace NonMatching
     const auto &immersed_fe = immersed_dh.get_fe();
 
     // Dof indices
-    std::vector<types::global_dof_index> dofs(immersed_fe.dofs_per_cell);
-    std::vector<types::global_dof_index> odofs(space_fe.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs(immersed_fe.n_dofs_per_cell());
+    std::vector<types::global_dof_index> odofs(space_fe.n_dofs_per_cell());
 
     // Take care of components
     const ComponentMask space_c =
@@ -446,7 +456,8 @@ namespace NonMatching
         immersed_gtl[i] = j++;
 
     FullMatrix<typename Matrix::value_type> cell_matrix(
-      space_dh.get_fe().dofs_per_cell, immersed_dh.get_fe().dofs_per_cell);
+      space_dh.get_fe().n_dofs_per_cell(),
+      immersed_dh.get_fe().n_dofs_per_cell());
 
     FEValues<dim1, spacedim> fe_v(immersed_mapping,
                                   immersed_dh.get_fe(),
@@ -473,7 +484,7 @@ namespace NonMatching
 
     std::vector<
       std::vector<typename Triangulation<dim0, spacedim>::active_cell_iterator>>
-                                                       cell_container(n_active_c);
+      cell_container(n_active_c);
     std::vector<std::vector<std::vector<Point<dim0>>>> qpoints_container(
       n_active_c);
     std::vector<std::vector<std::vector<unsigned int>>> maps_container(
@@ -576,14 +587,15 @@ namespace NonMatching
                 // Reset the matrices.
                 cell_matrix = typename Matrix::value_type();
 
-                for (unsigned int i = 0; i < space_dh.get_fe().dofs_per_cell;
+                for (unsigned int i = 0;
+                     i < space_dh.get_fe().n_dofs_per_cell();
                      ++i)
                   {
                     const auto comp_i =
                       space_dh.get_fe().system_to_component_index(i).first;
                     if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
                       for (unsigned int j = 0;
-                           j < immersed_dh.get_fe().dofs_per_cell;
+                           j < immersed_dh.get_fe().n_dofs_per_cell();
                            ++j)
                         {
                           const auto comp_j = immersed_dh.get_fe()
@@ -605,10 +617,8 @@ namespace NonMatching
                   }
 
                 // Now assemble the matrices
-                constraints.distribute_local_to_global(cell_matrix,
-                                                       odofs,
-                                                       dofs,
-                                                       matrix);
+                constraints.distribute_local_to_global(
+                  cell_matrix, odofs, immersed_constraints, dofs, matrix);
               }
           }
       }
@@ -676,8 +686,8 @@ namespace NonMatching
     const auto &fe1 = dh1.get_fe();
 
     // Dof indices
-    std::vector<types::global_dof_index> dofs0(fe0.dofs_per_cell);
-    std::vector<types::global_dof_index> dofs1(fe1.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs0(fe0.n_dofs_per_cell());
+    std::vector<types::global_dof_index> dofs1(fe1.n_dofs_per_cell());
 
     if (outer_loop_on_zero)
       {
@@ -690,31 +700,31 @@ namespace NonMatching
           typename Triangulation<dim1, spacedim>::active_cell_iterator>>
           intersection;
 
-        for (const auto &cell0 : dh0.active_cell_iterators())
-          if (cell0->is_locally_owned())
-            {
-              intersection.resize(0);
-              BoundingBox<spacedim> box0 =
-                cache0.get_mapping().get_bounding_box(cell0);
-              box0.extend(epsilon);
-              boost::geometry::index::query(tree1,
-                                            boost::geometry::index::intersects(
-                                              box0),
-                                            std::back_inserter(intersection));
-              if (!intersection.empty())
-                {
-                  cell0->get_dof_indices(dofs0);
-                  for (const auto &entry : intersection)
-                    {
-                      typename DoFHandler<dim1, spacedim>::cell_iterator cell1(
-                        *entry.second, &dh1);
-                      cell1->get_dof_indices(dofs1);
-                      constraints0.add_entries_local_to_global(dofs0,
-                                                               dofs1,
-                                                               sparsity);
-                    }
-                }
-            }
+        for (const auto &cell0 :
+             dh0.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+          {
+            intersection.resize(0);
+            BoundingBox<spacedim> box0 =
+              cache0.get_mapping().get_bounding_box(cell0);
+            box0.extend(epsilon);
+            boost::geometry::index::query(tree1,
+                                          boost::geometry::index::intersects(
+                                            box0),
+                                          std::back_inserter(intersection));
+            if (!intersection.empty())
+              {
+                cell0->get_dof_indices(dofs0);
+                for (const auto &entry : intersection)
+                  {
+                    typename DoFHandler<dim1, spacedim>::cell_iterator cell1(
+                      *entry.second, &dh1);
+                    cell1->get_dof_indices(dofs1);
+                    constraints0.add_entries_local_to_global(dofs0,
+                                                             dofs1,
+                                                             sparsity);
+                  }
+              }
+          }
       }
     else
       {
@@ -726,31 +736,31 @@ namespace NonMatching
           typename Triangulation<dim0, spacedim>::active_cell_iterator>>
           intersection;
 
-        for (const auto &cell1 : dh1.active_cell_iterators())
-          if (cell1->is_locally_owned())
-            {
-              intersection.resize(0);
-              BoundingBox<spacedim> box1 =
-                cache1.get_mapping().get_bounding_box(cell1);
-              box1.extend(epsilon);
-              boost::geometry::index::query(tree0,
-                                            boost::geometry::index::intersects(
-                                              box1),
-                                            std::back_inserter(intersection));
-              if (!intersection.empty())
-                {
-                  cell1->get_dof_indices(dofs1);
-                  for (const auto &entry : intersection)
-                    {
-                      typename DoFHandler<dim0, spacedim>::cell_iterator cell0(
-                        *entry.second, &dh0);
-                      cell0->get_dof_indices(dofs0);
-                      constraints0.add_entries_local_to_global(dofs0,
-                                                               dofs1,
-                                                               sparsity);
-                    }
-                }
-            }
+        for (const auto &cell1 :
+             dh1.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+          {
+            intersection.resize(0);
+            BoundingBox<spacedim> box1 =
+              cache1.get_mapping().get_bounding_box(cell1);
+            box1.extend(epsilon);
+            boost::geometry::index::query(tree0,
+                                          boost::geometry::index::intersects(
+                                            box1),
+                                          std::back_inserter(intersection));
+            if (!intersection.empty())
+              {
+                cell1->get_dof_indices(dofs1);
+                for (const auto &entry : intersection)
+                  {
+                    typename DoFHandler<dim0, spacedim>::cell_iterator cell0(
+                      *entry.second, &dh0);
+                    cell0->get_dof_indices(dofs0);
+                    constraints0.add_entries_local_to_global(dofs0,
+                                                             dofs1,
+                                                             sparsity);
+                  }
+              }
+          }
       }
   }
 
@@ -829,12 +839,12 @@ namespace NonMatching
                                     update_quadrature_points);
 
     // Dof indices
-    std::vector<types::global_dof_index> dofs0(fe0.dofs_per_cell);
-    std::vector<types::global_dof_index> dofs1(fe1.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs0(fe0.n_dofs_per_cell());
+    std::vector<types::global_dof_index> dofs1(fe1.n_dofs_per_cell());
 
     // Local Matrix
-    FullMatrix<typename Matrix::value_type> cell_matrix(fe0.dofs_per_cell,
-                                                        fe1.dofs_per_cell);
+    FullMatrix<typename Matrix::value_type> cell_matrix(fe0.n_dofs_per_cell(),
+                                                        fe1.n_dofs_per_cell());
 
     // Global to local indices
     const auto p =
@@ -851,27 +861,29 @@ namespace NonMatching
         {
           kernel.set_center(fev0.quadrature_point(q0));
           kernel.value_list(fev1.get_quadrature_points(), kernel_values);
-          for (unsigned int q1 = 0; q1 < quadrature1.size(); ++q1)
-            if (kernel_values[q1] != 0.0)
-              {
-                for (unsigned int i = 0; i < fe0.dofs_per_cell; ++i)
-                  {
-                    const auto comp_i = fe0.system_to_component_index(i).first;
-                    if (gtl0[comp_i] != numbers::invalid_unsigned_int)
-                      for (unsigned int j = 0; j < fe1.dofs_per_cell; ++j)
-                        {
-                          const auto comp_j =
-                            fe1.system_to_component_index(j).first;
-                          if (gtl1[comp_j] == gtl0[comp_i])
-                            {
-                              cell_matrix(i, j) += fev0.shape_value(i, q0) *
-                                                   fev1.shape_value(j, q1) *
-                                                   kernel_values[q1] *
-                                                   fev0.JxW(q0) * fev1.JxW(q1);
-                            }
-                        }
-                  }
-              }
+          for (unsigned int j = 0; j < fe1.n_dofs_per_cell(); ++j)
+            {
+              const auto comp_j = fe1.system_to_component_index(j).first;
+
+              // First compute the part of the integral that does not
+              // depend on i
+              typename Matrix::value_type sum_q1 = {};
+              for (unsigned int q1 = 0; q1 < quadrature1.size(); ++q1)
+                sum_q1 +=
+                  fev1.shape_value(j, q1) * kernel_values[q1] * fev1.JxW(q1);
+              sum_q1 *= fev0.JxW(q0);
+
+              // Now compute the main integral with the sum over q1 already
+              // completed - this gives a cubic complexity as usual rather
+              // than a quartic one with naive loops
+              for (unsigned int i = 0; i < fe0.n_dofs_per_cell(); ++i)
+                {
+                  const auto comp_i = fe0.system_to_component_index(i).first;
+                  if (gtl0[comp_i] != numbers::invalid_unsigned_int &&
+                      gtl1[comp_j] == gtl0[comp_i])
+                    cell_matrix(i, j) += fev0.shape_value(i, q0) * sum_q1;
+                }
+            }
         }
 
       constraints0.distribute_local_to_global(cell_matrix,
@@ -891,31 +903,31 @@ namespace NonMatching
           typename Triangulation<dim1, spacedim>::active_cell_iterator>>
           intersection;
 
-        for (const auto &cell0 : dh0.active_cell_iterators())
-          if (cell0->is_locally_owned())
-            {
-              intersection.resize(0);
-              BoundingBox<spacedim> box0 =
-                cache0.get_mapping().get_bounding_box(cell0);
-              box0.extend(epsilon);
-              boost::geometry::index::query(tree1,
-                                            boost::geometry::index::intersects(
-                                              box0),
-                                            std::back_inserter(intersection));
-              if (!intersection.empty())
-                {
-                  cell0->get_dof_indices(dofs0);
-                  fev0.reinit(cell0);
-                  for (const auto &entry : intersection)
-                    {
-                      typename DoFHandler<dim1, spacedim>::cell_iterator cell1(
-                        *entry.second, &dh1);
-                      cell1->get_dof_indices(dofs1);
-                      fev1.reinit(cell1);
-                      assemble_one_pair();
-                    }
-                }
-            }
+        for (const auto &cell0 :
+             dh0.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+          {
+            intersection.resize(0);
+            BoundingBox<spacedim> box0 =
+              cache0.get_mapping().get_bounding_box(cell0);
+            box0.extend(epsilon);
+            boost::geometry::index::query(tree1,
+                                          boost::geometry::index::intersects(
+                                            box0),
+                                          std::back_inserter(intersection));
+            if (!intersection.empty())
+              {
+                cell0->get_dof_indices(dofs0);
+                fev0.reinit(cell0);
+                for (const auto &entry : intersection)
+                  {
+                    typename DoFHandler<dim1, spacedim>::cell_iterator cell1(
+                      *entry.second, &dh1);
+                    cell1->get_dof_indices(dofs1);
+                    fev1.reinit(cell1);
+                    assemble_one_pair();
+                  }
+              }
+          }
       }
     else
       {
@@ -927,35 +939,36 @@ namespace NonMatching
           typename Triangulation<dim0, spacedim>::active_cell_iterator>>
           intersection;
 
-        for (const auto &cell1 : dh1.active_cell_iterators())
-          if (cell1->is_locally_owned())
-            {
-              intersection.resize(0);
-              BoundingBox<spacedim> box1 =
-                cache1.get_mapping().get_bounding_box(cell1);
-              box1.extend(epsilon);
-              boost::geometry::index::query(tree0,
-                                            boost::geometry::index::intersects(
-                                              box1),
-                                            std::back_inserter(intersection));
-              if (!intersection.empty())
-                {
-                  cell1->get_dof_indices(dofs1);
-                  fev1.reinit(cell1);
-                  for (const auto &entry : intersection)
-                    {
-                      typename DoFHandler<dim0, spacedim>::cell_iterator cell0(
-                        *entry.second, &dh0);
-                      cell0->get_dof_indices(dofs0);
-                      fev0.reinit(cell0);
-                      assemble_one_pair();
-                    }
-                }
-            }
+        for (const auto &cell1 :
+             dh1.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+          {
+            intersection.resize(0);
+            BoundingBox<spacedim> box1 =
+              cache1.get_mapping().get_bounding_box(cell1);
+            box1.extend(epsilon);
+            boost::geometry::index::query(tree0,
+                                          boost::geometry::index::intersects(
+                                            box1),
+                                          std::back_inserter(intersection));
+            if (!intersection.empty())
+              {
+                cell1->get_dof_indices(dofs1);
+                fev1.reinit(cell1);
+                for (const auto &entry : intersection)
+                  {
+                    typename DoFHandler<dim0, spacedim>::cell_iterator cell0(
+                      *entry.second, &dh0);
+                    cell0->get_dof_indices(dofs0);
+                    fev0.reinit(cell0);
+                    assemble_one_pair();
+                  }
+              }
+          }
       }
   }
-
-#include "coupling.inst"
+#ifndef DOXYGEN
+#  include "coupling.inst"
+#endif
 } // namespace NonMatching
 
 DEAL_II_NAMESPACE_CLOSE

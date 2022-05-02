@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,6 +32,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -43,8 +44,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/trilinos_vector.h>
 
@@ -69,7 +68,7 @@ test()
 
   for (unsigned int test = 0; test < 2; ++test)
     {
-      hp::DoFHandler<2, 3> dof_handler(tr);
+      DoFHandler<2, 3> dof_handler(tr);
       dof_handler.distribute_dofs(fe);
 
       // in the second test run, revert the global order of DoF
@@ -97,9 +96,8 @@ test()
               << "prior reordering:" << std::endl;
       const unsigned int                   dofs_per_cell = fe[0].dofs_per_cell;
       std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-      hp::DoFHandler<2, 3>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
-                                                 endc = dof_handler.end();
+      DoFHandler<2, 3>::active_cell_iterator cell = dof_handler.begin_active(),
+                                             endc = dof_handler.end();
       for (; cell != endc; ++cell)
         if (cell->subdomain_id() == tr.locally_owned_subdomain())
           {

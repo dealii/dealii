@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -90,14 +90,11 @@ namespace OpenCASCADE
     TopExp_Explorer exp;
     unsigned int    n_faces = 0, n_edges = 0, n_vertices = 0;
     for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next(), ++n_faces)
-      {
-      }
+      {}
     for (exp.Init(shape, TopAbs_EDGE); exp.More(); exp.Next(), ++n_edges)
-      {
-      }
+      {}
     for (exp.Init(shape, TopAbs_VERTEX); exp.More(); exp.Next(), ++n_vertices)
-      {
-      }
+      {}
     return std::tuple<unsigned int, unsigned int, unsigned int>(n_faces,
                                                                 n_edges,
                                                                 n_vertices);
@@ -619,8 +616,7 @@ namespace OpenCASCADE
             visited_faces[face_index]        = false;
 
             // extract mapped vertex locations
-            std::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell>
-              verts           = mapping.get_vertices(cell);
+            const auto verts  = mapping.get_vertices(cell);
             vert_to_point[v0] = verts[GeometryInfo<2>::face_to_cell_vertices(
               f, 0, true, false, false)];
             vert_to_point[v1] = verts[GeometryInfo<2>::face_to_cell_vertices(
@@ -842,7 +838,7 @@ namespace OpenCASCADE
         default:
           Assert(false, ExcUnsupportedShape());
       }
-    return Point<dim>();
+    return {};
   }
 
   std::tuple<Point<3>, Tensor<1, 3>, double, double>

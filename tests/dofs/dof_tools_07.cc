@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,20 +17,19 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::count_dofs_per_fe_component
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   const std::vector<types::global_dof_index> n_dofs =
     DoFTools::count_dofs_per_fe_component(dof_handler);
   for (unsigned int i = 0; i < n_dofs.size(); ++i)
-    deallog << n_dofs[i] << " ";
+    deallog << n_dofs[i] << ' ';
   deallog << std::endl;
 }

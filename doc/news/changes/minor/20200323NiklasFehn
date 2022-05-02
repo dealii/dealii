@@ -1,7 +1,0 @@
-New: ParameterHandler: add functionality ensuring that parameters are 
-indeed set in order to avoid errors that remain unrecognized otherwise.
-By extending the interfaces of declare_entry() and add_parameter(),
-parameters can be declared as mandatory parameters that must be set
-when parsing from an input file or by a set() function.
-<br>
-(Niklas Fehn, 2020/03/23)

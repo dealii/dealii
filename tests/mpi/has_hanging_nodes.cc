@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,7 +105,7 @@ test_int(const unsigned int n_global = 0, const unsigned int n_local = 0)
   tria_distrib.refine_global(n_global);
   tria_sequential.refine_global(n_global);
 
-  for (unsigned int i = 0; i < n_local; i++)
+  for (unsigned int i = 0; i < n_local; ++i)
     {
       // refine both the distributed and the sequential triangulation. the
       // following relies on the fact that the first cell of the "global"
@@ -134,7 +134,7 @@ test_int(const unsigned int n_global = 0, const unsigned int n_local = 0)
       tria_sequential.execute_coarsening_and_refinement();
     }
 
-  deallog << n_global << " " << n_local
+  deallog << n_global << ' ' << n_local
           << " distrib=" << tria_distrib.has_hanging_nodes()
           << "; shared=" << tria_sequential.has_hanging_nodes() << std::endl;
 }

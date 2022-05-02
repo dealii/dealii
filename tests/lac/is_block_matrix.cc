@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,21 +36,42 @@ test()
   deallog << std::setprecision(2);
   deallog.attach(logfile);
 
-  deallog << IsBlockMatrix<SparseMatrix<double>>::value << ' '
-          << IsBlockMatrix<SparseMatrix<float>>::value << ' '
-          << IsBlockMatrix<SparseMatrixEZ<double>>::value << ' '
-          << IsBlockMatrix<SparseMatrixEZ<float>>::value << std::endl;
+  deallog
+    << internal::AffineConstraints::IsBlockMatrix<SparseMatrix<double>>::value
+    << ' '
+    << internal::AffineConstraints::IsBlockMatrix<SparseMatrix<float>>::value
+    << ' '
+    << internal::AffineConstraints::IsBlockMatrix<SparseMatrixEZ<double>>::value
+    << ' '
+    << internal::AffineConstraints::IsBlockMatrix<SparseMatrixEZ<float>>::value
+    << std::endl;
 
-  deallog << IsBlockMatrix<BlockSparseMatrix<double>>::value << ' '
-          << IsBlockMatrix<BlockSparseMatrix<float>>::value << ' '
-          << IsBlockMatrix<BlockSparseMatrixEZ<double>>::value << ' '
-          << IsBlockMatrix<BlockSparseMatrixEZ<float>>::value << std::endl;
+  deallog << internal::AffineConstraints::IsBlockMatrix<
+               BlockSparseMatrix<double>>::value
+          << ' '
+          << internal::AffineConstraints::IsBlockMatrix<
+               BlockSparseMatrix<float>>::value
+          << ' '
+          << internal::AffineConstraints::IsBlockMatrix<
+               BlockSparseMatrixEZ<double>>::value
+          << ' '
+          << internal::AffineConstraints::IsBlockMatrix<
+               BlockSparseMatrixEZ<float>>::value
+          << std::endl;
 
-  deallog << IsBlockMatrix<SparsityPattern>::value << ' '
-          << IsBlockMatrix<DynamicSparsityPattern>::value << std::endl;
+  deallog << internal::AffineConstraints::IsBlockSparsityPattern<
+               SparsityPattern>::value
+          << ' '
+          << internal::AffineConstraints::IsBlockSparsityPattern<
+               DynamicSparsityPattern>::value
+          << std::endl;
 
-  deallog << IsBlockMatrix<BlockSparsityPattern>::value << ' '
-          << IsBlockMatrix<BlockDynamicSparsityPattern>::value << std::endl;
+  deallog << internal::AffineConstraints::IsBlockSparsityPattern<
+               BlockSparsityPattern>::value
+          << ' '
+          << internal::AffineConstraints::IsBlockSparsityPattern<
+               BlockDynamicSparsityPattern>::value
+          << std::endl;
 }
 
 

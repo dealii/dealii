@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,8 +25,8 @@ test_block_list(const parallel::distributed::Triangulation<dim> &tr,
 {
   deallog << fe.get_name() << std::endl;
 
-  DoFHandler<dim> dof;
-  dof.initialize(tr, fe);
+  DoFHandler<dim> dof(tr);
+  dof.distribute_dofs(fe);
   dof.distribute_mg_dofs();
 
   for (unsigned int level = 0; level < tr.n_global_levels(); ++level)

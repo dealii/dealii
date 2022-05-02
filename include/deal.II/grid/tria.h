@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,8 +25,10 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 
+#include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_iterator_selector.h>
+#include <deal.II/grid/tria_levels.h>
 
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -44,6 +46,13 @@
 
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef signals
+#  error \
+    "The name 'signals' is already defined. You are most likely using the QT library \
+and using the 'signals' keyword. You can either #include the Qt headers (or any conflicting headers) \
+*after* the deal.II headers or you can define the 'QT_NO_KEYWORDS' macro and use the 'Q_SIGNALS' macro."
+#endif
 
 // Forward declarations
 #ifndef DOXYGEN
@@ -78,13 +87,12 @@ namespace internal
 {
   namespace TriangulationImplementation
   {
-    template <int dim>
-    class TriaLevel;
-    template <int dim>
     class TriaFaces;
 
-    template <typename>
     class TriaObjects;
+
+    template <int, int>
+    class Policy;
 
     /**
      * Forward declaration of a class into which we put much of the
@@ -92,6 +100,7 @@ namespace internal
      * information.
      */
     struct Implementation;
+    struct ImplementationMixedMesh;
   } // namespace TriangulationImplementation
 
   namespace TriaAccessorImplementation
@@ -99,12 +108,6 @@ namespace internal
     struct Implementation;
   }
 } // namespace internal
-
-namespace hp
-{
-  template <int dim, int spacedim>
-  class DoFHandler;
-}
 #endif
 
 
@@ -129,8 +132,6 @@ namespace internal
      * until we hit the end iterator. This is time consuming and since access
      * to the number of lines etc is a rather frequent operation, this was not
      * an optimal solution.
-     *
-     * @author Wolfgang Bangerth, 1999
      */
     template <int dim>
     struct NumberCache
@@ -146,8 +147,6 @@ namespace internal
      * until we hit the end iterator. This is time consuming and since access
      * to the number of lines etc is a rather frequent operation, this was not
      * an optimal solution.
-     *
-     * @author Wolfgang Bangerth, 1999
      */
     template <>
     struct NumberCache<1>
@@ -191,7 +190,8 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        */
       template <class Archive>
       void
@@ -210,8 +210,6 @@ namespace internal
      * until we hit the end iterator. This is time consuming and since access
      * to the number of lines etc is a rather frequent operation, this was not
      * an optimal solution.
-     *
-     * @author Wolfgang Bangerth, 1999
      */
     template <>
     struct NumberCache<2> : public NumberCache<1>
@@ -250,7 +248,8 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        */
       template <class Archive>
       void
@@ -270,8 +269,6 @@ namespace internal
      * until we hit the end . This is time consuming and since access to the
      * number of lines etc is a rather frequent operation, this was not an
      * optimal solution.
-     *
-     * @author Wolfgang Bangerth, 1999
      */
     template <>
     struct NumberCache<3> : public NumberCache<2>
@@ -310,7 +307,8 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        */
       template <class Archive>
       void
@@ -324,9 +322,12 @@ namespace internal
 
 
 /**
- * Triangulations denote a hierarchy of levels of elements which together form
- * a @p dim -dimensional manifold in @p spacedim spatial dimensions (if
- * spacedim is not specified it takes the default value @p spacedim=dim).
+ * A triangulation is a collection of cells that, jointly, cover the domain
+ * on which one typically wants to solve a partial differential equation.
+ * This domain, and the mesh that covers it, represents a @p dim -dimensional manifold
+ * and lives in @p spacedim spatial dimensions, where @p dim and @p spacedim
+ * are the template arguments of this class. (If @p spacedim is not specified,
+ * it takes the default value `spacedim=dim`.)
  *
  * Thus, for example, an object of type @p Triangulation<1,1> (or simply @p
  * Triangulation<1> since @p spacedim==dim by default) is used to represent
@@ -335,6 +336,16 @@ namespace internal
  * objects such as @p Triangulation<1,2> or @p Triangulation<2,3> (that are
  * associated with curves in 2D or surfaces in 3D) are the ones one wants to
  * use in the boundary element method.
+ *
+ * The name of the class is mostly hierarchical and is not meant to imply that
+ * a Triangulation can only consist of triangles. Instead, triangulations
+ * consist of line segments in 1d (i.e., if `dim==1`), and of three-dimensional
+ * cells (if `dim==3`). Moreover, historically, deal.II only supported
+ * quadrilaterals (cells with four vertices: deformed rectangles) in 2d
+ * and hexahedra (cells with six sides and eight vertices that are deformed
+ * boxes), neither of which are triangles. In other words, the term
+ * "triangulation" in the deal.II language is synonymous with "mesh" and is
+ * to be understood separate from its linguistic origin.
  *
  * This class is written to be as independent of the dimension as possible
  * (thus the complex construction of the
@@ -1000,17 +1011,19 @@ namespace internal
  * following information is not stored:
  *   - signals
  *   - pointers to Manifold objects previously set using
- * Triangulation::set_manifold On the other hand, since these are objects that
+ *     Triangulation::set_manifold()
+ *
+ * On the other hand, since these are objects that
  * are usually set in user code, they can typically easily be set again in that
  * part of your code in which you re-load triangulations.
  *
  * In a sense, this approach to serialization means that re-loading a
  * triangulation is more akin to calling the
- * Triangulation::create_triangulation function and filling it with some
+ * Triangulation::create_triangulation() function and filling it with some
  * additional content, as that function also does not touch the signals and
- * boundary objects that belong to this triangulation. In keeping with this
- * analogy, the Triangulation::load function also triggers the same kinds of
- * signal as Triangulation::create_triangulation.
+ * Manifold objects that belong to this triangulation. In keeping with this
+ * analogy, the Triangulation::load() function also triggers the same kinds of
+ * signal as Triangulation::create_triangulation().
  *
  *
  * <h3>Technical details</h3>
@@ -1103,7 +1116,6 @@ namespace internal
  * data stored in the triangulation.
  *
  * @ingroup grid aniso
- * @author Wolfgang Bangerth, 1998; Ralf Hartmann, 2005
  */
 template <int dim, int spacedim = dim>
 class Triangulation : public Subscriptor
@@ -1281,7 +1293,7 @@ public:
      *
      * Actually there are two versions of this flag,
      * #eliminate_refined_inner_islands and
-     * #eliminate_refined_boundary_islands. There first eliminates islands
+     * #eliminate_refined_boundary_islands. The first eliminates islands
      * defined by the definition above which are in the interior of the
      * domain, while the second eliminates only those islands if the cell is
      * at the boundary. The reason for this split of flags is that one often
@@ -1341,6 +1353,12 @@ public:
    * @ingroup Iterators
    */
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
+
+  /**
+   * The same as above to allow the usage of the "MeshType concept" also
+   * on the refinement levels.
+   */
+  using level_cell_iterator = cell_iterator;
 
   /**
    * An alias that is used to identify
@@ -1508,7 +1526,7 @@ public:
      * automatically generated destructor would have a different one due to
      * member objects.
      */
-    virtual ~DistortedCellList() noexcept override = default;
+    virtual ~DistortedCellList() noexcept override;
 
     /**
      * A list of those cells among the coarse mesh cells that are deformed or
@@ -1521,12 +1539,12 @@ public:
   /**
    * Make the dimension available in function templates.
    */
-  static const unsigned int dimension = dim;
+  static constexpr unsigned int dimension = dim;
 
   /**
    * Make the space-dimension available in function templates.
    */
-  static const unsigned int space_dimension = spacedim;
+  static constexpr unsigned int space_dimension = spacedim;
 
   /**
    * Create an empty triangulation. Do not create any cells.
@@ -1591,6 +1609,13 @@ public:
   clear();
 
   /**
+   * Return MPI communicator used by this triangulation. In the case of
+   * a serial Triangulation object, MPI_COMM_SELF is returned.
+   */
+  virtual MPI_Comm
+  get_communicator() const;
+
+  /**
    * Set the mesh smoothing to @p mesh_smoothing. This overrides the
    * MeshSmoothing given to the constructor. It is allowed to call this
    * function only if the triangulation is empty.
@@ -1615,7 +1640,7 @@ public:
    * A copy of @p manifold_object is created using
    * Manifold<dim, spacedim>::clone() and stored internally.
    *
-   * It is possible to remove or replace the boundary object during the
+   * It is possible to remove or replace a Manifold object during the
    * lifetime of a non-empty triangulation. Usually, this is done before the
    * first refinement and is dangerous afterwards. Removal of a manifold
    * object is done by reset_manifold(). This operation then replaces the
@@ -1696,7 +1721,9 @@ public:
 
   /**
    * Return a constant reference to a Manifold object used for this
-   * triangulation.  Number is the same as in @p set_manifold
+   * triangulation. @p number is the same as in set_manifold().
+   *
+   * @note If no manifold could be found, the default flat manifold is returned.
    *
    * @ingroup manifold
    *
@@ -1801,10 +1828,12 @@ public:
    * the geometry of the domain, and in this case ignoring the exception is
    * probably unwise.
    *
-   * @note This function is used in step-14 .
+   * @note This function is used in step-14 and step-19.
    *
-   * @note This function triggers the create signal after doing its work. See
-   * the section on signals in the general documentation of this class.
+   * @note This function triggers the "create" signal after doing its work. See
+   * the section on signals in the general documentation of this class. For
+   * example as a consequence of this, all DoFHandler objects connected to
+   * this triangulation will be reinitialized via DoFHandler::reinit().
    *
    * @note The check for distorted cells is only done if dim==spacedim, as
    * otherwise cells can legitimately be twisted if the manifold they describe
@@ -1819,8 +1848,11 @@ public:
    * Create a triangulation from the provided
    * TriangulationDescription::Description.
    *
+   * @note Don't forget to attach the manifolds with set_manifold() before
+   *   calling this function if manifolds are needed.
+   *
    * @note The namespace TriangulationDescription::Utilities contains functions
-   *       to create TriangulationDescription::Description.
+   *   to create TriangulationDescription::Description.
    *
    * @param construction_data The data needed for this process.
    */
@@ -1837,6 +1869,7 @@ public:
    * @note This function internally calls create_triangulation and therefore
    * can throw the same exception as the other function.
    */
+  DEAL_II_DEPRECATED
   virtual void
   create_triangulation_compatibility(
     const std::vector<Point<spacedim>> &vertices,
@@ -1867,21 +1900,44 @@ public:
   set_all_refine_flags();
 
   /**
-   * Refine all cells @p times times, by alternatingly calling
-   * set_all_refine_flags and execute_coarsening_and_refinement.
+   * Refine all cells @p times times. In other words, in each one of
+   * the @p times iterations, loop over all cells and refine each cell
+   * uniformly into $2^\text{dim}$ children. In practice, this
+   * function repeats the following operations @p times times: call
+   * set_all_refine_flags() followed by
+   * execute_coarsening_and_refinement(). The end result is that the
+   * number of cells increases by a factor of
+   * $(2^\text{dim})^\text{times}=2^{\text{dim} \times \text{times}}$.
    *
-   * The latter function may throw an exception if it creates cells that are
-   * distorted (see its documentation for an explanation). This exception will
-   * be propagated through this function if that happens, and you may not get
-   * the actual number of refinement steps in that case.
+   * The execute_coarsening_and_refinement() function called in this
+   * loop may throw an exception if it creates cells that are
+   * distorted (see its documentation for an explanation). This
+   * exception will be propagated through this function if that
+   * happens, and you may not get the actual number of refinement
+   * steps in that case.
    *
    * @note This function triggers the pre- and post-refinement signals before
    * and after doing each individual refinement cycle (i.e. more than once if
-   * times > 1) . See the section on signals in the general documentation of
+   * `times > 1`) . See the section on signals in the general documentation of
    * this class.
    */
   void
   refine_global(const unsigned int times = 1);
+
+  /**
+   * Coarsen all cells the given number of times.
+   *
+   * In each of one of the @p times iterations, all cells will be marked for
+   * coarsening. If an active cell is already on the coarsest level, it will
+   * be ignored.
+   *
+   * @note This function triggers the pre- and post-refinement signals before
+   * and after doing each individual coarsening cycle (i.e. more than once if
+   * `times > 1`) . See the section on signals in the general documentation of
+   * this class.
+   */
+  void
+  coarsen_global(const unsigned int times = 1);
 
   /**
    * Execute both refinement and coarsening of the triangulation.
@@ -1988,7 +2044,7 @@ public:
   };
 
   /**
-   * A structure used to accumulate the results of the cell_weights slot
+   * A structure used to accumulate the results of the `weight` signal slot
    * functions below. It takes an iterator range and returns the sum of
    * values.
    */
@@ -2117,9 +2173,7 @@ public:
 
     /**
      * This signal is triggered for each cell during every automatic or manual
-     * repartitioning. This signal is somewhat special in that it is only
-     * triggered for distributed parallel calculations and only if functions
-     * are connected to it. It is intended to allow a weighted repartitioning
+     * repartitioning. It is intended to allow a weighted repartitioning
      * of the domain to balance the computational load across processes in a
      * different way than balancing the number of cells. Any connected
      * function is expected to take an iterator to a cell, and a CellStatus
@@ -2127,21 +2181,189 @@ public:
      * coarsened or left untouched (see the documentation of the CellStatus
      * enum for more information). The function is expected to return an
      * unsigned integer, which is interpreted as the additional computational
-     * load of this cell. If this cell is going to be coarsened, the signal is
-     * called for the parent cell and you need to provide the weight of the
-     * future parent cell. If this cell is going to be refined the function
-     * should return a weight, which will be equally assigned to every future
-     * child cell of the current cell. As a reference a value of 1000 is added
-     * for every cell to the total weight. This means a signal return value of
-     * 1000 (resulting in a weight of 2000) means that it is twice as
-     * expensive for a process to handle this particular cell. If several
-     * functions are connected to this signal, their return values will be
-     * summed to calculate the final weight.
+     * load of this cell.
+     *
+     * In serial and parallel shared applications, partitioning happens after
+     * refinement. So all cells will have the `CELL_PERSIST` status.
+     *
+     * In parallel distributed applications, partitioning happens during
+     * refinement. If this cell is going to be coarsened, the signal is called
+     * for the parent cell and you need to provide the weight of the future
+     * parent cell. If this cell is going to be refined, the function is called
+     * on all children while `cell_iterator` refers to their parent cell. In
+     * this case, you need to pick a weight for each individual child based on
+     * information given by the parent cell.
+     *
+     * If several functions are connected to this signal, their return values
+     * will be summed to calculate the final weight of a cell. This allows
+     * different parts of a larger code base to have their own functions
+     * computing the weight of a cell; for example in a code that does both
+     * finite element and particle computations on each cell, the code could
+     * separate the computation of a cell's weight into two functions, each
+     * implemented in their respective files, that provide the finite
+     * element-based and the particle-based weights.
+     *
+     * This function is used in step-68 and implicitly in step-75 using the
+     * parallel::CellWeights class.
      */
     boost::signals2::signal<unsigned int(const cell_iterator &,
                                          const CellStatus),
                             CellWeightSum<unsigned int>>
-      cell_weight;
+      weight;
+
+    /**
+     * Constructor.
+     *
+     * Connects a deprecated signal to its successor.
+     */
+    Signals()
+      : cell_weight(weight)
+    {}
+
+    /**
+     * Legacy signal emulation to deprecate the old signal.
+     */
+    class LegacySignal
+    {
+    public:
+      using signature_type = unsigned int(const cell_iterator &,
+                                          const CellStatus);
+      using combiner_type  = CellWeightSum<unsigned int>;
+
+      using slot_function_type = boost::function<signature_type>;
+      using slot_type =
+        boost::signals2::slot<signature_type, slot_function_type>;
+
+      /**
+       * Constructor.
+       */
+      LegacySignal(
+        boost::signals2::signal<signature_type, combiner_type> &new_signal)
+        : new_signal(new_signal)
+      {}
+
+      /**
+       * Destructor.
+       */
+      ~LegacySignal()
+      {
+        base_weight.disconnect();
+      }
+
+      /**
+       * Connects a function to the signal.
+       *
+       * Connects an additional base weight function if signal was previously
+       * empty.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      boost::signals2::connection
+      connect(
+        const slot_type &                 slot,
+        boost::signals2::connect_position position = boost::signals2::at_back)
+      {
+        if (base_weight.connected() == false)
+          {
+            base_weight = new_signal.connect(
+              [](const cell_iterator &, const CellStatus) -> unsigned int {
+                return 1000;
+              });
+            Assert(base_weight.connected() && new_signal.num_slots() == 1,
+                   ExcInternalError());
+          }
+
+        return new_signal.connect(slot, position);
+      }
+
+      /**
+       * Returns the number of connected functions <em>without</em> the base
+       * weight.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      std::size_t
+      num_slots() const
+      {
+        return new_signal.num_slots() -
+               static_cast<std::size_t>(base_weight.connected());
+      }
+
+      /**
+       * Checks if there are any connected functions to the signal.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      bool
+      empty() const
+      {
+        if (num_slots() == 0)
+          {
+            Assert(new_signal.num_slots() == 0, ExcInternalError());
+            return true;
+          }
+        return false;
+      }
+
+      /**
+       * Disconnects a function from the signal.
+       *
+       * Also disconnects the base weight function if it is the last connected
+       * function.
+       */
+      template <typename S>
+      DEAL_II_DEPRECATED_EARLY void
+      disconnect(const S &connection)
+      {
+        new_signal.disconnect(connection);
+
+        if (num_slots() == 0)
+          {
+            Assert(base_weight.connected() && new_signal.num_slots() == 1,
+                   ExcInternalError());
+            new_signal.disconnect(base_weight);
+          }
+      }
+
+      /**
+       * Triggers the signal.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      unsigned int
+      operator()(const cell_iterator &iterator, const CellStatus status)
+      {
+        return new_signal(iterator, status);
+      }
+
+    private:
+      /**
+       * Monitors the connection of the base weight function.
+       */
+      boost::signals2::connection base_weight;
+
+      /**
+       * Reference to the successor signal.
+       */
+      boost::signals2::signal<signature_type, combiner_type> &new_signal;
+    };
+
+    /**
+     * @copydoc weight
+     *
+     * As a reference, a value of 1000 is added for every cell to the total
+     * weight. This means a signal return value of 1000 (resulting in a weight
+     * of 2000) means that it is twice as expensive for a process to handle this
+     * particular cell.
+     *
+     * @deprecated Use the `weight` signal instead which omits the base weight.
+     * You can invoke the old behavior by connecting a function to the signal
+     * that returns the base weight as follows. This function should be added
+     * <em>in addition</em> to the one that actually computes the weight.
+     * @code{.cc}
+     * triangulation.signals.weight.connect(
+     *   [](const typename Triangulation<dim>::cell_iterator &,
+     *      const typename Triangulation<dim>::CellStatus)
+     *     -> unsigned int { return 1000; });
+     * @endcode
+     */
+    LegacySignal cell_weight;
 
     /**
      * This signal is triggered at the beginning of execution of the
@@ -2157,6 +2379,15 @@ public:
     boost::signals2::signal<void()> pre_distributed_refinement;
 
     /**
+     * This signal is triggered during execution of the
+     * parallel::distributed::Triangulation::execute_coarsening_and_refinement()
+     * function. At the time this signal is triggered, the p4est oracle has been
+     * refined and the cell relations have been updated. The triangulation is
+     * unchanged otherwise, and the p4est oracle has not yet been repartitioned.
+     */
+    boost::signals2::signal<void()> post_p4est_refinement;
+
+    /**
      * This signal is triggered at the end of execution of the
      * parallel::distributed::Triangulation::execute_coarsening_and_refinement()
      * function when the triangulation has reached its final state. This signal
@@ -2170,11 +2401,6 @@ public:
      * This signal is triggered at the beginning of execution of the
      * parallel::distributed::Triangulation::repartition() function. At the time
      * this signal is triggered, the triangulation is still unchanged.
-     *
-     * @note The parallel::distributed::Triangulation::repartition() function is
-     * also called by parallel::distributed::Triangulation::load(). Thus, the
-     * pre_distributed_repartition signal will be triggered after the
-     * pre_distributed_load one.
      */
     boost::signals2::signal<void()> pre_distributed_repartition;
 
@@ -2694,6 +2920,21 @@ public:
   last_active() const;
 
   /**
+   * Return an iterator to a cell of this Triangulation object constructed from
+   * an independent CellId object.
+   *
+   * If the given argument corresponds to a valid cell in this triangulation,
+   * this operation will always succeed for sequential triangulations where the
+   * current processor stores all cells that are part of the triangulation. On
+   * the other hand, if this is a parallel triangulation, then the current
+   * processor may not actually know about this cell. In this case, this
+   * operation will succeed for locally relevant cells, but may not for
+   * artificial cells that are less refined on the current processor.
+   */
+  cell_iterator
+  create_cell_iterator(const CellId &cell_id) const;
+
+  /**
    * @name Cell iterator functions returning ranges of iterators
    */
 
@@ -3001,6 +3242,13 @@ public:
   n_active_cells(const unsigned int level) const;
 
   /**
+   * Return the total number of coarse cells. If the coarse mesh is replicated
+   * on each process, this simply returns <tt>n_cells(0)</tt>.
+   */
+  virtual types::coarse_cell_id
+  n_global_coarse_cells() const;
+
+  /**
    * Return the total number of used faces, active or not.  In 2D, the result
    * equals n_lines(), in 3D it equals n_quads(), while in 1D it equals
    * the number of used vertices.
@@ -3253,7 +3501,8 @@ public:
 
   /**
    * Write the data of this object to a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    *
    * @note This function does not save <i>all</i> member variables of the
    * current triangulation. Rather, only certain kinds of information are
@@ -3265,7 +3514,9 @@ public:
 
   /**
    * Read the data of this object from a stream for the purpose of
-   * serialization. Throw away the previous content.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   * Throw away the previous content.
    *
    * @note This function does not reset <i>all</i> member variables of the
    * current triangulation to the ones of the triangulation that was
@@ -3311,37 +3562,48 @@ public:
   get_periodic_face_map() const;
 
   /**
-   * Translate the unique id of a coarse cell to its index. See the glossary
-   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
-   *
-   * @note For serial and shared triangulation both id and index are the same.
-   *       For distributed triangulations setting both might differ, since the
-   *       id might correspond to a global id and the index to a local id.
-   *
-   * @param coarse_cell_id Unique id of the coarse cell.
-   * @return Index of the coarse cell within the current triangulation.
+   * Return vector filled with the used reference-cell types of this
+   * triangulation.
    */
-  virtual unsigned int
-  coarse_cell_id_to_coarse_cell_index(
-    const types::coarse_cell_id coarse_cell_id) const;
-
+  const std::vector<ReferenceCell> &
+  get_reference_cells() const;
 
   /**
-   * Translate the index of coarse cell to its unique id. See the glossary
-   * entry on @ref GlossCoarseCellId "coarse cell IDs" for more information.
-   *
-   * @note See the note of the method
-   * coarse_cell_id_to_coarse_cell_index().
-   *
-   * @param coarse_cell_index Index of the coarse cell.
-   * @return Id of the coarse cell.
+   * Indicate if the triangulation only consists of hypercube-like cells, i.e.,
+   * lines, quadrilaterals, or hexahedra.
    */
-  virtual types::coarse_cell_id
-  coarse_cell_index_to_coarse_cell_id(
-    const unsigned int coarse_cell_index) const;
+  bool
+  all_reference_cells_are_hyper_cube() const;
 
+  /**
+   * Indicate if the triangulation only consists of simplex-like cells, i.e.,
+   * lines, triangles, or tetrahedra.
+   */
+  bool
+  all_reference_cells_are_simplex() const;
 
+  /**
+   * Indicate if the triangulation consists of different cell types (mix of
+   * simplices, hypercubes, ...) or different face types, as in the case
+   * of pyramids or wedges..
+   */
+  bool
+  is_mixed_mesh() const;
+
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization. using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   /**
    * @name Exceptions
@@ -3360,7 +3622,7 @@ public:
                  << arg1
                  << " of a triangulation, but this triangulation only has "
                  << arg2 << " refinement levels. The given level " << arg1
-                 << " must be *less* than " << arg2 << ".");
+                 << " must be *less* than " << arg2 << '.');
   /**
    * The function raising this exception can only operate on an empty
    * Triangulation, i.e., a Triangulation without grid cells.
@@ -3438,6 +3700,12 @@ protected:
   MeshSmoothing smooth_grid;
 
   /**
+   * Vector caching all reference-cell types of the given triangulation
+   * (also in the distributed case).
+   */
+  std::vector<ReferenceCell> reference_cells;
+
+  /**
    * Write a bool vector to the given stream, writing a pre- and a postfix
    * magic number. The vector is written in an almost binary format, i.e. the
    * bool flags are packed but the data is written as ASCII text.
@@ -3473,8 +3741,22 @@ protected:
   void
   update_periodic_face_map();
 
+  /**
+   * Update the internal reference_cells vector.
+   */
+  virtual void
+  update_reference_cells();
+
 
 private:
+  /**
+   * Policy with the Triangulation-specific tasks related to creation,
+   * refinement, and coarsening.
+   */
+  std::unique_ptr<
+    dealii::internal::TriangulationImplementation::Policy<dim, spacedim>>
+    policy;
+
   /**
    * If add_periodicity() is called, this variable stores the given periodic
    * face pairs on level 0 for later access during the identification of ghost
@@ -3770,6 +4052,12 @@ private:
   clear_despite_subscriptions();
 
   /**
+   * Reset triangulation policy.
+   */
+  void
+  reset_policy();
+
+  /**
    * For all cells, set the active cell indices so that active cells know the
    * how many-th active cell they are, and all other cells have an invalid
    * value. This function is called after mesh creation, refinement, and
@@ -3777,6 +4065,18 @@ private:
    */
   void
   reset_active_cell_indices();
+
+  /**
+   * Reset global cell ids and globale level cell ids.
+   */
+  void
+  reset_global_cell_indices();
+
+  /**
+   * Reset cache for the cells' vertex indices.
+   */
+  void
+  reset_cell_vertex_indices_cache();
 
   /**
    * Refine all cells on all levels which were previously flagged for
@@ -3811,11 +4111,45 @@ private:
   fix_coarsen_flags();
 
   /**
+   * Translate the unique id of a coarse cell to its index. See the glossary
+   * entry on
+   * @ref GlossCoarseCellId "coarse cell IDs"
+   * for more information.
+   *
+   * @note For serial and shared triangulation both id and index are the same.
+   *       For distributed triangulations setting both might differ, since the
+   *       id might correspond to a global id and the index to a local id.
+   *
+   * @param coarse_cell_id Unique id of the coarse cell.
+   * @return Index of the coarse cell within the current triangulation.
+   */
+  virtual unsigned int
+  coarse_cell_id_to_coarse_cell_index(
+    const types::coarse_cell_id coarse_cell_id) const;
+
+
+  /**
+   * Translate the index of coarse cell to its unique id. See the glossary
+   * entry on
+   * @ref GlossCoarseCellId "coarse cell IDs"
+   * for more information.
+   *
+   * @note See the note of the method
+   * coarse_cell_id_to_coarse_cell_index().
+   *
+   * @param coarse_cell_index Index of the coarse cell.
+   * @return Id of the coarse cell.
+   */
+  virtual types::coarse_cell_id
+  coarse_cell_index_to_coarse_cell_id(
+    const unsigned int coarse_cell_index) const;
+
+  /**
    * Array of pointers pointing to the objects storing the cell data on the
    * different levels.
    */
-  std::vector<std::unique_ptr<
-    dealii::internal::TriangulationImplementation::TriaLevel<dim>>>
+  std::vector<
+    std::unique_ptr<dealii::internal::TriangulationImplementation::TriaLevel>>
     levels;
 
   /**
@@ -3823,7 +4157,7 @@ private:
    * in 2D it contains data concerning lines and in 3D quads and lines.  All
    * of these have no level and are therefore treated separately.
    */
-  std::unique_ptr<dealii::internal::TriangulationImplementation::TriaFaces<dim>>
+  std::unique_ptr<dealii::internal::TriangulationImplementation::TriaFaces>
     faces;
 
 
@@ -3842,7 +4176,7 @@ private:
    * type FlatManifold.
    */
   std::map<types::manifold_id, std::unique_ptr<const Manifold<dim, spacedim>>>
-    manifold;
+    manifolds;
 
   /**
    * Flag indicating whether anisotropic refinement took place.
@@ -3918,11 +4252,10 @@ private:
 
   friend struct dealii::internal::TriaAccessorImplementation::Implementation;
 
-  friend class hp::DoFHandler<dim, spacedim>;
-
   friend struct dealii::internal::TriangulationImplementation::Implementation;
+  friend struct dealii::internal::TriangulationImplementation::
+    ImplementationMixedMesh;
 
-  template <typename>
   friend class dealii::internal::TriangulationImplementation::TriaObjects;
 
   // explicitly check for sensible template arguments, but not on windows
@@ -4031,8 +4364,8 @@ Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
 
   unsigned int n_levels = levels.size();
   ar &         n_levels;
-  for (unsigned int i = 0; i < levels.size(); ++i)
-    ar &levels[i];
+  for (const auto &level : levels)
+    ar &level;
 
   // boost dereferences a nullptr when serializing a nullptr
   // at least up to 1.65.1. This causes problems with clang-5.
@@ -4074,12 +4407,11 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   unsigned int size;
   ar &         size;
   levels.resize(size);
-  for (unsigned int i = 0; i < levels.size(); ++i)
+  for (auto &level_ : levels)
     {
-      std::unique_ptr<internal::TriangulationImplementation::TriaLevel<dim>>
-          level;
-      ar &level;
-      levels[i] = std::move(level);
+      std::unique_ptr<internal::TriangulationImplementation::TriaLevel> level;
+      ar &                                                              level;
+      level_ = std::move(level);
     }
 
   // Workaround for nullptr, see in save().
@@ -4098,11 +4430,18 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   // they are easy enough to rebuild upon re-loading data. do
   // this here. don't forget to first resize the fields appropriately
   {
-    for (unsigned int l = 0; l < levels.size(); ++l)
-      levels[l]->active_cell_indices.resize(levels[l]->refine_flags.size());
+    for (auto &level : levels)
+      {
+        level->active_cell_indices.resize(level->refine_flags.size());
+        level->global_active_cell_indices.resize(level->refine_flags.size());
+        level->global_level_cell_indices.resize(level->refine_flags.size());
+      }
+    reset_cell_vertex_indices_cache();
     reset_active_cell_indices();
+    reset_global_cell_indices();
   }
 
+  reset_policy();
 
   bool my_check_for_distorted_cells;
   ar & my_check_for_distorted_cells;
@@ -4150,9 +4489,6 @@ Triangulation<dim, spacedim>::coarse_cell_index_to_coarse_cell_id(
 
 template <>
 unsigned int
-Triangulation<1, 1>::n_raw_lines(const unsigned int level) const;
-template <>
-unsigned int
 Triangulation<1, 1>::n_quads() const;
 template <>
 unsigned int
@@ -4165,13 +4501,35 @@ unsigned int
 Triangulation<2, 2>::n_raw_quads(const unsigned int level) const;
 template <>
 unsigned int
-Triangulation<1, 1>::n_raw_hexs(const unsigned int level) const;
+Triangulation<3, 3>::n_raw_quads(const unsigned int level) const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_raw_quads() const;
 template <>
 unsigned int
 Triangulation<1, 1>::n_active_quads(const unsigned int level) const;
 template <>
 unsigned int
 Triangulation<1, 1>::n_active_quads() const;
+template <>
+unsigned int
+Triangulation<1, 1>::n_raw_hexs(const unsigned int level) const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_raw_hexs(const unsigned int level) const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_hexs() const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_active_hexs() const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_active_hexs(const unsigned int) const;
+template <>
+unsigned int
+Triangulation<3, 3>::n_hexs(const unsigned int level) const;
+
 template <>
 unsigned int
 Triangulation<1, 1>::max_adjacent_cells() const;
@@ -4181,9 +4539,6 @@ Triangulation<1, 1>::max_adjacent_cells() const;
 // -- Explicit specializations for codimension one grids
 
 
-template <>
-unsigned int
-Triangulation<1, 2>::n_raw_lines(const unsigned int level) const;
 template <>
 unsigned int
 Triangulation<1, 2>::n_quads() const;
@@ -4212,10 +4567,6 @@ Triangulation<1, 2>::max_adjacent_cells() const;
 // -------------------------------------------------------------------
 // -- Explicit specializations for codimension two grids
 
-
-template <>
-unsigned int
-Triangulation<1, 3>::n_raw_lines(const unsigned int level) const;
 template <>
 unsigned int
 Triangulation<1, 3>::n_quads() const;
@@ -4241,6 +4592,23 @@ template <>
 unsigned int
 Triangulation<1, 3>::max_adjacent_cells() const;
 
+template <>
+bool
+Triangulation<1, 1>::prepare_coarsening_and_refinement();
+template <>
+bool
+Triangulation<1, 2>::prepare_coarsening_and_refinement();
+template <>
+bool
+Triangulation<1, 3>::prepare_coarsening_and_refinement();
+
+
+extern template class Triangulation<1, 1>;
+extern template class Triangulation<1, 2>;
+extern template class Triangulation<1, 3>;
+extern template class Triangulation<2, 2>;
+extern template class Triangulation<2, 3>;
+extern template class Triangulation<3, 3>;
 
 #endif // DOXYGEN
 

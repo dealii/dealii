@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -281,8 +281,6 @@ namespace Physics
      * wikipedia page</a> and <a
      * href="https://github.com/dealii/dealii/tree/master/tests/physics/notation-kelvin_02.cc">the
      * unit tests</a>.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     namespace Kelvin
     {
@@ -295,7 +293,7 @@ namespace Physics
                      int,
                      << "The number of rows in the input matrix is " << arg1
                      << ", but needs to be either " << arg2 << " or " << arg3
-                     << ".");
+                     << '.');
 
 
       /**
@@ -307,8 +305,8 @@ namespace Physics
                      int,
                      int,
                      << "The number of rows in the input matrix is " << arg1
-                     << ", but needs to be either " << arg2 << "," << arg3
-                     << ", or " << arg4 << ".");
+                     << ", but needs to be either " << arg2 << ',' << arg3
+                     << ", or " << arg4 << '.');
 
 
       /**
@@ -320,7 +318,7 @@ namespace Physics
                      int,
                      << "The number of columns in the input matrix is " << arg1
                      << ", but needs to be either " << arg2 << " or " << arg3
-                     << ".");
+                     << '.');
 
 
       /**
@@ -332,8 +330,8 @@ namespace Physics
                      int,
                      int,
                      << "The number of columns in the input matrix is " << arg1
-                     << ", but needs to be either " << arg2 << "," << arg3
-                     << ", or " << arg4 << ".");
+                     << ", but needs to be either " << arg2 << ',' << arg3
+                     << ", or " << arg4 << '.');
 
 
       /**
@@ -682,7 +680,7 @@ namespace Physics
         indices_from_component(const unsigned int component_n, const bool)
         {
           AssertThrow(false, ExcNotImplemented());
-          return std::pair<unsigned int, unsigned int>();
+          return std::make_pair(0u, 0u);
         }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,11 @@
 
 #include <deal.II/base/polynomials_raviart_thomas.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 // TODO[WB]: This class is not thread-safe: it uses mutable member variables
 // that contain temporary state. this is not what one would want when one uses a
@@ -43,20 +43,52 @@ PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas(const unsigned int k)
 
 
 template <int dim>
+PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas(
+  const PolynomialsRaviartThomas &other)
+  : TensorPolynomialsBase<dim>(other)
+  , polynomial_space(other.polynomial_space)
+// no need to copy the scratch data, or the mutex
+{}
+
+
+
+template <int dim>
 std::vector<std::vector<Polynomials::Polynomial<double>>>
 PolynomialsRaviartThomas<dim>::create_polynomials(const unsigned int k)
 {
+  // Create a vector of polynomial spaces where the first element
+  // has degree k+1 and the rest has degree k. This corresponds to
+  // the space of single-variable polynomials from which we will create the
+  // space for the first component of the RT element by way of tensor
+  // product.
+  //
+  // The other components of the RT space can be created by rotating
+  // this vector of single-variable polynomials.
+  //
   std::vector<std::vector<Polynomials::Polynomial<double>>> pols(dim);
-  pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(k + 1);
   if (k == 0)
-    for (unsigned int d = 1; d < dim; ++d)
-      pols[d] = Polynomials::Legendre::generate_complete_basis(0);
+    {
+      // We need to treat the case k=0 differently because there,
+      // the polynomial in x has degree 1 and so has node points
+      // equal to the end points of the interval [0,1] (i.e., it
+      // is a "Lagrange" polynomial), whereas the y- and z-polynomials
+      // only have the interval midpoint as a node (i.e., they are
+      // a "Legendre" polynomial).
+      pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(1);
+      for (unsigned int d = 1; d < dim; ++d)
+        pols[d] = Polynomials::Legendre::generate_complete_basis(0);
+    }
   else
-    for (unsigned int d = 1; d < dim; ++d)
-      pols[d] = Polynomials::LagrangeEquidistant::generate_complete_basis(k);
+    {
+      pols[0] =
+        Polynomials::LagrangeEquidistant::generate_complete_basis(k + 1);
+      for (unsigned int d = 1; d < dim; ++d)
+        pols[d] = Polynomials::LagrangeEquidistant::generate_complete_basis(k);
+    }
 
   return pols;
 }
+
 
 
 template <int dim>
@@ -81,34 +113,19 @@ PolynomialsRaviartThomas<dim>::evaluate(
            fourth_derivatives.size() == 0,
          ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
-  // have a few scratch
-  // arrays. because we don't want to
-  // re-allocate them every time this
-  // function is called, we make them
-  // static. however, in return we
-  // have to ensure that the calls to
-  // the use of these variables is
-  // locked with a mutex. if the
-  // mutex is removed, several tests
-  // (notably
-  // deal.II/create_mass_matrix_05)
-  // will start to produce random
-  // results in multithread mode
-  static std::mutex           mutex;
-  std::lock_guard<std::mutex> lock(mutex);
-
-  static std::vector<double>         p_values;
-  static std::vector<Tensor<1, dim>> p_grads;
-  static std::vector<Tensor<2, dim>> p_grad_grads;
-  static std::vector<Tensor<3, dim>> p_third_derivatives;
-  static std::vector<Tensor<4, dim>> p_fourth_derivatives;
+  // In the following, we will access the scratch arrays declared as 'mutable'
+  // in the class. In order to do so from this function, we have to make sure
+  // that we guard this access by a mutex so that the invokation of this 'const'
+  // function is thread-safe.
+  std::lock_guard<std::mutex> lock(scratch_arrays_mutex);
 
   const unsigned int n_sub = polynomial_space.n();
-  p_values.resize((values.size() == 0) ? 0 : n_sub);
-  p_grads.resize((grads.size() == 0) ? 0 : n_sub);
-  p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
-  p_third_derivatives.resize((third_derivatives.size() == 0) ? 0 : n_sub);
-  p_fourth_derivatives.resize((fourth_derivatives.size() == 0) ? 0 : n_sub);
+  scratch_values.resize((values.size() == 0) ? 0 : n_sub);
+  scratch_grads.resize((grads.size() == 0) ? 0 : n_sub);
+  scratch_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
+  scratch_third_derivatives.resize((third_derivatives.size() == 0) ? 0 : n_sub);
+  scratch_fourth_derivatives.resize((fourth_derivatives.size() == 0) ? 0 :
+                                                                       n_sub);
 
   for (unsigned int d = 0; d < dim; ++d)
     {
@@ -128,34 +145,34 @@ PolynomialsRaviartThomas<dim>::evaluate(
         p(c) = unit_point((c + d) % dim);
 
       polynomial_space.evaluate(p,
-                                p_values,
-                                p_grads,
-                                p_grad_grads,
-                                p_third_derivatives,
-                                p_fourth_derivatives);
+                                scratch_values,
+                                scratch_grads,
+                                scratch_grad_grads,
+                                scratch_third_derivatives,
+                                scratch_fourth_derivatives);
 
-      for (unsigned int i = 0; i < p_values.size(); ++i)
-        values[i + d * n_sub][d] = p_values[i];
+      for (unsigned int i = 0; i < scratch_values.size(); ++i)
+        values[i + d * n_sub][d] = scratch_values[i];
 
-      for (unsigned int i = 0; i < p_grads.size(); ++i)
+      for (unsigned int i = 0; i < scratch_grads.size(); ++i)
         for (unsigned int d1 = 0; d1 < dim; ++d1)
-          grads[i + d * n_sub][d][(d1 + d) % dim] = p_grads[i][d1];
+          grads[i + d * n_sub][d][(d1 + d) % dim] = scratch_grads[i][d1];
 
-      for (unsigned int i = 0; i < p_grad_grads.size(); ++i)
+      for (unsigned int i = 0; i < scratch_grad_grads.size(); ++i)
         for (unsigned int d1 = 0; d1 < dim; ++d1)
           for (unsigned int d2 = 0; d2 < dim; ++d2)
             grad_grads[i + d * n_sub][d][(d1 + d) % dim][(d2 + d) % dim] =
-              p_grad_grads[i][d1][d2];
+              scratch_grad_grads[i][d1][d2];
 
-      for (unsigned int i = 0; i < p_third_derivatives.size(); ++i)
+      for (unsigned int i = 0; i < scratch_third_derivatives.size(); ++i)
         for (unsigned int d1 = 0; d1 < dim; ++d1)
           for (unsigned int d2 = 0; d2 < dim; ++d2)
             for (unsigned int d3 = 0; d3 < dim; ++d3)
               third_derivatives[i + d * n_sub][d][(d1 + d) % dim]
                                [(d2 + d) % dim][(d3 + d) % dim] =
-                                 p_third_derivatives[i][d1][d2][d3];
+                                 scratch_third_derivatives[i][d1][d2][d3];
 
-      for (unsigned int i = 0; i < p_fourth_derivatives.size(); ++i)
+      for (unsigned int i = 0; i < scratch_fourth_derivatives.size(); ++i)
         for (unsigned int d1 = 0; d1 < dim; ++d1)
           for (unsigned int d2 = 0; d2 < dim; ++d2)
             for (unsigned int d3 = 0; d3 < dim; ++d3)
@@ -163,7 +180,8 @@ PolynomialsRaviartThomas<dim>::evaluate(
                 fourth_derivatives[i + d * n_sub][d][(d1 + d) % dim]
                                   [(d2 + d) % dim][(d3 + d) % dim]
                                   [(d4 + d) % dim] =
-                                    p_fourth_derivatives[i][d1][d2][d3][d4];
+                                    scratch_fourth_derivatives[i][d1][d2][d3]
+                                                              [d4];
     }
 }
 
@@ -188,7 +206,7 @@ template <int dim>
 std::unique_ptr<TensorPolynomialsBase<dim>>
 PolynomialsRaviartThomas<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsRaviartThomas<dim>>(*this);
+  return std::make_unique<PolynomialsRaviartThomas<dim>>(*this);
 }
 
 

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2019 by the deal.II authors
+ * Copyright (C) 1999 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -27,14 +27,6 @@
 #include <deal.II/dofs/dof_handler.h>
 // And this is the file in which the functions are declared that create grids:
 #include <deal.II/grid/grid_generator.h>
-
-// The next three files contain classes which are needed for loops over all
-// cells and to get the information from the cell objects. The first two have
-// been used before to get geometric information from cells; the last one is
-// new and provides information about the degrees of freedom local to a cell:
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
 
 // This file contains the description of the Lagrange interpolation finite
 // element:
@@ -339,8 +331,8 @@ void Step3::assemble_system()
   // but maybe not so in higher level languages like C++, but serve
   // the current purpose quite well.
 
-  // For use further down below, we define two shortcuts for values that will
-  // be used very frequently. First, an abbreviation for the number of degrees
+  // For use further down below, we define a shortcut for a value that will
+  // be used very frequently. Namely, an abbreviation for the number of degrees
   // of freedom on each cell (since we are in 2D and degrees of freedom are
   // associated with vertices only, this number is four, but we rather want to
   // write the definition of this variable in a way that does not preclude us
@@ -348,19 +340,23 @@ void Step3::assemble_system()
   // number of degrees of freedom per cell, or work in a different space
   // dimension).
   //
-  // Secondly, we also define an abbreviation for the number of quadrature
-  // points (here that should be four). In general, it is a good idea to use
-  // their symbolic names instead of hard-coding these numbers even if you know
-  // them, since you may want to change the quadrature formula and/or finite
-  // element at some time; the program will just work with these changes,
-  // without the need to change anything in this function.
+  // In general, it is a good idea to use a symbolic name instead of
+  // hard-coding these numbers even if you know them, since for example,
+  // you may want to change the finite element at some time. Changing the
+  // element would have to be done in a different function and it is easy
+  // to forget to make a corresponding change in another part of the program.
+  // It is better to not rely on your own calculations, but instead ask
+  // the right object for the information: Here, we ask the finite element
+  // to tell us about the number of degrees of freedom per cell and we
+  // will get the correct number regardless of the space dimension or
+  // polynomial degree we may have chosen elsewhere in the program.
   //
-  // The shortcuts, finally, are only defined to make the following loops a
-  // bit more readable. You will see them in many places in larger programs,
-  // and `dofs_per_cell` and `n_q_points` are more or less by convention the
-  // standard names for these purposes:
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
+  // The shortcut here, defined primarily to discuss the basic concept
+  // and not because it saves a lot of typing, will then make the following
+  // loops a bit more readable. You will see such shortcuts in many places in
+  // larger programs, and `dofs_per_cell` is one that is more or less the
+  // conventional name for this kind of object.
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
   // Now, we said that we wanted to assemble the global matrix and vector
   // cell-by-cell. We could write the results directly into the global matrix,
@@ -414,7 +410,7 @@ void Step3::assemble_system()
       // Now it is time to start integration over the cell, which we
       // do by looping over all quadrature points, which we will
       // number by q_index.
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+      for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
           // First assemble the matrix: For the Laplace problem, the
           // matrix on each cell is the integral over the gradients of
@@ -433,8 +429,8 @@ void Step3::assemble_system()
           // determinant and the quadrature point weight (that one
           // gets together by the call to FEValues::JxW() ). Finally,
           // this is repeated for all shape functions $i$ and $j$:
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          for (const unsigned int i : fe_values.dof_indices())
+            for (const unsigned int j : fe_values.dof_indices())
               cell_matrix(i, j) +=
                 (fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
                  fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
@@ -445,9 +441,9 @@ void Step3::assemble_system()
           // hand side function, which we choose to be the function
           // with constant value one (more interesting examples will
           // be considered in the following programs).
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (const unsigned int i : fe_values.dof_indices())
             cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
-                            1 *                                 // f(x_q)
+                            1. *                                // f(x_q)
                             fe_values.JxW(q_index));            // dx
         }
       // Now that we have the contribution of this cell, we have to transfer
@@ -459,14 +455,14 @@ void Step3::assemble_system()
       // Then again loop over all shape functions i and j and transfer the
       // local elements to the global matrix. The global numbers can be
       // obtained using local_dof_indices[i]:
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+      for (const unsigned int i : fe_values.dof_indices())
+        for (const unsigned int j : fe_values.dof_indices())
           system_matrix.add(local_dof_indices[i],
                             local_dof_indices[j],
                             cell_matrix(i, j));
 
       // And again, we do the same thing for the right hand side vector.
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int i : fe_values.dof_indices())
         system_rhs(local_dof_indices[i]) += cell_rhs(i);
     }
 
@@ -531,35 +527,36 @@ void Step3::assemble_system()
 
 // @sect4{Step3::solve}
 
-// The following function simply solves the discretized equation. As the
-// system is quite a large one for direct solvers such as Gauss elimination or
-// LU decomposition, we use a Conjugate Gradient algorithm. You should
-// remember that the number of variables here (only 1089) is a very small
-// number for finite element computations, where 100.000 is a more usual
-// number.  For this number of variables, direct methods are no longer usable
-// and you are forced to use methods like CG.
+// The following function solves the discretized equation. As discussed in
+// the introduction, we want to use an iterative solver to do this,
+// specifically the Conjugate Gradient (CG) method.
+//
+// The way to do this in deal.II is a three-step process:
+// - First, we need to have an object that knows how to tell the CG algorithm
+//   when to stop. This is done by using a SolverControl object, and as
+//   stopping criterion we say: stop after a maximum of 1000 iterations (which
+//   is far more than is needed for 1089 variables; see the results section to
+//   find out how many were really used), and stop if the norm of the residual
+//   is below $\tau=10^{-6}\|\mathbf b\|$ where $\mathbf b$ is the right hand
+//   side vector. In practice, this latter criterion will be the one
+//   which stops the iteration.
+// - Then we need the solver itself. The template parameter to the SolverCG
+//   class is the type of the vectors we are using.
+// - The last step is to actually solve the system of equations. The CG solver
+//   takes as arguments the components of the linear system $Ax=b$ (in the
+//   order in which they appear in this equation), and a preconditioner
+//   as the fourth argument. We don't feel ready to delve into preconditioners
+//   yet, so we tell it to use the identity operation as preconditioner. Later
+//   tutorial programs will spend significant amount of time and space on
+//   constructing better preconditioners.
+//
+// At the end of this process, the `solution` variable contains the
+// nodal values of the solution function.
 void Step3::solve()
 {
-  // First, we need to have an object that knows how to tell the CG algorithm
-  // when to stop. This is done by using a SolverControl object, and as
-  // stopping criterion we say: stop after a maximum of 1000 iterations (which
-  // is far more than is needed for 1089 variables; see the results section to
-  // find out how many were really used), and stop if the norm of the residual
-  // is below $10^{-12}$. In practice, the latter criterion will be the one
-  // which stops the iteration:
-  SolverControl solver_control(1000, 1e-12);
-  // Then we need the solver itself. The template parameter to the SolverCG
-  // class is the type of the vectors, but the empty angle brackets indicate
-  // that we simply take the default argument (which is
-  // <code>Vector@<double@></code>):
+  SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
   SolverCG<Vector<double>> solver(solver_control);
-
-  // Now solve the system of equations. The CG solver takes a preconditioner
-  // as its fourth argument. We don't feel ready to delve into this yet, so we
-  // tell it to use the identity operation as preconditioner:
   solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
-  // Now that the solver has done its job, the solution variable contains the
-  // nodal values of the solution function.
 }
 
 

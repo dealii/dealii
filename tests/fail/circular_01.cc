@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@ char logname[] = "output";
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -38,7 +39,6 @@ char logname[] = "output";
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -90,7 +90,7 @@ private:
 
   Triangulation<dim> triangulation;
 
-  hp::DoFHandler<dim>      dof_handler;
+  DoFHandler<dim>          dof_handler;
   hp::FECollection<dim>    fe_collection;
   hp::QCollection<dim>     quadrature_collection;
   hp::QCollection<dim - 1> face_quadrature_collection;
@@ -215,9 +215,9 @@ LaplaceProblem<dim>::assemble_system()
 
   const RightHandSide<dim> rhs_function;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -399,9 +399,9 @@ LaplaceProblem<dim>::estimate_smoothness(
   std::vector<std::complex<double>> fourier_coefficients(n_fourier_modes);
   Vector<double>                    local_dof_values;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (unsigned int index = 0; cell != endc; ++cell, ++index)
     {
       local_dof_values.reinit(cell->get_fe().dofs_per_cell);
@@ -485,9 +485,9 @@ LaplaceProblem<dim>::refine_grid()
   float max_smoothness = 0,
         min_smoothness = smoothness_indicators.linfty_norm();
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (unsigned int index = 0; cell != endc; ++cell, ++index)
       if (cell->refine_flag_set())
         {
@@ -499,9 +499,9 @@ LaplaceProblem<dim>::refine_grid()
   }
   const float cutoff_smoothness = (max_smoothness + min_smoothness) / 2;
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (unsigned int index = 0; cell != endc; ++cell, ++index)
       if (cell->refine_flag_set() &&
           (smoothness_indicators(index) > cutoff_smoothness) &&
@@ -544,9 +544,9 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle) const
 
     Vector<float> fe_indices(triangulation.n_active_cells());
     {
-      typename hp::DoFHandler<dim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
+      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
+                                                              .begin_active(),
+                                                     endc = dof_handler.end();
       for (unsigned int index = 0; cell != endc; ++cell, ++index)
         {
           fe_indices(index) = cell->active_fe_index();
@@ -556,7 +556,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle) const
 
     const std::string filename =
       "solution-" + Utilities::int_to_string(cycle, 2) + ".vtk";
-    DataOut<dim, hp::DoFHandler<dim>> data_out;
+    DataOut<dim> data_out;
 
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");

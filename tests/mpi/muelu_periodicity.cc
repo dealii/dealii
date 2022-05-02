@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2018 by the deal.II authors
+ * Copyright (C) 2008 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -587,7 +587,7 @@ namespace Step22
     typename DoFHandler<dim>::active_cell_iterator cell =
       GridTools::find_active_cell_around_point(dof_handler, point);
 
-    if (cell->is_locally_owned())
+    if (cell.state() == IteratorState::valid && cell->is_locally_owned())
       VectorTools::point_value(dof_handler, solution, point, value);
 
     std::vector<double> tmp(value.size());
@@ -617,10 +617,10 @@ namespace Step22
   StokesProblem<2>::check_periodicity(const unsigned int cycle) const
   {
     unsigned int n_points = 4;
-    for (unsigned int i = 0; i < cycle; i++)
+    for (unsigned int i = 0; i < cycle; ++i)
       n_points *= 2;
 
-    for (unsigned int i = 1; i < n_points; i++)
+    for (unsigned int i = 1; i < n_points; ++i)
       {
         Vector<double> value1(3);
         Vector<double> value2(3);
@@ -683,7 +683,7 @@ namespace Step22
 
     std::ostringstream filename;
     filename
-      << "solution-" << Utilities::int_to_string(refinement_cycle, 2) << "."
+      << "solution-" << Utilities::int_to_string(refinement_cycle, 2) << '.'
       << Utilities::int_to_string(triangulation.locally_owned_subdomain(), 2)
       << ".vtu";
 
@@ -699,11 +699,11 @@ namespace Step22
           filenames.push_back(std::string("solution-") +
                               Utilities::int_to_string(refinement_cycle, 2) +
                               "." + Utilities::int_to_string(i, 2) + ".vtu");
-        const std::string pvtu_master_filename =
+        const std::string pvtu_filename =
           ("solution-" + Utilities::int_to_string(refinement_cycle, 2) +
            ".pvtu");
-        std::ofstream pvtu_master(pvtu_master_filename.c_str());
-        data_out.write_pvtu_record(pvtu_master, filenames);
+        std::ofstream pvtu_output(pvtu_filename.c_str());
+        data_out.write_pvtu_record(pvtu_output, filenames);
       }
   }
 

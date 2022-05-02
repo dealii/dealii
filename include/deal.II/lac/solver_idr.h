@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,7 +65,8 @@ namespace internal
        * Get vector number @p i. If this vector was unused before, an error
        * occurs.
        */
-      VectorType &operator[](const unsigned int i) const;
+      VectorType &
+      operator[](const unsigned int i) const;
 
       /**
        * Get vector number @p i. Allocate it if necessary.
@@ -111,8 +112,6 @@ namespace internal
  * iteration. If the user enables the history data, the residual at each of
  * these steps is stored and therefore there will be multiple values per
  * iteration.
- *
- * @author Conrad Clevenger, 2019
  */
 template <class VectorType = Vector<double>>
 class SolverIDR : public SolverBase<VectorType>
@@ -201,8 +200,8 @@ namespace internal
 
 
     template <class VectorType>
-    inline VectorType &TmpVectors<VectorType>::
-                       operator[](const unsigned int i) const
+    inline VectorType &
+    TmpVectors<VectorType>::operator[](const unsigned int i) const
     {
       AssertIndexRange(i, data.size());
 

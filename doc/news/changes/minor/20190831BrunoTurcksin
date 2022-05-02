@@ -1,4 +1,0 @@
-Fixed: CUDAWrappers::MatrixFree::cell_loop() now works on adapted mesh even in
-two dimensions with finite elements of even degree.
-<br>
-(Bruno Turcksin, 2019/08/31)

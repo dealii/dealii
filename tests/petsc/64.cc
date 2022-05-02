@@ -20,7 +20,6 @@
 // PETScWrappers::MatrixBase::operator=
 
 
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
@@ -28,6 +27,8 @@
 #include <vector>
 
 #include "../tests.h"
+
+#include "../testmatrix.h"
 
 
 template <typename MatrixType>
@@ -54,7 +55,8 @@ main(int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        const unsigned int n_dofs = 420;
+        const unsigned int N      = 20;
+        const unsigned int n_dofs = N * N;
         // check
         // PETScWrappers::SparseMatrix
         PETScWrappers::SparseMatrix v1(n_dofs, n_dofs, 5);
@@ -62,23 +64,23 @@ main(int argc, char **argv)
 
         // check
         // PETScWrappers::MPI::SparseMatrix
-        MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-        const unsigned int n_mpi_processes =
-          Utilities::MPI::n_mpi_processes(mpi_communicator);
-        const unsigned int my_id =
-          Utilities::MPI::this_mpi_process(mpi_communicator);
+        MPI_Comm mpi_communicator(MPI_COMM_WORLD);
+        int      n_jobs = 1;
+        MPI_Comm_size(mpi_communicator, &n_jobs);
+        const unsigned int n_mpi_processes = static_cast<unsigned int>(n_jobs);
         Assert(n_dofs % n_mpi_processes == 0, ExcInternalError());
-        const unsigned int n_local_dofs = n_dofs / n_mpi_processes;
-        IndexSet           locally_owned_dofs(n_dofs);
-        locally_owned_dofs.add_range(my_id * n_dofs / n_mpi_processes,
-                                     (my_id + 1) * n_dofs / n_mpi_processes);
-        DynamicSparsityPattern dsp(n_dofs);
-        dsp.add(0, 0);
         PETScWrappers::MPI::SparseMatrix v2;
-        v2.reinit(locally_owned_dofs,
-                  locally_owned_dofs,
-                  dsp,
-                  mpi_communicator);
+        {
+          FDMatrix               fd_matrix(N, N);
+          DynamicSparsityPattern dsp(n_dofs, n_dofs);
+          fd_matrix.five_point_structure(dsp);
+          dsp.add(0, 0); // be sure that we have this one
+          SparsityPattern sparsity_pattern;
+          sparsity_pattern.copy_from(dsp);
+          IndexSet all_dofs(n_dofs);
+          all_dofs.add_range(0, n_dofs);
+          v2.reinit(all_dofs, all_dofs, sparsity_pattern, PETSC_COMM_WORLD);
+        }
         test(v2);
       }
     }

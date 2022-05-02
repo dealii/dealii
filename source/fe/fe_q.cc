@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,14 +15,18 @@
 
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/fe_simplex_p_bubbles.h>
+#include <deal.II/fe/fe_wedge_p.h>
 
 #include <deal.II/lac/vector.h>
 
+#include <memory>
 #include <sstream>
 #include <vector>
 
@@ -42,7 +46,7 @@ namespace internal
           return QGaussLobatto<1>(degree + 1).get_points();
         else
           {
-            using FEQ = dealii::FE_Q_Base<TensorProductPolynomials<1>, 1, 1>;
+            using FEQ = dealii::FE_Q_Base<1, 1>;
             AssertThrow(false, FEQ::ExcFEQCannotHaveDegree0());
           }
         return std::vector<Point<1>>();
@@ -55,7 +59,7 @@ namespace internal
 
 template <int dim, int spacedim>
 FE_Q<dim, spacedim>::FE_Q(const unsigned int degree)
-  : FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>(
+  : FE_Q_Base<dim, spacedim>(
       TensorProductPolynomials<dim>(
         Polynomials::generate_complete_Lagrange_basis(
           internal::FE_Q::get_QGaussLobatto_points(degree))),
@@ -72,7 +76,7 @@ FE_Q<dim, spacedim>::FE_Q(const unsigned int degree)
 
 template <int dim, int spacedim>
 FE_Q<dim, spacedim>::FE_Q(const Quadrature<1> &points)
-  : FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>(
+  : FE_Q_Base<dim, spacedim>(
       TensorProductPolynomials<dim>(
         Polynomials::generate_complete_Lagrange_basis(points.get_points())),
       FiniteElementData<dim>(this->get_dpo_vector(points.size() - 1),
@@ -99,13 +103,15 @@ FE_Q<dim, spacedim>::get_name() const
   std::vector<double> points(this->degree + 1);
 
   // Decode the support points in one coordinate direction.
+  TensorProductPolynomials<dim> *poly_space_derived_ptr =
+    dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
   std::vector<unsigned int> lexicographic =
-    this->poly_space.get_numbering_inverse();
-  for (unsigned int j = 0; j <= this->degree; j++)
+    poly_space_derived_ptr->get_numbering_inverse();
+  for (unsigned int j = 0; j <= this->degree; ++j)
     points[j] = this->unit_support_points[lexicographic[j]][0];
 
   // Check whether the support points are equidistant.
-  for (unsigned int j = 0; j <= this->degree; j++)
+  for (unsigned int j = 0; j <= this->degree; ++j)
     if (std::fabs(points[j] - static_cast<double>(j) / this->degree) > 1e-15)
       {
         equidistant = false;
@@ -116,7 +122,7 @@ FE_Q<dim, spacedim>::get_name() const
     {
       if (this->degree > 2)
         namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim)
-                << ">(QIterated(QTrapez()," << this->degree << "))";
+                << ">(QIterated(QTrapezoid()," << this->degree << "))";
       else
         namebuf << "FE_Q<" << Utilities::dim_string(dim, spacedim) << ">("
                 << this->degree << ")";
@@ -126,7 +132,7 @@ FE_Q<dim, spacedim>::get_name() const
       // Check whether the support points come from QGaussLobatto.
       const QGaussLobatto<1> points_gl(this->degree + 1);
       bool                   gauss_lobatto = true;
-      for (unsigned int j = 0; j <= this->degree; j++)
+      for (unsigned int j = 0; j <= this->degree; ++j)
         if (points[j] != points_gl.point(j)(0))
           {
             gauss_lobatto = false;
@@ -153,9 +159,9 @@ FE_Q<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   AssertDimension(support_point_values.size(),
                   this->get_unit_support_points().size());
   AssertDimension(support_point_values.size(), nodal_values.size());
-  AssertDimension(this->dofs_per_cell, nodal_values.size());
+  AssertDimension(this->n_dofs_per_cell(), nodal_values.size());
 
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     {
       AssertDimension(support_point_values[i].size(), 1);
 
@@ -169,7 +175,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_Q<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Q<dim, spacedim>>(*this);
+  return std::make_unique<FE_Q<dim, spacedim>>(*this);
 }
 
 
@@ -200,6 +206,36 @@ FE_Q<dim, spacedim>::compare_for_domination(
       if (this->degree < fe_q_other->degree)
         return FiniteElementDomination::this_element_dominates;
       else if (this->degree == fe_q_other->degree)
+        return FiniteElementDomination::either_element_can_dominate;
+      else
+        return FiniteElementDomination::other_element_dominates;
+    }
+  else if (const FE_SimplexP<dim, spacedim> *fe_p_other =
+             dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other))
+    {
+      if (this->degree < fe_p_other->degree)
+        return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_p_other->degree)
+        return FiniteElementDomination::either_element_can_dominate;
+      else
+        return FiniteElementDomination::other_element_dominates;
+    }
+  else if (const FE_WedgeP<dim, spacedim> *fe_wp_other =
+             dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
+    {
+      if (this->degree < fe_wp_other->degree)
+        return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_wp_other->degree)
+        return FiniteElementDomination::either_element_can_dominate;
+      else
+        return FiniteElementDomination::other_element_dominates;
+    }
+  else if (const FE_PyramidP<dim, spacedim> *fe_pp_other =
+             dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
+    {
+      if (this->degree < fe_pp_other->degree)
+        return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_pp_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;

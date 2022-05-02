@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,8 @@ template <int dim, typename stream_type>
 void
 test(int n, const Point<dim> &split_point, stream_type &deallog)
 {
-  QSplit<dim> quad(QSimplex<dim>(QIterated<dim>(QTrapez<1>(), n)), split_point);
+  QSplit<dim> quad(QSimplex<dim>(QIterated<dim>(QTrapezoid<1>(), n)),
+                   split_point);
 
   deallog << std::endl
           << "# dim = " << dim << ", quad size = " << quad.size()

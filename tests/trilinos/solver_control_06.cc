@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -477,9 +477,9 @@ Test_Solver_Output::output(unsigned int cycle)
            ++i)
         filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) +
                             "." + Utilities::int_to_string(i, 4) + ".vtu");
-      std::ofstream master_output(
+      std::ofstream pvtu_output(
         ("solution-" + Utilities::int_to_string(cycle, 2) + ".pvtu").c_str());
-      data_out.write_pvtu_record(master_output, filenames);
+      data_out.write_pvtu_record(pvtu_output, filenames);
     }
 }
 

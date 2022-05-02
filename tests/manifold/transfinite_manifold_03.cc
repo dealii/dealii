@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,14 +14,14 @@
 // ---------------------------------------------------------------------
 
 
-// Similar to transfinite_manifold_01 but now applying a MappingQGeneric and
+// Similar to transfinite_manifold_01 but now applying a MappingQ and
 // computing some areas
 
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
@@ -38,9 +38,9 @@ do_test(const Triangulation<dim, spacedim> &tria)
 {
   for (unsigned int degree = 1; degree < 5; ++degree)
     {
-      MappingQGeneric<dim, spacedim> mapping(degree);
-      FE_Nothing<dim, spacedim>      fe;
-      QGauss<dim>                    gauss(degree + 1);
+      MappingQ<dim, spacedim>   mapping(degree);
+      FE_Nothing<dim, spacedim> fe;
+      QGauss<dim>               gauss(degree + 1);
       FEValues<dim, spacedim> fe_values(mapping, fe, gauss, update_JxW_values);
       double                  volume = 0;
       for (typename Triangulation<dim, spacedim>::cell_iterator cell =

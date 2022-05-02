@@ -77,7 +77,7 @@ public:
     data.cell_loop(*this, src_dummy, dst_dummy);
 
     // Check that the kernel was launched correctly
-    AssertCuda(cudaGetLastError());
+    AssertCuda(cudaPeekAtLastError());
     // Check that there was no problem during the execution of the kernel
     AssertCuda(cudaDeviceSynchronize());
 

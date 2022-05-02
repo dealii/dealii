@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -128,7 +128,7 @@ test()
 
   for (auto point = active_vertices.begin(); point != active_vertices.end();
        ++point)
-    deallog << point->second << " ";
+    deallog << point->second << ' ';
 
   deallog << std::endl << "Ok." << std::endl;
 }

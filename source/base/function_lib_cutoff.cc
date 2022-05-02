@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,14 +48,6 @@ namespace Functions
   }
 
 
-  template <int dim>
-  void
-  CutOffFunctionBase<dim>::new_center(const Point<dim> &p)
-  {
-    set_center(p);
-  }
-
-
 
   template <int dim>
   void
@@ -71,15 +63,6 @@ namespace Functions
   CutOffFunctionBase<dim>::get_center() const
   {
     return center;
-  }
-
-
-
-  template <int dim>
-  void
-  CutOffFunctionBase<dim>::new_radius(const double r)
-  {
-    set_radius(r);
   }
 
 
@@ -179,14 +162,19 @@ namespace Functions
   {
     Assert(initialized, ExcNotInitialized());
     Tensor<1, dim> ret;
-    for (unsigned int i = 0; i < dim; ++i)
-      ret[i] = base[i]->gradient(Point<1>(p[i]), component)[0];
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        ret[d] = base[d]->gradient(Point<1>(p[d]), component)[0];
+        for (unsigned int i = 0; i < dim; ++i)
+          if (i != d)
+            ret[d] *= base[i]->value(Point<1>(p[i]), component);
+      }
     return ret;
   }
 
 
 
-  //////////////////////////////////////////////////////////////////////
+  //--------------------------------------------------------------------
   namespace
   {
     // Integral of CutOffFunctionLinfty in dimension 1, 2, and 3 when the radius
@@ -336,8 +324,8 @@ namespace Functions
         {
           const double d = this->center.distance(points[i]);
           values[i]      = ((d < this->radius) ?
-                         (this->radius - d) / this->radius * this->rescaling :
-                         0.);
+                              (this->radius - d) / this->radius * this->rescaling :
+                              0.);
         }
     else
       std::fill(values.begin(), values.end(), 0.);

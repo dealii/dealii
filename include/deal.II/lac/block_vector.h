@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,7 +65,6 @@ namespace TrilinosWrappers
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <typename Number>
 class BlockVector : public BlockVectorBase<Vector<Number>>
@@ -125,12 +124,6 @@ public:
    * fail if there is no conversion path from <tt>OtherNumber</tt> to
    * <tt>Number</tt>. Note that you may lose accuracy when copying to a
    * BlockVector with data elements with less accuracy.
-   *
-   * Older versions of gcc did not honor the @p explicit keyword on template
-   * constructors. In such cases, it is easy to accidentally write code that
-   * can be very inefficient, since the compiler starts performing hidden
-   * conversions. To avoid this, this function is disabled if we have detected
-   * a broken compiler during configuration.
    */
   template <typename OtherNumber>
   explicit BlockVector(const BlockVector<OtherNumber> &v);
@@ -484,7 +477,6 @@ BlockVector<Number>::scale(const BlockVector2 &v)
  * exchanges the data of the two vectors.
  *
  * @relatesalso BlockVector
- * @author Wolfgang Bangerth, 2000
  */
 template <typename Number>
 inline void
@@ -534,8 +526,6 @@ namespace internal
 
 /**
  * Declare dealii::BlockVector as serial vector.
- *
- * @author Uwe Koecher, 2017
  */
 template <typename Number>
 struct is_serial_vector<BlockVector<Number>> : std::true_type

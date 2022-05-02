@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -72,7 +71,7 @@ test()
 
   hp::FECollection<dim> fe;
   fe.push_back(FE_Q<dim>(1));
-  hp::DoFHandler<dim> dh(tria);
+  DoFHandler<dim> dh(tria);
   dh.distribute_dofs(fe);
 
   BlockVector<double> v(2);
@@ -85,8 +84,7 @@ test()
   VectorTools::project(
     dh, cm, hp::QCollection<dim>(QGauss<dim>(3)), F<dim>(), v);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dh.begin_active();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
        cell != dh.end();
        ++cell)
     for (const unsigned int i : GeometryInfo<dim>::vertex_indices())

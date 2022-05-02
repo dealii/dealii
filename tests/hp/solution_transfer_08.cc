@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 // like _07 but do it the other way around: start with a fine mesh, then
 // coarsen
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -28,7 +29,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -53,7 +53,7 @@ test()
   fe_collection.push_back(FE_Q<dim>(1));
   fe_collection.push_back(FE_Q<dim>(2));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
   for (unsigned int c = 0; c < dof_handler.begin(0)->n_children(); ++c)
     dof_handler.begin(0)->child(c)->set_active_fe_index(1);
   dof_handler.distribute_dofs(fe_collection);
@@ -63,8 +63,7 @@ test()
   solution = 1.0;
 
   // coarsen everything away
-  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim>> solution_trans(
-    dof_handler);
+  SolutionTransfer<dim, Vector<double>> solution_trans(dof_handler);
   for (unsigned int c = 0; c < dof_handler.begin(0)->n_children(); ++c)
     dof_handler.begin(0)->child(c)->set_coarsen_flag();
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,6 +67,7 @@ namespace PETScWrappers
                 this_process,
                 preset_nonzero_locations);
     }
+
 
 
     void
@@ -317,12 +318,8 @@ namespace PETScWrappers
       // first have to know which areas are
       // ours
       size_type local_row_start = 0;
-      size_type local_col_start = 0;
       for (unsigned int p = 0; p < this_process; ++p)
-        {
-          local_row_start += local_rows_per_process[p];
-          local_col_start += local_columns_per_process[p];
-        }
+        local_row_start += local_rows_per_process[p];
       const size_type local_row_end =
         local_row_start + local_rows_per_process[this_process];
 

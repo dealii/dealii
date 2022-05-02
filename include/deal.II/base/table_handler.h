@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,13 +20,13 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/std_cxx17/variant.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
-#include <boost/variant.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <fstream>
@@ -48,10 +48,10 @@ namespace internal
   /**
    * A <tt>TableEntry</tt> stores the value of a table entry. It can either be
    * of type int, unsigned int, std::uint64_t, double or std::string. In
-   * essence, this structure is the same as <code>boost::variant@<int,unsigned
-   * int,std::uint64_t,double,std::string@></code> but we wrap this object in a
+   * essence, this structure is the same as `std::variant<int,unsigned
+   * int,std::uint64_t,double,std::string>` but we wrap this object in a
    * structure for which we can write a function that can serialize it. This is
-   * also why the function is not in fact of type boost::any.
+   * also why the function is not in fact of type std::any.
    */
   struct TableEntry
   {
@@ -115,7 +115,8 @@ namespace internal
 
     /**
      * Write the data of this object to a stream for the purpose of
-     * serialization.
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -123,20 +124,34 @@ namespace internal
 
     /**
      * Read the data of this object from a stream for the purpose of
-     * serialization.
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
     load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int version);
+#else
+    // This macro defines the serialize() method that is compatible with
+    // the templated save() and load() method that have been implemented.
     BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   private:
     /**
      * Abbreviation for the data type stored by this object.
      */
     using value_type =
-      boost::variant<int, unsigned int, std::uint64_t, double, std::string>;
+      std_cxx17::variant<int, unsigned int, std::uint64_t, double, std::string>;
 
     /**
      * Stored value.
@@ -276,7 +291,6 @@ namespace internal
  * element of that column.
  *
  * @ingroup textoutput
- * @author Ralf Hartmann, 1999; Wolfgang Bangerth, 2011
  */
 class TableHandler
 {
@@ -553,7 +567,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization.
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -602,7 +617,7 @@ public:
    */
   DeclException1(ExcUndefinedTexFormat,
                  std::string,
-                 << "<" << arg1 << "> is not a tex column format. Use "
+                 << '<' << arg1 << "> is not a tex column format. Use "
                  << "'l', 'c', or 'r' to indicate left, centered, or "
                  << "right aligned text.");
   //@}
@@ -631,16 +646,37 @@ protected:
     pad_column_below(const unsigned int length);
 
     /**
-     * Read or write the data of this object to or from a stream for the
-     * purpose of serialization.
+     * Write the data of this object to a stream for the purpose of
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
     save(Archive &ar, const unsigned int version) const;
+
+    /**
+     * Read the data of this object from a stream for the purpose of
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
     template <class Archive>
     void
     load(Archive &ar, const unsigned int version);
+
+#ifdef DOXYGEN
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int version);
+#else
+    // This macro defines the serialize() method that is compatible with
+    // the templated save() and load() method that have been implemented.
     BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
 
     /**
@@ -784,13 +820,13 @@ namespace internal
   {
     // we don't quite know the data type in 'value', but
     // it must be one of the ones in the type list of the
-    // boost::variant. so if T is not in the list, or if
+    // std_cxx17::variant. so if T is not in the list, or if
     // the data stored in the TableEntry is not of type
     // T, then we will get an exception that we can
     // catch and produce an error message
     try
       {
-        return boost::get<T>(value);
+        return std_cxx17::get<T>(value);
       }
     catch (...)
       {
@@ -810,30 +846,35 @@ namespace internal
     // write first an identifier for the kind
     // of data stored and then the actual
     // data, in its correct data type
-    if (const int *p = boost::get<int>(&value))
+    if (std_cxx17::holds_alternative<int>(value))
       {
-        char c = 'i';
-        ar &c &*p;
+        const int p = std_cxx17::get<int>(value);
+        char      c = 'i';
+        ar &c &p;
       }
-    else if (const unsigned int *p = boost::get<unsigned int>(&value))
+    else if (std_cxx17::holds_alternative<unsigned int>(value))
       {
-        char c = 'u';
-        ar &c &*p;
+        const unsigned int p = std_cxx17::get<unsigned int>(value);
+        char               c = 'u';
+        ar &c &p;
       }
-    else if (const double *p = boost::get<double>(&value))
+    else if (std_cxx17::holds_alternative<double>(value))
       {
-        char c = 'd';
-        ar &c &*p;
+        const double p = std_cxx17::get<double>(value);
+        char         c = 'd';
+        ar &c &p;
       }
-    else if (const std::string *p = boost::get<std::string>(&value))
+    else if (std_cxx17::holds_alternative<std::string>(value))
       {
-        char c = 's';
-        ar &c &*p;
+        const std::string p = std_cxx17::get<std::string>(value);
+        char              c = 's';
+        ar &c &p;
       }
-    else if (const std::uint64_t *p = boost::get<std::uint64_t>(&value))
+    else if (std_cxx17::holds_alternative<std::uint64_t>(value))
       {
-        char c = 'l';
-        ar &c &*p;
+        const std::uint64_t p = std_cxx17::get<std::uint64_t>(value);
+        char                c = 'l';
+        ar &c &p;
       }
     else
       Assert(false, ExcInternalError());
@@ -928,7 +969,7 @@ TableHandler::add_value(const std::string &key, const T value)
           columns[key].max_length =
             std::max(columns[key].max_length,
                      static_cast<unsigned int>(
-                       entry.get_cached_string().length()));
+                       entry.get_cached_string().size()));
         }
     }
 
@@ -938,7 +979,7 @@ TableHandler::add_value(const std::string &key, const T value)
   entry.cache_string(columns[key].scientific, columns[key].precision);
   columns[key].max_length =
     std::max(columns[key].max_length,
-             static_cast<unsigned int>(entry.get_cached_string().length()));
+             static_cast<unsigned int>(entry.get_cached_string().size()));
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,17 +12,6 @@
 // the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
-
-
-for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
-  {
-    template void internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::
-      reinit<deal_II_dimension>(
-        const Quadrature<1> &,
-        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-        const unsigned int);
-  }
-
 
 
 for (deal_II_dimension : DIMENSIONS;
@@ -46,44 +35,13 @@ for (deal_II_dimension : DIMENSIONS;
                              deal_II_scalar_vectorized::value_type,
                              deal_II_scalar_vectorized>::
       internal_reinit<deal_II_scalar_vectorized::value_type>(
-        const Mapping<deal_II_dimension> &,
+        const std::shared_ptr<hp::MappingCollection<deal_II_dimension>> &,
         const std::vector<const DoFHandler<deal_II_dimension> *> &,
         const std::vector<
           const AffineConstraints<deal_II_scalar_vectorized::value_type> *> &,
         const std::vector<IndexSet> &,
-        const std::vector<hp::QCollection<1>> &,
+        const std::vector<hp::QCollection<deal_II_dimension>> &,
         const AdditionalData &);
-
-    template void MatrixFree<deal_II_dimension,
-                             deal_II_scalar_vectorized::value_type,
-                             deal_II_scalar_vectorized>::
-      internal_reinit<deal_II_scalar_vectorized::value_type>(
-        const Mapping<deal_II_dimension> &,
-        const std::vector<const hp::DoFHandler<deal_II_dimension> *> &,
-        const std::vector<
-          const AffineConstraints<deal_II_scalar_vectorized::value_type> *> &,
-        const std::vector<IndexSet> &,
-        const std::vector<hp::QCollection<1>> &,
-        const AdditionalData &);
-
-    template const DoFHandler<deal_II_dimension> &
-    MatrixFree<deal_II_dimension,
-               deal_II_scalar_vectorized::value_type,
-               deal_II_scalar_vectorized>::
-      get_dof_handler<DoFHandler<deal_II_dimension>>(const unsigned int) const;
-
-    template const hp::DoFHandler<deal_II_dimension>
-      &MatrixFree<deal_II_dimension,
-                  deal_II_scalar_vectorized::value_type,
-                  deal_II_scalar_vectorized>::
-        get_dof_handler<hp::DoFHandler<deal_II_dimension>>(const unsigned int)
-          const;
-
-    template void internal::MatrixFreeFunctions::
-      ShapeInfo<deal_II_scalar_vectorized>::reinit<deal_II_dimension>(
-        const Quadrature<1> &,
-        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
-        const unsigned int);
   }
 
 
@@ -94,22 +52,11 @@ for (deal_II_dimension : DIMENSIONS;
                              deal_II_float_vectorized::value_type,
                              deal_II_float_vectorized>::
       internal_reinit<double>(
-        const Mapping<deal_II_dimension> &,
+        const std::shared_ptr<hp::MappingCollection<deal_II_dimension>> &,
         const std::vector<const DoFHandler<deal_II_dimension> *> &,
         const std::vector<const AffineConstraints<double> *> &,
         const std::vector<IndexSet> &,
-        const std::vector<hp::QCollection<1>> &,
-        const AdditionalData &);
-
-    template void MatrixFree<deal_II_dimension,
-                             deal_II_float_vectorized::value_type,
-                             deal_II_float_vectorized>::
-      internal_reinit<double>(
-        const Mapping<deal_II_dimension> &,
-        const std::vector<const hp::DoFHandler<deal_II_dimension> *> &,
-        const std::vector<const AffineConstraints<double> *> &,
-        const std::vector<IndexSet> &,
-        const std::vector<hp::QCollection<1>> &,
+        const std::vector<hp::QCollection<deal_II_dimension>> &,
         const AdditionalData &);
   }
 
@@ -124,10 +71,4 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       is_supported(
         const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
 #endif
-  }
-
-for (deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
-  {
-    template struct internal::MatrixFreeFunctions::ShapeInfo<
-      deal_II_scalar_vectorized>;
   }

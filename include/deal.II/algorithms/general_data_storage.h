@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,8 +50,6 @@ DEAL_II_NAMESPACE_OPEN
  *  Volume = {7},
  *  Year = {2018}}
  * @endcode
- *
- * @author Luca Heltai, Jean-Paul Pelteret, 2019
  */
 class GeneralDataStorage : public Subscriptor
 {
@@ -248,7 +246,18 @@ public:
   Type &
   get_or_add_object_with_name(const std::string &name,
                               Arg &              argument,
-                              Args &... arguments);
+                              Args &...arguments);
+
+  /**
+   * Return a reference to the object with given name. If the object does
+   * not exist, then the input @p arguments will be used to construct an object
+   * of the given @p Type and a reference to this new object then be returned.
+   *
+   * Same as above for a single argument.
+   */
+  template <typename Type, typename Arg>
+  Type &
+  get_or_add_object_with_name(const std::string &name, Arg &argument);
 
   /**
    * Return a reference to the object with given name. If the object does
@@ -264,7 +273,18 @@ public:
   Type &
   get_or_add_object_with_name(const std::string &name,
                               Arg &&             argument,
-                              Args &&... arguments);
+                              Args &&...arguments);
+
+  /**
+   * Return a reference to the object with given name. If the object does
+   * not exist, then the input @p arguments will be used to construct an object
+   * of the given @p Type and a reference to this new object then be returned.
+   *
+   * Same as above for a single argument.
+   */
+  template <typename Type, typename Arg>
+  Type &
+  get_or_add_object_with_name(const std::string &name, Arg &&argument);
 
   /**
    * Same as above for default constructors.
@@ -331,7 +351,7 @@ public:
                  const char *,
                  const char *,
                  << "The stored type for entry with name \"" << arg1 << "\" is "
-                 << arg2 << " but you requested type " << arg3 << ".");
+                 << arg2 << " but you requested type " << arg3 << '.');
 
 private:
   /**
@@ -454,11 +474,25 @@ GeneralDataStorage::get_object_with_name(const std::string &name) const
 }
 
 
+
+template <typename Type, typename Arg>
+Type &
+GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
+                                                Arg &              argument)
+{
+  if (!stores_object_with_name(name))
+    add_unique_copy(name, Type(argument));
+
+  return get_object_with_name<Type>(name);
+}
+
+
+
 template <typename Type, typename Arg, typename... Args>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
                                                 Arg &              argument,
-                                                Args &... arguments)
+                                                Args &...arguments)
 {
   if (!stores_object_with_name(name))
     add_unique_copy(name, Type(argument, arguments...));
@@ -467,11 +501,25 @@ GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
 }
 
 
+
+template <typename Type, typename Arg>
+Type &
+GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
+                                                Arg &&             argument)
+{
+  if (!stores_object_with_name(name))
+    add_unique_copy(name, Type(std::forward<Arg>(argument)));
+
+  return get_object_with_name<Type>(name);
+}
+
+
+
 template <typename Type, typename Arg, typename... Args>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
                                                 Arg &&             argument,
-                                                Args &&... arguments)
+                                                Args &&...arguments)
 {
   if (!stores_object_with_name(name))
     add_unique_copy(name,

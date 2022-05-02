@@ -1,0 +1,156 @@
+<h1>Results</h1>
+
+The output of this program consist of the console output and
+solutions in vtu format.
+
+In the first test case, when you run the program, the screen output should look like the following:
+@code
+Cycle 0
+  Number of active cells       : 16
+  Number of degrees of freedom : 256
+  Error in the L2 norm         : 0.00193285
+  Error in the H1 seminorm     : 0.106087
+  Error in the energy norm     : 0.150625
+
+Cycle 1
+  Number of active cells       : 64
+  Number of degrees of freedom : 1024
+  Error in the L2 norm         : 9.60497e-05
+  Error in the H1 seminorm     : 0.0089954
+  Error in the energy norm     : 0.0113265
+
+Cycle 2
+.
+.
+.
+@endcode
+
+When using the smooth case with polynomial degree 3, the convergence
+table will look like this:
+<table align="center" class="doxtable">
+  <tr>
+    <th>cycle</th>
+    <th>n_cells</th>
+    <th>n_dofs</th>
+    <th>L2 </th>
+    <th>rate</th>
+    <th>H1</th>
+    <th>rate</th>
+    <th>Energy</th>
+  </tr>
+  <tr>
+    <td align="center">0</td>
+    <td align="right">16</td>
+    <td align="right">256</td>
+    <td align="center">1.933e-03</td>
+    <td>&nbsp;</td>
+    <td align="center">1.061e-01</td>
+    <td>&nbsp;</td>
+    <td align="center">1.506e-01</td>
+  </tr>
+  <tr>
+    <td align="center">1</td>
+    <td align="right">64</td>
+    <td align="right">1024</td>
+    <td align="center">9.605e-05</td>
+    <td align="center">4.33</td>
+    <td align="center">8.995e-03</td>
+    <td align="center">3.56</td>
+    <td align="center">1.133e-02</td>
+  </tr>
+  <tr>
+    <td align="center">2</td>
+    <td align="right">256</td>
+    <td align="right">4096</td>
+    <td align="center">5.606e-06</td>
+    <td align="center">4.10</td>
+    <td align="center">9.018e-04</td>
+    <td align="center">3.32</td>
+    <td align="center">9.736e-04</td>
+  </tr>
+  <tr>
+    <td align="center">3</td>
+    <td align="right">1024</td>
+    <td align="right">16384</td>
+    <td align="center">3.484e-07</td>
+    <td align="center">4.01</td>
+    <td align="center">1.071e-04</td>
+    <td align="center">3.07</td>
+    <td align="center">1.088e-04</td>
+  </tr>
+  <tr>
+    <td align="center">4</td>
+    <td align="right">4096</td>
+    <td align="right">65536</td>
+    <td align="center">2.179e-08</td>
+    <td align="center">4.00</td>
+    <td align="center">1.327e-05</td>
+    <td align="center">3.01</td>
+    <td align="center">1.331e-05</td>
+  </tr>
+  <tr>
+    <td align="center">5</td>
+    <td align="right">16384</td>
+    <td align="right">262144</td>
+    <td align="center">1.363e-09</td>
+    <td align="center">4.00</td>
+    <td align="center">1.656e-06</td>
+    <td align="center">3.00</td>
+    <td align="center">1.657e-06</td>
+  </tr>
+</table>
+
+Theoretically, for polynomial degree $p$, the order of convergence in $L_2$
+norm and $H^1$ seminorm should be $p+1$ and $p$, respectively. Our numerical
+results are in good agreement with theory.
+
+In the second test case, when you run the program, the screen output should look like the following:
+@code
+Cycle 0
+  Number of active cells       : 192
+  Number of degrees of freedom : 3072
+  Error in the L2 norm         : 0.000323585
+  Error in the H1 seminorm     : 0.0296202
+  Error in the energy norm     : 0.0420478
+  Estimated error              : 0.136067
+
+Cycle 1
+  Number of active cells       : 249
+  Number of degrees of freedom : 3984
+  Error in the L2 norm         : 0.000114739
+  Error in the H1 seminorm     : 0.0186571
+  Error in the energy norm     : 0.0264879
+  Estimated error              : 0.0857186
+
+Cycle 2
+.
+.
+.
+@endcode
+
+The following figure provides a log-log plot of the errors versus
+the number of degrees of freedom for this test case on the L-shaped
+domain. In order to interpret it, let $n$ be the number of degrees of
+freedom, then on uniformly refined meshes, $h$ is of order
+$1/\sqrt{n}$ in 2D. Combining the theoretical results in the previous case,
+we see that if the solution is sufficiently smooth,
+we can expect the error in the $L_2$ norm to be of order $O(n^{-\frac{p+1}{2}})$
+and in $H^1$ seminorm to be $O(n^{-\frac{p}{2}})$. It is not a priori
+clear that one would get the same kind of behavior as a function of
+$n$ on adaptively refined meshes like the ones we use for this second
+test case, but one can certainly hope. Indeed, from the figure, we see
+that the SIPG with adaptive mesh refinement produces asymptotically
+the kinds of hoped-for results:
+
+<img width="600px" src="https://www.dealii.org/images/steps/developer/step-74.log-log-plot.png" alt="">
+
+In addition, we observe that the error estimator decreases
+at almost the same rate as the errors in the energy norm and $H^1$ seminorm,
+and one order lower than the $L_2$ error. This suggests
+its ability to predict regions with large errors.
+
+While this tutorial is focused on the implementation, the step-59 tutorial program achieves an efficient
+large-scale solver in terms of computing time with matrix-free solution techniques.
+Note that the step-59 tutorial does not work with meshes containing hanging nodes at this moment,
+because the multigrid interface matrices are not as easily determined,
+but that is merely the lack of some interfaces in deal.II, nothing fundamental.

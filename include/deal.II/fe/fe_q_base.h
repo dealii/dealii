@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,28 +33,22 @@ DEAL_II_NAMESPACE_OPEN
  * FE_Q_Bubbles. There is no public constructor for this class as it is not
  * functional as a stand-alone. The completion of definitions is left to the
  * derived classes.
- *
- * @author Wolfgang Bangerth, 1998, 2003; Guido Kanschat, 2001; Ralf Hartmann,
- * 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008;
- * Martin Kronbichler, 2008, 2013
  */
-template <class PolynomialType,
-          int dim      = PolynomialType::dimension,
-          int spacedim = dim>
-class FE_Q_Base : public FE_Poly<PolynomialType, dim, spacedim>
+template <int dim, int spacedim = dim>
+class FE_Q_Base : public FE_Poly<dim, spacedim>
 {
 public:
   /**
    * Constructor.
    */
-  FE_Q_Base(const PolynomialType &        poly_space,
-            const FiniteElementData<dim> &fe_data,
-            const std::vector<bool> &     restriction_is_additive_flags);
+  FE_Q_Base(const ScalarPolynomialsBase<dim> &poly_space,
+            const FiniteElementData<dim> &    fe_data,
+            const std::vector<bool> &         restriction_is_additive_flags);
 
   /**
    * Return the matrix interpolating from the given finite element to the
    * present one. The size of the matrix is then @p dofs_per_cell times
-   * <tt>source.dofs_per_cell</tt>.
+   * <tt>source.n_dofs_per_cell()</tt>.
    *
    * These matrices are only available if the source element is also a @p FE_Q
    * element. Otherwise, an exception of type
@@ -76,7 +70,8 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &matrix) const override;
+                                FullMatrix<double> &                matrix,
+                                const unsigned int face_no = 0) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -88,9 +83,11 @@ public:
    * thrown.
    */
   virtual void
-  get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                   const unsigned int                  subface,
-                                   FullMatrix<double> &matrix) const override;
+  get_subface_interpolation_matrix(
+    const FiniteElement<dim, spacedim> &source,
+    const unsigned int                  subface,
+    FullMatrix<double> &                matrix,
+    const unsigned int                  face_no = 0) const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
@@ -219,17 +216,17 @@ public:
 
   /**
    * Return whether this element implements its hanging node constraints in
-   * the new way, which has to be used to make elements "hp compatible".
+   * the new way, which has to be used to make elements "hp-compatible".
    *
    * For the FE_Q class the result is always true (independent of the degree
    * of the element), as it implements the complete set of functions necessary
-   * for hp capability.
+   * for hp-capability.
    */
   virtual bool
   hp_constraints_are_implemented() const override;
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code first
+   * If, on a vertex, several finite elements are active, the hp-code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
    * identical values, and consequently can receive the same global DoF index.
@@ -238,10 +235,10 @@ public:
    * reference to a finite element object representing one of the other finite
    * elements active on this particular vertex. The function computes which of
    * the degrees of freedom of the two finite element objects are equivalent,
-   * both numbered between zero and the corresponding value of dofs_per_vertex
-   * of the two finite elements. The first index of each pair denotes one of
-   * the vertex dofs of the present element, whereas the second is the
-   * corresponding index of the other finite element.
+   * both numbered between zero and the corresponding value of
+   * n_dofs_per_vertex() of the two finite elements. The first index of each
+   * pair denotes one of the vertex dofs of the present element, whereas the
+   * second is the corresponding index of the other finite element.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_vertex_dof_identities(
@@ -260,8 +257,8 @@ public:
    * of freedom on quads.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int face_no = 0) const override;
 
   //@}
 
@@ -331,7 +328,7 @@ protected:
   struct Implementation;
 
   // Declare implementation friend.
-  friend struct FE_Q_Base<PolynomialType, dim, spacedim>::Implementation;
+  friend struct FE_Q_Base<dim, spacedim>::Implementation;
 
 private:
   /**

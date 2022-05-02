@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -126,13 +126,13 @@ test()
       deallog << "Level: " << level << std::endl;
       deallog << "Interior faces: ";
       for (unsigned int f = 0; f < n_inner_faces.size(); ++f)
-        deallog << n_inner_faces[f] << " ";
+        deallog << n_inner_faces[f] << ' ';
       deallog << std::endl << "Exterior faces: ";
       for (unsigned int f = 0; f < n_inner_other_faces.size(); ++f)
-        deallog << n_inner_other_faces[f] << " ";
+        deallog << n_inner_other_faces[f] << ' ';
       deallog << std::endl << "Boundary faces: ";
       for (unsigned int f = 0; f < n_boundary_faces.size(); ++f)
-        deallog << n_boundary_faces[f] << " ";
+        deallog << n_boundary_faces[f] << ' ';
       deallog << std::endl;
     }
 }

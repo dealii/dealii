@@ -112,7 +112,7 @@ GLOBAL Int UMF_grow_front
 	/* :: frontal matrix size int overflow :: */
 	/* the desired front size is bigger than the integer maximum */
 	/* compute a such that a*a*s < Int_MAX / sizeof (Entry) */
-	double a = 0.9 * sqrt ((Int_MAX / sizeof (Entry)) / s) ;
+	double a = 0.9 * sqrt (((double) Int_MAX / sizeof (Entry)) / s) ;
 	fnr2 = MAX (fnr_min, a * fnr2) ;
 	fnc2 = MAX (fnc_min, a * fnc2) ;
 	/* the new frontal size is a*r*a*c = a*a*s */

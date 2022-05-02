@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,7 +53,7 @@ class MultipleParameterLoop;
  * Input may be sorted into subsection trees in order to give the input a
  * logical structure, and input files may include other files.
  *
- * The ParameterHandler class is discussed in in step-29,
+ * The ParameterHandler class is discussed in step-29,
  * step-33, and step-34.
  *
  * <h3>Declaring entries</h3>
@@ -836,67 +836,117 @@ class MultipleParameterLoop;
  *
  *
  * @ingroup input
- * @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011, 2017
- * @author Alberto Sartori, 2015
- * @author David Wells, 2016
- * @author Denis Davydov, 2018
- * @author Pasquale Claudio Africa, 2020
  */
 class ParameterHandler : public Subscriptor
 {
 public:
   /**
-   * List of possible output formats used for
-   * ParameterHandler::print_parameters().
+   * List of possible output formats used for functions like
+   * ParameterHandler::print_parameters(). The options can be categorized into
+   * two groups:
+   * - format options: PRM, LaTeX, Description, XML, JSON
+   * - stylistic options: Short, KeepDeclarationOrder
+   *
+   * Only one format option may be specified at the time. Any function that
+   * accepts an OutputStyle as an option will throw if you specify more than
+   * one.
+   *
+   * A number of shortcuts of commonly used option combinations are provided.
+   * E.g., ShortPRM prints the parameters in the PRM format, while skipping the
+   * documentation.
    */
   enum OutputStyle
   {
     /**
-     * Write human readable output suitable to be read by ParameterHandler
-     * again.
+     * Default stylistic style: print documentation and sort all parameters
+     * alphabetically.
      */
-    Text = 1,
-
-    /**
-     * Write parameters as a LaTeX table.
-     */
-    LaTeX = 2,
-    /**
-     * Write out declared parameters with description and possible values.
-     */
-    Description = 3,
-
-    /**
-     * Write out everything as an <a
-     * href="http://en.wikipedia.org/wiki/XML">XML</a> file.
-     *
-     * See the general documentation of this class for an example of output.
-     */
-    XML = 4,
-
-    /**
-     * Write out everything as a <a
-     * href="http://en.wikipedia.org/wiki/JSON">JSON</a> file.
-     */
-    JSON = 5,
+    DefaultStyle = 0x0000,
 
     /**
      * Write input for ParameterHandler without comments or changed default
      * values.
      */
-    ShortText = 193,
+    Short = 0x0001,
 
     /**
-     * Write input for ParameterHandler without comments or changed default
+     * Keep the order of the parameters as they have been declared.
+     */
+    KeepDeclarationOrder = 0x0002,
+
+    /**
+     * Write human readable output suitable to be read by
+     * ParameterHandler::parse_input() again.
+     */
+    PRM = 0x0010,
+
+    /**
+     * Write human readable output suitable to be read by
+     * ParameterHandler::parse_input() again.
+     *
+     * @deprecated Use `PRM` instead of `Text`.
+     */
+    Text = PRM,
+
+    /**
+     * Write parameters as a LaTeX table.
+     */
+    LaTeX = 0x0020,
+
+    /**
+     * Write out declared parameters with description and possible values.
+     *
+     * @note This format is not suitable to be read back again.
+     */
+    Description = 0x0040,
+
+    /**
+     * Write out everything as an <a
+     * href="http://en.wikipedia.org/wiki/XML">XML</a> file suitable to be read
+     * by ParameterHandler::parse_input_from_xml() again.
+     *
+     * See the general documentation of this class for an example of output.
+     */
+    XML = 0x0080,
+
+    /**
+     * Write out everything as a <a
+     * href="http://en.wikipedia.org/wiki/JSON">JSON</a> file suitable to be
+     * read by ParameterHandler::parse_input_from_json() again.
+     */
+    JSON = 0x0100,
+
+    /**
+     * Write the content of ParameterHandler without comments or changed default
+     * values.
+     */
+    ShortPRM = PRM | Short,
+
+    /**
+     * Write the content of ParameterHandler without comments or changed default
+     * values.
+     *
+     * @deprecated Use `ShortPRM` instead of `ShortText`.
+     */
+    ShortText = ShortPRM,
+
+    /**
+     * Write the content of ParameterHandler without comments or changed default
      * values as a XML file.
      */
-    ShortXML = 194,
+    ShortXML = XML | Short,
 
     /**
-     * Write input for ParameterHandler without comments or changed default
+     * Write the content of ParameterHandler without comments or changed default
      * values as a JSON file.
      */
-    ShortJSON = 195
+    ShortJSON = JSON | Short,
+
+    /**
+     * Write the content of ParameterHandler without comments or changed default
+     * values as a LaTeX file.
+     */
+    ShortLaTeX = LaTeX | Short,
   };
 
 
@@ -1050,7 +1100,7 @@ public:
    * The parameter @p has_to_be_set can be used in order to declare this
    * parameter as a parameter whose default value has to be overwritten by
    * one of the methods provided by this class. Whether a parameter has been set
-   * succesfully can be queried by the functions get_entries_wrongly_not_set()
+   * successfully can be queried by the functions get_entries_wrongly_not_set()
    * and assert_that_entries_have_been_set().
    *
    * @note An entry can be declared more than once without generating an
@@ -1122,7 +1172,7 @@ public:
    * The parameter @p has_to_be_set can be used in order to declare this
    * parameter as a parameter whose default value has to be overwritten by
    * one of the methods provided by this class. Whether a parameter has been set
-   * succesfully can be queried by the functions get_entries_wrongly_not_set()
+   * successfully can be queried by the functions get_entries_wrongly_not_set()
    * and assert_that_entries_have_been_set().
    */
   template <class ParameterType>
@@ -1294,7 +1344,7 @@ public:
   /**
    * Same as above, but an overload where the second argument is a character
    * pointer. This is necessary, since otherwise the call to
-   * <tt>set("abc","def")</code> will be mapped to the function taking one
+   * <code>set("abc","def")</code> will be mapped to the function taking one
    * string and a bool as arguments, which is certainly not what is most often
    * intended.
    *
@@ -1345,19 +1395,16 @@ public:
   set(const std::string &entry_name, const bool new_value);
 
   /**
-   * Print all parameters with the given style to @p out.
+   * Print all parameters with the given @p style to @p out.
    *
    * Before printing, all current parameters and subsections are sorted
    * alphabetically by default.
-   * This behavior can be disabled setting the last parameter @p sort_alphabetical
-   * to <tt>false</tt>: in this case entries are printed in the same order
-   * as they have been declared.
+   * This behavior can be disabled setting the optional parameter @p style
+   * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
+   * same order as they have been declared.
    *
-   * In the case of <tt>XML</tt> or <tt>JSON</tt>, a reduced tree, only
-   * containing the values and skipping the documentation, can be
-   * printed by setting @p print_documentation to <tt>false</tt>.
-   *
-   * In <tt>Text</tt> format, the output is formatted in such a way that it is
+   * In <tt>PRM</tt>, <tt>XML</tt>, and <tt>JSON</tt> format, the output is
+   * formatted in such a way that it is
    * possible to use it for later input again. This is most useful to record
    * the parameters for a specific run, since if you output the parameters
    * using this function into a log file, you can always recover the results
@@ -1367,6 +1414,12 @@ public:
    * default value of entries if it is different from the actual value, as
    * well as the documenting string given to the declare_entry() function if
    * available.
+   *
+   * By using the flag <tt>Short</tt> in combination with <tt>PRM</tt>,
+   * <tt>XML</tt>, <tt>JSON</tt>, or <tt>LaTeX</tt> (or by using the shortcuts
+   * <tt>ShortPRM</tt>, <tt>ShortXML</tt>, <tt>ShortJSON</tt>, or
+   * <tt>ShortLaTeX</tt>), a reduced output can be generated, only containing
+   * the values and skipping the documentation.
    *
    * In <tt>XML</tt> format, the output starts with one root element
    * <tt>ParameterHandler</tt> in order to get a valid XML document and all
@@ -1414,9 +1467,33 @@ public:
    * @endcode
    */
   std::ostream &
-  print_parameters(std::ostream &    out,
-                   const OutputStyle style,
-                   const bool        sort_alphabetical = true) const;
+  print_parameters(std::ostream &out, const OutputStyle style) const;
+
+
+
+  /**
+   * Print all parameters to the file given by @p filename with the given output
+   * style @p style.
+   *
+   * This function deduces the output format from the extension of the specified
+   * filename. Supported extensions are `prm`, `xml`, `tex`, and `json`. Hence,
+   * it is not necessary to specify an output format via the @p style argument
+   * as long as one of these extensions is added to the filename. If an output
+   * format is specified in the @p style parameter nevertheless, the output
+   * format has to be consistent with the filename extension.
+   *
+   * If no extension is specified or the extension is not supported, the
+   * output format is deduced from the @p style argument.
+   *
+   * If neither the extension is supported, nor does the @p style parameter
+   * contain a format specification, an assertion is thrown.
+   *
+   * @param filename The output file name.
+   * @param style The style with which output is produced.
+   */
+  void
+  print_parameters(const std::string &filename,
+                   const OutputStyle  style = DefaultStyle) const;
 
   /**
    * Print parameters to a logstream. This function allows to print all
@@ -1425,12 +1502,15 @@ public:
    *
    * All current parameters and subsections are sorted
    * alphabetically by default.
-   * This behavior can be disabled setting the last parameter @p sort_alphabetical
-   * to @p false: in this case entries are printed in the same order
-   * as they have been declared.
+   * This behavior can be disabled setting the optional parameter @p style
+   * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
+   * same order as they have been declared.
+   *
+   * @note All style settings in @p style not related to the ordering are
+   *   ignored.
    */
   void
-  log_parameters(LogStream &out, const bool sort_alphabetical = true);
+  log_parameters(LogStream &out, const OutputStyle style = DefaultStyle);
 
   /**
    * Log parameters in the present subsection. The subsection is determined by
@@ -1440,15 +1520,19 @@ public:
    *
    * All current parameters and subsections are sorted
    * alphabetically by default.
-   * This behavior can be disabled setting the last parameter @p sort_alphabetical
-   * to @p false: in this case entries are printed in the same order
-   * as they have been declared.
+   * This behavior can be disabled setting the optional parameter @p style
+   * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
+   * same order as they have been declared.
+   *
+   * @note All style settings in @p style not related to the ordering are
+   *   ignored.
    *
    * In most cases, you will not want to use this function directly, but have
    * it called recursively by the previous function.
    */
   void
-  log_parameters_section(LogStream &out, const bool sort_alphabetical = true);
+  log_parameters_section(LogStream &       out,
+                         const OutputStyle style = DefaultStyle);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -1459,7 +1543,8 @@ public:
 
   /**
    * Write the data of this object to a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -1467,13 +1552,27 @@ public:
 
   /**
    * Read the data of this object from a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
   load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   /**
    * Test for equality.
@@ -1510,7 +1609,7 @@ public:
    */
   DeclException1(ExcEntryAlreadyExists,
                  std::string,
-                 << "The following entry already exists: " << arg1 << ".");
+                 << "The following entry already exists: " << arg1 << '.');
   /**
    * Exception
    */
@@ -1599,16 +1698,6 @@ public:
   DeclExceptionMsg(ExcInvalidXMLParameterFile,
                    "The provided file could not be parsed as a "
                    "ParameterHandler description.");
-
-  /**
-   * Exception for when an entry in an XML parameter file does not match the
-   * provided pattern. The arguments are, in order, the entry value, entry
-   * name, and a description of the pattern.
-   *
-   * @deprecated Use ExcValueDoesNotMatchPattern instead of ExcInvalidEntryForPatternXML.
-   */
-  using ExcInvalidEntryForPatternXML DEAL_II_DEPRECATED =
-    ExcValueDoesNotMatchPattern;
 
   /**
    * Exception for when the file given in an include statement cannot be
@@ -1748,7 +1837,20 @@ private:
   friend class MultipleParameterLoop;
 };
 
-
+/**
+ * Global operator which returns an object in which all bits are set which are
+ * either set in the first or the second argument. This operator exists since
+ * if it did not then the result of the bit-or <tt>operator |</tt> would be an
+ * integer which would in turn trigger a compiler warning when we tried to
+ * assign it to an object of type ParameterHandler::OutputStyle.
+ */
+inline ParameterHandler::OutputStyle
+operator|(const ParameterHandler::OutputStyle f1,
+          const ParameterHandler::OutputStyle f2)
+{
+  return static_cast<ParameterHandler::OutputStyle>(
+    static_cast<unsigned int>(f1) | static_cast<unsigned int>(f2));
+}
 
 /**
  * The class MultipleParameterLoop offers an easy possibility to test several
@@ -1825,7 +1927,7 @@ private:
  *
  *     void HelperClass::create_new (const unsigned int run_no)
  *     {
- *       p = std_cxx14::make_unique<Problem>());
+ *       p = std::make_unique<Problem>());
  *     }
  *
  *
@@ -1964,7 +2066,6 @@ private:
  *
  *
  * @ingroup input
- * @author Wolfgang Bangerth, October 1997, 2010
  */
 class MultipleParameterLoop : public ParameterHandler
 {
@@ -2222,8 +2323,8 @@ ParameterHandler::add_parameter(const std::string &          entry,
                 "that is const. Use a non-const type.");
 
   declare_entry(entry,
-                Patterns::Tools::Convert<ParameterType>::to_string(
-                  parameter, pattern.clone()),
+                Patterns::Tools::Convert<ParameterType>::to_string(parameter,
+                                                                   pattern),
                 pattern,
                 documentation,
                 has_to_be_set);
@@ -2234,7 +2335,7 @@ ParameterHandler::add_parameter(const std::string &          entry,
 
   auto action = [&, pattern_index](const std::string &val) {
     parameter = Patterns::Tools::Convert<ParameterType>::to_value(
-      val, patterns[pattern_index]->clone());
+      val, *patterns[pattern_index]);
   };
   add_action(entry, action);
 }

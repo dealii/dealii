@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -124,10 +124,7 @@ namespace Algorithms
    * The use ThetaTimestepping is more complicated than for instance Newton,
    * since the inner operators will usually need to access the TimeStepData.
    * Thus, we have a circular dependency of information, and we include the
-   * following example for its use. It can be found in
-   * <tt>examples/doxygen/theta_timestepping.cc</tt>
-   *
-   * @dontinclude theta_timestepping.cc
+   * following example for its use.
    *
    * First, we define the two operators used by ThetaTimestepping and call
    * them <code>Implicit</code> and <code>Explicit</code>. They both share the
@@ -136,22 +133,58 @@ namespace Algorithms
    * use a SmartPointer here, since the TimestepData will be destroyed before
    * the operator.
    *
-   * @skip class Explicit
-   * @until End of declarations
+   * @code
+   * class Explicit : public OperatorBase
+   * {
+   * public:
+   *   Explicit(const FullMatrix<double> &matrix);
+   *   void operator()(AnyData &out, const AnyData &in);
+   *
+   * private:
+   *   SmartPointer<const FullMatrix<double>, Explicit> matrix;
+   *   FullMatrix<double>                               m;
+   * };
+   *
+   * class Implicit : public OperatorBase
+   * {
+   * public:
+   *   Implicit(const FullMatrix<double> &matrix);
+   *   void operator()(AnyData &out, const AnyData &in);
+   *
+   * private:
+   *   SmartPointer<const FullMatrix<double>, Implicit> matrix;
+   *   FullMatrix<double>                               m;
+   * };
+   * @endcode
    *
    * These operators will be implemented after the main program. But let us
    * look first at how they get used. First, let us define a matrix to be used
    * for our system and also an OutputOperator in order to write the data of
    * each timestep to a file.
    *
-   * @skipline main
-   * @until out.initialize
+   * @code
+   * int main()
+   * {
+   *   FullMatrix<double> matrix(2);
+   *   matrix(0, 0) = 0.;
+   *   matrix(1, 1) = 0.;
+   *   matrix(0, 1) = 3.14;
+   *   matrix(1, 0) = -3.14;
+   *
+   *   OutputOperator<Vector<double>> out;
+   *   out.initialize_stream(std::cout);
+   * @endcode
    *
    * Now we create objects for the implicit and explicit parts of the steps as
    * well as the ThetaTimestepping itself. We initialize the timestepping with
    * the output operator in order to be able to see the output in every step.
    *
-   * @until set_output
+   * @code
+   *   Explicit                          op_explicit(matrix);
+   *   Implicit                          op_implicit(matrix);
+   *   ThetaTimestepping<Vector<double>> solver(op_explicit, op_implicit);
+   *   solver.set_output(out);
+   * @endcode
    *
    * The next step is providing the vectors to be used. <tt>value</tt> is
    * filled with the initial value and is also the vector where the solution
@@ -160,20 +193,35 @@ namespace Algorithms
    * Since our problem has no additional parameters, the input AnyData object
    * remains empty.
    *
-   * @until add
+   * @code
+   *   Vector<double> value(2);
+   *   value(0) = 1.;
+   *   AnyData indata;
+   *   AnyData outdata;
+   *   outdata.add(&value, "value");
+   * @endcode
    *
    * Finally, we are ready to tell the solver, that we are starting at the
    * initial timestep and run it.
    *
-   * @until }
+   * @code
+   *   solver.notify(Events::initial);
+   *   solver(outdata, indata);
+   * }
+   * @endcode
    *
    * Besides the main function, we need to define the members functions
    * of the implicit and explicit operators.
    * First the constructor, which simply copies the system matrix into the
    * member pointer for later use.
    *
-   * @skip Explicit::
-   * @until }
+   * @code
+   * Explicit::Explicit(const FullMatrix<double> &M)
+   *   : matrix(&M)
+   * {
+   *   m.reinit(M.m(), M.n());
+   * }
+   * @endcode
    *
    * Now we need to study the application of the implicit and explicit
    * operator. We assume that the pointer <code>matrix</code> points to the
@@ -185,21 +233,55 @@ namespace Algorithms
    * off the notifications, we clear them, such that the matrix is only
    * generated when necessary.
    *
-   * @skipline void
-   * @until clear
+   * @code
+   * void Explicit::operator()(AnyData &out, const AnyData &in)
+   * {
+   *   const double timestep = *in.read_ptr<double>("Timestep");
+   *   if (this->notifications.test(Events::initial) ||
+   *       this->notifications.test(Events::new_timestep_size))
+   *     {
+   *       m.equ(-timestep, *matrix);
+   *       for (unsigned int i = 0; i < m.m(); ++i)
+   *         m(i, i) += 1.;
+   *     }
+   *   this->notifications.clear();
+   * @endcode
    *
    * Now we multiply the input vector with the new matrix and store on output.
    *
-   * @until }
+   * @code
+   *   m.vmult(*out.entry<Vector<double> *>(0),
+   *           *in.read_ptr<Vector<double>>("Previous iterate"));
+   * }
+   * @endcode
    *
    * The code for the implicit operator is almost the same, except
    * that we change the sign in front of the timestep and use the inverse of
    * the matrix.
    *
-   * @until vmult
-   * @until }
-   * @author Guido Kanschat
-   * @date 2010
+   * @code
+   * Implicit::Implicit(const FullMatrix<double> &M)
+   *   : matrix(&M)
+   * {
+   *   m.reinit(M.m(), M.n());
+   * }
+   *
+   * void Implicit::operator()(AnyData &out, const AnyData &in)
+   * {
+   *   const double timestep = *in.read_ptr<double>("Timestep");
+   *   if (this->notifications.test(Events::initial) ||
+   *       this->notifications.test(Events::new_timestep_size))
+   *     {
+   *       m.equ(timestep, *matrix);
+   *       for (unsigned int i = 0; i < m.m(); ++i)
+   *         m(i, i) += 1.;
+   *       m.gauss_jordan();
+   *     }
+   *   this->notifications.clear();
+   *   m.vmult(*out.entry<Vector<double> *>(0),
+   *           *in.read_ptr<Vector<double>>("Previous time"));
+   * }
+   * @endcode
    */
   template <typename VectorType>
   class ThetaTimestepping : public OperatorBase

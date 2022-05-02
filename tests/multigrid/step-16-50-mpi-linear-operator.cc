@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2018 by the deal.II authors
+ * Copyright (C) 2003 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -103,8 +103,8 @@ namespace Step50
     FE_Q<dim>                                 fe;
     DoFHandler<dim>                           mg_dof_handler;
 
-    typedef LA::MPI::SparseMatrix matrix_t;
-    typedef LA::MPI::Vector       vector_t;
+    using matrix_t = LA::MPI::SparseMatrix;
+    using vector_t = LA::MPI::Vector;
 
     matrix_t system_matrix;
 
@@ -221,7 +221,8 @@ namespace Step50
 
 
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+    mg_constrained_dofs.initialize(mg_dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
 
 
     const unsigned int n_levels = triangulation.n_global_levels();
@@ -407,8 +408,7 @@ namespace Step50
                          local_dof_indices[j]) // ( boundary(i) && boundary(j)
                                                // && i==j )
                    ))
-                {
-                }
+                {}
               else
                 {
                   cell_matrix(i, j) = 0;
@@ -442,10 +442,13 @@ namespace Step50
     SolverControl        coarse_solver_control(1000, 1e-10, false, false);
     SolverCG<vector_t>   coarse_solver(coarse_solver_control);
     PreconditionIdentity id;
-    MGCoarseGridLACIteration<SolverCG<vector_t>, vector_t> coarse_grid_solver(
-      coarse_solver, coarse_matrix, id);
+    MGCoarseGridIterativeSolver<vector_t,
+                                SolverCG<vector_t>,
+                                matrix_t,
+                                PreconditionIdentity>
+      coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
-    typedef LA::MPI::PreconditionJacobi                  Smoother;
+    using Smoother = LA::MPI::PreconditionJacobi;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);

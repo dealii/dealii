@@ -74,7 +74,7 @@ test(std::string filename, unsigned int n)
   VectorTools::project(
     dof_handler, constraints, quad, cosine, interpolated_one);
 
-  DataOut<dim, DoFHandler<dim, spacedim>> dataout;
+  DataOut<dim, spacedim> dataout;
   dataout.attach_dof_handler(dof_handler);
   dataout.add_data_vector(interpolated_one, "numbering");
   dataout.build_patches();
@@ -88,7 +88,7 @@ main()
 {
   initlog();
 
-  for (unsigned int n = 1; n < 5; n++)
+  for (unsigned int n = 1; n < 5; ++n)
     {
       deallog << "Test<1,2>, continuous finite element q_" << n << std::endl;
       test<1, 2>(SOURCE_DIR "/grids/circle_2.inp", n);

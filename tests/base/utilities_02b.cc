@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,14 +30,14 @@ do_test(const VectorizedArrayType array)
 
   auto exponentiated_array = Utilities::fixed_power<3>(array);
 
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
-    deallog << exponentiated_array[i] << " ";
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
+    deallog << exponentiated_array[i] << ' ';
   deallog << std::endl;
 
   exponentiated_array = Utilities::fixed_power<-3>(array);
 
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
-    deallog << exponentiated_array[i] << " ";
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
+    deallog << exponentiated_array[i] << ' ';
   deallog << std::endl;
 }
 

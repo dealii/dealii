@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2015 by the deal.II authors
+## Copyright (C) 2013 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -26,16 +26,17 @@ MACRO(FIND_SYSTEM_LIBRARY)
   LIST(GET _argn 0 _variable)
   LIST(REMOVE_AT _argn 0 1)
 
-  if("${_variable}" MATCHES "^${_variable}$")
+  IF(NOT DEFINED ${_variable})
     FOREACH(_arg ${_argn})
-      LIST(APPEND CMAKE_REQUIRED_LIBRARIES "-l${_arg}")
-      CHECK_CXX_COMPILER_FLAG("" ${_variable})
+      LIST(APPEND CMAKE_REQUIRED_LIBRARIES "${_arg}")
+      CHECK_CXX_SOURCE_COMPILES("int main(){}" ${_variable})
       RESET_CMAKE_REQUIRED()
 
       IF(${_variable})
         UNSET(${_variable} CACHE)
         SET(${_variable} ${_arg} CACHE STRING "A system library.")
         SET(${_variable} ${_arg})
+        MARK_AS_ADVANCED(${_variable})
         BREAK()
       ELSE()
         UNSET(${_variable} CACHE)

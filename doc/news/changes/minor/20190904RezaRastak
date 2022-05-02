@@ -1,4 +1,0 @@
-Added: GeometryInfo<dim>::unit_normal_vector provides outward-facing unit
-vectors for each face of the reference cell in the form of Tensor<1, dim>.
-<br>
-(Reza Rastak, 2019/09/04)

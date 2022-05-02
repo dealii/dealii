@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2005 - 2019 by the deal.II authors
+ * Copyright (C) 2005 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -38,11 +38,8 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
@@ -198,8 +195,7 @@ namespace Step20
     void ExactSolution<dim>::vector_value(const Point<dim> &p,
                                           Vector<double> &  values) const
     {
-      Assert(values.size() == dim + 1,
-             ExcDimensionMismatch(values.size(), dim + 1));
+      AssertDimension(values.size(), dim + 1);
 
       values(0) = alpha * p[1] * p[1] / 2 + beta - alpha * p[0] * p[0] / 2;
       values(1) = alpha * p[0] * p[1];
@@ -407,15 +403,9 @@ namespace Step20
     // <code>DynamicSparsityPattern</code>. This block sparsity pattern has
     // four blocks in a $2 \times 2$ pattern. The blocks' sizes depend on
     // <code>n_u</code> and <code>n_p</code>, which hold the number of velocity
-    // and pressure variables. In the second step we have to instruct the block
-    // system to update its knowledge about the sizes of the blocks it manages;
-    // this happens with the <code>dsp.collect_sizes ()</code> call.
-    BlockDynamicSparsityPattern dsp(2, 2);
-    dsp.block(0, 0).reinit(n_u, n_u);
-    dsp.block(1, 0).reinit(n_p, n_u);
-    dsp.block(0, 1).reinit(n_u, n_p);
-    dsp.block(1, 1).reinit(n_p, n_p);
-    dsp.collect_sizes();
+    // and pressure variables.
+    const std::vector<types::global_dof_index> block_sizes = {n_u, n_p};
+    BlockDynamicSparsityPattern                dsp(block_sizes, block_sizes);
     DoFTools::make_sparsity_pattern(dof_handler, dsp);
 
     // We use the compressed block sparsity pattern in the same way as the
@@ -426,15 +416,8 @@ namespace Step20
 
     // Then we have to resize the solution and right hand side vectors in
     // exactly the same way as the block compressed sparsity pattern:
-    solution.reinit(2);
-    solution.block(0).reinit(n_u);
-    solution.block(1).reinit(n_p);
-    solution.collect_sizes();
-
-    system_rhs.reinit(2);
-    system_rhs.block(0).reinit(n_u);
-    system_rhs.block(1).reinit(n_p);
-    system_rhs.collect_sizes();
+    solution.reinit(block_sizes);
+    system_rhs.reinit(block_sizes);
   }
 
 
@@ -464,7 +447,7 @@ namespace Step20
                                        update_quadrature_points |
                                        update_JxW_values);
 
-    const unsigned int dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
@@ -716,7 +699,7 @@ namespace Step20
     // points for integration. To avoid this problem, we simply use a
     // trapezoidal rule and iterate it <code>degree+2</code> times in each
     // coordinate direction (again as explained in step-7):
-    QTrapez<1>     q_trapez;
+    QTrapezoid<1>  q_trapez;
     QIterated<dim> quadrature(q_trapez, degree + 2);
 
     // With this, we can then let the library compute the errors and output

@@ -1,5 +1,0 @@
-Added: New python wrappers for the Manifold class
-with a possibility to assign manifold object to a
-python triangulation object.
-<br>
-(Alexander Grayver, 2019/11/28)

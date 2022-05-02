@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019-2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -92,42 +92,36 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
       // Store the point only if it is inside a locally owned sphere cell
       if (cell->subdomain_id() == my_rank)
         loc_owned_points.emplace_back(center_pt);
-      try
+      // Find the cube cell where center pt lies
+      auto my_pair = GridTools::find_active_cell_around_point(cache, center_pt);
+      // If it is inside a locally owned cell it shall be returned
+      // from distributed compute point locations
+      if (my_pair.first.state() == IteratorState::valid &&
+          my_pair.first->is_locally_owned())
         {
-          // Find the cube cell where center pt lies
-          auto my_pair =
-            GridTools::find_active_cell_around_point(cache, center_pt);
-          // If it is inside a locally owned cell it shall be returned
-          // from distributed compute point locations
-          if (my_pair.first->is_locally_owned())
-            {
-              computed_pts++;
-              auto cells_it = std::find(computed_cells.begin(),
-                                        computed_cells.end(),
-                                        my_pair.first);
+          computed_pts++;
+          auto cells_it = std::find(computed_cells.begin(),
+                                    computed_cells.end(),
+                                    my_pair.first);
 
-              if (cells_it == computed_cells.end())
-                {
-                  // Cell not found: adding a new cell
-                  computed_cells.emplace_back(my_pair.first);
-                  computed_qpoints.emplace_back(1, my_pair.second);
-                  computed_points.emplace_back(1, center_pt);
-                  computed_ranks.emplace_back(1, cell->subdomain_id());
-                }
-              else
-                {
-                  // Cell found: just adding the point index and qpoint to the
-                  // list
-                  unsigned int current_cell = cells_it - computed_cells.begin();
-                  computed_qpoints[current_cell].emplace_back(my_pair.second);
-                  computed_points[current_cell].emplace_back(center_pt);
-                  computed_ranks[current_cell].emplace_back(
-                    cell->subdomain_id());
-                }
+          if (cells_it == computed_cells.end())
+            {
+              // Cell not found: adding a new cell
+              computed_cells.emplace_back(my_pair.first);
+              computed_qpoints.emplace_back(1, my_pair.second);
+              computed_points.emplace_back(1, center_pt);
+              computed_ranks.emplace_back(1, cell->subdomain_id());
+            }
+          else
+            {
+              // Cell found: just adding the point index and qpoint to the
+              // list
+              unsigned int current_cell = cells_it - computed_cells.begin();
+              computed_qpoints[current_cell].emplace_back(my_pair.second);
+              computed_points[current_cell].emplace_back(center_pt);
+              computed_ranks[current_cell].emplace_back(cell->subdomain_id());
             }
         }
-      catch (const GridTools::ExcPointNotFound<dim> &)
-        {}
     }
 
   // Computing bounding boxes describing the locally owned part of the mesh
@@ -164,7 +158,7 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
     }
 
   unsigned int output_computed_pts = 0;
-  for (unsigned int c = 0; c < output_cells.size(); c++)
+  for (unsigned int c = 0; c < output_cells.size(); ++c)
     {
       output_computed_pts += output_points[c].size();
       const auto &cell = output_cells[c];

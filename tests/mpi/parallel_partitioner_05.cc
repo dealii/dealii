@@ -65,8 +65,8 @@ test()
   local_relevant.add_indices(&ghost_indices[0], &ghost_indices[0] + 10);
   types::global_dof_index before_start = myid > 0 ? my_start - set / 4 : 0;
   types::global_dof_index after_end    = myid < numproc - 1 ?
-                                        my_start + local_size + set / 3 :
-                                        my_start + local_size;
+                                           my_start + local_size + set / 3 :
+                                           my_start + local_size;
   if (before_start < my_start)
     local_relevant.add_range(before_start, my_start);
   if (after_end > my_start + local_size)
@@ -101,21 +101,21 @@ test()
   deallog << "Ghost subset in " << v.n_ghost_indices() << " indices: ";
   for (unsigned int i = 0; i < v.ghost_indices_within_larger_ghost_set().size();
        ++i)
-    deallog << "[" << v.ghost_indices_within_larger_ghost_set()[i].first << ", "
+    deallog << '[' << v.ghost_indices_within_larger_ghost_set()[i].first << ", "
             << v.ghost_indices_within_larger_ghost_set()[i].second << ") ";
   deallog << std::endl;
 
   deallog << "Ghost subset in " << w.n_ghost_indices() << " indices: ";
   for (unsigned int i = 0; i < w.ghost_indices_within_larger_ghost_set().size();
        ++i)
-    deallog << "[" << w.ghost_indices_within_larger_ghost_set()[i].first << ", "
+    deallog << '[' << w.ghost_indices_within_larger_ghost_set()[i].first << ", "
             << w.ghost_indices_within_larger_ghost_set()[i].second << ") ";
   deallog << std::endl;
 
   deallog << "Ghost subset in " << x.n_ghost_indices() << " indices: ";
   for (unsigned int i = 0; i < x.ghost_indices_within_larger_ghost_set().size();
        ++i)
-    deallog << "[" << x.ghost_indices_within_larger_ghost_set()[i].first << ", "
+    deallog << '[' << x.ghost_indices_within_larger_ghost_set()[i].first << ", "
             << x.ghost_indices_within_larger_ghost_set()[i].second << ") ";
   deallog << std::endl;
 }

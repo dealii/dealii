@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,10 +22,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
-#include <boost/serialization/vector.hpp>
-
 #include <algorithm>
-#include <iterator>
 #include <vector>
 
 
@@ -50,7 +47,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * A class that represents a subset of indices among a larger set. For
  * example, it can be used to denote the set of degrees of freedom within the
- * range $[0,\text{dof\_handler.n\_dofs})$ that belongs to a particular
+ * range $[0,\mathrm{dof\_handler.n\_dofs()})$ that belongs to a particular
  * subdomain, or those among all degrees of freedom that are stored on a
  * particular processor in a distributed parallel computation.
  *
@@ -68,8 +65,6 @@ DEAL_II_NAMESPACE_OPEN
  * The data structures used in this class along with a rationale can be found
  * in the
  * @ref distributed_paper "Distributed Computing paper".
- *
- * @author Wolfgang Bangerth, 2009
  */
 class IndexSet
 {
@@ -326,7 +321,8 @@ public:
    * sets must have the same size (though of course they do not have to have
    * the same number of indices).
    */
-  IndexSet operator&(const IndexSet &is) const;
+  IndexSet
+  operator&(const IndexSet &is) const;
 
   /**
    * This command takes an interval <tt>[begin, end)</tt> and returns the
@@ -348,7 +344,6 @@ public:
    * Split the set indices represented by this object into blocks given by the
    * @p n_indices_per_block structure. The sum of its entries must match the
    * global size of the current object.
-   *
    */
   std::vector<IndexSet>
   split_by_block(
@@ -508,7 +503,8 @@ public:
 
   /**
    * Write or read the data of this object to or from a stream for the purpose
-   * of serialization
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -660,12 +656,14 @@ public:
     /**
      * Dereferencing operator, returns an IntervalAccessor.
      */
-    const IntervalAccessor &operator*() const;
+    const IntervalAccessor &
+    operator*() const;
 
     /**
      * Dereferencing operator, returns a pointer to an IntervalAccessor.
      */
-    const IntervalAccessor *operator->() const;
+    const IntervalAccessor *
+    operator->() const;
 
     /**
      * Comparison.
@@ -736,7 +734,8 @@ public:
      * Dereferencing operator. The returned value is the index of the element
      * inside the IndexSet.
      */
-    size_type operator*() const;
+    size_type
+    operator*() const;
 
     /**
      * Does this iterator point to an existing element?
@@ -935,7 +934,8 @@ private:
 
     /**
      * Write or read the data of this object to or from a stream for the
-     * purpose of serialization
+     * purpose of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      */
     template <class Archive>
     void
@@ -1117,8 +1117,8 @@ IndexSet::IntervalAccessor::operator=(const IndexSet::IntervalAccessor &other)
 
 
 inline bool
-IndexSet::IntervalAccessor::
-operator==(const IndexSet::IntervalAccessor &other) const
+IndexSet::IntervalAccessor::operator==(
+  const IndexSet::IntervalAccessor &other) const
 {
   Assert(index_set == other.index_set,
          ExcMessage(
@@ -1129,8 +1129,8 @@ operator==(const IndexSet::IntervalAccessor &other) const
 
 
 inline bool
-IndexSet::IntervalAccessor::
-operator<(const IndexSet::IntervalAccessor &other) const
+IndexSet::IntervalAccessor::operator<(
+  const IndexSet::IntervalAccessor &other) const
 {
   Assert(index_set == other.index_set,
          ExcMessage(
@@ -1196,16 +1196,16 @@ IndexSet::IntervalIterator::operator++(int)
 
 
 
-inline const IndexSet::IntervalAccessor &IndexSet::IntervalIterator::
-                                         operator*() const
+inline const IndexSet::IntervalAccessor &
+IndexSet::IntervalIterator::operator*() const
 {
   return accessor;
 }
 
 
 
-inline const IndexSet::IntervalAccessor *IndexSet::IntervalIterator::
-                                         operator->() const
+inline const IndexSet::IntervalAccessor *
+IndexSet::IntervalIterator::operator->() const
 {
   return &accessor;
 }
@@ -1213,8 +1213,8 @@ inline const IndexSet::IntervalAccessor *IndexSet::IntervalIterator::
 
 
 inline bool
-IndexSet::IntervalIterator::
-operator==(const IndexSet::IntervalIterator &other) const
+IndexSet::IntervalIterator::operator==(
+  const IndexSet::IntervalIterator &other) const
 {
   return accessor == other.accessor;
 }
@@ -1222,8 +1222,8 @@ operator==(const IndexSet::IntervalIterator &other) const
 
 
 inline bool
-IndexSet::IntervalIterator::
-operator!=(const IndexSet::IntervalIterator &other) const
+IndexSet::IntervalIterator::operator!=(
+  const IndexSet::IntervalIterator &other) const
 {
   return !(*this == other);
 }
@@ -1231,8 +1231,8 @@ operator!=(const IndexSet::IntervalIterator &other) const
 
 
 inline bool
-IndexSet::IntervalIterator::
-operator<(const IndexSet::IntervalIterator &other) const
+IndexSet::IntervalIterator::operator<(
+  const IndexSet::IntervalIterator &other) const
 {
   return accessor < other.accessor;
 }
@@ -1240,8 +1240,8 @@ operator<(const IndexSet::IntervalIterator &other) const
 
 
 inline int
-IndexSet::IntervalIterator::
-operator-(const IndexSet::IntervalIterator &other) const
+IndexSet::IntervalIterator::operator-(
+  const IndexSet::IntervalIterator &other) const
 {
   Assert(accessor.index_set == other.accessor.index_set,
          ExcMessage(
@@ -1308,7 +1308,8 @@ IndexSet::ElementIterator::is_valid() const
 
 
 
-inline IndexSet::size_type IndexSet::ElementIterator::operator*() const
+inline IndexSet::size_type
+IndexSet::ElementIterator::operator*() const
 {
   Assert(
     is_valid(),
@@ -1320,8 +1321,8 @@ inline IndexSet::size_type IndexSet::ElementIterator::operator*() const
 
 
 inline bool
-IndexSet::ElementIterator::
-operator==(const IndexSet::ElementIterator &other) const
+IndexSet::ElementIterator::operator==(
+  const IndexSet::ElementIterator &other) const
 {
   Assert(index_set == other.index_set,
          ExcMessage(
@@ -1380,8 +1381,8 @@ IndexSet::ElementIterator::operator++(int)
 
 
 inline bool
-IndexSet::ElementIterator::
-operator!=(const IndexSet::ElementIterator &other) const
+IndexSet::ElementIterator::operator!=(
+  const IndexSet::ElementIterator &other) const
 {
   return !(*this == other);
 }
@@ -1389,8 +1390,8 @@ operator!=(const IndexSet::ElementIterator &other) const
 
 
 inline bool
-IndexSet::ElementIterator::
-operator<(const IndexSet::ElementIterator &other) const
+IndexSet::ElementIterator::operator<(
+  const IndexSet::ElementIterator &other) const
 {
   Assert(index_set == other.index_set,
          ExcMessage(
@@ -1402,8 +1403,8 @@ operator<(const IndexSet::ElementIterator &other) const
 
 
 inline std::ptrdiff_t
-IndexSet::ElementIterator::
-operator-(const IndexSet::ElementIterator &other) const
+IndexSet::ElementIterator::operator-(
+  const IndexSet::ElementIterator &other) const
 {
   Assert(index_set == other.index_set,
          ExcMessage(
@@ -1719,7 +1720,7 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
       size_type       end_index   = begin_index + 1;
       ForwardIterator q           = p;
       ++q;
-      while ((q != end) && (*q == end_index))
+      while ((q != end) && (static_cast<size_type>(*q) == end_index))
         {
           ++end_index;
           ++q;
@@ -1732,7 +1733,7 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
       // than the end index of the one just identified, then we will have at
       // least one pair of ranges that are not sorted, and consequently the
       // whole collection of ranges is not sorted.
-      if (p != end && *p < end_index)
+      if (p != end && static_cast<size_type>(*p) < end_index)
         ranges_are_sorted = false;
     }
 
@@ -2016,19 +2017,19 @@ inline void
 IndexSet::print(StreamType &out) const
 {
   compress();
-  out << "{";
+  out << '{';
   std::vector<Range>::const_iterator p;
   for (p = ranges.begin(); p != ranges.end(); ++p)
     {
       if (p->end - p->begin == 1)
         out << p->begin;
       else
-        out << "[" << p->begin << "," << p->end - 1 << "]";
+        out << '[' << p->begin << ',' << p->end - 1 << ']';
 
       if (p != --ranges.end())
         out << ", ";
     }
-  out << "}" << std::endl;
+  out << '}' << std::endl;
 }
 
 

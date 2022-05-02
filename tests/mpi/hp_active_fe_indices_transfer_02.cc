@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,16 +15,16 @@
 
 
 
-// active fe indices transfer on serialization
+// active FE indices transfer on serialization
 
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -48,15 +48,13 @@ test()
     GridGenerator::subdivided_hyper_cube(tria, 2);
     tria.refine_global(1);
 
-    hp::DoFHandler<dim> dh(tria);
-    // we need to introduce dof_handler to its fe_collection first
-    dh.set_fe(fe_collection);
+    DoFHandler<dim> dh(tria);
 
     unsigned int i = 0;
     for (auto &cell : dh.active_cell_iterators())
       if (cell->is_locally_owned())
         {
-          // set active fe index
+          // set active FE index
           if (!(cell->is_artificial()))
             {
               if (i >= fe_collection.size())
@@ -67,6 +65,8 @@ test()
           deallog << "cellid=" << cell->id()
                   << " fe_index=" << cell->active_fe_index() << std::endl;
         }
+
+    dh.distribute_dofs(fe_collection);
 
     // ----- transfer -----
     dh.prepare_for_serialization_of_active_fe_indices();
@@ -85,8 +85,7 @@ test()
     // triangulation has to be initialized with correct coarse cells
 
     // we need to introduce dof_handler to its fe_collection first
-    hp::DoFHandler<dim> dh(tria);
-    dh.set_fe(fe_collection);
+    DoFHandler<dim> dh(tria);
 
     // ----- transfer -----
     tria.load("file");

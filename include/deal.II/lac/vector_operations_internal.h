@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/memory_space.h>
+#include <deal.II/base/memory_space_data.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/types.h>
@@ -89,7 +90,7 @@ namespace internal
 
 
 
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
     /**
      * This struct takes the loop range from the tbb parallel for loop and
      * translates it to the actual ranges of the for loop within the vector. It
@@ -153,7 +154,7 @@ namespace internal
       const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
         &partitioner)
     {
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
       const size_type vec_size = end - start;
       // only go to the parallel function in case there are at least 4 parallel
       // items, otherwise the overhead is too large
@@ -213,7 +214,7 @@ namespace internal
 
         if (value == Number())
           {
-#ifdef DEAL_II_WITH_CXX17
+#ifdef DEAL_II_HAVE_CXX17
             if constexpr (std::is_trivial<Number>::value)
 #else
             if (std::is_trivial<Number>::value)
@@ -250,7 +251,7 @@ namespace internal
         if (__has_trivial_copy(Number) &&
             std::is_same<Number, OtherNumber>::value)
 #else
-#  ifdef DEAL_II_WITH_CXX17
+#  ifdef DEAL_II_HAVE_CXX17
         if constexpr (std::is_trivially_copyable<Number>() &&
                       std::is_same<Number, OtherNumber>::value)
 #  else
@@ -1229,7 +1230,7 @@ namespace internal
 
 
 
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
     /**
      * This struct takes the loop range from the tbb parallel for loop and
      * translates it to the actual ranges of the reduction loop inside the
@@ -1358,7 +1359,7 @@ namespace internal
       const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
         &partitioner)
     {
-#ifdef DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_TBB
       const size_type vec_size = end - start;
       // only go to the parallel function in case there are at least 4 parallel
       // items, otherwise the overhead is too large
@@ -1638,7 +1639,7 @@ namespace internal
 
       template <typename MemorySpace2>
       static void
-      import(
+      import_elements(
         const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
         /*thread_loop_partitioner*/,
         const size_type /*size*/,
@@ -1995,18 +1996,19 @@ namespace internal
 
       template <typename MemorySpace2>
       static void
-      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               &                     thread_loop_partitioner,
-             const size_type         size,
-             VectorOperation::values operation,
-             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-               &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::Host>
-               &data,
-             typename std::enable_if<
-               std::is_same<MemorySpace2, dealii::MemorySpace::Host>::value,
-               int>::type = 0)
+      import_elements(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &                     thread_loop_partitioner,
+        const size_type         size,
+        VectorOperation::values operation,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+          &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data,
+        typename std::enable_if<
+          std::is_same<MemorySpace2, dealii::MemorySpace::Host>::value,
+          int>::type = 0)
       {
         if (operation == VectorOperation::insert)
           {
@@ -2025,18 +2027,19 @@ namespace internal
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
       template <typename MemorySpace2>
       static void
-      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               & /*thread_loop_partitioner*/,
-             const size_type         size,
-             VectorOperation::values operation,
-             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-               &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::Host>
-               &data,
-             typename std::enable_if<
-               std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
-               int>::type = 0)
+      import_elements(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          & /*thread_loop_partitioner*/,
+        const size_type         size,
+        VectorOperation::values operation,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+          &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::Host>
+          &data,
+        typename std::enable_if<
+          std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
+          int>::type = 0)
       {
         if (operation == VectorOperation::insert)
           {
@@ -2093,13 +2096,7 @@ namespace internal
         const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::set<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), s, size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2118,13 +2115,7 @@ namespace internal
                                      1.,
                                      v_data.values_dev.get(),
                                      size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2143,13 +2134,7 @@ namespace internal
                                      -1.,
                                      v_data.values_dev.get(),
                                      size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2164,13 +2149,7 @@ namespace internal
         const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_add<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), a, size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2190,13 +2169,7 @@ namespace internal
                                      a,
                                      v_data.values_dev.get(),
                                      size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2221,13 +2194,7 @@ namespace internal
                                                     b,
                                                     w_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2245,13 +2212,7 @@ namespace internal
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.values_dev.get(), 1., v_data.values_dev.get(), size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2270,13 +2231,7 @@ namespace internal
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.values_dev.get(), a, v_data.values_dev.get(), size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2303,13 +2258,7 @@ namespace internal
                                                     b,
                                                     w_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2324,13 +2273,7 @@ namespace internal
         const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_scale<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), factor, size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2348,13 +2291,7 @@ namespace internal
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
                                                     v_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2374,13 +2311,7 @@ namespace internal
                                                     a,
                                                     v_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static void
@@ -2405,13 +2336,7 @@ namespace internal
                                                     b,
                                                     w_data.values_dev.get(),
                                                     size);
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
       }
 
       static Number
@@ -2438,13 +2363,7 @@ namespace internal
                                                     v_data.values_dev.get(),
                                                     static_cast<unsigned int>(
                                                       size));
-
-#  ifdef DEBUG
-        // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
-        // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
-#  endif
+        AssertCudaKernel();
 
         // Copy the result back to the host
         Number result;
@@ -2595,18 +2514,19 @@ namespace internal
 
       template <typename MemorySpace2>
       static void
-      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               &                     thread_loop_partitioner,
-             const size_type         size,
-             VectorOperation::values operation,
-             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-               &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::CUDA>
-               &data,
-             typename std::enable_if<
-               std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
-               int>::type = 0)
+      import_elements(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          &                     thread_loop_partitioner,
+        const size_type         size,
+        VectorOperation::values operation,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+          &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data,
+        typename std::enable_if<
+          std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
+          int>::type = 0)
       {
         if (operation == VectorOperation::insert)
           {
@@ -2624,18 +2544,19 @@ namespace internal
 
       template <typename MemorySpace2>
       static void
-      import(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               & /*thread_loop_partitioner*/,
-             const size_type         size,
-             VectorOperation::values operation,
-             const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-               &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::CUDA>
-               &data,
-             typename std::enable_if<
-               std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,
-               int>::type = 0)
+      import_elements(
+        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+          & /*thread_loop_partitioner*/,
+        const size_type         size,
+        VectorOperation::values operation,
+        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
+          &v_data,
+        ::dealii::MemorySpace::MemorySpaceData<Number,
+                                               ::dealii::MemorySpace::CUDA>
+          &data,
+        typename std::enable_if<
+          std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,
+          int>::type = 0)
       {
         if (operation == VectorOperation::insert)
           {

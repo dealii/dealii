@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -121,7 +121,7 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   const double threshold = 1e-6;
   deallog << ", dofs_per_cell=" << fe.dofs_per_cell << "; relative residual: "
           << (relative_residual < threshold ? "ok" : "botched up!")
-          << " (relative residual=" << relative_residual << ")" << std::endl;
+          << " (relative residual=" << relative_residual << ')' << std::endl;
 }
 
 

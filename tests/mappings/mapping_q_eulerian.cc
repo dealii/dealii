@@ -173,7 +173,7 @@ MappingTest<dim>::run_test()
       dof_handler.distribute_dofs(fe);
       displacements.reinit(dof_handler.n_dofs());
 
-      VectorTools::interpolate(MappingQGeneric<dim>(1),
+      VectorTools::interpolate(MappingQ<dim>(1),
                                dof_handler,
                                imposed_displacement,
                                displacements);
@@ -212,15 +212,15 @@ MappingTest<dim>::explicitly_move_mesh()
                                                    dof_handler.begin_active(),
                                                  endc = dof_handler.end();
 
-  for (; cell != endc; cell++)
+  for (; cell != endc; ++cell)
     {
-      for (unsigned int v = 0; v < vpc; v++)
+      for (unsigned int v = 0; v < vpc; ++v)
         {
           if (moved[cell->vertex_index(v)] == false)
             {
               moved[cell->vertex_index(v)] = true;
               Point<dim> vertex_disp;
-              for (unsigned int d = 0; d < dim; d++)
+              for (unsigned int d = 0; d < dim; ++d)
                 {
                   vertex_disp[d] = displacements(cell->vertex_dof_index(v, d));
                 }
@@ -244,7 +244,7 @@ MappingTest<dim>::graphical_output()
   dof_handler.distribute_dofs(fe);
   displacements.reinit(dof_handler.n_dofs());
 
-  VectorTools::interpolate(MappingQGeneric<dim>(1),
+  VectorTools::interpolate(MappingQ<dim>(1),
                            dof_handler,
                            imposed_displacement,
                            displacements);

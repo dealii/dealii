@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,7 @@ test(PETScWrappers::MatrixBase &m)
   Assert(m.m() != 0, ExcInternalError());
   Assert(m.n() != 0, ExcInternalError());
 
-  typedef PETScWrappers::MatrixBase::size_type size_type;
+  using size_type = PETScWrappers::MatrixBase::size_type;
 
   // build a tri-diagonal pattern
   double          norm_sqr = 0;

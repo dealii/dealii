@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,8 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  * adding to the abstract interface in MGSmootherBase, this class stores
  * information on the number and type of smoothing steps, which in turn can be
  * used by a derived class.
- *
- * @author Guido Kanschat 2009
  */
 template <typename VectorType>
 class MGSmoother : public MGSmootherBase<VectorType>
@@ -135,8 +133,6 @@ protected:
  * other than for testing some multigrid procedures. Also some applications
  * might get convergence without smoothing and then this class brings you the
  * cheapest possible multigrid.
- *
- * @author Guido Kanschat, 1999, 2002
  */
 template <typename VectorType>
 class MGSmootherIdentity : public MGSmootherBase<VectorType>
@@ -182,9 +178,6 @@ namespace mg
    * the possibility to extract a single block for smoothing. In this case,
    * the multigrid method must be used only with the vector associated to that
    * single block.
-   *
-   * @author Guido Kanschat,
-   * @date 2003, 2009, 2010
    */
   template <class RelaxationType, typename VectorType>
   class SmootherRelaxation : public MGLevelObject<RelaxationType>,
@@ -296,8 +289,6 @@ namespace mg
  * <tt>Vector<.></tt>, where the template arguments are all combinations of @p
  * float and @p double. Additional instantiations may be created by including
  * the file mg_smoother.templates.h.
- *
- * @author Guido Kanschat, 2003
  */
 template <typename MatrixType, class RelaxationType, typename VectorType>
 class MGSmootherRelaxation : public MGSmoother<VectorType>
@@ -448,8 +439,6 @@ private:
  * <tt>Vector<.></tt>, where the template arguments are all combinations of @p
  * float and @p double. Additional instantiations may be created by including
  * the file mg_smoother.templates.h.
- *
- * @author Guido Kanschat, 2009
  */
 template <typename MatrixType, typename PreconditionerType, typename VectorType>
 class MGSmootherPrecondition : public MGSmoother<VectorType>
@@ -477,6 +466,17 @@ public:
   initialize(const MGLevelObject<MatrixType2> &matrices,
              const typename PreconditionerType::AdditionalData &
                additional_data = typename PreconditionerType::AdditionalData());
+
+  /**
+   * In contrast to the function above, only initialize the matrices. The
+   * smoothers need to be set up manually by the user as a subsequent step
+   * in the code. For this purpose, the public field @p smoothers
+   * can be directly modified. This is useful if one wants full flexibility in
+   * the choice of smoothers, e.g., use different smoothers on the levels.
+   */
+  template <typename MatrixType2>
+  void
+  initialize_matrices(const MGLevelObject<MatrixType2> &matrices);
 
   /**
    * Initialize for matrices. This function stores pointers to the level
@@ -1044,8 +1044,34 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
       matrices[i] =
-        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
-      smoothers[i].initialize(m[i], data);
+        linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                    Utilities::get_underlying_value(m[i]));
+      smoothers[i].initialize(Utilities::get_underlying_value(m[i]), data);
+    }
+}
+
+
+
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
+template <typename MatrixType2>
+inline void
+MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::
+  initialize_matrices(const MGLevelObject<MatrixType2> &m)
+{
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
+
+  matrices.resize(min, max);
+  smoothers.resize(min, max);
+
+  for (unsigned int i = min; i <= max; ++i)
+    {
+      // Workaround: Unfortunately, not every "m[i]" object has a rich
+      // enough interface to populate reinit_(domain|range)_vector. Thus,
+      // apply an empty LinearOperator exemplar.
+      matrices[i] =
+        linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                    Utilities::get_underlying_value(m[i]));
     }
 }
 
@@ -1073,8 +1099,9 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
       matrices[i] =
-        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
-      smoothers[i].initialize(m[i], data[i]);
+        linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                    Utilities::get_underlying_value(m[i]));
+      smoothers[i].initialize(Utilities::get_underlying_value(m[i]), data[i]);
     }
 }
 

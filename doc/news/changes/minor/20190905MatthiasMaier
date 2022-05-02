@@ -1,8 +1,0 @@
-New: compare_and_apply_mask() allows to use a ternary operater idiom with
-VectorizedArray that is based on generating a mask via component-wise
-comparison. Such a computational idiom is useful as an alternative to
-branching whenever the control flow itself would depend on (computed) data
-(which is not possible for vectorized data).
-<br>
-(Matthias Maier, 2019/09/05)
-

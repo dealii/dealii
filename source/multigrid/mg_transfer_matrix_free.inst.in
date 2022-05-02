@@ -18,5 +18,9 @@
 for (deal_II_dimension : DIMENSIONS; S1 : REAL_SCALARS)
   {
     template class MGTransferMatrixFree<deal_II_dimension, S1>;
+    template class MGTransferBlockMatrixFreeBase<
+      deal_II_dimension,
+      S1,
+      MGTransferMatrixFree<deal_II_dimension, S1>>;
     template class MGTransferBlockMatrixFree<deal_II_dimension, S1>;
   }

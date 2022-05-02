@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,9 +14,10 @@
 // ---------------------------------------------------------------------
 
 // A test that checks make_flux_sparsity_pattern
-// with vector-valued hp objects and coupling masks
+// with vector-valued hp-objects and coupling masks
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -32,7 +33,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -86,7 +86,7 @@ check()
                                         FE_Nothing<dim>(),
                                         dim));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
   dof_handler.begin_active()->set_active_fe_index(1);
   dof_handler.distribute_dofs(fe_collection);
 

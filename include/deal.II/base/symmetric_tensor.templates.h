@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -168,7 +168,7 @@ namespace internal
       // Make the first row and column to be of the
       // desired form
       h = 0.0;
-      for (int i = 1; i < dim; i++)
+      for (int i = 1; i < dim; ++i)
         h += A[0][i] * A[0][i];
 
       g = 0.0;
@@ -179,7 +179,7 @@ namespace internal
       e[0] = g;
 
       std::array<Number, dim> u;
-      for (int i = 1; i < dim; i++)
+      for (int i = 1; i < dim; ++i)
         {
           u[i] = A[0][i];
           if (i == 1)
@@ -192,44 +192,44 @@ namespace internal
         {
           omega_inv = 1.0 / omega;
           K         = 0.0;
-          for (int i = 1; i < dim; i++)
+          for (int i = 1; i < dim; ++i)
             {
               f = 0.0;
-              for (int j = 1; j < dim; j++)
+              for (int j = 1; j < dim; ++j)
                 f += A[i][j] * u[j];
               q[i] = omega_inv * f;
               K += u[i] * f;
             }
           K *= 0.5 * omega_inv * omega_inv;
 
-          for (int i = 1; i < dim; i++)
+          for (int i = 1; i < dim; ++i)
             q[i] = q[i] - K * u[i];
 
           d[0] = A[0][0];
-          for (int i = 1; i < dim; i++)
+          for (int i = 1; i < dim; ++i)
             d[i] = A[i][i] - 2.0 * q[i] * u[i];
 
           // Store inverse Householder transformation
           // in Q
-          for (int j = 1; j < dim; j++)
+          for (int j = 1; j < dim; ++j)
             {
               f = omega_inv * u[j];
-              for (int i = 1; i < dim; i++)
+              for (int i = 1; i < dim; ++i)
                 Q[i][j] = Q[i][j] - f * u[i];
             }
 
           // For dim = 3: Calculate updated A[1][2] and
           // store it in e[1]
-          for (int i = 1; i < dim - 1; i++)
+          for (int i = 1; i < dim - 1; ++i)
             e[i] = A[i][i + 1] - q[i] * u[i + 1] - u[i] * q[i + 1];
         }
       else
         {
-          for (int i = 0; i < dim; i++)
+          for (unsigned int i = 0; i < dim; ++i)
             d[i] = A[i][i];
 
           // For dim = 3:
-          for (int i = 1; i < dim - 1; i++)
+          for (int i = 1; i < dim - 1; ++i)
             e[i] = A[i][i + 1];
         }
     }
@@ -269,14 +269,14 @@ namespace internal
       Number g, r, p, f, b, s, c, t;
 
       // Loop over all off-diagonal elements
-      for (int l = 0; l < dim - 1; l++)
+      for (int l = 0; l < dim - 1; ++l)
         {
           for (unsigned int it = 0; it <= max_n_it; ++it)
             {
               // Check for convergence and exit iteration loop
               // if the off-diagonal element e[l] is zero
               int m = l;
-              for (; m <= dim - 2; m++)
+              for (; m <= dim - 2; ++m)
                 {
                   g = std::abs(w[m]) + std::abs(w[m + 1]);
                   if (std::abs(e[m]) + g == g)
@@ -339,7 +339,7 @@ namespace internal
                   g        = c * r - b;
 
                   // Form the eigenvectors
-                  for (int k = 0; k < dim; k++)
+                  for (unsigned int k = 0; k < dim; ++k)
                     {
                       t           = Q[k][i + 1];
                       Q[k][i + 1] = s * Q[k][i] + c * t;
@@ -376,7 +376,7 @@ namespace internal
 
     template <int dim, typename Number>
     std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
-      jacobi(dealii::SymmetricTensor<2, dim, Number> A)
+    jacobi(dealii::SymmetricTensor<2, dim, Number> A)
     {
       static_assert(numbers::NumberTraits<Number>::is_complex == false,
                     "This implementation of the Jacobi algorithm does "
@@ -399,7 +399,7 @@ namespace internal
       // The diagonal elements of the tridiagonal matrix;
       // this will ultimately store the eigenvalues
       std::array<Number, dim> w;
-      for (int i = 0; i < dim; i++)
+      for (unsigned int i = 0; i < dim; ++i)
         w[i] = A[i][i];
 
       // Calculate (tr(A))^{2}
@@ -408,12 +408,12 @@ namespace internal
 
       // Number of iterations
       const unsigned int max_n_it = 50;
-      for (unsigned int it = 0; it <= max_n_it; it++)
+      for (unsigned int it = 0; it <= max_n_it; ++it)
         {
           // Test for convergence
           so = 0.0;
-          for (int p = 0; p < dim; p++)
-            for (int q = p + 1; q < dim; q++)
+          for (unsigned int p = 0; p < dim; ++p)
+            for (int q = p + 1; q < dim; ++q)
               so += std::abs(A[p][q]);
           if (so == 0.0)
             break;
@@ -438,8 +438,8 @@ namespace internal
             thresh = 0.0;
 
           // Perform sweep
-          for (int p = 0; p < dim; p++)
-            for (int q = p + 1; q < dim; q++)
+          for (unsigned int p = 0; p < dim; ++p)
+            for (unsigned int q = p + 1; q < dim; ++q)
               {
                 g = 100.0 * std::abs(A[p][q]);
 
@@ -486,19 +486,19 @@ namespace internal
                     w[p] -= z;
                     w[q] += z;
                     // ... by executing the various rotations in sequence
-                    for (int r = 0; r < p; r++)
+                    for (unsigned int r = 0; r < p; ++r)
                       {
                         t       = A[r][p];
                         A[r][p] = c * t - s * A[r][q];
                         A[r][q] = s * t + c * A[r][q];
                       }
-                    for (int r = p + 1; r < q; r++)
+                    for (unsigned int r = p + 1; r < q; ++r)
                       {
                         t       = A[p][r];
                         A[p][r] = c * t - s * A[r][q];
                         A[r][q] = s * t + c * A[r][q];
                       }
-                    for (int r = q + 1; r < dim; r++)
+                    for (unsigned int r = q + 1; r < dim; ++r)
                       {
                         t       = A[p][r];
                         A[p][r] = c * t - s * A[q][r];
@@ -506,7 +506,7 @@ namespace internal
                       }
 
                     // Update the eigenvectors
-                    for (int r = 0; r < dim; r++)
+                    for (unsigned int r = 0; r < dim; ++r)
                       {
                         t       = Q[r][p];
                         Q[r][p] = c * t - s * Q[r][q];
@@ -674,7 +674,7 @@ namespace internal
       else // This is the standard branch
         {
           norm = std::sqrt(1.0 / norm);
-          for (unsigned j = 0; j < dim; j++)
+          for (unsigned j = 0; j < dim; ++j)
             Q[j][0] = Q[j][0] * norm;
         }
 
@@ -691,7 +691,7 @@ namespace internal
       else
         {
           norm = std::sqrt(1.0 / norm);
-          for (unsigned int j = 0; j < dim; j++)
+          for (unsigned int j = 0; j < dim; ++j)
             Q[j][1] = Q[j][1] * norm;
         }
 
@@ -759,15 +759,15 @@ namespace internal
         {
           case (0):
             R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d(
-              {1, 0, 0}, rotation_angle);
+              Tensor<1, 3>({1., 0., 0.}), rotation_angle);
             break;
           case (1):
             R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d(
-              {0, 1, 0}, rotation_angle);
+              Tensor<1, 3>({0., 1., 0.}), rotation_angle);
             break;
           case (2):
             R = dealii::Physics::Transformations::Rotations::rotation_matrix_3d(
-              {0, 0, 1}, rotation_angle);
+              Tensor<1, 3>({0., 0., 1.}), rotation_angle);
             break;
           default:
             AssertThrow(false, ExcNotImplemented());

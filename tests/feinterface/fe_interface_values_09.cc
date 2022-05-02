@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,8 @@ make_2_cells(Triangulation<dim> &tria);
 
 
 template <>
-void make_2_cells<2>(Triangulation<2> &tria)
+void
+make_2_cells<2>(Triangulation<2> &tria)
 {
   const unsigned int        dim         = 2;
   std::vector<unsigned int> repetitions = {2, 1};
@@ -52,7 +53,8 @@ void make_2_cells<2>(Triangulation<2> &tria)
 
 
 template <>
-void make_2_cells<3>(Triangulation<3> &tria)
+void
+make_2_cells<3>(Triangulation<3> &tria)
 {
   const unsigned int        dim         = 3;
   std::vector<unsigned int> repetitions = {2, 1, 1};
@@ -74,16 +76,17 @@ print_norm_of_average_over_quadrature_points(const FEInterfaceValues<dim> &fiv)
   cell_vector = 0.0;
   for (unsigned int qpoint = 0; qpoint < fiv.n_quadrature_points; ++qpoint)
     for (unsigned int i = 0; i < n_dofs; ++i)
-      cell_vector(i) +=
-        fiv.jump_hessian(i, qpoint).norm() * fiv.get_JxW_values()[qpoint];
-  deallog << "jump_hessian.norm(): " << cell_vector << std::flush;
+      cell_vector(i) += fiv.jump_in_shape_hessians(i, qpoint).norm() *
+                        fiv.get_JxW_values()[qpoint];
+  deallog << "jump_in_shape_hessians.norm(): " << cell_vector << std::endl;
 
   cell_vector = 0.0;
   for (unsigned int qpoint = 0; qpoint < fiv.n_quadrature_points; ++qpoint)
     for (unsigned int i = 0; i < n_dofs; ++i)
-      cell_vector(i) += fiv.jump_3rd_derivative(i, qpoint).norm() *
+      cell_vector(i) += fiv.jump_in_shape_3rd_derivatives(i, qpoint).norm() *
                         fiv.get_JxW_values()[qpoint];
-  deallog << "jump_3rd_derivative.norm(): " << cell_vector << std::flush;
+  deallog << "jump_in_shape_3rd_derivatives.norm(): " << cell_vector
+          << std::endl;
 }
 
 

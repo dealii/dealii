@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,9 +15,8 @@
 
 
 /*
- * Given the number of refinements and the number of random points
- * it benchmarks the time needed to run the function FCT
- * which can be point_locator_D2 (or point_locator when it shall be written)
+ * Compare find_active_cell_around_point between the default variant and the
+ * one with a cache.
  */
 #include <deal.II/dofs/dof_handler.h>
 
@@ -58,7 +57,8 @@ test()
       if (d == 1)
         p2[d] = b;
       else
-        p2[d] = (a + b) * 0.5;
+        // avoid roundoff issues of point at exactly the vertex
+        p2[d] = (a + b) * (0.5 - 1e-8);
       p3[d] = b;
     }
 

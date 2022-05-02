@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +23,6 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector_memory.h>
 
-// Ignore deprecation warnings for auto_ptr.
 #include <boost/signals2.hpp>
 
 DEAL_II_NAMESPACE_OPEN
@@ -83,6 +82,9 @@ class Vector;
  * class Vector
  * {
  *   public:
+ *     // Define value type of the entries
+ *     using value_type = double;
+ *
  *     // Resize the current object to have the same size and layout as
  *     // the model_vector argument provided. The second argument
  *     // indicates whether to clear the current object after resizing.
@@ -92,6 +94,13 @@ class Vector;
  *
  *     // Inner product between the current object and the argument.
  *     double operator * (const Vector &v) const;
+ *
+ *     // Set all the vector entries to a constant scalar.
+ *     Vector & operator = (const double a);
+ *
+ *     // Deep copy of the vector.
+ *     // Important if Vector contains pointers to data to duplicate data.
+ *     Vector & operator = (const Vector &x);
  *
  *     // Addition of vectors
  *     void add (const Vector &x);
@@ -326,8 +335,6 @@ class Vector;
  * </td> </tr> </table>
  *
  * @ingroup Solvers
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005,
- * 2014
  */
 template <class VectorType = Vector<double>>
 class SolverBase : public Subscriptor
@@ -465,25 +472,14 @@ protected:
 
 
 
-/**
- * Type definition for the base class for iterative linear solvers.
- * This class provides interfaces to a memory pool and the objects that
- * determine whether a solver has converged.
- *
- * @deprecated Use <code>SolverBase</code> instead.
- */
-template <class VectorType = Vector<double>>
-using Solver DEAL_II_DEPRECATED = SolverBase<VectorType>;
-
-
 /*-------------------------------- Inline functions ------------------------*/
 
 
 template <class VectorType>
 inline SolverControl::State
-SolverBase<VectorType>::StateCombiner::
-operator()(const SolverControl::State state1,
-           const SolverControl::State state2) const
+SolverBase<VectorType>::StateCombiner::operator()(
+  const SolverControl::State state1,
+  const SolverControl::State state2) const
 {
   if ((state1 == SolverControl::failure) || (state2 == SolverControl::failure))
     return SolverControl::failure;

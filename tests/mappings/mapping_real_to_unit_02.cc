@@ -45,7 +45,7 @@ test2()
   GridGenerator::hyper_ball(triangulation);
   triangulation.set_manifold(0, boundary_description);
   triangulation.refine_global(1);
-  MappingQGeneric<dim> mapping(1);
+  MappingQ<dim> mapping(1);
 
 
   Point<dim> p(-0.27999999999999992, -0.62999999999999989);
@@ -62,8 +62,8 @@ test2()
   std::vector<double>     m(19 * 19);
 
   if (1) // works if changed to "if (0)"   <<<<<<<<<
-    for (unsigned int i = 0; i < 19; i++)
-      for (unsigned int j = 0; j < 19; j++)
+    for (unsigned int i = 0; i < 19; ++i)
+      for (unsigned int j = 0; j < 19; ++j)
         {
           /// all points are inside
           points[19 * i + j](0) = -0.7 + (i + 1) * .07;

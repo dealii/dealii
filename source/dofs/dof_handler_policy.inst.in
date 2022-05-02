@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,20 +25,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         \{
           template class PolicyBase<deal_II_dimension, deal_II_space_dimension>;
 
-          template class Sequential<
-            dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-          template class Sequential<
-            dealii::hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
+          template class Sequential<deal_II_dimension, deal_II_space_dimension>;
 
-          template class ParallelShared<
-            dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-          template class ParallelShared<
-            dealii::hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
+          template class ParallelShared<deal_II_dimension,
+                                        deal_II_space_dimension>;
 
-          template class ParallelDistributed<
-            dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
-          template class ParallelDistributed<
-            dealii::hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>>;
+          template class ParallelDistributed<deal_II_dimension,
+                                             deal_II_space_dimension>;
         \}
       \}
     \}

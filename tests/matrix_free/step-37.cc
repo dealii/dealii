@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -233,7 +233,7 @@ namespace Step37
   LaplaceOperator<dim, fe_degree, number>::evaluate_coefficient(
     const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = data.n_macro_cells();
+    const unsigned int n_cells = data.n_cell_batches();
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
     coefficient.resize(n_cells * phi.n_q_points);
     for (unsigned int cell = 0; cell < n_cells; ++cell)
@@ -256,18 +256,18 @@ namespace Step37
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
-    AssertDimension(coefficient.size(), data.n_macro_cells() * phi.n_q_points);
+    AssertDimension(coefficient.size(), data.n_cell_batches() * phi.n_q_points);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(false, true, false);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(coefficient[cell * phi.n_q_points + q] *
                                 phi.get_gradient(q),
                               q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -376,9 +376,9 @@ namespace Step37
     void
     output_results(const unsigned int cycle) const;
 
-    typedef LaplaceOperator<dim, degree_finite_element, double>
-                                                               SystemMatrixType;
-    typedef LaplaceOperator<dim, degree_finite_element, float> LevelMatrixType;
+    using SystemMatrixType =
+      LaplaceOperator<dim, degree_finite_element, double>;
+    using LevelMatrixType = LaplaceOperator<dim, degree_finite_element, float>;
 
     Triangulation<dim>        triangulation;
     FE_Q<dim>                 fe;
@@ -578,7 +578,7 @@ namespace Step37
     MGCoarseGridHouseholder<float, Vector<double>> mg_coarse;
     mg_coarse.initialize(coarse_matrix);
 
-    typedef PreconditionChebyshev<LevelMatrixType, Vector<double>> SMOOTHER;
+    using SMOOTHER = PreconditionChebyshev<LevelMatrixType, Vector<double>>;
     MGSmootherPrecondition<LevelMatrixType, SMOOTHER, Vector<double>>
       mg_smoother;
 

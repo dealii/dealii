@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,6 @@ namespace PETScWrappers
      *
      * @ingroup Matrix1 @see
      * @ref GlossBlockLA "Block (linear algebra)"
-     * @author Wolfgang Bangerth, 2004
      */
     class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>
     {
@@ -250,6 +249,14 @@ namespace PETScWrappers
        */
       std::vector<IndexSet>
       locally_owned_range_indices() const;
+
+      /**
+       * Return the number of nonzero elements of this matrix. Actually, it
+       * returns the number of entries in the sparsity pattern; if any of the
+       * entries should happen to be zero, it is counted anyway.
+       */
+      size_type
+      n_nonzero_elements() const;
 
       /**
        * Return a reference to the MPI communicator object in use with this

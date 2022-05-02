@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,7 +67,7 @@ test()
   // use one strategy to compute
   // thresholds and obtain those
   // thresholds
-  parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_number(
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
     tr, indicators, 2. / 3, 1. / 6);
   {
     float coarsen_indicator = min_indicator - 1,
@@ -101,10 +101,10 @@ test()
   // only works because we are
   // working on only a single
   // processor
-  dealii::GridRefinement ::refine_and_coarsen_fixed_number(tr,
-                                                           indicators,
-                                                           2. / 3,
-                                                           1. / 6);
+  dealii::GridRefinement::refine_and_coarsen_fixed_number(tr,
+                                                          indicators,
+                                                          2. / 3,
+                                                          1. / 6);
   {
     float coarsen_indicator = min_indicator - 1,
           refine_indicator  = max_indicator + 1;

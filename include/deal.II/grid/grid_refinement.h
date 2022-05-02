@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,8 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+
+#include <deal.II/numerics/vector_tools_common.h>
 
 #include <limits>
 
@@ -49,7 +51,6 @@ class Vector;
  * Nochetto, Rannacher, Stevenson, and others.
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, Thomas Richter, Guido Kanschat 1998, 2000, 2009
  */
 namespace GridRefinement
 {
@@ -220,6 +221,12 @@ namespace GridRefinement
    * through proliferation of refinement due to Triangulation::MeshSmoothing,
    * this number is only an indicator. The default value of this argument is
    * to impose no limit on the number of cells.
+   *
+   * @param[in] norm_type To determine thresholds, combined errors on
+   * subsets of cells are calculated as norms of the criteria on these
+   * cells. Different types of norms can be used for this purpose, from
+   * which VectorTools::NormType::L1_norm and
+   * VectorTools::NormType::L2_norm are currently supported.
    */
   template <int dim, typename Number, int spacedim>
   void
@@ -228,7 +235,8 @@ namespace GridRefinement
     const Vector<Number> &        criteria,
     const double                  top_fraction,
     const double                  bottom_fraction,
-    const unsigned int max_n_cells = std::numeric_limits<unsigned int>::max());
+    const unsigned int max_n_cells = std::numeric_limits<unsigned int>::max(),
+    const VectorTools::NormType norm_type = VectorTools::NormType::L1_norm);
 
 
 
@@ -300,10 +308,8 @@ namespace GridRefinement
    * above.
    *
    * @note This function was originally implemented by Thomas Richter. It
-   * follows a strategy described in T. Richter, "Parallel Multigrid Method
-   * for Adaptive Finite Elements with Application to 3D Flow Problems", PhD
-   * thesis, University of Heidelberg, 2005. See in particular Section 4.3,
-   * pp. 42-43.
+   * follows a strategy described in @cite Richter2005. See in particular
+   * Section 4.3, pp. 42-43.
    */
   template <int dim, typename Number, int spacedim>
   void

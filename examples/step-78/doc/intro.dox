@@ -1,0 +1,362 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+The Black-Scholes equation is a partial differential equation that falls a bit
+out of the ordinary scheme. It describes what the fair price of a "European
+call" stock option is. Without going into too much detail, a stock "option" is
+a contract one can buy from a bank that allows me, but not requires me, to buy
+a specific stock at a fixed price $K$ at a fixed future time $T$ in the
+future. The question one would then want to answer as a buyer of such an
+option is "How much do I think such a contract is worth?", or as the seller
+"How much do I need to charge for this contract?", both as a function of the
+time $t<T$ before the contract is up at time $T$ and as a function of the stock
+price $S$. Fischer Black and Myron Scholes derived a partial differential
+equation for the fair price $V(S,t)$ for such options under the assumption that
+stock prices exhibit random price fluctuations with a given level of
+"volatility" plus a background exponential price increase (which one can think
+of as the inflation rate that simply devalues all money over time). For their
+work, Black and Scholes received the Nobel Prize in Economic Sciences in 1997,
+making this the first tutorial program dealing with a problem for which someone
+has gotten a Nobel Prize @cite black1973pricing.
+
+The equation reads as follows:
+@f{align*}{
+    &\frac{\partial V}{\partial t} + \frac{\sigma^2S^2}{2} \
+    \frac{\partial^2 V}{\partial S^2} + \
+    rS\frac{\partial V}{\partial S} - rV = 0, \
+    \quad\quad &&\forall S\in \Omega, t \in (0,T)
+    \\
+    &V(0,t) = 0, \
+    &&\forall t \in (0,T)
+    \\
+    &V(S,t) \rightarrow S, \
+    && \text{as } S \rightarrow \infty, \forall t \in (0,T)
+    \\
+    &V(S,T) = \max(S-K,0) \
+    &&\forall S \in \Omega
+@f}
+where
+@f{align*}{
+    V(S,t): && \text{Value of call option at time t and asset price S} \\
+    \sigma: && \text{Volatility of the underlying asset} \\
+    r: && \text{Risk free interest rate} \\
+    K : && \text{Strike price for purchasing asset}
+@f}
+
+The way we should interpret this equation is that it is a time-dependent partial
+differential equation of one "space" variable
+$S$ as the price of the stock, and $V(S,t)$ is the price of the option at time
+$t$ if the stock price at that time were $S$.
+
+<h3>Particularities of the equation system</h3>
+
+There are a number of oddities in this equation that are worth discussing before
+moving on to its numerical solution. First, the "spatial" domain
+$\Omega\subset\mathbb{R}$ is unbounded, and thus $S$ can be unbounded in value.
+This is because there may be a practical upper bound for stock prices, but not a
+conceptual one. The boundary conditions $V(S,t)\rightarrow S$ as
+$S\rightarrow \infty$ can then be interpreted as follows: What is the value of
+an option that allows me to buy a stock at price $K$ if the stock price (today
+or at time $t=T$) is $S\gg K$? One would expect that it is $V\approx S-K$ plus
+some adjustment for inflation, or, if we really truly consider huge values of
+$S$, we can neglect $K$ and arrive at the statement that the boundary values at
+the infinite boundary should be of the form $V\rightarrow S$ as stated above.
+
+In practice, for us to use a finite element method to solve this, we are going
+to need to bound $\Omega$. Since this equation describes prices, and it doesn't
+make sense to talk about prices being negative, we will set the lower bound of
+$\Omega$ to be 0. Then, for an upper bound, we will choose a very large number,
+one that $S$ is not very likely to ever get to. We will call this $S_\text{max}$.
+So, $\Omega=[0,S_\text{max}]$.
+
+Second, after truncating the domain, we need to ask what boundary values we
+should pose at this now finite boundary. To take care of this, we use "put-call"
+parity @cite stoll1969relationship. A "pull option" is one in which we are
+allowed, but not required, to *sell* a stock at price $K$ to someone at a future
+time $T$. This says
+@f{align*}{
+    V(S,t)+Ke^{-r(T-t)}=P(S,t)+S
+@f}
+where $V(S,t)$ is the value of the call option, and $P(S,t)$ is the value of the
+put option. Since we expect $P(S,t) \rightarrow 0$ as $S \rightarrow \infty$,
+this says
+@f{align*}{
+    V(S,t) \rightarrow S-Ke^{-r(T-t)},
+@f}
+and we can use this as a reasonable boundary condition at our finite point
+$S_\text{max}$.
+
+The second complication of the Block-Scholes equation is that we are given a
+final condition, and not an initial condition. This is because we know what the
+option is worth at time $t=T$: If the stock price at $T$ is $S<K$, then we have
+no incentive to use our option of buying a price $K$ because we can buy that stock
+for cheaper on the open market. So $V(S,T)=0$ for $S<K$. On the other hand, if
+at time $T$ we have $S>K$, then we can buy the stock at price $K$ via the option
+and immediately sell it again on the market for price $S$, giving me a profit of
+$S-K$. In other words, $V(S,T)=S-K$ for $S>K$. So, we only know
+values for $V$ at the *end time* but not the initial time -- in fact, finding
+out what a fair price at the current time (conventionally taken to be $t=0$) is
+what solving these equations is all about.
+
+This means that this is not an equation that is posed going forward in
+time, but in fact going *backward* in time. Thus it makes sense to solve this
+problem in reverse by making the change of variables $\tau=T-t$ where now $\tau$
+denotes the time before the strike time $T$.
+
+With all of this, we finally end up with the following problem:
+@f{align*}{
+    &-\frac{\partial V}{\partial \tau} + \frac{\sigma^2S^2}{2} \
+    \frac{\partial^2 V}{\partial S^2} + rS\frac{\partial V}{\partial S} - rV=0\
+    , \quad\quad &&\forall S\in [0,S_\text{max}], \tau \in [0,T]
+    \\
+    &V(0,\tau) = 0, \
+    &&\forall \tau \in [0,T]
+    \\
+    &V(S_\text{max},\tau)=S_\text{max}-Ke^{-r\tau}, \
+    &&\forall \tau \in [0,T]
+    \\
+    &V(S,0) = \max(S-K,0) \
+    &&\forall S \in [0,S_\text{max}]
+@f}
+
+Conceptually, this is an advection-diffusion-reaction problem for the variable
+$V$: There is both a second-order derivative diffusion term, a first-order
+derivative advection term, and a zeroth-order reaction term.
+We can expect this problem to be a little bit forgiving in practice because for
+realistic values of the coefficients, it is diffusive dominated. But, because of
+the advective terms in the problem, we will have to be careful with mesh
+refinement and time step choice. There is also the issue that the diffusion term
+ is written in a non-conservative form and so integration by parts is not
+ immediately obvious. This will be discussed in the next section.
+
+<h3>Scheme for the numerical solution</h3>
+
+We will solve this problem using an IMEX method. In particular, we first discretize
+in time with the theta method and will later pick different values of theta for
+the advective and diffusive terms.
+Let $V^n(S)$ approximate $V(S,\tau_n)$:
+@f{align*}{
+    0=&-\frac{V^n(S)-V^{n-1}(S)}{k_n} \\
+    &+\frac{\sigma^2S^2}{2}\left[(1-\theta)\frac{d^2V^{n-1}(S)}{dS^2} + \
+    \theta \frac{d^2V^{n}(S)}{dS^2}\right] \\
+    &+rS\left[(1-\theta)\frac{dV^{n-1}(S)}{dS} + \
+    \theta\frac{dV^{n}(S)}{dS}\right]  \\
+    &-r\left[(1-\theta)V^{n-1}(S) + \theta V^n(S)\right]
+@f}
+Here, $k_n=\tau_n-\tau_{n-1}$ is the time step size. Given this time
+discretization, we can proceed to discretize space by multiplying with test
+functions and then integrating by parts. Because there are some interesting
+details in this due to the advective and non-advective terms in this equation,
+this process will be explained in detail.
+
+So, we begin by multiplying by test functions, $\{\phi_i(S)\}_{i\in\mathbb{N}}$:
+@f{align*}{
+    0=&-\int_0^{S_\text{max}}\phi_i(S)\left[V^n(S)-V^{n-1}(S)\right]dS \\
+    &+k_n\int_0^{S_\text{max}}\phi_i(S)\left[\frac{\sigma^2S^2}{2} \
+    \left[(1-\theta)\frac{d^2V^{n-1}(S)}{dS^2} + \
+     \theta \frac{d^2V^{n}(S)}{dS^2}\right]\right]dS \\
+    &+k_n\int_0^{S_\text{max}}\phi_i(S)\left[rS\left[(1-\theta)
+     \frac{dV^{n-1}(S)}{dS}\
+     + \theta\frac{dV^{n}(S)}{dS}\right]\right]dS  \\
+    &-k_n\int_0^{S_\text{max}}\phi_i(S)\left[r\left[(1-\theta)V^{n-1}(S)\
+     + \theta V^n(S)\right]\right]dS
+@f}
+
+
+As usual, (1) becomes $-\textbf{M}V^n+\textbf{M}V^{n-1}$ and (4) becomes
+$k_n\left[-r(1-\theta)\textbf{M}V^{n-1} - \theta r\textbf{M}V^n\right]$, where
+$\textbf{M}_{i,j}=\left(\phi_i(S),\phi_j(S)\right)$, and where we have taken the
+liberty of denoting by $V$ not only the function $V(S)$ but also the vector of
+nodal values after discretization.
+
+The interesting parts come from (2) and (3).
+
+
+For (2), we have:
+@f{align*}{
+    &k_n\int_0^{S_\text{max}}\phi_i(S)\left[\frac{\sigma^2S^2}{2} \
+     \left[(1-\theta)\frac{d^2V^{n-1}(S)}{dS^2} + \
+     \theta \frac{d^2V^{n}(S)}{dS^2}\right]\right]dS \\
+    &=k_n(1-\theta)\int_0^{S_\text{max}}\phi_i(S)\frac{\sigma^2S^2}{2} \
+     \frac{d^2V^{n-1}(S)}{dS^2} \
+    +k_n\theta\int_0^{S_\text{max}}\phi_i(S)\frac{\sigma^2S^2}{2} \
+     \frac{d^2V^{n}(S)}{dS^2}
+@f}
+
+There are two integrals here, that are more or less the same, with the
+differences being a slightly different coefficient in front of the integral,
+and a different time step for V. Therefore, we will outline this integral in the
+general case, and account for the differences at the end. So, consider the
+general integral, which we will solve using integration by parts:
+@f{align*}{
+    &\int_{0}^{S_\text{max}} \phi_i(S)\frac{\sigma^2S^2}{2}
+        \frac{d^2V^n(S)}{dS^2}dS \\
+    &= \phi_i(S)\frac{1}{2}\sigma^2S^2\frac{dV^n(S)}{dS}\Bigg|_0^{S_{max}} - \
+    \int_0^{S_\text{max}} \phi_i(S)\sigma^2S\frac{dV^n(S)}{dS}dS - \
+    \int_0^{S_\text{max}} \frac{d\phi_i(S)}{dS}\frac{1}{2}\sigma^2S^2 \
+    \frac{dV^n(S)}{dS}dS \\
+    &= -\int_0^{S_\text{max}} \phi_i(S)\sigma^2S\frac{dV^n(S)}{dS}dS - \
+    \int_0^{S_\text{max}} \frac{d\phi_i(S)}{dS}\frac{1}{2}\sigma^2S^2 \
+    \frac{dV^n(S)}{dS}dS \\
+    &= -\int_0^{S_\text{max}} \phi_i(S)\sigma^2S \sum_j V_j^n
+        \frac{d\phi_j(S)}{dS}dS \
+    -\int_0^{S_\text{max}} \frac{d\phi_i(S)}{dS}\frac{1}{2} \
+    \sigma^2S^2  \sum_k V_k^n \frac{d\phi_k(S)}{dS}dS \\
+    &= -\sum_j \sigma^2 \int_0^{S_\text{max}} \phi_i(S)S
+        \frac{d\phi_j(S)}{dS}dS V_j^n\
+    - \sum_k \frac{1}{2}\sigma^2 \int_0^{S_\text{max}} \frac{d\phi_i(S)}{dS}S^2\
+    \frac{d\phi_k}{dS}dS V_k^n \\
+    &= -\sum_j \sigma^2 \left(\phi_i(S)S, \frac{d\phi_j(S)}{dS}\right) V_j^n \
+    - \sum_k \frac{1}{2}\sigma^2 \left(\frac{d\phi_i(S)}{dS}S^2,\
+    \frac{d\phi_k(S)}{dS}\right) V_k^n \\
+    &= -\sigma^2\textbf{B}V^n - \frac{1}{2}\sigma^2\textbf{D}V^n, \quad\quad \
+    \textbf{B}_{i,j} = \left(\phi_i(S)S, \frac{d\phi_j(S)}{dS}\right),\
+    \textbf{D}_{i,j} = \left(\frac{d\phi_i(S)}{dS}S^2,\frac{d\phi_j(S)}{dS}\right)
+@f}
+
+So, after adding in the constants and exchanging $V^n$ for $V^{n-1}$ where
+applicable, we arrive at the following for (2):
+@f{align*}{
+    &k_n\int_0^{S_\text{max}}\phi_i(S)\left[\frac{\sigma^2S^2}{2}
+        \left[(1-\theta)\
+    \frac{d^2V^{n-1}(S)}{dS^2} + \
+    \theta \frac{d^2V^{n}(S)}{dS^2}\right]\right]dS \\
+    &= k_n\left[-(1-\theta)\sigma^2\textbf{B}V^{n-1}\
+     -(1-\theta)\frac{1}{2}\sigma^2\textbf{D}V^{n-1} \
+    -\theta\sigma^2\textbf{B}V^{n}
+     -\theta\frac{1}{2}\sigma^2\textbf{D}V^{n}\right]
+@f}
+But, because the matrix $\textbf{B}$ involves an advective term, we will choose
+$\theta=0$ there -- in other words, we use an explicit Euler method to treat
+advection. Conversely, since the matrix $\textbf{D}$ involves the diffusive term,
+we will choose $\theta=1/2$ there -- i.e., we treat diffusion using the second
+order Crank-Nicolson method.
+
+So, we arrive at the following:
+@f{align*}{
+    k_n\left[-\frac{1}{4}\sigma^2\textbf{D}V^{n-1} \
+    -\frac{1}{4}\sigma^2\textbf{D}V^n \
+    - \sigma^2\textbf{B}V^{n-1}\right]
+@f}
+
+Now, to handle (3). For this, we will again proceed by considering the general
+case like above.
+
+@f{align*}{
+    &\int_{0}^{S_\text{max}} \phi_i(S)rS\frac{dV^n}{dS}dS \\
+    &= \phi_i(S)rSV^n\Bigg|_0^{S_\text{max}} - \int_0^{S_\text{max}}
+        \left[r\phi_i(S) \
+    + r\frac{d\phi_i(S)}{dS}S \right]V^ndS \\
+    &= -\int_0^{S_\text{max}} r\phi_i(S)V^ndS - \
+    \int_0^{S_\text{max}} r\frac{d\phi_i(S)}{dS}SV^ndS \\
+    &= -\int_0^{S_\text{max}} r\phi_i(S) \sum_j V_j^n\phi_j(S)dS \
+    -\int_0^{S_\text{max}} rS\frac{d\phi_i(S)}{dS} \sum_k V_k\phi_k(S)dS \\
+    &= -\sum_j r\left(\phi_i(S), \phi_j(S)\right) V_j^n -\
+     \sum_k r\left(S\frac{d\phi_i(S)}{dS}, \phi_k(S)\right)V_k^n \\
+    &= -r\textbf{M}V^n -r\textbf{A}V^n, \quad\quad\
+    \textbf{M}_{i,j} = \left(\phi_i(S), \phi_j(S)\right),\
+    \textbf{A}_{i,j} = \left(S\frac{d\phi_i(S)}{dS}, \phi_j(S)\right)
+@f}
+
+So, again after adding in the constants and exchanging $V^n$ for $V^{n-1}$ where
+applicable, we arrive at the following for (3):
+@f{align*}{
+    &k_n\int_0^{S_\text{max}}\phi_i(S)\left[rS\left[(1-\theta)
+        \frac{dV^{n-1}(S)}{dS} +\
+     \theta\frac{dV^{n}(S)}{dS}\right]\right]dS \\
+    &= k_n\left[-(1-\theta)r\textbf{M}V^{n-1} -(1-\theta)r\textbf{A}V^{n-1}\
+    -\theta r\textbf{M}V^n -\theta r\textbf{A}V^n\right]
+@f}
+Just as before, we will use $\theta=0$ for the matrix $\textbf{A}$ and
+$\theta=\frac{1}{2}$ for the matrix $\textbf{M}$. So, we arrive at the
+following for (3):
+@f{align*}{
+    k_n\left[-\frac{1}{2}r\textbf{M}V^{n-1} - \frac{1}{2}r\textbf{M}V^n \
+    -r\textbf{A}V^{n-1}\right]
+@f}
+
+Now, putting everything together, we obtain the following discrete form for the
+Black-Scholes Equation:
+@f{align*}{
+    0&= \\
+    &-\textbf{M}V^n+\textbf{M}V^{n-1} \\
+    & +k_n\left[-\frac{1}{4}\sigma^2\textbf{D}V^{n-1} \
+    -\frac{1}{4}\sigma^2\textbf{D}V^n \
+    - \sigma^2\textbf{B}V^n \
+     -\frac{1}{2}r\textbf{M}V^{n-1} - \frac{1}{2}r\textbf{M}V^n \
+    -r\textbf{A}V^n \
+     -r\frac{1}{2}\textbf{M}V^{n-1} - \frac{1}{2} r\textbf{M}V^n\right] \\
+    &= -\textbf{M}V^n + \textbf{M}V^{n-1} +\
+    k_n\left[- \frac{1}{4}\sigma^2\textbf{D}V^{n-1} -\
+    \frac{1}{4}\sigma^2\textbf{D}V^n - r\textbf{M}V^{n-1} -\
+    r\textbf{M}V^n  - \sigma^2\textbf{B}V^{n-1} - r\textbf{A}V^{n-1}\right]
+@f}
+So, altogether we have:
+
+@f{equation}{
+    0 = \textbf{M}V^n - \textbf{M}V^{n-1} +\
+    k_n\left[ \frac{1}{4}\sigma^2\textbf{D}V^{n-1} +\
+    \frac{1}{4}\sigma^2\textbf{D}V^n + r\textbf{M}V^{n-1} + r\textbf{M}V^n  +\
+    \sigma^2\textbf{B}V^{n-1} + r\textbf{A}V^{n-1}\right]\tag{*}
+@f}
+
+As usual, we can write this with the unknown quantities on the left and the
+known ones on the right. This leads to the following linear system that would
+have to be solved in each time step:
+
+@f{align*}{
+    \left[\textbf{M}+\frac{1}{4}k_n\sigma^2\textbf{D}+k_nr\textbf{M}\right]V^n\
+     =\
+    \left[-\frac{1}{4}k_n\sigma^2\textbf{D}-\
+    k_nr\textbf{M}+k_n\sigma^2\textbf{B}-\
+    k_nr\textbf{A}+\textbf{M}\right]V^{n-1}
+@f}
+
+
+
+
+<h3>Test Case</h3>
+For this program, we will use the Method of Manufactured Solutions (MMS) to test
+ that it is working correctly. This means that we will choose our solution to be
+  a certain function similar to step-7. For our case, we will use:
+@f{align*}{
+    V(S,\tau) = -\tau^2 - S^2 + 6\tag{**}
+@f}
+This means that, using our PDE, we arrive at the following problem:
+@f{align*}{
+    &-\frac{\partial V}{\partial \tau} +\
+    \frac{\sigma^2S^2}{2}\frac{\partial^2 V}{\partial S^2} +\
+    rS\frac{\partial V}{\partial S} - rV = f(S,\tau) \\
+    &V(0,\tau) = -\tau^2 + 6 \\
+    &V(S_\text{max}, \tau) = -S_\text{max}^2 - \tau^2 + 6 \\
+    &V(S, 0) = -S^2 + 6
+@f}
+Where, $f(S,\tau) = 2\tau - \sigma^2S^2 - 2rS^2 - r(-\tau^2 - S^2 + 6)$.
+This set-up now has right hand sides for the equation itself and for the
+boundary conditions at $S=0$ that we did not have before, along with "final"
+conditions (or, with $\tau$-time "initial conditions") that do not match the
+real situation. We will implement this in such a way in the code that it is easy
+to exchange -- the introduction of the changes above is just meant to enable the
+ use of a manufactured solution.
+
+If the program is working correctly, then it should produce (**) as the
+solution. This does mean that we need to modify our variational form somewhat to
+account for the non-zero right hand side.
+
+First, we define the following:
+@f{align*}{
+    F^n_i = \left(\phi_i(S), f^n(S)\right), && \text{where } f^n(S) =\
+     f(S,\tau_n)
+@f}
+So, we arrive at the new equation:
+
+@f{align*}{
+    \left[\textbf{M}+\frac{1}{4}k_n\sigma^2\textbf{D}+k_nr\textbf{M}\right]V^n\
+     =\
+     \left[-\frac{1}{4}k_n\sigma^2\textbf{D}-\
+     k_nr\textbf{M}+k_n\sigma^2\textbf{B}-\
+     k_nr\textbf{A}+\textbf{M}\right]V^{n-1} -\
+      k_n\left[\frac{1}{2}F^{n-1}+\frac{1}{2}F^n\right]
+@f}
+
+We then solve this equation as outlined above.

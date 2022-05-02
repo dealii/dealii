@@ -1,6 +1,0 @@
-Removed: The DataOutBase namespace contained a number of `write_*`
-functions that had already been deprecated in deal.II 9.1. These were
-removed, but all were of mostly internal interest and unlikely to be
-used in user programs.
-<br>
-(Wolfgang Bangerth, 2020/02/05)

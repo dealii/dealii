@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,6 @@ DEAL_II_NAMESPACE_OPEN
  * are needed in various contexts when writing applications.
  *
  * @ingroup utilities
- * @author Denis Davydov, 2016
  */
 namespace GeometricUtilities
 {
@@ -52,6 +51,8 @@ namespace GeometricUtilities
      *  \theta &= {\rm atan}(y/x) \\
      *  \phi &= {\rm acos} (z/r)
      * @f}
+     *
+     * The use of this function is demonstrated in step-75.
      */
     template <int dim>
     std::array<double, dim>

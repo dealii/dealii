@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// check correct behaviour of Trilinos ghosted vectors
+// check correct behavior of Trilinos ghosted vectors
 // create distributed and copy into ghosted...
 
 #include <deal.II/base/index_set.h>
@@ -59,8 +59,8 @@ test()
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      deallog << myid * 2 << ":" << v(myid * 2) << std::endl;
-      deallog << myid * 2 + 1 << ":" << v(myid * 2 + 1) << std::endl;
+      deallog << myid * 2 << ':' << v(myid * 2) << std::endl;
+      deallog << myid * 2 + 1 << ':' << v(myid * 2 + 1) << std::endl;
     }
 
   Assert(v(myid * 2) == myid * 4.0, ExcInternalError());

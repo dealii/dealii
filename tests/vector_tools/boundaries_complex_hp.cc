@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,7 @@
 
 
 // check interpolation of boundary values for complex-valued
-// objects and the hp case
+// objects and the hp-case
 
 
 #include <deal.II/base/function_lib.h>
@@ -71,7 +71,7 @@ public:
 
 template <int dim>
 const Quadrature<dim - 1> &
-boundary_q(const hp::DoFHandler<dim> &)
+boundary_q(const DoFHandler<dim> &)
 {
   static const QGauss<dim - 1> q(4);
   return q;
@@ -147,7 +147,7 @@ check()
       hp::FECollection<dim> fe;
       fe.push_back(*fe_list[i]);
 
-      hp::DoFHandler<dim> dof(tr);
+      DoFHandler<dim> dof(tr);
       dof.distribute_dofs(fe);
 
       std::map<types::boundary_id, const Function<dim, std::complex<double>> *>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -275,12 +275,13 @@ namespace SparsityTools
 
   /**
    * Communicate rows in a dynamic sparsity pattern over MPI, similar to the
-   * one above but using a vector `rows_per_cpu` containing the number of of
+   * one above but using a vector `rows_per_cpu` containing the number of
    * rows per CPU for determining ownership. This is typically the value
-   * returned by DoFHandler::n_locally_owned_dofs_per_processor -- given that
-   * the construction of the input to this function involves all-to-all
-   * communication, it is typically slower than the function above for more
-   * than a thousand of processes (and quick enough also for small sizes).
+   * returned by Utilities::MPI::all_gather(MPI_Comm,
+   * DoFHandler::locally_owned_dofs()) -- given that the construction of the
+   * input to this function involves all-to-all communication, it is typically
+   * slower than the function above for more than a thousand of processes (and
+   * quick enough also for small sizes).
    */
   void
   distribute_sparsity_pattern(
@@ -347,16 +348,6 @@ namespace SparsityTools
                           const IndexSet &        locally_owned_rows,
                           const MPI_Comm &        mpi_comm,
                           const IndexSet &        locally_relevant_rows);
-
-  /**
-   * @deprecated Use the gather_sparsity_pattern() method with the index set
-   * for the present processor only.
-   */
-  DEAL_II_DEPRECATED void
-  gather_sparsity_pattern(DynamicSparsityPattern &     dsp,
-                          const std::vector<IndexSet> &owned_rows_per_processor,
-                          const MPI_Comm &             mpi_comm,
-                          const IndexSet &             ghost_range);
 
 #endif
 

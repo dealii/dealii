@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -227,7 +227,7 @@ test()
     out(renumbering[i]) -= out_orig.local_element(i);
 
   double diff_norm = out.linfty_norm() / out_orig.linfty_norm();
-  deallog << "Norm of difference:          " << diff_norm << " ";
+  deallog << "Norm of difference:          " << diff_norm << ' ';
 
   // test again, now doing matrix-vector product twice
   mf2.vmult(out, in);

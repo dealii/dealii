@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,20 +26,9 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
     \{
 
       template void
-      point_value<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
-                                     const VEC &,
-                                     const Point<deal_II_dimension> &,
-                                     Vector<VEC::value_type> &);
-
-      template VEC::value_type
-      point_value<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
-                                     const VEC &,
-                                     const Point<deal_II_dimension> &);
-
-      template void
       point_value<deal_II_dimension>(
         const hp::MappingCollection<deal_II_dimension> &,
-        const hp::DoFHandler<deal_II_dimension> &,
+        const DoFHandler<deal_II_dimension> &,
         const VEC &,
         const Point<deal_II_dimension> &,
         Vector<VEC::value_type> &);
@@ -47,7 +36,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
       template VEC::value_type
       point_value<deal_II_dimension>(
         const hp::MappingCollection<deal_II_dimension> &,
-        const hp::DoFHandler<deal_II_dimension> &,
+        const DoFHandler<deal_II_dimension> &,
         const VEC &,
         const Point<deal_II_dimension> &);
 
@@ -123,12 +112,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template void
       create_point_source_vector<deal_II_dimension>(
         const hp::MappingCollection<deal_II_dimension> &,
-        const hp::DoFHandler<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        Vector<double> &);
-      template void
-      create_point_source_vector<deal_II_dimension>(
-        const hp::DoFHandler<deal_II_dimension> &,
+        const DoFHandler<deal_II_dimension> &,
         const Point<deal_II_dimension> &,
         Vector<double> &);
       template void
@@ -148,13 +132,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template void
       create_point_source_vector<deal_II_dimension>(
         const hp::MappingCollection<deal_II_dimension> &,
-        const hp::DoFHandler<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        const Point<deal_II_dimension> &,
-        Vector<double> &);
-      template void
-      create_point_source_vector<deal_II_dimension>(
-        const hp::DoFHandler<deal_II_dimension> &,
+        const DoFHandler<deal_II_dimension> &,
         const Point<deal_II_dimension> &,
         const Point<deal_II_dimension> &,
         Vector<double> &);

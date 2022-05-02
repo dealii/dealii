@@ -1,0 +1,43 @@
+
+DEAL:0:2d::triangulation::cell     0.1: ghost, subdomain_id = 1
+DEAL:0:2d::new_triangulation::cell 0.1: ghost, subdomain_id = 1
+DEAL:0:2d::triangulation::cell     0.2: artificial
+DEAL:0:2d::new_triangulation::cell 0.2: artificial
+DEAL:0:2d::triangulation::cell     0.3: artificial
+DEAL:0:2d::new_triangulation::cell 0.3: artificial
+DEAL:0:2d::triangulation::cell     0.4: artificial
+DEAL:0:2d::new_triangulation::cell 0.4: artificial
+DEAL:0:2d::triangulation::cell     0.5: artificial
+DEAL:0:2d::new_triangulation::cell 0.5: artificial
+DEAL:0:2d::triangulation::cell     0.6: artificial
+DEAL:0:2d::new_triangulation::cell 0.6: artificial
+DEAL:0:2d::triangulation::cell     0.7: artificial
+DEAL:0:2d::new_triangulation::cell 0.7: artificial
+DEAL:0:2d::triangulation::cell     0.8: artificial
+DEAL:0:2d::new_triangulation::cell 0.8: artificial
+DEAL:0:2d::triangulation::cell     0.9: ghost, subdomain_id = 1
+DEAL:0:2d::new_triangulation::cell 0.9: ghost, subdomain_id = 1
+DEAL:0:2d::triangulation::cell     1.0: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 1.0: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     1.1: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 1.1: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     1.2: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 1.2: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     1.3: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 1.3: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide

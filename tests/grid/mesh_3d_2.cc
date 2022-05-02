@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,6 +66,6 @@ main()
   // we know that from the second
   // cell, the common face must have
   // wrong orientation. check this
-  Assert((++coarse_grid.begin_active())->face_orientation(5) == false,
+  Assert((std::next(coarse_grid.begin_active()))->face_orientation(5) == false,
          ExcInternalError());
 }

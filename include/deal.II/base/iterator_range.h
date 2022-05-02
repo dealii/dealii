@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,9 +20,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/template_constraints.h>
-
-#include <iterator>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -114,16 +111,16 @@ class IteratorOverIterators;
  * way that if you <i>dereference</i> the result of IteratorRange::begin(),
  * you get the <code>b</code> iterator. Furthermore, you must be able to
  * increment the object returned by IteratorRange::begin() so that
- * <code>*(++begin()) == b+1</code>. In other words, IteratorRange::begin()
- * must return an iterator that when dereferenced returns an iterator of the
- * template type <code>Iterator</code>: It is an iterator over iterators in
- * the same sense as if you had a pointer into an array of pointers.
+ * <code>*(std::next(begin())) == b+1</code>. In other words,
+ * IteratorRange::begin() must return an iterator that when dereferenced returns
+ * an iterator of the template type <code>Iterator</code>: It is an iterator
+ * over iterators in the same sense as if you had a pointer into an array of
+ * pointers.
  *
  * This is implemented in the form of the IteratorRange::IteratorOverIterators
  * class.
  *
  * @ingroup CPP11
- * @author Wolfgang Bangerth, 2014
  */
 template <typename Iterator>
 class IteratorRange
@@ -218,13 +215,15 @@ public:
    * Dereferencing operator.
    * @return The iterator within the collection currently pointed to.
    */
-  const BaseIterator &operator*() const;
+  const BaseIterator &
+  operator*() const;
 
   /**
    * Dereferencing operator.
    * @return The iterator within the collection currently pointed to.
    */
-  const BaseIterator *operator->() const;
+  const BaseIterator *
+  operator->() const;
 
   /**
    * Prefix increment operator. Move the current iterator to the next
@@ -288,8 +287,6 @@ private:
 /**
  * Create an object of type IteratorRange given the beginning and
  * end iterator.
- *
- * @author Jean-Paul Pelteret, 2019
  */
 template <typename BaseIterator>
 IteratorRange<BaseIterator>
@@ -314,7 +311,7 @@ inline IteratorOverIterators<Iterator>::IteratorOverIterators(
 
 template <typename Iterator>
 inline const typename IteratorOverIterators<Iterator>::BaseIterator &
-  IteratorOverIterators<Iterator>::operator*() const
+IteratorOverIterators<Iterator>::operator*() const
 {
   return element_of_iterator_collection;
 }
@@ -323,7 +320,7 @@ inline const typename IteratorOverIterators<Iterator>::BaseIterator &
 
 template <typename Iterator>
 inline const typename IteratorOverIterators<Iterator>::BaseIterator *
-  IteratorOverIterators<Iterator>::operator->() const
+IteratorOverIterators<Iterator>::operator->() const
 {
   return &element_of_iterator_collection;
 }
@@ -353,8 +350,8 @@ IteratorOverIterators<Iterator>::operator++(int)
 
 template <typename Iterator>
 inline bool
-IteratorOverIterators<Iterator>::
-operator!=(const IteratorOverIterators &i_o_i) const
+IteratorOverIterators<Iterator>::operator!=(
+  const IteratorOverIterators &i_o_i) const
 {
   return element_of_iterator_collection != i_o_i.element_of_iterator_collection;
 }

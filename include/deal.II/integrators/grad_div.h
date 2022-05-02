@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,6 @@ namespace LocalIntegrators
    * traces
    *
    * @ingroup Integrators
-   * @author Guido Kanschat, Timo Heister
-   * @date 2016
    */
   namespace GradDiv
   {
@@ -48,9 +46,6 @@ namespace LocalIntegrators
      * @f[
      *  \int_Z \nabla\cdot u \nabla \cdot v \,dx
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2011
      */
     template <int dim>
     void
@@ -85,9 +80,6 @@ namespace LocalIntegrators
      * @f[
      *  \int_Z \nabla\cdot u \nabla \cdot v \,dx
      * @f]
-     *
-     * @author Guido Kanschat
-     * @date 2014
      */
     template <int dim, typename number>
     void
@@ -176,9 +168,6 @@ namespace LocalIntegrators
      * are given in the arguments <tt>input</tt> and <tt>Dinput</tt>,
      * respectively. <i>g</i> is the inhomogeneous boundary value in the
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
-     *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim>
     void
@@ -226,9 +215,6 @@ namespace LocalIntegrators
     /**
      * The interior penalty flux for the grad-div operator. See
      * ip_residual() for details.
-     *
-     * @author Guido Kanschat
-     * @date 2016
      */
 
     template <int dim>
@@ -310,9 +296,6 @@ namespace LocalIntegrators
      * @f]
      *
      * See for instance Hansbo and Larson, 2002
-     *
-     * @author Guido Kanschat
-     * @date 2016
      */
     template <int dim>
     void

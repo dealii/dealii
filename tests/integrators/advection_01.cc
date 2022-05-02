@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2019 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,12 +63,8 @@ test_cell(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_values(u,
-                                indices,
-                                VectorSlice<std::vector<std::vector<double>>>(
-                                  uval),
-                                true);
-        cell_residual(w, fev, make_slice(uval), vel);
+        fev.get_function_values(u, indices, uval, true);
+        cell_residual(w, fev, uval, vel);
         M.vmult(v, u);
         w.add(-1., v);
         deallog << ' ' << w.l2_norm();
@@ -122,13 +118,8 @@ test_boundary(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_values(u,
-                                indices,
-                                VectorSlice<std::vector<std::vector<double>>>(
-                                  uval),
-                                true);
-        upwind_value_residual(
-          w, fev, make_slice(uval), make_slice(null_val), vel);
+        fev.get_function_values(u, indices, uval, true);
+        upwind_value_residual(w, fev, uval, null_val, vel);
         M.vmult(v, u);
         w.add(-1., v);
         deallog << ' ' << w.l2_norm();
@@ -200,13 +191,8 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
         u1(i1) = 1.;
         w1     = 0.;
         w2     = 0.;
-        fev1.get_function_values(u1,
-                                 indices1,
-                                 VectorSlice<std::vector<std::vector<double>>>(
-                                   u1val),
-                                 true);
-        upwind_face_residual(
-          w1, w2, fev1, fev2, make_slice(u1val), make_slice(nullval), vel);
+        fev1.get_function_values(u1, indices1, u1val, true);
+        upwind_face_residual(w1, w2, fev1, fev2, u1val, nullval, vel);
         M11.vmult(v1, u1);
         w1.add(-1., v1);
         M21.vmult(v2, u1);
@@ -227,13 +213,8 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
           }
         w1 = 0.;
         w2 = 0.;
-        fev2.get_function_values(u1,
-                                 indices2,
-                                 VectorSlice<std::vector<std::vector<double>>>(
-                                   u1val),
-                                 true);
-        upwind_face_residual(
-          w1, w2, fev1, fev2, make_slice(nullval), make_slice(u1val), vel);
+        fev2.get_function_values(u1, indices2, u1val, true);
+        upwind_face_residual(w1, w2, fev1, fev2, nullval, u1val, vel);
         M12.vmult(v1, u1);
         w1.add(-1., v1);
         M22.vmult(v2, u1);

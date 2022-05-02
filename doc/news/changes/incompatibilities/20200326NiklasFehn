@@ -1,5 +1,0 @@
-Changed: The function ParameterHandler::parse_input() can now also parse xml- and json-files,
-depending on the file suffix. From now on, only files ending with .prm are treated as standard 
-parameter files.
-<br>
-(Niklas Fehn, Peter Munch, 2020/03/26)

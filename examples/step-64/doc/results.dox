@@ -43,7 +43,7 @@ using a better preconditioner than the identity matrix we have used here.
 
 
 <a name="extensions"></a>
-<h3> Possible extensions </h3>
+<h3> Possibilities for extensions </h3>
 
 Currently, this program uses no preconditioner at all. This is mainly
 since constructing an efficient matrix-free preconditioner is

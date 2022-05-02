@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -396,7 +396,7 @@ namespace Step39
   class InteriorPenaltyProblem
   {
   public:
-    typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+    using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
     InteriorPenaltyProblem(const FiniteElement<dim> &fe);
 
@@ -422,7 +422,7 @@ namespace Step39
     output_results(const unsigned int cycle) const;
 
     parallel::distributed::Triangulation<dim> triangulation;
-    const MappingQGeneric<dim>                mapping;
+    const MappingQ<dim>                       mapping;
     const FiniteElement<dim> &                fe;
     DoFHandler<dim>                           dof_handler;
 
@@ -636,11 +636,13 @@ namespace Step39
       coarse_solver_control);
     PreconditionIdentity            identity;
     TrilinosWrappers::SparseMatrix &coarse_matrix = mg_matrix[0];
-    MGCoarseGridLACIteration<SolverCG<TrilinosWrappers::MPI::Vector>,
-                             TrilinosWrappers::MPI::Vector>
+    MGCoarseGridIterativeSolver<TrilinosWrappers::MPI::Vector,
+                                SolverCG<TrilinosWrappers::MPI::Vector>,
+                                TrilinosWrappers::SparseMatrix,
+                                PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, identity);
 
-    typedef TrilinosWrappers::PreconditionJacobi Smoother;
+    using Smoother = TrilinosWrappers::PreconditionJacobi;
     MGSmootherPrecondition<TrilinosWrappers::SparseMatrix,
                            Smoother,
                            TrilinosWrappers::MPI::Vector>

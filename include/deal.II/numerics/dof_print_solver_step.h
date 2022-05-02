@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,6 @@ DEAL_II_NAMESPACE_OPEN
  * data!
  *
  * @ingroup output
- * @author Guido Kanschat, 2000
  */
 template <int dim, typename SolverType, class VectorType = Vector<double>>
 class DoFPrintSolverStep : public SolverType

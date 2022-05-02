@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2019 by the deal.II authors
+ * Copyright (C) 2000 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -246,14 +246,14 @@ void Step6<dim>::setup_system()
 //
 // The rest of the code that forms the local contributions remains
 // unchanged. It is worth noting, however, that under the hood several things
-// are different than before. First, the variables <code>dofs_per_cell</code>
-// and <code>n_q_points</code> now are 9 each, where they were 4
-// before. Introducing such variables as abbreviations is a good strategy to
-// make code work with different elements without having to change too much
-// code. Secondly, the <code>fe_values</code> object of course needs to do
-// other things as well, since the shape functions are now quadratic, rather
-// than linear, in each coordinate variable. Again, however, this is something
-// that is completely handled by the library.
+// are different than before. First, the variable <code>dofs_per_cell</code>
+// and return value of <code>quadrature_formula.size()</code> now are 9 each,
+// where they were 4 before. Introducing such variables as abbreviations is a
+// good strategy to make code work with different elements without having to
+// change too much code. Secondly, the <code>fe_values</code> object of course
+// needs to do other things as well, since the shape functions are now
+// quadratic, rather than linear, in each coordinate variable. Again, however,
+// this is something that is completely handled by the library.
 template <int dim>
 void Step6<dim>::assemble_system()
 {
@@ -264,8 +264,7 @@ void Step6<dim>::assemble_system()
                           update_values | update_gradients |
                             update_quadrature_points | update_JxW_values);
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);
@@ -279,13 +278,13 @@ void Step6<dim>::assemble_system()
 
       fe_values.reinit(cell);
 
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+      for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
           const double current_coefficient =
-            coefficient<dim>(fe_values.quadrature_point(q_index));
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            coefficient(fe_values.quadrature_point(q_index));
+          for (const unsigned int i : fe_values.dof_indices())
             {
-              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+              for (const unsigned int j : fe_values.dof_indices())
                 cell_matrix(i, j) +=
                   (current_coefficient *              // a(x_q)
                    fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
@@ -479,7 +478,7 @@ void Step6<dim>::output_results(const unsigned int cycle) const
     std::ofstream         output("grid-" + std::to_string(cycle) + ".gnuplot");
     GridOutFlags::Gnuplot gnuplot_flags(false, 5);
     grid_out.set_flags(gnuplot_flags);
-    MappingQGeneric<dim> mapping(3);
+    MappingQ<dim> mapping(3);
     grid_out.write_gnuplot(triangulation, output, &mapping);
   }
 

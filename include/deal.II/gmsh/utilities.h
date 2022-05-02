@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,15 +38,11 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * A collection of %Gmsh related utilities and classes.
- *
- * @author Luca Heltai, Dirk Peschka, 2018
  */
 namespace Gmsh
 {
   /**
    * A parameter class used to pass options to the %Gmsh executable.
-   *
-   * @author Luca Heltai, 2018
    */
   class AdditionalParameters
   {
@@ -86,8 +82,6 @@ namespace Gmsh
    * %Gmsh.
    *
    * The input curve @p boundary should be closed.
-   *
-   * @authors Luca Heltai, Dirk Peschka, 2018
    */
   template <int spacedim>
   void

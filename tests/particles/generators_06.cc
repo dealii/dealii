@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,9 +48,9 @@ test(Function<spacedim> &probability_density_function)
     GridGenerator::hyper_cube(tr);
     tr.refine_global(1);
 
-    DoFHandler<dim, spacedim> dof_handler;
+    DoFHandler<dim, spacedim> dof_handler(tr);
     FE_Nothing<dim, spacedim> fe_nothing;
-    dof_handler.initialize(tr, fe_nothing);
+    dof_handler.distribute_dofs(fe_nothing);
 
     MappingQ<dim, spacedim> mapping(1);
 
@@ -97,7 +97,7 @@ main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  initlog();
+  MPILogInitAll all;
 
   {
     deallog.push("2d/2d");

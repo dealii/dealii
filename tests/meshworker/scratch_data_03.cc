@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -91,8 +91,8 @@ test()
   UpdateFlags cell_flags = update_values | update_gradients |
                            update_quadrature_points | update_JxW_values;
   UpdateFlags face_flags = update_values | update_gradients |
-                           update_quadrature_points |
-                           update_face_normal_vectors | update_JxW_values;
+                           update_quadrature_points | update_normal_vectors |
+                           update_JxW_values;
 
   // Stabilization for SIPG
   double gamma = 100;
@@ -108,15 +108,13 @@ test()
   auto cell = dh.begin_active();
   auto endc = dh.end();
 
-  typedef decltype(cell) Iterator;
+  using Iterator = decltype(cell);
 
   auto cell_worker =
     [&rhs_function](const Iterator &cell, ScratchData &s, CopyData &c) {
       const auto &fev = s.reinit(cell);
       const auto &JxW = s.get_JxW_values();
       const auto &p   = s.get_quadrature_points();
-
-      c = 0;
 
       c.local_dof_indices[0] = s.get_local_dof_indices();
 

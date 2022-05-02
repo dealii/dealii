@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -126,7 +126,7 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
         }
 
   std::vector<Vector<double>>      values(points.size(),
-                                          Vector<double>(f.n_components));
+                                     Vector<double>(f.n_components));
   std::vector<std::vector<double>> values2(f.n_components,
                                            std::vector<double>(points.size()));
   f.vector_value_list(points, values);
@@ -184,10 +184,10 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
                         << " )"
                         << " comp "
                         << k
-                        //      << " norms " << d1.norm() << " " << d2.norm()
+                        //      << " norms " << d1.norm() << ' ' << d2.norm()
                         << std::endl;
                 for (unsigned int d = 0; d < dim; ++d)
-                  deallog << " " << gradients[k][i][d] << " "
+                  deallog << ' ' << gradients[k][i][d] << ' '
                           << gradients1[i][k][d] << std::endl;
               }
           }
@@ -203,7 +203,7 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
       for (unsigned int d = 0; d < dim; ++d)
         div += gradients[d][k][d];
       if (std::fabs(div) > 1.e-13)
-        deallog << "Divergence " << k << " " << div << std::endl;
+        deallog << "Divergence " << k << ' ' << div << std::endl;
     }
   deallog << "tested" << std::endl;
 

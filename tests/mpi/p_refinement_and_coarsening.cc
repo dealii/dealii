@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,11 +21,13 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -46,32 +48,32 @@ test()
   for (unsigned int i = 0; i < std::pow(2, dim); ++i)
     fe.push_back(FE_Q<dim>(1));
 
-  hp::DoFHandler<dim> dh(tria);
-  dh.set_fe(fe);
+  DoFHandler<dim> dh(tria);
 
   // set future_fe_indices
   unsigned int future_feidx = 0;
-  for (const auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        // check if cell is initialized correctly
-        Assert(cell->active_fe_index() == 0, ExcInternalError());
+  for (const auto &cell :
+       dh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      // check if cell is initialized correctly
+      Assert(cell->active_fe_index() == 0, ExcInternalError());
 
-        cell->set_future_fe_index(future_feidx);
-        future_feidx = ((future_feidx + 1) < fe.size()) ? future_feidx + 1 : 0;
-      }
+      cell->set_future_fe_index(future_feidx);
+      future_feidx = ((future_feidx + 1) < fe.size()) ? future_feidx + 1 : 0;
+    }
 
+  dh.distribute_dofs(fe);
   tria.execute_coarsening_and_refinement();
 
   // check if all flags were cleared and verify fe_indices
-  for (const auto &cell : dh.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        Assert(cell->future_fe_index_set() == false, ExcInternalError());
+  for (const auto &cell :
+       dh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      Assert(cell->future_fe_index_set() == false, ExcInternalError());
 
-        deallog << "cell:" << cell->id().to_string()
-                << ", fe_index:" << cell->active_fe_index() << std::endl;
-      }
+      deallog << "cell:" << cell->id().to_string()
+              << ", fe_index:" << cell->active_fe_index() << std::endl;
+    }
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,12 +54,14 @@ namespace parallel
      * vector type, e.g. PETScWrappers::MPI::Vector,
      * TrilinosWrappers::MPI::Vector, or corresponding block vectors.
      * @code
-     * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
+     * parallel::distributed::SolutionTransfer<dim, VectorType>
+     *   soltrans(dof_handler);
      * // flag some cells for refinement and coarsening, e.g.
-     * GridRefinement::refine_and_coarsen_fixed_fraction(tria,
-     *                                                   error_indicators,
-     *                                                   0.3,
-     *                                                   0.05);
+     * parallel::distributed::GridRefinement::
+     *   refine_and_coarsen_fixed_fraction(tria,
+     *                                     error_indicators,
+     *                                     0.3,
+     *                                     0.05);
      *
      * // prepare the triangulation,
      * tria.prepare_coarsening_and_refinement();
@@ -69,10 +71,10 @@ namespace parallel
      * soltrans.prepare_for_coarsening_and_refinement(solution);
      *
      * // actually execute the refinement,
-     * tria.execute_coarsening_and_refinement ();
+     * tria.execute_coarsening_and_refinement();
      *
      * // redistribute dofs,
-     * dof_handler.distribute_dofs (fe);
+     * dof_handler.distribute_dofs(fe);
      *
      * // and interpolate the solution
      * VectorType interpolated_solution;
@@ -90,7 +92,7 @@ namespace parallel
      * IndexSet locally_owned_dofs, locally_relevant_dofs;
      * locally_owned_dofs = dof_handler.locally_owned_dofs();
      * DoFTools::extract_locally_relevant_dofs(dof_handler,
-     * locally_relevant_dofs);
+     *                                         locally_relevant_dofs);
      *
      * // The solution vector only knows about locally owned DoFs
      * TrilinosWrappers::MPI::Vector solution;
@@ -106,7 +108,8 @@ namespace parallel
      * old_solution = solution;
      *
      * // Initialize SolutionTransfer object
-     * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
+     * parallel::distributed::SolutionTransfer<dim, VectorType>
+     *   soltrans(dof_handler);
      * soltrans.prepare_for_coarsening_and_refinement(old_solution);
      * ...
      * // Refine grid
@@ -120,7 +123,7 @@ namespace parallel
      * LinearAlgebra::distributed::Vector allows writing into ghost elements.
      * For a ghosted vector the interpolation step can be accomplished via
      * @code
-     * interpolated_solution.zero_out_ghosts();
+     * interpolated_solution.zero_out_ghost_values();
      * soltrans.interpolate(interpolated_solution);
      * interpolated_solution.update_ghost_values();
      * @endcode
@@ -135,9 +138,9 @@ namespace parallel
      * If vector has the locally relevant DoFs, serialization works as
      * follows:
      * @code
-     * parallel::distributed::SolutionTransfer<dim,VectorType>
+     * parallel::distributed::SolutionTransfer<dim, VectorType>
      *   sol_trans(dof_handler);
-     * sol_trans.prepare_for_serialization (vector);
+     * sol_trans.prepare_for_serialization(vector);
      *
      * triangulation.save(filename);
      * @endcode
@@ -147,46 +150,37 @@ namespace parallel
      * //[create coarse mesh...]
      * triangulation.load(filename);
      *
-     * parallel::distributed::SolutionTransfer<dim,VectorType>
+     * parallel::distributed::SolutionTransfer<dim, VectorType>
      *   sol_trans(dof_handler);
-     * sol_trans.deserialize (distributed_vector);
+     * sol_trans.deserialize(distributed_vector);
      * @endcode
      *
      *
-     * <h3>Note on usage with hp::DoFHandler</h3>
+     * <h3>Note on usage with DoFHandler with hp-capabilities</h3>
      *
-     * If an object of the hp::DoFHandler class is registered with an
-     * instantiation of this parallel::distributed::SolutionTransfer
-     * class, it is necessary to explicitly specify this in the template
-     * argument list of this class, i.e.:
-     * @code
-     * parallel::distributed::SolutionsTransfer<dim, VectorType,
-     *   hp::DoFHandler<dim, spacedim>> sol_trans(hp_dof_handler);
-     * @endcode
-     *
-     * Since data on hp::DoFHandler objects is associated with many different
-     * FiniteElement objects, each cell's data has to be processed with its
-     * correpsonding `active_fe_index`. Further, if refinement is involved,
-     * data will be packed on the parent cell with its `active_fe_index` and
-     * unpacked later with the same index on its children. If cells get
-     * coarsened into one, data will be packed on the children with the least
-     * dominant finite element of their common subspace, and unpacked on the
-     * parent with this particular finite element (consult
+     * Since data on DoFHandler objects with hp-capabilities is associated with
+     * many different FiniteElement objects, each cell's data has to be
+     * processed with its corresponding `future_fe_index`. Further, if
+     * refinement is involved, data will be packed on the parent cell with its
+     * `future_fe_index` and unpacked later with the same index on its children.
+     * If cells get coarsened into one, data will be packed on the children with
+     * the least dominant finite element of their common subspace, and unpacked
+     * on the parent with this particular finite element (consult
      * hp::FECollection::find_dominated_fe_extended() for more information).
      *
      * Transferring a solution across refinement works exactly like in the
-     * non-hp case. However, when considering serialization, we also have to
-     * store the active_fe_indices in an additional step. A code snippet
+     * non-hp-case. However, when considering serialization, we also have to
+     * store the active FE indices in an additional step. A code snippet
      * demonstrating serialization with the
-     * parallel::distributed::SolutionTransfer class with hp::DoFHandler objects
-     * is provided in the following. Here VectorType is your favorite vector
-     * type, e.g. PETScWrappers::MPI::Vector, TrilinosWrappers::MPI::Vector, or
-     * corresponding block vectors.
+     * parallel::distributed::SolutionTransfer class with DoFHandler objects
+     * with hp-capabilities is provided in the following. Here VectorType is
+     * your favorite vector type, e.g. PETScWrappers::MPI::Vector,
+     * TrilinosWrappers::MPI::Vector, or corresponding block vectors.
      *
      * If vector has the locally relevant DoFs, serialization works as follows:
      * @code
      * parallel::distributed::
-     *   SolutionTransfer<dim, VectorType, hp::DoFHandler<dim,spacedim>>
+     *   SolutionTransfer<dim, VectorType, DoFHandler<dim,spacedim>>
      *     sol_trans(hp_dof_handler);
      *
      * hp_dof_handler.prepare_for_serialization_of_active_fe_indices();
@@ -204,16 +198,15 @@ namespace parallel
      * hp::FECollection<dim,spacedim> fe_collection;
      * //[prepare identical fe_collection...]
      *
-     * hp::DoFHandler<dim,spacedim> hp_dof_handler(triangulation);
+     * DoFHandler<dim,spacedim> hp_dof_handler(triangulation);
      * // We need to introduce our dof_handler to the fe_collection
-     * // before setting all active_fe_indices.
-     * hp_dof_handler.set_fe(fe_collection);
+     * // before setting all active FE indices.
      * hp_dof_handler.deserialize_active_fe_indices();
      * hp_dof_handler.distribute_dofs(fe_collection);
      *
      * parallel::distributed::
-     *   SolutionTransfer<dim,VectorType,hp::DoFHandler<dim,spacedim>>
-     *     sol_trans(dof_handler);
+     *   SolutionTransfer<dim,VectorType,DoFHandler<dim,spacedim>>
+     *     sol_trans(hp_dof_handler);
      * sol_trans.deserialize(distributed_vector);
      * @endcode
      *
@@ -227,29 +220,20 @@ namespace parallel
      * dealii::SolutionTransfer. See there for an extended discussion.
      *
      * @ingroup distributed
-     * @author Timo Heister, 2009-2011
      */
-    template <int dim,
-              typename VectorType,
-              typename DoFHandlerType = DoFHandler<dim>>
+    template <int dim, typename VectorType, int spacedim = dim>
     class SolutionTransfer
     {
-#ifndef DEAL_II_MSVC
-      static_assert(dim == DoFHandlerType::dimension,
-                    "The dimension explicitly provided as a template "
-                    "argument, and the dimension of the DoFHandlerType "
-                    "template argument must match.");
-#endif
     public:
       /**
        * Constructor.
        *
-       * @param[in] dof The DoFHandler or hp::DoFHandler on which all
-       *   operations will happen. At the time when this constructor
-       *   is called, the DoFHandler still points to the triangulation
-       *   before the refinement in question happens.
+       * @param[in] dof The DoFHandler on which all operations will happen.
+       *   At the time when this constructor is called, the DoFHandler still
+       *   points to the Triangulation before the refinement in question
+       *   happens.
        */
-      SolutionTransfer(const DoFHandlerType &dof);
+      SolutionTransfer(const DoFHandler<dim, spacedim> &dof);
 
       /**
        * Destructor.
@@ -312,27 +296,6 @@ namespace parallel
       prepare_for_serialization(const std::vector<const VectorType *> &all_in);
 
       /**
-       * Prepare the serialization of the given vector. The serialization is
-       * done by Triangulation::save(). The given vector needs all information
-       * on the locally active DoFs (it must be ghosted). See documentation of
-       * this class for more information.
-       *
-       * @deprecated Use parallel::distributed::SolutionTransfer::prepare_for_serialization() instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      prepare_serialization(const VectorType &in);
-
-      /**
-       * Same as the function above, only for a list of vectors.
-       *
-       * @deprecated Use parallel::distributed::SolutionTransfer::prepare_for_serialization() instead.
-       */
-      DEAL_II_DEPRECATED
-      void
-      prepare_serialization(const std::vector<const VectorType *> &all_in);
-
-      /**
        * Execute the deserialization of the given vector. This needs to be
        * done after calling Triangulation::load(). The given vector must be a
        * fully distributed vector without ghost elements. See documentation of
@@ -352,8 +315,8 @@ namespace parallel
       /**
        * Pointer to the degree of freedom handler to work with.
        */
-      SmartPointer<const DoFHandlerType,
-                   SolutionTransfer<dim, VectorType, DoFHandlerType>>
+      SmartPointer<const DoFHandler<dim, spacedim>,
+                   SolutionTransfer<dim, VectorType, spacedim>>
         dof_handler;
 
       /**
@@ -375,10 +338,8 @@ namespace parallel
        */
       std::vector<char>
       pack_callback(
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          cell_iterator &cell,
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          CellStatus status);
+        const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+        const typename Triangulation<dim, spacedim>::CellStatus     status);
 
       /**
        * A callback function used to unpack the data on the current mesh that
@@ -387,10 +348,8 @@ namespace parallel
        */
       void
       unpack_callback(
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          cell_iterator &cell,
-        const typename Triangulation<dim, DoFHandlerType::space_dimension>::
-          CellStatus status,
+        const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+        const typename Triangulation<dim, spacedim>::CellStatus     status,
         const boost::iterator_range<std::vector<char>::const_iterator>
           &                        data_range,
         std::vector<VectorType *> &all_out);
@@ -404,11 +363,28 @@ namespace parallel
       void
       register_data_attach();
     };
-
-
   } // namespace distributed
 } // namespace parallel
 
+namespace Legacy
+{
+  namespace parallel
+  {
+    namespace distributed
+    {
+      /**
+       * @deprecated Use dealii::parallel::distributed::SolutionTransfer
+       * without the DoFHandlerType template instead.
+       */
+      template <int dim,
+                typename VectorType,
+                typename DoFHandlerType = DoFHandler<dim>>
+      using SolutionTransfer DEAL_II_DEPRECATED =
+        dealii::parallel::distributed::
+          SolutionTransfer<dim, VectorType, DoFHandlerType::space_dimension>;
+    } // namespace distributed
+  }   // namespace parallel
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -34,7 +35,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -79,7 +79,7 @@ private:
 
   Triangulation<dim> triangulation;
 
-  hp::DoFHandler<dim>   dof_handler;
+  DoFHandler<dim>       dof_handler;
   hp::FECollection<dim> fe;
 
   AffineConstraints<double> hanging_node_constraints;
@@ -215,9 +215,9 @@ LaplaceProblem<dim>::assemble_system()
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values(n_q_points);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       cell_matrix = 0;
@@ -366,7 +366,7 @@ LaplaceProblem<dim>::run()
   DataOutBase::EpsFlags eps_flags;
   eps_flags.z_scaling = 4;
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.set_flags(eps_flags);
 
   data_out.attach_dof_handler(dof_handler);

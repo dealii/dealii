@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,7 @@
 #include "../tests.h"
 
 
-typedef parallel::distributed::Triangulation<2, 3>::cell_iterator cell_iterator;
+using cell_iterator = parallel::distributed::Triangulation<2, 3>::cell_iterator;
 DeclException1(ExcMissingCell,
                cell_iterator,
                << "Trying to find cell " << arg1

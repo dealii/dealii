@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,14 +33,16 @@
 using namespace dealii::Physics;
 
 template <int dim, typename Number>
-void initialize(Tensor<1, dim, Number> &x)
+void
+initialize(Tensor<1, dim, Number> &x)
 {
   for (unsigned int i = 0; i < x.n_independent_components; ++i)
     x[i] = i + 1;
 }
 
 template <int dim, typename Number>
-void initialize(Tensor<2, dim, Number> &x)
+void
+initialize(Tensor<2, dim, Number> &x)
 {
   unsigned int c = 1;
   for (unsigned int i = 0; i < dim; ++i)
@@ -51,7 +53,8 @@ void initialize(Tensor<2, dim, Number> &x)
 }
 
 template <int dim, typename Number>
-void initialize(SymmetricTensor<2, dim, Number> &x)
+void
+initialize(SymmetricTensor<2, dim, Number> &x)
 {
   unsigned int c = 1;
   for (unsigned int i = 0; i < dim; ++i)
@@ -62,7 +65,8 @@ void initialize(SymmetricTensor<2, dim, Number> &x)
 }
 
 template <int dim, typename Number>
-void initialize(Tensor<3, dim, Number> &x)
+void
+initialize(Tensor<3, dim, Number> &x)
 {
   unsigned int c = 1;
   for (unsigned int i = 0; i < dim; ++i)
@@ -76,8 +80,8 @@ void initialize(Tensor<3, dim, Number> &x)
 // A specialised constructor mimicking the construction
 // of a rank-3 tensor with two symmetric components
 template <int dim, typename Number>
-void initialize(Tensor<3, dim, Number> &x,
-                const bool              left_components_are_symmetric)
+void
+initialize(Tensor<3, dim, Number> &x, const bool left_components_are_symmetric)
 {
   Tensor<1, dim, Number> v;
   initialize(v);
@@ -91,7 +95,8 @@ void initialize(Tensor<3, dim, Number> &x,
 }
 
 template <int dim, typename Number>
-void initialize(Tensor<4, dim, Number> &x)
+void
+initialize(Tensor<4, dim, Number> &x)
 {
   unsigned int c = 1;
   for (unsigned int i = 0; i < dim; ++i)
@@ -104,7 +109,8 @@ void initialize(Tensor<4, dim, Number> &x)
 }
 
 template <int dim, typename Number>
-void initialize(SymmetricTensor<4, dim, Number> &x)
+void
+initialize(SymmetricTensor<4, dim, Number> &x)
 {
   unsigned int c = 1;
   for (unsigned int i = 0; i < dim; ++i)
@@ -129,9 +135,9 @@ test_scalars()
   Vector<double>           vB(mC.m());
   mC.vmult(vB, vA);
 
-  typedef typename std::decay<decltype(A)>::type InpVecType;
-  typedef typename std::decay<decltype(B)>::type ResVecType;
-  typedef typename std::decay<decltype(C)>::type InpMatType;
+  using InpVecType  = typename std::decay<decltype(A)>::type;
+  using ResVecType  = typename std::decay<decltype(B)>::type;
+  using InpMatType  = typename std::decay<decltype(C)>::type;
   const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
   const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
   const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);
@@ -169,9 +175,9 @@ test_rank_0_tensors()
   Vector<double>           vB(mC.m());
   mC.vmult(vB, vA);
 
-  typedef typename std::decay<decltype(A)>::type InpVecType;
-  typedef typename std::decay<decltype(B)>::type ResVecType;
-  typedef typename std::decay<decltype(C)>::type InpMatType;
+  using InpVecType  = typename std::decay<decltype(A)>::type;
+  using ResVecType  = typename std::decay<decltype(B)>::type;
+  using InpMatType  = typename std::decay<decltype(C)>::type;
   const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
   const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
   const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);
@@ -213,9 +219,9 @@ test_rank_1_2_tensors()
     Vector<double>           vB(mC.m());
     mC.vmult(vB, vA);
 
-    typedef typename std::decay<decltype(A)>::type InpVecType;
-    typedef typename std::decay<decltype(B)>::type ResVecType;
-    typedef typename std::decay<decltype(C)>::type InpMatType;
+    using InpVecType  = typename std::decay<decltype(A)>::type;
+    using ResVecType  = typename std::decay<decltype(B)>::type;
+    using InpMatType  = typename std::decay<decltype(C)>::type;
     const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
     const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
     const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);
@@ -253,9 +259,9 @@ test_rank_1_2_tensors()
     Vector<double>           vB(mC.m());
     mC.vmult(vB, vA);
 
-    typedef typename std::decay<decltype(A)>::type InpVecType;
-    typedef typename std::decay<decltype(B)>::type ResVecType;
-    typedef typename std::decay<decltype(C)>::type InpMatType;
+    using InpVecType  = typename std::decay<decltype(A)>::type;
+    using ResVecType  = typename std::decay<decltype(B)>::type;
+    using InpMatType  = typename std::decay<decltype(C)>::type;
     const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
     const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
     const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);
@@ -298,9 +304,9 @@ test_rank_2_4_tensors()
     Vector<double>           vB(mC.m());
     mC.vmult(vB, vA);
 
-    typedef typename std::decay<decltype(A)>::type InpVecType;
-    typedef typename std::decay<decltype(B)>::type ResVecType;
-    typedef typename std::decay<decltype(C)>::type InpMatType;
+    using InpVecType  = typename std::decay<decltype(A)>::type;
+    using ResVecType  = typename std::decay<decltype(B)>::type;
+    using InpMatType  = typename std::decay<decltype(C)>::type;
     const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
     const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
     const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);
@@ -338,9 +344,9 @@ test_rank_2_4_tensors()
     Vector<double>           vB(mC.m());
     mC.vmult(vB, vA);
 
-    typedef typename std::decay<decltype(A)>::type InpVecType;
-    typedef typename std::decay<decltype(B)>::type ResVecType;
-    typedef typename std::decay<decltype(C)>::type InpMatType;
+    using InpVecType  = typename std::decay<decltype(A)>::type;
+    using ResVecType  = typename std::decay<decltype(B)>::type;
+    using InpMatType  = typename std::decay<decltype(C)>::type;
     const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
     const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
     const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);
@@ -381,9 +387,9 @@ test_rank_2_4_tensors()
     Vector<double>           vB(mC.m());
     mC.vmult(vB, vA);
 
-    typedef typename std::decay<decltype(A)>::type InpVecType;
-    typedef typename std::decay<decltype(B)>::type ResVecType;
-    typedef typename std::decay<decltype(C)>::type InpMatType;
+    using InpVecType  = typename std::decay<decltype(A)>::type;
+    using ResVecType  = typename std::decay<decltype(B)>::type;
+    using InpMatType  = typename std::decay<decltype(C)>::type;
     const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
     const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
     const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);
@@ -428,9 +434,9 @@ test_rank_3_tensors()
     Vector<double>           vB(mC.n()); // Note result size
     mC.Tvmult(vB, vA);                   // Note transpose vmult
 
-    typedef typename std::decay<decltype(A)>::type InpVecType;
-    typedef typename std::decay<decltype(B)>::type ResVecType;
-    typedef typename std::decay<decltype(C)>::type InpMatType;
+    using InpVecType  = typename std::decay<decltype(A)>::type;
+    using ResVecType  = typename std::decay<decltype(B)>::type;
+    using InpMatType  = typename std::decay<decltype(C)>::type;
     const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
     const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
     const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);
@@ -472,9 +478,9 @@ test_rank_3_tensors()
     Vector<double> vB(mC.m()); // Note result size
     mC.vmult(vB, vA);          // Note transpose vmult
 
-    typedef typename std::decay<decltype(A)>::type InpVecType;
-    typedef typename std::decay<decltype(B)>::type ResVecType;
-    typedef typename std::decay<decltype(C)>::type InpMatType;
+    using InpVecType  = typename std::decay<decltype(A)>::type;
+    using ResVecType  = typename std::decay<decltype(B)>::type;
+    using InpMatType  = typename std::decay<decltype(C)>::type;
     const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
     const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
     const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);
@@ -517,9 +523,9 @@ test_rank_3_tensors()
     Vector<double> vB(mC.n()); // Note result size
     mC.Tvmult(vB, vA);         // Note transpose vmult
 
-    typedef typename std::decay<decltype(A)>::type InpVecType;
-    typedef typename std::decay<decltype(B)>::type ResVecType;
-    typedef typename std::decay<decltype(C)>::type InpMatType;
+    using InpVecType  = typename std::decay<decltype(A)>::type;
+    using ResVecType  = typename std::decay<decltype(B)>::type;
+    using InpMatType  = typename std::decay<decltype(C)>::type;
     const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
     const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
     const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);
@@ -562,9 +568,9 @@ test_rank_3_tensors()
     Vector<double> vB(mC.m()); // Note result size
     mC.vmult(vB, vA);          // Note transpose vmult
 
-    typedef typename std::decay<decltype(A)>::type InpVecType;
-    typedef typename std::decay<decltype(B)>::type ResVecType;
-    typedef typename std::decay<decltype(C)>::type InpMatType;
+    using InpVecType  = typename std::decay<decltype(A)>::type;
+    using ResVecType  = typename std::decay<decltype(B)>::type;
+    using InpMatType  = typename std::decay<decltype(C)>::type;
     const auto A_conv = Notation::Kelvin::to_tensor<InpVecType>(vA);
     const auto B_conv = Notation::Kelvin::to_tensor<ResVecType>(vB);
     const auto C_conv = Notation::Kelvin::to_tensor<InpMatType>(mC);

@@ -1,0 +1,289 @@
+
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 0   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_ABF<2>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 2
+DEAL::   n_dofs_per_line      : 1
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 4
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 1
+DEAL::
+DEAL::   n_components         : 2
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 1   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_ABF<2>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 2
+DEAL::   n_dofs_per_line      : 1
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 4
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 1
+DEAL::
+DEAL::   n_components         : 2
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 2   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_ABF<2>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 2
+DEAL::   n_dofs_per_line      : 1
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 4
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 1
+DEAL::
+DEAL::   n_components         : 2
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 0   *******   orientation case 3   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_ABF<2>(0)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 2
+DEAL::   n_dofs_per_line      : 1
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 4
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 1
+DEAL::
+DEAL::   n_components         : 2
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 0   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_ABF<2>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 16
+DEAL::   n_dofs_per_face      : 2
+DEAL::   n_dofs_per_quad      : 8
+DEAL::   n_dofs_per_line      : 2
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 8
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 2
+DEAL::
+DEAL::   n_components         : 2
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 1   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_ABF<2>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 16
+DEAL::   n_dofs_per_face      : 2
+DEAL::   n_dofs_per_quad      : 8
+DEAL::   n_dofs_per_line      : 2
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 8
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 2
+DEAL::
+DEAL::   n_components         : 2
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 2   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_ABF<2>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 16
+DEAL::   n_dofs_per_face      : 2
+DEAL::   n_dofs_per_quad      : 8
+DEAL::   n_dofs_per_line      : 2
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 8
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 2
+DEAL::
+DEAL::   n_components         : 2
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::
+DEAL::*******   degree 1   *******   orientation case 3   *******
+DEAL::Element Info:  
+DEAL::   name                 : FE_ABF<2>(1)
+DEAL::   is_primitive         : 0
+DEAL::   n_dofs_per_cell      : 16
+DEAL::   n_dofs_per_face      : 2
+DEAL::   n_dofs_per_quad      : 8
+DEAL::   n_dofs_per_line      : 2
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 8
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 2
+DEAL::
+DEAL::   n_components         : 2
+DEAL::   n_blocks             : 1
+DEAL::   n_base_elements      : 1
+DEAL::
+DEAL::Normal jumps (at quad points) in cell   0_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   1
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   1_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   2_0:   at face   3
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   3_0:   at face   0
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   
+DEAL::Normal jumps (at quad points) in cell   4_0:   at face   2
+DEAL::   interface jumps:   0.0000   0.0000   0.0000   0.0000   0.0000   

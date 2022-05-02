@@ -1,0 +1,40 @@
+
+DEAL:0::active FE indices after adaptation:
+DEAL:0::OK
+DEAL:0::active FE indices after adaptation:
+DEAL:0::OK
+DEAL:0::active FE indices after adaptation:
+DEAL:0::OK
+
+DEAL:1::active FE indices after adaptation:
+DEAL:1:: 0_0: 3
+DEAL:1::OK
+DEAL:1::active FE indices after adaptation:
+DEAL:1:: 0_0: 5
+DEAL:1::OK
+DEAL:1::active FE indices after adaptation:
+DEAL:1:: 0_0: 7
+DEAL:1::OK
+
+
+DEAL:2::active FE indices after adaptation:
+DEAL:2:: 1_0: 2
+DEAL:2::OK
+DEAL:2::active FE indices after adaptation:
+DEAL:2:: 1_0: 3
+DEAL:2::OK
+DEAL:2::active FE indices after adaptation:
+DEAL:2:: 1_0: 4
+DEAL:2::OK
+
+
+DEAL:3::active FE indices after adaptation:
+DEAL:3:: 2_0: 1
+DEAL:3::OK
+DEAL:3::active FE indices after adaptation:
+DEAL:3:: 2_0: 1
+DEAL:3::OK
+DEAL:3::active FE indices after adaptation:
+DEAL:3:: 2_0: 1
+DEAL:3::OK
+

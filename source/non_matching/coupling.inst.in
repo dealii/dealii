@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,8 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const ComponentMask &             space_comps,
       const ComponentMask &             immersed_comps,
       const Mapping<dim0, spacedim> &   space_mapping,
-      const Mapping<dim1, spacedim> &   immersed_mapping);
+      const Mapping<dim1, spacedim> &   immersed_mapping,
+      const AffineConstraints<S> &      immersed_constraints);
 
     template void create_coupling_sparsity_pattern(
       const GridTools::Cache<dim0, spacedim> &cache,
@@ -39,7 +40,8 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const AffineConstraints<S> &            constraints,
       const ComponentMask &                   space_comps,
       const ComponentMask &                   immersed_comps,
-      const Mapping<dim1, spacedim> &         immersed_mapping);
+      const Mapping<dim1, spacedim> &         immersed_mapping,
+      const AffineConstraints<S> &            immersed_constraints);
 
     template void create_coupling_sparsity_pattern(
       const double &                          epsilon,
@@ -69,7 +71,8 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const ComponentMask &                        space_comps,
       const ComponentMask &                        immersed_comps,
       const Mapping<dim0, spacedim> &              space_mapping,
-      const Mapping<dim1, spacedim> &              immersed_mapping);
+      const Mapping<dim1, spacedim> &              immersed_mapping,
+      const AffineConstraints<Matrix::value_type> &immersed_constraints);
 
     template void create_coupling_mass_matrix(
       const GridTools::Cache<dim0, spacedim> &     cache,
@@ -80,7 +83,8 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const AffineConstraints<Matrix::value_type> &constraints,
       const ComponentMask &                        space_comps,
       const ComponentMask &                        immersed_comps,
-      const Mapping<dim1, spacedim> &              immersed_mapping);
+      const Mapping<dim1, spacedim> &              immersed_mapping,
+      const AffineConstraints<Matrix::value_type> &immersed_constraints);
 
     template void create_coupling_mass_matrix(
       Functions::CutOffFunctionBase<spacedim> & kernel,

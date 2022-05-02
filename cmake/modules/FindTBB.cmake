@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2019 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,6 +21,7 @@
 #   TBB_LIBRARIES
 #   TBB_INCLUDE_DIRS
 #   TBB_WITH_DEBUGLIB
+#   TBB_WITH_ONEAPI
 #   TBB_VERSION
 #   TBB_VERSION_MAJOR
 #   TBB_VERSION_MINOR
@@ -29,7 +30,7 @@
 SET(TBB_DIR "" CACHE PATH "An optional hint to a TBB installation")
 SET_IF_EMPTY(TBB_DIR "$ENV{TBB_DIR}")
 
-FILE(GLOB _path ${TBB_DIR}/build/*_release)
+FILE(GLOB _path ${TBB_DIR}/build/*_release ${TBB_DIR}/lib/intel64/gcc*)
 DEAL_II_FIND_LIBRARY(TBB_LIBRARY
   NAMES tbb
   HINTS
@@ -41,7 +42,7 @@ DEAL_II_FIND_LIBRARY(TBB_LIBRARY
 #
 # Also search for the debug library:
 #
-FILE(GLOB _path ${TBB_DIR}/build/*_debug)
+FILE(GLOB _path ${TBB_DIR}/build/*_debug ${TBB_DIR}/lib/intel64/gcc*)
 DEAL_II_FIND_LIBRARY(TBB_DEBUG_LIBRARY
   NAMES tbb_debug
   HINTS
@@ -55,6 +56,10 @@ IF(NOT TBB_DEBUG_LIBRARY MATCHES "-NOTFOUND")
 ELSE()
   SET(_libraries TBB_LIBRARY)
 ENDIF()
+
+#
+# Check for old TBB header layout:
+#
 
 DEAL_II_FIND_PATH(TBB_INCLUDE_DIR tbb/tbb_stddef.h
   HINTS
@@ -76,6 +81,37 @@ IF(EXISTS ${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h)
   SET(TBB_VERSION
     "${TBB_VERSION_MAJOR}.${TBB_VERSION_MINOR}"
     )
+
+  SET(TBB_WITH_ONEAPI FALSE)
+ELSE()
+
+  #
+  # Check for new oneAPI TBB header layout:
+  #
+
+  DEAL_II_FIND_PATH(TBB_INCLUDE_DIR oneapi/tbb/version.h
+    HINTS
+      ${TBB_DIR}
+    PATH_SUFFIXES include include/tbb tbb
+    )
+
+  IF(EXISTS ${TBB_INCLUDE_DIR}/oneapi/tbb/version.h)
+    FILE(STRINGS "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h" TBB_VERSION_MAJOR_STRING
+      REGEX "#define.*TBB_VERSION_MAJOR")
+    STRING(REGEX REPLACE "^.*TBB_VERSION_MAJOR +([0-9]+).*" "\\1"
+      TBB_VERSION_MAJOR "${TBB_VERSION_MAJOR_STRING}"
+      )
+    FILE(STRINGS "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h" TBB_VERSION_MINOR_STRING
+      REGEX "#define.*TBB_VERSION_MINOR")
+    STRING(REGEX REPLACE "^.*TBB_VERSION_MINOR +([0-9]+).*" "\\1"
+      TBB_VERSION_MINOR "${TBB_VERSION_MINOR_STRING}"
+      )
+    SET(TBB_VERSION
+      "${TBB_VERSION_MAJOR}.${TBB_VERSION_MINOR}"
+      )
+  ENDIF()
+
+  SET(TBB_WITH_ONEAPI TRUE)
 ENDIF()
 
 DEAL_II_PACKAGE_HANDLE(TBB

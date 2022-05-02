@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// evaluate jump(), average(), shape_value() of FEInterfaceValues
+// evaluate jump_in_shape_values(), average_of_shape_values(), shape_value() of
+// FEInterfaceValues
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -36,7 +37,8 @@ void
 make_2_cells(Triangulation<dim> &tria);
 
 template <>
-void make_2_cells<2>(Triangulation<2> &tria)
+void
+make_2_cells<2>(Triangulation<2> &tria)
 {
   const unsigned int        dim         = 2;
   std::vector<unsigned int> repetitions = {2, 1};
@@ -47,7 +49,8 @@ void make_2_cells<2>(Triangulation<2> &tria)
 }
 
 template <>
-void make_2_cells<3>(Triangulation<3> &tria)
+void
+make_2_cells<3>(Triangulation<3> &tria)
 {
   const unsigned int        dim         = 3;
   std::vector<unsigned int> repetitions = {2, 1, 1};
@@ -102,28 +105,28 @@ test(unsigned int fe_degree)
           for (unsigned int i = 0; i < n_dofs; ++i)
             cell_vector(i) +=
               fiv.shape_value(true, i, qpoint) * fiv.get_JxW_values()[qpoint];
-        deallog << "shape_value(true): " << cell_vector << std::flush;
+        deallog << "shape_value(true): " << cell_vector << std::endl;
 
         cell_vector = 0.0;
         for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
           for (unsigned int i = 0; i < n_dofs; ++i)
             cell_vector(i) +=
               fiv.shape_value(false, i, qpoint) * fiv.get_JxW_values()[qpoint];
-        deallog << "shape_value(false): " << cell_vector << std::flush;
+        deallog << "shape_value(false): " << cell_vector << std::endl;
 
         cell_vector = 0.0;
         for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
           for (unsigned int i = 0; i < n_dofs; ++i)
-            cell_vector(i) +=
-              fiv.jump(i, qpoint) * fiv.get_JxW_values()[qpoint];
-        deallog << "jump(): " << cell_vector << std::flush;
+            cell_vector(i) += fiv.jump_in_shape_values(i, qpoint) *
+                              fiv.get_JxW_values()[qpoint];
+        deallog << "jump_in_shape_values(): " << cell_vector << std::endl;
 
         cell_vector = 0.0;
         for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
           for (unsigned int i = 0; i < n_dofs; ++i)
-            cell_vector(i) +=
-              fiv.average(i, qpoint) * fiv.get_JxW_values()[qpoint];
-        deallog << "average(): " << cell_vector << std::flush;
+            cell_vector(i) += fiv.average_of_shape_values(i, qpoint) *
+                              fiv.get_JxW_values()[qpoint];
+        deallog << "average_of_shape_values(): " << cell_vector << std::endl;
       }
 }
 

@@ -57,7 +57,7 @@ main()
             AssertThrow(&*(Td[i].begin() + j) == &Td(i, j), ExcInternalError());
             AssertThrow(&*(Ti[i].begin() + j) == &Ti(i, j), ExcInternalError());
 
-            deallog << i << " " << j << " " << Td[i][j] << " ok" << std::endl;
+            deallog << i << ' ' << j << ' ' << Td[i][j] << " ok" << std::endl;
           };
     };
 
@@ -87,7 +87,7 @@ main()
             AssertThrow(&*(Td[i].begin() + j) == &Td(i, j), ExcInternalError());
             AssertThrow(&*(Ti[i].begin() + j) == &Ti(i, j), ExcInternalError());
 
-            deallog << i << " " << j << " " << Td[i][j] << " ok" << std::endl;
+            deallog << i << ' ' << j << ' ' << Td[i][j] << " ok" << std::endl;
           };
 
       for (unsigned int i = 0; i < 4; ++i)
@@ -144,7 +144,7 @@ main()
           AssertThrow(Ti[i] == Ti(i), ExcInternalError());
           AssertThrow(Ti[i] == Td(i), ExcInternalError());
 
-          deallog << i << " " << Td[i] << " ok" << std::endl;
+          deallog << i << ' ' << Td[i] << " ok" << std::endl;
         };
     };
 
@@ -184,7 +184,7 @@ main()
               AssertThrow(&*(Ti[i][j].begin() + k) == &Ti(i, j, k),
                           ExcInternalError());
 
-              deallog << i << " " << j << " " << k << " " << Td[i][j][k]
+              deallog << i << ' ' << j << ' ' << k << ' ' << Td[i][j][k]
                       << " ok" << std::endl;
             };
 
@@ -243,7 +243,7 @@ main()
                 AssertThrow(&*(Ti[i][j][k].begin() + l) == &Ti(i, j, k, l),
                             ExcInternalError());
 
-                deallog << i << " " << j << " " << k << " " << l << " "
+                deallog << i << ' ' << j << ' ' << k << ' ' << l << ' '
                         << Td[i][j][k][l] << " ok" << std::endl;
               };
 
@@ -305,8 +305,8 @@ main()
                                 &Ti(i, j, k, l, m),
                               ExcInternalError());
 
-                  deallog << i << " " << j << " " << k << " " << l << " " << m
-                          << " " << Td[i][j][k][l][m] << " ok" << std::endl;
+                  deallog << i << ' ' << j << ' ' << k << ' ' << l << ' ' << m
+                          << ' ' << Td[i][j][k][l][m] << " ok" << std::endl;
                 };
 
       for (unsigned int i = 0; i < I; ++i)
@@ -370,8 +370,8 @@ main()
                                   &Ti(i, j, k, l, m, n),
                                 ExcInternalError());
 
-                    deallog << i << " " << j << " " << k << " " << l << " " << m
-                            << " " << n << " " << Td[i][j][k][l][m][n] << " ok"
+                    deallog << i << ' ' << j << ' ' << k << ' ' << l << ' ' << m
+                            << ' ' << n << ' ' << Td[i][j][k][l][m][n] << " ok"
                             << std::endl;
                   };
 

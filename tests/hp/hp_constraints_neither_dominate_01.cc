@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -41,7 +42,6 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -78,7 +78,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
   Triangulation<dim> triangulation;
   {
     Point<dim> p1, p2;
-    for (unsigned int d = 0; d < dim; d++)
+    for (unsigned int d = 0; d < dim; ++d)
       p1[d] = -1;
     p2[0] = 1.0;
     std::vector<unsigned int> repetitoins(dim, 1);
@@ -89,20 +89,20 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
                                               p2);
   }
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(
     FESystem<dim>(FE_Q<dim>(p1), 1, FE_Nothing<dim>(1, true), 1));
   fe_collection.push_back(FESystem<dim>(FE_Q<dim>(p2), 1, FE_Q<dim>(1), 1));
-  // push back to be able to resolve hp constrains no matter what:
+  // push back to be able to resolve hp-constrains no matter what:
   fe_collection.push_back(
     FESystem<dim>(FE_Q<dim>(p2), 1, FE_Nothing<dim>(1, true), 1));
 
   hp::QCollection<dim - 1> q_face_collection;
-  q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
-  q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
-  q_face_collection.push_back(QIterated<dim - 1>(QTrapez<1>(), 2));
+  q_face_collection.push_back(QIterated<dim - 1>(QTrapezoid<1>(), 2));
+  q_face_collection.push_back(QIterated<dim - 1>(QTrapezoid<1>(), 2));
+  q_face_collection.push_back(QIterated<dim - 1>(QTrapezoid<1>(), 2));
 
   deallog << "2cells: " << fe_collection[0].get_name() << " vs "
           << fe_collection[1].get_name() << std::endl;
@@ -123,7 +123,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
   counter++;
   std::vector<Vector<double>> shape_functions;
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < dof_handler.n_dofs(); s++)
+  for (unsigned int s = 0; s < dof_handler.n_dofs(); ++s)
     {
       Vector<double> shape_function;
       shape_function.reinit(dof_handler.n_dofs());
@@ -145,21 +145,21 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
       shape_functions.push_back(shape_function);
     }
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
   Vector<float> fe_index(triangulation.n_active_cells());
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (unsigned int index = 0; cell != endc; ++cell, ++index)
     {
       fe_index[index] = cell->active_fe_index();
     }
   data_out.add_data_vector(fe_index, "fe_index");
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(0);
@@ -172,7 +172,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
 
   // fill some vector
   Vector<double> solution(dof_handler.n_dofs());
-  for (unsigned int dof = 0; dof < dof_handler.n_dofs(); dof++)
+  for (unsigned int dof = 0; dof < dof_handler.n_dofs(); ++dof)
     solution[dof] = 21.0 * (dof % 2) + 0.5 + dof % 3;
 
   constraints.distribute(solution);
@@ -184,7 +184,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
 
   std::vector<unsigned int>   local_face_dof_indices;
   std::vector<Vector<double>> values;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -207,9 +207,9 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
             const std::vector<dealii::Point<dim>> &q_points =
               fe_face_values.get_quadrature_points();
 
-            for (unsigned int q = 0; q < n_q_points; q++)
-              deallog << "u[" << q_points[q] << "]={" << values[q][0] << ","
-                      << values[q][1] << "}" << std::endl;
+            for (unsigned int q = 0; q < n_q_points; ++q)
+              deallog << "u[" << q_points[q] << "]={" << values[q][0] << ','
+                      << values[q][1] << '}' << std::endl;
           }
     }
 

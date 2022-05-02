@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 
 // check that LinearAlgebra::Vector::add_and_dot works correctly
+
+#include <deal.II/base/numbers.h>
 
 #include <deal.II/lac/la_vector.h>
 
@@ -36,7 +38,7 @@ check()
         {
           v1[i] = 0.1 + 0.005 * i;
           v2[i] = -5.2 + 0.18 * i;
-          v3[i] = 3.14159 + 2.7183 / (1. + i);
+          v3[i] = numbers::PI + numbers::E / (1. + i);
         }
       check               = v1;
       const number factor = 0.01432;
@@ -48,18 +50,18 @@ check()
         {
           deallog << "Vector add reference:   ";
           for (unsigned int i = 0; i < size; ++i)
-            deallog << v1[i] << " ";
+            deallog << v1[i] << ' ';
           deallog << std::endl;
           deallog << "Vector check reference: ";
           for (unsigned int i = 0; i < size; ++i)
-            deallog << check[i] << " ";
+            deallog << check[i] << ' ';
           deallog << std::endl;
 
           const number constant = 1.;
           v1.add(constant);
           deallog << "Vector add constant:    ";
           for (unsigned int i = 0; i < size; ++i)
-            deallog << v1[i] << " ";
+            deallog << v1[i] << ' ';
           deallog << std::endl;
         }
 

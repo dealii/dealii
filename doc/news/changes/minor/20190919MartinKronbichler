@@ -1,8 +1,0 @@
-New: MGTransferMatrixFree::build() now takes an optional second argument to
-specify partitioner objects for LinearAlgebra::distributed::Vector types in
-use elsewhere. If the ghost indices required by the multigrid algorithm are
-contained in the ghosts of the given partitioners, they can be used, saving
-some vector copy operations during MGTransferMatrixFree::restrict_and_add()
-and MGTransferMatrixFree::prolongate().
-<br>
-(Martin Kronbichler, 2019/09/18)

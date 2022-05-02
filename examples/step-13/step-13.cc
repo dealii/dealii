@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2019 by the deal.II authors
+ * Copyright (C) 2001 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -38,11 +38,8 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -202,9 +199,9 @@ namespace Step13
     // Now for the function that is mainly of interest in this class, the
     // computation of the point value:
     template <int dim>
-    void PointValueEvaluation<dim>::
-         operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const
+    void
+    PointValueEvaluation<dim>::operator()(const DoFHandler<dim> &dof_handler,
+                                          const Vector<double> & solution) const
     {
       // First allocate a variable that will hold the point value. Initialize
       // it with a value that is clearly bogus, so that if we fail to set it
@@ -221,9 +218,7 @@ namespace Step13
       bool evaluation_point_found = false;
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (!evaluation_point_found)
-          for (unsigned int vertex = 0;
-               vertex < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex)
+          for (const auto vertex : cell->vertex_indices())
             if (cell->vertex(vertex) == evaluation_point)
               {
                 // In order to extract the point value from the global solution
@@ -876,7 +871,7 @@ namespace Step13
       AssemblyScratchData &                                 scratch_data,
       AssemblyCopyData &                                    copy_data) const
     {
-      const unsigned int dofs_per_cell = fe->dofs_per_cell;
+      const unsigned int dofs_per_cell = fe->n_dofs_per_cell();
       const unsigned int n_q_points    = quadrature->size();
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
@@ -918,10 +913,10 @@ namespace Step13
     // independent, we do that in parallel (if the library was configured to
     // use concurrency, at least; otherwise, the actions are performed
     // sequentially). Note that we start only one thread, and do the second
-    // action in the main thread. Since only one thread is generated, we don't
-    // use the <code>Threads::ThreadGroup</code> class here, but rather use
-    // the one created thread object directly to wait for this particular
-    // thread's exit.
+    // action in the main thread. Since only one task is generated, we don't
+    // use the <code>Threads::TaskGroup</code> class here, but rather use
+    // the one created task object directly to wait for this particular
+    // task's exit.
     //
     // Note that taking up the address of the
     // <code>DoFTools::make_hanging_node_constraints</code> function is a
@@ -1052,7 +1047,7 @@ namespace Step13
                               update_values | update_quadrature_points |
                                 update_JxW_values);
 
-      const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
+      const unsigned int dofs_per_cell = this->fe->n_dofs_per_cell();
       const unsigned int n_q_points    = this->quadrature->size();
 
       Vector<double>                       cell_rhs(dofs_per_cell);
@@ -1304,7 +1299,7 @@ namespace Step13
         // iteration. Note that the <code>std::flush</code> is needed to have
         // the text actually appear on the screen, rather than only in some
         // buffer that is only flushed the next time we issue an end-line.
-        std::cout << step << " " << std::flush;
+        std::cout << step << ' ' << std::flush;
 
         // Now solve the problem on the present grid, and run the evaluators
         // on it. The long type name of iterators into the list is a little
@@ -1364,18 +1359,14 @@ namespace Step13
 
     // Create a solver object of the kind indicated by the argument to this
     // function. If the name is not recognized, throw an exception!
-    // The respective solver object is stored in a std::unique_ptr to avoid
-    // having to delete the pointer after use. For initializing, we want to use
-    // the C++14 function std::make_unique. Since deal.II only requires C++11 up
-    // to now, we define this function in a separate namespace called
-    // `std_cxx14`. In case the compiler supports C++14, this just calls
-    // std::make_unique.
+    // The respective solver object is stored in a `std::unique_ptr` to avoid
+    // having to delete the pointer after use.
     std::unique_ptr<LaplaceSolver::Base<dim>> solver;
     if (solver_name == "global")
-      solver = std_cxx14::make_unique<LaplaceSolver::RefinementGlobal<dim>>(
+      solver = std::make_unique<LaplaceSolver::RefinementGlobal<dim>>(
         triangulation, fe, quadrature, rhs_function, boundary_values);
     else if (solver_name == "kelly")
-      solver = std_cxx14::make_unique<LaplaceSolver::RefinementKelly<dim>>(
+      solver = std::make_unique<LaplaceSolver::RefinementKelly<dim>>(
         triangulation, fe, quadrature, rhs_function, boundary_values);
     else
       AssertThrow(false, ExcNotImplemented());

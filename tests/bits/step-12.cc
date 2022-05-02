@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -346,8 +346,8 @@ private:
   void
   output_results(const unsigned int cycle) const;
 
-  Triangulation<dim>         triangulation;
-  const MappingQGeneric<dim> mapping;
+  Triangulation<dim>  triangulation;
+  const MappingQ<dim> mapping;
 
   FE_DGQ<dim>     fe;
   DoFHandler<dim> dof_handler;

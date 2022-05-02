@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/ginkgo_solver.h>
 
@@ -24,6 +23,7 @@
 #  include <deal.II/lac/exceptions.h>
 
 #  include <cmath>
+#  include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -137,14 +137,14 @@ namespace GinkgoWrappers
     // logger returns a `linop`, it is necessary to convert it to a Dense
     // matrix. Additionally, if the logger is logging on the gpu, it is
     // necessary to copy the data to the host and hence the
-    // `residual_norm_d_master`
+    // `residual_norm_d_parent`
     auto residual_norm = convergence_logger->get_residual_norm();
     auto residual_norm_d =
       gko::as<gko::matrix::Dense<ValueType>>(residual_norm);
-    auto residual_norm_d_master =
+    auto residual_norm_d_parent =
       gko::matrix::Dense<ValueType>::create(executor->get_master(),
                                             gko::dim<2>{1, 1});
-    residual_norm_d_master->copy_from(residual_norm_d);
+    residual_norm_d_parent->copy_from(residual_norm_d);
 
     // Get the number of iterations taken to converge to the solution.
     auto num_iteration = convergence_logger->get_num_iterations();
@@ -171,12 +171,12 @@ namespace GinkgoWrappers
 
     Assert(b_norm.get()->at(0, 0) != 0.0, ExcDivideByZero());
     // Pass the number of iterations and residual norm to the solver_control
-    // object. As both `residual_norm_d_master` and `b_norm` are seen as Dense
+    // object. As both `residual_norm_d_parent` and `b_norm` are seen as Dense
     // matrices, we use the `at` function to get the first value here. In case
     // of multiple right hand sides, this will need to be modified.
     const SolverControl::State state =
       solver_control.check(num_iteration,
-                           residual_norm_d_master->at(0, 0) / b_norm->at(0, 0));
+                           residual_norm_d_parent->at(0, 0) / b_norm->at(0, 0));
 
     // in case of failure: throw exception
     if (state != SolverControl::success)

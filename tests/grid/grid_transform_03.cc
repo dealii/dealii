@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,7 @@ public:
   {
     double l2_inverse = std::numeric_limits<double>::max();
 
-    for (unsigned int d = 0; d < distance_source.size(); d++)
+    for (unsigned int d = 0; d < distance_source.size(); ++d)
       l2_inverse = std::min((p - distance_source[d]).norm_square(), l2_inverse);
 
     l2_inverse = std::max(l2_inverse, 1.e-5);

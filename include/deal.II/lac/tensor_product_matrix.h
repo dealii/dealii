@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,8 +69,6 @@ class FullMatrix;
  * dimension). By default at -1, which means that the number of rows
  * is determined at run-time by means of the matrices passed to the
  * reinit() function.
- *
- * @author Martin Kronbichler and Julius Witte, 2017
  */
 template <int dim, typename Number, int n_rows_1d = -1>
 class TensorProductMatrixSymmetricSumBase
@@ -235,8 +233,6 @@ private:
  * dimension). By default at -1, which means that the number of rows
  * is determined at run-time by means of the matrices passed to the
  * reinit() function.
- *
- * @author Martin Kronbichler and Julius Witte, 2017
  */
 template <int dim, typename Number, int n_rows_1d = -1>
 class TensorProductMatrixSymmetricSum
@@ -329,8 +325,6 @@ private:
  * being the arithmetic template. For a detailed description see
  * the main documentation of the generic
  * TensorProductMatrixSymmetricSum class.
- *
- * @author Martin Kronbichler and Julius Witte, 2017
  */
 template <int dim, typename Number, int n_rows_1d>
 class TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>
@@ -676,7 +670,7 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit_impl(
   this->mass_matrix          = mass_matrices;
   this->derivative_matrix    = derivative_matrices;
 
-  for (int dir = 0; dir < dim; ++dir)
+  for (unsigned int dir = 0; dir < dim; ++dir)
     {
       Assert(n_rows_1d == -1 ||
                (n_rows_1d > 0 && static_cast<unsigned int>(n_rows_1d) ==
@@ -691,7 +685,7 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::reinit_impl(
       this->eigenvectors[dir].reinit(mass_matrices[dir].n_cols(),
                                      mass_matrices[dir].n_rows());
       this->eigenvalues[dir].resize(mass_matrices[dir].n_cols());
-      internal::TensorProductMatrix ::spectral_assembly<Number>(
+      internal::TensorProductMatrix::spectral_assembly<Number>(
         &(mass_matrices[dir](0, 0)),
         &(derivative_matrices[dir](0, 0)),
         mass_matrices[dir].n_rows(),
@@ -817,7 +811,7 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>::
   eigenvectors_flat.resize(nm_flat_size_max);
   std::array<unsigned int, macro_size> offsets_nm;
   std::array<unsigned int, macro_size> offsets_n;
-  for (int dir = 0; dir < dim; ++dir)
+  for (unsigned int dir = 0; dir < dim; ++dir)
     {
       Assert(n_rows_1d == -1 ||
                (n_rows_1d > 0 && static_cast<unsigned int>(n_rows_1d) ==
@@ -851,7 +845,7 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, n_rows_1d>::
       Number *      eigenvec_begin = eigenvectors_flat.data();
       Number *      eigenval_begin = eigenvalues_flat.data();
       for (unsigned int lane = 0; lane < macro_size; ++lane)
-        internal::TensorProductMatrix ::spectral_assembly<Number>(
+        internal::TensorProductMatrix::spectral_assembly<Number>(
           mass_cbegin + nm * lane,
           deriv_cbegin + nm * lane,
           n_rows,

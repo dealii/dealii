@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,7 +72,7 @@ private:
 
   Triangulation<2>    triangulation;
   hp::FECollection<2> fe;
-  hp::DoFHandler<2>   dof_handler;
+  DoFHandler<2>       dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
@@ -102,8 +102,8 @@ LaplaceProblem::make_grid_and_dofs()
           << std::endl;
   deallog << "Total number of cells: " << triangulation.n_cells() << std::endl;
 
-  hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
-                                          endc = dof_handler.end();
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
+                                      endc = dof_handler.end();
 
   unsigned int cell_no = 0;
   for (; cell != endc; ++cell)
@@ -162,8 +162,8 @@ LaplaceProblem::assemble_system()
 
   std::vector<types::global_dof_index> local_dof_indices(max_dofs_per_cell);
 
-  hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
-                                          endc = dof_handler.end();
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
+                                      endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       x_fe_values.reinit(cell);
@@ -235,7 +235,7 @@ LaplaceProblem::solve()
 void
 LaplaceProblem::output_results() const
 {
-  DataOut<2, hp::DoFHandler<2>> data_out;
+  DataOut<2> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(solution, "solution");
   data_out.build_patches();
@@ -248,9 +248,10 @@ LaplaceProblem::output_results() const
 void
 LaplaceProblem::run()
 {
-  FE_Q<2> fe_1(1), fe_2(2), fe_3(QIterated<1>(QTrapez<1>(), 3)),
-    fe_4(QIterated<1>(QTrapez<1>(), 4)), fe_5(QIterated<1>(QTrapez<1>(), 5)),
-    fe_6(QIterated<1>(QTrapez<1>(), 6));
+  FE_Q<2> fe_1(1), fe_2(2), fe_3(QIterated<1>(QTrapezoid<1>(), 3)),
+    fe_4(QIterated<1>(QTrapezoid<1>(), 4)),
+    fe_5(QIterated<1>(QTrapezoid<1>(), 5)),
+    fe_6(QIterated<1>(QTrapezoid<1>(), 6));
 
   fe.push_back(fe_1);
   fe.push_back(fe_2);

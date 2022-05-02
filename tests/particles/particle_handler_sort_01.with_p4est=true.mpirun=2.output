@@ -1,0 +1,314 @@
+
+DEAL:0:2d/2d::Particle <10> lost. Current position: 0.123546 -3.22534e-05
+DEAL:0:2d/2d::Particle <13> lost. Current position: 0.0592617 -0.0153436
+DEAL:0:2d/2d::Particle <24> lost. Current position: -0.0240617 0.328969
+DEAL:0:2d/2d::Particle <28> lost. Current position: -0.00959221 0.111116
+DEAL:0:2d/2d::Particle <29> lost. Current position: 0.0496921 -0.0364129
+DEAL:0:2d/2d::Particle <83> lost. Current position: 0.426693 -0.0304454
+DEAL:0:2d/2d::Particle <106> lost. Current position: 0.388269 -0.0165948
+DEAL:0:2d/2d::Particle <107> lost. Current position: 0.502722 -0.00184541
+DEAL:0:2d/2d::Particle <117> lost. Current position: 0.334069 -0.0144788
+DEAL:0:2d/2d::Particle <121> lost. Current position: 0.315083 -0.0125546
+DEAL:0:2d/2d::Particle <122> lost. Current position: 0.317890 -0.0542556
+DEAL:0:2d/2d::Particle <123> lost. Current position: 0.485083 -0.0446890
+DEAL:0:2d/2d::Particle <135> lost. Current position: -0.0450507 0.357004
+DEAL:0:2d/2d::Particle <163> lost. Current position: -0.0448786 0.344800
+DEAL:0:2d/2d::Particle <171> lost. Current position: -0.00582897 0.506751
+DEAL:0:2d/2d::Particle <172> lost. Current position: -0.0163957 0.246578
+DEAL:0:2d/2d::Particle <285> lost. Current position: 0.430814 -0.0408523
+DEAL:0:2d/2d::Particle <307> lost. Current position: 0.666830 -0.0704076
+DEAL:0:2d/2d::Particle <316> lost. Current position: 1.03008 0.159433
+DEAL:0:2d/2d::Particle <317> lost. Current position: 0.918052 -2.13527e-05
+DEAL:0:2d/2d::Particle <320> lost. Current position: 0.750379 -0.0111130
+DEAL:0:2d/2d::Particle <323> lost. Current position: 0.768758 -0.0262384
+DEAL:0:2d/2d::Particle <324> lost. Current position: 1.05812 0.134124
+DEAL:0:2d/2d::Particle <331> lost. Current position: 1.06763 0.0576714
+DEAL:0:2d/2d::Particle <332> lost. Current position: 0.775282 -0.0668379
+DEAL:0:2d/2d::Particle <335> lost. Current position: 0.921799 -0.00943756
+DEAL:0:2d/2d::Particle <350> lost. Current position: 1.03318 -0.00279399
+DEAL:0:2d/2d::Particle <355> lost. Current position: 0.931415 -0.0722842
+DEAL:0:2d/2d::Particle <356> lost. Current position: 1.01001 -0.0260975
+DEAL:0:2d/2d::Particle <357> lost. Current position: 1.01142 0.154709
+DEAL:0:2d/2d::Particle <359> lost. Current position: 0.965355 -0.0103550
+DEAL:0:2d/2d::Particle <360> lost. Current position: 1.00382 -0.0321879
+DEAL:0:2d/2d::Particle <366> lost. Current position: 0.858059 -0.0855409
+DEAL:0:2d/2d::Particle <367> lost. Current position: 1.00780 0.0496914
+DEAL:0:2d/2d::Particle <369> lost. Current position: 0.779471 -0.0230970
+DEAL:0:2d/2d::Particle <371> lost. Current position: 0.831861 -0.00244779
+DEAL:0:2d/2d::Particle <372> lost. Current position: 0.935899 -0.0163743
+DEAL:0:2d/2d::Particle <440> lost. Current position: 1.05131 0.354944
+DEAL:0:2d/2d::Particle <441> lost. Current position: 1.02410 0.351623
+DEAL:0:2d/2d::Particle <448> lost. Current position: 1.01144 0.447548
+DEAL:0:2d/2d::Particle <458> lost. Current position: 1.00928 0.484150
+DEAL:0:2d/2d::Particle <466> lost. Current position: 1.03665 0.357633
+DEAL:0:2d/2d::Particle <475> lost. Current position: 1.00617 0.177590
+DEAL:0:2d/2d::OK
+DEAL:0:2d/3d::Particle <2> lost. Current position: 0.0495662 -0.0788784 0.00000
+DEAL:0:2d/3d::Particle <4> lost. Current position: 0.258248 -0.00771465 0.00000
+DEAL:0:2d/3d::Particle <5> lost. Current position: -0.0501639 0.237119 0.00000
+DEAL:0:2d/3d::Particle <6> lost. Current position: 0.0194713 -0.00772157 0.00000
+DEAL:0:2d/3d::Particle <9> lost. Current position: -0.0182414 0.167656 0.00000
+DEAL:0:2d/3d::Particle <12> lost. Current position: -0.0430939 0.176550 0.00000
+DEAL:0:2d/3d::Particle <23> lost. Current position: 0.144544 -0.0247948 0.00000
+DEAL:0:2d/3d::Particle <24> lost. Current position: -0.0363335 0.146430 0.00000
+DEAL:0:2d/3d::Particle <29> lost. Current position: -0.00611471 0.0291877 0.00000
+DEAL:0:2d/3d::Particle <39> lost. Current position: -0.0351908 0.261920 0.00000
+DEAL:0:2d/3d::Particle <45> lost. Current position: 0.0933775 -0.0389728 0.00000
+DEAL:0:2d/3d::Particle <53> lost. Current position: -0.00912205 0.124590 0.00000
+DEAL:0:2d/3d::Particle <58> lost. Current position: -0.0578585 0.152783 0.00000
+DEAL:0:2d/3d::Particle <60> lost. Current position: -0.00929609 0.313380 0.00000
+DEAL:0:2d/3d::Particle <80> lost. Current position: 0.524320 -0.00362129 0.00000
+DEAL:0:2d/3d::Particle <81> lost. Current position: 0.241490 -0.00772411 0.00000
+DEAL:0:2d/3d::Particle <82> lost. Current position: 0.488299 -0.0164613 0.00000
+DEAL:0:2d/3d::Particle <111> lost. Current position: 0.402354 -0.00680798 0.00000
+DEAL:0:2d/3d::Particle <112> lost. Current position: 0.499936 -0.00434458 0.00000
+DEAL:0:2d/3d::Particle <162> lost. Current position: -0.0703123 0.412146 0.00000
+DEAL:0:2d/3d::Particle <165> lost. Current position: -0.0461364 0.423798 0.00000
+DEAL:0:2d/3d::Particle <176> lost. Current position: -0.0599543 0.288464 0.00000
+DEAL:0:2d/3d::Particle <179> lost. Current position: -0.00836116 0.173768 0.00000
+DEAL:0:2d/3d::Particle <187> lost. Current position: -0.0136946 0.389931 0.00000
+DEAL:0:2d/3d::Particle <252> lost. Current position: 0.719620 -0.0109041 0.00000
+DEAL:0:2d/3d::Particle <254> lost. Current position: 0.720646 -0.00701273 0.00000
+DEAL:0:2d/3d::Particle <260> lost. Current position: 0.749350 -0.0166246 0.00000
+DEAL:0:2d/3d::Particle <271> lost. Current position: 0.663036 -0.0529382 0.00000
+DEAL:0:2d/3d::Particle <284> lost. Current position: 0.594672 -0.0653654 0.00000
+DEAL:0:2d/3d::Particle <292> lost. Current position: 0.451296 -0.0108527 0.00000
+DEAL:0:2d/3d::Particle <307> lost. Current position: 0.718900 -0.0387880 0.00000
+DEAL:0:2d/3d::Particle <311> lost. Current position: 0.596964 -0.0298996 0.00000
+DEAL:0:2d/3d::Particle <313> lost. Current position: 1.00745 0.196179 0.00000
+DEAL:0:2d/3d::Particle <319> lost. Current position: 0.796551 -0.0873605 0.00000
+DEAL:0:2d/3d::Particle <324> lost. Current position: 1.01563 0.0931341 0.00000
+DEAL:0:2d/3d::Particle <325> lost. Current position: 0.969166 -0.0669716 0.00000
+DEAL:0:2d/3d::Particle <332> lost. Current position: 0.912937 -0.0660477 0.00000
+DEAL:0:2d/3d::Particle <334> lost. Current position: 1.08517 0.0729799 0.00000
+DEAL:0:2d/3d::Particle <341> lost. Current position: 1.07882 0.170296 0.00000
+DEAL:0:2d/3d::Particle <351> lost. Current position: 0.747210 -0.0262935 0.00000
+DEAL:0:2d/3d::Particle <361> lost. Current position: 0.854600 -0.0543533 0.00000
+DEAL:0:2d/3d::Particle <364> lost. Current position: 1.05829 0.270414 0.00000
+DEAL:0:2d/3d::Particle <365> lost. Current position: 1.00382 0.279318 0.00000
+DEAL:0:2d/3d::Particle <368> lost. Current position: 0.746939 -0.0226075 0.00000
+DEAL:0:2d/3d::Particle <371> lost. Current position: 1.01290 0.139051 0.00000
+DEAL:0:2d/3d::Particle <373> lost. Current position: 1.00316 0.279367 0.00000
+DEAL:0:2d/3d::Particle <446> lost. Current position: 1.03351 0.573815 0.00000
+DEAL:0:2d/3d::Particle <469> lost. Current position: 1.05063 0.356238 0.00000
+DEAL:0:2d/3d::Particle <486> lost. Current position: 1.07744 0.300467 0.00000
+DEAL:0:2d/3d::Particle <490> lost. Current position: 1.02784 0.404175 0.00000
+DEAL:0:2d/3d::OK
+DEAL:0:3d/3d::Particle <2> lost. Current position: 0.118931 -0.0694517 -0.0398326
+DEAL:0:3d/3d::Particle <5> lost. Current position: -0.0366208 0.154071 0.186981
+DEAL:0:3d/3d::Particle <7> lost. Current position: -0.0246737 0.135167 0.173719
+DEAL:0:3d/3d::Particle <9> lost. Current position: -0.0273990 0.116122 0.187349
+DEAL:0:3d/3d::Particle <11> lost. Current position: -0.00351403 0.275429 -0.0713183
+DEAL:0:3d/3d::Particle <17> lost. Current position: 0.437506 -0.00475633 0.185817
+DEAL:0:3d/3d::Particle <18> lost. Current position: 0.418068 0.199284 -0.000569544
+DEAL:0:3d/3d::Particle <26> lost. Current position: 0.412626 -0.0425750 0.128568
+DEAL:0:3d/3d::Particle <33> lost. Current position: 0.0356113 0.224032 -0.0151719
+DEAL:0:3d/3d::Particle <36> lost. Current position: -0.0401850 0.350227 0.253044
+DEAL:0:3d/3d::Particle <38> lost. Current position: 0.0142332 0.427159 -0.0732225
+DEAL:0:3d/3d::Particle <39> lost. Current position: -0.0377175 0.444464 0.237034
+DEAL:0:3d/3d::Particle <54> lost. Current position: 0.437501 0.353674 -0.0159607
+DEAL:0:3d/3d::Particle <55> lost. Current position: 0.399932 0.375448 -0.0275231
+DEAL:0:3d/3d::Particle <59> lost. Current position: 0.454196 0.406578 -0.0272487
+DEAL:0:3d/3d::Particle <64> lost. Current position: -0.0573114 0.184603 0.567273
+DEAL:0:3d/3d::Particle <65> lost. Current position: 0.118148 -0.0490377 0.384812
+DEAL:0:3d/3d::Particle <74> lost. Current position: 0.161982 -0.0678497 0.475513
+DEAL:0:3d/3d::Particle <81> lost. Current position: 0.273784 -0.0215688 0.222743
+DEAL:0:3d/3d::Particle <99> lost. Current position: -0.0527647 0.438335 0.569829
+DEAL:0:3d/3d::Particle <126> lost. Current position: 0.632677 -0.0345135 0.135615
+DEAL:0:3d/3d::Particle <136> lost. Current position: 0.615228 -0.0567895 0.0153335
+DEAL:0:3d/3d::Particle <137> lost. Current position: 0.617427 -0.00663604 0.329097
+DEAL:0:3d/3d::Particle <140> lost. Current position: 0.518516 -0.0314186 0.129352
+DEAL:0:3d/3d::Particle <142> lost. Current position: 0.860745 0.0805449 -0.00990323
+DEAL:0:3d/3d::Particle <147> lost. Current position: 1.03246 0.119754 0.241015
+DEAL:0:3d/3d::Particle <155> lost. Current position: 1.04689 0.0931779 -0.0276283
+DEAL:0:3d/3d::Particle <160> lost. Current position: 0.457646 0.370383 -0.0483054
+DEAL:0:3d/3d::Particle <162> lost. Current position: 0.433044 0.241983 -0.0824608
+DEAL:0:3d/3d::Particle <172> lost. Current position: 1.03368 0.301310 0.151696
+DEAL:0:3d/3d::Particle <173> lost. Current position: 1.03684 0.355528 0.0980036
+DEAL:0:3d/3d::Particle <176> lost. Current position: 0.867062 0.313106 -0.0451460
+DEAL:0:3d/3d::Particle <184> lost. Current position: 1.00980 0.256876 0.157719
+DEAL:0:3d/3d::Particle <185> lost. Current position: 1.00281 0.453065 0.0910358
+DEAL:0:3d/3d::Particle <197> lost. Current position: 0.729718 -0.0253315 0.412523
+DEAL:0:3d/3d::Particle <200> lost. Current position: 0.610486 -0.00859241 0.262208
+DEAL:0:3d/3d::Particle <204> lost. Current position: 0.986775 -0.00422297 0.432435
+DEAL:0:3d/3d::Particle <205> lost. Current position: 0.754203 -0.0536068 0.424313
+DEAL:0:3d/3d::Particle <213> lost. Current position: 0.885328 -0.0252311 0.253745
+DEAL:0:3d/3d::Particle <216> lost. Current position: 1.01246 0.199910 0.325525
+DEAL:0:3d/3d::Particle <251> lost. Current position: 0.169946 0.739865 -0.0321259
+DEAL:0:3d/3d::Particle <253> lost. Current position: -0.0254956 0.702507 0.0677099
+DEAL:0:3d/3d::Particle <255> lost. Current position: 0.115376 0.649536 -0.0221318
+DEAL:0:3d/3d::Particle <258> lost. Current position: -0.0710090 0.692336 0.0186516
+DEAL:0:3d/3d::Particle <270> lost. Current position: 0.365782 0.672364 -0.0898777
+DEAL:0:3d/3d::Particle <281> lost. Current position: 0.161200 0.789389 -0.00997535
+DEAL:0:3d/3d::Particle <286> lost. Current position: -0.0405439 0.872570 0.229443
+DEAL:0:3d/3d::Particle <287> lost. Current position: 0.0646731 1.01722 0.114353
+DEAL:0:3d/3d::Particle <292> lost. Current position: -0.0232605 0.810144 0.0384166
+DEAL:0:3d/3d::Particle <293> lost. Current position: 0.304739 1.05823 -0.0263780
+DEAL:0:3d/3d::Particle <294> lost. Current position: 0.198352 0.771672 -0.0637023
+DEAL:0:3d/3d::Particle <295> lost. Current position: 0.170792 1.05286 0.142243
+DEAL:0:3d/3d::Particle <299> lost. Current position: 0.439788 0.860934 -0.0433275
+DEAL:0:3d/3d::Particle <302> lost. Current position: 0.284451 0.695247 -0.0217961
+DEAL:0:3d/3d::Particle <303> lost. Current position: 0.375315 1.07117 0.227289
+DEAL:0:3d/3d::Particle <316> lost. Current position: -0.0501312 0.548253 0.529866
+DEAL:0:3d/3d::Particle <317> lost. Current position: -0.0102853 0.587836 0.474420
+DEAL:0:3d/3d::Particle <320> lost. Current position: -0.0124042 0.607950 0.486360
+DEAL:0:3d/3d::Particle <345> lost. Current position: 0.114990 1.00903 0.386368
+DEAL:0:3d/3d::Particle <353> lost. Current position: 0.0126285 1.01181 0.321963
+DEAL:0:3d/3d::Particle <357> lost. Current position: 0.154777 1.01160 0.492952
+DEAL:0:3d/3d::Particle <376> lost. Current position: 0.614205 0.681668 -0.0233425
+DEAL:0:3d/3d::Particle <403> lost. Current position: 0.947047 0.675026 -0.0272672
+DEAL:0:3d/3d::Particle <406> lost. Current position: 0.643949 1.05199 0.0863530
+DEAL:0:3d/3d::Particle <408> lost. Current position: 0.780166 1.05876 -0.0829048
+DEAL:0:3d/3d::Particle <413> lost. Current position: 0.645245 0.997521 -0.0556738
+DEAL:0:3d/3d::Particle <415> lost. Current position: 0.682306 1.00037 0.0702467
+DEAL:0:3d/3d::Particle <417> lost. Current position: 0.634609 0.963691 -0.0377466
+DEAL:0:3d/3d::Particle <425> lost. Current position: 0.863686 0.978592 -0.0201421
+DEAL:0:3d/3d::Particle <428> lost. Current position: 1.00693 0.794961 0.125410
+DEAL:0:3d/3d::Particle <434> lost. Current position: 0.734266 1.01167 0.126536
+DEAL:0:3d/3d::Particle <457> lost. Current position: 1.06589 0.522799 0.381171
+DEAL:0:3d/3d::Particle <464> lost. Current position: 1.00170 0.566258 0.348135
+DEAL:0:3d/3d::Particle <471> lost. Current position: 0.800054 1.08476 0.327504
+DEAL:0:3d/3d::Particle <478> lost. Current position: 0.596810 1.05932 0.345119
+DEAL:0:3d/3d::Particle <485> lost. Current position: 0.835711 1.00112 0.427761
+DEAL:0:3d/3d::Particle <490> lost. Current position: 1.06339 0.934236 0.551389
+DEAL:0:3d/3d::Particle <491> lost. Current position: 1.00855 0.830484 0.249463
+DEAL:0:3d/3d::Particle <493> lost. Current position: 0.882159 1.03612 0.396834
+DEAL:0:3d/3d::Particle <498> lost. Current position: 0.815334 1.00694 0.476989
+DEAL:0:3d/3d::OK
+
+DEAL:1:2d/2d::Particle <512> lost. Current position: -0.0340560 0.585061
+DEAL:1:2d/2d::Particle <524> lost. Current position: -0.0133184 0.761916
+DEAL:1:2d/2d::Particle <547> lost. Current position: -0.00791189 0.701519
+DEAL:1:2d/2d::Particle <625> lost. Current position: 0.0723842 1.02594
+DEAL:1:2d/2d::Particle <635> lost. Current position: -0.0120235 0.881976
+DEAL:1:2d/2d::Particle <643> lost. Current position: 0.335816 1.04431
+DEAL:1:2d/2d::Particle <645> lost. Current position: -0.0479216 0.914904
+DEAL:1:2d/2d::Particle <651> lost. Current position: 0.261345 1.03509
+DEAL:1:2d/2d::Particle <657> lost. Current position: 0.157473 1.01874
+DEAL:1:2d/2d::Particle <664> lost. Current position: 0.0315280 1.07525
+DEAL:1:2d/2d::Particle <682> lost. Current position: -0.0329131 0.882768
+DEAL:1:2d/2d::Particle <689> lost. Current position: 0.474793 1.01269
+DEAL:1:2d/2d::Particle <712> lost. Current position: 0.348681 1.00241
+DEAL:1:2d/2d::Particle <713> lost. Current position: 0.360776 1.02200
+DEAL:1:2d/2d::Particle <716> lost. Current position: 0.324243 1.05360
+DEAL:1:2d/2d::Particle <728> lost. Current position: 0.239177 1.00433
+DEAL:1:2d/2d::Particle <729> lost. Current position: 0.273269 1.02409
+DEAL:1:2d/2d::Particle <816> lost. Current position: 1.01887 0.796267
+DEAL:1:2d/2d::Particle <821> lost. Current position: 1.01783 0.499763
+DEAL:1:2d/2d::Particle <825> lost. Current position: 1.03480 0.751485
+DEAL:1:2d/2d::Particle <841> lost. Current position: 1.05405 0.562292
+DEAL:1:2d/2d::Particle <848> lost. Current position: 1.01504 0.615457
+DEAL:1:2d/2d::Particle <867> lost. Current position: 1.00007 0.476821
+DEAL:1:2d/2d::Particle <896> lost. Current position: 0.520570 1.04736
+DEAL:1:2d/2d::Particle <900> lost. Current position: 0.662529 1.00187
+DEAL:1:2d/2d::Particle <907> lost. Current position: 0.810779 1.02928
+DEAL:1:2d/2d::Particle <923> lost. Current position: 0.595370 1.02909
+DEAL:1:2d/2d::Particle <932> lost. Current position: 0.744668 1.02127
+DEAL:1:2d/2d::Particle <939> lost. Current position: 0.865353 1.05417
+DEAL:1:2d/2d::Particle <940> lost. Current position: 1.01049 0.875798
+DEAL:1:2d/2d::Particle <966> lost. Current position: 1.06742 0.857590
+DEAL:1:2d/2d::Particle <976> lost. Current position: 1.06818 0.838219
+DEAL:1:2d/2d::Particle <980> lost. Current position: 0.737977 1.00783
+DEAL:1:2d/2d::Particle <984> lost. Current position: 1.01019 0.866126
+DEAL:1:2d/2d::Particle <986> lost. Current position: 0.801638 1.00653
+DEAL:1:2d/2d::Particle <991> lost. Current position: 0.741165 1.02436
+DEAL:1:2d/2d::Particle <994> lost. Current position: 0.914241 1.01634
+DEAL:1:2d/2d::Particle <997> lost. Current position: 1.04573 0.930064
+DEAL:1:2d/2d::Particle <998> lost. Current position: 1.01490 0.815071
+DEAL:1:2d/2d::OK
+DEAL:1:2d/3d::Particle <530> lost. Current position: -0.0169577 0.736810 0.00000
+DEAL:1:2d/3d::Particle <555> lost. Current position: -0.00520795 0.633375 0.00000
+DEAL:1:2d/3d::Particle <559> lost. Current position: -0.0346884 0.769988 0.00000
+DEAL:1:2d/3d::Particle <637> lost. Current position: -0.00522572 0.845010 0.00000
+DEAL:1:2d/3d::Particle <641> lost. Current position: -0.0105717 0.891867 0.00000
+DEAL:1:2d/3d::Particle <644> lost. Current position: 0.0145759 1.08357 0.00000
+DEAL:1:2d/3d::Particle <648> lost. Current position: -0.0403868 0.691243 0.00000
+DEAL:1:2d/3d::Particle <662> lost. Current position: 0.0475305 1.02961 0.00000
+DEAL:1:2d/3d::Particle <664> lost. Current position: -0.0272942 0.738614 0.00000
+DEAL:1:2d/3d::Particle <679> lost. Current position: -0.0362157 0.805331 0.00000
+DEAL:1:2d/3d::Particle <692> lost. Current position: 0.402397 1.01882 0.00000
+DEAL:1:2d/3d::Particle <706> lost. Current position: 0.401855 1.02212 0.00000
+DEAL:1:2d/3d::Particle <710> lost. Current position: 0.311343 1.06895 0.00000
+DEAL:1:2d/3d::Particle <716> lost. Current position: 0.306159 1.03293 0.00000
+DEAL:1:2d/3d::Particle <720> lost. Current position: 0.445469 1.04803 0.00000
+DEAL:1:2d/3d::Particle <727> lost. Current position: 0.459243 1.03575 0.00000
+DEAL:1:2d/3d::Particle <742> lost. Current position: 0.385123 1.04123 0.00000
+DEAL:1:2d/3d::Particle <743> lost. Current position: 0.404869 1.04532 0.00000
+DEAL:1:2d/3d::Particle <747> lost. Current position: 0.471512 1.02462 0.00000
+DEAL:1:2d/3d::Particle <816> lost. Current position: 1.04088 0.768232 0.00000
+DEAL:1:2d/3d::Particle <817> lost. Current position: 1.03336 0.704634 0.00000
+DEAL:1:2d/3d::Particle <828> lost. Current position: 1.05503 0.676366 0.00000
+DEAL:1:2d/3d::Particle <834> lost. Current position: 1.07371 0.675546 0.00000
+DEAL:1:2d/3d::Particle <835> lost. Current position: 1.07737 0.654556 0.00000
+DEAL:1:2d/3d::Particle <837> lost. Current position: 1.01157 0.668248 0.00000
+DEAL:1:2d/3d::Particle <843> lost. Current position: 1.02680 0.517793 0.00000
+DEAL:1:2d/3d::Particle <876> lost. Current position: 0.687538 1.01575 0.00000
+DEAL:1:2d/3d::Particle <881> lost. Current position: 0.557015 1.02828 0.00000
+DEAL:1:2d/3d::Particle <883> lost. Current position: 0.662587 1.03455 0.00000
+DEAL:1:2d/3d::Particle <886> lost. Current position: 0.744004 1.04494 0.00000
+DEAL:1:2d/3d::Particle <896> lost. Current position: 0.608633 1.04050 0.00000
+DEAL:1:2d/3d::Particle <916> lost. Current position: 0.711194 1.04270 0.00000
+DEAL:1:2d/3d::Particle <943> lost. Current position: 1.02393 0.834502 0.00000
+DEAL:1:2d/3d::Particle <945> lost. Current position: 0.733315 1.01370 0.00000
+DEAL:1:2d/3d::Particle <950> lost. Current position: 0.669260 1.02169 0.00000
+DEAL:1:2d/3d::Particle <956> lost. Current position: 0.769934 1.03761 0.00000
+DEAL:1:2d/3d::Particle <969> lost. Current position: 1.06465 0.885654 0.00000
+DEAL:1:2d/3d::Particle <989> lost. Current position: 1.06337 0.833050 0.00000
+DEAL:1:2d/3d::Particle <993> lost. Current position: 0.925446 1.05928 0.00000
+DEAL:1:2d/3d::Particle <999> lost. Current position: 0.803161 1.03514 0.00000
+DEAL:1:2d/3d::OK
+DEAL:1:3d/3d::Particle <500> lost. Current position: -0.0210881 0.0868617 0.674380
+DEAL:1:3d/3d::Particle <504> lost. Current position: -0.0239487 0.142402 0.698843
+DEAL:1:3d/3d::Particle <513> lost. Current position: -0.0294405 0.123482 0.713983
+DEAL:1:3d/3d::Particle <526> lost. Current position: 0.329797 -0.0364709 0.527051
+DEAL:1:3d/3d::Particle <564> lost. Current position: -0.00639875 0.130122 1.05536
+DEAL:1:3d/3d::Particle <575> lost. Current position: 0.103565 0.165747 1.06566
+DEAL:1:3d/3d::Particle <578> lost. Current position: 0.324488 -0.0461890 0.926273
+DEAL:1:3d/3d::Particle <580> lost. Current position: 0.581851 0.0621402 1.03050
+DEAL:1:3d/3d::Particle <599> lost. Current position: 0.118974 0.389950 1.02216
+DEAL:1:3d/3d::Particle <609> lost. Current position: 0.521950 0.320990 1.01949
+DEAL:1:3d/3d::Particle <613> lost. Current position: 0.512065 0.487264 1.05239
+DEAL:1:3d/3d::Particle <625> lost. Current position: 0.617658 -0.00280637 0.553801
+DEAL:1:3d/3d::Particle <636> lost. Current position: 0.676217 -0.0505742 0.675318
+DEAL:1:3d/3d::Particle <645> lost. Current position: 1.02915 0.180749 0.628831
+DEAL:1:3d/3d::Particle <647> lost. Current position: 1.00505 -0.0555470 0.669282
+DEAL:1:3d/3d::Particle <648> lost. Current position: 0.874331 -0.0460176 0.707449
+DEAL:1:3d/3d::Particle <675> lost. Current position: 1.05608 0.186815 0.551561
+DEAL:1:3d/3d::Particle <684> lost. Current position: 1.02808 0.174884 0.504965
+DEAL:1:3d/3d::Particle <690> lost. Current position: 0.639558 0.196834 1.00296
+DEAL:1:3d/3d::Particle <693> lost. Current position: 0.555445 0.0132260 1.09087
+DEAL:1:3d/3d::Particle <697> lost. Current position: 0.714009 -0.0404528 0.854361
+DEAL:1:3d/3d::Particle <699> lost. Current position: 0.637791 0.0623353 1.04335
+DEAL:1:3d/3d::Particle <703> lost. Current position: 0.955472 0.196672 1.08537
+DEAL:1:3d/3d::Particle <707> lost. Current position: 0.926613 -0.0257779 0.967421
+DEAL:1:3d/3d::Particle <708> lost. Current position: 0.784032 0.206149 1.02255
+DEAL:1:3d/3d::Particle <709> lost. Current position: 1.00225 -0.0175908 0.790487
+DEAL:1:3d/3d::Particle <713> lost. Current position: 0.798423 -0.0254984 0.752078
+DEAL:1:3d/3d::Particle <718> lost. Current position: 0.938455 -0.0221863 0.938666
+DEAL:1:3d/3d::Particle <759> lost. Current position: -0.0142053 0.475649 0.630905
+DEAL:1:3d/3d::Particle <762> lost. Current position: -0.0121241 0.556748 0.669971
+DEAL:1:3d/3d::Particle <764> lost. Current position: -0.0530716 0.740401 0.634525
+DEAL:1:3d/3d::Particle <793> lost. Current position: 0.279033 1.01741 0.494475
+DEAL:1:3d/3d::Particle <831> lost. Current position: 0.353502 0.742471 1.06220
+DEAL:1:3d/3d::Particle <836> lost. Current position: 0.420876 0.617602 1.02414
+DEAL:1:3d/3d::Particle <846> lost. Current position: -0.0156169 0.946769 0.793348
+DEAL:1:3d/3d::Particle <850> lost. Current position: -0.0178550 0.992342 0.998054
+DEAL:1:3d/3d::Particle <855> lost. Current position: -0.0385575 0.887385 0.827121
+DEAL:1:3d/3d::Particle <862> lost. Current position: 0.455440 0.687453 1.00432
+DEAL:1:3d/3d::Particle <867> lost. Current position: 0.439317 0.986249 1.01561
+DEAL:1:3d/3d::Particle <868> lost. Current position: 0.328445 1.01860 0.933027
+DEAL:1:3d/3d::Particle <871> lost. Current position: 0.387395 1.03651 0.966508
+DEAL:1:3d/3d::Particle <919> lost. Current position: 0.561692 1.05466 0.623726
+DEAL:1:3d/3d::Particle <934> lost. Current position: 0.867230 1.02900 0.654966
+DEAL:1:3d/3d::Particle <955> lost. Current position: 0.808747 0.624894 1.04061
+DEAL:1:3d/3d::Particle <966> lost. Current position: 1.01943 0.518492 0.884315
+DEAL:1:3d/3d::Particle <973> lost. Current position: 0.454007 0.924138 1.01175
+DEAL:1:3d/3d::Particle <977> lost. Current position: 0.623128 0.854309 1.04609
+DEAL:1:3d/3d::Particle <983> lost. Current position: 0.502505 0.920019 1.05909
+DEAL:1:3d/3d::Particle <990> lost. Current position: 0.932620 0.802086 1.01733
+DEAL:1:3d/3d::Particle <993> lost. Current position: 0.850579 1.06715 1.09040
+DEAL:1:3d/3d::Particle <995> lost. Current position: 0.966508 1.02010 0.909289
+DEAL:1:3d/3d::Particle <997> lost. Current position: 0.875547 1.05016 0.887652
+DEAL:1:3d/3d::Particle <999> lost. Current position: 0.732727 1.09489 0.882254
+DEAL:1:3d/3d::OK
+

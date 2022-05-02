@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@ char logname[] = "output";
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
@@ -38,8 +39,6 @@ char logname[] = "output";
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
@@ -65,10 +64,10 @@ test()
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(3);
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   // distribute fe_indices randomly
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -83,7 +82,7 @@ test()
 
   std::set<unsigned int> line_already_treated;
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -92,7 +91,7 @@ test()
           line_already_treated.end())
         // line not yet treated
         {
-          const typename hp::DoFHandler<dim>::active_line_iterator line =
+          const typename DoFHandler<dim>::active_line_iterator line =
             cell->line(l);
           deallog << "line=" << line << std::endl;
           line_already_treated.insert(line->index());

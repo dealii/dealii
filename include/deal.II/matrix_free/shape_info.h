@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,12 +22,18 @@
 
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/quadrature_lib.h>
-
-#include <deal.II/fe/fe.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/vectorization.h>
 
 
 DEAL_II_NAMESPACE_OPEN
+
+
+// forward declaration
+template <int dim, int spacedim>
+class FiniteElement;
+
 
 namespace internal
 {
@@ -91,7 +97,21 @@ namespace internal
        * of the unit interval 0.5 that additionally add a constant shape
        * function according to FE_Q_DG0.
        */
-      tensor_symmetric_plus_dg0 = 5
+      tensor_symmetric_plus_dg0 = 5,
+
+      /**
+       * Special case of the FE_RaviartThomasNodal element with anisotropic
+       * tensor product shape functions, i.e degree (k + 1) in normal direction,
+       * and k in tangential direction.
+       */
+      tensor_raviart_thomas = 6,
+
+      /**
+       * Shape functions without a tensor product properties.
+       */
+      tensor_none = 7
+
+
     };
 
 
@@ -103,8 +123,6 @@ namespace internal
      * coordinates. This data structure also includes the evaluation of
      * quantities at the cell boundary and on the sub-interval $(0, 0.5)$ and
      * $(0.5, 1)$ for face integrals.
-     *
-     * @author Katharina Kormann, Martin Kronbichler, Julius Witte, 2010-2020
      */
     template <typename Number>
     struct UnivariateShapeData
@@ -128,27 +146,24 @@ namespace internal
       ElementType element_type;
 
       /**
-       * Stores the shape values of the 1D finite element evaluated on all 1D
-       * quadrature points in vectorized format, i.e., as an array of
-       * VectorizedArray<dim>::size equal elements. The length of
+       * Stores the shape values of the 1D finite element evaluated at all 1D
+       * quadrature points. The length of
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
        */
       AlignedVector<Number> shape_values;
 
       /**
-       * Stores the shape gradients of the 1D finite element evaluated on all
-       * 1D quadrature points in vectorized format, i.e., as an array of
-       * VectorizedArray<dim>::size equal elements. The length of
+       * Stores the shape gradients of the 1D finite element evaluated at all
+       * 1D quadrature points. The length of
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
        */
       AlignedVector<Number> shape_gradients;
 
       /**
-       * Stores the shape Hessians of the 1D finite element evaluated on all
-       * 1D quadrature points in vectorized format, i.e., as an array of
-       * VectorizedArray<dim>::size equal elements. The length of
+       * Stores the shape Hessians of the 1D finite element evaluated at all
+       * 1D quadrature points. The length of
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
        */
@@ -229,25 +244,52 @@ namespace internal
        * (the vertices) in one data structure. Sorting is first the values,
        * then gradients, then second derivatives.
        */
-      AlignedVector<Number> shape_data_on_face[2];
+      std::array<AlignedVector<Number>, 2> shape_data_on_face;
+
+      /**
+       * Collects all data of 1D nodal shape values (defined by the Lagrange
+       * polynomials in the points of the quadrature rule) evaluated at the
+       * point 0 and 1 (the vertices) in one data structure.
+       *
+       * This data structure can be used to interpolate from the cell to the
+       * face quadrature points.
+       *
+       * @note In contrast to shape_data_on_face, only the vales are evaluated.
+       */
+      std::array<AlignedVector<Number>, 2> quadrature_data_on_face;
 
       /**
        * Stores one-dimensional values of shape functions on subface. Since
        * there are two subfaces, store two variants.
        */
-      AlignedVector<Number> values_within_subface[2];
+      std::array<AlignedVector<Number>, 2> values_within_subface;
 
       /**
        * Stores one-dimensional gradients of shape functions on subface. Since
        * there are two subfaces, store two variants.
        */
-      AlignedVector<Number> gradients_within_subface[2];
+      std::array<AlignedVector<Number>, 2> gradients_within_subface;
 
       /**
        * Stores one-dimensional gradients of shape functions on subface. Since
        * there are two subfaces, store two variants.
        */
-      AlignedVector<Number> hessians_within_subface[2];
+      std::array<AlignedVector<Number>, 2> hessians_within_subface;
+
+      /**
+       * A 1D subface interpolation matrices to the first and second quadrant.
+       * This data structure is only set up for FE_Q for dim > 1.
+       */
+      std::array<AlignedVector<Number>, 2> subface_interpolation_matrices;
+
+      /**
+       * Same as above but stored in a scalar format independent of the type of
+       * Number
+       */
+      std::array<AlignedVector<typename dealii::internal::VectorizedArrayTrait<
+                   Number>::value_type>,
+                 2>
+        subface_interpolation_matrices_scalar;
 
       /**
        * We store a copy of the one-dimensional quadrature formula
@@ -270,6 +312,20 @@ namespace internal
        * end points of the unit cell.
        */
       bool nodal_at_cell_boundaries;
+
+      /**
+       * Stores the shape values of the finite element evaluated at all
+       * quadrature points for all faces and orientations (no tensor-product
+       * structure exploited).
+       */
+      Table<3, Number> shape_values_face;
+
+      /**
+       * Stores the shape gradients of the finite element evaluated at all
+       * quadrature points for all faces, orientations, and directions
+       * (no tensor-product structure exploited).
+       */
+      Table<4, Number> shape_gradients_face;
     };
 
 
@@ -283,8 +339,6 @@ namespace internal
      * case such as the hierarchical -> lexicographic ordering of FE_Q.
      *
      * @ingroup matrixfree
-     *
-     * @author Katharina Kormann, Martin Kronbichler, Julius Witte, 2010-2020
      */
     template <typename Number>
     struct ShapeInfo
@@ -304,10 +358,10 @@ namespace internal
       /**
        * Constructor that initializes the data fields using the reinit method.
        */
-      template <int dim>
-      ShapeInfo(const Quadrature<1> &     quad,
-                const FiniteElement<dim> &fe,
-                const unsigned int        base_element = 0);
+      template <int dim, int spacedim, int dim_q>
+      ShapeInfo(const Quadrature<dim_q> &           quad,
+                const FiniteElement<dim, spacedim> &fe,
+                const unsigned int                  base_element = 0);
 
       /**
        * Initializes the data fields. Takes a one-dimensional quadrature
@@ -317,11 +371,25 @@ namespace internal
        * dimensional element by a tensor product and that the zeroth shape
        * function in zero evaluates to one.
        */
-      template <int dim>
+      template <int dim, int spacedim, int dim_q>
       void
-      reinit(const Quadrature<1> &     quad,
-             const FiniteElement<dim> &fe_dim,
-             const unsigned int        base_element = 0);
+      reinit(const Quadrature<dim_q> &           quad,
+             const FiniteElement<dim, spacedim> &fe_dim,
+             const unsigned int                  base_element = 0);
+
+      /**
+       * Return which kinds of elements are supported by MatrixFree.
+       */
+      template <int dim, int spacedim>
+      static bool
+      is_supported(const FiniteElement<dim, spacedim> &fe);
+
+      /**
+       * Compute a table with numbers of re-orientation for all versions of
+       * face flips, orientation, and rotation (relating only to 3D elements).
+       */
+      static Table<2, unsigned int>
+      compute_orientation_table(const unsigned int n_points_per_dim);
 
       /**
        * Return data of univariate shape functions which defines the
@@ -388,6 +456,12 @@ namespace internal
        * Stores the number of quadrature points per face in @p dim dimensions.
        */
       unsigned int n_q_points_face;
+
+      /**
+       * Stores the number of quadrature points of a face in @p dim dimensions
+       * for simplex, wedge and pyramid reference cells.
+       */
+      std::vector<unsigned int> n_q_points_faces;
 
       /**
        * Stores the number of DoFs per face in @p dim dimensions.
@@ -471,6 +545,22 @@ namespace internal
        */
       dealii::Table<2, unsigned int> face_to_cell_index_hermite;
 
+      /**
+       * For unknowns located on faces, the basis functions are not
+       * in the correct order if a face is not in the standard orientation
+       * to a given element. This data structure is used to re-order the
+       * basis functions to represent the correct order.
+       */
+      dealii::Table<2, unsigned int> face_orientations_dofs;
+
+      /**
+       * For interpretation of values at quadrature points, the order of
+       * points is not correct if a face is not in the standard orientation to
+       * a given element. This data structure is used to re-order the
+       * quadrature points to represent the correct order.
+       */
+      dealii::Table<2, unsigned int> face_orientations_quad;
+
     private:
       /**
        * Check whether we have symmetries in the shape values. In that case,
@@ -494,22 +584,6 @@ namespace internal
 
 
     // ------------------------------------------ inline functions
-
-    template <typename Number>
-    template <int dim>
-    inline ShapeInfo<Number>::ShapeInfo(const Quadrature<1> &     quad,
-                                        const FiniteElement<dim> &fe_in,
-                                        const unsigned int base_element_number)
-      : element_type(tensor_general)
-      , n_dimensions(0)
-      , n_components(0)
-      , n_q_points(0)
-      , dofs_per_component_on_cell(0)
-      , n_q_points_face(0)
-      , dofs_per_component_on_face(0)
-    {
-      reinit(quad, fe_in, base_element_number);
-    }
 
     template <typename Number>
     inline const UnivariateShapeData<Number> &

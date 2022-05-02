@@ -1,0 +1,74 @@
+
+DEAL:Serialization:Float::f: x*y
+DEAL:Serialization:Float::g: x/y
+DEAL:Serialization:Float::f(x,y): 20.00000000
+DEAL:Serialization:Float::g(x,y): 5.000000000
+DEAL:Serialization:Float::
+DEAL:Serialization:Float::Serializing...
+DEAL:Serialization:Float::Serialized optimizer: 
+DEAL:Serialization:Float::0 0 0 0 0 0 2 0 0 0 0 0 1 x 4 10.0 1 y 3 2.0 0 0 2 0 3 x*y 3 x/y 2 0 2.000000000e+01 5.000000000e+00 0 0 2 0 0 0 3 x*y 0 3 x/y 1 1 1 2 0 1 x 1 y 0 0 0 0 0 0 2 0 3 x*y 3 x/y
+
+DEAL:Serialization:Float::Deserializing...
+DEAL:Serialization:Float::Deserialized optimizer: 
+DEAL:Serialization:Float::0 0 0 0 0 0 2 0 0 0 0 0 1 x 4 10.0 1 y 3 2.0 0 0 2 0 3 x*y 3 x/y 2 0 2.000000000e+01 5.000000000e+00 0 0 2 0 0 0 3 x*y 0 3 x/y 1 1 1 2 0 1 x 1 y 0 0 0 0 0 0 2 0 3 x*y 3 x/y
+DEAL:Serialization:Float::f: x*y
+DEAL:Serialization:Float::g: x/y
+DEAL:Serialization:Float::f(x,y): 20.00000000
+DEAL:Serialization:Float::g(x,y): 5.000000000
+DEAL:Serialization:Float::
+DEAL:Serialization:Float::OK
+DEAL:Serialization:Double::f: x*y
+DEAL:Serialization:Double::g: x/y
+DEAL:Serialization:Double::f(x,y): 20.00000000
+DEAL:Serialization:Double::g(x,y): 5.000000000
+DEAL:Serialization:Double::
+DEAL:Serialization:Double::Serializing...
+DEAL:Serialization:Double::Serialized optimizer: 
+DEAL:Serialization:Double::0 0 0 0 0 0 2 0 0 0 0 0 1 x 4 10.0 1 y 3 2.0 0 0 2 0 3 x*y 3 x/y 2 0 2.00000000000000000e+01 5.00000000000000000e+00 0 0 2 0 0 0 3 x*y 0 3 x/y 1 1 1 2 0 1 x 1 y 0 0 0 0 0 0 2 0 3 x*y 3 x/y
+
+DEAL:Serialization:Double::Deserializing...
+DEAL:Serialization:Double::Deserialized optimizer: 
+DEAL:Serialization:Double::0 0 0 0 0 0 2 0 0 0 0 0 1 x 4 10.0 1 y 3 2.0 0 0 2 0 3 x*y 3 x/y 2 0 2.00000000000000000e+01 5.00000000000000000e+00 0 0 2 0 0 0 3 x*y 0 3 x/y 1 1 1 2 0 1 x 1 y 0 0 0 0 0 0 2 0 3 x*y 3 x/y
+DEAL:Serialization:Double::f: x*y
+DEAL:Serialization:Double::g: x/y
+DEAL:Serialization:Double::f(x,y): 20.00000000
+DEAL:Serialization:Double::g(x,y): 5.000000000
+DEAL:Serialization:Double::
+DEAL:Serialization:Double::OK
+DEAL:Serialization:Complex float::f: x*y
+DEAL:Serialization:Complex float::g: x/y
+DEAL:Serialization:Complex float::f(x,y): (20.00000000,0.000000000)
+DEAL:Serialization:Complex float::g(x,y): (5.000000000,0.000000000)
+DEAL:Serialization:Complex float::
+DEAL:Serialization:Complex float::Serializing...
+DEAL:Serialization:Complex float::Serialized optimizer: 
+DEAL:Serialization:Complex float::0 0 0 0 0 0 2 0 0 0 0 0 1 x 12 10.0 + 0.0*I 1 y 11 2.0 + 0.0*I 0 0 2 0 3 x*y 3 x/y 0 0 2 0 2.000000000e+01 0.000000000e+00 5.000000000e+00 0.000000000e+00 0 0 2 0 0 0 3 x*y 0 3 x/y 1 1 1 2 0 1 x 1 y 0 0 0 0 0 0 2 0 3 x*y 3 x/y
+
+DEAL:Serialization:Complex float::Deserializing...
+DEAL:Serialization:Complex float::Deserialized optimizer: 
+DEAL:Serialization:Complex float::0 0 0 0 0 0 2 0 0 0 0 0 1 x 12 10.0 + 0.0*I 1 y 11 2.0 + 0.0*I 0 0 2 0 3 x*y 3 x/y 0 0 2 0 2.000000000e+01 0.000000000e+00 5.000000000e+00 0.000000000e+00 0 0 2 0 0 0 3 x*y 0 3 x/y 1 1 1 2 0 1 x 1 y 0 0 0 0 0 0 2 0 3 x*y 3 x/y
+DEAL:Serialization:Complex float::f: x*y
+DEAL:Serialization:Complex float::g: x/y
+DEAL:Serialization:Complex float::f(x,y): (20.00000000,0.000000000)
+DEAL:Serialization:Complex float::g(x,y): (5.000000000,0.000000000)
+DEAL:Serialization:Complex float::
+DEAL:Serialization:Complex float::OK
+DEAL:Serialization:Complex double::f: x*y
+DEAL:Serialization:Complex double::g: x/y
+DEAL:Serialization:Complex double::f(x,y): (20.00000000,0.000000000)
+DEAL:Serialization:Complex double::g(x,y): (5.000000000,0.000000000)
+DEAL:Serialization:Complex double::
+DEAL:Serialization:Complex double::Serializing...
+DEAL:Serialization:Complex double::Serialized optimizer: 
+DEAL:Serialization:Complex double::0 0 0 0 0 0 2 0 0 0 0 0 1 x 12 10.0 + 0.0*I 1 y 11 2.0 + 0.0*I 0 0 2 0 3 x*y 3 x/y 0 0 2 0 2.00000000000000000e+01 0.00000000000000000e+00 5.00000000000000000e+00 0.00000000000000000e+00 0 0 2 0 0 0 3 x*y 0 3 x/y 1 1 1 2 0 1 x 1 y 0 0 0 0 0 0 2 0 3 x*y 3 x/y
+
+DEAL:Serialization:Complex double::Deserializing...
+DEAL:Serialization:Complex double::Deserialized optimizer: 
+DEAL:Serialization:Complex double::0 0 0 0 0 0 2 0 0 0 0 0 1 x 12 10.0 + 0.0*I 1 y 11 2.0 + 0.0*I 0 0 2 0 3 x*y 3 x/y 0 0 2 0 2.00000000000000000e+01 0.00000000000000000e+00 5.00000000000000000e+00 0.00000000000000000e+00 0 0 2 0 0 0 3 x*y 0 3 x/y 1 1 1 2 0 1 x 1 y 0 0 0 0 0 0 2 0 3 x*y 3 x/y
+DEAL:Serialization:Complex double::f: x*y
+DEAL:Serialization:Complex double::g: x/y
+DEAL:Serialization:Complex double::f(x,y): (20.00000000,0.000000000)
+DEAL:Serialization:Complex double::g(x,y): (5.000000000,0.000000000)
+DEAL:Serialization:Complex double::
+DEAL:Serialization:Complex double::OK
+DEAL::OK

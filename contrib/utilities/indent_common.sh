@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 - 2019 by the deal.II authors
+## Copyright (C) 2018 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -38,8 +38,8 @@ checks() {
   fi
 
   # Add the location 'download_clang_format' or 'compile_clang_format'
-  # installs clang-format to to the local PATH.
-  CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/programs/clang-6/bin"
+  # installs clang-format to the local PATH.
+  CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/programs/clang-11/bin"
   export PATH="${CLANG_FORMAT_PATH}:${PATH}"
 
   if ! [ -x "$(command -v "${DEAL_II_CLANG_FORMAT}")" ]; then
@@ -51,14 +51,13 @@ checks() {
     exit 1
   fi
 
-  # Make sure to have the right version. We know that clang-6.0.0
-  # and clang-6.0.1 work. Hence, test for clang-6.0.
+  # Make sure to have the right version.
   CLANG_FORMAT_VERSION="$(${DEAL_II_CLANG_FORMAT} --version)"
   CLANG_FORMAT_MAJOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*\([0-9]*\).*$/\1/g')
   CLANG_FORMAT_MINOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*[0-9]*\.\([0-9]*\).*$/\1/g')
 
-  if [ "${CLANG_FORMAT_MAJOR_VERSION}" -ne 6 ] || [ "${CLANG_FORMAT_MINOR_VERSION}" -ne 0 ]; then
-    echo "***   This indent script requires clang-format version 6.0,"
+  if [ "${CLANG_FORMAT_MAJOR_VERSION}" -ne 11 ] || [ "${CLANG_FORMAT_MINOR_VERSION}" -ne 1 ]; then
+    echo "***   This indent script requires clang-format version 11.1,"
     echo "***   but version ${CLANG_FORMAT_MAJOR_VERSION}.${CLANG_FORMAT_MINOR_VERSION} was found instead."
     echo "***"
     echo "***   You can run the './contrib/utilities/download_clang_format'"
@@ -88,7 +87,7 @@ checks() {
 	  echo "invalid author '$name' without firstname and lastname"
 	  echo ""
 	  echo "hint: for possible solutions, consult the webpage:"
-	  echo "      https://github.com/dealii/dealii/wiki/Indentation#commit-authorship"
+	  echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
 	  exit 2
       fi
   done || exit 2
@@ -100,14 +99,14 @@ checks() {
 	  echo "invalid email '$email'"
           echo ""
           echo "hint: for possible solutions, consult the webpage:"
-          echo "      https://github.com/dealii/dealii/wiki/Indentation#commit-authorship"
+          echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
 	  exit 3
       fi
       if ! echo "$email" | grep -q -v -e "\.local$"; then
 	  echo "invalid email '$email'"
           echo ""
           echo "hint: for possible solutions, consult the webpage:"
-          echo "      https://github.com/dealii/dealii/wiki/Indentation#commit-authorship"
+          echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
 	  exit 3
       fi
   done || exit 3
@@ -163,16 +162,23 @@ format_file()
 export -f format_file
 
 #
-# Remove trailiing whitespace. Mac OSX requires an extension for a backup file
-# for in-place replacements. So we need to provide something before the regex.
-# Using '-e' avoids creating these files on GNU platforms at least.
-# For Mac OSX, we still need to delete the created file.
+# Remove trailing whitespace.
 #
 
 remove_trailing_whitespace()
 {
-  sed -i -e 's/\s\+$//g' "$1"
-  rm -f "$1-e"
+  file="${1}"
+  tmpfile="$(mktemp "${TMPDIR}/$(basename "$1").tmp.XXXXXXXX")"
+
+  #
+  # Mac OS uses BSD sed (other than GNU sed in Linux),
+  # so it doesn't recognize \s as 'spaces' or + as 'one or more'.
+  #
+  sed 's/[[:space:]]\{1,\}$//g' "${file}" > "${tmpfile}"
+  if ! diff -q "${file}" "${tmpfile}" >/dev/null; then
+    mv "${tmpfile}" "${file}"
+  fi
+  rm -f "${tmpfile}"
 }
 export -f remove_trailing_whitespace
 
@@ -221,7 +227,7 @@ dos_to_unix()
   tr -d '\015' <"${file}" >"${tmpfile}"
 
   fix_or_report "${file}" "${tmpfile}" "file has non-unix line-ending '\\r\\n'"
-  rm -f "${tmpfile}" "${tmpfile}"
+  rm -f "${tmpfile}"
 }
 export -f dos_to_unix
 
@@ -253,8 +259,8 @@ fix_permissions()
 export -f fix_permissions
 
 #
-# Collect all files found in a list of directories "${1}$" matching a
-# regular expression "${2}$", and process them with a command "${3}" on 10
+# Collect all files found in a list of directories "${1}" matching a
+# regular expression "${2}", and process them with a command "${3}" on 10
 # threads in parallel.
 #
 # The command line is a bit complicated, so let's discuss the more
@@ -265,9 +271,9 @@ export -f fix_permissions
 #   serves as a good candidate to separate individual file names.
 # - For 'xargs', -0 does the opposite: it separates filenames that are
 #   delimited by \0
-# - the options "-n 1 -P 10" make sure that the following script will be
-#   called exactly with one file name as argument at a time, but we allow
-#   execution for up to 10 times in parallel
+# - the option "-P 10" starts up to 10 processes in parallel. -0 implies '-L 1'
+#   (one argument to each command) so each launch of clang-format corresponds
+#   to exactly one file.
 #
 
 process()
@@ -276,11 +282,11 @@ process()
   case "${OSTYPE}" in
     darwin*)
       find -E ${directories} -regex "${2}" -print0 |
-        xargs -0 -n 1 -P 10 -I {} bash -c "${3} {}"
+        xargs -0 -P 10 -I {} bash -c "${3} {}"
       ;;
     *)
       find ${directories} -regextype egrep -regex "${2}" -print0 |
-        xargs -0 -n 1 -P 10 -I {} bash -c "${3} {}"
+        xargs -0 -P 10 -I {} bash -c "${3} {}"
       ;;
   esac
 }
@@ -312,5 +318,32 @@ process_changed()
       sort -u |
       xargs -n 1 ls -d 2>/dev/null |
       grep -E "^${2}$" |
-      ${XARGS} '\n' -n 1 -P 10 -I {} bash -c "${3} {}"
+      ${XARGS} '\n' -P 10 -I {} bash -c "${3} {}"
 }
+
+#
+# Ensure only a single newline at end of files
+#
+ensure_single_trailing_newline()
+{
+  f=$1
+
+  # Remove newlines at end of file
+  # Check that the current line only contains newlines
+  # If it doesn't match, print it
+  # If it does match and we're not at the end of the file,
+  # append the next line to the current line and repeat the check
+  # If it does match and we're at the end of the file,
+  # remove the line.
+  sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $f >$f.tmpi
+
+  # Then add a newline to the end of the file
+  # '$' denotes the end of file
+  # 'a\' appends the following text (which in this case is nothing)
+  # on a new line
+  sed -e '$a\' $f.tmpi >$f.tmp
+
+  diff -q $f $f.tmp >/dev/null || mv $f.tmp $f
+  rm -f $f.tmp $f.tmpi
+}
+export -f ensure_single_trailing_newline

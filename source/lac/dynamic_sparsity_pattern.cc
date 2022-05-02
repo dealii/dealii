@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -534,7 +534,7 @@ DynamicSparsityPattern::print(std::ostream &out) const
       out << ']' << std::endl;
     }
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -557,7 +557,7 @@ DynamicSparsityPattern::print_gnuplot(std::ostream &out) const
     }
 
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -622,7 +622,7 @@ DynamicSparsityPattern::nonempty_rows() const
   std::vector<types::global_dof_index> rows;
   auto                                 line = lines.begin();
   AssertDimension(locally_stored_rows.n_elements(), lines.size());
-  for (const auto &row : locally_stored_rows)
+  for (const auto row : locally_stored_rows)
     {
       if (line->entries.size() > 0)
         rows.push_back(row);
@@ -662,7 +662,7 @@ DynamicSparsityPattern::column_index(
   Assert(rowset.size() == 0 || rowset.is_element(row), ExcInternalError());
 
   const DynamicSparsityPattern::size_type local_row =
-    rowset.size() ? rowset.index_within_set(row) : row;
+    rowset.size() != 0u ? rowset.index_within_set(row) : row;
 
   // now we need to do a binary search. Note that col indices are assumed to
   // be sorted.

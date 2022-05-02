@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,9 +18,10 @@
 #include <deal.II/base/polynomials_bdm.h>
 #include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_dg_vector.templates.h>
+
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN

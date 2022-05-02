@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,12 +59,12 @@ mass_operator(const MatrixFree<dim, Number> &              data,
     {
       fe_eval.reinit(cell);
       fe_eval.read_dof_values(src);
-      fe_eval.evaluate(true, false, false);
+      fe_eval.evaluate(EvaluationFlags::values);
       for (unsigned int q = 0; q < n_q_points; ++q)
         {
           fe_eval.submit_value(fe_eval.get_value(q), q);
         }
-      fe_eval.integrate(true, false);
+      fe_eval.integrate(EvaluationFlags::values);
       fe_eval.distribute_local_to_global(dst);
     }
 }
@@ -75,7 +75,7 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
 public:
-  typedef VectorizedArray<Number> vector_t;
+  using vector_t = VectorizedArray<Number>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};
@@ -102,7 +102,7 @@ template <int dim, int fe_degree>
 void
 test(const FiniteElement<dim> &fe, const unsigned int n_iterations)
 {
-  typedef double number;
+  using number = double;
 
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -166,17 +166,18 @@ main()
     test<2, 2>(FE_Q<2>(2), 34);
     test<2, 2>(FE_DGQ<2>(2), 6);
     test<2, 4>(FE_Q<2>(4), 56);
-    test<2, 4>(FE_Q<2>(QIterated<1>(QTrapez<1>(), 4)), 75);
+    test<2, 4>(FE_Q<2>(QIterated<1>(QTrapezoid<1>(), 4)), 75);
     test<2, 4>(FE_DGQ<2>(4), 18);
     test<2, 4>(FE_Q_Hierarchical<2>(4), 736);
     test<2, 6>(FE_Q<2>(6), 77);
-    test<2, 6>(FE_Q<2>(QIterated<1>(QTrapez<1>(), 6)), 161);
+    test<2, 6>(FE_Q<2>(QIterated<1>(QTrapezoid<1>(), 6)), 161);
     test<2, 6>(FE_DGQ<2>(6), 32);
-    test<2, 6>(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(), 6)), 38);
+    test<2, 6>(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapezoid<1>(), 6)), 38);
     test<2, 10>(FE_Q<2>(10), 108);
-    test<2, 10>(FE_Q<2>(QIterated<1>(QTrapez<1>(), 10)), 782);
+    test<2, 10>(FE_Q<2>(QIterated<1>(QTrapezoid<1>(), 10)), 782);
     test<2, 10>(FE_DGQ<2>(10), 70);
-    test<2, 10>(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(), 10)), 118);
+    test<2, 10>(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapezoid<1>(), 10)),
+                118);
     test<2, 16>(FE_Q<2>(16), 156);
     test<2, 25>(FE_Q<2>(25), 200);
     deallog.pop();
@@ -184,7 +185,7 @@ main()
     test<3, 1>(FE_Q<3>(1), 37);
     test<3, 2>(FE_Q<3>(2), 80);
     test<3, 5>(FE_Q<3>(5), 187);
-    test<3, 5>(FE_Q<3>(QIterated<1>(QTrapez<1>(), 5)), 494);
+    test<3, 5>(FE_Q<3>(QIterated<1>(QTrapezoid<1>(), 5)), 494);
     deallog.pop();
   }
 }

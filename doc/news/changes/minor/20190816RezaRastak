@@ -1,4 +1,0 @@
-Fixed: Forward declarations in header files are prevented from confusing
-doxygen.
-<br>
-(Reza Rastak, 2019/08/16)

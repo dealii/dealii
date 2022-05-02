@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,7 +25,7 @@
 
 using namespace Polynomials;
 
-typedef std::vector<Polynomial<double>> PolVector;
+using PolVector = std::vector<Polynomial<double>>;
 
 
 void
@@ -37,14 +37,14 @@ print_2d(const AnisotropicPolynomials<2> &aniso)
       deallog << std::endl;
       for (unsigned int j = 0; j <= M; ++j)
         {
-          deallog << 1. * i / N << " " << 1. * j / M << " ";
+          deallog << 1. * i / N << ' ' << 1. * j / M << ' ';
           for (unsigned int k = 0; k < aniso.n(); ++k)
             deallog << aniso.compute_value(k, Point<2>(1. * i / N, 1. * j / M))
-                    << " ";
+                    << ' ';
           deallog << std::endl;
           for (unsigned int k = 0; k < aniso.n(); ++k)
             deallog << aniso.compute_grad(k, Point<2>(1. * i / N, 1. * j / M))
-                    << " ";
+                    << ' ';
           deallog << std::endl;
         }
     }
@@ -88,16 +88,16 @@ print_3d(const AnisotropicPolynomials<3> &aniso)
           deallog << std::endl;
           for (unsigned int k = 0; k <= P; ++k)
             {
-              deallog << 1. * i / N << " " << 1. * j / M << " " << 1. * k / P;
+              deallog << 1. * i / N << ' ' << 1. * j / M << ' ' << 1. * k / P;
               for (unsigned int k = 0; k < aniso.n(); ++k)
                 deallog << aniso.compute_value(
                              k, Point<3>(1. * i / N, 1. * j / M, 1. * k / P))
-                        << " ";
+                        << ' ';
               deallog << std::endl;
               for (unsigned int k = 0; k < aniso.n(); ++k)
                 deallog << aniso.compute_grad(
                              k, Point<3>(1. * i / N, 1. * j / M, 1. * k / P))
-                        << " ";
+                        << ' ';
               deallog << std::endl;
             }
         }

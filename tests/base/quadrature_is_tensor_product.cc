@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,8 +50,9 @@ print_is_tensor_product()
   deallog << "QSimpson<" << dim << ">: " << q_5.is_tensor_product()
           << std::endl;
 
-  QTrapez<dim> q_6;
-  deallog << "QTrapez<" << dim << ">: " << q_6.is_tensor_product() << std::endl;
+  QTrapezoid<dim> q_6;
+  deallog << "QTrapezoid<" << dim << ">: " << q_6.is_tensor_product()
+          << std::endl;
 
   QMilne<dim> q_7;
   deallog << "QMilne<" << dim << ">: " << q_7.is_tensor_product() << std::endl;

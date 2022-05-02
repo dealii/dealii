@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,8 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/tensor.h>
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_update_flags.h>
 
@@ -64,6 +66,7 @@ namespace DataPostprocessorInputs
    * then the @p normal_vectors member variable does not contain anything
    * useful.
    *
+   *
    * <h4>Cell access</h4>
    *
    * DataPostprocessor is typically called from classes such as DataOut
@@ -78,14 +81,12 @@ namespace DataPostprocessorInputs
    *
    * However, the situation is not so simple. This is because the current
    * class (and those derived from it) only knows the space dimension in
-   * which the output lives. But this can come from many sources. First,
-   * the cell may be a cell in a DoFHandler or hp::DoFHandler object.
-   * Second, if we are in 3d, this may be because we are working on a
-   * DoFHandler<3>, or a DoFHandler<2,3> (i.e., either a 3d mesh, or a
-   * 2d meshes of a 2d surface embedded in 3d space). Finally, if one
-   * considers classes such as DataOutRotation or DataOutStack, then
-   * @p spacedim being equal to 3 might mean that we are actually
-   * working on a DoFHandler<2> or hp::DoFHandler<2>.
+   * which the output lives. But this can come from many sources. For example,
+   * if we are in 3d, this may be because we are working on a DoFHandler<3> or
+   * a DoFHandler<2,3> (i.e., either a 3d mesh, or a 2d meshes of a 2d surface
+   * embedded in 3d space). Another case is classes like DataOutRotation or
+   * DataOutStack, then @p spacedim being equal to 3 might mean that we are
+   * actually working on a DoFHandler<2>.
    *
    * In other words, just because we know the value of the @p spacedim
    * template argument of the current class does not mean that the
@@ -101,18 +102,16 @@ namespace DataPostprocessorInputs
    * To make this work, the DataOut and related classes store in objects
    * of the current type a representation of the cell. To get it back out,
    * you would use the get_cell() function that requires you to say,
-   * as a template parameter, the DoFHandler type to which the cell that
-   * is currently being processed belongs. This is knowledge you typically
-   * have in an application: for example, if your application runs in
-   * @p dim space dimensions, uses a hp::DoFHandler, and you are currently
-   * using the DataOut class, then the cells that are worked on have data
-   * type <code>DataOut<dim>::cell_iterator</code>. Consequently, in a
-   * postprocessor, you can call
-   * <code>inputs.get_cell@<hp::DoFHandler@<dim@> @> </code>. For technical
-   * reasons, however, C++ will typically require you to write this as
-   * <code>inputs.template get_cell@<DoFHandler@<dim@> @> </code>
-   * because the member function we call here requires that we explicitly
-   * provide the template argument.
+   * as a template parameter, the dimension of the cell that is currently
+   * being processed. This is knowledge you typically have in an
+   * application: for example, if your application runs in @p dim space
+   * dimensions and you are currently using the DataOut class, then the cells
+   * that are worked on have data type <code>DataOut<dim>::cell_iterator</code>.
+   * Consequently, in a postprocessor, you can call <code>inputs.get_cell@<dim@>
+   * </code>. For technical reasons, however, C++ will typically require you to
+   * write this as <code>inputs.template get_cell@<dim@> </code> because the
+   * member function we call here requires that we explicitly provide the
+   * template argument.
    *
    * Let us consider a complete example of a postprocessor that computes
    * the fluid norm of the stress $\|\sigma\| = \|\eta \nabla u\|$ from the
@@ -123,7 +122,7 @@ namespace DataPostprocessorInputs
    * DataPostprocessor::evaluate_vector_field() function that receives the
    * values and gradients of the velocity (plus of other solution variables such
    * as the pressure, but let's ignore those for the moment). Then we could use
-   * code such as this, assuming that we use a hp::DoFHandler:
+   * code such as this:
    * @code
    *   template <int dim>
    *   class ComputeStress : public DataPostprocessorScalar<dim>
@@ -132,12 +131,12 @@ namespace DataPostprocessorInputs
    *       ... // overload other necessary member variables
    *       virtual
    *       void
-   *       evaluate_vector_field(
-   *         const DataPostprocessorInputs::Vector<dim> &input_data,
-   *         std::vector<Vector<double> > &computed_quantities) const
+   *       evaluate_vector_field
+   *       (const DataPostprocessorInputs::Vector<dim> &input_data,
+   *        std::vector<Vector<double> > &computed_quantities) const override
    *       {
-   *         const typename hp::DoFHandler<dim>::cell_iterator current_cell =
-   *           input_data.template get_cell<hp::DoFHandler<dim> >();
+   *         const typename DoFHandler<dim>::cell_iterator current_cell =
+   *           input_data.template get_cell<dim>();
    *         const viscosity = look_up_viscosity (current_cell->material_id());
    *
    *         for (unsigned int q=0; q<input_data.solution_gradients.size(); ++q)
@@ -147,11 +146,57 @@ namespace DataPostprocessorInputs
    *   };
    * @endcode
    *
-   * @author Wolfgang Bangerth, 2016
+   *
+   * <h4>Face access</h4>
+   *
+   * When a DataPostprocessor object is used for output via the DataOutFaces
+   * class, it is sometimes necessary to also know which face is currently
+   * being worked on. Like accessing the cell as shown above, postprocessors
+   * can then query the face number via the CommonInputs::get_face_number()
+   * function. An example postprocessor that ignores its input and
+   * only puts the @ref GlossBoundaryIndicator "Boundary indicator"
+   * into the output file would then look as follows:
+   * @code
+   * template <int dim>
+   * class BoundaryIds : public DataPostprocessorScalar<dim>
+   * {
+   * public:
+   *   BoundaryIds()
+   *     : DataPostprocessorScalar<dim>("boundary_id", update_quadrature_points)
+   *   {}
+   *
+   *
+   *   virtual void
+   *   evaluate_scalar_field(
+   *     const DataPostprocessorInputs::Scalar<dim> &inputs,
+   *     std::vector<Vector<double>> &computed_quantities) const override
+   *   {
+   *     AssertDimension(computed_quantities.size(),
+   *                     inputs.solution_values.size());
+   *
+   *     // Get the cell and face we are currently dealing with:
+   *     const typename DoFHandler<dim>::active_cell_iterator cell =
+   *       inputs.template get_cell<dim>();
+   *     const unsigned int face = inputs.get_face_number();
+   *
+   *     // Then fill the output fields with the boundary_id of the face
+   *     for (auto &output : computed_quantities)
+   *       {
+   *         AssertDimension(output.size(), 1);
+   *         output(0) = cell->face(face)->boundary_id();
+   *       }
+   *   }
+   * };
+   * @endcode
    */
   template <int spacedim>
   struct CommonInputs
   {
+    /**
+     * Constructor.
+     */
+    CommonInputs();
+
     /**
      * An array of vectors normal to the faces of cells, evaluated at the points
      * at which we are generating graphical output. This array is only used by
@@ -192,8 +237,39 @@ namespace DataPostprocessorInputs
      * called by DataOut and similar classes when creating the object that
      * is then passed to DataPostprocessor.
      */
-    template <typename DoFHandlerType>
+    template <int dim>
     void
+    set_cell(const typename DoFHandler<dim, spacedim>::cell_iterator &cell);
+
+    /**
+     * Set the cell and face number that is currently being used in evaluating
+     * the data for which the DataPostprocessor object is being called. Given
+     * that a face is required, this function is meant to be called by a class
+     * such as DataOutFaces.
+     *
+     * This function is not usually called from user space, but is instead
+     * called by DataOutFaces and similar classes when creating the object that
+     * is then passed to DataPostprocessor.
+     */
+    template <int dim>
+    void
+    set_cell_and_face(
+      const typename DoFHandler<dim, spacedim>::cell_iterator &cell,
+      const unsigned int                                       face_number);
+
+    /**
+     * Set the cell that is currently being used in evaluating the data
+     * for which the DataPostprocessor object is being called.
+     *
+     * This function is not usually called from user space, but is instead
+     * called by DataOut and similar classes when creating the object that
+     * is then passed to DataPostprocessor.
+     *
+     * @deprecated Use the equivalent function with the dim template parameter
+     * instead.
+     */
+    template <typename DoFHandlerType>
+    DEAL_II_DEPRECATED void
     set_cell(const typename DoFHandlerType::cell_iterator &cell);
 
     /**
@@ -201,9 +277,33 @@ namespace DataPostprocessorInputs
      * See the documentation of the current class for an example on how
      * to use this function.
      */
-    template <typename DoFHandlerType>
-    typename DoFHandlerType::cell_iterator
+    template <int dim>
+    typename DoFHandler<dim, spacedim>::cell_iterator
     get_cell() const;
+
+    /**
+     * Query the cell on which we currently produce graphical output.
+     * See the documentation of the current class for an example on how
+     * to use this function.
+     *
+     * @deprecated Use the equivalent function with the dim template parameter
+     * instead.
+     */
+    template <typename DoFHandlerType>
+    DEAL_II_DEPRECATED typename DoFHandlerType::cell_iterator
+    get_cell() const;
+
+    /**
+     * Query the face number on which we currently produce graphical output.
+     * See the documentation of the current class for an example on how
+     * to use the related get_cell() function that is meant to query the cell
+     * currently being worked on.
+     *
+     * This function is intended for use when producing graphical output on
+     * faces, for example through the DataOutFaces class.
+     */
+    unsigned int
+    get_face_number() const;
 
   private:
     /**
@@ -214,6 +314,12 @@ namespace DataPostprocessorInputs
      * get_cell().
      */
     boost::any cell;
+
+    /**
+     * The place where set_cell_and_face() stores the number of the face
+     * being worked on.
+     */
+    unsigned int face_number;
   };
 
   /**
@@ -231,8 +337,6 @@ namespace DataPostprocessorInputs
    * makes available access to the locations of evaluations points,
    * normal vectors (if appropriate), and which cell data is currently
    * being evaluated on (also if appropriate).
-   *
-   * @author Wolfgang Bangerth, 2016
    */
   template <int spacedim>
   struct Scalar : public CommonInputs<spacedim>
@@ -304,14 +408,13 @@ namespace DataPostprocessorInputs
    * and `solution_hessians` fields: First the gradients/Hessians of
    * the real components, then all the gradients/Hessians of the
    * imaginary components. There is more information about the subject in the
-   * documentation of the DataPostprocessor class itself.
+   * documentation of the DataPostprocessor class itself. step-58 provides an
+   * example of how this class is used in a complex-valued situation.
    *
    * Through the fields in the CommonInputs base class, this class also
    * makes available access to the locations of evaluations points,
    * normal vectors (if appropriate), and which cell data is currently
    * being evaluated on (also if appropriate).
-   *
-   * @author Wolfgang Bangerth, 2016
    */
   template <int spacedim>
   struct Vector : public CommonInputs<spacedim>
@@ -379,11 +482,12 @@ namespace DataPostprocessorInputs
  * and possibly the first and second derivatives of the solution. Examples are
  * the calculation of Mach numbers from velocity and density in supersonic
  * flow computations, or the computation of the magnitude of a complex-valued
- * solution as demonstrated in step-29. Other uses are shown in step-32 and
- * step-33. This class offers the interface to perform such postprocessing.
- * Given the values and derivatives of the solution at those points where we
- * want to generated output, the functions of this class can be overloaded to
- * compute new quantities.
+ * solution as demonstrated in step-29 and step-58 (where it is actually
+ * the *square* of the magnitude). Other uses are shown in
+ * step-32 and step-33. This class offers the interface to perform such
+ * postprocessing. Given the values and derivatives of the solution at those
+ * points where we want to generated output, the functions of this class can be
+ * overloaded to compute new quantities.
  *
  * A data vector and an object of a class derived from the current one can be
  * given to the DataOut::add_data_vector() function (and similarly for
@@ -454,11 +558,11 @@ namespace DataPostprocessorInputs
  *
  * <h3>Complex-valued solutions</h3>
  *
- * There are PDEs whose solutions are complex-valued. For example, step-62
- * solves a problem whose solution at each point consists of a complex number
- * represented by a `std::complex<double>` variable. (step-29 also solves such
- * a problem, but there we choose to represent the solution by two real-valued
- * fields.) In such cases, the vector that is handed to
+ * There are PDEs whose solutions are complex-valued. For example, step-58 and
+ * step-62 solve problems whose solutions at each point consists of a complex
+ * number represented by a `std::complex<double>` variable. (step-29 also solves
+ * such a problem, but there we choose to represent the solution by two
+ * real-valued fields.) In such cases, the vector that is handed to
  * DataOut::build_patches() is of type `Vector<std::complex<double>>`, or
  * something essentially equivalent to this. The issue with this, as also
  * discussed in the documentation of DataOut itself, is that the most widely
@@ -490,9 +594,10 @@ namespace DataPostprocessorInputs
  *   parts of all solution components, and then the values (or gradients,
  *   or Hessians) of the imaginary parts of all solution components.
  *
+ * step-58 provides an example of how this class (or, rather, the derived
+ * DataPostprocessorScalar class) is used in a complex-valued situation.
  *
  * @ingroup output
- * @author Tobias Leicht, 2007; Wolfgang Bangerth, 2016, 2019
  */
 template <int dim>
 class DataPostprocessor : public Subscriptor
@@ -605,13 +710,19 @@ public:
  * DataPostprocessor::evaluate_vector_field() as discussed in the
  * DataPostprocessor class's documentation.
  *
- * An example of how this class can be used can be found in step-29.
+ * An example of how this class can be used can be found in step-29 for the case
+ * where we are interested in computing the magnitude (a scalar) of a
+ * complex-valued solution. While in step-29, the solution vector consists of
+ * separate real and imaginary parts of the solution, step-58 computes the
+ * solution vector as a vector with complex entries and the
+ * DataPostprocessorScalar class is used there to compute the magnitude and
+ * phase of the solution in a different way there.
+ *
  * An example of how the closely related DataPostprocessorVector
  * class can be used is found in the documentation of that class.
  * The same is true for the DataPostprocessorTensor class.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2011
  */
 template <int dim>
 class DataPostprocessorScalar : public DataPostprocessor<dim>
@@ -695,7 +806,9 @@ private:
  * <h3> An example </h3>
  *
  * A common example of what one wants to do with postprocessors is to visualize
- * not just the value of the solution, but the gradient. Let's, for simplicity,
+ * not just the value of the solution, but the gradient. This is, in fact,
+ * precisely what step-19 needs, and it consequently uses the code below almost
+ * verbatim. Let's, for simplicity,
  * assume that you have only a scalar solution. In fact, because it's readily
  * available, let us simply take the step-6 solver to produce such a scalar
  * solution. The gradient is a vector (with exactly @p dim components), so the
@@ -718,9 +831,9 @@ private:
  *
  *   virtual
  *   void
- *   evaluate_scalar_field(
- *     const DataPostprocessorInputs::Scalar<dim> &input_data,
- *     std::vector<Vector<double> >               &computed_quantities) const
+ *   evaluate_scalar_field
+ *   (const DataPostprocessorInputs::Scalar<dim> &input_data,
+ *    std::vector<Vector<double> > &computed_quantities) const override
  *   {
  *     // ensure that there really are as many output slots
  *     // as there are points at which DataOut provides the
@@ -804,9 +917,9 @@ private:
  *
  *   virtual
  *   void
- *   evaluate_scalar_field(
- *     const DataPostprocessorInputs::Scalar<dim> &input_data,
- *     std::vector<Vector<double> >               &computed_quantities) const
+ *   evaluate_scalar_field
+ *   (const DataPostprocessorInputs::Scalar<dim> &input_data,
+ *    std::vector<Vector<double> > &computed_quantities) const override
  *   {
  *     AssertDimension (input_data.solution_gradients.size(),
  *                      computed_quantities.size());
@@ -854,7 +967,6 @@ private:
  *
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2011, 2017
  */
 template <int dim>
 class DataPostprocessorVector : public DataPostprocessor<dim>
@@ -980,9 +1092,9 @@ private:
  *
  *     virtual
  *     void
- *     evaluate_vector_field(
- *       const DataPostprocessorInputs::Vector<dim> &input_data,
- *       std::vector<Vector<double> >               &computed_quantities) const
+ *     evaluate_vector_field
+ *     (const DataPostprocessorInputs::Vector<dim> &input_data,
+ *      std::vector<Vector<double> > &computed_quantities) const override
  *     {
  *       // ensure that there really are as many output slots
  *       // as there are points at which DataOut provides the
@@ -1070,9 +1182,9 @@ private:
  *
  *     virtual
  *     void
- *     evaluate_vector_field(
- *       const DataPostprocessorInputs::Vector<dim> &input_data,
- *       std::vector<Vector<double> >               &computed_quantities) const
+ *     evaluate_vector_field
+ *     (const DataPostprocessorInputs::Vector<dim> &input_data,
+ *      std::vector<Vector<double> > &computed_quantities) const override
  *     {
  *       AssertDimension (input_data.solution_gradients.size(),
  *                        computed_quantities.size());
@@ -1103,7 +1215,6 @@ private:
  * in simple cases, the Lam&eacute; constants.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2017
  */
 template <int dim>
 class DataPostprocessorTensor : public DataPostprocessor<dim>
@@ -1174,16 +1285,45 @@ namespace DataPostprocessorInputs
   CommonInputs<spacedim>::set_cell(
     const typename DoFHandlerType::cell_iterator &new_cell)
   {
+    return set_cell<DoFHandlerType::dimension>(new_cell);
+  }
+
+
+
+  template <int spacedim>
+  template <int dim>
+  void
+  CommonInputs<spacedim>::set_cell(
+    const typename DoFHandler<dim, spacedim>::cell_iterator &new_cell)
+  {
     // see if we had previously already stored a cell that has the same
     // data type; if so, reuse the memory location and avoid calling 'new'
     // inside boost::any
-    if (typename DoFHandlerType::cell_iterator *storage_location =
-          boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell))
+    if (typename DoFHandler<dim, spacedim>::cell_iterator *storage_location =
+          boost::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
+            &cell))
       *storage_location = new_cell;
     else
       // if we had nothing stored before, or if we had stored a different
       // data type, just let boost::any replace things
       cell = new_cell;
+
+    // Also reset the face number, just to make sure nobody
+    // accidentally uses an outdated value.
+    face_number = numbers::invalid_unsigned_int;
+  }
+
+
+
+  template <int spacedim>
+  template <int dim>
+  void
+  CommonInputs<spacedim>::set_cell_and_face(
+    const typename DoFHandler<dim, spacedim>::cell_iterator &new_cell,
+    const unsigned int                                       new_face_number)
+  {
+    set_cell<dim>(new_cell);
+    face_number = new_face_number;
   }
 
 
@@ -1193,23 +1333,35 @@ namespace DataPostprocessorInputs
   typename DoFHandlerType::cell_iterator
   CommonInputs<spacedim>::get_cell() const
   {
+    return get_cell<DoFHandlerType::dimension>();
+  }
+
+
+
+  template <int spacedim>
+  template <int dim>
+  typename DoFHandler<dim, spacedim>::cell_iterator
+  CommonInputs<spacedim>::get_cell() const
+  {
     Assert(cell.empty() == false,
            ExcMessage(
              "You are trying to access the cell associated with a "
              "DataPostprocessorInputs::Scalar object for which no cell has "
              "been set."));
-    Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) !=
-             nullptr,
+    Assert((boost::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
+              &cell) != nullptr),
            ExcMessage(
              "You are trying to access the cell associated with a "
-             "DataPostprocessorInputs::Scalar with a DoFHandler type that "
-             "is different from the type with which it has been set. For "
-             "example, if the cell for which output is currently being "
-             "generated belongs to a hp::DoFHandler<2,3> object, then you can "
-             "only call the current function with a template argument "
-             "equal to hp::DoFHandler<2,3>, but not with any other class "
-             "type or dimension template argument."));
-    return boost::any_cast<typename DoFHandlerType::cell_iterator>(cell);
+             "DataPostprocessorInputs::Scalar with a DoFHandler type that is "
+             "different from the type with which it has been set. For example, "
+             "if the cell for which output is currently being generated "
+             "belongs to a DoFHandler<2, 3> object, then you can only call the "
+             "current function with a template argument equal to "
+             "DoFHandler<2, 3>, but not with any other class type or dimension "
+             "template argument."));
+
+    return boost::any_cast<typename DoFHandler<dim, spacedim>::cell_iterator>(
+      cell);
   }
 } // namespace DataPostprocessorInputs
 

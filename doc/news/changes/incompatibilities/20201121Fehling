@@ -1,0 +1,30 @@
+Deprecated: The template arguments of the following classes have been
+changed to avoid the legacy argument `DoFHandlerType`:
+<ul>
+  <li> `SolutionTransfer<dim, VectorType, DoFHandlerType> -> SolutionTransfer<dim, VectorType, spacedim>`
+  <li> `parallel::distributed::SolutionTransfer<dim, VectorType, DoFHandlerType> -> parallel::distributed::SolutionTransfer<dim, VectorType, spacedim>`
+  <li> `Functions::FEFieldFunction<dim, DoFHandlerType, VectorType> -> Functions::FEFieldFunction<dim, VectorType, spacedim>`
+  <li> `DataOut<dim, DoFHandlerType> -> DataOut<dim, spacedim>`
+  <li> `DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim> -> DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>`
+  <li> `DataOutFaces<dim, DoFHandlerType> -> DataOutFaces<dim, spacedim>`
+  <li> `DataOutRotation<dim, DoFHandlerType> -> DataOutRotation<dim, spacedim>`
+</ul>
+Please change your code accordingly.
+<br>
+If for some reason, you need a code that is compatible with deal.II
+9.3 and the subsequent release, a Legacy namespace has been introduced
+with aliases of these classes with their original interface. You can
+make the following substitutions to your code for each of the affected
+classes:
+<ul>
+  <li>X &rarr; Legacy::X
+</ul>
+To perform this substitution automatically, you may use a *search and
+replace* script like the following made for the *bash* shell:
+@code{.sh}
+classes=(SolutionTransfer parallel::distributed::SolutionTransfer Functions::FEFieldFunction DataOut DataOut_DoFData DataOutFaces DataOutRotation)
+for c in \${classes[@]}; do
+  find /path/to/your/code -type f -exec sed -i -E "/(\w\${c}|\${c}[^<]|Particles::\${c}|distributed::\${c}|^\s*(\/\/|\*))/! s/\${c}/Legacy::\${c}/g" {} \;
+done
+@endcode
+(Marc Fehling, 2020/11/21)

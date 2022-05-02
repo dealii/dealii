@@ -155,7 +155,7 @@ In other words, we end up with what is in essence a system of two
 coupled Laplace equations for $u,v$, each with Dirichlet-type boundary
 conditions. We know how to solve such problems, and it should not be
 very difficult to construct good solvers and preconditioners for this
-system either using the techniques of step-20 and step-22. So this
+system either using the techniques of step-20 or step-22. So this
 case is pretty simple to deal with.
 
 @note It is worth pointing out that this only works for domains whose
@@ -216,6 +216,10 @@ this scheme for the biharmonic equation is typically called the $C^0$ IP
 (or C0IP) method, since it uses $C^0$ (continuous but not continuously
 differentiable) shape functions with an interior penalty formulation.
 
+It is worth noting that the C0IP method is not the only one that has
+been developed for the biharmonic equation. step-82 shows an
+alternative method.
+
 
 <h3> Derivation of the C0IP method </h3>
 
@@ -230,7 +234,10 @@ As mentioned, this method relies on the use of $C^0$ Lagrange finite
 elements where the $C^1$ continuity requirement is relaxed and has
 been replaced with interior penalty techniques. To derive this method,
 we consider a $C^0$ shape function $v_h$ which vanishes on
-$\partial\Omega$. Since the higher order derivatives of $v_h$ have two
+$\partial\Omega$. We introduce notation $ \mathbb{F} $ as the set of
+all faces of $\mathbb{T}$, $ \mathbb{F}^b $ as the set of boundary faces,
+and $ \mathbb{F}^i $ as the set of interior faces for use further down below.
+Since the higher order derivatives of $v_h$ have two
 values on each interface $e\in \mathbb{F}$ (shared by the two cells
 $K_{+},K_{-} \in \mathbb{T}$), we cope with this discontinuity by
 defining the following single-valued functions on $e$:

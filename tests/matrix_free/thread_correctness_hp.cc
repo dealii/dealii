@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018-2014 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,13 +16,14 @@
 
 
 // this function tests the correctness of the implementation of parallel
-// matrix free matrix-vector products for hp elements by comparing to the
+// matrix free matrix-vector products for hp-elements by comparing to the
 // serial version
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/template_constraints.h>
 
-#include <deal.II/hp/dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/hp/fe_values.h>
 
 #include "../tests.h"
@@ -114,12 +115,11 @@ do_test(const unsigned int parallel_option)
       quadrature_collection_mf.push_back(QGauss<1>(deg + 1));
     }
 
-  hp::DoFHandler<dim> dof(tria);
+  DoFHandler<dim> dof(tria);
   // set the active FE index in a random order
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator cell =
-                                                         dof.begin_active(),
-                                                       endc = dof.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
+                                                   endc = dof.end();
     for (; cell != endc; ++cell)
       {
         const unsigned int fe_index = Testing::rand() % max_degree;

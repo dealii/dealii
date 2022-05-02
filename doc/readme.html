@@ -7,7 +7,7 @@
     <title>The deal.II Readme</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <link href="screen.css" rel="StyleSheet" />
-    <meta name="copyright" content="Copyright (C) 1998 - 2019 by the deal.II Authors" />
+    <meta name="copyright" content="Copyright (C) 1998 - 2021 by the deal.II Authors" />
     <meta name="keywords" content="deal.II" />
 </head>
 
@@ -53,17 +53,23 @@
     <h3>Supported platforms</h3>
 
     <p>
-        <acronym>deal.II</acronym> is mostly developed on Linux using the
-        <a href="http://gcc.gnu.org">GCC</a> compiler. However, it is not platform specific and we strive to keep the source code compliant with the <a href="https://www.iso.org/standard/50372.html">C++ 2011
-  Standard</a> (see also <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf">here</a> for a copy of the C++11 standard).
+      <acronym>deal.II</acronym> is mostly developed on Linux using the
+      <a href="http://gcc.gnu.org">GCC</a> compiler. However, it is
+      not platform specific and we strive to keep the source code
+      compliant with
+      the <a href="https://en.cppreference.com/w/cpp/links">C++ 2014
+      Standard</a> (see
+      also <a href="https://github.com/cplusplus/draft/blob/master/papers/n4140.pdf?raw=true">here</a>
+      for PDFs of the various C++ standards).
     </p>
 
     <p>
         <acronym>deal.II</acronym> supports at least the following platforms:
     </p>
     <ul>
-        <li>GNU/Linux: GCC version 4.9 or later; Clang version 4.0 or later; ICC versions 15 or later</li>
-        <li>Mac OS X: GCC version 4.9 or later; Clang version 4.0 or later. Please see the <a href="https://github.com/dealii/dealii/wiki/MacOSX" target="_top">deal.II Wiki</a> for installation instructions.</li>
+        <li>GNU/Linux: GCC version 5.0 or later; Clang version 4.0 or later; ICC versions 15 or later</li>
+        <li>Mac OS X: GCC version 5.0 or later; Clang version 4.0 or later; <a href="https://en.wikipedia.org/wiki/Xcode#Xcode_7.0_-_11.x_(since_Free_On-Device_Development)">Apple Clang version 9.0</a>  or later.
+            Please see the <a href="https://github.com/dealii/dealii/wiki/MacOSX" target="_top">deal.II Wiki</a> for installation instructions.</li>
         <li>Windows: experimental support for Visual Studio 2017. Please have a look at the
             <a href="https://github.com/dealii/dealii/wiki/Frequently-Asked-Questions#can-i-use-dealii-on-a-windows-platform">
       FAQ</a> and at the <a href="https://github.com/dealii/dealii/wiki/Windows" target="_top">deal.II Wiki</a> for more information and alternative solutions.</li>
@@ -84,7 +90,7 @@
     </p>
     <ul>
         <li>
-            <a href="http://www.cmake.org/" target="_top">CMake</a> version 2.8.12 or later
+            <a href="http://www.cmake.org/" target="_top">CMake</a> version 3.3.0 or later
         </li>
 
         <li>
@@ -321,7 +327,7 @@
         <li>
             <p>
                 <i>Threading</i>: By default, deal.II supports parallelism between multiple cores on the same machine using threads and a task-based model built on the
-                <a href="http://threadingbuildingblocks.org/" target="_top">Threading Building Blocks</a>. You can switch threading off by passing the <code>-DDEAL_II_WITH_THREADS=OFF</code> argument to <code>cmake</code>.
+                <a href="http://threadingbuildingblocks.org/" target="_top">Threading Building Blocks</a>. You can switch threading inside the library off by passing the <code>-DDEAL_II_WITH_TBB=OFF</code> argument to <code>cmake</code>.
             </p>
         </li>
 
@@ -330,7 +336,7 @@
                 <i>MPI</i>: To enable parallel computations beyond a single node using the <a href="http://mpi-forum.org/" target="_top">Message
 	  Passing Interface (MPI)</a>, pass the
                 <code>-DDEAL_II_WITH_MPI=ON</code> argument to <code>cmake</code>. If <code>cmake</code> found MPI but you specifically do not want to use it, then pass <code>-DDEAL_II_WITH_MPI=OFF</code>.
-                The minimal supported version is MPI-2.0.
+                The minimal supported version is MPI-3.0.
             </p>
         </li>
 
@@ -401,6 +407,15 @@
             </p>
         </dd>
 
+        <dt><a name="ArborX"/>
+            <a href="https://github.com/arborx/ArborX" target="_top">ArborX</a></dt>
+        <dd>
+            <p>
+                <a href="https://github.com/arborx/ArborX" target="_top">ArborX</a> is an open-source library designed to provide performance portable algorithms for geometric search, similarly to nanoflann and Boost Geometry.
+                To use a self compiled version, pass <code>-DARBORX_DIR=/path/to/arborx</code> to the deal.II CMake call. To use <a href="https://github.com/arborx/ArborX" target="_top">ArborX</a>, deal.II needs to be configured with <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a> support.
+            </p>
+        </dd>
+
         <dt><a name="ARPACK"/>
 	<a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a></dt>
         <dd>
@@ -437,6 +452,32 @@
                 (You might have to install development versions of the libraries for <acronym>deal.II</acronym> being able to use them). For details on how to set up <acronym>deal.II</acronym> with a non standard BLAS/LAPACK implementation, see the
                 <a href="users/cmake_dealii.html#advanced">advanced
             setup</a> section in the CMake ReadME.
+            </p>
+        </dd>
+
+        <dt><a name="CGAL" />
+            <a href="https://www.cgal.org/" target="_top">CGAL</a>
+        </dt>
+        <dd>
+            <p>
+                <a href="https://www.cgal.org/" target="_top">CGAL</a>
+                is a software project that provides easy access to
+                efficient and reliable geometric algorithms in the form of a C++
+                library. CGAL is used in various areas needing geometric
+                computation, such as geographic information systems, computer
+                aided design, molecular biology, medical imaging, computer
+                graphics, and robotics.
+
+                The library offers data structures and algorithms like
+                triangulations, Voronoi diagrams, Boolean operations on polygons
+                and polyhedra, point set processing, arrangements of curves,
+                surface and volume mesh generation, geometry processing, alpha
+                shapes, convex hull algorithms, shape reconstruction, AABB and
+                KD trees.
+
+                The CGAL Wrappers use c++17 features. In order to use CGAL, add
+                <code>-DCGAL_DIR=/path/to/cgal</code> to the deal.II CMake call,
+                and make sure that <code>DEAL_II_HAVE_CXX17</code> is enabled.
             </p>
         </dd>
 
@@ -498,6 +539,15 @@
                 </p>
             </dd>
 
+            <dt><a name="Kokkos"/>
+                <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a></dt>
+            <dd>
+                <p>
+                    <a href="https://github.com/kokkos/kokkos" target="_top">Kokkos</a> implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms.
+                    To use a self compiled version, pass <code>-DKOKKOS_DIR=/path/to/kokkos</code> to the deal.II CMake call.
+                </p>
+            </dd>
+
 
             <dt><a name="metis"></a><a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview"
 	     target="_top">METIS</a></dt>
@@ -523,28 +573,6 @@
                 <p>
                     <a href="http://muparser.beltoforion.de/">muparser</a> is a library that allows to enter functions in text form and have them interpreted at run time. This is particularly useful in input parameter files. <code>cmake</code> will usually
                     find the version of this library that comes bundled with <acronym>deal.II</acronym>, but you can specify <code>-DMUPARSER_DIR=/path/to/muparser</code> if desired.
-                </p>
-            </dd>
-
-            <dt><a name="nanoflann"/>
-             <a href="https://github.com/jlblancoc/nanoflann" target="_top">nanoflann</a></dt>
-            <dd>
-                <p>
-                    <a href="https://github.com/jlblancoc/nanoflann" target="_top">nanoflann</a> is a C++11 header-only library for building KD-Trees of datasets with different topologies. In particular, it can be used for operations such as finding the
-                    vertex or cell closest to a given evaluation point that occur frequently in many applications using unstructured meshes. scale eigenvalue problems.
-                    <a href="https://github.com/jlblancoc/nanoflann" target="_top">nanoflann</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
-                    <code>-DNANOFLANN_DIR=/path/to/nanoflann</code> to the deal.II CMake call.
-                </p>
-            </dd>
-
-            <dt><a name="netcdf"></a><a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a></dt>
-            <dd>
-                <p>
-                <a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a> is a library that provides services for reading and writing mesh data (and many other things). <acronym>deal.II</acronym> can use it to read meshes via one
-                of the functions of the <code>GridIn</code> class.
-                <a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
-                <code>-DNETCDF_DIR=/path/to/netcdf</code> to <code>cmake</code>.
-                <em>The deal.II NetCDF bindings are only compatible with an obsolete version of NetCDF and will be removed in a future release of the library unless newer bindings are contributed.</em>
                 </p>
             </dd>
 
@@ -605,10 +633,10 @@
             </dd>
 
 
-            <dt><a name="slepc"></a><a href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a></dt>
+            <dt><a name="slepc"></a><a href="https://slepc.upv.es/" target="_top">SLEPc</a></dt>
             <dd>
                 <p>
-                    <a href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a> is a library for eigenvalue computations that builds on PETSc. Its configuration works just like that for PETSc, except that the variable to set is <code>SLEPC_DIR</code>.
+                    <a href="https://slepc.upv.es/" target="_top">SLEPc</a> is a library for eigenvalue computations that builds on PETSc. Its configuration works just like that for PETSc, except that the variable to set is <code>SLEPC_DIR</code>.
                     For the interface with SLEPc to work, <acronym>deal.II</acronym>'s PETSc interface must also be configured correctly (see above).
                 </p>
 

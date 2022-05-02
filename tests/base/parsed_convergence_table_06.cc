@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,6 +29,8 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <deal.II/numerics/vector_tools.h>
+
 #include <map>
 
 #include "../tests.h"
@@ -36,7 +38,7 @@
 int
 main()
 {
-  initlog(1);
+  initlog(true);
 
   ParsedConvergenceTable table({"u", "u", "p"}, {{VectorTools::H1_norm}, {}});
 

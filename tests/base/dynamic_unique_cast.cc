@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,7 @@ void
 test()
 {
   // Create a pointer to D
-  std::unique_ptr<D> d = std_cxx14::make_unique<D>();
+  std::unique_ptr<D> d = std::make_unique<D>();
 
   // See that we can successfully downcast to B
   std::unique_ptr<B> b = Utilities::dynamic_unique_cast<B>(std::move(d));
@@ -58,7 +58,7 @@ void
 invalid_test()
 {
   // Create a pointer to B
-  std::unique_ptr<B> b = std_cxx14::make_unique<B>();
+  std::unique_ptr<B> b = std::make_unique<B>();
 
   // Check that we can indeed not upcast to D:
   try

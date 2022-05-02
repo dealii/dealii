@@ -1,5 +1,0 @@
-Fixed: DoFHandler::distribute_mg_dofs() for distributed triangulations has
-been made up to ten times faster by replacing an inefficient function for the
-exchange of ghosted level degrees of freedom.
-<br>
-(Martin Kronbichler, 2019/09/13)

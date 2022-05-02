@@ -1,0 +1,79 @@
+
+DEAL:0::n_levels:                  3
+DEAL:0::n_cells:                   136
+DEAL:0::n_active_cells:            104
+DEAL:0::has_hanging_nodes:         false
+DEAL:0::
+DEAL:0::n_dofs:                             1089
+DEAL:0::n_locally_owned_dofs:               297
+DEAL:0::has_hanging_nodes:                  false
+DEAL:0::
+DEAL:0::n_levels:                  3
+DEAL:0::n_cells:                   136
+DEAL:0::n_active_cells:            104
+DEAL:0::has_hanging_nodes:         false
+DEAL:0::
+DEAL:0::n_dofs:                             1089
+DEAL:0::n_locally_owned_dofs:               297
+DEAL:0::has_hanging_nodes:                  false
+DEAL:0::
+
+DEAL:1::n_levels:                  3
+DEAL:1::n_cells:                   188
+DEAL:1::n_active_cells:            144
+DEAL:1::has_hanging_nodes:         false
+DEAL:1::
+DEAL:1::n_dofs:                             1089
+DEAL:1::n_locally_owned_dofs:               264
+DEAL:1::has_hanging_nodes:                  false
+DEAL:1::
+DEAL:1::n_levels:                  3
+DEAL:1::n_cells:                   188
+DEAL:1::n_active_cells:            144
+DEAL:1::has_hanging_nodes:         false
+DEAL:1::
+DEAL:1::n_dofs:                             1089
+DEAL:1::n_locally_owned_dofs:               264
+DEAL:1::has_hanging_nodes:                  false
+DEAL:1::
+
+
+DEAL:2::n_levels:                  3
+DEAL:2::n_cells:                   188
+DEAL:2::n_active_cells:            144
+DEAL:2::has_hanging_nodes:         false
+DEAL:2::
+DEAL:2::n_dofs:                             1089
+DEAL:2::n_locally_owned_dofs:               264
+DEAL:2::has_hanging_nodes:                  false
+DEAL:2::
+DEAL:2::n_levels:                  3
+DEAL:2::n_cells:                   188
+DEAL:2::n_active_cells:            144
+DEAL:2::has_hanging_nodes:         false
+DEAL:2::
+DEAL:2::n_dofs:                             1089
+DEAL:2::n_locally_owned_dofs:               264
+DEAL:2::has_hanging_nodes:                  false
+DEAL:2::
+
+
+DEAL:3::n_levels:                  3
+DEAL:3::n_cells:                   136
+DEAL:3::n_active_cells:            104
+DEAL:3::has_hanging_nodes:         false
+DEAL:3::
+DEAL:3::n_dofs:                             1089
+DEAL:3::n_locally_owned_dofs:               264
+DEAL:3::has_hanging_nodes:                  false
+DEAL:3::
+DEAL:3::n_levels:                  3
+DEAL:3::n_cells:                   136
+DEAL:3::n_active_cells:            104
+DEAL:3::has_hanging_nodes:         false
+DEAL:3::
+DEAL:3::n_dofs:                             1089
+DEAL:3::n_locally_owned_dofs:               264
+DEAL:3::has_hanging_nodes:                  false
+DEAL:3::
+

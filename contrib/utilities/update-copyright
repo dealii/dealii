@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2015 - 2016 by the deal.II authors
+## Copyright (C) 2015 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -17,7 +17,7 @@
 
 # Purpose: Update the copyright year of every file based on the last
 #          modification recorded in the git logs
-
+#
 
 if test ! -d source -o ! -d include -o ! -d examples ; then
   echo "*** This script must be run from the top-level directory of deal.II."
@@ -32,10 +32,8 @@ files="
          contrib/utilities/{update-copyright,indent} \
          doc/doxygen/*/*.{h,h.in} \
          doc/doxygen/scripts/{create_anchors,filter,intro2toc,program*,*.pl} \
-         doc/screen.css \
-         examples/*/*.cc \
-         include/deal.II/*/*h \
-         source/*/*.{cc,in})
+         doc/screen.css)
+  $(find include/ source/ examples/ | egrep '\.(h|in|cc|cu)$')
   $(find cmake/ | egrep '\.(cmake|in|cc)$')
   $(find . -name CMakeLists.txt)
   $(find tests/ | egrep '\.(h|cc)$')

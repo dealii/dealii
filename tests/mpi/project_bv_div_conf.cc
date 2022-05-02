@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -203,7 +203,12 @@ namespace ResFlow
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
       VectorTools::project_boundary_values_div_conforming(
-        dof_handler, 0, FluxBoundaryValues<dim>(), 0, constraints);
+        dof_handler,
+        0,
+        FluxBoundaryValues<dim>(),
+        0,
+        constraints,
+        StaticMappingQ1<dim>::mapping);
 
       deallog << "Constraints" << std::endl;
       constraints.print(deallog.get_file_stream());

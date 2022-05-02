@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// like deal.II/matrices, but for hp objects. here, each hp object has only a
+// like deal.II/matrices, but for hp-objects. here, each hp-object has only a
 // single component, so we expect exactly the same output as for the old test.
 // matrices_hp tests for different finite elements
 
@@ -23,6 +23,7 @@
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -34,7 +35,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
@@ -75,7 +75,7 @@ public:
 
 template <int dim>
 void
-check_boundary(const hp::DoFHandler<dim> &       dof,
+check_boundary(const DoFHandler<dim> &           dof,
                const hp::MappingCollection<dim> &mapping)
 {
   MySquareFunction<dim>                               coefficient;
@@ -125,7 +125,7 @@ check_boundary(const hp::DoFHandler<dim> &       dof,
 
 
 void
-check_boundary(const hp::DoFHandler<1> &, const hp::MappingCollection<1> &)
+check_boundary(const DoFHandler<1> &, const hp::MappingCollection<1> &)
 {}
 
 
@@ -150,7 +150,7 @@ check()
   // of one Q1 and one Q2 element
   hp::FECollection<dim> element;
   element.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Q<dim>(2), 1));
-  hp::DoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
   // use a more complicated mapping

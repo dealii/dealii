@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,7 +61,7 @@ test()
   grid_out.set_flags(GridOutFlags::Ucd(true));
   grid_out.write_ucd(tria, deallog.get_file_stream());
 
-  QTrapez<dim>                                     quad;
+  QTrapezoid<dim>                                  quad;
   MappingQ1Eulerian<dim, Vector<double>, spacedim> mapping(shift_dh, shift);
 
   typename Triangulation<dim, spacedim>::active_cell_iterator

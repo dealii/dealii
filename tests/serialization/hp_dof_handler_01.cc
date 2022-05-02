@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,9 +14,10 @@
 // ---------------------------------------------------------------------
 
 
-// check serialization for hp::DoFHandler<dim>
+// check serialization for DoFHandler<dim>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -27,21 +28,19 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include "serialization.h"
 
 namespace dealii
 {
   template <int dim, int spacedim>
   bool
-  operator==(const hp::DoFHandler<dim, spacedim> &t1,
-             const hp::DoFHandler<dim, spacedim> &t2)
+  operator==(const DoFHandler<dim, spacedim> &t1,
+             const DoFHandler<dim, spacedim> &t2)
   {
     // test a few attributes, though we can't
     // test everything unfortunately...
-    typename hp::DoFHandler<dim, spacedim>::cell_iterator c1 = t1.begin(),
-                                                          c2 = t2.begin();
+    typename DoFHandler<dim, spacedim>::cell_iterator c1 = t1.begin(),
+                                                      c2 = t2.begin();
     for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
         for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
@@ -128,8 +127,8 @@ namespace dealii
 
     // also check the order of raw iterators as they contain
     // something about the history of the triangulation
-    typename hp::DoFHandler<dim, spacedim>::cell_iterator r1 = t1.begin(),
-                                                          r2 = t2.begin();
+    typename DoFHandler<dim, spacedim>::cell_iterator r1 = t1.begin(),
+                                                      r2 = t2.begin();
     for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
       {
         if (r1->level() != r2->level())
@@ -155,7 +154,8 @@ do_boundary(Triangulation<dim, spacedim> &t1)
 
 
 template <int spacedim>
-void do_boundary(Triangulation<1, spacedim> &)
+void
+do_boundary(Triangulation<1, spacedim> &)
 {}
 
 
@@ -181,8 +181,8 @@ test()
   fe_collection.push_back(FESystem<dim, spacedim>(
     FE_Q<dim, spacedim>(3), dim, FE_Q<dim, spacedim>(2), 1));
 
-  hp::DoFHandler<dim, spacedim> dof_1(tria);
-  hp::DoFHandler<dim, spacedim> dof_2(tria);
+  DoFHandler<dim, spacedim> dof_1(tria);
+  DoFHandler<dim, spacedim> dof_2(tria);
 
   dof_1.begin_active()->set_active_fe_index(1);
   dof_2.begin_active()->set_active_fe_index(1);
@@ -193,8 +193,8 @@ test()
   dof_1.begin_active()->set_future_fe_index(0);
   dof_2.begin_active()->set_future_fe_index(0);
 
-  (++dof_1.begin_active())->set_future_fe_index(1);
-  (++dof_2.begin_active())->set_future_fe_index(1);
+  (std::next(dof_1.begin_active()))->set_future_fe_index(1);
+  (std::next(dof_2.begin_active()))->set_future_fe_index(1);
 
   // right now, both hp::DoFHandlers are the same. Renumber one of them
   DoFRenumbering::random(dof_1);

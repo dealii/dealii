@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,8 +15,9 @@
 
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials_const.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -203,7 +204,7 @@ template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 TensorProductPolynomialsConst<dim>::clone() const
 {
-  return std_cxx14::make_unique<TensorProductPolynomialsConst<dim>>(*this);
+  return std::make_unique<TensorProductPolynomialsConst<dim>>(*this);
 }
 
 

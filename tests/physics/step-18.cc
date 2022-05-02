@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2017 - 2018 by the deal.II authors
+ * Copyright (C) 2017 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -406,7 +406,7 @@ namespace Step18
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     BodyForce<dim>                       body_force;
     std::vector<Vector<double>>          body_force_values(n_q_points,
-                                                           Vector<double>(dim));
+                                                  Vector<double>(dim));
     typename DoFHandler<dim>::active_cell_iterator cell =
                                                      dof_handler.begin_active(),
                                                    endc = dof_handler.end();
@@ -416,9 +416,10 @@ namespace Step18
           cell_matrix = 0;
           cell_rhs    = 0;
           fe_values.reinit(cell);
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
-              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (const unsigned int i : fe_values.dof_indices())
+            for (const unsigned int j : fe_values.dof_indices())
+              for (const unsigned int q_point :
+                   fe_values.quadrature_point_indices())
                 {
                   const SymmetricTensor<2, dim>
                     eps_phi_i = get_strain(fe_values, i, q_point),
@@ -430,11 +431,12 @@ namespace Step18
             reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
           body_force.vector_value_list(fe_values.get_quadrature_points(),
                                        body_force_values);
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          for (const unsigned int i : fe_values.dof_indices())
             {
               const unsigned int component_i =
                 fe.system_to_component_index(i).first;
-              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+              for (const unsigned int q_point :
+                   fe_values.quadrature_point_indices())
                 {
                   const SymmetricTensor<2, dim> &old_stress =
                     local_quadrature_points_data[q_point].old_stress;
@@ -571,17 +573,18 @@ namespace Step18
           filenames.push_back("solution-" +
                               Utilities::int_to_string(timestep_no, 4) + "." +
                               Utilities::int_to_string(i, 3) + ".vtu");
-        const std::string visit_master_filename =
+        const std::string visit_filename =
           ("solution-" + Utilities::int_to_string(timestep_no, 4) + ".visit");
-        std::ofstream visit_master(visit_master_filename.c_str());
-        DataOutBase::write_visit_record(visit_master, filenames);
-        const std::string pvtu_master_filename =
+        std::ofstream visit_output(visit_filename.c_str());
+        DataOutBase::write_visit_record(visit_output, filenames);
+
+        const std::string pvtu_filename =
           ("solution-" + Utilities::int_to_string(timestep_no, 4) + ".pvtu");
-        std::ofstream pvtu_master(pvtu_master_filename.c_str());
-        data_out.write_pvtu_record(pvtu_master, filenames);
+        std::ofstream pvtu_output(pvtu_filename.c_str());
+        data_out.write_pvtu_record(pvtu_output, filenames);
         static std::vector<std::pair<double, std::string>> times_and_names;
         times_and_names.push_back(
-          std::pair<double, std::string>(present_time, pvtu_master_filename));
+          std::pair<double, std::string>(present_time, pvtu_filename));
         std::ofstream pvd_output("solution.pvd");
         DataOutBase::write_pvd_record(pvd_output, times_and_names);
       }
@@ -607,7 +610,7 @@ namespace Step18
           pcout << (p == 0 ? ' ' : '+')
                 << (GridTools::count_cells_with_subdomain_association(
                      triangulation, p));
-        pcout << ")" << std::endl;
+        pcout << ')' << std::endl;
         setup_system();
         pcout << "    Number of degrees of freedom: " << dof_handler.n_dofs()
               << " (by partition:";
@@ -615,7 +618,7 @@ namespace Step18
           pcout << (p == 0 ? ' ' : '+')
                 << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
                                                                     p));
-        pcout << ")" << std::endl;
+        pcout << ')' << std::endl;
         // Get point at which to output displacement
         // (outer radius of displaced surface)
         {

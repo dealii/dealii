@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,17 +63,11 @@ main(int argc, char **argv)
 
 
   // now copy everything into a Trilinos matrix
-  Epetra_Map rowmap(TrilinosWrappers::types::int_type(4),
-                    4,
-                    0,
-                    Utilities::Trilinos::comm_world());
-  Epetra_Map colmap(TrilinosWrappers::types::int_type(5),
-                    5,
-                    0,
-                    Utilities::Trilinos::comm_world());
-
+  const auto                     local_rows = complete_index_set(4);
+  const auto                     local_cols = complete_index_set(5);
   TrilinosWrappers::SparseMatrix tmatrix;
-  tmatrix.reinit(rowmap, colmap, matrix, 0, true, &xsparsity);
+  tmatrix.reinit(
+    local_rows, local_cols, matrix, MPI_COMM_SELF, 0, true, &xsparsity);
 
   deallog << "Copy structure only:" << std::endl;
   tmatrix.print(deallog.get_file_stream());

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,8 @@
 
 
 #include <deal.II/base/config.h>
+
+#include <deal.II/base/mpi_consensus_algorithms.h>
 
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria.h>
@@ -68,9 +70,13 @@ namespace FETools
         Assert(false, ExcNotImplemented())
       }
     };
+
 #else
-    // Implementation of the @p extrapolate function
-    // on parallel distributed grids.
+
+    /**
+     * Implementation of the FETools::extrapolate() function
+     * on parallel distributed grids.
+     */
     template <int dim, int spacedim, class OutVector>
     class ExtrapolateImplementation
     {
@@ -84,11 +90,15 @@ namespace FETools
                            OutVector &                      u2);
 
     private:
-      // A shortcut for the type of the OutVector
+      /**
+       *  A shortcut for the type of the OutVector.
+       */
       using value_type = typename OutVector::value_type;
 
-      // A structure holding all data to
-      // set dofs recursively on cells of arbitrary level
+      /**
+       * A structure holding all data to set dofs recursively on cells of
+       * arbitrary level.
+       */
       struct WorkPackage
       {
         const typename dealii::internal::p4est::types<dim>::forest forest;
@@ -96,110 +106,51 @@ namespace FETools
         const typename dealii::internal::p4est::types<dim>::locidx tree_index;
         const typename DoFHandler<dim, spacedim>::cell_iterator    dealii_cell;
         const typename dealii::internal::p4est::types<dim>::quadrant p4est_cell;
-
-        WorkPackage(
-          const typename dealii::internal::p4est::types<dim>::forest &forest_,
-          const typename dealii::internal::p4est::types<dim>::tree &  tree_,
-          const typename dealii::internal::p4est::types<dim>::locidx
-            &                                                      tree_index_,
-          const typename DoFHandler<dim, spacedim>::cell_iterator &dealii_cell_,
-          const typename dealii::internal::p4est::types<dim>::quadrant
-            &p4est_cell_)
-          : forest(forest_)
-          , tree(tree_)
-          , tree_index(tree_index_)
-          , dealii_cell(dealii_cell_)
-          , p4est_cell(p4est_cell_)
-        {}
       };
 
 
-      // A structure holding all data
-      // of cells needed from other processes
-      // for the extrapolate algorithm.
+      /**
+       * A structure holding all data of cells needed from other processes
+       * for the extrapolate algorithm.
+       */
       struct CellData
       {
+        /**
+         * Default constructor.
+         */
         CellData();
 
+        /**
+         * Constructor setting the `dof_values` member to the right size.
+         */
         CellData(const unsigned int dofs_per_cell);
 
+        /**
+         * Comparison operator.
+         */
+        bool
+        operator<(const CellData &rhs) const;
+
+        /**
+         * Pack or unpack the data of this object into a buffer.
+         */
+        template <class Archive>
+        void
+        serialize(Archive &ar, const unsigned int);
+
+        /**
+         * The values of degrees of freedom associated with the current cell.
+         */
         Vector<value_type> dof_values;
 
-        unsigned int tree_index;
-
+        /**
+         * The tree within the forest (i.e., the coarse cell) and which of its
+         * descendents we are currently working on.
+         */
+        unsigned int                                           tree_index;
         typename dealii::internal::p4est::types<dim>::quadrant quadrant;
 
-        int receiver;
-
-        bool
-        operator<(const CellData &rhs) const
-        {
-          if (dealii::internal::p4est::functions<dim>::quadrant_compare(
-                &quadrant, &rhs.quadrant) < 0)
-            return true;
-
-          return false;
-        }
-
-        unsigned int
-        bytes_for_buffer() const
-        {
-          return (sizeof(unsigned int) +                   // dofs_per_cell
-                  dof_values.size() * sizeof(value_type) + // dof_values
-                  sizeof(unsigned int) +                   // tree_index
-                  sizeof(typename dealii::internal::p4est::types<
-                         dim>::quadrant)); // quadrant
-        }
-
-        void
-        pack_data(std::vector<char> &buffer) const
-        {
-          buffer.resize(bytes_for_buffer());
-
-          char *ptr = buffer.data();
-
-          unsigned int n_dofs = dof_values.size();
-          std::memcpy(ptr, &n_dofs, sizeof(unsigned int));
-          ptr += sizeof(unsigned int);
-
-          std::memcpy(ptr, dof_values.begin(), n_dofs * sizeof(value_type));
-          ptr += n_dofs * sizeof(value_type);
-
-          std::memcpy(ptr, &tree_index, sizeof(unsigned int));
-          ptr += sizeof(unsigned int);
-
-          std::memcpy(
-            ptr,
-            &quadrant,
-            sizeof(typename dealii::internal::p4est::types<dim>::quadrant));
-          ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
-
-          Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
-        }
-
-        void
-        unpack_data(const std::vector<char> &buffer)
-        {
-          const char * ptr = buffer.data();
-          unsigned int n_dofs;
-          memcpy(&n_dofs, ptr, sizeof(unsigned int));
-          ptr += sizeof(unsigned int);
-
-          dof_values.reinit(n_dofs);
-          std::memcpy(dof_values.begin(), ptr, n_dofs * sizeof(value_type));
-          ptr += n_dofs * sizeof(value_type);
-
-          std::memcpy(&tree_index, ptr, sizeof(unsigned int));
-          ptr += sizeof(unsigned int);
-
-          std::memcpy(
-            &quadrant,
-            ptr,
-            sizeof(typename dealii::internal::p4est::types<dim>::quadrant));
-          ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
-
-          Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
-        }
+        types::subdomain_id receiver;
       };
 
       // Problem: The function extrapolates a polynomial
@@ -371,8 +322,8 @@ namespace FETools
       // cells_to_send to their receivers
       // and receives a vector of cell_data
       void
-      send_cells(const std::vector<CellData> &cells_to_send,
-                 std::vector<CellData> &      received_cells) const;
+      exchange_data_on_cells(const std::vector<CellData> &cells_to_send,
+                             std::vector<CellData> &      received_cells) const;
 
       // add new cell_data to
       // the ordered list new_needs
@@ -414,6 +365,8 @@ namespace FETools
       // counts the send/receive round we are in
       unsigned int round;
     };
+
+
 
     template <class OutVector>
     class ExtrapolateImplementation<1, 1, OutVector>
@@ -487,10 +440,42 @@ namespace FETools
     template <int dim, int spacedim, class OutVector>
     ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::CellData(
       const unsigned int dofs_per_cell)
-      : tree_index(0)
+      : dof_values(dofs_per_cell)
+      , tree_index(0)
       , receiver(0)
+    {}
+
+
+
+    template <int dim, int spacedim, class OutVector>
+    bool
+    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::operator<(
+      const CellData &rhs) const
     {
-      dof_values.reinit(dofs_per_cell);
+      if (dealii::internal::p4est::functions<dim>::quadrant_compare(
+            &quadrant, &rhs.quadrant) < 0)
+        return true;
+
+      return false;
+    }
+
+
+
+    template <int dim, int spacedim, class OutVector>
+    template <class Archive>
+    void
+    ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::serialize(
+      Archive &ar,
+      const unsigned int)
+    {
+      // Serialize those data types for which there are overloads:
+      ar &dof_values &tree_index;
+
+      // Then also serialize the 'quadrant' variable for which there
+      // isn't an overload. Do so by simply copying the individual
+      // bytes
+      ar &boost::serialization::make_array(reinterpret_cast<char *>(&quadrant),
+                                           sizeof(quadrant));
     }
 
 
@@ -546,7 +531,7 @@ namespace FETools
         {
           const FiniteElement<dim, spacedim> &fe =
             dealii_cell->get_dof_handler().get_fe();
-          const unsigned int dofs_per_cell = fe.dofs_per_cell;
+          const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
           Vector<typename OutVector::value_type> interpolated_values(
             dofs_per_cell);
@@ -608,7 +593,7 @@ namespace FETools
         {
           const FiniteElement<dim, spacedim> &fe =
             dealii_cell->get_dof_handler().get_fe();
-          const unsigned int dofs_per_cell = fe.dofs_per_cell;
+          const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
           Assert(interpolated_values.size() == dofs_per_cell,
                  ExcDimensionMismatch(interpolated_values.size(),
@@ -728,7 +713,7 @@ namespace FETools
     {
       const FiniteElement<dim, spacedim> &fe =
         dealii_cell->get_dof_handler().get_fe();
-      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
       if (dealii_cell->is_active())
         {
@@ -796,9 +781,7 @@ namespace FETools
 
       Assert(tr != nullptr, ExcInternalError());
 
-      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
-                                                        endc = dof2.end(0);
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof2.cell_iterators_on_level(0))
         {
           if (dealii::internal::p4est::tree_exists_locally<dim>(
                 tr->parallel_forest,
@@ -1002,15 +985,10 @@ namespace FETools
       // collect in a set all trees this
       // process has to compute cells on
       std::set<unsigned int> trees;
-      for (typename std::vector<CellData>::const_iterator it =
-             cells_to_compute.begin();
-           it != cells_to_compute.end();
-           ++it)
-        trees.insert(it->tree_index);
+      for (const auto &c : cells_to_compute)
+        trees.insert(c.tree_index);
 
-      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
-                                                        endc = dof2.end(0);
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof2.cell_iterators_on_level(0))
         {
           // check if this is a tree this process has to
           // work on and that this tree is in the p4est
@@ -1141,92 +1119,70 @@ namespace FETools
 
     template <int dim, int spacedim, class OutVector>
     void
-    ExtrapolateImplementation<dim, spacedim, OutVector>::send_cells(
+    ExtrapolateImplementation<dim, spacedim, OutVector>::exchange_data_on_cells(
       const std::vector<CellData> &cells_to_send,
       std::vector<CellData> &      received_cells) const
     {
-      std::vector<std::vector<char>> sendbuffers(cells_to_send.size());
-      std::vector<std::vector<char>>::iterator buffer = sendbuffers.begin();
-      std::vector<MPI_Request>                 requests(cells_to_send.size());
-      std::vector<unsigned int>                destinations;
+      // First figure out where we need to send stuff. Some of the cells
+      // in the input argument to this function might be destined for
+      // the same process, so we have to only look at the unique set of
+      // destinations:
+      std::vector<types::subdomain_id> destinations;
+      for (const auto &cell : cells_to_send)
+        destinations.emplace_back(cell.receiver);
+      std::sort(destinations.begin(), destinations.end());
+      destinations.erase(std::unique(destinations.begin(), destinations.end()),
+                         destinations.end());
 
-      // Protect the communcation below:
-      static Utilities::MPI::CollectiveMutex      mutex;
-      Utilities::MPI::CollectiveMutex::ScopedLock lock(mutex, communicator);
+      // Then set up the send/receive operation. This is best done through
+      // the 'consensus algorithm' setup that is used for point-to-point
+      // communication of information in cases where we do not know up
+      // front which processes (and from how many processes) we have to
+      // expect information from.
+      const auto create_request =
+        [&cells_to_send](const types::subdomain_id other_rank) {
+          std::vector<CellData> cells_for_this_destination;
+          for (const auto &cell : cells_to_send)
+            if (cell.receiver == other_rank)
+              cells_for_this_destination.emplace_back(cell);
 
-      // We pick a new tag in each round. Wrap around after 10 rounds:
-      const int mpi_tag =
-        Utilities::MPI::internal::Tags::fe_tools_extrapolate + round % 10;
+          return Utilities::pack(cells_for_this_destination, false);
+        };
 
-      // send data
-      unsigned int idx = 0;
-      for (typename std::vector<CellData>::const_iterator it =
-             cells_to_send.begin();
-           it != cells_to_send.end();
-           ++it, ++idx)
-        {
-          destinations.push_back(it->receiver);
+      const auto answer_request =
+        [&received_cells](const unsigned int       other_rank,
+                          const std::vector<char> &request) {
+          // We got a message from 'other_rank', so let us decode the
+          // message in the same way as we have assembled it above.
+          // Note that the cells just received do not contain
+          // information where they came from, and we have to add that
+          // ourselves for later use.
+          for (CellData &cell_data :
+               Utilities::unpack<std::vector<CellData>>(request, false))
+            {
+              cell_data.receiver = other_rank;
+              received_cells.emplace_back(std::move(cell_data));
+            }
 
-          it->pack_data(*buffer);
-          const int ierr = MPI_Isend(buffer->data(),
-                                     buffer->size(),
-                                     MPI_BYTE,
-                                     it->receiver,
-                                     mpi_tag,
-                                     communicator,
-                                     &requests[idx]);
-          AssertThrowMPI(ierr);
-        }
+          // Nothing left to do here, we don't actually need to provide an
+          // answer:
+          return std::vector<char>();
+        };
 
-      Assert(destinations.size() == cells_to_send.size(), ExcInternalError());
+      const auto read_answer = [](const unsigned int /*other_rank*/,
+                                  const std::vector<char> &answer) {
+        // We don't put anything into the answers, so nothing should
+        // have been coming out at this end either:
+        (void)answer;
+        Assert(answer.size() == 0, ExcInternalError());
+      };
 
-      const unsigned int n_senders =
-        Utilities::MPI::compute_n_point_to_point_communications(communicator,
-                                                                destinations);
-
-      // receive data
-      std::vector<char> receive;
-      CellData          cell_data;
-      for (unsigned int index = 0; index < n_senders; ++index)
-        {
-          MPI_Status status;
-          int ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, communicator, &status);
-          AssertThrowMPI(ierr);
-
-          int len;
-          ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-          AssertThrowMPI(ierr);
-          receive.resize(len);
-
-          char *buf = receive.data();
-          ierr      = MPI_Recv(buf,
-                          len,
-                          MPI_BYTE,
-                          status.MPI_SOURCE,
-                          status.MPI_TAG,
-                          communicator,
-                          &status);
-          AssertThrowMPI(ierr);
-
-          cell_data.unpack_data(receive);
-
-          // this process has to send this
-          // cell back to the sender
-          // the receiver is the old sender
-          cell_data.receiver = status.MPI_SOURCE;
-
-          received_cells.push_back(cell_data);
-        }
-
-      if (requests.size() > 0)
-        {
-          const int ierr =
-            MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
-        }
-
-      // finally sort the list of cells
-      std::sort(received_cells.begin(), received_cells.end());
+      Utilities::MPI::ConsensusAlgorithms::Selector<char, char>().run(
+        destinations,
+        create_request,
+        answer_request,
+        read_answer,
+        communicator);
     }
 
 
@@ -1242,7 +1198,7 @@ namespace FETools
     {
       const FiniteElement<dim, spacedim> &fe =
         dealii_cell->get_dof_handler().get_fe();
-      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
       CellData cell_data(dofs_per_cell);
       cell_data.quadrant   = p4est_cell;
@@ -1310,7 +1266,7 @@ namespace FETools
 
       // Send the cells needed to their owners and receive
       // a list of cells other processes need from us.
-      send_cells(cells_we_need, received_needs);
+      exchange_data_on_cells(cells_we_need, received_needs);
 
       // The list of received needs can contain some cells more than once
       // because different processes may need data from the same cell.
@@ -1336,13 +1292,10 @@ namespace FETools
             Utilities::MPI::sum(new_needs.size() + cells_to_compute.size(),
                                 communicator);
 
-          for (typename std::vector<CellData>::const_iterator comp =
-                 computed_cells.begin();
-               comp != computed_cells.end();
-               ++comp)
+          for (const auto &comp : computed_cells)
             {
               // store computed cells...
-              cell_data_insert(*comp, available_cells);
+              cell_data_insert(comp, available_cells);
 
               // ...and generate a vector of computed cells with correct
               // receivers, then delete this received need from the list
@@ -1351,9 +1304,9 @@ namespace FETools
               while (recv != received_needs.end())
                 {
                   if (dealii::internal::p4est::quadrant_is_equal<dim>(
-                        recv->quadrant, comp->quadrant))
+                        recv->quadrant, comp.quadrant))
                     {
-                      recv->dof_values = comp->dof_values;
+                      recv->dof_values = comp.dof_values;
                       cells_to_send.push_back(*recv);
                       received_needs.erase(recv);
                       recv = received_needs.begin();
@@ -1367,15 +1320,12 @@ namespace FETools
           // and receive data from the correct call
           ++round;
 
-          send_cells(cells_to_send, received_cells);
+          exchange_data_on_cells(cells_to_send, received_cells);
 
           // store received cell_data
-          for (typename std::vector<CellData>::const_iterator recv =
-                 received_cells.begin();
-               recv != received_cells.end();
-               ++recv)
+          for (const auto &recv : received_cells)
             {
-              cell_data_insert(*recv, available_cells);
+              cell_data_insert(recv, available_cells);
             }
 
           // increase the round counter, such that we are sure to only send
@@ -1383,7 +1333,7 @@ namespace FETools
           ++round;
 
           // finally send and receive new needs and start a new round
-          send_cells(new_needs, received_needs);
+          exchange_data_on_cells(new_needs, received_needs);
         }
       while (ready != 0);
     }
@@ -1412,27 +1362,24 @@ namespace FETools
       compute_all_non_local_data(dof2, u2_relevant);
 
       // exclude dofs on more refined ghosted cells
-      const FiniteElement<dim, spacedim> &fe            = dof2.get_fe();
-      const unsigned int                  dofs_per_face = fe.dofs_per_face;
-      if (dofs_per_face > 0)
+      const FiniteElement<dim, spacedim> &fe = dof2.get_fe();
+      if (fe.max_dofs_per_face() > 0)
         {
-          const unsigned int                   dofs_per_cell = fe.dofs_per_cell;
+          const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
           std::vector<types::global_dof_index> indices(dofs_per_cell);
-          typename DoFHandler<dim, spacedim>::active_cell_iterator
-            cell = dof2.begin_active(),
-            endc = dof2.end();
-          for (; cell != endc; ++cell)
+
+          for (const auto &cell : dof2.active_cell_iterators())
             if (cell->is_ghost())
               {
                 cell->get_dof_indices(indices);
-                for (const unsigned int face :
-                     GeometryInfo<dim>::face_indices())
+                for (const unsigned int face : cell->face_indices())
                   if (!cell->at_boundary(face))
                     {
                       const typename DoFHandler<dim, spacedim>::cell_iterator
                         neighbor = cell->neighbor(face);
                       if (neighbor->level() != cell->level())
-                        for (unsigned int i = 0; i < dofs_per_face; ++i)
+                        for (unsigned int i = 0; i < fe.n_dofs_per_face(face);
+                             ++i)
                           {
                             const types::global_dof_index index =
                               indices[fe.face_to_cell_index(i, face)];
@@ -1459,9 +1406,7 @@ namespace FETools
 
       std::queue<WorkPackage> queue;
       {
-        typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
-                                                          endc = dof2.end(0);
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof2.cell_iterators_on_level(0))
           {
             if (dealii::internal::p4est::tree_exists_locally<dim>(
                   tr->parallel_forest,
@@ -1470,19 +1415,21 @@ namespace FETools
               continue;
 
             typename dealii::internal::p4est::types<dim>::quadrant
-                               p4est_coarse_cell;
-            const unsigned int tree_index =
-              tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
+              p4est_coarse_cell;
+            const typename dealii::internal::p4est::types<dim>::locidx
+              tree_index =
+                tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
             typename dealii::internal::p4est::types<dim>::tree *tree =
               tr->init_tree(cell->index());
 
             dealii::internal::p4est::init_coarse_quadrant<dim>(
               p4est_coarse_cell);
 
-            const WorkPackage data(
-              *tr->parallel_forest, *tree, tree_index, cell, p4est_coarse_cell);
-
-            queue.push(data);
+            queue.push({*tr->parallel_forest,
+                        *tree,
+                        tree_index,
+                        cell,
+                        p4est_coarse_cell});
           }
       }
 
@@ -1517,11 +1464,11 @@ namespace FETools
               for (unsigned int c = 0;
                    c < GeometryInfo<dim>::max_children_per_cell;
                    ++c)
-                queue.push(WorkPackage(forest,
-                                       tree,
-                                       tree_index,
-                                       dealii_cell->child(c),
-                                       p4est_child[c]));
+                queue.push({forest,
+                            tree,
+                            tree_index,
+                            dealii_cell->child(c),
+                            p4est_child[c]});
             }
           queue.pop();
         }
@@ -1709,31 +1656,28 @@ namespace FETools
 
 
 
+    /**
+     * Perform the extrapolation of a finite element field to patch-based
+     * values for serial triangulations.
+     */
     template <int dim, class InVector, class OutVector, int spacedim>
     void
     extrapolate_serial(const InVector &                 u3,
                        const DoFHandler<dim, spacedim> &dof2,
                        OutVector &                      u2)
     {
-      const unsigned int dofs_per_cell = dof2.get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell = dof2.get_fe().n_dofs_per_cell();
       Vector<typename OutVector::value_type> dof_values(dofs_per_cell);
 
-      // then traverse grid bottom up
+      // Then traverse grid bottom up, excluding the finest level
       for (unsigned int level = 0;
            level < dof2.get_triangulation().n_levels() - 1;
            ++level)
         {
-          typename DoFHandler<dim, spacedim>::cell_iterator cell =
-                                                              dof2.begin(level),
-                                                            endc =
-                                                              dof2.end(level);
-
-          for (; cell != endc; ++cell)
-            if (!cell->is_active())
+          for (const auto &cell : dof2.cell_iterators_on_level(level))
+            if (cell->has_children())
               {
-                // check whether this
-                // cell has active
-                // children
+                // Check whether this cell has active children
                 bool active_children = false;
                 for (unsigned int child_n = 0; child_n < cell->n_children();
                      ++child_n)
@@ -1743,13 +1687,13 @@ namespace FETools
                       break;
                     }
 
-                // if there are active
-                // children, this process
-                // has to work on this
-                // cell. get the data
-                // from the one vector
-                // and set it on the
-                // other
+                // If there are active children, this process
+                // has to work on this cell. Get the values from the input
+                // vector on this cell and interpolate it from the current
+                // cell to its children in the other vector. If any of the
+                // children have children themselves, then we will visit it
+                // later in the outer loop here and overwrite the results in
+                // u2.
                 if (active_children)
                   {
                     cell->get_interpolated_dof_values(u3, dof_values);
@@ -1760,6 +1704,8 @@ namespace FETools
     }
   } // namespace internal
 
+
+
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   extrapolate(const DoFHandler<dim, spacedim> &dof1,
@@ -1767,6 +1713,8 @@ namespace FETools
               const DoFHandler<dim, spacedim> &dof2,
               OutVector &                      u2)
   {
+    // Forward to the other function using an empty set of
+    // constraints.
     AffineConstraints<typename OutVector::value_type> dummy;
     dummy.close();
     extrapolate(dof1, u1, dof2, dummy, u2);
@@ -1783,6 +1731,9 @@ namespace FETools
     const AffineConstraints<typename OutVector::value_type> &constraints,
     OutVector &                                              u2)
   {
+    Assert(dof1.get_fe_collection().size() == 1, ExcNotImplemented());
+    Assert(dof2.get_fe_collection().size() == 1, ExcNotImplemented());
+
     Assert(dof1.get_fe(0).n_components() == dof2.get_fe(0).n_components(),
            ExcDimensionMismatch(dof1.get_fe(0).n_components(),
                                 dof2.get_fe(0).n_components()));
@@ -1795,13 +1746,12 @@ namespace FETools
 
     // make sure that each cell on the coarsest level is at least once refined,
     // otherwise, these cells can't be treated and would generate a bogus result
-    {
-      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
-                                                        endc = dof2.end(0);
-      for (; cell != endc; ++cell)
+    for (const auto &cell : dof2.cell_iterators_on_level(0))
+      {
+        (void)cell;
         Assert(cell->has_children() || cell->is_artificial(),
                ExcGridNotRefinedAtLeastOnce());
-    }
+      }
 
 
     internal::BlockType<OutVector> u3;
@@ -1809,6 +1759,13 @@ namespace FETools
     if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                        *>(&dof2.get_triangulation()) != nullptr)
       {
+        Assert(dof1.get_fe()[0].reference_cell() ==
+                 ReferenceCells::get_hypercube<dim>(),
+               ExcNotImplemented());
+        Assert(dof2.get_fe()[0].reference_cell() ==
+                 ReferenceCells::get_hypercube<dim>(),
+               ExcNotImplemented());
+
         interpolate(dof1, u1, dof2, constraints, u3);
 
         internal::BlockType<OutVector> u3_relevant;

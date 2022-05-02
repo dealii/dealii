@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,7 @@ namespace
    * https://github.com/elemental/Elemental/blob/master/src/core/Grid.cpp#L67-L91
    */
   inline std::pair<int, int>
-  compute_processor_grid_sizes(MPI_Comm           mpi_comm,
+  compute_processor_grid_sizes(const MPI_Comm &   mpi_comm,
                                const unsigned int m,
                                const unsigned int n,
                                const unsigned int block_size_m,
@@ -101,7 +101,7 @@ namespace Utilities
   namespace MPI
   {
     ProcessGrid::ProcessGrid(
-      MPI_Comm                                     mpi_comm,
+      const MPI_Comm &                             mpi_comm,
       const std::pair<unsigned int, unsigned int> &grid_dimensions)
       : mpi_communicator(mpi_comm)
       , this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator))
@@ -184,10 +184,10 @@ namespace Utilities
       const int mpi_tag =
         Utilities::MPI::internal::Tags::process_grid_constructor;
 
-      ierr = Utilities::MPI::create_group(mpi_communicator,
-                                          inactive_with_root_group,
-                                          mpi_tag,
-                                          &mpi_communicator_inactive_with_root);
+      ierr = MPI_Comm_create_group(mpi_communicator,
+                                   inactive_with_root_group,
+                                   mpi_tag,
+                                   &mpi_communicator_inactive_with_root);
       AssertThrowMPI(ierr);
 
       ierr = MPI_Group_free(&all_group);
@@ -206,7 +206,7 @@ namespace Utilities
 
 
 
-    ProcessGrid::ProcessGrid(MPI_Comm           mpi_comm,
+    ProcessGrid::ProcessGrid(const MPI_Comm &   mpi_comm,
                              const unsigned int n_rows_matrix,
                              const unsigned int n_columns_matrix,
                              const unsigned int row_block_size,
@@ -221,7 +221,7 @@ namespace Utilities
 
 
 
-    ProcessGrid::ProcessGrid(MPI_Comm           mpi_comm,
+    ProcessGrid::ProcessGrid(const MPI_Comm &   mpi_comm,
                              const unsigned int n_rows,
                              const unsigned int n_columns)
       : ProcessGrid(mpi_comm, std::make_pair(n_rows, n_columns))
@@ -235,7 +235,7 @@ namespace Utilities
         Cblacs_gridexit(blacs_context);
 
       if (mpi_communicator_inactive_with_root != MPI_COMM_NULL)
-        MPI_Comm_free(&mpi_communicator_inactive_with_root);
+        Utilities::MPI::free_communicator(mpi_communicator_inactive_with_root);
     }
 
 
@@ -250,7 +250,7 @@ namespace Utilities
           const int ierr =
             MPI_Bcast(value,
                       count,
-                      Utilities::MPI::internal::mpi_type_id(value),
+                      Utilities::MPI::mpi_type_id_for_type<decltype(*value)>,
                       0 /*from root*/,
                       mpi_communicator_inactive_with_root);
           AssertThrowMPI(ierr);

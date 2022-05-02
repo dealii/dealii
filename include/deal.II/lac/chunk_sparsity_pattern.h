@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,9 +58,6 @@ namespace ChunkSparsityPatternIterators
    * Note that this class only allows read access to elements, providing their
    * row and column number. It does not allow modifying the sparsity pattern
    * itself.
-   *
-   * @author Martin Kronbichler
-   * @date 2013
    */
   class Accessor
   {
@@ -195,12 +192,14 @@ namespace ChunkSparsityPatternIterators
     /**
      * Dereferencing operator.
      */
-    const Accessor &operator*() const;
+    const Accessor &
+    operator*() const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor *operator->() const;
+    const Accessor *
+    operator->() const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
@@ -241,8 +240,6 @@ namespace ChunkSparsityPatternIterators
  * It uses the compressed row storage (CSR) format to store data.
  *
  * The use of this class is demonstrated in step-51.
- *
- * @author Wolfgang Bangerth, 2008
  */
 class ChunkSparsityPattern : public Subscriptor
 {
@@ -771,7 +768,7 @@ public:
                  size_type,
                  size_type,
                  << "The given index " << arg1 << " should be less than "
-                 << arg2 << ".");
+                 << arg2 << '.');
   /**
    * Exception
    */
@@ -1067,14 +1064,16 @@ namespace ChunkSparsityPatternIterators
 
 
 
-  inline const Accessor &Iterator::operator*() const
+  inline const Accessor &
+  Iterator::operator*() const
   {
     return accessor;
   }
 
 
 
-  inline const Accessor *Iterator::operator->() const
+  inline const Accessor *
+  Iterator::operator->() const
   {
     return &accessor;
   }

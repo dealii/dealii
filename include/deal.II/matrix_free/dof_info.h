@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,10 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/matrix_free/face_info.h>
+#include <deal.II/matrix_free/hanging_nodes_internal.h>
+#include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/task_info.h>
+#include <deal.II/matrix_free/vector_data_exchange.h>
 
 #include <array>
 #include <memory>
@@ -38,15 +41,56 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
 namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    // Forward declaration
-#ifndef DOXYGEN
-    template <typename Number>
-    struct ConstraintValues;
+    template <int dim>
+    class HangingNodes;
+
+    template <typename, typename>
+    struct FPArrayComparator;
+  } // namespace MatrixFreeFunctions
+} // namespace internal
 #endif
+
+namespace internal
+{
+  namespace MatrixFreeFunctions
+  {
+    /**
+     * A struct that takes entries describing a constraint and puts them into
+     * a sorted list where duplicates are filtered out
+     */
+    template <typename Number>
+    struct ConstraintValues
+    {
+      ConstraintValues();
+
+      /**
+       * This function inserts some constrained entries to the collection of
+       * all values. It stores the (reordered) numbering of the dofs
+       * (according to the ordering that matches with the function) in
+       * new_indices, and returns the storage position the double array for
+       * access later on.
+       */
+      template <typename number2>
+      unsigned short
+      insert_entries(
+        const std::vector<std::pair<types::global_dof_index, number2>>
+          &entries);
+
+      std::vector<std::pair<types::global_dof_index, double>>
+                                           constraint_entries;
+      std::vector<types::global_dof_index> constraint_indices;
+
+      std::pair<std::vector<Number>, types::global_dof_index> next_constraint;
+      std::map<std::vector<Number>,
+               types::global_dof_index,
+               FPArrayComparator<Number, VectorizedArray<Number>>>
+        constraints;
+    };
 
     /**
      * The class that stores the indices of the degrees of freedom for all the
@@ -65,8 +109,6 @@ namespace internal
      * combination will be handled in the MatrixFree class.
      *
      * @ingroup matrixfree
-     *
-     * @author Katharina Kormann and Martin Kronbichler, 2010, 2011, 2018
      */
     struct DoFInfo
     {
@@ -95,23 +137,45 @@ namespace internal
       DoFInfo(const DoFInfo &) = default;
 
       /**
+       * Move constructor.
+       */
+      DoFInfo(DoFInfo &&) noexcept = default;
+
+      /**
+       * Destructor.
+       */
+      ~DoFInfo() = default;
+
+      /**
+       * Copy assignment operator.
+       */
+      DoFInfo &
+      operator=(const DoFInfo &) = default;
+
+      /**
+       * Move assignment operator.
+       */
+      DoFInfo &
+      operator=(DoFInfo &&) noexcept = default;
+
+      /**
        * Clear all data fields in this class.
        */
       void
       clear();
 
       /**
-       * Return the FE index for a given finite element degree. If not in hp
+       * Return the FE index for a given finite element degree. If not in hp-
        * mode, this function always returns index 0. If an index is not found
-       * in hp mode, it returns numbers::invalid_unsigned_int.
+       * in hp-mode, it returns numbers::invalid_unsigned_int.
        */
       unsigned int
       fe_index_from_degree(const unsigned int first_selected_component,
                            const unsigned int fe_degree) const;
 
       /**
-       * Populate the vector @p locall_indices with locally owned degrees of freedom
-       * stored on the cell block @p cell.
+       * Populate the vector @p local_indices with locally owned degrees of freedom
+       * stored on the cell batch @p cell_batch.
        * If @p with_constraints is `true`, then the returned vector will contain indices
        * required to resolve constraints.
        *
@@ -129,27 +193,42 @@ namespace internal
        * `std::vector::erase()`.
        */
       void
-      get_dof_indices_on_cell_batch(std::vector<unsigned int> &locall_indices,
-                                    const unsigned int         cell,
+      get_dof_indices_on_cell_batch(std::vector<unsigned int> &local_indices,
+                                    const unsigned int         cell_batch,
                                     const bool with_constraints = true) const;
 
       /**
-       * This internal method takes the local indices on a cell and fills them
-       * into this class. It resolves the constraints and distributes the
-       * results. Ghost indices, i.e., indices that are located on another
-       * processor, get a temporary number by this function, and will later be
-       * assigned the correct index after all the ghost indices have been
-       * collected by the call to @p assign_ghosts.
+       * This internal method takes the local indices on a cell (two versions:
+       * hanging-node constraints resolved if possible and plain, i.e., not
+       * resolved) and fills them into this class. It resolves the constraints
+       * and distributes the results. Ghost indices, i.e., indices that are
+       * located on another processor, get a temporary number by this function,
+       * and will later be assigned the correct index after all the ghost
+       * indices have been collected by the call to @p assign_ghosts.
        */
       template <typename number>
       void
       read_dof_indices(
+        const std::vector<types::global_dof_index> &local_indices_resolved,
         const std::vector<types::global_dof_index> &local_indices,
-        const std::vector<unsigned int> &           lexicographic_inv,
-        const AffineConstraints<number> &           constraints,
+        const bool                                  cell_has_hanging_nodes,
+        const dealii::AffineConstraints<number> &   constraints,
         const unsigned int                          cell_number,
         ConstraintValues<double> &                  constraint_values,
         bool &                                      cell_at_boundary);
+
+      /**
+       * For a given cell, determine if it has hanging node constraints. If yes,
+       * adjust the dof indices, store the mask, and return true as indication.
+       */
+      template <int dim>
+      bool
+      process_hanging_node_constraints(
+        const HangingNodes<dim> &                     hanging_nodes,
+        const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
+        const unsigned int                            cell_number,
+        const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
+        std::vector<types::global_dof_index> &                dof_indices);
 
       /**
        * This method assigns the correct indices to ghost indices from the
@@ -159,7 +238,9 @@ namespace internal
        * access to all vector entries.
        */
       void
-      assign_ghosts(const std::vector<unsigned int> &boundary_cells);
+      assign_ghosts(const std::vector<unsigned int> &boundary_cells,
+                    const MPI_Comm &                 communicator_sm,
+                    const bool use_vector_data_exchanger_full);
 
       /**
        * This method reorders the way cells are gone through based on a given
@@ -199,6 +280,32 @@ namespace internal
       make_connectivity_graph(const TaskInfo &                 task_info,
                               const std::vector<unsigned int> &renumbering,
                               DynamicSparsityPattern &connectivity) const;
+
+      /**
+       * In case face integrals are enabled, find out whether certain loops
+       * over the unknowns only access a subset of all the ghost dofs we keep
+       * in the main partitioner.
+       */
+      void
+      compute_tight_partitioners(
+        const Table<2, ShapeInfo<double>> &       shape_info,
+        const unsigned int                        n_owned_cells,
+        const unsigned int                        n_lanes,
+        const std::vector<FaceToCellTopology<1>> &inner_faces,
+        const std::vector<FaceToCellTopology<1>> &ghosted_faces,
+        const bool                                fill_cell_centric,
+        const MPI_Comm &                          communicator_sm,
+        const bool use_vector_data_exchanger_full);
+
+      /**
+       * Given @p cell_indices_contiguous_sm containing the local index of
+       * cells of macro faces (inner/outer) and macro faces compute
+       * dof_indices_contiguous_sm.
+       */
+      void
+      compute_shared_memory_contiguous_indices(
+        std::array<std::vector<std::pair<unsigned int, unsigned int>>, 3>
+          &cell_indices_contiguous_sm);
 
       /**
        * Compute a renumbering of the degrees of freedom to improve the data
@@ -392,7 +499,7 @@ namespace internal
        * as interior (0), the faces decorated with as exterior (1), and the
        * cells (2) according to CellOrFaceAccess.
        */
-      std::vector<IndexStorageVariants> index_storage_variants[3];
+      std::array<std::vector<IndexStorageVariants>, 3> index_storage_variants;
 
       /**
        * Stores the rowstart indices of the compressed row storage in the @p
@@ -420,6 +527,18 @@ namespace internal
       std::vector<unsigned int> dof_indices;
 
       /**
+       * Supported components of all entries of the hp::FECollection object of
+       * the given DoFHandler.
+       */
+      std::vector<std::vector<bool>> hanging_node_constraint_masks_comp;
+
+      /**
+       * Masks indicating for each cell and component if the optimized
+       * hanging-node constraint is applicable and if yes which type.
+       */
+      std::vector<compressed_constraint_kind> hanging_node_constraint_masks;
+
+      /**
        * This variable describes the position of constraints in terms of the
        * local numbering of degrees of freedom on a cell. The first number
        * stores the distance from one constrained degree of freedom to the
@@ -444,7 +563,18 @@ namespace internal
        * as interior (0), the faces decorated with as exterior (1), and the
        * cells (2) according to CellOrFaceAccess.
        */
-      std::vector<unsigned int> dof_indices_contiguous[3];
+      std::array<std::vector<unsigned int>, 3> dof_indices_contiguous;
+
+      /**
+       * The same as above but for shared-memory usage. The first value of the
+       * pair is identifying the owning process and the second the index
+       * within that locally-owned data of that process.
+       *
+       * @note This data structure is only set up if all entries in
+       *   index_storage_variants[2] are IndexStorageVariants::contiguous.
+       */
+      std::array<std::vector<std::pair<unsigned int, unsigned int>>, 3>
+        dof_indices_contiguous_sm;
 
       /**
        * Compressed index storage for faster access than through @p
@@ -454,7 +584,7 @@ namespace internal
        * as minus (0), the faces decorated with as plus (1), and the cells
        * (2).
        */
-      std::vector<unsigned int> dof_indices_interleave_strides[3];
+      std::array<std::vector<unsigned int>, 3> dof_indices_interleave_strides;
 
       /**
        * Caches the number of indices filled when vectorizing. This
@@ -465,7 +595,7 @@ namespace internal
        * as interior (0), the faces decorated with as exterior (1), and the
        * cells (2) according to CellOrFaceAccess.
        */
-      std::vector<unsigned char> n_vectorization_lanes_filled[3];
+      std::array<std::vector<unsigned char>, 3> n_vectorization_lanes_filled;
 
       /**
        * This stores the parallel partitioning that can be used to set up
@@ -476,7 +606,15 @@ namespace internal
       std::shared_ptr<const Utilities::MPI::Partitioner> vector_partitioner;
 
       /**
-       * This partitioning selects a subset of ghost indices to the full
+       * Vector exchanger compatible with vector_partitioner.
+       */
+      std::shared_ptr<
+        const internal::MatrixFreeFunctions::VectorDataExchange::Base>
+        vector_exchanger;
+
+      /**
+       * Vector exchanger compatible with partitioners that select a subset of
+       * ghost indices to the full
        * vector partitioner stored in @p vector_partitioner. These
        * partitioners are used in specialized loops that only import parts of
        * the ghosted region for reducing the amount of communication. There
@@ -493,8 +631,11 @@ namespace internal
        *   values and the gradients on all faces adjacent to the locally owned
        *   cells.
        */
-      std::array<std::shared_ptr<const Utilities::MPI::Partitioner>, 5>
-        vector_partitioner_face_variants;
+      std::array<
+        std::shared_ptr<
+          const internal::MatrixFreeFunctions::VectorDataExchange::Base>,
+        5>
+        vector_exchanger_face_variants;
 
       /**
        * This stores a (sorted) list of all locally owned degrees of freedom
@@ -556,7 +697,7 @@ namespace internal
        * account. This information is encoded in the row_starts variables
        * directly.
        *
-       * The outer vector goes through the various fe indices in the hp case,
+       * The outer vector goes through the various FE indices in the hp-case,
        * similarly to the @p dofs_per_cell variable.
        */
       std::vector<std::vector<unsigned int>> component_dof_indices_offset;
@@ -577,20 +718,20 @@ namespace internal
       bool store_plain_indices;
 
       /**
-       * Stores the index of the active finite element in the hp case.
+       * Stores the index of the active finite element in the hp-case.
        */
       std::vector<unsigned int> cell_active_fe_index;
 
       /**
-       * Stores the maximum degree of different finite elements for the hp
+       * Stores the maximum degree of different finite elements for the hp-
        * case.
        */
       unsigned int max_fe_index;
 
       /**
-       * To each of the slots in an hp adaptive case, the inner vector stores
+       * To each of the slots in an hp-adaptive case, the inner vector stores
        * the corresponding element degree. This is used by the constructor of
-       * FEEvaluationBase to identify the correct data slot in the hp case.
+       * FEEvaluationBase to identify the correct data slot in the hp-case.
        */
       std::vector<std::vector<unsigned int>> fe_index_conversion;
 

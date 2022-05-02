@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,6 @@
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/differentiation/ad/ad_number_traits.h>
@@ -35,7 +34,6 @@
 #include <algorithm>
 #include <initializer_list>
 #include <iosfwd>
-#include <iterator>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -105,8 +103,6 @@ namespace parallel
  * others can be generated in application programs (see the section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>
 class Vector : public Subscriptor
@@ -277,7 +273,7 @@ public:
    * waste some memory, so keep this in mind.  However, if <tt>N==0</tt> all
    * memory is freed, i.e. if you want to resize the vector and release the
    * memory not needed, you have to first call <tt>reinit(0)</tt> and then
-   * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the
+   * <tt>reinit(N)</tt>. This cited behavior is analogous to that of the
    * standard library containers.
    *
    * If @p omit_zeroing_entries is false, the vector is filled by zeros.
@@ -477,7 +473,8 @@ public:
    * repeatable results from one run to another.
    */
   template <typename Number2>
-  Number operator*(const Vector<Number2> &V) const;
+  Number
+  operator*(const Vector<Number2> &V) const;
 
   /**
    * Return the square of the $l_2$-norm.
@@ -628,14 +625,16 @@ public:
    *
    * Exactly the same as operator().
    */
-  Number operator[](const size_type i) const;
+  Number
+  operator[](const size_type i) const;
 
   /**
    * Access the @p ith component as a writeable reference.
    *
    * Exactly the same as operator().
    */
-  Number &operator[](const size_type i);
+  Number &
+  operator[](const size_type i);
 
   /**
    * Instead of getting individual elements of a vector via operator(),
@@ -884,7 +883,8 @@ public:
 
   /**
    * Write the data of this object to a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -892,13 +892,27 @@ public:
 
   /**
    * Read the data of this object from a stream for the purpose of
-   * serialization.
+   * serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
   load(Archive &ar, const unsigned int version);
 
+#ifdef DOXYGEN
+  /**
+   * Write and read the data of this object from a stream for the purpose
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   */
+  template <class Archive>
+  void
+  serialize(Archive &archive, const unsigned int version);
+#else
+  // This macro defines the serialize() method that is compatible with
+  // the templated save() and load() method that have been implemented.
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
   /**
    * @}
@@ -940,6 +954,16 @@ public:
    */
   size_type
   size() const;
+
+  /**
+   * Return local dimension of the vector. Since this vector does not support
+   * distributed data this is always the same value as size().
+   *
+   * @note This function exists for compatibility with
+   * LinearAlgebra::ReadWriteVector.
+   */
+  size_type
+  locally_owned_size() const;
 
   /**
    * Return whether the vector contains only elements with value zero. This
@@ -1076,6 +1100,16 @@ Vector<Number>::size() const
 }
 
 
+
+template <typename Number>
+inline typename Vector<Number>::size_type
+Vector<Number>::locally_owned_size() const
+{
+  return values.size();
+}
+
+
+
 template <typename Number>
 inline bool
 Vector<Number>::in_local_range(const size_type) const
@@ -1160,7 +1194,8 @@ Vector<Number>::operator()(const size_type i)
 
 
 template <typename Number>
-inline Number Vector<Number>::operator[](const size_type i) const
+inline Number
+Vector<Number>::operator[](const size_type i) const
 {
   return operator()(i);
 }
@@ -1168,7 +1203,8 @@ inline Number Vector<Number>::operator[](const size_type i) const
 
 
 template <typename Number>
-inline Number &Vector<Number>::operator[](const size_type i)
+inline Number &
+Vector<Number>::operator[](const size_type i)
 {
   return operator()(i);
 }
@@ -1343,7 +1379,6 @@ Vector<Number>::load(Archive &ar, const unsigned int)
  * exchanges the data of the two vectors.
  *
  * @relatesalso Vector
- * @author Wolfgang Bangerth, 2000
  */
 template <typename Number>
 inline void
@@ -1354,14 +1389,26 @@ swap(Vector<Number> &u, Vector<Number> &v)
 
 
 /**
- * Output operator writing a vector to a stream.
+ * Output operator writing a vector to a stream. This operator outputs the
+ * elements of the vector one by one, with a space between entries. Each entry
+ * is formatted according to the flags set on the output stream.
+ *
+ * @relatesalso Vector
  */
 template <typename number>
 inline std::ostream &
-operator<<(std::ostream &os, const Vector<number> &v)
+operator<<(std::ostream &out, const Vector<number> &v)
 {
-  v.print(os);
-  return os;
+  Assert(v.size() != 0, ExcEmptyObject());
+  AssertThrow(out.fail() == false, ExcIO());
+
+  for (typename Vector<number>::size_type i = 0; i < v.size() - 1; ++i)
+    out << v(i) << ' ';
+  out << v(v.size() - 1);
+
+  AssertThrow(out.fail() == false, ExcIO());
+
+  return out;
 }
 
 /*@}*/
@@ -1370,7 +1417,7 @@ operator<<(std::ostream &os, const Vector<number> &v)
 /**
  * Declare dealii::Vector< Number > as serial vector.
  *
- * @author Uwe Koecher, 2017
+ * @relatesalso Vector
  */
 template <typename Number>
 struct is_serial_vector<Vector<Number>> : std::true_type

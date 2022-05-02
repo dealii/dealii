@@ -1,0 +1,144 @@
+
+DEAL::Number of active cells: 512
+DEAL::Total number of cells: 680
+DEAL::Number of degrees of freedom: 3714 (2178+1536)
+DEAL:cg::Starting value 0.624584
+DEAL:cg::Convergence step 25 value 4.62032e-11
+DEAL:cg::Starting value 37.4651
+DEAL:cg:cg::Starting value 37.4651
+DEAL:cg:cg::Convergence step 30 value 0.0848672
+DEAL:cg:cg::Starting value 0.826345
+DEAL:cg:cg::Convergence step 25 value 5.36874e-11
+DEAL:cg:cg::Starting value 8.99626
+DEAL:cg:cg::Convergence step 30 value 0.108473
+DEAL:cg:cg::Starting value 0.257746
+DEAL:cg:cg::Convergence step 25 value 1.58401e-11
+DEAL:cg:cg::Starting value 3.18381
+DEAL:cg:cg::Convergence step 30 value 0.0283153
+DEAL:cg:cg::Starting value 0.0877011
+DEAL:cg:cg::Convergence step 25 value 6.78488e-12
+DEAL:cg:cg::Starting value 1.08833
+DEAL:cg:cg::Convergence step 30 value 0.0265170
+DEAL:cg:cg::Starting value 0.0390461
+DEAL:cg:cg::Convergence step 25 value 3.22787e-12
+DEAL:cg:cg::Starting value 0.408285
+DEAL:cg:cg::Convergence step 30 value 0.00738618
+DEAL:cg:cg::Starting value 0.0169890
+DEAL:cg:cg::Convergence step 25 value 1.31488e-12
+DEAL:cg:cg::Starting value 0.205984
+DEAL:cg:cg::Convergence step 30 value 0.00300423
+DEAL:cg:cg::Starting value 0.00694787
+DEAL:cg:cg::Convergence step 25 value 5.53097e-13
+DEAL:cg:cg::Starting value 0.0555164
+DEAL:cg:cg::Convergence step 30 value 0.00172572
+DEAL:cg:cg::Starting value 0.00208394
+DEAL:cg:cg::Convergence step 25 value 1.92428e-13
+DEAL:cg:cg::Starting value 0.0202742
+DEAL:cg:cg::Convergence step 30 value 0.000727924
+DEAL:cg:cg::Starting value 0.000839806
+DEAL:cg:cg::Convergence step 25 value 7.63218e-14
+DEAL:cg:cg::Starting value 0.00899883
+DEAL:cg:cg::Convergence step 30 value 0.000386101
+DEAL:cg:cg::Starting value 0.000366998
+DEAL:cg:cg::Convergence step 25 value 2.97977e-14
+DEAL:cg:cg::Starting value 0.00371456
+DEAL:cg:cg::Convergence step 30 value 0.000143672
+DEAL:cg:cg::Starting value 0.000149522
+DEAL:cg:cg::Convergence step 25 value 1.25747e-14
+DEAL:cg:cg::Starting value 0.00151238
+DEAL:cg:cg::Convergence step 30 value 2.76485e-05
+DEAL:cg:cg::Starting value 5.80561e-05
+DEAL:cg:cg::Convergence step 25 value 4.95193e-15
+DEAL:cg:cg::Starting value 0.000568491
+DEAL:cg:cg::Convergence step 30 value 1.51566e-05
+DEAL:cg:cg::Starting value 2.14606e-05
+DEAL:cg:cg::Convergence step 25 value 1.85827e-15
+DEAL:cg:cg::Starting value 0.000231159
+DEAL:cg:cg::Convergence step 30 value 4.26986e-06
+DEAL:cg:cg::Starting value 8.83789e-06
+DEAL:cg:cg::Convergence step 25 value 7.59785e-16
+DEAL:cg:cg::Starting value 9.93855e-05
+DEAL:cg:cg::Convergence step 30 value 1.66407e-06
+DEAL:cg:cg::Starting value 3.98372e-06
+DEAL:cg:cg::Convergence step 25 value 3.25992e-16
+DEAL:cg:cg::Starting value 3.74185e-05
+DEAL:cg:cg::Convergence step 30 value 1.12542e-06
+DEAL:cg:cg::Starting value 1.44245e-06
+DEAL:cg:cg::Convergence step 25 value 1.13963e-16
+DEAL:cg:cg::Starting value 1.41827e-05
+DEAL:cg:cg::Convergence step 30 value 3.57707e-07
+DEAL:cg:cg::Starting value 5.33178e-07
+DEAL:cg:cg::Convergence step 25 value 4.28754e-17
+DEAL:cg:cg::Starting value 5.62814e-06
+DEAL:cg:cg::Convergence step 30 value 1.27950e-07
+DEAL:cg:cg::Starting value 2.23213e-07
+DEAL:cg:cg::Convergence step 25 value 1.81003e-17
+DEAL:cg:cg::Starting value 2.12806e-06
+DEAL:cg:cg::Convergence step 30 value 4.90715e-08
+DEAL:cg:cg::Starting value 8.59275e-08
+DEAL:cg:cg::Convergence step 25 value 6.89855e-18
+DEAL:cg:cg::Starting value 8.70957e-07
+DEAL:cg:cg::Convergence step 30 value 1.25220e-08
+DEAL:cg:cg::Starting value 3.33966e-08
+DEAL:cg:cg::Convergence step 25 value 2.74359e-18
+DEAL:cg:cg::Starting value 2.94918e-07
+DEAL:cg:cg::Convergence step 30 value 7.19353e-09
+DEAL:cg:cg::Starting value 1.20206e-08
+DEAL:cg:cg::Convergence step 25 value 9.72271e-19
+DEAL:cg:cg::Starting value 1.20514e-07
+DEAL:cg:cg::Convergence step 30 value 2.48469e-09
+DEAL:cg:cg::Starting value 4.68186e-09
+DEAL:cg:cg::Convergence step 25 value 3.97912e-19
+DEAL:cg:cg::Starting value 5.18972e-08
+DEAL:cg:cg::Convergence step 30 value 1.83964e-09
+DEAL:cg:cg::Starting value 2.00490e-09
+DEAL:cg:cg::Convergence step 24 value 4.00689e-19
+DEAL:cg:cg::Starting value 1.99515e-08
+DEAL:cg:cg::Convergence step 30 value 9.89302e-10
+DEAL:cg:cg::Starting value 7.90511e-10
+DEAL:cg:cg::Convergence step 23 value 4.17184e-19
+DEAL:cg:cg::Starting value 7.90659e-09
+DEAL:cg:cg::Convergence step 30 value 3.01626e-10
+DEAL:cg:cg::Starting value 3.15023e-10
+DEAL:cg:cg::Convergence step 22 value 4.65119e-19
+DEAL:cg:cg::Starting value 3.05591e-09
+DEAL:cg:cg::Convergence step 30 value 8.78930e-11
+DEAL:cg:cg::Starting value 1.23874e-10
+DEAL:cg:cg::Convergence step 21 value 4.01642e-19
+DEAL:cg:cg::Starting value 1.44274e-09
+DEAL:cg:cg::Convergence step 30 value 3.28342e-11
+DEAL:cg:cg::Starting value 5.36043e-11
+DEAL:cg:cg::Convergence step 20 value 4.90919e-19
+DEAL:cg:cg::Starting value 5.39812e-10
+DEAL:cg:cg::Convergence step 30 value 1.21691e-11
+DEAL:cg:cg::Starting value 2.06924e-11
+DEAL:cg:cg::Convergence step 19 value 5.18474e-19
+DEAL:cg:cg::Starting value 1.95959e-10
+DEAL:cg:cg::Convergence step 30 value 3.48296e-12
+DEAL:cg:cg::Starting value 7.18708e-12
+DEAL:cg:cg::Convergence step 18 value 4.56473e-19
+DEAL:cg:cg::Starting value 7.93580e-11
+DEAL:cg:cg::Convergence step 30 value 1.28153e-12
+DEAL:cg:cg::Starting value 2.99859e-12
+DEAL:cg:cg::Convergence step 17 value 4.66330e-19
+DEAL:cg:cg::Starting value 3.15137e-11
+DEAL:cg:cg::Convergence step 30 value 5.03608e-13
+DEAL:cg:cg::Starting value 1.21338e-12
+DEAL:cg:cg::Convergence step 16 value 4.39333e-19
+DEAL:cg:cg::Starting value 1.28779e-11
+DEAL:cg:cg::Convergence step 30 value 3.26557e-13
+DEAL:cg:cg::Starting value 4.68242e-13
+DEAL:cg:cg::Convergence step 15 value 4.13608e-19
+DEAL:cg:cg::Starting value 4.57873e-12
+DEAL:cg:cg::Convergence step 30 value 1.99147e-13
+DEAL:cg:cg::Starting value 1.70285e-13
+DEAL:cg:cg::Convergence step 14 value 4.69229e-19
+DEAL:cg:cg::Starting value 1.63301e-12
+DEAL:cg:cg::Convergence step 30 value 5.33467e-14
+DEAL:cg:cg::Starting value 6.71379e-14
+DEAL:cg:cg::Convergence step 13 value 4.72485e-19
+DEAL:cg::Convergence step 33 value 7.32840e-13
+DEAL::33 CG Schur complement iterations to obtain convergence.
+DEAL:cg::Starting value 0.143776
+DEAL:cg::Convergence step 19 value 1.12728e-11
+DEAL::Errors: ||e_p||_L2 = 0.00221522,   ||e_u||_L2 = 2.44171e-09

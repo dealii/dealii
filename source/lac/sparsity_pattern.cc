@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,6 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -27,6 +26,7 @@
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <numeric>
 
 DEAL_II_NAMESPACE_OPEN
@@ -275,7 +275,7 @@ SparsityPattern::reinit(const size_type                      m,
     {
       vec_len     = 1;
       max_vec_len = vec_len;
-      colnums     = std_cxx14::make_unique<size_type[]>(max_vec_len);
+      colnums     = std::make_unique<size_type[]>(max_vec_len);
     }
 
   max_row_length =
@@ -297,14 +297,14 @@ SparsityPattern::reinit(const size_type                      m,
   if (rows > max_dim)
     {
       max_dim  = rows;
-      rowstart = std_cxx14::make_unique<std::size_t[]>(max_dim + 1);
+      rowstart = std::make_unique<std::size_t[]>(max_dim + 1);
     }
 
   // allocate memory for the column numbers if necessary
   if (vec_len > max_vec_len)
     {
       max_vec_len = vec_len;
-      colnums     = std_cxx14::make_unique<size_type[]>(max_vec_len);
+      colnums     = std::make_unique<size_type[]>(max_vec_len);
     }
 
   // set the rowstart array
@@ -708,7 +708,7 @@ SparsityPatternBase::add(const size_type i, const size_type j)
   AssertIndexRange(j, cols);
   Assert(compressed == false, ExcMatrixIsCompressed());
 
-  for (std::size_t k = rowstart[i]; k < rowstart[i + 1]; k++)
+  for (std::size_t k = rowstart[i]; k < rowstart[i + 1]; ++k)
     {
       // entry already exists
       if (colnums[k] == j)
@@ -743,7 +743,7 @@ SparsityPattern::add_entries(const size_type row,
           bool            has_larger_entries = false;
           // skip diagonal
           std::size_t k = rowstart[row] + store_diagonal_first_in_row;
-          for (; k < rowstart[row + 1]; k++)
+          for (; k < rowstart[row + 1]; ++k)
             if (colnums[k] == invalid_entry)
               break;
             else if (colnums[k] >= *it)
@@ -876,7 +876,7 @@ SparsityPatternBase::print(std::ostream &out) const
 {
   Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   for (size_type i = 0; i < rows; ++i)
     {
@@ -887,7 +887,7 @@ SparsityPatternBase::print(std::ostream &out) const
       out << ']' << std::endl;
     }
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -897,7 +897,7 @@ SparsityPatternBase::print_gnuplot(std::ostream &out) const
 {
   Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = rowstart[i]; j < rowstart[i + 1]; ++j)
@@ -907,14 +907,14 @@ SparsityPatternBase::print_gnuplot(std::ostream &out) const
         // the order of output
         out << colnums[j] << " " << -static_cast<signed int>(i) << std::endl;
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 void
 SparsityPatternBase::print_svg(std::ostream &out) const
 {
-  unsigned int m = this->n_rows();
-  unsigned int n = this->n_cols();
+  const unsigned int m = this->n_rows();
+  const unsigned int n = this->n_cols();
   out
     << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 "
     << n + 2 << " " << m + 2
@@ -933,11 +933,10 @@ SparsityPatternBase::print_svg(std::ostream &out) const
     << n + 0.1 << "\" height=\"" << m + 0.1
     << "\" fill=\"rgb(255, 255, 255)\"/>\n\n";
 
-  SparsityPattern::iterator it = this->begin(), end = this->end();
-  for (; it != end; ++it)
+  for (const auto &entry : *this)
     {
-      out << "  <rect class=\"pixel\" x=\"" << it->column() + 1 << "\" y=\""
-          << it->row() + 1 << "\" width=\".9\" height=\".9\"/>\n";
+      out << "  <rect class=\"pixel\" x=\"" << entry.column() + 1 << "\" y=\""
+          << entry.row() + 1 << "\" width=\".9\" height=\".9\"/>\n";
     }
   out << "</svg>" << std::endl;
 }
@@ -967,7 +966,7 @@ SparsityPatternBase::bandwidth() const
 void
 SparsityPattern::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // first the simple objects, bracketed in [...]
   out << '[' << max_dim << ' ' << rows << ' ' << cols << ' ' << max_vec_len
@@ -983,7 +982,7 @@ SparsityPattern::block_write(std::ostream &out) const
               reinterpret_cast<const char *>(colnums.get()));
   out << ']';
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -991,7 +990,7 @@ SparsityPattern::block_write(std::ostream &out) const
 void
 SparsityPattern::block_read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   char c;
 
@@ -1007,8 +1006,8 @@ SparsityPattern::block_read(std::istream &in)
   AssertThrow(c == '[', ExcIO());
 
   // reallocate space
-  rowstart = std_cxx14::make_unique<std::size_t[]>(max_dim + 1);
-  colnums  = std_cxx14::make_unique<size_type[]>(max_vec_len);
+  rowstart = std::make_unique<std::size_t[]>(max_dim + 1);
+  colnums  = std::make_unique<size_type[]>(max_vec_len);
 
   // then read data
   in.read(reinterpret_cast<char *>(rowstart.get()),

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,8 +22,17 @@
 void
 print_time(const DiscreteTime &time)
 {
+  if (time.is_at_start())
+    deallog << "Simulation started" << std::endl;
   deallog << "Current time = " << time.get_current_time()
-          << ", next step size = " << time.get_next_step_size() << std::endl;
+          << ", next = " << time.get_next_time()
+          << ", previous = " << time.get_previous_time()
+          << ", step number = " << time.get_step_number()
+          << ", next step size = " << time.get_next_step_size()
+          << ", previous step size = " << time.get_previous_step_size()
+          << std::endl;
+  if (time.is_at_end())
+    deallog << "Simulation ended" << std::endl;
 }
 
 void
@@ -33,7 +42,7 @@ test_from_start_to_end()
 
   DiscreteTime time(/*start_time*/ 0.,
                     /*end_time*/ 1.5,
-                    /*start_step_size*/ 0.123);
+                    /*desired_start_step_size*/ 0.123);
 
   deallog << "Start time = " << time.get_start_time() << std::endl;
   deallog << "End time = " << time.get_end_time() << std::endl;
@@ -56,7 +65,7 @@ test_adjust_time_step_size()
 
   DiscreteTime time(/*start_time*/ 0.4,
                     /*end_time*/ 2.1,
-                    /*start_step_size*/ 0.15);
+                    /*desired_start_step_size*/ 0.15);
   print_time(time);
   time.advance_time();
   print_time(time);
@@ -65,7 +74,7 @@ test_adjust_time_step_size()
   print_time(time);
   time.advance_time();
   print_time(time);
-  time.set_next_step_size(0.61);
+  time.set_desired_next_step_size(0.61);
   time.advance_time();
   print_time(time);
   time.advance_time(); // Here we reach the end time.

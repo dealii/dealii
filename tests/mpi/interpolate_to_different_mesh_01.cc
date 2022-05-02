@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,7 +84,7 @@ output(DoFHandler<dim> & dh,
   data_out.add_data_vector(dh, v, "1");
   data_out.build_patches(1);
   std::ostringstream filename;
-  filename << filename_ << Utilities::int_to_string(loop, 2) << "."
+  filename << filename_ << Utilities::int_to_string(loop, 2) << '.'
            << Utilities::int_to_string(myid, 2) << ".vtu";
 
   std::ofstream output(filename.str().c_str());
@@ -97,10 +97,10 @@ output(DoFHandler<dim> & dh,
            ++i)
         filenames.push_back(filename_ + Utilities::int_to_string(loop, 2) +
                             "." + Utilities::int_to_string(i, 2) + ".vtu");
-      const std::string pvtu_master_filename =
+      const std::string pvtu_filename =
         (filename_ + Utilities::int_to_string(loop, 2) + ".pvtu");
-      std::ofstream pvtu_master(pvtu_master_filename.c_str());
-      data_out.write_pvtu_record(pvtu_master, filenames);
+      std::ofstream pvtu_output(pvtu_filename.c_str());
+      data_out.write_pvtu_record(pvtu_output, filenames);
     }
 }
 
@@ -206,7 +206,7 @@ test()
       const unsigned int checksum  = tr.get_checksum();
       const unsigned int checksum2 = tr2.get_checksum();
       if (myid == 0)
-        deallog << "Checksum: " << checksum << " " << checksum2 << std::endl;
+        deallog << "Checksum: " << checksum << ' ' << checksum2 << std::endl;
     }
 }
 

@@ -49,7 +49,7 @@ test()
 {
   VectorizedArray<Number> vector;
 
-  for (unsigned int v = 0; v < VectorizedArray<Number>::size(); v++)
+  for (unsigned int v = 0; v < VectorizedArray<Number>::size(); ++v)
     vector[v] = v;
 
   test_const(vector);

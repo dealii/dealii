@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,8 +68,8 @@ helmholtz_operator(const MatrixFree<dim, Number> &                        data,
 
       phi0.read_dof_values(src, 0);
       phi1.read_dof_values(src, 1);
-      phi0.evaluate(true, true, false);
-      phi1.evaluate(true, true, false);
+      phi0.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
+      phi1.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
       for (unsigned int q = 0; q < n_q_points; ++q)
         {
           phi0.submit_value(make_vectorized_array(Number(10)) *
@@ -81,9 +81,9 @@ helmholtz_operator(const MatrixFree<dim, Number> &                        data,
                             q);
           phi1.submit_gradient(phi1.get_gradient(q), q);
         }
-      phi0.integrate(true, true);
+      phi0.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       phi0.distribute_local_to_global(dst, 0);
-      phi1.integrate(true, true);
+      phi1.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       phi1.distribute_local_to_global(dst, 1);
     }
 }
@@ -94,8 +94,8 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
 public:
-  typedef VectorizedArray<Number> vector_t;
-  static const std::size_t        n_vectors = VectorizedArray<Number>::size();
+  using vector_t                     = VectorizedArray<Number>;
+  static const std::size_t n_vectors = VectorizedArray<Number>::size();
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};
@@ -125,7 +125,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double number;
+  using number = double;
 
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -263,7 +263,7 @@ test()
       sparse_matrix.vmult(ref, in.block(i));
       out.block(i) -= ref;
       const double diff_norm = out.block(i).linfty_norm();
-      deallog << diff_norm << " ";
+      deallog << diff_norm << ' ';
     }
   deallog << std::endl << std::endl;
 }

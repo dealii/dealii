@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,9 +64,6 @@ DEAL_II_NAMESPACE_OPEN
  * cg.solve (system_matrix, solution, system_rhs,
  *           IdentityMatrix(solution.size()));
  * @endcode
- *
- *
- * @author Wolfgang Bangerth, 2006
  */
 class IdentityMatrix
 {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_fe_field.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 
@@ -67,8 +67,8 @@ test()
   // Create a Mapping
   std::vector<LinearAlgebra::distributed::Vector<double>> level_vectors(
     tria.n_global_levels());
-  MappingQGeneric<dim, spacedim> mapping_ref(fe.degree);
-  FEValues<dim>                  fe_values_setup(mapping_ref,
+  MappingQ<dim, spacedim> mapping_ref(fe.degree);
+  FEValues<dim>           fe_values_setup(mapping_ref,
                                 dh.get_fe(),
                                 Quadrature<dim>(
                                   dh.get_fe().get_unit_support_points()),
@@ -98,10 +98,7 @@ test()
       level_vectors[level].update_ghost_values();
     }
 
-  MappingFEField<dim,
-                 spacedim,
-                 LinearAlgebra::distributed::Vector<double>,
-                 DoFHandler<dim>>
+  MappingFEField<dim, spacedim, LinearAlgebra::distributed::Vector<double>>
     mapping(dh, level_vectors);
 
   QGauss<dim>   quad(1);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2019 by the deal.II authors
+// Copyright (C) 2006 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,7 +64,6 @@ namespace internal
      * classes are included in the DoFLevel and DoFFaces classes.
      *
      * @ingroup dofs
-     * @author Tobias Leicht, 2006
      */
     template <int dim>
     class DoFObjects
@@ -85,9 +84,9 @@ namespace internal
        *
        * The third argument, @p fe_index, must equal zero. It is otherwise
        * unused, but we retain the argument so that we can use the same
-       * interface for non-hp and hp finite element methods, in effect making
-       * it possible to share the DoFAccessor class hierarchy between hp and
-       * non-hp classes.
+       * interface for non-hp- and hp-finite element methods, in effect making
+       * it possible to share the DoFAccessor class hierarchy between hp- and
+       * non-hp-classes.
        */
       template <int dh_dim, int spacedim>
       void
@@ -105,9 +104,9 @@ namespace internal
        *
        * The third argument, @p fe_index, must equal zero. It is otherwise
        * unused, but we retain the argument so that we can use the same
-       * interface for non-hp and hp finite element methods, in effect making
-       * it possible to share the DoFAccessor class hierarchy between hp and
-       * non-hp classes.
+       * interface for non-hp- and hp-finite element methods, in effect making
+       * it possible to share the DoFAccessor class hierarchy between hp- and
+       * non-hp-classes.
        */
       template <int dh_dim, int spacedim>
       types::global_dof_index
@@ -147,7 +146,8 @@ namespace internal
 
       /**
        * Read or write the data of this object to or from a stream for the
-       * purpose of serialization
+       * purpose of serialization using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
        */
       template <class Archive>
       void
@@ -185,9 +185,10 @@ namespace internal
       const unsigned int fe_index) const
     {
       (void)fe_index;
-      Assert(fe_index == 0,
+      Assert((fe_index ==
+              dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
              ExcMessage("Only zero fe_index values are allowed for "
-                        "non-hp DoFHandlers."));
+                        "non-hp-DoFHandlers."));
       return true;
     }
 
@@ -206,7 +207,7 @@ namespace internal
       Assert(
         (fe_index == dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
         ExcMessage(
-          "Only the default FE index is allowed for non-hp DoFHandler objects"));
+          "Only the default FE index is allowed for non-hp-DoFHandler objects"));
       Assert(
         local_index < dof_handler.get_fe().template n_dofs_per_object<dim>(),
         ExcIndexRange(local_index,

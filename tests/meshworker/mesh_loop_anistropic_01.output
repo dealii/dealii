@@ -1,0 +1,61 @@
+
+DEAL::Testing dim = 2
+DEAL::===============
+DEAL::
+DEAL::Cell (+): 2.0 -- 1, -1
+DEAL::Cell (-): 3.0 -- 0, -1
+DEAL::
+DEAL::Cell (+): 2.2 -- 0, -1
+DEAL::Cell (-): 4.0 -- 1, -1
+DEAL::
+DEAL::Cell (+): 2.2 -- 3, -1
+DEAL::Cell (-): 2.3 -- 2, -1
+DEAL::
+DEAL::Cell (+): 2.3 -- 0, -1
+DEAL::Cell (-): 5.1 -- 1, -1
+DEAL::
+DEAL::Cell (+): 4.0 -- 0, -1
+DEAL::Cell (-): 3.0 -- 1, 0
+DEAL::
+DEAL::Cell (+): 5.0 -- 0, -1
+DEAL::Cell (-): 3.0 -- 1, 1
+DEAL::
+DEAL::Cell (+): 5.0 -- 1, -1
+DEAL::Cell (-): 5.1 -- 0, -1
+DEAL::
+DEAL::Cell (+): 5.0 -- 2, -1
+DEAL::Cell (-): 4.0 -- 3, 0
+DEAL::
+DEAL::Cell (+): 5.1 -- 2, -1
+DEAL::Cell (-): 4.0 -- 3, 1
+DEAL::
+DEAL::Testing dim = 3
+DEAL::===============
+DEAL::
+DEAL::Cell (+): 2.0 -- 3, -1
+DEAL::Cell (-): 2.1 -- 2, -1
+DEAL::
+DEAL::Cell (+): 2.2 -- 0, -1
+DEAL::Cell (-): 2.0 -- 1, 0
+DEAL::
+DEAL::Cell (+): 2.2 -- 3, -1
+DEAL::Cell (-): 2.3 -- 2, -1
+DEAL::
+DEAL::Cell (+): 2.2 -- 5, -1
+DEAL::Cell (-): 2.4 -- 4, -1
+DEAL::
+DEAL::Cell (+): 2.3 -- 0, -1
+DEAL::Cell (-): 2.1 -- 1, 0
+DEAL::
+DEAL::Cell (+): 2.3 -- 5, -1
+DEAL::Cell (-): 2.5 -- 4, -1
+DEAL::
+DEAL::Cell (+): 2.4 -- 0, -1
+DEAL::Cell (-): 2.0 -- 1, 1
+DEAL::
+DEAL::Cell (+): 2.4 -- 3, -1
+DEAL::Cell (-): 2.5 -- 2, -1
+DEAL::
+DEAL::Cell (+): 2.5 -- 0, -1
+DEAL::Cell (-): 2.1 -- 1, 1
+DEAL::

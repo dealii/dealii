@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -86,12 +86,12 @@ test(VectorTools::NormType norm, double exp = 2.0)
   Vector<double> solution(dofh.n_dofs());
 
   Vector<double> cellwise_errors(tria.n_active_cells());
-  QIterated<dim> quadrature(QTrapez<1>(), 2);
+  QIterated<dim> quadrature(QTrapezoid<1>(), 2);
 
   const ComponentSelectFunction<dim> component_mask(1, 2);
   VectorTools::integrate_difference(dofh,
                                     solution,
-                                    ZeroFunction<dim>(2),
+                                    Functions::ZeroFunction<dim>(2),
                                     cellwise_errors,
                                     quadrature,
                                     norm,

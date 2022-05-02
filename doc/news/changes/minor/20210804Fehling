@@ -1,0 +1,4 @@
+New: Diagnostic functions AffineConstraints::n_identities() and
+AffineConstraints::n_inhomogeneities() to analyse your constraints.
+<br>
+(Marc Fehling, 2021/08/04)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,6 @@
 #include <deal.II/base/polynomials_p.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 
@@ -31,10 +30,15 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 
 DEAL_II_NAMESPACE_OPEN
+
+// TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+// adjust_line_dof_index_for_line_orientation_table fields, and write tests
+// similar to bits/face_orientation_and_fe_q_*
 
 template <int dim>
 FE_BDM<dim>::FE_BDM(const unsigned int deg)
@@ -54,7 +58,7 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg)
     ExcMessage(
       "Lowest order BDM element are degree 1, but you asked for degree 0"));
 
-  const unsigned int n_dofs = this->dofs_per_cell;
+  const unsigned int n_dofs = this->n_dofs_per_cell();
 
   this->mapping_kind = {mapping_bdm};
   // These must be done first, since
@@ -80,12 +84,17 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg)
   this->reinit_restriction_and_prolongation_matrices(true, true);
   FETools::compute_embedding_matrices(*this, this->prolongation, true, 1.);
 
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
-    face_embeddings[i].reinit(this->dofs_per_face, this->dofs_per_face);
+    face_embeddings[i].reinit(this->n_dofs_per_face(face_no),
+                              this->n_dofs_per_face(face_no));
   FETools::compute_face_embedding_matrices(*this, face_embeddings, 0, 0, 1.);
-  this->interface_constraints.reinit((1 << (dim - 1)) * this->dofs_per_face,
-                                     this->dofs_per_face);
+  this->interface_constraints.reinit((1 << (dim - 1)) *
+                                       this->n_dofs_per_face(face_no),
+                                     this->n_dofs_per_face(face_no));
   unsigned int target_row = 0;
   for (unsigned int d = 0; d < GeometryInfo<dim>::max_children_per_face; ++d)
     for (unsigned int i = 0; i < face_embeddings[d].m(); ++i)
@@ -94,8 +103,24 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg)
           this->interface_constraints(target_row, j) = face_embeddings[d](i, j);
         ++target_row;
       }
+
+  // We need to initialize the dof permutation table and the one for the sign
+  // change.
+  initialize_quad_dof_index_permutation_and_sign_change();
 }
 
+
+template <int dim>
+void
+FE_BDM<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+{
+  // for 1D and 2D, do nothing
+  if (dim < 3)
+    return;
+
+  // TODO: Implement this for this class
+  return;
+}
 
 
 template <int dim>
@@ -124,7 +149,7 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_BDM<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_BDM<dim>>(*this);
+  return std::make_unique<FE_BDM<dim>>(*this);
 }
 
 
@@ -139,8 +164,8 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
   AssertDimension(support_point_values[0].size(), dim);
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
 
   // First do interpolation on faces. There, the component evaluated
   // depends on the face direction and orientation.
@@ -155,15 +180,15 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
       // initialize_support_points()
       if (test_values_face.size() == 0)
         {
-          for (unsigned int i = 0; i < this->dofs_per_face; ++i)
+          for (unsigned int i = 0; i < this->n_dofs_per_face(f); ++i)
             nodal_values[dbase + i] =
               support_point_values[pbase + i]
                                   [GeometryInfo<dim>::unit_normal_direction[f]];
-          pbase += this->dofs_per_face;
+          pbase += this->n_dofs_per_face(f);
         }
       else
         {
-          for (unsigned int i = 0; i < this->dofs_per_face; ++i)
+          for (unsigned int i = 0; i < this->n_dofs_per_face(f); ++i)
             {
               double s = 0.;
               for (unsigned int k = 0; k < test_values_face.size(); ++k)
@@ -175,24 +200,29 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
             }
           pbase += test_values_face.size();
         }
-      dbase += this->dofs_per_face;
+      dbase += this->n_dofs_per_face(f);
     }
 
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+  (void)face_no;
+
   AssertDimension(dbase,
-                  this->dofs_per_face * GeometryInfo<dim>::faces_per_cell);
+                  this->n_dofs_per_face(face_no) *
+                    GeometryInfo<dim>::faces_per_cell);
   AssertDimension(pbase,
                   this->generalized_support_points.size() -
                     test_values_cell.size());
 
   // Done for BDM1
-  if (dbase == this->dofs_per_cell)
+  if (dbase == this->n_dofs_per_cell())
     return;
 
   // What's missing are the interior
   // degrees of freedom. In each
   // point, we take all components of
   // the solution.
-  Assert((this->dofs_per_cell - dbase) % dim == 0, ExcInternalError());
+  Assert((this->n_dofs_per_cell() - dbase) % dim == 0, ExcInternalError());
 
   for (unsigned int d = 0; d < dim; ++d, dbase += test_values_cell[0].size())
     {
@@ -205,7 +235,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
         }
     }
 
-  Assert(dbase == this->dofs_per_cell, ExcInternalError());
+  Assert(dbase == this->n_dofs_per_cell(), ExcInternalError());
 }
 
 
@@ -332,10 +362,15 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   // considered later. In 2D, we can use point values.
   QGauss<dim - 1> face_points(deg + 1);
 
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
   // Copy the quadrature formula to the face points.
-  this->generalized_face_support_points.resize(face_points.size());
+  this->generalized_face_support_points[face_no].resize(face_points.size());
   for (unsigned int k = 0; k < face_points.size(); ++k)
-    this->generalized_face_support_points[k] = face_points.point(k);
+    this->generalized_face_support_points[face_no][k] = face_points.point(k);
 
   // In the interior, we only test with polynomials of degree up to
   // deg-2, thus we use deg points. Note that deg>=1 and the lowest
@@ -349,13 +384,19 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
 
   this->generalized_support_points.resize(npoints);
 
-  Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(face_points);
+  Quadrature<dim> faces =
+    QProjector<dim>::project_to_all_faces(this->reference_cell(), face_points);
   for (unsigned int k = 0;
        k < face_points.size() * GeometryInfo<dim>::faces_per_cell;
        ++k)
-    this->generalized_support_points[k] =
-      faces.point(k + QProjector<dim>::DataSetDescriptor::face(
-                        0, true, false, false, this->dofs_per_face));
+    this->generalized_support_points[k] = faces.point(
+      k +
+      QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
+                                               0,
+                                               true,
+                                               false,
+                                               false,
+                                               this->n_dofs_per_face(face_no)));
 
   // Currently, for backward compatibility, we do not use moments, but
   // point values on faces in 2D. In 3D, this is impossible, since the

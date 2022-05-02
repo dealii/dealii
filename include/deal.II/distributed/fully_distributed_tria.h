@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,9 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
-
-#include <deal.II/grid/grid_tools.h>
 
 #include <vector>
 
@@ -108,8 +107,6 @@ namespace parallel
      * @note Currently only simple periodicity conditions (i.e. without offsets
      *       and rotation matrices - see also the documentation of
      *       GridTools::collect_periodic_faces()) are supported.
-     *
-     * @author Peter Munch, 2019
      */
     template <int dim, int spacedim = dim>
     class Triangulation
@@ -131,7 +128,7 @@ namespace parallel
        * @param mpi_communicator The MPI communicator to be used for the
        *                         triangulation.
        */
-      explicit Triangulation(MPI_Comm mpi_communicator);
+      explicit Triangulation(const MPI_Comm &mpi_communicator);
 
       /**
        * Destructor.
@@ -199,6 +196,22 @@ namespace parallel
         const TriangulationDescription::Settings &     settings);
 
       /**
+       * Register a partitioner, which is used within the method
+       * repartition().
+       */
+      void
+      set_partitioner(
+        const RepartitioningPolicyTools::Base<dim, spacedim> &partitioner,
+        const TriangulationDescription::Settings &            settings);
+
+      /**
+       * Execute repartitioning and use the partitioner attached by the
+       * method set_partitioner();
+       */
+      void
+      repartition();
+
+      /**
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
        *
@@ -217,14 +230,6 @@ namespace parallel
       prepare_coarsening_and_refinement() override;
 
       /**
-       * Return true if the triangulation has hanging nodes.
-       *
-       * @note Not implemented yet.
-       */
-      virtual bool
-      has_hanging_nodes() const override;
-
-      /**
        * Return the local memory consumption in bytes.
        */
       virtual std::size_t
@@ -233,6 +238,39 @@ namespace parallel
       virtual bool
       is_multilevel_hierarchy_constructed() const override;
 
+      /**
+       * Save the triangulation into the given file. This file needs to be
+       * reachable from all nodes in the computation on a shared network file
+       * system. See the SolutionTransfer class on how to store solution vectors
+       * into this file. Additional cell-based data can be saved using
+       * register_data_attach().
+       */
+      virtual void
+      save(const std::string &filename) const override;
+
+      /**
+       * Load the triangulation saved with save() back in. The mesh
+       * must be empty before calling this function.
+       *
+       * You need to load with the same number of MPI processes that
+       * you saved with, hence autopartition is disabled.
+       *
+       * Cell-based data that was saved with register_data_attach() can be read
+       * in with notify_ready_to_unpack() after calling load().
+       */
+      virtual void
+      load(const std::string &filename) override;
+
+      /**
+       * @copydoc load()
+       *
+       * @deprecated The autopartition parameter has been removed.
+       */
+      DEAL_II_DEPRECATED_EARLY
+      virtual void
+      load(const std::string &filename, const bool autopartition) override;
+
+    private:
       virtual unsigned int
       coarse_cell_id_to_coarse_cell_index(
         const types::coarse_cell_id coarse_cell_id) const override;
@@ -241,11 +279,20 @@ namespace parallel
       coarse_cell_index_to_coarse_cell_id(
         const unsigned int coarse_cell_index) const override;
 
-    private:
       /**
-       * Override the function to update the number cache so we can fill data
-       * like @p level_ghost_owners.
+       * Go through all active cells that are locally owned and record how they
+       * will change in the private member vector local_cell_relations.
+       *
+       * As no adaptive mesh refinement is supported at the moment for this
+       * class, all cells will be flagged with the CellStatus CELL_PERSIST.
+       * These relations will currently only be used for serialization.
+       *
+       * The stored vector will have a size equal to the number of locally owned
+       * active cells and will be ordered by the occurrence of those cells.
        */
+      virtual void
+      update_cell_relations() override;
+
       virtual void
       update_number_cache() override;
 
@@ -260,6 +307,12 @@ namespace parallel
       std::function<void(dealii::Triangulation<dim, spacedim> &,
                          const unsigned int)>
         partitioner;
+
+      /**
+       * Partitioner used during repartition().
+       */
+      SmartPointer<const RepartitioningPolicyTools::Base<dim, spacedim>>
+        partitioner_distributed;
 
       /**
        * Sorted list of pairs of coarse-cell ids and their indices.

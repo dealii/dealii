@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,11 +22,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
-
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#include <boost/geometry/algorithms/envelope.hpp>
-#include <boost/geometry/geometries/multi_point.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -71,14 +66,14 @@ enum class NeighborType
 /**
  * A class that represents a box of arbitrary dimension <tt>spacedim</tt> and
  * with sides parallel to the coordinate axes, that is, a region
- *
  * @f[
  * [x_0^L, x_0^U] \times ... \times [x_{spacedim-1}^L, x_{spacedim-1}^U],
  * @f]
- *
- * where $(x_0^L , ..., x_{spacedim-1}^L) and $(x_0^U , ..., x_{spacedim-1}^U)
+ * where $(x_0^L , ..., x_{spacedim-1}^L)$ and $(x_0^U , ..., x_{spacedim-1}^U)$
  * denote the two vertices (bottom left and top right) which are used to
- * represent the box.
+ * represent the box. The quantities $x_k^L$ and $x_k^U$ denote the "lower"
+ * and "upper" bounds of values that are within the box for each coordinate
+ * direction $k$.
  *
  * Geometrically, a bounding box is thus:
  * - 1D: a segment (represented by its vertices in the proper order)
@@ -101,7 +96,17 @@ enum class NeighborType
  * @endcode
  *
  * Bounding boxes are, for example, useful in parallel distributed meshes to
- * give a general description of the owners of each portion of the mesh.
+ * give a general description of the owners of each portion of the mesh. More
+ * generally, bounding boxes are often used to roughly describe a region of
+ * space in which an object is contained; if a candidate point is not within
+ * the bounding box (a test that is cheap to execute), then it is not necessary
+ * to perform an expensive test whether the candidate point is in fact inside
+ * the object itself. Bounding boxes are therefore often used as a first,
+ * cheap rejection test before more detailed checks. As such, bounding boxes
+ * serve many of the same purposes as the
+ * [convex hull](https://en.wikipedia.org/wiki/Convex_hull), for which it is
+ * also relatively straightforward to compute whether a point is inside or
+ * outside, though not quite as cheap as for the bounding box.
  *
  * Taking the cross section of a BoundingBox<spacedim> orthogonal to a given
  * direction gives a box in one dimension lower: BoundingBox<spacedim - 1>.
@@ -121,8 +126,6 @@ enum class NeighborType
  *
  * This is according to the convention set by the function
  * <code>coordinate_to_one_dim_higher</code>.
- *
- * @author Giovanni Alzetta, 2017, Simon Sticko 2020.
  */
 template <int spacedim, typename Number = double>
 class BoundingBox
@@ -165,6 +168,18 @@ public:
   get_boundary_points() const;
 
   /**
+   * Test for equality.
+   */
+  bool
+  operator==(const BoundingBox<spacedim, Number> &box) const;
+
+  /**
+   * Test for inequality.
+   */
+  bool
+  operator!=(const BoundingBox<spacedim, Number> &box) const;
+
+  /**
    * Check if the current object and @p other_bbox are neighbors, i.e. if the boxes
    * have dimension spacedim, check if their intersection is non empty.
    *
@@ -182,10 +197,15 @@ public:
   merge_with(const BoundingBox<spacedim, Number> &other_bbox);
 
   /**
-   * Return true if the point is inside the Bounding Box, false otherwise.
+   * Return true if the point is inside the Bounding Box, false otherwise. The
+   * parameter @p tolerance is a factor by which the bounding box is enlarged
+   * relative to the dimensions of the bounding box in order to determine in a
+   * numerically robust way whether the point is inside.
    */
   bool
-  point_inside(const Point<spacedim, Number> &p) const;
+  point_inside(
+    const Point<spacedim, Number> &p,
+    const double tolerance = std::numeric_limits<Number>::epsilon()) const;
 
   /**
    * Increase (or decrease) the size of the bounding box by the given amount.
@@ -198,7 +218,7 @@ public:
    * an assertion.
    */
   void
-  extend(const Number &amount);
+  extend(const Number amount);
 
   /**
    * Compute the volume (i.e. the dim-dimensional measure) of the BoundingBox.
@@ -253,12 +273,39 @@ public:
   /**
    * Returns the cross section of the box orthogonal to @p direction.
    * This is a box in one dimension lower.
+   *
+   * @note Calling this method in 1D will result in an exception since
+   * <code>BoundingBox&lt;0&gt;</code> is not implemented.
    */
   BoundingBox<spacedim - 1, Number>
   cross_section(const unsigned int direction) const;
 
   /**
-   * Boost serialization function
+   * Apply the affine transformation that transforms this BoundingBox to a unit
+   * BoundingBox object.
+   *
+   * If $B$ is this bounding box, and $\hat{B}$ is the unit bounding box,
+   * compute the affine mapping that satisfies $G(B) = \hat{B}$ and apply it to
+   * @p point.
+   */
+  Point<spacedim, Number>
+  real_to_unit(const Point<spacedim, Number> &point) const;
+
+  /**
+   * Apply the affine transformation that transforms the unit BoundingBox object
+   * to this object.
+   *
+   * If $B$ is this bounding box, and $\hat{B}$ is the unit bounding box,
+   * compute the affine mapping that satisfies $F(\hat{B}) = B$ and apply it to
+   * @p point.
+   */
+  Point<spacedim, Number>
+  unit_to_real(const Point<spacedim, Number> &point) const;
+
+  /**
+   * Write or read the data of this object to or from a stream for the
+   * purpose of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -266,6 +313,32 @@ public:
 
 private:
   std::pair<Point<spacedim, Number>, Point<spacedim, Number>> boundary_points;
+};
+
+/**
+ * Specialization of BoundingBox for spacedim 0. This class exists to enable
+ * dimension-independent programming but unconditionally throws an exception
+ * in its constructor.
+ */
+template <typename Number>
+class BoundingBox<0, Number>
+{
+public:
+  /**
+   * Default constructor. Throws an exception.
+   */
+  BoundingBox();
+
+  /**
+   * Equivalent two-point constructor. Throws an exception.
+   */
+  BoundingBox(const std::pair<Point<0, Number>, Point<0, Number>> &);
+
+  /**
+   * Equivalent container constructor. Throws an exception.
+   */
+  template <class Container>
+  BoundingBox(const Container &);
 };
 
 
@@ -308,19 +381,19 @@ namespace internal
    * dimension to a coordinate index in dim + 1 dimensions.
    *
    * @param locked_coordinate should be in the range [0, dim+1).
-   * @param coordiante_in_dim should be in the range [0, dim).
+   * @param coordinate_in_dim should be in the range [0, dim).
    * @return A coordinate index in the range [0, dim+1)
    *
    * @relates BoundingBox
    */
   template <int dim>
-  inline unsigned int
-  coordinate_to_one_dim_higher(const unsigned int locked_coordinate,
-                               const unsigned int coordiante_in_dim)
+  inline int
+  coordinate_to_one_dim_higher(const int locked_coordinate,
+                               const int coordinate_in_dim)
   {
     AssertIndexRange(locked_coordinate, dim + 1);
-    AssertIndexRange(coordiante_in_dim, dim);
-    return (locked_coordinate + coordiante_in_dim + 1) % (dim + 1);
+    AssertIndexRange(coordinate_in_dim, dim);
+    return (locked_coordinate + coordinate_in_dim + 1) % (dim + 1);
   }
 
 } // namespace internal
@@ -350,17 +423,71 @@ template <int spacedim, typename Number>
 template <class Container>
 inline BoundingBox<spacedim, Number>::BoundingBox(const Container &points)
 {
-  boost::geometry::envelope(
-    boost::geometry::model::multi_point<Point<spacedim, Number>>(points.begin(),
-                                                                 points.end()),
-    *this);
+  // Use the default constructor in case points is empty instead of setting
+  // things to +oo and -oo
+  if (points.size() > 0)
+    {
+      auto &min = boundary_points.first;
+      auto &max = boundary_points.second;
+      std::fill(min.begin_raw(),
+                min.end_raw(),
+                std::numeric_limits<Number>::infinity());
+      std::fill(max.begin_raw(),
+                max.end_raw(),
+                -std::numeric_limits<Number>::infinity());
+
+      for (const Point<spacedim, Number> &point : points)
+        for (unsigned int d = 0; d < spacedim; ++d)
+          {
+            min[d] = std::min(min[d], point[d]);
+            max[d] = std::max(max[d], point[d]);
+          }
+    }
+}
+
+
+
+template <int spacedim, typename Number>
+inline std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
+BoundingBox<spacedim, Number>::get_boundary_points()
+{
+  return this->boundary_points;
+}
+
+
+
+template <int spacedim, typename Number>
+inline const std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
+BoundingBox<spacedim, Number>::get_boundary_points() const
+{
+  return this->boundary_points;
+}
+
+
+
+template <int spacedim, typename Number>
+inline bool
+BoundingBox<spacedim, Number>::operator==(
+  const BoundingBox<spacedim, Number> &box) const
+{
+  return boundary_points == box.boundary_points;
+}
+
+
+
+template <int spacedim, typename Number>
+inline bool
+BoundingBox<spacedim, Number>::operator!=(
+  const BoundingBox<spacedim, Number> &box) const
+{
+  return boundary_points != box.boundary_points;
 }
 
 
 
 template <int spacedim, typename Number>
 inline void
-BoundingBox<spacedim, Number>::extend(const Number &amount)
+BoundingBox<spacedim, Number>::extend(const Number amount)
 {
   for (unsigned int d = 0; d < spacedim; ++d)
     {
@@ -381,6 +508,34 @@ BoundingBox<spacedim, Number>::serialize(Archive &ar,
 {
   ar &boundary_points;
 }
+
+
+
+template <typename Number>
+inline BoundingBox<0, Number>::BoundingBox()
+{
+  AssertThrow(false, ExcImpossibleInDim(0));
+}
+
+
+
+template <typename Number>
+inline BoundingBox<0, Number>::BoundingBox(
+  const std::pair<Point<0, Number>, Point<0, Number>> &)
+{
+  AssertThrow(false, ExcImpossibleInDim(0));
+}
+
+
+
+template <typename Number>
+template <class Container>
+inline BoundingBox<0, Number>::BoundingBox(const Container &)
+{
+  AssertThrow(false, ExcImpossibleInDim(0));
+}
+
+
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE

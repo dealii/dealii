@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,6 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -37,25 +36,13 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
+#include <memory>
+
 DEAL_II_NAMESPACE_OPEN
 
 
 
 // .... MAPPING Q EULERIAN CONSTRUCTOR
-
-template <int dim, class VectorType, int spacedim>
-MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
-  MappingQEulerianGeneric(
-    const unsigned int                                 degree,
-    const MappingQEulerian<dim, VectorType, spacedim> &mapping_q_eulerian)
-  : MappingQGeneric<dim, spacedim>(degree)
-  , mapping_q_eulerian(mapping_q_eulerian)
-  , support_quadrature(degree)
-  , fe_values(mapping_q_eulerian.euler_dof_handler->get_fe(),
-              support_quadrature,
-              update_values | update_quadrature_points)
-{}
-
 
 
 template <int dim, class VectorType, int spacedim>
@@ -64,21 +51,15 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
   const DoFHandler<dim, spacedim> &euler_dof_handler,
   const VectorType &               euler_vector,
   const unsigned int               level)
-  : MappingQ<dim, spacedim>(degree, true)
+  : MappingQ<dim, spacedim>(degree)
   , euler_vector(&euler_vector)
   , euler_dof_handler(&euler_dof_handler)
   , level(level)
-{
-  // reset the q1 mapping we use for interior cells (and previously
-  // set by the MappingQ constructor) to a MappingQ1Eulerian with the
-  // current vector
-  this->q1_mapping =
-    std::make_shared<MappingQ1Eulerian<dim, VectorType, spacedim>>(
-      euler_dof_handler, euler_vector);
-
-  // also reset the qp mapping pointer with our own class
-  this->qp_mapping = std::make_shared<MappingQEulerianGeneric>(degree, *this);
-}
+  , support_quadrature(degree)
+  , fe_values(euler_dof_handler.get_fe(),
+              support_quadrature,
+              update_values | update_quadrature_points)
+{}
 
 
 
@@ -86,8 +67,8 @@ template <int dim, class VectorType, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQEulerian<dim, VectorType, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQEulerian<dim, VectorType, spacedim>>(
-    this->get_degree(), *euler_dof_handler, *euler_vector);
+  return std::make_unique<MappingQEulerian<dim, VectorType, spacedim>>(
+    this->get_degree(), *euler_dof_handler, *euler_vector, this->level);
 }
 
 
@@ -95,8 +76,8 @@ MappingQEulerian<dim, VectorType, spacedim>::clone() const
 // .... SUPPORT QUADRATURE CONSTRUCTOR
 
 template <int dim, class VectorType, int spacedim>
-MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
-  SupportQuadrature::SupportQuadrature(const unsigned int map_degree)
+MappingQEulerian<dim, VectorType, spacedim>::SupportQuadrature::
+  SupportQuadrature(const unsigned int map_degree)
   : Quadrature<dim>(Utilities::fixed_power<dim>(map_degree + 1))
 {
   // first we determine the support points on the unit cell in lexicographic
@@ -120,20 +101,18 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
 // .... COMPUTE MAPPING SUPPORT POINTS
 
 template <int dim, class VectorType, int spacedim>
-std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+boost::container::small_vector<Point<spacedim>,
+                               GeometryInfo<dim>::vertices_per_cell>
 MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
   // get the vertices as the first 2^dim mapping support points
-  const std::vector<Point<spacedim>> a =
-    dynamic_cast<const MappingQEulerianGeneric &>(*this->qp_mapping)
-      .compute_mapping_support_points(cell);
+  const std::vector<Point<spacedim>> a = compute_mapping_support_points(cell);
 
-  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-    vertex_locations;
-  std::copy(a.begin(),
-            a.begin() + GeometryInfo<dim>::vertices_per_cell,
-            vertex_locations.begin());
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<dim>::vertices_per_cell>
+    vertex_locations(a.begin(),
+                     a.begin() + GeometryInfo<dim>::vertices_per_cell);
 
   return vertex_locations;
 }
@@ -141,41 +120,15 @@ MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
 
 
 template <int dim, class VectorType, int spacedim>
-std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
-  get_vertices(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
-{
-  return mapping_q_eulerian.get_vertices(cell);
-}
-
-
-
-template <int dim, class VectorType, int spacedim>
-bool
-MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
-  preserves_vertex_locations() const
-{
-  return false;
-}
-
-
-
-template <int dim, class VectorType, int spacedim>
 std::vector<Point<spacedim>>
-MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
-  compute_mapping_support_points(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  const bool mg_vector =
-    mapping_q_eulerian.level != numbers::invalid_unsigned_int;
+  const bool mg_vector = level != numbers::invalid_unsigned_int;
 
   const types::global_dof_index n_dofs =
-    mg_vector ?
-      mapping_q_eulerian.euler_dof_handler->n_dofs(mapping_q_eulerian.level) :
-      mapping_q_eulerian.euler_dof_handler->n_dofs();
-  const types::global_dof_index vector_size =
-    mapping_q_eulerian.euler_vector->size();
+    mg_vector ? euler_dof_handler->n_dofs(level) : euler_dof_handler->n_dofs();
+  const types::global_dof_index vector_size = euler_vector->size();
 
   (void)n_dofs;
   (void)vector_size;
@@ -184,8 +137,8 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
 
   // we then transform our tria iterator into a dof iterator so we can access
   // data not associated with triangulations
-  typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(
-    *cell, mapping_q_eulerian.euler_dof_handler);
+  typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(*cell,
+                                                             euler_dof_handler);
 
   Assert(mg_vector || dof_cell->is_active() == true, ExcInactiveCell());
 
@@ -201,8 +154,7 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
   // that. This implies that the user should order components appropriately,
   // or create a separate dof handler for the displacements.
   const unsigned int n_support_pts = support_quadrature.size();
-  const unsigned int n_components =
-    mapping_q_eulerian.euler_dof_handler->get_fe(0).n_components();
+  const unsigned int n_components = euler_dof_handler->get_fe(0).n_components();
 
   Assert(n_components >= spacedim,
          ExcDimensionMismatch(n_components, spacedim));
@@ -211,7 +163,7 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
     n_support_pts, Vector<typename VectorType::value_type>(n_components));
 
   std::vector<types::global_dof_index> dof_indices(
-    mapping_q_eulerian.euler_dof_handler->get_fe(0).dofs_per_cell);
+    euler_dof_handler->get_fe(0).n_dofs_per_cell());
   // fill shift vector for each support point using an fe_values object. make
   // sure that the fe_values variable isn't used simultaneously from different
   // threads
@@ -220,13 +172,10 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
   if (mg_vector)
     {
       dof_cell->get_mg_dof_indices(dof_indices);
-      fe_values.get_function_values(*mapping_q_eulerian.euler_vector,
-                                    dof_indices,
-                                    shift_vector);
+      fe_values.get_function_values(*euler_vector, dof_indices, shift_vector);
     }
   else
-    fe_values.get_function_values(*mapping_q_eulerian.euler_vector,
-                                  shift_vector);
+    fe_values.get_function_values(*euler_vector, shift_vector);
 
   // and finally compute the positions of the support points in the deformed
   // configuration.
@@ -266,7 +215,6 @@ MappingQEulerian<dim, VectorType, spacedim>::fill_fe_values(
   // the original vertices which are meaningless
   return CellSimilarity::invalid_next_cell;
 }
-
 
 
 // explicit instantiations

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,11 +48,11 @@ template <typename NumberType>
 void
 test_number_functions()
 {
-  typedef SD::Expression                SD_number_t;
-  typedef SE::RCP<const SE::RealDouble> SE_double_t;
-  // typedef SD_number_t result_t;
-  typedef NumberType result_t;
-  typedef double     float_result_t;
+  using SD_number_t = SD::Expression;
+  using SE_double_t = SE::RCP<const SE::RealDouble>;
+  // using result_t = SD_number_t;
+  using result_t       = NumberType;
+  using float_result_t = double;
 
   // Primitive numbers
   const NumberType x_(NumberType(2.2));

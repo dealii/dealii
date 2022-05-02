@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -118,7 +118,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   VectorFunction<dim> fe_function;
 
-  MappingQGeneric<dim> mapping(1);
+  MappingQ<dim> mapping(1);
 
   const QGauss<dim> quadrature(fe.degree + 2);
   FEValues<dim>     fe_values(mapping,
@@ -155,7 +155,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
           function_vals, selected_vector_values);
         deallog << "component=" << c << std::endl;
 
-        for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+        for (const auto q : fe_values.quadrature_point_indices())
           for (unsigned int d = 0; d < dim; ++d)
             {
               for (unsigned int e = 0; e < dim; ++e)
@@ -188,7 +188,7 @@ test_hyper_sphere()
 
   const unsigned int order = 3;
 
-  test(tr, FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), order)), dim));
+  test(tr, FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), order)), dim));
 }
 
 

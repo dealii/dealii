@@ -1,6 +1,0 @@
-New: The step-65 tutorial program presents TransfiniteInterpolationManifold, a
-manifold class that can propagate curved boundary information into the
-interior of a computational domain, and MappingQCache for fast operations for
-expensive manifolds.
-<br>
-(Martin Kronbichler, 2019/06/06)

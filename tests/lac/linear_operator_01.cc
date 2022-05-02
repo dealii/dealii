@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,8 +27,8 @@
 
 struct LeftVector
 {
-  typedef double value_type;
-  value_type     value;
+  using value_type = double;
+  value_type value;
 
   LeftVector &
   operator=(value_type new_value)
@@ -68,8 +68,8 @@ struct LeftVector
 
 struct RightVector
 {
-  typedef double value_type;
-  value_type     value;
+  using value_type = double;
+  value_type value;
 
   RightVector &
   operator=(value_type new_value)
@@ -114,7 +114,7 @@ main()
 
   // Create to distinct linear operators:
 
-  typedef dealii::internal::LinearOperatorImplementation::EmptyPayload Payload;
+  using Payload = dealii::internal::LinearOperatorImplementation::EmptyPayload;
   LinearOperator<LeftVector, RightVector, Payload> multiply2;
   multiply2.vmult = [](LeftVector &v, const RightVector &u) {
     v.value = 2 * u.value;

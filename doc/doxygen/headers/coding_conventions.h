@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,7 @@ code is written, without having to look up the exact definition of something.
 
 <h3>Notes on deal.II indentation</h3>
 
-<p>deal.II uses <code>clang-format</code> 6.0 to normalize indentation. A
+<p>deal.II uses <code>clang-format</code> 11.1 to normalize indentation. A
 style file is provided at
 @code
   \${SOURCE_DIR}/.clang-format
@@ -56,6 +56,14 @@ pre-commit hook. One way to do so, is to copy
 <code>\${SOURCE_DIR}/contrib/git-hooks/pre-commit</code> to
 <code>\${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
 executable.
+
+If the system you are working on has more than one version of
+<code>clang-format</code> installed (or if it is not in the path)
+you should replace the above <code>make indent</code> command with
+@code
+  make DEAL_II_CLANG_FORMAT=/path/to/clang-11.1/clang-format indent
+@endcode
+to point to the correct executable.
 </p>
 
 <h3>Style issues</h3>
@@ -300,8 +308,7 @@ we list here:
     operator+=(Vector       &lhs,
                const Vector &rhs)
     {
-      Assert (lhs.size() == rhs.size(),
-              ExcDimensionMismatch(lhs.size(), rhs.size());
+      AssertDimension (lhs.size(), rhs.size());
       for (unsigned int i=0; i<lhs.size(); ++i)
         lhs(i) += rhs(i);
       return lhs;

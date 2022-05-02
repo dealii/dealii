@@ -5,7 +5,7 @@
     <title>User CMake configuration - deal.II</title>
     <link href="../screen.css" rel="StyleSheet">
     <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-    <meta name="copyright" content="Copyright (C) 2012 - 2019 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2012 - 2021 by the deal.II authors">
     <meta name="keywords" content="deal.II">
   </head>
 
@@ -63,9 +63,9 @@
   version):
 
 <pre class="cmake">
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 
-FIND_PACKAGE(deal.II 9.2.0 REQUIRED
+FIND_PACKAGE(deal.II 9.4.0 REQUIRED
   HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
@@ -271,8 +271,8 @@ mycode/include/*.h
 In this case the top level <code>CMakeLists.txt</code> file may be:
 <pre class="cmake">
 # top level CMakeLists.txt
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
-FIND_PACKAGE(deal.II 9.2.0 REQUIRED)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
+FIND_PACKAGE(deal.II 9.4.0 REQUIRED)
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(myproject)
@@ -480,6 +480,9 @@ source file you have to touch a <code>CMakeLists.txt</code> file or to run
     href="#dealiiconfig"><code>deal.IIConfig.cmake</code></a> for
   details):
 <pre class="cmake">
+DEAL_II_CUDA_FLAGS
+DEAL_II_CUDA_FLAGS_DEBUG
+DEAL_II_CUDA_FLAGS_RELEASE
 DEAL_II_CXX_FLAGS
 DEAL_II_CXX_FLAGS_DEBUG
 DEAL_II_CXX_FLAGS_RELEASE
@@ -500,14 +503,14 @@ The <code>DEAL_II_INITIALIZE_CACHED_VARIABLES</code> macro is responsible
 for setting up cached variables and has to invoked before the
 <code>PROJECT</code> call:
 <pre class="cmake">
-FIND_PACKAGE(deal.II 9.2.0 REQUIRED)
+FIND_PACKAGE(deal.II 9.4.0 REQUIRED)
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
 PROJECT(myproject)
 </pre>
 The macro will set an uninitialized <code>CMAKE_BUILD_TYPE</code> variable
-to the the build type of deal.II, i.e. <code>DEAL_II_BUILD_TYPE</code>. If
+to the build type of deal.II, i.e. <code>DEAL_II_BUILD_TYPE</code>. If
 <code>CMAKE_BUILD_TYPE</code> is specified it will automatically be reset
 if the given value is unsupported by the deal.II installation (i.e., if it
 is not equal to <code>Debug</code>, <code>Release</code>, or
@@ -644,7 +647,7 @@ INSTALL(DIRECTORY run DESTINATION share/mycode/run)
 </p>
 
 <pre class="cmake">
-FIND_PACKAGE(deal.II 9.2.0 REQUIRED
+FIND_PACKAGE(deal.II 9.4.0 REQUIRED
   HINTS
     ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
     # You can specify additional hints for search paths here, e.g.
@@ -660,7 +663,7 @@ SET(TARGET_SRC
   # You can specify additional files here!
 )
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET} CXX)
 DEAL_II_INVOKE_AUTOPILOT()
@@ -826,6 +829,17 @@ DEAL_II_LIBRARIES_RELEASE - a list of the full link interface for the release co
 DEAL_II_LIBRARIES         - full list of libraries with "debug" and "optimized" keywords
 
 #
+# Information about CUDA configuration
+#
+
+DEAL_II_CUDA_TOOLKIT_ROOT_DIR   - CUDA toolkit directory
+DEAL_II_CUDA_COMPILER           - the CUDA compiler used to compiler deal.II
+
+DEAL_II_CUDA_FLAGS              - compile flags for all CUDA configuration
+DEAL_II_CUDA_FLAGS_DEBUG        - _additional_ compile flags for the CUDA debug configuration
+DEAL_II_CUDA_FLAGS_RELEASE      - _additional_ compile flags for the CUDA release configuration
+
+#
 # Information about library targets
 #
 
@@ -838,28 +852,27 @@ DEAL_II_TARGET         - full list of targets with "debug" and "optimized" keywo
 
 #
 # Feature configuration: The following booleans are set to "ON" or "OFF" depending
-# on the current feature configuration:
+# on the current feature configuration (note that other variables are defined
+# only if one of the following variable is "ON", for example DEAL_II_MPI_VERSION
+# is only defined if DEAL_II_WITH_MPI is "ON"):
 #
 
 DEAL_II_WITH_64BIT_INDICES
 DEAL_II_WITH_ADOLC
 DEAL_II_WITH_ARPACK
 DEAL_II_WITH_ASSIMP
-DEAL_II_WITH_BOOST
 DEAL_II_WITH_COMPLEX_VALUES
 DEAL_II_WITH_CUDA
-DEAL_II_WITH_CXX14
-DEAL_II_WITH_CXX17
 DEAL_II_WITH_GINKGO
 DEAL_II_WITH_GMSH
 DEAL_II_WITH_GSL
 DEAL_II_WITH_HDF5
 DEAL_II_WITH_LAPACK
+LAPACK_WITH_64BIT_BLAS_INDICES
+DEAL_II_LAPACK_WITH_MKL
 DEAL_II_WITH_METIS
 DEAL_II_WITH_MPI
 DEAL_II_WITH_MUPARSER
-DEAL_II_WITH_NANOFLANN
-DEAL_II_WITH_NETCDF
 DEAL_II_WITH_OPENCASCADE
 DEAL_II_WITH_P4EST
 DEAL_II_WITH_PETSC
@@ -867,7 +880,8 @@ DEAL_II_WITH_SCALAPACK
 DEAL_II_WITH_SLEPC
 DEAL_II_WITH_SUNDIALS
 DEAL_II_WITH_SYMENGINE
-DEAL_II_WITH_THREADS
+DEAL_II_WITH_TASKFLOW
+DEAL_II_WITH_TBB
 DEAL_II_WITH_TRILINOS
 DEAL_II_WITH_UMFPACK
 DEAL_II_WITH_ZLIB

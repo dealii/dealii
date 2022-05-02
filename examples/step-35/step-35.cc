@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -47,12 +47,9 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_in.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/dofs/dof_renumbering.h>
 
@@ -355,8 +352,7 @@ namespace Step35
                                    const unsigned int) const
     {
       const unsigned int n_points = points.size();
-      Assert(values.size() == n_points,
-             ExcDimensionMismatch(values.size(), n_points));
+      AssertDimension(values.size(), n_points);
       for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Velocity<dim>::value(points[i]);
     }
@@ -414,8 +410,7 @@ namespace Step35
       (void)component;
       AssertIndexRange(component, 1);
       const unsigned int n_points = points.size();
-      Assert(values.size() == n_points,
-             ExcDimensionMismatch(values.size(), n_points));
+      AssertDimension(values.size(), n_points);
       for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Pressure<dim>::value(points[i]);
     }
@@ -497,7 +492,7 @@ namespace Step35
                    double,
                    << " The time step " << arg1 << " is out of range."
                    << std::endl
-                   << " The permitted range is (0," << arg2 << "]");
+                   << " The permitted range is (0," << arg2 << ']');
 
     void create_triangulation_and_dofs(const unsigned int n_refines);
 
@@ -636,7 +631,7 @@ namespace Step35
                            const QGauss<dim> &quad,
                            const UpdateFlags  flags)
         : nqp(quad.size())
-        , dpc(fe.dofs_per_cell)
+        , dpc(fe.n_dofs_per_cell())
         , u_star_local(nqp)
         , grad_u_star(nqp)
         , u_star_tmp(nqp)
@@ -796,12 +791,10 @@ namespace Step35
         vel_exact.set_time(t_0);
         vel_exact.set_component(d);
         VectorTools::interpolate(dof_handler_velocity,
-                                 Functions::ZeroFunction<dim>(),
+                                 vel_exact,
                                  u_n_minus_1[d]);
         vel_exact.advance_time(dt);
-        VectorTools::interpolate(dof_handler_velocity,
-                                 Functions::ZeroFunction<dim>(),
-                                 u_n[d]);
+        VectorTools::interpolate(dof_handler_velocity, vel_exact, u_n[d]);
       }
   }
 
@@ -887,8 +880,8 @@ namespace Step35
     }
 
     InitGradPerTaskData per_task_data(0,
-                                      fe_velocity.dofs_per_cell,
-                                      fe_pressure.dofs_per_cell);
+                                      fe_velocity.n_dofs_per_cell(),
+                                      fe_pressure.n_dofs_per_cell());
     InitGradScratchData scratch_data(fe_velocity,
                                      fe_pressure,
                                      quadrature_velocity,
@@ -1135,7 +1128,7 @@ namespace Step35
   void NavierStokesProjection<dim>::assemble_advection_term()
   {
     vel_Advection = 0.;
-    AdvectionPerTaskData data(fe_velocity.dofs_per_cell);
+    AdvectionPerTaskData data(fe_velocity.n_dofs_per_cell());
     AdvectionScratchData scratch(fe_velocity,
                                  quadrature_velocity,
                                  update_values | update_JxW_values |
@@ -1199,8 +1192,8 @@ namespace Step35
   void NavierStokesProjection<dim>::copy_advection_local_to_global(
     const AdvectionPerTaskData &data)
   {
-    for (unsigned int i = 0; i < fe_velocity.dofs_per_cell; ++i)
-      for (unsigned int j = 0; j < fe_velocity.dofs_per_cell; ++j)
+    for (unsigned int i = 0; i < fe_velocity.n_dofs_per_cell(); ++i)
+      for (unsigned int j = 0; j < fe_velocity.n_dofs_per_cell(); ++j)
         vel_Advection.add(data.local_dof_indices[i],
                           data.local_dof_indices[j],
                           data.local_advection(i, j));
@@ -1308,9 +1301,9 @@ namespace Step35
            ExcInternalError());
     Vector<double> joint_solution(joint_dof_handler.n_dofs());
     std::vector<types::global_dof_index> loc_joint_dof_indices(
-      joint_fe.dofs_per_cell),
-      loc_vel_dof_indices(fe_velocity.dofs_per_cell),
-      loc_pres_dof_indices(fe_pressure.dofs_per_cell);
+      joint_fe.n_dofs_per_cell()),
+      loc_vel_dof_indices(fe_velocity.n_dofs_per_cell()),
+      loc_pres_dof_indices(fe_pressure.n_dofs_per_cell());
     typename DoFHandler<dim>::active_cell_iterator
       joint_cell = joint_dof_handler.begin_active(),
       joint_endc = joint_dof_handler.end(),
@@ -1321,7 +1314,7 @@ namespace Step35
         joint_cell->get_dof_indices(loc_joint_dof_indices);
         vel_cell->get_dof_indices(loc_vel_dof_indices);
         pres_cell->get_dof_indices(loc_pres_dof_indices);
-        for (unsigned int i = 0; i < joint_fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < joint_fe.n_dofs_per_cell(); ++i)
           switch (joint_fe.system_to_base_index(i).first.first)
             {
               case 0:
@@ -1392,7 +1385,7 @@ namespace Step35
                              quadrature_velocity,
                              update_gradients | update_JxW_values |
                                update_values);
-    const unsigned int dpc = fe_velocity.dofs_per_cell,
+    const unsigned int dpc = fe_velocity.n_dofs_per_cell(),
                        nqp = quadrature_velocity.size();
     std::vector<types::global_dof_index> ldi(dpc);
     Vector<double>                       loc_rot(dpc);

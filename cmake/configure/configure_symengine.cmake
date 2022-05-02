@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2019 by the deal.II authors
+## Copyright (C) 2019 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -25,9 +25,9 @@ MACRO(FEATURE_SYMENGINE_FIND_EXTERNAL var)
     SET(${var} TRUE)
 
     #
-    # We require at least version 0.4 of the symengine library:
+    # We require at least version 0.6 of the symengine library:
     #
-    SET(_version_required "0.4")
+    SET(_version_required "0.6")
 
     IF(SYMENGINE_VERSION VERSION_LESS ${_version_required})
       MESSAGE(STATUS "Insufficient SymEngine installation found: "

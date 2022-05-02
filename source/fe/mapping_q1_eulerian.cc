@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -34,6 +33,7 @@
 #include <deal.II/lac/vector.h>
 
 #include <array>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -42,7 +42,7 @@ template <int dim, class VectorType, int spacedim>
 MappingQ1Eulerian<dim, VectorType, spacedim>::MappingQ1Eulerian(
   const DoFHandler<dim, spacedim> &shiftmap_dof_handler,
   const VectorType &               euler_transform_vectors)
-  : MappingQGeneric<dim, spacedim>(1)
+  : MappingQ<dim, spacedim>(1)
   , euler_transform_vectors(&euler_transform_vectors)
   , shiftmap_dof_handler(&shiftmap_dof_handler)
 {}
@@ -50,11 +50,14 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::MappingQ1Eulerian(
 
 
 template <int dim, class VectorType, int spacedim>
-std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+boost::container::small_vector<Point<spacedim>,
+                               GeometryInfo<dim>::vertices_per_cell>
 MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<dim>::vertices_per_cell>
+    vertices(GeometryInfo<dim>::vertices_per_cell);
   // The assertions can not be in the constructor, since this would
   // require to call dof_handler.distribute_dofs(fe) *before* the mapping
   // object is constructed, which is not necessarily what we want.
@@ -78,7 +81,7 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
 
   // now get the values of the shift vectors at the vertices
   Vector<typename VectorType::value_type> mapping_values(
-    shiftmap_dof_handler->get_fe().dofs_per_cell);
+    shiftmap_dof_handler->get_fe().n_dofs_per_cell());
   dof_cell->get_dof_values(*euler_transform_vectors, mapping_values);
 
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
@@ -105,8 +108,7 @@ std::vector<Point<spacedim>>
 MappingQ1Eulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  const std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-    vertices = this->get_vertices(cell);
+  const auto vertices = this->get_vertices(cell);
 
   std::vector<Point<spacedim>> a(GeometryInfo<dim>::vertices_per_cell);
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
@@ -121,8 +123,7 @@ template <int dim, class VectorType, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQ1Eulerian<dim, VectorType, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQ1Eulerian<dim, VectorType, spacedim>>(
-    *this);
+  return std::make_unique<MappingQ1Eulerian<dim, VectorType, spacedim>>(*this);
 }
 
 
@@ -140,12 +141,11 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::fill_fe_values(
   // call the function of the base class, but ignoring
   // any potentially detected cell similarity between
   // the current and the previous cell
-  MappingQGeneric<dim, spacedim>::fill_fe_values(
-    cell,
-    CellSimilarity::invalid_next_cell,
-    quadrature,
-    internal_data,
-    output_data);
+  MappingQ<dim, spacedim>::fill_fe_values(cell,
+                                          CellSimilarity::invalid_next_cell,
+                                          quadrature,
+                                          internal_data,
+                                          output_data);
   // also return the updated flag since any detected
   // similarity wasn't based on the mapped field, but
   // the original vertices which are meaningless

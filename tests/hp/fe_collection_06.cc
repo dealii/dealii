@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 /* clang-format off */
-// find the most dominating fe from a set of fes on faces (codim=1).
+// find the most dominating FE from a set of FEs on faces (codim=1).
 // for this task we concatenate the two functions
 // FECollection::find_encapsulating_space() and FECollection::find_dominating_fe().
 // we test the results for the following collections:

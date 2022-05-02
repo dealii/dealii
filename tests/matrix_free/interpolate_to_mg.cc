@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -151,7 +151,7 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   fine_projection.update_ghost_values();
 
   // output for debug purposes:
-  if (true)
+  if (false)
     {
       DataOut<dim> data_out;
       data_out.attach_dof_handler(dof_handler);
@@ -190,6 +190,14 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   const unsigned int min_level = 0;
   MGLevelObject<LinearAlgebra::distributed::Vector<LevelNumberType>>
     level_projection(min_level, max_level);
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    {
+      IndexSet set;
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler, level, set);
+      level_projection[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                                     set,
+                                     mpi_communicator);
+    }
   mg_transfer.interpolate_to_mg(dof_handler, level_projection, fine_projection);
 
   // now go through all GMG levels and make sure FE field can represent
@@ -226,14 +234,14 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
                   {
                     std::cout << "dofs: ";
                     for (const auto i : dof_indices)
-                      std::cout << i << " ";
+                      std::cout << i << ' ';
                     std::cout << std::endl << "values: ";
                     std::vector<LevelNumberType> local_values(
                       dof_indices.size());
                     level_projection[level].extract_subvector_to(dof_indices,
                                                                  local_values);
                     for (const auto v : local_values)
-                      std::cout << v << " ";
+                      std::cout << v << ' ';
                     std::cout << std::endl
                               << "val(q)=" << q_values[q] << std::endl;
                     std::cout << "MGTransfer indices:" << std::endl;

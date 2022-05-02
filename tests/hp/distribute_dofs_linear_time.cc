@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,8 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
 
@@ -31,7 +33,6 @@
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -138,7 +139,7 @@ public:
   std::shared_ptr<Manifold<dim>> boundary_manifold;
   Triangulation<dim>             triangulation;
   hp::FECollection<dim>          finite_elements;
-  hp::DoFHandler<dim>            dof_handler;
+  DoFHandler<dim>                dof_handler;
 
   void
   setup_dofs();
@@ -178,9 +179,9 @@ QuadraticTimeCircle<dim>::setup_dofs()
 {
   deallog << "Number of cells: " << triangulation.n_active_cells() << std::endl;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   {
     cell->set_active_fe_index(0);
   }

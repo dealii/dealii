@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,20 +24,31 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       \{
         template void
         full_p_adaptivity<deal_II_dimension, deal_II_space_dimension>(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &);
 
         template void
         p_adaptivity_from_flags<deal_II_dimension, deal_II_space_dimension>(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &,
           const std::vector<bool> &);
 
         template void
         force_p_over_h<deal_II_dimension, deal_II_space_dimension>(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &);
 
         template void
         choose_p_over_h<deal_II_dimension, deal_II_space_dimension>(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &);
+
+        template bool
+        limit_p_level_difference<deal_II_dimension, deal_II_space_dimension>(
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &,
+          const unsigned int,
+          const unsigned int);
       \}
     \}
 #endif
@@ -55,7 +66,8 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
         p_adaptivity_from_absolute_threshold<deal_II_dimension,
                                              S,
                                              deal_II_space_dimension>(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &,
           const Vector<S> &,
           const S,
           const S,
@@ -66,7 +78,8 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
         p_adaptivity_from_relative_threshold<deal_II_dimension,
                                              S,
                                              deal_II_space_dimension>(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &,
           const Vector<S> &,
           const double,
           const double,
@@ -77,7 +90,8 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
         p_adaptivity_fixed_number<deal_II_dimension,
                                   S,
                                   deal_II_space_dimension>(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &,
           const Vector<S> &,
           const double,
           const double,
@@ -88,14 +102,16 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
         p_adaptivity_from_regularity<deal_II_dimension,
                                      S,
                                      deal_II_space_dimension>(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &,
           const Vector<S> &);
 
         template void
         p_adaptivity_from_reference<deal_II_dimension,
                                     S,
                                     deal_II_space_dimension>(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &,
           const Vector<S> &,
           const Vector<S> &,
           const ComparisonFunction<typename identity<S>::type> &,
@@ -103,7 +119,8 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_SCALARS;
 
         template void
         predict_error<deal_II_dimension, S, deal_II_space_dimension>(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+          const dealii::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+            &,
           const Vector<S> &,
           Vector<S> &,
           const double,

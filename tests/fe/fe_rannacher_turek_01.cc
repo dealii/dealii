@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,8 +52,8 @@ test_n_dofs()
   GridGenerator::hyper_cube(tria, -1, 1);
   tria.refine_global(1);
 
-  DoFHandler<2> dofh;
-  dofh.initialize(tria, fe_ratu);
+  DoFHandler<2> dofh(tria);
+  dofh.distribute_dofs(fe_ratu);
 
   deallog << dofh.n_dofs() - 12 << std::endl;
 }
@@ -95,7 +95,7 @@ test_nodal_matrix()
               deallog << N(i, j) - 0.0;
             }
           if (j + 1 < 4)
-            deallog << " ";
+            deallog << ' ';
           else
             deallog << std::endl;
         }
@@ -112,8 +112,8 @@ test_interpolation()
   FE_RannacherTurek<2> fe;
   const unsigned int   n_dofs = fe.dofs_per_cell;
 
-  DoFHandler<2> dofh;
-  dofh.initialize(tr, fe);
+  DoFHandler<2> dofh(tr);
+  dofh.distribute_dofs(fe);
 
   Vector<double> input_vector(dofh.n_dofs());
   for (unsigned int i = 0; i < input_vector.size(); ++i)
@@ -124,8 +124,8 @@ test_interpolation()
   Quadrature<2> quadrature(fe.get_generalized_support_points());
   FEValues<2>   fev(fe, quadrature, update_values | update_JxW_values);
 
-  typedef DoFHandler<2>::cell_iterator cell_it;
-  cell_it                              cell = dofh.begin_active();
+  using cell_it = DoFHandler<2>::cell_iterator;
+  cell_it cell  = dofh.begin_active();
   for (; cell != dofh.end(); ++cell)
     {
       fev.reinit(cell);
@@ -142,7 +142,7 @@ test_interpolation()
 
       for (unsigned int j = 0; j < n_dofs; ++j)
         {
-          deallog << local_dofs[j] - interpolated_local_dofs[j] << " ";
+          deallog << local_dofs[j] - interpolated_local_dofs[j] << ' ';
         }
       deallog << std::endl;
     }

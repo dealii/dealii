@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -25,7 +25,7 @@
 # [1] http://public.kitware.com/Bug/view.php?id=9220
 #
 # Usage:
-#     ENABLE_LANGUAGE_FORTRAN_OPTIONAL(language)
+#     ENABLE_LANGUAGE_OPTIONAL(language)
 #
 # where language is either C or Fortran
 #
@@ -65,12 +65,13 @@ MACRO(ENABLE_LANGUAGE_OPTIONAL _language)
       ENABLE_LANGUAGE(${_language})
     ELSE()
       MESSAGE(STATUS "No working ${_language} compiler found, disabling ${_language}")
+      SET(DEAL_II_${_language}_COMPILER_WORKS FALSE CACHE INTERNAL "" FORCE)
     ENDIF()
   ELSE()
     #
     # Enable the language depending on the cached result from a former run:
     #
-    IF(DEAL_II_${_language}_COMPILER_WORKS)
+    IF(${DEAL_II_${_language}_COMPILER_WORKS})
       ENABLE_LANGUAGE(${_language})
     ENDIF()
   ENDIF()

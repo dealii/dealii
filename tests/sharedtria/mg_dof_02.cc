@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,8 @@ write_dof_data(DoFHandler<dim> &dof_handler)
   for (unsigned int lvl = 0; lvl < n_levels; ++lvl)
     {
       std::vector<IndexSet> dof_index_per_proc =
-        dof_handler.compute_locally_owned_mg_dofs_per_processor(lvl);
+        Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                   dof_handler.locally_owned_mg_dofs(lvl));
       for (unsigned int i = 0; i < dof_index_per_proc.size(); ++i)
         dof_index_per_proc[i].print(deallog);
 
@@ -71,7 +72,7 @@ write_dof_data(DoFHandler<dim> &dof_handler)
                   << ", "
                   << "cell " << cell->id() << ", mg_dof_indices: ";
           for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-            deallog << local_mg_dof_indices[i] << " ";
+            deallog << local_mg_dof_indices[i] << ' ';
           deallog << std::endl;
         }
     }
@@ -118,7 +119,7 @@ test()
          tria.level_ghost_owners().begin();
        it != tria.level_ghost_owners().end();
        ++it)
-    deallog << *it << " ";
+    deallog << *it << ' ';
   deallog << std::endl;
 
   write_dof_data(dof_handler);

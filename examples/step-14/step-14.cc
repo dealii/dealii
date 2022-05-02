@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2002 - 2019 by the deal.II authors
+ * Copyright (C) 2002 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -22,7 +22,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
@@ -35,11 +34,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -49,10 +45,11 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
-#include <iostream>
-#include <fstream>
-#include <list>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <memory>
 #include <numeric>
 
 // The last step is as in all previous programs:
@@ -126,18 +123,16 @@ namespace Step14
 
 
     template <int dim>
-    void PointValueEvaluation<dim>::
-         operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const
+    void
+    PointValueEvaluation<dim>::operator()(const DoFHandler<dim> &dof_handler,
+                                          const Vector<double> & solution) const
     {
       double point_value = 1e20;
 
       bool evaluation_point_found = false;
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (!evaluation_point_found)
-          for (unsigned int vertex = 0;
-               vertex < GeometryInfo<dim>::vertices_per_cell;
-               ++vertex)
+          for (const auto vertex : cell->vertex_indices())
             if (cell->vertex(vertex).distance(evaluation_point) <
                 cell->diameter() * 1e-8)
               {
@@ -197,9 +192,9 @@ namespace Step14
     // The more interesting things happen inside the function doing the actual
     // evaluation:
     template <int dim>
-    void PointXDerivativeEvaluation<dim>::
-         operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const
+    void PointXDerivativeEvaluation<dim>::operator()(
+      const DoFHandler<dim> &dof_handler,
+      const Vector<double> & solution) const
     {
       // This time initialize the return value with something useful, since we
       // will have to add up a number of contributions and take the mean value
@@ -208,7 +203,7 @@ namespace Step14
 
       // ...then have some objects of which the meaning will become clear
       // below...
-      QTrapez<dim>                vertex_quadrature;
+      QTrapezoid<dim>             vertex_quadrature;
       FEValues<dim>               fe_values(dof_handler.get_fe(),
                               vertex_quadrature,
                               update_gradients | update_quadrature_points);
@@ -218,9 +213,7 @@ namespace Step14
       // often the vertex has been found:
       unsigned int evaluation_point_hits = 0;
       for (const auto &cell : dof_handler.active_cell_iterators())
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
+        for (const auto vertex : cell->vertex_indices())
           if (cell->vertex(vertex) == evaluation_point)
             {
               // Things are now no more as simple, since we can't get the
@@ -580,7 +573,7 @@ namespace Step14
       AssemblyScratchData &                                 scratch_data,
       AssemblyCopyData &                                    copy_data) const
     {
-      const unsigned int dofs_per_cell = fe->dofs_per_cell;
+      const unsigned int dofs_per_cell = fe->n_dofs_per_cell();
       const unsigned int n_q_points    = quadrature->size();
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
@@ -624,9 +617,9 @@ namespace Step14
     // at least; otherwise, the actions are performed
     // sequentially). Note that we start only one thread, and do the
     // second action in the main thread. Since only one thread is
-    // generated, we don't use the <code>Threads::ThreadGroup</code>
-    // class here, but rather use the one created thread object
-    // directly to wait for this particular thread's exit. The
+    // generated, we don't use the <code>Threads::TaskGroup</code>
+    // class here, but rather use the one created task object
+    // directly to wait for this particular task's exit. The
     // approach is generally the same as the one we have used in
     // <code>Solver::assemble_linear_system()</code> above.
     //
@@ -764,7 +757,7 @@ namespace Step14
                               update_values | update_quadrature_points |
                                 update_JxW_values);
 
-      const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
+      const unsigned int dofs_per_cell = this->fe->n_dofs_per_cell();
       const unsigned int n_q_points    = this->quadrature->size();
 
       Vector<double>                       cell_rhs(dofs_per_cell);
@@ -1294,8 +1287,7 @@ namespace Step14
       std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
       for (unsigned int i = 0; i < n_cells; ++i)
         {
-          for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell;
-               ++j)
+          for (unsigned int j = 0; j < cell_vertices[i].size(); ++j)
             cells[i].vertices[j] = cell_vertices[i][j];
           cells[i].material_id = 0;
         }
@@ -1447,9 +1439,7 @@ namespace Step14
       // vertices (or very close to a vertex, which may happen due to floating
       // point round-off):
       for (const auto &cell : dof_handler.active_cell_iterators())
-        for (unsigned int vertex = 0;
-             vertex < GeometryInfo<dim>::vertices_per_cell;
-             ++vertex)
+        for (const auto vertex : cell->vertex_indices())
           if (cell->vertex(vertex).distance(evaluation_point) <
               cell->diameter() * 1e-8)
             {
@@ -2273,7 +2263,7 @@ namespace Step14
       // After computing the cell terms, turn to the face terms. For this,
       // loop over all faces of the present cell, and see whether
       // something needs to be computed on it:
-      for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+      for (const auto face_no : cell->face_indices())
         {
           // First, if this face is part of the boundary, then there is
           // nothing to do. However, to make things easier when summing up
@@ -2706,56 +2696,53 @@ namespace Step14
       {
         case ProblemDescription::dual_weighted_error_estimator:
           {
-            solver =
-              std_cxx14::make_unique<LaplaceSolver::WeightedResidual<dim>>(
-                triangulation,
-                primal_fe,
-                dual_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values(),
-                *descriptor.dual_functional);
+            solver = std::make_unique<LaplaceSolver::WeightedResidual<dim>>(
+              triangulation,
+              primal_fe,
+              dual_fe,
+              quadrature,
+              face_quadrature,
+              descriptor.data->get_right_hand_side(),
+              descriptor.data->get_boundary_values(),
+              *descriptor.dual_functional);
             break;
           }
 
         case ProblemDescription::global_refinement:
           {
-            solver =
-              std_cxx14::make_unique<LaplaceSolver::RefinementGlobal<dim>>(
-                triangulation,
-                primal_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values());
-            break;
-          }
-
-        case ProblemDescription::kelly_indicator:
-          {
-            solver =
-              std_cxx14::make_unique<LaplaceSolver::RefinementKelly<dim>>(
-                triangulation,
-                primal_fe,
-                quadrature,
-                face_quadrature,
-                descriptor.data->get_right_hand_side(),
-                descriptor.data->get_boundary_values());
-            break;
-          }
-
-        case ProblemDescription::weighted_kelly_indicator:
-          {
-            solver = std_cxx14::make_unique<
-              LaplaceSolver::RefinementWeightedKelly<dim>>(
+            solver = std::make_unique<LaplaceSolver::RefinementGlobal<dim>>(
               triangulation,
               primal_fe,
               quadrature,
               face_quadrature,
               descriptor.data->get_right_hand_side(),
-              descriptor.data->get_boundary_values(),
-              *descriptor.kelly_weight);
+              descriptor.data->get_boundary_values());
+            break;
+          }
+
+        case ProblemDescription::kelly_indicator:
+          {
+            solver = std::make_unique<LaplaceSolver::RefinementKelly<dim>>(
+              triangulation,
+              primal_fe,
+              quadrature,
+              face_quadrature,
+              descriptor.data->get_right_hand_side(),
+              descriptor.data->get_boundary_values());
+            break;
+          }
+
+        case ProblemDescription::weighted_kelly_indicator:
+          {
+            solver =
+              std::make_unique<LaplaceSolver::RefinementWeightedKelly<dim>>(
+                triangulation,
+                primal_fe,
+                quadrature,
+                face_quadrature,
+                descriptor.data->get_right_hand_side(),
+                descriptor.data->get_boundary_values(),
+                *descriptor.kelly_weight);
             break;
           }
 
@@ -2838,7 +2825,7 @@ int main()
       // take here the description of <code>Exercise_2_3</code>, but you can
       // also use <code>CurvedRidges@<dim@></code>:
       descriptor.data =
-        std_cxx14::make_unique<Data::SetUp<Data::Exercise_2_3<dim>, dim>>();
+        std::make_unique<Data::SetUp<Data::Exercise_2_3<dim>, dim>>();
 
       // Next set first a dual functional, then a list of evaluation
       // objects. We choose as default the evaluation of the value at an
@@ -2855,7 +2842,7 @@ int main()
       // each step.
       const Point<dim> evaluation_point(0.75, 0.75);
       descriptor.dual_functional =
-        std_cxx14::make_unique<DualFunctional::PointValueEvaluation<dim>>(
+        std::make_unique<DualFunctional::PointValueEvaluation<dim>>(
           evaluation_point);
 
       Evaluation::PointValueEvaluation<dim> postprocessor1(evaluation_point);

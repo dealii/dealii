@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,10 +39,10 @@
 #include "../tests.h"
 
 
-template <int dim, int spacedim>
+template <int dim>
 void
-write_mesh(const parallel::shared::Triangulation<dim, spacedim> &tria,
-           const char *                                          filename_)
+write_mesh(const parallel::shared::Triangulation<dim> &tria,
+           const char *                                filename_)
 {
   DataOut<dim> data_out;
   data_out.attach_triangulation(tria);

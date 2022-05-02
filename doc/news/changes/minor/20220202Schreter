@@ -1,0 +1,4 @@
+Improved: In MatrixFreeTools::compute_diagonal a template argument VectorType 
+has been introduced to be applicable for arbitrary vector types. 
+<br>
+(Magdalena Schreter, Peter Munch, 2022/02/02)

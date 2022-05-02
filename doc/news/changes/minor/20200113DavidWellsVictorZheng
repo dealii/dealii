@@ -1,5 +1,0 @@
-New: Added a new function GridGenerator::replicate_triangulation() for creating
-a new triangulation by copying a given triangulation repeatedly along the
-coordinate axes.
-<br>
-(David Wells, Victor Zheng, 2020/01/13)

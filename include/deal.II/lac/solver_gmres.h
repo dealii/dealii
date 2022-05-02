@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/full_matrix.h>
@@ -33,6 +32,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -74,7 +74,8 @@ namespace internal
        * Get vector number @p i. If this vector was unused before, an error
        * occurs.
        */
-      VectorType &operator[](const unsigned int i) const;
+      VectorType &
+      operator[](const unsigned int i) const;
 
       /**
        * Get vector number @p i. Allocate it if necessary.
@@ -170,9 +171,6 @@ namespace internal
  * can be obtained by connecting a function as a slot using @p
  * connect_condition_number_slot and @p connect_eigenvalues_slot. These slots
  * will then be called from the solver with the estimates as argument.
- *
- *
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
  */
 template <class VectorType = Vector<double>>
 class SolverGMRES : public SolverBase<VectorType>
@@ -457,8 +455,6 @@ protected:
  * preconditioner less at each restart and at the end of solve().
  *
  * For more details see @cite Saad1991.
- *
- * @author Guido Kanschat, 2003
  */
 template <class VectorType = Vector<double>>
 class SolverFGMRES : public SolverBase<VectorType>
@@ -475,18 +471,6 @@ public:
     explicit AdditionalData(const unsigned int max_basis_size = 30)
       : max_basis_size(max_basis_size)
     {}
-
-    /**
-     * @deprecated: use the other constructor as the second argument is
-     unused.
-     */
-    DEAL_II_DEPRECATED
-    AdditionalData(const unsigned int max_basis_size,
-                   const bool         use_default_residual)
-      : max_basis_size(max_basis_size)
-    {
-      (void)use_default_residual;
-    }
 
     /**
      * Maximum basis size.
@@ -554,8 +538,8 @@ namespace internal
 
 
     template <class VectorType>
-    inline VectorType &TmpVectors<VectorType>::
-                       operator[](const unsigned int i) const
+    inline VectorType &
+    TmpVectors<VectorType>::operator[](const unsigned int i) const
     {
       AssertIndexRange(i, data.size());
 
@@ -648,7 +632,7 @@ SolverGMRES<VectorType>::givens_rotation(Vector<double> &h,
                                          Vector<double> &si,
                                          int             col) const
 {
-  for (int i = 0; i < col; i++)
+  for (int i = 0; i < col; ++i)
     {
       const double s     = si(i);
       const double c     = ci(i);
@@ -842,7 +826,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
   unsigned int dim = 0;
 
   SolverControl::State iteration_state = SolverControl::iterate;
-  double               last_res        = -std::numeric_limits<double>::max();
+  double               last_res        = std::numeric_limits<double>::lowest();
 
   // switch to determine whether we want a left or a right preconditioner. at
   // present, left is default, but both ways are implemented
@@ -869,7 +853,7 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
       r->reinit(x);
       x_->reinit(x);
 
-      gamma_ = std_cxx14::make_unique<dealii::Vector<double>>(gamma.size());
+      gamma_ = std::make_unique<dealii::Vector<double>>(gamma.size());
     }
 
   bool re_orthogonalize = additional_data.force_re_orthogonalization;
@@ -1233,7 +1217,7 @@ SolverFGMRES<VectorType>::solve(const MatrixType &        A,
   Vector<double> y;
 
   // Iteration starts here
-  double res = -std::numeric_limits<double>::max();
+  double res = std::numeric_limits<double>::lowest();
 
   typename VectorMemory<VectorType>::Pointer aux(this->memory);
   aux->reinit(x);

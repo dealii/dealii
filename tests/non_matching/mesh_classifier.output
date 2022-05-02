@@ -1,0 +1,206 @@
+
+DEAL::dim = 1
+DEAL::test_negative_function
+DEAL::
+DEAL::discrete:
+DEAL::cell inside
+DEAL::face 0 inside
+DEAL::face 1 inside
+DEAL::
+DEAL::analytic:
+DEAL::cell inside
+DEAL::face 0 inside
+DEAL::face 1 inside
+DEAL::
+DEAL::test_positive_function
+DEAL::
+DEAL::discrete:
+DEAL::cell outside
+DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::
+DEAL::analytic:
+DEAL::cell outside
+DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::
+DEAL::test_intersection_x_eq_0_plane
+DEAL::
+DEAL::discrete:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 outside
+DEAL::
+DEAL::analytic:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 outside
+DEAL::
+DEAL::test_reclassify_called_multiple_times
+DEAL::Level set negative
+DEAL::cell inside
+DEAL::face 0 inside
+DEAL::face 1 inside
+DEAL::Level set positive
+DEAL::cell outside
+DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::
+DEAL::dim = 2
+DEAL::test_negative_function
+DEAL::
+DEAL::discrete:
+DEAL::cell inside
+DEAL::face 0 inside
+DEAL::face 1 inside
+DEAL::face 2 inside
+DEAL::face 3 inside
+DEAL::
+DEAL::analytic:
+DEAL::cell inside
+DEAL::face 0 inside
+DEAL::face 1 inside
+DEAL::face 2 inside
+DEAL::face 3 inside
+DEAL::
+DEAL::test_positive_function
+DEAL::
+DEAL::discrete:
+DEAL::cell outside
+DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::
+DEAL::analytic:
+DEAL::cell outside
+DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::
+DEAL::test_intersection_x_eq_0_plane
+DEAL::
+DEAL::discrete:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 outside
+DEAL::face 2 intersected
+DEAL::face 3 intersected
+DEAL::
+DEAL::analytic:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 outside
+DEAL::face 2 intersected
+DEAL::face 3 intersected
+DEAL::
+DEAL::test_lagrange_coefficents_positive
+DEAL::cell intersected
+DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::face 2 intersected
+DEAL::face 3 outside
+DEAL::
+DEAL::test_reclassify_called_multiple_times
+DEAL::Level set negative
+DEAL::cell inside
+DEAL::face 0 inside
+DEAL::face 1 inside
+DEAL::face 2 inside
+DEAL::face 3 inside
+DEAL::Level set positive
+DEAL::cell outside
+DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::
+DEAL::dim = 3
+DEAL::test_negative_function
+DEAL::
+DEAL::discrete:
+DEAL::cell inside
+DEAL::face 0 inside
+DEAL::face 1 inside
+DEAL::face 2 inside
+DEAL::face 3 inside
+DEAL::face 4 inside
+DEAL::face 5 inside
+DEAL::
+DEAL::analytic:
+DEAL::cell inside
+DEAL::face 0 inside
+DEAL::face 1 inside
+DEAL::face 2 inside
+DEAL::face 3 inside
+DEAL::face 4 inside
+DEAL::face 5 inside
+DEAL::
+DEAL::test_positive_function
+DEAL::
+DEAL::discrete:
+DEAL::cell outside
+DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::face 4 outside
+DEAL::face 5 outside
+DEAL::
+DEAL::analytic:
+DEAL::cell outside
+DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::face 4 outside
+DEAL::face 5 outside
+DEAL::
+DEAL::test_intersection_x_eq_0_plane
+DEAL::
+DEAL::discrete:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 outside
+DEAL::face 2 intersected
+DEAL::face 3 intersected
+DEAL::face 4 intersected
+DEAL::face 5 intersected
+DEAL::
+DEAL::analytic:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 outside
+DEAL::face 2 intersected
+DEAL::face 3 intersected
+DEAL::face 4 intersected
+DEAL::face 5 intersected
+DEAL::
+DEAL::test_lagrange_coefficents_positive
+DEAL::cell intersected
+DEAL::face 0 outside
+DEAL::face 1 intersected
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::face 4 intersected
+DEAL::face 5 outside
+DEAL::
+DEAL::test_reclassify_called_multiple_times
+DEAL::Level set negative
+DEAL::cell inside
+DEAL::face 0 inside
+DEAL::face 1 inside
+DEAL::face 2 inside
+DEAL::face 3 inside
+DEAL::face 4 inside
+DEAL::face 5 inside
+DEAL::Level set positive
+DEAL::cell outside
+DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::face 4 outside
+DEAL::face 5 outside
+DEAL::

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,11 +39,6 @@ main()
 
   AffineConstraints<double> cm(std::move(constraints));
   cm.print(deallog.get_file_stream());
-  deallog << constraints.n_constraints() << std::endl << std::endl;
-
-  constraints = std::move(cm);
-  constraints.print(deallog.get_file_stream());
-  deallog << cm.n_constraints() << std::endl;
 
   deallog << "OK" << std::endl;
 }

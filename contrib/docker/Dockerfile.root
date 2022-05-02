@@ -1,0 +1,11 @@
+FROM dealii/dealii:master-focal
+
+USER root
+
+ENV HOME /root
+
+WORKDIR /root
+
+ENV OMPI_ALLOW_RUN_AS_ROOT 1
+
+ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM 1

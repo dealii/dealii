@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,7 +87,7 @@ test()
   v = 0.;
 
   // set local values
-  for (unsigned int i = 0; i < local_nonzero.n_elements(); i++)
+  for (unsigned int i = 0; i < local_nonzero.n_elements(); ++i)
     v(local_nonzero.nth_index_in_set(i)) = local_nonzero.nth_index_in_set(i);
 
   // set value from processor which does not own it:

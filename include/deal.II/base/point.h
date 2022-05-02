@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,7 +105,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup geomprimitives
- * @author Wolfgang Bangerth, 1997
  */
 template <int dim, typename Number = double>
 class Point : public Tensor<1, dim, Number>
@@ -186,7 +185,7 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV Number
-                        operator()(const unsigned int index) const;
+  operator()(const unsigned int index) const;
 
   /**
    * Read and write access to the <tt>index</tt>th coordinate.
@@ -289,7 +288,8 @@ public:
    *
    * @note This function can also be used in CUDA device code.
    */
-  DEAL_II_CUDA_HOST_DEV Number operator*(const Tensor<1, dim, Number> &p) const;
+  DEAL_II_CUDA_HOST_DEV Number
+  operator*(const Tensor<1, dim, Number> &p) const;
 
   /**
    * Return the scalar product of this point vector with itself, i.e. the
@@ -331,7 +331,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -472,7 +473,7 @@ inline DEAL_II_CUDA_HOST_DEV Number
 Point<dim, Number>::operator()(const unsigned int index) const
 {
 #  ifndef __CUDA_ARCH__
-  AssertIndexRange(index, dim);
+  AssertIndexRange(static_cast<int>(index), dim);
 #  endif
   return this->values[index];
 }
@@ -484,7 +485,7 @@ inline DEAL_II_CUDA_HOST_DEV Number &
 Point<dim, Number>::operator()(const unsigned int index)
 {
 #  ifndef __CUDA_ARCH__
-  AssertIndexRange(index, dim);
+  AssertIndexRange(static_cast<int>(index), dim);
 #  endif
   return this->values[index];
 }
@@ -548,10 +549,10 @@ Point<dim, Number>::operator-() const
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline DEAL_II_CUDA_HOST_DEV
-    Point<dim,
+  Point<dim,
         typename ProductType<Number,
                              typename EnableIfScalar<OtherNumber>::type>::type>
-    Point<dim, Number>::operator*(const OtherNumber factor) const
+  Point<dim, Number>::operator*(const OtherNumber factor) const
 {
   Point<dim, typename ProductType<Number, OtherNumber>::type> tmp;
   for (unsigned int i = 0; i < dim; ++i)
@@ -580,8 +581,8 @@ inline DEAL_II_CUDA_HOST_DEV
 
 
 template <int dim, typename Number>
-inline DEAL_II_CUDA_HOST_DEV Number Point<dim, Number>::
-                                    operator*(const Tensor<1, dim, Number> &p) const
+inline DEAL_II_CUDA_HOST_DEV Number
+Point<dim, Number>::operator*(const Tensor<1, dim, Number> &p) const
 {
   Number res = Number();
   for (unsigned int i = 0; i < dim; ++i)

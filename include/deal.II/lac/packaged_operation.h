@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,33 +63,33 @@ class PackagedOperation;
  *
  * As an example consider the addition of multiple vectors
  * @code
- *   dealii::Vector<double> a, b, c, d;
+ *   Vector<double> a, b, c, d;
  *   // ..
- *   dealii::Vector<double> result = a + b - c + d;
+ *   Vector<double> result = a + b - c + d;
  * @endcode
  * or the computation of a residual $b-Ax$:
  * @code
- *   dealii::SparseMatrix<double> A;
- *   dealii::Vector<double> b, x;
+ *   SparseMatrix<double> A;
+ *   Vector<double> b, x;
  *   // ..
  *   const auto op_a = linear_operator(A);
  *
- *   dealii::Vector<double> residual =  b - op_a * x;
+ *   auto residual =  b - op_a * x;
  * @endcode
  * The expression <code>residual</code> is of type
- * <code>PackagedOperation<dealii::Vector<double>></code>. It stores
+ * <code>PackagedOperation<Vector<double>></code>. It stores
  * references to <code>A</code>, <code>b</code> and <code>x</code> and defers
  * the actual computation until <code>apply</code>, or <code>apply_add</code>
  * are explicitly invoked,
  * @code
- *   dealii::Vector<double> y;
+ *   Vector<double> y;
  *   residual.reinit_vector(y);
  *   residual.apply(y);
  *   residual.apply_add(y);
  * @endcode
  * or until the @p PackagedOperation object is implicitly converted:
  * @code
- *   dealii::Vector<double> y;
+ *   Vector<double> y;
  *   y = residual;
  *   y += residual;
  *   y -= residual;
@@ -98,7 +98,6 @@ class PackagedOperation;
  * @note The step-20 tutorial program has a detailed usage example of the
  * LinearOperator class.
  *
- * @author Matthias Maier, 2015
  *
  * @ingroup LAOperators
  */
@@ -361,8 +360,9 @@ operator-(const PackagedOperation<Range> &first_comp,
  * @ingroup LAOperators
  */
 template <typename Range>
-PackagedOperation<Range> operator*(const PackagedOperation<Range> &comp,
-                                   typename Range::value_type      number)
+PackagedOperation<Range>
+operator*(const PackagedOperation<Range> &comp,
+          typename Range::value_type      number)
 {
   PackagedOperation<Range> return_comp;
 
@@ -401,8 +401,9 @@ PackagedOperation<Range> operator*(const PackagedOperation<Range> &comp,
  * @ingroup LAOperators
  */
 template <typename Range>
-PackagedOperation<Range> operator*(typename Range::value_type      number,
-                                   const PackagedOperation<Range> &comp)
+PackagedOperation<Range>
+operator*(typename Range::value_type      number,
+          const PackagedOperation<Range> &comp)
 {
   return comp * number;
 }
@@ -615,8 +616,8 @@ template <typename Range,
           typename = typename std::enable_if<
             internal::PackagedOperationImplementation::has_vector_interface<
               Range>::type::value>::type>
-PackagedOperation<Range> operator*(const Range &              u,
-                                   typename Range::value_type number)
+PackagedOperation<Range>
+operator*(const Range &u, typename Range::value_type number)
 {
   return PackagedOperation<Range>(u) * number;
 }
@@ -640,8 +641,8 @@ template <typename Range,
           typename = typename std::enable_if<
             internal::PackagedOperationImplementation::has_vector_interface<
               Range>::type::value>::type>
-PackagedOperation<Range> operator*(typename Range::value_type number,
-                                   const Range &              u)
+PackagedOperation<Range>
+operator*(typename Range::value_type number, const Range &u)
 {
   return number * PackagedOperation<Range>(u);
 }

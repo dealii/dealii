@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2018 by the deal.II authors
+//    Copyright (C) 2018 - 2021 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -40,7 +40,7 @@ test()
   auto &out = deallog.get_file_stream();
   out << std::setprecision(5) << std::fixed << std::right;
 
-  typedef Vector<number> VectorType;
+  using VectorType = Vector<number>;
 
   // size of the problem
   const unsigned int N = 20;

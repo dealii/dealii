@@ -1,4 +1,0 @@
-Changed: Fixed VectorTools::project_boundary_values_curl_conforming_l2 to
-work with FESystems containing an FE_Nedelec.
-<br>
-(Winnifried Wollner, 2020/02/28)

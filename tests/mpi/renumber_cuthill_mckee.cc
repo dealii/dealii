@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,10 @@ test()
   unsigned int myid   = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   unsigned int nprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
+  parallel::distributed::Triangulation<dim> tr(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::limit_level_difference_at_vertices,
+    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
 
   GridGenerator::hyper_cube(tr, -1.0, 1.0);
   tr.refine_global(8 - 2 * dim);
@@ -65,45 +68,88 @@ test()
 
   static const FE_Q<dim> fe(1);
   dofh.distribute_dofs(fe);
-  std::vector<types::global_dof_index> renumbering(
-    dofh.locally_owned_dofs().n_elements());
-  DoFRenumbering::compute_Cuthill_McKee(renumbering, dofh);
+  dofh.distribute_mg_dofs();
 
-  // send everything to processor 0 for output
-  std::vector<types::global_dof_index> complete_renumbering(dofh.n_dofs());
-  std::copy(renumbering.begin(),
-            renumbering.end(),
-            complete_renumbering.begin());
-  unsigned int                offset = renumbering.size();
-  const std::vector<IndexSet> dofs_per_proc =
-    dofh.compute_locally_owned_dofs_per_processor();
-  for (unsigned int i = 1; i < nprocs; ++i)
+  for (unsigned int level = 0; level <= tr.n_levels(); ++level)
     {
-      if (myid == i)
-        MPI_Send(&renumbering[0],
-                 renumbering.size(),
-                 Utilities::MPI::internal::mpi_type_id(
-                   &complete_renumbering[0]),
-                 0,
-                 i,
-                 MPI_COMM_WORLD);
-      else if (myid == 0)
-        MPI_Recv(&complete_renumbering[offset],
-                 dofs_per_proc[i].n_elements(),
-                 Utilities::MPI::internal::mpi_type_id(
-                   &complete_renumbering[0]),
-                 i,
-                 i,
-                 MPI_COMM_WORLD,
-                 MPI_STATUSES_IGNORE);
-      offset += dofs_per_proc[i].n_elements();
-    }
+      types::global_dof_index              n_dofs{0};
+      std::vector<types::global_dof_index> renumbering;
+      if (level < tr.n_levels())
+        {
+          n_dofs      = dofh.n_dofs(level);
+          renumbering = std::vector<types::global_dof_index>(
+            dofh.locally_owned_mg_dofs(level).n_elements());
+          DoFRenumbering::compute_Cuthill_McKee(
+            renumbering,
+            dofh,
+            false,
+            false,
+            std::vector<types::global_dof_index>(),
+            level);
+        }
+      else
+        {
+          n_dofs      = dofh.n_dofs();
+          renumbering = std::vector<types::global_dof_index>(
+            dofh.locally_owned_dofs().n_elements());
+          DoFRenumbering::compute_Cuthill_McKee(renumbering, dofh);
+        }
 
-  if (myid == 0)
-    {
-      AssertDimension(offset, complete_renumbering.size());
-      for (unsigned int i = 0; i < complete_renumbering.size(); ++i)
-        deallog << complete_renumbering[i] << std::endl;
+      // send everything to processor 0 for output
+      std::vector<types::global_dof_index> complete_renumbering(n_dofs);
+      std::copy(renumbering.begin(),
+                renumbering.end(),
+                complete_renumbering.begin());
+      unsigned int          offset = renumbering.size();
+      std::vector<IndexSet> dofs_per_proc;
+      if (level < tr.n_levels())
+        {
+          dofs_per_proc =
+            Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                       dofh.locally_owned_mg_dofs(level));
+        }
+      else
+        {
+          dofs_per_proc = Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                                     dofh.locally_owned_dofs());
+        }
+
+      for (unsigned int i = 1; i < nprocs; ++i)
+        {
+          if (myid == i)
+            MPI_Send(&renumbering[0],
+                     renumbering.size(),
+                     Utilities::MPI::mpi_type_id_for_type<decltype(
+                       complete_renumbering[0])>,
+                     0,
+                     i,
+                     MPI_COMM_WORLD);
+          else if (myid == 0)
+            MPI_Recv(&complete_renumbering[offset],
+                     dofs_per_proc[i].n_elements(),
+                     Utilities::MPI::mpi_type_id_for_type<decltype(
+                       complete_renumbering[0])>,
+                     i,
+                     i,
+                     MPI_COMM_WORLD,
+                     MPI_STATUSES_IGNORE);
+          offset += dofs_per_proc[i].n_elements();
+        }
+
+      if (myid == 0)
+        {
+          AssertDimension(offset, complete_renumbering.size());
+          if (level < tr.n_levels())
+            {
+              deallog << "On level: " << level << std::endl;
+            }
+          else
+            {
+              deallog << "On active cells:" << std::endl;
+            }
+          for (unsigned int i = 0; i < complete_renumbering.size(); ++i)
+            deallog << complete_renumbering[i] << std::endl;
+        }
     }
 }
 

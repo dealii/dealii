@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +37,7 @@ DeclException2(ExcNumberMismatch,
 
 
 
-typedef Triangulation<2>::active_cell_iterator active_cell_iterator;
+using active_cell_iterator = Triangulation<2>::active_cell_iterator;
 
 template <typename Iterator>
 bool

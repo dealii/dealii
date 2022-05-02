@@ -1,0 +1,45 @@
+
+DEAL:2d::Testing FE_Q_Hierarchical<2>(1)
+DEAL:2d::Norm of difference: 3.41061e-13
+DEAL:2d::l2_norm: 2160.00
+DEAL:2d::l1_norm: 17424.0
+DEAL:2d::linfty_norm: 576.000
+DEAL:2d::
+DEAL:2d::Norm of difference: 1.13687e-13
+DEAL:2d::l2_norm: 960.000
+DEAL:2d::l1_norm: 7744.00
+DEAL:2d::linfty_norm: 256.000
+DEAL:2d::
+DEAL:2d::Testing FE_Q_Hierarchical<2>(2)
+DEAL:2d::Norm of difference: 5.68434e-13
+DEAL:2d::l2_norm: 3960.00
+DEAL:2d::l1_norm: 63504.0
+DEAL:2d::linfty_norm: 576.000
+DEAL:2d::
+DEAL:2d::Norm of difference: 4.27463e-11
+DEAL:2d::l2_norm: 37440.0
+DEAL:2d::l1_norm: 553536.
+DEAL:2d::linfty_norm: 3600.00
+DEAL:2d::
+DEAL:3d::Testing FE_Q_Hierarchical<3>(1)
+DEAL:3d::Norm of difference: 5.45697e-12
+DEAL:3d::l2_norm: 100388.
+DEAL:3d::l1_norm: 2.29997e+06
+DEAL:3d::linfty_norm: 13824.0
+DEAL:3d::
+DEAL:3d::Norm of difference: 1.36424e-12
+DEAL:3d::l2_norm: 29744.5
+DEAL:3d::l1_norm: 681472.
+DEAL:3d::linfty_norm: 4096.00
+DEAL:3d::
+DEAL:3d::Testing FE_Q_Hierarchical<3>(2)
+DEAL:3d::Norm of difference: 3.63798e-11
+DEAL:3d::l2_norm: 249197.
+DEAL:3d::l1_norm: 1.60030e+07
+DEAL:3d::linfty_norm: 13824.0
+DEAL:3d::
+DEAL:3d::Norm of difference: 1.40572e-08
+DEAL:3d::l2_norm: 7.24442e+06
+DEAL:3d::l1_norm: 4.11831e+08
+DEAL:3d::linfty_norm: 216000.
+DEAL:3d::

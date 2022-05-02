@@ -36,9 +36,14 @@ pipeline
       {
         stage("permission")
         {
-          // skip permission check on master:
+          // skip permission check on master and release branches
           when {
-              not {branch 'master'}
+            not {
+              anyOf {
+                branch 'master'
+                branch pattern: "dealii-*", comparator: "GLOB"
+              }
+            }
           }
           steps
           {
@@ -53,34 +58,6 @@ pipeline
                { echo "This commit will only be tested when it has the label 'ready to test'. Trigger a rebuild by adding a comment that contains '/rebuild'..."; exit 1; }
             '''
             githubNotify context: 'CI', description: 'running tests...',  status: 'PENDING'
-          }
-        }
-
-        stage("indent")
-        {
-          post {
-            failure {
-              githubNotify context: 'indent', description: 'failed',  status: 'FAILURE'
-            }
-          }
-
-          steps
-          {
-            // we are finally running, so we can mark the 'ready' context from Jenkinsfile.mark as success:
-            githubNotify context: 'ready', description: ':-)',  status: 'SUCCESS'
-
-            // We can not use 'indent' because we are missing the master branch:
-            // "fatal: ambiguous argument 'master': unknown revision or path"
-            sh '''
-               ./contrib/utilities/indent-all
-            '''
-            sh 'git diff > changes.diff'
-            archiveArtifacts artifacts: 'changes.diff', fingerprint: true
-            sh '''
-               git diff --exit-code || \
-               { echo "Please check indentation, see artifacts at the top right!"; exit 1; }
-            '''
-            githubNotify context: 'indent', description: '',  status: 'SUCCESS'
           }
         }
       }
@@ -132,9 +109,10 @@ pipeline
                  cd /home/dealii/build
                  cmake -G "Ninja" \
                    -D DEAL_II_CXX_FLAGS='-Werror' \
+                   -D DEAL_II_CXX_FLAGS_DEBUG='-Og' \
+                   -D DEAL_II_EARLY_DEPRECATIONS=ON \
                    -D CMAKE_BUILD_TYPE=Debug \
                    -D DEAL_II_WITH_MPI=OFF \
-                   -D DEAL_II_WITH_CXX14=OFF \
                    -D DEAL_II_UNITY_BUILD=ON \
                    $WORKSPACE/
                  time ninja -j $NP
@@ -187,6 +165,8 @@ pipeline
                   cd /home/dealii/build
                   cmake -G "Ninja" \
                     -D DEAL_II_CXX_FLAGS='-Werror' \
+                    -D DEAL_II_CXX_FLAGS_DEBUG='-Og' \
+                    -D DEAL_II_EARLY_DEPRECATIONS=ON \
                     -D CMAKE_BUILD_TYPE=Debug \
                     -D DEAL_II_WITH_MPI=ON \
                     -D DEAL_II_UNITY_BUILD=OFF \

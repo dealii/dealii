@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,6 +44,16 @@ namespace LACExceptions
    * Block indices of two block objects are different.
    */
   DeclException0(ExcDifferentBlockIndices);
+
+  /**
+   * The operation requires a sparsity pattern.
+   */
+  DeclExceptionMsg(
+    ExcNeedsSparsityPattern,
+    "This function requires that the current object have a "
+    "sparsity pattern attached to it, but no sparsity pattern "
+    "is available. This usually means that there is a missing "
+    "reinit() call which would have added the sparsity pattern.");
 
   /**
    * Exception thrown when a PETSc function reports an error. If possible,

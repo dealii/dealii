@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,12 +77,12 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
           fe_function, selected_vector_values);
         deallog << "component=" << c << std::endl;
 
-        for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+        for (const auto q : fe_values.quadrature_point_indices())
           for (unsigned int d = 0; d < dim; ++d)
             {
               for (unsigned int e = 0; e < dim; ++e)
                 for (unsigned int f = 0; f < dim; ++f)
-                  deallog << selected_vector_values[q][d][e][f] << " ";
+                  deallog << selected_vector_values[q][d][e][f] << ' ';
               deallog << std::endl;
               Assert((selected_vector_values[q][d] - vector_values[q][c + d])
                          .norm() <= 1e-12 * selected_vector_values[q][d].norm(),

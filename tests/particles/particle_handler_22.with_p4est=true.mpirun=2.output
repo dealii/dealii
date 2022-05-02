@@ -1,0 +1,23 @@
+
+DEAL:0::Number of particles inserted: 48
+DEAL:0::Number of ghost particles before sort: 0
+DEAL:0::Number of ghost particles after sort: 0
+DEAL:0::Number of ghost particles after exchange: 4
+DEAL:0::Number of ghost particles before sort: 4
+DEAL:0::Number of ghost particles after sort: 4
+DEAL:0::Number of ghost particles after exchange: 4
+DEAL:0::Number of ghost particles before sort: 4
+DEAL:0::Number of ghost particles after sort: 4
+DEAL:0::Number of ghost particles after exchange: 7
+
+DEAL:1::Number of particles inserted: 48
+DEAL:1::Number of ghost particles before sort: 0
+DEAL:1::Number of ghost particles after sort: 0
+DEAL:1::Number of ghost particles after exchange: 0
+DEAL:1::Number of ghost particles before sort: 0
+DEAL:1::Number of ghost particles after sort: 0
+DEAL:1::Number of ghost particles after exchange: 0
+DEAL:1::Number of ghost particles before sort: 0
+DEAL:1::Number of ghost particles after sort: 0
+DEAL:1::Number of ghost particles after exchange: 0
+

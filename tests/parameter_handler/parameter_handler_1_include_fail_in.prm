@@ -1,0 +1,4 @@
+set test_1 = 1,1,1
+
+# the following file does not exist
+include parameter_handler_1_include_fail_in.prm2

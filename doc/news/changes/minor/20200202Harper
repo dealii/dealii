@@ -1,4 +1,0 @@
-Changed: The GridOutFlags::Svg constructor may now take an additional
-argument supporting the output of boundary ids on faces.
-<br>
-(Graham Harper, 2020/02/02)

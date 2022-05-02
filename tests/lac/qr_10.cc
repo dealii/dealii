@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,7 +66,7 @@ template <typename number>
 void
 test()
 {
-  typedef Vector<number> VectorType;
+  using VectorType = Vector<number>;
   ImplicitQR<VectorType> qr;
 
   const unsigned int v_size = 5;
@@ -145,7 +145,7 @@ test()
       {
         deallog.get_file_stream() << std::setw(9) << A[j](i);
         if (j < size - 1)
-          deallog.get_file_stream() << " ";
+          deallog.get_file_stream() << ' ';
         else
           deallog.get_file_stream() << std::endl;
       }

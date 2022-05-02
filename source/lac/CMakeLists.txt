@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -53,9 +53,11 @@ SET(_unity_include_src
 SET(_separate_src
   full_matrix.cc
   lapack_full_matrix.cc
+  qr.cc
   sparse_matrix.cc
   sparse_matrix_inst2.cc
   tridiagonal_matrix.cc
+  utilities.cc
   )
 
 # Add CUDA wrapper files

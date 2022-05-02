@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 - 2018 by the deal.II authors
+## Copyright (C) 2017 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -69,13 +69,35 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
     ENDIF()
 
     #
+    # We have to avoid another symbol clash with the netcdf library that
+    # might get transitively pulled in by Trilinos (the libnetcdf.so shared
+    # object exports the global symbol 'function' but so does adolc
+    # itself).
+    #
+    IF("${Trilinos_TPL_LIBRARIES}" MATCHES "netcdf")
+      MESSAGE(STATUS
+        "Could not find a sufficient ADOL-C installation: "
+        "Possible symbol clash between the ADOL-C library and netcdf "
+        "(pulled in as optional external dependency of Trilinos) detected"
+        )
+      SET(ADOLC_ADDITIONAL_ERROR_STRING
+        ${ADOLC_ADDITIONAL_ERROR_STRING}
+        "Could not find a sufficient ADOL-C installation:\n"
+        "Possible symbol clash between the ADOL-C library and netcdf "
+        "(pulled in as optional external dependency of Trilinos). "
+        "If you want to use ADOL-C, please configure deal.II to use a "
+        "Trilinos library with disabled netcdf bindings.\n\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
+    #
     # Check whether we have a recent enough ADOL-C library that can return
     # values from constant objects.
     #
 
     LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${ADOLC_LIBRARIES})
     LIST(APPEND CMAKE_REQUIRED_INCLUDES ${ADOLC_INCLUDE_DIRS})
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
 
     CHECK_CXX_SOURCE_COMPILES("
       #include <adolc/adouble.h>

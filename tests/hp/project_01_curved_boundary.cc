@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,6 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -83,7 +82,7 @@ test()
 
   hp::FECollection<dim> fe;
   fe.push_back(FE_Q<dim>(1));
-  hp::DoFHandler<dim> dh(tria);
+  DoFHandler<dim> dh(tria);
   dh.distribute_dofs(fe);
 
   Vector<double> v(dh.n_dofs());
@@ -101,7 +100,7 @@ test()
 
   // use an explicit Q1 mapping. this will yield a zero solution
   {
-    VectorTools::project(hp::MappingCollection<dim>(MappingQGeneric<dim>(1)),
+    VectorTools::project(hp::MappingCollection<dim>(MappingQ<dim>(1)),
                          dh,
                          cm,
                          hp::QCollection<dim>(QGauss<dim>(3)),
@@ -159,7 +158,7 @@ test()
                          true);
     deallog << v.l2_norm() << std::endl;
     Assert(v.l2_norm() != 0, ExcInternalError());
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+    for (typename DoFHandler<dim>::active_cell_iterator cell =
            dh.begin_active();
          cell != dh.end();
          ++cell)
@@ -170,7 +169,7 @@ test()
   }
 
 
-  // same as above, but use a projection with a QTrapez formula. this happens
+  // same as above, but use a projection with a QTrapezoid formula. this happens
   // to evaluate the function only at points where it is zero, and
   // consequently the values at the boundary should be zero
   {
@@ -181,11 +180,11 @@ test()
                          F<dim>(),
                          v,
                          false,
-                         hp::QCollection<dim - 1>(QTrapez<dim - 1>()),
+                         hp::QCollection<dim - 1>(QTrapezoid<dim - 1>()),
                          true);
     deallog << v.l2_norm() << std::endl;
     Assert(v.l2_norm() != 0, ExcInternalError());
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+    for (typename DoFHandler<dim>::active_cell_iterator cell =
            dh.begin_active();
          cell != dh.end();
          ++cell)

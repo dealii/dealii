@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 - 2019 by the deal.II authors
+## Copyright (C) 2018 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -17,23 +17,31 @@
 # Configuration for the Ginkgo library:
 #
 
-MACRO(FEATURE_GINKGO_ERROR_MESSAGE)
-  MESSAGE(FATAL_ERROR "\n"
-    "Could not find Ginkgo and supporting libraries!\n"
-    "Please ensure that the libraries are installed on your computer.\n"
-    "If the libraries are not at a default location, either provide some hints\n"
-    "for the autodetection:\n"
-    "    $ GINKGO_DIR=\"...\" cmake <...>\n"
-    "    $ cmake -DGINKGO_DIR=\"...\" <...>\n"
-    "or set the relevant variables by hand in ccmake.\n"
-    "Relevant hints for GINKGO are GINKGO_DIR.\n"
-    )
-ENDMACRO()
+MACRO(FEATURE_GINKGO_FIND_EXTERNAL var)
+  FIND_PACKAGE(GINKGO)
 
-MACRO(FEATURE_GINKGO_CONFIGURE_EXTERNAL)
-  SET(DEAL_II_GINKGO_BUILT_REFERENCE ${GINKGO_BUILT_REFERENCE})
-  SET(DEAL_II_GINKGO_BUILT_OPENMP ${GINKGO_BUILT_OMP})
-  SET(DEAL_II_GINKGO_BUILT_CUDA ${GINKGO_BUILT_CUDA})
+  IF(GINKGO_FOUND)
+    SET(${var} TRUE)
+
+    #
+    # We require at least version 1.4.0
+    # - The interface requires in fact only GINKGO 1.3.0, however, below 1.4.0
+    #   the LD_LIBRARY_PATH has to be set manually by:
+    #   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GINKGO_DIR/lib
+    #
+    SET(_version_required 1.4.0)
+    IF(GINKGO_VERSION VERSION_LESS ${_version_required})
+      MESSAGE(STATUS "Insufficient ginkgo installation found: "
+        "At least version ${_version_required} is required."
+        )
+      SET(GINKGO_ADDITIONAL_ERROR_STRING
+        "Insufficient ginkgo installation found!\n"
+        "At least version ${_version_required} is required.\n"
+        )
+      SET(${var} FALSE)
+
+    ENDIF()
+  ENDIF()
 ENDMACRO()
 
 CONFIGURE_FEATURE(GINKGO)

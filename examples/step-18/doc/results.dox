@@ -404,7 +404,7 @@ Without such a formulation we cannot expect anything to make physical sense,
 even if it produces nice pictures!
 
 
-<h3>Possible directions for extensions</h3>
+<h3>Possibilities for extensions</h3>
 
 The program as is does not really solve an equation that has many applications
 in practice: quasi-static material deformation based on a purely elastic law
@@ -527,12 +527,12 @@ general approach to this would go like this:
                  local_history_values_at_qpoints (dim, std::vector< Vector<double> >(dim)),
                  local_history_fe_values (dim, std::vector< Vector<double> >(dim));
 
-    for (unsigned int i=0; i<dim; i++)
-      for (unsigned int j=0; j<dim; j++)
+    for (unsigned int i=0; i<dim; ++i)
+      for (unsigned int j=0; j<dim; ++j)
       {
         history_field[i][j].reinit(history_dof_handler.n_dofs());
         local_history_values_at_qpoints[i][j].reinit(quadrature.size());
-        local_history_fe_values[i][j].reinit(history_fe.dofs_per_cell);
+        local_history_fe_values[i][j].reinit(history_fe.n_dofs_per_cell());
       }
 
     FullMatrix<double> qpoint_to_dof_matrix (history_fe.dofs_per_cell,
@@ -557,8 +557,8 @@ general approach to this would go like this:
         Assert (local_quadrature_points_history < &quadrature_point_history.back(),
                 ExcInternalError());
 
-        for (unsigned int i=0; i<dim; i++)
-          for (unsigned int j=0; j<dim; j++)
+        for (unsigned int i=0; i<dim; ++i)
+          for (unsigned int j=0; j<dim; ++j)
           {
             for (unsigned int q=0; q<quadrature.size(); ++q)
               local_history_values_at_qpoints[i][j](q)
@@ -582,7 +582,7 @@ general approach to this would go like this:
   will do that:
   @code
     FullMatrix<double> dof_to_qpoint_matrix (quadrature.size(),
-                                             history_fe.dofs_per_cell);
+                                             history_fe.n_dofs_per_cell());
     FETools::compute_interpolation_to_quadrature_points_matrix
               (history_fe,
                quadrature,
@@ -602,8 +602,8 @@ general approach to this would go like this:
       Assert (local_quadrature_points_history < &quadrature_point_history.back(),
               ExcInternalError());
 
-      for (unsigned int i=0; i<dim; i++)
-        for (unsigned int j=0; j<dim; j++)
+      for (unsigned int i=0; i<dim; ++i)
+        for (unsigned int j=0; j<dim; ++j)
         {
           dg_cell->get_dof_values (history_field[i][j],
                                    local_history_fe_values[i][j]);

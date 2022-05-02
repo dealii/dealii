@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,7 +80,7 @@ template <int dim>
 void
 plot_FE_Q_shape_functions()
 {
-  MappingQGeneric<dim> m(1);
+  MappingQ<dim> m(1);
   //  FE_Q<dim> q1(1);
   //  plot_derivatives(m, q1, "Q1");
   //  plot_face_shape_functions(m, q1, "Q1");
@@ -97,8 +97,8 @@ template <int dim>
 void
 plot_FE_DGQ_shape_functions()
 {
-  MappingQGeneric<dim> m(1);
-  FE_DGQ<dim>          q1(1);
+  MappingQ<dim> m(1);
+  FE_DGQ<dim>   q1(1);
   plot_derivatives(m, q1, "DGQ1");
   FE_DGQ<dim> q2(2);
   plot_derivatives(m, q2, "DGQ2");

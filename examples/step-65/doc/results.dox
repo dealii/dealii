@@ -14,7 +14,7 @@ Scanning dependencies of target \step-65
 [ 66%] Built target \step-65
 [100%] Run \step-65 with Release configuration
 
-====== Running with the basic MappingQGeneric class ======
+====== Running with the basic MappingQ class ======
 
    Number of active cells:       6656
    Number of degrees of freedom: 181609
@@ -83,7 +83,7 @@ impressive for a linear stationary problem, and cost savings would indeed be
 much more prominent for time-dependent and nonlinear problems where assembly
 is called several times. If we look into the individual components, we get a
 clearer picture of what is going on and why the cache is so efficient: In the
-MappingQGeneric case, essentially every operation that involves a mapping take
+MappingQ case, essentially every operation that involves a mapping take
 at least 5 seconds to run. The norm computation runs two
 VectorTools::integrate_difference() functions, which each take almost 5
 seconds. (The computation of constraints is cheaper because it only evaluates
@@ -91,9 +91,9 @@ the mapping in cells at the boundary for the interpolation of boundary
 conditions.) If we compare these 5 seconds to the time it takes to fill the
 MappingQCache, which is 5.2 seconds (for all cells, not just the active ones),
 it becomes obvious that the computation of the mapping support points
-dominates over everything else in the MappingQGeneric case. Perhaps the most
+dominates over everything else in the MappingQ case. Perhaps the most
 striking result is the time for the error estimator, labeled "Compute error
-estimator", where the MappingQGeneric implementation takes 17.3 seconds and
+estimator", where the MappingQ implementation takes 17.3 seconds and
 the MappingQCache variant less than 0.5 seconds. The reason why the former is
 so expensive (three times more expensive than the assembly, for instance) is
 that the error estimation involves evaluation of quantities over faces, where

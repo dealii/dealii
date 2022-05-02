@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/subscriptor.h>
@@ -78,7 +78,6 @@ namespace LinearAlgebra
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
-     * @author Daniel Arndt, 2019
      */
     template <typename Number>
     class Vector : public VectorSpaceVector<Number>, public Subscriptor
@@ -151,11 +150,10 @@ namespace LinearAlgebra
        * improve performance.
        */
       virtual void
-      import(
-        const ReadWriteVector<Number> &                 V,
-        VectorOperation::values                         operation,
-        std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-          std::shared_ptr<const CommunicationPatternBase>()) override;
+      import(const ReadWriteVector<Number> &V,
+             VectorOperation::values        operation,
+             std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+               communication_pattern = {}) override;
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -307,6 +305,13 @@ namespace LinearAlgebra
        */
       virtual size_type
       size() const override;
+
+      /**
+       * Return the local size of the vector, i.e., the number of indices
+       * owned locally.
+       */
+      size_type
+      locally_owned_size() const;
 
       /**
        * Return the MPI communicator object in use with this object.

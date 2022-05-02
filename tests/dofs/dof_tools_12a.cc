@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,9 +21,9 @@
 // extracted vector of the global DoF, which has to be mapped with the locally
 // owned IndexSet first.
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   std::vector<bool> mask(dof_handler.get_fe_collection().n_components(), false);
 

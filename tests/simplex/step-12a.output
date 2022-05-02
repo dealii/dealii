@@ -1,0 +1,15 @@
+
+DEAL::Cycle 0
+DEAL::  Number of active cells:       2048
+DEAL::  Number of degrees of freedom: 12288
+DEAL:Richardson::Starting value 0.0883883
+DEAL:Richardson::Convergence step 16 value 8.69225e-17
+DEAL::  Solver converged in 16 iterations.
+DEAL::  L-infinity norm: 2.33280
+DEAL::Cycle 0
+DEAL::  Number of active cells:       2560
+DEAL::  Number of degrees of freedom: 25600
+DEAL:Richardson::Starting value 0.0360844
+DEAL:Richardson::Convergence step 13 value 1.78265e-14
+DEAL::  Solver converged in 13 iterations.
+DEAL::  L-infinity norm: 14.2242

@@ -1,0 +1,56 @@
+<h1>Results</h1>
+
+
+Below is the output of the program:
+@code
+===========================================
+Number of active cells: 1
+Number of degrees of freedom: 2
+
+Time step 0 at t=0.0002
+[...]
+
+Cycle 7:
+Number of active cells: 128
+Number of degrees of freedom: 129
+
+Time step 0 at t=0.0002
+Time step 1000 at t=0.2002
+Time step 2000 at t=0.4002
+Time step 3000 at t=0.6002
+Time step 4000 at t=0.8002
+
+cells dofs    L2        H1      Linfty
+    1    2 1.667e-01 5.774e-01 2.222e-01
+    2    3 3.906e-02 2.889e-01 5.380e-02
+    4    5 9.679e-03 1.444e-01 1.357e-02
+    8    9 2.405e-03 7.218e-02 3.419e-03
+   16   17 5.967e-04 3.609e-02 8.597e-04
+   32   33 1.457e-04 1.804e-02 2.155e-04
+   64   65 3.307e-05 9.022e-03 5.388e-05
+  128  129 5.016e-06 4.511e-03 1.342e-05
+
+n cells         H1                  L2
+      1 5.774e-01    -    - 1.667e-01    -    -
+      2 2.889e-01 2.00 1.00 3.906e-02 4.27 2.09
+      4 1.444e-01 2.00 1.00 9.679e-03 4.04 2.01
+      8 7.218e-02 2.00 1.00 2.405e-03 4.02 2.01
+     16 3.609e-02 2.00 1.00 5.967e-04 4.03 2.01
+     32 1.804e-02 2.00 1.00 1.457e-04 4.10 2.03
+     64 9.022e-03 2.00 1.00 3.307e-05 4.41 2.14
+    128 4.511e-03 2.00 1.00 5.016e-06 6.59 2.72
+@endcode
+
+What is more interesting is the output of the convergence tables. They are
+outputted into the console, as well into a LaTeX file. The convergence tables
+are shown above. Here, you can see that the solution has a convergence rate
+of $\mathcal{O}(h)$ with respect to the $H^1$-norm, and the solution has a convergence rate
+of $\mathcal{O}(h^2)$ with respect to the $L^2$-norm.
+
+
+Below is the visualization of the solution.
+
+<div style="text-align:center;">
+  <img src="https://www.dealii.org/images/steps/developer/step-78.mms-solution.png"
+       alt="Solution of the MMS problem.">
+</div>

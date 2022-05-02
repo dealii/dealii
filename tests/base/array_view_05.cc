@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 // test for class ArrayView. check make_array_view for Table arguments
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/table.h>
 
 #include "../tests.h"
 

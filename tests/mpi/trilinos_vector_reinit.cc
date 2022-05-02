@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// check correct behaviour of reinit of Trilinos vectors
+// check correct behavior of reinit of Trilinos vectors
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>

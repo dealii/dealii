@@ -1,0 +1,5 @@
+Added: The DEAL_II_QUERY_GIT_INFORMATION() CMake macro now also records the
+date and time of the commit in the CMake variable GIT_TIMESTAMP.
+<br>
+(Matthias Maier, 2022/02/06)
+

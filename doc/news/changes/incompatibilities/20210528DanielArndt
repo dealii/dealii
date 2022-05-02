@@ -1,0 +1,4 @@
+Removed: The deprecated overloads for DoFTools::extract_hanging_node_dofs(),
+and DoFTools::extract_dofs() have been removed.
+<br>
+(Daniel Arndt, 2021/05/28)

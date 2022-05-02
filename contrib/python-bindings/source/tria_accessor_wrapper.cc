@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -170,6 +170,14 @@ namespace python
         static_cast<const TriaAccessor<structdim, dim, spacedim> *>(
           tria_accessor);
       return accessor->measure();
+    }
+
+    template <int structdim, int dim, int spacedim>
+    const TriaAccessor<structdim, dim, spacedim> *
+    tria_accessor_cast(const void *tria_accessor)
+    {
+      return static_cast<const TriaAccessor<structdim, dim, spacedim> *>(
+        tria_accessor);
     }
   } // namespace internal
 
@@ -398,6 +406,71 @@ namespace python
       return internal::measure<1, 2, 3>(tria_accessor);
     else
       return internal::measure<2, 3, 3>(tria_accessor);
+  }
+
+
+
+  unsigned int
+  TriaAccessorWrapper::n_vertices() const
+  {
+    if ((dim == 2) && (spacedim == 2) && (structdim == 1))
+      return internal::tria_accessor_cast<1, 2, 2>(tria_accessor)->n_vertices();
+    else if ((dim == 2) && (spacedim == 3) && (structdim == 1))
+      return internal::tria_accessor_cast<1, 2, 3>(tria_accessor)->n_vertices();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 1))
+      return internal::tria_accessor_cast<1, 3, 3>(tria_accessor)->n_vertices();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 2))
+      return internal::tria_accessor_cast<2, 3, 3>(tria_accessor)->n_vertices();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 3))
+      return internal::tria_accessor_cast<3, 3, 3>(tria_accessor)->n_vertices();
+    else
+      {
+        AssertThrow(false,
+                    ExcMessage("Wrong structdim-dim-spacedim combination."));
+        return -1;
+      }
+  }
+
+
+
+  unsigned int
+  TriaAccessorWrapper::n_lines() const
+  {
+    if ((dim == 2) && (spacedim == 2) && (structdim == 1))
+      return internal::tria_accessor_cast<1, 2, 2>(tria_accessor)->n_lines();
+    else if ((dim == 2) && (spacedim == 3) && (structdim == 1))
+      return internal::tria_accessor_cast<1, 2, 3>(tria_accessor)->n_lines();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 1))
+      return internal::tria_accessor_cast<1, 3, 3>(tria_accessor)->n_lines();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 2))
+      return internal::tria_accessor_cast<2, 3, 3>(tria_accessor)->n_lines();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 3))
+      return internal::tria_accessor_cast<3, 3, 3>(tria_accessor)->n_lines();
+    else
+      {
+        AssertThrow(false,
+                    ExcMessage("Wrong structdim-dim-spacedim combination."));
+        return -1;
+      }
+  }
+
+
+
+  unsigned int
+  TriaAccessorWrapper::n_faces() const
+  {
+    if ((dim == 2) && (spacedim == 2) && (structdim == 1))
+      return internal::tria_accessor_cast<1, 2, 2>(tria_accessor)->n_faces();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 2))
+      return internal::tria_accessor_cast<2, 3, 3>(tria_accessor)->n_faces();
+    else if ((dim == 3) && (spacedim == 3) && (structdim == 3))
+      return internal::tria_accessor_cast<3, 3, 3>(tria_accessor)->n_faces();
+    else
+      {
+        AssertThrow(false,
+                    ExcMessage("Wrong structdim-dim-spacedim combination."));
+        return -1;
+      }
   }
 
 } // namespace python

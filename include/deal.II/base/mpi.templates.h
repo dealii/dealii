@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,90 +39,6 @@ namespace Utilities
   {
     namespace internal
     {
-#ifdef DEAL_II_WITH_MPI
-      /**
-       * Return the corresponding MPI data type id for the argument given.
-       */
-      inline MPI_Datatype
-      mpi_type_id(const int *)
-      {
-        return MPI_INT;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const long int *)
-      {
-        return MPI_LONG;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const unsigned int *)
-      {
-        return MPI_UNSIGNED;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const unsigned long int *)
-      {
-        return MPI_UNSIGNED_LONG;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const unsigned long long int *)
-      {
-        return MPI_UNSIGNED_LONG_LONG;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const float *)
-      {
-        return MPI_FLOAT;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const double *)
-      {
-        return MPI_DOUBLE;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const long double *)
-      {
-        return MPI_LONG_DOUBLE;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const std::complex<float> *)
-      {
-        return MPI_COMPLEX;
-      }
-
-
-
-      inline MPI_Datatype
-      mpi_type_id(const std::complex<double> *)
-      {
-        return MPI_DOUBLE_COMPLEX;
-      }
-#endif
-
-
       template <typename T>
       void
       all_reduce(const MPI_Op &            mpi_op,
@@ -164,12 +80,10 @@ namespace Utilities
             }
 #  endif
             const int ierr =
-              MPI_Allreduce(values != output ?
-                              DEAL_II_MPI_CONST_CAST(values.data()) :
-                              MPI_IN_PLACE,
+              MPI_Allreduce(values != output ? values.data() : MPI_IN_PLACE,
                             static_cast<void *>(output.data()),
                             static_cast<int>(values.size()),
-                            internal::mpi_type_id(values.data()),
+                            mpi_type_id_for_type<decltype(*values.data())>,
                             mpi_op,
                             mpi_communicator);
             AssertThrowMPI(ierr);
@@ -209,7 +123,7 @@ namespace Utilities
                               MPI_IN_PLACE,
                             static_cast<void *>(output.data()),
                             static_cast<int>(values.size() * 2),
-                            internal::mpi_type_id(static_cast<T *>(nullptr)),
+                            mpi_type_id_for_type<T>,
                             mpi_op,
                             mpi_communicator);
             AssertThrowMPI(ierr);
@@ -271,12 +185,20 @@ namespace Utilities
 
     template <int rank, int dim, typename Number>
     Tensor<rank, dim, Number>
-    sum(const Tensor<rank, dim, Number> &local,
-        const MPI_Comm &                 mpi_communicator)
+    sum(const Tensor<rank, dim, Number> &t, const MPI_Comm &mpi_communicator)
     {
-      Tensor<rank, dim, Number> sums;
-      sum(local, mpi_communicator, sums);
-      return sums;
+      // Copy the tensor into a C-style array with which we can then
+      // call the other sum() function.
+      Number array[Tensor<rank, dim, Number>::n_independent_components];
+      for (unsigned int i = 0;
+           i < Tensor<rank, dim, Number>::n_independent_components;
+           ++i)
+        array[i] =
+          t[Tensor<rank, dim, Number>::unrolled_to_component_indices(i)];
+
+      sum(array, mpi_communicator, array);
+
+      return Tensor<rank, dim, Number>(make_array_view(array));
     }
 
 
@@ -286,6 +208,8 @@ namespace Utilities
     sum(const SymmetricTensor<rank, dim, Number> &local,
         const MPI_Comm &                          mpi_communicator)
     {
+      // Copy the tensor into a C-style array with which we can then
+      // call the other sum() function.
       const unsigned int n_entries =
         SymmetricTensor<rank, dim, Number>::n_independent_components;
       Number
@@ -417,71 +341,181 @@ namespace Utilities
 
 
     template <typename T>
+    T
+    logical_or(const T &t, const MPI_Comm &mpi_communicator)
+    {
+      static_assert(std::is_integral<T>::value,
+                    "The MPI_LOR operation only allows integral data types.");
+
+      T return_value{};
+      internal::all_reduce(MPI_LOR,
+                           ArrayView<const T>(&t, 1),
+                           mpi_communicator,
+                           ArrayView<T>(&return_value, 1));
+      return return_value;
+    }
+
+
+
+    template <typename T, typename U>
+    void
+    logical_or(const T &values, const MPI_Comm &mpi_communicator, U &results)
+    {
+      static_assert(std::is_same<typename std::decay<T>::type,
+                                 typename std::decay<U>::type>::value,
+                    "Input and output arguments must have the same type!");
+
+      static_assert(std::is_integral<typename T::value_type>::value,
+                    "The MPI_LOR operation only allows integral data types.");
+
+      // Specializations of std containers for the data type bool do not
+      // necessarily store its elements as a contiguous array. Thus we will use
+      // the make_array_view() function with iterators here, which verifies
+      // this.
+      const auto array_view_values =
+        make_array_view(values.cbegin(), values.cend());
+      const auto array_view_results =
+        make_array_view(results.begin(), results.end());
+
+      using const_type =
+        ArrayView<const typename decltype(array_view_values)::value_type>;
+      logical_or(static_cast<const_type>(array_view_values),
+                 mpi_communicator,
+                 array_view_results);
+    }
+
+
+
+    template <typename T>
+    void
+    logical_or(const ArrayView<const T> &values,
+               const MPI_Comm &          mpi_communicator,
+               const ArrayView<T> &      results)
+    {
+      static_assert(std::is_integral<T>::value,
+                    "The MPI_LOR operation only allows integral data types.");
+
+      internal::all_reduce(MPI_LOR, values, mpi_communicator, results);
+    }
+
+
+
+    template <typename T>
+    T
+    reduce(const T &                                     vec,
+           const MPI_Comm &                              comm,
+           const std::function<T(const T &, const T &)> &combiner,
+           const unsigned int                            root_process)
+    {
+#ifdef DEAL_II_WITH_MPI
+      if (job_supports_mpi() && n_mpi_processes(comm) > 1)
+        {
+          // 1) perform custom reduction
+          T result = vec;
+
+          const unsigned int rank  = this_mpi_process(comm);
+          const unsigned int nproc = n_mpi_processes(comm);
+
+          for (unsigned int stride = 1; stride < nproc; stride *= 2)
+            {
+              unsigned int rank_recv =
+                (2 * stride) *
+                  ((rank + nproc - root_process) % nproc / (2 * stride)) +
+                root_process;
+              unsigned int rank_send = rank_recv + stride;
+
+              if (rank_send >= nproc + root_process) // nothing to do
+                continue;
+
+              rank_recv = rank_recv % nproc;
+              rank_send = rank_send % nproc;
+
+              if (rank_recv == rank) // process receives data
+                {
+                  MPI_Status status;
+                  const auto ierr_1 = MPI_Probe(rank_send,
+                                                internal::Tags::compute_union,
+                                                comm,
+                                                &status);
+                  AssertThrowMPI(ierr_1);
+
+                  int        amount;
+                  const auto ierr_2 = MPI_Get_count(&status, MPI_CHAR, &amount);
+                  AssertThrowMPI(ierr_2);
+
+                  std::vector<char> temp(amount);
+
+                  const auto ierr_3 = MPI_Recv(temp.data(),
+                                               amount,
+                                               MPI_CHAR,
+                                               status.MPI_SOURCE,
+                                               status.MPI_TAG,
+                                               comm,
+                                               MPI_STATUS_IGNORE);
+                  AssertThrowMPI(ierr_3);
+
+                  result = combiner(result, Utilities::unpack<T>(temp, false));
+                }
+              else if (rank_send == rank) // process sends data
+                {
+                  const std::vector<char> temp = Utilities::pack(result, false);
+
+                  const auto ierr = MPI_Send(temp.data(),
+                                             temp.size(),
+                                             MPI_CHAR,
+                                             rank_recv,
+                                             internal::Tags::compute_union,
+                                             comm);
+                  AssertThrowMPI(ierr);
+                }
+            }
+
+          if (rank == root_process)
+            return result;
+          else
+            return {};
+        }
+#endif
+      (void)comm;
+      (void)combiner;
+      (void)root_process;
+      return vec;
+    }
+
+
+
+    template <typename T>
+    T
+    all_reduce(const T &                                     vec,
+               const MPI_Comm &                              comm,
+               const std::function<T(const T &, const T &)> &combiner)
+    {
+      if (job_supports_mpi() && n_mpi_processes(comm) > 1)
+        {
+          // 1) perform reduction
+          const auto result = Utilities::MPI::reduce<T>(vec, comm, combiner);
+
+          // 2) broadcast result
+          return Utilities::MPI::broadcast(comm, result);
+        }
+      else
+        return vec;
+    }
+
+
+    template <typename T>
     std::vector<T>
     compute_set_union(const std::vector<T> &vec, const MPI_Comm &comm)
     {
-#ifdef DEAL_II_WITH_MPI
-      // 1) collect vector entries and create union
-      std::vector<T> result = vec;
-
-      if (this_mpi_process(comm) == 0)
-        {
-          for (unsigned int i = 1; i < n_mpi_processes(comm); i++)
-            {
-              MPI_Status status;
-              const auto ierr_1 = MPI_Probe(MPI_ANY_SOURCE,
-                                            internal::Tags::compute_union,
-                                            comm,
-                                            &status);
-              AssertThrowMPI(ierr_1);
-
-              int        amount;
-              const auto ierr_2 =
-                MPI_Get_count(&status,
-                              internal::mpi_type_id(vec.data()),
-                              &amount);
-              AssertThrowMPI(ierr_2);
-
-              const unsigned int old_size = result.size();
-              result.resize(old_size + amount);
-
-              const auto ierr_3 = MPI_Recv(result.data() + old_size,
-                                           amount,
-                                           internal::mpi_type_id(vec.data()),
-                                           status.MPI_SOURCE,
-                                           status.MPI_TAG,
-                                           comm,
-                                           MPI_STATUS_IGNORE);
-              AssertThrowMPI(ierr_3);
-
-              std::sort(result.begin(), result.end());
-              result.erase(std::unique(result.begin(), result.end()),
-                           result.end());
-            }
-        }
-      else
-        {
-          const auto ierr = MPI_Send(vec.data(),
-                                     vec.size(),
-                                     internal::mpi_type_id(vec.data()),
-                                     0,
-                                     internal::Tags::compute_union,
-                                     comm);
-          AssertThrowMPI(ierr);
-        }
-
-      // 2) broadcast result
-      int size = result.size();
-      MPI_Bcast(&size, 1, MPI_INT, 0, comm);
-      result.resize(size);
-      MPI_Bcast(
-        result.data(), size, internal::mpi_type_id(vec.data()), 0, comm);
-
-      return result;
-#else
-      (void)comm;
-      return vec;
-#endif
+      return Utilities::MPI::all_reduce<std::vector<T>>(
+        vec, comm, [](const auto &set_1, const auto &set_2) {
+          // merge vectors, sort, and eliminate duplicates -> mimic std::set<T>
+          auto result = set_1;
+          result.insert(result.end(), set_2.begin(), set_2.end());
+          std::sort(result.begin(), result.end());
+          result.erase(std::unique(result.begin(), result.end()), result.end());
+          return result;
+        });
     }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 
 #include <array>
@@ -44,7 +45,8 @@ class Triangulation;
  *
  * This class stores the index of the coarse cell from which a cell is
  * descendant (or, more specifically, the
- * entry on @ref GlossCoarseCellId "coarse cell IDs"),
+ * entry on
+ * @ref GlossCoarseCellId "coarse cell IDs"),
  * together with information on how to reach the cell from that coarse cell
  * (i.e., which child index to take on each level of the triangulation when
  * moving from one cell to its children). The important point about this
@@ -112,6 +114,12 @@ public:
   CellId(const binary_type &binary_representation);
 
   /**
+   * Create a CellId from a string with the same format that is produced by
+   * to_string().
+   */
+  explicit CellId(const std::string &string_representation);
+
+  /**
    * Construct an invalid CellId.
    */
   CellId();
@@ -140,9 +148,11 @@ public:
 
   /**
    * Return a cell_iterator to the cell represented by this CellId.
+   *
+   * @deprecated Use Triangulation::create_cell_iterator() instead.
    */
   template <int dim, int spacedim>
-  typename Triangulation<dim, spacedim>::cell_iterator
+  DEAL_II_DEPRECATED typename Triangulation<dim, spacedim>::cell_iterator
   to_cell(const Triangulation<dim, spacedim> &tria) const;
 
   /**
@@ -178,7 +188,9 @@ public:
   is_ancestor_of(const CellId &other) const;
 
   /**
-   * Boost serialization function
+   * Read or write the data of this object to or from a stream for the
+   * purpose of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -189,6 +201,17 @@ public:
    */
   types::coarse_cell_id
   get_coarse_cell_id() const;
+
+  /**
+   * Return a read-only container of integers that denotes which child to pick
+   * from one refinement level to the next, starting with the coarse cell, until
+   * we get to the cell represented by the current object.
+   *
+   * The number of elements in this container corresponds to (level-1) of the
+   * current cell.
+   */
+  ArrayView<const std::uint8_t>
+  get_child_indices() const;
 
 private:
   /**
@@ -374,10 +397,19 @@ CellId::is_ancestor_of(const CellId &other) const
 }
 
 
+
 inline types::coarse_cell_id
 CellId::get_coarse_cell_id() const
 {
   return coarse_cell_id;
+}
+
+
+
+inline ArrayView<const std::uint8_t>
+CellId::get_child_indices() const
+{
+  return {child_indices.data(), n_child_indices};
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,29 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+
+namespace DataPostprocessorInputs
+{
+  template <int spacedim>
+  CommonInputs<spacedim>::CommonInputs()
+    : face_number(numbers::invalid_unsigned_int)
+  {}
+
+
+
+  template <int spacedim>
+  unsigned int
+  CommonInputs<spacedim>::get_face_number() const
+  {
+    Assert(
+      face_number != numbers::invalid_unsigned_int,
+      ExcMessage(
+        "This function can only be called if set_cell_and_face() has "
+        "previously been called. Typically, this would be by using DataOutFaces "
+        "or a related class."));
+    return face_number;
+  }
+} // namespace DataPostprocessorInputs
 
 // -------------------------- DataPostprocessor ---------------------------
 
@@ -54,7 +77,7 @@ DataPostprocessor<dim>::get_data_component_interpretation() const
 }
 
 
-// -------------------------- DataPostprocessorScalar -------------------------
+// -------------------- DataPostprocessorScalar -------------------------
 
 template <int dim>
 DataPostprocessorScalar<dim>::DataPostprocessorScalar(
@@ -93,7 +116,8 @@ DataPostprocessorScalar<dim>::get_needed_update_flags() const
 
 
 
-// -------------------------- DataPostprocessorVector -------------------------
+// -------------------------- DataPostprocessorVector
+// -------------------------
 
 template <int dim>
 DataPostprocessorVector<dim>::DataPostprocessorVector(
@@ -132,7 +156,8 @@ DataPostprocessorVector<dim>::get_needed_update_flags() const
 
 
 
-// -------------------------- DataPostprocessorTensor -------------------------
+// -------------------------- DataPostprocessorTensor
+// -------------------------
 
 template <int dim>
 DataPostprocessorTensor<dim>::DataPostprocessorTensor(
@@ -148,15 +173,7 @@ template <int dim>
 std::vector<std::string>
 DataPostprocessorTensor<dim>::get_names() const
 {
-  static_assert(dim <= 3,
-                "The following variable needs to be expanded for dim>3");
-  static const char suffixes[] = {'x', 'y', 'z'};
-
-  std::vector<std::string> names;
-  for (unsigned int d = 0; d < dim; ++d)
-    for (unsigned int e = 0; e < dim; ++e)
-      names.push_back(name + '_' + suffixes[d] + suffixes[e]);
-  return names;
+  return std::vector<std::string>(dim * dim, name);
 }
 
 
@@ -166,7 +183,7 @@ std::vector<DataComponentInterpretation::DataComponentInterpretation>
 DataPostprocessorTensor<dim>::get_data_component_interpretation() const
 {
   return std::vector<DataComponentInterpretation::DataComponentInterpretation>(
-    dim * dim, DataComponentInterpretation::component_is_scalar);
+    dim * dim, DataComponentInterpretation::component_is_part_of_tensor);
 }
 
 

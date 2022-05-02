@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,7 +49,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double number;
+  using number = double;
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
@@ -173,7 +173,7 @@ test()
           mf.vmult(out, in);
           out -= ref;
           const double diff_norm = out.linfty_norm();
-          deallog << " " << diff_norm;
+          deallog << ' ' << diff_norm;
         }
       deallog << std::endl;
     }

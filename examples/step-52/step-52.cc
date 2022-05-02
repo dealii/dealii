@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2014 - 2019 by the deal.II authors
+ * Copyright (C) 2014 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -21,17 +21,15 @@
 
 // The first task as usual is to include the functionality of these well-known
 // deal.II library files and some C++ header files.
+#include <deal.II/base/discrete_time.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_out.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -207,7 +205,7 @@ namespace Step52
                           update_values | update_gradients | update_JxW_values);
 
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -301,7 +299,7 @@ namespace Step52
                             update_JxW_values);
 
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     Vector<double> cell_source(dofs_per_cell);
@@ -467,7 +465,6 @@ namespace Step52
     static std::string pvd_filename;
     if (method_name_prev != method_name)
       {
-        std::cout << "Starting a new time-stepping scheme ..." << std::endl;
         times_and_names.clear();
         method_name_prev = method_name;
         pvd_filename     = "solution_" + method_name + ".pvd";
@@ -486,6 +483,7 @@ namespace Step52
   // constraints are respected; of course, with the mesh we use here,
   // hanging node constraints are not in fact an issue). It then calls
   // <code>evolve_one_time_step</code> which performs one time step.
+  // Time is stored and incremented through a DiscreteTime object.
   //
   // For explicit methods, <code>evolve_one_time_step</code> needs to
   // evaluate $M^{-1}(f(t,y))$, i.e, it needs
@@ -504,28 +502,31 @@ namespace Step52
   {
     const double time_step =
       (final_time - initial_time) / static_cast<double>(n_time_steps);
-    double time = initial_time;
 
     solution = 0.;
     constraint_matrix.distribute(solution);
 
     TimeStepping::ExplicitRungeKutta<Vector<double>> explicit_runge_kutta(
       method);
-    output_results(time, 0, method);
-    for (unsigned int i = 0; i < n_time_steps; ++i)
+    output_results(initial_time, 0, method);
+    DiscreteTime time(initial_time, final_time, time_step);
+    while (time.is_at_end() == false)
       {
-        time = explicit_runge_kutta.evolve_one_time_step(
+        explicit_runge_kutta.evolve_one_time_step(
           [this](const double time, const Vector<double> &y) {
             return this->evaluate_diffusion(time, y);
           },
-          time,
-          time_step,
+          time.get_current_time(),
+          time.get_next_step_size(),
           solution);
+        time.advance_time();
 
         constraint_matrix.distribute(solution);
 
-        if ((i + 1) % 10 == 0)
-          output_results(time, i + 1, method);
+        if (time.get_step_number() % 10 == 0)
+          output_results(time.get_current_time(),
+                         time.get_step_number(),
+                         method);
       }
   }
 
@@ -544,31 +545,34 @@ namespace Step52
   {
     const double time_step =
       (final_time - initial_time) / static_cast<double>(n_time_steps);
-    double time = initial_time;
 
     solution = 0.;
     constraint_matrix.distribute(solution);
 
     TimeStepping::ImplicitRungeKutta<Vector<double>> implicit_runge_kutta(
       method);
-    output_results(time, 0, method);
-    for (unsigned int i = 0; i < n_time_steps; ++i)
+    output_results(initial_time, 0, method);
+    DiscreteTime time(initial_time, final_time, time_step);
+    while (time.is_at_end() == false)
       {
-        time = implicit_runge_kutta.evolve_one_time_step(
+        implicit_runge_kutta.evolve_one_time_step(
           [this](const double time, const Vector<double> &y) {
             return this->evaluate_diffusion(time, y);
           },
           [this](const double time, const double tau, const Vector<double> &y) {
             return this->id_minus_tau_J_inverse(time, tau, y);
           },
-          time,
-          time_step,
+          time.get_current_time(),
+          time.get_next_step_size(),
           solution);
+        time.advance_time();
 
         constraint_matrix.distribute(solution);
 
-        if ((i + 1) % 10 == 0)
-          output_results(time, i + 1, method);
+        if (time.get_step_number() % 10 == 0)
+          output_results(time.get_current_time(),
+                         time.get_step_number(),
+                         method);
       }
   }
 
@@ -585,20 +589,27 @@ namespace Step52
   //   - max_delta: largest time step acceptable.
   //   - refine_tol: threshold above which the time step is refined.
   //   - coarsen_tol: threshold below which the time step is coarsen.
+  //
   // Embedded methods use a guessed time step. If the error using this time step
   // is too large, the time step will be reduced. If the error is below the
   // threshold, a larger time step will be tried for the next time step.
   // <code>delta_t_guess</code> is the guessed time step produced by the
-  // embedded method.
+  // embedded method. In summary, time step size is potentially modified in
+  // three ways:
+  //   - Reducing or increasing time step size within
+  //     TimeStepping::EmbeddedExplicitRungeKutta::evolve_one_time_step().
+  //   - Using the calculated <code>delta_t_guess</code>.
+  //   - Automatically adjusting the step size of the last time step to ensure
+  //     simulation ends precisely at <code>final_time</code>. This adjustment
+  //     is handled inside the DiscreteTime instance.
   unsigned int Diffusion::embedded_explicit_method(
     const TimeStepping::runge_kutta_method method,
     const unsigned int                     n_time_steps,
     const double                           initial_time,
     const double                           final_time)
   {
-    double time_step =
+    const double time_step =
       (final_time - initial_time) / static_cast<double>(n_time_steps);
-    double       time          = initial_time;
     const double coarsen_param = 1.2;
     const double refine_param  = 0.8;
     const double min_delta     = 1e-8;
@@ -617,34 +628,33 @@ namespace Step52
                                     max_delta,
                                     refine_tol,
                                     coarsen_tol);
-    output_results(time, 0, method);
-
-    // Now for the time loop. The last time step is chosen such that the final
-    // time is exactly reached.
-    unsigned int n_steps = 0;
-    while (time < final_time)
+    output_results(initial_time, 0, method);
+    DiscreteTime time(initial_time, final_time, time_step);
+    while (time.is_at_end() == false)
       {
-        if (time + time_step > final_time)
-          time_step = final_time - time;
-
-        time = embedded_explicit_runge_kutta.evolve_one_time_step(
-          [this](const double time, const Vector<double> &y) {
-            return this->evaluate_diffusion(time, y);
-          },
-          time,
-          time_step,
-          solution);
+        const double new_time =
+          embedded_explicit_runge_kutta.evolve_one_time_step(
+            [this](const double time, const Vector<double> &y) {
+              return this->evaluate_diffusion(time, y);
+            },
+            time.get_current_time(),
+            time.get_next_step_size(),
+            solution);
+        time.set_next_step_size(new_time - time.get_current_time());
+        time.advance_time();
 
         constraint_matrix.distribute(solution);
 
-        if ((n_steps + 1) % 10 == 0)
-          output_results(time, n_steps + 1, method);
+        if (time.get_step_number() % 10 == 0)
+          output_results(time.get_current_time(),
+                         time.get_step_number(),
+                         method);
 
-        time_step = embedded_explicit_runge_kutta.get_status().delta_t_guess;
-        ++n_steps;
+        time.set_desired_next_step_size(
+          embedded_explicit_runge_kutta.get_status().delta_t_guess);
       }
 
-    return n_steps;
+    return time.get_step_number();
   }
 
 
@@ -652,8 +662,8 @@ namespace Step52
   // @sect4{<code>Diffusion::run</code>}
   //
   // The following is the main function of the program. At the top, we create
-  // the grid (a [0,5]x[0,5] square) and refine it four times to get a mesh
-  // that has 16 by 16 cells, for a total of 256.  We then set the boundary
+  // the grid (a $[0,5]\times [0,5]$ square) and refine it four times to get a
+  // mesh that has 16 by 16 cells, for a total of 256.  We then set the boundary
   // indicator to 1 for those parts of the boundary where $x=0$ and $x=5$.
   void Diffusion::run()
   {
@@ -749,7 +759,7 @@ namespace Step52
                                        final_time);
     std::cout << "   Heun-Euler:               error=" << solution.l2_norm()
               << std::endl;
-    std::cout << "                steps performed=" << n_steps << std::endl;
+    std::cout << "                   steps performed=" << n_steps << std::endl;
 
     n_steps = embedded_explicit_method(TimeStepping::BOGACKI_SHAMPINE,
                                        n_time_steps,
@@ -757,7 +767,7 @@ namespace Step52
                                        final_time);
     std::cout << "   Bogacki-Shampine:         error=" << solution.l2_norm()
               << std::endl;
-    std::cout << "                steps performed=" << n_steps << std::endl;
+    std::cout << "                   steps performed=" << n_steps << std::endl;
 
     n_steps = embedded_explicit_method(TimeStepping::DOPRI,
                                        n_time_steps,
@@ -765,7 +775,7 @@ namespace Step52
                                        final_time);
     std::cout << "   Dopri:                    error=" << solution.l2_norm()
               << std::endl;
-    std::cout << "                steps performed=" << n_steps << std::endl;
+    std::cout << "                   steps performed=" << n_steps << std::endl;
 
     n_steps = embedded_explicit_method(TimeStepping::FEHLBERG,
                                        n_time_steps,
@@ -773,7 +783,7 @@ namespace Step52
                                        final_time);
     std::cout << "   Fehlberg:                 error=" << solution.l2_norm()
               << std::endl;
-    std::cout << "                steps performed=" << n_steps << std::endl;
+    std::cout << "                   steps performed=" << n_steps << std::endl;
 
     n_steps = embedded_explicit_method(TimeStepping::CASH_KARP,
                                        n_time_steps,
@@ -781,7 +791,7 @@ namespace Step52
                                        final_time);
     std::cout << "   Cash-Karp:                error=" << solution.l2_norm()
               << std::endl;
-    std::cout << "                steps performed=" << n_steps << std::endl;
+    std::cout << "                   steps performed=" << n_steps << std::endl;
   }
 } // namespace Step52
 

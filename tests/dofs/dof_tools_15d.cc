@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,7 +19,6 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::
@@ -29,9 +28,9 @@
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // test doesn't make much sense if
   // no boundary dofs exist
@@ -78,7 +77,7 @@ check_this(const DoFHandlerType &dof_handler)
                ++c)
             deallog << sp.block(block_row.first, col)
                          .column_number(block_row.second, c)
-                    << " ";
+                    << ' ';
           deallog << std::endl;
         }
     }

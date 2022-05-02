@@ -202,7 +202,8 @@ arena::arena ( market& m, unsigned num_slots, unsigned num_reserved_slots ) {
     my_max_num_workers = num_slots-num_reserved_slots;
     my_references = ref_external; // accounts for the master
 #if __TBB_TASK_PRIORITY
-    my_bottom_priority = my_top_priority = normalized_normal_priority;
+    my_bottom_priority = normalized_normal_priority;
+    my_top_priority = normalized_normal_priority;
 #endif /* __TBB_TASK_PRIORITY */
     my_aba_epoch = m.my_arenas_aba_epoch;
 #if __TBB_ARENA_OBSERVER

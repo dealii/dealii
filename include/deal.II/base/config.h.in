@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,23 +37,22 @@
 #cmakedefine DEAL_II_WITH_64BIT_INDICES
 #cmakedefine DEAL_II_WITH_ADOLC
 #cmakedefine DEAL_II_WITH_ARPACK
+#cmakedefine DEAL_II_WITH_ARBORX
 #cmakedefine DEAL_II_WITH_ASSIMP
+#cmakedefine DEAL_II_WITH_CGAL
 #cmakedefine DEAL_II_WITH_COMPLEX_VALUES
 #cmakedefine DEAL_II_WITH_CUDA
-#cmakedefine DEAL_II_WITH_CXX14
-#cmakedefine DEAL_II_WITH_CXX17
 #cmakedefine DEAL_II_WITH_GINKGO
-#cmakedefine DEAL_II_WITH_GSL
 #cmakedefine DEAL_II_WITH_GMSH
+#cmakedefine DEAL_II_WITH_GSL
 #cmakedefine DEAL_II_WITH_HDF5
+#cmakedefine DEAL_II_WITH_KOKKOS
 #cmakedefine DEAL_II_WITH_LAPACK
 #cmakedefine LAPACK_WITH_64BIT_BLAS_INDICES
 #cmakedefine DEAL_II_LAPACK_WITH_MKL
 #cmakedefine DEAL_II_WITH_METIS
 #cmakedefine DEAL_II_WITH_MPI
 #cmakedefine DEAL_II_WITH_MUPARSER
-#cmakedefine DEAL_II_WITH_NANOFLANN
-#cmakedefine DEAL_II_WITH_NETCDF
 #cmakedefine DEAL_II_WITH_OPENCASCADE
 #cmakedefine DEAL_II_WITH_P4EST
 #cmakedefine DEAL_II_WITH_PETSC
@@ -61,14 +60,24 @@
 #cmakedefine DEAL_II_WITH_SLEPC
 #cmakedefine DEAL_II_WITH_SUNDIALS
 #cmakedefine DEAL_II_WITH_SYMENGINE
-#cmakedefine DEAL_II_WITH_THREADS
+#cmakedefine DEAL_II_WITH_TASKFLOW
+#cmakedefine DEAL_II_WITH_TBB
 #cmakedefine DEAL_II_WITH_TRILINOS
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_WITH_ZLIB
 
-// defined for backwards compatibility with pre-C++11
-#define DEAL_II_WITH_CXX11
-#define DEAL_II_NOEXCEPT noexcept
+#ifdef DEAL_II_WITH_TBB
+/**
+ * For backwards compatibility, continue defining DEAL_II_WITH_THREADS when the
+ * library is configured with TBB.
+ */
+#define DEAL_II_WITH_THREADS
+
+#define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
+
+#cmakedefine DEAL_II_TBB_WITH_ONEAPI
+
+#endif
 
 /***********************************************************************
  * Compiler bugs:
@@ -76,12 +85,7 @@
  * For documentation see cmake/checks/check_03_compiler_bugs.cmake
  */
 
-#cmakedefine DEAL_II_TEMPL_SPEC_FRIEND_BUG
-#cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
-#cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG
-#cmakedefine DEAL_II_BIND_NO_CONST_OP_PARENTHESES
-#cmakedefine DEAL_II_CONSTEXPR_BUG
-
+#cmakedefine DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
 
 /***********************************************************************
  * Compiler features:
@@ -95,11 +99,9 @@
 #cmakedefine DEAL_II_HAVE_GLIBC_STACKTRACE
 #cmakedefine DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
-#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
 #cmakedefine DEAL_II_ALWAYS_INLINE @DEAL_II_ALWAYS_INLINE@
 #cmakedefine DEAL_II_RESTRICT @DEAL_II_RESTRICT@
 #cmakedefine DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
-#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
 /*
  * A variable to tell if the compiler used in the current compilation process
@@ -146,11 +148,40 @@
  * For documentation see cmake/checks/check_01_cxx_features.cmake
  */
 
-#cmakedefine DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
-#cmakedefine DEAL_II_HAVE_CXX14_CONSTEXPR
+#cmakedefine DEAL_II_HAVE_CXX14
+#cmakedefine DEAL_II_HAVE_CXX17
+#cmakedefine DEAL_II_HAVE_CXX20
+
 #cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 #cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+#cmakedefine DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+#cmakedefine DEAL_II_CXX14_CONSTEXPR_BUG
+
+/**
+ * Macro indicating that the current feature will be removed in a future
+ * release.
+ */
+#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
+
+/**
+ * Same as above, but for things that have been deprecated during the current
+ * development cycle. By default, no warnings are printed for a feature
+ * deprecated prior to a release until <em>after</em> that release has been
+ * finalized - see DEAL_II_EARLY_DEPRECATIONS for more information.
+ */
+#ifndef DEAL_II_DEPRECATED_EARLY
+// guard to allow user to override DEAL_II_DEPRECATED_EARLY
+#cmakedefine DEAL_II_DEPRECATED_EARLY @DEAL_II_DEPRECATED_EARLY@
+#endif
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
+#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
+
+// defined for backwards compatibility with older deal.II versions
+#define DEAL_II_WITH_CXX11
+#define DEAL_II_WITH_CXX14
+#ifdef DEAL_II_HAVE_CXX17
+#  define DEAL_II_WITH_CXX17
+#endif
 
 
 /***********************************************************************
@@ -180,8 +211,14 @@
 #cmakedefine DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
 #cmakedefine DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING
 
+/* cmake/modules/FindARBORX.cmake */
+#cmakedefine DEAL_II_ARBORX_WITH_MPI
+
 /* cmake/modules/FindARPACK.cmake */
 #cmakedefine DEAL_II_ARPACK_WITH_PARPACK
+
+/* cmake/modules/FindGMSH.cmake */
+#cmakedefine DEAL_II_GMSH_WITH_API
 
 /* cmake/modules/FindPETSC.cmake */
 #cmakedefine DEAL_II_PETSC_WITH_COMPLEX
@@ -194,17 +231,17 @@
 /* cmake/modules/FindSYMENGINE.cmake */
 #cmakedefine DEAL_II_SYMENGINE_WITH_LLVM
 
-/* cmake/configure/configure_1_threads.cmake */
-#cmakedefine DEAL_II_USE_MT_POSIX
-#cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS
+/* cmake/configure/configure_2_boost.cmake */
+#cmakedefine DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
 
 /* cmake/configure/configure_2_trilinos.cmake */
 #cmakedefine DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
 #cmakedefine DEAL_II_TRILINOS_WITH_EPETRAEXT
+#cmakedefine DEAL_II_TRILINOS_WITH_MUELU
 #cmakedefine DEAL_II_TRILINOS_WITH_ROL
 #cmakedefine DEAL_II_TRILINOS_WITH_SACADO
+#cmakedefine DEAL_II_TRILINOS_WITH_SEACAS
 #cmakedefine DEAL_II_TRILINOS_WITH_TPETRA
-#cmakedefine DEAL_II_TRILINOS_WITH_MUELU
 #cmakedefine DEAL_II_TRILINOS_WITH_ZOLTAN
 
 
@@ -219,6 +256,12 @@
  * deal.II:
  */
 
+/**
+ * Returns true if the used deal.II version is greater or equal than the 
+ * version specified by the three arguments. The internal implementation 
+ * assumes that the number of minor and subminor versions is not larger 
+ * than 100.
+ */
 #define DEAL_II_VERSION_GTE(major,minor,subminor) \
  ((DEAL_II_VERSION_MAJOR * 10000 + \
     DEAL_II_VERSION_MINOR * 100 + \
@@ -226,6 +269,19 @@
     >=  \
     (major)*10000 + (minor)*100 + (subminor))
 
+/*
+ * boost:
+ */
+#define DEAL_II_BOOST_VERSION_MAJOR @Boost_MAJOR_VERSION@
+#define DEAL_II_BOOST_VERSION_MINOR @Boost_MINOR_VERSION@
+#define DEAL_II_BOOST_VERSION_SUBMINOR @Boost_SUBMINOR_VERSION@
+
+#define DEAL_II_BOOST_VERSION_GTE(major,minor,subminor) \
+ ((DEAL_II_BOOST_VERSION_MAJOR * 100000 + \
+    DEAL_II_BOOST_VERSION_MINOR * 100 + \
+     DEAL_II_BOOST_VERSION_SUBMINOR) \
+    >= \
+    (major)*100000 + (minor)*100 + (subminor))
 
 /*
  * Gmsh:
@@ -346,6 +402,8 @@
     DEAL_II_MPI_VERSION_MINOR) \
     >=  \
     (major)*100 + (minor))
+#else
+#  define DEAL_II_MPI_VERSION_GTE(major,minor) false
 #endif
 
 #cmakedefine DEAL_II_MPI_WITH_CUDA_SUPPORT
@@ -379,7 +437,7 @@ _Pragma("GCC diagnostic ignored \"-Wextra\"")                     /*!*/ \
 _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"")        \
 _Pragma("GCC diagnostic ignored \"-Wdeprecated-copy\"")                 \
 _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")         \
-_Pragma("GCC diagnostic ignored \"-Wexpansion-to-defined\"")            \
+_Pragma("GCC diagnostic ignored \"-Wdeprecated-volatile\"")             \
 _Pragma("GCC diagnostic ignored \"-Wexpansion-to-defined\"")            \
 _Pragma("GCC diagnostic ignored \"-Wignored-attributes\"")              \
 _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"")              \
@@ -390,6 +448,7 @@ _Pragma("GCC diagnostic ignored \"-Wmisleading-indentation\"")          \
 _Pragma("GCC diagnostic ignored \"-Wmissing-field-initializers\"")      \
 _Pragma("GCC diagnostic ignored \"-Wnested-anon-types\"")               \
 _Pragma("GCC diagnostic ignored \"-Wnon-virtual-dtor\"")                \
+_Pragma("GCC diagnostic ignored \"-Wnonnull\"")                         \
 _Pragma("GCC diagnostic ignored \"-Woverflow\"")                        \
 _Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"")              \
 _Pragma("GCC diagnostic ignored \"-Wpedantic\"")                        \
@@ -415,6 +474,15 @@ _Pragma("GCC diagnostic pop")
 #  define DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #endif
+
+/***********************************************************************
+ * Define macros for picking the correct C linkage name for a Fortran function.
+ * See cmake/configure/configure_fortran_mangling.cmake for more information.
+ */
+
+#define DEAL_II_FORTRAN_MANGLE(name, NAME) @DEAL_II_FORTRAN_MANGLE@
+
+#define DEAL_II_FORTRAN_MANGLE_UNDERSCORE(name, NAME) @DEAL_II_FORTRAN_MANGLE_UNDERSCORE@
 
 /***********************************************************************
  * Define a portable preprocessor macro that generates custom warnings
@@ -448,5 +516,22 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/types.h>
+
+/*
+ * Include the boost version header to do a quick version check in case, by
+ * accident, we have configured with one version of boost but are compiling
+ * either the library or an external application with a different version of
+ * boost.
+ */
+#include <boost/version.hpp>
+static_assert(
+  BOOST_VERSION == 100000 * DEAL_II_BOOST_VERSION_MAJOR +
+                     100 * DEAL_II_BOOST_VERSION_MINOR +
+                     DEAL_II_BOOST_VERSION_SUBMINOR,
+  "The version number of boost that you are compiling with does not match the "
+  "version number of boost found during deal.II's configuration step. This "
+  "leads to difficult to understand bugs and is not supported. Please check "
+  "that you have set up your application with the same version of boost as "
+  "deal.II.");
 
 #endif

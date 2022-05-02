@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,19 +81,14 @@ test()
   //                    start_row[bj] + (i+2*k) % local_rows_per_process[bj]);
 
 
-
   // now create a matrix with this sparsity
   // pattern
-  Epetra_Map map(
-    TrilinosWrappers::types::int_type(-1),
-    TrilinosWrappers::types::int_type(
-      local_rows_per_process[Utilities::Trilinos::get_this_mpi_process(
-        Utilities::Trilinos::comm_world())]),
-    0,
-    Utilities::Trilinos::comm_world());
+  const unsigned int my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  IndexSet           locally_owned_dofs(N);
+  locally_owned_dofs.add_range(start_row[my_id], local_rows_per_process[my_id]);
 
   TrilinosWrappers::SparseMatrix m;
-  m.reinit(map, csp);
+  m.reinit(locally_owned_dofs, locally_owned_dofs, csp, MPI_COMM_WORLD);
   // now write into the exact same matrix
   // entries as have been created by the
   // sparsity pattern above

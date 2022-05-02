@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,6 +36,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef signals
+#  error \
+    "The name 'signals' is already defined. You are most likely using the QT library \
+and using the 'signals' keyword. You can either #include the Qt headers (or any conflicting headers) \
+*after* the deal.II headers or you can define the 'QT_NO_KEYWORDS' macro and use the 'Q_SIGNALS' macro."
+#endif
+
 /*!@addtogroup mg */
 /*@{*/
 
@@ -70,6 +77,10 @@ namespace mg
      * This signal is triggered before (@p before is true) and after (@p before
      * is
      * false) the call to the coarse solver on @p level.
+     *
+     * The coarse solve will be done with ``defect[leve]`` and returned in
+     * ``solution[level]``, which can be inspected by the user using this
+     * signal.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       coarse_solve;
@@ -78,6 +89,9 @@ namespace mg
      * This signal is triggered before (@p before is true) and after (@p before
      * is false) the call to MGTransfer::restrict_and_add() which restricts a
      * vector from @p level to the next coarser one (@p level - 1).
+     *
+     * The vector ``defect[level-1]`` will be updated between these two
+     * triggers and can be inspected by the user using this signal.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       restriction;
@@ -94,6 +108,9 @@ namespace mg
      * This signal is triggered before (@p before is true) and after (@p before
      * is false) the call to a pre-smoothing step via MGPreSmoother::apply() on
      * @p level.
+     *
+     * The smoother result will be stored in ``solution[level]`` and can be
+     * inspected by the user using this signal.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       pre_smoother_step;
@@ -101,11 +118,25 @@ namespace mg
     /**
      * This signal is triggered before (@p before is true) and after (@p before
      * is false) the call to a post-smoothing step via MGPostSmoother::apply()
-     * on
-     * @p level.
+     * on @p level.
      */
     boost::signals2::signal<void(const bool before, const unsigned int level)>
       post_smoother_step;
+
+    /**
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is false) the computation of the residual vector on @p level, including
+     * the result of edge_out and edge_down.
+     */
+    boost::signals2::signal<void(const bool before, const unsigned int level)>
+      residual_step;
+
+    /**
+     * This signal is triggered before (@p before is true) and after (@p before
+     * is false) the execution of edge_in and edge_up.
+     */
+    boost::signals2::signal<void(const bool before, const unsigned int level)>
+      edge_prolongation;
   };
 } // namespace mg
 
@@ -125,13 +156,6 @@ namespace mg
  * vector. This is a nontrivial operation, usually initiated automatically by
  * the class PreconditionMG and performed by the classes derived from
  * MGTransferBase.
- *
- * @note The interface of this class is still very clumsy. In particular, you
- * will have to set up quite a few auxiliary objects before you can use it.
- * Unfortunately, it seems that this can be avoided only be restricting the
- * flexibility of this class in an unacceptable way.
- *
- * @author Guido Kanschat, 1999 - 2005
  */
 template <typename VectorType>
 class Multigrid : public Subscriptor
@@ -214,6 +238,15 @@ public:
                     const MGMatrixBase<VectorType> &edge_in);
 
   /**
+   * Similar to the function above: however, only @p edge_in is set. This
+   * is useful if the matrix attached to this class ignores the edge
+   * constraints during vmult(), which is only used during the computation
+   * of the residual.
+   */
+  void
+  set_edge_in_matrix(const MGMatrixBase<VectorType> &edge_in);
+
+  /**
    * Set additional matrices to correct residual computation at refinement
    * edges. These matrices originate from discontinuous Galerkin methods (see
    * FE_DGQ etc.), where they correspond to the edge fluxes at the refinement
@@ -273,10 +306,17 @@ public:
   void set_cycle(Cycle);
 
   /**
-   * Connect a function to mg::Signals::coarse_solve.
+   * Connect a function to mg::Signals::pre_smoother_step.
    */
   boost::signals2::connection
-  connect_coarse_solve(
+  connect_pre_smoother_step(
+    const std::function<void(const bool, const unsigned int)> &slot);
+
+  /**
+   * Connect a function to mg::Signals::residual_step.
+   */
+  boost::signals2::connection
+  connect_residual_step(
     const std::function<void(const bool, const unsigned int)> &slot);
 
   /**
@@ -287,6 +327,13 @@ public:
     const std::function<void(const bool, const unsigned int)> &slot);
 
   /**
+   * Connect a function to mg::Signals::coarse_solve.
+   */
+  boost::signals2::connection
+  connect_coarse_solve(
+    const std::function<void(const bool, const unsigned int)> &slot);
+
+  /**
    * Connect a function to mg::Signals::prolongation.
    */
   boost::signals2::connection
@@ -294,10 +341,10 @@ public:
     const std::function<void(const bool, const unsigned int)> &slot);
 
   /**
-   * Connect a function to mg::Signals::pre_smoother_step.
+   * Connect a function to mg::Signals::edge_prolongation.
    */
   boost::signals2::connection
-  connect_pre_smoother_step(
+  connect_edge_prolongation(
     const std::function<void(const bool, const unsigned int)> &slot);
 
   /**
@@ -447,8 +494,6 @@ private:
  * If VectorType is in fact a block vector and the TRANSFER object supports
  * use of a separate DoFHandler for each block, this class also allows
  * to be initialized with a separate DoFHandler for each block.
- *
- * @author Guido Kanschat, Daniel Arndt, 1999, 2000, 2001, 2002, 2017
  */
 template <int dim, typename VectorType, class TRANSFER>
 class PreconditionMG : public Subscriptor
@@ -533,7 +578,7 @@ public:
   /**
    * Return the MPI communicator object in use with this preconditioner.
    */
-  const MPI_Comm &
+  MPI_Comm
   get_mpi_communicator() const;
 
   /**
@@ -547,6 +592,18 @@ public:
    */
   boost::signals2::connection
   connect_transfer_to_global(const std::function<void(bool)> &slot);
+
+  /**
+   * Return the Multigrid object passed to the constructor.
+   */
+  Multigrid<VectorType> &
+  get_multigrid();
+
+  /**
+   * Return the Multigrid object passed to the constructor.
+   */
+  const Multigrid<VectorType> &
+  get_multigrid() const;
 
 private:
   /**
@@ -850,7 +907,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices(
 
 
 template <int dim, typename VectorType, class TRANSFER>
-const MPI_Comm &
+MPI_Comm
 PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
 {
   // currently parallel GMG works with parallel triangulations only,
@@ -920,6 +977,22 @@ PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add(
   const OtherVectorType &) const
 {
   Assert(false, ExcNotImplemented());
+}
+
+
+template <int dim, typename VectorType, class TRANSFER>
+Multigrid<VectorType> &
+PreconditionMG<dim, VectorType, TRANSFER>::get_multigrid()
+{
+  return *this->multigrid;
+}
+
+
+template <int dim, typename VectorType, class TRANSFER>
+const Multigrid<VectorType> &
+PreconditionMG<dim, VectorType, TRANSFER>::get_multigrid() const
+{
+  return *this->multigrid;
 }
 
 #endif // DOXYGEN

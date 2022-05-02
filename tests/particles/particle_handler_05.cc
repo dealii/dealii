@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -98,22 +98,6 @@ test()
 
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
 
-    // TODO: Move this into the Particle handler class. Unfortunately, there are
-    // some interactions with the SolutionTransfer class that prevent us from
-    // doing this at the moment. When doing this, check that transferring a
-    // solution and particles during the same refinement is possible (in
-    // particular that the order of serialization/deserialization is preserved).
-    tr.signals.pre_distributed_refinement.connect(std::bind(
-      &Particles::ParticleHandler<dim,
-                                  spacedim>::register_store_callback_function,
-      &particle_handler));
-
-    tr.signals.post_distributed_refinement.connect(std::bind(
-      &Particles::ParticleHandler<dim,
-                                  spacedim>::register_load_callback_function,
-      &particle_handler,
-      false));
-
     create_regular_particle_distribution(particle_handler, tr);
 
     for (const auto &particle : particle_handler)
@@ -122,7 +106,9 @@ test()
               << std::endl;
 
     // Check that all particles are moved to children
+    particle_handler.prepare_for_coarsening_and_refinement();
     tr.refine_global(1);
+    particle_handler.unpack_after_coarsening_and_refinement();
 
     for (const auto &particle : particle_handler)
       deallog << "After refinement particle id " << particle.get_id()
@@ -133,7 +119,9 @@ test()
     for (auto cell = tr.begin_active(); cell != tr.end(); ++cell)
       cell->set_coarsen_flag();
 
+    particle_handler.prepare_for_coarsening_and_refinement();
     tr.execute_coarsening_and_refinement();
+    particle_handler.unpack_after_coarsening_and_refinement();
 
     for (const auto &particle : particle_handler)
       deallog << "After coarsening particle id " << particle.get_id()

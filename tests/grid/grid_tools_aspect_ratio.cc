@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,7 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -72,11 +72,11 @@ compute_aspect_ratio_hyper_rectangle(
       tria.begin_active()->vertex(0) += shift;
     }
 
-  MappingQGeneric<dim> const mapping(degree);
-  QGauss<dim> const          gauss(n_q_points);
+  MappingQ<dim> const mapping(degree);
+  QGauss<dim> const   gauss(n_q_points);
 
   Vector<double> ratios =
-    GridTools::compute_aspect_ratio_of_cells(tria, mapping, gauss);
+    GridTools::compute_aspect_ratio_of_cells(mapping, tria, gauss);
 
   deallog << std::endl
           << "Parameters:"
@@ -87,7 +87,7 @@ compute_aspect_ratio_hyper_rectangle(
   deallog << "Aspect ratio vector = " << std::endl;
   ratios.print(deallog.get_file_stream());
 
-  return GridTools::compute_maximum_aspect_ratio(tria, mapping, gauss);
+  return GridTools::compute_maximum_aspect_ratio(mapping, tria, gauss);
 }
 
 int

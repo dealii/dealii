@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,14 +38,33 @@ class DoFHandler;
 #endif
 
 /**
+ * @deprecated Use DataOutStack<dim, spacedim> instead.
+ */
+template <int dim, int spacedim = dim, typename DoFHandlerType = void>
+class DataOutStack;
+
+#ifndef DOXYGEN
+// prevent doxygen from complaining about potential recursive class relations
+template <int dim, int spacedim, typename DoFHandlerType>
+class DataOutStack : public DataOutStack<dim, spacedim, void>
+{
+public:
+  DEAL_II_DEPRECATED
+  DataOutStack()
+    : DataOutStack<dim, spacedim, void>()
+  {}
+};
+#endif // DOXYGEN
+
+/**
  * This class is used to stack the output from several computations into one
- * output file by stacking the data sets in another co-ordinate direction
+ * output file by stacking the data sets in another coordinate direction
  * orthogonal to the space directions. The most common use is to stack the
  * results of several time steps into one space-time output file, or for
  * example to connect the results of solutions of a parameter dependent
  * equation for several parameter value together into one. The interface is
  * mostly modelled after the DataOut class, see there for some more
- * documentation.
+ * documentation. The class is used in step-78.
  *
  * We will explain the concept for a time dependent problem, but instead of
  * the time any parameter can be substituted. In our example, a solution of an
@@ -64,7 +83,7 @@ class DoFHandler;
  * added in the future.
  *
  *
- * <h3>Example of Use</h3>
+ * <h3>Example of use</h3>
  *
  * The following little example shall illustrate the different steps of use of
  * this class. It is assumed that the finite element used is composed of two
@@ -110,14 +129,25 @@ class DoFHandler;
  * @endcode
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 1999
  */
-template <int dim,
-          int spacedim            = dim,
-          typename DoFHandlerType = DoFHandler<dim, spacedim>>
-class DataOutStack : public DataOutInterface<dim + 1>
+template <int dim, int spacedim>
+class DataOutStack<dim, spacedim, void>
+  : public DataOutInterface<dim + 1, spacedim + 1>
 {
+  static_assert(dim < 3,
+                "Because this class stacks data into the (dim+1)st "
+                "dimension to create graphical output, it only works for "
+                "dim<3.");
+  static_assert(dim == spacedim,
+                "This class is not implemented for dim != spacedim.");
+
 public:
+  /**
+   * Dimension parameters for the patches.
+   */
+  static constexpr int patch_dim      = dim + 1;
+  static constexpr int patch_spacedim = spacedim + 1;
+
   /**
    * Data type declaring the two types of vectors which are used in this
    * class.
@@ -157,7 +187,7 @@ public:
    * value.
    */
   void
-  attach_dof_handler(const DoFHandlerType &dof_handler);
+  attach_dof_handler(const DoFHandler<dim, spacedim> &dof_handler);
 
   /**
    * Declare a data vector. The @p vector_type argument determines whether the
@@ -313,14 +343,14 @@ private:
    * DoF handler to be used for the data corresponding to the present
    * parameter value.
    */
-  SmartPointer<const DoFHandlerType,
-               DataOutStack<dim, spacedim, DoFHandlerType>>
+  SmartPointer<const DoFHandler<dim, spacedim>,
+               DataOutStack<dim, spacedim, void>>
     dof_handler;
 
   /**
    * List of patches of all past and present parameter value data sets.
    */
-  std::vector<dealii::DataOutBase::Patch<dim + 1, dim + 1>> patches;
+  std::vector<dealii::DataOutBase::Patch<patch_dim, patch_spacedim>> patches;
 
   /**
    * Structure holding data vectors (cell and dof data) for the present
@@ -361,7 +391,9 @@ private:
    * data in the form of Patch structures (declared in the base class
    * DataOutBase) to the actual output function.
    */
-  virtual const std::vector<dealii::DataOutBase::Patch<dim + 1, dim + 1>> &
+  virtual const std::vector<dealii::DataOutBase::Patch<
+    DataOutStack<dim, spacedim, void>::patch_dim,
+    DataOutStack<dim, spacedim, void>::patch_spacedim>> &
   get_patches() const override;
 
 

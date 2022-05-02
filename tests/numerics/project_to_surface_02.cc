@@ -63,7 +63,8 @@ do_rotate(Triangulation<dim> &tria)
 }
 
 
-void do_rotate(Triangulation<1> &)
+void
+do_rotate(Triangulation<1> &)
 {}
 
 
@@ -139,7 +140,7 @@ test()
           deallog << quad->vertex(2);
           deallog << " to ";
           deallog << quad->vertex(3);
-          deallog << ")" << std::endl;
+          deallog << ')' << std::endl;
 
           // now make sure that p is
           // indeed closer to

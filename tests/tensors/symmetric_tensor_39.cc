@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,13 +26,13 @@
 // in clang-3.7.0 and clang-3.9.1 in release mode. Hence, use a separate
 // function.
 template <int dim, typename Number>
-void fill_tensor(
-  dealii::SymmetricTensor<2, dim, dealii::VectorizedArray<Number>> &A)
+void
+fill_tensor(dealii::SymmetricTensor<2, dim, dealii::VectorizedArray<Number>> &A)
 {
   Number counter = 0.0;
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
-      for (unsigned int v = 0; v < dealii::VectorizedArray<Number>::size(); v++)
+      for (unsigned int v = 0; v < dealii::VectorizedArray<Number>::size(); ++v)
         {
           A[i][j][v] = counter;
           counter += 1.0;
@@ -51,10 +51,10 @@ main()
   SymmetricTensor<2, dim, VectorizedArray<double>> B;
 
   // I^sym = 0.5(d_ik*d_jl + d_il*d_jk) -> I^sym : A = A^sym
-  for (unsigned int i = 0; i < dim; i++)
-    for (unsigned int j = 0; j < dim; j++)
-      for (unsigned int k = 0; k < dim; k++)
-        for (unsigned int l = 0; l < dim; l++)
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = 0; j < dim; ++j)
+      for (unsigned int k = 0; k < dim; ++k)
+        for (unsigned int l = 0; l < dim; ++l)
           I[i][j][k][l] = ((i == k && j == l && i == l && j == k) ?
                              make_vectorized_array(1.0) :
                              ((i == k && j == l) || (i == l && j == k) ?

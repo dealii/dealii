@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,7 +42,7 @@ vector_values(const FiniteElement<dim> &fe)
   Assert(fe.n_base_elements() == 1, ExcNotImplemented());
   deallog.push(fe.get_name());
 
-  QTrapez<dim>                           quadrature;
+  QTrapezoid<dim>                        quadrature;
   std::vector<unsigned int>              renumbering(fe.dofs_per_cell);
   std::vector<std::vector<unsigned int>> component_start;
   FETools::compute_component_wise(fe, renumbering, component_start);

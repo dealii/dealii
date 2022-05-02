@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,8 @@
 std::ofstream logfile("output");
 
 
-void make_tria(Triangulation<3> &tria, int step)
+void
+make_tria(Triangulation<3> &tria, int step)
 {
   switch (step)
     {
@@ -230,11 +231,11 @@ void make_tria(Triangulation<3> &tria, int step)
 
               case 7:
                 tria.begin_active()->set_refine_flag();
-                (++tria.begin_active())->set_refine_flag();
+                (std::next(tria.begin_active()))->set_refine_flag();
                 break;
               case 8:
                 tria.begin_active()->set_refine_flag();
-                (++(++(++tria.begin_active())))->set_refine_flag();
+                (std::next((++(++tria.begin_active()))))->set_refine_flag();
                 break;
             };
 
@@ -285,7 +286,7 @@ main()
 
           constraints.print(logfile);
 
-          // release fe
+          // release FE
           dof.clear();
 
           deallog << std::endl;

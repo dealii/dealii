@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,7 +19,6 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::
@@ -29,9 +28,9 @@
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // set up X-shape mask
   const unsigned int n_components = dof_handler.get_fe().n_components();
@@ -55,7 +54,7 @@ check_this(const DoFHandlerType &dof_handler)
     {
       const unsigned int line = l * (sp.n_rows() / 20);
       for (unsigned int c = 0; c < sp.row_length(line); ++c)
-        deallog << sp.column_number(line, c) << " ";
+        deallog << sp.column_number(line, c) << ' ';
       deallog << std::endl;
     }
 

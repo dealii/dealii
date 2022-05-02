@@ -1,0 +1,11 @@
+
+DEAL::Face 0 boundary id 0
+DEAL::Face 1 boundary id 100000
+DEAL::Face 2 boundary id 200000
+DEAL::Face 3 boundary id 300000
+DEAL::Face 0 boundary id 0
+DEAL::Face 1 boundary id 100000
+DEAL::Face 2 boundary id 200000
+DEAL::Face 3 boundary id 300000
+DEAL::Face 4 boundary id 400000
+DEAL::Face 5 boundary id 500000

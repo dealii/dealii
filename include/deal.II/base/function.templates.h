@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -322,18 +322,6 @@ Function<dim, RangeNumberType>::memory_consumption() const
 namespace Functions
 {
   template <int dim, typename RangeNumberType>
-  ZeroFunction<dim, RangeNumberType>::ZeroFunction(
-    const unsigned int n_components)
-    : ConstantFunction<dim, RangeNumberType>(RangeNumberType(), n_components)
-  {}
-
-} // namespace Functions
-
-//---------------------------------------------------------------------------
-
-namespace Functions
-{
-  template <int dim, typename RangeNumberType>
   ConstantFunction<dim, RangeNumberType>::ConstantFunction(
     const RangeNumberType value,
     const unsigned int    n_components)
@@ -341,12 +329,15 @@ namespace Functions
     , function_value_vector(n_components, value)
   {}
 
+
+
   template <int dim, typename RangeNumberType>
   ConstantFunction<dim, RangeNumberType>::ConstantFunction(
     const std::vector<RangeNumberType> &values)
     : Function<dim, RangeNumberType>(values.size())
     , function_value_vector(values)
   {}
+
 
 
   template <int dim, typename RangeNumberType>
@@ -359,6 +350,7 @@ namespace Functions
            ExcDimensionMismatch(values.size(), function_value_vector.size()));
     std::copy(values.begin(), values.end(), function_value_vector.begin());
   }
+
 
 
   template <int dim, typename RangeNumberType>
@@ -465,6 +457,7 @@ namespace Functions
   }
 
 
+
   template <int dim, typename RangeNumberType>
   void
   ConstantFunction<dim, RangeNumberType>::vector_gradient(
@@ -477,6 +470,7 @@ namespace Functions
     for (unsigned int c = 0; c < this->n_components; ++c)
       gradients[c].clear();
   }
+
 
 
   template <int dim, typename RangeNumberType>
@@ -492,6 +486,7 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       gradients[i].clear();
   }
+
 
 
   template <int dim, typename RangeNumberType>
@@ -512,6 +507,85 @@ namespace Functions
   }
 
 
+
+  template <int dim, typename RangeNumberType>
+  SymmetricTensor<2, dim, RangeNumberType>
+  ConstantFunction<dim, RangeNumberType>::hessian(const Point<dim> &,
+                                                  const unsigned int) const
+  {
+    return SymmetricTensor<2, dim, RangeNumberType>();
+  }
+
+
+
+  template <int dim, typename RangeNumberType>
+  RangeNumberType
+  ConstantFunction<dim, RangeNumberType>::laplacian(const Point<dim> &,
+                                                    const unsigned int) const
+  {
+    return 0;
+  }
+
+
+
+  template <int dim, typename RangeNumberType>
+  ZeroFunction<dim, RangeNumberType>::ZeroFunction(
+    const unsigned int n_components)
+    : ConstantFunction<dim, RangeNumberType>(RangeNumberType(), n_components)
+  {}
+
+
+
+  template <int dim, typename RangeNumberType>
+  IdentityFunction<dim, RangeNumberType>::IdentityFunction()
+    : Function<dim, RangeNumberType>(dim)
+  {}
+
+
+
+  template <int dim, typename RangeNumberType>
+  RangeNumberType
+  IdentityFunction<dim, RangeNumberType>::value(
+    const Point<dim> & p,
+    const unsigned int component) const
+  {
+    AssertIndexRange(component, this->n_components);
+    return p[component];
+  }
+
+
+
+  template <int dim, typename RangeNumberType>
+  Tensor<1, dim, RangeNumberType>
+  IdentityFunction<dim, RangeNumberType>::gradient(
+    const Point<dim> &,
+    const unsigned int component) const
+  {
+    AssertIndexRange(component, this->n_components);
+    Tensor<1, dim, RangeNumberType> result;
+    result[component] = RangeNumberType(1);
+    return result;
+  }
+
+
+
+  template <int dim, typename RangeNumberType>
+  SymmetricTensor<2, dim, RangeNumberType>
+  IdentityFunction<dim, RangeNumberType>::hessian(const Point<dim> &,
+                                                  const unsigned int) const
+  {
+    return SymmetricTensor<2, dim, RangeNumberType>();
+  }
+
+
+
+  template <int dim, typename RangeNumberType>
+  RangeNumberType
+  IdentityFunction<dim, RangeNumberType>::laplacian(const Point<dim> &,
+                                                    const unsigned int) const
+  {
+    return 0;
+  }
 } // namespace Functions
 
 //---------------------------------------------------------------------------
@@ -521,7 +595,7 @@ ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
   const unsigned int    selected,
   const RangeNumberType value,
   const unsigned int    n_components)
-  : ConstantFunction<dim, RangeNumberType>(value, n_components)
+  : Functions::ConstantFunction<dim, RangeNumberType>(value, n_components)
   , selected_components(std::make_pair(selected, selected + 1))
 {}
 
@@ -531,7 +605,7 @@ template <int dim, typename RangeNumberType>
 ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
   const unsigned int selected,
   const unsigned int n_components)
-  : ConstantFunction<dim, RangeNumberType>(1., n_components)
+  : Functions::ConstantFunction<dim, RangeNumberType>(1., n_components)
   , selected_components(std::make_pair(selected, selected + 1))
 {
   AssertIndexRange(selected, n_components);
@@ -543,7 +617,7 @@ template <int dim, typename RangeNumberType>
 ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
   const std::pair<unsigned int, unsigned int> &selected,
   const unsigned int                           n_components)
-  : ConstantFunction<dim, RangeNumberType>(1., n_components)
+  : Functions::ConstantFunction<dim, RangeNumberType>(1., n_components)
   , selected_components(selected)
 {
   Assert(selected_components.first < selected_components.second,
@@ -559,7 +633,7 @@ ComponentSelectFunction<dim, RangeNumberType>::ComponentSelectFunction(
 template <int dim, typename RangeNumberType>
 void
 ComponentSelectFunction<dim, RangeNumberType>::substitute_function_value_with(
-  const ConstantFunction<dim, RangeNumberType> &f)
+  const Functions::ConstantFunction<dim, RangeNumberType> &f)
 {
   Point<dim> p;
   for (unsigned int i = 0; i < this->function_value_vector.size(); ++i)
@@ -608,8 +682,9 @@ ComponentSelectFunction<dim, RangeNumberType>::memory_consumption() const
   // No new complex data structure is introduced here, just evaluate how much
   // more memory is used *inside* the class via sizeof() and add that value to
   // parent class's memory_consumption()
-  return (sizeof(*this) - sizeof(ConstantFunction<dim, RangeNumberType>) +
-          ConstantFunction<dim, RangeNumberType>::memory_consumption());
+  return (
+    sizeof(*this) - sizeof(Functions::ConstantFunction<dim, RangeNumberType>) +
+    Functions::ConstantFunction<dim, RangeNumberType>::memory_consumption());
 }
 
 //---------------------------------------------------------------------------

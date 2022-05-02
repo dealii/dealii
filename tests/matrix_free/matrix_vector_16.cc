@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,7 +74,7 @@ public:
       {
         fe_eval.reinit(cell);
         fe_eval.read_dof_values(src_cpy);
-        fe_eval.evaluate(true, true, false);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
             fe_eval.submit_value(make_vectorized_array<Number>(10.) *
@@ -82,7 +82,7 @@ public:
                                  q);
             fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
           }
-        fe_eval.integrate(true, true);
+        fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
         fe_eval.distribute_local_to_global(dst);
       }
     constraints.condense(dst);

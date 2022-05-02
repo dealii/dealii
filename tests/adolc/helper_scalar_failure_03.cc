@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,8 @@ template <int dim, typename number_t, enum AD::NumberTypes ad_type_code>
 bool
 test_overlapping_ind_var_components()
 {
-  typedef AD::ScalarFunction<dim, ad_type_code, number_t> ADHelper;
-  typedef typename ADHelper::ad_type                      ADNumberType;
+  using ADHelper     = AD::ScalarFunction<dim, ad_type_code, number_t>;
+  using ADNumberType = typename ADHelper::ad_type;
 
   std::cout << "*** Test variables: Tensor + Vector (coupled), "
             << (AD::ADNumberTraits<ADNumberType>::is_taped == true ? "Taped" :

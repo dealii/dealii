@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,8 +29,10 @@ template <int rank1,
           int rank3,
           int dim,
           typename number,
-          template <int, int, typename> class T1,
-          template <int, int, typename> class T3>
+          template <int, int, typename>
+          class T1,
+          template <int, int, typename>
+          class T3>
 void
 test_symm_tensor_contract_3(const T1<rank1, dim, number> &    l,
                             const Tensor<rank2, dim, number> &m,

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,7 @@
 
 template <template <int dim> class Quad, int dim, typename... Args>
 std::string
-check_q_assign_move(Args &&... args)
+check_q_assign_move(Args &&...args)
 {
   Quad<dim>                     quad1(args...);
   const unsigned int            size1    = quad1.size();
@@ -52,11 +52,11 @@ check_q_assign_move(Args &&... args)
 
 template <template <int dim> class Quad, typename... Args>
 void
-check_quadrature_assign_move(Args &&... args)
+check_quadrature_assign_move(Args &&...args)
 {
   deallog << check_q_assign_move<Quad, 1>(std::forward<Args>(args)...) << 1
-          << " " << check_q_assign_move<Quad, 2>(std::forward<Args>(args)...)
-          << 2 << " "
+          << ' ' << check_q_assign_move<Quad, 2>(std::forward<Args>(args)...)
+          << 2 << ' '
           << check_q_assign_move<Quad, 3>(std::forward<Args>(args)...) << 3
           << std::endl;
 }
@@ -68,7 +68,7 @@ main()
   initlog();
 
   check_quadrature_assign_move<QMidpoint>();
-  check_quadrature_assign_move<QTrapez>();
+  check_quadrature_assign_move<QTrapezoid>();
   check_quadrature_assign_move<QSimpson>();
   check_quadrature_assign_move<QMilne>();
   check_quadrature_assign_move<QWeddle>();

@@ -1,0 +1,1021 @@
+
+DEAL::Timestep 1
+DEAL::  Field degrees of freedom:                 2145
+DEAL::Creating particle 0 at 0.281250 0.562500 with properties 0.00000 0.00000 
+DEAL::Creating particle 1 at 0.343750 0.687500 with properties 0.00000 0.00000 
+DEAL::Creating particle 2 at 0.406250 0.812500 with properties 0.00000 0.00000 
+DEAL::Creating particle 3 at 0.468750 0.937500 with properties 0.00000 0.00000 
+DEAL::Creating particle 4 at 0.468750 1.06250 with properties 0.00000 0.00000 
+DEAL::Creating particle 5 at 0.406250 1.18750 with properties 0.00000 0.00000 
+DEAL::Creating particle 6 at 0.343750 1.31250 with properties 0.00000 0.00000 
+DEAL::Creating particle 7 at 0.281250 1.43750 with properties 0.00000 0.00000 
+DEAL::  Total number of particles in simulation:  8
+DEAL::Evaluating E for particle 0: 0.0484072 -0.0242036
+DEAL::Getting old velocity of particle 0: 0.00000 0.00000
+DEAL::Setting new velocity of particle 0: 6514.41 -3257.20
+DEAL::Setting location of particle 0: 0.286234 0.560008
+DEAL::Evaluating E for particle 1: 0.0700622 -0.0350311
+DEAL::Getting old velocity of particle 1: 0.00000 0.00000
+DEAL::Setting new velocity of particle 1: 9428.64 -4714.32
+DEAL::Setting location of particle 1: 0.350964 0.683893
+DEAL::Evaluating E for particle 2: 0.0971391 -0.0485696
+DEAL::Getting old velocity of particle 2: 0.00000 0.00000
+DEAL::Setting new velocity of particle 2: 13072.5 -6536.26
+DEAL::Setting location of particle 2: 0.416252 0.807499
+DEAL::Evaluating E for particle 3: 0.139925 -0.0699624
+DEAL::Getting old velocity of particle 3: 0.00000 0.00000
+DEAL::Setting new velocity of particle 3: 18830.4 -9415.20
+DEAL::Setting location of particle 3: 0.483158 0.930296
+DEAL::Evaluating E for particle 4: 0.139925 0.0699624
+DEAL::Getting old velocity of particle 4: 0.00000 0.00000
+DEAL::Setting new velocity of particle 4: 18830.4 9415.20
+DEAL::Setting location of particle 4: 0.483158 1.06970
+DEAL::Evaluating E for particle 5: 0.0971391 0.0485696
+DEAL::Getting old velocity of particle 5: 0.00000 0.00000
+DEAL::Setting new velocity of particle 5: 13072.5 6536.26
+DEAL::Setting location of particle 5: 0.416252 1.19250
+DEAL::Evaluating E for particle 6: 0.0700622 0.0350311
+DEAL::Getting old velocity of particle 6: 0.00000 0.00000
+DEAL::Setting new velocity of particle 6: 9428.64 4714.32
+DEAL::Setting location of particle 6: 0.350964 1.31611
+DEAL::Evaluating E for particle 7: 0.0484072 0.0242036
+DEAL::Getting old velocity of particle 7: 0.00000 0.00000
+DEAL::Setting new velocity of particle 7: 6514.41 3257.20
+DEAL::Setting location of particle 7: 0.286234 1.43999
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=7.65145e-07, dt=7.65145e-07.
+DEAL::
+DEAL::Timestep 2
+DEAL::  Field degrees of freedom:                 2145
+DEAL::Particle 0, at 0.286234 0.560008/0.0692291 0.480062 with properties 6514.41 -3257.20 
+DEAL::Particle 1, at 0.350964 0.683893/0.109631 0.471143 with properties 9428.64 -4714.32 
+DEAL::Particle 2, at 0.416252 0.807499/0.167755 0.459990 with properties 13072.5 -6536.26 
+DEAL::Particle 3, at 0.483158 0.930296/0.269383 0.442368 with properties 18830.4 -9415.20 
+DEAL::Particle 4, at 0.483158 1.06970/0.269383 0.557632 with properties 18830.4 9415.20 
+DEAL::Particle 5, at 0.416252 1.19250/0.167755 0.540010 with properties 13072.5 6536.26 
+DEAL::Particle 6, at 0.350964 1.31611/0.109631 0.528857 with properties 9428.64 4714.32 
+DEAL::Particle 7, at 0.286234 1.43999/0.0692291 0.519938 with properties 6514.41 3257.20 
+DEAL::Evaluating particle 0 at 0.286234 0.560008 with reference location 0.0692291 0.480062
+DEAL::Evaluating particle 1 at 0.350964 0.683893 with reference location 0.109631 0.471143
+DEAL::Evaluating particle 2 at 0.416252 0.807499 with reference location 0.167755 0.459990
+DEAL::Evaluating particle 3 at 0.483158 0.930296 with reference location 0.269383 0.442368
+DEAL::Evaluating particle 4 at 0.483158 1.06970 with reference location 0.269383 0.557632
+DEAL::Evaluating particle 5 at 0.416252 1.19250 with reference location 0.167755 0.540010
+DEAL::Evaluating particle 6 at 0.350964 1.31611 with reference location 0.109631 0.528857
+DEAL::Evaluating particle 7 at 0.286234 1.43999 with reference location 0.0692291 0.519938
+DEAL::Creating particle 8 at 0.281250 0.562500 with properties 0.00000 0.00000 
+DEAL::Creating particle 9 at 0.343750 0.687500 with properties 0.00000 0.00000 
+DEAL::Creating particle 10 at 0.406250 0.812500 with properties 0.00000 0.00000 
+DEAL::Creating particle 11 at 0.468750 0.937500 with properties 0.00000 0.00000 
+DEAL::Creating particle 12 at 0.468750 1.06250 with properties 0.00000 0.00000 
+DEAL::Creating particle 13 at 0.406250 1.18750 with properties 0.00000 0.00000 
+DEAL::Creating particle 14 at 0.343750 1.31250 with properties 0.00000 0.00000 
+DEAL::Creating particle 15 at 0.281250 1.43750 with properties 0.00000 0.00000 
+DEAL::  Total number of particles in simulation:  16
+DEAL::Evaluating E for particle 0: 0.0478971 -0.0229864
+DEAL::Getting old velocity of particle 0: 6514.41 -3257.20
+DEAL::Setting new velocity of particle 0: 12766.6 -6257.73
+DEAL::Setting location of particle 0: 0.295710 0.555363
+DEAL::Evaluating E for particle 8: 0.0474002 -0.0237001
+DEAL::Getting old velocity of particle 8: 0.00000 0.00000
+DEAL::Setting new velocity of particle 8: 6187.38 -3093.69
+DEAL::Setting location of particle 8: 0.285842 0.560204
+DEAL::Evaluating E for particle 1: 0.0693955 -0.0329883
+DEAL::Getting old velocity of particle 1: 9428.64 -4714.32
+DEAL::Setting new velocity of particle 1: 18487.2 -9020.45
+DEAL::Setting location of particle 1: 0.364685 0.677198
+DEAL::Evaluating E for particle 9: 0.0684557 -0.0342278
+DEAL::Getting old velocity of particle 9: 0.00000 0.00000
+DEAL::Setting new velocity of particle 9: 8935.86 -4467.93
+DEAL::Setting location of particle 9: 0.350382 0.684184
+DEAL::Evaluating E for particle 2: 0.0964246 -0.0447523
+DEAL::Getting old velocity of particle 2: 13072.5 -6536.26
+DEAL::Setting new velocity of particle 2: 25659.3 -12378.0
+DEAL::Setting location of particle 2: 0.435296 0.798312
+DEAL::Evaluating E for particle 10: 0.0947587 -0.0473793
+DEAL::Getting old velocity of particle 10: 0.00000 0.00000
+DEAL::Setting new velocity of particle 10: 12369.3 -6184.66
+DEAL::Setting location of particle 10: 0.415430 0.807910
+DEAL::Evaluating E for particle 3: 0.139210 -0.0538598
+DEAL::Getting old velocity of particle 3: 18830.4 -9415.20
+DEAL::Setting new velocity of particle 3: 37002.2 -16445.8
+DEAL::Setting location of particle 3: 0.510620 0.918090
+DEAL::Evaluating E for particle 11: 0.136500 -0.0682499
+DEAL::Getting old velocity of particle 11: 0.00000 0.00000
+DEAL::Setting new velocity of particle 11: 17818.0 -8909.00
+DEAL::Setting location of particle 11: 0.481974 0.930888
+DEAL::Evaluating E for particle 4: 0.139210 0.0538598
+DEAL::Getting old velocity of particle 4: 18830.4 9415.20
+DEAL::Setting new velocity of particle 4: 37002.2 16445.8
+DEAL::Setting location of particle 4: 0.510620 1.08191
+DEAL::Evaluating E for particle 12: 0.136500 0.0682499
+DEAL::Getting old velocity of particle 12: 0.00000 0.00000
+DEAL::Setting new velocity of particle 12: 17818.0 8909.00
+DEAL::Setting location of particle 12: 0.481974 1.06911
+DEAL::Evaluating E for particle 5: 0.0964246 0.0447523
+DEAL::Getting old velocity of particle 5: 13072.5 6536.26
+DEAL::Setting new velocity of particle 5: 25659.3 12378.0
+DEAL::Setting location of particle 5: 0.435296 1.20169
+DEAL::Evaluating E for particle 13: 0.0947587 0.0473793
+DEAL::Getting old velocity of particle 13: 0.00000 0.00000
+DEAL::Setting new velocity of particle 13: 12369.3 6184.66
+DEAL::Setting location of particle 13: 0.415430 1.19209
+DEAL::Evaluating E for particle 6: 0.0693955 0.0329883
+DEAL::Getting old velocity of particle 6: 9428.64 4714.32
+DEAL::Setting new velocity of particle 6: 18487.2 9020.45
+DEAL::Setting location of particle 6: 0.364685 1.32280
+DEAL::Evaluating E for particle 14: 0.0684557 0.0342278
+DEAL::Getting old velocity of particle 14: 0.00000 0.00000
+DEAL::Setting new velocity of particle 14: 8935.86 4467.93
+DEAL::Setting location of particle 14: 0.350382 1.31582
+DEAL::Evaluating E for particle 7: 0.0478971 0.0229864
+DEAL::Getting old velocity of particle 7: 6514.41 3257.20
+DEAL::Setting new velocity of particle 7: 12766.6 6257.73
+DEAL::Setting location of particle 7: 0.295710 1.44464
+DEAL::Evaluating E for particle 15: 0.0474002 0.0237001
+DEAL::Getting old velocity of particle 15: 0.00000 0.00000
+DEAL::Setting new velocity of particle 15: 6187.38 3093.69
+DEAL::Setting location of particle 15: 0.285842 1.43980
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=1.50732e-06, dt=7.42173e-07.
+DEAL::
+DEAL::Timestep 3
+DEAL::  Field degrees of freedom:                 2145
+DEAL::Particle 0, at 0.295710 0.555363/0.199666 0.442908 with properties 12766.6 -6257.73 
+DEAL::Particle 8, at 0.285842 0.560204/0.0637883 0.481632 with properties 6187.38 -3093.69 
+DEAL::Particle 1, at 0.364685 0.677198/0.315523 0.417585 with properties 18487.2 -9020.45 
+DEAL::Particle 9, at 0.350382 0.684184/0.100804 0.473472 with properties 8935.86 -4467.93 
+DEAL::Particle 2, at 0.435296 0.798312/0.481189 0.386498 with properties 25659.3 -12378.0 
+DEAL::Particle 10, at 0.415430 0.807910/0.154018 0.463279 with properties 12369.3 -6184.66 
+DEAL::Particle 3, at 0.510620 0.918090/0.762723 0.344723 with properties 37002.2 -16445.8 
+DEAL::Particle 11, at 0.481974 0.930888/0.247384 0.447104 with properties 17818.0 -8909.00 
+DEAL::Particle 4, at 0.510620 1.08191/0.762723 0.655277 with properties 37002.2 16445.8 
+DEAL::Particle 12, at 0.481974 1.06911/0.247384 0.552896 with properties 17818.0 8909.00 
+DEAL::Particle 5, at 0.435296 1.20169/0.481189 0.613502 with properties 25659.3 12378.0 
+DEAL::Particle 13, at 0.415430 1.19209/0.154018 0.536721 with properties 12369.3 6184.66 
+DEAL::Particle 6, at 0.364685 1.32280/0.315523 0.582415 with properties 18487.2 9020.45 
+DEAL::Particle 14, at 0.350382 1.31582/0.100804 0.526528 with properties 8935.86 4467.93 
+DEAL::Particle 7, at 0.295710 1.44464/0.199666 0.557092 with properties 12766.6 6257.73 
+DEAL::Particle 15, at 0.285842 1.43980/0.0637883 0.518368 with properties 6187.38 3093.69 
+DEAL::Evaluating particle 0 at 0.295710 0.555363 with reference location 0.199666 0.442908
+DEAL::Evaluating particle 8 at 0.285842 0.560204 with reference location 0.0637883 0.481632
+DEAL::Evaluating particle 1 at 0.364685 0.677198 with reference location 0.315523 0.417585
+DEAL::Evaluating particle 9 at 0.350382 0.684184 with reference location 0.100804 0.473472
+DEAL::Evaluating particle 2 at 0.435296 0.798312 with reference location 0.481189 0.386498
+DEAL::Evaluating particle 10 at 0.415430 0.807910 with reference location 0.154018 0.463279
+DEAL::Evaluating particle 3 at 0.510620 0.918090 with reference location 0.762723 0.344723
+DEAL::Evaluating particle 11 at 0.481974 0.930888 with reference location 0.247384 0.447104
+DEAL::Evaluating particle 4 at 0.510620 1.08191 with reference location 0.762723 0.655277
+DEAL::Evaluating particle 12 at 0.481974 1.06911 with reference location 0.247384 0.552896
+DEAL::Evaluating particle 5 at 0.435296 1.20169 with reference location 0.481189 0.613502
+DEAL::Evaluating particle 13 at 0.415430 1.19209 with reference location 0.154018 0.536721
+DEAL::Evaluating particle 6 at 0.364685 1.32280 with reference location 0.315523 0.582415
+DEAL::Evaluating particle 14 at 0.350382 1.31582 with reference location 0.100804 0.526528
+DEAL::Evaluating particle 7 at 0.295710 1.44464 with reference location 0.199666 0.557092
+DEAL::Evaluating particle 15 at 0.285842 1.43980 with reference location 0.0637883 0.518368
+DEAL::Creating particle 16 at 0.281250 0.562500 with properties 0.00000 0.00000 
+DEAL::Creating particle 17 at 0.343750 0.687500 with properties 0.00000 0.00000 
+DEAL::Creating particle 18 at 0.406250 0.812500 with properties 0.00000 0.00000 
+DEAL::Creating particle 19 at 0.468750 0.937500 with properties 0.00000 0.00000 
+DEAL::Creating particle 20 at 0.468750 1.06250 with properties 0.00000 0.00000 
+DEAL::Creating particle 21 at 0.406250 1.18750 with properties 0.00000 0.00000 
+DEAL::Creating particle 22 at 0.343750 1.31250 with properties 0.00000 0.00000 
+DEAL::Creating particle 23 at 0.281250 1.43750 with properties 0.00000 0.00000 
+DEAL::  Total number of particles in simulation:  24
+DEAL::Evaluating E for particle 0: 0.0471726 -0.0209828
+DEAL::Getting old velocity of particle 0: 12766.6 -6257.73
+DEAL::Setting new velocity of particle 0: 15968.2 -7681.80
+DEAL::Setting location of particle 0: 0.301871 0.552399
+DEAL::Evaluating E for particle 8: 0.0456394 -0.0219735
+DEAL::Getting old velocity of particle 8: 6187.38 -3093.69
+DEAL::Setting new velocity of particle 8: 9284.86 -4585.00
+DEAL::Setting location of particle 8: 0.289425 0.558435
+DEAL::Evaluating E for particle 16: 0.0449211 -0.0224606
+DEAL::Getting old velocity of particle 16: 0.00000 0.00000
+DEAL::Setting new velocity of particle 16: 3048.74 -1524.37
+DEAL::Setting location of particle 16: 0.282426 0.561912
+DEAL::Evaluating E for particle 1: 0.0693510 -0.0300894
+DEAL::Getting old velocity of particle 1: 18487.2 -9020.45
+DEAL::Setting new velocity of particle 1: 23193.9 -11062.6
+DEAL::Setting location of particle 1: 0.373635 0.672929
+DEAL::Evaluating E for particle 9: 0.0663089 -0.0316462
+DEAL::Getting old velocity of particle 9: 8935.86 -4467.93
+DEAL::Setting new velocity of particle 9: 13436.1 -6615.71
+DEAL::Setting location of particle 9: 0.355567 0.681631
+DEAL::Evaluating E for particle 17: 0.0648858 -0.0324429
+DEAL::Getting old velocity of particle 17: 0.00000 0.00000
+DEAL::Setting new velocity of particle 17: 4403.71 -2201.85
+DEAL::Setting location of particle 17: 0.345449 0.686650
+DEAL::Evaluating E for particle 2: 0.0984034 -0.0403741
+DEAL::Getting old velocity of particle 2: 25659.3 -12378.0
+DEAL::Setting new velocity of particle 2: 32337.8 -15118.1
+DEAL::Setting location of particle 2: 0.447774 0.792478
+DEAL::Evaluating E for particle 10: 0.0928442 -0.0433246
+DEAL::Getting old velocity of particle 10: 12369.3 -6184.66
+DEAL::Setting new velocity of particle 10: 18670.5 -9125.04
+DEAL::Setting location of particle 10: 0.422635 0.804389
+DEAL::Evaluating E for particle 18: 0.0903551 -0.0451775
+DEAL::Getting old velocity of particle 18: 0.00000 0.00000
+DEAL::Setting new velocity of particle 18: 6132.28 -3066.14
+DEAL::Setting location of particle 18: 0.408616 0.811317
+DEAL::Evaluating E for particle 3: 0.150029 -0.0444836
+DEAL::Getting old velocity of particle 3: 37002.2 -16445.8
+DEAL::Setting new velocity of particle 3: 47184.5 -19464.8
+DEAL::Setting location of particle 3: 0.528827 0.910579
+DEAL::Evaluating E for particle 11: 0.135906 -0.0532692
+DEAL::Getting old velocity of particle 11: 17818.0 -8909.00
+DEAL::Setting new velocity of particle 11: 27041.8 -12524.3
+DEAL::Setting location of particle 11: 0.492409 0.926055
+DEAL::Evaluating E for particle 19: 0.132575 -0.0662873
+DEAL::Getting old velocity of particle 19: 0.00000 0.00000
+DEAL::Setting new velocity of particle 19: 8997.66 -4498.83
+DEAL::Setting location of particle 19: 0.472222 0.935764
+DEAL::Evaluating E for particle 4: 0.150029 0.0444836
+DEAL::Getting old velocity of particle 4: 37002.2 16445.8
+DEAL::Setting new velocity of particle 4: 47184.5 19464.8
+DEAL::Setting location of particle 4: 0.528827 1.08942
+DEAL::Evaluating E for particle 12: 0.135906 0.0532692
+DEAL::Getting old velocity of particle 12: 17818.0 8909.00
+DEAL::Setting new velocity of particle 12: 27041.8 12524.3
+DEAL::Setting location of particle 12: 0.492409 1.07394
+DEAL::Evaluating E for particle 20: 0.132575 0.0662873
+DEAL::Getting old velocity of particle 20: 0.00000 0.00000
+DEAL::Setting new velocity of particle 20: 8997.66 4498.83
+DEAL::Setting location of particle 20: 0.472222 1.06424
+DEAL::Evaluating E for particle 5: 0.0984034 0.0403741
+DEAL::Getting old velocity of particle 5: 25659.3 12378.0
+DEAL::Setting new velocity of particle 5: 32337.8 15118.1
+DEAL::Setting location of particle 5: 0.447774 1.20752
+DEAL::Evaluating E for particle 13: 0.0928442 0.0433246
+DEAL::Getting old velocity of particle 13: 12369.3 6184.66
+DEAL::Setting new velocity of particle 13: 18670.5 9125.04
+DEAL::Setting location of particle 13: 0.422635 1.19561
+DEAL::Evaluating E for particle 21: 0.0903551 0.0451775
+DEAL::Getting old velocity of particle 21: 0.00000 0.00000
+DEAL::Setting new velocity of particle 21: 6132.28 3066.14
+DEAL::Setting location of particle 21: 0.408616 1.18868
+DEAL::Evaluating E for particle 6: 0.0693510 0.0300894
+DEAL::Getting old velocity of particle 6: 18487.2 9020.45
+DEAL::Setting new velocity of particle 6: 23193.9 11062.6
+DEAL::Setting location of particle 6: 0.373635 1.32707
+DEAL::Evaluating E for particle 14: 0.0663089 0.0316462
+DEAL::Getting old velocity of particle 14: 8935.86 4467.93
+DEAL::Setting new velocity of particle 14: 13436.1 6615.71
+DEAL::Setting location of particle 14: 0.355567 1.31837
+DEAL::Evaluating E for particle 22: 0.0648858 0.0324429
+DEAL::Getting old velocity of particle 22: 0.00000 0.00000
+DEAL::Setting new velocity of particle 22: 4403.71 2201.85
+DEAL::Setting location of particle 22: 0.345449 1.31335
+DEAL::Evaluating E for particle 7: 0.0471726 0.0209828
+DEAL::Getting old velocity of particle 7: 12766.6 6257.73
+DEAL::Setting new velocity of particle 7: 15968.2 7681.80
+DEAL::Setting location of particle 7: 0.301871 1.44760
+DEAL::Evaluating E for particle 15: 0.0456394 0.0219735
+DEAL::Getting old velocity of particle 15: 6187.38 3093.69
+DEAL::Setting new velocity of particle 15: 9284.86 4585.00
+DEAL::Setting location of particle 15: 0.289425 1.44157
+DEAL::Evaluating E for particle 23: 0.0449211 0.0224606
+DEAL::Getting old velocity of particle 23: 0.00000 0.00000
+DEAL::Setting new velocity of particle 23: 3048.74 1524.37
+DEAL::Setting location of particle 23: 0.282426 1.43809
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=1.89319e-06, dt=3.85876e-07.
+DEAL::
+DEAL::Timestep 4
+DEAL::  Field degrees of freedom:                 2145
+DEAL::Particle 0, at 0.301871 0.552399/0.283743 0.419194 with properties 15968.2 -7681.80 
+DEAL::Particle 8, at 0.289425 0.558435/0.113294 0.467478 with properties 9284.86 -4585.00 
+DEAL::Particle 16, at 0.282426 0.561912/0.0163611 0.495294 with properties 3048.74 -1524.37 
+DEAL::Particle 1, at 0.373635 0.672929/0.448148 0.383435 with properties 23193.9 -11062.6 
+DEAL::Particle 9, at 0.355567 0.681631/0.179022 0.453049 with properties 13436.1 -6615.71 
+DEAL::Particle 17, at 0.345449 0.686650/0.0258771 0.493203 with properties 4403.71 -2201.85 
+DEAL::Particle 2, at 0.447774 0.792478/0.682855 0.339828 with properties 32337.8 -15118.1 
+DEAL::Particle 10, at 0.422635 0.804389/0.273538 0.435110 with properties 18670.5 -9125.04 
+DEAL::Particle 18, at 0.408616 0.811317/0.0398137 0.490535 with properties 6132.28 -3066.14 
+DEAL::Particle 19, at 0.472222 0.935764/0.0652483 0.486112 with properties 8997.66 -4498.83 
+DEAL::Particle 11, at 0.492409 0.926055/0.437732 0.408441 with properties 27041.8 -12524.3 
+DEAL::Particle 3, at 0.528827 0.910579/0.0800265 0.284635 with properties 47184.5 -19464.8 
+DEAL::Particle 20, at 0.472222 1.06424/0.0652483 0.513888 with properties 8997.66 4498.83 
+DEAL::Particle 12, at 0.492409 1.07394/0.437732 0.591559 with properties 27041.8 12524.3 
+DEAL::Particle 4, at 0.528827 1.08942/0.0800265 0.715365 with properties 47184.5 19464.8 
+DEAL::Particle 5, at 0.447774 1.20752/0.682855 0.660172 with properties 32337.8 15118.1 
+DEAL::Particle 13, at 0.422635 1.19561/0.273538 0.564890 with properties 18670.5 9125.04 
+DEAL::Particle 21, at 0.408616 1.18868/0.0398137 0.509465 with properties 6132.28 3066.14 
+DEAL::Particle 6, at 0.373635 1.32707/0.448148 0.616565 with properties 23193.9 11062.6 
+DEAL::Particle 14, at 0.355567 1.31837/0.179022 0.546951 with properties 13436.1 6615.71 
+DEAL::Particle 22, at 0.345449 1.31335/0.0258771 0.506797 with properties 4403.71 2201.85 
+DEAL::Particle 7, at 0.301871 1.44760/0.283743 0.580806 with properties 15968.2 7681.80 
+DEAL::Particle 15, at 0.289425 1.44157/0.113294 0.532522 with properties 9284.86 4585.00 
+DEAL::Particle 23, at 0.282426 1.43809/0.0163611 0.504706 with properties 3048.74 1524.37 
+DEAL::Evaluating particle 0 at 0.301871 0.552399 with reference location 0.283743 0.419194
+DEAL::Evaluating particle 8 at 0.289425 0.558435 with reference location 0.113294 0.467478
+DEAL::Evaluating particle 16 at 0.282426 0.561912 with reference location 0.0163611 0.495294
+DEAL::Evaluating particle 1 at 0.373635 0.672929 with reference location 0.448148 0.383435
+DEAL::Evaluating particle 9 at 0.355567 0.681631 with reference location 0.179022 0.453049
+DEAL::Evaluating particle 17 at 0.345449 0.686650 with reference location 0.0258771 0.493203
+DEAL::Evaluating particle 2 at 0.447774 0.792478 with reference location 0.682855 0.339828
+DEAL::Evaluating particle 10 at 0.422635 0.804389 with reference location 0.273538 0.435110
+DEAL::Evaluating particle 18 at 0.408616 0.811317 with reference location 0.0398137 0.490535
+DEAL::Evaluating particle 19 at 0.472222 0.935764 with reference location 0.0652483 0.486112
+DEAL::Evaluating particle 11 at 0.492409 0.926055 with reference location 0.437732 0.408441
+DEAL::Evaluating particle 3 at 0.528827 0.910579 with reference location 0.0800265 0.284635
+DEAL::Evaluating particle 20 at 0.472222 1.06424 with reference location 0.0652483 0.513888
+DEAL::Evaluating particle 12 at 0.492409 1.07394 with reference location 0.437732 0.591559
+DEAL::Evaluating particle 4 at 0.528827 1.08942 with reference location 0.0800265 0.715365
+DEAL::Evaluating particle 5 at 0.447774 1.20752 with reference location 0.682855 0.660172
+DEAL::Evaluating particle 13 at 0.422635 1.19561 with reference location 0.273538 0.564890
+DEAL::Evaluating particle 21 at 0.408616 1.18868 with reference location 0.0398137 0.509465
+DEAL::Evaluating particle 6 at 0.373635 1.32707 with reference location 0.448148 0.616565
+DEAL::Evaluating particle 14 at 0.355567 1.31837 with reference location 0.179022 0.546951
+DEAL::Evaluating particle 22 at 0.345449 1.31335 with reference location 0.0258771 0.506797
+DEAL::Evaluating particle 7 at 0.301871 1.44760 with reference location 0.283743 0.580806
+DEAL::Evaluating particle 15 at 0.289425 1.44157 with reference location 0.113294 0.532522
+DEAL::Evaluating particle 23 at 0.282426 1.43809 with reference location 0.0163611 0.504706
+DEAL::Creating particle 24 at 0.343750 0.687500 with properties 0.00000 0.00000 
+DEAL::Creating particle 25 at 0.406250 0.812500 with properties 0.00000 0.00000 
+DEAL::Creating particle 26 at 0.468750 0.937500 with properties 0.00000 0.00000 
+DEAL::Creating particle 27 at 0.468750 1.06250 with properties 0.00000 0.00000 
+DEAL::Creating particle 28 at 0.406250 1.18750 with properties 0.00000 0.00000 
+DEAL::Creating particle 29 at 0.343750 1.31250 with properties 0.00000 0.00000 
+DEAL::  Total number of particles in simulation:  30
+DEAL::Evaluating E for particle 0: 0.0471944 -0.0200718
+DEAL::Getting old velocity of particle 0: 15968.2 -7681.80
+DEAL::Setting new velocity of particle 0: 18509.2 -8762.49
+DEAL::Setting location of particle 0: 0.307537 0.549717
+DEAL::Evaluating E for particle 8: 0.0448472 -0.0209829
+DEAL::Getting old velocity of particle 8: 9284.86 -4585.00
+DEAL::Setting new velocity of particle 8: 11699.5 -5714.75
+DEAL::Setting location of particle 8: 0.293006 0.556685
+DEAL::Evaluating E for particle 16: 0.0435063 -0.0215400
+DEAL::Getting old velocity of particle 16: 3048.74 -1524.37
+DEAL::Setting new velocity of particle 16: 5391.18 -2684.11
+DEAL::Setting location of particle 16: 0.284077 0.561090
+DEAL::Evaluating E for particle 1: 0.0703842 -0.0288953
+DEAL::Getting old velocity of particle 1: 23193.9 -11062.6
+DEAL::Setting new velocity of particle 1: 26983.5 -12618.3
+DEAL::Setting location of particle 1: 0.381895 0.669067
+DEAL::Evaluating E for particle 9: 0.0658697 -0.0303515
+DEAL::Getting old velocity of particle 9: 13436.1 -6615.71
+DEAL::Setting new velocity of particle 9: 16982.7 -8249.88
+DEAL::Setting location of particle 9: 0.360765 0.679106
+DEAL::Evaluating E for particle 17: 0.0632767 -0.0312487
+DEAL::Getting old velocity of particle 17: 4403.71 -2201.85
+DEAL::Setting new velocity of particle 17: 7810.61 -3884.33
+DEAL::Setting location of particle 17: 0.347840 0.685461
+DEAL::Evaluating E for particle 24: 0.0628414 -0.0314207
+DEAL::Getting old velocity of particle 24: 0.00000 0.00000
+DEAL::Setting new velocity of particle 24: 3383.47 -1691.73
+DEAL::Setting location of particle 24: 0.344786 0.686982
+DEAL::Evaluating E for particle 2: 0.101045 -0.0382948
+DEAL::Getting old velocity of particle 2: 32337.8 -15118.1
+DEAL::Setting new velocity of particle 2: 37778.2 -17180.0
+DEAL::Setting location of particle 2: 0.459339 0.787219
+DEAL::Evaluating E for particle 10: 0.0934748 -0.0414797
+DEAL::Getting old velocity of particle 10: 18670.5 -9125.04
+DEAL::Setting new velocity of particle 10: 23703.3 -11358.4
+DEAL::Setting location of particle 10: 0.429891 0.800912
+DEAL::Evaluating E for particle 18: 0.0892488 -0.0437722
+DEAL::Getting old velocity of particle 18: 6132.28 -3066.14
+DEAL::Setting new velocity of particle 18: 10937.6 -5422.89
+DEAL::Setting location of particle 18: 0.411965 0.809657
+DEAL::Evaluating E for particle 25: 0.0885622 -0.0442811
+DEAL::Getting old velocity of particle 25: 0.00000 0.00000
+DEAL::Setting new velocity of particle 25: 4768.32 -2384.16
+DEAL::Setting location of particle 25: 0.407710 0.811770
+DEAL::Evaluating E for particle 19: 0.132600 -0.0616857
+DEAL::Getting old velocity of particle 19: 8997.66 -4498.83
+DEAL::Setting new velocity of particle 19: 16137.0 -7820.07
+DEAL::Setting location of particle 19: 0.477162 0.933370
+DEAL::Evaluating E for particle 11: 0.139283 -0.0479918
+DEAL::Getting old velocity of particle 11: 27041.8 -12524.3
+DEAL::Setting new velocity of particle 11: 34541.0 -15108.3
+DEAL::Setting location of particle 11: 0.502983 0.921430
+DEAL::Evaluating E for particle 26: 0.132137 -0.0660685
+DEAL::Getting old velocity of particle 26: 0.00000 0.00000
+DEAL::Setting new velocity of particle 26: 7114.44 -3557.22
+DEAL::Setting location of particle 26: 0.470928 0.936411
+DEAL::Evaluating E for particle 3: 0.149064 -0.0359764
+DEAL::Getting old velocity of particle 3: 47184.5 -19464.8
+DEAL::Setting new velocity of particle 3: 55210.3 -21401.8
+DEAL::Setting location of particle 3: 0.545728 0.904028
+DEAL::Evaluating E for particle 20: 0.132600 0.0616857
+DEAL::Getting old velocity of particle 20: 8997.66 4498.83
+DEAL::Setting new velocity of particle 20: 16137.0 7820.07
+DEAL::Setting location of particle 20: 0.477162 1.06663
+DEAL::Evaluating E for particle 12: 0.139283 0.0479918
+DEAL::Getting old velocity of particle 12: 27041.8 12524.3
+DEAL::Setting new velocity of particle 12: 34541.0 15108.3
+DEAL::Setting location of particle 12: 0.502983 1.07857
+DEAL::Evaluating E for particle 27: 0.132137 0.0660685
+DEAL::Getting old velocity of particle 27: 0.00000 0.00000
+DEAL::Setting new velocity of particle 27: 7114.44 3557.22
+DEAL::Setting location of particle 27: 0.470928 1.06359
+DEAL::Evaluating E for particle 4: 0.149064 0.0359764
+DEAL::Getting old velocity of particle 4: 47184.5 19464.8
+DEAL::Setting new velocity of particle 4: 55210.3 21401.8
+DEAL::Setting location of particle 4: 0.545728 1.09597
+DEAL::Evaluating E for particle 5: 0.101045 0.0382948
+DEAL::Getting old velocity of particle 5: 32337.8 15118.1
+DEAL::Setting new velocity of particle 5: 37778.2 17180.0
+DEAL::Setting location of particle 5: 0.459339 1.21278
+DEAL::Evaluating E for particle 13: 0.0934748 0.0414797
+DEAL::Getting old velocity of particle 13: 18670.5 9125.04
+DEAL::Setting new velocity of particle 13: 23703.3 11358.4
+DEAL::Setting location of particle 13: 0.429891 1.19909
+DEAL::Evaluating E for particle 21: 0.0892488 0.0437722
+DEAL::Getting old velocity of particle 21: 6132.28 3066.14
+DEAL::Setting new velocity of particle 21: 10937.6 5422.89
+DEAL::Setting location of particle 21: 0.411965 1.19034
+DEAL::Evaluating E for particle 28: 0.0885622 0.0442811
+DEAL::Getting old velocity of particle 28: 0.00000 0.00000
+DEAL::Setting new velocity of particle 28: 4768.32 2384.16
+DEAL::Setting location of particle 28: 0.407710 1.18823
+DEAL::Evaluating E for particle 6: 0.0703842 0.0288953
+DEAL::Getting old velocity of particle 6: 23193.9 11062.6
+DEAL::Setting new velocity of particle 6: 26983.5 12618.3
+DEAL::Setting location of particle 6: 0.381895 1.33093
+DEAL::Evaluating E for particle 14: 0.0658697 0.0303515
+DEAL::Getting old velocity of particle 14: 13436.1 6615.71
+DEAL::Setting new velocity of particle 14: 16982.7 8249.88
+DEAL::Setting location of particle 14: 0.360765 1.32089
+DEAL::Evaluating E for particle 22: 0.0632767 0.0312487
+DEAL::Getting old velocity of particle 22: 4403.71 2201.85
+DEAL::Setting new velocity of particle 22: 7810.61 3884.33
+DEAL::Setting location of particle 22: 0.347840 1.31454
+DEAL::Evaluating E for particle 29: 0.0628414 0.0314207
+DEAL::Getting old velocity of particle 29: 0.00000 0.00000
+DEAL::Setting new velocity of particle 29: 3383.47 1691.73
+DEAL::Setting location of particle 29: 0.344786 1.31302
+DEAL::Evaluating E for particle 7: 0.0471944 0.0200718
+DEAL::Getting old velocity of particle 7: 15968.2 7681.80
+DEAL::Setting new velocity of particle 7: 18509.2 8762.49
+DEAL::Setting location of particle 7: 0.307537 1.45028
+DEAL::Evaluating E for particle 15: 0.0448472 0.0209829
+DEAL::Getting old velocity of particle 15: 9284.86 4585.00
+DEAL::Setting new velocity of particle 15: 11699.5 5714.75
+DEAL::Setting location of particle 15: 0.293006 1.44331
+DEAL::Evaluating E for particle 23: 0.0435063 0.0215400
+DEAL::Getting old velocity of particle 23: 3048.74 1524.37
+DEAL::Setting new velocity of particle 23: 5391.18 2684.11
+DEAL::Setting location of particle 23: 0.284077 1.43891
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=2.19932e-06, dt=3.06122e-07.
+DEAL::
+DEAL::Timestep 5
+DEAL::  Field degrees of freedom:                 2145
+DEAL::Particle 0, at 0.307537 0.549717/0.360525 0.397735 with properties 18509.2 -8762.49 
+DEAL::Particle 8, at 0.293006 0.556685/0.162556 0.453482 with properties 11699.5 -5714.75 
+DEAL::Particle 16, at 0.284077 0.561090/0.0392712 0.488721 with properties 5391.18 -2684.11 
+DEAL::Particle 1, at 0.381895 0.669067/0.569368 0.352533 with properties 26983.5 -12618.3 
+DEAL::Particle 9, at 0.360765 0.679106/0.256948 0.432846 with properties 16982.7 -8249.88 
+DEAL::Particle 17, at 0.347840 0.685461/0.0621924 0.483690 with properties 7810.61 -3884.33 
+DEAL::Particle 24, at 0.344786 0.686982/0.0157767 0.495857 with properties 3383.47 -1691.73 
+DEAL::Particle 2, at 0.459339 0.787219/0.867158 0.297754 with properties 37778.2 -17180.0 
+DEAL::Particle 10, at 0.429891 0.800912/0.392764 0.407294 with properties 23703.3 -11358.4 
+DEAL::Particle 18, at 0.411965 0.809657/0.0959204 0.477254 with properties 10937.6 -5422.89 
+DEAL::Particle 25, at 0.407710 0.811770/0.0245691 0.494161 with properties 4768.32 -2384.16 
+DEAL::Particle 19, at 0.477162 0.933370/0.157158 0.466961 with properties 16137.0 -7820.07 
+DEAL::Particle 11, at 0.502983 0.921430/0.627015 0.371441 with properties 34541.0 -15108.3 
+DEAL::Particle 26, at 0.470928 0.936411/0.0409536 0.491288 with properties 7114.44 -3557.22 
+DEAL::Particle 3, at 0.545728 0.904028/0.368131 0.232222 with properties 55210.3 -21401.8 
+DEAL::Particle 20, at 0.477162 1.06663/0.157158 0.533039 with properties 16137.0 7820.07 
+DEAL::Particle 12, at 0.502983 1.07857/0.627015 0.628559 with properties 34541.0 15108.3 
+DEAL::Particle 27, at 0.470928 1.06359/0.0409536 0.508712 with properties 7114.44 3557.22 
+DEAL::Particle 4, at 0.545728 1.09597/0.368131 0.767778 with properties 55210.3 21401.8 
+DEAL::Particle 5, at 0.459339 1.21278/0.867158 0.702246 with properties 37778.2 17180.0 
+DEAL::Particle 13, at 0.429891 1.19909/0.392764 0.592706 with properties 23703.3 11358.4 
+DEAL::Particle 21, at 0.411965 1.19034/0.0959204 0.522746 with properties 10937.6 5422.89 
+DEAL::Particle 28, at 0.407710 1.18823/0.0245691 0.505839 with properties 4768.32 2384.16 
+DEAL::Particle 6, at 0.381895 1.33093/0.569368 0.647467 with properties 26983.5 12618.3 
+DEAL::Particle 14, at 0.360765 1.32089/0.256948 0.567154 with properties 16982.7 8249.88 
+DEAL::Particle 22, at 0.347840 1.31454/0.0621924 0.516310 with properties 7810.61 3884.33 
+DEAL::Particle 29, at 0.344786 1.31302/0.0157767 0.504143 with properties 3383.47 1691.73 
+DEAL::Particle 7, at 0.307537 1.45028/0.360525 0.602265 with properties 18509.2 8762.49 
+DEAL::Particle 15, at 0.293006 1.44331/0.162556 0.546518 with properties 11699.5 5714.75 
+DEAL::Particle 23, at 0.284077 1.43891/0.0392712 0.511279 with properties 5391.18 2684.11 
+DEAL::Evaluating particle 0 at 0.307537 0.549717 with reference location 0.360525 0.397735
+DEAL::Evaluating particle 8 at 0.293006 0.556685 with reference location 0.162556 0.453482
+DEAL::Evaluating particle 16 at 0.284077 0.561090 with reference location 0.0392712 0.488721
+DEAL::Evaluating particle 1 at 0.381895 0.669067 with reference location 0.569368 0.352533
+DEAL::Evaluating particle 9 at 0.360765 0.679106 with reference location 0.256948 0.432846
+DEAL::Evaluating particle 17 at 0.347840 0.685461 with reference location 0.0621924 0.483690
+DEAL::Evaluating particle 24 at 0.344786 0.686982 with reference location 0.0157767 0.495857
+DEAL::Evaluating particle 2 at 0.459339 0.787219 with reference location 0.867158 0.297754
+DEAL::Evaluating particle 10 at 0.429891 0.800912 with reference location 0.392764 0.407294
+DEAL::Evaluating particle 18 at 0.411965 0.809657 with reference location 0.0959204 0.477254
+DEAL::Evaluating particle 25 at 0.407710 0.811770 with reference location 0.0245691 0.494161
+DEAL::Evaluating particle 19 at 0.477162 0.933370 with reference location 0.157158 0.466961
+DEAL::Evaluating particle 11 at 0.502983 0.921430 with reference location 0.627015 0.371441
+DEAL::Evaluating particle 26 at 0.470928 0.936411 with reference location 0.0409536 0.491288
+DEAL::Evaluating particle 3 at 0.545728 0.904028 with reference location 0.368131 0.232222
+DEAL::Evaluating particle 20 at 0.477162 1.06663 with reference location 0.157158 0.533039
+DEAL::Evaluating particle 12 at 0.502983 1.07857 with reference location 0.627015 0.628559
+DEAL::Evaluating particle 27 at 0.470928 1.06359 with reference location 0.0409536 0.508712
+DEAL::Evaluating particle 4 at 0.545728 1.09597 with reference location 0.368131 0.767778
+DEAL::Evaluating particle 5 at 0.459339 1.21278 with reference location 0.867158 0.702246
+DEAL::Evaluating particle 13 at 0.429891 1.19909 with reference location 0.392764 0.592706
+DEAL::Evaluating particle 21 at 0.411965 1.19034 with reference location 0.0959204 0.522746
+DEAL::Evaluating particle 28 at 0.407710 1.18823 with reference location 0.0245691 0.505839
+DEAL::Evaluating particle 6 at 0.381895 1.33093 with reference location 0.569368 0.647467
+DEAL::Evaluating particle 14 at 0.360765 1.32089 with reference location 0.256948 0.567154
+DEAL::Evaluating particle 22 at 0.347840 1.31454 with reference location 0.0621924 0.516310
+DEAL::Evaluating particle 29 at 0.344786 1.31302 with reference location 0.0157767 0.504143
+DEAL::Evaluating particle 7 at 0.307537 1.45028 with reference location 0.360525 0.602265
+DEAL::Evaluating particle 15 at 0.293006 1.44331 with reference location 0.162556 0.546518
+DEAL::Evaluating particle 23 at 0.284077 1.43891 with reference location 0.0392712 0.511279
+DEAL::Creating particle 30 at 0.343750 0.687500 with properties 0.00000 0.00000 
+DEAL::Creating particle 31 at 0.406250 0.812500 with properties 0.00000 0.00000 
+DEAL::Creating particle 32 at 0.468750 0.937500 with properties 0.00000 0.00000 
+DEAL::Creating particle 33 at 0.468750 1.06250 with properties 0.00000 0.00000 
+DEAL::Creating particle 34 at 0.406250 1.18750 with properties 0.00000 0.00000 
+DEAL::Creating particle 35 at 0.343750 1.31250 with properties 0.00000 0.00000 
+DEAL::  Total number of particles in simulation:  36
+DEAL::Evaluating E for particle 0: 0.0475472 -0.0194714
+DEAL::Getting old velocity of particle 0: 18509.2 -8762.49
+DEAL::Setting new velocity of particle 0: 20715.9 -9666.18
+DEAL::Setting location of particle 0: 0.313004 0.547166
+DEAL::Evaluating E for particle 8: 0.0444382 -0.0202348
+DEAL::Getting old velocity of particle 8: 11699.5 -5714.75
+DEAL::Setting new velocity of particle 8: 13761.9 -6653.86
+DEAL::Setting location of particle 8: 0.296638 0.554929
+DEAL::Evaluating E for particle 16: 0.0424761 -0.0207417
+DEAL::Getting old velocity of particle 16: 5391.18 -2684.11
+DEAL::Setting new velocity of particle 16: 7362.54 -3646.76
+DEAL::Setting location of particle 16: 0.286020 0.560128
+DEAL::Evaluating E for particle 1: 0.0717788 -0.0280097
+DEAL::Getting old velocity of particle 1: 26983.5 -12618.3
+DEAL::Setting new velocity of particle 1: 30314.9 -13918.3
+DEAL::Setting location of particle 1: 0.389895 0.665394
+DEAL::Evaluating E for particle 9: 0.0659795 -0.0293884
+DEAL::Getting old velocity of particle 9: 16982.7 -8249.88
+DEAL::Setting new velocity of particle 9: 20044.8 -9613.83
+DEAL::Setting location of particle 9: 0.366055 0.676569
+DEAL::Evaluating E for particle 17: 0.0622714 -0.0302108
+DEAL::Getting old velocity of particle 17: 7810.61 -3884.33
+DEAL::Setting new velocity of particle 17: 10700.7 -5286.44
+DEAL::Setting location of particle 17: 0.350664 0.684066
+DEAL::Evaluating E for particle 24: 0.0613945 -0.0304581
+DEAL::Getting old velocity of particle 24: 3383.47 -1691.73
+DEAL::Setting new velocity of particle 24: 6232.86 -3105.33
+DEAL::Setting location of particle 24: 0.346430 0.686163
+DEAL::Evaluating E for particle 30: 0.0610979 -0.0305489
+DEAL::Getting old velocity of particle 30: 0.00000 0.00000
+DEAL::Setting new velocity of particle 30: 2835.62 -1417.81
+DEAL::Setting location of particle 30: 0.344498 0.687126
+DEAL::Evaluating E for particle 2: 0.102978 -0.0358128
+DEAL::Getting old velocity of particle 2: 37778.2 -17180.0
+DEAL::Setting new velocity of particle 2: 42557.5 -18842.1
+DEAL::Setting location of particle 2: 0.470569 0.782247
+DEAL::Evaluating E for particle 10: 0.0945914 -0.0401223
+DEAL::Getting old velocity of particle 10: 23703.3 -11358.4
+DEAL::Setting new velocity of particle 10: 28093.4 -13220.5
+DEAL::Setting location of particle 10: 0.437304 0.797423
+DEAL::Evaluating E for particle 18: 0.0891392 -0.0426090
+DEAL::Getting old velocity of particle 18: 10937.6 -5422.89
+DEAL::Setting new velocity of particle 18: 15074.6 -7400.43
+DEAL::Setting location of particle 18: 0.415942 0.807704
+DEAL::Evaluating E for particle 25: 0.0878807 -0.0434193
+DEAL::Getting old velocity of particle 25: 4768.32 -2384.16
+DEAL::Setting new velocity of particle 25: 8846.96 -4399.30
+DEAL::Setting location of particle 25: 0.410044 0.810609
+DEAL::Evaluating E for particle 31: 0.0874558 -0.0437279
+DEAL::Getting old velocity of particle 31: 0.00000 0.00000
+DEAL::Setting new velocity of particle 31: 4058.92 -2029.46
+DEAL::Setting location of particle 31: 0.407321 0.811964
+DEAL::Evaluating E for particle 19: 0.132228 -0.0559541
+DEAL::Getting old velocity of particle 19: 16137.0 -7820.07
+DEAL::Setting new velocity of particle 19: 22273.9 -10417.0
+DEAL::Setting location of particle 19: 0.483039 0.930621
+DEAL::Evaluating E for particle 11: 0.144224 -0.0452117
+DEAL::Getting old velocity of particle 11: 34541.0 -15108.3
+DEAL::Setting new velocity of particle 11: 41234.6 -17206.6
+DEAL::Setting location of particle 11: 0.513863 0.916890
+DEAL::Evaluating E for particle 26: 0.130607 -0.0623235
+DEAL::Getting old velocity of particle 26: 7114.44 -3557.22
+DEAL::Setting new velocity of particle 26: 13176.1 -6449.73
+DEAL::Setting location of particle 26: 0.474405 0.934709
+DEAL::Evaluating E for particle 32: 0.130240 -0.0651199
+DEAL::Getting old velocity of particle 32: 0.00000 0.00000
+DEAL::Setting new velocity of particle 32: 6044.58 -3022.29
+DEAL::Setting location of particle 32: 0.470345 0.936702
+DEAL::Evaluating E for particle 3: 0.145062 -0.0290379
+DEAL::Getting old velocity of particle 3: 55210.3 -21401.8
+DEAL::Setting new velocity of particle 3: 61942.8 -22749.5
+DEAL::Setting location of particle 3: 0.562074 0.898025
+DEAL::Evaluating E for particle 20: 0.132228 0.0559541
+DEAL::Getting old velocity of particle 20: 16137.0 7820.07
+DEAL::Setting new velocity of particle 20: 22273.9 10417.0
+DEAL::Setting location of particle 20: 0.483039 1.06938
+DEAL::Evaluating E for particle 12: 0.144224 0.0452117
+DEAL::Getting old velocity of particle 12: 34541.0 15108.3
+DEAL::Setting new velocity of particle 12: 41234.6 17206.6
+DEAL::Setting location of particle 12: 0.513863 1.08311
+DEAL::Evaluating E for particle 27: 0.130607 0.0623235
+DEAL::Getting old velocity of particle 27: 7114.44 3557.22
+DEAL::Setting new velocity of particle 27: 13176.1 6449.73
+DEAL::Setting location of particle 27: 0.474405 1.06529
+DEAL::Evaluating E for particle 33: 0.130240 0.0651199
+DEAL::Getting old velocity of particle 33: 0.00000 0.00000
+DEAL::Setting new velocity of particle 33: 6044.58 3022.29
+DEAL::Setting location of particle 33: 0.470345 1.06330
+DEAL::Evaluating E for particle 4: 0.145062 0.0290379
+DEAL::Getting old velocity of particle 4: 55210.3 21401.8
+DEAL::Setting new velocity of particle 4: 61942.8 22749.5
+DEAL::Setting location of particle 4: 0.562074 1.10198
+DEAL::Evaluating E for particle 5: 0.102978 0.0358128
+DEAL::Getting old velocity of particle 5: 37778.2 17180.0
+DEAL::Setting new velocity of particle 5: 42557.5 18842.1
+DEAL::Setting location of particle 5: 0.470569 1.21775
+DEAL::Evaluating E for particle 13: 0.0945914 0.0401223
+DEAL::Getting old velocity of particle 13: 23703.3 11358.4
+DEAL::Setting new velocity of particle 13: 28093.4 13220.5
+DEAL::Setting location of particle 13: 0.437304 1.20258
+DEAL::Evaluating E for particle 21: 0.0891392 0.0426090
+DEAL::Getting old velocity of particle 21: 10937.6 5422.89
+DEAL::Setting new velocity of particle 21: 15074.6 7400.43
+DEAL::Setting location of particle 21: 0.415942 1.19230
+DEAL::Evaluating E for particle 28: 0.0878807 0.0434193
+DEAL::Getting old velocity of particle 28: 4768.32 2384.16
+DEAL::Setting new velocity of particle 28: 8846.96 4399.30
+DEAL::Setting location of particle 28: 0.410044 1.18939
+DEAL::Evaluating E for particle 34: 0.0874558 0.0437279
+DEAL::Getting old velocity of particle 34: 0.00000 0.00000
+DEAL::Setting new velocity of particle 34: 4058.92 2029.46
+DEAL::Setting location of particle 34: 0.407321 1.18804
+DEAL::Evaluating E for particle 6: 0.0717788 0.0280097
+DEAL::Getting old velocity of particle 6: 26983.5 12618.3
+DEAL::Setting new velocity of particle 6: 30314.9 13918.3
+DEAL::Setting location of particle 6: 0.389895 1.33461
+DEAL::Evaluating E for particle 14: 0.0659795 0.0293884
+DEAL::Getting old velocity of particle 14: 16982.7 8249.88
+DEAL::Setting new velocity of particle 14: 20044.8 9613.83
+DEAL::Setting location of particle 14: 0.366055 1.32343
+DEAL::Evaluating E for particle 22: 0.0622714 0.0302108
+DEAL::Getting old velocity of particle 22: 7810.61 3884.33
+DEAL::Setting new velocity of particle 22: 10700.7 5286.44
+DEAL::Setting location of particle 22: 0.350664 1.31593
+DEAL::Evaluating E for particle 29: 0.0613945 0.0304581
+DEAL::Getting old velocity of particle 29: 3383.47 1691.73
+DEAL::Setting new velocity of particle 29: 6232.86 3105.33
+DEAL::Setting location of particle 29: 0.346430 1.31384
+DEAL::Evaluating E for particle 35: 0.0610979 0.0305489
+DEAL::Getting old velocity of particle 35: 0.00000 0.00000
+DEAL::Setting new velocity of particle 35: 2835.62 1417.81
+DEAL::Setting location of particle 35: 0.344498 1.31287
+DEAL::Evaluating E for particle 7: 0.0475472 0.0194714
+DEAL::Getting old velocity of particle 7: 18509.2 8762.49
+DEAL::Setting new velocity of particle 7: 20715.9 9666.18
+DEAL::Setting location of particle 7: 0.313004 1.45283
+DEAL::Evaluating E for particle 15: 0.0444382 0.0202348
+DEAL::Getting old velocity of particle 15: 11699.5 5714.75
+DEAL::Setting new velocity of particle 15: 13761.9 6653.86
+DEAL::Setting location of particle 15: 0.296638 1.44507
+DEAL::Evaluating E for particle 23: 0.0424761 0.0207417
+DEAL::Getting old velocity of particle 23: 5391.18 2684.11
+DEAL::Setting new velocity of particle 23: 7362.54 3646.76
+DEAL::Setting location of particle 23: 0.286020 1.43987
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=2.46319e-06, dt=2.63877e-07.
+DEAL::
+DEAL::Timestep 6
+DEAL::  Field degrees of freedom:                 2145
+DEAL::Particle 0, at 0.313004 0.547166/0.434139 0.377329 with properties 20715.9 -9666.18 
+DEAL::Particle 8, at 0.296638 0.554929/0.212287 0.439436 with properties 13761.9 -6653.86 
+DEAL::Particle 16, at 0.286020 0.560128/0.0661801 0.481023 with properties 7362.54 -3646.76 
+DEAL::Particle 1, at 0.389895 0.665394/0.685717 0.323151 with properties 30314.9 -13918.3 
+DEAL::Particle 9, at 0.366055 0.676569/0.335738 0.412551 with properties 20044.8 -9613.83 
+DEAL::Particle 17, at 0.350664 0.684066/0.104939 0.472530 with properties 10700.7 -5286.44 
+DEAL::Particle 24, at 0.346430 0.686163/0.0407857 0.489302 with properties 6232.86 -3105.33 
+DEAL::Particle 30, at 0.344498 0.687126/0.0113987 0.497007 with properties 2835.62 -1417.81 
+DEAL::Particle 31, at 0.407321 0.811964/0.0180307 0.495716 with properties 4058.92 -2029.46 
+DEAL::Particle 10, at 0.437304 0.797423/0.513463 0.379385 with properties 28093.4 -13220.5 
+DEAL::Particle 18, at 0.415942 0.807704/0.162247 0.461632 with properties 15074.6 -7400.43 
+DEAL::Particle 25, at 0.410044 0.810609/0.0637577 0.484874 with properties 8846.96 -4399.30 
+DEAL::Particle 2, at 0.470569 0.782247/0.0438302 0.257979 with properties 42557.5 -18842.1 
+DEAL::Particle 19, at 0.483039 0.930621/0.265257 0.444971 with properties 22273.9 -10417.0 
+DEAL::Particle 11, at 0.513863 0.916890/0.818657 0.335118 with properties 41234.6 -17206.6 
+DEAL::Particle 26, at 0.474405 0.934709/0.105889 0.477673 with properties 13176.1 -6449.73 
+DEAL::Particle 32, at 0.470345 0.936702/0.0300014 0.493620 with properties 6044.58 -3022.29 
+DEAL::Particle 3, at 0.562074 0.898025/0.641581 0.184198 with properties 61942.8 -22749.5 
+DEAL::Particle 20, at 0.483039 1.06938/0.265257 0.555029 with properties 22273.9 10417.0 
+DEAL::Particle 12, at 0.513863 1.08311/0.818657 0.664882 with properties 41234.6 17206.6 
+DEAL::Particle 27, at 0.474405 1.06529/0.105889 0.522327 with properties 13176.1 6449.73 
+DEAL::Particle 33, at 0.470345 1.06330/0.0300014 0.506380 with properties 6044.58 3022.29 
+DEAL::Particle 4, at 0.562074 1.10198/0.641581 0.815802 with properties 61942.8 22749.5 
+DEAL::Particle 34, at 0.407321 1.18804/0.0180307 0.504284 with properties 4058.92 2029.46 
+DEAL::Particle 13, at 0.437304 1.20258/0.513463 0.620615 with properties 28093.4 13220.5 
+DEAL::Particle 21, at 0.415942 1.19230/0.162247 0.538368 with properties 15074.6 7400.43 
+DEAL::Particle 28, at 0.410044 1.18939/0.0637577 0.515126 with properties 8846.96 4399.30 
+DEAL::Particle 5, at 0.470569 1.21775/0.0438302 0.742021 with properties 42557.5 18842.1 
+DEAL::Particle 6, at 0.389895 1.33461/0.685717 0.676849 with properties 30314.9 13918.3 
+DEAL::Particle 14, at 0.366055 1.32343/0.335738 0.587449 with properties 20044.8 9613.83 
+DEAL::Particle 22, at 0.350664 1.31593/0.104939 0.527470 with properties 10700.7 5286.44 
+DEAL::Particle 29, at 0.346430 1.31384/0.0407857 0.510698 with properties 6232.86 3105.33 
+DEAL::Particle 35, at 0.344498 1.31287/0.0113987 0.502993 with properties 2835.62 1417.81 
+DEAL::Particle 7, at 0.313004 1.45283/0.434139 0.622671 with properties 20715.9 9666.18 
+DEAL::Particle 15, at 0.296638 1.44507/0.212287 0.560564 with properties 13761.9 6653.86 
+DEAL::Particle 23, at 0.286020 1.43987/0.0661801 0.518977 with properties 7362.54 3646.76 
+DEAL::Evaluating particle 0 at 0.313004 0.547166 with reference location 0.434139 0.377329
+DEAL::Evaluating particle 8 at 0.296638 0.554929 with reference location 0.212287 0.439436
+DEAL::Evaluating particle 16 at 0.286020 0.560128 with reference location 0.0661801 0.481023
+DEAL::Evaluating particle 1 at 0.389895 0.665394 with reference location 0.685717 0.323151
+DEAL::Evaluating particle 9 at 0.366055 0.676569 with reference location 0.335738 0.412551
+DEAL::Evaluating particle 17 at 0.350664 0.684066 with reference location 0.104939 0.472530
+DEAL::Evaluating particle 24 at 0.346430 0.686163 with reference location 0.0407857 0.489302
+DEAL::Evaluating particle 30 at 0.344498 0.687126 with reference location 0.0113987 0.497007
+DEAL::Evaluating particle 31 at 0.407321 0.811964 with reference location 0.0180307 0.495716
+DEAL::Evaluating particle 10 at 0.437304 0.797423 with reference location 0.513463 0.379385
+DEAL::Evaluating particle 18 at 0.415942 0.807704 with reference location 0.162247 0.461632
+DEAL::Evaluating particle 25 at 0.410044 0.810609 with reference location 0.0637577 0.484874
+DEAL::Evaluating particle 2 at 0.470569 0.782247 with reference location 0.0438302 0.257979
+DEAL::Evaluating particle 19 at 0.483039 0.930621 with reference location 0.265257 0.444971
+DEAL::Evaluating particle 11 at 0.513863 0.916890 with reference location 0.818657 0.335118
+DEAL::Evaluating particle 26 at 0.474405 0.934709 with reference location 0.105889 0.477673
+DEAL::Evaluating particle 32 at 0.470345 0.936702 with reference location 0.0300014 0.493620
+DEAL::Evaluating particle 3 at 0.562074 0.898025 with reference location 0.641581 0.184198
+DEAL::Evaluating particle 20 at 0.483039 1.06938 with reference location 0.265257 0.555029
+DEAL::Evaluating particle 12 at 0.513863 1.08311 with reference location 0.818657 0.664882
+DEAL::Evaluating particle 27 at 0.474405 1.06529 with reference location 0.105889 0.522327
+DEAL::Evaluating particle 33 at 0.470345 1.06330 with reference location 0.0300014 0.506380
+DEAL::Evaluating particle 4 at 0.562074 1.10198 with reference location 0.641581 0.815802
+DEAL::Evaluating particle 34 at 0.407321 1.18804 with reference location 0.0180307 0.504284
+DEAL::Evaluating particle 13 at 0.437304 1.20258 with reference location 0.513463 0.620615
+DEAL::Evaluating particle 21 at 0.415942 1.19230 with reference location 0.162247 0.538368
+DEAL::Evaluating particle 28 at 0.410044 1.18939 with reference location 0.0637577 0.515126
+DEAL::Evaluating particle 5 at 0.470569 1.21775 with reference location 0.0438302 0.742021
+DEAL::Evaluating particle 6 at 0.389895 1.33461 with reference location 0.685717 0.676849
+DEAL::Evaluating particle 14 at 0.366055 1.32343 with reference location 0.335738 0.587449
+DEAL::Evaluating particle 22 at 0.350664 1.31593 with reference location 0.104939 0.527470
+DEAL::Evaluating particle 29 at 0.346430 1.31384 with reference location 0.0407857 0.510698
+DEAL::Evaluating particle 35 at 0.344498 1.31287 with reference location 0.0113987 0.502993
+DEAL::Evaluating particle 7 at 0.313004 1.45283 with reference location 0.434139 0.622671
+DEAL::Evaluating particle 15 at 0.296638 1.44507 with reference location 0.212287 0.560564
+DEAL::Evaluating particle 23 at 0.286020 1.43987 with reference location 0.0661801 0.518977
+DEAL::Creating particle 36 at 0.343750 0.687500 with properties 0.00000 0.00000 
+DEAL::Creating particle 37 at 0.406250 0.812500 with properties 0.00000 0.00000 
+DEAL::Creating particle 38 at 0.468750 0.937500 with properties 0.00000 0.00000 
+DEAL::Creating particle 39 at 0.468750 1.06250 with properties 0.00000 0.00000 
+DEAL::Creating particle 40 at 0.406250 1.18750 with properties 0.00000 0.00000 
+DEAL::Creating particle 41 at 0.343750 1.31250 with properties 0.00000 0.00000 
+DEAL::  Total number of particles in simulation:  42
+DEAL::Evaluating E for particle 0: 0.0481349 -0.0190394
+DEAL::Getting old velocity of particle 0: 20715.9 -9666.18
+DEAL::Setting new velocity of particle 0: 22720.5 -10459.1
+DEAL::Setting location of particle 0: 0.318384 0.544690
+DEAL::Evaluating E for particle 8: 0.0443325 -0.0196678
+DEAL::Getting old velocity of particle 8: 13761.9 -6653.86
+DEAL::Setting new velocity of particle 8: 15608.2 -7472.95
+DEAL::Setting location of particle 8: 0.300334 0.553160
+DEAL::Evaluating E for particle 16: 0.0417698 -0.0200714
+DEAL::Getting old velocity of particle 16: 7362.54 -3646.76
+DEAL::Setting new velocity of particle 16: 9102.09 -4482.66
+DEAL::Setting location of particle 16: 0.288175 0.559066
+DEAL::Evaluating E for particle 1: 0.0733538 -0.0271715
+DEAL::Getting old velocity of particle 1: 30314.9 -13918.3
+DEAL::Setting new velocity of particle 1: 33369.8 -15049.9
+DEAL::Setting location of particle 1: 0.397796 0.661830
+DEAL::Evaluating E for particle 9: 0.0664538 -0.0286400
+DEAL::Getting old velocity of particle 9: 20044.8 -9613.83
+DEAL::Setting new velocity of particle 9: 22812.4 -10806.6
+DEAL::Setting location of particle 9: 0.371456 0.674010
+DEAL::Evaluating E for particle 17: 0.0616860 -0.0293001
+DEAL::Getting old velocity of particle 17: 10700.7 -5286.44
+DEAL::Setting new velocity of particle 17: 13269.7 -6506.68
+DEAL::Setting location of particle 17: 0.353806 0.682526
+DEAL::Evaluating E for particle 24: 0.0603705 -0.0295668
+DEAL::Getting old velocity of particle 24: 6232.86 -3105.33
+DEAL::Setting new velocity of particle 24: 8747.05 -4336.67
+DEAL::Setting location of particle 24: 0.348502 0.685136
+DEAL::Evaluating E for particle 30: 0.0597726 -0.0297108
+DEAL::Getting old velocity of particle 30: 2835.62 -1417.81
+DEAL::Setting new velocity of particle 30: 5324.92 -2655.15
+DEAL::Setting location of particle 30: 0.345759 0.686497
+DEAL::Evaluating E for particle 36: 0.0595417 -0.0297709
+DEAL::Getting old velocity of particle 36: 0.00000 0.00000
+DEAL::Setting new velocity of particle 36: 2479.68 -1239.84
+DEAL::Setting location of particle 36: 0.344337 0.687206
+DEAL::Evaluating E for particle 31: 0.0866775 -0.0429638
+DEAL::Getting old velocity of particle 31: 4058.92 -2029.46
+DEAL::Setting new velocity of particle 31: 7668.71 -3818.74
+DEAL::Setting location of particle 31: 0.409137 0.811060
+DEAL::Evaluating E for particle 10: 0.0958050 -0.0389023
+DEAL::Getting old velocity of particle 10: 28093.4 -13220.5
+DEAL::Setting new velocity of particle 10: 32083.3 -14840.6
+DEAL::Setting location of particle 10: 0.444901 0.793909
+DEAL::Evaluating E for particle 18: 0.0892888 -0.0415015
+DEAL::Getting old velocity of particle 18: 15074.6 -7400.43
+DEAL::Setting new velocity of particle 18: 18793.1 -9128.81
+DEAL::Setting location of particle 18: 0.420392 0.805542
+DEAL::Evaluating E for particle 25: 0.0874934 -0.0424524
+DEAL::Getting old velocity of particle 25: 8846.96 -4399.30
+DEAL::Setting new velocity of particle 25: 12490.7 -6167.28
+DEAL::Setting location of particle 25: 0.413002 0.809149
+DEAL::Evaluating E for particle 37: 0.0863596 -0.0431798
+DEAL::Getting old velocity of particle 37: 0.00000 0.00000
+DEAL::Setting new velocity of particle 37: 3596.54 -1798.27
+DEAL::Setting location of particle 37: 0.407102 0.812074
+DEAL::Evaluating E for particle 2: 0.104034 -0.0326066
+DEAL::Getting old velocity of particle 2: 42557.5 -18842.1
+DEAL::Setting new velocity of particle 2: 46890.1 -20200.0
+DEAL::Setting location of particle 2: 0.481672 0.777464
+DEAL::Evaluating E for particle 19: 0.133130 -0.0511823
+DEAL::Getting old velocity of particle 19: 22273.9 -10417.0
+DEAL::Setting new velocity of particle 19: 27818.2 -12548.5
+DEAL::Setting location of particle 19: 0.489626 0.927650
+DEAL::Evaluating E for particle 11: 0.149787 -0.0431100
+DEAL::Getting old velocity of particle 11: 41234.6 -17206.6
+DEAL::Setting new velocity of particle 11: 47472.6 -19001.9
+DEAL::Setting location of particle 11: 0.525104 0.912390
+DEAL::Evaluating E for particle 26: 0.129913 -0.0577635
+DEAL::Getting old velocity of particle 26: 13176.1 -6449.73
+DEAL::Setting new velocity of particle 26: 18586.4 -8855.35
+DEAL::Setting location of particle 26: 0.478806 0.932612
+DEAL::Evaluating E for particle 32: 0.128874 -0.0622337
+DEAL::Getting old velocity of particle 32: 6044.58 -3022.29
+DEAL::Setting new velocity of particle 32: 11411.7 -5614.09
+DEAL::Setting location of particle 32: 0.473047 0.935373
+DEAL::Evaluating E for particle 38: 0.128569 -0.0642844
+DEAL::Getting old velocity of particle 38: 0.00000 0.00000
+DEAL::Setting new velocity of particle 38: 5354.40 -2677.20
+DEAL::Setting location of particle 38: 0.470018 0.936866
+DEAL::Evaluating E for particle 3: 0.143825 -0.0237167
+DEAL::Getting old velocity of particle 3: 61942.8 -22749.5
+DEAL::Setting new velocity of particle 3: 67932.5 -23737.2
+DEAL::Setting location of particle 3: 0.578159 0.892404
+DEAL::Evaluating E for particle 20: 0.133130 0.0511823
+DEAL::Getting old velocity of particle 20: 22273.9 10417.0
+DEAL::Setting new velocity of particle 20: 27818.2 12548.5
+DEAL::Setting location of particle 20: 0.489626 1.07235
+DEAL::Evaluating E for particle 12: 0.149787 0.0431100
+DEAL::Getting old velocity of particle 12: 41234.6 17206.6
+DEAL::Setting new velocity of particle 12: 47472.6 19001.9
+DEAL::Setting location of particle 12: 0.525104 1.08761
+DEAL::Evaluating E for particle 27: 0.129913 0.0577635
+DEAL::Getting old velocity of particle 27: 13176.1 6449.73
+DEAL::Setting new velocity of particle 27: 18586.4 8855.35
+DEAL::Setting location of particle 27: 0.478806 1.06739
+DEAL::Evaluating E for particle 33: 0.128874 0.0622337
+DEAL::Getting old velocity of particle 33: 6044.58 3022.29
+DEAL::Setting new velocity of particle 33: 11411.7 5614.09
+DEAL::Setting location of particle 33: 0.473047 1.06463
+DEAL::Evaluating E for particle 39: 0.128569 0.0642844
+DEAL::Getting old velocity of particle 39: 0.00000 0.00000
+DEAL::Setting new velocity of particle 39: 5354.40 2677.20
+DEAL::Setting location of particle 39: 0.470018 1.06313
+DEAL::Evaluating E for particle 4: 0.143825 0.0237167
+DEAL::Getting old velocity of particle 4: 61942.8 22749.5
+DEAL::Setting new velocity of particle 4: 67932.5 23737.2
+DEAL::Setting location of particle 4: 0.578159 1.10760
+DEAL::Evaluating E for particle 34: 0.0866775 0.0429638
+DEAL::Getting old velocity of particle 34: 4058.92 2029.46
+DEAL::Setting new velocity of particle 34: 7668.71 3818.74
+DEAL::Setting location of particle 34: 0.409137 1.18894
+DEAL::Evaluating E for particle 13: 0.0958050 0.0389023
+DEAL::Getting old velocity of particle 13: 28093.4 13220.5
+DEAL::Setting new velocity of particle 13: 32083.3 14840.6
+DEAL::Setting location of particle 13: 0.444901 1.20609
+DEAL::Evaluating E for particle 21: 0.0892888 0.0415015
+DEAL::Getting old velocity of particle 21: 15074.6 7400.43
+DEAL::Setting new velocity of particle 21: 18793.1 9128.81
+DEAL::Setting location of particle 21: 0.420392 1.19446
+DEAL::Evaluating E for particle 28: 0.0874934 0.0424524
+DEAL::Getting old velocity of particle 28: 8846.96 4399.30
+DEAL::Setting new velocity of particle 28: 12490.7 6167.28
+DEAL::Setting location of particle 28: 0.413002 1.19085
+DEAL::Evaluating E for particle 40: 0.0863596 0.0431798
+DEAL::Getting old velocity of particle 40: 0.00000 0.00000
+DEAL::Setting new velocity of particle 40: 3596.54 1798.27
+DEAL::Setting location of particle 40: 0.407102 1.18793
+DEAL::Evaluating E for particle 5: 0.104034 0.0326066
+DEAL::Getting old velocity of particle 5: 42557.5 18842.1
+DEAL::Setting new velocity of particle 5: 46890.1 20200.0
+DEAL::Setting location of particle 5: 0.481672 1.22254
+DEAL::Evaluating E for particle 6: 0.0733538 0.0271715
+DEAL::Getting old velocity of particle 6: 30314.9 13918.3
+DEAL::Setting new velocity of particle 6: 33369.8 15049.9
+DEAL::Setting location of particle 6: 0.397796 1.33817
+DEAL::Evaluating E for particle 14: 0.0664538 0.0286400
+DEAL::Getting old velocity of particle 14: 20044.8 9613.83
+DEAL::Setting new velocity of particle 14: 22812.4 10806.6
+DEAL::Setting location of particle 14: 0.371456 1.32599
+DEAL::Evaluating E for particle 22: 0.0616860 0.0293001
+DEAL::Getting old velocity of particle 22: 10700.7 5286.44
+DEAL::Setting new velocity of particle 22: 13269.7 6506.68
+DEAL::Setting location of particle 22: 0.353806 1.31747
+DEAL::Evaluating E for particle 29: 0.0603705 0.0295668
+DEAL::Getting old velocity of particle 29: 6232.86 3105.33
+DEAL::Setting new velocity of particle 29: 8747.05 4336.67
+DEAL::Setting location of particle 29: 0.348502 1.31486
+DEAL::Evaluating E for particle 35: 0.0597726 0.0297108
+DEAL::Getting old velocity of particle 35: 2835.62 1417.81
+DEAL::Setting new velocity of particle 35: 5324.92 2655.15
+DEAL::Setting location of particle 35: 0.345759 1.31350
+DEAL::Evaluating E for particle 41: 0.0595417 0.0297709
+DEAL::Getting old velocity of particle 41: 0.00000 0.00000
+DEAL::Setting new velocity of particle 41: 2479.68 1239.84
+DEAL::Setting location of particle 41: 0.344337 1.31279
+DEAL::Evaluating E for particle 7: 0.0481349 0.0190394
+DEAL::Getting old velocity of particle 7: 20715.9 9666.18
+DEAL::Setting new velocity of particle 7: 22720.5 10459.1
+DEAL::Setting location of particle 7: 0.318384 1.45531
+DEAL::Evaluating E for particle 15: 0.0443325 0.0196678
+DEAL::Getting old velocity of particle 15: 13761.9 6653.86
+DEAL::Setting new velocity of particle 15: 15608.2 7472.95
+DEAL::Setting location of particle 15: 0.300334 1.44684
+DEAL::Evaluating E for particle 23: 0.0417698 0.0200714
+DEAL::Getting old velocity of particle 23: 7362.54 3646.76
+DEAL::Setting new velocity of particle 23: 9102.09 4482.66
+DEAL::Setting location of particle 23: 0.288175 1.44093
+DEAL::  Number of particles lost this time step:  0
+DEAL::
+DEAL::  Now at t=2.69998e-06, dt=2.36785e-07.
+DEAL::
+DEAL::0 0.318384 0.544690 0.506161 0.357517
+DEAL::0 properties: 22720.5 -10459.1 
+DEAL::8 0.300334 0.553160 0.262681 0.425280
+DEAL::8 properties: 15608.2 -7472.95 
+DEAL::16 0.288175 0.559066 0.0959559 0.472531
+DEAL::16 properties: 9102.09 -4482.66 
+DEAL::1 0.397796 0.661830 0.799670 0.294642
+DEAL::1 properties: 33369.8 -15049.9 
+DEAL::9 0.371456 0.674010 0.415706 0.392080
+DEAL::9 properties: 22812.4 -10806.6 
+DEAL::17 0.353806 0.682526 0.152330 0.460205
+DEAL::17 properties: 13269.7 -6506.68 
+DEAL::24 0.348502 0.685136 0.0722046 0.481087
+DEAL::24 properties: 8747.05 -4336.67 
+DEAL::30 0.345759 0.686497 0.0305811 0.491977
+DEAL::30 properties: 5324.92 -2655.15 
+DEAL::36 0.344337 0.687206 0.00894506 0.497651
+DEAL::36 properties: 2479.68 -1239.84 
+DEAL::31 0.409137 0.811060 0.0485375 0.488482
+DEAL::31 properties: 7668.71 -3818.74 
+DEAL::10 0.444901 0.793909 0.636055 0.351273
+DEAL::10 properties: 32083.3 -14840.6 
+DEAL::18 0.420392 0.805542 0.236038 0.444339
+DEAL::18 properties: 18793.1 -9128.81 
+DEAL::25 0.413002 0.809149 0.113228 0.473192
+DEAL::25 properties: 12490.7 -6167.28 
+DEAL::37 0.407102 0.812074 0.0143377 0.496594
+DEAL::37 properties: 3596.54 -1798.27 
+DEAL::2 0.481672 0.777464 0.216355 0.219714
+DEAL::2 properties: 46890.1 -20200.0 
+DEAL::19 0.489626 0.927650 0.384969 0.421200
+DEAL::19 properties: 27818.2 -12548.5 
+DEAL::38 0.470018 0.936866 0.0238510 0.494929
+DEAL::38 properties: 5354.40 -2677.20 
+DEAL::26 0.478806 0.932612 0.187367 0.460899
+DEAL::26 properties: 18586.4 -8855.35 
+DEAL::32 0.473047 0.935373 0.0805624 0.482985
+DEAL::32 properties: 11411.7 -5614.09 
+DEAL::3 0.578159 0.892404 0.906212 0.139233
+DEAL::3 properties: 67932.5 -23737.2 
+DEAL::11 0.525104 0.912390 0.0137312 0.299123
+DEAL::11 properties: 47472.6 -19001.9 
+DEAL::20 0.489626 1.07235 0.384969 0.578800
+DEAL::20 properties: 27818.2 12548.5 
+DEAL::39 0.470018 1.06313 0.0238510 0.505071
+DEAL::39 properties: 5354.40 2677.20 
+DEAL::27 0.478806 1.06739 0.187367 0.539101
+DEAL::27 properties: 18586.4 8855.35 
+DEAL::33 0.473047 1.06463 0.0805624 0.517015
+DEAL::33 properties: 11411.7 5614.09 
+DEAL::4 0.578159 1.10760 0.906212 0.860767
+DEAL::4 properties: 67932.5 23737.2 
+DEAL::12 0.525104 1.08761 0.0137312 0.700877
+DEAL::12 properties: 47472.6 19001.9 
+DEAL::34 0.409137 1.18894 0.0485375 0.511518
+DEAL::34 properties: 7668.71 3818.74 
+DEAL::13 0.444901 1.20609 0.636055 0.648727
+DEAL::13 properties: 32083.3 14840.6 
+DEAL::21 0.420392 1.19446 0.236038 0.555661
+DEAL::21 properties: 18793.1 9128.81 
+DEAL::28 0.413002 1.19085 0.113228 0.526808
+DEAL::28 properties: 12490.7 6167.28 
+DEAL::40 0.407102 1.18793 0.0143377 0.503406
+DEAL::40 properties: 3596.54 1798.27 
+DEAL::5 0.481672 1.22254 0.216355 0.780286
+DEAL::5 properties: 46890.1 20200.0 
+DEAL::6 0.397796 1.33817 0.799670 0.705358
+DEAL::6 properties: 33369.8 15049.9 
+DEAL::14 0.371456 1.32599 0.415706 0.607920
+DEAL::14 properties: 22812.4 10806.6 
+DEAL::22 0.353806 1.31747 0.152330 0.539795
+DEAL::22 properties: 13269.7 6506.68 
+DEAL::29 0.348502 1.31486 0.0722046 0.518913
+DEAL::29 properties: 8747.05 4336.67 
+DEAL::35 0.345759 1.31350 0.0305811 0.508023
+DEAL::35 properties: 5324.92 2655.15 
+DEAL::41 0.344337 1.31279 0.00894506 0.502349
+DEAL::41 properties: 2479.68 1239.84 
+DEAL::7 0.318384 1.45531 0.506161 0.642483
+DEAL::7 properties: 22720.5 10459.1 
+DEAL::15 0.300334 1.44684 0.262681 0.574720
+DEAL::15 properties: 15608.2 7472.95 
+DEAL::23 0.288175 1.44093 0.0959559 0.527469
+DEAL::23 properties: 9102.09 4482.66 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,12 +32,24 @@
 #  include <deal.II/fe/mapping.h>
 #  include <deal.II/fe/mapping_q1.h>
 
+#  include <deal.II/grid/filtered_iterator.h>
+
 #  include <deal.II/lac/affine_constraints.h>
 #  include <deal.II/lac/cuda_vector.h>
 #  include <deal.II/lac/la_parallel_vector.h>
 
 
+
 DEAL_II_NAMESPACE_OPEN
+
+// Forward declaration
+namespace internal
+{
+  namespace MatrixFreeFunctions
+  {
+    enum class ConstraintKinds : std::uint16_t;
+  }
+} // namespace internal
 
 namespace CUDAWrappers
 {
@@ -82,6 +94,8 @@ namespace CUDAWrappers
   public:
     using jacobian_type = Tensor<2, dim, Tensor<1, dim, Number>>;
     using point_type    = Point<dim, Number>;
+    using CellFilter =
+      FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
 
     /**
      * Parallelization scheme used: parallel_in_elem (parallelism at the level
@@ -105,19 +119,27 @@ namespace CUDAWrappers
       AdditionalData(
         const ParallelizationScheme parallelization_scheme = parallel_in_elem,
         const UpdateFlags           mapping_update_flags   = update_gradients |
-                                                 update_JxW_values,
-        const bool use_coloring = false,
-        const bool n_colors     = 1)
+                                                 update_JxW_values |
+                                                 update_quadrature_points,
+        const bool use_coloring                      = false,
+        const bool overlap_communication_computation = false)
         : parallelization_scheme(parallelization_scheme)
         , mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
-        , n_colors(n_colors)
-      {}
-
-      /**
-       * Number of colors created by the graph coloring algorithm.
-       */
-      unsigned int n_colors;
+        , overlap_communication_computation(overlap_communication_computation)
+      {
+#  ifndef DEAL_II_MPI_WITH_CUDA_SUPPORT
+        AssertThrow(
+          overlap_communication_computation == false,
+          ExcMessage(
+            "Overlapping communication and computation requires CUDA-aware MPI."));
+#  endif
+        if (overlap_communication_computation == true)
+          AssertThrow(
+            use_coloring == false || overlap_communication_computation == false,
+            ExcMessage(
+              "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
+      }
       /**
        * Parallelization scheme used, parallelization over degrees of freedom or
        * over cells.
@@ -140,6 +162,12 @@ namespace CUDAWrappers
        * newer architectures.
        */
       bool use_coloring;
+
+      /**
+       *  Overlap MPI communications with computation. This requires CUDA-aware
+       *  MPI and use_coloring must be false.
+       */
+      bool overlap_communication_computation;
     };
 
     /**
@@ -170,6 +198,11 @@ namespace CUDAWrappers
       Number *JxW;
 
       /**
+       * ID of the associated MatrixFree object.
+       */
+      unsigned int id;
+
+      /**
        * Number of cells.
        */
       unsigned int n_cells;
@@ -187,7 +220,7 @@ namespace CUDAWrappers
       /**
        * Mask deciding where constraints are set on a given cell.
        */
-      unsigned int *constraint_mask;
+      dealii::internal::MatrixFreeFunctions::ConstraintKinds *constraint_mask;
 
       /**
        * If true, use graph coloring has been used and we can simply add into
@@ -202,6 +235,11 @@ namespace CUDAWrappers
     MatrixFree();
 
     /**
+     * Destructor.
+     */
+    ~MatrixFree();
+
+    /**
      * Return the length of the padding.
      */
     unsigned int
@@ -213,7 +251,21 @@ namespace CUDAWrappers
      * degrees of freedom, the DoFHandler and the mapping describe the
      * transformation from unit to real cell, and the finite element
      * underlying the DoFHandler together with the quadrature formula
-     * describe the local operations.
+     * describe the local operations. This function takes an IteratorFilters
+     * object (predicate) to loop over a subset of the active cells. When using
+     * MPI, the predicate should filter out non locally owned cells.
+     */
+    template <typename IteratorFiltersType>
+    void
+    reinit(const Mapping<dim> &             mapping,
+           const DoFHandler<dim> &          dof_handler,
+           const AffineConstraints<Number> &constraints,
+           const Quadrature<1> &            quad,
+           const IteratorFiltersType &      iterator_filter,
+           const AdditionalData &           additional_data = AdditionalData());
+
+    /**
+     * Same as above using Iterators::LocallyOwnedCell() as predicate.
      */
     void
     reinit(const Mapping<dim> &             mapping,
@@ -229,7 +281,7 @@ namespace CUDAWrappers
     reinit(const DoFHandler<dim> &          dof_handler,
            const AffineConstraints<Number> &constraints,
            const Quadrature<1> &            quad,
-           const AdditionalData &           AdditionalData = AdditionalData());
+           const AdditionalData &           additional_data = AdditionalData());
 
     /**
      * Return the Data structure associated with @p color.
@@ -316,10 +368,35 @@ namespace CUDAWrappers
       LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &vec) const;
 
     /**
+     * Return the colored graph of locally owned active cells.
+     */
+    const std::vector<std::vector<CellFilter>> &
+    get_colored_graph() const;
+
+    /**
+     * Return the partitioner that represents the locally owned data and the
+     * ghost indices where access is needed to for the cell loop. The
+     * partitioner is constructed from the locally owned dofs and ghost dofs
+     * given by the respective fields. If you want to have specific information
+     * about these objects, you can query them with the respective access
+     * functions. If you just want to initialize a (parallel) vector, you should
+     * usually prefer this data structure as the data exchange information can
+     * be reused from one vector to another.
+     */
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &
+    get_vector_partitioner() const;
+
+    /**
      * Free all the memory allocated.
      */
     void
     free();
+
+    /**
+     * Return the DoFHandler.
+     */
+    const DoFHandler<dim> &
+    get_dof_handler() const;
 
     /**
      * Return an approximation of the memory consumption of this class in bytes.
@@ -331,11 +408,13 @@ namespace CUDAWrappers
     /**
      * Initializes the data structures.
      */
+    template <typename IteratorFiltersType>
     void
     internal_reinit(const Mapping<dim> &             mapping,
                     const DoFHandler<dim> &          dof_handler,
                     const AffineConstraints<Number> &constraints,
                     const Quadrature<1> &            quad,
+                    const IteratorFiltersType &      iterator_filter,
                     std::shared_ptr<const MPI_Comm>  comm,
                     const AdditionalData             additional_data);
 
@@ -430,6 +509,11 @@ namespace CUDAWrappers
       LinearAlgebra::CUDAWrappers::Vector<Number> &dst) const;
 
     /**
+     * Unique ID associated with the object.
+     */
+    int my_id;
+
+    /**
      * Parallelization scheme used, parallelization over degrees of freedom or
      * over cells.
      */
@@ -441,6 +525,12 @@ namespace CUDAWrappers
      * newer architectures.
      */
     bool use_coloring;
+
+    /**
+     *  Overlap MPI communications with computation. This requires CUDA-aware
+     *  MPI and use_coloring must be false.
+     */
+    bool overlap_communication_computation;
 
     /**
      * Total number of degrees of freedom.
@@ -507,9 +597,10 @@ namespace CUDAWrappers
     types::global_dof_index *constrained_dofs;
 
     /**
-     *  Mask deciding where constraints are set on a given cell.
+     * Mask deciding where constraints are set on a given cell.
      */
-    std::vector<unsigned int *> constraint_mask;
+    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds *>
+      constraint_mask;
 
     /**
      * Grid dimensions associated to the different colors. The grid dimensions
@@ -557,6 +648,16 @@ namespace CUDAWrappers
      */
     std::vector<unsigned int> row_start;
 
+    /**
+     * Pointer to the DoFHandler associated with the object.
+     */
+    const DoFHandler<dim> *dof_handler;
+
+    /**
+     * Colored graphed of locally owned active cells.
+     */
+    std::vector<std::vector<CellFilter>> graph;
+
     friend class internal::ReinitHelper<dim, Number>;
   };
 
@@ -577,7 +678,7 @@ namespace CUDAWrappers
     SharedData(Number *vd, Number *gq[dim])
       : values(vd)
     {
-      for (int d = 0; d < dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         gradients[d] = gq[d];
     }
 
@@ -600,7 +701,7 @@ namespace CUDAWrappers
   // time (by virtue of being 'constexpr')
   // TODO this function should be rewritten using meta-programming
   __host__ __device__ constexpr unsigned int
-           cells_per_block_shmem(int dim, int fe_degree)
+  cells_per_block_shmem(int dim, int fe_degree)
   {
     /* clang-format off */
     // We are limiting the number of threads according to the
@@ -619,22 +720,21 @@ namespace CUDAWrappers
   }
 
 
-
+  /*----------------------- Helper functions ---------------------------------*/
   /**
    * Compute the quadrature point index in the local cell of a given thread.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim>
   __device__ inline unsigned int
   q_point_id_in_cell(const unsigned int n_q_points_1d)
   {
-    return (dim == 1 ?
-              threadIdx.x % n_q_points_1d :
-              dim == 2 ?
-              threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
-              threadIdx.x % n_q_points_1d +
-                  n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));
+    return (
+      dim == 1 ? threadIdx.x % n_q_points_1d :
+      dim == 2 ? threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
+                 threadIdx.x % n_q_points_1d +
+                   n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));
   }
 
 
@@ -643,7 +743,7 @@ namespace CUDAWrappers
    * Return the quadrature point index local of a given thread. The index is
    * only unique for a given MPI process.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim, typename Number>
   __device__ inline unsigned int
@@ -662,7 +762,7 @@ namespace CUDAWrappers
   /**
    * Return the quadrature point associated with a given thread.
    *
-   * @relates MatrixFree
+   * @relates CUDAWrappers::MatrixFree
    */
   template <int dim, typename Number>
   __device__ inline typename CUDAWrappers::MatrixFree<dim, Number>::point_type &
@@ -674,10 +774,195 @@ namespace CUDAWrappers
     return *(data->q_points + data->padding_length * cell +
              q_point_id_in_cell<dim>(n_q_points_1d));
   }
+
+  /**
+   * Structure which is passed to the kernel. It is used to pass all the
+   * necessary information from the CPU to the GPU.
+   */
+  template <int dim, typename Number>
+  struct DataHost
+  {
+    /**
+     * Vector of quadrature points.
+     */
+    std::vector<Point<dim, Number>> q_points;
+
+    /**
+     * Map the position in the local vector to the position in the global
+     * vector.
+     */
+    std::vector<types::global_dof_index> local_to_global;
+
+    /**
+     * Vector of inverse Jacobians.
+     */
+    std::vector<Number> inv_jacobian;
+
+    /**
+     * Vector of Jacobian times the weights.
+     */
+    std::vector<Number> JxW;
+
+    /**
+     * ID of the associated MatrixFree object.
+     */
+    unsigned int id;
+
+    /**
+     * Number of cells.
+     */
+    unsigned int n_cells;
+
+    /**
+     * Length of the padding.
+     */
+    unsigned int padding_length;
+
+    /**
+     * Row start (including padding).
+     */
+    unsigned int row_start;
+
+    /**
+     * Mask deciding where constraints are set on a given cell.
+     */
+    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
+      constraint_mask;
+
+    /**
+     * If true, use graph coloring has been used and we can simply add into
+     * the destingation vector. Otherwise, use atomic operations.
+     */
+    bool use_coloring;
+  };
+
+
+
+  /**
+   * Copy @p data from the device to the device. @p update_flags should be
+   * identical to the one used in MatrixFree::AdditionalData.
+   *
+   * @relates CUDAWrappers::MatrixFree
+   */
+  template <int dim, typename Number>
+  DataHost<dim, Number>
+  copy_mf_data_to_host(
+    const typename dealii::CUDAWrappers::MatrixFree<dim, Number>::Data &data,
+    const UpdateFlags &update_flags)
+  {
+    DataHost<dim, Number> data_host;
+
+    data_host.id             = data.id;
+    data_host.n_cells        = data.n_cells;
+    data_host.padding_length = data.padding_length;
+    data_host.row_start      = data.row_start;
+    data_host.use_coloring   = data.use_coloring;
+
+    const unsigned int n_elements =
+      data_host.n_cells * data_host.padding_length;
+    if (update_flags & update_quadrature_points)
+      {
+        data_host.q_points.resize(n_elements);
+        Utilities::CUDA::copy_to_host(data.q_points, data_host.q_points);
+      }
+
+    data_host.local_to_global.resize(n_elements);
+    Utilities::CUDA::copy_to_host(data.local_to_global,
+                                  data_host.local_to_global);
+
+    if (update_flags & update_gradients)
+      {
+        data_host.inv_jacobian.resize(n_elements * dim * dim);
+        Utilities::CUDA::copy_to_host(data.inv_jacobian,
+                                      data_host.inv_jacobian);
+      }
+
+    if (update_flags & update_JxW_values)
+      {
+        data_host.JxW.resize(n_elements);
+        Utilities::CUDA::copy_to_host(data.JxW, data_host.JxW);
+      }
+
+    data_host.constraint_mask.resize(data_host.n_cells);
+    Utilities::CUDA::copy_to_host(data.constraint_mask,
+                                  data_host.constraint_mask);
+
+    return data_host;
+  }
+
+
+
+  /**
+   * This function is the host version of local_q_point_id().
+   *
+   * @relates CUDAWrappers::MatrixFree
+   */
+  template <int dim, typename Number>
+  inline unsigned int
+  local_q_point_id_host(const unsigned int           cell,
+                        const DataHost<dim, Number> &data,
+                        const unsigned int           n_q_points,
+                        const unsigned int           i)
+  {
+    return (data.row_start / data.padding_length + cell) * n_q_points + i;
+  }
+
+
+
+  /**
+   * This function is the host version of get_quadrature_point(). It assumes
+   * that the data in MatrixFree<dim, Number>::Data has been copied to the host
+   * using copy_mf_data_to_host().
+   *
+   * @relates CUDAWrappers::MatrixFree
+   */
+  template <int dim, typename Number>
+  inline Point<dim, Number>
+  get_quadrature_point_host(const unsigned int           cell,
+                            const DataHost<dim, Number> &data,
+                            const unsigned int           i)
+  {
+    return data.q_points[data.padding_length * cell + i];
+  }
+
+
+  /*----------------------- Inline functions ---------------------------------*/
+
+#  ifndef DOXYGEN
+
+  template <int dim, typename Number>
+  inline const std::vector<std::vector<
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>>> &
+  MatrixFree<dim, Number>::get_colored_graph() const
+  {
+    return graph;
+  }
+
+
+
+  template <int dim, typename Number>
+  inline const std::shared_ptr<const Utilities::MPI::Partitioner> &
+  MatrixFree<dim, Number>::get_vector_partitioner() const
+  {
+    return partitioner;
+  }
+
+
+
+  template <int dim, typename Number>
+  inline const DoFHandler<dim> &
+  MatrixFree<dim, Number>::get_dof_handler() const
+  {
+    Assert(dof_handler != nullptr, ExcNotInitialized());
+
+    return *dof_handler;
+  }
+
+#  endif
+
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-
 #endif

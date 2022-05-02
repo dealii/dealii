@@ -1,0 +1,127 @@
+
+DEAL::FE_SimplexP<2>(1): 
+DEAL::  n_dofs_per_vertex(): 1
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   0 
+DEAL::  n_dofs_per_hex():    0
+DEAL::  n_dofs_per_face():   2 2 2 
+DEAL::  n_dofs_per_cell():   3
+DEAL::  tensor_degree():     1
+DEAL::
+DEAL::FE_SimplexP<2>(2): 
+DEAL::  n_dofs_per_vertex(): 1
+DEAL::  n_dofs_per_line():   1
+DEAL::  n_dofs_per_quad():   0 
+DEAL::  n_dofs_per_hex():    0
+DEAL::  n_dofs_per_face():   3 3 3 
+DEAL::  n_dofs_per_cell():   6
+DEAL::  tensor_degree():     2
+DEAL::
+DEAL::FE_SimplexP<3>(1): 
+DEAL::  n_dofs_per_vertex(): 1
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   0 0 0 0 
+DEAL::  n_dofs_per_hex():    0
+DEAL::  n_dofs_per_face():   3 3 3 3 
+DEAL::  n_dofs_per_cell():   4
+DEAL::  tensor_degree():     1
+DEAL::
+DEAL::FE_SimplexP<3>(2): 
+DEAL::  n_dofs_per_vertex(): 1
+DEAL::  n_dofs_per_line():   1
+DEAL::  n_dofs_per_quad():   0 0 0 0 
+DEAL::  n_dofs_per_hex():    0
+DEAL::  n_dofs_per_face():   6 6 6 6 
+DEAL::  n_dofs_per_cell():   10
+DEAL::  tensor_degree():     2
+DEAL::
+DEAL::FE_SimplexDGP<2>(1): 
+DEAL::  n_dofs_per_vertex(): 0
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   3 
+DEAL::  n_dofs_per_hex():    0
+DEAL::  n_dofs_per_face():   0 0 0 
+DEAL::  n_dofs_per_cell():   3
+DEAL::  tensor_degree():     1
+DEAL::
+DEAL::FE_SimplexDGP<2>(2): 
+DEAL::  n_dofs_per_vertex(): 0
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   6 
+DEAL::  n_dofs_per_hex():    0
+DEAL::  n_dofs_per_face():   0 0 0 
+DEAL::  n_dofs_per_cell():   6
+DEAL::  tensor_degree():     2
+DEAL::
+DEAL::FE_SimplexDGP<3>(1): 
+DEAL::  n_dofs_per_vertex(): 0
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   0 0 0 0 
+DEAL::  n_dofs_per_hex():    4
+DEAL::  n_dofs_per_face():   0 0 0 0 
+DEAL::  n_dofs_per_cell():   4
+DEAL::  tensor_degree():     1
+DEAL::
+DEAL::FE_SimplexDGP<3>(2): 
+DEAL::  n_dofs_per_vertex(): 0
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   0 0 0 0 
+DEAL::  n_dofs_per_hex():    10
+DEAL::  n_dofs_per_face():   0 0 0 0 
+DEAL::  n_dofs_per_cell():   10
+DEAL::  tensor_degree():     2
+DEAL::
+DEAL::FE_WedgeP<3>(1): 
+DEAL::  n_dofs_per_vertex(): 1
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   0 0 0 0 0 
+DEAL::  n_dofs_per_hex():    0
+DEAL::  n_dofs_per_face():   3 3 4 4 4 
+DEAL::  n_dofs_per_cell():   6
+DEAL::  tensor_degree():     1
+DEAL::
+DEAL::FE_WedgeP<3>(2): 
+DEAL::  n_dofs_per_vertex(): 1
+DEAL::  n_dofs_per_line():   1
+DEAL::  n_dofs_per_quad():   0 0 1 1 1 
+DEAL::  n_dofs_per_hex():    0
+DEAL::  n_dofs_per_face():   6 6 9 9 9 
+DEAL::  n_dofs_per_cell():   18
+DEAL::  tensor_degree():     2
+DEAL::
+DEAL::FE_WedgeDGP<3>(1): 
+DEAL::  n_dofs_per_vertex(): 0
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   0 0 0 0 0 
+DEAL::  n_dofs_per_hex():    6
+DEAL::  n_dofs_per_face():   0 0 0 0 0 
+DEAL::  n_dofs_per_cell():   6
+DEAL::  tensor_degree():     1
+DEAL::
+DEAL::FE_WedgeDGP<3>(2): 
+DEAL::  n_dofs_per_vertex(): 0
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   0 0 0 0 0 
+DEAL::  n_dofs_per_hex():    18
+DEAL::  n_dofs_per_face():   0 0 0 0 0 
+DEAL::  n_dofs_per_cell():   18
+DEAL::  tensor_degree():     2
+DEAL::
+DEAL::FE_PyramidP<3>(1): 
+DEAL::  n_dofs_per_vertex(): 1
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   0 0 0 0 0 
+DEAL::  n_dofs_per_hex():    0
+DEAL::  n_dofs_per_face():   4 3 3 3 3 
+DEAL::  n_dofs_per_cell():   5
+DEAL::  tensor_degree():     1
+DEAL::
+DEAL::FE_PyramidDGP<3>(1): 
+DEAL::  n_dofs_per_vertex(): 0
+DEAL::  n_dofs_per_line():   0
+DEAL::  n_dofs_per_quad():   0 0 0 0 0 
+DEAL::  n_dofs_per_hex():    5
+DEAL::  n_dofs_per_face():   0 0 0 0 0 
+DEAL::  n_dofs_per_cell():   5
+DEAL::  tensor_degree():     1
+DEAL::

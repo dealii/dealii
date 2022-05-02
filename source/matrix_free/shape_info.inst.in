@@ -1,0 +1,89 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2020 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_scalar : REAL_SCALARS)
+  {
+    template internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::
+      ShapeInfo(const Quadrature<deal_II_dimension> &,
+                const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+                const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::reinit(
+      const Quadrature<deal_II_dimension> &,
+      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+      const unsigned int);
+
+#if deal_II_dimension > 1
+    template internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::
+      ShapeInfo(const Quadrature<1> &,
+                const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+                const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar>::reinit(
+      const Quadrature<1> &,
+      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+      const unsigned int);
+#endif
+  }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template bool
+    internal::MatrixFreeFunctions::ShapeInfo<double>::is_supported(
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
+#endif
+  }
+
+
+
+for (deal_II_dimension : DIMENSIONS;
+     deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
+  {
+    template internal::MatrixFreeFunctions::
+      ShapeInfo<deal_II_scalar_vectorized>::ShapeInfo(
+        const Quadrature<deal_II_dimension> &,
+        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+        const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar_vectorized>::reinit(
+      const Quadrature<deal_II_dimension> &,
+      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+      const unsigned int);
+
+#if deal_II_dimension > 1
+    template internal::MatrixFreeFunctions::
+      ShapeInfo<deal_II_scalar_vectorized>::ShapeInfo(
+        const Quadrature<1> &,
+        const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+        const unsigned int);
+
+    template void
+    internal::MatrixFreeFunctions::ShapeInfo<deal_II_scalar_vectorized>::reinit(
+      const Quadrature<1> &,
+      const FiniteElement<deal_II_dimension, deal_II_dimension> &,
+      const unsigned int);
+#endif
+  }
+
+for (deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
+  {
+    template struct internal::MatrixFreeFunctions::ShapeInfo<
+      deal_II_scalar_vectorized>;
+  }

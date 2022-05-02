@@ -1,7 +1,0 @@
-Changed: The step-61 program now has a separate function
-`compute_postprocessed_velocity()` that computes the velocity field as
-a postprocessing step after computing the pressure variable. The
-resulting velocity field is used in both computing errors and when
-creating graphical output.
-<br>
-(Wolfgang Bangerth, 2019/12/02)

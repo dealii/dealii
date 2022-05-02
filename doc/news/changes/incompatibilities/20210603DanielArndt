@@ -1,0 +1,3 @@
+Removed: The deprecated member function CellAccessor::active() has been removed.
+<br>
+(Daniel Arndt, 2021/06/03)

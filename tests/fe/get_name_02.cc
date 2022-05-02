@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,7 +67,7 @@ main()
     test(fe);
   }
   {
-    QIterated<1>               quadrature(QTrapez<1>(), 3);
+    QIterated<1>               quadrature(QTrapezoid<1>(), 3);
     FE_DGQArbitraryNodes<2, 3> fe(quadrature);
     test(fe);
   }

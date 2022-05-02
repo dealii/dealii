@@ -1,4 +1,0 @@
-Add: python binds for Triangulation::create_triangulation, GridTools::scale
-and GridGenerator::hyper_cube_with_cylindrical_hole.
-<br>
-(Alexander Grayver, 2020/02/11)

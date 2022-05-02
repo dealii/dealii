@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,12 +41,12 @@ operator<<(LogStream &log, const TriaIterator<ACCESSOR> &i)
 }
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-test_in_dim(const DoFHandlerType &d1, const DoFHandlerType &d2)
+test_in_dim(const DoFHandler<dim> &d1, const DoFHandler<dim> &d2)
 {
-  typename DoFHandlerType::active_cell_iterator a = d1.begin_active();
-  typename DoFHandlerType::cell_iterator        l =
+  typename DoFHandler<dim>::active_cell_iterator a = d1.begin_active();
+  typename DoFHandler<dim>::cell_iterator        l =
     d1.begin(d1.get_triangulation().n_levels() - 1);
 
   deallog << "a " << a << std::endl << "l " << l << std::endl;
@@ -62,16 +62,6 @@ init_tria(Triangulation<dim> &tr)
 }
 
 
-template <int dim>
-void
-init_dofs(DoFHandler<dim> &         dof,
-          const Triangulation<dim> &tr,
-          const FiniteElement<dim> &fe)
-{
-  dof.initialize(tr, fe);
-}
-
-
 int
 main()
 {
@@ -81,12 +71,12 @@ main()
   init_tria(t2);
 
   FE_Q<2>       q21(1);
-  DoFHandler<2> d21;
-  init_dofs(d21, t2, q21);
+  DoFHandler<2> d21(t2);
+  d21.distribute_dofs(q21);
 
   FE_Q<2>       q22(2);
-  DoFHandler<2> d22;
-  init_dofs(d22, t2, q22);
+  DoFHandler<2> d22(t2);
+  d22.distribute_dofs(q22);
 
   test_in_dim(d21, d22);
 }

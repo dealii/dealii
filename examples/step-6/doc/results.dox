@@ -254,7 +254,7 @@ curved. We can do this by making one change to the gnuplot part of
   std::ofstream output("grid-" + std::to_string(cycle) + ".gnuplot");
   GridOutFlags::Gnuplot gnuplot_flags(false, 5, /*curved_interior_cells*/true);
   grid_out.set_flags(gnuplot_flags);
-  MappingQGeneric<dim> mapping(3);
+  MappingQ<dim> mapping(3);
   grid_out.write_gnuplot(triangulation, output, &mapping);
 }
 @endcode
@@ -327,9 +327,7 @@ const double core_radius  = 1.0/5.0,
 for (const auto &cell : triangulation.active_cell_iterators())
   if (mesh_center.distance(cell->center()) < 1e-5)
     {
-      for (unsigned int v=0;
-           v < GeometryInfo<dim>::vertices_per_cell;
-           ++v)
+      for (const auto v : cell->vertex_indices())
         cell->vertex(v) *= core_radius/mesh_center.distance(cell->vertex(v));
     }
 
@@ -348,7 +346,7 @@ triangulation.execute_coarsening_and_refinement();
 // created in radial direction to a place where we need
 // them.
 for (const auto &cell : triangulation.active_cell_iterators())
-  for (unsigned int v=0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+  for (const auto v : cell->vertex_indices())
     {
       const double dist = mesh_center.distance(cell->vertex(v));
       if (dist > core_radius*1.0001 && dist < 0.9999)
@@ -369,7 +367,7 @@ for (const auto &cell : triangulation.active_cell_iterators())
 for (const auto &cell : triangulation.active_cell_iterators())
   {
     bool is_in_inner_circle = false;
-    for (unsigned int v=0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+    for (const auto v : cell->vertex_indices())
       if (mesh_center.distance(cell->vertex(v)) < inner_radius)
         {
           is_in_inner_circle = true;

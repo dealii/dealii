@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,13 +22,12 @@
 #include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/trilinos_vector.h>
 
@@ -47,7 +46,7 @@ test()
   GridGenerator::subdivided_hyper_cube(tria, 2);
   tria.refine_global(1);
 
-  hp::DoFHandler<dim>   dh(tria);
+  DoFHandler<dim>       dh(tria);
   hp::FECollection<dim> fe_collection;
 
   // prepare FECollection with arbitrary number of entries
@@ -55,14 +54,14 @@ test()
   for (unsigned int i = 0; i < max_degree; ++i)
     fe_collection.push_back(FE_Q<dim>(max_degree - i));
 
-  typename hp::DoFHandler<dim, dim>::active_cell_iterator cell;
-  unsigned int                                            i = 0;
+  typename DoFHandler<dim, dim>::active_cell_iterator cell;
+  unsigned int                                        i = 0;
 
   for (cell = dh.begin_active(); cell != dh.end(); ++cell)
     {
       if (cell->is_locally_owned())
         {
-          // set active fe index
+          // set active FE index
           if (!(cell->is_artificial()))
             {
               if (i >= fe_collection.size())
@@ -100,9 +99,8 @@ test()
 
 
   // ----- transfer -----
-  parallel::distributed::
-    SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, hp::DoFHandler<dim>>
-      soltrans(dh);
+  parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector>
+    soltrans(dh);
 
   soltrans.prepare_for_coarsening_and_refinement(old_solution);
   tria.execute_coarsening_and_refinement();

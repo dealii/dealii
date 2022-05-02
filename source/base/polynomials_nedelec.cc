@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,10 +17,10 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1512,7 +1512,7 @@ template <int dim>
 std::unique_ptr<TensorPolynomialsBase<dim>>
 PolynomialsNedelec<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsNedelec<dim>>(*this);
+  return std::make_unique<PolynomialsNedelec<dim>>(*this);
 }
 
 

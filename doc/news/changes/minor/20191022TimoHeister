@@ -1,4 +1,0 @@
-New: The Utilities::MPI::DuplicatedCommunicator helper class allows
-safe duplication and freeing of an MPI communicator.
-<br>
-(Timo Heister, 2019/10/22)

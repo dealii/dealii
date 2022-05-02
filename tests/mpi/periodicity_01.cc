@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -166,7 +166,8 @@ namespace Step40
     constraints.close();
 
     const std::vector<IndexSet> &locally_owned_dofs =
-      dof_handler.compute_locally_owned_dofs_per_processor();
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.locally_owned_dofs());
     IndexSet locally_active_dofs;
     DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
     AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs,
@@ -186,8 +187,10 @@ namespace Step40
     system_matrix.reinit(
       mpi_communicator,
       csp,
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.n_locally_owned_dofs()),
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.n_locally_owned_dofs()),
       Utilities::MPI::this_mpi_process(mpi_communicator));
   }
 
@@ -325,7 +328,7 @@ namespace Step40
     typename DoFHandler<dim>::active_cell_iterator cell =
       GridTools::find_active_cell_around_point(dof_handler, point);
 
-    if (cell->is_locally_owned())
+    if (cell.state() == IteratorState::valid && cell->is_locally_owned())
       VectorTools::point_value(dof_handler,
                                locally_relevant_solution,
                                point,
@@ -358,14 +361,14 @@ namespace Step40
   LaplaceProblem<2>::check_periodicity(const unsigned int cycle) const
   {
     unsigned int n_points = 2;
-    for (unsigned int i = 0; i < cycle; i++)
+    for (unsigned int i = 0; i < cycle; ++i)
       n_points *= 2;
 
     // don't test exactly at the support points, since point_value is not stable
     // there
     const double eps = 1. / (16. * n_points);
 
-    for (unsigned int i = 1; i < n_points; i++)
+    for (unsigned int i = 1; i < n_points; ++i)
       {
         Vector<PetscScalar> value1(1);
         Vector<PetscScalar> value2(1);
@@ -404,15 +407,15 @@ namespace Step40
   LaplaceProblem<3>::check_periodicity(const unsigned int cycle) const
   {
     unsigned int n_points = 2;
-    for (unsigned int i = 0; i < cycle; i++)
+    for (unsigned int i = 0; i < cycle; ++i)
       n_points *= 2;
 
     // don't test exactly at the support points, since point_value is not stable
     // there
     const double eps = 1. / (16. * n_points);
 
-    for (unsigned int i = 1; i < n_points; i++)
-      for (unsigned int j = 1; j < n_points; j++)
+    for (unsigned int i = 1; i < n_points; ++i)
+      for (unsigned int j = 1; j < n_points; ++j)
         {
           Vector<PetscScalar> value1(1);
           Vector<PetscScalar> value2(1);
@@ -497,8 +500,8 @@ namespace Step40
           filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) +
                               "." + Utilities::int_to_string(i, 4) + ".vtu");
 
-        std::ofstream master_output((filename + ".pvtu").c_str());
-        data_out.write_pvtu_record(master_output, filenames);
+        std::ofstream pvtu_output((filename + ".pvtu").c_str());
+        data_out.write_pvtu_record(pvtu_output, filenames);
       }
   }
 

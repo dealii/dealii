@@ -1,30 +1,29 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-This tutorial program attempts to show how to use $hp$ finite element methods
+This tutorial program attempts to show how to use $hp$-finite element methods
 with deal.II. It solves the Laplace equation and so builds only on the first
 few tutorial programs, in particular on step-4 for dimension
-independent programming and step-6 for adaptive mesh
-refinement.
+independent programming and step-6 for adaptive mesh refinement.
 
-The $hp$ finite element method was proposed in the early 1980s by
-Babuska and Guo as an alternative to either
-(i) mesh refinement (i.e. decreasing the mesh parameter $h$ in a finite
+The $hp$-finite element method was proposed in the early 1980s by
+Babu&scaron;ka and Guo as an alternative to either
+(i) mesh refinement (i.e., decreasing the mesh parameter $h$ in a finite
 element computation) or (ii) increasing the polynomial degree $p$ used for
 shape functions. It is based on the observation that increasing the polynomial
 degree of the shape functions reduces the approximation error if the solution
-is sufficiently smooth.  On the other hand, it is well known
+is sufficiently smooth. On the other hand, it is well known
 that even for the generally well-behaved class of elliptic problems, higher
 degrees of regularity can not be guaranteed in the vicinity of boundaries,
 corners, or where coefficients are discontinuous; consequently, the
 approximation can not be improved in these areas by increasing the polynomial
 degree $p$ but only by refining the mesh, i.e., by reducing the mesh size
 $h$. These differing means to reduce the
-error have led to the notion of $hp$ finite elements, where the approximating
+error have led to the notion of $hp$-finite elements, where the approximating
 finite element spaces are adapted to have a high polynomial degree $p$
 wherever the solution is sufficiently smooth, while the mesh width $h$ is
 reduced at places wherever the solution lacks regularity. It was
-already realized in the first papers on this method that $hp$ finite elements
+already realized in the first papers on this method that $hp$-finite elements
 can be a powerful tool that can guarantee that the error is reduced not only
 with some negative power of the number of degrees of freedom, but in fact
 exponentially.
@@ -40,8 +39,9 @@ we will have to discuss the following aspects:
 
   <li>Degrees of freedom will then have to be allocated on each cell depending
   on what finite element is associated with this particular cell. Constraints
-  will have to generated in the same way as for hanging nodes, but now also
-  including the case where two neighboring cells.</li>
+  will have to be generated in the same way as for hanging nodes, but we now
+  also have to deal with the case where two neighboring cells have different
+  finite elements assigned.</li>
 
   <li>We will need to be able to assemble cell and face contributions
   to global matrices and right hand side vectors.</li>
@@ -59,19 +59,19 @@ tasks are already well supported by functionality provided by the
 deal.II, and that we will only have to provide the logic of what the
 program should do, not exactly how all this is going to happen.
 
-In deal.II, the $hp$ functionality is largely packaged into
-the hp namespace. This namespace provides classes that handle
-$hp$ discretizations, assembling matrices and vectors, and other
+In deal.II, the $hp$-functionality is largely packaged into
+the hp-namespace. This namespace provides classes that handle
+$hp$-discretizations, assembling matrices and vectors, and other
 tasks. We will get to know many of them further down below. In
 addition, most of the functions in the DoFTools, and VectorTools
-namespaces accept $hp$ objects in addition to the non-$hp$ ones. Much of
-the $hp$ implementation is also discussed in the @ref hp documentation
+namespaces accept $hp$-objects in addition to the non-$hp$-ones. Much of
+the $hp$-implementation is also discussed in the @ref hp documentation
 module and the links found there.
 
 It may be worth giving a slightly larger perspective at the end of
-this first part of the introduction. $hp$ functionality has been
+this first part of the introduction. $hp$-functionality has been
 implemented in a number of different finite element packages (see, for
-example, the list of references cited in the @ref hp_paper "hp paper").
+example, the list of references cited in the @ref hp_paper "hp-paper").
 However, by and large, most of these packages have implemented it only
 for the (i) the 2d case, and/or (ii) the discontinuous Galerkin
 method. The latter is a significant simplification because
@@ -79,21 +79,22 @@ discontinuous finite elements by definition do not require continuity
 across faces between cells and therefore do not require the special
 treatment otherwise necessary whenever finite elements of different
 polynomial degree meet at a common face. In contrast, deal.II
-implements the most general case, i.e. it allows for continuous and
+implements the most general case, i.e., it allows for continuous and
 discontinuous elements in 1d, 2d, and 3d, and automatically handles
 the resulting complexity. In particular, it handles computing the
 constraints (similar to hanging node constraints) of elements of
 different degree meeting at a face or edge. The many algorithmic and
 data structure techniques necessary for this are described in the
-@ref hp_paper "hp paper" for those interested in such detail.
+@ref hp_paper "hp-paper" for those interested in such detail.
 
 We hope that providing such a general implementation will help explore
-the potential of $hp$ methods further.
+the potential of $hp$-methods further.
+
 
 
 <h3>Finite element collections</h3>
 
-Now on again to the details of how to use the $hp$ functionality in
+Now on again to the details of how to use the $hp$-functionality in
 deal.II. The first aspect we have to deal with is that now we do not
 have only a single finite element any more that is used on all cells,
 but a number of different elements that cells can choose to use. For
@@ -118,7 +119,7 @@ used elements can then be created as follows:
 
 
 
-<h3>The hp::DoFHandler class, associating cells with finite elements, and constraints</h3>
+<h3>The DoFHandler class in <i>hp</i>-mode, associating cells with finite elements, and constraints</h3>
 
 The next task we have to consider is what to do with the list of
 finite element objects we want to use. In previous tutorial programs,
@@ -132,13 +133,13 @@ The situation here is a bit more complicated since we do not just have
 a single finite element object, but rather may want to use different
 elements on different cells. We therefore need two things: (i) a
 version of the DoFHandler class that can deal with this situation, and
-(ii) a way to tell the DoF handler which element to use on which cell.
+(ii) a way to tell the DoFHandler which element to use on which cell.
 
-The first of these two things is implemented in the hp::DoFHandler
-class: rather than associating it with a triangulation and a single
-finite element object, it is associated with a triangulation and a
-finite element collection. The second part is achieved by a loop over
-all cells of this hp::DoFHandler and for each cell setting the index
+The first of these two things is implemented in the <i>hp</i>-mode of
+the DoFHandler class: rather than associating it with a triangulation
+and a single finite element object, it is associated with a triangulation
+and a finite element collection. The second part is achieved by a loop
+over all cells of this DoFHandler and for each cell setting the index
 of the finite element within the collection that shall be used on this
 cell. We call the index of the finite element object within the
 collection that shall be used on a cell the cell's <i>active FE
@@ -147,7 +148,7 @@ on this cell, whereas all the other elements of the collection are
 inactive on it. The general outline of this reads like this:
 
 @code
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
   for (auto &cell: dof_handler.active_cell_iterators())
     cell->set_active_fe_index(...);
   dof_handler.distribute_dofs(fe_collection);
@@ -157,7 +158,7 @@ Dots in the call to <code>set_active_fe_index()</code> indicate that
 we will have to have some sort of strategy later on to decide which
 element to use on which cell; we will come back to this later. The
 main point here is that the first and last line of this code snippet
-is pretty much exactly the same as for the non-$hp$ case.
+is pretty much exactly the same as for the non-$hp$-case.
 
 Another complication arises from the fact that this time we do not
 simply have hanging nodes from local mesh refinement, but we also have
@@ -172,16 +173,16 @@ and in fact the code looks exactly the same:
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 @endcode
 In other words, the DoFTools::make_hanging_node_constraints deals not
-only with hanging node constraints, but also with $hp$ constraints at
+only with hanging node constraints, but also with $hp$-constraints at
 the same time.
 
 
 
-<h3>Assembling matrices and vectors with hp objects</h3>
+<h3>Assembling matrices and vectors with hp-objects</h3>
 
 Following this, we have to set up matrices and vectors for the linear system
 of the correct size and assemble them. Setting them up works in exactly the
-same way as for the non-$hp$ case. Assembling requires a bit more thought.
+same way as for the non-$hp$-case. Assembling requires a bit more thought.
 
 The main idea is of course unchanged: we have to loop over all cells, assemble
 local contributions, and then copy them into the global objects. As discussed
@@ -194,7 +195,7 @@ FEValues object, thereby asking it to re-compute that part of the information
 that changes from cell to cell. It can then be used to sum up local
 contributions to bilinear form and right hand side.
 
-In the context of $hp$ finite element methods, we have to deal with the fact
+In the context of $hp$-finite element methods, we have to deal with the fact
 that we do not use the same finite element object on each cell. In fact, we
 should not even use the same quadrature object for all cells, but rather
 higher order quadrature formulas for cells where we use higher order finite
@@ -205,14 +206,14 @@ To facilitate these considerations, deal.II has a class hp::FEValues that does
 what we need in the current context. The difference is that instead of a
 single finite element, quadrature formula, and mapping, it takes collections
 of these objects. It's use is very much like the regular FEValues class,
-i.e. the interesting part of the loop over all cells would look like this:
+i.e., the interesting part of the loop over all cells would look like this:
 
 @code
   hp::FEValues<dim> hp_fe_values(mapping_collection,
                                  fe_collection,
                                  quadrature_collection,
-                                 update_values   | update_gradients |
-                                 update_q_points | update_JxW_values);
+                                 update_values | update_gradients |
+                                 update_quadrature_points | update_JxW_values);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
@@ -234,13 +235,13 @@ program below), in which case <code>cell-@>active_fe_index()</code> is used
 for this index. The order of these arguments is chosen in this way because one
 may sometimes want to pick a different quadrature or mapping object from their
 respective collections, but hardly ever a different finite element than the
-one in use on this cell, i.e. one with an index different from
+one in use on this cell, i.e., one with an index different from
 <code>cell-@>active_fe_index()</code>. The finite element collection index is
 therefore the last default argument so that it can be conveniently omitted.
 
 What this <code>reinit</code> call does is the following: the
 hp::FEValues class checks whether it has previously already allocated a
-non-$hp$ FEValues object for this combination of finite element, quadrature,
+non-$hp$-FEValues object for this combination of finite element, quadrature,
 and mapping objects. If not, it allocates one. It then re-initializes this
 object for the current cell, after which there is now a FEValues object for
 the selected finite element, quadrature and mapping usable on the current
@@ -250,7 +251,7 @@ usual fashion to assemble local contributions.
 
 
 
-<h3>A simple indicator for hp refinement and estimating smoothness</h3>
+<h3>A simple indicator for hp-refinement and estimating smoothness</h3>
 
 One of the central pieces of the adaptive finite element method is that we
 inspect the computed solution (a posteriori) with an indicator that tells us
@@ -261,12 +262,12 @@ complicated strategies in some programs, most importantly in step-14.
 
 In any case, as long as the decision is only "refine this cell" or "do not
 refine this cell", the actual refinement step is not particularly
-challenging. However, here we have a code that is capable of hp refinement,
-i.e. we suddenly have two choices whenever we detect that the error on a
+challenging. However, here we have a code that is capable of hp-refinement,
+i.e., we suddenly have two choices whenever we detect that the error on a
 certain cell is too large for our liking: we can refine the cell by splitting
 it into several smaller ones, or we can increase the polynomial degree of the
 shape functions used on it. How do we know which is the more promising
-strategy? Answering this question is the central problem in $hp$ finite
+strategy? Answering this question is the central problem in $hp$-finite
 element research at the time of this writing.
 
 In short, the question does not appear to be settled in the literature at this
@@ -286,7 +287,7 @@ therefore do not intend to present the following ideas as a complete solution
 to the problem. Rather, it is intended as an idea to approach it that merits
 further research and investigation. In other words, we do not intend to enter
 a sophisticated proposal into the fray about answers to the general
-question. However, to demonstrate our approach to $hp$ finite elements, we
+question. However, to demonstrate our approach to $hp$-finite elements, we
 need a simple indicator that does generate some useful information that is
 able to drive the simple calculations this tutorial program will perform.
 
@@ -298,7 +299,7 @@ Sobolev space $H^s(K)$ on a cell $K$, it has to satisfy the condition
 @f[
    \int_K |\nabla^s u({\bf x})|^2 \; d{\bf x} < \infty.
 @f]
-Assuming that the cell $K$ is not degenerate, i.e. that the mapping from the
+Assuming that the cell $K$ is not degenerate, i.e., that the mapping from the
 unit cell to cell $K$ is sufficiently regular, above condition is of course
 equivalent to
 @f[
@@ -335,7 +336,7 @@ It becomes clear that we can then write the $H^s$ norm of $\hat u$ as
     |{\bf k}|^{2s}
     |\hat U_{\bf k}|^2.
 @f]
-In other words, if this norm is to be finite (i.e. for $\hat u(\hat{\bf x})$ to be in $H^s(\hat K)$), we need that
+In other words, if this norm is to be finite (i.e., for $\hat u(\hat{\bf x})$ to be in $H^s(\hat K)$), we need that
 @f[
    |\hat U_{\bf k}| = {\cal O}\left(|{\bf k}|^{-\left(s+1/2+\frac{d-1}{2}+\epsilon\right)}\right).
 @f]
@@ -403,9 +404,9 @@ cell. In other words, we can write it as a matrix-vector product
 @f]
 with the matrix
 @f[
-        {\cal F}_{{\bf k},j}
-        =
-        \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_j(\hat{\bf x}) d\hat{\bf x}.
+   {\cal F}_{{\bf k},j}
+   =
+   \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_j(\hat{\bf x}) d\hat{\bf x}.
 @f]
 This matrix is easily computed for a given number of shape functions
 $\varphi_j$ and Fourier modes $N$. Consequently, finding the
@@ -509,6 +510,12 @@ $\beta$, the formula above gives us a mean to calculate the value of
 the exponent $\mu$ that we can then use to determine that
 $\hat u(\hat{\bf x})$ is in $H^s(\hat K)$ with $s=\mu-\frac d2$.
 
+These steps outlined above are applicable to many different scenarios, which
+motivated the introduction of a generic function
+SmoothnessEstimator::Fourier::coefficient_decay() in deal.II, that combines all
+the tasks described in this section in one simple function call. We will use it
+in the implementation of this program.
+
 
 <h4>Compensating for anisotropy</h4>
 
@@ -528,7 +535,7 @@ essentially trying to determine the smoothness of the solution in that spatial
 direction in which the solution appears to be roughest?
 
 One can probably argue for either case. The issue would be of more interest if
-deal.II had the ability to use anisotropic finite elements, i.e. ones that use
+deal.II had the ability to use anisotropic finite elements, i.e., ones that use
 different polynomial degrees in different spatial directions, as they would be
 able to exploit the directionally variable smoothness much better. Alas, this
 capability does not exist at the time of writing this tutorial program.
@@ -557,7 +564,7 @@ using the formula
 To calculate $\mu$ as shown above, we have to slightly modify all sums:
 instead of summing over all Fourier modes, we only sum over those for which
 the Fourier coefficient is the largest one among all $\hat U_{{\bf k}}$ with
-the same magnitude $|{\bf k}|$, i.e. all sums above have to replaced by the
+the same magnitude $|{\bf k}|$, i.e., all sums above have to replaced by the
 following sums:
 @f[
   \sum_{{\bf k}, |{\bf k}|\le N}
@@ -591,7 +598,7 @@ To compensate for the transformation means not attempting to fit a decay
 $|{\bf k}|^\mu$ with respect to the Fourier frequencies ${\bf k}$ <i>on the unit
 cell</i>, but to fit the coefficients $\hat U_{{\bf k}}$ computed on the
 reference cell <i>to the Fourier frequencies on the real cell $|\bf
-k|h$</i>, where $h$ is the norm of the transformation operator (i.e. something
+k|h$</i>, where $h$ is the norm of the transformation operator (i.e., something
 like the diameter of the cell). In other words, we would have to minimize the
 sum of squares of the terms
 @f[
@@ -611,11 +618,11 @@ estimated smoothness exponent will be the same in either case.
 
 
 
-<h3>Complications with linear systems for hp discretizations</h3>
+<h3>Complications with linear systems for hp-discretizations</h3>
 
 <h4>Creating the sparsity pattern</h4>
 
-One of the problems with $hp$ methods is that the high polynomial degree of
+One of the problems with $hp$-methods is that the high polynomial degree of
 shape functions together with the large number of constrained degrees of
 freedom leads to matrices with large numbers of nonzero entries in some
 rows. At the same time, because there are areas where we use low polynomial
@@ -643,21 +650,22 @@ The early tutorial programs use first or second degree finite elements, so
 removing entries in the sparsity pattern corresponding to constrained degrees of
 freedom does not have a large impact on the overall number of zeros explicitly
 stored by the matrix. However, since as many as a third of the degrees of
-freedom may be constrained in an hp discretization (and, with higher degree
+freedom may be constrained in an hp-discretization (and, with higher degree
 elements, these constraints can couple one DoF to as many as ten or twenty other
 DoFs), it is worthwhile to take these constraints into consideration since the
 resulting matrix will be much sparser (and, therefore, matrix-vector products or
 factorizations will be substantially faster too).
 
+
 <h4>Eliminating constrained degrees of freedom</h4>
 
-A second problem particular to $hp$ methods arises because we have so
+A second problem particular to $hp$-methods arises because we have so
 many constrained degrees of freedom: typically up to about one third
 of all degrees of freedom (in 3d) are constrained because they either
 belong to cells with hanging nodes or because they are on cells
 adjacent to cells with a higher or lower polynomial degree. This is,
 in fact, not much more than the fraction of constrained degrees of
-freedom in non-$hp$ mode, but the difference is that each constrained
+freedom in non-$hp$-mode, but the difference is that each constrained
 hanging node is constrained not only against the two adjacent degrees
 of freedom, but is constrained against many more degrees of freedom.
 
@@ -682,6 +690,7 @@ transfer from local to global data on matrix and vector simultaneously. This
 is exactly what we've shown in step-6.
 
 
+
 <h3>The test case</h3>
 
 The test case we will solve with this program is a re-take of the one we
@@ -690,10 +699,10 @@ already look at in step-14: we solve the Laplace equation
    -\Delta u = f
 @f]
 in 2d, with $f=(x+1)(y+1)$, and with zero Dirichlet boundary values for
-$u$. We do so on the domain $[-1,1]^2\backslash[-\frac 12,\frac 12]^2$, i.e. a
-square with a square hole in the middle.
+$u$. We do so on the domain $[-1,1]^2\backslash[-\frac 12,\frac 12]^2$,
+i.e., a square with a square hole in the middle.
 
-The difference to step-14 is of course that we use $hp$ finite
+The difference to step-14 is of course that we use $hp$-finite
 elements for the solution. The test case is of interest because it has
 re-entrant corners in the corners of the hole, at which the solution has
 singularities. We therefore expect that the solution will be smooth in the

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -17,12 +17,10 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
   utilities.cc
-  boundary_lib.cc
   manifold_lib.cc
   )
 
 SET(_inst
-  boundary_lib.inst.in
   manifold_lib.inst.in
   utilities.inst.in
   )

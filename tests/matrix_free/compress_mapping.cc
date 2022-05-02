@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,9 +25,10 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -82,15 +83,15 @@ test()
   data.tasks_parallel_scheme = MatrixFree<dim>::AdditionalData::none;
   mf.reinit(dof, constraints, quad, data);
 
-  const unsigned int        n_macro_cells = mf.n_macro_cells();
+  const unsigned int        n_cell_batches = mf.n_cell_batches();
   std::vector<unsigned int> n_cell_types(4, 0);
-  for (unsigned int i = 0; i < n_macro_cells; ++i)
+  for (unsigned int i = 0; i < n_cell_batches; ++i)
     n_cell_types[mf.get_mapping_info().get_cell_type(i)]++;
 
   // should do at least some compression
   Assert(n_cell_types[0] + n_cell_types[1] > 0, ExcInternalError());
   Assert(mf.get_mapping_info().cell_data[0].jacobians[0].size() <
-           (n_cell_types[3] * quad.size() + n_macro_cells - n_cell_types[3]),
+           (n_cell_types[3] * quad.size() + n_cell_batches - n_cell_types[3]),
          ExcInternalError());
   deallog << "OK" << std::endl;
 }
@@ -119,15 +120,15 @@ test_cube()
   data.tasks_parallel_scheme = MatrixFree<dim>::AdditionalData::none;
   mf.reinit(dof, constraints, quad, data);
 
-  const unsigned int        n_macro_cells = mf.n_macro_cells();
+  const unsigned int        n_cell_batches = mf.n_cell_batches();
   std::vector<unsigned int> n_cell_types(4, 0);
-  for (unsigned int i = 0; i < n_macro_cells; ++i)
+  for (unsigned int i = 0; i < n_cell_batches; ++i)
     n_cell_types[mf.get_mapping_info().get_cell_type(i)]++;
 
   // should have one Cartesian cell and no other cell type
-  AssertDimension(n_cell_types[0], n_macro_cells);
+  AssertDimension(n_cell_types[0], n_cell_batches);
   AssertDimension(mf.get_mapping_info().cell_data[0].jacobians[0].size(), 2);
-  Assert(n_macro_cells > 1, ExcInternalError());
+  Assert(n_cell_batches > 1, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 
@@ -162,16 +163,16 @@ test_parallelogram()
   data.tasks_parallel_scheme = MatrixFree<dim>::AdditionalData::none;
   mf.reinit(dof, constraints, quad, data);
 
-  const unsigned int        n_macro_cells = mf.n_macro_cells();
+  const unsigned int        n_cell_batches = mf.n_cell_batches();
   std::vector<unsigned int> n_cell_types(4, 0);
-  for (unsigned int i = 0; i < n_macro_cells; ++i)
+  for (unsigned int i = 0; i < n_cell_batches; ++i)
     n_cell_types[mf.get_mapping_info().get_cell_type(i)]++;
 
   // should have one affine cell and no other
   // cell type
-  AssertDimension(n_cell_types[1], n_macro_cells);
+  AssertDimension(n_cell_types[1], n_cell_batches);
   AssertDimension(mf.get_mapping_info().cell_data[0].jacobians[0].size(), 2);
-  Assert(n_macro_cells > 1, ExcInternalError());
+  Assert(n_cell_batches > 1, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 
@@ -186,7 +187,7 @@ public:
   virtual std::unique_ptr<Manifold<dim, dim>>
   clone() const
   {
-    return std_cxx14::make_unique<DeformedManifold<dim>>();
+    return std::make_unique<DeformedManifold<dim>>();
   }
 
   virtual Point<dim>
@@ -236,16 +237,16 @@ test_deformed_cube()
     update_gradients | update_normal_vectors;
 
   mf.reinit(dof, constraints, quad, data);
-  const unsigned int n_macro_cells = mf.n_macro_cells();
-  Assert(n_macro_cells > 1, ExcInternalError());
+  const unsigned int n_cell_batches = mf.n_cell_batches();
+  Assert(n_cell_batches > 1, ExcInternalError());
 
   {
     std::vector<unsigned int> n_cell_types(4, 0);
-    for (unsigned int i = 0; i < n_macro_cells; ++i)
+    for (unsigned int i = 0; i < n_cell_batches; ++i)
       n_cell_types[mf.get_mapping_info().get_cell_type(i)]++;
 
     // should have all Cartesian type and no other cell type
-    AssertDimension(n_cell_types[0], n_macro_cells);
+    AssertDimension(n_cell_types[0], n_cell_batches);
 
     // should have as many different Jacobians as we have cell batches in x
     // direction; as the mesh is a cube, we can easily calculate it
@@ -256,15 +257,15 @@ test_deformed_cube()
 
   // check again, now using a mapping that displaces points
   {
-    MappingQGeneric<dim> mapping(3);
+    MappingQ<dim> mapping(3);
     mf.reinit(mapping, dof, constraints, quad, data);
 
     std::vector<unsigned int> n_cell_types(4, 0);
-    for (unsigned int i = 0; i < n_macro_cells; ++i)
+    for (unsigned int i = 0; i < n_cell_batches; ++i)
       n_cell_types[mf.get_mapping_info().get_cell_type(i)]++;
 
     // should have all general type and no other cell type
-    AssertDimension(n_cell_types[3], n_macro_cells);
+    AssertDimension(n_cell_types[3], n_cell_batches);
 
     // should have as many different Jacobians as we have cell batches in x
     // direction times the number of quadrature points; as the mesh is a cube,

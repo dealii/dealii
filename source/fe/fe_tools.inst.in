@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -102,7 +102,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           std::vector<std::pair<unsigned int, unsigned int>>
             &face_system_to_component_table,
           const FiniteElement<deal_II_dimension, deal_II_space_dimension> &fe,
-          const bool do_tensor_product);
+          const bool         do_tensor_product,
+          const unsigned int face_no);
 
       \}
 
@@ -175,9 +176,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension == deal_II_space_dimension
 
       template class FEFactoryBase<deal_II_dimension>;
-
-      template FiniteElement<deal_II_dimension> *
-      get_fe_from_name<deal_II_dimension>(const std::string &);
 
       template FullMatrix<double>
       compute_node_matrix(const FiniteElement<deal_II_dimension> &);
@@ -256,34 +254,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         FullMatrix<double> &);
 #  endif
 
-      template void
-      hierarchic_to_lexicographic_numbering<deal_II_dimension>(
-        unsigned int,
-        std::vector<unsigned int> &);
-
-      template void
-      hierarchic_to_lexicographic_numbering<deal_II_dimension>(
-        const FiniteElementData<deal_II_dimension> &,
-        std::vector<unsigned int> &);
-
-      template void
-      lexicographic_to_hierarchic_numbering<deal_II_dimension>(
-        const FiniteElementData<deal_II_dimension> &,
-        std::vector<unsigned int> &);
-
       template std::vector<unsigned int>
       hierarchic_to_lexicographic_numbering<deal_II_dimension>(unsigned int);
 
       template std::vector<unsigned int>
       lexicographic_to_hierarchic_numbering<deal_II_dimension>(unsigned int);
-
-      template std::vector<unsigned int>
-      hierarchic_to_lexicographic_numbering<deal_II_dimension>(
-        const FiniteElementData<deal_II_dimension> &);
-
-      template std::vector<unsigned int>
-      lexicographic_to_hierarchic_numbering<deal_II_dimension>(
-        const FiniteElementData<deal_II_dimension> &);
 
 #endif
     \}

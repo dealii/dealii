@@ -57,7 +57,7 @@ IF(EXISTS ${ADOLC_SETTINGS_H})
   # Check whether ADOL-C is configured with extra trig functions
   #
   FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_ATRIG_ERF_STRING
-    REGEX "#define ATRIG_ERF"
+    REGEX "^[ \t]*#[ \t]*define[ \t]+ATRIG_ERF"
     )
   IF(NOT "${ADOLC_ATRIG_ERF_STRING}" STREQUAL "")
     SET(ADOLC_WITH_ATRIG_ERF TRUE)
@@ -69,7 +69,7 @@ IF(EXISTS ${ADOLC_SETTINGS_H})
   # Check whether ADOL-C is configured with advanced branching
   #
   FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_ADVANCED_BRANCHING_STRING
-    REGEX "#define ADOLC_ADVANCED_BRANCHING"
+    REGEX "^[ \t]*#[ \t]*define[ \t]+ADOLC_ADVANCED_BRANCHING"
     )
   IF(NOT "${ADOLC_ADVANCED_BRANCHING_STRING}" STREQUAL "")
     SET(ADOLC_WITH_ADVANCED_BRANCHING TRUE)
@@ -81,7 +81,7 @@ IF(EXISTS ${ADOLC_SETTINGS_H})
   # Check whether ADOL-C is configured with tapeless number reference counting
   #
   FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_WITH_TAPELESS_REFCOUNTING_STRING
-    REGEX "#define USE_ADTL_REFCOUNTING 1"
+    REGEX "^[ \t]*#[ \t]*define[ \t]+USE_ADTL_REFCOUNTING 1"
     )
   IF(NOT "${ADOLC_WITH_TAPELESS_REFCOUNTING_STRING}" STREQUAL "")
     SET(ADOLC_WITH_TAPELESS_REFCOUNTING TRUE)
@@ -93,7 +93,7 @@ IF(EXISTS ${ADOLC_SETTINGS_H})
   # Check whether ADOL-C is configured to use the Boost pool allocator
   #
   FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_BOOST_POOL_STRING
-    REGEX "#define USE_BOOST_POOL 1"
+    REGEX "^[ \t]*#[ \t]*define[ \t]+USE_BOOST_POOL 1"
     )
   IF(NOT "${ADOLC_BOOST_POOL_STRING}" STREQUAL "")
     SET(ADOLC_WITH_BOOST_ALLOCATOR TRUE)
@@ -111,10 +111,10 @@ DEAL_II_PACKAGE_HANDLE(ADOLC
   LIBRARIES
     REQUIRED ADOLC_LIBRARY
     ${_additional_library}
-  INCLUDE_DIRS 
+  INCLUDE_DIRS
     REQUIRED ADOLC_INCLUDE_DIR
     ${_additional_include_dirs}
-  USER_INCLUDE_DIRS 
+  USER_INCLUDE_DIRS
     REQUIRED ADOLC_INCLUDE_DIR
     ${_additional_include_dirs}
   CLEAR ADOLC_INCLUDE_DIR ADOLC_LIBRARY ADOLC_SETTINGS_H

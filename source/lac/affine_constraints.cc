@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -109,6 +109,14 @@ INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(PETScWrappers::MPI::BlockSparseMatrix,
 INSTANTIATE_DLTG_MATRIX(PETScWrappers::SparseMatrix);
 INSTANTIATE_DLTG_MATRIX(PETScWrappers::MPI::SparseMatrix);
 INSTANTIATE_DLTG_MATRIX(PETScWrappers::MPI::BlockSparseMatrix);
+#  ifndef DOXYGEN
+#    ifdef DEAL_II_PETSC_WITH_COMPLEX
+template void
+dealii::AffineConstraints<double>::distribute<
+  dealii::PETScWrappers::MPI::Vector>(
+  dealii::PETScWrappers::MPI::Vector &) const;
+#    endif
+#  endif
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -125,34 +133,16 @@ INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(TrilinosWrappers::BlockSparseMatrix,
 
 INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::SparseMatrix);
 INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::BlockSparseMatrix);
+
+#  ifndef DOXYGEN
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+// FIXME: This mixed variant is needed for multigrid and matrix free.
+template void
+dealii::AffineConstraints<double>::distribute<
+  dealii::LinearAlgebra::TpetraWrappers::Vector<float>>(
+  dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
+#    endif
+#  endif
 #endif
-
-/*
- * Allocate scratch data.
- *
- * We cannot use the generic template instantiation because we need to
- * provide an initializer object of type
- * internals::AffineConstraintsData<Number> that can be passed to the
- * constructor of scratch_data (it won't allow one to be constructed in
- * place).
- */
-
-namespace internals
-{
-#define SCRATCH_INITIALIZER(number, Name)                                     \
-  AffineConstraintsData<number>::ScratchData scratch_data_initializer_##Name; \
-  template <>                                                                 \
-  Threads::ThreadLocalStorage<AffineConstraintsData<number>::ScratchData>     \
-    AffineConstraintsData<number>::scratch_data(                              \
-      scratch_data_initializer_##Name)
-
-  SCRATCH_INITIALIZER(double, d);
-  SCRATCH_INITIALIZER(float, f);
-#ifdef DEAL_II_WITH_COMPLEX_VALUES
-  SCRATCH_INITIALIZER(std::complex<double>, cd);
-  SCRATCH_INITIALIZER(std::complex<float>, cf);
-#endif
-#undef SCRATCH_INITIALIZER
-} // namespace internals
 
 DEAL_II_NAMESPACE_CLOSE

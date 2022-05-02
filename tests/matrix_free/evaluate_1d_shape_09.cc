@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ test()
   deallog << "Errors no transpose: ";
   for (unsigned int i = 0; i < M; ++i)
     {
-      deallog << y[i][0] - y_ref[i][0] << " ";
+      deallog << y[i][0] - y_ref[i][0] << ' ';
       for (unsigned int v = 1; v < VectorizedArray<double>::size(); ++v)
         AssertThrow(std::abs(y[i][v] - y_ref[i][v]) < 1e-12,
                     ExcInternalError());
@@ -110,7 +110,7 @@ test()
   deallog << "Errors transpose:    ";
   for (unsigned int i = 0; i < N; ++i)
     {
-      deallog << x[i][0] - x_ref[i][0] << " ";
+      deallog << x[i][0] - x_ref[i][0] << ' ';
       for (unsigned int v = 1; v < VectorizedArray<double>::size(); ++v)
         AssertThrow(std::abs(x[i][v] - x_ref[i][v]) < 1e-12,
                     ExcInternalError());

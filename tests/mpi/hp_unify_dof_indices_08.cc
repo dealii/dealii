@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,12 +15,12 @@
 
 
 
-// Read in a large grid from a file and distribute hp DoFs on it using
+// Read in a large grid from a file and distribute hp-DoFs on it using
 // FE_Q elements of different orders on different cells. The
 // active_fe_index on each cell is determined in a mostly random way,
 // but so that it is the same regardless of the number of processors.
 //
-// We used to treat hp DoF unification on vertices and faces
+// We used to treat hp-DoF unification on vertices and faces
 // differently depending on whether we are in the interior of a
 // subdomain or at a processor boundary. But later versions of the
 // code did away with this distinction, and now the total number of
@@ -35,14 +35,16 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <numeric>
@@ -87,22 +89,20 @@ test()
   // regardless of the number of processors involved, and we can use
   // that to build a hash value from it that is then used to assign an
   // active_fe_index
-  hp::DoFHandler<dim> dof_handler(triangulation);
-  for (auto &cell : dof_handler.active_cell_iterators())
-    if (cell->is_locally_owned())
-      cell->set_active_fe_index(
-        (cell->active_cell_index() +
-         13 * cell->active_cell_index() * cell->active_cell_index()) %
-        fe.size());
+  DoFHandler<dim> dof_handler(triangulation);
+  for (const auto &cell : dof_handler.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
+    cell->set_active_fe_index(
+      (cell->active_cell_index() +
+       13 * cell->active_cell_index() * cell->active_cell_index()) %
+      fe.size());
   dof_handler.distribute_dofs(fe);
 
-  deallog << "Processor: " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-          << std::endl;
-  deallog << "  n_globally_active_cells: "
+  deallog << "n_globally_active_cells: "
           << triangulation.n_global_active_cells() << std::endl;
-  deallog << "  n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs()
+  deallog << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs()
           << std::endl;
-  deallog << "  n_global_dofs: " << dof_handler.n_dofs() << std::endl;
+  deallog << "n_global_dofs: " << dof_handler.n_dofs() << std::endl;
 }
 
 

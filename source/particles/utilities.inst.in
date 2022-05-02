@@ -1,0 +1,51 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2020 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     Sparsity : SPARSITY_PATTERNS;
+     scalar : REAL_SCALARS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension && deal_II_dimension > 1
+    template void create_interpolation_sparsity_pattern<deal_II_dimension,
+                                                        deal_II_space_dimension,
+                                                        Sparsity,
+                                                        scalar>(
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &space_dh,
+      const Particles::ParticleHandler<deal_II_dimension,
+                                       deal_II_space_dimension>
+        &                              particle_handler,
+      Sparsity &                       sparsity,
+      const AffineConstraints<scalar> &constraints,
+      const ComponentMask &            space_comps);
+#endif
+  }
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     Matrix : SPARSE_MATRICES)
+  {
+#if deal_II_dimension <= deal_II_space_dimension && deal_II_dimension > 1
+    template void create_interpolation_matrix<deal_II_dimension,
+                                              deal_II_space_dimension,
+                                              Matrix>(
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &space_dh,
+      const Particles::ParticleHandler<deal_II_dimension,
+                                       deal_II_space_dimension>
+        &                                          particle_handler,
+      Matrix &                                     matrix,
+      const AffineConstraints<Matrix::value_type> &constraints,
+      const ComponentMask &                        space_comps);
+#endif
+  }

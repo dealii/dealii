@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
             FEValuesExtractors::Vector vec_components(c);
 
             for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
-              for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+              for (const auto q : fe_values.quadrature_point_indices())
                 {
                   deallog << "i=" << i << ", q=" << q << std::endl;
                   deallog << "   ";

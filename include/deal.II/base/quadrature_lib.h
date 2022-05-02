@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,8 +33,6 @@ DEAL_II_NAMESPACE_OPEN
  * described in <a
  * href="http://en.wikipedia.org/wiki/Numerical_Recipes">Numerical
  * Recipes</a>.
- *
- * @author Guido Kanschat, 2001
  */
 template <int dim>
 class QGauss : public Quadrature<dim>
@@ -69,8 +67,6 @@ public:
  * @sa http://en.wikipedia.org/wiki/Handbook_of_Mathematical_Functions @sa
  * Karniadakis, G.E. and Sherwin, S.J.: Spectral/hp element methods for
  * computational fluid dynamics. Oxford: Oxford University Press, 2005
- *
- * @author Guido Kanschat, 2005, 2006; F. Prill, 2006
  */
 template <int dim>
 class QGaussLobatto : public Quadrature<dim>
@@ -112,22 +108,33 @@ public:
 
 /**
  * The trapezoidal rule for numerical quadrature. This formula with two
- * quadrature points is exact for linear polynomials.
- *
- * The class is poorly named since the proper name of the quadrature formula
- * is "trapezoidal rule", or sometimes also called the "trapezoid rule". The
- * misnomer results from the fact that its original authors' poor English
- * language skills led them to translate the name incorrectly from the German
- * "Trapezregel".
- *
- * @author Wolfgang Bangerth, 1998
+ * quadrature points is exact for linear polynomials and uses the
+ * end points of an interval for function evaluation in 1d, see
+ * https://en.wikipedia.org/wiki/Trapezoidal_rule . In higher dimensions,
+ * the class is constructed via a tensor product and then uses the
+ * vertices of a quadrilateral or hexahedron for function evaluation.
  */
 template <int dim>
-class QTrapez : public Quadrature<dim>
+class QTrapezoid : public Quadrature<dim>
 {
 public:
-  QTrapez();
+  QTrapezoid();
 };
+
+
+/**
+ * An alias for QTrapezoid available for historic reasons. This name is
+ * deprecated.
+ *
+ * The class was originally named QTrapez, a poorly named choice since the
+ * proper name of the quadrature formula
+ * is "trapezoidal rule", or sometimes also called the "trapezoid rule". The
+ * misnomer resulted from the fact that its original authors' poor English
+ * language skills led them to translate the name incorrectly from the German
+ * "Trapezregel".
+ */
+template <int dim>
+using QTrapez DEAL_II_DEPRECATED = QTrapezoid<dim>;
 
 
 
@@ -246,7 +253,7 @@ public:
    * formula or it is factored out, to be included in the integrand.
    */
   QGaussLogR(const unsigned int n,
-             const Point<dim>   x0                         = Point<dim>(),
+             const Point<dim> & x0                         = Point<dim>(),
              const double       alpha                      = 1,
              const bool         factor_out_singular_weight = false);
 
@@ -326,7 +333,7 @@ public:
    * @endcode
    */
   QGaussOneOverR(const unsigned int n,
-                 const Point<dim>   singularity,
+                 const Point<dim> & singularity,
                  const bool         factor_out_singular_weight = false);
   /**
    * The constructor takes three arguments: the order of the Gauss formula,
@@ -373,7 +380,7 @@ private:
    * the cell, on an edge of the cell, or on a corner of the cell.
    */
   static unsigned int
-  quad_size(const Point<dim> singularity, const unsigned int n);
+  quad_size(const Point<dim> &singularity, const unsigned int n);
 };
 
 
@@ -460,8 +467,6 @@ private:
  *
  * The weights and functions for Gauss Legendre formula have been tabulated up
  * to order 12.
- *
- * @author Nicola Giuliani, Luca Heltai 2015
  */
 template <int dim>
 class QTelles : public Quadrature<dim>
@@ -492,8 +497,6 @@ public:
  * the integral $\int_0^1 f(x) w(x) dx$ with the weight: $w(x) =
  * 1/\sqrt{x(1-x)}$. For details see: M. Abramowitz & I.A. Stegun: Handbook of
  * Mathematical Functions, par. 25.4.38
- *
- * @author Giuseppe Pitton, Luca Heltai 2015
  */
 template <int dim>
 class QGaussChebyshev : public Quadrature<dim>
@@ -517,8 +520,6 @@ public:
  * with the left endpoint as quadrature node, but the quadrature node can be
  * imposed at the right endpoint through the variable ep that can assume the
  * values left or right.
- *
- * @author Giuseppe Pitton, Luca Heltai 2015
  */
 template <int dim>
 class QGaussRadauChebyshev : public Quadrature<dim>
@@ -564,8 +565,6 @@ private:
  * $\int_0^1 f(x) w(x) dx$ with the weight: $w(x) = 1/\sqrt{x(1-x)}$. For
  * details see: M. Abramowitz & I.A. Stegun: Handbook of Mathematical
  * Functions, par. 25.4.40
- *
- * @author Giuseppe Pitton, Luca Heltai 2015
  */
 template <int dim>
 class QGaussLobattoChebyshev : public Quadrature<dim>
@@ -589,6 +588,9 @@ public:
  *
  * No transformation is applied to the weights, and the weights referring to
  * points that live outside the reference simplex are simply discarded.
+ * Because this leads to (or *may* lead to) a sum of quadrature weights that
+ * do not equal the area of the simplex, the resulting quadrature formula
+ * is not useful for actually computing integrals.
  *
  * The main use of this quadrature formula is not to chop tensor product
  * quadratures. Ideally you should pass to this class a quadrature formula
@@ -604,8 +606,6 @@ public:
  * singularities at certain points, or functions that present jumps along a
  * co-dimension one surface inside the reference element, like in the extended
  * finite element method (XFEM).
- *
- * @author Luca Heltai, 2017.
  */
 template <int dim>
 class QSimplex : public Quadrature<dim>
@@ -664,8 +664,6 @@ public:
  *  \end{pmatrix}
  *  \qquad \theta \dealcoloneq \frac\pi 2 \hat y
  * \f]
- *
- * @author Luca Heltai, 2017
  */
 class QTrianglePolar : public QSimplex<2>
 {
@@ -720,8 +718,6 @@ public:
  *
  * When $\beta = 1$, this transformation is also known as the Lachat-Watson
  * transformation.
- *
- * @author Luca Heltai, Nicola Giuliani, 2017.
  */
 class QDuffy : public QSimplex<2>
 {
@@ -757,8 +753,6 @@ public:
 /**
  * A quadrature to use when the cell should be split into subregions to
  * integrate using one or more base quadratures.
- *
- * @author Luca Heltai, 2017.
  */
 template <int dim>
 class QSplit : public Quadrature<dim>
@@ -801,6 +795,130 @@ public:
   QSplit(const QSimplex<dim> &base, const Point<dim> &split_point);
 };
 
+/**
+ * Integration rule for simplex entities.
+ *
+ * Users specify a number `n_points_1D` as an indication of what polynomial
+ * degree to be integrated exactly, similarly to the number of points in a
+ * QGauss quadrature object, even though the present quadrature formula is not
+ * a tensor product. The given value is translated for n_points_1D=1,2,3,4 to
+ * following number of quadrature points for 2D and 3D:
+ * - 2D: 1, 4, 7, 15
+ * - 3D: 1, 6, 14, 35
+ *
+ * For 1D, the quadrature rule degenerates to a
+ * `dealii::QGauss<1>(n_points_1D)`.
+ *
+ * @ingroup simplex
+ *
+ * @note The quadrature rules implemented by this class come from a variety of
+ * sources, but all of them have positive quadrature weights.
+ *
+ * @note Several of the schemes implemented by this class are not symmetric with
+ * respect to the vertices - i.e., the locations of the mapped quadrature points
+ * depends on the numbering of the cell vertices. If you need rules that are
+ * independent of the vertex numbering then use QWitherdenVincentSimplex.
+ */
+template <int dim>
+class QGaussSimplex : public QSimplex<dim>
+{
+public:
+  /**
+   * Constructor taking the number of quadrature points in 1D direction
+   * @p n_points_1D.
+   */
+  explicit QGaussSimplex(const unsigned int n_points_1D);
+};
+
+/**
+ * Witherden-Vincent rules for simplex entities.
+ *
+ * Like QGauss, users should specify a number `n_points_1D` as an indication
+ * of what polynomial degree to be integrated exactly (e.g., for $n$ points,
+ * the rule can integrate polynomials of degree $2 n - 1$ exactly).
+ * Additionally, since these rules were derived for simplices, there are
+ * also even-ordered rules (i.e., they integrate polynomials of degree $2 n$)
+ * available which do not have analogous 1D rules.
+ *
+ * The given value for n_points_1D = 1, 2, 3, 4, 5, 6, 7 (where the last two are
+ * only implemented in 2D) results in the following number of quadrature points
+ * in 2D and 3D:
+ * - 2D: odd (default): 1, 6, 7, 15, 19, 28, 37
+ * - 2D: even: 3, 6, 12, 16, 25, 33, 42
+ * - 3D: odd (default): 1, 8, 14, 35, 59
+ * - 3D: even: 4, 14, 24, 46, 81
+ *
+ * For 1D, the quadrature rule degenerates to a
+ * `dealii::QGauss<1>(n_points_1D)` and @p use_odd_order is ignored.
+ *
+ * These rules match the ones listed for Witherden-Vincent in the quadpy
+ * @cite quadpy library and were first described in
+ * @cite witherden2015identification.
+ *
+ * @note Some rules (2D 2 odd and 3D 2 even) do not yet exist and instead a
+ * higher-order rule is used in their place.
+ *
+ * @ingroup simplex
+ */
+template <int dim>
+class QWitherdenVincentSimplex : public QSimplex<dim>
+{
+public:
+  /**
+   * Constructor taking the equivalent number of quadrature points in 1D
+   * @p n_points_1D and boolean indicating whether the rule should be order
+   * $2 n - 1$ or $2 n$: see the general documentation of this class for more
+   * information.
+   */
+  explicit QWitherdenVincentSimplex(const unsigned int n_points_1D,
+                                    const bool         use_odd_order = true);
+};
+
+/**
+ * Iterated quadrature for simplices. Since simplex cannot be described as
+ * tensor products the base quadrature has equal dimension.
+ *
+ * At the moment @p n_copies must be a power of 2 due to the complexity of
+ * subdividing a simplex.
+ */
+template <int dim>
+class QIteratedSimplex : public Quadrature<dim>
+{
+public:
+  QIteratedSimplex(const Quadrature<dim> &base_quadrature,
+                   const unsigned int     n_copies);
+};
+
+/**
+ * Integration rule for wedge entities.
+ */
+template <int dim>
+class QGaussWedge : public Quadrature<dim>
+{
+public:
+  /**
+   * Users specify a number `n_points_1D` as an indication of what polynomial
+   * degree to be integrated exactly. For details, see the comments of
+   * QGaussSimplex.
+   */
+  explicit QGaussWedge(const unsigned int n_points_1D);
+};
+
+/**
+ * Integration rule for pyramid entities.
+ */
+template <int dim>
+class QGaussPyramid : public Quadrature<dim>
+{
+public:
+  /**
+   * Users specify a number `n_points_1D` as an indication of what polynomial
+   * degree to be integrated exactly. For details, see the comments of
+   * QGaussSimplex.
+   */
+  explicit QGaussPyramid(const unsigned int n_points_1D);
+};
+
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
@@ -821,7 +939,7 @@ QGaussLog<1>::get_quadrature_weights(const unsigned int);
 template <>
 QMidpoint<1>::QMidpoint();
 template <>
-QTrapez<1>::QTrapez();
+QTrapezoid<1>::QTrapezoid();
 template <>
 QSimpson<1>::QSimpson();
 template <>
@@ -832,7 +950,7 @@ template <>
 QGaussLog<1>::QGaussLog(const unsigned int n, const bool revert);
 template <>
 QGaussLogR<1>::QGaussLogR(const unsigned int n,
-                          const Point<1>     x0,
+                          const Point<1> &   x0,
                           const double       alpha,
                           const bool         flag);
 template <>

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 - 2018 by the deal.II authors
+## Copyright (C) 2014 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -26,8 +26,9 @@ FILE(WRITE ${CMAKE_BINARY_DIR}/revision.log
 "###
 #
 #  Git information:
-#        Branch:   ${DEAL_II_GIT_BRANCH}
-#        Revision: ${DEAL_II_GIT_REVISION}
+#        Branch:    ${DEAL_II_GIT_BRANCH}
+#        Revision:  ${DEAL_II_GIT_REVISION}
+#        Timestamp: ${DEAL_II_GIT_TIMESTAMP}
 #
 ###"
   )
@@ -86,6 +87,13 @@ _both(
 #                                ${CMAKE_CXX_COMPILER}
 "
   )
+IF(DEAL_II_HAVE_CXX20)
+  _both("#        C++ language standard:  C++20\n")
+ELSEIF(DEAL_II_HAVE_CXX17)
+  _both("#        C++ language standard:  C++17\n")
+ELSEIF(DEAL_II_HAVE_CXX14)
+  _both("#        C++ language standard:  C++14\n")
+ENDIF()
 
 IF(CMAKE_C_COMPILER_WORKS)
   _detailed("#        CMAKE_C_COMPILER:       ${CMAKE_C_COMPILER}\n")
@@ -158,6 +166,15 @@ IF(CMAKE_BUILD_TYPE MATCHES "Debug")
 ENDIF()
 _detailed("#        DEAL_II_VECTORIZATION_WIDTH_IN_BITS: ${DEAL_II_VECTORIZATION_WIDTH_IN_BITS}\n")
 
+IF(DEAL_II_HAVE_CXX20)
+  _detailed("#        DEAL_II_HAVE_CXX20\n")
+ELSEIF(DEAL_II_HAVE_CXX17)
+  _detailed("#        DEAL_II_HAVE_CXX17\n")
+ELSEIF(DEAL_II_HAVE_CXX14)
+  _detailed("#        DEAL_II_HAVE_CXX14\n")
+ENDIF()
+
+
 _detailed("#\n")
 
 IF(NOT DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
@@ -228,7 +245,7 @@ FOREACH(_feature ${_deal_ii_features_sorted})
     # Print the feature configuration:
     #
     FOREACH(_var2
-      C_COMPILER CXX_COMPILER Fortran_COMPILER EXE WITH_64BIT_BLAS_INDICES
+      C_COMPILER CXX_COMPILER Fortran_COMPILER WITH_64BIT_BLAS_INDICES
       ${DEAL_II_STRING_SUFFIXES} ${DEAL_II_LIST_SUFFIXES}
       )
       IF(DEFINED ${_feature}_${_var2})

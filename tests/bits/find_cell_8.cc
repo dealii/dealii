@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,8 @@
 #include "../tests.h"
 
 
-void create_coarse_grid(Triangulation<2> &coarse_grid)
+void
+create_coarse_grid(Triangulation<2> &coarse_grid)
 {
   static const Point<2> vertices_1[] = {
     Point<2>(0., 0.),       // 0
@@ -62,7 +63,8 @@ void create_coarse_grid(Triangulation<2> &coarse_grid)
 }
 
 
-void check(Triangulation<2> &tria)
+void
+check(Triangulation<2> &tria)
 {
   Point<2> p(0.99, 1. / 2.);
 
@@ -71,7 +73,7 @@ void check(Triangulation<2> &tria)
 
   deallog << cell << std::endl;
   for (const unsigned int v : GeometryInfo<2>::vertex_indices())
-    deallog << "<" << cell->vertex(v) << "> ";
+    deallog << '<' << cell->vertex(v) << "> ";
   deallog << std::endl;
 
   AssertThrow(p.distance(cell->center()) < cell->diameter() / 2,

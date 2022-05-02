@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,12 +24,13 @@
 
 #include <deal.II/distributed/shared_tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -50,7 +51,7 @@ test()
   tria.refine_global(1);
   deallog << "cells before: " << tria.n_global_active_cells() << std::endl;
 
-  hp::DoFHandler<dim>   dh(tria);
+  DoFHandler<dim>       dh(tria);
   hp::FECollection<dim> fe_collection;
 
   // prepare FECollection with arbitrary number of entries
@@ -58,8 +59,8 @@ test()
   for (unsigned int i = 0; i < max_degree; ++i)
     fe_collection.push_back(FE_Q<dim>(max_degree - i));
 
-  typename hp::DoFHandler<dim, dim>::active_cell_iterator cell;
-  unsigned int                                            i = 0;
+  typename DoFHandler<dim, dim>::active_cell_iterator cell;
+  unsigned int                                        i = 0;
 
   for (auto &cell : dh.active_cell_iterators())
     {
@@ -72,7 +73,7 @@ test()
 
       if (cell->is_locally_owned())
         {
-          // set active fe index
+          // set active FE index
           if (i >= fe_collection.size())
             i = 0;
           cell->set_active_fe_index(i++);
@@ -88,7 +89,7 @@ test()
         }
     }
 
-  dh.set_fe(fe_collection);
+  dh.distribute_dofs(fe_collection);
 
   // ----- refine -----
   tria.execute_coarsening_and_refinement();

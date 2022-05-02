@@ -57,7 +57,7 @@ obviously in part due to the simple nature of the problem solved, but
 it shows the power of multigrid methods.
 
 
-<h3> Possible extensions </h3>
+<h3> Possibilities for extensions </h3>
 
 
 We encourage you to generate timings for the solve() call and compare to

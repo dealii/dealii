@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,6 +28,8 @@
 #include <utility>
 #include <vector>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Comm.h>
 #  include <Epetra_Map.h>
@@ -40,20 +42,18 @@
 #  endif
 #endif
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/core/demangle.hpp>
+#include <boost/iostreams/device/array.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/vector.hpp>
 
 #ifdef DEAL_II_WITH_ZLIB
-#  include <boost/iostreams/device/back_inserter.hpp>
 #  include <boost/iostreams/filter/gzip.hpp>
-#  include <boost/iostreams/filtering_stream.hpp>
-#  include <boost/iostreams/stream.hpp>
 #endif
 
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
@@ -72,7 +72,6 @@ class Point;
  * in various contexts when writing applications.
  *
  * @ingroup utilities
- * @author Wolfgang Bangerth, 2005
  */
 namespace Utilities
 {
@@ -147,8 +146,6 @@ namespace Utilities
    * @param[in] input The string to compress
    *
    * @return A compressed version of the input string
-   *
-   * @authors Luca Heltai, Nicola Giuliani, 2020
    */
   std::string
   compress(const std::string &input);
@@ -165,8 +162,6 @@ namespace Utilities
    * function compress()
    *
    * @return The original uncompressed string.
-   *
-   * @authors Luca Heltai, Nicola Giuliani, 2020
    */
   std::string
   decompress(const std::string &compressed_input);
@@ -183,8 +178,6 @@ namespace Utilities
    * @param binary_input A vector of characters, representing your input as
    * binary data.
    * @return A string containing the binary input as a base64 string.
-   *
-   * @author Luca Heltai, 2020.
    */
   std::string
   encode_base64(const std::vector<unsigned char> &binary_input);
@@ -196,8 +189,6 @@ namespace Utilities
    *
    * @param base64_input A string that contains the input in base64 format.
    * @return A vector of characters that represents your input as binary data.
-   *
-   * @author Luca Heltai, 2020.
    */
   std::vector<unsigned char>
   decode_base64(const std::string &base64_input);
@@ -246,8 +237,6 @@ namespace Utilities
   /**
    * Determine how many digits are needed to represent numbers at most as
    * large as the given number.
-   *
-   * @author Niklas Fehn, 2019
    */
   unsigned int
   needed_digits(const unsigned int max_number);
@@ -259,8 +248,6 @@ namespace Utilities
    * operation, this function reduces the absolute value of a floating point
    * number and always rounds towards zero, since decimal places are simply
    * cut off.
-   *
-   * @author Niklas Fehn, 2019
    */
   template <typename Number>
   Number
@@ -447,8 +434,6 @@ namespace Utilities
    * In general, C++ uses mangled names to identify types. This function
    * uses boost::core::demangle to return a human readable string describing
    * the type of the variable passed as argument.
-   *
-   * @author Luca Heltai, 2019.
    */
   template <class T>
   std::string
@@ -475,12 +460,13 @@ namespace Utilities
   constexpr T
   pow(const T base, const int iexp)
   {
-#if defined(DEBUG) && defined(DEAL_II_HAVE_CXX14_CONSTEXPR)
+#if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
     // The call to __builtin_expect turns out to be problematic.
     if (!(iexp >= 0))
       ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
-        ::dealii::deal_II_exceptions::internals::abort_or_throw_on_exception,
+        ::dealii::deal_II_exceptions::internals::ExceptionHandling::
+          abort_or_throw_on_exception,
         __FILE__,
         __LINE__,
         __PRETTY_FUNCTION__,
@@ -585,8 +571,6 @@ namespace Utilities
    * If many consecutive calls with the same buffer are considered, it is
    * recommended for reasons of performance to ensure that its capacity is
    * sufficient.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   size_t
@@ -601,8 +585,6 @@ namespace Utilities
    * If the library has been compiled with ZLIB enabled, then the output buffer
    * can be compressed. This can be triggered with the parameter
    * @p allow_compression, and is only of effect if ZLIB is enabled.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   std::vector<char>
@@ -637,8 +619,6 @@ namespace Utilities
    *  This is because C++ does not allow functions to return arrays.
    *  Consequently, there is a separate unpack() function for arrays, see
    *  below.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   T
@@ -651,8 +631,6 @@ namespace Utilities
    * The @p allow_compression parameter denotes if the buffer to
    * read from could have been previously compressed with ZLIB, and
    * is only of effect if ZLIB is enabled.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
   T
@@ -691,8 +669,6 @@ namespace Utilities
    *  Note that unlike the other unpack() function, it is not necessary
    *  to explicitly specify the template arguments since they can be
    *  deduced from the second argument.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T, int N>
   void
@@ -707,8 +683,6 @@ namespace Utilities
    * The @p allow_compression parameter denotes if the buffer to
    * read from could have been previously compressed with ZLIB, and
    * is only of effect if ZLIB is enabled.
-   *
-   * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T, int N>
   void
@@ -716,6 +690,20 @@ namespace Utilities
          const std::vector<char>::const_iterator &cend,
          T (&unpacked_object)[N],
          const bool allow_compression = true);
+
+  /**
+   * Check if the bit at position @p n in @p number is set.
+   */
+  bool
+  get_bit(const unsigned char number, const unsigned int n);
+
+
+  /**
+   * Set the bit at position @p n in @p number to value @p x.
+   */
+  void
+  set_bit(unsigned char &number, const unsigned int n, const bool x);
+
 
   /**
    * Convert an object of type `std::unique_ptr<From>` to an object of
@@ -776,20 +764,42 @@ namespace Utilities
    */
   template <typename To, typename From>
   std::unique_ptr<To>
-  dynamic_unique_cast(std::unique_ptr<From> &&p)
-  {
-    // Let's see if we can cast from 'From' to 'To'. If so, do the cast,
-    // and then release the pointer from the old
-    // owner
-    if (To *cast = dynamic_cast<To *>(p.get()))
-      {
-        std::unique_ptr<To> result(cast);
-        p.release();
-        return result;
-      }
-    else
-      throw std::bad_cast();
-  }
+  dynamic_unique_cast(std::unique_ptr<From> &&p);
+
+  /**
+   * Return underlying value. Default: return input.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(T &p);
+
+  /**
+   * Return underlying value. Specialization for std::shared_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(std::shared_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for const std::shared_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(const std::shared_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for std::unique_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(std::unique_ptr<T> &p);
+
+  /**
+   * Return underlying value. Specialization for const std::unique_ptr<T>.
+   */
+  template <typename T>
+  T &
+  get_underlying_value(const std::unique_ptr<T> &p);
 
   /**
    * A namespace for utility functions that probe system properties.
@@ -1210,28 +1220,18 @@ namespace Utilities
        std::vector<char> &dest_buffer,
        const bool         allow_compression)
   {
-    // the data is never compressed when we can't use zlib.
-    (void)allow_compression;
-
     std::size_t size = 0;
 
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-#if __GNUG__ && __GNUC__ < 5
-    if (__has_trivial_copy(T) && sizeof(T) < 256)
-#else
-#  ifdef DEAL_II_WITH_CXX17
+#ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  else
+#else
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  endif
 #endif
       {
+        (void)allow_compression;
         const std::size_t previous_size = dest_buffer.size();
         dest_buffer.resize(previous_size + sizeof(T));
 
@@ -1244,31 +1244,21 @@ namespace Utilities
         // use buffer as the target of a compressing
         // stream into which we serialize the current object
         const std::size_t previous_size = dest_buffer.size();
+        {
+          boost::iostreams::filtering_ostreambuf fosb;
 #ifdef DEAL_II_WITH_ZLIB
-        if (allow_compression)
-          {
-            boost::iostreams::filtering_ostream out;
-            out.push(
-              boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-                boost::iostreams::gzip::default_compression)));
-            out.push(boost::iostreams::back_inserter(dest_buffer));
-
-            boost::archive::binary_oarchive archive(out);
-            archive << object;
-            out.flush();
-          }
-        else
+          if (allow_compression)
+            fosb.push(boost::iostreams::gzip_compressor());
+#else
+          (void)allow_compression;
 #endif
-          {
-            std::ostringstream              out;
-            boost::archive::binary_oarchive archive(out);
-            archive << object;
+          fosb.push(boost::iostreams::back_inserter(dest_buffer));
 
-            const std::string &s = out.str();
-            dest_buffer.reserve(dest_buffer.size() + s.size());
-            std::move(s.begin(), s.end(), std::back_inserter(dest_buffer));
-          }
-
+          boost::archive::binary_oarchive boa(fosb);
+          boa << object;
+          // the stream object has to be destroyed before the return statement
+          // to ensure that all data has been written in the buffer
+        }
         size = dest_buffer.size() - previous_size;
       }
 
@@ -1294,54 +1284,33 @@ namespace Utilities
   {
     T object;
 
-    // the data is never compressed when we can't use zlib.
-    (void)allow_compression;
-
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-#if __GNUG__ && __GNUC__ < 5
-    if (__has_trivial_copy(T) && sizeof(T) < 256)
-#else
-#  ifdef DEAL_II_WITH_CXX17
+#ifdef DEAL_II_HAVE_CXX17
     if constexpr (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  else
+#else
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
-#  endif
 #endif
       {
+        (void)allow_compression;
         Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
         std::memcpy(&object, &*cbegin, sizeof(T));
       }
     else
       {
-        std::string decompressed_buffer;
-
-        // first decompress the buffer
+        // decompress the buffer section into the object
+        boost::iostreams::filtering_istreambuf fisb;
 #ifdef DEAL_II_WITH_ZLIB
         if (allow_compression)
-          {
-            boost::iostreams::filtering_ostream decompressing_stream;
-            decompressing_stream.push(boost::iostreams::gzip_decompressor());
-            decompressing_stream.push(
-              boost::iostreams::back_inserter(decompressed_buffer));
-            decompressing_stream.write(&*cbegin, std::distance(cbegin, cend));
-          }
-        else
+          fisb.push(boost::iostreams::gzip_decompressor());
+#else
+        (void)allow_compression;
 #endif
-          {
-            decompressed_buffer.assign(cbegin, cend);
-          }
+        fisb.push(boost::iostreams::array_source(&*cbegin, cend - cbegin));
 
-        // then restore the object from the buffer
-        std::istringstream              in(decompressed_buffer);
-        boost::archive::binary_iarchive archive(in);
-
-        archive >> object;
+        boost::archive::binary_iarchive bia(fisb);
+        bia >> object;
       }
 
     return object;
@@ -1366,17 +1335,11 @@ namespace Utilities
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
-    //
-    // we have to work around the fact that GCC 4.8.x claims to be C++
-    // conforming, but is not actually as it does not implement
-    // std::is_trivially_copyable.
-    if (
-#if __GNUG__ && __GNUC__ < 5
-      __has_trivial_copy(T)
+#ifdef DEAL_II_HAVE_CXX17
+    if constexpr (std::is_trivially_copyable<T>() && sizeof(T) * N < 256)
 #else
-      std::is_trivially_copyable<T>()
+    if (std::is_trivially_copyable<T>() && sizeof(T) * N < 256)
 #endif
-      && sizeof(T) * N < 256)
       {
         Assert(std::distance(cbegin, cend) == sizeof(T) * N,
                ExcInternalError());
@@ -1384,30 +1347,18 @@ namespace Utilities
       }
     else
       {
-        std::string decompressed_buffer;
-
-        // first decompress the buffer
-        (void)allow_compression;
+        // decompress the buffer section into the object
+        boost::iostreams::filtering_istreambuf fisb;
 #ifdef DEAL_II_WITH_ZLIB
         if (allow_compression)
-          {
-            boost::iostreams::filtering_ostream decompressing_stream;
-            decompressing_stream.push(boost::iostreams::gzip_decompressor());
-            decompressing_stream.push(
-              boost::iostreams::back_inserter(decompressed_buffer));
-            decompressing_stream.write(&*cbegin, std::distance(cbegin, cend));
-          }
-        else
+          fisb.push(boost::iostreams::gzip_decompressor());
+#else
+        (void)allow_compression;
 #endif
-          {
-            decompressed_buffer.assign(cbegin, cend);
-          }
+        fisb.push(boost::iostreams::array_source(&*cbegin, cend - cbegin));
 
-        // then restore the object from the buffer
-        std::istringstream              in(decompressed_buffer);
-        boost::archive::binary_iarchive archive(in);
-
-        archive >> unpacked_object;
+        boost::archive::binary_iarchive bia(fisb);
+        bia >> unpacked_object;
       }
   }
 
@@ -1422,6 +1373,96 @@ namespace Utilities
                  buffer.cend(),
                  unpacked_object,
                  allow_compression);
+  }
+
+
+
+  inline bool
+  get_bit(const unsigned char number, const unsigned int n)
+  {
+    AssertIndexRange(n, 8);
+
+    // source:
+    // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
+    // "Checking a bit"
+    return ((number >> n) & 1U) != 0u;
+  }
+
+
+
+  inline void
+  set_bit(unsigned char &number, const unsigned int n, const bool x)
+  {
+    AssertIndexRange(n, 8);
+
+    // source:
+    // https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit
+    // "Changing the nth bit to x"
+    number ^= (-static_cast<unsigned char>(x) ^ number) & (1U << n);
+  }
+
+
+
+  template <typename To, typename From>
+  inline std::unique_ptr<To>
+  dynamic_unique_cast(std::unique_ptr<From> &&p)
+  {
+    // Let's see if we can cast from 'From' to 'To'. If so, do the cast,
+    // and then release the pointer from the old
+    // owner
+    if (To *cast = dynamic_cast<To *>(p.get()))
+      {
+        std::unique_ptr<To> result(cast);
+        p.release();
+        return result;
+      }
+    else
+      throw std::bad_cast();
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(T &p)
+  {
+    return p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(std::shared_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(const std::shared_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(std::unique_ptr<T> &p)
+  {
+    return *p;
+  }
+
+
+
+  template <typename T>
+  inline T &
+  get_underlying_value(const std::unique_ptr<T> &p)
+  {
+    return *p;
   }
 
 
@@ -1474,7 +1515,7 @@ namespace boost
   namespace serialization
   {
     // Provides boost and c++11 with a way to serialize tuples and pairs
-    // automatically
+    // automatically.
     template <int N>
     struct Serialize
     {

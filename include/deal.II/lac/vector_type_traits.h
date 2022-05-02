@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,8 +42,6 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  * for a vector type with support of distributed storage,
  * must be done in a header file of a vector declaration.
- *
- * @author Uwe Koecher, 2017
  */
 template <typename T>
 struct is_serial_vector;

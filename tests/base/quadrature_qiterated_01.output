@@ -1,0 +1,399 @@
+
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(1)::0.500000 1.00000 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(1)::
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(2)::0.211325 0.500000 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(2)::0.788675 0.500000 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(2)::
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.112702 0.277778 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.500000 0.444444 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.887298 0.277778 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(1)::0.250000 0.500000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(1)::0.750000 0.500000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(1)::
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.105662 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.394338 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.605662 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.894338 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.0563508 0.138889 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.250000 0.222222 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.443649 0.138889 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.556351 0.138889 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.750000 0.222222 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.943649 0.138889 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.138197 0.276393 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.500000 0.447214 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.861803 0.276393 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.0584088 0.138197 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.217984 0.138197 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.370901 0.223607 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.629099 0.223607 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.782016 0.138197 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.941591 0.138197 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.0311500 0.0767759 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.138197 0.122841 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.245243 0.0767759 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.326795 0.124226 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.500000 0.198762 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.673205 0.124226 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.754757 0.0767759 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.861803 0.122841 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.968850 0.0767759 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(2)::0.00000 0.500000 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(2)::1.00000 0.500000 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(2)::
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::0.00000 0.166667 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::0.500000 0.666667 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::1.00000 0.166667 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::0.00000 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::0.500000 0.500000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::1.00000 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.00000 0.0833333 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.250000 0.333333 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.500000 0.166667 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.750000 0.333333 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::1.00000 0.0833333 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.00000 0.138197 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.276393 0.361803 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.723607 0.361803 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::1.00000 0.138197 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.00000 0.0460655 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.138197 0.184262 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.276393 0.120601 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.500000 0.298142 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.723607 0.120601 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.861803 0.184262 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::1.00000 0.0460655 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(1)::0.500000 0.500000 1.00000 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(1)::
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(2)::0.211325 0.211325 0.250000 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(2)::0.788675 0.211325 0.250000 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(2)::0.211325 0.788675 0.250000 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(2)::0.788675 0.788675 0.250000 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(2)::
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.112702 0.112702 0.0771605 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.500000 0.112702 0.123457 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.887298 0.112702 0.0771605 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.112702 0.500000 0.123457 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.500000 0.500000 0.197531 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.887298 0.500000 0.123457 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.112702 0.887298 0.0771605 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.500000 0.887298 0.123457 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::0.887298 0.887298 0.0771605 
+DEAL:QGaussLobatto<1>(2) + QGauss<1>(3)::
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(1)::0.250000 0.250000 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(1)::0.750000 0.250000 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(1)::0.250000 0.750000 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(1)::0.750000 0.750000 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(1)::
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.105662 0.105662 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.394338 0.105662 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.605662 0.105662 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.894338 0.105662 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.105662 0.394338 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.394338 0.394338 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.605662 0.394338 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.894338 0.394338 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.105662 0.605662 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.394338 0.605662 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.605662 0.605662 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.894338 0.605662 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.105662 0.894338 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.394338 0.894338 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.605662 0.894338 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::0.894338 0.894338 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(2)::
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.0563508 0.0563508 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.250000 0.0563508 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.443649 0.0563508 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.556351 0.0563508 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.750000 0.0563508 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.943649 0.0563508 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.0563508 0.250000 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.250000 0.250000 0.0493827 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.443649 0.250000 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.556351 0.250000 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.750000 0.250000 0.0493827 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.943649 0.250000 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.0563508 0.443649 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.250000 0.443649 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.443649 0.443649 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.556351 0.443649 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.750000 0.443649 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.943649 0.443649 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.0563508 0.556351 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.250000 0.556351 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.443649 0.556351 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.556351 0.556351 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.750000 0.556351 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.943649 0.556351 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.0563508 0.750000 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.250000 0.750000 0.0493827 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.443649 0.750000 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.556351 0.750000 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.750000 0.750000 0.0493827 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.943649 0.750000 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.0563508 0.943649 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.250000 0.943649 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.443649 0.943649 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.556351 0.943649 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.750000 0.943649 0.0308642 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::0.943649 0.943649 0.0192901 
+DEAL:QGaussLobatto<1>(3) + QGauss<1>(3)::
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.138197 0.138197 0.0763932 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.500000 0.138197 0.123607 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.861803 0.138197 0.0763932 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.138197 0.500000 0.123607 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.500000 0.500000 0.200000 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.861803 0.500000 0.123607 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.138197 0.861803 0.0763932 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.500000 0.861803 0.123607 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::0.861803 0.861803 0.0763932 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(1)::
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.0584088 0.0584088 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.217984 0.0584088 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.370901 0.0584088 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.629099 0.0584088 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.782016 0.0584088 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.941591 0.0584088 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.0584088 0.217984 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.217984 0.217984 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.370901 0.217984 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.629099 0.217984 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.782016 0.217984 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.941591 0.217984 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.0584088 0.370901 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.217984 0.370901 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.370901 0.370901 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.629099 0.370901 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.782016 0.370901 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.941591 0.370901 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.0584088 0.629099 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.217984 0.629099 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.370901 0.629099 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.629099 0.629099 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.782016 0.629099 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.941591 0.629099 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.0584088 0.782016 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.217984 0.782016 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.370901 0.782016 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.629099 0.782016 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.782016 0.782016 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.941591 0.782016 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.0584088 0.941591 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.217984 0.941591 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.370901 0.941591 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.629099 0.941591 0.0309017 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.782016 0.941591 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::0.941591 0.941591 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(2)::
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.0311500 0.0311500 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.138197 0.0311500 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.245243 0.0311500 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.326795 0.0311500 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.500000 0.0311500 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.673205 0.0311500 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.754757 0.0311500 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.861803 0.0311500 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.968850 0.0311500 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.0311500 0.138197 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.138197 0.138197 0.0150900 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.245243 0.138197 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.326795 0.138197 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.500000 0.138197 0.0244162 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.673205 0.138197 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.754757 0.138197 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.861803 0.138197 0.0150900 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.968850 0.138197 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.0311500 0.245243 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.138197 0.245243 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.245243 0.245243 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.326795 0.245243 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.500000 0.245243 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.673205 0.245243 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.754757 0.245243 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.861803 0.245243 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.968850 0.245243 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.0311500 0.326795 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.138197 0.326795 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.245243 0.326795 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.326795 0.326795 0.0154321 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.500000 0.326795 0.0246914 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.673205 0.326795 0.0154321 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.754757 0.326795 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.861803 0.326795 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.968850 0.326795 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.0311500 0.500000 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.138197 0.500000 0.0244162 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.245243 0.500000 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.326795 0.500000 0.0246914 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.500000 0.500000 0.0395062 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.673205 0.500000 0.0246914 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.754757 0.500000 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.861803 0.500000 0.0244162 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.968850 0.500000 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.0311500 0.673205 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.138197 0.673205 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.245243 0.673205 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.326795 0.673205 0.0154321 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.500000 0.673205 0.0246914 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.673205 0.673205 0.0154321 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.754757 0.673205 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.861803 0.673205 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.968850 0.673205 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.0311500 0.754757 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.138197 0.754757 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.245243 0.754757 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.326795 0.754757 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.500000 0.754757 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.673205 0.754757 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.754757 0.754757 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.861803 0.754757 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.968850 0.754757 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.0311500 0.861803 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.138197 0.861803 0.0150900 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.245243 0.861803 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.326795 0.861803 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.500000 0.861803 0.0244162 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.673205 0.861803 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.754757 0.861803 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.861803 0.861803 0.0150900 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.968850 0.861803 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.0311500 0.968850 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.138197 0.968850 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.245243 0.968850 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.326795 0.968850 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.500000 0.968850 0.0152601 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.673205 0.968850 0.00953756 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.754757 0.968850 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.861803 0.968850 0.00943126 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::0.968850 0.968850 0.00589454 
+DEAL:QGaussLobatto<1>(4) + QGauss<1>(3)::
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(2)::0.00000 0.00000 0.250000 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(2)::1.00000 0.00000 0.250000 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(2)::0.00000 1.00000 0.250000 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(2)::1.00000 1.00000 0.250000 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(2)::
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::0.00000 0.00000 0.0277778 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::0.500000 0.00000 0.111111 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::1.00000 0.00000 0.0277778 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::0.00000 0.500000 0.111111 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::0.500000 0.500000 0.444444 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::1.00000 0.500000 0.111111 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::0.00000 1.00000 0.0277778 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::0.500000 1.00000 0.111111 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::1.00000 1.00000 0.0277778 
+DEAL:QGaussLobatto<1>(2) + QGaussLobatto<1>(3)::
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::0.00000 0.00000 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::0.500000 0.00000 0.125000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::1.00000 0.00000 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::0.00000 0.500000 0.125000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::0.500000 0.500000 0.250000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::1.00000 0.500000 0.125000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::0.00000 1.00000 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::0.500000 1.00000 0.125000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::1.00000 1.00000 0.0625000 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(2)::
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.00000 0.00000 0.00694444 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.250000 0.00000 0.0277778 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.500000 0.00000 0.0138889 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.750000 0.00000 0.0277778 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::1.00000 0.00000 0.00694444 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.00000 0.250000 0.0277778 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.250000 0.250000 0.111111 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.500000 0.250000 0.0555556 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.750000 0.250000 0.111111 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::1.00000 0.250000 0.0277778 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.00000 0.500000 0.0138889 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.250000 0.500000 0.0555556 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.500000 0.500000 0.0277778 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.750000 0.500000 0.0555556 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::1.00000 0.500000 0.0138889 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.00000 0.750000 0.0277778 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.250000 0.750000 0.111111 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.500000 0.750000 0.0555556 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.750000 0.750000 0.111111 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::1.00000 0.750000 0.0277778 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.00000 1.00000 0.00694444 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.250000 1.00000 0.0277778 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.500000 1.00000 0.0138889 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::0.750000 1.00000 0.0277778 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::1.00000 1.00000 0.00694444 
+DEAL:QGaussLobatto<1>(3) + QGaussLobatto<1>(3)::
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.00000 0.00000 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.276393 0.00000 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.723607 0.00000 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::1.00000 0.00000 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.00000 0.276393 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.276393 0.276393 0.130902 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.723607 0.276393 0.130902 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::1.00000 0.276393 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.00000 0.723607 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.276393 0.723607 0.130902 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.723607 0.723607 0.130902 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::1.00000 0.723607 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.00000 1.00000 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.276393 1.00000 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::0.723607 1.00000 0.0500000 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::1.00000 1.00000 0.0190983 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(2)::
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.00000 0.00000 0.00212203 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.138197 0.00000 0.00848813 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.276393 0.00000 0.00555556 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.500000 0.00000 0.0137341 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.723607 0.00000 0.00555556 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.861803 0.00000 0.00848813 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::1.00000 0.00000 0.00212203 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.00000 0.138197 0.00848813 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.138197 0.138197 0.0339525 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.276393 0.138197 0.0222222 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.500000 0.138197 0.0549364 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.723607 0.138197 0.0222222 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.861803 0.138197 0.0339525 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::1.00000 0.138197 0.00848813 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.00000 0.276393 0.00555556 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.138197 0.276393 0.0222222 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.276393 0.276393 0.0145446 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.500000 0.276393 0.0359563 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.723607 0.276393 0.0145446 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.861803 0.276393 0.0222222 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::1.00000 0.276393 0.00555556 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.00000 0.500000 0.0137341 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.138197 0.500000 0.0549364 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.276393 0.500000 0.0359563 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.500000 0.500000 0.0888889 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.723607 0.500000 0.0359563 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.861803 0.500000 0.0549364 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::1.00000 0.500000 0.0137341 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.00000 0.723607 0.00555556 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.138197 0.723607 0.0222222 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.276393 0.723607 0.0145446 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.500000 0.723607 0.0359563 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.723607 0.723607 0.0145446 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.861803 0.723607 0.0222222 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::1.00000 0.723607 0.00555556 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.00000 0.861803 0.00848813 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.138197 0.861803 0.0339525 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.276393 0.861803 0.0222222 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.500000 0.861803 0.0549364 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.723607 0.861803 0.0222222 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.861803 0.861803 0.0339525 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::1.00000 0.861803 0.00848813 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.00000 1.00000 0.00212203 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.138197 1.00000 0.00848813 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.276393 1.00000 0.00555556 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.500000 1.00000 0.0137341 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.723607 1.00000 0.00555556 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::0.861803 1.00000 0.00848813 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::1.00000 1.00000 0.00212203 
+DEAL:QGaussLobatto<1>(4) + QGaussLobatto<1>(3)::

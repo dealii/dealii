@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -99,9 +99,6 @@ DEAL_II_NAMESPACE_OPEN
  * control flow leaves it due to an exception), a memory leak cannot
  * happen: the vector the VectroMemory::Pointer object points to is
  * <i>always</i> returned.
- *
- *
- * @author Guido Kanschat, 1998-2003; Wolfgang Bangerth, 2017.
  */
 template <typename VectorType = dealii::Vector<double>>
 class VectorMemory : public Subscriptor
@@ -186,8 +183,6 @@ public:
    * allocates memory from a memory pool upon construction, and (ii) that the
    * memory is not destroyed using `operator delete` but returned to the
    * VectorMemory pool.
-   *
-   * @author Guido Kanschat, 2009; Wolfgang Bangerth, 2017.
    */
   class Pointer
     : public std::unique_ptr<VectorType, std::function<void(VectorType *)>>
@@ -313,8 +308,6 @@ public:
  * GrowingVectorMemory object whenever needed without the performance penalty
  * of creating a new memory pool every time. A drawback of this policy is that
  * vectors once allocated are only released at the end of the program run.
- *
- * @author Guido Kanschat, 1999, 2007; Wolfgang Bangerth, 2017.
  */
 template <typename VectorType = dealii::Vector<double>>
 class GrowingVectorMemory : public VectorMemory<VectorType>
@@ -408,8 +401,6 @@ private:
    * This is where the actual storage for GrowingVectorMemory is provided.
    * Only one of these pools is used for each vector type, thus allocating all
    * vectors from the same storage.
-   *
-   * @author Guido Kanschat, 2007, Wolfgang Bangerth 2017.
    */
   struct Pool
   {

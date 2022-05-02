@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// cell->get_interpolated_dof_values can not work properly in the hp
+// cell->get_interpolated_dof_values can not work properly in the hp-
 // context when called on non-active cells because these do not have a
 // finite element associated with them
 //
@@ -26,6 +26,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -33,8 +34,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -60,8 +59,8 @@ test()
   for (unsigned int i = 1; i < 5; ++i)
     fe.push_back(FE_Q<dim>(i));
 
-  hp::DoFHandler<dim> dof_handler(tr);
-  for (typename hp::DoFHandler<dim>::cell_iterator cell = dof_handler.begin();
+  DoFHandler<dim> dof_handler(tr);
+  for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin();
        cell != dof_handler.end();
        ++cell)
     if (cell->has_children() == false)
@@ -75,7 +74,7 @@ test()
     solution(i) = i;
 
   // do the test
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)

@@ -1,0 +1,6 @@
+
+DEAL:0::numproc=4
+DEAL:0::Initial set and ghost update OK
+DEAL:0::First move: dimensions OK
+DEAL:0::First move: local values OK
+DEAL:0::Ghost values after first move OK

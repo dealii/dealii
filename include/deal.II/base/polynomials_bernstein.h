@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,8 +36,6 @@ DEAL_II_NAMESPACE_OPEN
  * They are used to create the Bernstein finite element FE_Bernstein.
  *
  * @ingroup Polynomials
- * @author Luca Heltai, Marco Tezzele
- * @date 2013, 2015
  */
 template <typename number>
 class PolynomialsBernstein : public Polynomials::Polynomial<number>

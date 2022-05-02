@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/petsc_solver.h>
 
@@ -30,6 +29,7 @@
 #  include <petscversion.h>
 
 #  include <cmath>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -50,10 +50,10 @@ namespace PETScWrappers
 
 
   void
-  SolverBase::solve(const MatrixBase &        A,
-                    VectorBase &              x,
-                    const VectorBase &        b,
-                    const PreconditionerBase &preconditioner)
+  SolverBase::solve(const MatrixBase &      A,
+                    VectorBase &            x,
+                    const VectorBase &      b,
+                    const PreconditionBase &preconditioner)
   {
     /*
       TODO: PETSc duplicates communicators, so this does not work (you put
@@ -72,7 +72,7 @@ namespace PETScWrappers
     // is necessary
     if (solver_data.get() == nullptr)
       {
-        solver_data = std_cxx14::make_unique<SolverData>();
+        solver_data = std::make_unique<SolverData>();
 
         PetscErrorCode ierr = KSPCreate(mpi_communicator, &solver_data->ksp);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -210,11 +210,11 @@ namespace PETScWrappers
   }
 
   void
-  SolverBase::initialize(const PreconditionerBase &preconditioner)
+  SolverBase::initialize(const PreconditionBase &preconditioner)
   {
     PetscErrorCode ierr;
 
-    solver_data = std_cxx14::make_unique<SolverData>();
+    solver_data = std::make_unique<SolverData>();
 
     ierr = KSPCreate(mpi_communicator, &solver_data->ksp);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -643,7 +643,7 @@ namespace PETScWrappers
   void
   SparseDirectMUMPS::set_solver_type(KSP &ksp) const
   {
-    /**
+    /*
      * KSPPREONLY implements a stub method that applies only the
      * preconditioner.  Its use is due to SparseDirectMUMPS being a direct
      * (rather than iterative) solver
@@ -651,7 +651,7 @@ namespace PETScWrappers
     PetscErrorCode ierr = KSPSetType(ksp, KSPPREONLY);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    /**
+    /*
      * The KSPPREONLY solver of PETSc never calls the convergence monitor,
      * which leads to failure even when everything was ok. Therefore, the
      * SolverControl status is set to some nice values, which guarantee a
@@ -659,7 +659,7 @@ namespace PETScWrappers
      */
     solver_control.check(1, 0.0);
 
-    /**
+    /*
      * Using a PREONLY solver with a nonzero initial guess leads PETSc to
      * produce some error messages.
      */
@@ -673,41 +673,41 @@ namespace PETScWrappers
                            const VectorBase &b)
   {
 #  ifdef DEAL_II_PETSC_WITH_MUMPS
-    /**
+    /*
      * factorization matrix to be obtained from MUMPS
      */
     Mat F;
 
-    /**
+    /*
      * setting MUMPS integer control parameters ICNTL to be passed to
      * MUMPS.  Setting entry 7 of MUMPS ICNTL array (of size 40) to a value
      * of 2. This sets use of Approximate Minimum Fill (AMF)
      */
     PetscInt ival = 2, icntl = 7;
-    /**
+    /*
      * number of iterations to solution (should be 1) for a direct solver
      */
     PetscInt its;
-    /**
+    /*
      * norm of residual
      */
     PetscReal rnorm;
 
-    /**
+    /*
      * creating a solver object if this is necessary
      */
     if (solver_data == nullptr)
       {
-        solver_data = std_cxx14::make_unique<SolverDataMUMPS>();
+        solver_data = std::make_unique<SolverDataMUMPS>();
 
-        /**
+        /*
          * creates the default KSP context and puts it in the location
          * solver_data->ksp
          */
         PetscErrorCode ierr = KSPCreate(mpi_communicator, &solver_data->ksp);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        /**
+        /*
          * set the matrices involved. the last argument is irrelevant here,
          * since we use the solver only once anyway
          */
@@ -719,18 +719,18 @@ namespace PETScWrappers
 #    endif
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        /**
+        /*
          * setting the solver type
          */
         set_solver_type(solver_data->ksp);
 
-        /**
+        /*
          * getting the associated preconditioner context
          */
         ierr = KSPGetPC(solver_data->ksp, &solver_data->pc);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        /**
+        /*
          * build PETSc PC for particular PCLU or PCCHOLESKY preconditioner
          * depending on whether the symmetric mode has been set
          */
@@ -740,7 +740,7 @@ namespace PETScWrappers
           ierr = PCSetType(solver_data->pc, PCLU);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        /**
+        /*
          * convergence monitor function that checks with the solver_control
          * object for convergence
          */
@@ -750,7 +750,7 @@ namespace PETScWrappers
                                      PETSC_NULL);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        /**
+        /*
          * set the software that is to be used to perform the lu
          * factorization here we start to see differences with the base
          * class solve function
@@ -762,7 +762,7 @@ namespace PETScWrappers
 #    endif
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        /**
+        /*
          * set up the package to call for the factorization
          */
 #    if DEAL_II_PETSC_VERSION_LT(3, 9, 0)
@@ -772,7 +772,7 @@ namespace PETScWrappers
 #    endif
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        /**
+        /*
          * get the factored matrix F from the preconditioner context.  This
          * routine is valid only for LU, ILU, Cholesky, and incomplete
          * Cholesky
@@ -780,19 +780,19 @@ namespace PETScWrappers
         ierr = PCFactorGetMatrix(solver_data->pc, &F);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        /**
+        /*
          * Passing the control parameters to MUMPS
          */
         ierr = MatMumpsSetIcntl(F, icntl, ival);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        /**
+        /*
          * set the command line option prefix name
          */
         ierr = KSPSetOptionsPrefix(solver_data->ksp, prefix_name.c_str());
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        /**
+        /*
          * set the command line options provided by the user to override
          * the defaults
          */
@@ -800,13 +800,13 @@ namespace PETScWrappers
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 
-    /**
+    /*
      * solve the linear system
      */
     PetscErrorCode ierr = KSPSolve(solver_data->ksp, b, x);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    /**
+    /*
      * in case of failure throw exception
      */
     if (solver_control.last_check() != SolverControl::success)
@@ -817,7 +817,7 @@ namespace PETScWrappers
       }
     else
       {
-        /**
+        /*
          * obtain convergence information. obtain the number of iterations
          * and residual norm
          */

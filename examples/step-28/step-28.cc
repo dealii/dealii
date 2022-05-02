@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2019 by the deal.II authors
+ * Copyright (C) 2009 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -30,9 +30,10 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
@@ -41,17 +42,18 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/affine_constraints.h>
+
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
+
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
@@ -60,7 +62,6 @@
 #include <fstream>
 #include <iostream>
 
-#include <deal.II/base/utilities.h>
 
 // We use the next include file to access block vectors which provide us a
 // convenient way to manage solution and right hand side vectors of all energy
@@ -660,7 +661,7 @@ namespace Step28
                             update_values | update_gradients |
                               update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -725,7 +726,7 @@ namespace Step28
 
     const QGauss<dim> quadrature_formula(fe.degree + 1);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FEValues<dim> fe_values(fe,
@@ -797,7 +798,7 @@ namespace Step28
 
     for (const auto &cell_pair : cell_list)
       {
-        FullMatrix<double> unit_matrix(fe.dofs_per_cell);
+        FullMatrix<double> unit_matrix(fe.n_dofs_per_cell());
         for (unsigned int i = 0; i < unit_matrix.m(); ++i)
           unit_matrix(i, i) = 1;
         assemble_cross_group_rhs_recursive(g_prime,
@@ -871,14 +872,14 @@ namespace Step28
                                           group,
                                           cell_g_prime->material_id());
 
-        FullMatrix<double> local_mass_matrix_f(fe.dofs_per_cell,
-                                               fe.dofs_per_cell);
-        FullMatrix<double> local_mass_matrix_g(fe.dofs_per_cell,
-                                               fe.dofs_per_cell);
+        FullMatrix<double> local_mass_matrix_f(fe.n_dofs_per_cell(),
+                                               fe.n_dofs_per_cell());
+        FullMatrix<double> local_mass_matrix_g(fe.n_dofs_per_cell(),
+                                               fe.n_dofs_per_cell());
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
+            for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
               {
                 local_mass_matrix_f(i, j) +=
                   (fission_dist_XS * fe_values.shape_value(i, q_point) *
@@ -899,13 +900,13 @@ namespace Step28
         // or the product with the transpose matrix using <code>Tvmult</code>.
         // After doing so, we transfer the result into the global right hand
         // side vector of energy group $g$.
-        Vector<double> g_prime_new_values(fe.dofs_per_cell);
-        Vector<double> g_prime_old_values(fe.dofs_per_cell);
+        Vector<double> g_prime_new_values(fe.n_dofs_per_cell());
+        Vector<double> g_prime_old_values(fe.n_dofs_per_cell());
         cell_g_prime->get_dof_values(g_prime.solution_old, g_prime_old_values);
         cell_g_prime->get_dof_values(g_prime.solution, g_prime_new_values);
 
-        Vector<double> cell_rhs(fe.dofs_per_cell);
-        Vector<double> tmp(fe.dofs_per_cell);
+        Vector<double> cell_rhs(fe.n_dofs_per_cell());
+        Vector<double> tmp(fe.n_dofs_per_cell());
 
         if (cell_g->level() > cell_g_prime->level())
           {
@@ -925,10 +926,10 @@ namespace Step28
           }
 
         std::vector<types::global_dof_index> local_dof_indices(
-          fe.dofs_per_cell);
+          fe.n_dofs_per_cell());
         cell_g->get_dof_indices(local_dof_indices);
 
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
       }
 
@@ -944,7 +945,8 @@ namespace Step28
            child < GeometryInfo<dim>::max_children_per_cell;
            ++child)
         {
-          FullMatrix<double> new_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
+          FullMatrix<double> new_matrix(fe.n_dofs_per_cell(),
+                                        fe.n_dofs_per_cell());
           fe.get_prolongation_matrix(child).mmult(new_matrix,
                                                   prolongation_matrix);
 
@@ -1078,7 +1080,7 @@ namespace Step28
 
     triangulation.execute_coarsening_and_refinement();
     dof_handler.distribute_dofs(fe);
-    this->setup_linear_system();
+    setup_linear_system();
 
     solution.reinit(dof_handler.n_dofs());
     soltrans.interpolate(solution_old, solution);
@@ -1129,7 +1131,7 @@ namespace Step28
   // in many of the other tutorial programs in that it has a public
   // <code>run</code> function and private functions doing all the rest. In
   // several places, we have to do something for all energy groups, in which
-  // case we will start threads for each group to let these things run in
+  // case we will start tasks for each group to let these things run in
   // parallel if deal.II was configured for multithreading.  For strategies of
   // parallelization, take a look at the @ref threads module.
   //
@@ -1460,7 +1462,7 @@ namespace Step28
     // of energy group objects and let them initialize their individual meshes
     // with the coarse mesh generated above:
     for (unsigned int group = 0; group < parameters.n_groups; ++group)
-      energy_groups.emplace_back(std_cxx14::make_unique<EnergyGroup<dim>>(
+      energy_groups.emplace_back(std::make_unique<EnergyGroup<dim>>(
         group, material_data, coarse_grid, fe));
     convergence_table_stream.open("convergence_table");
     convergence_table_stream.precision(12);
@@ -1477,31 +1479,36 @@ namespace Step28
   // since each of these sums can be computed independently, we actually do
   // this in parallel. One of the problems is that the function in the
   // <code>EnergyGroup</code> class that computes the fission source returns a
-  // value. If we now simply spin off a new thread, we have to later capture
-  // the return value of the function run on that thread. The way this can be
-  // done is to use the return value of the Threads::new_thread function,
-  // which returns an object of type Threads::Thread@<double@> if the function
-  // spawned returns a double. We can then later ask this object for the
-  // returned value (when doing so, the Threads::Thread::return_value function
-  // first waits for the thread to finish if it hasn't done so already).
+  // value. We would like to add these values together in the loop itself:
+  // ideally, each task would compute its value and then immediately add it to
+  // the total. Concurrently summing values in this way requires two features:
+  // <ol>
+  //   <li>We need a way of storing a value such that multiple threads can
+  //   read and write into concurrently in a way that prevents data races
+  //   (i.e., thread-safe reading and writing).</li>
+  //   <li>We need a way to increment such a value that is also
+  //   thread-safe.</li>
+  // </ol>
   //
-  // The way this function then works is to first spawn one thread for each
-  // energy group we work with, then one-by-one collecting the returned values
-  // of each thread and return the sum.
+  // The first feature is available through the template class
+  // <code>std::atomic</code>. However, the second feature, implemented by
+  // <code>std::atomic<double>::fetch_add()</code>, is only available in C++20
+  // and later: since deal.II supports older versions of the C++ language
+  // standard we cannot use this feature yet. Hence, instead, we simply write
+  // each group's value out to an entry in a vector and sum the values at the
+  // end of the function.
   template <int dim>
   double NeutronDiffusionProblem<dim>::get_total_fission_source() const
   {
-    std::vector<Threads::Thread<double>> threads;
+    std::vector<double>  fission_sources(parameters.n_groups);
+    Threads::TaskGroup<> tasks;
     for (unsigned int group = 0; group < parameters.n_groups; ++group)
-      threads.push_back(
-        Threads::new_thread(&EnergyGroup<dim>::get_fission_source,
-                            *energy_groups[group]));
+      tasks += Threads::new_task<>([&, group]() {
+        fission_sources[group] = energy_groups[group]->get_fission_source();
+      });
+    tasks.join_all();
 
-    double fission_source = 0;
-    for (unsigned int group = 0; group < parameters.n_groups; ++group)
-      fission_source += threads[group].return_value();
-
-    return fission_source;
+    return std::accumulate(fission_sources.begin(), fission_sources.end(), 0.0);
   }
 
 
@@ -1525,27 +1532,28 @@ namespace Step28
     BlockVector<float> group_error_indicators(n_cells);
 
     {
-      Threads::ThreadGroup<void> threads;
+      Threads::TaskGroup<> tasks;
       for (unsigned int group = 0; group < parameters.n_groups; ++group)
-        threads += Threads::new_thread(&EnergyGroup<dim>::estimate_errors,
-                                       *energy_groups[group],
-                                       group_error_indicators.block(group));
-      threads.join_all();
+        tasks += Threads::new_task([&, group]() {
+          energy_groups[group]->estimate_errors(
+            group_error_indicators.block(group));
+        });
     }
+    // The destructor of Threads::TaskGroup joins all threads so we know that
+    // the computation is done by the time we exit the scope.
 
     const float max_error         = group_error_indicators.linfty_norm();
     const float refine_threshold  = 0.3 * max_error;
     const float coarsen_threshold = 0.01 * max_error;
 
     {
-      Threads::ThreadGroup<void> threads;
+      Threads::TaskGroup<void> tasks;
       for (unsigned int group = 0; group < parameters.n_groups; ++group)
-        threads += Threads::new_thread(&EnergyGroup<dim>::refine_grid,
-                                       *energy_groups[group],
-                                       group_error_indicators.block(group),
-                                       refine_threshold,
-                                       coarsen_threshold);
-      threads.join_all();
+        tasks += Threads::new_task([&, group]() {
+          energy_groups[group]->refine_grid(group_error_indicators.block(group),
+                                            refine_threshold,
+                                            coarsen_threshold);
+        });
     }
   }
 
@@ -1580,9 +1588,9 @@ namespace Step28
       {
         // We will measure the CPU time that each cycle takes below. The
         // constructor for Timer calls Timer::start(), so once we create a
-        // timer we can query it for information. Since we use a thread pool
-        // to assemble the system matrices, the CPU time we measure (if we run
-        // with more than one thread) will be larger than the wall time.
+        // timer we can query it for information. Since many parts of this
+        // loop are parallelized with tasks, the CPU time we measure (if we
+        // run with more than one thread) will be larger than the wall time.
         Timer timer;
 
         std::cout << "Cycle " << cycle << ':' << std::endl;
@@ -1611,13 +1619,11 @@ namespace Step28
           std::cout << energy_groups[group]->n_dofs() << ' ';
         std::cout << std::endl << std::endl;
 
-
-        Threads::ThreadGroup<void> threads;
+        Threads::TaskGroup<> tasks;
         for (unsigned int group = 0; group < parameters.n_groups; ++group)
-          threads +=
-            Threads::new_thread(&EnergyGroup<dim>::assemble_system_matrix,
-                                *energy_groups[group]);
-        threads.join_all();
+          tasks += Threads::new_task(
+            [&, group]() { energy_groups[group]->assemble_system_matrix(); });
+        tasks.join_all();
 
         double       error;
         unsigned int iteration = 1;
@@ -1657,9 +1663,9 @@ namespace Step28
             ++iteration;
           }
         while ((error > parameters.convergence_tolerance) && (iteration < 500));
-        convergence_table_stream << cycle << " " << energy_groups[0]->n_dofs()
-                                 << " " << energy_groups[1]->n_dofs() << " "
-                                 << k_eff << " "
+        convergence_table_stream << cycle << ' ' << energy_groups[0]->n_dofs()
+                                 << ' ' << energy_groups[1]->n_dofs() << ' '
+                                 << k_eff << ' '
                                  << energy_groups[0]->solution.linfty_norm() /
                                       energy_groups[1]->solution.linfty_norm()
                                  << '\n';

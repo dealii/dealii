@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,7 @@
 
 #include <deal.II/distributed/tria.h>
 
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -48,13 +48,13 @@ test()
   GridGenerator::torus(
     tria_open, R, r, n_cells_toroidal / factor, angle / (double)factor);
 
-  MappingQGeneric<3> const mapping(3);
-  QGauss<3> const          gauss(4);
+  MappingQ<3> const mapping(3);
+  QGauss<3> const   gauss(4);
 
   double const ar_full_torus =
-    GridTools::compute_maximum_aspect_ratio(tria, mapping, gauss);
+    GridTools::compute_maximum_aspect_ratio(mapping, tria, gauss);
   double const ar_open_torus =
-    GridTools::compute_maximum_aspect_ratio(tria_open, mapping, gauss);
+    GridTools::compute_maximum_aspect_ratio(mapping, tria_open, gauss);
 
   deallog << "N_active_cells_full = " << tria.n_global_active_cells()
           << std::endl;

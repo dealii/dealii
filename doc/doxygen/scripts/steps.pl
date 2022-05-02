@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2006 - 2015 by the deal.II authors
+## Copyright (C) 2006 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -202,11 +202,18 @@ foreach $step (@ARGV)
             # kind, use the same color as the nodes as this makes
             # reading the flow of the graph a bit easier. Furthermore,
             # set the edge weight to 5 (instead of the default of 1)
-            # to try and keep programs of the same kind together. The
-            # exception is the "basic" tutorial programs: these are
-            # going to be connected by edges of weight 100, ensuring
-            # that they are all essentially aligned vertically.
-            if ($kind_map{$source} eq $kind_map{$destination})
+            # to try and keep programs of the same kind together.
+            #
+            # There are two exceptions:
+            # * The "basic" tutorial programs: these are
+            #   going to be connected by edges of weight 100, ensuring
+            #   that they are all essentially aligned vertically.
+            # * Code gallery programs: Here, we don't care much where
+            #   they are placed, and so don't treat edges between these kinds
+            #   of programs as special
+            if ($kind_map{$source} eq $kind_map{$destination}
+                &&
+                ! ($kind_map{$source} eq "code-gallery"))
             {
                 $edge_attributes = "color=\"$colors{$kind_map{$source}}\",";
                 if ($kind_map{$source} eq "basic")
@@ -220,9 +227,9 @@ foreach $step (@ARGV)
             }
 
             # If the destination is a code gallery program, used a dashed line
-            if ($destination =~ /code_gallery/)
+            if ($kind_map{$destination} eq "code-gallery")
             {
-                $edge_attributes .= "style=\"dashed\", arrowhead=\"empty\",";
+                $edge_attributes .= "style=\"dashed\", arrowhead=\"empty\", color=\"gray\",";
             }
             print " [$edge_attributes];\n";
         }

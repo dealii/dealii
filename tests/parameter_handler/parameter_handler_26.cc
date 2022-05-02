@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +20,7 @@
 #include "../tests.h"
 
 void
-success()
+success(const std::string &filename)
 {
   unsigned int dim       = 2;
   std::string  precision = "double";
@@ -42,8 +42,6 @@ success()
 
   try
     {
-      std::string source   = SOURCE_DIR;
-      std::string filename = source + "/prm/parameter_handler_26_success.json";
       prm.parse_input(filename, "", true, true);
     }
   catch (std::exception &exc)
@@ -55,7 +53,7 @@ success()
 }
 
 void
-fail()
+fail(const std::string &filename)
 {
   unsigned int dim       = 2;
   std::string  precision = "double";
@@ -74,8 +72,6 @@ fail()
 
   try
     {
-      std::string source   = SOURCE_DIR;
-      std::string filename = source + "/prm/parameter_handler_26_fail.json";
       prm.parse_input(filename, "", true, true);
     }
   catch (std::exception &exc)
@@ -91,10 +87,13 @@ main()
   initlog();
   deallog.get_file_stream().precision(3);
 
+  const std::string source = SOURCE_DIR;
   try
     {
-      success();
-      fail();
+      success(source + "/prm/parameter_handler_26_success.json");
+      fail(source + "/prm/parameter_handler_26_fail.json");
+      success(source + "/prm/parameter_handler_26_success.prm");
+      fail(source + "/prm/parameter_handler_26_fail.prm");
     }
   catch (std::exception &exc)
     {

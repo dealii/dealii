@@ -1,5 +1,5 @@
 <i>This program was contributed by Timo Heister. Parts of the results section
-were contributed by Yuhan Zhou, Wolfgang Bangerth, and David Wells.</i>
+were contributed by Yuhan Zhou, Wolfgang Bangerth, David Wells, and Sean Ingimarson.</i>
 
 <a name="Intro"></a>
 <h1> Introduction </h1>
@@ -76,19 +76,33 @@ Meshes can be generated from different tools like <a
 href="http://gmsh.info" target="_top">gmsh</a>, <a
 href="https://lagrit.lanl.gov/" target="_top">lagrit</a> and <a
 href="http://cubit.sandia.gov/" target="_top">cubit</a>. See the
-documentation of GridIn for more information. The problem is that deal.II
-needs meshes that only consist of quadrilaterals and hexahedra -- tetrahedral
-meshes won't work (this means tools like tetgen can not be used directly).
+documentation of GridIn for more information.
 
-We will describe a possible workflow using %Gmsh. %Gmsh is the smallest and
+One of the issues you will
+encounter is that deal.II, at least until version 9.2, can only deal with
+meshes that only consist of quadrilaterals and hexahedra -- tetrahedral
+meshes were not supported and will likely not be supported with all
+of the features deal.II offers for quadrilateral and hexahedral
+meshes for several versions following the 9.3 release that introduced
+support for simplicial and mixed meshes first. As a consequence, let
+us not show how to work with the tetgen mesh generator that is widely used
+but can only generate tetrahedral meshes, but instead illustrate how one
+can work with %Gmsh instead.
+
+%Gmsh is the smallest and
 most quickly set up open source tool we are aware of. It can generate
 unstructured 2d quad meshes. In 3d, it can extrude 2d meshes to
 get hexahedral meshes; 3D meshing of unstructured geometry into hexahedra is
 possible, though there are some issues with the quality of these meshes
 that imply that these meshes only sometimes work in deal.II.
 
-In %Gmsh, a mesh is fundamentally described in a text-based
-<code>.geo</code> file whose format can
+%Gmsh has a graphical user interface, but what it does is in essence
+only to generate a text file that then drives the actual mesh generation.
+The graphical user interface does allow querying information about the
+geometry and mesh, however, and so is useful. But it is useful to
+understand the text format regardless because it allows automating the
+mesh generation workflow. These text files, with a
+<code>.geo</code> suffix, can
 contain computations, loops, variables, etc. This format is quite flexible
 in allowing the description of complex geometries. The mesh is then
 generated from a surface representation, which is built from a list of line
@@ -99,41 +113,278 @@ many cases it is best to combine both approaches. The file can be easily
 reloaded by pressing "reload" under the "Geometry" tab if you want to write
 it by hand and see the effects in the graphical user interface of gmsh.
 
+
+
 This tutorial contains an example <code>.geo</code> file that describes a box
-with two objects cut out in the interior. This is how
-<code>example.geo</code> looks like in %Gmsh (displaying the boundary
-indicators as well as the mesh discussed further down below):
+with two circles cut out in the interior and several slits on the sides. For the
+<code>example.geo</code> file that you can find in the `examples/step-49`
+directory, %Gmsh will show the following view (displaying the boundary
+indicators as well as the mesh are discussed further down below):
 
-<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture2.png" alt="">
 
-You might want to open the <code>example.geo</code> file in a text editor (it
-is located in the same directory as the <tt>step-49.cc</tt> source file) to
-see how it is structured. You can see how the boundary of the domain is
-composed of a number of lines and how later on we combine several lines into
-"physical lines" (or "physical surfaces") that list the logical lines'
-numbers. "Physical" object are the ones that carry information about the
-boundary indicator (see @ref GlossBoundaryIndicator "this glossary entry").
+We will go through the basics of %Gmsh and show how we can obtain a mesh like this.
 
-@note It is important that this file contain "physical lines" and "physical
-  surfaces". These give the boundary indicators and material ids for use
-  in deal.II. Without these physical entities, nothing will be imported into
-  deal.II.
+It's also worth mentioning this video (which can be found here https://www.youtube.com/watch?v=xL2LmDsDLYw&t=921s)
+which does a good job of explaining how to use gmsh to create basic shapes and meshes.
+Let us first go through the documented <code>example.geo</code> file that describes the geometry.
 
-deal.II's GridIn class can read the <code>.msh</code> format written by
-%Gmsh and that contains a mesh created for the geometry described by the
-<code>.geo</code> file. You generate the <code>.msh</code> from the
-<code>.geo</code> by running the commands
+We will now go through the main parts of <code>example.geo</code> file that defines the mesh.
+
+<h5>Point declaration</h5>
+
+In this section we create the points that make up the domain.
+
+The points can either be typed in the `.geo` file manually or
+found via <code>Geometry -> Elementary Entities -> Add ->
+%Point</code> where you simply enter the coordinates in the prompt or use the mouse
+to place them. The latter approach yields a list of the following kind:
+
+@code
+Point(1) = {-3.5, -3.36, 0, 1.0};
+Point(2) = {3.5, -3.36, 0, 1.0};
+Point(3) = {3.5, 3.36, 0, 1.0};
+Point(4) = {-3.5, 3.36, 0, 1.0};
+Point(5) = {-3.5, 0.2, 0, 1.0};
+Point(6) = {-0.98 - b, 0.2, 0, 1.0};
+...
+@endcode
+
+It is relevant to note that all points in %Gmsh are three-dimensional objects.
+Since we here want to generate a two-dimensional mesh, the points simply have
+a zero $z$ coordinate. The fourth number in the curly braces for each
+point (equal to 1.0 for all of the points above) indicates the desired mesh
+size in the vicinity of this point. %Gmsh's graphical user interfaces writes
+this into the `.geo` file automatically, but it can be omitted and one
+would probably do that if one were to write this file by hand.
+
+The file contains many more points than just these six. If you look into
+the file, you will also realize that one does not have to enumerate points
+consecutively: One can number them in whichever way one wants, which
+is often useful when constructing complex geometries. In such cases, one
+might for example want to number all points for one particular part of the
+geometry starting at zero, and the points for another part at, say, 1000.
+It does not matter whether all numbers between zero and 1000 are used.
+
+
+<h5>Lines on outer domain</h5>
+
+To create lines of the mesh, go to <code>Geometry -> Elementary
+entities -> Add -> Line</code>.  You do not get a prompt to enter in
+specific coordinates, rather you simply click a starting point and
+ending point for each line.
+
+The generated code in the geo file then looks like this:
+
+@code
+Line(4) = {4, 5};
+Line(5) = {5, 6};
+Line(6) = {6, 7};
+Line(7) = {7, 8};
+Line(8) = {8, 9};
+...
+@endcode
+
+What appears on the right are pairs of point indices that define a line.
+As before, the indices of the lines (here 4 to 8) need not be consecutive.
+
+
+<h5>Creating holes in domain</h5>
+
+Here are the points and lines that create the two holes in the domain.
+We start by defining the relevant points for bottom left hole:
+
+@code
+Point(31) = {-2.1, -1.54, 0, 1.0}; // origin
+Point(32) = {-2.1, -0.84, 0, 1.0}; // top point
+Point(33) = {-2.1, -2.24, 0, 1.0}; // bottom point
+Point(103) = {-1.4, -1.54, 0, 1.0}; // right point
+Point(104) = {-2.8, -1.54, 0, 1.0}; // left point
+@endcode
+
+Then we use the <code>Circle arc</code> entity, which is found in the same category as
+<code>%Point</code> and <code>Lines</code>.  The file reads "Circle"
+but the difference to note is that this function uses three points to
+make an arc of a circle, namely the starting point, center, and ending point. The
+angle of an arc is required to be less than 180 degrees. We therefore split the circle
+into four arcs, which also allows us to set different boundary IDs.
+This then looks as follows
+where point 31 is the common center for all arcs:
+
+@code
+Circle(48) = {103, 31, 32};
+Circle(49) = {32, 31, 104};
+Circle(50) = {104, 31, 33};
+Circle(51) = {33, 31, 103};
+@endcode
+
+We follow the same procedure for the second circle.
+
+
+<h5>Plane surfaces</h5>
+
+This section describes the "Plane Surfaces", i.e., the 2D surfaces for meshing.
+This can be found in <code>Elementary entities</code> as <code>Plane Surface</code>.
+The purpose of this entity is to specify the domain in 2D.  Because we have our
+mesh split into 4 sections, we must have 4 plane surfaces.
+
+To make a plane surface, simply click <code>Plane surface</code> and click on all
+the relevant borders for the mesh.  This includes holes or other objects contained
+in the mesh.  Again, since we have 4 different meshes, we will do this 4 times.
+
+The code below is for the top right mesh.  Notice we have 2 instances of
+<code>Curve Loop</code>, which are constructed from lists of the
+line segments we have previously built from pairs of two points.
+The first of the curve loops is the outer boundary of the part of the domain
+we are describing, whereas the second one is for the hole.
+This can easily be traced back by following along with the numbers in the braces.
+
+@code
+Curve Loop(1) = {40, -43, 10, 57, 59, 60, 58};
+Curve Loop(2) = {12, 13, 14, 15};
+Plane Surface(1) = {1, 2};
+@endcode
+
+In the description of the first curve loop above, the second line segment (segment
+43) is described with a negative sign. This is because we have not paid enough
+attention when creating the line segment and have specified its two vertices in the
+wrong order:
+@code
+Line(14) = {7, 14};
+...
+Line(40) = {3, 36};
+...
+Line(43) = {7, 36};
+@endcode
+The negative sign then ensures that it is considered in the correct
+orientation, with an order for vertices of `3 -> 36 -> 7 -> 14`.
+
+The other four surfaces are declared in a similar way.
+
+Next we define the physical surface itself.  This line is what makes our mesh 2D.
+The values in the braces on the right hand side are the tags for the `Plane Surface`s
+we declared above.  The number in the parentheses of physical surfaces will become the
+material ID of the mesh as well.  For more information about material IDs, check the
+glossary entry
+@ref GlossMaterialId "material indicators" .
+
+@code
+Physical Surface(2) = {1, 2, 3, 4};
+@endcode
+
+
+<h5>Physical IDs</h5>
+
+The steps above would be enough to define a two dimensional geometry that can be meshed.
+In practice, however, one often needs to attach additional information to parts of
+the geometry. The prototypical example are
+@ref GlossBoundaryIndicator "boundary indicators"
+and
+@ref GlossMaterialId "material indicators" .
+
+To do this, we need to tell %Gmsh about all of the "physical entities" and assign
+them with indices. For example, the physical surface above has been assigned
+index 2, and so this index "2" will be output as a tag for the cells that make
+up the surface (i.e., *all* cells of this mesh) and deal.II will then interpret
+tags on cells as material ids.
+
+@code
+Physical Curve(0) = {38, 39, 52:57, 59, 60, 58, 40, 41, 4:9};
+@endcode
+The indices in the list on the right correspond to line segments, with a
+colon "`:`" denoting a range.
+
+
+We then assign boundary ID of 1 to the top right circle, where the index 12
+corresponds to the circle (a different kind of line segment):
+@code
+Physical Curve(1) = {12};
+@endcode
+
+Finally, we assign boundary IDs of 2 and 3 to the top and bottom half of the bottom left
+hole, respectively.  We can see here that we needed to pick two boundaries
+to make both of the physical curves.  Recall this circle is comprised of
+four circle arcs, so Physical Curve(2) is the top left and top right quarter
+of the circle, and Physical Curve(3) is the bottom left and bottom right quarter
+of the circle.
+
+@code
+Physical Curve(2) = {48, 49};
+Physical Curve(3) = {50, 51};
+@endcode
+
+
+@note It is important that the `.geo` file contains some "physical lines" and "physical
+  surfaces", not just for the purposes of material and boundary ids: Without
+  physical lines and surfaces (and volumes in 3d), there is only a collection of
+  geometric objects, but no "domain" that %Gmsh can actually define a mesh on.
+
+
+
+<h5>Meshing Parameters</h5>
+
+Finally, the `.geo` file contains meshing parameters that can all be adjusted in the GMSH GUI.  We include
+these parameters at the bottom of our `.geo` file to keep the changes when creating our
+mesh (with suffix <code>.msh</code>) file.
+
+@code
+Mesh.Algorithm = 3;
+Mesh.RecombineAll = 1;
+Mesh.CharacteristicLengthFactor = .6;
+Mesh.SubdivisionAlgorithm = 1;
+Mesh.Smoothing = 20;
+Show "*";
+@endcode
+
+To view what each of these do, press <code>Tools -> Options -> Mesh</code>.
+
+You may change the algorithm used for meshing in <code>2D algorithm</code>.
+
+<code>CharacteristicLengthFactor</code> can be thought of the distance between
+nodes on the boundaries of the mesh.  This sets the initial size of the nodes
+of the mesh.  If we want a finer mesh we want a smaller characteristic length.
+For this examples purposes we would like to do more refinement in deal.II so
+we pick a relatively coarse mesh.  This can also be adjusted in the Options
+menu.
+
+<code>SubdivisionAlgorithm</code> is set to 1 in our file because we want to
+use "All Quads" for subdivision.  In the options menu the default is "None",
+but we use "All Quads" for the reasons mentioned earlier.
+
+<code>Smoothing</code> is a post-processing step that iteratively improves
+mesh quality (for example by moving inner vertices). The number of steps is
+not crucial in this example. For our example we pick 20, however this value can be adjusted
+accordingly as it's not the most important step in mesh building.
+
+
+
+@note That ends the code for <code>example.geo</code>.  It's important to note that
+  the <code>.geo</code> file did not come out as organized as it appears here.  It
+  was edited after creating the mesh and geometry to be more readable.
+
+Before loading this into deal.II, we need to create the <code>.msh</code>
+file.  If everything was set up correctly, we can press <code>Mesh -> 2D</code>.
+If all this goes well, then we
+should see something similar to the following output:
+
+<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture_2Dmesh.png" alt="">
+
+It behooves us at this point to also make sure our boundaries were declared
+correctly.  So in the Options menu go to <code>Mesh -> Visibility</code>.
+In the dropdown menu labeled "Label type" we may choose a label for our boundaries.
+We wish to check physical IDs, so we would like to have "Physical tag" picked.
+Now we check "1D element labels" and we should see the numbers assigned to the
+specified boundaries.
+
+<img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture_2Dmesh_ids.png" alt="">
+
+Finally, we can choose  <code>Mesh -> Save</code> to save the <code>.msh</code> file, which
+deal.II's GridIn class can read. You can also generate the <code>.msh</code> from the
+<code>.geo</code> file by running the command
 
 @code
 gmsh -2 example.geo
 @endcode
-
-on the command line, or by clicking "Mesh" and then "2D" inside %Gmsh after
-loading the file.  Now this is the mesh read from the <code>.msh</code> file
-and saved again by deal.II as an image (see the <code>grid_1</code> function
-of the current program):
-
-<img src="https://www.dealii.org/images/steps/developer/step-49.grid-1.png" alt="">
 
 @note %Gmsh has a number of other interfaces by which one can describe
   geometries to it. In particular, it has the ability to interface with

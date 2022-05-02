@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,13 +53,13 @@ namespace internal
 
     static const bool requires_distributed_sparsity_pattern = false;
 
-    template <typename SparsityPatternType, typename DoFHandlerType>
+    template <typename SparsityPatternType, int dim, int spacedim>
     static void
     reinit(Matrix &                   matrix,
            Sparsity &                 sparsity,
            int                        level,
            const SparsityPatternType &sp,
-           const DoFHandlerType &)
+           const DoFHandler<dim, spacedim> &)
     {
       sparsity.copy_from(sp);
       (void)level;
@@ -76,21 +76,15 @@ namespace internal
 
     static const bool requires_distributed_sparsity_pattern = false;
 
-    template <typename SparsityPatternType, typename DoFHandlerType>
+    template <typename SparsityPatternType, int dim, int spacedim>
     static void
     reinit(Matrix &matrix,
            Sparsity &,
-           int                        level,
-           const SparsityPatternType &sp,
-           DoFHandlerType &           dh)
+           int                              level,
+           const SparsityPatternType &      sp,
+           const DoFHandler<dim, spacedim> &dh)
     {
-      const dealii::parallel::TriangulationBase<DoFHandlerType::dimension,
-                                                DoFHandlerType::space_dimension>
-        *dist_tria = dynamic_cast<const dealii::parallel::TriangulationBase<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension> *>(&(dh.get_triangulation()));
-      MPI_Comm communicator =
-        dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+      const MPI_Comm communicator = dh.get_communicator();
 
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -108,21 +102,16 @@ namespace internal
 
     static const bool requires_distributed_sparsity_pattern = false;
 
-    template <typename SparsityPatternType, typename DoFHandlerType>
+    template <typename SparsityPatternType, int dim, int spacedim>
     static void
     reinit(Matrix &matrix,
            Sparsity &,
-           int                        level,
-           const SparsityPatternType &sp,
-           DoFHandlerType &           dh)
+           int                              level,
+           const SparsityPatternType &      sp,
+           const DoFHandler<dim, spacedim> &dh)
     {
-      const dealii::parallel::TriangulationBase<DoFHandlerType::dimension,
-                                                DoFHandlerType::space_dimension>
-        *dist_tria = dynamic_cast<const dealii::parallel::TriangulationBase<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension> *>(&(dh.get_triangulation()));
-      MPI_Comm communicator =
-        dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+      const MPI_Comm communicator = dh.get_communicator();
+
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
                     sp,
@@ -141,21 +130,16 @@ namespace internal
 
     static const bool requires_distributed_sparsity_pattern = false;
 
-    template <typename SparsityPatternType, typename DoFHandlerType>
+    template <typename SparsityPatternType, int dim, int spacedim>
     static void
     reinit(Matrix &matrix,
            Sparsity &,
-           int                        level,
-           const SparsityPatternType &sp,
-           DoFHandlerType &           dh)
+           int                              level,
+           const SparsityPatternType &      sp,
+           const DoFHandler<dim, spacedim> &dh)
     {
-      const dealii::parallel::TriangulationBase<DoFHandlerType::dimension,
-                                                DoFHandlerType::space_dimension>
-        *dist_tria = dynamic_cast<const dealii::parallel::TriangulationBase<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension> *>(&(dh.get_triangulation()));
-      MPI_Comm communicator =
-        dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+      const MPI_Comm communicator = dh.get_communicator();
+
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
                     sp,
@@ -173,21 +157,16 @@ namespace internal
 
     static const bool requires_distributed_sparsity_pattern = false;
 
-    template <typename SparsityPatternType, typename DoFHandlerType>
+    template <typename SparsityPatternType, int dim, int spacedim>
     static void
     reinit(Matrix &matrix,
            Sparsity &,
-           int                        level,
-           const SparsityPatternType &sp,
-           DoFHandlerType &           dh)
+           int                              level,
+           const SparsityPatternType &      sp,
+           const DoFHandler<dim, spacedim> &dh)
     {
-      const dealii::parallel::TriangulationBase<DoFHandlerType::dimension,
-                                                DoFHandlerType::space_dimension>
-        *dist_tria = dynamic_cast<const dealii::parallel::TriangulationBase<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension> *>(&(dh.get_triangulation()));
-      MPI_Comm communicator =
-        dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+      const MPI_Comm communicator = dh.get_communicator();
+
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
                     sp,
@@ -207,13 +186,13 @@ namespace internal
 
     static const bool requires_distributed_sparsity_pattern = false;
 
-    template <typename SparsityPatternType, typename DoFHandlerType>
+    template <typename SparsityPatternType, int dim, int spacedim>
     static void
     reinit(Matrix &,
            Sparsity &,
            int,
            const SparsityPatternType &,
-           const DoFHandlerType &)
+           const DoFHandler<dim, spacedim> &)
     {
       AssertThrow(
         false,
@@ -234,21 +213,16 @@ namespace internal
 
     static const bool requires_distributed_sparsity_pattern = true;
 
-    template <typename SparsityPatternType, typename DoFHandlerType>
+    template <typename SparsityPatternType, int dim, int spacedim>
     static void
     reinit(Matrix &matrix,
            Sparsity &,
-           int                        level,
-           const SparsityPatternType &sp,
-           const DoFHandlerType &     dh)
+           int                              level,
+           const SparsityPatternType &      sp,
+           const DoFHandler<dim, spacedim> &dh)
     {
-      const dealii::parallel::TriangulationBase<DoFHandlerType::dimension,
-                                                DoFHandlerType::space_dimension>
-        *dist_tria = dynamic_cast<const dealii::parallel::TriangulationBase<
-          DoFHandlerType::dimension,
-          DoFHandlerType::space_dimension> *>(&(dh.get_triangulation()));
-      MPI_Comm communicator =
-        dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+      const MPI_Comm communicator = dh.get_communicator();
+
       // Reinit PETSc matrix
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -271,9 +245,6 @@ namespace internal
 /**
  * Implementation of transfer between the global vectors and the multigrid
  * levels for use in the derived class MGTransferPrebuilt and other classes.
- *
- * @author Wolfgang Bangerth, Guido Kanschat, Timo Heister, Martin Kronbichler
- * @date 1999, 2000, 2001, 2002, 2003, 2004, 2012, 2015
  */
 template <typename VectorType>
 class MGLevelGlobalTransfer : public MGTransferBase<VectorType>
@@ -436,9 +407,6 @@ private:
  * LinearAlgebra::distributed::Vector that requires a few different calling
  * routines as compared to the %parallel vectors in the PETScWrappers and
  * TrilinosWrappers namespaces.
- *
- * @author Martin Kronbichler
- * @date 2016
  */
 template <typename Number>
 class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>
@@ -643,6 +611,13 @@ protected:
   mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
     solution_ghosted_level_vector;
 
+  /**
+   * Function to initialize internal level vectors.
+   */
+  std::function<void(const unsigned int,
+                     LinearAlgebra::distributed::Vector<Number> &)>
+    initialize_dof_vector;
+
 private:
   /**
    * This function is called to make sure that build() has been invoked.
@@ -663,9 +638,6 @@ private:
  *
  * See MGTransferBase to find out which of the transfer classes is best for
  * your needs.
- *
- * @author Wolfgang Bangerth, Guido Kanschat, Timo Heister, Martin Kronbichler
- * @date 1999, 2000, 2001, 2002, 2003, 2004, 2012, 2015
  */
 template <typename VectorType>
 class MGTransferPrebuilt : public MGLevelGlobalTransfer<VectorType>
@@ -707,15 +679,6 @@ public:
   template <int dim, int spacedim>
   void
   build(const DoFHandler<dim, spacedim> &dof_handler);
-
-  /**
-   * Actually build the prolongation matrices for each level.
-   *
-   * @deprecated use build() instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  build_matrices(const DoFHandler<dim, spacedim> &dof_handler);
 
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level

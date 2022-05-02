@@ -1,0 +1,6 @@
+Updated: The header inclusions of several files in the `deal.II/matrix_free`
+subfolder have been cleaned up to make the library more maintainable. As a
+result, some headers are no longer implicitly included and a user code might
+need to add the respective include file.
+<br>
+(Martin Kronbichler, 2021/11/30)

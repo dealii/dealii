@@ -1,0 +1,19 @@
+
+DEAL:0::Cycle 1 / 1:
+DEAL:0::n_global_active_cells: 8000 n_global_levels: 2 ghost_owners.size: 1 level_ghost_owners.size: 1
+DEAL:0::checkpointing...
+DEAL:0::resume...
+DEAL:0::vec 0: 0.00000
+DEAL:0::vec 1: 1.00000
+DEAL:0::vec y: 2.00000
+DEAL:0::
+
+DEAL:1::Cycle 1 / 1:
+DEAL:1::n_global_active_cells: 8000 n_global_levels: 2 ghost_owners.size: 1 level_ghost_owners.size: 1
+DEAL:1::checkpointing...
+DEAL:1::resume...
+DEAL:1::vec 0: 0.00000
+DEAL:1::vec 1: 1.00000
+DEAL:1::vec y: 2.00000
+DEAL:1::
+

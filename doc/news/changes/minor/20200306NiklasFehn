@@ -1,7 +1,0 @@
-New: LinearAlgebra::set_zero_mean_value()
-Add free function that allows to shift a vector by a constant value in a
-way that its mean value becomes zero. This function only makes use of the
-pure virtual functions add() and mean_value() of the abstract class
-VectorSpaceVector.
-<br>
-(Niklas Fehn, 2020/03/06)

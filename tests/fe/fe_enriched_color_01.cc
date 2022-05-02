@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,16 +64,15 @@ test()
   deallog << "dim = " << dim << std::endl;
 
   // Construct grid
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler(triangulation);
   GridGenerator::hyper_cube(triangulation, -20, 20);
   triangulation.refine_global(4);
 
   // Construct vector of predicates for 2 and 3 dimensions
   Assert(dim == 2 || dim == 3, ExcDimensionMismatch2(dim, 2, 3));
-  typedef std::function<bool(
-    const typename Triangulation<dim>::active_cell_iterator &)>
-                                  predicate_function;
+  using predicate_function = std::function<bool(
+    const typename Triangulation<dim>::active_cell_iterator &)>;
   std::vector<predicate_function> predicates;
   predicates.resize(5);
   if (dim == 2)
@@ -99,7 +98,7 @@ test()
   for (int i = 0; i < 5; ++i)
     for (int j = 0; j < 5; ++j)
       {
-        deallog << i << ":" << j << "="
+        deallog << i << ':' << j << '='
                 << ColorEnriched::internal::find_connection_between_subdomains(
                      dof_handler, predicates[i], predicates[j])
                 << std::endl;

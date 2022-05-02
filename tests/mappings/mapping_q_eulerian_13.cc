@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,7 +61,7 @@ test()
       const auto p1 = cell->bounding_box().get_boundary_points();
       const auto p2 = euler.get_bounding_box(cell).get_boundary_points();
       deallog << "BBox: [" << p1.first << ", " << p1.second
-              << "], with mapping [" << p2.first << ", " << p2.second << "]"
+              << "], with mapping [" << p2.first << ", " << p2.second << ']'
               << std::endl;
     }
 }
@@ -71,7 +71,7 @@ test()
 int
 main()
 {
-  initlog(1);
+  initlog(true);
 
   test<1>();
   test<2>();

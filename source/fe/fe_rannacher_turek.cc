@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,13 +15,13 @@
 
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_rannacher_turek.h>
 
 #include <deal.II/lac/vector.h>
 
 #include <algorithm>
+#include <memory>
 #include <sstream>
 
 
@@ -32,14 +32,13 @@ template <int dim>
 FE_RannacherTurek<dim>::FE_RannacherTurek(
   const unsigned int order,
   const unsigned int n_face_support_points)
-  : FE_Poly<PolynomialsRannacherTurek<dim>, dim>(
-      PolynomialsRannacherTurek<dim>(),
-      FiniteElementData<dim>(this->get_dpo_vector(),
-                             1,
-                             2,
-                             FiniteElementData<dim>::L2),
-      std::vector<bool>(4, false), // restriction not implemented
-      std::vector<ComponentMask>(4, std::vector<bool>(1, true)))
+  : FE_Poly<dim>(PolynomialsRannacherTurek<dim>(),
+                 FiniteElementData<dim>(this->get_dpo_vector(),
+                                        1,
+                                        2,
+                                        FiniteElementData<dim>::L2),
+                 std::vector<bool>(4, false), // restriction not implemented
+                 std::vector<ComponentMask>(4, std::vector<bool>(1, true)))
   , order(order)
   , n_face_support_points(n_face_support_points)
 {
@@ -79,8 +78,8 @@ template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_RannacherTurek<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_RannacherTurek<dim>>(
-    this->order, this->n_face_support_points);
+  return std::make_unique<FE_RannacherTurek<dim>>(this->order,
+                                                  this->n_face_support_points);
 }
 
 
@@ -116,7 +115,7 @@ FE_RannacherTurek<dim>::convert_generalized_support_point_values_to_dof_values(
 {
   AssertDimension(support_point_values.size(),
                   this->generalized_support_points.size());
-  AssertDimension(nodal_values.size(), this->dofs_per_cell);
+  AssertDimension(nodal_values.size(), this->n_dofs_per_cell());
 
   const unsigned int q_points_per_face = this->weights.size();
   std::fill(nodal_values.begin(), nodal_values.end(), 0.0);

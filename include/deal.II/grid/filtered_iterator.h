@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2019 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,10 +21,10 @@
 
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/iterator_range.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/grid/tria_iterator_base.h>
 
+#  include <memory>
 #  include <set>
 #  include <tuple>
 
@@ -45,7 +45,6 @@ DEAL_II_NAMESPACE_OPEN
  * the general description of the FilteredIterator class.
  *
  * @ingroup Iterators
- * @author Wolfgang Bangerth, 2002
  */
 namespace IteratorFilters
 {
@@ -225,7 +224,6 @@ namespace IteratorFilters
    * pointed to is equal to a value or set of values given to the constructor,
    * assuming that the iterator allows querying for a material id.
    *
-   * @author Jean-Paul Pelteret, Denis Davydov, 2015
    *
    * @ingroup Iterators
    */
@@ -272,7 +270,6 @@ namespace IteratorFilters
    * pointed to is equal to a value or set of values given to the constructor,
    * assuming that the iterator allows querying for an active FE index.
    *
-   * @author Jean-Paul Pelteret, Denis Davydov, 2015
    *
    * @ingroup Iterators
    */
@@ -318,7 +315,6 @@ namespace IteratorFilters
    * Filter for iterators that evaluates to true if the iterator of the object
    * pointed to is on the boundary.
    *
-   * @author Bruno Turcksin, 2016
    *
    * @ingroup Iterators
    */
@@ -332,6 +328,82 @@ namespace IteratorFilters
     bool
     operator()(const Iterator &i) const;
   };
+
+
+  /**
+   * Filter for iterators that evaluates to true if the iterator of the object
+   * pointed to is equal to a value or set of values given to the constructor,
+   * assuming that the iterator allows querying for a boundary id.
+   *
+   * @ingroup Iterators
+   */
+  class BoundaryIdEqualTo
+  {
+  public:
+    /**
+     * Constructor. Store the boundary id which iterators shall have to be
+     * evaluated to true.
+     */
+    BoundaryIdEqualTo(const types::boundary_id boundary_id);
+
+    /**
+     * Constructor. Store a collection of boundary ids which iterators shall
+     * have to be evaluated to true.
+     */
+    BoundaryIdEqualTo(const std::set<types::boundary_id> &boundary_ids);
+
+    /**
+     * Evaluation operator. Returns true if the boundary id of the object
+     * pointed to is equal within the stored set of value allowable values.
+     */
+    template <class Iterator>
+    bool
+    operator()(const Iterator &i) const;
+
+  protected:
+    /**
+     * Stored value to compare the material id with.
+     */
+    const std::set<types::boundary_id> boundary_ids;
+  };
+
+
+  /**
+   * Filter for iterators that evaluates to true if the iterator of the object
+   * pointed to is equal to a value or set of values given to the constructor,
+   * assuming that the iterator allows querying for a manifold id.
+   *
+   * @ingroup Iterators
+   */
+  class ManifoldIdEqualTo
+  {
+  public:
+    /**
+     * Constructor. Store the boundary id which iterators shall have to be
+     * evaluated to true.
+     */
+    ManifoldIdEqualTo(const types::manifold_id manifold_id);
+
+    /**
+     * Constructor. Store a collection of boundary ids which iterators shall
+     * have to be evaluated to true.
+     */
+    ManifoldIdEqualTo(const std::set<types::manifold_id> &manifold_ids);
+
+    /**
+     * Evaluation operator. Returns true if the boundary id of the object
+     * pointed to is equal within the stored set of value allowable values.
+     */
+    template <class Iterator>
+    bool
+    operator()(const Iterator &i) const;
+
+  protected:
+    /**
+     * Stored value to compare the material id with.
+     */
+    const std::set<types::manifold_id> manifold_ids;
+  };
 } // namespace IteratorFilters
 
 
@@ -340,7 +412,7 @@ namespace IteratorFilters
  * DoFHandler iterators by only iterating over elements that satisfy a given
  * filter (called a <em>predicate</em>, following the notation of the C++
  * standard library). Once initialized with a predicate and a value for the
- * iterator, a filtered iterator hops to the next or previous element that
+ * iterator, a filtered iterator advances to the next or previous element that
  * satisfies the predicate if operators ++ or \-- are invoked. Intermediate
  * iterator values that lie in between but do not satisfy the predicate are
  * skipped. It is thus very simple to write loops over a certain class of
@@ -348,6 +420,33 @@ namespace IteratorFilters
  * to satisfy in each loop iteration. This in particular is helpful if
  * functions are called with a pair of iterators denoting a range on which
  * they shall act, by choosing a filtered iterator instead of usual ones.
+ * The use of this class is particularly useful when writing "ranged-based"
+ * `for` loops of the form
+ * @code
+ *   for (const auto &cell : <some FilteredIterator object>)
+ *     { ... }
+ * @endcode
+ * An example is to write
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (const auto &cell :
+ *          dof_handler.active_cell_iterators()
+ *          | IteratorFilters::LocallyOwnedCell()
+ *          | IteratorFilters::AtBoundary())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ * @endcode
+ * where the resulting loop iterates over all active cells that are also
+ * locally owned and that point to cells that are at the boundary of the
+ * domain.
+ *
+ * This class implements functionality comparable to what was added to C++20
+ * in the form of
+ * [range adaptors](https://en.cppreference.com/w/cpp/ranges/filter_view)
+ * and the filters and filter views that represent them.
  *
  * This class is used in step-32.
  *
@@ -355,7 +454,7 @@ namespace IteratorFilters
  * <h3>Predicates</h3>
  *
  * The object that represent the condition an iterator has to satisfy only
- * have to provide an interface that allows to call the evaluation operator,
+ * has to provide an interface that allows to call the evaluation operator,
  * i.e. <code>bool operator() (const BaseIterator&)</code>. This includes
  * function pointers as well as classes that implement an <code>bool operator
  * ()(const BaseIterator&)</code>. Then, the FilteredIterator will skip all
@@ -385,9 +484,10 @@ namespace IteratorFilters
  *     return (static_cast<unsigned int>(c->level()) == level);
  *   };
  * @endcode
- * then
+ * then the lambda function
  * @code
- *   [](const BIterator& c){ return level_equal_to<active_cell_iterator>(c, 3);}
+ *   [](const BIterator& c) { return level_equal_to<active_cell_iterator>(c,
+ * 3);}
  * @endcode
  * is another valid predicate (here: a function that returns true if either
  * the iterator is past the end or the level is equal to the second argument;
@@ -441,7 +541,7 @@ namespace IteratorFilters
  * <h3>Initialization of filtered iterators</h3>
  *
  * Filtered iterators are given a predicate at construction time which cannot
- * be changed any more. This behaviour would be expected if the predicate
+ * be changed any more. This behavior would be expected if the predicate
  * would have been given as a template parameter to the class, but since that
  * would make the declaration of filtered iterators a nightmare, we rather
  * give the predicate as an unchangeable entity to the constructor. Note that
@@ -523,7 +623,6 @@ namespace IteratorFilters
  *
  * @ingroup grid
  * @ingroup Iterators
- * @author Wolfgang Bangerth, 2002
  */
 template <typename BaseIterator>
 class FilteredIterator : public BaseIterator
@@ -786,7 +885,6 @@ private:
  * explicitly specify the type of the base iterator by hand -- it is deduced
  * automatically here.
  *
- * @author Wolfgang Bangerth
  * @relatesalso FilteredIterator
  */
 template <typename BaseIterator, typename Predicate>
@@ -858,12 +956,29 @@ namespace internal
  *     }
  * @endcode
  *
- * @author Bruno Turcksin, 2016
+ * @note This function is obsolete and should be replaced by calling
+ *   `operator|` instead. The latter is certainly more in the
+ *   spirit of
+ *   [C++20 range
+ * adaptors](https://en.cppreference.com/w/cpp/ranges/filter_view) and results
+ * in the following code instead of the one shown above:
+ *   @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (const auto &cell :
+ *          dof_handler.active_cell_iterators()
+ *          | IteratorFilters::LocallyOwnedCell())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ *   @endcode
+ *
  * @relatesalso FilteredIterator
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate>
-IteratorRange<FilteredIterator<BaseIterator>>
+inline IteratorRange<FilteredIterator<BaseIterator>>
 filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p)
 {
   FilteredIterator<BaseIterator> fi(p, *(i.begin()));
@@ -907,7 +1022,25 @@ filter_iterators(IteratorRange<BaseIterator> i, const Predicate &p)
  *     }
  * @endcode
  *
- * @author Bruno Turcksin, 2016
+ * @note This function is obsolete and should be replaced by calling
+ *   `operator|` once or multiple times instead.
+ *   The latter is certainly more in the spirit of
+ *   [C++20 range
+ * adaptors](https://en.cppreference.com/w/cpp/ranges/filter_view) and results
+ * in the following code instead of the one shown above:
+ *   @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (const auto &cell :
+ *          dof_handler.active_cell_iterators()
+ *          | IteratorFilters::LocallyOwnedCell()
+ *          | IteratorFilters::AtBoundary())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ *   @endcode
+ *
  * @relatesalso FilteredIterator
  * @ingroup CPP11
  */
@@ -923,6 +1056,74 @@ filter_iterators(IteratorRange<BaseIterator> i,
   auto fi = filter_iterators(i, p);
   return filter_iterators(fi, args...);
 }
+
+
+
+/**
+ * Filter the  given range of iterators using a predicate. This allows to
+ * replace:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (const auto &cell : dof_handler.active_cell_iterators())
+ *     {
+ *       if (cell->is_locally_owned())
+ *         {
+ *           fe_values.reinit (cell);
+ *           ...do the local integration on 'cell'...;
+ *         }
+ *     }
+ * @endcode
+ * by:
+ * @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   const auto filtered_iterators_range =
+ *     filter_iterators();
+ *   for (const auto &cell :
+ *           dof_handler.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ * @endcode
+ * Here, the `operator|` is to be interpreted in the same way as is done in
+ * the [range adaptors](https://en.cppreference.com/w/cpp/ranges) feature
+ * that is part of [C++20](https://en.wikipedia.org/wiki/C%2B%2B20). It has
+ * the same meaning as the `|` symbol on the command line: It takes what is
+ * on its left as its inputs, and filters and transforms to produce some
+ * output. In the example above, it "filters" all of the active cell iterators
+ * and removes those that do not satisfy the predicate -- that is, it produces
+ * a range of iterators that only contains those cells that are both active
+ * and locally owned.
+ *
+ * @note The `|` operator can be applied more than once. This results in code
+ *   such as the following:
+ *   @code
+ *   DoFHandler<dim> dof_handler;
+ *   ...
+ *   for (const auto &cell :
+ *          dof_handler.active_cell_iterators()
+ *          | IteratorFilters::LocallyOwnedCell()
+ *          | IteratorFilters::AtBoundary())
+ *     {
+ *       fe_values.reinit (cell);
+ *       ...do the local integration on 'cell'...;
+ *     }
+ *   @endcode
+ *   In this code, the loop executes over all active cells that are both
+ *   locally owned and located at the boundary.
+ *
+ * @relatesalso FilteredIterator
+ * @ingroup CPP11
+ */
+template <typename BaseIterator, typename Predicate>
+inline IteratorRange<FilteredIterator<BaseIterator>>
+operator|(IteratorRange<BaseIterator> i, const Predicate &p)
+{
+  return filter_iterators(i, p);
+}
+
 
 
 /* ------------------ Inline functions and templates ------------ */
@@ -1139,8 +1340,8 @@ inline FilteredIterator<BaseIterator>::PredicateTemplate<
 template <typename BaseIterator>
 template <typename Predicate>
 bool
-FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::
-operator()(const BaseIterator &bi) const
+FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::operator()(
+  const BaseIterator &bi) const
 {
   return predicate(bi);
 }
@@ -1152,7 +1353,7 @@ template <typename Predicate>
 std::unique_ptr<typename FilteredIterator<BaseIterator>::PredicateBase>
 FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::clone() const
 {
-  return std_cxx14::make_unique<PredicateTemplate>(predicate);
+  return std::make_unique<PredicateTemplate>(predicate);
 }
 
 
@@ -1314,6 +1515,54 @@ namespace IteratorFilters
   AtBoundary::operator()(const Iterator &i) const
   {
     return (i->at_boundary());
+  }
+
+
+
+  // ---------------- IteratorFilters::BoundaryIdEqualTo ---------
+  inline BoundaryIdEqualTo::BoundaryIdEqualTo(
+    const types::boundary_id boundary_id)
+    : boundary_ids{boundary_id}
+  {}
+
+
+
+  inline BoundaryIdEqualTo::BoundaryIdEqualTo(
+    const std::set<types::boundary_id> &boundary_ids)
+    : boundary_ids(boundary_ids)
+  {}
+
+
+
+  template <class Iterator>
+  inline bool
+  BoundaryIdEqualTo::operator()(const Iterator &i) const
+  {
+    return boundary_ids.find(i->boundary_id()) != boundary_ids.end();
+  }
+
+
+
+  // ---------------- IteratorFilters::ManifoldIdEqualTo ---------
+  inline ManifoldIdEqualTo::ManifoldIdEqualTo(
+    const types::manifold_id manifold_id)
+    : manifold_ids{manifold_id}
+  {}
+
+
+
+  inline ManifoldIdEqualTo::ManifoldIdEqualTo(
+    const std::set<types::manifold_id> &manifold_ids)
+    : manifold_ids(manifold_ids)
+  {}
+
+
+
+  template <class Iterator>
+  inline bool
+  ManifoldIdEqualTo::operator()(const Iterator &i) const
+  {
+    return manifold_ids.find(i->manifold_id()) != manifold_ids.end();
   }
 } // namespace IteratorFilters
 

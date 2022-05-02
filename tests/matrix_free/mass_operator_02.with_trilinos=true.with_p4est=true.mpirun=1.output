@@ -1,0 +1,45 @@
+
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Norm of difference: 0.00000
+DEAL:2d::l2_norm: 1008.02
+DEAL:2d::l1_norm: 7088.00
+DEAL:2d::linfty_norm: 144.000
+DEAL:2d::
+DEAL:2d::Norm of difference: 2.84217e-14
+DEAL:2d::l2_norm: 504.352
+DEAL:2d::l1_norm: 3536.64
+DEAL:2d::linfty_norm: 92.1600
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(2)
+DEAL:2d::Norm of difference: 3.41061e-13
+DEAL:2d::l2_norm: 8100.00
+DEAL:2d::l1_norm: 108964.
+DEAL:2d::linfty_norm: 900.000
+DEAL:2d::
+DEAL:2d::Norm of difference: 2.84217e-13
+DEAL:2d::l2_norm: 5051.63
+DEAL:2d::l1_norm: 68866.9
+DEAL:2d::linfty_norm: 576.000
+DEAL:2d::
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Norm of difference: 2.27374e-13
+DEAL:3d::l2_norm: 32003.0
+DEAL:3d::l1_norm: 593090.
+DEAL:3d::linfty_norm: 1728.00
+DEAL:3d::
+DEAL:3d::Norm of difference: 2.27374e-13
+DEAL:3d::l2_norm: 11325.6
+DEAL:3d::l1_norm: 207861.
+DEAL:3d::linfty_norm: 884.736
+DEAL:3d::
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Norm of difference: 2.54659e-11
+DEAL:3d::l2_norm: 729000.
+DEAL:3d::l1_norm: 3.59385e+07
+DEAL:3d::linfty_norm: 27000.0
+DEAL:3d::
+DEAL:3d::Norm of difference: 1.27329e-11
+DEAL:3d::l2_norm: 359043.
+DEAL:3d::l1_norm: 1.80487e+07
+DEAL:3d::linfty_norm: 13824.0
+DEAL:3d::

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,7 @@
 
 
 // a test adapted from little programs by Markus Buerg that makes sure
-// we compute the same solution for hp and non-hp cases
+// we compute the same solution for hp- and non-hp-cases
 
 
 #include <deal.II/base/function.h>
@@ -94,7 +94,7 @@ namespace with_hp
 
     Triangulation<dim>    triangulation;
     hp::FECollection<dim> fe;
-    hp::DoFHandler<dim>   dof_handler;
+    DoFHandler<dim>       dof_handler;
     hp::QCollection<dim>  quadrature;
     SparsityPattern       sparsity_pattern;
     SparseMatrix<double>  system_matrix;
@@ -153,9 +153,9 @@ namespace with_hp
 
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       {
         fe_values.reinit(cell);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,12 +26,14 @@
 #  include <p4est_extended.h>
 #  include <p4est_ghost.h>
 #  include <p4est_iterate.h>
+#  include <p4est_search.h>
 #  include <p4est_vtk.h>
 #  include <p8est_bits.h>
 #  include <p8est_communication.h>
 #  include <p8est_extended.h>
 #  include <p8est_ghost.h>
 #  include <p8est_iterate.h>
+#  include <p8est_search.h>
 #  include <p8est_vtk.h>
 
 #  include <map>
@@ -87,12 +89,16 @@ namespace internal
       using forest           = p4est_t;
       using tree             = p4est_tree_t;
       using quadrant         = p4est_quadrant_t;
+      using quadrant_coord   = p4est_qcoord_t;
       using topidx           = p4est_topidx_t;
       using locidx           = p4est_locidx_t;
       using gloidx           = p4est_gloidx_t;
       using balance_type     = p4est_connect_type_t;
       using ghost            = p4est_ghost_t;
       using transfer_context = p4est_transfer_context_t;
+#  ifdef P4EST_SEARCH_LOCAL
+      using search_partition_callback = p4est_search_partition_t;
+#  endif
     };
 
     template <>
@@ -102,12 +108,16 @@ namespace internal
       using forest           = p8est_t;
       using tree             = p8est_tree_t;
       using quadrant         = p8est_quadrant_t;
+      using quadrant_coord   = p4est_qcoord_t;
       using topidx           = p4est_topidx_t;
       using locidx           = p4est_locidx_t;
       using gloidx           = p4est_gloidx_t;
       using balance_type     = p8est_connect_type_t;
       using ghost            = p8est_ghost_t;
       using transfer_context = p8est_transfer_context_t;
+#  ifdef P4EST_SEARCH_LOCAL
+      using search_partition_callback = p8est_search_partition_t;
+#  endif
     };
 
 
@@ -159,6 +169,20 @@ namespace internal
         types<2>::topidx num_trees,
         types<2>::topidx num_corners,
         types<2>::topidx num_vtt);
+
+      static types<2>::connectivity *(&connectivity_new_copy)(
+        types<2>::topidx        num_vertices,
+        types<2>::topidx        num_trees,
+        types<2>::topidx        num_corners,
+        const double *          vertices,
+        const types<2>::topidx *ttv,
+        const types<2>::topidx *ttt,
+        const int8_t *          ttf,
+        const types<2>::topidx *ttc,
+        const types<2>::topidx *coff,
+        const types<2>::topidx *ctt,
+        const int8_t *          ctc);
+
       static void (&connectivity_join_faces)(types<2>::connectivity *conn,
                                              types<2>::topidx        tree_left,
                                              types<2>::topidx        tree_right,
@@ -179,6 +203,9 @@ namespace internal
         std::size_t             data_size,
         p4est_init_t            init_fn,
         void *                  user_pointer);
+
+      static types<2>::forest *(&copy_forest)(types<2>::forest *input,
+                                              int               copy_data);
 
       static void (&destroy)(types<2>::forest *p4est);
 
@@ -244,9 +271,9 @@ namespace internal
 
       template <int spacedim>
       static void
-        iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
-                dealii::internal::p4est::types<2>::ghost * parallel_ghost,
-                void *                                     user_data);
+      iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
+              dealii::internal::p4est::types<2>::ghost * parallel_ghost,
+              void *                                     user_data);
 
       static constexpr unsigned int max_level = P4EST_MAXLEVEL;
 
@@ -289,6 +316,22 @@ namespace internal
         const int *             src_sizes);
 
       static void (&transfer_custom_end)(types<2>::transfer_context *tc);
+
+#  ifdef P4EST_SEARCH_LOCAL
+      static void (&search_partition)(
+        types<2>::forest *                  forest,
+        int                                 call_post,
+        types<2>::search_partition_callback quadrant_fn,
+        types<2>::search_partition_callback point_fn,
+        sc_array_t *                        points);
+#  endif
+
+      static void (&quadrant_coord_to_vertex)(
+        types<2>::connectivity * connectivity,
+        types<2>::topidx         treeid,
+        types<2>::quadrant_coord x,
+        types<2>::quadrant_coord y,
+        double                   vxyz[3]);
     };
 
 
@@ -331,6 +374,24 @@ namespace internal
         types<3>::topidx num_corners,
         types<3>::topidx num_ctt);
 
+      static types<3>::connectivity *(&connectivity_new_copy)(
+        types<3>::topidx        num_vertices,
+        types<3>::topidx        num_trees,
+        types<3>::topidx        num_edges,
+        types<3>::topidx        num_corners,
+        const double *          vertices,
+        const types<3>::topidx *ttv,
+        const types<3>::topidx *ttt,
+        const int8_t *          ttf,
+        const types<3>::topidx *tte,
+        const types<3>::topidx *eoff,
+        const types<3>::topidx *ett,
+        const int8_t *          ete,
+        const types<3>::topidx *ttc,
+        const types<3>::topidx *coff,
+        const types<3>::topidx *ctt,
+        const int8_t *          ctc);
+
       static void (&connectivity_join_faces)(types<3>::connectivity *conn,
                                              types<3>::topidx        tree_left,
                                              types<3>::topidx        tree_right,
@@ -349,6 +410,9 @@ namespace internal
         std::size_t             data_size,
         p8est_init_t            init_fn,
         void *                  user_pointer);
+
+      static types<3>::forest *(&copy_forest)(types<3>::forest *input,
+                                              int               copy_data);
 
       static void (&destroy)(types<3>::forest *p8est);
 
@@ -452,6 +516,23 @@ namespace internal
         const int *             src_sizes);
 
       static void (&transfer_custom_end)(types<3>::transfer_context *tc);
+
+#  ifdef P4EST_SEARCH_LOCAL
+      static void (&search_partition)(
+        types<3>::forest *                  forest,
+        int                                 call_post,
+        types<3>::search_partition_callback quadrant_fn,
+        types<3>::search_partition_callback point_fn,
+        sc_array_t *                        points);
+#  endif
+
+      static void (&quadrant_coord_to_vertex)(
+        types<3>::connectivity * connectivity,
+        types<3>::topidx         treeid,
+        types<3>::quadrant_coord x,
+        types<3>::quadrant_coord y,
+        types<3>::quadrant_coord z,
+        double                   vxyz[3]);
     };
 
 
@@ -543,17 +624,22 @@ namespace internal
                         const typename types<dim>::topidx  coarse_grid_cell);
 
 
-
     /**
-     * Compute the ghost neighbors surrounding each vertex by querying p4est
+     * Deep copy a p4est connectivity object.
      */
-    template <int dim, int spacedim>
-    std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-    compute_vertices_with_ghost_neighbors(
-      const dealii::parallel::distributed::Triangulation<dim, spacedim> &tria,
-      typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
-      typename dealii::internal::p4est::types<dim>::ghost * parallel_ghost);
+    template <int dim>
+    typename types<dim>::connectivity *
+    copy_connectivity(const typename types<dim>::connectivity *connectivity);
 
+#  ifndef DOXYGEN
+    template <>
+    typename types<2>::connectivity *
+    copy_connectivity<2>(const typename types<2>::connectivity *connectivity);
+
+    template <>
+    typename types<3>::connectivity *
+    copy_connectivity<3>(const typename types<3>::connectivity *connectivity);
+#  endif
   } // namespace p4est
 } // namespace internal
 

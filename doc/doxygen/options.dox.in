@@ -24,9 +24,10 @@ SHORT_NAMES            = NO
 CASE_SENSE_NAMES       = YES
 
 
-INLINE_INHERITED_MEMB  = NO
-STRIP_FROM_PATH        = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include
+INLINE_INHERITED_MEMB  = YES
+STRIP_FROM_PATH        = @CMAKE_SOURCE_DIR@ @CMAKE_BINARY_DIR@
 STRIP_FROM_INC_PATH    = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include
+
 FULL_PATH_NAMES        = YES
 JAVADOC_AUTOBRIEF      = NO
 INHERIT_DOCS           = YES
@@ -51,7 +52,7 @@ SORT_MEMBER_DOCS       = NO
 SORT_BRIEF_DOCS        = NO
 SORT_BY_SCOPE_NAME     = NO
 GENERATE_TODOLIST      = YES
-GENERATE_DEPRECATEDLIST= NO
+GENERATE_DEPRECATEDLIST= YES
 SHOW_USED_FILES        = YES
 
 #---------------------------------------------------------------------------
@@ -74,12 +75,12 @@ EXAMPLE_PATH           = @CMAKE_BINARY_DIR@/doc/doxygen/tutorial \
                          @CMAKE_SOURCE_DIR@/examples/doxygen
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
-INPUT_FILTER           = ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/filter
+INPUT_FILTER           = ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/filter.pl
 FILTER_SOURCE_FILES    = YES
 
 # Have some user defined commands that we can use in the documentation
 # and that expands to specific text. For some more transformations, see
-# the scripts/filter perl script that is run over the header files before
+# the scripts/filter.pl perl script that is run over the header files before
 # doxygen sees it and that can expand more complex expressions.
 ALIASES += dealiiRequiresUpdateFlags{1}="@note For this function to work properly, the underlying FEValues, FEFaceValues, or FESubfaceValues object on which you call it must have computed the information you are requesting. To do so, the <code>\1</code> flag must be an element of the list of UpdateFlags that you passed to the constructor of this object. See @ref UpdateFlags for more information."
 
@@ -106,7 +107,6 @@ VERBATIM_HEADERS       = NO
 #---------------------------------------------------------------------------
 
 ALPHABETICAL_INDEX     = YES
-COLS_IN_ALPHA_INDEX    = 3
 
 #---------------------------------------------------------------------------
 # configuration options related to the HTML output
@@ -135,7 +135,7 @@ GENERATE_LATEX         = NO
 
 # but set a few flags for when processing formulas embedded
 # in the documentation.
-PAPER_TYPE             = a4wide
+PAPER_TYPE             = a4
 EXTRA_PACKAGES         = amsmath amsfonts mathtools @_extra_packages@
 LATEX_BATCHMODE        = YES
 
@@ -187,17 +187,21 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING=1 \
                          DEAL_II_ADOLC_WITH_ATRIG_ERF=1 \
                          DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING=1 \
+                         DEAL_II_DEPRECATED_EARLY= \
+                         DEAL_II_WITH_ARBORX=1 \
+                         DEAL_II_ARBORX_WITH_MPI=1 \
                          DEAL_II_WITH_ARPACK=1 \
                          DEAL_II_ARPACK_WITH_PARPACK=1 \
                          DEAL_II_WITH_ASSIMP=1 \
                          DEAL_II_WITH_BOOST=1 \
+                         DEAL_II_WITH_CGAL=1 \
+                         DEAL_II_WITH_TASKFLOW=1 \
                          DEAL_II_WITH_COMPLEX_VALUES=1 \
                          DEAL_II_WITH_CUDA=1 \
                          DEAL_II_COMPILER_CUDA_AWARE=1 \
-                         DEAL_II_WITH_CXX14=1 \
-                         DEAL_II_WITH_CXX17=1 \
                          DEAL_II_WITH_GINKGO=1 \
                          DEAL_II_WITH_GMSH=1 \
+                         DEAL_II_GMSH_WITH_API=1 \
                          DEAL_II_WITH_GSL=1 \
                          DEAL_II_WITH_HDF5=1 \
                          DEAL_II_WITH_LAPACK=1 \
@@ -208,8 +212,6 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_MPI_VERSION_MAJOR=3 \
                          DEAL_II_MPI_VERSION_MINOR=0 \
                          DEAL_II_WITH_MUPARSER=1 \
-                         DEAL_II_WITH_NANOFLANN=1 \
-                         DEAL_II_WITH_NETCDF=1 \
                          DEAL_II_WITH_OPENCASCADE=1 \
                          DEAL_II_WITH_P4EST=1 \
                          DEAL_II_P4EST_VERSION_MAJOR=2 \
@@ -229,7 +231,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_SUNDIALS_VERSION_LT=0 \
                          DEAL_II_WITH_SYMENGINE=1 \
                          DEAL_II_SYMENGINE_WITH_LLVM=1 \
-                         DEAL_II_WITH_THREAD=1 \
+                         DEAL_II_WITH_TBB=1 \
                          DEAL_II_WITH_TRILINOS=1 \
                          DEAL_II_TRILINOS_WITH_EPETRAEXT=1 \
                          DEAL_II_TRILINOS_WITH_MUELU=1 \

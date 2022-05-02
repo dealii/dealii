@@ -5,7 +5,7 @@
     <title>deal.II CMake documentation</title>
     <link href="../screen.css" rel="StyleSheet">
     <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-    <meta name="copyright" content="Copyright (C) 2012 - 2019 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2012 - 2020 by the deal.II authors">
     <meta name="keywords" content="deal.II">
   </head>
 
@@ -49,6 +49,7 @@
 	    <li><a href="#configurecomp">Component selection</a></li>
 	    <li><a href="#configurebuild">Build configuration</a></li>
 	    <li><a href="#compiler">Selecting a compiler</a></li>
+	    <li><a href="#compileccache">Compiling using Ccache</a></li>
 	    <li><a href="#configureinstall">Installation</a></li>
 	  </ol>
 	</li>
@@ -324,7 +325,7 @@ $ cmake ..
 
     <p>
       <b>Note:</b> However, under rare occasions an in-source build might be
-      useful or needed , so it is supported
+      useful or needed, so it is supported
 <pre class="cmake">
 $ cmake .
 </pre>
@@ -416,7 +417,18 @@ library        - builds and installs the 'library' component
       configuration.
     </p>
 
+    <p>
+      The library will be compiled with the default C++ standard enabled by
+      the compiler. This is (as of May 2020) C++14 for all compilers. If
+      you want to override this behavior, please set the C++ standard
+      directly for example by configuring with
+      <code>-DDEAL_II_CXX_FLAGS="-std=c++17"</code>, or by setting the
+      environement variable <code>CXXFLAGS="-std=c++17"</code>.
 
+      Similarly, for enabling SIMD vectorization support, you have to set
+      an appropriate target architecture via <code>-march=...</code>, for
+      example <code>-DDEAL_II_CXX_FLAGS="-march=native"</code>.
+    </p>
 
     <a name="configurefeature"></a>
     <h3>Feature configuration</h3>
@@ -427,18 +439,6 @@ library        - builds and installs the 'library' component
       of <code>C++</code>. All of these options are represented
       by <code>cmake</code> variables that may be set to either <code>ON</code>
       or <code>OFF</code>.
-
-      By default, <acronym>deal.II</acronym>'s <code>CMake</code> build scripts
-      will attempt to find the newest <code>C++</code> version available by
-      checking which language version flags work with the detected compiler. For
-      example: if <code>CMake</code> detects <code>GCC 5.1</code> or <code>Clang
-      3.6</code>, <acronym>deal.II</acronym> will be compiled
-      in <code>C++14</code> mode unless <code>C++14</code> support is explicitly
-      disabled. Another example: if <code>DEAL_II_WITH_CXX14=ON</code> is passed
-      to <code>CMake</code>, then <acronym>deal.II</acronym> will check if the
-      compiler supports enough of the <code>C++14</code> standard to enable
-      the <code>C++14</code>-specific parts of the library. The configuration
-      process will fail if a feature flag is passed in that cannot be supported.
 
       The remaining flags are set to <code>ON</code> if an external package is
       found or to <code>OFF</code> otherwise. By explicitly setting it to off
@@ -456,10 +456,9 @@ DEAL_II_WITH_ADOLC
 DEAL_II_WITH_ARPACK
 DEAL_II_WITH_ASSIMP
 DEAL_II_WITH_BOOST
+DEAL_II_WITH_CGAL
 DEAL_II_WITH_COMPLEX_VALUES
 DEAL_II_WITH_CUDA
-DEAL_II_WITH_CXX14
-DEAL_II_WITH_CXX17
 DEAL_II_WITH_GINKGO
 DEAL_II_WITH_GMSH
 DEAL_II_WITH_GSL
@@ -468,8 +467,6 @@ DEAL_II_WITH_LAPACK
 DEAL_II_WITH_METIS
 DEAL_II_WITH_MPI
 DEAL_II_WITH_MUPARSER
-DEAL_II_WITH_NANOFLANN
-DEAL_II_WITH_NETCDF
 DEAL_II_WITH_OPENCASCADE
 DEAL_II_WITH_P4EST
 DEAL_II_WITH_PETSC
@@ -477,19 +474,15 @@ DEAL_II_WITH_SCALAPACK
 DEAL_II_WITH_SLEPC
 DEAL_II_WITH_SUNDIALS
 DEAL_II_WITH_SYMENGINE
-DEAL_II_WITH_THREADS
+DEAL_II_WITH_TBB
 DEAL_II_WITH_TRILINOS
 DEAL_II_WITH_UMFPACK
 DEAL_II_WITH_ZLIB
 </pre>
-      They all have standard meaning with the exception of
-      two:
+      They all have standard meanings with the exception of one:
       <ul>
         <li> <code>DEAL_II_WITH_BOOST</code> is always <code>ON</code>
-          since BOOST is a mandatory build time dependency.
-
-        <li> <code>DEAL_II_WITH_THREADS</code> enables threading support
-          with the help of the Threading Building Blocks (TBB) library.
+          since BOOST is a mandatory build time dependency.</li>
       </ul>
     </p>
 
@@ -498,15 +491,6 @@ DEAL_II_WITH_ZLIB
       more dependencies to external or 'bundled' (i.e. bundled with
       <acronym>deal.II</acronym> and residing under <code>bundled/</code>)
       libraries.
-    </p>
-
-    <p>
-      Additionally, the variable
-<pre class="cmake">
-DEAL_II_CXX_VERSION_FLAG
-</pre>
-      may be set to specify the <code>C++</code> language version flag passed to
-      the compiler.
     </p>
 
     <p>
@@ -798,16 +782,16 @@ cmake -DLAPACK_FOUND=true \
           (default), <acronym>deal.II</acronym> will perform platform
           introspection for the given CPU.
 
-	<li>
+        <li>
           <code>BUILD_SHARED_LIBS</code>: If set (default),
           <acronym>deal.II</acronym> will be linked as a shared library
 
         <li>
-        <code>DEAL_II_PREFER_STATIC_LIBS</code> (defaults to off): If set
-        to true, static archives will be preferred over dynamic libraries when
-        searching for features and corresponding link interface.
+          <code>DEAL_II_PREFER_STATIC_LIBS</code> (defaults to off): If set
+          to true, static archives will be preferred over dynamic libraries when
+          searching for features and corresponding link interface.
 
-	<li>
+        <li>
           <code>DEAL_II_STATIC_EXECUTABLE</code> (defaults to off):
           If set to true, <acronym>deal.II</acronym> will be configured in
           a way to provide a link interface that is suitable for static
@@ -815,11 +799,11 @@ cmake -DLAPACK_FOUND=true \
           <code>BUILD_SHARED_LIBS=OFF</code> and
           <code>DEAL_II_PREFER_STATIC_LIBS=ON</code>.
 
-	<li>
-	  <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
-	  (default), the <acronym>deal.II</acronym> library will be
-	  installed with rpaths  set for all libraries outside of the
-	  system search paths
+        <li>
+          <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
+          (default), the <acronym>deal.II</acronym> library will be
+          installed with rpaths  set for all libraries outside of the
+          system search paths
       </ul>
     </p>
 
@@ -831,9 +815,9 @@ cmake -DLAPACK_FOUND=true \
       Compilers can be switched either by command line or by setting
       <code>CMAKE_(C|CXX|Fortran)_COMPILER</code>:
 <pre class="cmake">
-CC=mpicc CXX=mpicxx FC=mpif90 cmake &lt;...&gt;
+CC=my_c_compiler CXX=my_cxx_compiler FC=my_fortran_compiler cmake &lt;...&gt;
 
-cmake -DCMAKE_C_COMPILER="mpicc" -DCMAKE_CXX_COMPILER="mpicxx" -DCMAKE_Fortran_COMPILER="mpif90" &lt;...&gt;
+cmake -DCMAKE_C_COMPILER=my_c_compiler -DCMAKE_CXX_COMPILER=my_cxx_compiler -DCMAKE_Fortran_COMPILER=my_fortran_compiler &lt;...&gt;
 </pre>
       Please note that
       <ul>
@@ -891,6 +875,49 @@ cmake -DDEAL_II_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
           coverage information by adding the flag
           <code>-D DEAL_II_SETUP_COVERAGE=ON</code>.
       </ol>
+    </p>
+
+
+    <a name="compileccache"></a>
+    <h3> Compiling using Ccache </h3>
+    <p>
+      <a href="https://ccache.dev/">Ccache</a> is a compiler caching tool. It
+      accelerates recompilation by caching previously executed compilations
+      and subsequently detecting when the same compilation is being performed
+      again.
+    </p>
+
+    <p>
+      It is possible for the library to be built using the Ccache tool.
+      This may be useful for those who frequently rebuild the library, as it
+      caches the output of the compilation (the C++ components, at least).
+      The next time that the library is built, if the compilation objects remain
+      the same then rebuilding them can be avoided as the results will be taken
+      from directly the cache. Anecdotally, Ccache is not well suited to
+      everybody's workflow, so it may take some experimentation to determine if
+      it's effective and helpful, or offers no particular gain to you.
+    </p>
+
+    <p>
+      Building with Ccache can be enabled directly via the command line.
+      When using a version of CMake that is greater or equal to 3.4, then using
+      Ccache is easy. Passing the configure-time argument
+<pre class="cmake">
+  -DCXX_COMPILER_LAUNCHER="ccache"
+</pre>
+      to Cmake ensures that Ccache is invoked whenever C++ code is compiled.
+    </p>
+
+    <p>
+      For older versions of CMake, Ccache may be invoked by prefixing the
+      compiler commands passed to CMake by environment or configure-time
+      variables. For example, if building using GCC then
+<pre class="cmake">
+  -DCMAKE_C_COMPILER="ccache gcc" -DCMAKE_CXX_COMPILER="ccache g++"
+</pre>
+      would indicate that ccache should invoke the GCC compilers to build deal.II.
+      Ccache itself is invoked when calling <code>make</code> or
+      <code>ninja</code>.
     </p>
 
 

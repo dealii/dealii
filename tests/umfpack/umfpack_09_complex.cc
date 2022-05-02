@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -141,7 +141,7 @@ test()
                                  1 + i +
                                    i * (j + 1) * (j + 1)); // imaginary part
           solution(j) *=
-            1. * (j + j * (i + 1) * (i + 1)) / std::fabs(solution(j));
+            1. * (j + j * (i + 1) * (i + 1)) / std::abs(solution(j));
         }
 
       // Then choose as rhs for the linear system the vector

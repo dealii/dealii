@@ -1,0 +1,41 @@
+name: indent
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{github.event_name == 'pull_request'}}
+
+jobs:
+  indent:
+    # run the indent checks
+
+    name: indent
+    runs-on: [ubuntu-18.04]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 100
+    - name: setup
+      run: |
+        ./contrib/utilities/download_clang_format
+        sudo apt update && sudo apt install doxygen graphviz perl texlive-bibtex-extra
+        doxygen --version
+    - name: indent
+      run: |
+        ./contrib/utilities/check_indentation.sh
+    - name: documentation
+      run: |
+        mkdir build
+        cd build
+        cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DDEAL_II_DOXYGEN_USE_MATHJAX=ON ..
+        make -j 2 documentation
+        cat doxygen.log
+        ! [ -s doxygen.log ] || exit 1
+        tar -czf doxygen_documentation.tar.gz doc/doxygen
+    - name: archive documentation
+      uses: actions/upload-artifact@v1
+      with:
+        name: doxygen_documentation.tar.gz
+        path: build/doxygen_documentation.tar.gz

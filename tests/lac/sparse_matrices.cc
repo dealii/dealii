@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix_ez.h>
 #include <deal.II/lac/sparse_matrix_ez.templates.h>
+#include <deal.II/lac/sparse_vanka.h>
 #include <deal.II/lac/vector.h>
 
 #include "../tests.h"
@@ -122,6 +123,45 @@ check_vmult_quadratic(std::vector<double> &residuals,
   PREC_CHECK(prich, Tsolve, block_ssor);
   PREC_CHECK(prich, Tsolve, block_sor);
   PREC_CHECK(prich, Tsolve, block_psor);
+
+  // vanka needs to match the type
+  using value_type = typename MatrixType::value_type;
+  if (std::is_same<MatrixType, SparseMatrix<value_type>>::value)
+    {
+      deallog << "Vanka" << std::endl;
+      const SparseMatrix<value_type> &B =
+        reinterpret_cast<const SparseMatrix<value_type> &>(A);
+
+      std::vector<bool> selected_dofs(B.m(), false);
+      // tag every third dof for vanka
+      for (unsigned int i = 0; i < B.m(); i += 3)
+        selected_dofs[i] = true;
+      SparseVanka<value_type> vanka;
+      vanka.initialize(
+        B, typename SparseVanka<value_type>::AdditionalData(selected_dofs));
+
+      SparseBlockVanka<value_type> block_vanka_1(
+        B,
+        selected_dofs,
+        n_blocks,
+        SparseBlockVanka<value_type>::index_intervals);
+      SparseBlockVanka<value_type> block_vanka_2(
+        B, selected_dofs, n_blocks, SparseBlockVanka<value_type>::adaptive);
+
+      PREC_CHECK(prich, solve, vanka);
+      PREC_CHECK(prich, solve, block_vanka_1);
+      PREC_CHECK(prich, solve, block_vanka_2);
+
+      // since SparseMatrixEZ doesn't support this format remove it from the
+      // residuals:
+      deallog << "vanka residual: " << residuals.back() << std::endl;
+      residuals.pop_back();
+      deallog << "vanka residual: " << residuals.back() << std::endl;
+      residuals.pop_back();
+      deallog << "vanka residual: " << residuals.back() << std::endl;
+      residuals.pop_back();
+    }
+
   deallog.pop();
 }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -49,13 +48,13 @@
 #include "../tests.h"
 
 
-// This a test for the hp capable version of the make_hanging_node_constraints
+// This a test for the hp-capable version of the make_hanging_node_constraints
 // method. It uses a triangulation with one refined element beside an
 // unrefined element to create the constraints for this configuration.
 
-template <int dim>
+template <int dim, int spacedim>
 int
-generate_grid(Triangulation<dim> &tria)
+generate_grid(Triangulation<dim, spacedim> &tria)
 {
   Point<dim>                p1, p2;
   std::vector<unsigned int> sub_div;
@@ -78,11 +77,11 @@ generate_grid(Triangulation<dim> &tria)
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-test_constraints(hp::FECollection<dim> &fe_coll)
+test_constraints(hp::FECollection<dim, spacedim> &fe_coll)
 {
-  Triangulation<dim> tria;
+  Triangulation<dim, spacedim> tria;
 
   // Setup a rectangular domain
   // where one cell is h-refined,
@@ -96,11 +95,11 @@ test_constraints(hp::FECollection<dim> &fe_coll)
   // Now assign increasing
   // active_fe_indices to
   // the different cells.
-  hp::DoFHandler<dim>                                dof_handler(tria);
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
-  unsigned int fe_indx                                    = 0;
+  DoFHandler<dim, spacedim> dof_handler(tria);
+  typename DoFHandler<dim, spacedim>::active_cell_iterator
+    cell               = dof_handler.begin_active(),
+    endc               = dof_handler.end();
+  unsigned int fe_indx = 0;
   for (; cell != endc; ++cell)
     {
       cell->set_active_fe_index(fe_indx);
@@ -121,11 +120,11 @@ test_constraints(hp::FECollection<dim> &fe_coll)
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-test_constraints_old(FiniteElement<dim> &fe)
+test_constraints_old(FiniteElement<dim, spacedim> &fe)
 {
-  Triangulation<dim> tria;
+  Triangulation<dim, spacedim> tria;
 
   // Setup a rectangular domain
   // where one cell is h-refined,
@@ -139,7 +138,7 @@ test_constraints_old(FiniteElement<dim> &fe)
   // Now assign increasing
   // active_fe_indices to
   // the different cells.
-  DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim, spacedim> dof_handler(tria);
 
   // Distribute DoFs;
   dof_handler.distribute_dofs(fe);
@@ -154,27 +153,37 @@ test_constraints_old(FiniteElement<dim> &fe)
   constraint_matrix.print(deallog.get_file_stream());
 }
 
+template <int dim, int spacedim>
+void
+check()
+{
+  FE_Q<dim, spacedim> fe_1(1);
+  FE_Q<dim, spacedim> fe_2(2);
+  FE_Q<dim, spacedim> fe_3(QIterated<1>(QTrapezoid<1>(), 3));
+
+  hp::FECollection<dim, spacedim> fe_coll2;
+  fe_coll2.push_back(fe_3);
+  fe_coll2.push_back(fe_2);
+  fe_coll2.push_back(fe_2);
+
+  fe_coll2.push_back(fe_2);
+  fe_coll2.push_back(fe_3);
+
+  test_constraints<dim, spacedim>(fe_coll2);
+
+  test_constraints_old<dim, spacedim>(fe_1);
+}
+
+
+
 int
 main()
 {
   initlog();
   deallog.get_file_stream().precision(2);
 
-  FE_Q<2> fe_1(1);
-  FE_Q<2> fe_2(2);
-  FE_Q<2> fe_3(QIterated<1>(QTrapez<1>(), 3));
-
-  hp::FECollection<2> fe_coll2;
-  fe_coll2.push_back(fe_3);
-  fe_coll2.push_back(fe_2);
-  fe_coll2.push_back(fe_2);
-
-  fe_coll2.push_back(fe_2);
-  fe_coll2.push_back(fe_3);
-
-  test_constraints<2>(fe_coll2);
-
-  test_constraints_old<2>(fe_1);
+  check<2, 2>();
+  check<2, 3>();
 
   return 0;
 }

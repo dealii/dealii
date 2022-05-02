@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2016 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,7 @@ do_test()
 
     MGTransferPrebuilt<Vector<double>> transfer;
 
-    transfer.build_matrices(dof_handler);
+    transfer.build(dof_handler);
 
     // This is not quite the correct thing to do, but "interpolate_to_mg"
     // doesn't exist for serial vectors. Here it means that the level 0 is 0

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,7 @@ check_poly_q(const PolynomialsAdini<dim> &poly)
       deallog << "Adini<" << dim << "> point " << i << " (" << points[i][0];
       for (unsigned int d = 1; d < dim; ++d)
         deallog << ", " << points[i][d];
-      deallog << ")" << std::endl;
+      deallog << ')' << std::endl;
 
       poly.evaluate(points[i], values, grads, grads2, thirds, fourths);
 

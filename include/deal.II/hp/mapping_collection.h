@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,8 @@
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/hp/collection.h>
 
 #include <memory>
 #include <vector>
@@ -49,11 +51,9 @@ namespace hp
    * for the rules which mapping will be selected for a given cell.
    *
    * @ingroup hp hpcollection
-   *
-   * @author Oliver Kayser-Herold, 2005
    */
   template <int dim, int spacedim = dim>
-  class MappingCollection : public Subscriptor
+  class MappingCollection : public Collection<Mapping<dim, spacedim>>
   {
   public:
     /**
@@ -71,10 +71,41 @@ namespace hp
     explicit MappingCollection(const Mapping<dim, spacedim> &mapping);
 
     /**
+     * Constructor. This constructor creates a MappingCollection from one or
+     * more mapping objects passed to the constructor. For this
+     * call to be valid, all arguments need to be of types derived
+     * from class Mapping<dim,spacedim>.
+     */
+    template <class... MappingTypes>
+    explicit MappingCollection(const MappingTypes &...mappings);
+
+    /**
      * Copy constructor.
      */
     MappingCollection(
       const MappingCollection<dim, spacedim> &mapping_collection);
+
+    /**
+     * Move constructor.
+     *
+     * @note The implementation of standard datatypes may change with different
+     * libraries, so their move members may or may not be flagged non-throwing.
+     * We need to explicitly set the noexcept specifier according to its
+     * member variables to still get the performance benefits (and to satisfy
+     * clang-tidy).
+     */
+    MappingCollection(MappingCollection<dim, spacedim> &&) noexcept(
+      std::is_nothrow_move_constructible<
+        std::vector<std::shared_ptr<const Mapping<dim, spacedim>>>>::value
+        &&std::is_nothrow_move_constructible<std::function<
+          unsigned int(const typename hp::MappingCollection<dim, spacedim> &,
+                       const unsigned int)>>::value) = default;
+
+    /**
+     * Move assignment operator.
+     */
+    MappingCollection<dim, spacedim> &
+    operator=(MappingCollection<dim, spacedim> &&) = default; // NOLINT
 
     /**
      * Add a new mapping to the MappingCollection. Generally, you will
@@ -90,35 +121,6 @@ namespace hp
      */
     void
     push_back(const Mapping<dim, spacedim> &new_mapping);
-
-    /**
-     * Return the mapping object which was specified by the user for the
-     * active_fe_index which is provided as a parameter to this method.
-     *
-     * @pre @p index must be between zero and the number of elements of the
-     * collection.
-     */
-    const Mapping<dim, spacedim> &operator[](const unsigned int index) const;
-
-    /**
-     * Return the number of mapping objects stored in this container.
-     */
-    unsigned int
-    size() const;
-
-    /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object.
-     */
-    std::size_t
-    memory_consumption() const;
-
-  private:
-    /**
-     * The real container, which stores pointers to the different Mapping
-     * objects.
-     */
-    std::vector<std::shared_ptr<const Mapping<dim, spacedim>>> mappings;
   };
 
 
@@ -126,7 +128,7 @@ namespace hp
    * Many places in the library by default use (bi-,tri-)linear mappings
    * unless users explicitly provide a different mapping to use. In these
    * cases, the called function has to create a $Q_1$ mapping object, i.e., an
-   * object of kind MappingQGeneric(1). This is costly. It would also be
+   * object of kind MappingQ(1). This is costly. It would also be
    * costly to create such objects as static objects in the affected
    * functions, because static objects are never destroyed throughout the
    * lifetime of a program, even though they only have to be created once the
@@ -152,20 +154,22 @@ namespace hp
   /* --------------- inline functions ------------------- */
 
   template <int dim, int spacedim>
-  inline unsigned int
-  MappingCollection<dim, spacedim>::size() const
+  template <class... MappingTypes>
+  MappingCollection<dim, spacedim>::MappingCollection(
+    const MappingTypes &...mappings)
   {
-    return mappings.size();
-  }
+    static_assert(
+      is_base_of_all<Mapping<dim, spacedim>, MappingTypes...>::value,
+      "Not all of the input arguments of this function "
+      "are derived from FiniteElement<dim,spacedim>!");
 
-
-
-  template <int dim, int spacedim>
-  inline const Mapping<dim, spacedim> &MappingCollection<dim, spacedim>::
-                                       operator[](const unsigned int index) const
-  {
-    AssertIndexRange(index, mappings.size());
-    return *mappings[index];
+    // loop over all of the given arguments and add the mappings to
+    // this collection. Inlining the definition of mapping_pointers causes
+    // internal compiler errors on GCC 7.1.1 so we define it separately:
+    const auto mapping_pointers = {
+      (static_cast<const Mapping<dim, spacedim> *>(&mappings))...};
+    for (const auto p : mapping_pointers)
+      push_back(*p);
   }
 
 } // namespace hp

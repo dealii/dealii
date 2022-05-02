@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,12 @@ test(FiniteElement<dim> &fe)
   AffineConstraints<double>    constraints;
   Functions::ZeroFunction<dim> boundary_values(fe.n_components());
   VectorTools::project_boundary_values_curl_conforming_l2(
-    dof_handler, 0, boundary_values, 0, constraints);
+    dof_handler,
+    0,
+    boundary_values,
+    0,
+    constraints,
+    StaticMappingQ1<dim>::mapping);
 }
 
 

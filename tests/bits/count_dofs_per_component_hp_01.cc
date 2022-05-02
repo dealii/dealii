@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,15 +23,12 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/hp/fe_collection.h>
-
 #include "../tests.h"
 
 // check
 //   DoFTools::
 //   count_dofs_per_component (...);
-// for the hp case
+// for the hp-case
 
 
 using namespace std;
@@ -50,33 +47,19 @@ test()
 
   FESystem<dim> fe_system(u, 2, p, 1);
 
-  hp::FECollection<dim> fe_collection;
-  fe_collection.push_back(fe_system);
-
-  hp::DoFHandler<dim> hp_dof_handler(triangulation);
-  DoFHandler<dim>     dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   // distribute dofs
-  hp_dof_handler.distribute_dofs(fe_collection);
   dof_handler.distribute_dofs(fe_system);
 
   // count dofs per component and show them on the screen
   const std::vector<types::global_dof_index> dofs_per_component =
     DoFTools::count_dofs_per_fe_component(dof_handler);
-  const std::vector<types::global_dof_index> dofs_per_component_hp =
-    DoFTools::count_dofs_per_fe_component(hp_dof_handler);
 
-  for (unsigned int i = 0; i < 3; i++)
+  for (unsigned int i = 0; i < 3; ++i)
     {
       deallog << "DoFs in the " << i
-              << ". component for classical FE: " << dofs_per_component.at(i)
-              << std::endl;
-      deallog << "DoFs in the " << i
-              << ". component for hp FE: " << dofs_per_component_hp.at(i)
-              << std::endl;
-
-      Assert(dofs_per_component.at(i) == dofs_per_component_hp.at(i),
-             ExcInternalError());
+              << ". component: " << dofs_per_component.at(i) << std::endl;
     }
 }
 

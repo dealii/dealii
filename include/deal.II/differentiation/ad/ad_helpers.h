@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -164,8 +164,6 @@ namespace Differentiation
      *
      * @todo Make this class thread safe for Sacado number and ADOL-C tapeless
      * numbers (if supported).
-     *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -832,8 +830,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -1216,8 +1212,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -1418,9 +1412,7 @@ namespace Differentiation
      *       ad_helper.register_dof_values(solution, local_dof_indices);
      *
      *       // Then we get the complete set of degree of freedom values as
-     *       // represented by auto-differentiable numbers. The operations
-     *       // performed with these variables are tracked by the AD library
-     *       // from this point until stop_recording_operations() is called.
+     *       // represented by auto-differentiable numbers.
      *       const std::vector<ADNumberType> dof_values_ad
      *         = ad_helper.get_sensitive_dof_values();
      *
@@ -1531,8 +1523,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
@@ -2395,11 +2385,12 @@ namespace Differentiation
         using ExtractorType = FEValuesExtractors::SymmetricTensor<2>;
         const IndexType n_components =
           internal::Extractor<dim, ExtractorType>::n_components;
+        const IndexType comp_first =
+          internal::Extractor<dim, ExtractorType>::first_component(
+            extractor_symm_tensor);
+
         if (ignore_symmetries == true)
           {
-            const IndexType comp_first =
-              internal::Extractor<dim, ExtractorType>::first_component(
-                extractor_symm_tensor);
             std::vector<IndexType> indices(n_components);
             std::iota(indices.begin(), indices.end(), comp_first);
             return indices;
@@ -2416,14 +2407,19 @@ namespace Differentiation
             // from the symmetric tensor
             for (unsigned int i = 0; i < indices.size(); ++i)
               {
-                if (indices[i] >= n_components)
+                // The indices stored in the vector start with the extractor's
+                // first_component_index. We need to account for this when
+                // retrieving the tensor (local) index.
+                const IndexType local_index_i = indices[i] - comp_first;
+                if (local_index_i >= n_components)
                   {
                     const TableIndices<2> ti_tensor =
-                      Tensor<2, dim>::unrolled_to_component_indices(indices[i]);
+                      Tensor<2, dim>::unrolled_to_component_indices(
+                        local_index_i);
                     const IndexType sti_new_index =
                       SymmetricTensor<2, dim>::component_to_unrolled_index(
                         ti_tensor);
-                    indices[i] = sti_new_index;
+                    indices[i] = comp_first + sti_new_index;
                   }
               }
 
@@ -2453,9 +2449,10 @@ namespace Differentiation
        * @p t to the given @p value.
        */
       template <int dim, typename NumberType>
-      inline void set_tensor_entry(Tensor<0, dim, NumberType> &t,
-                                   const unsigned int          unrolled_index,
-                                   const NumberType &          value)
+      inline void
+      set_tensor_entry(Tensor<0, dim, NumberType> &t,
+                       const unsigned int          unrolled_index,
+                       const NumberType &          value)
       {
         AssertIndexRange(unrolled_index, 1);
         (void)unrolled_index;
@@ -2486,10 +2483,11 @@ namespace Differentiation
        * @p t to the given @p value.
        */
       template <int dim, typename NumberType>
-      inline void set_tensor_entry(SymmetricTensor<4, dim, NumberType> &t,
-                                   const unsigned int unrolled_index_row,
-                                   const unsigned int unrolled_index_col,
-                                   const NumberType & value)
+      inline void
+      set_tensor_entry(SymmetricTensor<4, dim, NumberType> &t,
+                       const unsigned int                   unrolled_index_row,
+                       const unsigned int                   unrolled_index_col,
+                       const NumberType &                   value)
       {
         // Fourth order symmetric tensors require a specialized interface
         // to extract values.
@@ -2514,7 +2512,8 @@ namespace Differentiation
       template <int rank,
                 int dim,
                 typename NumberType,
-                template <int, int, typename> class TensorType>
+                template <int, int, typename>
+                class TensorType>
       inline NumberType
       get_tensor_entry(const TensorType<rank, dim, NumberType> &t,
                        const unsigned int                       unrolled_index)
@@ -2532,7 +2531,8 @@ namespace Differentiation
        */
       template <int dim,
                 typename NumberType,
-                template <int, int, typename> class TensorType>
+                template <int, int, typename>
+                class TensorType>
       inline NumberType
       get_tensor_entry(const TensorType<0, dim, NumberType> &t,
                        const unsigned int                    unrolled_index)
@@ -2565,7 +2565,8 @@ namespace Differentiation
       template <int rank,
                 int dim,
                 typename NumberType,
-                template <int, int, typename> class TensorType>
+                template <int, int, typename>
+                class TensorType>
       inline NumberType &
       get_tensor_entry(TensorType<rank, dim, NumberType> &t,
                        const unsigned int                 unrolled_index)
@@ -2583,9 +2584,11 @@ namespace Differentiation
        */
       template <int dim,
                 typename NumberType,
-                template <int, int, typename> class TensorType>
-      NumberType &get_tensor_entry(TensorType<0, dim, NumberType> &t,
-                                   const unsigned int              index)
+                template <int, int, typename>
+                class TensorType>
+      NumberType &
+      get_tensor_entry(TensorType<0, dim, NumberType> &t,
+                       const unsigned int              index)
       {
         AssertIndexRange(index, 1);
         (void)index;
@@ -2631,8 +2634,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
@@ -2645,7 +2646,7 @@ namespace Differentiation
        * Type definition for the dimension of the associated input and output
        * tensor types.
        */
-      static const unsigned int dimension = dim;
+      static constexpr unsigned int dimension = dim;
 
       /**
        * Type definition for the floating point number type that is used in,
@@ -3017,7 +3018,7 @@ namespace Differentiation
      *       0.5*mu_0*mu_r*J*H_AD*C_inv_AD*H_AD;
      *
      *     // Register the definition of the total stored energy
-     *     ad_helper.register_dependent_variable(psi_CH);
+     *     ad_helper.register_dependent_variable(psi);
      *
      *     // Indicate that we have completed tracing the operations onto
      *     // the tape.
@@ -3078,8 +3079,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
@@ -3471,8 +3470,6 @@ namespace Differentiation
      * deal.II, so this class should @b not be embedded within a multithreaded
      * function when using ADOL-C number types. It is, however, suitable for use
      * in both serial and MPI routines.
-     *
-     * @author Jean-Paul Pelteret, 2016, 2017, 2018
      */
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
@@ -3841,7 +3838,8 @@ namespace Differentiation
               typename ScalarType>
     template <typename ExtractorType>
     typename internal::Extractor<dim, ExtractorType>::template tensor_type<
-      typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type>
+      typename PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+        ad_type>
     PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       get_sensitive_variables(const ExtractorType &extractor) const
     {
@@ -3950,7 +3948,7 @@ namespace Differentiation
       // non-symmetric Tensor<3,dim> but we have to fetch information from a
       // SymmTensor row/column that has too few entries to fill the output
       // tensor. So we must duplicate the relevant entries in the row/column
-      // indexset to fetch off-diagonal components that are Otherwise
+      // indexset to fetch off-diagonal components that are otherwise
       // non-existent in a SymmTensor.
       const std::vector<unsigned int> row_index_set(
         internal::extract_field_component_indices<dim>(
@@ -4072,7 +4070,7 @@ namespace Differentiation
       // non-symmetric Tensor<3,dim> but we have to fetch information from a
       // SymmTensor row/column that has too few entries to fill the output
       // tensor. So we must duplicate the relevant entries in the row/column
-      // indexset to fetch off-diagonal components that are Otherwise
+      // indexset to fetch off-diagonal components that are otherwise
       // non-existent in a SymmTensor.
       const std::vector<unsigned int> row_index_set(
         internal::extract_field_component_indices<dim>(

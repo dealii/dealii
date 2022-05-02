@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,13 +25,15 @@ template <int dim, int spacedim, typename Extractor>
 void
 test(const Extractor &)
 {
-  typename FEValuesViews::View<dim, spacedim, Extractor>::template OutputType<
-    double>::value_type t1;
+  typename FEValuesViews::View<dim, spacedim, Extractor>::
+    template solution_value_type<double>
+      t1;
 
-  typename FEValuesViews::View<dim, spacedim, Extractor>::template OutputType<
-    double>::gradient_type t2;
+  typename FEValuesViews::View<dim, spacedim, Extractor>::
+    template solution_gradient_type<double>
+      t2;
 
-  deallog << "Test<" << Utilities::dim_string(dim, spacedim) << ">" << std::endl
+  deallog << "Test<" << Utilities::dim_string(dim, spacedim) << '>' << std::endl
           << Utilities::type_to_string(t1) << std::endl
           << Utilities::type_to_string(t2) << std::endl;
 }

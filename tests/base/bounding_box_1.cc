@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,7 @@ test_bounding_box()
 
   std::pair<Point<spacedim>, Point<spacedim>> boundaries;
 
-  for (int i = 0; i < spacedim; i++)
+  for (int i = 0; i < spacedim; ++i)
     {
       boundaries.first[i]  = 0.2 - i * 0.2;
       boundaries.second[i] = 0.8 + i * 0.8;
@@ -45,7 +45,7 @@ test_bounding_box()
   deallog << b.get_boundary_points().second << std::endl;
 
   deallog << "Boundary points are inside: " << b.point_inside(boundaries.first)
-          << " " << b.point_inside(boundaries.second) << std::endl;
+          << ' ' << b.point_inside(boundaries.second) << std::endl;
 
   std::vector<Point<spacedim>> test_points;
 
@@ -67,6 +67,16 @@ test_bounding_box()
             << " is inside: " << b.point_inside(test_points[i]) << std::endl;
 
   deallog << std::endl;
+
+  // Verify that we get the same box when we use all those points together
+  {
+    test_points.push_back(boundaries.first);
+    test_points.push_back(boundaries.second);
+
+    BoundingBox<spacedim> b2(test_points);
+    deallog << "Boxes should be equal : " << (b2 == b) << std::endl;
+  }
+
   test_points.clear();
 
   // To create outside points we take a non-convex combination
@@ -86,6 +96,13 @@ test_bounding_box()
   for (unsigned int i = 0; i < test_points.size(); ++i)
     deallog << test_points[i]
             << " is inside: " << b.point_inside(test_points[i]) << std::endl;
+
+  // Similarly, verify that we get different boxes since some points are
+  // outside:
+  {
+    BoundingBox<spacedim> b2(test_points);
+    deallog << "Boxes should not be equal : " << (b2 != b) << std::endl;
+  }
   deallog << std::endl;
 }
 
@@ -94,7 +111,7 @@ test_unitary()
 {
   std::pair<Point<3>, Point<3>> boundaries;
 
-  for (int i = 0; i < 3; i++)
+  for (int i = 0; i < 3; ++i)
     {
       boundaries.second[i] = 1.0;
     }
@@ -109,13 +126,27 @@ test_unitary()
   Point<3> p3(0, 0, 1.0);
 
   deallog << "Checking if all vertices are inside: "
-          << b.point_inside(boundaries.first) << " "
+          << b.point_inside(boundaries.first) << ' '
           << b.point_inside(boundaries.second) << std::endl;
 
-  deallog << b.point_inside(p1) << " " << b.point_inside(p2) << " "
-          << b.point_inside(p3) << " " << b.point_inside(p1 + p2) << " "
-          << b.point_inside(p2 + p3) << " " << b.point_inside(p1 + p3) << " "
+  deallog << b.point_inside(p1) << ' ' << b.point_inside(p2) << ' '
+          << b.point_inside(p3) << ' ' << b.point_inside(p1 + p2) << ' '
+          << b.point_inside(p2 + p3) << ' ' << b.point_inside(p1 + p3) << ' '
           << std::endl;
+
+  double eps = std::numeric_limits<double>::epsilon();
+  AssertThrow(b.point_inside(Point<3>(0.0, 0.0, 1.0 + 1.0 * eps), 10. * eps) ==
+                true,
+              ExcMessage("failed."));
+  AssertThrow(b.point_inside(Point<3>(0.0, 0.0, 1.0 + 10. * eps), 1.0 * eps) ==
+                false,
+              ExcMessage("failed."));
+  AssertThrow(b.point_inside(Point<3>(0.0 - 1.0 * eps, 0.0, 0.0), 10. * eps) ==
+                true,
+              ExcMessage("failed."));
+  AssertThrow(b.point_inside(Point<3>(0.0 - 10. * eps, 0.0, 0.0), 1.0 * eps) ==
+                false,
+              ExcMessage("failed."));
 }
 
 int

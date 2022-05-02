@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2018 by the deal.II authors
+//    Copyright (C) 2017 - 2021 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * file.
  *
  * Such registry is traversed upon invocation of the single function
- * ParameterAcceptor::initialize(file.prm) which in turn calls the method
+ * ParameterAcceptor::initialize("file.prm") which in turn calls the method
  * ParameterAcceptor::declare_parameters() for each of the registered classes,
  * reads the file `file.prm` and subsequently calls the method
  * ParameterAcceptor::parse_parameters(), again for each of the registered
@@ -225,7 +225,7 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  * Note that there is only one section "Forcing term", this is because
  * both objects have defined the same name for the section of their
- * SomeParsedClass. There are two strategies to change this behaviour. The
+ * SomeParsedClass. There are two strategies to change this behavior. The
  * first one (not recommended) would be to change the name of the section
  * of SomeParsedClass such that it contains also the string passed to
  * the constructor of MyClass:
@@ -344,8 +344,6 @@ DEAL_II_NAMESPACE_OPEN
  * itself.
  *
  * See the tutorial program step-60 for an example on how to use this class.
- *
- * @author Luca Heltai, 2017.
  */
 class ParameterAcceptor : public Subscriptor
 {
@@ -373,29 +371,40 @@ public:
    * default values, and don't want to read external files to use a class
    * derived from ParameterAcceptor.
    *
-   * If outfilename is not the empty string, then write the content that was
-   * read in to the outfilename. The format of both input and output files are
-   * selected using the extensions of the files themselves. This can be either
-   * `prm` or `xml` for input, and `prm`, `xml`, or `tex/latex` for output. If
-   * the output format is `prm`, then `output_style_for_prm_format` is used to
-   * decide whether we write the full documentation as well, or only the
-   * parameters.
+   * If @p output_filename is not the empty string, then we write the content
+   * that was read into the @p output_filename file, using the style specified
+   * in @p output_style_for_output_filename. The format of both input and output
+   * files are selected using the extensions of the files themselves. This can
+   * be either `prm`, `xml`, or `json` for the @p filename, and any of the
+   * supported formats for the @p output_filename.
    *
    * If the input file does not exist, a default one with the same name is
-   * created for you, and an exception is thrown.
+   * created for you following the style specified in
+   * @p output_style_for_filename, and an exception is thrown.
+   *
+   * By default, the file format used to write the files is deduced from
+   * the extension of the file names. If the corresponding
+   * ParameterHandler::OutputStyle specifies a format specification, this must
+   * be compatible with the file extension, or an exception will be thrown.
+   *
+   * If the extension is not recognized, and you do not specify a format in the
+   * corresponding ParameterHandler::OutputStyle, an assertion is thrown.
    *
    * @param filename Input file name
    * @param output_filename Output file name
-   * @param output_style_for_prm_format How to write the output file if format
-   * is `prm`
+   * @param output_style_for_output_filename How to write the output file
    * @param prm The ParameterHandler to use
+   * @param output_style_for_filename How to write the default input file if it
+   * does not exist
    */
   static void
-  initialize(const std::string &                 filename        = "",
-             const std::string &                 output_filename = "",
-             const ParameterHandler::OutputStyle output_style_for_prm_format =
-               ParameterHandler::ShortText,
-             ParameterHandler &prm = ParameterAcceptor::prm);
+  initialize(const std::string &filename        = "",
+             const std::string &output_filename = "",
+             const ParameterHandler::OutputStyle
+               output_style_for_output_filename      = ParameterHandler::Short,
+             ParameterHandler &                  prm = ParameterAcceptor::prm,
+             const ParameterHandler::OutputStyle output_style_for_filename =
+               ParameterHandler::DefaultStyle);
 
   /**
    * Call declare_all_parameters(), read the parameters from the `input_stream`
@@ -428,7 +437,7 @@ public:
   /**
    * Declare parameter call back. This signal is triggered right after
    * declare_parameters() has been called, to allow users to prepare their
-   * variables right after parameters have been decalred. The default
+   * variables right after parameters have been declared. The default
    * implementation is empty.
    */
   boost::signals2::signal<void()> declare_parameters_call_back;
@@ -508,6 +517,67 @@ public:
   static ParameterHandler prm;
 
   /**
+   * Add the given @p subsection to the global path stored in this class.
+   *
+   * This function changes the behavior of enter_my_subsection(), by
+   * appending a new subsection to the path stored in this class.
+   *
+   * This method can be used to split the parameters of this class into
+   * subsections, while still maintaining the general behavior of this
+   * class.
+   *
+   * An example usage is given by the following snippet:
+   * @code
+   * class MyClass : public ParameterAcceptor
+   * {
+   *   MyClass()
+   *     : ParameterAcceptor("Main section")
+   *   {
+   *     add_parameter("A param", member_var);
+   *     enter_subsection("New section");
+   *     add_parameter("Another param", another_member_var);
+   *     leave_subsection();
+   *   }
+   *
+   * private:
+   *   std::vector<unsigned int> member_var = {1,2};
+   *   std::map<types::boundary_id, std::string> another_member_var;
+   *   ...
+   * };
+   *
+   * int main()
+   * {
+   *   // ParameterAcceptor::initialize()
+   *   MyClass class;
+   *
+   *   // With this call, all derived classes will have their
+   *   // parameters initialized
+   *   ParameterAcceptor::initialize("file.prm");
+   * }
+   * @endcode
+   *
+   * which will produce a parameter file organized as
+   *
+   * @code
+   * subsection Main section
+   *   set A param = 1, 2
+   *   subsection New section
+   *     set Another param =
+   *   end
+   * end
+   * @endcode
+   */
+  void
+  enter_subsection(const std::string &subsection);
+
+  /**
+   * Leave the subsection that was entered by calling the enter_subsection()
+   * function.
+   */
+  void
+  leave_subsection();
+
+  /**
    * Make sure we enter the right subsection of the given parameter.
    */
   void
@@ -538,6 +608,9 @@ private:
 protected:
   /** The subsection name for this class. */
   const std::string section_name;
+
+  /** The subsubsections that are currently active. */
+  std::vector<std::string> subsections;
 };
 
 
@@ -590,8 +663,6 @@ protected:
  * files.
  *
  * See the tutorial program step-60 for an example on how to use this class.
- *
- * @author Luca Heltai, 2018
  */
 template <class SourceClass>
 class ParameterAcceptorProxy : public SourceClass, public ParameterAcceptor

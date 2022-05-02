@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,10 +22,11 @@
 // apparently, what is happening is that we don't unify more than 2 finite
 // elements on an edge in 3d, according to a comment at the top of
 // hp::DoFHandler::compute_line_dof_identities at the time of this writing
-// (and referring to a comment in the hp paper). there is now code that deals
+// (and referring to a comment in the hp-paper). there is now code that deals
 // with the more narrow special case we have here
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -36,8 +37,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -56,10 +55,10 @@ test()
     fe_collection.push_back(
       FESystem<dim>(FE_Q<dim>(2), 1, FE_DGQ<dim>(i % 4), 1));
 
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
 
   unsigned int fe_index = 0;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell, ++fe_index)
@@ -76,7 +75,7 @@ test()
   std::vector<types::global_dof_index> line_dof_indices_2(
     fe_collection[0].dofs_per_line + 2 * fe_collection[0].dofs_per_vertex);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -92,7 +91,7 @@ test()
                       << cell->line(line)->nth_active_fe_index(i) << " ("
                       << fe_collection[cell->line(line)->nth_active_fe_index(i)]
                            .get_name()
-                      << ")" << std::endl;
+                      << ')' << std::endl;
 
               cell->line(line)->get_dof_indices(
                 line_dof_indices_1, cell->line(line)->nth_active_fe_index(i));
@@ -103,9 +102,9 @@ test()
             }
 
 
-          // if there are multiple active fe
+          // if there are multiple active FE
           // indices, make sure that all their
-          // fe indices were unified
+          // FE indices were unified
           for (unsigned int i = 0; i < cell->line(line)->n_active_fe_indices();
                ++i)
             for (unsigned int j = i + 1;

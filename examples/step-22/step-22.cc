@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2019 by the deal.II authors
+ * Copyright (C) 2008 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -25,6 +25,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/tensor_function.h>
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -35,15 +36,13 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
@@ -219,37 +218,43 @@ namespace Step22
 
 
   // We implement similar functions for the right hand side which for the
-  // current example is simply zero:
+  // current example is simply zero. In the current case, what we want to
+  // represent is the right hand side of the velocity equation, that is, the
+  // body forces acting on the fluid. (The right hand side of the divergence
+  // equation is always zero, since we are dealing with an incompressible
+  // medium.) As such, the right hand side is represented by a `Tensor<1,dim>`
+  // object: a dim-dimensional vector, and the right tool to implement such a
+  // function is to derive it from `TensorFunction<1,dim>`:
   template <int dim>
-  class RightHandSide : public Function<dim>
+  class RightHandSide : public TensorFunction<1, dim>
   {
   public:
     RightHandSide()
-      : Function<dim>(dim + 1)
+      : TensorFunction<1, dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual Tensor<1, dim> value(const Point<dim> &p) const override;
 
-    virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  value) const override;
+    virtual void value_list(const std::vector<Point<dim>> &p,
+                            std::vector<Tensor<1, dim>> &value) const override;
   };
 
 
   template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> & /*p*/,
-                                   const unsigned int /*component*/) const
+  Tensor<1, dim> RightHandSide<dim>::value(const Point<dim> & /*p*/) const
   {
-    return 0;
+    return Tensor<1, dim>();
   }
 
 
   template <int dim>
-  void RightHandSide<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
+  void RightHandSide<dim>::value_list(const std::vector<Point<dim>> &vp,
+                                      std::vector<Tensor<1, dim>> &values) const
   {
-    for (unsigned int c = 0; c < this->n_components; ++c)
-      values(c) = RightHandSide<dim>::value(p, c);
+    for (unsigned int c = 0; c < vp.size(); ++c)
+      {
+        values[c] = RightHandSide<dim>::value(vp[c]);
+      }
   }
 
 
@@ -478,7 +483,7 @@ namespace Step22
     {
       constraints.clear();
 
-      FEValuesExtractors::Vector velocities(0);
+      const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       VectorTools::interpolate_boundary_values(dof_handler,
                                                1,
@@ -497,8 +502,8 @@ namespace Step22
     // velocity and pressure block via <code>block_component</code>.
     const std::vector<types::global_dof_index> dofs_per_block =
       DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
-    const unsigned int n_u = dofs_per_block[0];
-    const unsigned int n_p = dofs_per_block[1];
+    const types::global_dof_index n_u = dofs_per_block[0];
+    const types::global_dof_index n_p = dofs_per_block[1];
 
     std::cout << "   Number of active cells: " << triangulation.n_active_cells()
               << std::endl
@@ -530,17 +535,9 @@ namespace Step22
     // <code>dsp</code> will be released once the information has been copied to
     // <code>sparsity_pattern</code>.
     {
-      BlockDynamicSparsityPattern dsp(2, 2);
-
-      dsp.block(0, 0).reinit(n_u, n_u);
-      dsp.block(1, 0).reinit(n_p, n_u);
-      dsp.block(0, 1).reinit(n_u, n_p);
-      dsp.block(1, 1).reinit(n_p, n_p);
-
-      dsp.collect_sizes();
+      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
-
       for (unsigned int c = 0; c < dim + 1; ++c)
         for (unsigned int d = 0; d < dim + 1; ++d)
           if (!((c == dim) && (d == dim)))
@@ -555,17 +552,10 @@ namespace Step22
     }
 
     {
-      BlockDynamicSparsityPattern preconditioner_dsp(2, 2);
-
-      preconditioner_dsp.block(0, 0).reinit(n_u, n_u);
-      preconditioner_dsp.block(1, 0).reinit(n_p, n_u);
-      preconditioner_dsp.block(0, 1).reinit(n_u, n_p);
-      preconditioner_dsp.block(1, 1).reinit(n_p, n_p);
-
-      preconditioner_dsp.collect_sizes();
+      BlockDynamicSparsityPattern preconditioner_dsp(dofs_per_block,
+                                                     dofs_per_block);
 
       Table<2, DoFTools::Coupling> preconditioner_coupling(dim + 1, dim + 1);
-
       for (unsigned int c = 0; c < dim + 1; ++c)
         for (unsigned int d = 0; d < dim + 1; ++d)
           if (((c == dim) && (d == dim)))
@@ -588,15 +578,8 @@ namespace Step22
     system_matrix.reinit(sparsity_pattern);
     preconditioner_matrix.reinit(preconditioner_sparsity_pattern);
 
-    solution.reinit(2);
-    solution.block(0).reinit(n_u);
-    solution.block(1).reinit(n_p);
-    solution.collect_sizes();
-
-    system_rhs.reinit(2);
-    system_rhs.block(0).reinit(n_u);
-    system_rhs.block(1).reinit(n_p);
-    system_rhs.collect_sizes();
+    solution.reinit(dofs_per_block);
+    system_rhs.reinit(dofs_per_block);
   }
 
 
@@ -620,7 +603,7 @@ namespace Step22
                             update_values | update_quadrature_points |
                               update_JxW_values | update_gradients);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
     const unsigned int n_q_points = quadrature_formula.size();
 
@@ -632,7 +615,7 @@ namespace Step22
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const RightHandSide<dim>    right_hand_side;
-    std::vector<Vector<double>> rhs_values(n_q_points, Vector<double>(dim + 1));
+    std::vector<Tensor<1, dim>> rhs_values(n_q_points, Tensor<1, dim>());
 
     // Next, we need two objects that work as extractors for the FEValues
     // object. Their use is explained in detail in the report on @ref
@@ -664,6 +647,7 @@ namespace Step22
     // the outer loop.
     std::vector<SymmetricTensor<2, dim>> symgrad_phi_u(dofs_per_cell);
     std::vector<double>                  div_phi_u(dofs_per_cell);
+    std::vector<Tensor<1, dim>>          phi_u(dofs_per_cell);
     std::vector<double>                  phi_p(dofs_per_cell);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
@@ -673,8 +657,8 @@ namespace Step22
         local_preconditioner_matrix = 0;
         local_rhs                   = 0;
 
-        right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
-                                          rhs_values);
+        right_hand_side.value_list(fe_values.get_quadrature_points(),
+                                   rhs_values);
 
         for (unsigned int q = 0; q < n_q_points; ++q)
           {
@@ -683,6 +667,7 @@ namespace Step22
                 symgrad_phi_u[k] =
                   fe_values[velocities].symmetric_gradient(k, q);
                 div_phi_u[k] = fe_values[velocities].divergence(k, q);
+                phi_u[k]     = fe_values[velocities].value(k, q);
                 phi_p[k]     = fe_values[pressure].value(k, q);
               }
 
@@ -732,22 +717,17 @@ namespace Step22
                 // is overloaded for symmetric tensors, yielding the scalar
                 // product between the two tensors.
                 //
-                // For the right-hand side we use the fact that the shape
-                // functions are only non-zero in one component (because our
-                // elements are primitive).  Instead of multiplying the tensor
-                // representing the dim+1 values of shape function i with the
-                // whole right-hand side vector, we only look at the only
-                // non-zero component. The function
-                // FiniteElement::system_to_component_index will return
-                // which component this shape function lives in (0=x velocity,
-                // 1=y velocity, 2=pressure in 2d), which we use to pick out
-                // the correct component of the right-hand side vector to
-                // multiply with.
-                const unsigned int component_i =
-                  fe.system_to_component_index(i).first;
-                local_rhs(i) += (fe_values.shape_value(i, q)   // (phi_u_i(x_q)
-                                 * rhs_values[q](component_i)) // * f(x_q))
-                                * fe_values.JxW(q);            // * dx
+                // For the right-hand side, we need to multiply the (vector of)
+                // velocity shape functions with the vector of body force
+                // right-hand side components, both evaluated at the current
+                // quadrature point. We have implemented the body forces as a
+                // `TensorFunction<1,dim>`, so its values at quadrature points
+                // are already tensors for which the application of `operator*`
+                // against the velocity components of the shape function results
+                // in the dot product, as intended.
+                local_rhs(i) += phi_u[i]            // phi_u_i(x_q)
+                                * rhs_values[q]     // * f(x_q)
+                                * fe_values.JxW(q); // * dx
               }
           }
 
@@ -964,7 +944,7 @@ namespace Step22
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    FEValuesExtractors::Scalar pressure(dim);
+    const FEValuesExtractors::Scalar pressure(dim);
     KellyErrorEstimator<dim>::estimate(
       dof_handler,
       QGauss<dim - 1>(degree + 1),

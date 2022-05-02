@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +20,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/manifold_lib.h>
 #include <deal.II/opencascade/utilities.h>
 
 #include <BRepFill.hxx>
@@ -54,7 +54,7 @@ main()
   TopoDS_Face face = BRepFill::Face(edge1, edge2);
 
 
-  NormalToMeshProjectionBoundary<1, 3> manifold(face);
+  NormalToMeshProjectionManifold<1, 3> manifold(face);
 
   Triangulation<1, 3> tria;
   GridGenerator::hyper_cube(tria);

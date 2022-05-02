@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -25,6 +25,8 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/numerics/rtree.h>
+
+#include <boost/geometry/algorithms/buffer.hpp>
 
 #include "../tests.h"
 

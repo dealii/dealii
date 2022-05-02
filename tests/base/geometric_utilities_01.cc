@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,11 +31,11 @@ print(T point1, T point2)
 {
   deallog << std::endl << "Point 1: ";
   for (unsigned int i = 0; i < dim; ++i)
-    deallog << point1[i] << " ";
+    deallog << point1[i] << ' ';
 
   deallog << std::endl << "Point 2: ";
   for (unsigned int i = 0; i < dim; ++i)
-    deallog << point2[i] << " ";
+    deallog << point2[i] << ' ';
 
   deallog << std::endl;
 }
@@ -49,11 +49,11 @@ test()
   const Point<dim> origin;
 
   std::array<double, dim> sorigin;
-  for (unsigned int d = 0; d < dim; d++)
+  for (unsigned int d = 0; d < dim; ++d)
     sorigin[d] = 0.;
 
   Point<dim> one;
-  for (unsigned int d = 0; d < dim; d++)
+  for (unsigned int d = 0; d < dim; ++d)
     one[d] = 1.;
 
   std::array<double, dim> sone;

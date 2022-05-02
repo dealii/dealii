@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ get_this_mpi_process()
 void
 test()
 {
-  typedef PETScWrappers::MPI::SparseMatrix::size_type size_type;
+  using size_type = PETScWrappers::MPI::SparseMatrix::size_type;
 
   // create a parallel matrix where the first
   // process has 10 rows, the second one 20,

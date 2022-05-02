@@ -142,11 +142,11 @@ main()
 
   deallog
     << "Calculation of the integral of ln(x-a)*f(x) on the interval [a,b] = ["
-    << a << ", " << b << "]" << std::endl;
+    << a << ", " << b << ']' << std::endl;
   for (unsigned int j = 0; j < 13; ++j)
     {
       exact_integral = 0;
-      for (unsigned int k = 0; k <= j; k++)
+      for (unsigned int k = 0; k <= j; ++k)
         exact_integral +=
           newton_binomial(j, k) * pow(a, static_cast<int>(j - k)) *
           (pow(b - a, static_cast<int>(k) + 1) / (k + 1) * log(b - a) -

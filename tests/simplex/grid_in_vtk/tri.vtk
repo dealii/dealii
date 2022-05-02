@@ -1,0 +1,30 @@
+# vtk DataFile Version 3.0
+tri, Created by Gmsh
+ASCII
+DATASET UNSTRUCTURED_GRID
+POINTS 5 double
+0 0 0
+1 0 0
+1 1 0
+0 1 0
+0.5 0.5 0
+
+CELLS 4 16
+3 0 1 4
+3 3 0 4
+3 1 2 4
+3 2 3 4
+
+CELL_TYPES 4
+5
+5
+5
+5
+
+CELL_DATA 4
+SCALARS CellEntityIds int 1
+LOOKUP_TABLE default
+1
+1
+1
+1

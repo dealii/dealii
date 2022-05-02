@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,7 @@ do_test(const VectorizedArrayType                      array,
 {
   deallog << "  test " << VectorizedArrayType::size() << " array elements"
           << std::endl;
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
     if (array[i] != number)
       deallog << "  problem in element " << i << std::endl;
 }

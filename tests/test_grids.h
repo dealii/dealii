@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,10 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/point.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
+
+#include <vector>
 
 #include "tests.h"
 
@@ -39,26 +43,21 @@
  * <tr><td>#star_shaped(tr,2,true)</td><td>method is robust if more than
  * usual cells meet in one vertex and local refinement exceeds one
  * level</td></tr>
+ * <tr><td>#hyper_line(tr,n)</td><td>aligns n unit cells in
+ * x-direction</td></tr>
  * </table>
- *
- * @author Guido Kanschat
- * @date 2006, 2010
  */
 namespace TestGrids
 {
   /**
-   * Generate grids based on
-   * hypercube. These meshes have a
-   * regular geometry and topology.
+   * Generate grids based on hypercube. These meshes have a regular geometry and
+   * topology.
    *
-   * @param <tt>refinement</tt>
-   * denotes the number of refinement
-   * steps of the root cell.
+   * @param <tt>refinement</tt> denotes the number of refinement steps of the
+   * root cell.
    *
-   * @param if <tt>local</tt> is
-   * <tt>true</tt>, refine only the
-   * cell containing the corner with
-   * only negative coordinates.
+   * @param if <tt>local</tt> is <tt>true</tt>, refine only the cell containing
+   * the corner with only negative coordinates.
    */
   template <int dim>
   void
@@ -99,42 +98,63 @@ namespace TestGrids
   }
 
   /**
-   * Create a star-shaped mesh,
-   * having more than the average
-   * <tt>2<sup>dim</sup></tt> cells
-   * in the central vertex.
+   * Create a star-shaped mesh, having more than the average
+   * <tt>2<sup>dim</sup></tt> cells in the central vertex.
    *
-   * @param <tt>refinement</tt>
-   * denotes the number of refinement
+   * @param <tt>refinement</tt> denotes the number of refinement
    * steps of the root mesh.
    *
-   * @param if <tt>local</tt> is
-   * <tt>true</tt>, refine only one
-   * of the coarse cells.
+   * @param if <tt>local</tt> is <tt>true</tt>, refine only one of
+   * the coarse cells.
    */
   template <int dim>
   void
   star_shaped(Triangulation<dim> &tr,
               unsigned int        refinement = 0,
               bool                local      = false);
+
   /**
-   * Local refinement of every other
-   * cell in a checkerboard fashion.
+   * Local refinement of every other cell in a checkerboard fashion.
    */
   template <int dim>
   void
   checkers(Triangulation<dim> &tr);
+
   /**
-   * Islands of local refinement
+   * Islands of local refinement.
    */
   template <int dim>
   void
   islands(Triangulation<dim> &tr);
+
   /**
-   * Local refinement with an
-   * unrefined hole.
+   * Local refinement with an unrefined hole.
    */
   template <int dim>
   void
   laguna(Triangulation<dim> &tr);
+
+  /**
+   * Generates grid with @p n_cells unit cells $[0,1]^d$ aligned in the
+   * x-coordinate direction.
+   *
+   * The domain this grid represents covers $[0,n_cells] \times [0,1]^{d-1}$.
+   * Thus, integer division of the x-cordinate $x // 1$ on any point in this
+   * triangulation gives you the index of the cell the point is located in.
+   */
+  template <int dim, int spacedim>
+  void
+  hyper_line(Triangulation<dim, spacedim> &tr, const unsigned int n_cells)
+  {
+    std::vector<unsigned int> repetitions(dim, 1);
+    repetitions[0] = n_cells;
+    Point<dim> p1, p2;
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        p1[d] = 0;
+        p2[d] = (d == 0) ? n_cells : 1;
+      }
+    GridGenerator::subdivided_hyper_rectangle(tr, repetitions, p1, p2);
+    Assert(tr.n_global_active_cells() == n_cells, ExcInternalError());
+  }
 } // namespace TestGrids

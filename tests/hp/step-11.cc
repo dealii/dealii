@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,7 @@
 
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table_handler.h>
 
@@ -71,7 +72,7 @@ private:
 
   Triangulation<dim>         triangulation;
   hp::FECollection<dim>      fe;
-  hp::DoFHandler<dim>        dof_handler;
+  DoFHandler<dim>            dof_handler;
   hp::MappingCollection<dim> mapping;
 
   SparsityPattern           sparsity_pattern;
@@ -92,7 +93,7 @@ LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree)
   , dof_handler(triangulation)
   , mapping(MappingQ<dim>(mapping_degree))
 {
-  deallog << "Using mapping with degree " << mapping_degree << ":" << std::endl
+  deallog << "Using mapping with degree " << mapping_degree << ':' << std::endl
           << "============================" << std::endl;
 }
 
@@ -180,8 +181,7 @@ LaplaceProblem<dim>::assemble_and_solve()
 
   output_table.add_value("cells", triangulation.n_active_cells());
   output_table.add_value("|u|_1", norm);
-  output_table.add_value("error",
-                         std::fabs(norm - std::sqrt(3.14159265358 / 2)));
+  output_table.add_value("error", std::fabs(norm - std::sqrt(numbers::PI_2)));
 }
 
 

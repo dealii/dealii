@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,10 +51,15 @@ namespace internal
 
 template <int dim, int spacedim, typename VectorType>
 CellDataTransfer<dim, spacedim, VectorType>::CellDataTransfer(
-  const Triangulation<dim, spacedim> &                triangulation,
+  const Triangulation<dim, spacedim> &               triangulation,
+  const std::function<std::vector<value_type>(
+    const typename Triangulation<dim, spacedim>::cell_iterator &parent,
+    const value_type parent_value)>                  refinement_strategy,
   const std::function<value_type(
-    const std::vector<value_type> &children_indices)> coarsening_strategy)
+    const typename Triangulation<dim, spacedim>::cell_iterator &parent,
+    const std::vector<value_type> &children_values)> coarsening_strategy)
   : triangulation(&triangulation, typeid(*this).name())
+  , refinement_strategy(refinement_strategy)
   , coarsening_strategy(coarsening_strategy)
   , n_active_cells_pre(numbers::invalid_unsigned_int)
 {
@@ -100,11 +105,8 @@ CellDataTransfer<dim, spacedim, VectorType>::
               coarsened_cells_active_index.end())
             {
               std::set<unsigned int> indices_children;
-              for (unsigned int child_index = 0;
-                   child_index < parent->n_children();
-                   ++child_index)
+              for (const auto &sibling : parent->child_iterators())
                 {
-                  const auto sibling = parent->child(child_index);
                   Assert(sibling->is_active() && sibling->coarsen_flag_set(),
                          typename dealii::Triangulation<
                            dim>::ExcInconsistentCoarseningFlags());
@@ -156,19 +158,27 @@ CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
 
   // Transfer data of the parent cell to all of its children that it has been
   // refined to.
+  std::vector<value_type> children_values;
   for (const auto &refined : refined_cells_active_index)
-    for (unsigned int child_index = 0;
-         child_index < refined.first->n_children();
-         ++child_index)
-      {
-        const auto child = refined.first->child(child_index);
-        Assert(child->is_active(), ExcInternalError());
-        out[child->active_cell_index()] = in[refined.second];
-      }
+    {
+      // Decide how to handle the previous data.
+      children_values = refinement_strategy(refined.first, in[refined.second]);
+      Assert(refined.first->n_children() == children_values.size(),
+             ExcInternalError());
+
+      // Set values for all children cells.
+      for (unsigned int child_index = 0;
+           child_index < refined.first->n_children();
+           ++child_index)
+        {
+          const auto &child = refined.first->child(child_index);
+          Assert(child->is_active(), ExcInternalError());
+          out[child->active_cell_index()] = children_values[child_index];
+        }
+    }
 
   // Transfer data from the former children to the cell that they have been
   // coarsened to.
-  std::vector<value_type> children_values;
   for (const auto &coarsened : coarsened_cells_active_index)
     {
       // Get previous values of former children.
@@ -181,7 +191,8 @@ CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
       Assert(values_it == children_values.end(), ExcInternalError());
 
       // Decide how to handle the previous data.
-      const value_type parent_value = coarsening_strategy(children_values);
+      const value_type parent_value =
+        coarsening_strategy(coarsened.first, children_values);
 
       // Set value for the parent cell.
       Assert(coarsened.first->is_active(), ExcInternalError());

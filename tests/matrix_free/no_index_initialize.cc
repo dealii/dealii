@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,7 +81,8 @@ public:
         else
           for (unsigned int e = 0; e < fe_eval.dofs_per_cell; ++e)
             fe_eval.submit_dof_value(make_vectorized_array<Number>(1.), e);
-        fe_eval.evaluate(true, true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                         EvaluationFlags::hessians);
 
         // values should evaluate to one, derivatives to zero
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)

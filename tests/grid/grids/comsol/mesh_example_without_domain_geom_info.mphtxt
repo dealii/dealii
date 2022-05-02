@@ -1,0 +1,64 @@
+# Created by COMSOL Multiphysics.
+
+# Major & minor version
+0 1 
+1 # number of tags
+# Tags
+5 mesh1 
+1 # number of types
+# Types
+3 obj 
+
+# --------- Object 0 ----------
+
+0 0 1 
+4 Mesh # class
+4 # version
+3 # sdim
+12 # number of mesh vertices
+0 # lowest mesh vertex index
+
+# Mesh vertex coordinates
+0 0 0 
+0 0 1 
+0 1 1 
+1 0 1 
+0 1 0 
+1 0 0 
+1 1 1 
+2 0 1 
+1 1 0 
+2 0 0 
+2 1 1 
+2 1 0 
+
+2 # number of element types
+
+# Type #0
+
+3 tet # type name
+
+
+4 # number of vertices per element
+5 # number of elements
+# Elements
+0 5 4 1 
+2 4 6 1 
+5 4 1 6 
+3 5 1 6 
+8 5 6 4 
+
+0 # number of geometric entity indices
+
+# Type #1
+
+5 prism # type name
+
+
+6 # number of vertices per element
+2 # number of elements
+# Elements
+3 5 6 7 9 10 
+8 6 5 11 10 9 
+
+0 # number of geometric entity indices

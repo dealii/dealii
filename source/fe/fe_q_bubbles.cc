@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,10 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -53,7 +51,7 @@ namespace internal
         std::vector<std::vector<FullMatrix<double>>> &matrices,
         const bool                                    isotropic_only)
       {
-        const unsigned int dpc    = fe.dofs_per_cell;
+        const unsigned int dpc    = fe.n_dofs_per_cell();
         const unsigned int degree = fe.degree;
 
         // Initialize quadrature formula on fine cells
@@ -64,23 +62,28 @@ namespace internal
           {
             case 1:
               if (spacedim == 1)
-                q_fine = std_cxx14::make_unique<QGauss<dim>>(degree + 1);
+                q_fine = std::make_unique<QGauss<dim>>(degree + 1);
               else if (spacedim == 2)
-                q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(
-                  QGauss<1>(degree + 1), q_dummy);
+                q_fine =
+                  std::make_unique<QAnisotropic<dim>>(QGauss<1>(degree + 1),
+                                                      q_dummy);
               else
-                q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(
-                  QGauss<1>(degree + 1), q_dummy, q_dummy);
+                q_fine =
+                  std::make_unique<QAnisotropic<dim>>(QGauss<1>(degree + 1),
+                                                      q_dummy,
+                                                      q_dummy);
               break;
             case 2:
               if (spacedim == 2)
-                q_fine = std_cxx14::make_unique<QGauss<dim>>(degree + 1);
+                q_fine = std::make_unique<QGauss<dim>>(degree + 1);
               else
-                q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(
-                  QGauss<1>(degree + 1), QGauss<1>(degree + 1), q_dummy);
+                q_fine =
+                  std::make_unique<QAnisotropic<dim>>(QGauss<1>(degree + 1),
+                                                      QGauss<1>(degree + 1),
+                                                      q_dummy);
               break;
             case 3:
-              q_fine = std_cxx14::make_unique<QGauss<dim>>(degree + 1);
+              q_fine = std::make_unique<QGauss<dim>>(degree + 1);
               break;
             default:
               Assert(false, ExcInternalError());
@@ -118,11 +121,12 @@ namespace internal
             dealii::DoFHandler<dim, spacedim> dh(tr);
             dh.distribute_dofs(fe);
 
-            dealii::FEValues<dim, spacedim> fine(
-              StaticMappingQ1<dim, spacedim>::mapping,
-              fe,
-              *q_fine,
-              update_quadrature_points | update_JxW_values | update_values);
+            dealii::FEValues<dim, spacedim> fine(get_default_linear_mapping(tr),
+                                                 fe,
+                                                 *q_fine,
+                                                 update_quadrature_points |
+                                                   update_JxW_values |
+                                                   update_values);
 
             const unsigned int n_dofs = dh.n_dofs();
 
@@ -130,7 +134,7 @@ namespace internal
             FullMatrix<double> coarse_rhs_matrix(n_dofs, dpc);
 
             std::vector<std::vector<types::global_dof_index>> child_ldi(
-              nc, std::vector<types::global_dof_index>(fe.dofs_per_cell));
+              nc, std::vector<types::global_dof_index>(fe.n_dofs_per_cell()));
 
             // now create the mass matrix and all the right_hand sides
             unsigned int                                           child_no = 0;
@@ -183,15 +187,14 @@ namespace internal
 
 template <int dim, int spacedim>
 FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree)
-  : FE_Q_Base<TensorProductPolynomialsBubbles<dim>, dim, spacedim>(
-      TensorProductPolynomialsBubbles<dim>(
-        Polynomials::generate_complete_Lagrange_basis(
-          QGaussLobatto<1>(q_degree + 1).get_points())),
-      FiniteElementData<dim>(get_dpo_vector(q_degree),
-                             1,
-                             q_degree + 1,
-                             FiniteElementData<dim>::H1),
-      get_riaf_vector(q_degree))
+  : FE_Q_Base<dim, spacedim>(TensorProductPolynomialsBubbles<dim>(
+                               Polynomials::generate_complete_Lagrange_basis(
+                                 QGaussLobatto<1>(q_degree + 1).get_points())),
+                             FiniteElementData<dim>(get_dpo_vector(q_degree),
+                                                    1,
+                                                    q_degree + 1,
+                                                    FiniteElementData<dim>::H1),
+                             get_riaf_vector(q_degree))
   , n_bubbles((q_degree <= 1) ? 1 : dim)
 {
   Assert(q_degree > 0,
@@ -206,7 +209,7 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree)
     point[d] = 0.5;
   for (unsigned int i = 0; i < n_bubbles; ++i)
     this->unit_support_points.push_back(point);
-  AssertDimension(this->dofs_per_cell, this->unit_support_points.size());
+  AssertDimension(this->n_dofs_per_cell(), this->unit_support_points.size());
 
   this->reinit_restriction_and_prolongation_matrices();
   if (dim == spacedim)
@@ -223,7 +226,7 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree)
 
 template <int dim, int spacedim>
 FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const Quadrature<1> &points)
-  : FE_Q_Base<TensorProductPolynomialsBubbles<dim>, dim, spacedim>(
+  : FE_Q_Base<dim, spacedim>(
       TensorProductPolynomialsBubbles<dim>(
         Polynomials::generate_complete_Lagrange_basis(points.get_points())),
       FiniteElementData<dim>(get_dpo_vector(points.size() - 1),
@@ -245,7 +248,7 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const Quadrature<1> &points)
     point[d] = 0.5;
   for (unsigned int i = 0; i < n_bubbles; ++i)
     this->unit_support_points.push_back(point);
-  AssertDimension(this->dofs_per_cell, this->unit_support_points.size());
+  AssertDimension(this->n_dofs_per_cell(), this->unit_support_points.size());
 
   this->reinit_restriction_and_prolongation_matrices();
   if (dim == spacedim)
@@ -272,13 +275,13 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
   bool                           type     = true;
   const unsigned int             n_points = this->degree;
   std::vector<double>            points(n_points);
-  const unsigned int             dofs_per_cell = this->dofs_per_cell;
+  const unsigned int             dofs_per_cell = this->n_dofs_per_cell();
   const std::vector<Point<dim>> &unit_support_points =
     this->unit_support_points;
   unsigned int index = 0;
 
   // Decode the support points in one coordinate direction.
-  for (unsigned int j = 0; j < dofs_per_cell; j++)
+  for (unsigned int j = 0; j < dofs_per_cell; ++j)
     {
       if ((dim > 1) ? (unit_support_points[j](1) == 0 &&
                        ((dim > 2) ? unit_support_points[j](2) == 0 : true)) :
@@ -300,7 +303,7 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
            "Could not decode support points in one coordinate direction."));
 
   // Check whether the support points are equidistant.
-  for (unsigned int j = 0; j < n_points; j++)
+  for (unsigned int j = 0; j < n_points; ++j)
     if (std::fabs(points[j] - static_cast<double>(j) / (this->degree - 1)) >
         1e-15)
       {
@@ -312,7 +315,7 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
     {
       if (this->degree > 3)
         namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
-                << ">(QIterated(QTrapez()," << this->degree - 1 << "))";
+                << ">(QIterated(QTrapezoid()," << this->degree - 1 << "))";
       else
         namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
                 << ">(" << this->degree - 1 << ")";
@@ -322,7 +325,7 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
       // Check whether the support points come from QGaussLobatto.
       const QGaussLobatto<1> points_gl(n_points);
       type = true;
-      for (unsigned int j = 0; j < n_points; j++)
+      for (unsigned int j = 0; j < n_points; ++j)
         if (points[j] != points_gl.point(j)(0))
           {
             type = false;
@@ -343,7 +346,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_Q_Bubbles<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Q_Bubbles<dim, spacedim>>(*this);
+  return std::make_unique<FE_Q_Bubbles<dim, spacedim>>(*this);
 }
 
 
@@ -358,13 +361,13 @@ FE_Q_Bubbles<dim, spacedim>::
   Assert(support_point_values.size() == this->unit_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
                               this->unit_support_points.size()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
   Assert(support_point_values[0].size() == this->n_components(),
          ExcDimensionMismatch(support_point_values[0].size(),
                               this->n_components()));
 
-  for (unsigned int i = 0; i < this->dofs_per_cell - 1; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell() - 1; ++i)
     {
       const std::pair<unsigned int, unsigned int> index =
         this->system_to_component_index(i);
@@ -393,11 +396,12 @@ FE_Q_Bubbles<dim, spacedim>::get_interpolation_matrix(
     (x_source_fe.get_name().find("FE_Q_Bubbles<") == 0) ||
       (dynamic_cast<const FEQBUBBLES *>(&x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
-  Assert(interpolation_matrix.m() == this->dofs_per_cell,
-         ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+  Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
          ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_cell));
+                              this->n_dofs_per_cell()));
+  Assert(interpolation_matrix.n() == x_source_fe.n_dofs_per_cell(),
+         ExcDimensionMismatch(interpolation_matrix.m(),
+                              x_source_fe.n_dofs_per_cell()));
 
   // Provide a short cut in case we are just inquiring the identity
   auto casted_fe = dynamic_cast<const FEQBUBBLES *>(&x_source_fe);
@@ -418,7 +422,7 @@ template <int dim, int spacedim>
 std::vector<bool>
 FE_Q_Bubbles<dim, spacedim>::get_riaf_vector(const unsigned int q_deg)
 {
-  unsigned int       n_cont_dofs = Utilities::fixed_power<dim>(q_deg + 1);
+  const unsigned int n_cont_dofs = Utilities::fixed_power<dim>(q_deg + 1);
   const unsigned int n_bubbles   = (q_deg <= 1 ? 1 : dim);
   return std::vector<bool>(n_cont_dofs + n_bubbles, true);
 }
@@ -433,8 +437,9 @@ FE_Q_Bubbles<dim, spacedim>::get_dpo_vector(const unsigned int q_deg)
   for (unsigned int i = 1; i < dpo.size(); ++i)
     dpo[i] = dpo[i - 1] * (q_deg - 1);
 
-  dpo[dim] +=
-    (q_deg <= 1 ? 1 : dim); // all the bubble functions are discontinuous
+  // Then add the bubble functions; they are all associated with the
+  // cell interior
+  dpo[dim] += (q_deg <= 1 ? 1 : dim);
   return dpo;
 }
 
@@ -450,8 +455,8 @@ FE_Q_Bubbles<dim, spacedim>::has_support_on_face(
   if (shape_index >= this->n_dofs_per_cell() - n_bubbles)
     return false;
   else
-    return FE_Q_Base<TensorProductPolynomialsBubbles<dim>, dim, spacedim>::
-      has_support_on_face(shape_index, face_index);
+    return FE_Q_Base<dim, spacedim>::has_support_on_face(shape_index,
+                                                         face_index);
 }
 
 

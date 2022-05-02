@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,7 +25,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -33,7 +32,7 @@
 // check
 //   DoFTools::
 //   count_dofs_per_component (...);
-// for the hp case
+// for the hp-case
 //
 // in contrast to the _01 test also check that this works if the element
 // collection has more than one element
@@ -61,7 +60,7 @@ test()
   fe_collection.push_back(fe_system1);
   fe_collection.push_back(fe_system2);
 
-  hp::DoFHandler<dim> hp_dof_handler(triangulation);
+  DoFHandler<dim> hp_dof_handler(triangulation);
   hp_dof_handler.begin_active()->set_active_fe_index(1);
 
   // distribute dofs
@@ -71,11 +70,10 @@ test()
   const std::vector<types::global_dof_index> dofs_per_component_hp =
     DoFTools::count_dofs_per_fe_component(hp_dof_handler);
 
-  for (unsigned int i = 0; i < 3; i++)
+  for (unsigned int i = 0; i < 3; ++i)
     {
       deallog << "DoFs in the " << i
-              << ". component for hp FE: " << dofs_per_component_hp.at(i)
-              << std::endl;
+              << ". component: " << dofs_per_component_hp.at(i) << std::endl;
     }
 }
 

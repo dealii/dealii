@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,7 +87,7 @@ test_hyper_cube()
 
   for (unsigned int degree = 1; degree < 4; ++degree)
     {
-      FESystem<dim> fe(FE_Q<dim>(QIterated<1>(QTrapez<1>(), degree)),
+      FESystem<dim> fe(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), degree)),
                        dim,
                        FE_DGP<dim>(degree + 1),
                        1);

@@ -53,7 +53,7 @@ test(const unsigned int chunk_size)
            it != m.end(i);
            ++it)
         {
-          deallog << "[" << it->column() << "," << std::setprecision(2)
+          deallog << '[' << it->column() << ',' << std::setprecision(2)
                   << std::fixed << std::setw(4) << it->value() << "] ";
         }
       deallog << std::endl;

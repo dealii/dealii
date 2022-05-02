@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -29,7 +29,6 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -65,9 +64,11 @@
 // to evaluate the result of the simulation.
 #include <deal.II/numerics/vector_tools.h>
 
-// We need this header for the function GridTools::find_active_cell_around_point
-// that we use in the function `ElasticWave::store_frequency_step_data()`
+// We need these headers for the function
+// GridTools::find_active_cell_around_point that we use in the function
+// `ElasticWave::store_frequency_step_data()`
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
 
 namespace step62
 {
@@ -346,7 +347,7 @@ namespace step62
     HDF5::DataSet frequency_dataset;
     HDF5::DataSet probe_positions_dataset;
 
-    // HDF5 dataset that stores the values of the energy measured by the proble.
+    // HDF5 dataset that stores the values of the energy measured by the probe.
     HDF5::DataSet displacement;
 
 
@@ -563,7 +564,7 @@ namespace step62
     // height="200" />
     // where the brown color represents material_a and the green color
     // represents material_b.
-    for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
+    for (unsigned int idx = 0; idx < nb_mirror_pairs; ++idx)
       {
         const double layer_transition_center =
           material_a_wavelength / 2 +
@@ -585,7 +586,7 @@ namespace step62
     // [subpixel
     // smoothing](https://meep.readthedocs.io/en/latest/Subpixel_Smoothing/)
     // which improves the precision of the simulation.
-    for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
+    for (unsigned int idx = 0; idx < nb_mirror_pairs; ++idx)
       {
         const double layer_transition_center =
           material_a_wavelength / 2 +
@@ -611,7 +612,7 @@ namespace step62
       }
 
     // the material_a layers
-    for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
+    for (unsigned int idx = 0; idx < nb_mirror_pairs; ++idx)
       {
         const double layer_center =
           material_a_wavelength / 2 +
@@ -626,7 +627,7 @@ namespace step62
       }
 
     // the material_b layers
-    for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
+    for (unsigned int idx = 0; idx < nb_mirror_pairs; ++idx)
       {
         const double layer_center =
           material_a_wavelength / 2 +
@@ -728,7 +729,7 @@ namespace step62
             (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
     , computing_timer(mpi_communicator,
                       pcout,
-                      TimerOutput::summary,
+                      TimerOutput::never,
                       TimerOutput::wall_times)
   {}
 
@@ -747,7 +748,8 @@ namespace step62
     dof_handler.distribute_dofs(fe);
 
     locally_owned_dofs = dof_handler.locally_owned_dofs();
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     locally_relevant_solution.reinit(locally_owned_dofs,
                                      locally_relevant_dofs,
@@ -794,7 +796,7 @@ namespace step62
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<std::complex<double>> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -877,6 +879,24 @@ namespace step62
                       s[component]     = pml_values[q][component];
                       xi *= s[component];
                     }
+
+                  // Here we calculate the $\alpha_{mnkl}$ and $\beta_{mnkl}$
+                  // tensors.
+                  Tensor<4, dim, std::complex<double>> alpha;
+                  Tensor<4, dim, std::complex<double>> beta;
+                  for (unsigned int m = 0; m < dim; ++m)
+                    for (unsigned int n = 0; n < dim; ++n)
+                      for (unsigned int k = 0; k < dim; ++k)
+                        for (unsigned int l = 0; l < dim; ++l)
+                          {
+                            alpha[m][n][k][l] = xi *
+                                                stiffness_tensor[m][n][k][l] /
+                                                (2.0 * s[n] * s[k]);
+                            beta[m][n][k][l] = xi *
+                                               stiffness_tensor[m][n][k][l] /
+                                               (2.0 * s[n] * s[l]);
+                          }
+
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
                       const Tensor<1, dim> phi_i =
@@ -903,15 +923,6 @@ namespace step62
                               for (unsigned int k = 0; k < dim; ++k)
                                 for (unsigned int l = 0; l < dim; ++l)
                                   {
-                                    // Here we calculate the tensors
-                                    // $\alpha_{mnkl}$ and $\beta_{mnkl}$
-                                    const std::complex<double> alpha =
-                                      xi * stiffness_tensor[m][n][k][l] /
-                                      (2.0 * s[n] * s[k]);
-                                    const std::complex<double> beta =
-                                      xi * stiffness_tensor[m][n][k][l] /
-                                      (2.0 * s[n] * s[l]);
-
                                     // Here we calculate the stiffness matrix.
                                     // Note that the stiffness matrix is not
                                     // symmetric because of the PMLs. We use the
@@ -931,8 +942,8 @@ namespace step62
                                     // very easy to make a mistake.
                                     stiffness_coefficient +=
                                       grad_phi_i[m][n] *
-                                      (alpha * grad_phi_j[l][k] +
-                                       beta * grad_phi_j[k][l]);
+                                      (alpha[m][n][k][l] * grad_phi_j[l][k] +
+                                       beta[m][n][k][l] * grad_phi_j[k][l]);
                                   }
 
                           // We save the value of the stiffness matrix in
@@ -1046,6 +1057,13 @@ namespace step62
     // displacement_data contains the value of the displacement at these points.
     std::vector<hsize_t>              coordinates;
     std::vector<std::complex<double>> displacement_data;
+
+    const auto &mapping = get_default_linear_mapping(triangulation);
+    GridTools::Cache<dim, dim> cache(triangulation, mapping);
+    typename Triangulation<dim, dim>::active_cell_iterator cell_hint{};
+    std::vector<bool>                                      marked_vertices = {};
+    const double                                           tolerance = 1.e-10;
+
     for (unsigned int position_idx = 0;
          position_idx < parameters.nb_probe_points;
          ++position_idx)
@@ -1055,17 +1073,16 @@ namespace step62
           {
             point[dim_idx] = probe_positions[position_idx][dim_idx];
           }
-        bool point_in_locally_owned_cell;
+        bool point_in_locally_owned_cell = false;
         {
-          // First we have to find out if the point is in a locally owned cell.
-          auto mapping = StaticMappingQ1<dim>::mapping;
-          const std::pair<typename DoFHandler<dim>::active_cell_iterator,
-                          Point<dim>>
-            cell_point = GridTools::find_active_cell_around_point(mapping,
-                                                                  dof_handler,
-                                                                  point);
-
-          point_in_locally_owned_cell = cell_point.first->is_locally_owned();
+          auto cell_and_ref_point = GridTools::find_active_cell_around_point(
+            cache, point, cell_hint, marked_vertices, tolerance);
+          if (cell_and_ref_point.first.state() == IteratorState::valid)
+            {
+              cell_hint = cell_and_ref_point.first;
+              point_in_locally_owned_cell =
+                cell_and_ref_point.first->is_locally_owned();
+            }
         }
         if (point_in_locally_owned_cell)
           {
@@ -1219,7 +1236,7 @@ namespace step62
 
     quadrature_cache.resize(triangulation.n_locally_owned_active_cells() *
                               quadrature_formula.size(),
-                            QuadratureCache<dim>(fe.dofs_per_cell));
+                            QuadratureCache<dim>(fe.n_dofs_per_cell()));
     unsigned int cache_index = 0;
     for (const auto &cell : triangulation.active_cell_iterators())
       if (cell->is_locally_owned())
@@ -1362,10 +1379,99 @@ int main(int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      HDF5::File  data_file("results.h5",
-                           HDF5::File::FileAccessMode::open,
+      HDF5::File data_file("results.h5",
+                           HDF5::File::FileAccessMode::create,
                            MPI_COMM_WORLD);
-      HDF5::Group data = data_file.open_group("data");
+      auto       data = data_file.create_group("data");
+
+      // Each of the simulations (displacement and calibration) is stored in a
+      // separate HDF5 group:
+      const std::vector<std::string> group_names = {"displacement",
+                                                    "calibration"};
+      for (auto group_name : group_names)
+        {
+          // For each of these two group names, we now create the group and put
+          // attributes into these groups.
+          // Specifically, these are:
+          // - The dimensions of the waveguide (in $x$ and $y$ directions)
+          // - The position of the probe (in $x$ and $y$ directions)
+          // - The number of points in the probe
+          // - The global refinement level
+          // - The cavity resonance frequency
+          // - The number of mirror pairs
+          // - The material properties
+          // - The force parameters
+          // - The PML parameters
+          // - The frequency parameters
+
+          auto group = data.create_group(group_name);
+
+          group.set_attribute<double>("dimension_x", 2e-5);
+          group.set_attribute<double>("dimension_y", 2e-8);
+          group.set_attribute<double>("probe_pos_x", 8e-6);
+          group.set_attribute<double>("probe_pos_y", 0);
+          group.set_attribute<double>("probe_width_y", 2e-08);
+          group.set_attribute<unsigned int>("nb_probe_points", 5);
+          group.set_attribute<unsigned int>("grid_level", 1);
+          group.set_attribute<double>("cavity_resonance_frequency", 20e9);
+          group.set_attribute<unsigned int>("nb_mirror_pairs", 15);
+
+          group.set_attribute<double>("poissons_ratio", 0.27);
+          group.set_attribute<double>("youngs_modulus", 270000000000.0);
+          group.set_attribute<double>("material_a_rho", 3200);
+
+          if (group_name == std::string("displacement"))
+            group.set_attribute<double>("material_b_rho", 2000);
+          else
+            group.set_attribute<double>("material_b_rho", 3200);
+
+          group.set_attribute(
+            "lambda",
+            group.get_attribute<double>("youngs_modulus") *
+              group.get_attribute<double>("poissons_ratio") /
+              ((1 + group.get_attribute<double>("poissons_ratio")) *
+               (1 - 2 * group.get_attribute<double>("poissons_ratio"))));
+          group.set_attribute("mu",
+                              group.get_attribute<double>("youngs_modulus") /
+                                (2 * (1 + group.get_attribute<double>(
+                                            "poissons_ratio"))));
+
+          group.set_attribute<double>("max_force_amplitude", 1e26);
+          group.set_attribute<double>("force_sigma_x", 1e-7);
+          group.set_attribute<double>("force_sigma_y", 1);
+          group.set_attribute<double>("max_force_width_x", 3e-7);
+          group.set_attribute<double>("max_force_width_y", 2e-8);
+          group.set_attribute<double>("force_x_pos", -8e-6);
+          group.set_attribute<double>("force_y_pos", 0);
+
+          group.set_attribute<bool>("pml_x", true);
+          group.set_attribute<bool>("pml_y", false);
+          group.set_attribute<double>("pml_width_x", 1.8e-6);
+          group.set_attribute<double>("pml_width_y", 5e-7);
+          group.set_attribute<double>("pml_coeff", 1.6);
+          group.set_attribute<unsigned int>("pml_coeff_degree", 2);
+
+          group.set_attribute<double>("center_frequency", 20e9);
+          group.set_attribute<double>("frequency_range", 0.5e9);
+          group.set_attribute<double>(
+            "start_frequency",
+            group.get_attribute<double>("center_frequency") -
+              group.get_attribute<double>("frequency_range") / 2);
+          group.set_attribute<double>(
+            "stop_frequency",
+            group.get_attribute<double>("center_frequency") +
+              group.get_attribute<double>("frequency_range") / 2);
+          group.set_attribute<unsigned int>("nb_frequency_points", 400);
+
+          if (group_name == std::string("displacement"))
+            group.set_attribute<std::string>(
+              "simulation_name", std::string("phononic_cavity_displacement"));
+          else
+            group.set_attribute<std::string>(
+              "simulation_name", std::string("phononic_cavity_calibration"));
+
+          group.set_attribute<bool>("save_vtu_files", false);
+        }
 
       {
         // Displacement simulation. The parameters are read from the

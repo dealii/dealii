@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,38 +27,17 @@ namespace hp
   MappingCollection<dim, spacedim>::MappingCollection(
     const Mapping<dim, spacedim> &mapping)
   {
-    mappings.push_back(
-      std::shared_ptr<const Mapping<dim, spacedim>>(mapping.clone()));
+    this->push_back(mapping);
   }
 
 
 
   template <int dim, int spacedim>
   MappingCollection<dim, spacedim>::MappingCollection(
-    const MappingCollection<dim, spacedim> &mapping_collection)
-    : Subscriptor()
-    ,
-    // copy the array
-    // of shared
-    // pointers. nothing
-    // bad should
-    // happen -- they
-    // simply all point
-    // to the same
-    // objects, and the
-    // last one to die
-    // will delete the
-    // mappings
-    mappings(mapping_collection.mappings)
-  {}
-
-
-
-  template <int dim, int spacedim>
-  std::size_t
-  MappingCollection<dim, spacedim>::memory_consumption() const
+    const MappingCollection<dim, spacedim> &other)
   {
-    return (sizeof(*this) + MemoryConsumption::memory_consumption(mappings));
+    for (unsigned int i = 0; i < other.size(); ++i)
+      push_back(other[i]);
   }
 
 
@@ -68,7 +47,7 @@ namespace hp
   MappingCollection<dim, spacedim>::push_back(
     const Mapping<dim, spacedim> &new_mapping)
   {
-    mappings.push_back(
+    Collection<Mapping<dim, spacedim>>::push_back(
       std::shared_ptr<const Mapping<dim, spacedim>>(new_mapping.clone()));
   }
 
@@ -87,7 +66,7 @@ namespace hp
      * this function is called.
      */
     template <int dim, int spacedim>
-    MappingQGeneric<dim, spacedim> &
+    MappingQ<dim, spacedim> &
     get_static_mapping_q1()
     {
       static MappingQ1<dim, spacedim> mapping;

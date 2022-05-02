@@ -1,4 +1,0 @@
-New: Extend function GridGenerator::torus<3,3>() so that one can generate
-an open torus with an angle of 0 < phi <= 2*pi.
-<br>
-(Niklas Fehn, 2019/10/16)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,8 +75,7 @@ namespace OpenCASCADE
     }
   } // namespace
 
-  /*============================== NormalProjectionManifold
-   * ==============================*/
+  /*======================= NormalProjectionManifold =========================*/
   template <int dim, int spacedim>
   NormalProjectionManifold<dim, spacedim>::NormalProjectionManifold(
     const TopoDS_Shape &sh,
@@ -117,8 +116,7 @@ namespace OpenCASCADE
   }
 
 
-  /*============================== DirectionalProjectionManifold
-   * ==============================*/
+  /*===================== DirectionalProjectionManifold ======================*/
   template <int dim, int spacedim>
   DirectionalProjectionManifold<dim, spacedim>::DirectionalProjectionManifold(
     const TopoDS_Shape &       sh,
@@ -162,8 +160,7 @@ namespace OpenCASCADE
 
 
 
-  /*============================== NormalToMeshProjectionManifold
-   * ==============================*/
+  /*===================== NormalToMeshProjectionManifold =====================*/
   template <int dim, int spacedim>
   NormalToMeshProjectionManifold<dim, spacedim>::NormalToMeshProjectionManifold(
     const TopoDS_Shape &sh,
@@ -187,170 +184,199 @@ namespace OpenCASCADE
   }
 
 
+  namespace
+  {
+    template <int spacedim>
+    Point<spacedim>
+    internal_project_to_manifold(const TopoDS_Shape &,
+                                 const double,
+                                 const ArrayView<const Point<spacedim>> &,
+                                 const Point<spacedim> &)
+    {
+      Assert(false, ExcNotImplemented());
+      return {};
+    }
+
+    template <>
+    Point<3>
+    internal_project_to_manifold(
+      const TopoDS_Shape &             sh,
+      const double                     tolerance,
+      const ArrayView<const Point<3>> &surrounding_points,
+      const Point<3> &                 candidate)
+    {
+      constexpr int       spacedim = 3;
+      TopoDS_Shape        out_shape;
+      Tensor<1, spacedim> average_normal;
+#  ifdef DEBUG
+      for (unsigned int i = 0; i < surrounding_points.size(); ++i)
+        {
+          Assert(closest_point(sh, surrounding_points[i], tolerance)
+                     .distance(surrounding_points[i]) <
+                   std::max(tolerance * surrounding_points[i].norm(),
+                            tolerance),
+                 ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
+        }
+#  endif
+
+      switch (surrounding_points.size())
+        {
+          case 2:
+            {
+              for (unsigned int i = 0; i < surrounding_points.size(); ++i)
+                {
+                  std::tuple<Point<3>, Tensor<1, 3>, double, double>
+                    p_and_diff_forms = closest_point_and_differential_forms(
+                      sh, surrounding_points[i], tolerance);
+                  average_normal += std::get<1>(p_and_diff_forms);
+                }
+
+              average_normal /= 2.0;
+
+              Assert(
+                average_normal.norm() > 1e-4,
+                ExcMessage(
+                  "Failed to refine cell: the average of the surface normals at the surrounding edge turns out to be a null vector, making the projection direction undetermined."));
+
+              Tensor<1, 3> T = surrounding_points[0] - surrounding_points[1];
+              T /= T.norm();
+              average_normal = average_normal - (average_normal * T) * T;
+              average_normal /= average_normal.norm();
+              break;
+            }
+          case 4:
+            {
+              Tensor<1, 3> u = surrounding_points[1] - surrounding_points[0];
+              Tensor<1, 3> v = surrounding_points[2] - surrounding_points[0];
+              const double n1_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                           u[2] * v[0] - u[0] * v[2],
+                                           u[0] * v[1] - u[1] * v[0]};
+              Tensor<1, 3> n1(n1_coords);
+              n1 = n1 / n1.norm();
+              u  = surrounding_points[2] - surrounding_points[3];
+              v  = surrounding_points[1] - surrounding_points[3];
+              const double n2_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                           u[2] * v[0] - u[0] * v[2],
+                                           u[0] * v[1] - u[1] * v[0]};
+              Tensor<1, 3> n2(n2_coords);
+              n2 = n2 / n2.norm();
+
+              average_normal = (n1 + n2) / 2.0;
+
+              Assert(
+                average_normal.norm() > tolerance,
+                ExcMessage(
+                  "Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
+
+              average_normal /= average_normal.norm();
+              break;
+            }
+          case 8:
+            {
+              Tensor<1, 3> u = surrounding_points[1] - surrounding_points[0];
+              Tensor<1, 3> v = surrounding_points[2] - surrounding_points[0];
+              const double n1_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                           u[2] * v[0] - u[0] * v[2],
+                                           u[0] * v[1] - u[1] * v[0]};
+              Tensor<1, 3> n1(n1_coords);
+              n1 = n1 / n1.norm();
+              u  = surrounding_points[2] - surrounding_points[3];
+              v  = surrounding_points[1] - surrounding_points[3];
+              const double n2_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                           u[2] * v[0] - u[0] * v[2],
+                                           u[0] * v[1] - u[1] * v[0]};
+              Tensor<1, 3> n2(n2_coords);
+              n2 = n2 / n2.norm();
+              u  = surrounding_points[4] - surrounding_points[7];
+              v  = surrounding_points[6] - surrounding_points[7];
+              const double n3_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                           u[2] * v[0] - u[0] * v[2],
+                                           u[0] * v[1] - u[1] * v[0]};
+              Tensor<1, 3> n3(n3_coords);
+              n3 = n3 / n3.norm();
+              u  = surrounding_points[6] - surrounding_points[7];
+              v  = surrounding_points[5] - surrounding_points[7];
+              const double n4_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                           u[2] * v[0] - u[0] * v[2],
+                                           u[0] * v[1] - u[1] * v[0]};
+              Tensor<1, 3> n4(n4_coords);
+              n4 = n4 / n4.norm();
+
+              average_normal = (n1 + n2 + n3 + n4) / 4.0;
+
+              Assert(
+                average_normal.norm() > tolerance,
+                ExcMessage(
+                  "Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
+
+              average_normal /= average_normal.norm();
+              break;
+            }
+          default:
+            {
+              // Given an arbitrary number of points we compute all the possible
+              // normal vectors
+              for (unsigned int i = 0; i < surrounding_points.size(); ++i)
+                for (unsigned int j = 0; j < surrounding_points.size(); ++j)
+                  if (j != i)
+                    for (unsigned int k = 0; k < surrounding_points.size(); ++k)
+                      if (k != j && k != i)
+                        {
+                          Tensor<1, 3> u =
+                            surrounding_points[i] - surrounding_points[j];
+                          Tensor<1, 3> v =
+                            surrounding_points[i] - surrounding_points[k];
+                          const double n_coords[3] = {u[1] * v[2] - u[2] * v[1],
+                                                      u[2] * v[0] - u[0] * v[2],
+                                                      u[0] * v[1] -
+                                                        u[1] * v[0]};
+                          Tensor<1, 3> n1(n_coords);
+                          if (n1.norm() > tolerance)
+                            {
+                              n1 = n1 / n1.norm();
+                              if (average_normal.norm() < tolerance)
+                                average_normal = n1;
+                              else
+                                {
+                                  auto dot_prod = n1 * average_normal;
+                                  // We check that the direction of the normal
+                                  // vector w.r.t the current average, and make
+                                  // sure we flip it if it is opposite
+                                  if (dot_prod > 0)
+                                    average_normal += n1;
+                                  else
+                                    average_normal -= n1;
+                                }
+                            }
+                        }
+              Assert(
+                average_normal.norm() > tolerance,
+                ExcMessage(
+                  "Failed to compute a normal: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
+              average_normal = average_normal / average_normal.norm();
+              break;
+            }
+        }
+
+      return line_intersection(sh, candidate, average_normal, tolerance);
+    }
+  } // namespace
+
+
   template <int dim, int spacedim>
   Point<spacedim>
   NormalToMeshProjectionManifold<dim, spacedim>::project_to_manifold(
     const ArrayView<const Point<spacedim>> &surrounding_points,
     const Point<spacedim> &                 candidate) const
   {
-    TopoDS_Shape out_shape;
-    Tensor<1, 3> average_normal;
-#  ifdef DEBUG
-    for (unsigned int i = 0; i < surrounding_points.size(); ++i)
-      {
-        Assert(closest_point(sh, surrounding_points[i], tolerance)
-                   .distance(surrounding_points[i]) <
-                 std::max(tolerance * surrounding_points[i].norm(), tolerance),
-               ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
-      }
-#  endif
-
-    switch (surrounding_points.size())
-      {
-        case 2:
-          {
-            for (unsigned int i = 0; i < surrounding_points.size(); ++i)
-              {
-                std::tuple<Point<3>, Tensor<1, 3>, double, double>
-                  p_and_diff_forms =
-                    closest_point_and_differential_forms(sh,
-                                                         surrounding_points[i],
-                                                         tolerance);
-                average_normal += std::get<1>(p_and_diff_forms);
-              }
-
-            average_normal /= 2.0;
-
-            Assert(
-              average_normal.norm() > 1e-4,
-              ExcMessage(
-                "Failed to refine cell: the average of the surface normals at the surrounding edge turns out to be a null vector, making the projection direction undetermined."));
-
-            Tensor<1, 3> T = surrounding_points[0] - surrounding_points[1];
-            T /= T.norm();
-            average_normal = average_normal - (average_normal * T) * T;
-            average_normal /= average_normal.norm();
-            break;
-          }
-        case 4:
-          {
-            Tensor<1, 3> u = surrounding_points[1] - surrounding_points[0];
-            Tensor<1, 3> v = surrounding_points[2] - surrounding_points[0];
-            const double n1_coords[3] = {u[1] * v[2] - u[2] * v[1],
-                                         u[2] * v[0] - u[0] * v[2],
-                                         u[0] * v[1] - u[1] * v[0]};
-            Tensor<1, 3> n1(n1_coords);
-            n1 = n1 / n1.norm();
-            u  = surrounding_points[2] - surrounding_points[3];
-            v  = surrounding_points[1] - surrounding_points[3];
-            const double n2_coords[3] = {u[1] * v[2] - u[2] * v[1],
-                                         u[2] * v[0] - u[0] * v[2],
-                                         u[0] * v[1] - u[1] * v[0]};
-            Tensor<1, 3> n2(n2_coords);
-            n2 = n2 / n2.norm();
-
-            average_normal = (n1 + n2) / 2.0;
-
-            Assert(
-              average_normal.norm() > tolerance,
-              ExcMessage(
-                "Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
-
-            average_normal /= average_normal.norm();
-            break;
-          }
-        case 8:
-          {
-            Tensor<1, 3> u = surrounding_points[1] - surrounding_points[0];
-            Tensor<1, 3> v = surrounding_points[2] - surrounding_points[0];
-            const double n1_coords[3] = {u[1] * v[2] - u[2] * v[1],
-                                         u[2] * v[0] - u[0] * v[2],
-                                         u[0] * v[1] - u[1] * v[0]};
-            Tensor<1, 3> n1(n1_coords);
-            n1 = n1 / n1.norm();
-            u  = surrounding_points[2] - surrounding_points[3];
-            v  = surrounding_points[1] - surrounding_points[3];
-            const double n2_coords[3] = {u[1] * v[2] - u[2] * v[1],
-                                         u[2] * v[0] - u[0] * v[2],
-                                         u[0] * v[1] - u[1] * v[0]};
-            Tensor<1, 3> n2(n2_coords);
-            n2 = n2 / n2.norm();
-            u  = surrounding_points[4] - surrounding_points[7];
-            v  = surrounding_points[6] - surrounding_points[7];
-            const double n3_coords[3] = {u[1] * v[2] - u[2] * v[1],
-                                         u[2] * v[0] - u[0] * v[2],
-                                         u[0] * v[1] - u[1] * v[0]};
-            Tensor<1, 3> n3(n3_coords);
-            n3 = n3 / n3.norm();
-            u  = surrounding_points[6] - surrounding_points[7];
-            v  = surrounding_points[5] - surrounding_points[7];
-            const double n4_coords[3] = {u[1] * v[2] - u[2] * v[1],
-                                         u[2] * v[0] - u[0] * v[2],
-                                         u[0] * v[1] - u[1] * v[0]};
-            Tensor<1, 3> n4(n4_coords);
-            n4 = n4 / n4.norm();
-
-            average_normal = (n1 + n2 + n3 + n4) / 4.0;
-
-            Assert(
-              average_normal.norm() > tolerance,
-              ExcMessage(
-                "Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
-
-            average_normal /= average_normal.norm();
-            break;
-          }
-        default:
-          {
-            // Given an arbitrary number of points we compute all the possible
-            // normal vectors
-            for (unsigned int i = 0; i < surrounding_points.size(); ++i)
-              for (unsigned int j = 0; j < surrounding_points.size(); ++j)
-                if (j != i)
-                  for (unsigned int k = 0; k < surrounding_points.size(); ++k)
-                    if (k != j && k != i)
-                      {
-                        Tensor<1, 3> u =
-                          surrounding_points[i] - surrounding_points[j];
-                        Tensor<1, 3> v =
-                          surrounding_points[i] - surrounding_points[k];
-                        const double n_coords[3] = {u[1] * v[2] - u[2] * v[1],
-                                                    u[2] * v[0] - u[0] * v[2],
-                                                    u[0] * v[1] - u[1] * v[0]};
-                        Tensor<1, 3> n1(n_coords);
-                        if (n1.norm() > tolerance)
-                          {
-                            n1 = n1 / n1.norm();
-                            if (average_normal.norm() < tolerance)
-                              average_normal = n1;
-                            else
-                              {
-                                auto dot_prod = n1 * average_normal;
-                                // We check that the direction of the normal
-                                // vector w.r.t the current average, and make
-                                // sure we flip it if it is opposite
-                                if (dot_prod > 0)
-                                  average_normal += n1;
-                                else
-                                  average_normal -= n1;
-                              }
-                          }
-                      }
-            Assert(
-              average_normal.norm() > tolerance,
-              ExcMessage(
-                "Failed to compute a normal: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
-            average_normal = average_normal / average_normal.norm();
-            break;
-          }
-      }
-
-    return line_intersection(sh, candidate, average_normal, tolerance);
+    return internal_project_to_manifold(sh,
+                                        tolerance,
+                                        surrounding_points,
+                                        candidate);
   }
 
 
-  /*============================== ArclengthProjectionLineManifold
-   * ==============================*/
+  /*==================== ArclengthProjectionLineManifold =====================*/
   template <int dim, int spacedim>
   ArclengthProjectionLineManifold<dim, spacedim>::
     ArclengthProjectionLineManifold(const TopoDS_Shape &sh,

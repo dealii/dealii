@@ -1,0 +1,1510 @@
+
+DEAL:Float:Add:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Add:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Add:Symbolic computation: Function initialisation::symb_psi: (s1 + s2)**2
+DEAL:Float:Add:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*(s1 + s2)
+DEAL:Float:Add:Symbolic computation: Differentiation::symb_dpsi_ds1: 2*(s1 + s2)
+DEAL:Float:Add:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2
+DEAL:Float:Add:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2
+DEAL:Float:Add:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2
+DEAL:Float:Add:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2
+DEAL:Float:Add:Symbolic computation: Substitution::subs_psi: 25.00000
+DEAL:Float:Add:Symbolic computation: Substitution::subs_dpsi_ds0: 10.00000
+DEAL:Float:Add:Symbolic computation: Substitution::subs_dpsi_ds1: 10.00000
+DEAL:Float:Add:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 2.000000
+DEAL:Float:Add:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 2.000000
+DEAL:Float:Add:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 2.000000
+DEAL:Float:Add:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 2.000000
+DEAL:Float:Subtract:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Subtract:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Subtract:Symbolic computation: Function initialisation::symb_psi: (s1 - s2)**2
+DEAL:Float:Subtract:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*(s1 - s2)
+DEAL:Float:Subtract:Symbolic computation: Differentiation::symb_dpsi_ds1: -2*(s1 - s2)
+DEAL:Float:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2
+DEAL:Float:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -2
+DEAL:Float:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -2
+DEAL:Float:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2
+DEAL:Float:Subtract:Symbolic computation: Substitution::subs_psi: 1.000000
+DEAL:Float:Subtract:Symbolic computation: Substitution::subs_dpsi_ds0: 2.000000
+DEAL:Float:Subtract:Symbolic computation: Substitution::subs_dpsi_ds1: -2.000000
+DEAL:Float:Subtract:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 2.000000
+DEAL:Float:Subtract:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -2.000000
+DEAL:Float:Subtract:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -2.000000
+DEAL:Float:Subtract:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 2.000000
+DEAL:Float:Multiply:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Multiply:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Multiply:Symbolic computation: Function initialisation::symb_psi: s1**2*s2**2
+DEAL:Float:Multiply:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*s2**2
+DEAL:Float:Multiply:Symbolic computation: Differentiation::symb_dpsi_ds1: 2*s1**2*s2
+DEAL:Float:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2**2
+DEAL:Float:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 4*s1*s2
+DEAL:Float:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 4*s1*s2
+DEAL:Float:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2*s1**2
+DEAL:Float:Multiply:Symbolic computation: Substitution::subs_psi: 36.00000
+DEAL:Float:Multiply:Symbolic computation: Substitution::subs_dpsi_ds0: 24.00000
+DEAL:Float:Multiply:Symbolic computation: Substitution::subs_dpsi_ds1: 36.00000
+DEAL:Float:Multiply:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 8.000000
+DEAL:Float:Multiply:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 24.00000
+DEAL:Float:Multiply:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 24.00000
+DEAL:Float:Multiply:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 18.00000
+DEAL:Float:Divide:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Divide:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Divide:Symbolic computation: Function initialisation::symb_psi: s1**2/s2**2
+DEAL:Float:Divide:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1/s2**2
+DEAL:Float:Divide:Symbolic computation: Differentiation::symb_dpsi_ds1: -2*s1**2/s2**3
+DEAL:Float:Divide:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2/s2**2
+DEAL:Float:Divide:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -4*s1/s2**3
+DEAL:Float:Divide:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -4*s1/s2**3
+DEAL:Float:Divide:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 6*s1**2/s2**4
+DEAL:Float:Divide:Symbolic computation: Substitution::subs_psi: 2.250000
+DEAL:Float:Divide:Symbolic computation: Substitution::subs_dpsi_ds0: 1.500000
+DEAL:Float:Divide:Symbolic computation: Substitution::subs_dpsi_ds1: -2.250000
+DEAL:Float:Divide:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.5000000
+DEAL:Float:Divide:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -1.500000
+DEAL:Float:Divide:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -1.500000
+DEAL:Float:Divide:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 3.375000
+DEAL:Float:Power:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Power:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Power:Symbolic computation: Function initialisation::symb_psi: 2.0*s1**s2
+DEAL:Float:Power:Symbolic computation: Differentiation::symb_dpsi_ds0: 2.0*s1**(-1 + s2)*s2
+DEAL:Float:Power:Symbolic computation: Differentiation::symb_dpsi_ds1: 2.0*s1**s2*log(s1)
+DEAL:Float:Power:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2.0*s1**(-2 + s2)*s2*(-1 + s2)
+DEAL:Float:Power:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2.0*s1**(-1 + s2)*s2*log(s1) + 2.0*s1**(-1 + s2)
+DEAL:Float:Power:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2.0*s1**(-1 + s2)*s2*log(s1) + 2.0*s1**(-1 + s2)
+DEAL:Float:Power:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2.0*s1**s2*log(s1)**2
+DEAL:Float:Power:Symbolic computation: Substitution::subs_psi: 18.00000
+DEAL:Float:Power:Symbolic computation: Substitution::subs_dpsi_ds0: 12.00000
+DEAL:Float:Power:Symbolic computation: Substitution::subs_dpsi_ds1: 19.77502
+DEAL:Float:Power:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 4.000000
+DEAL:Float:Power:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 19.18335
+DEAL:Float:Power:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 19.18335
+DEAL:Float:Power:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 21.72508
+DEAL:Float:Sqrt:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Sqrt:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Sqrt:Symbolic computation: Function initialisation::symb_psi: 2.0*sqrt(s1*s2)
+DEAL:Float:Sqrt:Symbolic computation: Differentiation::symb_dpsi_ds0: 1.0*s2/sqrt(s1*s2)
+DEAL:Float:Sqrt:Symbolic computation: Differentiation::symb_dpsi_ds1: 1.0*s1/sqrt(s1*s2)
+DEAL:Float:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -0.5*s2**2/(s1*s2)**(3/2)
+DEAL:Float:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -0.5*s1*s2/(s1*s2)**(3/2) + 1.0*(s1*s2)**(-1/2)
+DEAL:Float:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -0.5*s1*s2/(s1*s2)**(3/2) + 1.0*(s1*s2)**(-1/2)
+DEAL:Float:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -0.5*s1**2/(s1*s2)**(3/2)
+DEAL:Float:Sqrt:Symbolic computation: Substitution::subs_psi: 4.898980
+DEAL:Float:Sqrt:Symbolic computation: Substitution::subs_dpsi_ds0: 0.8164966
+DEAL:Float:Sqrt:Symbolic computation: Substitution::subs_dpsi_ds1: 1.224745
+DEAL:Float:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: -0.1360828
+DEAL:Float:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.2041241
+DEAL:Float:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.2041241
+DEAL:Float:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.3061862
+DEAL:Float:Exponential:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Exponential:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Exponential:Symbolic computation: Function initialisation::symb_psi: exp(s2)*s1**2
+DEAL:Float:Exponential:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*exp(s2)*s1
+DEAL:Float:Exponential:Symbolic computation: Differentiation::symb_dpsi_ds1: exp(s2)*s1**2
+DEAL:Float:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*exp(s2)
+DEAL:Float:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2*exp(s2)*s1
+DEAL:Float:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2*exp(s2)*s1
+DEAL:Float:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: exp(s2)*s1**2
+DEAL:Float:Exponential:Symbolic computation: Substitution::subs_psi: 66.50150
+DEAL:Float:Exponential:Symbolic computation: Substitution::subs_dpsi_ds0: 44.33434
+DEAL:Float:Exponential:Symbolic computation: Substitution::subs_dpsi_ds1: 66.50150
+DEAL:Float:Exponential:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 14.77811
+DEAL:Float:Exponential:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 44.33434
+DEAL:Float:Exponential:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 44.33434
+DEAL:Float:Exponential:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 66.50150
+DEAL:Float:Logarithm:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Logarithm:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Logarithm:Symbolic computation: Function initialisation::symb_psi: s1**2*log(s2)
+DEAL:Float:Logarithm:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*log(s2)
+DEAL:Float:Logarithm:Symbolic computation: Differentiation::symb_dpsi_ds1: s1**2/s2
+DEAL:Float:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*log(s2)
+DEAL:Float:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2*s1/s2
+DEAL:Float:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2*s1/s2
+DEAL:Float:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -s1**2/s2**2
+DEAL:Float:Logarithm:Symbolic computation: Substitution::subs_psi: 6.238325
+DEAL:Float:Logarithm:Symbolic computation: Substitution::subs_dpsi_ds0: 4.158883
+DEAL:Float:Logarithm:Symbolic computation: Substitution::subs_dpsi_ds1: 4.500000
+DEAL:Float:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 1.386294
+DEAL:Float:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 3.000000
+DEAL:Float:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 3.000000
+DEAL:Float:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -2.250000
+DEAL:Float:Logarithm with Base:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Logarithm with Base:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Logarithm with Base:Symbolic computation: Function initialisation::symb_psi: log(s2)/log(s1)
+DEAL:Float:Logarithm with Base:Symbolic computation: Differentiation::symb_dpsi_ds0: -log(s2)/(s1*log(s1)**2)
+DEAL:Float:Logarithm with Base:Symbolic computation: Differentiation::symb_dpsi_ds1: 1/(s2*log(s1))
+DEAL:Float:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*log(s2)/(s1**2*log(s1)**3) + log(s2)/(s1**2*log(s1)**2)
+DEAL:Float:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1/(s1*s2*log(s1)**2)
+DEAL:Float:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1/(s1*s2*log(s1)**2)
+DEAL:Float:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1/(s2**2*log(s1))
+DEAL:Float:Logarithm with Base:Symbolic computation: Substitution::subs_psi: 0.6309298
+DEAL:Float:Logarithm with Base:Symbolic computation: Substitution::subs_dpsi_ds0: -0.1914323
+DEAL:Float:Logarithm with Base:Symbolic computation: Substitution::subs_dpsi_ds1: 0.4551196
+DEAL:Float:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.1799769
+DEAL:Float:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.1380892
+DEAL:Float:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.1380892
+DEAL:Float:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.2275598
+DEAL:Float:Logarithm base 10:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Logarithm base 10:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Logarithm base 10:Symbolic computation: Function initialisation::symb_psi: 0.434294481903252*s1**2*log(s2)
+DEAL:Float:Logarithm base 10:Symbolic computation: Differentiation::symb_dpsi_ds0: 0.868588963806504*s1*log(s2)
+DEAL:Float:Logarithm base 10:Symbolic computation: Differentiation::symb_dpsi_ds1: 0.434294481903252*s1**2/s2
+DEAL:Float:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 0.868588963806504*log(s2)
+DEAL:Float:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 0.868588963806504*s1/s2
+DEAL:Float:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 0.868588963806504*s1/s2
+DEAL:Float:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -0.434294481903252*s1**2/s2**2
+DEAL:Float:Logarithm base 10:Symbolic computation: Substitution::subs_psi: 2.709270
+DEAL:Float:Logarithm base 10:Symbolic computation: Substitution::subs_dpsi_ds0: 1.806180
+DEAL:Float:Logarithm base 10:Symbolic computation: Substitution::subs_dpsi_ds1: 1.954325
+DEAL:Float:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.6020600
+DEAL:Float:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 1.302883
+DEAL:Float:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 1.302883
+DEAL:Float:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.9771626
+DEAL:Float:Sin:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Sin:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Sin:Symbolic computation: Function initialisation::symb_psi: sin(s2/s1)
+DEAL:Float:Sin:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*cos(s2/s1)/s1**2
+DEAL:Float:Sin:Symbolic computation: Differentiation::symb_dpsi_ds1: cos(s2/s1)/s1
+DEAL:Float:Sin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s2**2*sin(s2/s1)/s1**4 + 2*s2*cos(s2/s1)/s1**3
+DEAL:Float:Sin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -cos(s2/s1)/s1**2 + s2*sin(s2/s1)/s1**3
+DEAL:Float:Sin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -cos(s2/s1)/s1**2 + s2*sin(s2/s1)/s1**3
+DEAL:Float:Sin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -sin(s2/s1)/s1**2
+DEAL:Float:Sin:Symbolic computation: Substitution::subs_psi: 0.6183698
+DEAL:Float:Sin:Symbolic computation: Substitution::subs_dpsi_ds0: -0.1746416
+DEAL:Float:Sin:Symbolic computation: Substitution::subs_dpsi_ds1: 0.2619624
+DEAL:Float:Sin:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.08589096
+DEAL:Float:Sin:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.04151563
+DEAL:Float:Sin:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.04151563
+DEAL:Float:Sin:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.06870776
+DEAL:Float:Cos:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Cos:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Cos:Symbolic computation: Function initialisation::symb_psi: cos(s2/s1)
+DEAL:Float:Cos:Symbolic computation: Differentiation::symb_dpsi_ds0: s2*sin(s2/s1)/s1**2
+DEAL:Float:Cos:Symbolic computation: Differentiation::symb_dpsi_ds1: -sin(s2/s1)/s1
+DEAL:Float:Cos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s2**2*cos(s2/s1)/s1**4 - 2*s2*sin(s2/s1)/s1**3
+DEAL:Float:Cos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: sin(s2/s1)/s1**2 + s2*cos(s2/s1)/s1**3
+DEAL:Float:Cos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: sin(s2/s1)/s1**2 + s2*cos(s2/s1)/s1**3
+DEAL:Float:Cos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -cos(s2/s1)/s1**2
+DEAL:Float:Cos:Symbolic computation: Substitution::subs_psi: 0.7858872
+DEAL:Float:Cos:Symbolic computation: Substitution::subs_dpsi_ds0: 0.1374155
+DEAL:Float:Cos:Symbolic computation: Substitution::subs_dpsi_ds1: -0.2061233
+DEAL:Float:Cos:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: -0.1304196
+DEAL:Float:Cos:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.1269216
+DEAL:Float:Cos:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.1269216
+DEAL:Float:Cos:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.08732080
+DEAL:Float:Tan:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Tan:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Tan:Symbolic computation: Function initialisation::symb_psi: tan(s2/s1)
+DEAL:Float:Tan:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*(1 + tan(s2/s1)**2)/s1**2
+DEAL:Float:Tan:Symbolic computation: Differentiation::symb_dpsi_ds1: (1 + tan(s2/s1)**2)/s1
+DEAL:Float:Tan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2*(1 + tan(s2/s1)**2)/s1**3 + 2*s2**2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**4
+DEAL:Float:Tan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -(1 + tan(s2/s1)**2)/s1**2 - 2*s2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**3
+DEAL:Float:Tan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -(1 + tan(s2/s1)**2)/s1**2 - 2*s2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**3
+DEAL:Float:Tan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**2
+DEAL:Float:Tan:Symbolic computation: Substitution::subs_psi: 0.7868429
+DEAL:Float:Tan:Symbolic computation: Substitution::subs_dpsi_ds0: -0.3598048
+DEAL:Float:Tan:Symbolic computation: Substitution::subs_dpsi_ds1: 0.5397073
+DEAL:Float:Tan:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.3656965
+DEAL:Float:Tan:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.3686424
+DEAL:Float:Tan:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.3686424
+DEAL:Float:Tan:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.2831099
+DEAL:Float:ASin:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:ASin:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:ASin:Symbolic computation: Function initialisation::symb_psi: asin(1.0/(s1*s2))
+DEAL:Float:ASin:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASin:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 1.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1**3*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 1.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1*s2**3*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASin:Symbolic computation: Substitution::subs_psi: 0.1674481
+DEAL:Float:ASin:Symbolic computation: Substitution::subs_dpsi_ds0: -0.05634362
+DEAL:Float:ASin:Symbolic computation: Substitution::subs_dpsi_ds1: -0.08451542
+DEAL:Float:ASin:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.03809902
+DEAL:Float:ASin:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.02897672
+DEAL:Float:ASin:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.02897672
+DEAL:Float:ASin:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.08572279
+DEAL:Float:ACos:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:ACos:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:ACos:Symbolic computation: Function initialisation::symb_psi: acos(1.0/(s1*s2))
+DEAL:Float:ACos:Symbolic computation: Differentiation::symb_dpsi_ds0: 1.0/(s1**2*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ACos:Symbolic computation: Differentiation::symb_dpsi_ds1: 1.0/(s1*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ACos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -1.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 2.0*1/(s1**3*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ACos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ACos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ACos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 2.0*1/(s1*s2**3*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ACos:Symbolic computation: Substitution::subs_psi: 1.403348
+DEAL:Float:ACos:Symbolic computation: Substitution::subs_dpsi_ds0: 0.05634362
+DEAL:Float:ACos:Symbolic computation: Substitution::subs_dpsi_ds1: 0.08451542
+DEAL:Float:ACos:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: -0.03809902
+DEAL:Float:ACos:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.02897672
+DEAL:Float:ACos:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.02897672
+DEAL:Float:ACos:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.08572279
+DEAL:Float:ATan:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:ATan:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:ATan:Symbolic computation: Function initialisation::symb_psi: atan(1.0/(s1*s2))
+DEAL:Float:ATan:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATan:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -2.0*1/(s1**5*s2**3*(1 + 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1**3*s2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -2.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -2.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -2.0*1/(s1**3*s2**5*(1 + 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1*s2**3*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATan:Symbolic computation: Substitution::subs_psi: 0.1651487
+DEAL:Float:ATan:Symbolic computation: Substitution::subs_dpsi_ds0: -0.05405406
+DEAL:Float:ATan:Symbolic computation: Substitution::subs_dpsi_ds1: -0.08108108
+DEAL:Float:ATan:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.03506209
+DEAL:Float:ATan:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.02556611
+DEAL:Float:ATan:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.02556611
+DEAL:Float:ATan:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.07888971
+DEAL:Float:ATan2:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:ATan2:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:ATan2:Symbolic computation: Function initialisation::symb_psi: 3.0*atan2(s2, s1)
+DEAL:Float:ATan2:Symbolic computation: Differentiation::symb_dpsi_ds0: -3.0*s2/(s1**2 + s2**2)
+DEAL:Float:ATan2:Symbolic computation: Differentiation::symb_dpsi_ds1: 3.0*s1/(s1**2 + s2**2)
+DEAL:Float:ATan2:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 6.0*s1*s2/(s1**2 + s2**2)**2
+DEAL:Float:ATan2:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 6.0*s2**2/(s1**2 + s2**2)**2 - 3.0*(s1**2 + s2**2)**(-1)
+DEAL:Float:ATan2:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -6.0*s1**2/(s1**2 + s2**2)**2 + 3.0*(s1**2 + s2**2)**(-1)
+DEAL:Float:ATan2:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -6.0*s1*s2/(s1**2 + s2**2)**2
+DEAL:Float:ATan2:Symbolic computation: Substitution::subs_psi: 1.764008
+DEAL:Float:ATan2:Symbolic computation: Substitution::subs_dpsi_ds0: -0.4615385
+DEAL:Float:ATan2:Symbolic computation: Substitution::subs_dpsi_ds1: 0.6923077
+DEAL:Float:ATan2:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.2130178
+DEAL:Float:ATan2:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.08875740
+DEAL:Float:ATan2:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.08875740
+DEAL:Float:ATan2:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.2130178
+DEAL:Float:Sinh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Sinh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Sinh:Symbolic computation: Function initialisation::symb_psi: sinh(s2/s1)
+DEAL:Float:Sinh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*cosh(s2/s1)/s1**2
+DEAL:Float:Sinh:Symbolic computation: Differentiation::symb_dpsi_ds1: cosh(s2/s1)/s1
+DEAL:Float:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: s2**2*sinh(s2/s1)/s1**4 + 2*s2*cosh(s2/s1)/s1**3
+DEAL:Float:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -cosh(s2/s1)/s1**2 - s2*sinh(s2/s1)/s1**3
+DEAL:Float:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -cosh(s2/s1)/s1**2 - s2*sinh(s2/s1)/s1**3
+DEAL:Float:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: sinh(s2/s1)/s1**2
+DEAL:Float:Sinh:Symbolic computation: Substitution::subs_psi: 0.7171585
+DEAL:Float:Sinh:Symbolic computation: Substitution::subs_dpsi_ds0: -0.2734613
+DEAL:Float:Sinh:Symbolic computation: Substitution::subs_dpsi_ds1: 0.4101919
+DEAL:Float:Sinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.2177227
+DEAL:Float:Sinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.1898535
+DEAL:Float:Sinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.1898535
+DEAL:Float:Sinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.07968428
+DEAL:Float:Cosh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Cosh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Cosh:Symbolic computation: Function initialisation::symb_psi: cosh(s2/s1)
+DEAL:Float:Cosh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*sinh(s2/s1)/s1**2
+DEAL:Float:Cosh:Symbolic computation: Differentiation::symb_dpsi_ds1: sinh(s2/s1)/s1
+DEAL:Float:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: s2**2*cosh(s2/s1)/s1**4 + 2*s2*sinh(s2/s1)/s1**3
+DEAL:Float:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -sinh(s2/s1)/s1**2 - s2*cosh(s2/s1)/s1**3
+DEAL:Float:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -sinh(s2/s1)/s1**2 - s2*cosh(s2/s1)/s1**3
+DEAL:Float:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: cosh(s2/s1)/s1**2
+DEAL:Float:Cosh:Symbolic computation: Substitution::subs_psi: 1.230576
+DEAL:Float:Cosh:Symbolic computation: Substitution::subs_dpsi_ds0: -0.1593686
+DEAL:Float:Cosh:Symbolic computation: Substitution::subs_dpsi_ds1: 0.2390528
+DEAL:Float:Cosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.1670149
+DEAL:Float:Cosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.1708380
+DEAL:Float:Cosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.1708380
+DEAL:Float:Cosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.1367306
+DEAL:Float:Tanh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Tanh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Tanh:Symbolic computation: Function initialisation::symb_psi: tanh(s2/s1)
+DEAL:Float:Tanh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*(1 - tanh(s2/s1)**2)/s1**2
+DEAL:Float:Tanh:Symbolic computation: Differentiation::symb_dpsi_ds1: (1 - tanh(s2/s1)**2)/s1
+DEAL:Float:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2*(1 - tanh(s2/s1)**2)/s1**3 - 2*s2**2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**4
+DEAL:Float:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -(1 - tanh(s2/s1)**2)/s1**2 + 2*s2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**3
+DEAL:Float:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -(1 - tanh(s2/s1)**2)/s1**2 + 2*s2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**3
+DEAL:Float:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**2
+DEAL:Float:Tanh:Symbolic computation: Substitution::subs_psi: 0.5827830
+DEAL:Float:Tanh:Symbolic computation: Substitution::subs_dpsi_ds0: -0.1467475
+DEAL:Float:Tanh:Symbolic computation: Substitution::subs_dpsi_ds1: 0.2201213
+DEAL:Float:Tanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.05982193
+DEAL:Float:Tanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.01635912
+DEAL:Float:Tanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.01635912
+DEAL:Float:Tanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.08552197
+DEAL:Float:ASinh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:ASinh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:ASinh:Symbolic computation: Function initialisation::symb_psi: asinh(1.0/(s1*s2))
+DEAL:Float:ASinh:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASinh:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -1.0*1/(s1**5*s2**3*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1**3*s2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1.0*1/(s1**3*s2**5*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1*s2**3*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ASinh:Symbolic computation: Substitution::subs_psi: 0.1659046
+DEAL:Float:ASinh:Symbolic computation: Substitution::subs_dpsi_ds0: -0.05479966
+DEAL:Float:ASinh:Symbolic computation: Substitution::subs_dpsi_ds1: -0.08219950
+DEAL:Float:ASinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.03603942
+DEAL:Float:ASinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.02665929
+DEAL:Float:ASinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.02665929
+DEAL:Float:ASinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.08108869
+DEAL:Float:ACosh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:ACosh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:ACosh:Symbolic computation: Function initialisation::symb_psi: acosh(s1*s2)
+DEAL:Float:ACosh:Symbolic computation: Differentiation::symb_dpsi_ds0: s2/sqrt(-1 + s1**2*s2**2)
+DEAL:Float:ACosh:Symbolic computation: Differentiation::symb_dpsi_ds1: s1/sqrt(-1 + s1**2*s2**2)
+DEAL:Float:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s1*s2**3/(-1 + s1**2*s2**2)**(3/2)
+DEAL:Float:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -s1**2*s2**2/(-1 + s1**2*s2**2)**(3/2) + (-1 + s1**2*s2**2)**(-1/2)
+DEAL:Float:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -s1**2*s2**2/(-1 + s1**2*s2**2)**(3/2) + (-1 + s1**2*s2**2)**(-1/2)
+DEAL:Float:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -s1**3*s2/(-1 + s1**2*s2**2)**(3/2)
+DEAL:Float:ACosh:Symbolic computation: Substitution::subs_psi: 2.477889
+DEAL:Float:ACosh:Symbolic computation: Substitution::subs_dpsi_ds0: 0.3380617
+DEAL:Float:ACosh:Symbolic computation: Substitution::subs_dpsi_ds1: 0.5070925
+DEAL:Float:ACosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: -0.1159069
+DEAL:Float:ACosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.004829457
+DEAL:Float:ACosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.004829457
+DEAL:Float:ACosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.2607905
+DEAL:Float:ATanh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:ATanh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:ATanh:Symbolic computation: Function initialisation::symb_psi: atanh(1.0/(s1*s2))
+DEAL:Float:ATanh:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATanh:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1**3*s2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1*s2**3*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Float:ATanh:Symbolic computation: Substitution::subs_psi: 0.1682361
+DEAL:Float:ATanh:Symbolic computation: Substitution::subs_dpsi_ds0: -0.05714286
+DEAL:Float:ATanh:Symbolic computation: Substitution::subs_dpsi_ds1: -0.08571430
+DEAL:Float:ATanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.03918368
+DEAL:Float:ATanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.03020408
+DEAL:Float:ATanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.03020408
+DEAL:Float:ATanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.08816327
+DEAL:Float:Erf:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Erf:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Erf:Symbolic computation: Function initialisation::symb_psi: s1**2*erf(s2)
+DEAL:Float:Erf:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*erf(s2)
+DEAL:Float:Erf:Symbolic computation: Differentiation::symb_dpsi_ds1: 2*exp(-s2**2)*s1**2/sqrt(pi)
+DEAL:Float:Erf:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*erf(s2)
+DEAL:Float:Erf:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 4*exp(-s2**2)*s1/sqrt(pi)
+DEAL:Float:Erf:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 4*exp(-s2**2)*s1/sqrt(pi)
+DEAL:Float:Erf:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -4*exp(-s2**2)*s1**2*s2/sqrt(pi)
+DEAL:Float:Erf:Symbolic computation: Substitution::subs_psi: 8.957901
+DEAL:Float:Erf:Symbolic computation: Substitution::subs_dpsi_ds0: 5.971934
+DEAL:Float:Erf:Symbolic computation: Substitution::subs_dpsi_ds1: 0.1860029
+DEAL:Float:Erf:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 1.990645
+DEAL:Float:Erf:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.1240019
+DEAL:Float:Erf:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.1240019
+DEAL:Float:Erf:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.7440115
+DEAL:Float:Erfc:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Float:Erfc:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Float:Erfc:Symbolic computation: Function initialisation::symb_psi: s1**2*erfc(s2)
+DEAL:Float:Erfc:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*erfc(s2)
+DEAL:Float:Erfc:Symbolic computation: Differentiation::symb_dpsi_ds1: -2*exp(-s2**2)*s1**2/sqrt(pi)
+DEAL:Float:Erfc:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*erfc(s2)
+DEAL:Float:Erfc:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -4*exp(-s2**2)*s1/sqrt(pi)
+DEAL:Float:Erfc:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -4*exp(-s2**2)*s1/sqrt(pi)
+DEAL:Float:Erfc:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 4*exp(-s2**2)*s1**2*s2/sqrt(pi)
+DEAL:Float:Erfc:Symbolic computation: Substitution::subs_psi: 0.04209961
+DEAL:Float:Erfc:Symbolic computation: Substitution::subs_dpsi_ds0: 0.02806641
+DEAL:Float:Erfc:Symbolic computation: Substitution::subs_dpsi_ds1: -0.1860029
+DEAL:Float:Erfc:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.009355470
+DEAL:Float:Erfc:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.1240019
+DEAL:Float:Erfc:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.1240019
+DEAL:Float:Erfc:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.7440115
+DEAL:Float::OK
+DEAL:Double:Add:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Add:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Add:Symbolic computation: Function initialisation::symb_psi: (s1 + s2)**2
+DEAL:Double:Add:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*(s1 + s2)
+DEAL:Double:Add:Symbolic computation: Differentiation::symb_dpsi_ds1: 2*(s1 + s2)
+DEAL:Double:Add:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2
+DEAL:Double:Add:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2
+DEAL:Double:Add:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2
+DEAL:Double:Add:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2
+DEAL:Double:Add:Symbolic computation: Substitution::subs_psi: 25.00000
+DEAL:Double:Add:Symbolic computation: Substitution::subs_dpsi_ds0: 10.00000
+DEAL:Double:Add:Symbolic computation: Substitution::subs_dpsi_ds1: 10.00000
+DEAL:Double:Add:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 2.000000
+DEAL:Double:Add:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 2.000000
+DEAL:Double:Add:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 2.000000
+DEAL:Double:Add:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 2.000000
+DEAL:Double:Subtract:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Subtract:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Subtract:Symbolic computation: Function initialisation::symb_psi: (s1 - s2)**2
+DEAL:Double:Subtract:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*(s1 - s2)
+DEAL:Double:Subtract:Symbolic computation: Differentiation::symb_dpsi_ds1: -2*(s1 - s2)
+DEAL:Double:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2
+DEAL:Double:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -2
+DEAL:Double:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -2
+DEAL:Double:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2
+DEAL:Double:Subtract:Symbolic computation: Substitution::subs_psi: 1.000000
+DEAL:Double:Subtract:Symbolic computation: Substitution::subs_dpsi_ds0: 2.000000
+DEAL:Double:Subtract:Symbolic computation: Substitution::subs_dpsi_ds1: -2.000000
+DEAL:Double:Subtract:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 2.000000
+DEAL:Double:Subtract:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -2.000000
+DEAL:Double:Subtract:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -2.000000
+DEAL:Double:Subtract:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 2.000000
+DEAL:Double:Multiply:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Multiply:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Multiply:Symbolic computation: Function initialisation::symb_psi: s1**2*s2**2
+DEAL:Double:Multiply:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*s2**2
+DEAL:Double:Multiply:Symbolic computation: Differentiation::symb_dpsi_ds1: 2*s1**2*s2
+DEAL:Double:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2**2
+DEAL:Double:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 4*s1*s2
+DEAL:Double:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 4*s1*s2
+DEAL:Double:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2*s1**2
+DEAL:Double:Multiply:Symbolic computation: Substitution::subs_psi: 36.00000
+DEAL:Double:Multiply:Symbolic computation: Substitution::subs_dpsi_ds0: 24.00000
+DEAL:Double:Multiply:Symbolic computation: Substitution::subs_dpsi_ds1: 36.00000
+DEAL:Double:Multiply:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 8.000000
+DEAL:Double:Multiply:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 24.00000
+DEAL:Double:Multiply:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 24.00000
+DEAL:Double:Multiply:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 18.00000
+DEAL:Double:Divide:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Divide:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Divide:Symbolic computation: Function initialisation::symb_psi: s1**2/s2**2
+DEAL:Double:Divide:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1/s2**2
+DEAL:Double:Divide:Symbolic computation: Differentiation::symb_dpsi_ds1: -2*s1**2/s2**3
+DEAL:Double:Divide:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2/s2**2
+DEAL:Double:Divide:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -4*s1/s2**3
+DEAL:Double:Divide:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -4*s1/s2**3
+DEAL:Double:Divide:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 6*s1**2/s2**4
+DEAL:Double:Divide:Symbolic computation: Substitution::subs_psi: 2.250000
+DEAL:Double:Divide:Symbolic computation: Substitution::subs_dpsi_ds0: 1.500000
+DEAL:Double:Divide:Symbolic computation: Substitution::subs_dpsi_ds1: -2.250000
+DEAL:Double:Divide:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.5000000
+DEAL:Double:Divide:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -1.500000
+DEAL:Double:Divide:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -1.500000
+DEAL:Double:Divide:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 3.375000
+DEAL:Double:Power:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Power:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Power:Symbolic computation: Function initialisation::symb_psi: 2.0*s1**s2
+DEAL:Double:Power:Symbolic computation: Differentiation::symb_dpsi_ds0: 2.0*s1**(-1 + s2)*s2
+DEAL:Double:Power:Symbolic computation: Differentiation::symb_dpsi_ds1: 2.0*s1**s2*log(s1)
+DEAL:Double:Power:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2.0*s1**(-2 + s2)*s2*(-1 + s2)
+DEAL:Double:Power:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2.0*s1**(-1 + s2)*s2*log(s1) + 2.0*s1**(-1 + s2)
+DEAL:Double:Power:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2.0*s1**(-1 + s2)*s2*log(s1) + 2.0*s1**(-1 + s2)
+DEAL:Double:Power:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2.0*s1**s2*log(s1)**2
+DEAL:Double:Power:Symbolic computation: Substitution::subs_psi: 18.00000
+DEAL:Double:Power:Symbolic computation: Substitution::subs_dpsi_ds0: 12.00000
+DEAL:Double:Power:Symbolic computation: Substitution::subs_dpsi_ds1: 19.77502
+DEAL:Double:Power:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 4.000000
+DEAL:Double:Power:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 19.18335
+DEAL:Double:Power:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 19.18335
+DEAL:Double:Power:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 21.72508
+DEAL:Double:Sqrt:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Sqrt:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Sqrt:Symbolic computation: Function initialisation::symb_psi: 2.0*sqrt(s1*s2)
+DEAL:Double:Sqrt:Symbolic computation: Differentiation::symb_dpsi_ds0: 1.0*s2/sqrt(s1*s2)
+DEAL:Double:Sqrt:Symbolic computation: Differentiation::symb_dpsi_ds1: 1.0*s1/sqrt(s1*s2)
+DEAL:Double:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -0.5*s2**2/(s1*s2)**(3/2)
+DEAL:Double:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -0.5*s1*s2/(s1*s2)**(3/2) + 1.0*(s1*s2)**(-1/2)
+DEAL:Double:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -0.5*s1*s2/(s1*s2)**(3/2) + 1.0*(s1*s2)**(-1/2)
+DEAL:Double:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -0.5*s1**2/(s1*s2)**(3/2)
+DEAL:Double:Sqrt:Symbolic computation: Substitution::subs_psi: 4.898979
+DEAL:Double:Sqrt:Symbolic computation: Substitution::subs_dpsi_ds0: 0.8164966
+DEAL:Double:Sqrt:Symbolic computation: Substitution::subs_dpsi_ds1: 1.224745
+DEAL:Double:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: -0.1360828
+DEAL:Double:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.2041241
+DEAL:Double:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.2041241
+DEAL:Double:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.3061862
+DEAL:Double:Exponential:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Exponential:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Exponential:Symbolic computation: Function initialisation::symb_psi: exp(s2)*s1**2
+DEAL:Double:Exponential:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*exp(s2)*s1
+DEAL:Double:Exponential:Symbolic computation: Differentiation::symb_dpsi_ds1: exp(s2)*s1**2
+DEAL:Double:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*exp(s2)
+DEAL:Double:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2*exp(s2)*s1
+DEAL:Double:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2*exp(s2)*s1
+DEAL:Double:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: exp(s2)*s1**2
+DEAL:Double:Exponential:Symbolic computation: Substitution::subs_psi: 66.50150
+DEAL:Double:Exponential:Symbolic computation: Substitution::subs_dpsi_ds0: 44.33434
+DEAL:Double:Exponential:Symbolic computation: Substitution::subs_dpsi_ds1: 66.50150
+DEAL:Double:Exponential:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 14.77811
+DEAL:Double:Exponential:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 44.33434
+DEAL:Double:Exponential:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 44.33434
+DEAL:Double:Exponential:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 66.50150
+DEAL:Double:Logarithm:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Logarithm:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Logarithm:Symbolic computation: Function initialisation::symb_psi: s1**2*log(s2)
+DEAL:Double:Logarithm:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*log(s2)
+DEAL:Double:Logarithm:Symbolic computation: Differentiation::symb_dpsi_ds1: s1**2/s2
+DEAL:Double:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*log(s2)
+DEAL:Double:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2*s1/s2
+DEAL:Double:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2*s1/s2
+DEAL:Double:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -s1**2/s2**2
+DEAL:Double:Logarithm:Symbolic computation: Substitution::subs_psi: 6.238325
+DEAL:Double:Logarithm:Symbolic computation: Substitution::subs_dpsi_ds0: 4.158883
+DEAL:Double:Logarithm:Symbolic computation: Substitution::subs_dpsi_ds1: 4.500000
+DEAL:Double:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 1.386294
+DEAL:Double:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 3.000000
+DEAL:Double:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 3.000000
+DEAL:Double:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -2.250000
+DEAL:Double:Logarithm with Base:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Logarithm with Base:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Logarithm with Base:Symbolic computation: Function initialisation::symb_psi: log(s2)/log(s1)
+DEAL:Double:Logarithm with Base:Symbolic computation: Differentiation::symb_dpsi_ds0: -log(s2)/(s1*log(s1)**2)
+DEAL:Double:Logarithm with Base:Symbolic computation: Differentiation::symb_dpsi_ds1: 1/(s2*log(s1))
+DEAL:Double:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*log(s2)/(s1**2*log(s1)**3) + log(s2)/(s1**2*log(s1)**2)
+DEAL:Double:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1/(s1*s2*log(s1)**2)
+DEAL:Double:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1/(s1*s2*log(s1)**2)
+DEAL:Double:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1/(s2**2*log(s1))
+DEAL:Double:Logarithm with Base:Symbolic computation: Substitution::subs_psi: 0.6309298
+DEAL:Double:Logarithm with Base:Symbolic computation: Substitution::subs_dpsi_ds0: -0.1914323
+DEAL:Double:Logarithm with Base:Symbolic computation: Substitution::subs_dpsi_ds1: 0.4551196
+DEAL:Double:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.1799769
+DEAL:Double:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.1380892
+DEAL:Double:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.1380892
+DEAL:Double:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.2275598
+DEAL:Double:Logarithm base 10:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Logarithm base 10:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Logarithm base 10:Symbolic computation: Function initialisation::symb_psi: 0.434294481903252*s1**2*log(s2)
+DEAL:Double:Logarithm base 10:Symbolic computation: Differentiation::symb_dpsi_ds0: 0.868588963806504*s1*log(s2)
+DEAL:Double:Logarithm base 10:Symbolic computation: Differentiation::symb_dpsi_ds1: 0.434294481903252*s1**2/s2
+DEAL:Double:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 0.868588963806504*log(s2)
+DEAL:Double:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 0.868588963806504*s1/s2
+DEAL:Double:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 0.868588963806504*s1/s2
+DEAL:Double:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -0.434294481903252*s1**2/s2**2
+DEAL:Double:Logarithm base 10:Symbolic computation: Substitution::subs_psi: 2.709270
+DEAL:Double:Logarithm base 10:Symbolic computation: Substitution::subs_dpsi_ds0: 1.806180
+DEAL:Double:Logarithm base 10:Symbolic computation: Substitution::subs_dpsi_ds1: 1.954325
+DEAL:Double:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.6020600
+DEAL:Double:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 1.302883
+DEAL:Double:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 1.302883
+DEAL:Double:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.9771626
+DEAL:Double:Sin:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Sin:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Sin:Symbolic computation: Function initialisation::symb_psi: sin(s2/s1)
+DEAL:Double:Sin:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*cos(s2/s1)/s1**2
+DEAL:Double:Sin:Symbolic computation: Differentiation::symb_dpsi_ds1: cos(s2/s1)/s1
+DEAL:Double:Sin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s2**2*sin(s2/s1)/s1**4 + 2*s2*cos(s2/s1)/s1**3
+DEAL:Double:Sin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -cos(s2/s1)/s1**2 + s2*sin(s2/s1)/s1**3
+DEAL:Double:Sin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -cos(s2/s1)/s1**2 + s2*sin(s2/s1)/s1**3
+DEAL:Double:Sin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -sin(s2/s1)/s1**2
+DEAL:Double:Sin:Symbolic computation: Substitution::subs_psi: 0.6183698
+DEAL:Double:Sin:Symbolic computation: Substitution::subs_dpsi_ds0: -0.1746416
+DEAL:Double:Sin:Symbolic computation: Substitution::subs_dpsi_ds1: 0.2619624
+DEAL:Double:Sin:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.08589096
+DEAL:Double:Sin:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.04151564
+DEAL:Double:Sin:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.04151564
+DEAL:Double:Sin:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.06870776
+DEAL:Double:Cos:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Cos:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Cos:Symbolic computation: Function initialisation::symb_psi: cos(s2/s1)
+DEAL:Double:Cos:Symbolic computation: Differentiation::symb_dpsi_ds0: s2*sin(s2/s1)/s1**2
+DEAL:Double:Cos:Symbolic computation: Differentiation::symb_dpsi_ds1: -sin(s2/s1)/s1
+DEAL:Double:Cos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s2**2*cos(s2/s1)/s1**4 - 2*s2*sin(s2/s1)/s1**3
+DEAL:Double:Cos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: sin(s2/s1)/s1**2 + s2*cos(s2/s1)/s1**3
+DEAL:Double:Cos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: sin(s2/s1)/s1**2 + s2*cos(s2/s1)/s1**3
+DEAL:Double:Cos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -cos(s2/s1)/s1**2
+DEAL:Double:Cos:Symbolic computation: Substitution::subs_psi: 0.7858873
+DEAL:Double:Cos:Symbolic computation: Substitution::subs_dpsi_ds0: 0.1374155
+DEAL:Double:Cos:Symbolic computation: Substitution::subs_dpsi_ds1: -0.2061233
+DEAL:Double:Cos:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: -0.1304196
+DEAL:Double:Cos:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.1269216
+DEAL:Double:Cos:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.1269216
+DEAL:Double:Cos:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.08732081
+DEAL:Double:Tan:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Tan:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Tan:Symbolic computation: Function initialisation::symb_psi: tan(s2/s1)
+DEAL:Double:Tan:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*(1 + tan(s2/s1)**2)/s1**2
+DEAL:Double:Tan:Symbolic computation: Differentiation::symb_dpsi_ds1: (1 + tan(s2/s1)**2)/s1
+DEAL:Double:Tan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2*(1 + tan(s2/s1)**2)/s1**3 + 2*s2**2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**4
+DEAL:Double:Tan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -(1 + tan(s2/s1)**2)/s1**2 - 2*s2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**3
+DEAL:Double:Tan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -(1 + tan(s2/s1)**2)/s1**2 - 2*s2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**3
+DEAL:Double:Tan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**2
+DEAL:Double:Tan:Symbolic computation: Substitution::subs_psi: 0.7868429
+DEAL:Double:Tan:Symbolic computation: Substitution::subs_dpsi_ds0: -0.3598048
+DEAL:Double:Tan:Symbolic computation: Substitution::subs_dpsi_ds1: 0.5397072
+DEAL:Double:Tan:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.3656965
+DEAL:Double:Tan:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.3686423
+DEAL:Double:Tan:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.3686423
+DEAL:Double:Tan:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.2831099
+DEAL:Double:ASin:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:ASin:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:ASin:Symbolic computation: Function initialisation::symb_psi: asin(1.0/(s1*s2))
+DEAL:Double:ASin:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASin:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 1.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1**3*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 1.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1*s2**3*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASin:Symbolic computation: Substitution::subs_psi: 0.1674481
+DEAL:Double:ASin:Symbolic computation: Substitution::subs_dpsi_ds0: -0.05634362
+DEAL:Double:ASin:Symbolic computation: Substitution::subs_dpsi_ds1: -0.08451543
+DEAL:Double:ASin:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.03809902
+DEAL:Double:ASin:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.02897672
+DEAL:Double:ASin:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.02897672
+DEAL:Double:ASin:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.08572279
+DEAL:Double:ACos:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:ACos:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:ACos:Symbolic computation: Function initialisation::symb_psi: acos(1.0/(s1*s2))
+DEAL:Double:ACos:Symbolic computation: Differentiation::symb_dpsi_ds0: 1.0/(s1**2*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ACos:Symbolic computation: Differentiation::symb_dpsi_ds1: 1.0/(s1*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ACos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -1.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 2.0*1/(s1**3*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ACos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ACos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ACos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 2.0*1/(s1*s2**3*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ACos:Symbolic computation: Substitution::subs_psi: 1.403348
+DEAL:Double:ACos:Symbolic computation: Substitution::subs_dpsi_ds0: 0.05634362
+DEAL:Double:ACos:Symbolic computation: Substitution::subs_dpsi_ds1: 0.08451543
+DEAL:Double:ACos:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: -0.03809902
+DEAL:Double:ACos:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.02897672
+DEAL:Double:ACos:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.02897672
+DEAL:Double:ACos:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.08572279
+DEAL:Double:ATan:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:ATan:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:ATan:Symbolic computation: Function initialisation::symb_psi: atan(1.0/(s1*s2))
+DEAL:Double:ATan:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATan:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -2.0*1/(s1**5*s2**3*(1 + 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1**3*s2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -2.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -2.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -2.0*1/(s1**3*s2**5*(1 + 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1*s2**3*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATan:Symbolic computation: Substitution::subs_psi: 0.1651487
+DEAL:Double:ATan:Symbolic computation: Substitution::subs_dpsi_ds0: -0.05405405
+DEAL:Double:ATan:Symbolic computation: Substitution::subs_dpsi_ds1: -0.08108108
+DEAL:Double:ATan:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.03506209
+DEAL:Double:ATan:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.02556611
+DEAL:Double:ATan:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.02556611
+DEAL:Double:ATan:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.07888970
+DEAL:Double:ATan2:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:ATan2:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:ATan2:Symbolic computation: Function initialisation::symb_psi: 3.0*atan2(s2, s1)
+DEAL:Double:ATan2:Symbolic computation: Differentiation::symb_dpsi_ds0: -3.0*s2/(s1**2 + s2**2)
+DEAL:Double:ATan2:Symbolic computation: Differentiation::symb_dpsi_ds1: 3.0*s1/(s1**2 + s2**2)
+DEAL:Double:ATan2:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 6.0*s1*s2/(s1**2 + s2**2)**2
+DEAL:Double:ATan2:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 6.0*s2**2/(s1**2 + s2**2)**2 - 3.0*(s1**2 + s2**2)**(-1)
+DEAL:Double:ATan2:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -6.0*s1**2/(s1**2 + s2**2)**2 + 3.0*(s1**2 + s2**2)**(-1)
+DEAL:Double:ATan2:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -6.0*s1*s2/(s1**2 + s2**2)**2
+DEAL:Double:ATan2:Symbolic computation: Substitution::subs_psi: 1.764008
+DEAL:Double:ATan2:Symbolic computation: Substitution::subs_dpsi_ds0: -0.4615385
+DEAL:Double:ATan2:Symbolic computation: Substitution::subs_dpsi_ds1: 0.6923077
+DEAL:Double:ATan2:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.2130178
+DEAL:Double:ATan2:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.08875740
+DEAL:Double:ATan2:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.08875740
+DEAL:Double:ATan2:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.2130178
+DEAL:Double:Sinh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Sinh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Sinh:Symbolic computation: Function initialisation::symb_psi: sinh(s2/s1)
+DEAL:Double:Sinh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*cosh(s2/s1)/s1**2
+DEAL:Double:Sinh:Symbolic computation: Differentiation::symb_dpsi_ds1: cosh(s2/s1)/s1
+DEAL:Double:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: s2**2*sinh(s2/s1)/s1**4 + 2*s2*cosh(s2/s1)/s1**3
+DEAL:Double:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -cosh(s2/s1)/s1**2 - s2*sinh(s2/s1)/s1**3
+DEAL:Double:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -cosh(s2/s1)/s1**2 - s2*sinh(s2/s1)/s1**3
+DEAL:Double:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: sinh(s2/s1)/s1**2
+DEAL:Double:Sinh:Symbolic computation: Substitution::subs_psi: 0.7171585
+DEAL:Double:Sinh:Symbolic computation: Substitution::subs_dpsi_ds0: -0.2734612
+DEAL:Double:Sinh:Symbolic computation: Substitution::subs_dpsi_ds1: 0.4101919
+DEAL:Double:Sinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.2177227
+DEAL:Double:Sinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.1898535
+DEAL:Double:Sinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.1898535
+DEAL:Double:Sinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.07968427
+DEAL:Double:Cosh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Cosh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Cosh:Symbolic computation: Function initialisation::symb_psi: cosh(s2/s1)
+DEAL:Double:Cosh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*sinh(s2/s1)/s1**2
+DEAL:Double:Cosh:Symbolic computation: Differentiation::symb_dpsi_ds1: sinh(s2/s1)/s1
+DEAL:Double:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: s2**2*cosh(s2/s1)/s1**4 + 2*s2*sinh(s2/s1)/s1**3
+DEAL:Double:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -sinh(s2/s1)/s1**2 - s2*cosh(s2/s1)/s1**3
+DEAL:Double:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -sinh(s2/s1)/s1**2 - s2*cosh(s2/s1)/s1**3
+DEAL:Double:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: cosh(s2/s1)/s1**2
+DEAL:Double:Cosh:Symbolic computation: Substitution::subs_psi: 1.230576
+DEAL:Double:Cosh:Symbolic computation: Substitution::subs_dpsi_ds0: -0.1593685
+DEAL:Double:Cosh:Symbolic computation: Substitution::subs_dpsi_ds1: 0.2390528
+DEAL:Double:Cosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.1670149
+DEAL:Double:Cosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.1708380
+DEAL:Double:Cosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.1708380
+DEAL:Double:Cosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.1367306
+DEAL:Double:Tanh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Tanh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Tanh:Symbolic computation: Function initialisation::symb_psi: tanh(s2/s1)
+DEAL:Double:Tanh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*(1 - tanh(s2/s1)**2)/s1**2
+DEAL:Double:Tanh:Symbolic computation: Differentiation::symb_dpsi_ds1: (1 - tanh(s2/s1)**2)/s1
+DEAL:Double:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2*(1 - tanh(s2/s1)**2)/s1**3 - 2*s2**2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**4
+DEAL:Double:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -(1 - tanh(s2/s1)**2)/s1**2 + 2*s2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**3
+DEAL:Double:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -(1 - tanh(s2/s1)**2)/s1**2 + 2*s2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**3
+DEAL:Double:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**2
+DEAL:Double:Tanh:Symbolic computation: Substitution::subs_psi: 0.5827829
+DEAL:Double:Tanh:Symbolic computation: Substitution::subs_dpsi_ds0: -0.1467476
+DEAL:Double:Tanh:Symbolic computation: Substitution::subs_dpsi_ds1: 0.2201213
+DEAL:Double:Tanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.05982194
+DEAL:Double:Tanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.01635913
+DEAL:Double:Tanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.01635913
+DEAL:Double:Tanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.08552198
+DEAL:Double:ASinh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:ASinh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:ASinh:Symbolic computation: Function initialisation::symb_psi: asinh(1.0/(s1*s2))
+DEAL:Double:ASinh:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASinh:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -1.0*1/(s1**5*s2**3*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1**3*s2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1.0*1/(s1**3*s2**5*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1*s2**3*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ASinh:Symbolic computation: Substitution::subs_psi: 0.1659046
+DEAL:Double:ASinh:Symbolic computation: Substitution::subs_dpsi_ds0: -0.05479966
+DEAL:Double:ASinh:Symbolic computation: Substitution::subs_dpsi_ds1: -0.08219949
+DEAL:Double:ASinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.03603942
+DEAL:Double:ASinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.02665930
+DEAL:Double:ASinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.02665930
+DEAL:Double:ASinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.08108869
+DEAL:Double:ACosh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:ACosh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:ACosh:Symbolic computation: Function initialisation::symb_psi: acosh(s1*s2)
+DEAL:Double:ACosh:Symbolic computation: Differentiation::symb_dpsi_ds0: s2/sqrt(-1 + s1**2*s2**2)
+DEAL:Double:ACosh:Symbolic computation: Differentiation::symb_dpsi_ds1: s1/sqrt(-1 + s1**2*s2**2)
+DEAL:Double:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s1*s2**3/(-1 + s1**2*s2**2)**(3/2)
+DEAL:Double:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -s1**2*s2**2/(-1 + s1**2*s2**2)**(3/2) + (-1 + s1**2*s2**2)**(-1/2)
+DEAL:Double:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -s1**2*s2**2/(-1 + s1**2*s2**2)**(3/2) + (-1 + s1**2*s2**2)**(-1/2)
+DEAL:Double:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -s1**3*s2/(-1 + s1**2*s2**2)**(3/2)
+DEAL:Double:ACosh:Symbolic computation: Substitution::subs_psi: 2.477889
+DEAL:Double:ACosh:Symbolic computation: Substitution::subs_dpsi_ds0: 0.3380617
+DEAL:Double:ACosh:Symbolic computation: Substitution::subs_dpsi_ds1: 0.5070926
+DEAL:Double:ACosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: -0.1159069
+DEAL:Double:ACosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.004829453
+DEAL:Double:ACosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.004829453
+DEAL:Double:ACosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.2607905
+DEAL:Double:ATanh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:ATanh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:ATanh:Symbolic computation: Function initialisation::symb_psi: atanh(1.0/(s1*s2))
+DEAL:Double:ATanh:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATanh:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1**3*s2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1*s2**3*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Double:ATanh:Symbolic computation: Substitution::subs_psi: 0.1682361
+DEAL:Double:ATanh:Symbolic computation: Substitution::subs_dpsi_ds0: -0.05714286
+DEAL:Double:ATanh:Symbolic computation: Substitution::subs_dpsi_ds1: -0.08571429
+DEAL:Double:ATanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.03918367
+DEAL:Double:ATanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.03020408
+DEAL:Double:ATanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.03020408
+DEAL:Double:ATanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.08816327
+DEAL:Double:Erf:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Erf:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Erf:Symbolic computation: Function initialisation::symb_psi: s1**2*erf(s2)
+DEAL:Double:Erf:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*erf(s2)
+DEAL:Double:Erf:Symbolic computation: Differentiation::symb_dpsi_ds1: 2*exp(-s2**2)*s1**2/sqrt(pi)
+DEAL:Double:Erf:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*erf(s2)
+DEAL:Double:Erf:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 4*exp(-s2**2)*s1/sqrt(pi)
+DEAL:Double:Erf:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 4*exp(-s2**2)*s1/sqrt(pi)
+DEAL:Double:Erf:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -4*exp(-s2**2)*s1**2*s2/sqrt(pi)
+DEAL:Double:Erf:Symbolic computation: Substitution::subs_psi: 8.957900
+DEAL:Double:Erf:Symbolic computation: Substitution::subs_dpsi_ds0: 5.971934
+DEAL:Double:Erf:Symbolic computation: Substitution::subs_dpsi_ds1: 0.1860029
+DEAL:Double:Erf:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 1.990645
+DEAL:Double:Erf:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: 0.1240019
+DEAL:Double:Erf:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: 0.1240019
+DEAL:Double:Erf:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: -0.7440115
+DEAL:Double:Erfc:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Double:Erfc:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Double:Erfc:Symbolic computation: Function initialisation::symb_psi: s1**2*erfc(s2)
+DEAL:Double:Erfc:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*erfc(s2)
+DEAL:Double:Erfc:Symbolic computation: Differentiation::symb_dpsi_ds1: -2*exp(-s2**2)*s1**2/sqrt(pi)
+DEAL:Double:Erfc:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*erfc(s2)
+DEAL:Double:Erfc:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -4*exp(-s2**2)*s1/sqrt(pi)
+DEAL:Double:Erfc:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -4*exp(-s2**2)*s1/sqrt(pi)
+DEAL:Double:Erfc:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 4*exp(-s2**2)*s1**2*s2/sqrt(pi)
+DEAL:Double:Erfc:Symbolic computation: Substitution::subs_psi: 0.04209961
+DEAL:Double:Erfc:Symbolic computation: Substitution::subs_dpsi_ds0: 0.02806641
+DEAL:Double:Erfc:Symbolic computation: Substitution::subs_dpsi_ds1: -0.1860029
+DEAL:Double:Erfc:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: 0.009355470
+DEAL:Double:Erfc:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: -0.1240019
+DEAL:Double:Erfc:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: -0.1240019
+DEAL:Double:Erfc:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: 0.7440115
+DEAL:Double::OK
+DEAL:Complex float:Add:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Add:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Add:Symbolic computation: Function initialisation::symb_psi: (s1 + s2)**2
+DEAL:Complex float:Add:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*(s1 + s2)
+DEAL:Complex float:Add:Symbolic computation: Differentiation::symb_dpsi_ds1: 2*(s1 + s2)
+DEAL:Complex float:Add:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2
+DEAL:Complex float:Add:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2
+DEAL:Complex float:Add:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2
+DEAL:Complex float:Add:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2
+DEAL:Complex float:Add:Symbolic computation: Substitution::subs_psi: (25.00000,0.000000)
+DEAL:Complex float:Add:Symbolic computation: Substitution::subs_dpsi_ds0: (10.00000,0.000000)
+DEAL:Complex float:Add:Symbolic computation: Substitution::subs_dpsi_ds1: (10.00000,0.000000)
+DEAL:Complex float:Add:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (2.000000,0.000000)
+DEAL:Complex float:Add:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (2.000000,0.000000)
+DEAL:Complex float:Add:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (2.000000,0.000000)
+DEAL:Complex float:Add:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (2.000000,0.000000)
+DEAL:Complex float:Subtract:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Subtract:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Subtract:Symbolic computation: Function initialisation::symb_psi: (s1 - s2)**2
+DEAL:Complex float:Subtract:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*(s1 - s2)
+DEAL:Complex float:Subtract:Symbolic computation: Differentiation::symb_dpsi_ds1: -2*(s1 - s2)
+DEAL:Complex float:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2
+DEAL:Complex float:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -2
+DEAL:Complex float:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -2
+DEAL:Complex float:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2
+DEAL:Complex float:Subtract:Symbolic computation: Substitution::subs_psi: (1.000000,0.000000)
+DEAL:Complex float:Subtract:Symbolic computation: Substitution::subs_dpsi_ds0: (2.000000,0.000000)
+DEAL:Complex float:Subtract:Symbolic computation: Substitution::subs_dpsi_ds1: (-2.000000,0.000000)
+DEAL:Complex float:Subtract:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (2.000000,0.000000)
+DEAL:Complex float:Subtract:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-2.000000,0.000000)
+DEAL:Complex float:Subtract:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-2.000000,0.000000)
+DEAL:Complex float:Subtract:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (2.000000,0.000000)
+DEAL:Complex float:Multiply:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Multiply:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Multiply:Symbolic computation: Function initialisation::symb_psi: s1**2*s2**2
+DEAL:Complex float:Multiply:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*s2**2
+DEAL:Complex float:Multiply:Symbolic computation: Differentiation::symb_dpsi_ds1: 2*s1**2*s2
+DEAL:Complex float:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2**2
+DEAL:Complex float:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 4*s1*s2
+DEAL:Complex float:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 4*s1*s2
+DEAL:Complex float:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2*s1**2
+DEAL:Complex float:Multiply:Symbolic computation: Substitution::subs_psi: (36.00000,0.000000)
+DEAL:Complex float:Multiply:Symbolic computation: Substitution::subs_dpsi_ds0: (24.00000,0.000000)
+DEAL:Complex float:Multiply:Symbolic computation: Substitution::subs_dpsi_ds1: (36.00000,0.000000)
+DEAL:Complex float:Multiply:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (8.000000,0.000000)
+DEAL:Complex float:Multiply:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (24.00000,0.000000)
+DEAL:Complex float:Multiply:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (24.00000,0.000000)
+DEAL:Complex float:Multiply:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (18.00000,0.000000)
+DEAL:Complex float:Divide:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Divide:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Divide:Symbolic computation: Function initialisation::symb_psi: s1**2/s2**2
+DEAL:Complex float:Divide:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1/s2**2
+DEAL:Complex float:Divide:Symbolic computation: Differentiation::symb_dpsi_ds1: -2*s1**2/s2**3
+DEAL:Complex float:Divide:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2/s2**2
+DEAL:Complex float:Divide:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -4*s1/s2**3
+DEAL:Complex float:Divide:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -4*s1/s2**3
+DEAL:Complex float:Divide:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 6*s1**2/s2**4
+DEAL:Complex float:Divide:Symbolic computation: Substitution::subs_psi: (2.250000,0.000000)
+DEAL:Complex float:Divide:Symbolic computation: Substitution::subs_dpsi_ds0: (1.500000,0.000000)
+DEAL:Complex float:Divide:Symbolic computation: Substitution::subs_dpsi_ds1: (-2.250000,0.000000)
+DEAL:Complex float:Divide:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.5000000,0.000000)
+DEAL:Complex float:Divide:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-1.500000,0.000000)
+DEAL:Complex float:Divide:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-1.500000,0.000000)
+DEAL:Complex float:Divide:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (3.375000,0.000000)
+DEAL:Complex float:Power:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Power:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Power:Symbolic computation: Function initialisation::symb_psi: 2.0*s1**s2
+DEAL:Complex float:Power:Symbolic computation: Differentiation::symb_dpsi_ds0: 2.0*s1**(-1 + s2)*s2
+DEAL:Complex float:Power:Symbolic computation: Differentiation::symb_dpsi_ds1: 2.0*s1**s2*log(s1)
+DEAL:Complex float:Power:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2.0*s1**(-2 + s2)*s2*(-1 + s2)
+DEAL:Complex float:Power:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2.0*s1**(-1 + s2)*s2*log(s1) + 2.0*s1**(-1 + s2)
+DEAL:Complex float:Power:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2.0*s1**(-1 + s2)*s2*log(s1) + 2.0*s1**(-1 + s2)
+DEAL:Complex float:Power:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2.0*s1**s2*log(s1)**2
+DEAL:Complex float:Power:Symbolic computation: Substitution::subs_psi: (18.00000,0.000000)
+DEAL:Complex float:Power:Symbolic computation: Substitution::subs_dpsi_ds0: (12.00000,0.000000)
+DEAL:Complex float:Power:Symbolic computation: Substitution::subs_dpsi_ds1: (19.77502,0.000000)
+DEAL:Complex float:Power:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (4.000000,0.000000)
+DEAL:Complex float:Power:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (19.18335,0.000000)
+DEAL:Complex float:Power:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (19.18335,0.000000)
+DEAL:Complex float:Power:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (21.72508,0.000000)
+DEAL:Complex float:Sqrt:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Sqrt:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Sqrt:Symbolic computation: Function initialisation::symb_psi: 2.0*sqrt(s1*s2)
+DEAL:Complex float:Sqrt:Symbolic computation: Differentiation::symb_dpsi_ds0: 1.0*s2/sqrt(s1*s2)
+DEAL:Complex float:Sqrt:Symbolic computation: Differentiation::symb_dpsi_ds1: 1.0*s1/sqrt(s1*s2)
+DEAL:Complex float:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -0.5*s2**2/(s1*s2)**(3/2)
+DEAL:Complex float:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -0.5*s1*s2/(s1*s2)**(3/2) + 1.0*(s1*s2)**(-1/2)
+DEAL:Complex float:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -0.5*s1*s2/(s1*s2)**(3/2) + 1.0*(s1*s2)**(-1/2)
+DEAL:Complex float:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -0.5*s1**2/(s1*s2)**(3/2)
+DEAL:Complex float:Sqrt:Symbolic computation: Substitution::subs_psi: (4.898980,0.000000)
+DEAL:Complex float:Sqrt:Symbolic computation: Substitution::subs_dpsi_ds0: (0.8164966,0.000000)
+DEAL:Complex float:Sqrt:Symbolic computation: Substitution::subs_dpsi_ds1: (1.224745,0.000000)
+DEAL:Complex float:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (-0.1360828,0.000000)
+DEAL:Complex float:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.2041241,0.000000)
+DEAL:Complex float:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.2041241,0.000000)
+DEAL:Complex float:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.3061862,0.000000)
+DEAL:Complex float:Exponential:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Exponential:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Exponential:Symbolic computation: Function initialisation::symb_psi: exp(s2)*s1**2
+DEAL:Complex float:Exponential:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*exp(s2)*s1
+DEAL:Complex float:Exponential:Symbolic computation: Differentiation::symb_dpsi_ds1: exp(s2)*s1**2
+DEAL:Complex float:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*exp(s2)
+DEAL:Complex float:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2*exp(s2)*s1
+DEAL:Complex float:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2*exp(s2)*s1
+DEAL:Complex float:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: exp(s2)*s1**2
+DEAL:Complex float:Exponential:Symbolic computation: Substitution::subs_psi: (66.50150,0.000000)
+DEAL:Complex float:Exponential:Symbolic computation: Substitution::subs_dpsi_ds0: (44.33434,0.000000)
+DEAL:Complex float:Exponential:Symbolic computation: Substitution::subs_dpsi_ds1: (66.50150,0.000000)
+DEAL:Complex float:Exponential:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (14.77811,0.000000)
+DEAL:Complex float:Exponential:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (44.33434,0.000000)
+DEAL:Complex float:Exponential:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (44.33434,0.000000)
+DEAL:Complex float:Exponential:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (66.50150,0.000000)
+DEAL:Complex float:Logarithm:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Logarithm:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Logarithm:Symbolic computation: Function initialisation::symb_psi: s1**2*log(s2)
+DEAL:Complex float:Logarithm:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*log(s2)
+DEAL:Complex float:Logarithm:Symbolic computation: Differentiation::symb_dpsi_ds1: s1**2/s2
+DEAL:Complex float:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*log(s2)
+DEAL:Complex float:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2*s1/s2
+DEAL:Complex float:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2*s1/s2
+DEAL:Complex float:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -s1**2/s2**2
+DEAL:Complex float:Logarithm:Symbolic computation: Substitution::subs_psi: (6.238325,0.000000)
+DEAL:Complex float:Logarithm:Symbolic computation: Substitution::subs_dpsi_ds0: (4.158883,0.000000)
+DEAL:Complex float:Logarithm:Symbolic computation: Substitution::subs_dpsi_ds1: (4.500000,0.000000)
+DEAL:Complex float:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (1.386294,0.000000)
+DEAL:Complex float:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (3.000000,0.000000)
+DEAL:Complex float:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (3.000000,0.000000)
+DEAL:Complex float:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-2.250000,0.000000)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Function initialisation::symb_psi: log(s2)/log(s1)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Differentiation::symb_dpsi_ds0: -log(s2)/(s1*log(s1)**2)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Differentiation::symb_dpsi_ds1: 1/(s2*log(s1))
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*log(s2)/(s1**2*log(s1)**3) + log(s2)/(s1**2*log(s1)**2)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1/(s1*s2*log(s1)**2)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1/(s1*s2*log(s1)**2)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1/(s2**2*log(s1))
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Substitution::subs_psi: (0.6309298,0.000000)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.1914323,0.000000)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Substitution::subs_dpsi_ds1: (0.4551196,0.000000)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.1799769,0.000000)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.1380892,0.000000)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.1380892,0.000000)
+DEAL:Complex float:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.2275598,0.000000)
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Function initialisation::symb_psi: 0.434294481903252*s1**2*log(s2)
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Differentiation::symb_dpsi_ds0: 0.868588963806504*s1*log(s2)
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Differentiation::symb_dpsi_ds1: 0.434294481903252*s1**2/s2
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 0.868588963806504*log(s2)
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 0.868588963806504*s1/s2
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 0.868588963806504*s1/s2
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -0.434294481903252*s1**2/s2**2
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Substitution::subs_psi: (2.709270,0.000000)
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Substitution::subs_dpsi_ds0: (1.806180,0.000000)
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Substitution::subs_dpsi_ds1: (1.954325,0.000000)
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.6020600,0.000000)
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (1.302883,0.000000)
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (1.302883,0.000000)
+DEAL:Complex float:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.9771626,0.000000)
+DEAL:Complex float:Sin:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Sin:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Sin:Symbolic computation: Function initialisation::symb_psi: sin(s2/s1)
+DEAL:Complex float:Sin:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*cos(s2/s1)/s1**2
+DEAL:Complex float:Sin:Symbolic computation: Differentiation::symb_dpsi_ds1: cos(s2/s1)/s1
+DEAL:Complex float:Sin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s2**2*sin(s2/s1)/s1**4 + 2*s2*cos(s2/s1)/s1**3
+DEAL:Complex float:Sin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -cos(s2/s1)/s1**2 + s2*sin(s2/s1)/s1**3
+DEAL:Complex float:Sin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -cos(s2/s1)/s1**2 + s2*sin(s2/s1)/s1**3
+DEAL:Complex float:Sin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -sin(s2/s1)/s1**2
+DEAL:Complex float:Sin:Symbolic computation: Substitution::subs_psi: (0.6183698,0.000000)
+DEAL:Complex float:Sin:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.1746416,0.000000)
+DEAL:Complex float:Sin:Symbolic computation: Substitution::subs_dpsi_ds1: (0.2619624,0.000000)
+DEAL:Complex float:Sin:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.08589096,0.000000)
+DEAL:Complex float:Sin:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.04151563,0.000000)
+DEAL:Complex float:Sin:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.04151563,0.000000)
+DEAL:Complex float:Sin:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.06870776,0.000000)
+DEAL:Complex float:Cos:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Cos:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Cos:Symbolic computation: Function initialisation::symb_psi: cos(s2/s1)
+DEAL:Complex float:Cos:Symbolic computation: Differentiation::symb_dpsi_ds0: s2*sin(s2/s1)/s1**2
+DEAL:Complex float:Cos:Symbolic computation: Differentiation::symb_dpsi_ds1: -sin(s2/s1)/s1
+DEAL:Complex float:Cos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s2**2*cos(s2/s1)/s1**4 - 2*s2*sin(s2/s1)/s1**3
+DEAL:Complex float:Cos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: sin(s2/s1)/s1**2 + s2*cos(s2/s1)/s1**3
+DEAL:Complex float:Cos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: sin(s2/s1)/s1**2 + s2*cos(s2/s1)/s1**3
+DEAL:Complex float:Cos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -cos(s2/s1)/s1**2
+DEAL:Complex float:Cos:Symbolic computation: Substitution::subs_psi: (0.7858872,0.000000)
+DEAL:Complex float:Cos:Symbolic computation: Substitution::subs_dpsi_ds0: (0.1374155,0.000000)
+DEAL:Complex float:Cos:Symbolic computation: Substitution::subs_dpsi_ds1: (-0.2061233,0.000000)
+DEAL:Complex float:Cos:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (-0.1304196,0.000000)
+DEAL:Complex float:Cos:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.1269216,0.000000)
+DEAL:Complex float:Cos:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.1269216,0.000000)
+DEAL:Complex float:Cos:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.08732080,0.000000)
+DEAL:Complex float:Tan:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Tan:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Tan:Symbolic computation: Function initialisation::symb_psi: tan(s2/s1)
+DEAL:Complex float:Tan:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*(1 + tan(s2/s1)**2)/s1**2
+DEAL:Complex float:Tan:Symbolic computation: Differentiation::symb_dpsi_ds1: (1 + tan(s2/s1)**2)/s1
+DEAL:Complex float:Tan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2*(1 + tan(s2/s1)**2)/s1**3 + 2*s2**2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**4
+DEAL:Complex float:Tan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -(1 + tan(s2/s1)**2)/s1**2 - 2*s2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**3
+DEAL:Complex float:Tan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -(1 + tan(s2/s1)**2)/s1**2 - 2*s2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**3
+DEAL:Complex float:Tan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**2
+DEAL:Complex float:Tan:Symbolic computation: Substitution::subs_psi: (0.7868429,0.000000)
+DEAL:Complex float:Tan:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.3598048,0.000000)
+DEAL:Complex float:Tan:Symbolic computation: Substitution::subs_dpsi_ds1: (0.5397073,0.000000)
+DEAL:Complex float:Tan:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.3656965,0.000000)
+DEAL:Complex float:Tan:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.3686424,0.000000)
+DEAL:Complex float:Tan:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.3686424,0.000000)
+DEAL:Complex float:Tan:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.2831099,0.000000)
+DEAL:Complex float:ASin:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:ASin:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:ASin:Symbolic computation: Function initialisation::symb_psi: asin(1.0/(s1*s2))
+DEAL:Complex float:ASin:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASin:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 1.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1**3*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 1.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1*s2**3*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASin:Symbolic computation: Substitution::subs_psi: (0.1674481,1.110223e-16)
+DEAL:Complex float:ASin:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.05634362,0.000000)
+DEAL:Complex float:ASin:Symbolic computation: Substitution::subs_dpsi_ds1: (-0.08451542,0.000000)
+DEAL:Complex float:ASin:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.03809902,0.000000)
+DEAL:Complex float:ASin:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.02897672,0.000000)
+DEAL:Complex float:ASin:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.02897672,0.000000)
+DEAL:Complex float:ASin:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.08572279,0.000000)
+DEAL:Complex float:ACos:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:ACos:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:ACos:Symbolic computation: Function initialisation::symb_psi: acos(1.0/(s1*s2))
+DEAL:Complex float:ACos:Symbolic computation: Differentiation::symb_dpsi_ds0: 1.0/(s1**2*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ACos:Symbolic computation: Differentiation::symb_dpsi_ds1: 1.0/(s1*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ACos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -1.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 2.0*1/(s1**3*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ACos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ACos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ACos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 2.0*1/(s1*s2**3*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ACos:Symbolic computation: Substitution::subs_psi: (1.403348,-1.110223e-16)
+DEAL:Complex float:ACos:Symbolic computation: Substitution::subs_dpsi_ds0: (0.05634362,0.000000)
+DEAL:Complex float:ACos:Symbolic computation: Substitution::subs_dpsi_ds1: (0.08451542,0.000000)
+DEAL:Complex float:ACos:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (-0.03809902,0.000000)
+DEAL:Complex float:ACos:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.02897672,0.000000)
+DEAL:Complex float:ACos:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.02897672,0.000000)
+DEAL:Complex float:ACos:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.08572279,0.000000)
+DEAL:Complex float:ATan:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:ATan:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:ATan:Symbolic computation: Function initialisation::symb_psi: atan(1.0/(s1*s2))
+DEAL:Complex float:ATan:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATan:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -2.0*1/(s1**5*s2**3*(1 + 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1**3*s2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -2.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -2.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -2.0*1/(s1**3*s2**5*(1 + 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1*s2**3*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATan:Symbolic computation: Substitution::subs_psi: (0.1651487,0.000000)
+DEAL:Complex float:ATan:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.05405406,0.000000)
+DEAL:Complex float:ATan:Symbolic computation: Substitution::subs_dpsi_ds1: (-0.08108108,0.000000)
+DEAL:Complex float:ATan:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.03506209,0.000000)
+DEAL:Complex float:ATan:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.02556611,0.000000)
+DEAL:Complex float:ATan:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.02556611,0.000000)
+DEAL:Complex float:ATan:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.07888971,0.000000)
+DEAL:Complex float:Sinh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Sinh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Sinh:Symbolic computation: Function initialisation::symb_psi: sinh(s2/s1)
+DEAL:Complex float:Sinh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*cosh(s2/s1)/s1**2
+DEAL:Complex float:Sinh:Symbolic computation: Differentiation::symb_dpsi_ds1: cosh(s2/s1)/s1
+DEAL:Complex float:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: s2**2*sinh(s2/s1)/s1**4 + 2*s2*cosh(s2/s1)/s1**3
+DEAL:Complex float:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -cosh(s2/s1)/s1**2 - s2*sinh(s2/s1)/s1**3
+DEAL:Complex float:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -cosh(s2/s1)/s1**2 - s2*sinh(s2/s1)/s1**3
+DEAL:Complex float:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: sinh(s2/s1)/s1**2
+DEAL:Complex float:Sinh:Symbolic computation: Substitution::subs_psi: (0.7171585,0.000000)
+DEAL:Complex float:Sinh:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.2734613,0.000000)
+DEAL:Complex float:Sinh:Symbolic computation: Substitution::subs_dpsi_ds1: (0.4101919,0.000000)
+DEAL:Complex float:Sinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.2177227,0.000000)
+DEAL:Complex float:Sinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.1898535,0.000000)
+DEAL:Complex float:Sinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.1898535,0.000000)
+DEAL:Complex float:Sinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.07968428,0.000000)
+DEAL:Complex float:Cosh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Cosh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Cosh:Symbolic computation: Function initialisation::symb_psi: cosh(s2/s1)
+DEAL:Complex float:Cosh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*sinh(s2/s1)/s1**2
+DEAL:Complex float:Cosh:Symbolic computation: Differentiation::symb_dpsi_ds1: sinh(s2/s1)/s1
+DEAL:Complex float:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: s2**2*cosh(s2/s1)/s1**4 + 2*s2*sinh(s2/s1)/s1**3
+DEAL:Complex float:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -sinh(s2/s1)/s1**2 - s2*cosh(s2/s1)/s1**3
+DEAL:Complex float:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -sinh(s2/s1)/s1**2 - s2*cosh(s2/s1)/s1**3
+DEAL:Complex float:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: cosh(s2/s1)/s1**2
+DEAL:Complex float:Cosh:Symbolic computation: Substitution::subs_psi: (1.230576,0.000000)
+DEAL:Complex float:Cosh:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.1593686,0.000000)
+DEAL:Complex float:Cosh:Symbolic computation: Substitution::subs_dpsi_ds1: (0.2390528,0.000000)
+DEAL:Complex float:Cosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.1670149,0.000000)
+DEAL:Complex float:Cosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.1708380,0.000000)
+DEAL:Complex float:Cosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.1708380,0.000000)
+DEAL:Complex float:Cosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.1367306,0.000000)
+DEAL:Complex float:Tanh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:Tanh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:Tanh:Symbolic computation: Function initialisation::symb_psi: tanh(s2/s1)
+DEAL:Complex float:Tanh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*(1 - tanh(s2/s1)**2)/s1**2
+DEAL:Complex float:Tanh:Symbolic computation: Differentiation::symb_dpsi_ds1: (1 - tanh(s2/s1)**2)/s1
+DEAL:Complex float:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2*(1 - tanh(s2/s1)**2)/s1**3 - 2*s2**2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**4
+DEAL:Complex float:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -(1 - tanh(s2/s1)**2)/s1**2 + 2*s2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**3
+DEAL:Complex float:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -(1 - tanh(s2/s1)**2)/s1**2 + 2*s2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**3
+DEAL:Complex float:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**2
+DEAL:Complex float:Tanh:Symbolic computation: Substitution::subs_psi: (0.5827830,0.000000)
+DEAL:Complex float:Tanh:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.1467475,0.000000)
+DEAL:Complex float:Tanh:Symbolic computation: Substitution::subs_dpsi_ds1: (0.2201213,0.000000)
+DEAL:Complex float:Tanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.05982193,0.000000)
+DEAL:Complex float:Tanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.01635912,0.000000)
+DEAL:Complex float:Tanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.01635912,0.000000)
+DEAL:Complex float:Tanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.08552197,0.000000)
+DEAL:Complex float:ASinh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:ASinh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:ASinh:Symbolic computation: Function initialisation::symb_psi: asinh(1.0/(s1*s2))
+DEAL:Complex float:ASinh:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASinh:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -1.0*1/(s1**5*s2**3*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1**3*s2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1.0*1/(s1**3*s2**5*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1*s2**3*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ASinh:Symbolic computation: Substitution::subs_psi: (0.1659046,0.000000)
+DEAL:Complex float:ASinh:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.05479966,0.000000)
+DEAL:Complex float:ASinh:Symbolic computation: Substitution::subs_dpsi_ds1: (-0.08219950,0.000000)
+DEAL:Complex float:ASinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.03603942,0.000000)
+DEAL:Complex float:ASinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.02665929,0.000000)
+DEAL:Complex float:ASinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.02665929,0.000000)
+DEAL:Complex float:ASinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.08108869,0.000000)
+DEAL:Complex float:ACosh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:ACosh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:ACosh:Symbolic computation: Function initialisation::symb_psi: acosh(s1*s2)
+DEAL:Complex float:ACosh:Symbolic computation: Differentiation::symb_dpsi_ds0: s2/sqrt(-1 + s1**2*s2**2)
+DEAL:Complex float:ACosh:Symbolic computation: Differentiation::symb_dpsi_ds1: s1/sqrt(-1 + s1**2*s2**2)
+DEAL:Complex float:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s1*s2**3/(-1 + s1**2*s2**2)**(3/2)
+DEAL:Complex float:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -s1**2*s2**2/(-1 + s1**2*s2**2)**(3/2) + (-1 + s1**2*s2**2)**(-1/2)
+DEAL:Complex float:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -s1**2*s2**2/(-1 + s1**2*s2**2)**(3/2) + (-1 + s1**2*s2**2)**(-1/2)
+DEAL:Complex float:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -s1**3*s2/(-1 + s1**2*s2**2)**(3/2)
+DEAL:Complex float:ACosh:Symbolic computation: Substitution::subs_psi: (2.477889,0.000000)
+DEAL:Complex float:ACosh:Symbolic computation: Substitution::subs_dpsi_ds0: (0.3380617,0.000000)
+DEAL:Complex float:ACosh:Symbolic computation: Substitution::subs_dpsi_ds1: (0.5070925,0.000000)
+DEAL:Complex float:ACosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (-0.1159069,0.000000)
+DEAL:Complex float:ACosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.004829457,0.000000)
+DEAL:Complex float:ACosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.004829457,0.000000)
+DEAL:Complex float:ACosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.2607905,0.000000)
+DEAL:Complex float:ATanh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex float:ATanh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex float:ATanh:Symbolic computation: Function initialisation::symb_psi: atanh(1.0/(s1*s2))
+DEAL:Complex float:ATanh:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATanh:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1**3*s2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1*s2**3*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex float:ATanh:Symbolic computation: Substitution::subs_psi: (0.1682361,0.000000)
+DEAL:Complex float:ATanh:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.05714286,0.000000)
+DEAL:Complex float:ATanh:Symbolic computation: Substitution::subs_dpsi_ds1: (-0.08571430,0.000000)
+DEAL:Complex float:ATanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.03918368,0.000000)
+DEAL:Complex float:ATanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.03020408,0.000000)
+DEAL:Complex float:ATanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.03020408,0.000000)
+DEAL:Complex float:ATanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.08816327,0.000000)
+DEAL:Complex float::OK
+DEAL:Complex double:Add:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Add:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Add:Symbolic computation: Function initialisation::symb_psi: (s1 + s2)**2
+DEAL:Complex double:Add:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*(s1 + s2)
+DEAL:Complex double:Add:Symbolic computation: Differentiation::symb_dpsi_ds1: 2*(s1 + s2)
+DEAL:Complex double:Add:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2
+DEAL:Complex double:Add:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2
+DEAL:Complex double:Add:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2
+DEAL:Complex double:Add:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2
+DEAL:Complex double:Add:Symbolic computation: Substitution::subs_psi: (25.00000,0.000000)
+DEAL:Complex double:Add:Symbolic computation: Substitution::subs_dpsi_ds0: (10.00000,0.000000)
+DEAL:Complex double:Add:Symbolic computation: Substitution::subs_dpsi_ds1: (10.00000,0.000000)
+DEAL:Complex double:Add:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (2.000000,0.000000)
+DEAL:Complex double:Add:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (2.000000,0.000000)
+DEAL:Complex double:Add:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (2.000000,0.000000)
+DEAL:Complex double:Add:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (2.000000,0.000000)
+DEAL:Complex double:Subtract:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Subtract:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Subtract:Symbolic computation: Function initialisation::symb_psi: (s1 - s2)**2
+DEAL:Complex double:Subtract:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*(s1 - s2)
+DEAL:Complex double:Subtract:Symbolic computation: Differentiation::symb_dpsi_ds1: -2*(s1 - s2)
+DEAL:Complex double:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2
+DEAL:Complex double:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -2
+DEAL:Complex double:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -2
+DEAL:Complex double:Subtract:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2
+DEAL:Complex double:Subtract:Symbolic computation: Substitution::subs_psi: (1.000000,0.000000)
+DEAL:Complex double:Subtract:Symbolic computation: Substitution::subs_dpsi_ds0: (2.000000,0.000000)
+DEAL:Complex double:Subtract:Symbolic computation: Substitution::subs_dpsi_ds1: (-2.000000,0.000000)
+DEAL:Complex double:Subtract:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (2.000000,0.000000)
+DEAL:Complex double:Subtract:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-2.000000,0.000000)
+DEAL:Complex double:Subtract:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-2.000000,0.000000)
+DEAL:Complex double:Subtract:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (2.000000,0.000000)
+DEAL:Complex double:Multiply:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Multiply:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Multiply:Symbolic computation: Function initialisation::symb_psi: s1**2*s2**2
+DEAL:Complex double:Multiply:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*s2**2
+DEAL:Complex double:Multiply:Symbolic computation: Differentiation::symb_dpsi_ds1: 2*s1**2*s2
+DEAL:Complex double:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2**2
+DEAL:Complex double:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 4*s1*s2
+DEAL:Complex double:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 4*s1*s2
+DEAL:Complex double:Multiply:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2*s1**2
+DEAL:Complex double:Multiply:Symbolic computation: Substitution::subs_psi: (36.00000,0.000000)
+DEAL:Complex double:Multiply:Symbolic computation: Substitution::subs_dpsi_ds0: (24.00000,0.000000)
+DEAL:Complex double:Multiply:Symbolic computation: Substitution::subs_dpsi_ds1: (36.00000,0.000000)
+DEAL:Complex double:Multiply:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (8.000000,0.000000)
+DEAL:Complex double:Multiply:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (24.00000,0.000000)
+DEAL:Complex double:Multiply:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (24.00000,0.000000)
+DEAL:Complex double:Multiply:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (18.00000,0.000000)
+DEAL:Complex double:Divide:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Divide:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Divide:Symbolic computation: Function initialisation::symb_psi: s1**2/s2**2
+DEAL:Complex double:Divide:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1/s2**2
+DEAL:Complex double:Divide:Symbolic computation: Differentiation::symb_dpsi_ds1: -2*s1**2/s2**3
+DEAL:Complex double:Divide:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2/s2**2
+DEAL:Complex double:Divide:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -4*s1/s2**3
+DEAL:Complex double:Divide:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -4*s1/s2**3
+DEAL:Complex double:Divide:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 6*s1**2/s2**4
+DEAL:Complex double:Divide:Symbolic computation: Substitution::subs_psi: (2.250000,0.000000)
+DEAL:Complex double:Divide:Symbolic computation: Substitution::subs_dpsi_ds0: (1.500000,0.000000)
+DEAL:Complex double:Divide:Symbolic computation: Substitution::subs_dpsi_ds1: (-2.250000,0.000000)
+DEAL:Complex double:Divide:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.5000000,0.000000)
+DEAL:Complex double:Divide:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-1.500000,0.000000)
+DEAL:Complex double:Divide:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-1.500000,0.000000)
+DEAL:Complex double:Divide:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (3.375000,0.000000)
+DEAL:Complex double:Power:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Power:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Power:Symbolic computation: Function initialisation::symb_psi: 2.0*s1**s2
+DEAL:Complex double:Power:Symbolic computation: Differentiation::symb_dpsi_ds0: 2.0*s1**(-1 + s2)*s2
+DEAL:Complex double:Power:Symbolic computation: Differentiation::symb_dpsi_ds1: 2.0*s1**s2*log(s1)
+DEAL:Complex double:Power:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2.0*s1**(-2 + s2)*s2*(-1 + s2)
+DEAL:Complex double:Power:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2.0*s1**(-1 + s2)*s2*log(s1) + 2.0*s1**(-1 + s2)
+DEAL:Complex double:Power:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2.0*s1**(-1 + s2)*s2*log(s1) + 2.0*s1**(-1 + s2)
+DEAL:Complex double:Power:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2.0*s1**s2*log(s1)**2
+DEAL:Complex double:Power:Symbolic computation: Substitution::subs_psi: (18.00000,0.000000)
+DEAL:Complex double:Power:Symbolic computation: Substitution::subs_dpsi_ds0: (12.00000,0.000000)
+DEAL:Complex double:Power:Symbolic computation: Substitution::subs_dpsi_ds1: (19.77502,0.000000)
+DEAL:Complex double:Power:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (4.000000,0.000000)
+DEAL:Complex double:Power:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (19.18335,0.000000)
+DEAL:Complex double:Power:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (19.18335,0.000000)
+DEAL:Complex double:Power:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (21.72508,0.000000)
+DEAL:Complex double:Sqrt:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Sqrt:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Sqrt:Symbolic computation: Function initialisation::symb_psi: 2.0*sqrt(s1*s2)
+DEAL:Complex double:Sqrt:Symbolic computation: Differentiation::symb_dpsi_ds0: 1.0*s2/sqrt(s1*s2)
+DEAL:Complex double:Sqrt:Symbolic computation: Differentiation::symb_dpsi_ds1: 1.0*s1/sqrt(s1*s2)
+DEAL:Complex double:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -0.5*s2**2/(s1*s2)**(3/2)
+DEAL:Complex double:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -0.5*s1*s2/(s1*s2)**(3/2) + 1.0*(s1*s2)**(-1/2)
+DEAL:Complex double:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -0.5*s1*s2/(s1*s2)**(3/2) + 1.0*(s1*s2)**(-1/2)
+DEAL:Complex double:Sqrt:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -0.5*s1**2/(s1*s2)**(3/2)
+DEAL:Complex double:Sqrt:Symbolic computation: Substitution::subs_psi: (4.898979,0.000000)
+DEAL:Complex double:Sqrt:Symbolic computation: Substitution::subs_dpsi_ds0: (0.8164966,0.000000)
+DEAL:Complex double:Sqrt:Symbolic computation: Substitution::subs_dpsi_ds1: (1.224745,0.000000)
+DEAL:Complex double:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (-0.1360828,0.000000)
+DEAL:Complex double:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.2041241,0.000000)
+DEAL:Complex double:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.2041241,0.000000)
+DEAL:Complex double:Sqrt:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.3061862,0.000000)
+DEAL:Complex double:Exponential:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Exponential:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Exponential:Symbolic computation: Function initialisation::symb_psi: exp(s2)*s1**2
+DEAL:Complex double:Exponential:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*exp(s2)*s1
+DEAL:Complex double:Exponential:Symbolic computation: Differentiation::symb_dpsi_ds1: exp(s2)*s1**2
+DEAL:Complex double:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*exp(s2)
+DEAL:Complex double:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2*exp(s2)*s1
+DEAL:Complex double:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2*exp(s2)*s1
+DEAL:Complex double:Exponential:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: exp(s2)*s1**2
+DEAL:Complex double:Exponential:Symbolic computation: Substitution::subs_psi: (66.50150,0.000000)
+DEAL:Complex double:Exponential:Symbolic computation: Substitution::subs_dpsi_ds0: (44.33434,0.000000)
+DEAL:Complex double:Exponential:Symbolic computation: Substitution::subs_dpsi_ds1: (66.50150,0.000000)
+DEAL:Complex double:Exponential:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (14.77811,0.000000)
+DEAL:Complex double:Exponential:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (44.33434,0.000000)
+DEAL:Complex double:Exponential:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (44.33434,0.000000)
+DEAL:Complex double:Exponential:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (66.50150,0.000000)
+DEAL:Complex double:Logarithm:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Logarithm:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Logarithm:Symbolic computation: Function initialisation::symb_psi: s1**2*log(s2)
+DEAL:Complex double:Logarithm:Symbolic computation: Differentiation::symb_dpsi_ds0: 2*s1*log(s2)
+DEAL:Complex double:Logarithm:Symbolic computation: Differentiation::symb_dpsi_ds1: s1**2/s2
+DEAL:Complex double:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*log(s2)
+DEAL:Complex double:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2*s1/s2
+DEAL:Complex double:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2*s1/s2
+DEAL:Complex double:Logarithm:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -s1**2/s2**2
+DEAL:Complex double:Logarithm:Symbolic computation: Substitution::subs_psi: (6.238325,0.000000)
+DEAL:Complex double:Logarithm:Symbolic computation: Substitution::subs_dpsi_ds0: (4.158883,0.000000)
+DEAL:Complex double:Logarithm:Symbolic computation: Substitution::subs_dpsi_ds1: (4.500000,0.000000)
+DEAL:Complex double:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (1.386294,0.000000)
+DEAL:Complex double:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (3.000000,0.000000)
+DEAL:Complex double:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (3.000000,0.000000)
+DEAL:Complex double:Logarithm:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-2.250000,0.000000)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Function initialisation::symb_psi: log(s2)/log(s1)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Differentiation::symb_dpsi_ds0: -log(s2)/(s1*log(s1)**2)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Differentiation::symb_dpsi_ds1: 1/(s2*log(s1))
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*log(s2)/(s1**2*log(s1)**3) + log(s2)/(s1**2*log(s1)**2)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1/(s1*s2*log(s1)**2)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1/(s1*s2*log(s1)**2)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1/(s2**2*log(s1))
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Substitution::subs_psi: (0.6309298,0.000000)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.1914323,0.000000)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Substitution::subs_dpsi_ds1: (0.4551196,0.000000)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.1799769,0.000000)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.1380892,0.000000)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.1380892,0.000000)
+DEAL:Complex double:Logarithm with Base:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.2275598,0.000000)
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Function initialisation::symb_psi: 0.434294481903252*s1**2*log(s2)
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Differentiation::symb_dpsi_ds0: 0.868588963806504*s1*log(s2)
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Differentiation::symb_dpsi_ds1: 0.434294481903252*s1**2/s2
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 0.868588963806504*log(s2)
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 0.868588963806504*s1/s2
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 0.868588963806504*s1/s2
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -0.434294481903252*s1**2/s2**2
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Substitution::subs_psi: (2.709270,0.000000)
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Substitution::subs_dpsi_ds0: (1.806180,0.000000)
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Substitution::subs_dpsi_ds1: (1.954325,0.000000)
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.6020600,0.000000)
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (1.302883,0.000000)
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (1.302883,0.000000)
+DEAL:Complex double:Logarithm base 10:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.9771626,0.000000)
+DEAL:Complex double:Sin:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Sin:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Sin:Symbolic computation: Function initialisation::symb_psi: sin(s2/s1)
+DEAL:Complex double:Sin:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*cos(s2/s1)/s1**2
+DEAL:Complex double:Sin:Symbolic computation: Differentiation::symb_dpsi_ds1: cos(s2/s1)/s1
+DEAL:Complex double:Sin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s2**2*sin(s2/s1)/s1**4 + 2*s2*cos(s2/s1)/s1**3
+DEAL:Complex double:Sin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -cos(s2/s1)/s1**2 + s2*sin(s2/s1)/s1**3
+DEAL:Complex double:Sin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -cos(s2/s1)/s1**2 + s2*sin(s2/s1)/s1**3
+DEAL:Complex double:Sin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -sin(s2/s1)/s1**2
+DEAL:Complex double:Sin:Symbolic computation: Substitution::subs_psi: (0.6183698,0.000000)
+DEAL:Complex double:Sin:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.1746416,0.000000)
+DEAL:Complex double:Sin:Symbolic computation: Substitution::subs_dpsi_ds1: (0.2619624,0.000000)
+DEAL:Complex double:Sin:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.08589096,0.000000)
+DEAL:Complex double:Sin:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.04151564,0.000000)
+DEAL:Complex double:Sin:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.04151564,0.000000)
+DEAL:Complex double:Sin:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.06870776,0.000000)
+DEAL:Complex double:Cos:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Cos:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Cos:Symbolic computation: Function initialisation::symb_psi: cos(s2/s1)
+DEAL:Complex double:Cos:Symbolic computation: Differentiation::symb_dpsi_ds0: s2*sin(s2/s1)/s1**2
+DEAL:Complex double:Cos:Symbolic computation: Differentiation::symb_dpsi_ds1: -sin(s2/s1)/s1
+DEAL:Complex double:Cos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s2**2*cos(s2/s1)/s1**4 - 2*s2*sin(s2/s1)/s1**3
+DEAL:Complex double:Cos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: sin(s2/s1)/s1**2 + s2*cos(s2/s1)/s1**3
+DEAL:Complex double:Cos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: sin(s2/s1)/s1**2 + s2*cos(s2/s1)/s1**3
+DEAL:Complex double:Cos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -cos(s2/s1)/s1**2
+DEAL:Complex double:Cos:Symbolic computation: Substitution::subs_psi: (0.7858873,0.000000)
+DEAL:Complex double:Cos:Symbolic computation: Substitution::subs_dpsi_ds0: (0.1374155,0.000000)
+DEAL:Complex double:Cos:Symbolic computation: Substitution::subs_dpsi_ds1: (-0.2061233,0.000000)
+DEAL:Complex double:Cos:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (-0.1304196,0.000000)
+DEAL:Complex double:Cos:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.1269216,0.000000)
+DEAL:Complex double:Cos:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.1269216,0.000000)
+DEAL:Complex double:Cos:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.08732081,0.000000)
+DEAL:Complex double:Tan:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Tan:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Tan:Symbolic computation: Function initialisation::symb_psi: tan(s2/s1)
+DEAL:Complex double:Tan:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*(1 + tan(s2/s1)**2)/s1**2
+DEAL:Complex double:Tan:Symbolic computation: Differentiation::symb_dpsi_ds1: (1 + tan(s2/s1)**2)/s1
+DEAL:Complex double:Tan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2*(1 + tan(s2/s1)**2)/s1**3 + 2*s2**2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**4
+DEAL:Complex double:Tan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -(1 + tan(s2/s1)**2)/s1**2 - 2*s2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**3
+DEAL:Complex double:Tan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -(1 + tan(s2/s1)**2)/s1**2 - 2*s2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**3
+DEAL:Complex double:Tan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2*tan(s2/s1)*(1 + tan(s2/s1)**2)/s1**2
+DEAL:Complex double:Tan:Symbolic computation: Substitution::subs_psi: (0.7868429,0.000000)
+DEAL:Complex double:Tan:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.3598048,0.000000)
+DEAL:Complex double:Tan:Symbolic computation: Substitution::subs_dpsi_ds1: (0.5397072,0.000000)
+DEAL:Complex double:Tan:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.3656965,0.000000)
+DEAL:Complex double:Tan:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.3686423,0.000000)
+DEAL:Complex double:Tan:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.3686423,0.000000)
+DEAL:Complex double:Tan:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.2831099,0.000000)
+DEAL:Complex double:ASin:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:ASin:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:ASin:Symbolic computation: Function initialisation::symb_psi: asin(1.0/(s1*s2))
+DEAL:Complex double:ASin:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASin:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 1.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1**3*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASin:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASin:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 1.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1*s2**3*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASin:Symbolic computation: Substitution::subs_psi: (0.1674481,0.000000)
+DEAL:Complex double:ASin:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.05634362,0.000000)
+DEAL:Complex double:ASin:Symbolic computation: Substitution::subs_dpsi_ds1: (-0.08451543,0.000000)
+DEAL:Complex double:ASin:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.03809902,0.000000)
+DEAL:Complex double:ASin:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.02897672,0.000000)
+DEAL:Complex double:ASin:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.02897672,0.000000)
+DEAL:Complex double:ASin:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.08572279,0.000000)
+DEAL:Complex double:ACos:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:ACos:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:ACos:Symbolic computation: Function initialisation::symb_psi: acos(1.0/(s1*s2))
+DEAL:Complex double:ACos:Symbolic computation: Differentiation::symb_dpsi_ds0: 1.0/(s1**2*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ACos:Symbolic computation: Differentiation::symb_dpsi_ds1: 1.0/(s1*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ACos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -1.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 2.0*1/(s1**3*s2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ACos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ACos:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 1.0*1/(s1**2*s2**2*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ACos:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**(3/2)) - 2.0*1/(s1*s2**3*sqrt(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ACos:Symbolic computation: Substitution::subs_psi: (1.403348,0.000000)
+DEAL:Complex double:ACos:Symbolic computation: Substitution::subs_dpsi_ds0: (0.05634362,0.000000)
+DEAL:Complex double:ACos:Symbolic computation: Substitution::subs_dpsi_ds1: (0.08451543,0.000000)
+DEAL:Complex double:ACos:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (-0.03809902,0.000000)
+DEAL:Complex double:ACos:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.02897672,0.000000)
+DEAL:Complex double:ACos:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.02897672,0.000000)
+DEAL:Complex double:ACos:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.08572279,0.000000)
+DEAL:Complex double:ATan:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:ATan:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:ATan:Symbolic computation: Function initialisation::symb_psi: atan(1.0/(s1*s2))
+DEAL:Complex double:ATan:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATan:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -2.0*1/(s1**5*s2**3*(1 + 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1**3*s2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -2.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATan:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -2.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATan:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -2.0*1/(s1**3*s2**5*(1 + 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1*s2**3*(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATan:Symbolic computation: Substitution::subs_psi: (0.1651487,0.000000)
+DEAL:Complex double:ATan:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.05405405,0.000000)
+DEAL:Complex double:ATan:Symbolic computation: Substitution::subs_dpsi_ds1: (-0.08108108,0.000000)
+DEAL:Complex double:ATan:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.03506209,0.000000)
+DEAL:Complex double:ATan:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.02556611,0.000000)
+DEAL:Complex double:ATan:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.02556611,0.000000)
+DEAL:Complex double:ATan:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.07888970,0.000000)
+DEAL:Complex double:Sinh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Sinh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Sinh:Symbolic computation: Function initialisation::symb_psi: sinh(s2/s1)
+DEAL:Complex double:Sinh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*cosh(s2/s1)/s1**2
+DEAL:Complex double:Sinh:Symbolic computation: Differentiation::symb_dpsi_ds1: cosh(s2/s1)/s1
+DEAL:Complex double:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: s2**2*sinh(s2/s1)/s1**4 + 2*s2*cosh(s2/s1)/s1**3
+DEAL:Complex double:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -cosh(s2/s1)/s1**2 - s2*sinh(s2/s1)/s1**3
+DEAL:Complex double:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -cosh(s2/s1)/s1**2 - s2*sinh(s2/s1)/s1**3
+DEAL:Complex double:Sinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: sinh(s2/s1)/s1**2
+DEAL:Complex double:Sinh:Symbolic computation: Substitution::subs_psi: (0.7171585,0.000000)
+DEAL:Complex double:Sinh:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.2734612,0.000000)
+DEAL:Complex double:Sinh:Symbolic computation: Substitution::subs_dpsi_ds1: (0.4101919,0.000000)
+DEAL:Complex double:Sinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.2177227,0.000000)
+DEAL:Complex double:Sinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.1898535,0.000000)
+DEAL:Complex double:Sinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.1898535,0.000000)
+DEAL:Complex double:Sinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.07968427,0.000000)
+DEAL:Complex double:Cosh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Cosh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Cosh:Symbolic computation: Function initialisation::symb_psi: cosh(s2/s1)
+DEAL:Complex double:Cosh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*sinh(s2/s1)/s1**2
+DEAL:Complex double:Cosh:Symbolic computation: Differentiation::symb_dpsi_ds1: sinh(s2/s1)/s1
+DEAL:Complex double:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: s2**2*cosh(s2/s1)/s1**4 + 2*s2*sinh(s2/s1)/s1**3
+DEAL:Complex double:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -sinh(s2/s1)/s1**2 - s2*cosh(s2/s1)/s1**3
+DEAL:Complex double:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -sinh(s2/s1)/s1**2 - s2*cosh(s2/s1)/s1**3
+DEAL:Complex double:Cosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: cosh(s2/s1)/s1**2
+DEAL:Complex double:Cosh:Symbolic computation: Substitution::subs_psi: (1.230576,0.000000)
+DEAL:Complex double:Cosh:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.1593685,0.000000)
+DEAL:Complex double:Cosh:Symbolic computation: Substitution::subs_dpsi_ds1: (0.2390528,0.000000)
+DEAL:Complex double:Cosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.1670149,0.000000)
+DEAL:Complex double:Cosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.1708380,0.000000)
+DEAL:Complex double:Cosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.1708380,0.000000)
+DEAL:Complex double:Cosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.1367306,0.000000)
+DEAL:Complex double:Tanh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:Tanh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:Tanh:Symbolic computation: Function initialisation::symb_psi: tanh(s2/s1)
+DEAL:Complex double:Tanh:Symbolic computation: Differentiation::symb_dpsi_ds0: -s2*(1 - tanh(s2/s1)**2)/s1**2
+DEAL:Complex double:Tanh:Symbolic computation: Differentiation::symb_dpsi_ds1: (1 - tanh(s2/s1)**2)/s1
+DEAL:Complex double:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2*s2*(1 - tanh(s2/s1)**2)/s1**3 - 2*s2**2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**4
+DEAL:Complex double:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -(1 - tanh(s2/s1)**2)/s1**2 + 2*s2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**3
+DEAL:Complex double:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -(1 - tanh(s2/s1)**2)/s1**2 + 2*s2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**3
+DEAL:Complex double:Tanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -2*tanh(s2/s1)*(1 - tanh(s2/s1)**2)/s1**2
+DEAL:Complex double:Tanh:Symbolic computation: Substitution::subs_psi: (0.5827829,0.000000)
+DEAL:Complex double:Tanh:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.1467476,0.000000)
+DEAL:Complex double:Tanh:Symbolic computation: Substitution::subs_dpsi_ds1: (0.2201213,0.000000)
+DEAL:Complex double:Tanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.05982194,0.000000)
+DEAL:Complex double:Tanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.01635913,0.000000)
+DEAL:Complex double:Tanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.01635913,0.000000)
+DEAL:Complex double:Tanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.08552198,0.000000)
+DEAL:Complex double:ASinh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:ASinh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:ASinh:Symbolic computation: Function initialisation::symb_psi: asinh(1.0/(s1*s2))
+DEAL:Complex double:ASinh:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASinh:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -1.0*1/(s1**5*s2**3*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1**3*s2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -1.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -1.0*1/(s1**4*s2**4*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 1.0*1/(s1**2*s2**2*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASinh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -1.0*1/(s1**3*s2**5*(1 + 1.0*1/(s1**2*s2**2))**(3/2)) + 2.0*1/(s1*s2**3*sqrt(1 + 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ASinh:Symbolic computation: Substitution::subs_psi: (0.1659046,0.000000)
+DEAL:Complex double:ASinh:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.05479966,0.000000)
+DEAL:Complex double:ASinh:Symbolic computation: Substitution::subs_dpsi_ds1: (-0.08219949,0.000000)
+DEAL:Complex double:ASinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.03603942,0.000000)
+DEAL:Complex double:ASinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.02665930,0.000000)
+DEAL:Complex double:ASinh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.02665930,0.000000)
+DEAL:Complex double:ASinh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.08108869,0.000000)
+DEAL:Complex double:ACosh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:ACosh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:ACosh:Symbolic computation: Function initialisation::symb_psi: acosh(s1*s2)
+DEAL:Complex double:ACosh:Symbolic computation: Differentiation::symb_dpsi_ds0: s2/sqrt(-1 + s1**2*s2**2)
+DEAL:Complex double:ACosh:Symbolic computation: Differentiation::symb_dpsi_ds1: s1/sqrt(-1 + s1**2*s2**2)
+DEAL:Complex double:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: -s1*s2**3/(-1 + s1**2*s2**2)**(3/2)
+DEAL:Complex double:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: -s1**2*s2**2/(-1 + s1**2*s2**2)**(3/2) + (-1 + s1**2*s2**2)**(-1/2)
+DEAL:Complex double:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: -s1**2*s2**2/(-1 + s1**2*s2**2)**(3/2) + (-1 + s1**2*s2**2)**(-1/2)
+DEAL:Complex double:ACosh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: -s1**3*s2/(-1 + s1**2*s2**2)**(3/2)
+DEAL:Complex double:ACosh:Symbolic computation: Substitution::subs_psi: (2.477889,0.000000)
+DEAL:Complex double:ACosh:Symbolic computation: Substitution::subs_dpsi_ds0: (0.3380617,0.000000)
+DEAL:Complex double:ACosh:Symbolic computation: Substitution::subs_dpsi_ds1: (0.5070926,0.000000)
+DEAL:Complex double:ACosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (-0.1159069,0.000000)
+DEAL:Complex double:ACosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (-0.004829453,0.000000)
+DEAL:Complex double:ACosh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (-0.004829453,0.000000)
+DEAL:Complex double:ACosh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (-0.2607905,0.000000)
+DEAL:Complex double:ATanh:Symbolic computation: Function initialisation::symb_s0: s1
+DEAL:Complex double:ATanh:Symbolic computation: Function initialisation::symb_s1: s2
+DEAL:Complex double:ATanh:Symbolic computation: Function initialisation::symb_psi: atanh(1.0/(s1*s2))
+DEAL:Complex double:ATanh:Symbolic computation: Differentiation::symb_dpsi_ds0: -1.0/(s1**2*s2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATanh:Symbolic computation: Differentiation::symb_dpsi_ds1: -1.0/(s1*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds0: 2.0*1/(s1**5*s2**3*(1 - 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1**3*s2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds0: 2.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds0_ds1: 2.0*1/(s1**4*s2**4*(1 - 1.0*1/(s1**2*s2**2))**2) + 1.0*1/(s1**2*s2**2*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATanh:Symbolic computation: Differentiation::symb_d2psi_ds1_ds1: 2.0*1/(s1**3*s2**5*(1 - 1.0*1/(s1**2*s2**2))**2) + 2.0*1/(s1*s2**3*(1 - 1.0*1/(s1**2*s2**2)))
+DEAL:Complex double:ATanh:Symbolic computation: Substitution::subs_psi: (0.1682361,0.000000)
+DEAL:Complex double:ATanh:Symbolic computation: Substitution::subs_dpsi_ds0: (-0.05714286,0.000000)
+DEAL:Complex double:ATanh:Symbolic computation: Substitution::subs_dpsi_ds1: (-0.08571429,0.000000)
+DEAL:Complex double:ATanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds0: (0.03918367,0.000000)
+DEAL:Complex double:ATanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds0: (0.03020408,0.000000)
+DEAL:Complex double:ATanh:Symbolic computation: Substitution::subs_d2psi_ds0_ds1: (0.03020408,0.000000)
+DEAL:Complex double:ATanh:Symbolic computation: Substitution::subs_d2psi_ds1_ds1: (0.08816327,0.000000)
+DEAL:Complex double::OK
+DEAL::OK

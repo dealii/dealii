@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,7 @@ transfer(std::ostream &out)
   fe.push_back(FE_Q<dim>(1));
   fe.push_back(FE_Q<dim>(2));
 
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
   dof_handler.begin(0)->child(0)->set_active_fe_index(1);
 
   Vector<double> solution;
@@ -63,8 +63,8 @@ transfer(std::ostream &out)
   for (unsigned int i = 0; i < solution.size(); ++i)
     solution(i) = i;
 
-  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim>> soltrans(
-    dof_handler);
+  SolutionTransfer<dim, Vector<double>> soltrans(dof_handler);
+
 
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();

@@ -59,9 +59,9 @@ S=A\left(\frac{1}{v}\omega \cos(\omega t)(bx -x^2) + \sin(\omega t)
 \left(\Sigma_a (bx-x^2)+2D\right) \right).
 @f}
 Because the solution is a sine in time, we know that the exact solution
-satisfies $\phi\left(x,\pi\right) = 0$.
-Therefore, the error at time $t=\pi$ is simply the norm of the numerical
-solution, i.e., $\|e(\cdot,t=\pi)\|_{L_2} = \|\phi_h(\cdot,t=\pi)\|_{L_2}$,
+satisfies $\phi\left(x,\frac{\pi}{\omega}\right) = 0$.
+Therefore, the error at time $t=\frac{\pi}{\omega}$ is simply the norm of the numerical
+solution, i.e., $\|e(\cdot,t=\frac{\pi}{\omega})\|_{L_2} = \|\phi_h(\cdot,t=\frac{\pi}{\omega})\|_{L_2}$,
 and is particularly easily evaluated. In the code, we evaluate the $l_2$ norm
 of the vector of nodal values of $\phi_h$ instead of the $L_2$ norm of the
 associated spatial function, since the former is simpler to compute; however,
@@ -110,10 +110,10 @@ y_{n+1} = y_n + \sum_{i=1}^s b_i k_i
 @f}
 where for the form of the right hand side above
 @f{eqnarray*}
-k_i = h M^{-1} f\left(t_n+c_ih,y_n+\sum_{j=1}^sa_{ij}k_j\right).
+k_i = \Delta t \, M^{-1} f\left(t_n+c_ih,y_n+\sum_{j=1}^sa_{ij}k_j\right).
 @f}
 Here $a_{ij}$, $b_i$, and $c_i$ are known coefficients that identify which
-particular Runge-Kutta scheme you want to use, and $h=t_{n+1}-t_n$ is the time step
+particular Runge-Kutta scheme you want to use, and $\Delta t=t_{n+1}-t_n$ is the time step
 used. Different time stepping methods of the Runge-Kutta class differ in the
 number of stages $s$ and the values they use for the coefficients $a_{ij}$,
 $b_i$, and $c_i$ but are otherwise easy to implement since one can look up
@@ -135,7 +135,8 @@ $a_{ii}\neq 0$ for at least one of the stages $i=1,\ldots,s$.
 Many well known time stepping schemes that one does not typically associate
 with the names Runge or Kutta can in fact be written in a way so that they,
 too, can be expressed in these categories. They oftentimes represent the
-lowest-order members of these families.
+lowest-order members of these families; one example is the simple explicit
+Euler method.
 
 
 <h4>Explicit Runge-Kutta methods</h4>

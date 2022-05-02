@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -37,7 +37,15 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
 ENDIF()
 
 
-IF(FEATURE_THREADS_BUNDLED_CONFIGURED)
+IF(FEATURE_TASKFLOW_BUNDLED_CONFIGURED)
+  INSTALL(DIRECTORY ${TASKFLOW_FOLDER}/include/taskflow
+    DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
+    COMPONENT library
+    )
+ENDIF()
+
+
+IF(FEATURE_TBB_BUNDLED_CONFIGURED)
   INSTALL(DIRECTORY ${TBB_FOLDER}/include/tbb
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library

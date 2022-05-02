@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,13 +46,13 @@ test()
 
   FE_Q<dim - 1, dim>       fe(1);
   DoFHandler<dim - 1, dim> dh(tria);
-  MappingQ<dim - 1, dim>   mapping(1, true);
+  MappingQ<dim - 1, dim>   mapping(1);
 
   dh.distribute_dofs(fe);
 
   FEFaceValues<dim - 1, dim> fe_face_values(mapping,
                                             fe,
-                                            QTrapez<dim - 2>(),
+                                            QTrapezoid<dim - 2>(),
                                             update_normal_vectors);
 
   for (typename DoFHandler<dim - 1, dim>::active_cell_iterator cell =

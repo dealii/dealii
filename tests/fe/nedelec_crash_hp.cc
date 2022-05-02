@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,7 +18,7 @@
 // interpolation matrices from lower to higher order elements. This
 // consequently led to a situation where
 // DoFTools::make_hanging_node_constraints got into trouble because it could
-// not find a master DoF for one particular slave DoF.
+// not find a primary DoF for one particular dependent DoF.
 
 
 char logname[] = "output";
@@ -28,6 +28,7 @@ char logname[] = "output";
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nedelec.h>
@@ -38,8 +39,6 @@ char logname[] = "output";
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
@@ -69,14 +68,14 @@ test()
                                             Point<dim>(),
                                             (dim == 3 ? Point<dim>(2, 1, 1) :
                                                         Point<dim>(2, 1)));
-  (++triangulation.begin_active())->set_refine_flag();
+  (std::next(triangulation.begin_active()))->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 
   hp::FECollection<dim> fe;
   fe.push_back(FE_Nedelec<dim>(1));
   fe.push_back(FE_Nedelec<dim>(2));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   for (unsigned int i = 0; i < fe.size(); ++i)
     for (unsigned int j = 0; j < fe.size(); ++j)
@@ -84,9 +83,9 @@ test()
         deallog << "Testing " << fe[i].get_name() << " vs. " << fe[j].get_name()
                 << std::endl;
 
-        // set fe on coarse cell to 'i', on
+        // set FE on coarse cell to 'i', on
         // all fine cells to 'j'
-        typename hp::DoFHandler<dim>::active_cell_iterator cell =
+        typename DoFHandler<dim>::active_cell_iterator cell =
           dof_handler.begin_active();
         cell->set_active_fe_index(i);
         ++cell;

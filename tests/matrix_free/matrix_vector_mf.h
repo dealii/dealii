@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,7 @@ helmholtz_operator(const MatrixFree<dim, typename VectorType::value_type> &data,
                    const VectorType &                                      src,
                    const std::pair<unsigned int, unsigned int> &cell_range)
 {
-  typedef typename VectorType::value_type                Number;
+  using Number = typename VectorType::value_type;
   FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(data);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
@@ -43,13 +43,45 @@ helmholtz_operator(const MatrixFree<dim, typename VectorType::value_type> &data,
     {
       fe_eval.reinit(cell);
       fe_eval.read_dof_values(src);
-      fe_eval.evaluate(true, true, false);
+      fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
       for (unsigned int q = 0; q < n_q_points; ++q)
         {
           fe_eval.submit_value(Number(10) * fe_eval.get_value(q), q);
           fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
         }
-      fe_eval.integrate(true, true);
+      fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
+      fe_eval.distribute_local_to_global(dst);
+    }
+}
+
+
+
+template <int dim, typename VectorType>
+void
+helmholtz_operator_no_template(
+  const MatrixFree<dim, typename VectorType::value_type> &data,
+  VectorType &                                            dst,
+  const VectorType &                                      src,
+  const std::pair<unsigned int, unsigned int> &           cell_range,
+  const unsigned int                                      active_fe_index,
+  const unsigned int                                      active_quad_index)
+{
+  using Number = typename VectorType::value_type;
+  FEEvaluation<dim, -1, 0, 1, Number> fe_eval(
+    data, 0, 0, 0, active_fe_index, active_quad_index);
+  const unsigned int n_q_points = fe_eval.n_q_points;
+
+  for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
+    {
+      fe_eval.reinit(cell);
+      fe_eval.read_dof_values(src);
+      fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        {
+          fe_eval.submit_value(Number(10) * fe_eval.get_value(q), q);
+          fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
+        }
+      fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       fe_eval.distribute_local_to_global(dst);
     }
 }
@@ -64,7 +96,7 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  typedef VectorizedArray<Number> vector_t;
+  using vector_t = VectorizedArray<Number>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in)

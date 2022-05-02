@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,9 +76,9 @@ test()
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       deallog << "Center: [" << cell->center() << "], with mapping ["
-              << euler.get_center(cell, false) << "]" << std::endl;
+              << euler.get_center(cell, false) << ']' << std::endl;
       deallog << "Center: [" << cell->center() << "], with mapping + flag ["
-              << euler.get_center(cell, true) << "]" << std::endl;
+              << euler.get_center(cell, true) << ']' << std::endl;
     }
 }
 
@@ -87,7 +87,7 @@ test()
 int
 main()
 {
-  initlog(1);
+  initlog(true);
 
   test<1>();
   test<2>();

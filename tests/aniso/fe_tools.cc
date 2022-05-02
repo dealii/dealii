@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,7 @@ print_formatted(const FullMatrix<number> &A,
             deallog << std::setw(width) << std::setprecision(precision)
                     << A(i, j);
           else
-            deallog << std::setw(width) << std::setprecision(precision) << "~";
+            deallog << std::setw(width) << std::setprecision(precision) << '~';
           deallog << ' ';
         };
       deallog << std::endl;
@@ -123,8 +123,8 @@ test_projection(std::ostream &out)
   FE_DGQ<dim>               q0(0);
   FE_DGQ<dim>               q1(1);
   FE_DGQ<dim>               q2(2);
-  FE_DGQArbitraryNodes<dim> q3(QIterated<1>(QTrapez<1>(), 3));
-  FE_DGQArbitraryNodes<dim> q4(QIterated<1>(QTrapez<1>(), 4));
+  FE_DGQArbitraryNodes<dim> q3(QIterated<1>(QTrapezoid<1>(), 3));
+  FE_DGQArbitraryNodes<dim> q4(QIterated<1>(QTrapezoid<1>(), 4));
 
   FE_DGP<dim> p0(0);
   FE_DGP<dim> p1(1);

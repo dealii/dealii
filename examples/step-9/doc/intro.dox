@@ -11,7 +11,7 @@ In this example, our aims are the following:
 </ol>
 While the second aim is difficult to describe in general terms without
 reference to the code, we will discuss the other two aims in the
-following text. The use of multiple threads will then be detailed at the
+following. The use of multiple threads will then be detailed at the
 relevant places within the program. We will, however, follow the
 general discussion of the WorkStream approach detailed in the
 @ref threads "Parallel computing with multiple processors accessing shared memory"
@@ -20,13 +20,14 @@ documentation module.
 
 <h3>Discretizing the advection equation</h3>
 
-In the present example program, we shall numerically approximate the
+In the present example program, we want to numerically approximate the
 solution of the advection equation
 @f[
   \beta \cdot \nabla u = f,
 @f]
 where $\beta$ is a vector field that describes the advection direction and
-speed (which may be dependent on the space variables), $f$ is a source
+speed (which may be dependent on the space variables if
+$\beta=\beta(\mathbf x)$), $f$ is a source
 function, and $u$ is the solution. The physical process that this
 equation describes is that of a given flow field $\beta$, with which
 another substance is transported, the density or concentration of
@@ -53,8 +54,8 @@ be negative if the transport direction $\beta$ points inward, i.e. at
 the inflow boundary. The mathematical theory states that we must not
 pose any boundary condition on the outflow part of the boundary.
 
-As stated, the transport equation cannot be solved in a stable way using
-the standard finite element method, however. The problem is that
+Unfortunately, the equation stated above cannot be solved in a stable way using
+the standard finite element method. The problem is that
 solutions to this equation possess insufficient regularity
 perpendicular to the transport direction: while they are smooth along
 the streamlines defined by the "wind field"
@@ -66,24 +67,26 @@ for the derivatives in the perpendicular direction, and consequently
 if $u$ is discontinuous at a point on the inflow boundary, then this
 discontinuity will simply be transported along the streamline of the
 wind field that starts at this boundary point.
-
 These discontinuities lead to numerical instabilities that
 make a stable solution by a standard continuous finite element discretization
-impossible. We will thus use the streamline diffusion stabilized
-formulation, in which we test the equation with test functions $v +
-\delta \beta\cdot\nabla v$ instead of $v$, where $\delta$ is a
+impossible.
+
+A standard approach to address this difficulty is the <em>"streamline-upwind
+Petrov-Galerkin"</em> (SUPG) method, sometimes also called the
+streamline diffusion method. A good explanation of the method can be
+found in @cite elman2005 . Formally, this method replaces the step
+in which we derive the weak form of the differential equation from
+the strong form: Instead of multiplying the equation by a test
+function $v$ and integrating over the domain, we instead multiply
+by $v + \delta \beta\cdot\nabla v$, where $\delta$ is a
 parameter that is chosen in the range of the (local) mesh width $h$;
 good results are usually obtained by setting $\delta=0.1h$.
-The modification in the test function can be thought as
-adding a small amount of diffusion along the direction $\beta$ of the
-wind field, i.e., along "stream lines". The value added here is small enough
-that we do not introduce excessive diffusion and also large enough that the
-linear system can be solved in a reasonable amount of time.
-We will not discuss reasons, pros, and cons of the streamline
-diffusion method, but rather use it "as is", and refer the
-interested reader to the sufficiently available literature; every
-recent good book on finite elements should have a discussion of that
-topic.
+(Why this is called "streamline diffusion" will be explained below;
+for the moment, let us simply take for granted that this is how we
+derive a stable discrete formulation.)
+The value for $\delta$ here is small enough
+that we do not introduce excessive diffusion, but large enough that the
+resulting problem is well-posed.
 
 Using the test functions as defined above, an initial weak form of the
 problem would ask for finding a function $u_h$ so that for all test
@@ -174,6 +177,117 @@ and then to obtain
   (\beta\cdot {\mathbf n} \varphi_i, \varphi_j)_{\partial\Omega_-},
 @f]
 as system matrix. We will assemble this matrix in the program.
+
+
+<h3>Why is this method called "streamline diffusion"?</h3>
+
+Looking at the bilinear form mentioned above, we see that the discrete
+solution has to satisfy an equation of which the left hand side in
+weak form has a domain term of the kind
+@f[
+  (v_h + \delta \beta\cdot\nabla v_h, \beta \cdot \nabla u_h)_\Omega,
+@f]
+or if we split this up, the form
+@f[
+  (v_h, \beta \cdot \nabla u_h)_\Omega
+  +
+  (\delta \beta\cdot\nabla v_h, \beta \cdot \nabla u_h)_\Omega.
+@f]
+If we wanted to see what strong form of the equation that would
+correspond to, we need to integrate the second term. This yields the
+following formulation, where for simplicity we'll ignore boundary
+terms for now:
+@f[
+  (v_h, \beta \cdot \nabla u_h)_\Omega
+  -
+  \left(v_h, \delta \nabla \cdot \left[\beta \left(\beta \cdot \nabla
+  u_h\right)\right]\right)_\Omega
+  +
+  \text{boundary terms}.
+@f]
+Let us assume for a moment that the wind field $\beta$ is
+divergence-free, i.e., that $\nabla \cdot \beta = 0$. Then applying
+the product rule to the derivative of the term in square brackets on
+the right and using the divergence-freeness will give us the following:
+@f[
+  (v_h, \beta \cdot \nabla u_h)_\Omega
+  -
+  \left(v_h, \delta \left[\beta \cdot \nabla\right] \left[\beta \cdot \nabla
+  \right]u_h\right)_\Omega
+  +
+  \text{boundary terms}.
+@f]
+That means that the strong form of the equation would be of the sort
+@f[
+  \beta \cdot \nabla u_h
+  -
+  \delta
+  \left[\beta \cdot \nabla\right] \left[\beta \cdot \nabla
+  \right] u_h.
+@f]
+What is important to recognize now is that $\beta\cdot\nabla$ is the
+<em>derivative in direction $\beta$</em>. So, if we denote this by
+$\beta\cdot\nabla=\frac{\partial}{\partial \beta}$ (in the same way as
+we often write $\mathbf n\cdot\nabla=\frac{\partial}{\partial n}$ for
+the derivative in normal direction at the boundary), then the strong
+form of the equation is
+@f[
+  \beta \cdot \nabla u_h
+  -
+  \delta
+  \frac{\partial^2}{\partial\beta^2} u_h.
+@f]
+In other words, the unusual choice of test function is equivalent to
+the addition of term to the strong form that corresponds to a second
+order (i.e., diffusion) differential operator in the direction of the wind
+field $\beta$, i.e., in "streamline direction". A fuller account would
+also have to explore the effect of the test function on boundary
+values and why it is necessary to also use the same test function for
+the right hand side, but the discussion above might make clear where
+the name "streamline diffusion" for the method originates from.
+
+
+<h3>Why is this method also called "Petrov-Galerkin"?</h3>
+
+A "Galerkin method" is one where one obtains the weak formulation by
+multiplying the equation by a test function $v$ (and then integrating
+over $\Omega$) where the functions $v$ are from the same space as the
+solution $u$ (though possibly with different boundary values). But
+this is not strictly necessary: One could also imagine choosing the
+test functions from a different set of functions, as long as that
+different set has "as many dimensions" as the original set of
+functions so that we end up with as many independent equations as
+there are degrees of freedom (where all of this needs to be
+appropriately defined in the infinite-dimensional case). Methods that
+make use of this possibility (i.e., choose the set of test functions
+differently than the set of solutions) are called "Petrov-Galerkin"
+methods. In the current case, the test functions all have the form
+$v+\beta\cdot\nabla v$ where $v$ is from the set of solutions.
+
+
+<h3>Why is this method also called "streamline-upwind"?</h3>
+
+[Upwind methods](https://en.wikipedia.org/wiki/Upwind_scheme) have a
+long history in the derivation of stabilized schemes for advection
+equations. Generally, the idea is that instead of looking at a
+function "here", we look at it a small distance further "upstream" or "upwind",
+i.e., where the information "here" originally came from. This might
+suggest not considering $u(\mathbf x)$, but
+something like $u(\mathbf x - \delta \beta)$. Or, equivalently upon
+integration, we could evaluate $u(\mathbf x)$ and instead consider $v$
+a bit downstream: $v(\mathbf x+\delta \beta)$. This would be cumbersome
+for a variety of reasons: First, we would have to define what $v$
+should be if $\mathbf x + \delta \beta$ happens to be outside
+$\Omega$; second, computing integrals numerically would be much more
+awkward since we no longer evaluate $u$ and $v$ at the same quadrature
+points. But since we assume that $\delta$ is small, we can do a Taylor
+expansion:
+@f[
+  v(\mathbf x + \delta \beta)
+  \approx
+  v(\mathbf x) + \delta \beta \cdot \nabla v(\mathbf x).
+@f]
+This form for the test function should by now look familiar.
 
 
 <h3>Solving the linear system that corresponds to the advection equation</h3>

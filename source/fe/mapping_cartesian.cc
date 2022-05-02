@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,7 +18,6 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/signaling_nan.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -33,6 +32,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -71,6 +71,23 @@ MappingCartesian<dim, spacedim>::preserves_vertex_locations() const
 
 
 template <int dim, int spacedim>
+bool
+MappingCartesian<dim, spacedim>::is_compatible_with(
+  const ReferenceCell &reference_cell) const
+{
+  Assert(dim == reference_cell.get_dimension(),
+         ExcMessage("The dimension of your mapping (" +
+                    Utilities::to_string(dim) +
+                    ") and the reference cell cell_type (" +
+                    Utilities::to_string(reference_cell.get_dimension()) +
+                    " ) do not agree."));
+
+  return reference_cell.is_hyper_cube();
+}
+
+
+
+template <int dim, int spacedim>
 UpdateFlags
 MappingCartesian<dim, spacedim>::requires_update_flags(
   const UpdateFlags in) const
@@ -95,7 +112,7 @@ MappingCartesian<dim, spacedim>::get_data(const UpdateFlags      update_flags,
                                           const Quadrature<dim> &q) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>(q);
+    std::make_unique<InternalData>(q);
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // store the flags in the internal data object so we can access them
@@ -111,12 +128,14 @@ MappingCartesian<dim, spacedim>::get_data(const UpdateFlags      update_flags,
 template <int dim, int spacedim>
 std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingCartesian<dim, spacedim>::get_face_data(
-  const UpdateFlags          update_flags,
-  const Quadrature<dim - 1> &quadrature) const
+  const UpdateFlags               update_flags,
+  const hp::QCollection<dim - 1> &quadrature) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>(
-      QProjector<dim>::project_to_all_faces(quadrature));
+    std::make_unique<InternalData>(QProjector<dim>::project_to_all_faces(
+      ReferenceCells::get_hypercube<dim>(), quadrature[0]));
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // verify that we have computed the transitive hull of the required
@@ -140,8 +159,8 @@ MappingCartesian<dim, spacedim>::get_subface_data(
   const Quadrature<dim - 1> &quadrature) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std_cxx14::make_unique<InternalData>(
-      QProjector<dim>::project_to_all_subfaces(quadrature));
+    std::make_unique<InternalData>(QProjector<dim>::project_to_all_subfaces(
+      ReferenceCells::get_hypercube<dim>(), quadrature));
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
 
   // verify that we have computed the transitive hull of the required
@@ -203,8 +222,7 @@ MappingCartesian<dim, spacedim>::maybe_update_cell_quadrature_points(
 {
   if (data.update_each & update_quadrature_points)
     {
-      const typename QProjector<dim>::DataSetDescriptor offset =
-        QProjector<dim>::DataSetDescriptor::cell();
+      const auto offset = QProjector<dim>::DataSetDescriptor::cell();
 
       transform_quadrature_points(cell, data, offset, quadrature_points);
     }
@@ -224,13 +242,13 @@ MappingCartesian<dim, spacedim>::maybe_update_face_quadrature_points(
 
   if (data.update_each & update_quadrature_points)
     {
-      const typename QProjector<dim>::DataSetDescriptor offset =
-        QProjector<dim>::DataSetDescriptor::face(face_no,
-                                                 cell->face_orientation(
-                                                   face_no),
-                                                 cell->face_flip(face_no),
-                                                 cell->face_rotation(face_no),
-                                                 quadrature_points.size());
+      const auto offset = QProjector<dim>::DataSetDescriptor::face(
+        ReferenceCells::get_hypercube<dim>(),
+        face_no,
+        cell->face_orientation(face_no),
+        cell->face_flip(face_no),
+        cell->face_rotation(face_no),
+        quadrature_points.size());
 
 
       transform_quadrature_points(cell, data, offset, quadrature_points);
@@ -257,15 +275,15 @@ MappingCartesian<dim, spacedim>::maybe_update_subface_quadrature_points(
 
   if (data.update_each & update_quadrature_points)
     {
-      const typename QProjector<dim>::DataSetDescriptor offset =
-        QProjector<dim>::DataSetDescriptor::subface(
-          face_no,
-          sub_no,
-          cell->face_orientation(face_no),
-          cell->face_flip(face_no),
-          cell->face_rotation(face_no),
-          quadrature_points.size(),
-          cell->subface_case(face_no));
+      const auto offset = QProjector<dim>::DataSetDescriptor::subface(
+        ReferenceCells::get_hypercube<dim>(),
+        face_no,
+        sub_no,
+        cell->face_orientation(face_no),
+        cell->face_flip(face_no),
+        cell->face_rotation(face_no),
+        quadrature_points.size(),
+        cell->subface_case(face_no));
 
       transform_quadrature_points(cell, data, offset, quadrature_points);
     }
@@ -368,6 +386,66 @@ MappingCartesian<dim, spacedim>::maybe_update_jacobian_derivatives(
 
 
 template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::maybe_update_volume_elements(
+  const InternalData &data) const
+{
+  if (data.update_each & update_volume_elements)
+    {
+      double volume = data.cell_extents[0];
+      for (unsigned int d = 1; d < dim; ++d)
+        volume *= data.cell_extents[d];
+      data.volume_element = volume;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::maybe_update_jacobians(
+  const InternalData &             data,
+  const CellSimilarity::Similarity cell_similarity,
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  // "compute" Jacobian at the quadrature points, which are all the
+  // same
+  if (data.update_each & update_jacobians)
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i = 0; i < output_data.jacobians.size(); ++i)
+        {
+          output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
+          for (unsigned int j = 0; j < dim; ++j)
+            output_data.jacobians[i][j][j] = data.cell_extents[j];
+        }
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::maybe_update_inverse_jacobians(
+  const InternalData &             data,
+  const CellSimilarity::Similarity cell_similarity,
+  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  // "compute" inverse Jacobian at the quadrature points, which are
+  // all the same
+  if (data.update_each & update_inverse_jacobians)
+    if (cell_similarity != CellSimilarity::translation)
+      for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
+        {
+          output_data.inverse_jacobians[i] = Tensor<2, dim>();
+          for (unsigned int j = 0; j < dim; ++j)
+            output_data.inverse_jacobians[i][j][j] = 1. / data.cell_extents[j];
+        }
+}
+
+
+
+template <int dim, int spacedim>
 CellSimilarity::Similarity
 MappingCartesian<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -403,31 +481,49 @@ MappingCartesian<dim, spacedim>::fill_fe_values(
           for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
             output_data.JxW_values[i] = J * quadrature.weight(i);
       }
-  // "compute" Jacobian at the quadrature points, which are all the
-  // same
-  if (data.update_each & update_jacobians)
-    if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i = 0; i < output_data.jacobians.size(); ++i)
-        {
-          output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
-          for (unsigned int j = 0; j < dim; ++j)
-            output_data.jacobians[i][j][j] = data.cell_extents[j];
-        }
 
+
+  maybe_update_jacobians(data, cell_similarity, output_data);
   maybe_update_jacobian_derivatives(data, cell_similarity, output_data);
-
-  // "compute" inverse Jacobian at the quadrature points, which are
-  // all the same
-  if (data.update_each & update_inverse_jacobians)
-    if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
-        {
-          output_data.inverse_jacobians[i] = Tensor<2, dim>();
-          for (unsigned int j = 0; j < dim; ++j)
-            output_data.inverse_jacobians[i][j][j] = 1. / data.cell_extents[j];
-        }
+  maybe_update_inverse_jacobians(data, cell_similarity, output_data);
 
   return cell_similarity;
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::fill_mapping_data_for_generic_points(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<dim>> &                         unit_points,
+  const UpdateFlags                                           update_flags,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  if (update_flags == update_default)
+    return;
+
+  Assert(update_flags & update_inverse_jacobians ||
+           update_flags & update_jacobians ||
+           update_flags & update_quadrature_points,
+         ExcNotImplemented());
+
+  output_data.initialize(unit_points.size(), update_flags);
+
+  InternalData data;
+  data.update_each = update_flags;
+  data.quadrature_points =
+    std::vector<Point<dim>>(unit_points.begin(), unit_points.end());
+
+  update_cell_extents(cell, CellSimilarity::none, data);
+
+  maybe_update_cell_quadrature_points(cell,
+                                      data,
+                                      output_data.quadrature_points);
+
+  maybe_update_jacobians(data, CellSimilarity::none, output_data);
+  maybe_update_inverse_jacobians(data, CellSimilarity::none, output_data);
 }
 
 
@@ -437,11 +533,13 @@ void
 MappingCartesian<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
@@ -468,37 +566,16 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values(
 
   if (data.update_each & update_JxW_values)
     for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
-      output_data.JxW_values[i] = J * quadrature.weight(i);
+      output_data.JxW_values[i] = J * quadrature[0].weight(i);
 
   if (data.update_each & update_boundary_forms)
     for (unsigned int i = 0; i < output_data.boundary_forms.size(); ++i)
       output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
-  if (data.update_each & update_volume_elements)
-    {
-      J = data.cell_extents[0];
-      for (unsigned int d = 1; d < dim; ++d)
-        J *= data.cell_extents[d];
-      data.volume_element = J;
-    }
-
-  if (data.update_each & update_jacobians)
-    for (unsigned int i = 0; i < output_data.jacobians.size(); ++i)
-      {
-        output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
-        for (unsigned int d = 0; d < dim; ++d)
-          output_data.jacobians[i][d][d] = data.cell_extents[d];
-      }
-
+  maybe_update_volume_elements(data);
+  maybe_update_jacobians(data, CellSimilarity::none, output_data);
   maybe_update_jacobian_derivatives(data, CellSimilarity::none, output_data);
-
-  if (data.update_each & update_inverse_jacobians)
-    for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
-      {
-        output_data.inverse_jacobians[i] = DerivativeForm<1, dim, spacedim>();
-        for (unsigned int d = 0; d < dim; ++d)
-          output_data.inverse_jacobians[i][d][d] = 1. / data.cell_extents[d];
-      }
+  maybe_update_inverse_jacobians(data, CellSimilarity::none, output_data);
 }
 
 
@@ -552,31 +629,73 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values(
     for (unsigned int i = 0; i < output_data.boundary_forms.size(); ++i)
       output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
-  if (data.update_each & update_volume_elements)
-    {
-      J = data.cell_extents[0];
-      for (unsigned int d = 1; d < dim; ++d)
-        J *= data.cell_extents[d];
-      data.volume_element = J;
-    }
-
-  if (data.update_each & update_jacobians)
-    for (unsigned int i = 0; i < output_data.jacobians.size(); ++i)
-      {
-        output_data.jacobians[i] = DerivativeForm<1, dim, spacedim>();
-        for (unsigned int d = 0; d < dim; ++d)
-          output_data.jacobians[i][d][d] = data.cell_extents[d];
-      }
-
+  maybe_update_volume_elements(data);
+  maybe_update_jacobians(data, CellSimilarity::none, output_data);
   maybe_update_jacobian_derivatives(data, CellSimilarity::none, output_data);
+  maybe_update_inverse_jacobians(data, CellSimilarity::none, output_data);
+}
 
-  if (data.update_each & update_inverse_jacobians)
-    for (unsigned int i = 0; i < output_data.inverse_jacobians.size(); ++i)
+
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  AssertDimension(dim, spacedim);
+
+  // Convert data object to internal data for this class. Fails with an
+  // exception if that is not possible.
+  Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
+         ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(internal_data);
+
+
+  update_cell_extents(cell, CellSimilarity::none, data);
+
+  maybe_update_cell_quadrature_points(cell,
+                                      data,
+                                      output_data.quadrature_points);
+
+  if (data.update_each & update_normal_vectors)
+    for (unsigned int i = 0; i < output_data.normal_vectors.size(); ++i)
       {
-        output_data.inverse_jacobians[i] = DerivativeForm<1, spacedim, dim>();
+        // The normals are n = J^{-T} * \hat{n} before normalizing.
+        Tensor<1, dim>        normal;
+        const Tensor<1, dim> &ref_space_normal = quadrature.normal_vector(i);
         for (unsigned int d = 0; d < dim; ++d)
-          output_data.inverse_jacobians[i][d][d] = 1. / data.cell_extents[d];
+          {
+            normal[d] = ref_space_normal[d] / data.cell_extents[d];
+          }
+        normal /= normal.norm();
+        output_data.normal_vectors[i] = normal;
       }
+
+  if (data.update_each & update_JxW_values)
+    for (unsigned int i = 0; i < output_data.JxW_values.size(); ++i)
+      {
+        const Tensor<1, dim> &ref_space_normal = quadrature.normal_vector(i);
+
+        // J^{-T} \times \hat{n}
+        Tensor<1, dim> invJTxNormal;
+        double         det_jacobian = 1.;
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+            det_jacobian *= data.cell_extents[d];
+            invJTxNormal[d] = ref_space_normal[d] / data.cell_extents[d];
+          }
+        output_data.JxW_values[i] =
+          det_jacobian * invJTxNormal.norm() * quadrature.weight(i);
+      }
+
+  maybe_update_volume_elements(data);
+  maybe_update_jacobians(data, CellSimilarity::none, output_data);
+  maybe_update_jacobian_derivatives(data, CellSimilarity::none, output_data);
+  maybe_update_inverse_jacobians(data, CellSimilarity::none, output_data);
 }
 
 
@@ -1061,7 +1180,7 @@ template <int dim, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingCartesian<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingCartesian<dim, spacedim>>(*this);
+  return std::make_unique<MappingCartesian<dim, spacedim>>(*this);
 }
 
 

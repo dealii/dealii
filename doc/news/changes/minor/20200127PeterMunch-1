@@ -1,4 +1,0 @@
-New: ParameterHandler::parse_input_from_json() and  ParameterHandler::parse_input_from_xml() can skip
-undifined sections and entries.
-<br>
-(Peter Munch, 2020/01/27)

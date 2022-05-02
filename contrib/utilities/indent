@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 - 2019 by the deal.II authors
+## Copyright (C) 2018 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -27,9 +27,9 @@
 #
 # The script can be invoked with DEAL_II_CLANG_FORMAT to change
 # the default version of clang-format. For example:
-#   DEAL_II_CLANG_FORMAT=clang-format-6.0 ./contrib/utilities/indent
+#   DEAL_II_CLANG_FORMAT=clang-format-11.0 ./contrib/utilities/indent
 # or,
-#   make DEAL_II_CLANG_FORMAT="clang-format-6.0" indent
+#   make DEAL_II_CLANG_FORMAT="clang-format-11.0" indent
 #
 # Note: If the script is invoked with REPORT_ONLY=true set,
 #   REPORT_ONLY=true ./contrib/utilities/indent
@@ -39,8 +39,13 @@
 # changes.
 #
 
-if [ ! -f contrib/utilities/indent_common.sh ]; then
+if [ ! -f contrib/utilities/indent ]; then
   echo "*** This script must be run from the top-level directory of deal.II."
+  exit 1
+fi
+
+if [ ! -f contrib/utilities/indent_common.sh ]; then
+  echo "*** This script requires contrib/utilities/indent_common.sh."
   exit 1
 fi
 
@@ -56,22 +61,29 @@ checks
 # Process all source and header files:
 #
 
-process_changed "tests include source examples contrib/python-bindings" ".*\.(cc|h|cu|cuh)" format_file
+process_changed "tests include source examples cmake/scripts contrib/python-bindings" ".*\.(cc|h|cu|cuh)" format_file
 process_changed "source" ".*\.inst.in" format_inst
 
 #
 # Fix permissions and convert to unix line ending if necessary:
 #
 
-process_changed "tests include source examples contrib/python-bindings" \
+process_changed "tests include source examples cmake/scripts contrib/python-bindings" \
   ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" fix_permissions
 
-process_changed "tests include source examples contrib/python-bindings" \
+process_changed "tests include source examples cmake/scripts contrib/python-bindings" \
   ".*\.(cc|h|cu|cuh|inst.in|cmake)" dos_to_unix
 
 #
 # Removing trailing whitespace
 #
 
-process_changed "include source examples contrib/python-bindings doc" \
+process_changed "tests include source examples cmake/scripts contrib/python-bindings doc" \
   ".*\.(cc|h|cu|cuh|html|dox|txt)" remove_trailing_whitespace
+
+#
+# Ensure only a single newline at end of files
+#
+
+process_changed "tests include source examples cmake/scripts contrib/python-bindings doc" \
+  ".*\.(cc|h|cu|cuh|html|dox|txt)" ensure_single_trailing_newline

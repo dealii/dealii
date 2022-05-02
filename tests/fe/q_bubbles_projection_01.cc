@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,7 @@ char logname[] = "output";
 void
 test()
 {
-  FESystem<2> fe(FE_Q_Bubbles<2>(QIterated<1>(QTrapez<1>(), 3)), 2);
+  FESystem<2> fe(FE_Q_Bubbles<2>(QIterated<1>(QTrapezoid<1>(), 3)), 2);
   const std::array<unsigned int, 3> min_convergence_steps = {{15, 15, 15}};
   check(fe, min_convergence_steps);
 }

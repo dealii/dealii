@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -145,7 +145,7 @@ private:
     locally_owned_dofs = dof_handler.locally_owned_dofs();
 
     std::vector<types::global_dof_index> new_number(dof_handler.n_dofs());
-    for (types::global_dof_index i = 0; i < dof_handler.n_dofs(); i++)
+    for (types::global_dof_index i = 0; i < dof_handler.n_dofs(); ++i)
       new_number[i] = dof_handler.n_dofs() - i - 1;
 
     std::vector<types::global_dof_index> local_new_number;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,8 @@ main()
   initlog();
   deallog << std::setprecision(3);
 
-  typedef Tensor<0, 1> T;
-  T                    t1(13.), t2(42);
+  using T = Tensor<0, 1>;
+  T t1(13.), t2(42);
 
   compare(T(), 0.);
   compare(T(13.), 13.);

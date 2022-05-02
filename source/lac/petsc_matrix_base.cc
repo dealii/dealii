@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -438,7 +438,6 @@ namespace PETScWrappers
   }
 
 
-
   void
   MatrixBase::vmult(VectorBase &dst, const VectorBase &src) const
   {
@@ -549,6 +548,8 @@ namespace PETScWrappers
                             MAT_INITIAL_MATRIX,
                             PETSC_DEFAULT,
                             &result.petsc_matrix());
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          ierr = PETScWrappers::destroy_matrix(tmp);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
         }
     }
@@ -673,7 +674,7 @@ namespace PETScWrappers
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
   }
 
 

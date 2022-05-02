@@ -1,4 +1,0 @@
-Improved: Add assignment operator for two Point objects with different
-underlying scalar types.
-<br>
-(Daniel Garcia-Sanchez, 2019/07/23)

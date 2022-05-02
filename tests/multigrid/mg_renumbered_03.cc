@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -226,7 +226,7 @@ template <int dim>
 class LaplaceProblem
 {
 public:
-  typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+  using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
   LaplaceProblem(const unsigned int deg);
   void
@@ -242,11 +242,11 @@ private:
   void
   refine_local();
 
-  Triangulation<dim>         triangulation;
-  const MappingQGeneric<dim> mapping;
-  FESystem<dim>              fe;
-  DoFHandler<dim>            mg_dof_handler;
-  DoFHandler<dim>            mg_dof_handler_renumbered;
+  Triangulation<dim>  triangulation;
+  const MappingQ<dim> mapping;
+  FESystem<dim>       fe;
+  DoFHandler<dim>     mg_dof_handler;
+  DoFHandler<dim>     mg_dof_handler_renumbered;
 
   const unsigned int                             degree;
   std::vector<std::set<types::global_dof_index>> boundary_indices,
@@ -304,7 +304,7 @@ LaplaceProblem<dim>::output_gpl(const DoFHandler<dim> &        dof,
 {
   MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = dof.get_fe().tensor_degree();
-  QTrapez<1>         trapez;
+  QTrapezoid<1>      trapez;
   QIterated<dim>     quadrature(trapez, n_gauss_points);
   info_box.cell_quadrature = quadrature;
   AnyData data;
@@ -348,15 +348,13 @@ template <int dim>
 void
 LaplaceProblem<dim>::test()
 {
-  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-  Functions::ZeroFunction<dim> dirichlet_bc(fe.n_components());
-  dirichlet_boundary[0] = &dirichlet_bc;
-
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+  mg_constrained_dofs.initialize(mg_dof_handler);
+  mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
   MGConstrainedDoFs mg_constrained_dofs_renumbered;
-  mg_constrained_dofs_renumbered.initialize(mg_dof_handler_renumbered,
-                                            dirichlet_boundary);
+  mg_constrained_dofs_renumbered.initialize(mg_dof_handler_renumbered);
+  mg_constrained_dofs_renumbered.make_zero_boundary_constraints(
+    mg_dof_handler_renumbered, {0});
 
   MGTransferPrebuilt<Vector<double>> mg_transfer(mg_constrained_dofs);
   mg_transfer.build(mg_dof_handler);
@@ -379,11 +377,11 @@ LaplaceProblem<dim>::test()
   for (unsigned int l = 0; l < triangulation.n_levels(); ++l)
     {
       diff(d[l], mg_dof_handler_renumbered, u[l], l);
-      deallog << l << " " << u[l].l2_norm() << '\t' << v[l].l2_norm() << '\t'
+      deallog << l << ' ' << u[l].l2_norm() << '\t' << v[l].l2_norm() << '\t'
               << d[l].l2_norm() << std::endl;
       for (unsigned int i = 0; i < d[l].size(); ++i)
         if (d[l](i) != 0)
-          deallog << i << " " << d[l](i) << std::endl;
+          deallog << i << ' ' << d[l](i) << std::endl;
     }
   output_gpl(mg_dof_handler_renumbered, d);
 }

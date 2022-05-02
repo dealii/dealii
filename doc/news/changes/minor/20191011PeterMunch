@@ -1,4 +1,0 @@
-Improved: Make the output of cells, (all non-internal) faces and (all non-internal) 
-co-faces optional in GridOut::write_vtk.
-<br>
-(Peter Munch, Niklas Fehn, 2019/10/11)

@@ -1,5 +1,5 @@
 #
-# The clang-format (Clang 6) style file used by deal.II.
+# The clang-format (Clang 11) style file used by deal.II.
 #
 
 AccessModifierOffset: -2
@@ -26,8 +26,9 @@ BinPackArguments: false
 BinPackParameters: false
 
 BraceWrapping:
+  AfterCaseLabel: true
   AfterClass: true
-  AfterControlStatement: true
+  AfterControlStatement: Always
   AfterEnum: true
   AfterExternBlock: true
   AfterFunction: true
@@ -36,6 +37,8 @@ BraceWrapping:
   AfterUnion: true
   BeforeCatch: true
   BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: true
   IndentBraces: true
   SplitEmptyFunction: false
   SplitEmptyRecord: false
@@ -69,6 +72,8 @@ IncludeCategories:
     Priority: -1
 # deal.II folders in sorted order:
   - Regex:    "deal.II/algorithms/.*\\.h"
+    Priority: 100
+  - Regex:    "deal.II/arborx/.*\\.h"
     Priority: 110
   - Regex:    "deal.II/base/.*\\.h"
     Priority: 120

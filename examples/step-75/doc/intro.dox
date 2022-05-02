@@ -1,0 +1,273 @@
+<br>
+
+<i>This program was contributed by Marc Fehling, Peter Munch and
+Wolfgang Bangerth.
+<br>
+This material is based upon work partly supported by the National
+Science Foundation under Award No. DMS-1821210, EAR-1550901, and
+OAC-1835673. Any opinions, findings, and conclusions or recommendations
+expressed in this publication are those of the authors and do not
+necessarily reflect the views of the National Science Foundation.
+<br>
+Peter Munch would like to thank Timo Heister, Martin Kronbichler, and
+Laura Prieto Saavedra for many very interesting discussions.
+</i>
+
+@dealiiTutorialDOI{10.5281/zenodo.6423570,https://zenodo.org/badge/DOI/10.5281/zenodo.6423570.svg}
+
+@note As a prerequisite of this program, you need to have the p4est
+library and the Trilinos library installed. The installation of deal.II
+together with these additional libraries is described in the <a
+href="../../readme.html" target="body">README</a> file.
+
+
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+In the finite element context, more degrees of freedom usually yield a
+more accurate solution but also require more computational effort.
+
+Throughout previous tutorials, we found ways to effectively distribute
+degrees of freedom by aligning the grid resolution locally with the
+complexity of the solution (adaptive mesh refinement, step-6). This
+approach is particularly effective if we do not only adapt the grid
+alone, but also locally adjust the polynomial degree of the associated
+finite element on each cell (hp-adaptation, step-27).
+
+In addition, assigning more processes to run your program simultaneously
+helps to tackle the computational workload in lesser time. Depending on
+the hardware architecture of your machine, your program must either be
+prepared for the case that all processes have access to the same memory
+(shared memory, step-18), or that processes are hosted on several
+independent nodes (distributed memory, step-40).
+
+In the high-performance computing segment, memory access turns out to be
+the current bottleneck on supercomputers. We can avoid storing matrices
+altogether by computing the effect of matrix-vector products on the fly
+with MatrixFree methods (step-37). They can be used for geometric
+multigrid methods (step-50) and also for polynomial multigrid methods to
+speed solving the system of equation tremendously.
+
+This tutorial combines all of these particularities and presents a
+state-of-the-art way how to solve a simple Laplace problem: utilizing
+both hp-adaptation and matrix-free hybrid multigrid methods on machines
+with distributed memory.
+
+
+<h3>Load balancing</h3>
+
+For parallel applications in FEM, we partition the grid into
+subdomains (aka domain decomposition), which are assigned to processes.
+This partitioning happens on active cells in deal.II as demonstrated in
+step-40. There, each cell has the same finite element and the same
+number of degrees of freedom assigned, and approximately the same
+workload. To balance the workload among all processes, we have to
+balance the number of cells on all participating processes.
+
+With hp-adaptive methods, this is no longer the case: the finite element
+type may vary from cell to cell and consequently also the number of
+degrees of freedom. Matching the number of cells does not yield a
+balanced workload. In the matrix-free context, the workload can be
+assumed to be proportional the number of degrees of freedom of each
+process, since in the best case only the source and the destination
+vector have to be loaded.
+
+One could balance the workload by assigning weights to every cell which
+are proportional to the number of degrees of freedom, and balance the
+sum of all weights between all processes. Assigning individual weights
+to each cell can be realized with the class parallel::CellWeights which
+we will use later.
+
+
+<h3>hp-decision indicators</h3>
+
+With hp-adaptive methods, we not only have to decide which cells we want
+to refine or coarsen, but we also have the choice how we want to do
+that: either by adjusting the grid resolution or the polynomial degree
+of the finite element.
+
+We will again base the decision on which cells to adapt on (a
+posteriori) computed error estimates of the current solution, e.g.,
+using the KellyErrorEstimator. We will similarly decide how to adapt
+with (a posteriori) computed smoothness estimates: large polynomial
+degrees work best on smooth parts of the solution while fine grid
+resolutions are favorable on irregular parts. In step-27, we presented a
+way to calculate smoothness estimates based on the decay of Fourier
+coefficients. Let us take here the opportunity and present an
+alternative that follows the same idea, but with Legendre coefficients.
+
+We will briefly present the idea of this new technique, but limit its
+description to 1D for simplicity. Suppose $u_\text{hp}(x)$ is a finite
+element function defined on a cell $K$ as
+@f[
+u_\text{hp}(x) = \sum c_i \varphi_i(x)
+@f]
+where each $\varphi_i(x)$ is a shape function.
+We can equivalently represent $u_\text{hp}(x)$ in the basis of Legendre
+polynomials $P_k$ as
+@f[
+u_\text{hp}(x) = \sum l_k P_k(x).
+@f]
+Our goal is to obtain a mapping between the finite element coefficients
+$c_i$ and the Legendre coefficients $l_k$. We will accomplish this by
+writing the problem as a $L^2$-projection of $u_\text{hp}(x)$ onto the
+Legendre basis. Each coefficient $l_k$ can be calculated via
+@f[
+l_k = \int_K u_\text{hp}(x) P_k(x) dx.
+@f]
+By construction, the Legendre polynomials are orthogonal under the
+$L^2$-inner product on $K$. Additionally, we assume that they have been
+normalized, so their inner products can be written as
+@f[
+\int_K P_i(x) P_j(x) dx = \det(J_K) \, \delta_{ij}
+@f]
+where $\delta_{ij}$ is the Kronecker delta, and $J_K$ is the Jacobian of
+the mapping from $\hat{K}$ to $K$, which (in this tutorial) is assumed
+to be constant (i.e., the mapping must be affine).
+
+Hence, combining all these assumptions, the projection matrix for
+expressing $u_\text{hp}(x)$ in the Legendre basis is just $\det(J_K) \,
+\mathbb{I}$ -- that is, $\det(J_K)$ times the identity matrix. Let $F_K$
+be the Mapping from $K$ to its reference cell $\hat{K}$. The entries in
+the right-hand side in the projection system are, therefore,
+@f[
+\int_K u_\text{hp}(x) P_k(x) dx
+= \det(J_K) \int_\hat{K} u_\text{hp}(F_K(\hat{x})) P_k(F_K(\hat{x})) d\hat{x}.
+@f]
+Recalling the shape function representation of $u_\text{hp}(x)$, we can
+write this as $\det(J_K) \, \mathbf{C} \, \mathbf{c}$, where
+$\mathbf{C}$ is the change-of-basis matrix with entries
+@f[
+\int_K P_i(x) \varphi_j(x) dx
+= \det(J_K) \int_{\hat{K}} P_i(F_K(\hat{x})) \varphi_j(F_K(\hat{x})) d\hat{x}
+= \det(J_K) \int_{\hat{K}} \hat{P}_i(\hat{x}) \hat{\varphi}_j(\hat{x}) d\hat{x}
+\dealcoloneq \det(J_K) \, C_{ij}
+@f]
+so the values of $\mathbf{C}$ can be written <em>independently</em> of
+$K$ by factoring $\det(J_K)$ out front after transforming to reference
+coordinates. Hence, putting it all together, the projection problem can
+be written as
+@f[
+\det(J_K) \, \mathbb{I} \, \mathbf{l} = \det(J_K) \, \mathbf{C} \, \mathbf{c}
+@f]
+which can be rewritten as simply
+@f[
+\mathbf{l} = \mathbf{C} \, \mathbf{c}.
+@f]
+
+At this point, we need to emphasize that most finite element
+applications use unstructured meshes for which mapping is almost always
+non-affine. Put another way: the assumption that $J_K$ is constant
+across the cell is not true for general meshes. Hence, a correct
+calculation of $l_k$ requires not only that we calculate the
+corresponding transformation matrix $\mathbf{C}$ for every single cell,
+but that we also define a set of Legendre-like orthogonal functions on a
+cell $K$ which may have an arbitrary and very complex geometry. The
+second part, in particular, is very computationally expensive. The
+current implementation of the FESeries transformation classes relies on
+the simplification resulting from having a constant Jacobian to increase
+performance and thus only yields correct results for affine mappings.
+The transformation is only used for the purpose of smoothness estimation
+to decide on the type of adaptation, which is not a critical component
+of a finite element program. Apart from that, this circumstance does not
+pose a problem for this tutorial as we only use square-shaped cells.
+
+Eibner and Melenk @cite eibner2007hp argued that a function is analytic,
+i.e., representable by a power series, if and only if the absolute
+values of the Legendre coefficients decay exponentially with increasing
+index $k$:
+@f[
+\exists C,\sigma > 0 : \quad \forall k \in \mathbb{N}_0 : \quad |l_k|
+\leq C \exp\left( - \sigma k \right) .
+@f]
+The rate of decay $\sigma$ can be interpreted as a measure for the
+smoothness of that function. We can get it as the slope of a linear
+regression fit of the transformation coefficients:
+@f[
+\ln(|l_k|) \sim \ln(C) - \sigma k .
+@f]
+
+We will perform this fit on each cell $K$ to get a local estimate for
+the smoothness of the finite element approximation. The decay rate
+$\sigma_K$ then acts as the decision indicator for hp-adaptation. For a
+finite element on a cell $K$ with a polynomial degree $p$, calculating
+the coefficients for $k \leq (p+1)$ proved to be a reasonable choice to
+estimate smoothness. You can find a more detailed and dimension
+independent description in @cite fehling2020.
+
+All of the above is already implemented in the FESeries::Legendre class
+and the SmoothnessEstimator::Legendre namespace. With the error
+estimates and smoothness indicators, we are then left to flag the cells
+for actual refinement and coarsening. Some functions from the
+parallel::distributed::GridRefinement and hp::Refinement namespaces will
+help us with that later.
+
+
+<h3>Hybrid geometric multigrid</h3>
+
+Finite element matrices are typically very sparse. Additionally,
+hp-adaptive methods correspond to matrices with highly variable numbers
+of nonzero entries per row. Some state-of-the-art preconditioners, like
+the algebraic multigrid (AMG) ones as used in step-40, behave poorly in
+these circumstances.
+
+We will thus rely on a matrix-free hybrid multigrid preconditioner.
+step-50 has already demonstrated the superiority of geometric multigrid
+methods method when combined with the MatrixFree framework. The
+application on hp-adaptive FEM requires some additional work though
+since the children of a cell might have different polynomial degrees. As
+a remedy, we perform a p-relaxation to linear elements first (similar to
+Mitchell @cite mitchell2010hpmg) and then perform h-relaxation in the
+usual manner. On the coarsest level, we apply an algebraic multigrid
+solver. The combination of p-multigrid, h-multigrid, and AMG makes the
+solver to a hybrid multigrid solver.
+
+We will create a custom hybrid multigrid preconditioner with the special
+level requirements as described above with the help of the existing
+global-coarsening infrastructure via the use of
+MGTransferGlobalCoarsening.
+
+
+<h3>The test case</h3>
+
+For elliptic equations, each reentrant corner typically invokes a
+singularity @cite brenner2008. We can use this circumstance to put our
+hp-decision algorithms to a test: on all cells to be adapted, we would
+prefer a fine grid near the singularity, and a high polynomial degree
+otherwise.
+
+As the simplest elliptic problem to solve under these conditions, we
+chose the Laplace equation in a L-shaped domain with the reentrant
+corner in the origin of the coordinate system.
+
+To be able to determine the actual error, we manufacture a boundary
+value problem with a known solution. On the above mentioned domain, one
+solution to the Laplace equation is, in polar coordinates,
+$(r, \varphi)$:
+@f[
+u_\text{sol} = r^{2/3} \sin(2/3 \varphi).
+@f]
+
+See also @cite brenner2008 or @cite mitchell2014hp. The solution looks as follows:
+
+<div style="text-align:center;">
+  <img src="https://www.dealii.org/images/steps/developer/step-75.solution.svg"
+       alt="Analytic solution.">
+</div>
+
+The singularity becomes obvious by investigating the solution's gradient
+in the vicinity of the reentrant corner, i.e., the origin
+@f[
+\left\| \nabla u_\text{sol} \right\|_{2} = 2/3 r^{-1/3} , \quad
+\lim\limits_{r \rightarrow 0} \left\| \nabla u_\text{sol} \right\|_{2} =
+\infty .
+@f]
+
+As we know where the singularity will be located, we expect that our
+hp-decision algorithm decides for a fine grid resolution in this
+particular region, and high polynomial degree anywhere else.
+
+So let's see if that is actually the case, and how hp-adaptation
+performs compared to pure h-adaptation. But first let us have a detailed
+look at the actual code.

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -110,7 +110,7 @@ test()
   constraints.close();
   // set vector:
   unsigned int myid = Utilities::MPI::this_mpi_process(mpi_communicator);
-  for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); i++)
+  for (unsigned int i = 0; i < locally_owned_dofs.n_elements(); ++i)
     {
       const PetscScalar val = 1.0 + myid + (myid + i % 2) * 2.0 * PETSC_i;
       vector(locally_owned_dofs.nth_index_in_set(i))    = val;

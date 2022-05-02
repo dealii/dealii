@@ -2507,7 +2507,7 @@ VECTORS x_0__x_1 double
 0.792893 0.00000 0
 0.689340 0.00000 0
 0.585786 0.00000 0
-DEAL::FE=FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))^2]
+DEAL::FE=FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))^2]
 # vtk DataFile Version 3.0
 #This file was generated 
 ASCII

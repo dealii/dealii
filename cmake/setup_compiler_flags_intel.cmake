@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -44,11 +44,6 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fpic")
 # the deal.II library with it.
 #
 ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
-
-#
-# Set ansi mode:
-#
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-ansi")
 
 #
 # Enable verbose warnings:
@@ -187,6 +182,12 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   #
 
   ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
+
+  #
+  # Disable assert() in deal.II and user projects in release mode
+  #
+  LIST(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
+  LIST(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
 
   # equivalent to -fno-strict-aliasing:
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-ansi-alias")

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,7 @@ check_norms()
 
             const number result = v1 * v2;
             deallog << static_cast<double>(std::abs(result - inner_product))
-                    << " ";
+                    << ' ';
           }
       deallog << std::endl;
     }

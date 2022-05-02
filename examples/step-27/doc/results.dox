@@ -3,7 +3,7 @@
 In this section, we discuss a few results produced from running the
 current tutorial program. More results, in particular the extension to
 3d calculations and determining how much compute time the individual
-components of the program take, are given in the @ref hp_paper .
+components of the program take, are given in the @ref hp_paper "hp-paper".
 
 When run, this is what the program produces:
 
@@ -16,37 +16,37 @@ Cycle 0:
    Number of degrees of freedom: 3264
    Number of constraints       : 384
 Cycle 1:
-   Number of active cells      : 966
-   Number of degrees of freedom: 5245
-   Number of constraints       : 936
+   Number of active cells      : 807
+   Number of degrees of freedom: 4764
+   Number of constraints       : 756
 Cycle 2:
-   Number of active cells      : 1143
-   Number of degrees of freedom: 8441
-   Number of constraints       : 1929
+   Number of active cells      : 927
+   Number of degrees of freedom: 8226
+   Number of constraints       : 1856
 Cycle 3:
-   Number of active cells      : 1356
-   Number of degrees of freedom: 12349
-   Number of constraints       : 3046
+   Number of active cells      : 978
+   Number of degrees of freedom: 12146
+   Number of constraints       : 2944
 Cycle 4:
-   Number of active cells      : 1644
-   Number of degrees of freedom: 18178
-   Number of constraints       : 4713
+   Number of active cells      : 1104
+   Number of degrees of freedom: 16892
+   Number of constraints       : 3998
 Cycle 5:
-   Number of active cells      : 1728
-   Number of degrees of freedom: 22591
-   Number of constraints       : 6095
+   Number of active cells      : 1149
+   Number of degrees of freedom: 22078
+   Number of constraints       : 5230
 @endcode
 
 The first thing we learn from this is that the number of constrained degrees
 of freedom is on the order of 20-25% of the total number of degrees of
 freedom, at least on the later grids when we have elements of relatively
 high order (in 3d, the fraction of constrained degrees of freedom can be up
-to 30%). This is, in fact, on the same order of magnitude as for non-$hp$
-discretizations. For example, in the last step of the step-6
+to 30%). This is, in fact, on the same order of magnitude as for
+non-$hp$-discretizations. For example, in the last step of the step-6
 program, we have 18353 degrees of freedom, 4432 of which are
 constrained. The difference is that in the latter program, each constrained
 hanging node is constrained against only the two adjacent degrees of
-freedom, whereas in the $hp$ case, constrained nodes are constrained against
+freedom, whereas in the $hp$-case, constrained nodes are constrained against
 many more degrees of freedom. Note also that the current program also
 includes nodes subject to Dirichlet boundary conditions in the list of
 constraints. In cycle 0, all the constraints are actually because of
@@ -64,36 +64,36 @@ Secondly, let us look at the sequence of meshes generated:
 
 <div class="threecolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-0.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-00.svg"
          alt="Triangulation containing reentrant corners without adaptive refinement."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-1.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-01.svg"
          alt="Triangulation containing reentrant corners with one level of
          refinement. New cells are placed near the corners."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-2.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-02.svg"
          alt="Triangulation containing reentrant corners with two levels of
          refinement. New cells are placed near the corners."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-3.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-03.svg"
          alt="Triangulation containing reentrant corners with three levels of
          refinement. New cells are placed near the corners."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-4.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-04.svg"
          alt="Triangulation containing reentrant corners with four levels of
          refinement. New cells are placed near the corners."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-5.svg"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.mesh-05.svg"
          alt="Triangulation containing reentrant corners with five levels of
          refinement. New cells are placed near the corners."
          width="200" height="200">
@@ -103,36 +103,37 @@ Secondly, let us look at the sequence of meshes generated:
 It is clearly visible how the mesh is refined near the corner singularities,
 as one would expect it. More interestingly, we should be curious to see the
 distribution of finite element polynomial degrees to these mesh cells, where
-grey corresponds to degree two and pink corresponds to degree seven:
+the lightest color corresponds to degree two and the darkest one corresponds
+to degree seven:
 
 <div class="threecolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-0.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-00.svg"
          alt="Initial grid where all cells contain just biquadratic functions."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-1.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-01.svg"
          alt="Depiction of local approximation degrees after one refinement."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-2.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-02.svg"
          alt="Depiction of local approximation degrees after two refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-3.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-03.svg"
          alt="Depiction of local approximation degrees after three refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-4.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-04.svg"
          alt="Depiction of local approximation degrees after four refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-5.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-05.svg"
          alt="Depiction of local approximation degrees after five refinements."
          width="200" height="200">
   </div>
@@ -141,9 +142,9 @@ grey corresponds to degree two and pink corresponds to degree seven:
 While this is certainly not a perfect arrangement, it does make some sense: we
 use low order elements close to boundaries and corners where regularity is
 low. On the other hand, higher order elements are used where (i) the error was
-at one point fairly large, i.e. mainly in the general area around the corner
+at one point fairly large, i.e., mainly in the general area around the corner
 singularities and in the top right corner where the solution is large, and
-(ii) where the solution is smooth, i.e. far away from the boundary.
+(ii) where the solution is smooth, i.e., far away from the boundary.
 
 This arrangement of polynomial degrees of course follows from our smoothness
 estimator. Here is the estimated smoothness of the solution, with darker colors
@@ -151,32 +152,32 @@ indicating least smoothness and lighter indicating the smoothest areas:
 
 <div class="threecolumn" style="width: 80%">
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-0.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-00.svg"
          alt="Estimated regularity per cell on the initial grid."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-1.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-01.svg"
          alt="Depiction of the estimated regularity per cell after one refinement."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-2.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-02.svg"
          alt="Depiction of the estimated regularity per cell after two refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-3.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-03.svg"
          alt="Depiction of the estimated regularity per cell after three refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-4.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-04.svg"
          alt="Depiction of the estimated regularity per cell after four refinements."
          width="200" height="200">
   </div>
   <div>
-    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-5.png"
+    <img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-05.svg"
          alt="Depiction of the estimated regularity per cell after five refinements."
          width="200" height="200">
   </div>
@@ -209,7 +210,92 @@ include estimating the smoothness not on single cells, but cell assemblies or
 patches surrounding each cell. It may also be possible to find simple
 correction factors for each cell depending on the number of constrained
 degrees of freedom it has. In either case, there are ample opportunities for
-further research on finding good $hp$ refinement criteria. On the other hand,
-the main point of the current program was to demonstrate using the $hp$
-technology in deal.II, which is unaffected by our use of a possible
+further research on finding good $hp$-refinement criteria. On the other hand,
+the main point of the current program was to demonstrate using the
+$hp$-technology in deal.II, which is unaffected by our use of a possible
 sub-optimal refinement criterion.
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+<h4>Different hp-decision strategies</h4>
+
+This tutorial demonstrates only one particular strategy to decide between $h$- and
+$p$-adaptation. In fact, there are many more ways to automatically decide on the
+adaptation type, of which a few are already implemented in deal.II:
+<ul>
+  <li><i>Fourier coefficient decay:</i> This is the strategy currently
+  implemented in this tutorial. For more information on this strategy, see
+  the general documentation of the SmoothnessEstimator::Fourier namespace.</li>
+
+  <li><i>Legendre coefficient decay:</i> This strategy is quite similar
+  to the current one, but uses Legendre series expansion rather than the
+  Fourier one: instead of sinusoids as basis functions, this strategy uses
+  Legendre polynomials. Of course, since we approximate the solution using a
+  finite-dimensional polynomial on each cell, the expansion of the solution in
+  Legendre polynomials is also finite and, consequently, when we talk about the
+  "decay" of this expansion, we can only consider the finitely many nonzero
+  coefficients of this expansion, rather than think about it in asymptotic terms.
+  But, if we have enough of these coefficients, we can certainly think of the
+  decay of these coefficients as characteristic of the decay of the coefficients
+  of the exact solution (which is, in general, not polynomial and so will have an
+  infinite Legendre expansion), and considering the coefficients we have should
+  reveal something about the properties of the exact solution.
+
+  The transition from the Fourier strategy to the Legendre one is quite simple:
+  You just need to change the series expansion class and the corresponding
+  smoothness estimation function to be part of the proper namespaces
+  FESeries::Legendre and SmoothnessEstimator::Legendre. This strategy is used
+  in step-75. For the theoretical background of this strategy, consult the
+  general documentation of the SmoothnessEstimator::Legendre namespace, as well
+  as @cite mavriplis1994hp , @cite eibner2007hp and @cite davydov2017hp .</li>
+
+  <li><i>Refinement history:</i> The last strategy is quite different
+  from the other two. In theory, we know how the error will converge
+  after changing the discretization of the function space. With
+  $h$-refinement the solution converges algebraically as already pointed
+  out in step-7. If the solution is sufficiently smooth, though, we
+  expect that the solution will converge exponentially with increasing
+  polynomial degree of the finite element. We can compare a proper
+  prediction of the error with the actual error in the following step to
+  see if our choice of adaptation type was justified.
+
+  The transition to this strategy is a bit more complicated. For this, we need
+  an initialization step with pure $h$- or $p$-refinement and we need to
+  transfer the predicted errors over adapted meshes. The extensive
+  documentation of the hp::Refinement::predict_error() function describes not
+  only the theoretical details of this approach, but also presents a blueprint
+  on how to implement this strategy in your code. For more information, see
+  @cite melenk2001hp .
+
+  Note that with this particular function you cannot predict the error for
+  the next time step in time-dependent problems. Therefore, this strategy
+  cannot be applied to this type of problem without further ado. Alternatively,
+  the following approach could be used, which works for all the other
+  strategies as well: start each time step with a coarse mesh, keep refining
+  until happy with the result, and only then move on to the next time step.</li>
+</ul>
+
+Try implementing one of these strategies into this tutorial and observe the
+subtle changes to the results. You will notice that all strategies are
+capable of identifying the singularities near the reentrant corners and
+will perform $h$-refinement in these regions, while preferring $p$-refinement
+in the bulk domain. A detailed comparison of these strategies is presented
+in @cite fehling2020 .
+
+
+<h4>Parallel hp-adaptive finite elements</h4>
+
+All functionality presented in this tutorial already works for both
+sequential and parallel applications. It is possible without too much
+effort to change to either the parallel::shared::Triangulation or the
+parallel::distributed::Triangulation classes. If you feel eager to try
+it, we recommend reading step-18 for the former and step-40 for the
+latter case first for further background information on the topic, and
+then come back to this tutorial to try out your newly acquired skills.
+
+We go one step further in step-75: Here, we combine hp-adapative and
+MatrixFree methods in combination with
+parallel::distributed::Triangulation objects.

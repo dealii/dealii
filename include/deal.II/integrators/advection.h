@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,8 +46,6 @@ namespace LocalIntegrators
    * function.
    *
    * @ingroup Integrators
-   * @author Guido Kanschat
-   * @date 2012
    */
   namespace Advection
   {
@@ -71,9 +69,6 @@ namespace LocalIntegrators
      * in which case a constant velocity is assumed, or a vector with as many
      * entries as quadrature points if the velocity is not constant.
      * @param factor is an optional multiplication factor for the result.
-     *
-     * @author Guido Kanschat
-     * @date 2012
      */
     template <int dim>
     void

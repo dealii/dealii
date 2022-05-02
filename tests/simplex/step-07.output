@@ -1,0 +1,99 @@
+
+DEAL::Solving with P1 elements, adaptive refinement
+DEAL::=============================================
+DEAL::
+DEAL::
+DEAL::Solving with P1 elements, global refinement
+DEAL::===========================================
+DEAL::
+DEAL:cg::Starting value 4.31042
+DEAL:cg::Convergence step 32 value 4.40009e-13
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       512
+DEAL::   Number of degrees of freedom: 289
+DEAL:cg::Starting value 2.73770
+DEAL:cg::Convergence step 58 value 8.84330e-13
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       2048
+DEAL::   Number of degrees of freedom: 1089
+DEAL:cg::Starting value 1.49432
+DEAL:cg::Convergence step 113 value 6.96029e-13
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       8192
+DEAL::   Number of degrees of freedom: 4225
+DEAL::
+cycle cells dofs    L2        H1      Linfty   
+0     512   289  1.335e-01 3.062e+00 8.074e-01 
+1     2048  1089 4.205e-02 1.878e+00 3.744e-01 
+2     8192  4225 1.131e-02 9.927e-01 1.125e-01 
+\documentclass[10pt]{report}
+\usepackage{float}
+
+
+\begin{document}
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|r|r|c|c|c|} \hline
+cycle & \# cells & \# dofs & $L^2$-error & $H^1$-error & $L^\infty$-error\\ \hline
+0 & 512 & 289 & 1.335e-01 & 3.062e+00 & 8.074e-01\\ \hline
+1 & 2048 & 1089 & 4.205e-02 & 1.878e+00 & 3.744e-01\\ \hline
+2 & 8192 & 4225 & 1.131e-02 & 9.927e-01 & 1.125e-01\\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+\end{document}
+DEAL::
+n cells         H1                  L2          
+0 512   3.062e+00 -    -    1.335e-01 -    -    
+1 2048  1.878e+00 1.63 0.71 4.205e-02 3.17 1.67 
+2 8192  9.927e-01 1.89 0.92 1.131e-02 3.72 1.89 
+DEAL::
+DEAL::Solving with P2 elements, global refinement
+DEAL::===========================================
+DEAL::
+DEAL:cg::Starting value 3.03300
+DEAL:cg::Convergence step 76 value 7.67913e-13
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       512
+DEAL::   Number of degrees of freedom: 1089
+DEAL:cg::Starting value 1.71371
+DEAL:cg::Convergence step 150 value 8.04906e-13
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       2048
+DEAL::   Number of degrees of freedom: 4225
+DEAL:cg::Starting value 0.880749
+DEAL:cg::Convergence step 296 value 9.07150e-13
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       8192
+DEAL::   Number of degrees of freedom: 16641
+DEAL::
+cycle cells dofs     L2        H1      Linfty   
+0     512   1089  6.841e-02 1.940e+00 8.066e-01 
+1     2048  4225  1.537e-02 7.758e-01 2.471e-01 
+2     8192  16641 2.177e-03 2.177e-01 3.643e-02 
+\documentclass[10pt]{report}
+\usepackage{float}
+
+
+\begin{document}
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|r|r|c|c|c|} \hline
+cycle & \# cells & \# dofs & $L^2$-error & $H^1$-error & $L^\infty$-error\\ \hline
+0 & 512 & 1089 & 6.841e-02 & 1.940e+00 & 8.066e-01\\ \hline
+1 & 2048 & 4225 & 1.537e-02 & 7.758e-01 & 2.471e-01\\ \hline
+2 & 8192 & 16641 & 2.177e-03 & 2.177e-01 & 3.643e-02\\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+\end{document}
+DEAL::
+n cells         H1                  L2          
+0 512   1.940e+00 -    -    6.841e-02 -    -    
+1 2048  7.758e-01 2.50 1.32 1.537e-02 4.45 2.15 
+2 8192  2.177e-01 3.56 1.83 2.177e-03 7.06 2.82 
+DEAL::
+DEAL::Solving with P2 elements, adaptive refinement
+DEAL::===========================================
+DEAL::
+DEAL::

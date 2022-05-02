@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,6 @@ DEAL_II_NAMESPACE_OPEN
  * @todo Add support for environment variables like in kpathsea.
  *
  * @ingroup input
- * @author Guido Kanschat, Luca Heltai 2005
  */
 class PathSearch
 {
@@ -191,7 +190,7 @@ public:
                  std::string,
                  std::string,
                  << "The file \"" << arg1 << "\" was not found in the path for "
-                 << "files of class " << arg2 << ".");
+                 << "files of class " << arg2 << '.');
 
 private:
   /**

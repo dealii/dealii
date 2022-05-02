@@ -1,6 +1,0 @@
-Fixed: Make sure that merge_triangulations() does
-not forget about where the boundary is (the problem has
-actually been in create_triangulation(), which assigned
-numbers::internal_face_boundary_id to boundary faces)
-<br>
-(Sebastian Stark, 2019/10/08)

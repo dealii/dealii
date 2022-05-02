@@ -1,0 +1,4 @@
+Fixed: The DataOutFaces class can now also be used with simplex
+meshes. It previously aborted with exceptions.
+<br>
+(Wolfgang Bangerth, 2021/10/13)

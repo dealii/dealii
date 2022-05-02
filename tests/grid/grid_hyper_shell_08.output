@@ -1,0 +1,56 @@
+
+DEAL::Number of cells: 6
+DEAL::Number of vertices at inner radius: 8
+DEAL::Number of vertices at outer radius: 8
+DEAL::Number of vertices at other radius: 0
+DEAL::
+DEAL::Number of cells: 12
+DEAL::Number of vertices at inner radius: 14
+DEAL::Number of vertices at outer radius: 14
+DEAL::Number of vertices at other radius: 0
+DEAL::
+DEAL::Number of cells: 24
+DEAL::Number of vertices at inner radius: 26
+DEAL::Number of vertices at outer radius: 26
+DEAL::Number of vertices at other radius: 0
+DEAL::
+DEAL::Number of cells: 48
+DEAL::Number of vertices at inner radius: 50
+DEAL::Number of vertices at outer radius: 50
+DEAL::Number of vertices at other radius: 0
+DEAL::
+DEAL::Number of cells: 96
+DEAL::Number of vertices at inner radius: 50
+DEAL::Number of vertices at outer radius: 50
+DEAL::Number of vertices at other radius: 50
+DEAL::
+DEAL::Number of cells: 192
+DEAL::Number of vertices at inner radius: 194
+DEAL::Number of vertices at outer radius: 194
+DEAL::Number of vertices at other radius: 0
+DEAL::
+DEAL::Number of cells: 384
+DEAL::Number of vertices at inner radius: 386
+DEAL::Number of vertices at outer radius: 386
+DEAL::Number of vertices at other radius: 0
+DEAL::
+DEAL::Number of cells: 768
+DEAL::Number of vertices at inner radius: 770
+DEAL::Number of vertices at outer radius: 770
+DEAL::Number of vertices at other radius: 0
+DEAL::
+DEAL::Number of cells: 1536
+DEAL::Number of vertices at inner radius: 1538
+DEAL::Number of vertices at outer radius: 1538
+DEAL::Number of vertices at other radius: 0
+DEAL::
+DEAL::Number of cells: 3072
+DEAL::Number of vertices at inner radius: 3074
+DEAL::Number of vertices at outer radius: 3074
+DEAL::Number of vertices at other radius: 0
+DEAL::
+DEAL::Number of cells: 6144
+DEAL::Number of vertices at inner radius: 6146
+DEAL::Number of vertices at outer radius: 6146
+DEAL::Number of vertices at other radius: 0
+DEAL::

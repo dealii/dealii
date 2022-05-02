@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2019 by the deal.II authors
+ * Copyright (C) 2006 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -401,7 +401,7 @@ namespace Step25
                             update_values | update_JxW_values |
                               update_quadrature_points);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     Vector<double>                       local_nl_term(dofs_per_cell);
@@ -461,7 +461,7 @@ namespace Step25
                             update_values | update_JxW_values |
                               update_quadrature_points);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> local_nl_matrix(dofs_per_cell, dofs_per_cell);
@@ -614,7 +614,7 @@ namespace Step25
 
         std::cout << std::endl
                   << "Time step #" << timestep_number << "; "
-                  << "advancing to t = " << time << "." << std::endl;
+                  << "advancing to t = " << time << '.' << std::endl;
 
         // At the beginning of each time step we must solve the nonlinear
         // equation in the split formulation via Newton's method ---

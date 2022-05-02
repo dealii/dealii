@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 - 2019 by the deal.II authors
+## Copyright (C) 2017 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -24,21 +24,19 @@ MACRO(FEATURE_SUNDIALS_FIND_EXTERNAL var)
     SET(${var} TRUE)
 
     #
-    # We don't support version 4.0.0 or later yet.
+    # We require at least sundials 3.0.0
     #
-    SET(_first_unsupported_sundials_version 4.0.0)
-    IF(NOT SUNDIALS_VERSION VERSION_LESS ${_first_unsupported_sundials_version})
-      MESSAGE(STATUS
-              "Insufficient SUNDIALS installation found: "
-              "version ${_first_unsupported_sundials_version} "
-              "or later is not yet supported, "
-              "but version ${SUNDIALS_VERSION} was found."
+    SET(_version_required 3.0.0)
+    IF(SUNDIALS_VERSION VERSION_LESS ${_version_required})
+      MESSAGE(STATUS "Could not find a sufficient Sundials installation: "
+        "deal.II requires at least version ${_version_required}, "
+        "but version ${SUNDIALS_VERSION} was found."
         )
       SET(SUNDIALS_ADDITIONAL_ERROR_STRING
-          "Insufficient SUNDIALS installation found!\n"
-          "Version ${_first_unsupported_sundials_version} "
-          "or later is not yet supported, "
-          "but version ${SUNDIALS_VERSION} was found.\n"
+        ${SUNDIALS_ADDITIONAL_ERROR_STRING}
+        "The SUNDIALS installation (found at \"${SUNDIALS_DIR}\")\n"
+        "with version ${SUNDIALS_VERSION} is too old.\n"
+        "deal.II requires at least version ${_version_required}.\n\n"
         )
       SET(${var} FALSE)
     ENDIF()

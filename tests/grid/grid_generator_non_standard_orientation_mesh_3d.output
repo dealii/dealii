@@ -1,0 +1,171 @@
+
+DEAL::Testing 3D mesh for orientation tests:
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::****************
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 0 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::****************
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 1 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::****************
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 1 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::****************
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::****************
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::****************
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 1 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::****************
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 1 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::****************
+DEAL::Testing 3D orientation mesh done.

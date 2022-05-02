@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,9 +26,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         create_description_from_triangulation(
           const dealii::Triangulation<deal_II_dimension,
                                       deal_II_space_dimension> &tria,
-          const MPI_Comm                                        comm,
-          const bool         construct_multilevel_hierarchy,
-          const unsigned int my_rank_in);
+          const MPI_Comm &                                      comm,
+          const TriangulationDescription::Settings              settings,
+          const unsigned int                                    my_rank_in);
 
         template Description<deal_II_dimension, deal_II_space_dimension>
         create_description_from_triangulation_in_groups(
@@ -37,12 +37,34 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
               &)> &               serial_grid_generator,
           const std::function<void(
             dealii::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-            const MPI_Comm,
+            const MPI_Comm &,
             const unsigned int)> &serial_grid_partitioner,
-          const MPI_Comm          comm,
+          const MPI_Comm &        comm,
           const int               group_size,
-          const bool              construct_multilevel_hierarchy);
+          const typename Triangulation<deal_II_dimension,
+                                       deal_II_space_dimension>::MeshSmoothing
+            smoothing,
+          const TriangulationDescription::Settings);
+
+        template Description<deal_II_dimension, deal_II_space_dimension>
+        create_description_from_triangulation(
+          const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria,
+          const LinearAlgebra::distributed::Vector<double> &partition,
+          const TriangulationDescription::Settings          settings);
+
+        template Description<deal_II_dimension, deal_II_space_dimension>
+        create_description_from_triangulation(
+          const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria,
+          const LinearAlgebra::distributed::Vector<double> &partition,
+          const std::vector<LinearAlgebra::distributed::Vector<double>>
+            &                                      mg_partitions,
+          const TriangulationDescription::Settings settings);
 #endif
       \}
     \}
+  }
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template struct CellData<deal_II_dimension>;
   }

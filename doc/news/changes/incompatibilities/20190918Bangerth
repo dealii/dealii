@@ -1,7 +1,0 @@
-Changed: The 
-Algorithms::TimeStepControl::file_name_format() functions have been
-removed. They were setters and getters for an internal field of that
-class that turned out to be unused anywhere -- in other words, the
-functions had no real functionality.
-<br>
-(Wolfgang Bangerth, 2019/09/18)

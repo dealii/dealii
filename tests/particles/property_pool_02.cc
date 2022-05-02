@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,11 +29,14 @@ void
 test()
 {
   {
-    const unsigned int      n_properties = 3;
-    Particles::PropertyPool pool(n_properties);
+    const int dim      = 2;
+    const int spacedim = 2;
 
-    typename Particles::PropertyPool::Handle handle =
-      pool.allocate_properties_array();
+    const unsigned int                     n_properties = 3;
+    Particles::PropertyPool<dim, spacedim> pool(n_properties);
+
+    typename Particles::PropertyPool<dim, spacedim>::Handle handle =
+      pool.register_particle();
 
     pool.get_properties(handle)[0] = 1.2;
     pool.get_properties(handle)[1] = 2.5;
@@ -43,11 +46,11 @@ test()
     deallog << "Pool properties:";
 
     for (unsigned int i = 0; i < pool.get_properties(handle).size(); ++i)
-      deallog << " " << pool.get_properties(handle)[i];
+      deallog << ' ' << pool.get_properties(handle)[i];
 
     deallog << std::endl;
 
-    pool.deallocate_properties_array(handle);
+    pool.deregister_particle(handle);
   }
 
   deallog << "OK" << std::endl;

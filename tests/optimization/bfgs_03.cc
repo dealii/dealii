@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2018 by the deal.II authors
+//    Copyright (C) 2018 - 2021 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -39,7 +39,7 @@ template <typename number>
 void
 test()
 {
-  typedef Vector<number> VectorType;
+  using VectorType = Vector<number>;
 
   // size of the problem
   const unsigned int N = 10;
@@ -102,7 +102,7 @@ test()
   const auto line_min =
     [&](number &f, VectorType &x, VectorType &g, const VectorType &p) {
       deallog << "-------------------" << std::endl
-              << "Line search " << iteration++ << ":" << std::endl;
+              << "Line search " << iteration++ << ':' << std::endl;
 
       const number g_norm_sqr = g.norm_sqr();
 

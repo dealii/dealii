@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,8 +28,8 @@ template <typename number>
 void
 fill_matrix_invertible(FullMatrix<number> &A)
 {
-  for (unsigned int i = 0; i < A.m(); i++)
-    for (unsigned int j = 0; j < A.n(); j++)
+  for (unsigned int i = 0; i < A.m(); ++i)
+    for (unsigned int j = 0; j < A.n(); ++j)
       {
         A(i, j) = number(i * j);
         if (i == j)

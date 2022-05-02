@@ -1,0 +1,64 @@
+
+DEAL:0:2d::Testing FE_Q<2>(1)
+DEAL:0:2d::Cell: 0
+DEAL:0:2d:: 7 18 19
+DEAL:0:2d:: 6 16 17 18 19 20
+DEAL:0:2d::Cell: 1
+DEAL:0:2d:: 7 18 19 21 22
+DEAL:0:2d:: 7 18 19 20 21 22
+DEAL:0:2d::Cell: 2
+DEAL:0:2d:: 7 9 21 22 23 24
+DEAL:0:2d:: 7 21 22 23 24 25
+DEAL:0:2d::Cell: 3
+DEAL:0:2d:: 7 9 10 23 24
+DEAL:0:2d:: 9 10 23 24 25 26
+DEAL:0:2d::Cell: 4
+DEAL:0:2d:: 2 7 9
+DEAL:0:2d:: 0 2 6 7 8 9
+DEAL:0:2d::Cell: 5
+DEAL:0:2d:: 2 4 9 10 11 12
+DEAL:0:2d:: 2 9 10 11 12 13
+DEAL:0:2d::Cell: 6
+DEAL:0:2d:: 2 4 11 12 14 15
+DEAL:0:2d:: 4 11 12 13 14 15
+DEAL:0:2d::Cell: 7
+DEAL:0:2d:: 2 3 4 5
+DEAL:0:2d:: 0 1 2 3 4 5
+DEAL:0:2d::Testing FE_Q<2>(1)
+DEAL:0:2d::Cell: 0
+DEAL:0:2d:: 7 18 19 21 22
+DEAL:0:2d:: 6 7 16 17 18 19 20 21 22
+DEAL:0:2d::Cell: 1
+DEAL:0:2d:: 7 9 10 21 22 23 24
+DEAL:0:2d:: 7 9 10 21 22 23 24 25 26
+DEAL:0:2d::Cell: 2
+DEAL:0:2d:: 2 4 9 10 11 12 14 15
+DEAL:0:2d:: 2 4 9 10 11 12 13 14 15
+DEAL:0:2d::Cell: 3
+DEAL:0:2d:: 2 3 4 5 7 9
+DEAL:0:2d:: 0 1 2 3 4 5 6 7 8 9
+DEAL:0:2d::Testing FE_Q<2>(1)
+DEAL:0:2d::Cell: 0
+DEAL:0:2d:: 2 3 5
+DEAL:0:2d:: 0 1 2 3 4 5
+DEAL:0:2d::Cell: 1
+DEAL:0:2d:: 2 3 5 6 7 8
+DEAL:0:2d:: 2 3 5 6 7 8
+DEAL:0:2d::Cell: 2
+DEAL:0:2d:: 5 10 12
+DEAL:0:2d:: 4 5 9 10 11 12
+DEAL:0:2d::Cell: 3
+DEAL:0:2d:: 5 8 10 12 13 14
+DEAL:0:2d:: 5 8 10 12 13 14
+DEAL:0:2d::Cell: 4
+DEAL:0:2d:: 6 7 8 15 16 17
+DEAL:0:2d:: 6 7 8 15 16 17
+DEAL:0:2d::Cell: 5
+DEAL:0:2d:: 15 16 17 18 19 20
+DEAL:0:2d:: 15 16 17 18 19 20
+DEAL:0:2d::Cell: 6
+DEAL:0:2d:: 8 13 14 17 21 22
+DEAL:0:2d:: 8 13 14 17 21 22
+DEAL:0:2d::Cell: 7
+DEAL:0:2d:: 17 20 21 22 23 24
+DEAL:0:2d:: 17 20 21 22 23 24

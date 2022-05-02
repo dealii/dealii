@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,7 @@ test(const Point<spacedim> &p)
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
-  // Vector fe
+  // Vector FE
   FESystem<dim, spacedim>   fe{FE_Q<dim, spacedim>(1), spacedim};
   DoFHandler<dim, spacedim> dh(tria);
   dh.distribute_dofs(fe);

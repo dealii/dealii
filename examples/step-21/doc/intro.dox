@@ -204,7 +204,9 @@ implicit pressure-velocity system that only depends on the previously computed
 saturation $S^n$, and then do an explicit time step for $S^{n+1}$ that only
 depends on the previously known $S^n$ and the just computed
 $\mathbf{u}^{n+1}$. This way, we never have to iterate for the nonlinearities
-of the system as we would have if we used a fully implicit method.
+of the system as we would have if we used a fully implicit method. (In
+a more modern perspective, this should be seen as an "operator
+splitting" method. step-58 has a long description of the idea behind this.)
 
 We can then state the problem in weak form as follows, by multiplying each
 equation with test functions $\mathbf v$, $\phi$, and $\sigma$ and integrating
@@ -250,6 +252,10 @@ cell term to get an equation as follows:
   (S^n,\sigma)_\Omega +
   \triangle t \sum_K  \left(F(S^n) q^{n+1}, \sigma\right)_K.
 @f}
+We introduce an object of type DiscreteTime in order to keep track of the
+current value of time and time step in the code. This class encapsulates many
+complexities regarding adjusting time step size and stopping at a specified
+final time.
 
 
 

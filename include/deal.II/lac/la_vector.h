@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,8 +72,6 @@ namespace LinearAlgebra
    * ::dealii::LinearAlgebra::VectorSpaceVector. As opposed to the array of
    * the C++ standard library, this class implements an element of a vector
    * space suitable for numerical computations.
-   *
-   * @author Bruno Turcksin, 2015.
    */
   template <typename Number>
   class Vector : public ReadWriteVector<Number>,
@@ -216,17 +214,17 @@ namespace LinearAlgebra
     /**
      * Return the scalar product of two vectors.
      */
-    virtual Number operator*(const VectorSpaceVector<Number> &V) const override;
+    virtual Number
+    operator*(const VectorSpaceVector<Number> &V) const override;
 
     /**
      * This function is not implemented and will throw an exception.
      */
     virtual void
-    import(
-      const ReadWriteVector<Number> &                 V,
-      VectorOperation::values                         operation,
-      std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-        std::shared_ptr<const CommunicationPatternBase>()) override;
+    import(const ReadWriteVector<Number> &V,
+           VectorOperation::values        operation,
+           std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             communication_pattern = {}) override;
 
     /**
      * Add @p a to all components. Note that @p a is a scalar not a vector.
@@ -402,6 +400,15 @@ namespace LinearAlgebra
     memory_consumption() const override;
 
     /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <typename Archive>
+    void
+    serialize(Archive &ar, const unsigned int version);
+
+    /**
      * Attempt to perform an operation between two incompatible vector types.
      *
      * @ingroup Exceptions
@@ -409,17 +416,6 @@ namespace LinearAlgebra
     DeclException0(ExcVectorTypeNotCompatible);
 
   private:
-    /**
-     * Serialize the data of this object using boost. This function is
-     * necessary to use boost::archive::text_iarchive and
-     * boost::archive::text_oarchive.
-     */
-    template <typename Archive>
-    void
-    serialize(Archive &ar, const unsigned int version);
-
-    friend class boost::serialization::access;
-
     // Make all other ReadWriteVector types friends.
     template <typename Number2>
     friend class Vector;
@@ -490,7 +486,7 @@ namespace LinearAlgebra
   {
     size_type current_size = this->size();
     ar &static_cast<Subscriptor &>(*this);
-    ar & this->stored_elements;
+    ar &this->stored_elements;
     // If necessary, resize the vector during a read operation
     if (this->size() != current_size)
       this->reinit(this->size());
@@ -510,8 +506,6 @@ namespace LinearAlgebra
 
 /**
  * Declare dealii::LinearAlgebra::Vector as serial vector.
- *
- * @author Uwe Koecher, 2017
  */
 template <typename Number>
 struct is_serial_vector<LinearAlgebra::Vector<Number>> : std::true_type

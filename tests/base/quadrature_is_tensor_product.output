@@ -5,7 +5,7 @@ DEAL::QGauss<1>: true
 DEAL::QGaussLobatto<1>: true
 DEAL::QMidpoint<1>: true
 DEAL::QSimpson<1>: true
-DEAL::QTrapez<1>: true
+DEAL::QTrapezoid<1>: true
 DEAL::QMilne<1>: true
 DEAL::QWeddle<1>: true
 DEAL::QGaussChebyshev<1>: true
@@ -22,7 +22,7 @@ DEAL::QGauss<2>: true
 DEAL::QGaussLobatto<2>: true
 DEAL::QMidpoint<2>: true
 DEAL::QSimpson<2>: true
-DEAL::QTrapez<2>: true
+DEAL::QTrapezoid<2>: true
 DEAL::QMilne<2>: true
 DEAL::QWeddle<2>: true
 DEAL::QGaussChebyshev<2>: true
@@ -38,7 +38,7 @@ DEAL::QGauss<3>: true
 DEAL::QGaussLobatto<3>: true
 DEAL::QMidpoint<3>: true
 DEAL::QSimpson<3>: true
-DEAL::QTrapez<3>: true
+DEAL::QTrapezoid<3>: true
 DEAL::QMilne<3>: true
 DEAL::QWeddle<3>: true
 DEAL::QGaussChebyshev<3>: true

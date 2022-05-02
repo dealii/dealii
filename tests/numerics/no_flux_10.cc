@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,10 +51,11 @@
 #include "../tests.h"
 
 
-void colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
-                                    const Point<3> &  center,
-                                    const double      inner_radius,
-                                    const double      outer_radius)
+void
+colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
+                               const Point<3> &  center,
+                               const double      inner_radius,
+                               const double      outer_radius)
 {
   //    if (tria.n_cells() != 4)
   //      AssertThrow (false, ExcNotImplemented());
@@ -137,10 +138,11 @@ void colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
       }
 }
 
-void sixty_deg_hyper_shell(Triangulation<3> &tria,
-                           const Point<3> &  center,
-                           const double      inner_radius,
-                           const double      outer_radius)
+void
+sixty_deg_hyper_shell(Triangulation<3> &tria,
+                      const Point<3> &  center,
+                      const double      inner_radius,
+                      const double      outer_radius)
 {
   const double r0 = inner_radius;
   const double r1 = outer_radius;
@@ -216,7 +218,7 @@ run()
   MappingQ<3>           m(4);
   GridOut               go;
   GridOutFlags::Gnuplot gof;
-  gof.n_boundary_face_points = 6;
+  gof.n_extra_curved_line_points = 6;
   go.set_flags(gof);
   go.write_gnuplot(triangulation, deallog.get_file_stream(), &m);
 

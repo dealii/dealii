@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,8 @@
 
 
 // check that Vector::add_and_dot works correctly
+
+#include <deal.II/base/numbers.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -34,7 +36,7 @@ check()
         {
           v1(i) = 0.1 + 0.005 * i;
           v2(i) = -5.2 + 0.18 * i;
-          v3(i) = 3.14159 + 2.7183 / (1. + i);
+          v3(i) = numbers::PI + numbers::E / (1. + i);
         }
       check               = v1;
       const number factor = 0.01432;

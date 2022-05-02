@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2019 by the deal.II authors
+ * Copyright (C) 1999 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -25,9 +25,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
@@ -337,12 +334,12 @@ void Step4<dim>::assemble_system()
                           update_values | update_gradients |
                             update_quadrature_points | update_JxW_values);
 
-  // We then again define a few abbreviations. The values of these variables
-  // of course depend on the dimension which we are presently using. However,
-  // the FE and Quadrature classes do all the necessary work for you and you
-  // don't have to care about the dimension dependent parts:
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.size();
+  // We then again define the same abbreviation as in the previous program.
+  // The value of this variable of course depends on the dimension which we
+  // are presently using, but the FiniteElement class does all the necessary
+  // work for you and you don't have to care about the dimension dependent
+  // parts:
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);
@@ -372,16 +369,16 @@ void Step4<dim>::assemble_system()
       // difference to how we did things in step-3: Instead of using a
       // constant right hand side with value 1, we use the object representing
       // the right hand side and evaluate it at the quadrature points:
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int q_index : fe_values.quadrature_point_indices())
+        for (const unsigned int i : fe_values.dof_indices())
           {
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            for (const unsigned int j : fe_values.dof_indices())
               cell_matrix(i, j) +=
                 (fe_values.shape_grad(i, q_index) * // grad phi_i(x_q)
                  fe_values.shape_grad(j, q_index) * // grad phi_j(x_q)
                  fe_values.JxW(q_index));           // dx
 
-            const auto x_q = fe_values.quadrature_point(q_index);
+            const auto &x_q = fe_values.quadrature_point(q_index);
             cell_rhs(i) += (fe_values.shape_value(i, q_index) * // phi_i(x_q)
                             right_hand_side.value(x_q) *        // f(x_q)
                             fe_values.JxW(q_index));            // dx
@@ -409,9 +406,9 @@ void Step4<dim>::assemble_system()
       // and right hand side is done exactly as before, but here we have again
       // merged some loops for efficiency:
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      for (const unsigned int i : fe_values.dof_indices())
         {
-          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          for (const unsigned int j : fe_values.dof_indices())
             system_matrix.add(local_dof_indices[i],
                               local_dof_indices[j],
                               cell_matrix(i, j));
@@ -537,7 +534,6 @@ void Step4<dim>::run()
 // could actually use it.
 int main()
 {
-  deallog.depth_console(0);
   {
     Step4<2> laplace_problem_2d;
     laplace_problem_2d.run();

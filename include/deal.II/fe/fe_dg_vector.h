@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,8 +48,6 @@ DEAL_II_NAMESPACE_OPEN
  * must coincide.
  *
  * @ingroup febase
- * @author Guido Kanschat
- * @date 2010
  */
 template <class PolynomialType, int dim, int spacedim = dim>
 class FE_DGVector : public FE_PolyTensor<dim, spacedim>
@@ -141,8 +139,6 @@ private:
  *
  * The related class FE_DGRT is used in step-61.
  * @ingroup fe
- * @author Guido Kanschat
- * @date 2011
  */
 template <int dim, int spacedim = dim>
 class FE_DGNedelec : public FE_DGVector<PolynomialsNedelec<dim>, dim, spacedim>
@@ -174,8 +170,6 @@ public:
  * The class is used in step-61.
  *
  * @ingroup fe
- * @author Guido Kanschat
- * @date 2011
  */
 template <int dim, int spacedim = dim>
 class FE_DGRaviartThomas
@@ -207,8 +201,6 @@ public:
  * The related class FE_DGRT is used in step-61.
  *
  * @ingroup fe
- * @author Guido Kanschat
- * @date 2011
  */
 template <int dim, int spacedim = dim>
 class FE_DGBDM : public FE_DGVector<PolynomialsBDM<dim>, dim, spacedim>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,8 @@ namespace dealii
 {
   template <typename Number>
   template <typename Number2>
-  Number Vector<Number>::operator*(const Vector<Number2> &v) const
+  Number
+  Vector<Number>::operator*(const Vector<Number2> &v) const
   {
     Number sum = 0;
     for (unsigned int i = 0; i < size(); ++i)

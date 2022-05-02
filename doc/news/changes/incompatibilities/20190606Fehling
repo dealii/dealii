@@ -1,8 +1,0 @@
-Fixed: During coarsening, we need to decide which finite element is assigned
-to parent cells. The decision criterion was not consistent, but is now unified:
-The least dominant element of their children will be picked, according to
-hp::FECollection::find_dominated_fe_extended(). This affects the implementations
-of SolutionTransfer, parallel::distributed::SolutionTransfer, parallel::CellWeights,
-and hp::DoFHandler.
-<br>
-(Marc Fehling, 2019/06/06)

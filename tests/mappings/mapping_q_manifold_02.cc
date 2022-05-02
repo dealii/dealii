@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -235,7 +235,7 @@ test()
   for (unsigned mapping_p = 4; mapping_p <= 5; ++mapping_p)
     {
       deallog << "Mapping degree: " << mapping_p << std::endl;
-      MappingQ<dim>           mapping(mapping_p, true);
+      MappingQ<dim>           mapping(mapping_p);
       std::vector<Point<dim>> points(Utilities::fixed_power<dim>(2));
       for (unsigned int i = 0, c = 0; i < (dim == 2 ? 1 : 2); ++i)
         for (unsigned int j = 0; j < 2; ++j)

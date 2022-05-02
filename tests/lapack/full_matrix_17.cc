@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,7 @@ test(const unsigned int size)
   M.compute_cholesky_factorization();
   const double rcond = M.reciprocal_condition_number(la_l1);
 
-  deallog << 1. / (l1 * inv_l1) << " " << rcond << std::endl;
+  deallog << 1. / (l1 * inv_l1) << ' ' << rcond << std::endl;
 }
 
 

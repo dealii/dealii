@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -104,7 +104,7 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
   std::vector<unsigned int> block_component(n_stress_components +
                                               n_gamma_components,
                                             1);
-  for (unsigned int ii = 0; ii < n_stress_components; ii++)
+  for (unsigned int ii = 0; ii < n_stress_components; ++ii)
     block_component[ii] = 0;
 
   DoFRenumbering::component_wise(dof_handler);
@@ -119,7 +119,7 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
           << std::endl
           << "Total number of cells: " << triangulation.n_cells() << std::endl
           << "Number of degrees of freedom: " << dof_handler.n_dofs() << " = ("
-          << n_stress_dof << " + " << n_gamma_dof << ")" << std::endl;
+          << n_stress_dof << " + " << n_gamma_dof << ')' << std::endl;
 
   {
     BlockDynamicSparsityPattern csp(2, 2);
@@ -219,9 +219,9 @@ MixedElastoPlasticity<dim>::assemble_system()
                 << local_divergences[q] << std::endl
                 << local_scalar_values[q] << std::endl;
 
-        for (unsigned int m = 0; m < dim; m++)
+        for (unsigned int m = 0; m < dim; ++m)
           {
-            for (unsigned int n = 0; n < dim; n++)
+            for (unsigned int n = 0; n < dim; ++n)
               AssertThrow((local_values[q])[m][n] == stress_value,
                           ExcInternalError());
 

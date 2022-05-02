@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,7 +61,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           ParticleHandler<deal_II_dimension, deal_II_space_dimension>
             &particle_handler,
           const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
-          const ComponentMask &components);
+          const ComponentMask &                                      components,
+          const std::vector<std::vector<double>> &properties);
 
         template void
         quadrature_points<deal_II_dimension, deal_II_space_dimension>(
@@ -72,7 +73,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
             &global_bounding_boxes,
           ParticleHandler<deal_II_dimension, deal_II_space_dimension>
             &particle_handler,
-          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping);
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
+          const std::vector<std::vector<double>> &properties);
 
       \}
     \}

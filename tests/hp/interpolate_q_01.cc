@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -33,7 +34,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/vector.h>
@@ -82,7 +82,7 @@ test()
       FE_Q<dim>             fe(p);
       hp::FECollection<dim> hp_fe(fe);
 
-      hp::DoFHandler<dim> dof_handler(triangulation);
+      DoFHandler<dim> dof_handler(triangulation);
       dof_handler.distribute_dofs(hp_fe);
 
       Vector<double> interpolant(dof_handler.n_dofs());

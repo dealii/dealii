@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,8 +30,8 @@ test()
   for (unsigned int i = 1; i < 4; ++i)
     for (unsigned int j = i; j < 4; ++j)
       {
-        deallog << "inj " << i << " " << j << ":" << std::endl;
-        do_check(FE_Q_DG0<dim>(QIterated<1>(QTrapez<1>(), i)),
-                 FE_Q_DG0<dim>(QIterated<1>(QTrapez<1>(), j)));
+        deallog << "inj " << i << ' ' << j << ':' << std::endl;
+        do_check(FE_Q_DG0<dim>(QIterated<1>(QTrapezoid<1>(), i)),
+                 FE_Q_DG0<dim>(QIterated<1>(QTrapezoid<1>(), j)));
       }
 }

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2018 by the deal.II authors
+ * Copyright (C) 2000 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -33,10 +33,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -120,6 +117,10 @@ namespace Step9
     // this macro call declares and defines a class
     // <code>ExcDimensionMismatch</code> inheriting from ExceptionBase which
     // implements all necessary error output functions.
+    //
+    // @note This exception is similarly used inside the
+    // <code>AssertDimension</code> macro, which is a handy wrapper to the
+    // check the dimensions of two given objects.
   };
 
   // The following two functions implement the interface described above. The
@@ -134,7 +135,7 @@ namespace Step9
   template <int dim>
   Tensor<1, dim> AdvectionField<dim>::value(const Point<dim> &p) const
   {
-    Point<dim> value;
+    Tensor<1, dim> value;
     value[0] = 2;
     for (unsigned int i = 1; i < dim; ++i)
       value[i] = 1 + 0.8 * std::sin(8. * numbers::PI * p[0]);
@@ -609,7 +610,7 @@ namespace Step9
     AssemblyCopyData &                                    copy_data)
   {
     // We define some abbreviations to avoid unnecessarily long lines:
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points =
       scratch_data.fe_values.get_quadrature().size();
     const unsigned int n_face_q_points =
@@ -1043,7 +1044,7 @@ namespace Step9
     // have to clear the array storing the iterators to the active
     // neighbors, of course.
     scratch_data.active_neighbors.clear();
-    for (unsigned int face_n : GeometryInfo<dim>::face_indices())
+    for (const auto face_n : cell->face_indices())
       if (!cell->at_boundary(face_n))
         {
           // First define an abbreviation for the iterator to the face and

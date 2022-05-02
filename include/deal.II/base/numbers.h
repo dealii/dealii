@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2019 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,8 +55,6 @@ namespace internal
    *
    * @tparam Number The underlying data type for which one wants to find out
    *   the maximal length of hardware supported vectors.
-   *
-   * @author Peter Munch, 2019
    */
   template <typename Number>
   struct VectorizedArrayWidthSpecifier
@@ -71,9 +69,7 @@ namespace internal
    * A helper class specifying the maximal vector length of VectorizedArray
    * for the data type `double` for the given processor architecture and
    * optimization level. For a detailed description of supported maximal vector
-   * lengths, see the the documentation of VectorizedArray.
-   *
-   * @author Peter Munch, 2019
+   * lengths, see the documentation of VectorizedArray.
    */
   template <>
   struct VectorizedArrayWidthSpecifier<double>
@@ -97,9 +93,7 @@ namespace internal
    * A helper class specifying the maximal vector length of VectorizedArray
    * for the data type `float` for the given processor architecture and
    * optimization level. For a detailed description of supported maximal vector
-   * lengths, see the the documentation of VectorizedArray.
-   *
-   * @author Peter Munch, 2019
+   * lengths, see the documentation of VectorizedArray.
    */
   template <>
   struct VectorizedArrayWidthSpecifier<float>
@@ -148,7 +142,9 @@ DEAL_II_NAMESPACE_CLOSE
 // import the whole Sacado header at this point to get the math
 // functions imported into the standard namespace.
 #ifdef DEAL_II_TRILINOS_WITH_SACADO
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Sacado.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 namespace std
@@ -271,23 +267,6 @@ namespace numbers
   template <typename Number>
   struct is_cuda_compatible<std::complex<Number>, void> : std::false_type
   {};
-
-  /**
-   * Check whether a value is not a number.
-   *
-   * This function uses either <code>std::isnan</code>, <code>isnan</code>, or
-   * <code>_isnan</code>, whichever is available on the system and returns the
-   * result.
-   *
-   * If none of the functions detecting NaN is available, this function
-   * returns false.
-   *
-   * @deprecated This function has been deprecated in favor of the C++11
-   * function <code>std::isnan</code>.
-   */
-  DEAL_II_DEPRECATED
-  bool
-  is_nan(const double x);
 
   /**
    * Return @p true if the given value is a finite floating point number, i.e.
@@ -432,8 +411,6 @@ namespace numbers
    * types and complex number types. This template is mostly used to implement
    * linear algebra classes such as vectors and matrices that work for both
    * real and complex numbers.
-   *
-   * @author Wolfgang Bangerth, 2007
    */
   template <typename number>
   struct NumberTraits
@@ -452,6 +429,11 @@ namespace numbers
      * values, so the real_type is equal to the underlying type.
      */
     using real_type = number;
+
+    /**
+     * For this data type, alias the corresponding double type.
+     */
+    using double_type = double;
 
     /**
      * Return the complex-conjugate of the given number. Since the general
@@ -496,8 +478,6 @@ namespace numbers
   /**
    * Specialization of the general NumberTraits class that provides the
    * relevant information if the underlying data type is std::complex<T>.
-   *
-   * @author Wolfgang Bangerth, 2007
    */
   template <typename number>
   struct NumberTraits<std::complex<number>>
@@ -516,6 +496,11 @@ namespace numbers
      * two components of the complex number.
      */
     using real_type = number;
+
+    /**
+     * For this data type, alias the corresponding double type.
+     */
+    using double_type = std::complex<double>;
 
     /**
      * Return the complex-conjugate of the given number.
@@ -588,7 +573,7 @@ namespace numbers
 
   template <typename number>
   constexpr DEAL_II_CUDA_HOST_DEV const number &
-                                        NumberTraits<number>::conjugate(const number &x)
+  NumberTraits<number>::conjugate(const number &x)
   {
     return x;
   }
@@ -717,7 +702,7 @@ namespace internal
   struct NumberType
   {
     static constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV const T &
-                                                                       value(const T &t)
+    value(const T &t)
     {
       return t;
     }
@@ -732,8 +717,8 @@ namespace internal
     // Type T is constructible from F.
     template <typename F>
     static constexpr DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV T
-                                                                 value(const F &f,
-                                                                       typename std::enable_if<
+    value(const F &f,
+          typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
                           typename std::decay<F>::type>::value &&
             std::is_constructible<T, F>::value>::type * = nullptr)
@@ -744,8 +729,8 @@ namespace internal
     // Type T is explicitly convertible (but not constructible) from F.
     template <typename F>
     static constexpr DEAL_II_ALWAYS_INLINE T
-                                           value(const F &f,
-                                                 typename std::enable_if<
+    value(const F &f,
+          typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
                           typename std::decay<F>::type>::value &&
             !std::is_constructible<T, F>::value &&

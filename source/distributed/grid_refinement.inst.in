@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,7 @@ for (S : REAL_SCALARS)
           \{
             template std::pair<S, S>
             compute_global_min_and_max_at_root<S>(const dealii::Vector<S> &,
-                                                  MPI_Comm);
+                                                  const MPI_Comm &);
 
             namespace RefineAndCoarsenFixedNumber
             \{
@@ -35,7 +35,7 @@ for (S : REAL_SCALARS)
               compute_threshold<S>(const dealii::Vector<S> &,
                                    const std::pair<double, double> &,
                                    const types::global_cell_index,
-                                   MPI_Comm);
+                                   const MPI_Comm &);
             \}
             namespace RefineAndCoarsenFixedFraction
             \{
@@ -43,7 +43,7 @@ for (S : REAL_SCALARS)
               compute_threshold<S>(const dealii::Vector<S> &,
                                    const std::pair<double, double> &,
                                    const double,
-                                   MPI_Comm);
+                                   const MPI_Comm &);
             \}
           \}
         \}
@@ -78,7 +78,8 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
             parallel::distributed::Triangulation<deal_II_dimension> &,
             const dealii::Vector<S> &,
             const double,
-            const double);
+            const double,
+            const VectorTools::NormType);
         \}
       \}
     \}
@@ -92,9 +93,10 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
       \{
         namespace GridRefinement
         \{
-          template void refine_and_coarsen_fixed_number<deal_II_dimension - 1,
-                                                        S,
-                                                        deal_II_dimension>(
+          template void
+          refine_and_coarsen_fixed_number<deal_II_dimension - 1,
+                                          S,
+                                          deal_II_dimension>(
             parallel::distributed::Triangulation<deal_II_dimension - 1,
                                                  deal_II_dimension> &,
             const dealii::Vector<S> &,
@@ -102,14 +104,16 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
             const double,
             const types::global_cell_index);
 
-          template void refine_and_coarsen_fixed_fraction<deal_II_dimension - 1,
-                                                          S,
-                                                          deal_II_dimension>(
+          template void
+          refine_and_coarsen_fixed_fraction<deal_II_dimension - 1,
+                                            S,
+                                            deal_II_dimension>(
             parallel::distributed::Triangulation<deal_II_dimension - 1,
                                                  deal_II_dimension> &,
             const dealii::Vector<S> &,
             const double,
-            const double);
+            const double,
+            const VectorTools::NormType);
         \}
       \}
     \}

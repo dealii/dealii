@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -107,7 +107,7 @@ test()
               if (dofs[i] == numbers::invalid_dof_index)
                 deallog << "- ";
               else
-                deallog << dofs[i] << " ";
+                deallog << dofs[i] << ' ';
             deallog << " | ";
           }
         deallog << std::endl;

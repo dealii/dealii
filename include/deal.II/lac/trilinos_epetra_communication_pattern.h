@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,13 +21,11 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  ifdef DEAL_II_WITH_MPI
+#  include <deal.II/base/communication_pattern_base.h>
 
-#    include <deal.II/lac/communication_pattern_base.h>
+#  include <Epetra_Import.h>
 
-#    include <Epetra_Import.h>
-
-#    include <memory>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -36,13 +34,15 @@ namespace LinearAlgebra
   namespace EpetraWrappers
   {
     /**
-     * This class implements a wrapper to Trilinos Import.
+     * This class implements a wrapper to a Trilinos Epetra_Import object,
+     * for use in places where a Utilities::MPI::CommunicationPatternBase object
+     * is required.
      */
-    class CommunicationPattern : public CommunicationPatternBase
+    class CommunicationPattern : public Utilities::MPI::CommunicationPatternBase
     {
     public:
       /**
-       * Reinitialize the communication pattern. The first argument @p
+       * Initialize the communication pattern. The first argument @p
        * vector_space_vector_index_set is the index set associated to a
        * VectorSpaceVector object. The second argument @p
        * read_write_vector_index_set is the index set associated to a
@@ -81,14 +81,12 @@ namespace LinearAlgebra
       /**
        * Shared pointer to the Epetra_Import object used.
        */
-      std::unique_ptr<Epetra_Import> import;
+      std::unique_ptr<Epetra_Import> importer;
     };
   } // end of namespace EpetraWrappers
 } // end of namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
-
-#  endif
 
 #endif
 

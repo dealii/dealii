@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,8 +40,8 @@ test_values()
   GridGenerator::hyper_cube(tria, 0.0, 1.0);
 
   FE_RannacherTurek<2> fe;
-  DoFHandler<2>        dofh;
-  dofh.initialize(tria, fe);
+  DoFHandler<2>        dofh(tria);
+  dofh.distribute_dofs(fe);
 
   QGauss<2>   quadrature(8);
   FEValues<2> fev(fe,
@@ -53,10 +53,10 @@ test_values()
     {
       for (unsigned int q = 0; q < quadrature.size(); ++q)
         {
-          deallog << fev.shape_value(i, q) << " ";
+          deallog << fev.shape_value(i, q) << ' ';
           for (unsigned int d = 0; d < 2; ++d)
             {
-              deallog << fev.shape_grad(i, q)[d] << " ";
+              deallog << fev.shape_grad(i, q)[d] << ' ';
             }
         }
       deallog << std::endl;

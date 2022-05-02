@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,8 +43,6 @@ namespace CUDAWrappers
    * @<double@></tt>.
    *
    * @ingroup Matrix1
-   * @author Bruno Turcksin
-   * @date 2018
    */
   template <typename Number>
   class SparseMatrix : public virtual Subscriptor
@@ -322,10 +320,10 @@ namespace CUDAWrappers
     //@{
     /**
      * Return a tuple containing the pointer to the values of matrix, the
-     * pointer to the columns indices, the pointer to the rows pointer, and
-     * the cuSPARSE matrix description.
+     * pointer to the columns indices, the pointer to the rows pointer,
+     * the cuSPARSE matrix description, and the cuSPARSE SP matrix description.
      */
-    std::tuple<Number *, int *, int *, cusparseMatDescr_t>
+    std::tuple<Number *, int *, int *, cusparseMatDescr_t, cusparseSpMatDescr_t>
     get_cusparse_matrix() const;
     //@}
 
@@ -366,9 +364,14 @@ namespace CUDAWrappers
     std::unique_ptr<int[], void (*)(int *)> row_ptr_dev;
 
     /**
-     * cuSPARSE description of the sparse matrix.
+     * cuSPARSE description of the matrix.
      */
     cusparseMatDescr_t descr;
+
+    /**
+     * cuSPARSE description of the sparse matrix.
+     */
+    cusparseSpMatDescr_t sp_descr;
   };
 
 
@@ -448,7 +451,7 @@ namespace CUDAWrappers
             if (across)
               out << ' ' << i << ',' << cols[j] << ':' << val[j];
             else
-              out << "(" << i << "," << cols[j] << ") " << val[j] << std::endl;
+              out << '(' << i << ',' << cols[j] << ") " << val[j] << std::endl;
           }
       }
     if (across)
@@ -510,7 +513,7 @@ namespace CUDAWrappers
           }
         out << std::endl;
       };
-    AssertThrow(out, ExcIO());
+    AssertThrow(out.fail() == false, ExcIO());
 
     // reset output format
     out.precision(old_precision);

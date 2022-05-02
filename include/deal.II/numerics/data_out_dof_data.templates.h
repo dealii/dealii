@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,15 +23,18 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/signaling_nan.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/work_stream.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_pyramid_p.h>
+#include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_wedge_p.h>
 #include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/tria.h>
@@ -42,11 +45,14 @@
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/block_vector_base.h>
+#include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_out_dof_data.h>
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <utility>
@@ -61,10 +67,415 @@ namespace internal
   {
     template <int dim, int spacedim>
     ParallelDataBase<dim, spacedim>::ParallelDataBase(
+      const unsigned int                    n_datasets,
+      const unsigned int                    n_subdivisions,
+      const std::vector<unsigned int> &     n_postprocessor_outputs,
+      const dealii::Mapping<dim, spacedim> &mapping,
+      const std::vector<
+        std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
+        &               finite_elements,
+      const UpdateFlags update_flags,
+      const bool        use_face_values)
+      : ParallelDataBase<dim, spacedim>(
+          n_datasets,
+          n_subdivisions,
+          n_postprocessor_outputs,
+          dealii::hp::MappingCollection<dim, spacedim>(mapping),
+          finite_elements,
+          update_flags,
+          use_face_values)
+    {}
+
+
+
+    /**
+     * Generate evaluation points on a simplex with arbitrary number of
+     * subdivisions.
+     */
+    template <int dim>
+    inline std::vector<Point<dim>>
+    generate_simplex_evaluation_points(const unsigned int n_subdivisions)
+    {
+      (void)n_subdivisions;
+
+      Assert(false, ExcNotImplemented());
+
+      return {};
+    }
+
+
+
+    /**
+     * Helper function to create evaluation points recursively with
+     * subdivisions=0,1,2 being the base case:
+     *                                        +
+     *                                        |\
+     *                            +           +-+
+     *                            |\          |\|\
+     *                  +         +-+         +-+-+
+     *                  |\        |\|\        |\|\|\
+     *          +       +-+       +-+-+       +-+-+-+
+     *          |\      |\|\      |\|\|\      |\|\|\|\
+     *    +     +-+     +-+-+     +-+-+-+     +-+-+-+-+
+     *
+     *    0      1        2          3            4
+     *    ^      ^                   |            |
+     *    |      |                   |            |
+     *    +--------------------------+            |
+     *           |                                |
+     *           +--------------------------------+
+     */
+    inline void
+    generate_simplex_evaluation_points_recursively(
+      const std::vector<Point<2>> &bounding_vertices,
+      const unsigned int           n_subdivisions,
+      std::vector<Point<2>> &      evaluation_points)
+    {
+      if (n_subdivisions == 0)
+        {
+          evaluation_points.push_back(bounding_vertices[0]);
+          return;
+        }
+
+      for (const auto &p : bounding_vertices)
+        evaluation_points.push_back(p);
+
+      if (n_subdivisions == 1)
+        return;
+
+      // Helper functions to create intermediate points between p0 and p1 with
+      // n_subdivisions. This function appends these new points to the vector
+      // evaluation_points but also returns the points as a vector to be able
+      // to easily access specific points on the line.
+      const auto generate_inbetween_points = [&](const Point<2> &p0,
+                                                 const Point<2> &p1) {
+        std::vector<Point<2>> line_points;
+
+        for (unsigned int i = 1; i < n_subdivisions; ++i)
+          line_points.push_back(p0 + (p1 - p0) / n_subdivisions * i);
+
+        evaluation_points.insert(evaluation_points.end(),
+                                 line_points.begin(),
+                                 line_points.end());
+
+        return line_points;
+      };
+
+      const auto line_points_0 =
+        generate_inbetween_points(bounding_vertices[0], bounding_vertices[1]);
+      const auto line_points_1 =
+        generate_inbetween_points(bounding_vertices[1], bounding_vertices[2]);
+      const auto line_points_2 =
+        generate_inbetween_points(bounding_vertices[2], bounding_vertices[0]);
+
+      if (n_subdivisions == 2)
+        return;
+
+      generate_simplex_evaluation_points_recursively(
+        // create new inner triangle (see ASCII art above)
+        {{Point<2>(line_points_0[line_points_0.size() - 2][0],
+                   line_points_1[0][1]),
+          Point<2>(line_points_0[0][0],
+                   line_points_1[line_points_1.size() - 2][1]),
+          Point<2>(line_points_0[0][0], line_points_1[0][1])}},
+        n_subdivisions - 3,
+        evaluation_points);
+    }
+
+
+
+    /**
+     * Specialization for triangles.
+     */
+    template <>
+    inline std::vector<Point<2>>
+    generate_simplex_evaluation_points(const unsigned int n_subdivisions)
+    {
+      std::vector<Point<2>> evalution_points;
+
+      generate_simplex_evaluation_points_recursively(
+        {{Point<2>(0.0, 0.0), Point<2>(1.0, 0.0), Point<2>(0.0, 1.0)}},
+        n_subdivisions,
+        evalution_points);
+
+      return evalution_points;
+    }
+
+
+
+    /**
+     * Set up vectors of FEValues and FEFaceValues needed inside of
+     * ParallelDataBase and return the maximum number of quadrature points
+     * needed to allocate enough memory for the scratch data.
+     */
+    template <int dim, int spacedim>
+    unsigned int
+    setup_parallel_data_base_internal(
+      const unsigned int                                  n_subdivisions,
+      const dealii::hp::MappingCollection<dim, spacedim> &mapping_collection,
+      const std::vector<
+        std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
+        &               finite_elements,
+      const UpdateFlags update_flags,
+      const bool        use_face_values,
+      std::vector<std::shared_ptr<dealii::hp::FEValues<dim, spacedim>>>
+        &x_fe_values,
+      std::vector<std::shared_ptr<dealii::hp::FEFaceValues<dim, spacedim>>>
+        &x_fe_face_values)
+    {
+      // First figure out which reference cell types are present in the
+      // FECollections we got as arguments. To this end, use a lambda
+      // function that for a FECollection object tests whether one of the
+      // elements uses a specific reference cell. Then use this
+      // lambda function in a std::any_of() call that accumulates over
+      // all of the FECollection objects we were given.
+      //
+      // Note that in 1d, we will count a line segment as a hypercube
+      // even though it is *also* a simplex. Furthermore, wedges and
+      // pyramids can only appear in 3d set ups, so we do not need
+      // to test there if dim<3.
+      static const auto has_fe_with_reference_cell =
+        [](const dealii::hp::FECollection<dim, spacedim> &fe_collection,
+           const dealii::ReferenceCell &                  reference_cell) {
+          for (unsigned int i = 0; i < fe_collection.size(); ++i)
+            if (fe_collection[i].reference_cell() == reference_cell)
+              return true;
+          return false;
+        };
+
+      const bool needs_hypercube_setup = std::any_of(
+        finite_elements.begin(),
+        finite_elements.end(),
+        [](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
+             &fe_collection) {
+          return has_fe_with_reference_cell(
+            *fe_collection, ReferenceCells::get_hypercube<dim>());
+        });
+      const bool needs_simplex_setup =
+        (dim > 1 &&
+         std::any_of(
+           finite_elements.begin(),
+           finite_elements.end(),
+           [](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
+                &fe_collection) {
+             return has_fe_with_reference_cell(
+               *fe_collection, ReferenceCells::get_simplex<dim>());
+           }));
+      const bool needs_wedge_setup =
+        (dim == 3 &&
+         std::any_of(
+           finite_elements.begin(),
+           finite_elements.end(),
+           [](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
+                &fe_collection) {
+             return has_fe_with_reference_cell(*fe_collection,
+                                               ReferenceCells::Wedge);
+           }));
+      const bool needs_pyramid_setup =
+        (dim == 3 &&
+         std::any_of(
+           finite_elements.begin(),
+           finite_elements.end(),
+           [](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
+                &fe_collection) {
+             return has_fe_with_reference_cell(*fe_collection,
+                                               ReferenceCells::Pyramid);
+           }));
+
+      // Decide whether we want to work on cell or face FE(Face)Values objects:
+      if (use_face_values == false)
+        {
+          std::unique_ptr<dealii::Quadrature<dim>> quadrature_simplex;
+          std::unique_ptr<dealii::Quadrature<dim>> quadrature_hypercube;
+          std::unique_ptr<dealii::Quadrature<dim>> quadrature_wedge;
+          std::unique_ptr<dealii::Quadrature<dim>> quadrature_pyramid;
+
+          if (needs_simplex_setup)
+            {
+              if (dim == 2)
+                quadrature_simplex = std::make_unique<Quadrature<dim>>(
+                  generate_simplex_evaluation_points<dim>(n_subdivisions));
+              else
+                quadrature_simplex = std::make_unique<Quadrature<dim>>(
+                  FE_SimplexP<dim>(n_subdivisions).get_unit_support_points());
+            }
+
+          if (needs_hypercube_setup)
+            {
+              quadrature_hypercube =
+                std::make_unique<QIterated<dim>>(QTrapezoid<1>(),
+                                                 n_subdivisions);
+            }
+
+          if (needs_wedge_setup)
+            {
+              Assert(n_subdivisions == 1, ExcNotImplemented());
+
+              quadrature_wedge = std::make_unique<Quadrature<dim>>(
+                ReferenceCells::Wedge.get_nodal_type_quadrature<dim>());
+            }
+
+          if (needs_pyramid_setup)
+            {
+              Assert(n_subdivisions == 1, ExcNotImplemented());
+
+              quadrature_pyramid = std::make_unique<Quadrature<dim>>(
+                ReferenceCells::Pyramid.get_nodal_type_quadrature<dim>());
+            }
+
+          x_fe_values.resize(finite_elements.size());
+          for (unsigned int i = 0; i < finite_elements.size(); ++i)
+            {
+              // Check if one of the previous finite elements is equal to the
+              // present one. If so, re-use the FEValues object.
+              for (unsigned int j = 0; j < i; ++j)
+                if (finite_elements[i].get() == finite_elements[j].get())
+                  {
+                    x_fe_values[i] = x_fe_values[j];
+                    break;
+                  }
+
+              // If none was found, create an FEValues object:
+              if (x_fe_values[i].get() == nullptr)
+                {
+                  dealii::hp::QCollection<dim> quadrature;
+
+                  for (unsigned int j = 0; j < finite_elements[i]->size(); ++j)
+                    {
+                      const dealii::ReferenceCell reference_cell =
+                        (*finite_elements[i])[j].reference_cell();
+
+                      if (reference_cell.is_hyper_cube())
+                        quadrature.push_back(*quadrature_hypercube);
+                      else if (reference_cell.is_simplex())
+                        quadrature.push_back(*quadrature_simplex);
+                      else if (reference_cell == dealii::ReferenceCells::Wedge)
+                        quadrature.push_back(*quadrature_wedge);
+                      else if (reference_cell ==
+                               dealii::ReferenceCells::Pyramid)
+                        quadrature.push_back(*quadrature_pyramid);
+                      else
+                        Assert(false, ExcNotImplemented());
+                    }
+
+                  x_fe_values[i] =
+                    std::make_shared<dealii::hp::FEValues<dim, spacedim>>(
+                      mapping_collection,
+                      *finite_elements[i],
+                      quadrature,
+                      // certain reference-cell kinds take by default the
+                      // curved code path in DataOut::build_one_patch, for
+                      // which the quadrature points need to be enabled
+                      (needs_simplex_setup || needs_wedge_setup ||
+                       needs_pyramid_setup) ?
+                        (update_flags | update_quadrature_points) :
+                        update_flags);
+                }
+            }
+
+          // Return maximal number of evaluation points:
+          return std::max(
+            {needs_wedge_setup ? quadrature_wedge->size() : 0,
+             needs_simplex_setup ? quadrature_simplex->size() : 0,
+             needs_hypercube_setup ? quadrature_hypercube->size() : 0,
+             needs_pyramid_setup ? quadrature_pyramid->size() : 0});
+        }
+      else // build FEFaceValues objects instead
+        {
+          // The code following is not quite right for wedges and pyramids.
+          // Assert that we don't have these kinds of meshes.
+          Assert(needs_pyramid_setup == false && needs_wedge_setup == false,
+                 ExcNotImplemented());
+
+          std::unique_ptr<dealii::Quadrature<dim - 1>> quadrature_simplex;
+          std::unique_ptr<dealii::Quadrature<dim - 1>> quadrature_hypercube;
+
+          // See whether we need simplex or hypercube quadrature formulas.
+          // This is only an issue in 3d (in 2d every face integral is just
+          // a line integral, so we can deal with that via the usual hypercube
+          // quadrature rule).
+          if ((dim == 3) &&
+              (needs_simplex_setup || needs_pyramid_setup || needs_wedge_setup))
+            {
+              quadrature_simplex = std::make_unique<Quadrature<dim - 1>>(
+                generate_simplex_evaluation_points<dim - 1>(n_subdivisions));
+            }
+
+          if ((dim < 3) || (needs_hypercube_setup || needs_pyramid_setup ||
+                            needs_wedge_setup))
+            {
+              quadrature_hypercube =
+                std::make_unique<QIterated<dim - 1>>(QTrapezoid<1>(),
+                                                     n_subdivisions);
+            }
+
+          x_fe_face_values.resize(finite_elements.size());
+          for (unsigned int i = 0; i < finite_elements.size(); ++i)
+            {
+              // Check if one of the previous finite elements is equal to the
+              // present one. If so, re-use the FEValues object.
+              for (unsigned int j = 0; j < i; ++j)
+                if (finite_elements[i].get() == finite_elements[j].get())
+                  {
+                    x_fe_face_values[i] = x_fe_face_values[j];
+                    break;
+                  }
+
+              // If none was found, create an FEFaceValues object:
+              if (x_fe_face_values[i].get() == nullptr)
+                {
+                  dealii::hp::QCollection<dim - 1> quadrature;
+
+                  for (unsigned int j = 0; j < finite_elements[i]->size(); ++j)
+                    {
+                      const dealii::ReferenceCell reference_cell =
+                        (*finite_elements[i])[j].reference_cell();
+
+                      // In 1d/2d and for hypercube/wedge/pyramid elements, we
+                      // need hypercube quadratures.
+                      if ((dim < 3) ||
+                          (reference_cell.is_hyper_cube() ||
+                           (reference_cell == dealii::ReferenceCells::Wedge) ||
+                           (reference_cell == dealii::ReferenceCells::Pyramid)))
+                        quadrature.push_back(*quadrature_hypercube);
+
+                      // In 3d, if the element is for simplex/wedge/pyramid
+                      // cells, then we also need simplex quadratures
+                      if ((dim == 3) &&
+                          (reference_cell.is_simplex() ||
+                           (reference_cell == dealii::ReferenceCells::Wedge) ||
+                           (reference_cell == dealii::ReferenceCells::Pyramid)))
+                        quadrature.push_back(*quadrature_simplex);
+                    }
+
+                  x_fe_face_values[i] =
+                    std::make_shared<dealii::hp::FEFaceValues<dim, spacedim>>(
+                      mapping_collection,
+                      *finite_elements[i],
+                      quadrature,
+                      update_flags);
+                }
+            }
+
+          // Return maximal number of evaluation points:
+          return std::max(
+            {(dim == 3) && (needs_simplex_setup || needs_pyramid_setup ||
+                            needs_wedge_setup) ?
+               quadrature_simplex->size() :
+               0,
+             (dim < 3) || needs_hypercube_setup ? quadrature_hypercube->size() :
+                                                  0});
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    ParallelDataBase<dim, spacedim>::ParallelDataBase(
       const unsigned int               n_datasets,
       const unsigned int               n_subdivisions,
       const std::vector<unsigned int> &n_postprocessor_outputs,
-      const Mapping<dim, spacedim> &   mapping,
+      const dealii::hp::MappingCollection<dim, spacedim> &mapping,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
         &               finite_elements,
@@ -77,59 +488,14 @@ namespace internal
       , finite_elements(finite_elements)
       , update_flags(update_flags)
     {
-      unsigned int n_q_points = 0;
-      if (use_face_values == false)
-        {
-          dealii::hp::QCollection<dim> quadrature(
-            QIterated<dim>(QTrapez<1>(), n_subdivisions));
-          n_q_points = quadrature[0].size();
-          x_fe_values.resize(this->finite_elements.size());
-          for (unsigned int i = 0; i < this->finite_elements.size(); ++i)
-            {
-              // check if there is a finite element that is equal to the present
-              // one, then we can re-use the FEValues object
-              for (unsigned int j = 0; j < i; ++j)
-                if (this->finite_elements[i].get() ==
-                    this->finite_elements[j].get())
-                  {
-                    x_fe_values[i] = x_fe_values[j];
-                    break;
-                  }
-              if (x_fe_values[i].get() == nullptr)
-                x_fe_values[i] =
-                  std::make_shared<dealii::hp::FEValues<dim, spacedim>>(
-                    this->mapping_collection,
-                    *this->finite_elements[i],
-                    quadrature,
-                    this->update_flags);
-            }
-        }
-      else
-        {
-          dealii::hp::QCollection<dim - 1> quadrature(
-            QIterated<dim - 1>(QTrapez<1>(), n_subdivisions));
-          n_q_points = quadrature[0].size();
-          x_fe_face_values.resize(this->finite_elements.size());
-          for (unsigned int i = 0; i < this->finite_elements.size(); ++i)
-            {
-              // check if there is a finite element that is equal to the present
-              // one, then we can re-use the FEValues object
-              for (unsigned int j = 0; j < i; ++j)
-                if (this->finite_elements[i].get() ==
-                    this->finite_elements[j].get())
-                  {
-                    x_fe_face_values[i] = x_fe_face_values[j];
-                    break;
-                  }
-              if (x_fe_face_values[i].get() == nullptr)
-                x_fe_face_values[i] =
-                  std::make_shared<dealii::hp::FEFaceValues<dim, spacedim>>(
-                    this->mapping_collection,
-                    *this->finite_elements[i],
-                    quadrature,
-                    this->update_flags);
-            }
-        }
+      const unsigned int n_q_points =
+        setup_parallel_data_base_internal(n_subdivisions,
+                                          mapping,
+                                          finite_elements,
+                                          update_flags,
+                                          use_face_values,
+                                          x_fe_values,
+                                          x_fe_face_values);
 
       patch_values_scalar.solution_values.resize(n_q_points);
       patch_values_scalar.solution_gradients.resize(n_q_points);
@@ -162,88 +528,43 @@ namespace internal
       , finite_elements(data.finite_elements)
       , update_flags(data.update_flags)
     {
-      if (data.x_fe_values.empty() == false)
-        {
-          Assert(data.x_fe_face_values.empty() == true, ExcInternalError());
-          dealii::hp::QCollection<dim> quadrature(
-            QIterated<dim>(QTrapez<1>(), n_subdivisions));
-          x_fe_values.resize(this->finite_elements.size());
-          for (unsigned int i = 0; i < this->finite_elements.size(); ++i)
-            {
-              // check if there is a finite element that is equal to the present
-              // one, then we can re-use the FEValues object
-              for (unsigned int j = 0; j < i; ++j)
-                if (this->finite_elements[i].get() ==
-                    this->finite_elements[j].get())
-                  {
-                    x_fe_values[i] = x_fe_values[j];
-                    break;
-                  }
-              if (x_fe_values[i].get() == nullptr)
-                x_fe_values[i] =
-                  std::make_shared<dealii::hp::FEValues<dim, spacedim>>(
-                    this->mapping_collection,
-                    *this->finite_elements[i],
-                    quadrature,
-                    this->update_flags);
-            }
-        }
-      else
-        {
-          dealii::hp::QCollection<dim - 1> quadrature(
-            QIterated<dim - 1>(QTrapez<1>(), n_subdivisions));
-          x_fe_face_values.resize(this->finite_elements.size());
-          for (unsigned int i = 0; i < this->finite_elements.size(); ++i)
-            {
-              // check if there is a finite element that is equal to the present
-              // one, then we can re-use the FEValues object
-              for (unsigned int j = 0; j < i; ++j)
-                if (this->finite_elements[i].get() ==
-                    this->finite_elements[j].get())
-                  {
-                    x_fe_face_values[i] = x_fe_face_values[j];
-                    break;
-                  }
-              if (x_fe_face_values[i].get() == nullptr)
-                x_fe_face_values[i] =
-                  std::make_shared<dealii::hp::FEFaceValues<dim, spacedim>>(
-                    this->mapping_collection,
-                    *this->finite_elements[i],
-                    quadrature,
-                    this->update_flags);
-            }
-        }
+      setup_parallel_data_base_internal(n_subdivisions,
+                                        mapping_collection,
+                                        finite_elements,
+                                        update_flags,
+                                        data.x_fe_values.empty(),
+                                        x_fe_values,
+                                        x_fe_face_values);
     }
 
 
 
     template <int dim, int spacedim>
-    template <typename DoFHandlerType>
     void
     ParallelDataBase<dim, spacedim>::reinit_all_fe_values(
-      std::vector<std::shared_ptr<DataEntryBase<DoFHandlerType>>> &dof_data,
+      std::vector<std::shared_ptr<DataEntryBase<dim, spacedim>>> &dof_data,
       const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
       const unsigned int                                                  face)
     {
       for (unsigned int dataset = 0; dataset < dof_data.size(); ++dataset)
         {
-          bool duplicate = false;
-          for (unsigned int j = 0; j < dataset; ++j)
-            if (finite_elements[dataset].get() == finite_elements[j].get())
-              {
-                duplicate = true;
-                break;
-              }
-
-          if (duplicate == false)
+          const bool is_duplicate = std::any_of(
+            finite_elements.cbegin(),
+            finite_elements.cbegin() + dataset,
+            [&](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
+                  &fe) { return finite_elements[dataset].get() == fe.get(); });
+          if (is_duplicate == false)
             {
-              if (cell->active())
+              if (cell->is_active())
                 {
-                  typename DoFHandlerType::active_cell_iterator dh_cell(
-                    &cell->get_triangulation(),
-                    cell->level(),
-                    cell->index(),
-                    dof_data[dataset]->dof_handler);
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    dh_cell(&cell->get_triangulation(),
+                            cell->level(),
+                            cell->index(),
+                            dof_data[dataset]->dof_handler);
+
+                  // Check whether we need cell or face FEValues objects by
+                  // testing which of the two arrays actually has any content.
                   if (x_fe_values.empty())
                     {
                       AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
@@ -256,6 +577,11 @@ namespace internal
                 x_fe_values[dataset]->reinit(cell);
             }
         }
+
+      // If there is are no DoF-associated data (just cell-associated ones),
+      // then the loop above will not execute any iterations. In that case,
+      // do the initialization for the first FE(Face)Values object by
+      // hand, using only the (triangulation) cell without a DoFHandler.
       if (dof_data.empty())
         {
           if (x_fe_values.empty())
@@ -276,6 +602,9 @@ namespace internal
       const unsigned int dataset) const
     {
       AssertIndexRange(dataset, finite_elements.size());
+
+      // Check whether we need cell or face FEValues objects by testing
+      // which of the two arrays actually has any content.
       if (x_fe_values.empty())
         return x_fe_face_values[dataset]->get_present_fe_values();
       else
@@ -295,8 +624,6 @@ namespace internal
                       patch_values_system.solution_gradients.size());
       AssertDimension(patch_values_system.solution_values.size(),
                       patch_values_system.solution_hessians.size());
-      if (patch_values_system.solution_values[0].size() == n_components)
-        return;
       for (unsigned int k = 0; k < patch_values_system.solution_values.size();
            ++k)
         {
@@ -442,7 +769,7 @@ namespace internal
 
 
 
-#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
     template <>
     inline void
     VectorHelper<LinearAlgebra::TpetraWrappers::Vector<double>>::extract(
@@ -470,19 +797,16 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType>
-    DataEntryBase<DoFHandlerType>::DataEntryBase(
-      const DoFHandlerType *          dofs,
-      const std::vector<std::string> &names_in,
+    template <int dim, int spacedim>
+    DataEntryBase<dim, spacedim>::DataEntryBase(
+      const DoFHandler<dim, spacedim> *dofs,
+      const std::vector<std::string> & names_in,
       const std::vector<
         DataComponentInterpretation::DataComponentInterpretation>
         &data_component_interpretation)
-      : dof_handler(dofs,
-                    typeid(
-                      dealii::DataOut_DoFData<DoFHandlerType,
-                                              DoFHandlerType::dimension,
-                                              DoFHandlerType::space_dimension>)
-                      .name())
+      : dof_handler(
+          dofs,
+          typeid(dealii::DataOut_DoFData<dim, dim, spacedim, spacedim>).name())
       , names(names_in)
       , data_component_interpretation(data_component_interpretation)
       , postprocessor(nullptr, typeid(*this).name())
@@ -509,17 +833,13 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType>
-    DataEntryBase<DoFHandlerType>::DataEntryBase(
-      const DoFHandlerType *dofs,
-      const DataPostprocessor<DoFHandlerType::space_dimension>
-        *data_postprocessor)
-      : dof_handler(dofs,
-                    typeid(
-                      dealii::DataOut_DoFData<DoFHandlerType,
-                                              DoFHandlerType::dimension,
-                                              DoFHandlerType::space_dimension>)
-                      .name())
+    template <int dim, int spacedim>
+    DataEntryBase<dim, spacedim>::DataEntryBase(
+      const DoFHandler<dim, spacedim> *  dofs,
+      const DataPostprocessor<spacedim> *data_postprocessor)
+      : dof_handler(
+          dofs,
+          typeid(dealii::DataOut_DoFData<dim, dim, spacedim, spacedim>).name())
       , names(data_postprocessor->get_names())
       , data_component_interpretation(
           data_postprocessor->get_data_component_interpretation())
@@ -549,14 +869,195 @@ namespace internal
 
 
 
+    namespace
+    {
+      /**
+       * Copy the data from an arbitrary non-block vector to a
+       * LinearAlgebra::distributed::Vector.
+       */
+      template <typename VectorType, typename Number>
+      void
+      copy_locally_owned_data_from(
+        const VectorType &                          src,
+        LinearAlgebra::distributed::Vector<Number> &dst)
+      {
+        LinearAlgebra::ReadWriteVector<typename VectorType::value_type> temp;
+        temp.reinit(src.locally_owned_elements());
+        temp.import(src, VectorOperation::insert);
+
+        LinearAlgebra::ReadWriteVector<Number> temp2;
+        temp2.reinit(temp, true);
+        temp2 = temp;
+
+        dst.import(temp2, VectorOperation::insert);
+      }
+
+#ifdef DEAL_II_WITH_TRILINOS
+      template <typename Number>
+      void
+      copy_locally_owned_data_from(
+        const TrilinosWrappers::MPI::Vector &       src,
+        LinearAlgebra::distributed::Vector<Number> &dst)
+      {
+        // ReadWriteVector does not work for ghosted
+        // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
+        // entries manually.
+        for (const auto i : dst.locally_owned_elements())
+          dst[i] = src[i];
+      }
+#endif
+
+      /**
+       * Create a ghosted-copy of a block dof vector.
+       */
+      template <int dim,
+                int spacedim,
+                typename VectorType,
+                typename Number,
+                typename std::enable_if<IsBlockVector<VectorType>::value,
+                                        VectorType>::type * = nullptr>
+      void
+      create_dof_vector(const DoFHandler<dim, spacedim> &dof_handler,
+                        const VectorType &               src,
+                        LinearAlgebra::distributed::BlockVector<Number> &dst)
+      {
+        IndexSet locally_relevant_dofs;
+        DoFTools::extract_locally_relevant_dofs(dof_handler,
+                                                locally_relevant_dofs);
+
+        const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+
+        std::vector<types::global_dof_index> n_indices_per_block(
+          src.n_blocks());
+
+        for (unsigned int b = 0; b < src.n_blocks(); ++b)
+          n_indices_per_block[b] = src.get_block_indices().block_size(b);
+
+        const auto locally_owned_dofs_b =
+          locally_owned_dofs.split_by_block(n_indices_per_block);
+        const auto locally_relevant_dofs_b =
+          locally_relevant_dofs.split_by_block(n_indices_per_block);
+
+        dst.reinit(src.n_blocks());
+
+        for (unsigned int b = 0; b < src.n_blocks(); ++b)
+          {
+            Assert(src.block(b).locally_owned_elements().is_contiguous(),
+                   ExcMessage(
+                     "Using non-contiguous vector blocks is not currently "
+                     "supported by DataOut and related classes. The typical "
+                     "way you may end up with such vectors is if you order "
+                     "degrees of freedom via DoFRenumber::component_wise() "
+                     "but then group several vector components into one "
+                     "vector block -- for example, all 'dim' components "
+                     "of a velocity are grouped into the same vector block. "
+                     "If you do this, you don't want to renumber degrees "
+                     "of freedom based on vector component, but instead "
+                     "based on the 'blocks' you will later use for grouping "
+                     "things into vectors. Take a look at step-32 and step-55 "
+                     "and how they use the second argument of "
+                     "DoFRenumber::component_wise()."));
+
+            dst.block(b).reinit(locally_owned_dofs_b[b],
+                                locally_relevant_dofs_b[b],
+                                dof_handler.get_communicator());
+            copy_locally_owned_data_from(src.block(b), dst.block(b));
+          }
+
+        dst.collect_sizes();
+
+        dst.update_ghost_values();
+      }
+
+      /**
+       * Create a ghosted-copy of a non-block dof vector.
+       */
+      template <int dim,
+                int spacedim,
+                typename VectorType,
+                typename Number,
+                typename std::enable_if<!IsBlockVector<VectorType>::value,
+                                        VectorType>::type * = nullptr>
+      void
+      create_dof_vector(const DoFHandler<dim, spacedim> &dof_handler,
+                        const VectorType &               src,
+                        LinearAlgebra::distributed::BlockVector<Number> &dst)
+      {
+        Assert(dof_handler.locally_owned_dofs().is_contiguous(),
+               ExcMessage(
+                 "You are trying to add a non-block vector with non-contiguous "
+                 "locally-owned index sets. This is not possible. Please "
+                 "consider to use an adequate block vector!"));
+
+        IndexSet locally_relevant_dofs;
+        DoFTools::extract_locally_relevant_dofs(dof_handler,
+                                                locally_relevant_dofs);
+
+        dst.reinit(1);
+
+        dst.block(0).reinit(dof_handler.locally_owned_dofs(),
+                            locally_relevant_dofs,
+                            dof_handler.get_communicator());
+        copy_locally_owned_data_from(src, dst.block(0));
+
+        dst.collect_sizes();
+
+        dst.update_ghost_values();
+      }
+
+      /**
+       * Create a ghosted-copy of a block cell vector.
+       */
+      template <typename VectorType,
+                typename Number,
+                typename std::enable_if<IsBlockVector<VectorType>::value,
+                                        VectorType>::type * = nullptr>
+      void
+      create_cell_vector(const VectorType &                               src,
+                         LinearAlgebra::distributed::BlockVector<Number> &dst)
+      {
+        dst.reinit(src.n_blocks());
+
+        for (unsigned int b = 0; b < src.n_blocks(); ++b)
+          {
+            dst.block(b).reinit(src.get_block_indices().block_size(b));
+            copy_locally_owned_data_from(src.block(b), dst.block(b));
+          }
+
+        dst.collect_sizes();
+      }
+
+
+      /**
+       * Create a ghosted-copy of a non-block cell vector.
+       */
+      template <typename VectorType,
+                typename Number,
+                typename std::enable_if<!IsBlockVector<VectorType>::value,
+                                        VectorType>::type * = nullptr>
+      void
+      create_cell_vector(const VectorType &                               src,
+                         LinearAlgebra::distributed::BlockVector<Number> &dst)
+      {
+        dst.reinit(1);
+
+        dst.block(0).reinit(src.size());
+        copy_locally_owned_data_from(src, dst.block(0));
+
+        dst.collect_sizes();
+
+        dst.update_ghost_values();
+      }
+    } // namespace
+
+
+
     /**
      * Class that stores a pointer to a vector of type equal to the template
      * argument, and provides the functions to extract data from it.
-     *
-     * @author Wolfgang Bangerth, 2004
      */
-    template <typename DoFHandlerType, typename VectorType>
-    class DataEntry : public DataEntryBase<DoFHandlerType>
+    template <int dim, int spacedim, typename ScalarType>
+    class DataEntry : public DataEntryBase<dim, spacedim>
     {
     public:
       /**
@@ -564,22 +1065,24 @@ namespace internal
        * the vector and their interpretation as scalar or vector data. This
        * constructor assumes that no postprocessor is going to be used.
        */
-      DataEntry(const DoFHandlerType *          dofs,
-                const VectorType *              data,
-                const std::vector<std::string> &names,
+      template <typename DataVectorType, typename VectorType>
+      DataEntry(const DoFHandler<dim, spacedim> *dofs,
+                const VectorType *               data,
+                const std::vector<std::string> & names,
                 const std::vector<
                   DataComponentInterpretation::DataComponentInterpretation>
-                  &data_component_interpretation);
+                  &                  data_component_interpretation,
+                const DataVectorType actual_type);
 
       /**
        * Constructor when a data postprocessor is going to be used. In that
        * case, the names and vector declarations are going to be acquired from
        * the postprocessor.
        */
-      DataEntry(const DoFHandlerType *dofs,
-                const VectorType *    data,
-                const DataPostprocessor<DoFHandlerType::space_dimension>
-                  *data_postprocessor);
+      template <typename VectorType>
+      DataEntry(const DoFHandler<dim, spacedim> *  dofs,
+                const VectorType *                 data,
+                const DataPostprocessor<spacedim> *data_postprocessor);
 
       /**
        * Assuming that the stored vector is a cell vector, extract the given
@@ -595,11 +1098,9 @@ namespace internal
        * from the vector we actually store.
        */
       virtual void
-      get_function_values(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<double> &patch_values) const override;
+      get_function_values(const FEValuesBase<dim, spacedim> &fe_patch_values,
+                          const ComponentExtractor           extract_component,
+                          std::vector<double> &patch_values) const override;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -607,12 +1108,10 @@ namespace internal
        * one above but for vector-valued finite elements.
        */
       virtual void
-      get_function_values(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<dealii::Vector<double>> &patch_values_system)
-        const override;
+      get_function_values(const FEValuesBase<dim, spacedim> &fe_patch_values,
+                          const ComponentExtractor           extract_component,
+                          std::vector<dealii::Vector<double>>
+                            &patch_values_system) const override;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -620,11 +1119,9 @@ namespace internal
        */
       virtual void
       get_function_gradients(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<Tensor<1, DoFHandlerType::space_dimension>>
-          &patch_gradients) const override;
+        const FEValuesBase<dim, spacedim> &fe_patch_values,
+        const ComponentExtractor           extract_component,
+        std::vector<Tensor<1, spacedim>> & patch_gradients) const override;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -632,12 +1129,10 @@ namespace internal
        * as the one above but for vector-valued finite elements.
        */
       virtual void
-      get_function_gradients(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<std::vector<Tensor<1, DoFHandlerType::space_dimension>>>
-          &patch_gradients_system) const override;
+      get_function_gradients(const FEValuesBase<dim, spacedim> &fe_patch_values,
+                             const ComponentExtractor extract_component,
+                             std::vector<std::vector<Tensor<1, spacedim>>>
+                               &patch_gradients_system) const override;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -645,11 +1140,9 @@ namespace internal
        */
       virtual void
       get_function_hessians(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<Tensor<2, DoFHandlerType::space_dimension>> &patch_hessians)
-        const override;
+        const FEValuesBase<dim, spacedim> &fe_patch_values,
+        const ComponentExtractor           extract_component,
+        std::vector<Tensor<2, spacedim>> & patch_hessians) const override;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -657,12 +1150,10 @@ namespace internal
        * the same as the one above but for vector-valued finite elements.
        */
       virtual void
-      get_function_hessians(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<std::vector<Tensor<2, DoFHandlerType::space_dimension>>>
-          &patch_hessians_system) const override;
+      get_function_hessians(const FEValuesBase<dim, spacedim> &fe_patch_values,
+                            const ComponentExtractor extract_component,
+                            std::vector<std::vector<Tensor<2, spacedim>>>
+                              &patch_hessians_system) const override;
 
       /**
        * Return whether the data represented by (a derived class of) this object
@@ -684,79 +1175,86 @@ namespace internal
       virtual std::size_t
       memory_consumption() const override;
 
-    private:
       /**
-       * Pointer to the data vector. Note that ownership of the vector pointed
-       * to remains with the caller of this class.
+       * Copy of the data of the vector passed to DataOutDoFData::add_vector().
+       * This vector imports all elements necessary to create output from the
+       * source vector and stores it until we no longer need it. No reference
+       * to the original source vector is necessary nor stored.
        */
-      const VectorType *vector;
+      LinearAlgebra::distributed::BlockVector<ScalarType> vector;
     };
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
-    DataEntry<DoFHandlerType, VectorType>::DataEntry(
-      const DoFHandlerType *          dofs,
-      const VectorType *              data,
-      const std::vector<std::string> &names,
+    template <int dim, int spacedim, typename ScalarType>
+    template <typename DataVectorType, typename VectorType>
+    DataEntry<dim, spacedim, ScalarType>::DataEntry(
+      const DoFHandler<dim, spacedim> *dofs,
+      const VectorType *               data,
+      const std::vector<std::string> & names,
       const std::vector<
         DataComponentInterpretation::DataComponentInterpretation>
-        &data_component_interpretation)
-      : DataEntryBase<DoFHandlerType>(dofs,
-                                      names,
-                                      data_component_interpretation)
-      , vector(data)
-    {}
+        &                  data_component_interpretation,
+      const DataVectorType actual_type)
+      : DataEntryBase<dim, spacedim>(dofs, names, data_component_interpretation)
+    {
+      if (actual_type == DataVectorType::type_dof_data)
+        create_dof_vector(*dofs, *data, vector);
+      else if (actual_type == DataVectorType::type_cell_data)
+        create_cell_vector(*data, vector);
+      else
+        Assert(false, ExcInternalError());
+    }
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
-    DataEntry<DoFHandlerType, VectorType>::DataEntry(
-      const DoFHandlerType *dofs,
-      const VectorType *    data,
-      const DataPostprocessor<DoFHandlerType::space_dimension>
-        *data_postprocessor)
-      : DataEntryBase<DoFHandlerType>(dofs, data_postprocessor)
-      , vector(data)
-    {}
+    template <int dim, int spacedim, typename ScalarType>
+    template <typename VectorType>
+    DataEntry<dim, spacedim, ScalarType>::DataEntry(
+      const DoFHandler<dim, spacedim> *  dofs,
+      const VectorType *                 data,
+      const DataPostprocessor<spacedim> *data_postprocessor)
+      : DataEntryBase<dim, spacedim>(dofs, data_postprocessor)
+    {
+      create_dof_vector(*dofs, *data, vector);
+    }
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     double
-    DataEntry<DoFHandlerType, VectorType>::get_cell_data_value(
+    DataEntry<dim, spacedim, ScalarType>::get_cell_data_value(
       const unsigned int       cell_number,
       const ComponentExtractor extract_component) const
     {
       return get_component(
-        internal::ElementAccess<VectorType>::get(*vector, cell_number),
+        internal::ElementAccess<LinearAlgebra::distributed::BlockVector<
+          ScalarType>>::get(vector, cell_number),
         extract_component);
     }
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     void
-    DataEntry<DoFHandlerType, VectorType>::get_function_values(
-      const FEValuesBase<DoFHandlerType::dimension,
-                         DoFHandlerType::space_dimension> &fe_patch_values,
-      const ComponentExtractor                             extract_component,
+    DataEntry<dim, spacedim, ScalarType>::get_function_values(
+      const FEValuesBase<dim, spacedim> &  fe_patch_values,
+      const ComponentExtractor             extract_component,
       std::vector<dealii::Vector<double>> &patch_values_system) const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(ScalarType) == typeid(double))
         {
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
           fe_patch_values.get_function_values(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
             // get here
-            reinterpret_cast<
-              std::vector<dealii::Vector<typename VectorType::value_type>> &>(
+            reinterpret_cast<std::vector<dealii::Vector<ScalarType>> &>(
               patch_values_system));
         }
       else
@@ -771,15 +1269,14 @@ namespace internal
           const unsigned int n_eval_points =
             fe_patch_values.n_quadrature_points;
 
-          std::vector<dealii::Vector<typename VectorType::value_type>> tmp(
-            n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          std::vector<dealii::Vector<ScalarType>> tmp(n_eval_points);
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             tmp[i].reinit(n_components);
 
-          fe_patch_values.get_function_values(*vector, tmp);
+          fe_patch_values.get_function_values(vector, tmp);
 
           AssertDimension(patch_values_system.size(), n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             {
               AssertDimension(patch_values_system[i].size(), n_components);
 
@@ -792,67 +1289,62 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     void
-    DataEntry<DoFHandlerType, VectorType>::get_function_values(
-      const FEValuesBase<DoFHandlerType::dimension,
-                         DoFHandlerType::space_dimension> &fe_patch_values,
-      const ComponentExtractor                             extract_component,
-      std::vector<double> &                                patch_values) const
+    DataEntry<dim, spacedim, ScalarType>::get_function_values(
+      const FEValuesBase<dim, spacedim> &fe_patch_values,
+      const ComponentExtractor           extract_component,
+      std::vector<double> &              patch_values) const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(ScalarType) == typeid(double))
         {
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
           fe_patch_values.get_function_values(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
             // get here
-            reinterpret_cast<std::vector<typename VectorType::value_type> &>(
-              patch_values));
+            reinterpret_cast<std::vector<ScalarType> &>(patch_values));
         }
       else
         {
-          std::vector<typename VectorType::value_type> tmp(patch_values.size());
+          std::vector<ScalarType> tmp(patch_values.size());
 
-          fe_patch_values.get_function_values(*vector, tmp);
+          fe_patch_values.get_function_values(vector, tmp);
 
-          for (unsigned int i = 0; i < tmp.size(); i++)
+          for (unsigned int i = 0; i < tmp.size(); ++i)
             patch_values[i] = get_component(tmp[i], extract_component);
         }
     }
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     void
-    DataEntry<DoFHandlerType, VectorType>::get_function_gradients(
-      const FEValuesBase<DoFHandlerType::dimension,
-                         DoFHandlerType::space_dimension> &fe_patch_values,
-      const ComponentExtractor                             extract_component,
-      std::vector<std::vector<Tensor<1, DoFHandlerType::space_dimension>>>
-        &patch_gradients_system) const
+    DataEntry<dim, spacedim, ScalarType>::get_function_gradients(
+      const FEValuesBase<dim, spacedim> &            fe_patch_values,
+      const ComponentExtractor                       extract_component,
+      std::vector<std::vector<Tensor<1, spacedim>>> &patch_gradients_system)
+      const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(ScalarType) == typeid(double))
         {
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
           fe_patch_values.get_function_gradients(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
             // get here
-            reinterpret_cast<std::vector<
-              std::vector<Tensor<1,
-                                 DoFHandlerType::space_dimension,
-                                 typename VectorType::value_type>>> &>(
+            reinterpret_cast<
+              std::vector<std::vector<Tensor<1, spacedim, ScalarType>>> &>(
               patch_gradients_system));
         }
       else
@@ -867,21 +1359,19 @@ namespace internal
           const unsigned int n_eval_points =
             fe_patch_values.n_quadrature_points;
 
-          std::vector<std::vector<Tensor<1,
-                                         DoFHandlerType::space_dimension,
-                                         typename VectorType::value_type>>>
-            tmp(n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          std::vector<std::vector<Tensor<1, spacedim, ScalarType>>> tmp(
+            n_eval_points);
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             tmp[i].resize(n_components);
 
-          fe_patch_values.get_function_gradients(*vector, tmp);
+          fe_patch_values.get_function_gradients(vector, tmp);
 
           AssertDimension(patch_gradients_system.size(), n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             {
               AssertDimension(patch_gradients_system[i].size(), n_components);
 
-              for (unsigned int j = 0; j < n_components; j++)
+              for (unsigned int j = 0; j < n_components; ++j)
                 patch_gradients_system[i][j] =
                   get_component(tmp[i][j], extract_component);
             }
@@ -890,75 +1380,64 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     void
-    DataEntry<DoFHandlerType, VectorType>::get_function_gradients(
-      const FEValuesBase<DoFHandlerType::dimension,
-                         DoFHandlerType::space_dimension> &fe_patch_values,
-      const ComponentExtractor                             extract_component,
-      std::vector<Tensor<1, DoFHandlerType::space_dimension>> &patch_gradients)
-      const
+    DataEntry<dim, spacedim, ScalarType>::get_function_gradients(
+      const FEValuesBase<dim, spacedim> &fe_patch_values,
+      const ComponentExtractor           extract_component,
+      std::vector<Tensor<1, spacedim>> & patch_gradients) const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(ScalarType) == typeid(double))
         {
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
           fe_patch_values.get_function_gradients(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
             // get here
-            reinterpret_cast<
-              std::vector<Tensor<1,
-                                 DoFHandlerType::space_dimension,
-                                 typename VectorType::value_type>> &>(
+            reinterpret_cast<std::vector<Tensor<1, spacedim, ScalarType>> &>(
               patch_gradients));
         }
       else
         {
-          std::vector<Tensor<1,
-                             DoFHandlerType::space_dimension,
-                             typename VectorType::value_type>>
-            tmp;
+          std::vector<Tensor<1, spacedim, ScalarType>> tmp;
           tmp.resize(patch_gradients.size());
 
-          fe_patch_values.get_function_gradients(*vector, tmp);
+          fe_patch_values.get_function_gradients(vector, tmp);
 
-          for (unsigned int i = 0; i < tmp.size(); i++)
+          for (unsigned int i = 0; i < tmp.size(); ++i)
             patch_gradients[i] = get_component(tmp[i], extract_component);
         }
     }
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     void
-    DataEntry<DoFHandlerType, VectorType>::get_function_hessians(
-      const FEValuesBase<DoFHandlerType::dimension,
-                         DoFHandlerType::space_dimension> &fe_patch_values,
-      const ComponentExtractor                             extract_component,
-      std::vector<std::vector<Tensor<2, DoFHandlerType::space_dimension>>>
-        &patch_hessians_system) const
+    DataEntry<dim, spacedim, ScalarType>::get_function_hessians(
+      const FEValuesBase<dim, spacedim> &            fe_patch_values,
+      const ComponentExtractor                       extract_component,
+      std::vector<std::vector<Tensor<2, spacedim>>> &patch_hessians_system)
+      const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(ScalarType) == typeid(double))
         {
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
           fe_patch_values.get_function_hessians(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
             // get here
-            reinterpret_cast<std::vector<
-              std::vector<Tensor<2,
-                                 DoFHandlerType::space_dimension,
-                                 typename VectorType::value_type>>> &>(
+            reinterpret_cast<
+              std::vector<std::vector<Tensor<2, spacedim, ScalarType>>> &>(
               patch_hessians_system));
         }
       else
@@ -973,21 +1452,19 @@ namespace internal
           const unsigned int n_eval_points =
             fe_patch_values.n_quadrature_points;
 
-          std::vector<std::vector<Tensor<2,
-                                         DoFHandlerType::space_dimension,
-                                         typename VectorType::value_type>>>
-            tmp(n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          std::vector<std::vector<Tensor<2, spacedim, ScalarType>>> tmp(
+            n_eval_points);
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             tmp[i].resize(n_components);
 
-          fe_patch_values.get_function_hessians(*vector, tmp);
+          fe_patch_values.get_function_hessians(vector, tmp);
 
           AssertDimension(patch_hessians_system.size(), n_eval_points);
-          for (unsigned int i = 0; i < n_eval_points; i++)
+          for (unsigned int i = 0; i < n_eval_points; ++i)
             {
               AssertDimension(patch_hessians_system[i].size(), n_components);
 
-              for (unsigned int j = 0; j < n_components; j++)
+              for (unsigned int j = 0; j < n_components; ++j)
                 patch_hessians_system[i][j] =
                   get_component(tmp[i][j], extract_component);
             }
@@ -996,73 +1473,66 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     void
-    DataEntry<DoFHandlerType, VectorType>::get_function_hessians(
-      const FEValuesBase<DoFHandlerType::dimension,
-                         DoFHandlerType::space_dimension> &fe_patch_values,
-      const ComponentExtractor                             extract_component,
-      std::vector<Tensor<2, DoFHandlerType::space_dimension>> &patch_hessians)
-      const
+    DataEntry<dim, spacedim, ScalarType>::get_function_hessians(
+      const FEValuesBase<dim, spacedim> &fe_patch_values,
+      const ComponentExtractor           extract_component,
+      std::vector<Tensor<2, spacedim>> & patch_hessians) const
     {
-      if (typeid(typename VectorType::value_type) == typeid(double))
+      if (typeid(ScalarType) == typeid(double))
         {
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
           fe_patch_values.get_function_hessians(
-            *vector,
+            vector,
             // reinterpret output argument type; because of the 'if' statement
             // above, this is the identity cast whenever the code is executed,
             // but the cast is necessary to allow compilation even if we don't
             // get here
-            reinterpret_cast<
-              std::vector<Tensor<2,
-                                 DoFHandlerType ::space_dimension,
-                                 typename VectorType::value_type>> &>(
+            reinterpret_cast<std::vector<Tensor<2, spacedim, ScalarType>> &>(
               patch_hessians));
         }
       else
         {
-          std::vector<Tensor<2,
-                             DoFHandlerType::space_dimension,
-                             typename VectorType::value_type>>
-            tmp(patch_hessians.size());
+          std::vector<Tensor<2, spacedim, ScalarType>> tmp(
+            patch_hessians.size());
 
-          fe_patch_values.get_function_hessians(*vector, tmp);
+          fe_patch_values.get_function_hessians(vector, tmp);
 
-          for (unsigned int i = 0; i < tmp.size(); i++)
+          for (unsigned int i = 0; i < tmp.size(); ++i)
             patch_hessians[i] = get_component(tmp[i], extract_component);
         }
     }
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     bool
-    DataEntry<DoFHandlerType, VectorType>::is_complex_valued() const
+    DataEntry<dim, spacedim, ScalarType>::is_complex_valued() const
     {
-      return numbers::NumberTraits<typename VectorType::value_type>::is_complex;
+      return numbers::NumberTraits<ScalarType>::is_complex;
     }
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     std::size_t
-    DataEntry<DoFHandlerType, VectorType>::memory_consumption() const
+    DataEntry<dim, spacedim, ScalarType>::memory_consumption() const
     {
-      return (sizeof(vector) +
+      return (vector.memory_consumption() +
               MemoryConsumption::memory_consumption(this->names));
     }
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     void
-    DataEntry<DoFHandlerType, VectorType>::clear()
+    DataEntry<dim, spacedim, ScalarType>::clear()
     {
-      vector            = nullptr;
+      vector.reinit(0, 0);
       this->dof_handler = nullptr;
     }
 
@@ -1074,19 +1544,19 @@ namespace internal
      * MGLevelObject<VectorType> given on the specific level instead of
      * interpolating data to coarser cells.
      */
-    template <typename DoFHandlerType, typename VectorType>
-    class MGDataEntry : public DataEntryBase<DoFHandlerType>
+    template <int dim, int spacedim, typename VectorType>
+    class MGDataEntry : public DataEntryBase<dim, spacedim>
     {
     public:
-      MGDataEntry(const DoFHandlerType *           dofs,
+      MGDataEntry(const DoFHandler<dim, spacedim> *dofs,
                   const MGLevelObject<VectorType> *vectors,
                   const std::vector<std::string> & names,
                   const std::vector<
                     DataComponentInterpretation::DataComponentInterpretation>
                     &data_component_interpretation)
-        : DataEntryBase<DoFHandlerType>(dofs,
-                                        names,
-                                        data_component_interpretation)
+        : DataEntryBase<dim, spacedim>(dofs,
+                                       names,
+                                       data_component_interpretation)
         , vectors(vectors)
       {}
 
@@ -1096,11 +1566,9 @@ namespace internal
         const ComponentExtractor extract_component) const override;
 
       virtual void
-      get_function_values(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<double> &patch_values) const override;
+      get_function_values(const FEValuesBase<dim, spacedim> &fe_patch_values,
+                          const ComponentExtractor           extract_component,
+                          std::vector<double> &patch_values) const override;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -1108,12 +1576,10 @@ namespace internal
        * one above but for vector-valued finite elements.
        */
       virtual void
-      get_function_values(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension> &fe_patch_values,
-        const ComponentExtractor                             extract_component,
-        std::vector<dealii::Vector<double>> &patch_values_system)
-        const override;
+      get_function_values(const FEValuesBase<dim, spacedim> &fe_patch_values,
+                          const ComponentExtractor           extract_component,
+                          std::vector<dealii::Vector<double>>
+                            &patch_values_system) const override;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -1121,12 +1587,9 @@ namespace internal
        */
       virtual void
       get_function_gradients(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension>
-          & /*fe_patch_values*/,
+        const FEValuesBase<dim, spacedim> & /*fe_patch_values*/,
         const ComponentExtractor /*extract_component*/,
-        std::vector<Tensor<1, DoFHandlerType::space_dimension>>
-          & /*patch_gradients*/) const override
+        std::vector<Tensor<1, spacedim>> & /*patch_gradients*/) const override
       {
         Assert(false, ExcNotImplemented());
       }
@@ -1138,11 +1601,9 @@ namespace internal
        */
       virtual void
       get_function_gradients(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension>
-          & /*fe_patch_values*/,
+        const FEValuesBase<dim, spacedim> & /*fe_patch_values*/,
         const ComponentExtractor /*extract_component*/,
-        std::vector<std::vector<Tensor<1, DoFHandlerType::space_dimension>>>
+        std::vector<std::vector<Tensor<1, spacedim>>>
           & /*patch_gradients_system*/) const override
       {
         Assert(false, ExcNotImplemented());
@@ -1155,12 +1616,9 @@ namespace internal
        */
       virtual void
       get_function_hessians(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension>
-          & /*fe_patch_values*/,
+        const FEValuesBase<dim, spacedim> & /*fe_patch_values*/,
         const ComponentExtractor /*extract_component*/,
-        std::vector<Tensor<2, DoFHandlerType::space_dimension>>
-          & /*patch_hessians*/) const override
+        std::vector<Tensor<2, spacedim>> & /*patch_hessians*/) const override
       {
         Assert(false, ExcNotImplemented());
       }
@@ -1172,11 +1630,9 @@ namespace internal
        */
       virtual void
       get_function_hessians(
-        const FEValuesBase<DoFHandlerType::dimension,
-                           DoFHandlerType::space_dimension>
-          & /*fe_patch_values*/,
+        const FEValuesBase<dim, spacedim> & /*fe_patch_values*/,
         const ComponentExtractor /*extract_component*/,
-        std::vector<std::vector<Tensor<2, DoFHandlerType::space_dimension>>>
+        std::vector<std::vector<Tensor<2, spacedim>>>
           & /*patch_hessians_system*/) const override
       {
         Assert(false, ExcNotImplemented());
@@ -1222,9 +1678,9 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename VectorType>
     double
-    MGDataEntry<DoFHandlerType, VectorType>::get_cell_data_value(
+    MGDataEntry<dim, spacedim, VectorType>::get_cell_data_value(
       const unsigned int       cell_number,
       const ComponentExtractor extract_component) const
     {
@@ -1237,18 +1693,17 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename VectorType>
     void
-    MGDataEntry<DoFHandlerType, VectorType>::get_function_values(
-      const FEValuesBase<DoFHandlerType::dimension,
-                         DoFHandlerType::space_dimension> &fe_patch_values,
-      const ComponentExtractor                             extract_component,
-      std::vector<double> &                                patch_values) const
+    MGDataEntry<dim, spacedim, VectorType>::get_function_values(
+      const FEValuesBase<dim, spacedim> &fe_patch_values,
+      const ComponentExtractor           extract_component,
+      std::vector<double> &              patch_values) const
     {
       Assert(extract_component == ComponentExtractor::real_part,
              ExcNotImplemented());
 
-      const typename DoFHandlerType::level_cell_iterator dof_cell(
+      const typename DoFHandler<dim, spacedim>::level_cell_iterator dof_cell(
         &fe_patch_values.get_cell()->get_triangulation(),
         fe_patch_values.get_cell()->level(),
         fe_patch_values.get_cell()->index(),
@@ -1257,7 +1712,7 @@ namespace internal
       const VectorType *vector = &((*vectors)[dof_cell->level()]);
 
       const unsigned int dofs_per_cell =
-        this->dof_handler->get_fe(0).dofs_per_cell;
+        this->dof_handler->get_fe(0).n_dofs_per_cell();
 
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
       dof_cell->get_mg_dof_indices(dof_indices);
@@ -1276,18 +1731,17 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType, typename VectorType>
+    template <int dim, int spacedim, typename VectorType>
     void
-    MGDataEntry<DoFHandlerType, VectorType>::get_function_values(
-      const FEValuesBase<DoFHandlerType::dimension,
-                         DoFHandlerType::space_dimension> &fe_patch_values,
-      const ComponentExtractor                             extract_component,
+    MGDataEntry<dim, spacedim, VectorType>::get_function_values(
+      const FEValuesBase<dim, spacedim> &  fe_patch_values,
+      const ComponentExtractor             extract_component,
       std::vector<dealii::Vector<double>> &patch_values_system) const
     {
       Assert(extract_component == ComponentExtractor::real_part,
              ExcNotImplemented());
 
-      typename DoFHandlerType::level_cell_iterator dof_cell(
+      typename DoFHandler<dim, spacedim>::level_cell_iterator dof_cell(
         &fe_patch_values.get_cell()->get_triangulation(),
         fe_patch_values.get_cell()->level(),
         fe_patch_values.get_cell()->index(),
@@ -1296,7 +1750,7 @@ namespace internal
       const VectorType *vector = &((*vectors)[dof_cell->level()]);
 
       const unsigned int dofs_per_cell =
-        this->dof_handler->get_fe(0).dofs_per_cell;
+        this->dof_handler->get_fe(0).n_dofs_per_cell();
 
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
       dof_cell->get_mg_dof_indices(dof_indices);
@@ -1310,7 +1764,7 @@ namespace internal
       const unsigned int n_eval_points = fe_patch_values.n_quadrature_points;
 
       AssertDimension(patch_values_system.size(), n_eval_points);
-      for (unsigned int q = 0; q < n_eval_points; q++)
+      for (unsigned int q = 0; q < n_eval_points; ++q)
         {
           AssertDimension(patch_values_system[q].size(), n_components);
           patch_values_system[q] = 0.0;
@@ -1327,29 +1781,29 @@ namespace internal
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::DataOut_DoFData()
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::DataOut_DoFData()
   : triangulation(nullptr, typeid(*this).name())
   , dofs(nullptr, typeid(*this).name())
 {}
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::~DataOut_DoFData()
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::~DataOut_DoFData()
 {
   // virtual functions called in constructors and destructors never use the
   // override in a derived class for clarity be explicit on which function is
   // called
-  DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::clear();
+  DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::clear();
 }
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::attach_dof_handler(
-  const DoFHandlerType &d)
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::attach_dof_handler(
+  const DoFHandler<dim, spacedim> &d)
 {
   Assert(dof_data.size() == 0,
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
@@ -1357,20 +1811,18 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::attach_dof_handler(
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
-    SmartPointer<const Triangulation<DoFHandlerType::dimension,
-                                     DoFHandlerType::space_dimension>>(
-      &d.get_triangulation(), typeid(*this).name());
-  dofs = SmartPointer<const DoFHandlerType>(&d, typeid(*this).name());
+    SmartPointer<const Triangulation<dim, spacedim>>(&d.get_triangulation(),
+                                                     typeid(*this).name());
+  dofs =
+    SmartPointer<const DoFHandler<dim, spacedim>>(&d, typeid(*this).name());
 }
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
-  attach_triangulation(
-    const Triangulation<DoFHandlerType::dimension,
-                        DoFHandlerType::space_dimension> &tria)
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::attach_triangulation(
+  const Triangulation<dim, spacedim> &tria)
 {
   Assert(dof_data.size() == 0,
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
@@ -1378,20 +1830,19 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
-    SmartPointer<const Triangulation<DoFHandlerType::dimension,
-                                     DoFHandlerType::space_dimension>>(
-      &tria, typeid(*this).name());
+    SmartPointer<const Triangulation<dim, spacedim>>(&tria,
+                                                     typeid(*this).name());
 }
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 template <typename VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
-  const DoFHandlerType &                                    dof_handler,
-  const VectorType &                                        vec,
-  const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_data_vector(
+  const DoFHandler<dim, spacedim> &  dof_handler,
+  const VectorType &                 vec,
+  const DataPostprocessor<spacedim> &data_postprocessor)
 {
   // this is a specialized version of the other function where we have a
   // postprocessor. if we do, we know that we have type_dof_data, which makes
@@ -1405,10 +1856,8 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
     }
   else
     {
-      triangulation =
-        SmartPointer<const Triangulation<DoFHandlerType::dimension,
-                                         DoFHandlerType::space_dimension>>(
-          &dof_handler.get_triangulation(), typeid(*this).name());
+      triangulation = SmartPointer<const Triangulation<dim, spacedim>>(
+        &dof_handler.get_triangulation(), typeid(*this).name());
     }
 
   Assert(vec.size() == dof_handler.n_dofs(),
@@ -1418,23 +1867,27 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
            dof_handler.get_triangulation().n_active_cells()));
 
 
-  auto new_entry = std_cxx14::make_unique<
-    internal::DataOutImplementation::DataEntry<DoFHandlerType, VectorType>>(
-    &dof_handler, &vec, &data_postprocessor);
+  auto new_entry = std::make_unique<internal::DataOutImplementation::DataEntry<
+    dim,
+    spacedim,
+    typename numbers::NumberTraits<
+      typename VectorType::value_type>::double_type>>(&dof_handler,
+                                                      &vec,
+                                                      &data_postprocessor);
   dof_data.emplace_back(std::move(new_entry));
 }
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 template <typename VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
   add_data_vector_internal(
-    const DoFHandlerType *          dof_handler,
-    const VectorType &              data_vector,
-    const std::vector<std::string> &names,
-    const DataVectorType            type,
+    const DoFHandler<dim, spacedim> *dof_handler,
+    const VectorType &               data_vector,
+    const std::vector<std::string> & names,
+    const DataVectorType             type,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
       &        data_component_interpretation_,
     const bool deduce_output_names)
@@ -1443,10 +1896,8 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
   if (triangulation == nullptr)
     {
       Assert(dof_handler != nullptr, ExcInternalError());
-      triangulation =
-        SmartPointer<const Triangulation<DoFHandlerType::dimension,
-                                         DoFHandlerType::space_dimension>>(
-          &dof_handler->get_triangulation(), typeid(*this).name());
+      triangulation = SmartPointer<const Triangulation<dim, spacedim>>(
+        &dof_handler->get_triangulation(), typeid(*this).name());
     }
 
   if (dof_handler != nullptr)
@@ -1540,9 +1991,16 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
          DataComponentInterpretation::component_is_scalar));
 
   // finally, add the data vector:
-  auto new_entry = std_cxx14::make_unique<
-    internal::DataOutImplementation::DataEntry<DoFHandlerType, VectorType>>(
-    dof_handler, &data_vector, deduced_names, data_component_interpretation);
+  auto new_entry = std::make_unique<internal::DataOutImplementation::DataEntry<
+    dim,
+    spacedim,
+    typename numbers::NumberTraits<
+      typename VectorType::value_type>::double_type>>(
+    dof_handler,
+    &data_vector,
+    deduced_names,
+    data_component_interpretation,
+    actual_type);
 
   if (actual_type == type_dof_data)
     dof_data.emplace_back(std::move(new_entry));
@@ -1552,11 +2010,11 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 template <class VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_mg_data_vector(
-  const DoFHandlerType &           dof_handler,
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
+  const DoFHandler<dim, spacedim> &dof_handler,
   const MGLevelObject<VectorType> &data,
   const std::string &              name)
 {
@@ -1567,21 +2025,19 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_mg_data_vector(
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 template <class VectorType>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_mg_data_vector(
-  const DoFHandlerType &           dof_handler,
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
+  const DoFHandler<dim, spacedim> &dof_handler,
   const MGLevelObject<VectorType> &data,
   const std::vector<std::string> & names,
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
     &data_component_interpretation_)
 {
   if (triangulation == nullptr)
-    triangulation =
-      SmartPointer<const Triangulation<DoFHandlerType::dimension,
-                                       DoFHandlerType::space_dimension>>(
-        &dof_handler.get_triangulation(), typeid(*this).name());
+    triangulation = SmartPointer<const Triangulation<dim, spacedim>>(
+      &dof_handler.get_triangulation(), typeid(*this).name());
 
   Assert(&dof_handler.get_triangulation() == triangulation,
          ExcMessage("The triangulation attached to the DoFHandler does not "
@@ -1613,18 +2069,17 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_mg_data_vector(
          ExcMessage(
            "Invalid number of entries in data_component_interpretation."));
 
-  auto new_entry = std_cxx14::make_unique<
-    internal::DataOutImplementation::MGDataEntry<DoFHandlerType, VectorType>>(
+  auto new_entry = std::make_unique<
+    internal::DataOutImplementation::MGDataEntry<dim, spacedim, VectorType>>(
     &dof_handler, &data, deduced_names, data_component_interpretation);
   dof_data.emplace_back(std::move(new_entry));
 }
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
-  clear_data_vectors()
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::clear_data_vectors()
 {
   dof_data.erase(dof_data.begin(), dof_data.end());
   cell_data.erase(cell_data.begin(), cell_data.end());
@@ -1636,9 +2091,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
   clear_input_data_references()
 {
   for (unsigned int i = 0; i < dof_data.size(); ++i)
@@ -1653,9 +2108,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 void
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::clear()
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::clear()
 {
   dof_data.erase(dof_data.begin(), dof_data.end());
   cell_data.erase(cell_data.begin(), cell_data.end());
@@ -1670,9 +2125,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::clear()
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 std::vector<std::string>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_dataset_names()
   const
 {
   std::vector<std::string> names;
@@ -1730,7 +2185,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
                   {
                     // It's a vector. First output all real parts, then all
                     // imaginary parts:
-                    const unsigned int size = patch_space_dim;
+                    const unsigned int size = patch_spacedim;
                     for (unsigned int vec_comp = 0; vec_comp < size; ++vec_comp)
                       names.push_back(input_data->names[i + vec_comp] + "_re");
                     for (unsigned int vec_comp = 0; vec_comp < size; ++vec_comp)
@@ -1746,7 +2201,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
                   {
                     // It's a tensor. First output all real parts, then all
                     // imaginary parts:
-                    const unsigned int size = patch_space_dim * patch_space_dim;
+                    const unsigned int size = patch_spacedim * patch_spacedim;
                     for (unsigned int tensor_comp = 0; tensor_comp < size;
                          ++tensor_comp)
                       names.push_back(input_data->names[i + tensor_comp] +
@@ -1789,13 +2244,13 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 std::vector<
   std::tuple<unsigned int,
              unsigned int,
              std::string,
              DataComponentInterpretation::DataComponentInterpretation>>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
   get_nonscalar_data_ranges() const
 {
   std::vector<
@@ -1834,10 +2289,10 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               // ensure that there is a continuous number of next space_dim
               // components that all deal with vectors
               Assert(
-                i + patch_space_dim <= input_data->n_output_variables,
+                i + patch_spacedim <= input_data->n_output_variables,
                 Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration(
                   i, input_data->names[i]));
-              for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
+              for (unsigned int dd = 1; dd < patch_spacedim; ++dd)
                 Assert(
                   input_data->data_component_interpretation[i + dd] ==
                     DataComponentInterpretation::component_is_part_of_vector,
@@ -1848,7 +2303,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
               // name to these components. if not, leave the name empty and
               // let the output format writer decide what to do here
               std::string name = input_data->names[i];
-              for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
+              for (unsigned int dd = 1; dd < patch_spacedim; ++dd)
                 if (name != input_data->names[i + dd])
                   {
                     name = "";
@@ -1868,33 +2323,33 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
                 {
                   ranges.emplace_back(std::forward_as_tuple(
                     output_component,
-                    output_component + patch_space_dim - 1,
+                    output_component + patch_spacedim - 1,
                     name,
                     DataComponentInterpretation::component_is_part_of_vector));
 
                   // increase the 'component' counter by the appropriate amount,
                   // same for 'i', since we have already dealt with all these
                   // components
-                  output_component += patch_space_dim;
-                  i += patch_space_dim;
+                  output_component += patch_spacedim;
+                  i += patch_spacedim;
                 }
               else
                 {
                   ranges.emplace_back(std::forward_as_tuple(
                     output_component,
-                    output_component + patch_space_dim - 1,
+                    output_component + patch_spacedim - 1,
                     name + "_re",
                     DataComponentInterpretation::component_is_part_of_vector));
-                  output_component += patch_space_dim;
+                  output_component += patch_spacedim;
 
                   ranges.emplace_back(std::forward_as_tuple(
                     output_component,
-                    output_component + patch_space_dim - 1,
+                    output_component + patch_spacedim - 1,
                     name + "_im",
                     DataComponentInterpretation::component_is_part_of_vector));
-                  output_component += patch_space_dim;
+                  output_component += patch_spacedim;
 
-                  i += patch_space_dim;
+                  i += patch_spacedim;
                 }
 
 
@@ -1903,7 +2358,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
           case DataComponentInterpretation::component_is_part_of_tensor:
             {
-              const unsigned int size = patch_space_dim * patch_space_dim;
+              const unsigned int size = patch_spacedim * patch_spacedim;
               // ensure that there is a continuous number of next
               // space_dim*space_dim components that all deal with tensors
               Assert(
@@ -1985,24 +2440,20 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
-const std::vector<dealii::DataOutBase::Patch<patch_dim, patch_space_dim>> &
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_patches() const
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
+const std::vector<dealii::DataOutBase::Patch<patch_dim, patch_spacedim>> &
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_patches() const
 {
   return patches;
 }
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
-std::vector<
-  std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
-                                           DoFHandlerType::space_dimension>>>
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_fes() const
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
+std::vector<std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_fes() const
 {
-  const unsigned int dhdim      = DoFHandlerType::dimension;
-  const unsigned int dhspacedim = DoFHandlerType::space_dimension;
-  std::vector<std::shared_ptr<dealii::hp::FECollection<dhdim, dhspacedim>>>
+  std::vector<std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
     finite_elements(this->dof_data.size());
   for (unsigned int i = 0; i < this->dof_data.size(); ++i)
     {
@@ -2024,27 +2475,52 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_fes() const
           }
       if (duplicate == false)
         finite_elements[i] =
-          std::make_shared<dealii::hp::FECollection<dhdim, dhspacedim>>(
+          std::make_shared<dealii::hp::FECollection<dim, spacedim>>(
             this->dof_data[i]->dof_handler->get_fe_collection());
     }
   if (this->dof_data.empty())
     {
-      finite_elements.resize(1);
-      finite_elements[0] =
-        std::make_shared<dealii::hp::FECollection<dhdim, dhspacedim>>(
-          FE_DGQ<dhdim, dhspacedim>(0));
+      Assert(triangulation != nullptr, ExcNotImplemented());
+
+      const auto &reference_cells = triangulation->get_reference_cells();
+      finite_elements.reserve(reference_cells.size());
+
+      // TODO: below we select linear, discontinuous elements for simplex,
+      // wedge, and pyramid; we would like to select constant functions, but
+      // that is not implemented yet
+      for (const auto &reference_cell : reference_cells)
+        {
+          if (reference_cell.is_hyper_cube())
+            finite_elements.emplace_back(
+              std::make_shared<dealii::hp::FECollection<dim, spacedim>>(
+                FE_DGQ<dim, spacedim>(0)));
+          else if (reference_cell.is_simplex())
+            finite_elements.emplace_back(
+              std::make_shared<dealii::hp::FECollection<dim, spacedim>>(
+                FE_SimplexDGP<dim, spacedim>(1)));
+          else if (reference_cell == dealii::ReferenceCells::Wedge)
+            finite_elements.emplace_back(
+              std::make_shared<dealii::hp::FECollection<dim, spacedim>>(
+                FE_WedgeDGP<dim, spacedim>(1)));
+          else if (reference_cell == dealii::ReferenceCells::Pyramid)
+            finite_elements.emplace_back(
+              std::make_shared<dealii::hp::FECollection<dim, spacedim>>(
+                FE_PyramidDGP<dim, spacedim>(1)));
+          else
+            Assert(false, ExcNotImplemented());
+        }
     }
   return finite_elements;
 }
 
 
 
-template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 std::size_t
-DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
-  memory_consumption() const
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::memory_consumption()
+  const
 {
-  return (DataOutInterface<patch_dim, patch_space_dim>::memory_consumption() +
+  return (DataOutInterface<patch_dim, patch_spacedim>::memory_consumption() +
           MemoryConsumption::memory_consumption(dofs) +
           MemoryConsumption::memory_consumption(patches));
 }

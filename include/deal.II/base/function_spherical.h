@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,6 @@ namespace Functions
    * @note This function is currently only implemented for dim==3 .
    *
    * @ingroup functions
-   * @author Denis Davydov, 2017
    */
   template <int dim>
   class Spherical : public Function<dim>
@@ -88,8 +87,11 @@ namespace Functions
     hessian(const Point<dim> & p,
             const unsigned int component = 0) const override;
 
-    std::size_t
-    memory_consumption() const;
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
 
   private:
     /**

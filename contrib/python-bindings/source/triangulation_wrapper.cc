@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -514,23 +514,29 @@ namespace python
 
     template <int dim, int spacedim>
     void
-    merge_triangulations(TriangulationWrapper &triangulation_1,
-                         TriangulationWrapper &triangulation_2,
-                         void *                triangulation)
+    merge_triangulations(boost::python::list &triangulations,
+                         void *               triangulation,
+                         const double         duplicated_vertex_tolerance,
+                         const bool           copy_manifold_ids)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
       tria->clear();
-      Triangulation<dim, spacedim> *tria_1 =
-        static_cast<Triangulation<dim, spacedim> *>(
-          triangulation_1.get_triangulation());
-      Triangulation<dim, spacedim> *tria_2 =
-        static_cast<Triangulation<dim, spacedim> *>(
-          triangulation_2.get_triangulation());
-      GridGenerator::merge_triangulations(*tria_1, *tria_2, *tria);
-      // We need to reassign tria to triangulation because tria was cleared
-      // inside merge_triangulations.
-      triangulation = tria;
+
+      std::vector<const Triangulation<dim, spacedim> *> tria_ptrs;
+      size_t n_triangulations = boost::python::len(triangulations);
+      for (size_t i = 0; i < n_triangulations; ++i)
+        {
+          TriangulationWrapper &tria_wrapper =
+            boost::python::extract<TriangulationWrapper &>(triangulations[i]);
+          tria_ptrs.push_back(static_cast<const Triangulation<dim, spacedim> *>(
+            tria_wrapper.get_triangulation()));
+        }
+
+      GridGenerator::merge_triangulations(tria_ptrs,
+                                          *tria,
+                                          duplicated_vertex_tolerance,
+                                          copy_manifold_ids);
     }
 
 
@@ -545,6 +551,45 @@ namespace python
         static_cast<Triangulation<dim, spacedim_2> *>(
           tria_out.get_triangulation());
       GridGenerator::flatten_triangulation(*tria, *tria_2);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    convert_hypercube_to_simplex_mesh(void *                triangulation,
+                                      TriangulationWrapper &tria_out)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(triangulation);
+      Triangulation<dim, spacedim> *tria_2 =
+        static_cast<Triangulation<dim, spacedim> *>(
+          tria_out.get_triangulation());
+      GridGenerator::convert_hypercube_to_simplex_mesh(*tria, *tria_2);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    replicate_triangulation(TriangulationWrapper &     tria_in,
+                            const boost::python::list &extents,
+                            void *                     tria_out)
+    {
+      Triangulation<dim, spacedim> *replicated_triangulation =
+        static_cast<Triangulation<dim, spacedim> *>(tria_out);
+      const Triangulation<dim, spacedim> *triangulation =
+        static_cast<Triangulation<dim, spacedim> *>(
+          tria_in.get_triangulation());
+      replicated_triangulation->clear();
+
+      std::vector<unsigned int> extents_vector(dim);
+      for (int d = 0; d < dim; ++d)
+        extents_vector[d] = boost::python::extract<unsigned>(extents[d]);
+
+      GridGenerator::replicate_triangulation(*triangulation,
+                                             extents_vector,
+                                             *replicated_triangulation);
     }
 
 
@@ -595,9 +640,9 @@ namespace python
 
     template <int dim, int spacedim>
     std::pair<int, int>
-    find_active_cell_around_point(PointWrapper &          p,
-                                  MappingQGenericWrapper &mapping_wrapper,
-                                  void *                  triangulation)
+    find_active_cell_around_point(PointWrapper &   p,
+                                  MappingQWrapper &mapping_wrapper,
+                                  void *           triangulation)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
@@ -606,8 +651,8 @@ namespace python
 
       if (mapping_wrapper.get_mapping() != nullptr)
         {
-          const MappingQGeneric<dim, spacedim> *mapping =
-            static_cast<const MappingQGeneric<dim, spacedim> *>(
+          const MappingQ<dim, spacedim> *mapping =
+            static_cast<const MappingQ<dim, spacedim> *>(
               mapping_wrapper.get_mapping());
 
           auto cell_pair =
@@ -626,9 +671,9 @@ namespace python
     template <int dim, int spacedim>
     boost::python::list
     compute_aspect_ratio_of_cells(
-      const MappingQGenericWrapper &mapping_wrapper,
-      const QuadratureWrapper &     quadrature_wrapper,
-      const TriangulationWrapper &  triangulation_wrapper)
+      const MappingQWrapper &     mapping_wrapper,
+      const QuadratureWrapper &   quadrature_wrapper,
+      const TriangulationWrapper &triangulation_wrapper)
     {
       const Triangulation<dim, spacedim> *tria =
         static_cast<const Triangulation<dim, spacedim> *>(
@@ -637,12 +682,12 @@ namespace python
       const Quadrature<dim> *quad = static_cast<const Quadrature<dim> *>(
         quadrature_wrapper.get_quadrature());
 
-      const MappingQGeneric<dim, spacedim> *mapping =
-        static_cast<const MappingQGeneric<dim, spacedim> *>(
+      const MappingQ<dim, spacedim> *mapping =
+        static_cast<const MappingQ<dim, spacedim> *>(
           mapping_wrapper.get_mapping());
 
       auto aspect_ratios =
-        GridTools::compute_aspect_ratio_of_cells(*tria, *mapping, *quad);
+        GridTools::compute_aspect_ratio_of_cells(*mapping, *tria, *quad);
 
       boost::python::list ratios;
       for (size_t i = 0; i < aspect_ratios.size(); ++i)
@@ -690,6 +735,24 @@ namespace python
                                          cell->index()));
 
       return cells;
+    }
+
+
+
+    template <int dim, int spacedim>
+    boost::python::list
+    cells(TriangulationWrapper &triangulation_wrapper)
+    {
+      Triangulation<dim, spacedim> *tria =
+        static_cast<Triangulation<dim, spacedim> *>(
+          triangulation_wrapper.get_triangulation());
+      boost::python::list cells_list;
+      for (auto &cell : tria->cell_iterators())
+        cells_list.append(CellAccessorWrapper(triangulation_wrapper,
+                                              cell->level(),
+                                              cell->index()));
+
+      return cells_list;
     }
 
 
@@ -781,6 +844,7 @@ namespace python
       GridIn<dim, spacedim> mesh_reader;
       mesh_reader.attach_triangulation(*tria);
       std::ifstream ifs(filename);
+      AssertThrow(ifs, ExcIO());
       mesh_reader.read(ifs, input_format);
       ifs.close();
     }
@@ -854,6 +918,19 @@ namespace python
     else
       return (*static_cast<Triangulation<3, 3> *>(triangulation))
         .n_active_cells();
+  }
+
+
+
+  unsigned int
+  TriangulationWrapper::n_cells() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return (*static_cast<Triangulation<2, 2> *>(triangulation)).n_cells();
+    else if ((dim == 2) && (spacedim == 3))
+      return (*static_cast<Triangulation<2, 3> *>(triangulation)).n_cells();
+    else
+      return (*static_cast<Triangulation<3, 3> *>(triangulation)).n_cells();
   }
 
 
@@ -1410,40 +1487,43 @@ namespace python
 
   void
   TriangulationWrapper::merge_triangulations(
-    TriangulationWrapper &triangulation_1,
-    TriangulationWrapper &triangulation_2)
+    boost::python::list &triangulations,
+    const double         duplicated_vertex_tolerance,
+    const bool           copy_manifold_ids)
   {
-    AssertThrow(
-      triangulation_1.get_dim() == triangulation_2.get_dim(),
-      ExcMessage(
-        "Triangulation_1 and Triangulation_2 should have the same dimension."));
-    AssertThrow(
-      dim == triangulation_2.get_dim(),
-      ExcMessage(
-        "Triangulation and Triangulation_2 should have the same dimension."));
-    AssertThrow(
-      triangulation_1.get_spacedim() == triangulation_2.get_spacedim(),
-      ExcMessage(
-        "Triangulation_1 and Triangulation_2 should have the same space dimension."));
-    AssertThrow(
-      spacedim == triangulation_2.get_spacedim(),
-      ExcMessage(
-        "Triangulation and Triangulation_2 should have the same space dimension."));
+    AssertThrow(boost::python::len(triangulations) >= 2,
+                ExcMessage(
+                  "You must provide at least two triangulations to merge."));
 
-    if ((triangulation_1.get_dim() == 2) &&
-        (triangulation_1.get_spacedim() == 2))
-      internal::merge_triangulations<2, 2>(triangulation_1,
-                                           triangulation_2,
-                                           triangulation);
-    else if ((triangulation_1.get_dim() == 2) &&
-             (triangulation_1.get_spacedim() == 3))
-      internal::merge_triangulations<2, 3>(triangulation_1,
-                                           triangulation_2,
-                                           triangulation);
+    size_t n_triangulations = boost::python::len(triangulations);
+    for (size_t i = 0; i < n_triangulations; ++i)
+      {
+        TriangulationWrapper &tria_wrapper =
+          boost::python::extract<TriangulationWrapper &>(triangulations[i]);
+
+        AssertThrow(dim == tria_wrapper.get_dim(),
+                    ExcMessage(
+                      "All triangulations must have the same dimension."));
+        AssertThrow(
+          spacedim == tria_wrapper.get_spacedim(),
+          ExcMessage("All triangulations must have the same space dimension."));
+      }
+
+    if ((dim == 2) && (spacedim == 2))
+      internal::merge_triangulations<2, 2>(triangulations,
+                                           triangulation,
+                                           duplicated_vertex_tolerance,
+                                           copy_manifold_ids);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::merge_triangulations<2, 3>(triangulations,
+                                           triangulation,
+                                           duplicated_vertex_tolerance,
+                                           copy_manifold_ids);
     else
-      internal::merge_triangulations<3, 3>(triangulation_1,
-                                           triangulation_2,
-                                           triangulation);
+      internal::merge_triangulations<3, 3>(triangulations,
+                                           triangulation,
+                                           duplicated_vertex_tolerance,
+                                           copy_manifold_ids);
   }
 
 
@@ -1471,6 +1551,27 @@ namespace python
 
 
   void
+  TriangulationWrapper::convert_hypercube_to_simplex_mesh(
+    TriangulationWrapper &tria_out)
+  {
+    AssertThrow(
+      (tria_out.get_dim() == dim) && (tria_out.get_spacedim() == spacedim),
+      ExcMessage("The output Triangulation must be of the same dimension"));
+
+    if ((dim == 2) && (spacedim == 2))
+      internal::convert_hypercube_to_simplex_mesh<2, 2>(triangulation,
+                                                        tria_out);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::convert_hypercube_to_simplex_mesh<2, 3>(triangulation,
+                                                        tria_out);
+    else
+      internal::convert_hypercube_to_simplex_mesh<3, 3>(triangulation,
+                                                        tria_out);
+  }
+
+
+
+  void
   TriangulationWrapper::extrude_triangulation(
     const unsigned int    n_slices,
     const double          height,
@@ -1490,6 +1591,38 @@ namespace python
     Triangulation<3, 3> *tria_out =
       static_cast<Triangulation<3, 3> *>(triangulation_out.get_triangulation());
     GridGenerator::extrude_triangulation(*tria, n_slices, height, *tria_out);
+  }
+
+
+
+  void
+  TriangulationWrapper::replicate_triangulation(
+    TriangulationWrapper &triangulation_in,
+    boost::python::list & extents)
+  {
+    AssertThrow(
+      boost::python::len(extents) == dim,
+      ExcMessage(
+        "Size of the extents list must be equal to the triangulation dimension."));
+
+    AssertThrow((triangulation_in.get_dim() == dim) &&
+                  (triangulation_in.get_spacedim() == spacedim),
+                ExcMessage(
+                  "The input Triangulation must be of the same dimension"));
+
+
+    if ((dim == 2) && (spacedim == 2))
+      internal::replicate_triangulation<2, 2>(triangulation_in,
+                                              extents,
+                                              triangulation);
+    else if ((dim == 2) && (spacedim == 3))
+      internal::replicate_triangulation<2, 3>(triangulation_in,
+                                              extents,
+                                              triangulation);
+    else
+      internal::replicate_triangulation<3, 3>(triangulation_in,
+                                              extents,
+                                              triangulation);
   }
 
 
@@ -1522,9 +1655,8 @@ namespace python
 
 
   CellAccessorWrapper
-  TriangulationWrapper::find_active_cell_around_point(
-    PointWrapper &         p,
-    MappingQGenericWrapper mapping)
+  TriangulationWrapper::find_active_cell_around_point(PointWrapper &  p,
+                                                      MappingQWrapper mapping)
   {
     std::pair<int, int> level_index_pair;
     if ((dim == 2) && (spacedim == 2))
@@ -1566,8 +1698,8 @@ namespace python
 
   boost::python::list
   TriangulationWrapper::compute_aspect_ratio_of_cells(
-    const MappingQGenericWrapper &mapping,
-    const QuadratureWrapper &     quadrature)
+    const MappingQWrapper &  mapping,
+    const QuadratureWrapper &quadrature)
   {
     if ((dim == 2) && (spacedim == 2))
       return internal::compute_aspect_ratio_of_cells<2, 2>(mapping,
@@ -1766,6 +1898,19 @@ namespace python
 
 
 
+  boost::python::list
+  TriangulationWrapper::cells()
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cells<2, 2>(*this);
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cells<2, 3>(*this);
+    else
+      return internal::cells<3, 3>(*this);
+  }
+
+
+
   void
   TriangulationWrapper::set_manifold(const int        number,
                                      ManifoldWrapper &manifold)
@@ -1868,6 +2013,7 @@ namespace python
     else
       AssertThrow(false, ExcMessage("Dimension needs to be 2D or 3D."));
   }
+
 } // namespace python
 
 DEAL_II_NAMESPACE_CLOSE

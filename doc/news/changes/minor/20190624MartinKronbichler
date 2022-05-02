@@ -1,6 +1,0 @@
-Improved: The functions vectorized_load_and_transpose() and
-vectorized_transpose_and_store() for AVX-512 were rewritten to better utilize
-execution units with two load units and one shuffle/swizzle unit as common on
-recent Intel CPUs.
-<br>
-(Martin Kronbichler, 2019/06/24)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -204,22 +204,11 @@ MGTransferBlock<number>::copy_to_mg(
 
 template <int dim, int spacedim>
 void
-MGTransferBlockBase::build_matrices(
-  const DoFHandler<dim, spacedim> & /*dof*/,
-  const DoFHandler<dim, spacedim> &mg_dof_handler)
-{
-  build(mg_dof_handler);
-}
-
-
-
-template <int dim, int spacedim>
-void
 MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
 {
   const FiniteElement<dim> &fe            = dof_handler.get_fe();
   const unsigned int        n_blocks      = fe.n_blocks();
-  const unsigned int        dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int        dofs_per_cell = fe.n_dofs_per_cell();
   const unsigned int n_levels = dof_handler.get_triangulation().n_levels();
 
   Assert(selected.size() == n_blocks,
@@ -480,17 +469,6 @@ MGTransferBlockBase::build(const DoFHandler<dim, spacedim> &dof_handler)
 template <typename number>
 template <int dim, int spacedim>
 void
-MGTransferBlockSelect<number>::build_matrices(
-  const DoFHandler<dim, spacedim> & /*dof*/,
-  const DoFHandler<dim, spacedim> &mg_dof,
-  unsigned int                     select)
-{
-  build(mg_dof, select);
-}
-
-template <typename number>
-template <int dim, int spacedim>
-void
 MGTransferBlockSelect<number>::build(
   const DoFHandler<dim, spacedim> &dof_handler,
   unsigned int                     select)
@@ -505,8 +483,8 @@ MGTransferBlockSelect<number>::build(
   MGTransferBlockBase::build(dof_handler);
 
   std::vector<types::global_dof_index> temp_copy_indices;
-  std::vector<types::global_dof_index> global_dof_indices(fe.dofs_per_cell);
-  std::vector<types::global_dof_index> level_dof_indices(fe.dofs_per_cell);
+  std::vector<types::global_dof_index> global_dof_indices(fe.n_dofs_per_cell());
+  std::vector<types::global_dof_index> level_dof_indices(fe.n_dofs_per_cell());
 
   for (int level = dof_handler.get_triangulation().n_levels() - 1; level >= 0;
        --level)
@@ -531,7 +509,7 @@ MGTransferBlockSelect<number>::build(
           level_cell->get_dof_indices(global_dof_indices);
           level_cell->get_mg_dof_indices(level_dof_indices);
 
-          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
             {
               const unsigned int block = fe.system_to_block_index(i).first;
               if (selected[block])
@@ -579,17 +557,6 @@ MGTransferBlockSelect<number>::build(
 template <typename number>
 template <int dim, int spacedim>
 void
-MGTransferBlock<number>::build_matrices(
-  const DoFHandler<dim, spacedim> & /*dof*/,
-  const DoFHandler<dim, spacedim> &mg_dof,
-  const std::vector<bool> &        sel)
-{
-  build(mg_dof, sel);
-}
-
-template <typename number>
-template <int dim, int spacedim>
-void
 MGTransferBlock<number>::build(const DoFHandler<dim, spacedim> &dof_handler,
                                const std::vector<bool> &        sel)
 {
@@ -608,8 +575,8 @@ MGTransferBlock<number>::build(const DoFHandler<dim, spacedim> &dof_handler,
   MGTransferBlockBase::build(dof_handler);
 
   std::vector<std::vector<types::global_dof_index>> temp_copy_indices(n_blocks);
-  std::vector<types::global_dof_index> global_dof_indices(fe.dofs_per_cell);
-  std::vector<types::global_dof_index> level_dof_indices(fe.dofs_per_cell);
+  std::vector<types::global_dof_index> global_dof_indices(fe.n_dofs_per_cell());
+  std::vector<types::global_dof_index> level_dof_indices(fe.n_dofs_per_cell());
   for (int level = dof_handler.get_triangulation().n_levels() - 1; level >= 0;
        --level)
     {
@@ -637,7 +604,7 @@ MGTransferBlock<number>::build(const DoFHandler<dim, spacedim> &dof_handler,
           level_cell->get_dof_indices(global_dof_indices);
           level_cell->get_mg_dof_indices(level_dof_indices);
 
-          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
             {
               const unsigned int block = fe.system_to_block_index(i).first;
               if (selected[block])

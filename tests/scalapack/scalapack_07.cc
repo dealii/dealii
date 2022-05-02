@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,20 +74,20 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
   ScaLAPACKMatrix<NumberType> scalapack_matrix_source(
     size, size, grid_single, block_size_j, block_size_i);
 
-  pcout << "2D grid matrix: dim=" << scalapack_matrix_2d.m() << "x"
-        << scalapack_matrix_2d.n() << ";  blocks=" << block_size_i << "x"
-        << block_size_i << ";  grid=" << grid_2d->get_process_grid_rows() << "x"
+  pcout << "2D grid matrix: dim=" << scalapack_matrix_2d.m() << 'x'
+        << scalapack_matrix_2d.n() << ";  blocks=" << block_size_i << 'x'
+        << block_size_i << ";  grid=" << grid_2d->get_process_grid_rows() << 'x'
         << grid_2d->get_process_grid_columns() << std::endl;
 
-  pcout << "1D grid matrix: " << scalapack_matrix_1d.m() << "x"
-        << scalapack_matrix_1d.n() << ";  blocks=" << block_size_j << "x"
-        << block_size_j << ";  grid=" << grid_1d->get_process_grid_rows() << "x"
+  pcout << "1D grid matrix: " << scalapack_matrix_1d.m() << 'x'
+        << scalapack_matrix_1d.n() << ";  blocks=" << block_size_j << 'x'
+        << block_size_j << ";  grid=" << grid_1d->get_process_grid_rows() << 'x'
         << grid_1d->get_process_grid_columns() << std::endl;
 
-  pcout << "single process matrix: " << scalapack_matrix_single.m() << "x"
-        << scalapack_matrix_single.n() << ";  blocks=" << block_size_i << "x"
+  pcout << "single process matrix: " << scalapack_matrix_single.m() << 'x'
+        << scalapack_matrix_single.n() << ";  blocks=" << block_size_i << 'x'
         << block_size_j << ";  grid=" << grid_single->get_process_grid_rows()
-        << "x" << grid_single->get_process_grid_columns() << std::endl
+        << 'x' << grid_single->get_process_grid_columns() << std::endl
         << std::endl;
 
   scalapack_matrix_source = full;

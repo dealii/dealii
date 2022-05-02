@@ -1,0 +1,56 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       512
+DEAL::   Number of degrees of freedom: 1536
+DEAL::  0.125000
+DEAL::  17.2949
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       512
+DEAL::   Number of degrees of freedom: 3072
+DEAL::  0.125000
+DEAL::  24.3239
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       64
+DEAL::   Number of degrees of freedom: 256
+DEAL::  0.176777
+DEAL::  7.04972
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       64
+DEAL::   Number of degrees of freedom: 576
+DEAL::  0.176777
+DEAL::  10.4560
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       2560
+DEAL::   Number of degrees of freedom: 10240
+DEAL::  0.0360844
+DEAL::  45.1833
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       2560
+DEAL::   Number of degrees of freedom: 25600
+DEAL::  0.0360844
+DEAL::  69.8864
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       3072
+DEAL::   Number of degrees of freedom: 15360
+DEAL::  0.0441942
+DEAL::  54.8271
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       1024
+DEAL::   Number of degrees of freedom: 6144
+DEAL::  0.0441942
+DEAL::  34.7035
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       1024
+DEAL::   Number of degrees of freedom: 18432
+DEAL::  0.0441942
+DEAL::  59.5766
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       512
+DEAL::   Number of degrees of freedom: 4096
+DEAL::  0.0441942
+DEAL::  28.1989
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       512
+DEAL::   Number of degrees of freedom: 13824
+DEAL::  0.0441942
+DEAL::  51.2235

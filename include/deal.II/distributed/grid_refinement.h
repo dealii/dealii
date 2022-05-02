@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,8 @@
 #include <deal.II/base/exceptions.h>
 
 #include <deal.II/distributed/tria.h>
+
+#include <deal.II/numerics/vector_tools_common.h>
 
 #include <limits>
 #include <vector>
@@ -45,7 +47,7 @@ namespace internal
         std::pair<number, number>
         compute_global_min_and_max_at_root(
           const dealii::Vector<number> &criteria,
-          MPI_Comm                      mpi_communicator);
+          const MPI_Comm &              mpi_communicator);
 
         namespace RefineAndCoarsenFixedNumber
         {
@@ -58,7 +60,7 @@ namespace internal
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const types::global_cell_index   n_target_cells,
-                            MPI_Comm                         mpi_communicator);
+                            const MPI_Comm &                 mpi_communicator);
         } // namespace RefineAndCoarsenFixedNumber
 
         namespace RefineAndCoarsenFixedFraction
@@ -74,7 +76,7 @@ namespace internal
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const double                     target_error,
-                            MPI_Comm                         mpi_communicator);
+                            const MPI_Comm &                 mpi_communicator);
         } // namespace RefineAndCoarsenFixedFraction
       }   // namespace GridRefinement
     }     // namespace distributed
@@ -100,7 +102,6 @@ namespace parallel
      * meshes, i.e., objects of type parallel::distributed::Triangulation.
      *
      * @ingroup grid
-     * @author Wolfgang Bangerth, 2009
      */
     namespace GridRefinement
     {
@@ -125,6 +126,28 @@ namespace parallel
        * refined at all.
        *
        * The same is true for the fraction of cells that is coarsened.
+       *
+       * @param[in,out] tria The triangulation whose cells this function is
+       * supposed to mark for coarsening and refinement.
+       *
+       * @param[in] criteria The refinement criterion for each mesh cell active
+       * on the current triangulation. Entries may not be negative.
+       *
+       * @param[in] top_fraction_of_cells The fraction of cells to be refined.
+       * If this number is zero, no cells will be refined. If it equals one,
+       * the result will be flagging for global refinement.
+       *
+       * @param[in] bottom_fraction_of_cells The fraction of cells to be
+       * coarsened. If this number is zero, no cells will be coarsened.
+       *
+       * @param[in] max_n_cells This argument can be used to specify a maximal
+       * number of cells. If this number is going to be exceeded upon
+       * refinement, then refinement and coarsening fractions are going to be
+       * adjusted in an attempt to reach the maximum number of cells. Be aware
+       * though that through proliferation of refinement due to
+       * Triangulation::MeshSmoothing, this number is only an indicator. The
+       * default value of this argument is to impose no limit on the number of
+       * cells.
        */
       template <int dim, typename Number, int spacedim>
       void
@@ -158,14 +181,35 @@ namespace parallel
        * processors, no cells are refined at all.
        *
        * The same is true for the fraction of cells that is coarsened.
+       *
+       * @param[in,out] tria The triangulation whose cells this function is
+       * supposed to mark for coarsening and refinement.
+       *
+       * @param[in] criteria The refinement criterion computed on each mesh cell
+       * active on the current triangulation. Entries may not be negative.
+       *
+       * @param[in] top_fraction_of_error The fraction of the total estimate
+       * which should be refined. If this number is zero, no cells will be
+       * refined. If it equals one, the result will be flagging for global
+       * refinement.
+       *
+       * @param[in] bottom_fraction_of_error The fraction of the estimate
+       * coarsened. If this number is zero, no cells will be coarsened.
+       *
+       * @param[in] norm_type To determine thresholds, combined errors on
+       * subsets of cells are calculated as norms of the criteria on these
+       * cells. Different types of norms can be used for this purpose, from
+       * which VectorTools::NormType::L1_norm and
+       * VectorTools::NormType::L2_norm are currently supported.
        */
       template <int dim, typename Number, int spacedim>
       void
       refine_and_coarsen_fixed_fraction(
         parallel::distributed::Triangulation<dim, spacedim> &tria,
         const dealii::Vector<Number> &                       criteria,
-        const double top_fraction_of_error,
-        const double bottom_fraction_of_error);
+        const double                top_fraction_of_error,
+        const double                bottom_fraction_of_error,
+        const VectorTools::NormType norm_type = VectorTools::NormType::L1_norm);
     } // namespace GridRefinement
   }   // namespace distributed
 } // namespace parallel

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,7 @@ test()
   std::vector<double> x(N), y(N);
 
   // fill the data
-  for (unsigned int i = 0; i < N; i++)
+  for (unsigned int i = 0; i < N; ++i)
     {
       x[i] = 0.1 * i;
       y[i] = k_in * x[i] + b_in;
@@ -42,8 +42,8 @@ test()
 
   std::pair<double, double> fit = FESeries::linear_regression(x, y);
 
-  deallog << "exact:      " << k_in << " " << b_in << std::endl;
-  deallog << "calculated: " << fit.first << " " << fit.second << std::endl;
+  deallog << "exact:      " << k_in << ' ' << b_in << std::endl;
+  deallog << "calculated: " << fit.first << ' ' << fit.second << std::endl;
 }
 
 

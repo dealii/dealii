@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,8 +44,6 @@ namespace Differentiation
      *         to the given @p ScalarType.
      * @tparam T An arbitrary type resulting from the application of
      *         the SFINAE idiom to selectively specialize this class.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename ScalarType,
               enum NumberTypes ADNumberTypeCode,
@@ -65,8 +63,6 @@ namespace Differentiation
      *         auto-differentiable number.
      * @tparam T An arbitrary type resulting from the application of
      *         the SFINAE idiom to selectively specialize this class.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename ADNumberType, typename T = void>
     struct ADNumberTraits;
@@ -107,8 +103,6 @@ namespace Differentiation
        *   static const unsigned int     n_supported_derivative_levels;
        *
        * @endcode
-       *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <typename ScalarType,
                 enum NumberTypes ADNumberTypeCode,
@@ -144,8 +138,6 @@ namespace Differentiation
        *         auto-differentiable number.
        * @tparam T An arbitrary type resulting from the application of
        *         the SFINAE idiom to selectively specialize this class.
-       *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <typename ADNumberType, typename T = void>
       struct Marking;
@@ -179,8 +171,6 @@ namespace Differentiation
        *         auto-differentiable number.
        * @tparam T An arbitrary type resulting from the application of
        *         the SFINAE idiom to selectively specialize this class.
-       *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <typename ADNumberType, typename T = void>
       struct ExtractData;
@@ -197,8 +187,6 @@ namespace Differentiation
        *         supported auto-differentiable number.
        * @tparam T An arbitrary type resulting from the application of
        *         the SFINAE idiom to selectively specialize this class.
-       *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <typename ADNumberTrait, typename T = void>
       struct HasRequiredADInfo;
@@ -217,8 +205,6 @@ namespace Differentiation
        * an @p ADNumberType must be extracted through some function that is
        * specific to each type of AD number. This requires some specialist
        * intervention to get at this data.
-       *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <typename T>
       struct NumberType;
@@ -227,8 +213,6 @@ namespace Differentiation
       /**
        * A small struct to remove the @p std::complex wrapper
        * around a number.
-       *
-       * @author Jean-Paul Pelteret, 2017
        */
       template <typename Number>
       struct RemoveComplexWrapper;
@@ -241,8 +225,6 @@ namespace Differentiation
      * auto-differentiable number or not. By default, numbers are not
      * considered to have the necessary characteristics to fulfill this
      * condition.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType>
     struct is_ad_number;
@@ -253,8 +235,6 @@ namespace Differentiation
      * auto-differentiable number or not. By default, numbers are not
      * considered to have the necessary characteristics to fulfill this
      * condition.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
     struct is_taped_ad_number;
@@ -265,8 +245,6 @@ namespace Differentiation
      * auto-differentiable number or not. By default, numbers are not
      * considered to have the necessary characteristics to fulfill this
      * condition.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
     struct is_tapeless_ad_number;
@@ -277,8 +255,6 @@ namespace Differentiation
      * auto-differentiable number or not. By default, numbers are not
      * considered to have the necessary characteristics to fulfill this
      * condition.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
     struct is_real_valued_ad_number;
@@ -289,8 +265,6 @@ namespace Differentiation
      * auto-differentiable number or not. By default, numbers are not
      * considered to have the necessary characteristics to fulfill this
      * condition.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
     struct is_complex_valued_ad_number;
@@ -1430,22 +1404,6 @@ namespace Differentiation
 } // namespace Differentiation
 
 #endif // DOXYGEN
-
-
-namespace numbers
-{
-  template <typename ADNumberType>
-  bool
-  is_nan(const typename std::enable_if<
-         Differentiation::AD::is_ad_number<ADNumberType>::value,
-         ADNumberType>::type &x)
-  {
-    return is_nan(
-      Differentiation::AD::ADNumberTraits<ADNumberType>::get_value(x));
-  }
-
-} // namespace numbers
-
 
 DEAL_II_NAMESPACE_CLOSE
 

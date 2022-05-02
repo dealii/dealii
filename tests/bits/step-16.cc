@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,10 +16,6 @@
 
 
 // a un-hp-ified version of hp/step-16
-
-
-#include "../tests.h"
-std::ofstream logfile("output");
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -262,7 +258,7 @@ LaplaceProblem<dim>::solve()
   MGCoarseGridHouseholder<float, Vector<double>> mg_coarse;
   mg_coarse.initialize(coarse_matrix);
 
-  typedef PreconditionSOR<SparseMatrix<float>> RELAXATION;
+  using RELAXATION = PreconditionSOR<SparseMatrix<float>>;
   MGSmootherRelaxation<SparseMatrix<float>, RELAXATION, Vector<double>>
     mg_smoother;
 
@@ -341,6 +337,7 @@ LaplaceProblem<dim>::run()
 int
 main()
 {
+  std::ofstream logfile("output");
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);
 

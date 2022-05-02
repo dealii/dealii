@@ -1,0 +1,3 @@
+Fixed: The FEPointEvaluation class always evaluated a solution starting at the component 0 of the selected vector-valued base element, even if a different component was selected by the caller. This has been fixed to correctly start evaluating at the selected component.
+<br>
+(Rene Gassmoeller, 2021/10/01)

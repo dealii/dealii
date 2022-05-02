@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -224,7 +224,7 @@ Histogram::evaluate(const Vector<number> &values,
 void
 Histogram::write_gnuplot(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   Assert(!intervals.empty(),
          ExcMessage("There is nothing to write into the output file. "
                     "Did you forget to call the evaluate() function?"));
@@ -270,7 +270,7 @@ Histogram::write_gnuplot(std::ostream &out) const
         out << std::endl;
       }
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 

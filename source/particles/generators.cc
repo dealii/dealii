@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,7 +106,77 @@ namespace Particles
 
         return cumulative_cell_weights;
       }
+
+
+
+      // This function generates a random position in the given cell and
+      // returns the position and its coordinates in the reference cell. It
+      // first tries to generate a random and uniformly distributed point in
+      // real space, but if that fails (e.g. because the cell has a bad aspect
+      // ratio) it reverts to generating a random point in the unit cell.
+      template <int dim, int spacedim>
+      std::pair<Point<spacedim>, Point<dim>>
+      random_location_in_cell(
+        const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+        const Mapping<dim, spacedim> &mapping,
+        std::mt19937 &                random_number_generator)
+      {
+        Assert(cell->reference_cell().is_hyper_cube() == true,
+               ExcNotImplemented());
+
+        // Uniform distribution on the interval [0,1]. This
+        // will be used to generate random particle locations.
+        std::uniform_real_distribution<double> uniform_distribution_01(0, 1);
+
+        const BoundingBox<spacedim> cell_bounding_box(cell->bounding_box());
+        const std::pair<Point<spacedim>, Point<spacedim>> &cell_bounds(
+          cell_bounding_box.get_boundary_points());
+
+        // Generate random points in these bounds until one is within the cell
+        // or we exceed the maximum number of attempts.
+        const unsigned int n_attempts = 100;
+        for (unsigned int i = 0; i < n_attempts; ++i)
+          {
+            Point<spacedim> position;
+            for (unsigned int d = 0; d < spacedim; ++d)
+              {
+                position[d] = uniform_distribution_01(random_number_generator) *
+                                (cell_bounds.second[d] - cell_bounds.first[d]) +
+                              cell_bounds.first[d];
+              }
+
+            try
+              {
+                const Point<dim> reference_position =
+                  mapping.transform_real_to_unit_cell(cell, position);
+
+                if (cell->reference_cell().contains_point(reference_position))
+                  return {position, reference_position};
+              }
+            catch (typename Mapping<dim>::ExcTransformationFailed &)
+              {
+                // The point is not in this cell. Do nothing, just try again.
+              }
+          }
+
+        // If the above algorithm has not worked (e.g. because of badly
+        // deformed cells), retry generating particles
+        // randomly within the reference cell and then mapping it to to
+        // real space. This is not generating a
+        // uniform distribution in real space, but will always succeed.
+        Point<dim> reference_position;
+        for (unsigned int d = 0; d < dim; ++d)
+          reference_position[d] =
+            uniform_distribution_01(random_number_generator);
+
+        const Point<spacedim> position =
+          mapping.transform_unit_to_real_cell(cell, reference_position);
+
+        return {position, reference_position};
+      }
     } // namespace
+
+
 
     template <int dim, int spacedim>
     void
@@ -117,44 +187,45 @@ namespace Particles
       const Mapping<dim, spacedim> &      mapping)
     {
       types::particle_index particle_index = 0;
+      types::particle_index n_particles_to_generate =
+        triangulation.n_active_cells() * particle_reference_locations.size();
 
 #ifdef DEAL_II_WITH_MPI
       if (const auto tria =
-            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &triangulation))
         {
-          const types::particle_index n_particles_to_generate =
-            tria->n_locally_owned_active_cells() *
-            particle_reference_locations.size();
+          n_particles_to_generate = tria->n_locally_owned_active_cells() *
+                                    particle_reference_locations.size();
 
           // The local particle start index is the number of all particles
           // generated on lower MPI ranks.
-          MPI_Exscan(&n_particles_to_generate,
-                     &particle_index,
-                     1,
-                     DEAL_II_PARTICLE_INDEX_MPI_TYPE,
-                     MPI_SUM,
-                     tria->get_communicator());
+          const int ierr = MPI_Exscan(&n_particles_to_generate,
+                                      &particle_index,
+                                      1,
+                                      DEAL_II_PARTICLE_INDEX_MPI_TYPE,
+                                      MPI_SUM,
+                                      tria->get_communicator());
+          AssertThrowMPI(ierr);
         }
 #endif
 
-      for (const auto &cell : triangulation.active_cell_iterators())
-        {
-          if (cell->is_locally_owned())
-            {
-              for (const auto &reference_location :
-                   particle_reference_locations)
-                {
-                  const Point<spacedim> position_real =
-                    mapping.transform_unit_to_real_cell(cell,
-                                                        reference_location);
+      particle_handler.reserve(particle_handler.n_locally_owned_particles() +
+                               n_particles_to_generate);
 
-                  const Particle<dim, spacedim> particle(position_real,
-                                                         reference_location,
-                                                         particle_index);
-                  particle_handler.insert_particle(particle, cell);
-                  ++particle_index;
-                }
+      for (const auto &cell : triangulation.active_cell_iterators() |
+                                IteratorFilters::LocallyOwnedCell())
+        {
+          for (const auto &reference_location : particle_reference_locations)
+            {
+              const Point<spacedim> position_real =
+                mapping.transform_unit_to_real_cell(cell, reference_location);
+
+              particle_handler.insert_particle(position_real,
+                                               reference_location,
+                                               particle_index,
+                                               cell);
+              ++particle_index;
             }
         }
 
@@ -171,54 +242,31 @@ namespace Particles
       std::mt19937 &                random_number_generator,
       const Mapping<dim, spacedim> &mapping)
     {
-      // Uniform distribution on the interval [0,1]. This
-      // will be used to generate random particle locations.
-      std::uniform_real_distribution<double> uniform_distribution_01(0, 1);
+      const auto position_and_reference_position =
+        random_location_in_cell(cell, mapping, random_number_generator);
+      return Particle<dim, spacedim>(position_and_reference_position.first,
+                                     position_and_reference_position.second,
+                                     id);
+    }
 
-      const BoundingBox<spacedim> cell_bounding_box(cell->bounding_box());
-      const std::pair<Point<spacedim>, Point<spacedim>> cell_bounds(
-        cell_bounding_box.get_boundary_points());
 
-      // Generate random points in these bounds until one is within the cell
-      unsigned int       iteration          = 0;
-      const unsigned int maximum_iterations = 100;
-      Point<spacedim>    particle_position;
-      while (iteration < maximum_iterations)
-        {
-          for (unsigned int d = 0; d < spacedim; ++d)
-            {
-              particle_position[d] =
-                uniform_distribution_01(random_number_generator) *
-                  (cell_bounds.second[d] - cell_bounds.first[d]) +
-                cell_bounds.first[d];
-            }
-          try
-            {
-              const Point<dim> p_unit =
-                mapping.transform_real_to_unit_cell(cell, particle_position);
-              if (GeometryInfo<dim>::is_inside_unit_cell(p_unit))
-                {
-                  // Generate the particle
-                  return Particle<dim, spacedim>(particle_position, p_unit, id);
-                }
-            }
-          catch (typename Mapping<dim>::ExcTransformationFailed &)
-            {
-              // The point is not in this cell. Do nothing, just try again.
-            }
-          ++iteration;
-        }
-      AssertThrow(
-        iteration < maximum_iterations,
-        ExcMessage(
-          "Couldn't generate a particle position within the maximum number of tries. "
-          "The ratio between the bounding box volume in which the particle is "
-          "generated and the actual cell volume is approximately: " +
-          std::to_string(
-            cell->measure() /
-            (cell_bounds.second - cell_bounds.first).norm_square())));
 
-      return Particle<dim, spacedim>();
+    template <int dim, int spacedim>
+    ParticleIterator<dim, spacedim>
+    random_particle_in_cell_insert(
+      const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+      const types::particle_index                                        id,
+      std::mt19937 &                  random_number_generator,
+      ParticleHandler<dim, spacedim> &particle_handler,
+      const Mapping<dim, spacedim> &  mapping)
+    {
+      const auto position_and_reference_position =
+        random_location_in_cell(cell, mapping, random_number_generator);
+      return particle_handler.insert_particle(
+        position_and_reference_position.first,
+        position_and_reference_position.second,
+        id,
+        cell);
     }
 
 
@@ -236,7 +284,7 @@ namespace Particles
     {
       unsigned int combined_seed = random_number_seed;
       if (const auto tria =
-            dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &triangulation))
         {
           const unsigned int my_rank =
@@ -260,11 +308,14 @@ namespace Particles
                                                 probability_density_function);
 
         // Sum the local integrals over all nodes
-        double local_weight_integral = cumulative_cell_weights.back();
+        double local_weight_integral = (cumulative_cell_weights.size() > 0) ?
+                                         cumulative_cell_weights.back() :
+                                         0.0;
+
         double global_weight_integral;
 
         if (const auto tria =
-              dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &triangulation))
           {
             global_weight_integral =
@@ -292,15 +343,16 @@ namespace Particles
 
 #ifdef DEAL_II_WITH_MPI
         if (const auto tria =
-              dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &triangulation))
           {
-            MPI_Exscan(&local_weight_integral,
-                       &local_start_weight,
-                       1,
-                       MPI_DOUBLE,
-                       MPI_SUM,
-                       tria->get_communicator());
+            const int ierr = MPI_Exscan(&local_weight_integral,
+                                        &local_start_weight,
+                                        1,
+                                        MPI_DOUBLE,
+                                        MPI_SUM,
+                                        tria->get_communicator());
+            AssertThrowMPI(ierr);
           }
 #endif
 
@@ -350,57 +402,54 @@ namespace Particles
             // between their weight and the local weight integral
             types::particle_index particles_created = 0;
 
-            for (const auto &cell : triangulation.active_cell_iterators())
-              if (cell->is_locally_owned())
-                {
-                  const types::particle_index cumulative_particles_to_create =
-                    std::llround(
-                      static_cast<double>(n_local_particles) *
-                      cumulative_cell_weights[cell->active_cell_index()] /
-                      local_weight_integral);
+            for (const auto &cell : triangulation.active_cell_iterators() |
+                                      IteratorFilters::LocallyOwnedCell())
+              {
+                const types::particle_index cumulative_particles_to_create =
+                  std::llround(
+                    static_cast<double>(n_local_particles) *
+                    cumulative_cell_weights[cell->active_cell_index()] /
+                    local_weight_integral);
 
-                  // Compute particles for this cell as difference between
-                  // number of particles that should be created including this
-                  // cell minus the number of particles already created.
-                  particles_per_cell[cell->active_cell_index()] =
-                    cumulative_particles_to_create - particles_created;
-                  particles_created +=
-                    particles_per_cell[cell->active_cell_index()];
-                }
+                // Compute particles for this cell as difference between
+                // number of particles that should be created including this
+                // cell minus the number of particles already created.
+                particles_per_cell[cell->active_cell_index()] =
+                  cumulative_particles_to_create - particles_created;
+                particles_created +=
+                  particles_per_cell[cell->active_cell_index()];
+              }
           }
       }
 
       // Now generate as many particles per cell as determined above
       {
+        particle_handler.reserve(particle_handler.n_locally_owned_particles() +
+                                 n_local_particles);
         unsigned int current_particle_index = start_particle_id;
 
-        std::multimap<
-          typename Triangulation<dim, spacedim>::active_cell_iterator,
-          Particle<dim, spacedim>>
-          particles;
+        for (const auto &cell : triangulation.active_cell_iterators() |
+                                  IteratorFilters::LocallyOwnedCell())
+          {
+            for (unsigned int i = 0;
+                 i < particles_per_cell[cell->active_cell_index()];
+                 ++i)
+              {
+                random_particle_in_cell_insert(cell,
+                                               current_particle_index,
+                                               random_number_generator,
+                                               particle_handler,
+                                               mapping);
 
-        for (const auto &cell : triangulation.active_cell_iterators())
-          if (cell->is_locally_owned())
-            {
-              for (unsigned int i = 0;
-                   i < particles_per_cell[cell->active_cell_index()];
-                   ++i)
-                {
-                  Particle<dim, spacedim> particle =
-                    random_particle_in_cell(cell,
-                                            current_particle_index,
-                                            random_number_generator,
-                                            mapping);
-                  particles.emplace_hint(particles.end(),
-                                         cell,
-                                         std::move(particle));
-                  ++current_particle_index;
-                }
-            }
+                ++current_particle_index;
+              }
+          }
 
-        particle_handler.insert_particles(particles);
+        particle_handler.update_cached_numbers();
       }
     }
+
+
 
     template <int dim, int spacedim>
     void
@@ -409,7 +458,8 @@ namespace Particles
                          &                             global_bounding_boxes,
                        ParticleHandler<dim, spacedim> &particle_handler,
                        const Mapping<dim, spacedim> &  mapping,
-                       const ComponentMask &           components)
+                       const ComponentMask &           components,
+                       const std::vector<std::vector<double>> &properties)
     {
       const auto &fe = dof_handler.get_fe();
 
@@ -433,7 +483,8 @@ namespace Particles
         support_points_vec.push_back(element.second);
 
       particle_handler.insert_global_particles(support_points_vec,
-                                               global_bounding_boxes);
+                                               global_bounding_boxes,
+                                               properties);
     }
 
 
@@ -444,31 +495,31 @@ namespace Particles
       const Quadrature<dim> &             quadrature,
       // const std::vector<Point<dim>> &     particle_reference_locations,
       const std::vector<std::vector<BoundingBox<spacedim>>>
-        &                             global_bounding_boxes,
-      ParticleHandler<dim, spacedim> &particle_handler,
-      const Mapping<dim, spacedim> &  mapping)
+        &                                     global_bounding_boxes,
+      ParticleHandler<dim, spacedim> &        particle_handler,
+      const Mapping<dim, spacedim> &          mapping,
+      const std::vector<std::vector<double>> &properties)
     {
       const std::vector<Point<dim>> &particle_reference_locations =
         quadrature.get_points();
       std::vector<Point<spacedim>> points_to_generate;
+      points_to_generate.reserve(particle_reference_locations.size() *
+                                 triangulation.n_active_cells());
 
       //       Loop through cells and gather gauss points
-      for (const auto &cell : triangulation.active_cell_iterators())
+      for (const auto &cell : triangulation.active_cell_iterators() |
+                                IteratorFilters::LocallyOwnedCell())
         {
-          if (cell->is_locally_owned())
+          for (const auto &reference_location : particle_reference_locations)
             {
-              for (const auto &reference_location :
-                   particle_reference_locations)
-                {
-                  const Point<spacedim> position_real =
-                    mapping.transform_unit_to_real_cell(cell,
-                                                        reference_location);
-                  points_to_generate.push_back(position_real);
-                }
+              const Point<spacedim> position_real =
+                mapping.transform_unit_to_real_cell(cell, reference_location);
+              points_to_generate.push_back(position_real);
             }
         }
       particle_handler.insert_global_particles(points_to_generate,
-                                               global_bounding_boxes);
+                                               global_bounding_boxes,
+                                               properties);
     }
   } // namespace Generators
 } // namespace Particles

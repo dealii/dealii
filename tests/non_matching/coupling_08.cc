@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,7 +53,7 @@ test()
   GridGenerator::hyper_cube(tria0, -.4, .3);
   GridGenerator::hyper_cube(tria1, -1, 1);
 
-  tria0.refine_global(3);
+  tria0.refine_global((dim0 == 3) ? 2 : 3);
   tria1.refine_global(2);
 
   FE_Q<dim0, spacedim> fe0(1);
@@ -80,8 +80,8 @@ test()
           << "Dofs 1          : " << dh1.n_dofs() << std::endl
           << "Constrained dofs: " << constraints0.n_constraints() << std::endl;
 
-  QGauss<dim0> quad0(3); // Quadrature for coupling
-  QGauss<dim1> quad1(3); // Quadrature for coupling
+  QGauss<dim0> quad0(2); // Quadrature for coupling
+  QGauss<dim1> quad1(2); // Quadrature for coupling
 
   const double epsilon = 2 * std::max(GridTools::maximal_cell_diameter(tria0),
                                       GridTools::maximal_cell_diameter(tria1));
@@ -151,7 +151,7 @@ test()
 int
 main()
 {
-  initlog(1);
+  initlog(true);
   test<1, 1, 1>();
   test<2, 1, 2>();
   test<2, 2, 2>();

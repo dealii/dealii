@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,11 +88,9 @@ class Vector;
  *
  * For more information about the <tt>spacedim</tt> template parameter check
  * the documentation of FiniteElement or the one of Triangulation.
- *
- * @author Michael Stadler, 2001
  */
 template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
-class MappingQ1Eulerian : public MappingQGeneric<dim, spacedim>
+class MappingQ1Eulerian : public MappingQ<dim, spacedim>
 {
 public:
   /**
@@ -118,7 +116,8 @@ public:
    * cell but instead evaluates an externally given displacement field in
    * addition to the geometry of the cell.
    */
-  virtual std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  virtual boost::container::small_vector<Point<spacedim>,
+                                         GeometryInfo<dim>::vertices_per_cell>
   get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
     const override;
 
@@ -165,7 +164,7 @@ protected:
   /**
    * Compute the support points of the mapping. For the current class, these
    * are the vertices, as obtained by calling Mapping::get_vertices(). See the
-   * documentation of MappingQGeneric::compute_mapping_support_points() for
+   * documentation of MappingQ::compute_mapping_support_points() for
    * more information.
    */
   virtual std::vector<Point<spacedim>>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,11 +56,12 @@ namespace Functions
    * needs to find out where the points lie.
    *
    * If you know in advance in which cell your points lie, you can accelerate
-   * things a bit, by calling set_active_cell before asking for values or
+   * things a bit, by calling set_active_cell() before asking for values or
    * gradients of the function. If you don't do this, and your points don't
    * lie in the cell that is currently stored, the function
-   * GridTools::find_cell_around_point is called to find out where the point
-   * is. You can specify an optional mapping to use when looking for points in
+   * GridTools::find_active_cell_around_point is called to find out where the
+   * point is.
+   * You can specify an optional mapping to use when looking for points in
    * the grid. If you don't do so, this function uses a Q1 mapping.
    *
    * Once the FEFieldFunction knows where the points lie, it creates a
@@ -70,7 +71,7 @@ namespace Functions
    *
    * If you only need the quadrature points but not the values of the finite
    * element function (you might want this for the adjoint interpolation), you
-   * can also use the function @p compute_point_locations alone.
+   * can also use the function compute_point_locations() alone.
    *
    * An example of how to use this function is the following:
    *
@@ -87,22 +88,25 @@ namespace Functions
    * DoFHandler<dim> dh1 (tria_1);
    * Vector<double> solution_1;
    *
-   * // Do the same with the second
+   * // On this first domain, set up the various data structures,
+   * // assemble matrices, solve the linear system, and get a Nobel
+   * // prize for the work we have done here:
+   * [...]
+   *
+   * // Then create a DoFHandler and solution vector for the second domain:
    * DoFHandler<dim> dh2 (tria_2);
    * Vector<double> solution_2;
    *
-   * // Setup the system, assemble matrices, solve problems and get the
-   * // nobel prize on the first domain...
-   *
-   * // Now project it to the second domain
-   * FEFieldFunction<dim> fe_function_1 (dh_1, solution_1);
+   * // Finally, project the solution on the first domain onto the
+   * // second domain, assuming that this does not require querying
+   * // values from outside the first domain:
+   * Functions::FEFieldFunction<dim> fe_function_1 (dh_1, solution_1);
    * VectorTools::project (dh_2, constraints_2, quad,
    *                       fe_function_1, solution_2);
    *
-   * // Or interpolate it...
+   * // Alternatively, we could have also interpolated it:
    * Vector<double> solution_3;
    * VectorTools::interpolate (dh_2, fe_function_1, solution_3);
-   *
    * @endcode
    *
    * The snippet of code above will work assuming that the second
@@ -138,7 +142,7 @@ namespace Functions
    * for example, evaluating the solution at the origin (here using a parallel
    * TrilinosWrappers vector to hold the solution):
    * @code
-   *   Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>
+   *   Functions::FEFieldFunction<dim,TrilinosWrappers::MPI::Vector>
    *     solution_function (dof_handler, solution);
    *   Point<dim> origin = Point<dim>();
    *
@@ -158,11 +162,8 @@ namespace Functions
    * @endcode
    *
    * @ingroup functions
-   * @author Luca Heltai, 2006, Markus Buerg, 2012, Wolfgang Bangerth, 2013
    */
-  template <int dim,
-            typename DoFHandlerType = DoFHandler<dim>,
-            typename VectorType     = Vector<double>>
+  template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
   class FEFieldFunction : public Function<dim, typename VectorType::value_type>
   {
   public:
@@ -175,9 +176,9 @@ namespace Functions
      * lay. Otherwise the standard Q1 mapping is used.
      */
     FEFieldFunction(
-      const DoFHandlerType &dh,
-      const VectorType &    data_vector,
-      const Mapping<dim> &  mapping = StaticMappingQ1<dim>::mapping);
+      const DoFHandler<dim, spacedim> &dh,
+      const VectorType &               data_vector,
+      const Mapping<dim> &             mapping = StaticMappingQ1<dim>::mapping);
 
     /**
      * Set the current cell. If you know in advance where your points lie, you
@@ -186,7 +187,7 @@ namespace Functions
      */
     void
     set_active_cell(
-      const typename DoFHandlerType::active_cell_iterator &newcell);
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator &newcell);
 
     /**
      * Get one vector value at the given point. It is inefficient to use
@@ -213,7 +214,7 @@ namespace Functions
      * only one component (i.e. the function is scalar), you should state the
      * component you want to have evaluated; it defaults to zero, i.e. the
      * first component. It is inefficient to use single points. If you need
-     * more than one at a time, use the vector_value_list function. For
+     * more than one at a time, use the vector_value_list() function. For
      * efficiency reasons, it is better if all the points lie on the same
      * cell. This is not mandatory, however it does speed things up.
      *
@@ -272,7 +273,7 @@ namespace Functions
     /**
      * Return the gradient of all components of the function at the given
      * point.  It is inefficient to use single points. If you need more than
-     * one at a time, use the vector_value_list function. For efficiency
+     * one at a time, use the vector_value_list() function. For efficiency
      * reasons, it is better if all the points lie on the same cell. This is
      * not mandatory, however it does speed things up.
      *
@@ -292,7 +293,7 @@ namespace Functions
     /**
      * Return the gradient of the specified component of the function at the
      * given point. It is inefficient to use single points. If you need more
-     * than one at a time, use the vector_value_list function. For efficiency
+     * than one at a time, use the vector_value_list() function. For efficiency
      * reasons, it is better if all the points lie on the same cell. This is
      * not mandatory, however it does speed things up.
      *
@@ -435,23 +436,24 @@ namespace Functions
      */
     unsigned int
     compute_point_locations(
-      const std::vector<Point<dim>> &                             points,
-      std::vector<typename DoFHandlerType::active_cell_iterator> &cells,
-      std::vector<std::vector<Point<dim>>> &                      qpoints,
-      std::vector<std::vector<unsigned int>> &                    maps) const;
+      const std::vector<Point<dim>> &points,
+      std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+        &                                     cells,
+      std::vector<std::vector<Point<dim>>> &  qpoints,
+      std::vector<std::vector<unsigned int>> &maps) const;
 
   private:
     /**
      * Typedef holding the local cell_hint.
      */
     using cell_hint_t = Threads::ThreadLocalStorage<
-      typename DoFHandlerType::active_cell_iterator>;
+      typename DoFHandler<dim, spacedim>::active_cell_iterator>;
 
     /**
      * Pointer to the dof handler.
      */
-    SmartPointer<const DoFHandlerType,
-                 FEFieldFunction<dim, DoFHandlerType, VectorType>>
+    SmartPointer<const DoFHandler<dim, spacedim>,
+                 FEFieldFunction<dim, VectorType, spacedim>>
       dh;
 
     /**
@@ -467,7 +469,7 @@ namespace Functions
     /**
      * The Cache object
      */
-    GridTools::Cache<dim, DoFHandlerType::space_dimension> cache;
+    GridTools::Cache<dim, spacedim> cache;
 
     /**
      * The latest cell hint.
@@ -481,10 +483,27 @@ namespace Functions
      */
     std_cxx17::optional<Point<dim>>
     get_reference_coordinates(
-      const typename DoFHandlerType::active_cell_iterator &cell,
-      const Point<dim> &                                   point) const;
+      const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+      const Point<dim> &point) const;
   };
 } // namespace Functions
+
+namespace Legacy
+{
+  namespace Functions
+  {
+    /**
+     * @deprecated Use dealii::Functions::FEFieldFunction without the
+     * DoFHandlerType template instead.
+     */
+    template <int dim,
+              typename DoFHandlerType = DoFHandler<dim>,
+              typename VectorType     = Vector<double>>
+    using FEFieldFunction DEAL_II_DEPRECATED = dealii::Functions::
+      FEFieldFunction<dim, VectorType, DoFHandlerType::space_dimension>;
+  } // namespace Functions
+} // namespace Legacy
+
 
 DEAL_II_NAMESPACE_CLOSE
 

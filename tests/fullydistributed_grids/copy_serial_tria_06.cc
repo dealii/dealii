@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,7 @@ test(int n_refinements, MPI_Comm comm)
 
           deallog << std::setw(4) << cell->subdomain_id() << " : ";
           for (const auto dof : dofs)
-            deallog << std::setw(4) << dof << " ";
+            deallog << std::setw(4) << dof << ' ';
           deallog << std::endl;
         }
   }
@@ -95,7 +95,7 @@ test(int n_refinements, MPI_Comm comm)
     additional_data.mapping_update_flags_faces_by_cells =
       update_gradients | update_JxW_values | update_quadrature_points;
 
-    MappingQGeneric<dim>      mapping(1);
+    MappingQ<dim>             mapping(1);
     QGauss<1>                 quad(degree + 1);
     AffineConstraints<double> constraint;
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,7 +67,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup output
- * @author Wolfgang Bangerth, 2001
  */
 class MatrixOut : public DataOutInterface<2, 2>
 {
@@ -162,7 +161,7 @@ private:
   std::string name;
 
   /**
-   * Function by which the base class's functions get to know what patches
+   * %Function by which the base class's functions get to know what patches
    * they shall write to a file.
    */
   virtual const std::vector<Patch> &
@@ -350,12 +349,15 @@ MatrixOut::build_patches(const Matrix &     matrix,
   for (size_type i = 0; i < gridpoints_y; ++i)
     for (size_type j = 0; j < gridpoints_x; ++j, ++index)
       {
+        patches[index].n_subdivisions = 1;
+        patches[index].reference_cell = ReferenceCells::Quadrilateral;
+
         // within each patch, order the points in such a way that if some
         // graphical output program (such as gnuplot) plots the quadrilaterals
         // as two triangles, then the diagonal of the quadrilateral which cuts
         // it into the two printed triangles is parallel to the diagonal of the
         // matrix, rather than perpendicular to it. this has the advantage that,
-        // for example, the unit matrix is plotted as a straight rim, rather
+        // for example, the unit matrix is plotted as a straight ridge, rather
         // than as a series of bumps and valleys along the diagonal
         patches[index].vertices[0](0) = j;
         patches[index].vertices[0](1) = -static_cast<signed int>(i);

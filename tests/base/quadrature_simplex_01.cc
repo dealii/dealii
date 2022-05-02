@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@ template <int dim>
 void
 test(int n)
 {
-  QSimplex<dim> quad(QIterated<dim>(QTrapez<1>(), n));
+  QSimplex<dim> quad(QIterated<dim>(QTrapezoid<1>(), n));
 
   deallog << "# dim = " << dim << std::endl;
 

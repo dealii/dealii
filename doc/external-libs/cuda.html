@@ -4,7 +4,7 @@
   <head>
     <title>The deal.II Readme on interfacing to CUDA</title>
     <link href="../screen.css" rel="StyleSheet">
-    <meta name="copyright" content="Copyright (C) 2017 - 2019 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2017 - 2020 by the deal.II authors">
     <meta name="keywords" content="deal.II">
   </head>
 
@@ -20,7 +20,7 @@
       capabilities of newer ones. In order to use CUDA with deal.II, you will
       need your GPU to have compute capability 3.5 or higher. Independently
       from the GPU itself, you also need a version of CUDA recent enough.
-      deal.II supports CUDA 8.0 and higher. Finally to be able to configure
+      deal.II supports CUDA 10.2 and higher. Finally to be able to configure
       deal.II, you will need CMake 3.9 or higher.
     </p>
 
@@ -30,15 +30,9 @@
 
         -DDEAL_II_WITH_CUDA=ON
       </pre>
-      Depending on you system, this may be enough to get CUDA to work. If you
-      are using CUDA 8 with gcc 5.4, you will need to turn off support for
-      C++14:
-      <pre>
-
-        -DDEAL_II_WITH_CXX14=OFF
-      </pre>
-      If you are using CUDA 9 or CUDA 10, you will need to turn off support for
-      C++17 similarly.
+      Depending on you system, this may be enough to get CUDA to work. If
+      you are using CUDA 10.2, you will have to make sure that
+      C++17 is disabled.
       By default, we try to detect the compute capability of your device
       but you can easily set your own CUDA flags:
       <pre>
@@ -76,7 +70,7 @@
       Using CUDA in combination with architecture-specific C++ compiler flags
       like <code>-march=native</code> is known to be fragile and there might be
       compatibility issues with other libraries, e.g. using CUDA 10.1 with
-      <code>-DDEAL_II_WITH_THREADS=ON</code> and
+      <code>-DDEAL_II_WITH_TBB=ON</code> and
       <code>-DDEAL_II_CXX_FLAGS=-march=native</code> results in compile time
       errors like:
       <pre>

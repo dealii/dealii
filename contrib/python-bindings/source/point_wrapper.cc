@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -298,7 +298,8 @@ namespace python
 
 
 
-  double PointWrapper::operator*(const PointWrapper &p) const
+  double
+  PointWrapper::operator*(const PointWrapper &p) const
   {
     AssertThrow(p.get_dim() == dim,
                 ExcMessage("The points do not have the same dimension."));
@@ -378,7 +379,8 @@ namespace python
   }
 
 
-  PointWrapper PointWrapper::operator*(const double factor) const
+  PointWrapper
+  PointWrapper::operator*(const double factor) const
   {
     if (dim == 2)
       return PointWrapper(

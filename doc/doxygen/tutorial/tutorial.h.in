@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -256,6 +256,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-19</td>
+ *       <td> Coupling particles to the solution of partial differential equations.
+ *       <br/> Keywords: Particles
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-20</td>
  *       <td> Mixed finite elements. Using block
  *       matrices and block vectors to define more complicated solvers and
@@ -268,10 +274,10 @@
  *       <td>step-21</td>
  *       <td> The time dependent two-phase flow in
  *       porous media. Extensions of mixed Laplace discretizations. More
- *       complicated block solvers. Simple explicit (forward Euler) time 
+ *       complicated block solvers. Simple explicit (forward Euler) time
  *       stepping.
  *       <br/> Keywords: TensorFunction, FE_RaviartThomas,
- *       VectorTools::project()
+ *       VectorTools::project(), DiscreteTime
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -287,7 +293,7 @@
  *   <tr valign="top">
  *       <td>step-23</td>
  *       <td> Finally a "real" time dependent problem, the wave equation.
- *       Fractional time stepping (explicit, fully implicit and Crank-Nicholson 
+ *       Fractional time stepping (explicit, fully implicit and Crank-Nicholson
  *       method).
  *       <br/> Keywords: MatrixCreator, VectorTools::project()
  *       </td></tr>
@@ -319,8 +325,8 @@
  *
  *   <tr valign="top">
  *       <td>step-27</td>
- *       <td> The hp finite element method.
- *       <br/> Keywords: hp::DoFHandler, hp::FECollection, hp::QCollection,
+ *       <td> The hp-finite element method.
+ *       <br/> Keywords: hp::FECollection, hp::QCollection, hp::Refinement,
  *       FESeries::Fourier, Triangulation::create_triangulation()
  *       </td></tr>
  *
@@ -465,6 +471,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-50</td>
+ *       <td> Geometric multigrid on adaptive meshes distributed in parallel.
+ *       <br/> Keywords: Multigrid, MGLevelObject, MGConstrainedDoFs, IndexSet, MGTools, PreconditionMG, MatrixFree, FEInterfaceValues, MeshWorker::mesh_loop()
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-51</td>
  *       <td> Solving the convection-diffusion equation with a hybridizable
  *       discontinuous Galerkin method using face elements.
@@ -501,6 +513,11 @@
  *   <tr valign="top">
  *       <td>step-57</td>
  *       <td> Incompressible, stationary Navier Stokes equations.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-58</td>
+ *       <td> The nonlinear Schr&ouml;dinger equation.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -552,6 +569,14 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-66</td>
+ *       <td> A matrix-free geometric multigrid solver for a nonlinear problem.
+ *       <br/> Keywords: MatrixFree, Multigrid,
+ *       MGTransferMatrixFree::interpolate_to_mg(), MatrixFreeTools::compute_diagonal(),
+ *       TransfiniteInterpolationManifold, MappingQGeneric
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-67</td>
  *        <td> Solving the Euler equations of compressible gas dynamics with an
  *        explicit time integrator and high-order discontinuous Galerkin
@@ -559,13 +584,93 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-68</td>
+ *        <td> Simulation of the motion of massless tracer particles in a vortical flow.
+ *             Parallel simulation of the advection of particles with load balancing.
+ *        <br/> Keywords: Particles
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-69</td>
  *        <td> Hyperbolic conservation laws: a first-order guaranteed maximum
- *        wavespeed method for the compressible Euler equations. Explicit time 
+ *        wavespeed method for the compressible Euler equations. Explicit time
  *        stepping.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-70</td>
+ *       <td> A fluid structure interaction problem on fully distributed
+ *       non-matching grids, using penalty methods, and a coupling constructed
+ *       through a ParticleHandler object.
+ *       <br/> Keywords: Particles
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-71</td>
+ *       <td> Constitutive modelling: a demonstration of how automatic and symbolic 
+ *       differentiation can be used to rapidly implement a complex coupled constitutive
+ *       law.
+ *       <br/> Keywords: Automatic differentiation, Symbolic differentiation, 
+ *       Constitutive modelling
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-72</td>
+ *       <td> A nonlinear elliptic problem: The minimal surface equation.
+ *       Newton's method. Using automatic differentiation to linearize the 
+ *       residual, or to compute the full linear system from an energy
+ *       functional.
+ *       <br/> Keywords: Automatic differentiation, MeshWorker::mesh_loop()
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-74</td>
+ *       <td> The Symmetric interior penalty Galerkin (SIPG) method for Poisson's equation.
+ *       <br/> Keywords: MeshWorker::mesh_loop(), FEInterfaceValues, ConvergenceTable
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-75</td>
+ *       <td> Solving the Laplace equation on hp-adaptive meshes with MatrixFree
+ *       methods on thousands of processors.
+ *       <br/> Keywords: parallel::distributed::Triangulation, hp::Refinement, MatrixFree
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-76</td>
+ *       <td> Like step-67, but for demonstrating MPI-3.0 shared-memory features.
+ *       <br/> Keywords: MatrixFree, MatrixFree::cell_loop()
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-77</td>
+ *       <td> The nonlinear minimal surface equation revisited.
+ *       Interfacing with SUNDIALS' KINSOL nonlinear solver.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-78</td>
+ *       <td> Solving the Black-Scholes equation for options pricing in 1d.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-79</td>
+ *       <td> A topology optimization program for elastic media using the solid
+ *       isotropic material penalization (SIMP) formulation.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-82</td>
+ *        <td> Solving the fourth-order biharmonic equation using a lifting operator approach.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-85</td>
+ *       <td> Solving the Poisson equation using the cut finite element method.
+ *       </td></tr>
+ *
  * </table>
+ *
  *
  * <a name="topic"></a>
  * <h3>Tutorial programs grouped by topics</h3>
@@ -651,7 +756,9 @@
  *       step-44,
  *       step-55,
  *       step-56,
- *       step-57
+ *       step-57,
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -662,10 +769,15 @@
  *       step-31,
  *       step-32,
  *       step-33,
+ *       step-40,
  *       step-41,
  *       step-42,
  *       step-43,
- *       step-55
+ *       step-50,
+ *       step-55,
+ *       step-71,
+ *       step-72,
+ *       step-75
  *     </td>
  *   </tr>
  *
@@ -676,6 +788,7 @@
  *       step-17,
  *       step-18,
  *       step-40,
+ *       step-50,
  *       step-55
  *     </td>
  *   </tr>
@@ -685,8 +798,11 @@
  *     </td>
  *     <td>
  *       step-32,
+ *       step-40,
  *       step-42,
- *       step-55
+ *       step-50,
+ *       step-55,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -714,10 +830,14 @@
  *       step-37,
  *       step-40,
  *       step-42,
+ *       step-50,
  *       step-55,
  *       step-59,
+ *       step-66,
  *       step-67,
- *       step-69
+ *       step-69,
+ *       step-70,
+ *       step-75
  *     </td>
  *   </tr>
  *
@@ -736,7 +856,10 @@
  *       step-44,
  *       step-60,
  *       step-62,
- *       step-69
+ *       step-69,
+ *       step-70,
+ *       step-71,
+ *       step-72
  *     </td>
  *   </tr>
  *
@@ -749,6 +872,7 @@
  *       step-32,
  *       step-60,
  *       step-65,
+ *       step-66,
  *       step-67
  *     </td>
  *   </tr>
@@ -760,7 +884,9 @@
  *       step-6,
  *       step-9,
  *       step-14,
- *       step-39
+ *       step-39,
+ *       step-50,
+ *       step-74
  *     </td>
  *   </tr>
  *
@@ -775,7 +901,8 @@
  *       step-33,
  *       step-42,
  *       step-43,
- *       step-57
+ *       step-57,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -791,16 +918,19 @@
  *       step-51,
  *       step-59,
  *       step-61,
- *       step-67
+ *       step-67,
+ *       step-74,
+ *       step-82
  *     </td>
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> hp finite elements
+ *     <td> hp-finite elements
  *     </td>
  *     <td>
  *       step-27,
- *       step-46
+ *       step-46,
+ *       step-75
  *     </td>
  *   </tr>
  *
@@ -811,9 +941,19 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> Computing Jacobians from residuals, automatic differentiation
+ *     <td> Computing Jacobians from residuals, automatic and symbolic differentiation
  *     </td>
- *     <td>step-33</td>
+ *     <td>
+ *       step-33,
+ *       step-71,
+ *       step-72
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Operator splitting
+ *     </td>
+ *     <td>step-21, step-31, step-32, step-58</td>
  *   </tr>
  *
  *   <tr valign="top">
@@ -846,7 +986,10 @@
  *       step-48,
  *       step-59,
  *       step-64,
- *       step-67
+ *       step-66,
+ *       step-67,
+ *       step-75,
+ *       step-76
  *     </td>
  *   </tr>
  *
@@ -865,7 +1008,9 @@
  *     <td> Non matching algorithms
  *     </td>
  *     <td>
- *       step-60
+ *       step-60,
+ *       step-70,
+ *       step-85
  *     </td>
  *   </tr>
  *
@@ -874,6 +1019,16 @@
  *     </td>
  *     <td>
  *       step-62
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Particles
+ *     </td>
+ *     <td>
+ *     step-19,
+ *     step-68,
+ *     step-70
  *     </td>
  *   </tr>
  *
@@ -907,7 +1062,9 @@
  *       step-44,
  *       step-47,
  *       step-46,
- *       step-62
+ *       step-58,
+ *       step-62,
+ *       step-82
  *     </td>
  *   </tr>
  *
@@ -924,9 +1081,12 @@
  *       step-41,
  *       step-42,
  *       step-43,
+ *       step-50,
  *       step-56,
  *       step-59,
- *       step-63
+ *       step-63,
+ *       step-66,
+ *       step-75
  *     </td>
  *   </tr>
  *
@@ -940,8 +1100,11 @@
  *       step-37,
  *       step-40,
  *       step-42,
+ *       step-50,
  *       step-55,
- *       step-59
+ *       step-59,
+ *       step-66,
+ *       step-75
  *     </td>
  *   </tr>
  *
@@ -958,7 +1121,8 @@
  *       step-55,
  *       step-56,
  *       step-57,
- *       step-60
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -991,11 +1155,14 @@
  *     </td>
  *     <td>
  *       step-44,
- *       step-60
+ *       step-60,
+ *       step-70
  *     </td>
  *   </tr>
  *
  * </table>
+ *
+ *
  * <h4><b>Other equations</b></h4>
  * <table align="center" width="90%">
  *
@@ -1089,7 +1256,8 @@
  *       step-46,
  *       step-55,
  *       step-56,
- *       step-57
+ *       step-57,
+ *       step-70
  *     </td>
  *   </tr>
  *
@@ -1100,7 +1268,8 @@
  *       step-23,
  *       step-24,
  *       step-25,
- *       step-48
+ *       step-48,
+ *       step-58
  *     </td>
  *   </tr>
  *
@@ -1125,7 +1294,10 @@
  *   <tr valign="top">
  *     <td> Fourth-order biharmonic equation
  *     </td>
- *     <td>step-47</td>
+ *     <td>
+ *       step-47, 
+ *       step-82
+ *     </td>
  *   </tr>
  *
  *   <tr valign="top">
@@ -1138,12 +1310,21 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> The nonlinear Schr&ouml;dinger equation
+ *     </td>
+ *     <td>step-58</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> Coupling different equations in different parts of the domain
  *     </td>
  *     <td>step-46</td>
  *   </tr>
  *
  * </table>
+ *
+ *
+ *
  * <h4><b>%Vector problems</b></h4>
  * <table align="center" width="90%">
  *
@@ -1179,7 +1360,8 @@
  *         step-35,
  *         step-55,
  *         step-56,
- *         step-57
+ *         step-57,
+ *         step-70
  *    </td>
  *   </tr>
  *
@@ -1205,6 +1387,7 @@
  *   </tr>
  *
  * </table>
+ *
  *
  *
  * <h4><b>Time dependent problems</b></h4>
@@ -1240,7 +1423,8 @@
  *     <td>step-23,
  *         step-24,
  *         step-25,
- *         step-48
+ *         step-48,
+ *         step-58
  *     </td>
  *   </tr>
  *
@@ -1263,9 +1447,21 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> The nonlinear Schr&ouml;dinger equation
+ *     </td>
+ *     <td>step-58</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> Time dependent neutron diffusion equation
  *     </td>
  *     <td>step-52</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Time dependent fluid structure interaction problems
+ *     </td>
+ *     <td>step-70</td>
  *   </tr>
  * </table>
  */

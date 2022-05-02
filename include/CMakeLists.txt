@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -50,4 +50,3 @@ INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/deal.II
   COMPONENT library
   FILES_MATCHING PATTERN "*.h"
   )
-

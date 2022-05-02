@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -100,7 +100,7 @@ TestMap1<dim>::vector_value(const Point<dim> &p,
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
 
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -156,7 +156,7 @@ TestDef1<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -207,7 +207,7 @@ TestDef2<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -259,7 +259,7 @@ TestDef3<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -316,7 +316,7 @@ TestPoly<dim>::vector_value(const Point<dim> &p,
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
-  for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
+  for (unsigned int iCount = 0; iCount < this->n_components; ++iCount)
     return_value(iCount) = value(p, iCount);
 }
 
@@ -326,7 +326,8 @@ TestPoly<dim>::vector_value(const Point<dim> &p,
  * Check the value of the derivative field.
  */
 
-double TestProjection(Mapping<2> &mapping, DoFHandler<2> *dof_handler)
+double
+TestProjection(Mapping<2> &mapping, DoFHandler<2> *dof_handler)
 {
   Vector<double> solution;
   solution.reinit(dof_handler->n_dofs());
@@ -376,7 +377,7 @@ double TestProjection(Mapping<2> &mapping, DoFHandler<2> *dof_handler)
                                                  Vector<double>(n_components));
           fe_values.get_function_values(solution, this_value);
 
-          for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (const auto q_point : fe_values.quadrature_point_indices())
             {
               double   u = this_value[q_point](0), v = this_value[q_point](1);
               Point<2> p = fe_values.quadrature_point(q_point);

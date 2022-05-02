@@ -31,7 +31,7 @@ template <int dim>
 void
 test(const unsigned int degree)
 {
-  deallog << "FE_RaviartThomas<" << dim << "> (" << degree << ")" << std::endl;
+  deallog << "FE_RaviartThomas<" << dim << "> (" << degree << ')' << std::endl;
 
   FE_RaviartThomas<dim> fe_rt(degree);
 

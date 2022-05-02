@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,6 +29,7 @@
 #include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -41,7 +42,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -69,13 +69,12 @@ test()
   fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(), 1));
   fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(), 1, FE_Q<dim>(1), 1));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   dof_handler.begin_active()->set_active_fe_index(1);
-  typename hp::DoFHandler<dim>::active_cell_iterator cell =
-                                                       dof_handler.begin_active(
-                                                         1),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(1),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     if (cell->index() % 2 == 0)
       cell->set_active_fe_index(0);
@@ -93,11 +92,11 @@ test()
   deallog << "   Number of constraints:        " << constraints.n_constraints()
           << std::endl;
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
 
-    for (; cell != endc; cell++)
+    for (; cell != endc; ++cell)
       {
         deallog << cell << ' ' << cell->active_fe_index() << std::endl << "   ";
         std::vector<types::global_dof_index> local_dof_indices(

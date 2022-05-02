@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,7 +48,7 @@ check(const unsigned int testcase)
   switch (testcase)
     {
       case 2:
-        deallog << "Twisted cell in " << dim << "d" << std::endl;
+        deallog << "Twisted cell in " << dim << 'd' << std::endl;
         std::swap(vertices[1], vertices[0]);
         break;
       default:
@@ -74,23 +74,28 @@ check(const unsigned int testcase)
   catch (typename Triangulation<dim>::DistortedCellList &dcv)
     {
       flag = true;
+
+      // now build an FEValues object and compute quadrature points on that cell
+      FE_Nothing<dim> dummy;
+      QGauss<dim>     quadrature(2);
+      FEValues<dim>   fe_values(dummy, quadrature, update_JxW_values);
+      // should throw an assertion
+      try
+        {
+          fe_values.reinit(coarse_grid.begin());
+        }
+      catch (ExceptionBase &e)
+        {
+          deallog << e.get_exc_name() << std::endl;
+        }
+    }
+  catch (ExceptionBase &exc)
+    {
+      deallog << exc.get_exc_name() << std::endl;
+      flag = true;
     }
 
   Assert(flag == true, ExcInternalError());
-
-  // now build an FEValues object and compute quadrature points on that cell
-  FE_Nothing<dim> dummy;
-  QGauss<dim>     quadrature(2);
-  FEValues<dim>   fe_values(dummy, quadrature, update_JxW_values);
-  // should throw an assertion
-  try
-    {
-      fe_values.reinit(coarse_grid.begin());
-    }
-  catch (ExceptionBase &e)
-    {
-      deallog << e.get_exc_name() << std::endl;
-    }
 }
 
 

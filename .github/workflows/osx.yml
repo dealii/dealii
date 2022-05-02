@@ -1,0 +1,94 @@
+name: github-OSX
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{github.event_name == 'pull_request'}}
+
+jobs:
+  osx-serial:
+    # simple serial build using apple clang
+
+    name: OSX serial
+    runs-on: [macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: info
+      run: |
+        g++ -v
+        cmake --version
+    - name: configure
+      run: |
+        cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON .
+    - name: archive
+      uses: actions/upload-artifact@v1
+      with:
+        name: serial-detailed.log
+        path: detailed.log
+    - name: build
+      run: |
+        make -j 2
+        make -j 2 test # quicktests
+    - name: archive error 1
+      uses: actions/upload-artifact@v1
+      if: always()
+      continue-on-error: true
+      with:
+        name: osx-serial-CMakeOutput.log
+        path: CMakeFiles/CMakeOutput.log
+    - name: archive error 2
+      uses: actions/upload-artifact@v1
+      if: always()
+      continue-on-error: true
+      with:
+        name: osx-serial-CMakeError.log
+        path: CMakeFiles/CMakeError.log
+
+  osx-parallel64:
+    # MPI build using apple clang and 64 bit indices
+
+    name: OSX parallel 64bit
+    runs-on: [macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        brew install openmpi
+        # uncomment these for a gcc based build
+        #export OMPI_CXX=g++
+        #export OMPI_CC=gcc
+        #export OMPI_FC=gfortran
+    - name: info
+      run: |
+        mpicxx -v
+        cmake --version
+    - name: configure
+      run: |
+        CC=mpicc CXX=mpic++ cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_WITH_64BIT_INDICES=ON -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON -D DEAL_II_WITH_MPI=on .
+    - name: archive
+      uses: actions/upload-artifact@v1
+      with:
+        name: parallel-detailed.log
+        path: detailed.log
+    - name: build
+      run: |
+        make -j 2
+        make -j 2 test #quicktests
+    - name: archive error 1
+      uses: actions/upload-artifact@v1
+      if: always()
+      continue-on-error: true
+      with:
+        name: osx-parallel64-CMakeOutput.log
+        path: CMakeFiles/CMakeOutput.log
+    - name: archive error 2
+      uses: actions/upload-artifact@v1
+      if: always()
+      continue-on-error: true
+      with:
+        name: osx-parallel64-CMakeError.log
+        path: CMakeFiles/CMakeError.log
+

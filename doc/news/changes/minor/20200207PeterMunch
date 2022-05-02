@@ -1,4 +1,0 @@
-Improved: Add a constructor to ArrayView that takes as argument
-a reference to an arbitrary value type (like int, double, ...).
-<br>
-(Peter Munch, 2020/01/02)

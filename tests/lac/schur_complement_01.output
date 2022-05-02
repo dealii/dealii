@@ -2,14 +2,14 @@
 DEAL::Schur complement
 DEAL:SC_SparseMatrix::SparseMatrix 1
 DEAL:SC_SparseMatrix::Solver stopped within 1 - 1 iterations
-DEAL:SC_SparseMatrix::Solution vector: x: -4.000e+00 
-Solution vector: y: 4.500e+00 
-SparseMatrix OK
+DEAL:SC_SparseMatrix::Solution vector: x: -4.000000000
+DEAL:SC_SparseMatrix::Solution vector: y: 4.500000000
+DEAL:SC_SparseMatrix::SparseMatrix OK
 DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::BlockSparseMatrix 1
 DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solver stopped within 11 - 11 iterations
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solution vector: x = s.block(1): -3.333e+00 -6.000e+00 -8.667e+00 -1.133e+01 -1.400e+01 -1.667e+01 -1.933e+01 -2.200e+01 -2.467e+01 -2.733e+01 
-Solution vector: y = s.block(0): 8.333e+00 1.100e+01 1.367e+01 1.633e+01 1.900e+01 2.167e+01 2.433e+01 2.700e+01 2.967e+01 3.233e+01 
-Solver stopped within 11 - 11 iterations
-DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solution vector: x = s.block(1): -3.333e+00 -6.000e+00 -8.667e+00 -1.133e+01 -1.400e+01 -1.667e+01 -1.933e+01 -2.200e+01 -2.467e+01 -2.733e+01 
-Solution vector: y = s.block(0): 8.333e+00 1.100e+01 1.367e+01 1.633e+01 1.900e+01 2.167e+01 2.433e+01 2.700e+01 2.967e+01 3.233e+01 
-BlockSparseMatrix OK
+DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solution vector: x = s.block(1): -3.333333333 -6.000000000 -8.666666667 -11.33333333 -14.00000000 -16.66666667 -19.33333333 -22.00000000 -24.66666667 -27.33333333
+DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solution vector: y = s.block(0): 8.333333333 11.00000000 13.66666667 16.33333333 19.00000000 21.66666667 24.33333333 27.00000000 29.66666667 32.33333333
+DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solver stopped within 11 - 11 iterations
+DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solution vector: x = s.block(1): -3.333333333 -6.000000000 -8.666666667 -11.33333333 -14.00000000 -16.66666667 -19.33333333 -22.00000000 -24.66666667 -27.33333333
+DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::Solution vector: y = s.block(0): 8.333333333 11.00000000 13.66666667 16.33333333 19.00000000 21.66666667 24.33333333 27.00000000 29.66666667 32.33333333
+DEAL:SC_SparseMatrix:SC_BlockSparseMatrix::BlockSparseMatrix OK

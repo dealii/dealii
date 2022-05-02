@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,7 +76,7 @@ test()
   constraints.close();
 
   IndexSet locally_owned_dofs, locally_relevant_dofs;
-  DoFTools::extract_locally_owned_dofs(dof_handler, locally_owned_dofs);
+  locally_owned_dofs = dof_handler.locally_owned_dofs();
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   PETScWrappers::MPI::Vector vec(locally_owned_dofs, MPI_COMM_WORLD);

@@ -1,0 +1,11 @@
+
+DEAL:0::n_dofs = 9
+DEAL:0::OK
+DEAL:0::n_dofs = 84
+DEAL:0::OK
+
+DEAL:1::n_dofs = 9
+DEAL:1::OK
+DEAL:1::n_dofs = 84
+DEAL:1::OK
+

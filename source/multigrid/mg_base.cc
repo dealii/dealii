@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,6 +38,22 @@ MGSmootherBase<VectorType>::apply(const unsigned int level,
 {
   u = typename VectorType::value_type(0.);
   smooth(level, u, rhs);
+}
+
+
+
+template <typename VectorType>
+void
+MGTransferBase<VectorType>::prolongate_and_add(const unsigned int to_level,
+                                               VectorType &       dst,
+                                               const VectorType & src) const
+{
+  VectorType temp;
+  temp.reinit(dst, true);
+
+  this->prolongate(to_level, temp, src);
+
+  dst += temp;
 }
 
 

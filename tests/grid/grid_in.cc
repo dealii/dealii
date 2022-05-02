@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,7 +89,7 @@ test2()
          tria.begin_active();
        c != tria.end();
        ++c, ++index)
-    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+    for (const unsigned int i : c->vertex_indices())
       hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells() + 1);
   deallog << hash << std::endl;
 }
@@ -147,8 +147,6 @@ main()
 
   test1<2>();
   test2<2>();
-  // test3 needs NetCDF
-  //    test3<2> ();
 
   filename_resolution();
 }

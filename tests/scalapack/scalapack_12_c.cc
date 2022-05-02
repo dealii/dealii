@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,7 @@ test()
     std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,
                                                   proc_rows,
                                                   proc_columns);
-  pcout << "2D process grid: " << grid->get_process_grid_rows() << "x"
+  pcout << "2D process grid: " << grid->get_process_grid_rows() << 'x'
         << grid->get_process_grid_columns() << std::endl
         << std::endl;
 
@@ -94,9 +94,9 @@ test()
   scalapack_C.copy_to(tmp_full_C);
 
   pcout << "   computing C = b A * B^T + c C with"
-        << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << "),"
-        << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ") and"
-        << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")"
+        << " A in R^(" << scalapack_A.m() << 'x' << scalapack_A.n() << "),"
+        << " B in R^(" << scalapack_B.m() << 'x' << scalapack_B.n() << ") and"
+        << " C in R^(" << scalapack_C.m() << 'x' << scalapack_C.n() << ')'
         << std::endl;
   pcout << "   norms: " << tmp_full_C.frobenius_norm() << " & "
         << full_C.frobenius_norm() << "  for " << typeid(NumberType).name()

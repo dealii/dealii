@@ -1,0 +1,9 @@
+
+DEAL::dim = 2
+DEAL::area = 1.00000 * pi
+DEAL::circumference = 1.99997 * pi
+DEAL::
+DEAL::dim = 3
+DEAL::volume = 1.33334 * pi
+DEAL::surface area = 3.99996 * pi
+DEAL::

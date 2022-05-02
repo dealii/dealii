@@ -1,0 +1,27 @@
+
+DEAL::artificial cells: false
+DEAL::ncells:13, nfes:4
+DEAL::sequence:0 1 2 3
+DEAL::fe count:4 4 4 1
+DEAL::OK
+DEAL::ncells:13, nfes:8
+DEAL::sequence:0 1 2 3 4 5 6 7
+DEAL::fe count:0 4 0 4 0 4 0 1
+DEAL::OK
+DEAL::ncells:13, nfes:12
+DEAL::sequence:0 1 2 3 4 5 6 7 8 9 10 11
+DEAL::fe count:0 0 4 0 0 4 0 0 4 0 0 1
+DEAL::OK
+DEAL::artificial cells: true
+DEAL::ncells:13, nfes:4
+DEAL::sequence:0 1 2 3
+DEAL::fe count:4 4 4 1
+DEAL::OK
+DEAL::ncells:13, nfes:8
+DEAL::sequence:0 1 2 3 4 5 6 7
+DEAL::fe count:0 4 0 4 0 4 0 1
+DEAL::OK
+DEAL::ncells:13, nfes:12
+DEAL::sequence:0 1 2 3 4 5 6 7 8 9 10 11
+DEAL::fe count:0 0 4 0 0 4 0 0 4 0 0 1
+DEAL::OK

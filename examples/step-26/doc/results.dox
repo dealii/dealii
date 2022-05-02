@@ -65,7 +65,7 @@ we can choose the time step as we please. Or, better, choose it as we deem
 necessary for accuracy.
 
 Looking at the solution, it is clear that the action does not happen uniformly
-over time: a lot is changing around the time we switch on a source, things
+over time: a lot is changing around the times when we switch on a source, things
 become less dramatic once a source is on for a little while, and we enter a
 long phase of decline when both sources are off. During these times, we could
 surely get away with a larger time step than before without sacrificing too
@@ -74,20 +74,38 @@ much accuracy.
 The literature has many suggestions on how to choose the time step size
 adaptively. Much can be learned, for example, from the way ODE solvers choose
 their time steps. One can also be inspired by a posteriori error estimators
-that can, ideally, be written in a way that the consist of a temporal and a
+that can, ideally, be written in a way that they consist of a temporal and a
 spatial contribution to the overall error. If the temporal one is too large,
 we should choose a smaller time step. Ideas in this direction can be found,
 for example, in the PhD thesis of a former principal developer of deal.II,
-Ralf Hartmann, published by the University of Heidelberg, Germany, in 2002.
+Ralf Hartmann, published by the University of Heidelberg, Germany, in 2002
+(see @cite Har02).
 
 
 <h4>Better time stepping methods</h4>
 
 We here use one of the simpler time stepping methods, namely the second order
-in time Crank-Nicolson method. However, more accurate methods such as
+in time Crank-Nicolson method. This is surely already better than the even
+more widely used (and even less accurate) implicit Euler method,
+but many other, more accurate methods such as
 Runge-Kutta methods are available and should be used as they do not represent
 much additional effort. It is not difficult to implement this for the current
-program, but a more systematic treatment is also given in step-52.
+program, if one wanted; a more systematic treatment is also given in step-52.
+
+As a general rule, however, one should not be implementing time stepping
+methods by hand, as we do here, for problems that do not require
+exploiting special properties of the equation and consequently require
+specialized time stepping methods. (The heat equation does not fall into
+this category, and "standard" time stepping methods are all we need here.)
+Rather, one should use one of the available
+high-quality libraries for time stepping, for the same reasons as one should
+not be implementing finite element methods by hand but use deal.II instead.
+Indeed, deal.II has interfaces to one such time stepping library,
+[SUNDIALS](https://computing.llnl.gov/projects/sundials), already available.
+In particular, the SUNDIALS::ARKode class would make for a great starting
+point for the use of much better (and much more accurate) time steppers;
+the methods one would then get also implement the automatic time step
+control mentioned above.
 
 
 <h4>Better refinement criteria</h4>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,10 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TimeStepping
 {
+  DeclExceptionMsg(ExcNoMethodSelected,
+                   "No method selected. You need to call initialize or pass a "
+                   "runge_kutta_method to the constructor.");
+
   // ----------------------------------------------------------------------
   // RungeKutta
   // ----------------------------------------------------------------------
@@ -112,6 +116,29 @@ namespace TimeStepping
 
             break;
           }
+        case (SSP_THIRD_ORDER):
+          {
+            this->n_stages = 3;
+            this->b.reserve(this->n_stages);
+            this->c.reserve(this->n_stages);
+            this->b.push_back(1.0 / 6.0);
+            this->b.push_back(1.0 / 6.0);
+            this->b.push_back(2.0 / 3.0);
+            this->c.push_back(0.0);
+            this->c.push_back(1.0);
+            this->c.push_back(0.5);
+            std::vector<double> tmp;
+            this->a.push_back(tmp);
+            tmp.resize(1);
+            tmp[0] = 1.0;
+            this->a.push_back(tmp);
+            tmp.resize(2);
+            tmp[0] = 1.0 / 4.0;
+            tmp[1] = 1.0 / 4.0;
+            this->a.push_back(tmp);
+
+            break;
+          }
         case (RK_CLASSIC_FOURTH_ORDER):
           {
             this->n_stages = 4;
@@ -175,6 +202,8 @@ namespace TimeStepping
     double                                                             delta_t,
     VectorType &                                                       y)
   {
+    Assert(status.method != runge_kutta_method::invalid, ExcNoMethodSelected());
+
     std::vector<VectorType> f_stages(this->n_stages, y);
     // Compute the different stages needed.
     compute_stages(f, t, delta_t, y, f_stages);
@@ -219,6 +248,236 @@ namespace TimeStepping
 
 
   // ----------------------------------------------------------------------
+  // LowStorageRungeKutta
+  // ----------------------------------------------------------------------
+
+  template <typename VectorType>
+  LowStorageRungeKutta<VectorType>::LowStorageRungeKutta(
+    const runge_kutta_method method)
+  {
+    // virtual functions called in constructors and destructors never use the
+    // override in a derived class
+    // for clarity be explicit on which function is called
+    LowStorageRungeKutta<VectorType>::initialize(method);
+  }
+
+
+
+  template <typename VectorType>
+  void
+  LowStorageRungeKutta<VectorType>::initialize(const runge_kutta_method method)
+  {
+    status.method = method;
+
+    switch (method)
+      {
+        case (LOW_STORAGE_RK_STAGE3_ORDER3):
+          {
+            this->n_stages = 3;
+            this->b.reserve(this->n_stages);
+            this->b.push_back(0.245170287303492);
+            this->b.push_back(0.184896052186740);
+            this->b.push_back(0.569933660509768);
+
+            std::vector<double> tmp;
+            tmp = {{0.755726351946097, 0.386954477304099}};
+            this->a.push_back(tmp);
+            break;
+          }
+        case (LOW_STORAGE_RK_STAGE5_ORDER4):
+          {
+            this->n_stages = 5;
+            this->b        = {{1153189308089. / 22510343858157.,
+                        1772645290293. / 4653164025191.,
+                        -1672844663538. / 4480602732383.,
+                        2114624349019. / 3568978502595.,
+                        5198255086312. / 14908931495163.}};
+            std::vector<double> ai;
+            ai = {{970286171893. / 4311952581923.,
+                   6584761158862. / 12103376702013.,
+                   2251764453980. / 15575788980749.,
+                   26877169314380. / 34165994151039.}};
+            this->a.push_back(ai);
+            break;
+          }
+        case (LOW_STORAGE_RK_STAGE7_ORDER4):
+          {
+            this->n_stages = 7;
+            this->b        = {{0.0941840925477795334,
+                        0.149683694803496998,
+                        0.285204742060440058,
+                        -0.122201846148053668,
+                        0.0605151571191401122,
+                        0.345986987898399296,
+                        0.186627171718797670}};
+            std::vector<double> ai;
+            ai = {{0.241566650129646868 + this->b[0],
+                   0.0423866513027719953 + this->b[1],
+                   0.215602732678803776 + this->b[2],
+                   0.232328007537583987 + this->b[3],
+                   0.256223412574146438 + this->b[4],
+                   0.0978694102142697230 + this->b[5]}};
+            this->a.push_back(ai);
+            break;
+          }
+        case (LOW_STORAGE_RK_STAGE9_ORDER5):
+          {
+            this->n_stages = 9;
+            this->b        = {{2274579626619. / 23610510767302.,
+                        693987741272. / 12394497460941.,
+                        -347131529483. / 15096185902911.,
+                        1144057200723. / 32081666971178.,
+                        1562491064753. / 11797114684756.,
+                        13113619727965. / 44346030145118.,
+                        393957816125. / 7825732611452.,
+                        720647959663. / 6565743875477.,
+                        3559252274877. / 14424734981077.}};
+            std::vector<double> ai;
+            ai = {{1107026461565. / 5417078080134.,
+                   38141181049399. / 41724347789894.,
+                   493273079041. / 11940823631197.,
+                   1851571280403. / 6147804934346.,
+                   11782306865191. / 62590030070788.,
+                   9452544825720. / 13648368537481.,
+                   4435885630781. / 26285702406235.,
+                   2357909744247. / 11371140753790.}};
+            this->a.push_back(ai);
+            break;
+          }
+        default:
+          {
+            AssertThrow(false,
+                        ExcMessage(
+                          "Unimplemented low-storage Runge-Kutta method."));
+          }
+      }
+    // compute ci
+    this->c.reserve(this->n_stages);
+    this->c.push_back(0.);
+    double sum_previous_bi = 0.;
+    for (unsigned int stage = 1; stage < this->n_stages; ++stage)
+      {
+        const double tmp = sum_previous_bi + this->a[0][stage - 1];
+        this->c.push_back(tmp);
+        sum_previous_bi += this->b[stage - 1];
+      }
+  }
+
+
+
+  template <typename VectorType>
+  double
+  LowStorageRungeKutta<VectorType>::evolve_one_time_step(
+    const std::function<VectorType(const double, const VectorType &)> &f,
+    const std::function<
+      VectorType(const double, const double, const VectorType &)>
+      & /*id_minus_tau_J_inverse*/,
+    double      t,
+    double      delta_t,
+    VectorType &y)
+  {
+    // We need two auxiliary vectors, namely the vector ki
+    // to hold the evaluation of the differential operator, and the vector ri
+    // that holds the right-hand side for the differential operator application.
+    VectorType vec_ri;
+    VectorType vec_ki;
+    return evolve_one_time_step(f, t, delta_t, y, vec_ri, vec_ki);
+  }
+
+
+
+  template <typename VectorType>
+  double
+  LowStorageRungeKutta<VectorType>::evolve_one_time_step(
+    const std::function<VectorType(const double, const VectorType &)> &f,
+    double                                                             t,
+    double                                                             delta_t,
+    VectorType &                                                       solution,
+    VectorType &                                                       vec_ri,
+    VectorType &                                                       vec_ki)
+  {
+    Assert(status.method != runge_kutta_method::invalid, ExcNoMethodSelected());
+
+    compute_one_stage(f,
+                      t,
+                      this->b[0] * delta_t,
+                      this->a[0][0] * delta_t,
+                      solution,
+                      vec_ki,
+                      solution,
+                      vec_ri);
+
+    for (unsigned int stage = 1; stage < this->n_stages; ++stage)
+      {
+        const double c_i = this->c[stage];
+        const double factor_ai =
+          (stage == this->n_stages - 1 ? 0 : this->a[0][stage] * delta_t);
+        compute_one_stage(f,
+                          t + c_i * delta_t,
+                          this->b[stage] * delta_t,
+                          factor_ai,
+                          vec_ri,
+                          vec_ki,
+                          solution,
+                          vec_ri);
+      }
+    return (t + delta_t);
+  }
+
+  template <typename VectorType>
+  void
+  LowStorageRungeKutta<VectorType>::get_coefficients(
+    std::vector<double> &a,
+    std::vector<double> &b,
+    std::vector<double> &c) const
+  {
+    a.resize(this->a[0].size());
+    a = this->a[0];
+
+    b.resize(this->b.size());
+    b = this->b;
+
+    c.resize(this->c.size());
+    c = this->c;
+  }
+
+  template <typename VectorType>
+  const typename LowStorageRungeKutta<VectorType>::Status &
+  LowStorageRungeKutta<VectorType>::get_status() const
+  {
+    return status;
+  }
+
+  template <typename VectorType>
+  void
+  LowStorageRungeKutta<VectorType>::compute_one_stage(
+    const std::function<VectorType(const double, const VectorType &)> &f,
+    const double                                                       t,
+    const double      factor_solution,
+    const double      factor_ai,
+    const VectorType &current_ri,
+    VectorType &      vec_ki,
+    VectorType &      solution,
+    VectorType &      next_ri) const
+  {
+    const double ai = factor_ai;
+    const double bi = factor_solution;
+    vec_ki          = f(t, current_ri);
+
+    if (ai == double())
+      {
+        solution.sadd(1., bi, vec_ki);
+      }
+    else
+      {
+        next_ri = solution;
+        next_ri.sadd(1., ai, vec_ki);
+        solution.add(bi, vec_ki);
+      }
+  }
+
+
+  // ----------------------------------------------------------------------
   // ImplicitRungeKutta
   // ----------------------------------------------------------------------
 
@@ -228,7 +487,6 @@ namespace TimeStepping
     const unsigned int       max_it,
     const double             tolerance)
     : RungeKutta<VectorType>()
-    , skip_linear_combi(false)
     , max_it(max_it)
     , tolerance(tolerance)
   {
@@ -316,18 +574,16 @@ namespace TimeStepping
     double                                               delta_t,
     VectorType &                                         y)
   {
+    Assert(status.method != runge_kutta_method::invalid, ExcNoMethodSelected());
+
     VectorType              old_y(y);
     std::vector<VectorType> f_stages(this->n_stages, y);
     // Compute the different stages needed.
     compute_stages(f, id_minus_tau_J_inverse, t, delta_t, y, f_stages);
 
-    // If necessary, compute the linear combinations of the stages.
-    if (skip_linear_combi == false)
-      {
-        y = old_y;
-        for (unsigned int i = 0; i < this->n_stages; ++i)
-          y.sadd(1., delta_t * this->b[i], f_stages[i]);
-      }
+    y = old_y;
+    for (unsigned int i = 0; i < this->n_stages; ++i)
+      y.sadd(1., delta_t * this->b[i], f_stages[i]);
 
     return (t + delta_t);
   }
@@ -750,6 +1006,8 @@ namespace TimeStepping
     double                                                             delta_t,
     VectorType &                                                       y)
   {
+    Assert(status.method != runge_kutta_method::invalid, ExcNoMethodSelected());
+
     bool                    done       = false;
     unsigned int            count      = 0;
     double                  error_norm = 0.;

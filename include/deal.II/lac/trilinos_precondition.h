@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,18 +26,14 @@
 #    include <deal.II/lac/la_parallel_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
 
-#    include <memory>
-
-#    ifdef DEAL_II_WITH_MPI
-#      include <Epetra_MpiComm.h>
-#    else
-#      include <Epetra_SerialComm.h>
-#    endif
 #    include <Epetra_Map.h>
+#    include <Epetra_MpiComm.h>
 #    include <Epetra_MultiVector.h>
 #    include <Epetra_RowMatrix.h>
 #    include <Epetra_Vector.h>
 #    include <Teuchos_ParameterList.hpp>
+
+#    include <memory>
 
 // forward declarations
 #    ifndef DOXYGEN
@@ -76,8 +72,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008; extension for full compatibility with
-   * LinearOperator class: Jean-Paul Pelteret, 2015
    */
   class PreconditionBase : public Subscriptor
   {
@@ -216,7 +210,6 @@ namespace TrilinosWrappers
 
     /**
      * @addtogroup Exceptions
-     *
      */
     //@{
     /**
@@ -242,11 +235,7 @@ namespace TrilinosWrappers
      * Internal communication pattern in case the matrix needs to be copied
      * from deal.II format.
      */
-#    ifdef DEAL_II_WITH_MPI
     Epetra_MpiComm communicator;
-#    else
-    Epetra_SerialComm communicator;
-#    endif
 
     /**
      * Internal Trilinos map in case the matrix needs to be copied from
@@ -270,7 +259,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionJacobi : public PreconditionBase
   {
@@ -352,7 +340,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Wolfgang Bangerth, 2008
    */
   class PreconditionSSOR : public PreconditionBase
   {
@@ -447,7 +434,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionSOR : public PreconditionBase
   {
@@ -533,7 +519,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2014
    */
   class PreconditionBlockJacobi : public PreconditionBase
   {
@@ -551,9 +536,7 @@ namespace TrilinosWrappers
      * elements are zero. In a default application this would mean that we
      * divide by zero, so by setting the parameter <tt>min_diagonal</tt> to a
      * small nonzero value the SOR will work on a matrix that is not too far
-     * away from the one we want to treat. Finally, <tt>overlap</tt> governs
-     * the overlap of the partitions when the preconditioner runs in parallel,
-     * forming a so-called additive Schwarz preconditioner.
+     * away from the one we want to treat.
      */
     struct AdditionalData
     {
@@ -635,7 +618,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2014
    */
   class PreconditionBlockSSOR : public PreconditionBase
   {
@@ -747,7 +729,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2014
    */
   class PreconditionBlockSOR : public PreconditionBase
   {
@@ -872,7 +853,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionIC : public PreconditionBase
   {
@@ -977,7 +957,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionILU : public PreconditionBase
   {
@@ -1096,7 +1075,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2009
    */
   class PreconditionILUT : public PreconditionBase
   {
@@ -1199,7 +1177,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionBlockwiseDirect : public PreconditionBase
   {
@@ -1241,7 +1218,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionChebyshev : public PreconditionBase
   {
@@ -1356,7 +1332,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Martin Kronbichler, 2008
    */
   class PreconditionAMG : public PreconditionBase
   {
@@ -1381,7 +1356,7 @@ namespace TrilinosWrappers
        *   #include <deal.II/dofs/dof_tools.h>
        *   ...
        *
-       *   DoFHandlerType<...> dof_handler;
+       *   DoFHandler<...> dof_handler;
        *   FEValuesExtractors::Type... field_extractor;
        *   ...
        *
@@ -1734,7 +1709,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Bruno Turcksin, 2014
    */
   class PreconditionAMGMueLu : public PreconditionBase
   {
@@ -1928,7 +1902,7 @@ namespace TrilinosWrappers
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
-     * linear system with the given matrix. This function takes a deal.ii
+     * linear system with the given matrix. This function takes a deal.II
      * matrix and copies the content into a Trilinos matrix, so the function
      * can be considered rather inefficient.
      */
@@ -1967,8 +1941,6 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
-   * @author Bruno Turcksin, 2013; extension for full compatibility with
-   * LinearOperator class: Jean-Paul Pelteret, 2016
    */
   class PreconditionIdentity : public PreconditionBase
   {
@@ -2159,9 +2131,9 @@ namespace TrilinosWrappers
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
-    AssertDimension(dst.local_size(),
+    AssertDimension(dst.locally_owned_size(),
                     preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension(src.local_size(),
+    AssertDimension(src.locally_owned_size(),
                     preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst(View,
                            preconditioner->OperatorDomainMap(),
@@ -2179,9 +2151,9 @@ namespace TrilinosWrappers
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
-    AssertDimension(dst.local_size(),
+    AssertDimension(dst.locally_owned_size(),
                     preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension(src.local_size(),
+    AssertDimension(src.locally_owned_size(),
                     preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst(View,
                            preconditioner->OperatorDomainMap(),

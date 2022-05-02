@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,31 +45,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     namespace FETools
     \{
 #if deal_II_dimension == deal_II_space_dimension
-      template void
-      interpolate<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
-                                     const Vector<double> &,
-                                     const hp::DoFHandler<deal_II_dimension> &,
-                                     Vector<double> &);
-
-      template void
-      interpolate<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
-                                     const Vector<double> &,
-                                     const hp::DoFHandler<deal_II_dimension> &,
-                                     const AffineConstraints<double> &,
-                                     Vector<double> &);
-
-      template void
-      interpolate<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
-                                     const Vector<float> &,
-                                     const hp::DoFHandler<deal_II_dimension> &,
-                                     Vector<float> &);
-
-      template void
-      interpolate<deal_II_dimension>(const hp::DoFHandler<deal_II_dimension> &,
-                                     const Vector<float> &,
-                                     const hp::DoFHandler<deal_II_dimension> &,
-                                     const AffineConstraints<float> &,
-                                     Vector<float> &);
 #endif
     \}
   }
@@ -83,13 +58,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       template void
       back_interpolate<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
-        const VEC &,
-        const FiniteElement<deal_II_dimension> &,
-        VEC &);
-
-      template void
-      back_interpolate<deal_II_dimension>(
-        const hp::DoFHandler<deal_II_dimension> &,
         const VEC &,
         const FiniteElement<deal_II_dimension> &,
         VEC &);

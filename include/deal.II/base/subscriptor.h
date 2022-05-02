@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,6 @@
 #include <deal.II/base/exceptions.h>
 
 #include <atomic>
-#include <cstring>
 #include <map>
 #include <mutex>
 #include <string>
@@ -57,7 +56,6 @@ DEAL_II_NAMESPACE_OPEN
  * list_subscribers().
  *
  * @ingroup memory
- * @author Guido Kanschat, Daniel Arndt, 1998 - 2005, 2018
  */
 class Subscriptor
 {
@@ -104,6 +102,14 @@ public:
   operator=(Subscriptor &&) noexcept;
 
   /**
+   * @name Subscriptor functionality
+   *
+   * Classes derived from Subscriptor provide a facility to subscribe to this
+   * object. This is mostly used by the SmartPointer class.
+   */
+  // @{
+
+  /**
    * Subscribes a user of the object by storing the pointer @p validity. The
    * subscriber may be identified by text supplied as @p identifier.
    */
@@ -142,6 +148,8 @@ public:
   void
   list_subscribers() const;
 
+  // @}
+
   /**
    * @addtogroup Exceptions
    * @{
@@ -177,7 +185,8 @@ public:
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
-   * of serialization.
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    *
    * This function does not actually serialize any of the member variables of
    * this class. The reason is that what this class stores is only who
@@ -206,7 +215,6 @@ private:
    * This counter may be read from and written to concurrently in
    * multithreaded code: hence we use the <code>std::atomic</code> class
    * template.
-   *
    */
   mutable std::atomic<unsigned int> counter;
 

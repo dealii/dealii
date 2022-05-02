@@ -1,6 +1,0 @@
-Fixed: FEFaceEvaluation::read_dof_values() and
-FEFaceEvaluation::distribute_local_to_global() would not correctly represent
-cases with boundary integrals and constraints on the same boundary. This is
-now fixed.
-<br>
-(Niklas Fehn, Martin Kronbichler, 2020/03/03)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -92,9 +92,9 @@ test_scalar_scalar_coupled_one_run(const number_t     s1,
                                    const number_t     s2,
                                    const tape_index_t tape_no)
 {
-  typedef AD::ScalarFunction<dim, ad_type_code, number_t> ADHelper;
-  typedef typename ADHelper::ad_type                      ADNumberType;
-  typedef typename ADHelper::scalar_type                  ScalarNumberType;
+  using ADHelper         = AD::ScalarFunction<dim, ad_type_code, number_t>;
+  using ADNumberType     = typename ADHelper::ad_type;
+  using ScalarNumberType = typename ADHelper::scalar_type;
 
   std::cout
     //      << "*** Test variables: Scalar + Scalar (coupled), "
@@ -108,7 +108,7 @@ test_scalar_scalar_coupled_one_run(const number_t     s1,
   FullMatrix<ScalarNumberType> D2psi;
 
   // Function and its derivatives
-  typedef FunctionsTestScalarScalarCoupled<dim, ADNumberType> func_ad;
+  using func_ad = FunctionsTestScalarScalarCoupled<dim, ADNumberType>;
 
   // Setup the variable components and choose a value at which to
   // evaluate the tape
@@ -189,9 +189,8 @@ test_scalar_scalar_coupled_one_run(const number_t     s1,
   //      << "extracted Dpsi (s2): " << dpsi_ds2 << "\n";
 
   // Verify the result
-  typedef FunctionsTestScalarScalarCoupled<dim, ScalarNumberType> func;
-  static const ScalarNumberType                                   tol =
-    1e8 * std::numeric_limits<ScalarNumberType>::epsilon();
+  using func = FunctionsTestScalarScalarCoupled<dim, ScalarNumberType>;
+  static const ScalarNumberType tol = 1.e-7;
   //  std::cout << "dpsi_ds1:            " << dpsi_ds1 << std::endl;
   //  std::cout << "func::dpsi_ds1(s1,s2): " << func::dpsi_ds1(s1,s2) <<
   //  std::endl; std::cout << "diff: " << std::abs(dpsi_ds1 -

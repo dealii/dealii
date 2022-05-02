@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,8 +75,6 @@ namespace
    * re-sort and group components
    * as in
    * DoFRenumbering::component_wise.
-   *
-   *
    */
   template <int dim, typename number, int spacedim>
   void
@@ -256,16 +254,6 @@ MGTransferSelect<number>::do_copy_to_mg(
 
 template <int dim, int spacedim>
 void
-MGTransferComponentBase::build_matrices(const DoFHandler<dim, spacedim> &,
-                                        const DoFHandler<dim, spacedim> &mg_dof)
-{
-  build(mg_dof);
-}
-
-
-
-template <int dim, int spacedim>
-void
 MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
 {
   // Fill target component with
@@ -320,7 +308,7 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
   const unsigned int n_components =
     *std::max_element(mg_target_component.begin(), mg_target_component.end()) +
     1;
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
   const unsigned int n_levels      = mg_dof.get_triangulation().n_levels();
 
   Assert(mg_component_mask.represents_n_components(fe.n_components()),
@@ -531,16 +519,16 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
                   for (types::global_dof_index i = 0; i < n_dofs; ++i)
                     {
                       SparseMatrix<double>::iterator
-                        anfang = prolongation_matrices[level]
-                                   ->block(iblock, jblock)
-                                   .begin(i),
-                        ende = prolongation_matrices[level]
-                                 ->block(iblock, jblock)
-                                 .end(i);
-                      for (; anfang != ende; ++anfang)
+                        begin = prolongation_matrices[level]
+                                  ->block(iblock, jblock)
+                                  .begin(i),
+                        end = prolongation_matrices[level]
+                                ->block(iblock, jblock)
+                                .end(i);
+                      for (; begin != end; ++begin)
                         {
                           const types::global_dof_index column_number =
-                            anfang->column();
+                            begin->column();
 
                           // convert global indices into local ones
                           const BlockIndices block_indices_coarse(
@@ -566,23 +554,6 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
                 }
         }
     }
-}
-
-
-
-template <typename number>
-template <int dim, int spacedim>
-void
-MGTransferSelect<number>::build_matrices(
-  const DoFHandler<dim, spacedim> & /*dof*/,
-  const DoFHandler<dim, spacedim> &                     mg_dof,
-  unsigned int                                          select,
-  unsigned int                                          mg_select,
-  const std::vector<unsigned int> &                     t_component,
-  const std::vector<unsigned int> &                     mg_t_component,
-  const std::vector<std::set<types::global_dof_index>> &bdry_indices)
-{
-  build(mg_dof, select, mg_select, t_component, mg_t_component, bdry_indices);
 }
 
 
@@ -659,8 +630,8 @@ MGTransferSelect<number>::build(
   // use a temporary vector to create the
   // relation between global and level dofs
   std::vector<types::global_dof_index> temp_copy_indices;
-  std::vector<types::global_dof_index> global_dof_indices(fe.dofs_per_cell);
-  std::vector<types::global_dof_index> level_dof_indices(fe.dofs_per_cell);
+  std::vector<types::global_dof_index> global_dof_indices(fe.n_dofs_per_cell());
+  std::vector<types::global_dof_index> level_dof_indices(fe.n_dofs_per_cell());
   for (int level = mg_dof.get_triangulation().n_levels() - 1; level >= 0;
        --level)
     {
@@ -685,7 +656,7 @@ MGTransferSelect<number>::build(
           level_cell->get_dof_indices(global_dof_indices);
           level_cell->get_mg_dof_indices(level_dof_indices);
 
-          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
             {
               const unsigned int component =
                 fe.system_to_component_index(i).first;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -125,10 +125,10 @@ private:
       {
         fe_eval.reinit(cell);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(false, true);
+        fe_eval.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
-        fe_eval.integrate(false, true);
+        fe_eval.integrate(EvaluationFlags::gradients);
         fe_eval.distribute_local_to_global(dst);
       }
   }
@@ -175,11 +175,13 @@ test()
 
   for (unsigned int i = 0; i < vec1.local_size(); ++i)
     {
-      double entry          = random_value<double>();
+      // Multiply by 0.01 to make float error with roundoff less than the
+      // numdiff absolute tolerance
+      double entry          = 0.01 * random_value<double>();
       vec1.local_element(i) = entry;
-      entry                 = random_value<double>();
+      entry                 = 0.01 * random_value<double>();
       vec2.local_element(i) = entry;
-      entry                 = random_value<double>();
+      entry                 = 0.01 * random_value<double>();
       vec3.local_element(i) = entry;
     }
 
@@ -188,7 +190,7 @@ test()
   LinearAlgebra::distributed::Vector<number> ref3 = vec3;
 
   mf.vmult_with_update_basic(ref3, ref2, ref1);
-  mf.vmult_with_update_basic(vec3, vec2, vec1);
+  mf.vmult_with_update_merged(vec3, vec2, vec1);
 
   vec3 -= ref3;
   deallog << "Error in 1x merged operation: " << vec3.linfty_norm()
@@ -197,10 +199,10 @@ test()
   ref3 = 0;
 
   mf.vmult_with_update_basic(ref1, ref2, ref3);
-  mf.vmult_with_update_basic(vec1, vec2, vec3);
+  mf.vmult_with_update_merged(vec1, vec2, vec3);
 
   mf.vmult_with_update_basic(ref1, ref2, ref3);
-  mf.vmult_with_update_basic(vec1, vec2, vec3);
+  mf.vmult_with_update_merged(vec1, vec2, vec3);
 
   vec3 -= ref3;
   deallog << "Error in 2x merged operation: " << vec3.linfty_norm()

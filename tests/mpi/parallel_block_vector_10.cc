@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,7 +48,7 @@ template <int dim, int fe_degree>
 void
 test(const unsigned int n_blocks = 5)
 {
-  typedef double number;
+  using number = double;
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
@@ -149,7 +149,7 @@ test(const unsigned int n_blocks = 5)
 
   const double diff_norm  = std::abs(res - res2);
   const double diff_norm2 = std::abs(res - res3);
-  deallog << "Norm of difference: " << diff_norm << " " << diff_norm2
+  deallog << "Norm of difference: " << diff_norm << ' ' << diff_norm2
           << std::endl;
 }
 

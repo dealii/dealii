@@ -1,0 +1,28 @@
+
+DEAL::dim = 1, number = 1
+DEAL::before n_active_cells: 5
+DEAL::after n_active_cells: 3
+DEAL::dim = 1, number = 2
+DEAL::before n_active_cells: 5
+DEAL::after n_active_cells: 2
+DEAL::dim = 1, number = 3
+DEAL::before n_active_cells: 5
+DEAL::after n_active_cells: 1
+DEAL::dim = 2, number = 1
+DEAL::before n_active_cells: 19
+DEAL::after n_active_cells: 7
+DEAL::dim = 2, number = 2
+DEAL::before n_active_cells: 19
+DEAL::after n_active_cells: 4
+DEAL::dim = 2, number = 3
+DEAL::before n_active_cells: 19
+DEAL::after n_active_cells: 1
+DEAL::dim = 3, number = 1
+DEAL::before n_active_cells: 71
+DEAL::after n_active_cells: 15
+DEAL::dim = 3, number = 2
+DEAL::before n_active_cells: 71
+DEAL::after n_active_cells: 8
+DEAL::dim = 3, number = 3
+DEAL::before n_active_cells: 71
+DEAL::after n_active_cells: 1

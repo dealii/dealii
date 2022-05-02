@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2019 by the deal.II authors
+ * Copyright (C) 2019 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -37,7 +37,7 @@
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -230,9 +230,7 @@ namespace Step65
         for (const auto &face : cell->face_iterators())
           {
             bool face_at_sphere_boundary = true;
-            for (unsigned int v = 0;
-                 v < GeometryInfo<dim - 1>::vertices_per_cell;
-                 ++v)
+            for (const auto v : face->vertex_indices())
               {
                 if (std::abs(face->vertex(v).norm_square() - 0.25) > 1e-12)
                   face_at_sphere_boundary = false;
@@ -381,7 +379,7 @@ namespace Step65
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -584,7 +582,7 @@ namespace Step65
   // solver chain, starting from the setup of the equations, the assembly of
   // the linear system, its solution with a simple iterative solver, and the
   // postprocessing discussed above. The two instances differ in the way they
-  // use the mapping. The first uses a conventional MappingQGeneric mapping
+  // use the mapping. The first uses a conventional MappingQ mapping
   // object which we initialize to a degree one more than we use for the
   // finite element &ndash; after all, we expect the geometry representation
   // to be the bottleneck as the analytic solution is only a quadratic
@@ -602,11 +600,11 @@ namespace Step65
 
     {
       std::cout << std::endl
-                << "====== Running with the basic MappingQGeneric class ====== "
+                << "====== Running with the basic MappingQ class ====== "
                 << std::endl
                 << std::endl;
 
-      MappingQGeneric<dim> mapping(fe.degree + 1);
+      MappingQ<dim> mapping(fe.degree + 1);
       setup_system(mapping);
       assemble_system(mapping);
       solve();
@@ -621,7 +619,7 @@ namespace Step65
     // we want it to show the correct degree functionality in other contexts),
     // we fill the cache via the MappingQCache::initialize() function. At this
     // stage, we specify which mapping we want to use (obviously, the same
-    // MappingQGeneric as previously in order to repeat the same computations)
+    // MappingQ as previously in order to repeat the same computations)
     // for the cache, and then run through the same functions again, now
     // handing in the modified mapping. In the end, we again print the
     // accumulated wall times since the reset to see how the times compare to
@@ -635,7 +633,7 @@ namespace Step65
       MappingQCache<dim> mapping(fe.degree + 1);
       {
         TimerOutput::Scope scope(timer, "Initialize mapping cache");
-        mapping.initialize(triangulation, MappingQGeneric<dim>(fe.degree + 1));
+        mapping.initialize(MappingQ<dim>(fe.degree + 1), triangulation);
       }
       std::cout << "   Memory consumption cache:     "
                 << 1e-6 * mapping.memory_consumption() << " MB" << std::endl;

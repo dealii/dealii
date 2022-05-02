@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,8 +56,8 @@ test(const unsigned int size,
     std::make_shared<Utilities::MPI::ProcessGrid>(
       mpi_communicator, size, size, block_size, block_size);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
-        << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << ' ' << block_size << ' ' << grid->get_process_grid_rows()
+        << ' ' << grid->get_process_grid_columns() << std::endl;
 
   const unsigned int n_eigenvalues     = size;
   const unsigned int max_n_eigenvalues = 5;
@@ -93,9 +93,8 @@ test(const unsigned int size,
     int        LDA   = size; // leading dimension of the matrix A
     NumberType vl = 0, vu = 0;
     int        il = size - max_n_eigenvalues + 1, iu = size;
-    char       sign = 'S';
-    NumberType abstol;
-    lamch(&sign, abstol);
+    char       sign   = 'S';
+    NumberType abstol = lamch<NumberType>(&sign);
     abstol *= 2;
     int                     m = 0;
     std::vector<NumberType> eigenvectors(size * size);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -115,9 +115,9 @@ check()
   Triangulation<dim> tria;
   make_mesh(tria);
 
-  FE_Q<dim>            element(QIterated<1>(QTrapez<1>(), 3));
-  DoFHandler<dim>      dof(tria);
-  MappingQGeneric<dim> mapping(1);
+  FE_Q<dim>       element(QIterated<1>(QTrapezoid<1>(), 3));
+  DoFHandler<dim> dof(tria);
+  MappingQ<dim>   mapping(1);
   dof.distribute_dofs(element);
 
   // test with two different functions: one

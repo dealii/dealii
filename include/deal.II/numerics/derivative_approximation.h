@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,8 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/synchronous_iterator.h>
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/mapping.h>
@@ -74,7 +76,7 @@ DEAL_II_NAMESPACE_OPEN
  * of file <source/numerics/derivative_approximation.cc> in function
  *     void DerivativeApproximation::approximate(...)
  * [with DerivativeDescription = DerivativeApproximation::Gradient<3>, int
- * dim = 3, DoFHandlerType = DoFHandler, InputVector = Vector<double>]
+ * dim = 3, InputVector = Vector<double>, spacedim = 3]
  * The violated condition was:
  *     determinant(Y) != 0
  * The name and call sequence of the exception was:
@@ -155,7 +157,6 @@ DEAL_II_NAMESPACE_OPEN
  * derivative that is to be approximated.
  *
  * @ingroup numerics
- * @author Wolfgang Bangerth, 2000
  */
 namespace DerivativeApproximation
 {
@@ -174,29 +175,23 @@ namespace DerivativeApproximation
    * In a parallel computation the @p solution vector needs to contain the
    * locally relevant unknowns.
    */
-  template <int dim,
-            template <int, int> class DoFHandlerType,
-            class InputVector,
-            int spacedim>
+  template <int dim, class InputVector, int spacedim>
   void
-  approximate_gradient(const Mapping<dim, spacedim> &       mapping,
-                       const DoFHandlerType<dim, spacedim> &dof,
-                       const InputVector &                  solution,
-                       Vector<float> &                      derivative_norm,
-                       const unsigned int                   component = 0);
+  approximate_gradient(const Mapping<dim, spacedim> &   mapping,
+                       const DoFHandler<dim, spacedim> &dof,
+                       const InputVector &              solution,
+                       Vector<float> &                  derivative_norm,
+                       const unsigned int               component = 0);
 
   /**
-   * Call the function above with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * Call the function above with <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
-  template <int dim,
-            template <int, int> class DoFHandlerType,
-            class InputVector,
-            int spacedim>
+  template <int dim, class InputVector, int spacedim>
   void
-  approximate_gradient(const DoFHandlerType<dim, spacedim> &dof,
-                       const InputVector &                  solution,
-                       Vector<float> &                      derivative_norm,
-                       const unsigned int                   component = 0);
+  approximate_gradient(const DoFHandler<dim, spacedim> &dof,
+                       const InputVector &              solution,
+                       Vector<float> &                  derivative_norm,
+                       const unsigned int               component = 0);
 
   /**
    * This function is the analogue to the one above, computing finite
@@ -215,27 +210,21 @@ namespace DerivativeApproximation
    * In a parallel computation the @p solution vector needs to contain the
    * locally relevant unknowns.
    */
-  template <int dim,
-            template <int, int> class DoFHandlerType,
-            class InputVector,
-            int spacedim>
+  template <int dim, class InputVector, int spacedim>
   void
-  approximate_second_derivative(const Mapping<dim, spacedim> &       mapping,
-                                const DoFHandlerType<dim, spacedim> &dof,
-                                const InputVector &                  solution,
+  approximate_second_derivative(const Mapping<dim, spacedim> &   mapping,
+                                const DoFHandler<dim, spacedim> &dof,
+                                const InputVector &              solution,
                                 Vector<float> &    derivative_norm,
                                 const unsigned int component = 0);
 
   /**
-   * Call the function above with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * Call the function above with <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
-  template <int dim,
-            template <int, int> class DoFHandlerType,
-            class InputVector,
-            int spacedim>
+  template <int dim, class InputVector, int spacedim>
   void
-  approximate_second_derivative(const DoFHandlerType<dim, spacedim> &dof,
-                                const InputVector &                  solution,
+  approximate_second_derivative(const DoFHandler<dim, spacedim> &dof,
+                                const InputVector &              solution,
                                 Vector<float> &    derivative_norm,
                                 const unsigned int component = 0);
 
@@ -252,38 +241,37 @@ namespace DerivativeApproximation
    * In a parallel computation the @p solution vector needs to contain the
    * locally relevant unknowns.
    */
-  template <typename DoFHandlerType, class InputVector, int order>
+  template <int dim, int spacedim, class InputVector, int order>
   void
   approximate_derivative_tensor(
-    const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
-      &                   mapping,
-    const DoFHandlerType &dof,
-    const InputVector &   solution,
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const InputVector &              solution,
 #ifndef _MSC_VER
-    const typename DoFHandlerType::active_cell_iterator &cell,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
 #else
-    const TriaActiveIterator<dealii::DoFCellAccessor<DoFHandlerType, false>>
+    const TriaActiveIterator<dealii::DoFCellAccessor<dim, spacedim, false>>
       &cell,
 #endif
-    Tensor<order, DoFHandlerType::dimension> &derivative,
-    const unsigned int                        component = 0);
+    Tensor<order, dim> &derivative,
+    const unsigned int  component = 0);
 
   /**
-   * Same as above, with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * Same as above, with <tt>mapping=MappingQ@<dim@>(1)</tt>.
    */
-  template <typename DoFHandlerType, class InputVector, int order>
+  template <int dim, int spacedim, class InputVector, int order>
   void
   approximate_derivative_tensor(
-    const DoFHandlerType &dof,
-    const InputVector &   solution,
+    const DoFHandler<dim, spacedim> &dof,
+    const InputVector &              solution,
 #ifndef _MSC_VER
-    const typename DoFHandlerType::active_cell_iterator &cell,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
 #else
-    const TriaActiveIterator<dealii::DoFCellAccessor<DoFHandlerType, false>>
+    const TriaActiveIterator<dealii::DoFCellAccessor<dim, spacedim, false>>
       &cell,
 #endif
-    Tensor<order, DoFHandlerType::dimension> &derivative,
-    const unsigned int                        component = 0);
+    Tensor<order, dim> &derivative,
+    const unsigned int  component = 0);
 
   /**
    * Return the norm of the derivative.

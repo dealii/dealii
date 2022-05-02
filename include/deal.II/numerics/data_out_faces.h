@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -100,48 +100,41 @@ namespace internal
  * applications certainly exist, for which the author is not imaginative
  * enough.
  *
- * @pre This class only makes sense if the first template argument,
- * <code>dim</code> equals the dimension of the DoFHandler type given as the
- * second template argument, i.e., if <code>dim ==
- * DoFHandlerType::dimension</code>. This redundancy is a historical relic
- * from the time where the library had only a single DoFHandler class and this
- * class consequently only a single template argument.
- *
  * @todo Reimplement this whole class using actual FEFaceValues and
  * MeshWorker.
  *
  * @ingroup output
- * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2011
  */
-template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-class DataOutFaces : public DataOut_DoFData<DoFHandlerType,
-                                            DoFHandlerType::dimension - 1,
-                                            DoFHandlerType::dimension>
+template <int dim, int spacedim = dim>
+class DataOutFaces : public DataOut_DoFData<dim, dim - 1, spacedim, spacedim>
 {
+  static_assert(dim == spacedim, "Not implemented for dim != spacedim.");
+
 public:
   /**
-   * An abbreviation for the dimension of the DoFHandler object we work with.
-   * Faces are then <code>dimension-1</code> dimensional objects.
+   * Dimension parameters for the patches.
    */
-  static const unsigned int dimension = DoFHandlerType::dimension;
-
-  /**
-   * An abbreviation for the spatial dimension within which the triangulation
-   * and DoFHandler are embedded in.
-   */
-  static const unsigned int space_dimension = DoFHandlerType::space_dimension;
+  static constexpr int patch_dim      = dim - 1;
+  static constexpr int patch_spacedim = spacedim;
 
   /**
    * Alias to the iterator type of the dof handler class under
    * consideration.
    */
-  using cell_iterator = typename DataOut_DoFData<DoFHandlerType,
-                                                 dimension - 1,
-                                                 dimension>::cell_iterator;
+  using cell_iterator =
+    typename DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
+      cell_iterator;
 
   /**
-   * Constructor determining whether a surface mesh (default) or the whole
-   * wire basket is written.
+   * Constructor.
+   *
+   * @param[in] surface_only If `true`, then this class only generates
+   *   output on faces that lie on the boundary of the domain. This
+   *   is typically what this class is used for: To output information
+   *   about the solution, fluxes, and other quantities that live on
+   *   the boundary of the domain. On the other hand, it is sometimes
+   *   useful to also visualize data on internal faces. This is
+   *   facilitated by setting this argument to `false`.
    */
   DataOutFaces(const bool surface_only = true);
 
@@ -180,11 +173,11 @@ public:
    * deformation of each vertex.
    *
    * @todo The @p mapping argument should be replaced by a
-   * hp::MappingCollection in case of a hp::DoFHandler.
+   * hp::MappingCollection in case of a DoFHandler with hp-capabilities.
    */
   virtual void
-  build_patches(const Mapping<dimension> &mapping,
-                const unsigned int        n_subdivisions = 0);
+  build_patches(const Mapping<dim, spacedim> &mapping,
+                const unsigned int            n_subdivisions = 0);
 
   /**
    * Declare a way to describe a face which we would like to generate output
@@ -246,10 +239,20 @@ private:
   void
   build_one_patch(
     const FaceDescriptor *cell_and_face,
-    internal::DataOutFacesImplementation::ParallelData<dimension, dimension>
-      &                                                 data,
-    DataOutBase::Patch<dimension - 1, space_dimension> &patch);
+    internal::DataOutFacesImplementation::ParallelData<dim, spacedim> &data,
+    DataOutBase::Patch<patch_dim, patch_spacedim> &                    patch);
 };
+
+namespace Legacy
+{
+  /**
+   * @deprecated Use dealii::DataOutFaces without the DoFHandlerType template
+   * instead.
+   */
+  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+  using DataOutFaces DEAL_II_DEPRECATED =
+    dealii::DataOutFaces<dim, DoFHandlerType::space_dimension>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

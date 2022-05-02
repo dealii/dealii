@@ -1,4 +1,0 @@
-Deprecated: The include files in `deal.II/base/std_cxx11` have been
-deprecated. Just use the corresponding C++11 header files.
-<br>
-(Wolfgang Bangerth, 2019/08/21)

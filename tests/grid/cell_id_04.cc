@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,7 @@ check(Triangulation<dim> &tr)
 
   for (; cell != endc; ++cell)
     {
-      deallog << cell->level() << " " << cell->index() << std::endl;
+      deallog << cell->level() << ' ' << cell->index() << std::endl;
 
       // Store the CellId, convert it to a binary representation,
       // create a new CellId from that, and create a cell iterator
@@ -56,12 +56,13 @@ check(Triangulation<dim> &tr)
 
       const CellId cid2(cids);
 
-      typename Triangulation<dim>::cell_iterator cell2 = cid2.to_cell(tr);
+      typename Triangulation<dim>::cell_iterator cell2 =
+        tr.create_cell_iterator(cid2);
 
       Assert(cid2 == cid, ExcInternalError());
       Assert(cell2 == cell, ExcInternalError());
 
-      deallog << cell2->level() << " " << cell2->index() << std::endl;
+      deallog << cell2->level() << ' ' << cell2->index() << std::endl;
     }
 
   deallog << "OK" << std::endl;

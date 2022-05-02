@@ -1,0 +1,4 @@
+New: MeshWorker::ScratchData is now able to evaluate the jumps in, and averages
+of, finite element functions and their derivatives across an interface.
+<br>
+(Jean-Paul Pelteret, 2021/08/14)

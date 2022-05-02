@@ -1,0 +1,6 @@
+Fixed: The SparseDirectUMFPACK class had a bug where it did not
+correctly set up the data passed to the UMFPACK package if (i) the
+matrix is a block matrix, and (ii) the elements are
+complex-valued. This is now fixed.
+<br>
+(Kuljit S. Virk, 2021/12/30)

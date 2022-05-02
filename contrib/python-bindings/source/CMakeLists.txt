@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 - 2018 by the deal.II authors
+## Copyright (C) 2016 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -45,6 +45,7 @@ SET(_src
   mapping_wrapper.cc
   manifold_wrapper.cc
   quadrature_wrapper.cc
+  reference_cell_wrapper.cc
   )
 
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
@@ -104,4 +105,3 @@ INSTALL(FILES ${_python_sources}
   DESTINATION ${DEAL_II_PYTHON_RELDIR}
   COMPONENT python_bindings
   )
-

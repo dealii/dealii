@@ -13,10 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-// Test MappingQCache by comparison with MappingQGeneric
+// Test MappingQCache by comparison with MappingQ
 
+#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q_cache.h>
-#include <deal.II/fe/mapping_q_generic.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -33,8 +33,8 @@ do_test(const unsigned int degree)
   else
     GridGenerator::hyper_cube(tria, -1, 1);
 
-  MappingQGeneric<dim> mapping(degree);
-  MappingQCache<dim>   mapping_cache(degree);
+  MappingQ<dim>      mapping(degree);
+  MappingQCache<dim> mapping_cache(degree);
   mapping_cache.initialize(tria, mapping);
 
   Point<dim> p1;
@@ -44,7 +44,7 @@ do_test(const unsigned int degree)
   for (unsigned int d = 0; d < dim; ++d)
     p2[d] = 0.5;
 
-  deallog << "Testing degree " << degree << " in " << dim << "D" << std::endl;
+  deallog << "Testing degree " << degree << " in " << dim << 'D' << std::endl;
   for (const auto &cell : tria.active_cell_iterators())
     {
       deallog << "cell " << cell->id() << ": "

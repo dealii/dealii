@@ -1,5 +1,0 @@
-New: Provide new methods in CUDAWrappers::FEEvaluation that do neither take the 
-local dof index nor the quadrature point but recompute them based on the 
-thread id.
-<br>
-(Peter Munch, 2019/09/24)

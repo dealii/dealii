@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,7 +66,7 @@ public:
       {
         fe_eval.reinit(cell);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, false);
+        fe_eval.evaluate(EvaluationFlags::values);
         for (unsigned int q = 0; q < n_q_points; ++q)
           {
             Tensor<1, 3, VectorizedArray<double>> val = fe_eval.get_value(q);
@@ -75,7 +75,7 @@ public:
             val[2] *= make_vectorized_array(1.98);
             fe_eval.submit_value(val, q);
           }
-        fe_eval.integrate(true, false);
+        fe_eval.integrate(EvaluationFlags::values);
         fe_eval.distribute_local_to_global(dst);
       }
   }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -223,11 +223,11 @@ DEAL_II_NAMESPACE_OPEN
  * a preconditioner then the preconditioning operation is not a linear
  * operation. Here a flexible solver like SolverFGMRES (flexible GMRES) is
  * best employed as an outer solver in order to deal with the variable
- * behaviour of the preconditioner. Otherwise the iterative solver can
+ * behavior of the preconditioner. Otherwise the iterative solver can
  * stagnate somewhere near the tolerance of the preconditioner or generally
  * behave erratically. Alternatively, using a ReductionControl would ensure
  * that the preconditioner always solves to the same tolerance, thereby
- * rendering its behaviour constant.
+ * rendering its behavior constant.
  *
  * Further examples of this functionality can be found in the test-suite, such
  * as <code>tests/lac/schur_complement_01.cc</code> . The solution of a multi-
@@ -236,7 +236,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Jean-Paul Pelteret, Matthias Maier, Martin Kronbichler, 2015, 2017
  *
  * @ingroup LAOperators
  */
@@ -288,7 +287,6 @@ schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Jean-Paul Pelteret, Matthias Maier, 2015, 2017
  *
  * @ingroup LAOperators
  */
@@ -327,7 +325,6 @@ condense_schur_rhs(const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Jean-Paul Pelteret, Matthias Maier, 2015, 2017
  *
  * @ingroup LAOperators
  */

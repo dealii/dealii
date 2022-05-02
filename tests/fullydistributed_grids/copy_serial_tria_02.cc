@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,9 @@ test(int n_refinements, const int n_subdivisions, MPI_Comm comm)
   // extract relevant information form serial triangulation
   auto construction_data =
     TriangulationDescription::Utilities::create_description_from_triangulation(
-      basetria, comm, true);
+      basetria,
+      comm,
+      TriangulationDescription::Settings::construct_multigrid_hierarchy);
 
   // actually create triangulation
   tria_pft.create_triangulation(construction_data);

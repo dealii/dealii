@@ -1,6 +1,5 @@
 
-DEAL::Convergence step 8 value 0.00000
-DEAL::8 iterations used
+DEAL::Solver stopped within 2 - 10 iterations
 DEAL::      Eigenvalue 0 : (4.93877,0.00000)
 DEAL::      Eigenvalue 1 : (12.3707,0.00000)
 DEAL::      Eigenvalue 2 : (12.3707,0.00000)

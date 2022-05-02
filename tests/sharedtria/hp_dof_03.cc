@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,8 @@
 
 #include <deal.II/distributed/shared_tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
@@ -34,8 +36,6 @@
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <numeric>
 
@@ -55,7 +55,7 @@ test()
   hp::FECollection<dim> fe;
   fe.push_back(FESystem<dim>(FE_Q<dim>(3), 2, FE_DGQ<dim>(1), 1));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
@@ -113,14 +113,15 @@ test()
       //      unsigned int sum = 0;
       //      for (unsigned int i=0; i<v.size(); ++i)
       //        {
-      //          deallog << v[i] << " ";
+      //          deallog << v[i] << ' ';
       //          sum += v[i];
       //        }
       //      deallog << " sum: " << sum << std::endl;
 
       const std::vector<types::global_dof_index>
         n_locally_owned_dofs_per_processor =
-          dof_handler.compute_n_locally_owned_dofs_per_processor();
+          Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                     dof_handler.n_locally_owned_dofs());
       Assert(dof_handler.n_locally_owned_dofs() ==
                n_locally_owned_dofs_per_processor[triangulation
                                                     .locally_owned_subdomain()],
@@ -138,7 +139,8 @@ test()
              ExcInternalError());
 
       const std::vector<IndexSet> locally_owned_dofs_per_processor =
-        dof_handler.compute_locally_owned_dofs_per_processor();
+        Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                   dof_handler.locally_owned_dofs());
       IndexSet all(N);
       for (unsigned int i = 0; i < locally_owned_dofs_per_processor.size(); ++i)
         {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,8 +45,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This type, and the helper functions associated with it, are used as the
  * Value concept for the blocked_range type of the Threading Building Blocks.
- *
- * @author Wolfgang Bangerth, 2008
  */
 template <typename Iterators>
 struct SynchronousIterators
@@ -60,13 +58,15 @@ struct SynchronousIterators
    * Dereference const operator. Returns a const reference to the iterators
    * represented by the current class.
    */
-  const Iterators &operator*() const;
+  const Iterators &
+  operator*() const;
 
   /**
    * Dereference operator. Returns a reference to the iterators
    * represented by the current class.
    */
-  Iterators &operator*();
+  Iterators &
+  operator*();
 
 private:
   /**
@@ -85,7 +85,8 @@ inline SynchronousIterators<Iterators>::SynchronousIterators(const Iterators &i)
 
 
 template <typename Iterators>
-inline const Iterators &SynchronousIterators<Iterators>::operator*() const
+inline const Iterators &
+SynchronousIterators<Iterators>::operator*() const
 {
   return iterators;
 }
@@ -93,7 +94,8 @@ inline const Iterators &SynchronousIterators<Iterators>::operator*() const
 
 
 template <typename Iterators>
-inline Iterators &SynchronousIterators<Iterators>::operator*()
+inline Iterators &
+SynchronousIterators<Iterators>::operator*()
 {
   return iterators;
 }

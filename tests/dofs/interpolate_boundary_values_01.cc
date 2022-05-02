@@ -191,7 +191,7 @@ FindBug<dim>::dirichlet_conditions()
                                            component_mask);
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
     if (fixed_dofs[i] == true)
-      deallog << i << " " << dirichlet_dofs[i] << std::endl;
+      deallog << i << ' ' << dirichlet_dofs[i] << std::endl;
 }
 
 

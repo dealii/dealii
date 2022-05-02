@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ test()
 
           GridTools::get_subdomain_association(tr, cell_subd);
           for (unsigned int i = 0; i < tr.n_active_cells(); ++i)
-            deallog << cell_subd[i] << " ";
+            deallog << cell_subd[i] << ' ';
           deallog << std::endl;
         }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,8 @@
 
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   deallog << "Coarse cell 0 vertices:" << std::endl;
   for (unsigned int i = 0; i < 8; ++i)
@@ -43,7 +44,7 @@ void check(Triangulation<3> &tria)
 
   deallog << "Coarse cell 1 vertices:" << std::endl;
   for (unsigned int i = 0; i < 8; ++i)
-    deallog << ' ' << (++tria.begin_active())->vertex_index(i);
+    deallog << ' ' << (std::next(tria.begin_active()))->vertex_index(i);
   deallog << std::endl;
 
 

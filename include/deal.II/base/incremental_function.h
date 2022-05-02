@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,9 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/thread_management.h>
+
+#include <deal.II/lac/vector.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -44,7 +47,6 @@ namespace Functions
    * required by some implementations of non-linear solution schemes.
    *
    * @ingroup functions
-   * @author Denis Davydov, Jean-Paul Pelteret, 2018
    */
   template <int dim, typename RangeNumberType = double>
   class IncrementalFunction : public Function<dim, RangeNumberType>
@@ -54,7 +56,7 @@ namespace Functions
      * Export the value of the template parameter as a static member constant.
      * This is sometimes useful in the context of template programming.
      */
-    static const unsigned int dimension = dim;
+    static constexpr unsigned int dimension = dim;
 
     /**
      * The scalar-valued real type used for representing time.

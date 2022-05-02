@@ -1,6 +1,0 @@
-Improved: The additional roots of the HermiteLikeInterpolation with degree $p$
-greater than four have been switched to the roots of the Jacobi polynomial
-$P^{(4,4)}_{p-3}$, making the interior bubble functions $L_2$ orthogonal and
-improving the conditioning of interpolation slightly.
-<br>
-(Martin Kronbichler, 2019/07/12)

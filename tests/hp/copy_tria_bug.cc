@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,8 +25,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include "../tests.h"
 
 
@@ -35,8 +33,8 @@ template <int dim>
 void
 test1()
 {
-  Triangulation<dim>  tr1;
-  hp::DoFHandler<dim> dofh(tr1);
+  Triangulation<dim> tr1;
+  DoFHandler<dim>    dofh(tr1);
 
   Triangulation<dim> tr2;
   GridGenerator::hyper_ball(tr2);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_WITH_TRILINOS)
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/lac/block_linear_operator.h>
 #  include <deal.II/lac/linear_operator.h>
@@ -65,7 +65,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -96,7 +95,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -112,6 +110,42 @@ namespace TrilinosWrappers
       TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload;
     return dealii::linear_operator<Range, Domain, Payload, Matrix, Matrix>(
       matrix, matrix);
+  }
+
+
+  /**
+   * @relatesalso LinearOperator
+   *
+   * A function that encapsulates generic @p matrix objects, based on an
+   * @p operator_exemplar, that act on a compatible Vector type into a
+   * LinearOperator.
+   *
+   * This function is the equivalent of the dealii::linear_operator, but
+   * ensures full compatibility with Trilinos operations by preselecting the
+   * appropriate template parameters.
+   *
+   *
+   * @ingroup TrilinosWrappers
+   */
+  template <typename Range, typename Domain, typename Matrix>
+  inline LinearOperator<
+    Range,
+    Domain,
+    TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload>
+  linear_operator(
+    const LinearOperator<
+      Range,
+      Domain,
+      TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload>
+      &           operator_exemplar,
+    const Matrix &matrix)
+  {
+    using Payload =
+      TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload;
+    using OperatorExemplar = LinearOperator<Range, Domain, Payload>;
+    return dealii::
+      linear_operator<Range, Domain, Payload, OperatorExemplar, Matrix>(
+        operator_exemplar, matrix);
   }
 
 
@@ -131,7 +165,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -165,7 +198,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -210,7 +242,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */
@@ -246,7 +277,6 @@ namespace TrilinosWrappers
    * ensures full compatibility with Trilinos operations by preselecting the
    * appropriate template parameters.
    *
-   * @author Jean-Paul Pelteret, 2016
    *
    * @ingroup TrilinosWrappers
    */

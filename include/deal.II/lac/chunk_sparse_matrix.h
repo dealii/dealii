@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/identity_matrix.h>
 
+#  include <iterator>
 #  include <memory>
 
 
@@ -308,6 +309,12 @@ namespace ChunkSparseMatrixIterators
     using value_type = const Accessor<number, Constness> &;
 
     /**
+     * A type that denotes what data types is used to express the difference
+     * between two iterators.
+     */
+    using difference_type = types::global_dof_index;
+
+    /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
      * row and the index within it.
      */
@@ -339,12 +346,14 @@ namespace ChunkSparseMatrixIterators
     /**
      * Dereferencing operator.
      */
-    const Accessor<number, Constness> &operator*() const;
+    const Accessor<number, Constness> &
+    operator*() const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor<number, Constness> *operator->() const;
+    const Accessor<number, Constness> *
+    operator->() const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
@@ -399,6 +408,24 @@ namespace ChunkSparseMatrixIterators
 
 } // namespace ChunkSparseMatrixIterators
 
+DEAL_II_NAMESPACE_CLOSE
+
+namespace std
+{
+  template <typename number, bool Constness>
+  struct iterator_traits<
+    dealii::ChunkSparseMatrixIterators::Iterator<number, Constness>>
+  {
+    using iterator_category = forward_iterator_tag;
+    using value_type        = typename dealii::ChunkSparseMatrixIterators::
+      Iterator<number, Constness>::value_type;
+    using difference_type = typename dealii::ChunkSparseMatrixIterators::
+      Iterator<number, Constness>::difference_type;
+  };
+} // namespace std
+
+DEAL_II_NAMESPACE_OPEN
+
 
 
 /**
@@ -416,8 +443,6 @@ namespace ChunkSparseMatrixIterators
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Wolfgang Bangerth, 2008
  */
 template <typename number>
 class ChunkSparseMatrix : public virtual Subscriptor
@@ -1426,7 +1451,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::m() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   return cols->rows;
 }
 
@@ -1435,7 +1460,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::n() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   return cols->cols;
 }
 
@@ -1445,7 +1470,7 @@ template <typename number>
 inline const ChunkSparsityPattern &
 ChunkSparseMatrix<number>::get_sparsity_pattern() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   return *cols;
 }
 
@@ -1478,7 +1503,7 @@ ChunkSparseMatrix<number>::set(const size_type i,
 {
   AssertIsFinite(value);
 
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   // it is allowed to set elements of the matrix that are not part of the
   // sparsity pattern, if the value to which we set it is zero
   const size_type index = compute_location(i, j);
@@ -1499,7 +1524,7 @@ ChunkSparseMatrix<number>::add(const size_type i,
 {
   AssertIsFinite(value);
 
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
 
   if (std::abs(value) != 0.)
     {
@@ -1534,7 +1559,7 @@ template <typename number>
 inline ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator*=(const number factor)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
 
   const size_type chunk_size = cols->get_chunk_size();
@@ -1559,7 +1584,7 @@ template <typename number>
 inline ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator/=(const number factor)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
   Assert(std::abs(factor) != 0, ExcDivideByZero());
 
@@ -1589,7 +1614,7 @@ inline number
 ChunkSparseMatrix<number>::operator()(const size_type i,
                                       const size_type j) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   AssertThrow(compute_location(i, j) != SparsityPattern::invalid_entry,
               ExcInvalidIndex(i, j));
   return val[compute_location(i, j)];
@@ -1601,7 +1626,7 @@ template <typename number>
 inline number
 ChunkSparseMatrix<number>::el(const size_type i, const size_type j) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   const size_type index = compute_location(i, j);
 
   if (index != ChunkSparsityPattern::invalid_entry)
@@ -1616,7 +1641,7 @@ template <typename number>
 inline number
 ChunkSparseMatrix<number>::diag_element(const size_type i) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(m() == n(), ExcNotQuadratic());
   AssertIndexRange(i, m());
 
@@ -1876,16 +1901,16 @@ namespace ChunkSparseMatrixIterators
 
 
   template <typename number, bool Constness>
-  inline const Accessor<number, Constness> &Iterator<number, Constness>::
-                                            operator*() const
+  inline const Accessor<number, Constness> &
+  Iterator<number, Constness>::operator*() const
   {
     return accessor;
   }
 
 
   template <typename number, bool Constness>
-  inline const Accessor<number, Constness> *Iterator<number, Constness>::
-                                            operator->() const
+  inline const Accessor<number, Constness> *
+  Iterator<number, Constness>::operator->() const
   {
     return &accessor;
   }

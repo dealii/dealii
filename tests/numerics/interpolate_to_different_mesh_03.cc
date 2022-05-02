@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,7 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 
@@ -41,7 +41,7 @@ template <unsigned int spacedim>
 void
 check(const unsigned int refinement_1, const unsigned int refinement_2)
 {
-  MappingQGeneric<spacedim> mapping(1);
+  MappingQ<spacedim> mapping(1);
 
   Triangulation<spacedim> tria_1, tria_2;
   GridGenerator::hyper_cube(tria_1);

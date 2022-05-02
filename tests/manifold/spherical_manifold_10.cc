@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,7 @@
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -44,7 +44,7 @@ main()
   tria.set_all_manifold_ids(0);
   tria.set_manifold(0, spherical);
 
-  MappingQGeneric<dim>   mapping(4);
+  MappingQ<dim>          mapping(4);
   QGaussLobatto<dim - 1> quadrature(4);
 
   FE_Nothing<dim>   dummy;

@@ -1,0 +1,2 @@
+Newton's method for a nonlinear elliptic problem. Uses %SUNDIALS'
+KINSOL package.

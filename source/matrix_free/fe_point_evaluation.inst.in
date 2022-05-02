@@ -1,0 +1,30 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2021 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+
+for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template bool internal::FEPointEvaluation::is_fast_path_supported(
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+      const unsigned int);
+    template bool internal::FEPointEvaluation::is_fast_path_supported(
+      const Mapping<deal_II_dimension, deal_II_space_dimension> &);
+    template std::vector<Polynomials::Polynomial<double>>
+    internal::FEPointEvaluation::get_polynomial_space(
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
+#endif
+  }

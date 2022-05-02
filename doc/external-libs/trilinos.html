@@ -4,7 +4,7 @@
   <head>
     <title>The deal.II Readme on interfacing to Trilinos</title>
     <link href="../screen.css" rel="StyleSheet">
-    <meta name="copyright" content="Copyright (C) 2008 - 2019 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2008 - 2020 by the deal.II authors">
     <meta name="keywords" content="deal.II">
   </head>
 
@@ -50,8 +50,9 @@
 
     <p style="color: red">
       Note: The current version of deal.II requires at least Trilinos 12.4.
-      Deal.II is known to work with Trilinos up to 12.14. Other versions of
-      Trilinos should work too but we do not do regression tests with them.
+      Deal.II is known to work with Trilinos up to 12.18. Other versions of
+      Trilinos should work too but have not been tested prior to the
+      release.
     </p>
 
     <p>
@@ -66,6 +67,7 @@
         <li> MueLu (optional, required for TrilinosWrappers::PreconditionAMGMueLu),
         <li> ROL (optional),
         <li> Sacado (optional),
+        <li> SEACAS (optional, required for GridIn::read_exodusii()),
         <li> Teuchos,
         <li> Tpetra (optional),
         <li> Zoltan (optional).
@@ -89,6 +91,7 @@
     -DTrilinos_ENABLE_Ifpack=ON                      \
     -DTrilinos_ENABLE_AztecOO=ON                     \
     -DTrilinos_ENABLE_Sacado=ON                      \
+    -DTrilinos_ENABLE_SEACAS=ON                      \
     -DTrilinos_ENABLE_Teuchos=ON                     \
     -DTrilinos_ENABLE_MueLu=ON                       \
     -DTrilinos_ENABLE_ML=ON                          \
@@ -108,9 +111,8 @@
     make install
       </pre>
       You will need to adjust the path into which you want to install Trilinos
-      in the CMAKE_INSTALL_PREFIX line. If you do not have MPI installed you
-      should use <code>-DTPL_ENABLE_MPI=OFF</code> instead. Additionally, if
-      your computer has enough memory available, it may also be useful to pass
+      in the CMAKE_INSTALL_PREFIX line. If your computer has enough memory
+      available, it may also be useful to pass
       the flag <code>-DTrilinos_ENABLE_EXPLICIT_INSTANTIATION=ON</code>, which
       will improve compilation times of deal.II programs that use Trilinos.
     </p>

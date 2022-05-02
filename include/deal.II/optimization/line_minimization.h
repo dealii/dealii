@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2018 - 2019 by the deal.II authors
+//    Copyright (C) 2018 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -25,9 +25,6 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/numerics/history.h>
-
-#include <errno.h>
-#include <sys/stat.h>
 
 #include <fstream>
 #include <string>
@@ -598,8 +595,8 @@ namespace LineMinimization
 
           if (debug_output)
             deallog << "Bracketing phase: " << i << std::endl
-                    << ai << " " << fi << " " << gi << " " << w1(ai, fi) << " "
-                    << w2(gi) << " " << f_min << std::endl;
+                    << ai << ' ' << fi << ' ' << gi << ' ' << w1(ai, fi) << ' '
+                    << w2(gi) << ' ' << f_min << std::endl;
 
           // first check if we can stop bracketing or the whole line search:
           if (fi <= f_min || ai == a_max)
@@ -706,11 +703,11 @@ namespace LineMinimization
 
         if (debug_output)
           deallog << "Sectioning phase: " << i << std::endl
-                  << a_lo << " " << f_lo << " " << g_lo << " " << w1(a_lo, f_lo)
-                  << " " << w2(g_lo) << std::endl
-                  << a_hi << " " << f_hi << " " << g_hi << " " << w1(a_hi, f_hi)
-                  << " " << w2(g_hi) << std::endl
-                  << ai << " " << fi << " " << gi << " " << w1(ai, fi) << " "
+                  << a_lo << ' ' << f_lo << ' ' << g_lo << ' ' << w1(a_lo, f_lo)
+                  << ' ' << w2(g_lo) << std::endl
+                  << a_hi << ' ' << f_hi << ' ' << g_hi << ' ' << w1(a_hi, f_hi)
+                  << ' ' << w2(g_hi) << std::endl
+                  << ai << ' ' << fi << ' ' << gi << ' ' << w1(ai, fi) << ' '
                   << w2(gi) << std::endl;
 
         if (!w1(ai, fi) || fi >= f_lo)

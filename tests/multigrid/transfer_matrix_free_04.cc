@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,7 +87,13 @@ check(const unsigned int fe_degree)
           LinearAlgebra::distributed::Vector<Number> v1, v2;
           LinearAlgebra::distributed::Vector<double> v1_cpy, v2_cpy, v3;
           v1.reinit(mgdof.locally_owned_mg_dofs(level - 1), MPI_COMM_WORLD);
-          v2.reinit(mgdof.locally_owned_mg_dofs(level), MPI_COMM_WORLD);
+          IndexSet relevant_set;
+          DoFTools::extract_locally_relevant_level_dofs(mgdof,
+                                                        level,
+                                                        relevant_set);
+          v2.reinit(mgdof.locally_owned_mg_dofs(level),
+                    relevant_set,
+                    MPI_COMM_WORLD);
           v3.reinit(mgdof.locally_owned_mg_dofs(level), MPI_COMM_WORLD);
           for (unsigned int i = 0; i < v1.local_size(); ++i)
             v1.local_element(i) = random_value<double>();
@@ -99,6 +105,8 @@ check(const unsigned int fe_degree)
           deallog << "Diff prolongate   l" << level << ": "
                   << filter_out_small_numbers(v3.l2_norm(), tolerance)
                   << std::endl;
+          deallog << "Vectors have ghosts: " << v2.has_ghost_elements() << ' '
+                  << v3.has_ghost_elements() << std::endl;
         }
 
       // check restriction for all levels using random vector

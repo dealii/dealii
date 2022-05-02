@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,7 @@
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_dgp_monomial.h>
+#include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
@@ -654,9 +654,9 @@ namespace Step44
     , degree(parameters.poly_degree)
     , fe(FE_Q<dim>(parameters.poly_degree),
          dim, // displacement
-         FE_DGPMonomial<dim>(parameters.poly_degree - 1),
+         FE_DGP<dim>(parameters.poly_degree - 1),
          1, // pressure
-         FE_DGPMonomial<dim>(parameters.poly_degree - 1),
+         FE_DGP<dim>(parameters.poly_degree - 1),
          1)
     , // dilatation
     dof_handler_ref(triangulation)
@@ -1191,8 +1191,8 @@ namespace Step44
     Assert(n_dependent_variables == n_independent_variables,
            ExcMessage("Expect square system."));
 
-    typedef AD::ResidualLinearization<ad_type_code, number_t> ADHelper;
-    typedef typename ADHelper::ad_type                        ADNumberType;
+    using ADHelper     = AD::ResidualLinearization<ad_type_code, number_t>;
+    using ADNumberType = typename ADHelper::ad_type;
     ADHelper ad_helper(n_independent_variables, n_dependent_variables);
     ad_helper.set_tape_buffer_sizes(); // Increase the buffer size from the
                                        // default values
@@ -1342,14 +1342,14 @@ namespace Step44
         VectorTools::interpolate_boundary_values(
           dof_handler_ref,
           boundary_id,
-          ZeroFunction<dim>(n_components),
+          Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(x_displacement));
       else
         VectorTools::interpolate_boundary_values(
           dof_handler_ref,
           boundary_id,
-          ZeroFunction<dim>(n_components),
+          Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(x_displacement));
     }
@@ -1359,14 +1359,14 @@ namespace Step44
         VectorTools::interpolate_boundary_values(
           dof_handler_ref,
           boundary_id,
-          ZeroFunction<dim>(n_components),
+          Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(y_displacement));
       else
         VectorTools::interpolate_boundary_values(
           dof_handler_ref,
           boundary_id,
-          ZeroFunction<dim>(n_components),
+          Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(y_displacement));
     }
@@ -1379,7 +1379,7 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
@@ -1387,7 +1387,7 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
@@ -1398,14 +1398,14 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               fe.component_mask(z_displacement));
           else
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               fe.component_mask(z_displacement));
         }
@@ -1415,7 +1415,7 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
@@ -1423,7 +1423,7 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement) |
                fe.component_mask(z_displacement)));
@@ -1437,14 +1437,14 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
           else
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
         }
@@ -1454,14 +1454,14 @@ namespace Step44
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
           else
             VectorTools::interpolate_boundary_values(
               dof_handler_ref,
               boundary_id,
-              ZeroFunction<dim>(n_components),
+              Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
         }

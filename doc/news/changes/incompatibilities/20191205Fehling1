@@ -1,6 +1,0 @@
-Changed: Adjusted threshold for fixed number adaptation: The last qualifying
-cells for refinement and coarsening now specify their respective threshold.
-This affects both GridRefinement::fixed_number_refinement() and
-parallel::distributed::GridRefinement::fixed_number_refinement().
-<br>
-(Marc Fehling, 12/05/2019)

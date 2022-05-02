@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,27 +45,27 @@ namespace LinearAlgebra
   ReadWriteVector<float>::import(
     const distributed::Vector<float, ::dealii::MemorySpace::Host> &,
     VectorOperation::values,
-    const std::shared_ptr<const CommunicationPatternBase> &);
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 
   template void
   ReadWriteVector<double>::import(
     const distributed::Vector<double, ::dealii::MemorySpace::Host> &,
     VectorOperation::values,
-    const std::shared_ptr<const CommunicationPatternBase> &);
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
   template void
   ReadWriteVector<std::complex<float>>::import(
     const distributed::Vector<std::complex<float>, ::dealii::MemorySpace::Host>
       &,
     VectorOperation::values,
-    const std::shared_ptr<const CommunicationPatternBase> &);
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 
   template void
   ReadWriteVector<std::complex<double>>::import(
     const distributed::Vector<std::complex<double>, ::dealii::MemorySpace::Host>
       &,
     VectorOperation::values,
-    const std::shared_ptr<const CommunicationPatternBase> &);
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 #  endif
 #endif
 } // namespace LinearAlgebra

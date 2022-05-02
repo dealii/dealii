@@ -1,0 +1,5 @@
+New: The function FEInterfaceValues::dof_indices() has been added to make
+writing range-based for loops over all local interface degrees of freedom much
+simpler.
+<br>
+(Jean-Paul Pelteret, 2021/08/05)

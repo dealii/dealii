@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,6 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -34,6 +33,8 @@
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
+
+#include <memory>
 
 #include "../tests.h"
 
@@ -66,7 +67,7 @@ regression_slope(const std::vector<double> &x, const std::vector<double> &y)
 
   double sum_1 = 0.0, sum_x = 0.0, sum_x2 = 0.0, sum_y = 0.0, sum_xy = 0.0;
 
-  for (unsigned int i = 0; i < x.size(); i++)
+  for (unsigned int i = 0; i < x.size(); ++i)
     {
       sum_1 += 1.0;
       sum_x += x[i];
@@ -155,7 +156,7 @@ template <int dim>
 std::unique_ptr<Manifold<dim>>
 Geometry<dim>::clone() const
 {
-  return std_cxx14::make_unique<Geometry<dim>>();
+  return std::make_unique<Geometry<dim>>();
 }
 
 
@@ -207,17 +208,17 @@ test(const FiniteElement<dim> &fe)
       deallog << "mapping order: " << mapping_p << std::endl;
       Triangulation<dim> triangulation;
       create_tria(triangulation, geometry);
-      DoFHandler<dim> dof_handler;
+      DoFHandler<dim> dof_handler(triangulation);
 
       std::vector<double> log_refinements;
       std::vector<double> log_l2_errors;
 
-      MappingQ<dim> mapping(mapping_p, true);
+      MappingQ<dim> mapping(mapping_p);
       for (unsigned int refinement_n = 1; refinement_n < 4; ++refinement_n)
         {
           triangulation.refine_global(1);
           dof_handler.clear();
-          dof_handler.initialize(triangulation, fe);
+          dof_handler.distribute_dofs(fe);
 
           Vector<double> v(dof_handler.n_dofs());
           VectorTools::project(mapping,

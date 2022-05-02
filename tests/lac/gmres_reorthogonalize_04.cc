@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,8 @@ namespace dealii
 {
   template <typename Number>
   template <typename Number2>
-  Number Vector<Number>::operator*(const Vector<Number2> &v) const
+  Number
+  Vector<Number>::operator*(const Vector<Number2> &v) const
   {
     Number sum = 0;
     for (unsigned int i = 0; i < size(); ++i)
@@ -54,7 +55,7 @@ namespace dealii
 
 template <typename number>
 void
-test()
+test(const unsigned int n_expected_steps)
 {
   const unsigned int n = 200;
   Vector<number>     rhs(n), sol(n);
@@ -81,19 +82,24 @@ test()
                               << accumulated_iterations << std::endl;
   };
   solver.connect_re_orthogonalization_slot(print_re_orthogonalization);
-  solver.solve(matrix, sol, rhs, PreconditionIdentity());
+
+  check_solver_within_range(
+    solver.solve(matrix, sol, rhs, PreconditionIdentity()),
+    control.last_step(),
+    n_expected_steps - 3,
+    n_expected_steps + 3);
 }
 
 int
 main()
 {
   initlog();
-  deallog << std::setprecision(3);
+  deallog << std::setprecision(10);
 
   deallog.push("double");
-  test<double>();
+  test<double>(105);
   deallog.pop();
   deallog.push("float");
-  test<float>();
+  test<float>(59);
   deallog.pop();
 }

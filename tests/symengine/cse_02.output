@@ -1,0 +1,33 @@
+
+DEAL:Independents::a
+DEAL:Independents::b
+DEAL:Independents::c
+DEAL:Dependents::a + b
+DEAL:Dependents::2*a + 2*b
+DEAL:Dependents::c*(a + b)
+DEAL:Dependents::(a + b)**2
+DEAL:Dependents::(a + b)**2
+DEAL:Dependents::2**(a + b)
+DEAL:Dependents::(a + b)**(a + b)
+DEAL:Dependents::(a + b)**((a + b)**(a + b))
+DEAL:Dependents::exp(a + b)
+DEAL:Dependents::log(c*(a + b))
+DEAL:Dependents::sin(c*(a + b))
+DEAL:Dependents::asin(c*(a + b))
+DEAL:CSE elimination:Intermediate reduced expressions::0: x0 = a + b
+DEAL:CSE elimination:Intermediate reduced expressions::1: x1 = c*x0
+DEAL:CSE elimination:Intermediate reduced expressions::2: x2 = x0**2
+DEAL:CSE elimination:Intermediate reduced expressions::3: x3 = x0**x0
+DEAL:CSE elimination:Final reduced expressions for dependent variables::0: x0
+DEAL:CSE elimination:Final reduced expressions for dependent variables::1: 2*a + 2*b
+DEAL:CSE elimination:Final reduced expressions for dependent variables::2: x1
+DEAL:CSE elimination:Final reduced expressions for dependent variables::3: x2
+DEAL:CSE elimination:Final reduced expressions for dependent variables::4: x2
+DEAL:CSE elimination:Final reduced expressions for dependent variables::5: 2**x0
+DEAL:CSE elimination:Final reduced expressions for dependent variables::6: x3
+DEAL:CSE elimination:Final reduced expressions for dependent variables::7: x0**x3
+DEAL:CSE elimination:Final reduced expressions for dependent variables::8: exp(x0)
+DEAL:CSE elimination:Final reduced expressions for dependent variables::9: log(x1)
+DEAL:CSE elimination:Final reduced expressions for dependent variables::10: sin(x1)
+DEAL:CSE elimination:Final reduced expressions for dependent variables::11: asin(x1)
+DEAL:CSE elimination::OK

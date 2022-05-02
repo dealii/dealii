@@ -38,23 +38,23 @@ DEAL::No MappingQ transform possible for this cell and point.
 DEAL::Point p=(-0.400000 0.100000) on cell with id 1_0:: 0.741421 0.600000
 DEAL::Distance to mapping point: -1.11022e-16 0.0250000 
 DEAL::Point p=(-0.400000 0.100000) on cell with id 2_0:: -0.182843 0.670711
-DEAL::Distance to mapping point: 2.77556e-17 0.00000 
+DEAL::Distance to mapping point: 0.00000 0.00000 
 DEAL::Point p=(-0.400000 0.100000) on cell with id 3_0:: 0.600000 2.67279
 DEAL::No MappingQ transform possible for this cell and point.
 DEAL::Point p=(-0.400000 0.100000) on cell with id 4_0:: 1.46569 0.100000
-DEAL::Distance to mapping point: 2.22045e-16 -1.60000 
+DEAL::Distance to mapping point: -2.22045e-16 -1.60000 
 DEAL::Point p=(-0.400000 0.100000 0.600000) on cell with id 0_0:: -0.446410 0.736603 1.91962
-DEAL::Distance to mapping point: 5.55112e-17 1.11022e-16 -2.22045e-16 
+DEAL::Distance to mapping point: 0.00000 0.00000 0.00000 
 DEAL::Point p=(-0.400000 0.100000 0.600000) on cell with id 1_0:: -0.00717968 0.626795 3.21658
-DEAL::No MappingQ transform possible for this cell and point.
+DEAL::Distance to mapping point: 0.840513 -0.210128 -8.88178e-16 
 DEAL::Point p=(-0.400000 0.100000 0.600000) on cell with id 2_0:: 0.626795 2.67017 1.26077
-DEAL::No MappingQ transform possible for this cell and point.
+DEAL::Distance to mapping point: -0.251795 0.00000 -1.51077 
 DEAL::Point p=(-0.400000 0.100000 0.600000) on cell with id 3_0:: -0.00717968 -0.0618802 0.626795
-DEAL::Distance to mapping point: 0.173846 -4.85723e-17 -0.0434616 
+DEAL::Distance to mapping point: 0.173846 -3.05311e-16 -0.0434616 
 DEAL::Point p=(-0.400000 0.100000 0.600000) on cell with id 4_0:: 0.484530 0.626795 1.26077
-DEAL::Distance to mapping point: 0.00000 -0.00179492 -0.0107695 
+DEAL::Distance to mapping point: 2.77556e-16 -0.00179492 -0.0107695 
 DEAL::Point p=(-0.400000 0.100000 0.600000) on cell with id 5_0:: -0.00717968 1.85056 1.26077
-DEAL::No MappingQ transform possible for this cell and point.
+DEAL::Distance to mapping point: 2.50718 -2.22045e-16 -3.76077 
 DEAL::Point p=(-0.400000 0.100000 0.600000) on cell with id 6_0:: 1.30415 -0.00717968 1.26077
 DEAL::Distance to mapping point: 2.22045e-16 -1.49282 2.23923 
 DEAL::Point p=(-0.400000 0.00000) on cell with id 0_0:: -0.115537

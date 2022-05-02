@@ -1,0 +1,11 @@
+Fixed: AlignedVector objects for which
+AlignedVector::replicate_across_communicator() had previously been
+called, could not be move-constructed or move-assigned: The resulting
+object was usable, but destruction of the target object led to memory
+errors that aborted the program. This is now fixed. As a side effect
+of the patch, memory consumption of AlignedVector objects has also
+been shrunk for the most common case where
+AlignedVector::replicate_across_communicator() has not actually been called.
+<br>
+(Wolfgang Bangerth, 2021/07/28)
+

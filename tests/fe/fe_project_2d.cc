@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -141,8 +141,9 @@ VectorFunction<dim>::vector_value(const Point<dim> &p,
     values(i) = value(p, i);
 }
 
-void create_tria(Triangulation<2> &triangulation,
-                 const Point<2> *  vertices_parallelograms)
+void
+create_tria(Triangulation<2> &triangulation,
+            const Point<2> *  vertices_parallelograms)
 {
   const std::vector<Point<2>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
@@ -182,7 +183,7 @@ test(const FiniteElement<dim> &fe,
   const QGauss<dim>                quadrature(fe.degree + 1);
   const unsigned int               n_q_points = quadrature.size();
   MappingQ<dim>                    mapping(1);
-  // MappingQGeneric<dim> mapping(1);
+  // MappingQ<dim> mapping(1);
   std::vector<double>                                         div_v(n_q_points);
   std::vector<typename FEValuesViews::Vector<dim>::curl_type> curl_v(
     n_q_points);
@@ -228,7 +229,7 @@ test(const FiniteElement<dim> &fe,
           const std::vector<double> &JxW_values = fe_values.get_JxW_values();
           fe_values[vec].get_function_divergences(v, div_v);
           fe_values[vec].get_function_curls(v, curl_v);
-          for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for (const auto q_point : fe_values.quadrature_point_indices())
             {
               total_div += JxW_values[q_point] * div_v[q_point];
               total_curl += JxW_values[q_point] * curl_v[q_point];

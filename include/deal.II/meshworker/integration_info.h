@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,7 +72,6 @@ namespace MeshWorker
    * initialize() in this class.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim = dim>
   class IntegrationInfo
@@ -82,8 +81,8 @@ namespace MeshWorker
     std::vector<std::shared_ptr<FEValuesBase<dim, spacedim>>> fevalv;
 
   public:
-    static const unsigned int dimension       = dim;
-    static const unsigned int space_dimension = spacedim;
+    static constexpr unsigned int dimension       = dim;
+    static constexpr unsigned int space_dimension = spacedim;
 
     /**
      * Constructor.
@@ -293,7 +292,6 @@ namespace MeshWorker
    * correctly, typically in an IntegrationInfoBox.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim = dim>
   class IntegrationInfoBox

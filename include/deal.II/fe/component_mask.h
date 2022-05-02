@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,8 +76,6 @@ DEAL_II_NAMESPACE_OPEN
  * in 3d, the result would be <code>[true, true, true, false]</code>.
  *
  * @ingroup fe
- * @author Wolfgang Bangerth
- * @date 2012
  * @ingroup vector_valued
  */
 class ComponentMask
@@ -142,7 +140,8 @@ public:
    * Otherwise, the given index needs to be between zero and the number of
    * components that this mask represents.
    */
-  bool operator[](const unsigned int component_index) const;
+  bool
+  operator[](const unsigned int component_index) const;
 
   /**
    * Return whether this component mask represents a mask with exactly
@@ -202,7 +201,8 @@ public:
    * Return a component mask that has only those elements set that are set
    * both in the current object as well as the one passed as an argument.
    */
-  ComponentMask operator&(const ComponentMask &mask) const;
+  ComponentMask
+  operator&(const ComponentMask &mask) const;
 
   /**
    * Return whether this object and the argument are identical.
@@ -285,7 +285,8 @@ ComponentMask::set(const unsigned int index, const bool value)
 }
 
 
-inline bool ComponentMask::operator[](const unsigned int component_index) const
+inline bool
+ComponentMask::operator[](const unsigned int component_index) const
 {
   // if the mask represents the all-component mask
   // then always return true
@@ -379,7 +380,8 @@ ComponentMask::operator|(const ComponentMask &mask) const
 }
 
 
-inline ComponentMask ComponentMask::operator&(const ComponentMask &mask) const
+inline ComponentMask
+ComponentMask::operator&(const ComponentMask &mask) const
 {
   // if one of the two masks denotes the all-component mask,
   // then return the other one

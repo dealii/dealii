@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,8 +34,6 @@
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
 
-#include <deal.II/grid/grid_tools.h>
-
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_postprocessor.h>
@@ -61,6 +59,9 @@ namespace internal
     class PointGeometryData
     {
     public:
+      /**
+       * Only a constructor needed for this class (a struct really)
+       */
       PointGeometryData(
         const Point<dim> &                          new_requested_location,
         const std::vector<Point<dim>> &             new_locations,
@@ -442,8 +443,8 @@ public:
    * Return a @p Vector with the indices of selected points flagged with a 1.
    * This method is mainly for testing and verifying that the class is working
    * correctly. By passing this vector to a DataOut object, the user can
-   * verify that the positions returned by @p get_points agree with the
-   * positions that @p DataOut interprets from the @p Vector returned. The
+   * verify that the positions returned by @p get_support_locations agree with
+   * the positions that @p DataOut interprets from the @p Vector returned. The
    * code snippet below demonstrates how this could be done:
    * @code
    * // Make a DataOut object and attach the dof_handler
@@ -475,18 +476,6 @@ public:
   get_support_locations(std::vector<std::vector<Point<dim>>> &locations);
 
   /**
-   * @deprecated
-   *
-   * This function only exists for backward compatibility as this is the
-   * interface provided by previous versions of the library. The function
-   * get_support_locations replaces it and reflects the fact that the points
-   * returned are actually the support points.
-   */
-  DEAL_II_DEPRECATED
-  void
-  get_points(std::vector<std::vector<Point<dim>>> &locations);
-
-  /**
    * Stores the actual location of the points used by the data_postprocessor.
    * This can be used to compare with the points requested, for example by
    * using the @p Point<dim>::distance function. Unlike the support_locations,
@@ -505,9 +494,9 @@ public:
    * defines a state of the class and ensures this does not happen. Additional
    * points or vectors can only be added while the class is not closed, and
    * the class must be closed before datasets can be added or written to file.
-   * @p PointValueHistory::get_points and @p PointValueHistory::status do not
-   * require the class to be closed. If a method that requires a class to be
-   * open or close is called while in the wrong state a @p ExcInvalidState
+   * @p PointValueHistory::get_support_locations and @p PointValueHistory::status
+   * do not require the class to be closed. If a method that requires a class to
+   * be open or close is called while in the wrong state a @p ExcInvalidState
    * exception is thrown.
    */
   void

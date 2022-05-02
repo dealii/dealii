@@ -2,19 +2,19 @@
 DEAL:0:2d::* cycle 0
 DEAL:0:2d::ghost owners: 1 2 
 DEAL:0:2d::level ghost owners: 1 2 
-DEAL:0:2d::total active cells = 149
+DEAL:0:2d::total active cells = 152
 DEAL:0:2d::* cycle 1
 DEAL:0:2d::ghost owners: 1 2 
 DEAL:0:2d::level ghost owners: 1 2 
-DEAL:0:2d::total active cells = 227
+DEAL:0:2d::total active cells = 296
 DEAL:0:2d::* cycle 2
 DEAL:0:2d::ghost owners: 1 2 
 DEAL:0:2d::level ghost owners: 1 2 
-DEAL:0:2d::total active cells = 467
+DEAL:0:2d::total active cells = 581
 DEAL:0:2d::* cycle 3
-DEAL:0:2d::ghost owners: 1 2 
+DEAL:0:2d::ghost owners: 1 
 DEAL:0:2d::level ghost owners: 1 2 
-DEAL:0:2d::total active cells = 728
+DEAL:0:2d::total active cells = 1139
 DEAL:0:2d::OK
 DEAL:0:3d::* cycle 0
 DEAL:0:3d::ghost owners: 1 2 
@@ -23,15 +23,15 @@ DEAL:0:3d::total active cells = 1020
 DEAL:0:3d::* cycle 1
 DEAL:0:3d::ghost owners: 1 2 
 DEAL:0:3d::level ghost owners: 1 2 
-DEAL:0:3d::total active cells = 3785
+DEAL:0:3d::total active cells = 3813
 DEAL:0:3d::* cycle 2
 DEAL:0:3d::ghost owners: 1 2 
 DEAL:0:3d::level ghost owners: 1 2 
-DEAL:0:3d::total active cells = 11702
+DEAL:0:3d::total active cells = 12857
 DEAL:0:3d::* cycle 3
 DEAL:0:3d::ghost owners: 1 2 
 DEAL:0:3d::level ghost owners: 1 2 
-DEAL:0:3d::total active cells = 37868
+DEAL:0:3d::total active cells = 43454
 DEAL:0:3d::OK
 
 DEAL:1:2d::* cycle 0
@@ -41,10 +41,10 @@ DEAL:1:2d::* cycle 1
 DEAL:1:2d::ghost owners: 0 2 3 
 DEAL:1:2d::level ghost owners: 0 2 3 
 DEAL:1:2d::* cycle 2
-DEAL:1:2d::ghost owners: 0 2 
+DEAL:1:2d::ghost owners: 0 2 3 
 DEAL:1:2d::level ghost owners: 0 2 3 
 DEAL:1:2d::* cycle 3
-DEAL:1:2d::ghost owners: 0 2 
+DEAL:1:2d::ghost owners: 0 2 3 
 DEAL:1:2d::level ghost owners: 0 2 3 
 DEAL:1:2d::OK
 DEAL:1:3d::* cycle 0
@@ -69,11 +69,11 @@ DEAL:2:2d::* cycle 1
 DEAL:2:2d::ghost owners: 0 1 3 
 DEAL:2:2d::level ghost owners: 0 1 3 4 
 DEAL:2:2d::* cycle 2
-DEAL:2:2d::ghost owners: 0 1 3 4 
+DEAL:2:2d::ghost owners: 0 1 3 
 DEAL:2:2d::level ghost owners: 0 1 3 4 
 DEAL:2:2d::* cycle 3
-DEAL:2:2d::ghost owners: 0 1 3 
-DEAL:2:2d::level ghost owners: 0 1 3 4 5 
+DEAL:2:2d::ghost owners: 1 3 4 
+DEAL:2:2d::level ghost owners: 0 1 3 4 
 DEAL:2:2d::OK
 DEAL:2:3d::* cycle 0
 DEAL:2:3d::ghost owners: 0 1 3 4 
@@ -85,7 +85,7 @@ DEAL:2:3d::* cycle 2
 DEAL:2:3d::ghost owners: 0 1 3 4 5 6 
 DEAL:2:3d::level ghost owners: 0 1 3 4 5 6 
 DEAL:2:3d::* cycle 3
-DEAL:2:3d::ghost owners: 0 1 3 4 5 
+DEAL:2:3d::ghost owners: 0 1 3 4 5 6 
 DEAL:2:3d::level ghost owners: 0 1 3 4 5 6 
 DEAL:2:3d::OK
 
@@ -97,10 +97,10 @@ DEAL:3:2d::* cycle 1
 DEAL:3:2d::ghost owners: 1 2 4 5 
 DEAL:3:2d::level ghost owners: 1 2 4 5 
 DEAL:3:2d::* cycle 2
-DEAL:3:2d::ghost owners: 2 4 5 
+DEAL:3:2d::ghost owners: 1 2 4 5 
 DEAL:3:2d::level ghost owners: 1 2 4 5 
 DEAL:3:2d::* cycle 3
-DEAL:3:2d::ghost owners: 2 4 5 
+DEAL:3:2d::ghost owners: 1 2 4 
 DEAL:3:2d::level ghost owners: 1 2 4 5 
 DEAL:3:2d::OK
 DEAL:3:3d::* cycle 0
@@ -125,10 +125,10 @@ DEAL:4:2d::* cycle 1
 DEAL:4:2d::ghost owners: 3 5 6 
 DEAL:4:2d::level ghost owners: 2 3 5 6 
 DEAL:4:2d::* cycle 2
-DEAL:4:2d::ghost owners: 2 3 5 
+DEAL:4:2d::ghost owners: 3 5 6 
 DEAL:4:2d::level ghost owners: 2 3 5 6 
 DEAL:4:2d::* cycle 3
-DEAL:4:2d::ghost owners: 3 5 6 
+DEAL:4:2d::ghost owners: 2 3 5 6 
 DEAL:4:2d::level ghost owners: 2 3 5 6 
 DEAL:4:2d::OK
 DEAL:4:3d::* cycle 0
@@ -156,8 +156,8 @@ DEAL:5:2d::* cycle 2
 DEAL:5:2d::ghost owners: 3 4 6 
 DEAL:5:2d::level ghost owners: 3 4 6 
 DEAL:5:2d::* cycle 3
-DEAL:5:2d::ghost owners: 3 4 6 
-DEAL:5:2d::level ghost owners: 2 3 4 6 
+DEAL:5:2d::ghost owners: 4 6 
+DEAL:5:2d::level ghost owners: 3 4 6 
 DEAL:5:2d::OK
 DEAL:5:3d::* cycle 0
 DEAL:5:3d::ghost owners: 3 4 6 
@@ -181,7 +181,7 @@ DEAL:6:2d::* cycle 1
 DEAL:6:2d::ghost owners: 4 5 
 DEAL:6:2d::level ghost owners: 4 5 
 DEAL:6:2d::* cycle 2
-DEAL:6:2d::ghost owners: 5 
+DEAL:6:2d::ghost owners: 4 5 
 DEAL:6:2d::level ghost owners: 4 5 
 DEAL:6:2d::* cycle 3
 DEAL:6:2d::ghost owners: 4 5 
@@ -197,7 +197,7 @@ DEAL:6:3d::* cycle 2
 DEAL:6:3d::ghost owners: 2 3 4 5 
 DEAL:6:3d::level ghost owners: 2 3 4 5 
 DEAL:6:3d::* cycle 3
-DEAL:6:3d::ghost owners: 3 4 5 
+DEAL:6:3d::ghost owners: 2 3 4 5 
 DEAL:6:3d::level ghost owners: 2 3 4 5 
 DEAL:6:3d::OK
 

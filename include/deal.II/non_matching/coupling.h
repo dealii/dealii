@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,8 +89,6 @@ namespace NonMatching
    *
    * See the tutorial program step-60 for an example on how to use this
    * function.
-   *
-   * @author Luca Heltai, 2018
    */
   template <int dim0,
             int dim1,
@@ -109,15 +107,15 @@ namespace NonMatching
     const Mapping<dim0, spacedim> &   space_mapping =
       StaticMappingQ1<dim0, spacedim>::mapping,
     const Mapping<dim1, spacedim> &immersed_mapping =
-      StaticMappingQ1<dim1, spacedim>::mapping);
+      StaticMappingQ1<dim1, spacedim>::mapping,
+    const AffineConstraints<number> &immersed_constraints =
+      AffineConstraints<number>());
 
   /**
    * Same as above, but takes an additional GridTools::Cache object, instead of
    * creating one internally. In this version of the function, the parameter @p
    * space_mapping cannot be specified, since it is taken from the @p cache
    * parameter.
-   *
-   * @author Luca Heltai, 2018
    */
   template <int dim0,
             int dim1,
@@ -135,7 +133,9 @@ namespace NonMatching
     const ComponentMask &            space_comps = ComponentMask(),
     const ComponentMask &            immersed_comps = ComponentMask(),
     const Mapping<dim1, spacedim> &  immersed_mapping =
-      StaticMappingQ1<dim1, spacedim>::mapping);
+      StaticMappingQ1<dim1, spacedim>::mapping,
+    const AffineConstraints<number> &immersed_constraints =
+      AffineConstraints<number>());
 
 
   /**
@@ -181,8 +181,6 @@ namespace NonMatching
    *
    * See the tutorial program step-60 for an example on how to use this
    * function.
-   *
-   * @author Luca Heltai, 2018
    */
   template <int dim0, int dim1, int spacedim, typename Matrix>
   void
@@ -198,15 +196,15 @@ namespace NonMatching
     const Mapping<dim0, spacedim> &space_mapping =
       StaticMappingQ1<dim0, spacedim>::mapping,
     const Mapping<dim1, spacedim> &immersed_mapping =
-      StaticMappingQ1<dim1, spacedim>::mapping);
+      StaticMappingQ1<dim1, spacedim>::mapping,
+    const AffineConstraints<typename Matrix::value_type> &immersed_constraints =
+      AffineConstraints<typename Matrix::value_type>());
 
   /**
    * Same as above, but takes an additional GridTools::Cache object, instead of
    * creating one internally. In this version of the function, the parameter @p
    * space_mapping cannot specified, since it is taken from the @p cache
    * parameter.
-   *
-   * @author Luca Heltai, 2018
    */
   template <int dim0, int dim1, int spacedim, typename Matrix>
   void
@@ -221,7 +219,9 @@ namespace NonMatching
     const ComponentMask &          space_comps    = ComponentMask(),
     const ComponentMask &          immersed_comps = ComponentMask(),
     const Mapping<dim1, spacedim> &immersed_mapping =
-      StaticMappingQ1<dim1, spacedim>::mapping);
+      StaticMappingQ1<dim1, spacedim>::mapping,
+    const AffineConstraints<typename Matrix::value_type> &immersed_constraints =
+      AffineConstraints<typename Matrix::value_type>());
 
   /**
    * Create a coupling sparsity pattern for non-matching independent grids,
@@ -268,8 +268,6 @@ namespace NonMatching
    * as input (but a quadrature formula @p quad is required). In this case, more
    * restrictive conditions are required on the two spaces. See the
    * documentation of the other create_coupling_sparsity_pattern() function.
-   *
-   * @author Luca Heltai, 2019.
    */
   template <int dim0,
             int dim1,
@@ -334,8 +332,6 @@ namespace NonMatching
    * that the kernel is the Dirac delta distribution, and the call is forwarded
    * to the method in this namespace with the same name, that does not take an
    * epsilon as input.
-   *
-   * @author Luca Heltai, 2019.
    */
   template <int dim0, int dim1, int spacedim, typename Matrix>
   void

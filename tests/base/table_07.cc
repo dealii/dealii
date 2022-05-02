@@ -54,5 +54,8 @@ main()
   dealii::Table<2, T> table2;
   table2 = std::move(table); // should not create new objects
 
+  table.clear();
+  Assert(table.empty() == true, ExcInternalError());
+
   deallog << "OK" << std::endl;
 }

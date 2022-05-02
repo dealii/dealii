@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,9 +78,9 @@ main()
   bfad.val() = Sacado::Fad::DFad<double>(num_deriv, 1, b);
 
   // AD typedefs
-  typedef Sacado::Fad::DFad<Sacado::Fad::DFad<double>> ADNumberType;
-  typedef typename ADNumberType::value_type            ADDerivativeType;
-  typedef typename ADNumberType::scalar_type ADScalarType; // == double
+  using ADNumberType     = Sacado::Fad::DFad<Sacado::Fad::DFad<double>>;
+  using ADDerivativeType = typename ADNumberType::value_type;
+  using ADScalarType     = typename ADNumberType::scalar_type; // == double
 
   // Compute function and derivative with AD
   const ADNumberType rfad = func(afad, bfad, cfad);

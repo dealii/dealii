@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,6 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::map_dof_to_boundary_indices(const DoFHandler<int>     &,
@@ -26,9 +25,9 @@
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   std::vector<types::global_dof_index> map(dof_handler.n_dofs());
   std::set<types::boundary_id>         boundary_ids;
@@ -40,7 +39,7 @@ check_this(const DoFHandlerType &dof_handler)
     deallog << (map[i] == numbers::invalid_dof_index ?
                   -1 :
                   static_cast<signed int>(map[i]))
-            << " ";
+            << ' ';
   deallog << std::endl;
 
   // check for boundary id 0 and 1
@@ -50,6 +49,6 @@ check_this(const DoFHandlerType &dof_handler)
     deallog << (map[i] == numbers::invalid_dof_index ?
                   -1 :
                   static_cast<signed int>(map[i]))
-            << " ";
+            << ' ';
   deallog << std::endl;
 }

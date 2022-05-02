@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -110,8 +110,8 @@ test()
 
   // Integrate the difference in the second component. Since we did not
   // interpolate the function into the finite element space, this should be
-  // equal to the integral of the ConstantFunction (=1) over the domain (unit
-  // square/cube). Thus the integral should be one.
+  // equal to the integral of the Functions::ConstantFunction (=1) over the
+  // domain (unit square/cube). Thus the integral should be one.
   VectorTools::integrate_difference(dofh,
                                     x_rel,
                                     Functions::ConstantFunction<dim>(1, 2),

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2019 by the deal.II authors
+ * Copyright (C) 2011 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -40,14 +40,11 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -85,7 +82,7 @@ namespace Step41
     void setup_system();
     void assemble_system();
     void
-         assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
+    assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix &mass_matrix);
     void update_solution_and_constraints();
     void solve();
     void output_results(const unsigned int iteration) const;
@@ -249,7 +246,7 @@ namespace Step41
     mass_matrix.reinit(dsp);
     assemble_mass_matrix_diagonal(mass_matrix);
     diagonal_of_mass_matrix.reinit(solution_index_set);
-    for (unsigned int j = 0; j < solution.size(); j++)
+    for (unsigned int j = 0; j < solution.size(); ++j)
       diagonal_of_mass_matrix(j) = mass_matrix.diag_element(j);
   }
 
@@ -276,7 +273,7 @@ namespace Step41
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -345,12 +342,12 @@ namespace Step41
   {
     Assert(fe.degree == 1, ExcNotImplemented());
 
-    const QTrapez<dim> quadrature_formula;
-    FEValues<dim>      fe_values(fe,
+    const QTrapezoid<dim> quadrature_formula;
+    FEValues<dim>         fe_values(fe,
                             quadrature_formula,
                             update_values | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -443,10 +440,9 @@ namespace Step41
     std::vector<bool>   dof_touched(dof_handler.n_dofs(), false);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+      for (const auto v : cell->vertex_indices())
         {
-          Assert(dof_handler.get_fe().dofs_per_cell ==
-                   GeometryInfo<dim>::vertices_per_cell,
+          Assert(dof_handler.get_fe().n_dofs_per_cell() == cell->n_vertices(),
                  ExcNotImplemented());
 
           const unsigned int dof_index = cell->vertex_dof_index(v, 0);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,8 @@
 #  include <deal.II/base/thread_management.h>
 
 #  include <gsl/gsl_spline.h>
+
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -49,7 +51,7 @@ namespace Functions
                  << "The input interpolation points are not strictly ordered : "
                  << std::endl
                  << "x[" << arg1 << "] = " << arg2 << " >= x[" << (arg1 + 1)
-                 << "] = " << arg3 << ".");
+                 << "] = " << arg3 << '.');
 
   DeclException3(
     ExcCSplineRange,
@@ -58,7 +60,7 @@ namespace Functions
     double,
     << "Spline function can not be evaluated outside of the interpolation range: "
     << std::endl
-    << arg1 << " is not in [" << arg2 << ";" << arg3 << "].");
+    << arg1 << " is not in [" << arg2 << ';' << arg3 << "].");
 
   /**
    * The cubic spline function using GNU Scientific Library.
@@ -69,8 +71,6 @@ namespace Functions
    * @note This function is only implemented for dim==1 .
    *
    * @ingroup functions
-   * @author Denis Davydov
-   * @date 2016
    */
   template <int dim>
   class CSpline : public Function<dim>
@@ -83,11 +83,6 @@ namespace Functions
      */
     CSpline(const std::vector<double> &interpolation_points,
             const std::vector<double> &interpolation_values);
-
-    /**
-     * Virtual destructor.
-     */
-    virtual ~CSpline() override;
 
     virtual double
     value(const Point<dim> & point,
@@ -105,8 +100,11 @@ namespace Functions
     laplacian(const Point<dim> & p,
               const unsigned int component = 0) const override;
 
-    std::size_t
-    memory_consumption() const;
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
 
   private:
     /**
@@ -122,12 +120,12 @@ namespace Functions
     /**
      * GSL accelerator for spline interpolation
      */
-    gsl_interp_accel *acc;
+    std::unique_ptr<gsl_interp_accel, void (*)(gsl_interp_accel *)> acc;
 
     /**
      * GSL cubic spline interpolator
      */
-    gsl_spline *cspline;
+    std::unique_ptr<gsl_spline, void (*)(gsl_spline *)> cspline;
 
     /**
      * A mutex for accelerator object.

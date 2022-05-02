@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/tensor.h>
 
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -221,7 +221,7 @@ main()
             << "minimizers. The output here has been eyeballed as decent."
             << std::endl;
 
-    MappingQGeneric<2, 3> mapping(6);
+    MappingQ<2, 3> mapping(6);
     for (auto &cell : triangulation.active_cell_iterators())
       {
         const Point<3> projected_point =

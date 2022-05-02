@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,7 +106,6 @@ namespace internal
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Guido Kanschat, 2006
  */
 template <typename MatrixType>
 class MatrixBlock : public Subscriptor
@@ -348,7 +347,6 @@ private:
  *
  * @relatesalso MatrixBlock
  * @ingroup vector_valued
- * @author Baerbel Janssen, Guido Kanschat, 2010
  */
 template <typename MatrixType>
 class MatrixBlockVector : private AnyData
@@ -438,7 +436,6 @@ public:
  *
  * @relatesalso MatrixBlock
  * @ingroup vector_valued
- * @author Baerbel Janssen, Guido Kanschat, 2010
  */
 template <typename MatrixType>
 class MGMatrixBlockVector : public Subscriptor

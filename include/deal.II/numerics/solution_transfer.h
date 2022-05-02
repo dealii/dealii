@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * <li> If the grid will only be refined (i.e. no cells are coarsened) then
  * use @p SolutionTransfer as follows:
  * @code
- * SolutionTransfer<dim, double> soltrans(*dof_handler);
+ * SolutionTransfer<dim, Vector<double> > soltrans(*dof_handler);
  *
  * // flag some cells for refinement, e.g.
  * GridRefinement::refine_and_coarsen_fixed_fraction(*tria,
@@ -151,10 +151,10 @@ DEAL_II_NAMESPACE_OPEN
  * soltrans.refine_interpolate(old_solution, solution);
  * @endcode
  *
- * Multiple calls to the function <code>interpolate (const Vector<number> &in,
- * Vector<number> &out)</code> are NOT allowed. Interpolating several
+ * Multiple calls to the function <code>interpolate (const VectorType &in,
+ * VectorType &out)</code> are NOT allowed. Interpolating several
  * functions can be performed in one step by using <tt>void interpolate (const
- * vector<Vector<number> >&all_in, vector<Vector<number> >&all_out)
+ * vector<VectorType> &all_in, vector<VectorType> &all_out)
  * const</tt>, and using the respective @p
  * prepare_for_coarsening_and_refinement function taking several vectors as
  * input before actually refining and coarsening the triangulation (see
@@ -164,7 +164,7 @@ DEAL_II_NAMESPACE_OPEN
  * For deleting all stored data in @p SolutionTransfer and reinitializing it
  * use the <tt>clear()</tt> function.
  *
- * The template argument @p number denotes the data type of the vectors you
+ * The template argument @p VectorType denotes the type of data container you
  * want to transfer.
  *
  *
@@ -221,17 +221,17 @@ DEAL_II_NAMESPACE_OPEN
  * will not be coarsened need to be stored according to the solution transfer
  * with pure refinement (cf there). All this is performed by
  * <tt>prepare_for_coarsening_and_refinement(all_in)</tt> where the
- * <tt>vector<Vector<number> > all_in</tt> includes all discrete
+ * <tt>vector<VectorType> all_in</tt> includes all discrete
  * functions to be interpolated onto the new grid.
  *
  * As we need two different kinds of pointers (<tt>vector<unsigned int> *</tt>
- * for the Dof indices and <tt>vector<Vector<number> > *</tt> for the
+ * for the Dof indices and <tt>vector<VectorType> *</tt> for the
  * interpolated DoF values) we use the @p Pointerstruct that includes both of
  * these pointers and the pointer for each cell points to these @p
  * Pointerstructs. On each cell only one of the two different pointers is used
  * at one time hence we could use a <tt>void * pointer</tt> as
  * <tt>vector<unsigned int> *</tt> at one time and as
- * <tt>vector<Vector<number> > *</tt> at the other but using this @p
+ * <tt>vector<VectorType> *</tt> at the other but using this @p
  * Pointerstruct in between makes the use of these pointers more safe and
  * gives better possibility to expand their usage.
  *
@@ -239,10 +239,10 @@ DEAL_II_NAMESPACE_OPEN
  * according to the solution transfer while pure refinement. Additionally, on
  * each cell that is coarsened (hence previously was a father cell), the
  * values of the discrete functions in @p all_out are set to the stored local
- * interpolated values that are accessible due to the 'vector<Vector<number> >
+ * interpolated values that are accessible due to the 'vector<VectorType>
  * *' pointer in @p Pointerstruct that is pointed to by the pointer of that
  * cell. It is clear that <tt>interpolate(all_in, all_out)</tt> only can be
- * called with the <tt>vector<Vector<number> > all_in</tt> that previously was
+ * called with the <tt>vector<VectorType> all_in</tt> that previously was
  * the parameter of the <tt>prepare_for_coarsening_and_refinement(all_in)</tt>
  * function. Hence <tt>interpolate(all_in, all_out)</tt> can (in contrast to
  * <tt>refine_interpolate(in, out)</tt>) only be called once.
@@ -291,39 +291,39 @@ DEAL_II_NAMESPACE_OPEN
  * necessary to call AffineConstraints::distribute().
  *
  *
- * <h3>Implementation in the context of hp finite elements</h3>
+ * <h3>Implementation in the context of hp-finite elements</h3>
  *
- * In the case of hp::DoFHandlers, nothing defines which of the finite
- * elements that are part of the hp::FECollection associated with the DoF
- * handler, should be considered on cells that are not active (i.e., that have
- * children). This is because degrees of freedom are only allocated for active
- * cells and, in fact, it is not allowed to set an active_fe_index on non-
- * active cells using DoFAccessor::set_active_fe_index().
+ * In the case of DoFHandlers with hp-capabilities, nothing defines which of the
+ * finite elements that are part of the hp::FECollection associated with the
+ * DoFHandler, should be considered on cells that are not active (i.e., that
+ * have children). This is because degrees of freedom are only allocated for
+ * active cells and, in fact, it is not allowed to set an active FE index on
+ * non-active cells using DoFAccessor::set_active_fe_index().
  *
  * It is, thus, not entirely natural what should happen if, for example, a few
  * cells are coarsened away. This class then implements the following
  * algorithm:
  * - If a cell is refined, then the values of the solution vector(s) are
- *   saved before refinement on the to-be-refined cell and in the space
- *   associated with this cell. These values are then interpolated to the finite
- *   element spaces of the children post-refinement. This may lose information
- *   if, for example, the old cell used a Q2 space and the children use Q1
- *   spaces, or the information may be prolonged if the mother cell used a Q1
- *   space and the children are Q2s.
+ *   interpolated before refinement on the to-be-refined cell from the space of
+ *   the active finite element to the one of the future finite element. These
+ *   values are then distributed on the finite element spaces of the children
+ *   post-refinement. This may lose information if, for example, the old cell
+ *   used a Q2 space and the children use Q1 spaces, or the information may be
+ *   prolonged if the mother cell used a Q1 space and the children are Q2s.
  * - If cells are to be coarsened, then the values from the child cells are
- *   interpolated to the mother cell using the largest of the child cell spaces,
- *   which will be identified as the least dominant element following the
- *   FiniteElementDomination logic (consult
+ *   interpolated to the mother cell using the largest of the child cell future
+ *   finite element spaces, which will be identified as the least dominant
+ *   element following the FiniteElementDomination logic (consult
  *   hp::FECollection::find_dominated_fe_extended() for more information). For
  *   example, if the children of a cell use Q1, Q2 and Q3 spaces, then the
  *   values from the children are interpolated into a Q3 space on the mother
  *   cell. After refinement, this Q3 function on the mother cell is then
  *   interpolated into the space the user has selected for this cell (which may
  *   be different from Q3, in this example, if the user has set the
- *   active_fe_index for a different space post-refinement and before calling
- *   hp::DoFHandler::distribute_dofs()).
+ *   active FE index for a different space post-refinement and before calling
+ *   DoFHandler::distribute_dofs()).
  *
- * @note In the context of hp refinement, if cells are coarsened or the
+ * @note In the context of hp-refinement, if cells are coarsened or the
  * polynomial degree is lowered on some cells, then the old finite element
  * space is not a subspace of the new space and you may run into the same
  * situation as discussed above with hanging nodes. You may want to consider
@@ -331,25 +331,15 @@ DEAL_II_NAMESPACE_OPEN
  * transferring the solution.
  *
  * @ingroup numerics
- * @author Ralf Hartmann, 1999, Oliver Kayser-Herold and Wolfgang Bangerth,
- * 2006, Wolfgang Bangerth 2014
  */
-template <int dim,
-          typename VectorType     = Vector<double>,
-          typename DoFHandlerType = DoFHandler<dim>>
+template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
 class SolutionTransfer
 {
-#  ifndef DEAL_II_MSVC
-  static_assert(dim == DoFHandlerType::dimension,
-                "The dimension explicitly provided as a template "
-                "argument, and the dimension of the DoFHandlerType "
-                "template argument must match.");
-#  endif
 public:
   /**
    * Constructor, takes the current DoFHandler as argument.
    */
-  SolutionTransfer(const DoFHandlerType &dof);
+  SolutionTransfer(const DoFHandler<dim, spacedim> &dof);
 
   /**
    * Destructor
@@ -478,8 +468,8 @@ private:
   /**
    * Pointer to the degree of freedom handler to work with.
    */
-  SmartPointer<const DoFHandlerType,
-               SolutionTransfer<dim, VectorType, DoFHandlerType>>
+  SmartPointer<const DoFHandler<dim, spacedim>,
+               SolutionTransfer<dim, VectorType, spacedim>>
     dof_handler;
 
   /**
@@ -575,6 +565,19 @@ private:
   std::vector<std::vector<Vector<typename VectorType::value_type>>>
     dof_values_on_cell;
 };
+
+namespace Legacy
+{
+  /**
+   * @deprecated Use dealii::SolutionTransfer without the DoFHandlerType
+   * template instead.
+   */
+  template <int dim,
+            typename VectorType     = Vector<double>,
+            typename DoFHandlerType = DoFHandler<dim>>
+  using SolutionTransfer DEAL_II_DEPRECATED =
+    dealii::SolutionTransfer<dim, VectorType, DoFHandlerType::space_dimension>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

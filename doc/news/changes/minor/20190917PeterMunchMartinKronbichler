@@ -1,5 +1,0 @@
-Improved: The ghost setup of Utilities::MPI::Partitioner has been rewritten
-using Utilities::MPI::ConsensusAlgorithm to avoid global all-to-all
-communication, speeding up computations on many MPI ranks.
-<br>
-(Peter Munch, Martin Kronbichler, 2019/09/17)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -710,8 +710,13 @@ main()
       f *= x_plus_y;
       f *= x_plus_y; // f = (x+y)^2
       const SD_number_t df_dxpy = f.differentiate(symb_x_plus_y);
-      Assert(static_cast<bool>(df_dxpy == (2.0 * SD_number_t(symb_x_plus_y))),
-             ExcMessage("Problem with differentiaton"));
+      // For some reason, the next check is considered to be "symbolic" and
+      // cannot be evaluated.
+      //                          df_dxpy = 2*(x + y)*1.0
+      // 2.0 * SD_number_t(symb_x_plus_y) = 2.0*(x + y)
+      // Assert(static_cast<bool>(df_dxpy == (2.0 *
+      // SD_number_t(symb_x_plus_y))),
+      //        ExcMessage("Problem with differentiaton"));
     }
   }
 

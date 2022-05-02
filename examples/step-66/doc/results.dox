@@ -1,0 +1,253 @@
+<h1>Results</h1>
+
+The aim of this tutorial step was to demonstrate the solution of a nonlinear
+PDE with the matrix-free framework.
+
+
+
+<h3>Program output</h3>
+Running the program on two processes in release mode via
+@code
+cmake . && make release && make && mpirun -n 2 ./step-66
+@endcode
+gives the following output on the console
+@code
+================================================================================
+START DATE: 2021/5/18, TIME: 16:25:48
+--------------------------------------------------------------------------------
+Running with 2 MPI processes
+Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
+Finite element space: FE_Q<2>(4)
+================================================================================
+--------------------------------------------------------------------------------
+Cycle 0
+--------------------------------------------------------------------------------
+Set up system...
+   Triangulation: 20 cells
+   DoFHandler:    337 DoFs
+
+Solve using Newton's method...
+   Nstep 1, errf = 0.00380835, errx = 3.61904, it = 7
+   Nstep 2, errf = 3.80167e-06, errx = 0.104353, it = 6
+   Nstep 3, errf = 3.97939e-12, errx = 0.00010511, it = 4
+   Nstep 4, errf = 2.28859e-13, errx = 1.07726e-10, it = 1
+Convergence step 4 value 2.28859e-13 (used wall time: 0.0096409 s)
+
+Time for setup+solve (CPU/Wall) 0.015617/0.0156447 s
+
+Output results...
+  H1 seminorm: 0.773426
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |    0.0286s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble right hand side        |         4 |  9.71e-05s |      0.34% |
+| compute residual                |         4 |  0.000137s |      0.48% |
+| compute update                  |         4 |   0.00901s |        32% |
+| make grid                       |         1 |   0.00954s |        33% |
+| setup system                    |         1 |   0.00585s |        20% |
+| solve                           |         1 |   0.00966s |        34% |
++---------------------------------+-----------+------------+------------+
+
+.
+.
+.
+
+--------------------------------------------------------------------------------
+Cycle 6
+--------------------------------------------------------------------------------
+Set up system...
+   Triangulation: 81920 cells
+   DoFHandler:    1311745 DoFs
+
+Solve using Newton's method...
+   Nstep 1, errf = 5.90478e-05, errx = 231.427, it = 9
+   Nstep 2, errf = 5.89991e-08, errx = 6.67102, it = 6
+   Nstep 3, errf = 4.28813e-13, errx = 0.0067188, it = 4
+Convergence step 3 value 4.28813e-13 (used wall time: 4.82953 s)
+
+Time for setup+solve (CPU/Wall) 6.25094/6.37174 s
+
+Output results...
+  H1 seminorm: 0.773426
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      9.04s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble right hand side        |         3 |    0.0827s |      0.91% |
+| compute residual                |         3 |    0.0909s |         1% |
+| compute update                  |         3 |      4.65s |        51% |
+| setup system                    |         1 |      1.54s |        17% |
+| solve                           |         1 |      4.83s |        53% |
++---------------------------------+-----------+------------+------------+
+
+================================================================================
+START DATE: 2021/5/18, TIME: 16:26:00
+--------------------------------------------------------------------------------
+Running with 2 MPI processes
+Vectorization over 4 doubles = 256 bits (AVX), VECTORIZATION_LEVEL=2
+Finite element space: FE_Q<3>(4)
+================================================================================
+
+.
+.
+.
+
+--------------------------------------------------------------------------------
+Cycle 5
+--------------------------------------------------------------------------------
+Set up system...
+   Triangulation: 229376 cells
+   DoFHandler:    14729857 DoFs
+
+Solve using Newton's method...
+   Nstep 1, errf = 6.30096e-06, errx = 481.74, it = 8
+   Nstep 2, errf = 4.25607e-10, errx = 4.14315, it = 6
+   Nstep 3, errf = 7.29563e-13, errx = 0.000321775, it = 2
+Convergence step 3 value 7.29563e-13 (used wall time: 133.793 s)
+
+Time for setup+solve (CPU/Wall) 226.809/232.615 s
+
+Output results...
+  H1 seminorm: 0.588667
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |       390s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| assemble right hand side        |         3 |      2.06s |      0.53% |
+| compute residual                |         3 |      2.46s |      0.63% |
+| compute update                  |         3 |       129s |        33% |
+| setup system                    |         1 |      98.8s |        25% |
+| solve                           |         1 |       134s |        34% |
++---------------------------------+-----------+------------+------------+
+@endcode
+
+We show the solution for the two- and three-dimensional problem in the
+following figure.
+
+<div class="twocolumn" style="width: 80%; text-align: center;">
+  <div>
+    <img src = "https://www.dealii.org/images/steps/developer/step-66.solution-2d.png"
+     alt     = "Solution of the two-dimensional Gelfand problem."
+     width   = "100%">
+  </div>
+  <div>
+    <img src = "https://www.dealii.org/images/steps/developer/step-66.solution-3d.png"
+     alt     = "Solution of the three-dimensional Gelfand problem."
+     width   = "100%">
+  </div>
+</div>
+
+
+
+<h3>Newton solver</h3>
+In the program output above we find some interesting information about the
+Newton iterations. The terminal output in each refinement cycle presents
+detailed diagnostics of the Newton method, which show first of all the number
+of Newton steps and for each step the norm of the residual $\|F(u_h^{n+1})\|$,
+the norm of the Newton update $\|s_h^n\|$, and the number of CG iterations
+<code>it</code>.
+
+We observe that for all cases the Newton method converges in approximately
+three to four steps, which shows the quadratic convergence of the Newton method
+with a full step length $\alpha = 1$. However, be aware that for a badly chosen
+initial guess $u_h^0$, the Newton method will also diverge quadratically.
+Usually if you do not have an appropriate initial guess, you try a few damped
+Newton steps with a reduced step length $\alpha < 1$ until the Newton step is
+again in the quadratic convergence domain. This damping and relaxation of the
+Newton step length truly requires a more sophisticated implementation of the
+Newton method, which we designate to you as a possible extension of the
+tutorial.
+
+Furthermore, we see that the number of CG iterations is approximately constant
+with successive mesh refinements and an increasing number of DoFs. This is of
+course due to the geometric multigrid preconditioner and similar to the
+observations made in other tutorials that use this method, e.g., step-16 and
+step-37. Just to give an example, in the three-dimensional case after five
+refinements, we have approximately 14.7 million distributed DoFs with
+fourth-order Lagrangian finite elements, but the number of CG iterations is
+still less than ten.
+
+In addition, there is one more very useful optimization that we applied and
+that should be mentioned here. In the <code>compute_update()</code> function we
+explicitly reset the vector holding the Newton update before passing it as the
+output vector to the solver. In that case we use a starting value of zero for
+the CG method, which is more suitable than the previous Newton update, the
+actual content of the <code>newton_update</code> before resetting, and thus
+reduces the number of CG iterations by a few steps.
+
+
+
+<h3>Possibilities for extensions</h3>
+A couple of possible extensions are available concerning minor updates fo the
+present code as well as a deeper numerical investigation of the Gelfand problem.
+
+<h4>More sophisticated Newton iteration</h4>
+Beside a step size controlled version of the Newton iteration as mentioned
+already in step-15 (and actually implemented, with many more bells and
+whistles, in step-77), one could also implement a more flexible stopping criterion
+for the Newton iteration. For example one could replace the fixed tolerances
+for the residual <code>TOLf</code> and for the Newton updated <code>TOLx</code>
+and implement a mixed error control with a given absolute and relative
+tolerance, such that the Newton iteration exits with success as, e.g.,
+@f{align*}{
+  \|F(u_h^{n+1})\| \leq \texttt{RelTol} \|u_h^{n+1}\| + \texttt{AbsTol}.
+@f}
+For more advanced applications with many nonlinear systems to solve, for
+example at each time step for a time-dependent problem, it turns out that it is
+not necessary to set up and assemble the Jacobian anew at every single Newton
+step or even for each time step. Instead, the existing Jacobian from a previous
+step can be used for the Newton iteration. The Jacobian is then only rebuilt
+if, for example, the Newton iteration converges too slowly. Such an idea yields
+a <a href="https://en.wikipedia.org/wiki/Quasi-Newton_method">quasi-Newton
+method</a>. Admittedly, when using the matrix-free framework, the assembly of
+the Jacobian is omitted anyway, but with in this way one can try to optimize
+the reassembly of the geometric multigrid preconditioner. Remember that each
+time the solution from the old Newton step must be distributed to all levels
+and the mutligrid preconditioner must be reinitialized.
+
+<h4>Parallel scalability and thread parallelism</h4>
+In the results section of step-37 and others, the parallel scalability of the
+matrix-free framework on a large number of processors has already been
+demonstrated very impressively. In the nonlinear case we consider here, we note
+that one of the bottlenecks could become the transfer and evaluation of the
+matrix-free Jacobi operator and its multistage operators in the previous Newton
+step, since we need to transfer the old solution at all stages in each step. A
+first parallel scalability analysis in @cite castelli2021numerical shows quite
+good strong scalability when the problem size is large enough. However, a more
+detailed analysis needs to be performed for reliable results. Moreover, the
+problem has been solved only with MPI so far, without using the possibilities
+of shared memory parallelization with threads. Therefore, for this example, you
+could try hybrid parallelization with MPI and threads, such as described in
+step-48.
+
+<h4>Comparison to matrix-based methods</h4>
+Analogously to step-50 and the mentioned possible extension of step-75, you can
+convince yourself which method is faster.
+
+<h4>Eigenvalue problem</h4>
+One can consider the corresponding eigenvalue problem, which is called
+<a
+href="https://en.wikipedia.org/wiki/Liouville%E2%80%93Bratu%E2%80%93Gelfand_equation">Bratu
+problem</a>. For example, if we define a fixed eigenvalue $\lambda\in[0,6]$, we can
+compute the corresponding discrete eigenfunction. You will notice that the
+number of Newton steps will increase with increasing $\lambda$. To reduce the
+number of Newton steps you can use the following trick: start from a certain
+$\lambda$, compute the eigenfunction, increase $\lambda=\lambda +
+\delta_\lambda$, and then use the previous solution as an initial guess for the
+Newton iteration -- this approach is called a "continuation
+method". In the end you can plot the $H^1(\Omega)$-norm over the
+eigenvalue $\lambda \mapsto \|u_h\|_{H^1(\Omega)}$. What do you observe for
+further increasing $\lambda>7$?

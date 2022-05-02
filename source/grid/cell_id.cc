@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,6 +97,14 @@ CellId::CellId(const CellId::binary_type &binary_representation)
 
 
 
+CellId::CellId(const std::string &string_representation)
+{
+  std::istringstream ss(string_representation);
+  ss >> *this;
+}
+
+
+
 template <int dim>
 CellId::binary_type
 CellId::to_binary() const
@@ -158,14 +166,9 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::cell_iterator
 CellId::to_cell(const Triangulation<dim, spacedim> &tria) const
 {
-  typename Triangulation<dim, spacedim>::cell_iterator cell(
-    &tria, 0, tria.coarse_cell_id_to_coarse_cell_index(coarse_cell_id));
-
-  for (unsigned int i = 0; i < n_child_indices; ++i)
-    cell = cell->child(static_cast<unsigned int>(child_indices[i]));
-
-  return cell;
+  return tria.create_cell_iterator(*this);
 }
+
 
 // explicit instantiations
 #include "cell_id.inst"

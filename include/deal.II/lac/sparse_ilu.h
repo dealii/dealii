@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,8 +54,6 @@ DEAL_II_NAMESPACE_OPEN
  * section on
  * @ref Instantiations
  * in the manual).
- *
- * @author Wolfgang Bangerth, 2008, 2009; unified interface: Ralf Hartmann
  */
 template <typename number>
 class SparseILU : public SparseLUDecomposition<number>

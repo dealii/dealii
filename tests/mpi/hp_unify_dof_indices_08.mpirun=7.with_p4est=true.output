@@ -1,69 +1,55 @@
 
-DEAL:0:2d::Processor: 0
-DEAL:0:2d::  n_globally_active_cells: 29035
-DEAL:0:2d::  n_locally_owned_dofs: 68397
-DEAL:0:2d::  n_global_dofs: 485573
-DEAL:0:3d::Processor: 0
-DEAL:0:3d::  n_globally_active_cells: 13824
-DEAL:0:3d::  n_locally_owned_dofs: 162762
-DEAL:0:3d::  n_global_dofs: 1125219
+DEAL:0:2d::n_globally_active_cells: 29035
+DEAL:0:2d::n_locally_owned_dofs: 68397
+DEAL:0:2d::n_global_dofs: 485573
+DEAL:0:3d::n_globally_active_cells: 13824
+DEAL:0:3d::n_locally_owned_dofs: 162762
+DEAL:0:3d::n_global_dofs: 1125219
 
-DEAL:1:2d::Processor: 1
-DEAL:1:2d::  n_globally_active_cells: 29035
-DEAL:1:2d::  n_locally_owned_dofs: 72246
-DEAL:1:2d::  n_global_dofs: 485573
-DEAL:1:3d::Processor: 1
-DEAL:1:3d::  n_globally_active_cells: 13824
-DEAL:1:3d::  n_locally_owned_dofs: 162413
-DEAL:1:3d::  n_global_dofs: 1125219
+DEAL:1:2d::n_globally_active_cells: 29035
+DEAL:1:2d::n_locally_owned_dofs: 72246
+DEAL:1:2d::n_global_dofs: 485573
+DEAL:1:3d::n_globally_active_cells: 13824
+DEAL:1:3d::n_locally_owned_dofs: 162413
+DEAL:1:3d::n_global_dofs: 1125219
 
 
-DEAL:2:2d::Processor: 2
-DEAL:2:2d::  n_globally_active_cells: 29035
-DEAL:2:2d::  n_locally_owned_dofs: 67840
-DEAL:2:2d::  n_global_dofs: 485573
-DEAL:2:3d::Processor: 2
-DEAL:2:3d::  n_globally_active_cells: 13824
-DEAL:2:3d::  n_locally_owned_dofs: 161549
-DEAL:2:3d::  n_global_dofs: 1125219
+DEAL:2:2d::n_globally_active_cells: 29035
+DEAL:2:2d::n_locally_owned_dofs: 67840
+DEAL:2:2d::n_global_dofs: 485573
+DEAL:2:3d::n_globally_active_cells: 13824
+DEAL:2:3d::n_locally_owned_dofs: 161549
+DEAL:2:3d::n_global_dofs: 1125219
 
 
-DEAL:3:2d::Processor: 3
-DEAL:3:2d::  n_globally_active_cells: 29035
-DEAL:3:2d::  n_locally_owned_dofs: 69235
-DEAL:3:2d::  n_global_dofs: 485573
-DEAL:3:3d::Processor: 3
-DEAL:3:3d::  n_globally_active_cells: 13824
-DEAL:3:3d::  n_locally_owned_dofs: 160833
-DEAL:3:3d::  n_global_dofs: 1125219
+DEAL:3:2d::n_globally_active_cells: 29035
+DEAL:3:2d::n_locally_owned_dofs: 69235
+DEAL:3:2d::n_global_dofs: 485573
+DEAL:3:3d::n_globally_active_cells: 13824
+DEAL:3:3d::n_locally_owned_dofs: 160833
+DEAL:3:3d::n_global_dofs: 1125219
 
 
-DEAL:4:2d::Processor: 4
-DEAL:4:2d::  n_globally_active_cells: 29035
-DEAL:4:2d::  n_locally_owned_dofs: 69494
-DEAL:4:2d::  n_global_dofs: 485573
-DEAL:4:3d::Processor: 4
-DEAL:4:3d::  n_globally_active_cells: 13824
-DEAL:4:3d::  n_locally_owned_dofs: 161477
-DEAL:4:3d::  n_global_dofs: 1125219
+DEAL:4:2d::n_globally_active_cells: 29035
+DEAL:4:2d::n_locally_owned_dofs: 69494
+DEAL:4:2d::n_global_dofs: 485573
+DEAL:4:3d::n_globally_active_cells: 13824
+DEAL:4:3d::n_locally_owned_dofs: 161477
+DEAL:4:3d::n_global_dofs: 1125219
 
 
-DEAL:5:2d::Processor: 5
-DEAL:5:2d::  n_globally_active_cells: 29035
-DEAL:5:2d::  n_locally_owned_dofs: 70925
-DEAL:5:2d::  n_global_dofs: 485573
-DEAL:5:3d::Processor: 5
-DEAL:5:3d::  n_globally_active_cells: 13824
-DEAL:5:3d::  n_locally_owned_dofs: 159501
-DEAL:5:3d::  n_global_dofs: 1125219
+DEAL:5:2d::n_globally_active_cells: 29035
+DEAL:5:2d::n_locally_owned_dofs: 70925
+DEAL:5:2d::n_global_dofs: 485573
+DEAL:5:3d::n_globally_active_cells: 13824
+DEAL:5:3d::n_locally_owned_dofs: 159501
+DEAL:5:3d::n_global_dofs: 1125219
 
 
-DEAL:6:2d::Processor: 6
-DEAL:6:2d::  n_globally_active_cells: 29035
-DEAL:6:2d::  n_locally_owned_dofs: 67436
-DEAL:6:2d::  n_global_dofs: 485573
-DEAL:6:3d::Processor: 6
-DEAL:6:3d::  n_globally_active_cells: 13824
-DEAL:6:3d::  n_locally_owned_dofs: 156684
-DEAL:6:3d::  n_global_dofs: 1125219
+DEAL:6:2d::n_globally_active_cells: 29035
+DEAL:6:2d::n_locally_owned_dofs: 67436
+DEAL:6:2d::n_global_dofs: 485573
+DEAL:6:3d::n_globally_active_cells: 13824
+DEAL:6:3d::n_locally_owned_dofs: 156684
+DEAL:6:3d::n_global_dofs: 1125219
 

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2019 by the deal.II authors
+ * Copyright (C) 2000 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -37,11 +37,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_values.h>
@@ -141,8 +138,7 @@ namespace Step8
   void right_hand_side(const std::vector<Point<dim>> &points,
                        std::vector<Tensor<1, dim>> &  values)
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    AssertDimension(values.size(), points.size());
     Assert(dim >= 2, ExcNotImplemented());
 
     // The rest of the function implements computing force values. We will use
@@ -248,7 +244,7 @@ namespace Step8
 
   // The big changes in this program are in the creation of matrix and right
   // hand side, since they are problem-dependent. We will go through that
-  // process \step-by-step, since it is a bit more complicated than in previous
+  // process step-by-step, since it is a bit more complicated than in previous
   // examples.
   //
   // The first parts of this function are the same as before, however: setting
@@ -271,7 +267,7 @@ namespace Step8
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -334,17 +330,18 @@ namespace Step8
         //
         // With this knowledge, we can assemble the local matrix
         // contributions:
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : fe_values.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
 
-            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            for (const unsigned int j : fe_values.dof_indices())
               {
                 const unsigned int component_j =
                   fe.system_to_component_index(j).first;
 
-                for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+                for (const unsigned int q_point :
+                     fe_values.quadrature_point_indices())
                   {
                     cell_matrix(i, j) +=
                       // The first term is $\lambda \partial_i u_i, \partial_j
@@ -390,12 +387,13 @@ namespace Step8
 
         // Assembling the right hand side is also just as discussed in the
         // introduction:
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : fe_values.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
 
-            for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+            for (const unsigned int q_point :
+                 fe_values.quadrature_point_indices())
               cell_rhs(i) += fe_values.shape_value(i, q_point) *
                              rhs_values[q_point][component_i] *
                              fe_values.JxW(q_point);

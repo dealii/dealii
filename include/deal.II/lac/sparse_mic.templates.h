@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,10 +101,10 @@ SparseMIC<number>::initialize(const SparseMatrix<somenumber> &matrix,
   inner_sums.resize(this->m());
 
   // precalc sum(j=k+1, N, a[k][j]))
-  for (size_type row = 0; row < this->m(); row++)
+  for (size_type row = 0; row < this->m(); ++row)
     inner_sums[row] = get_rowsum(row);
 
-  for (size_type row = 0; row < this->m(); row++)
+  for (size_type row = 0; row < this->m(); ++row)
     {
       const number temp  = this->begin(row)->value();
       number       temp1 = 0;
@@ -176,7 +176,7 @@ SparseMIC<number>::vmult(Vector<somenumber> &      dst,
     }
 
   // Now: v = Xu
-  for (size_type row = 0; row < N; row++)
+  for (size_type row = 0; row < N; ++row)
     dst(row) *= diag[row];
 
   // x = (X-U)v

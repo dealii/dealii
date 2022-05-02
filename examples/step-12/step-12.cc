@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -30,12 +30,9 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -100,8 +97,7 @@ namespace Step12
   {
     (void)component;
     AssertIndexRange(component, 1);
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    AssertDimension(values.size(), points.size());
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {
@@ -123,10 +119,12 @@ namespace Step12
   {
     Assert(dim >= 2, ExcNotImplemented());
 
-    Point<dim> wind_field;
-    wind_field(0) = -p(1);
-    wind_field(1) = p(0);
-    wind_field /= wind_field.norm();
+    Tensor<1, dim> wind_field;
+    wind_field[0] = -p[1];
+    wind_field[1] = p[0];
+
+    if (wind_field.norm() > 1e-10)
+      wind_field /= wind_field.norm();
 
     return wind_field;
   }
@@ -143,20 +141,21 @@ namespace Step12
   template <int dim>
   struct ScratchData
   {
-    ScratchData(const Mapping<dim> &      mapping,
-                const FiniteElement<dim> &fe,
-                const unsigned int        quadrature_degree,
-                const UpdateFlags         update_flags = update_values |
+    ScratchData(const Mapping<dim> &       mapping,
+                const FiniteElement<dim> & fe,
+                const Quadrature<dim> &    quadrature,
+                const Quadrature<dim - 1> &quadrature_face,
+                const UpdateFlags          update_flags = update_values |
                                                  update_gradients |
                                                  update_quadrature_points |
                                                  update_JxW_values,
                 const UpdateFlags interface_update_flags =
                   update_values | update_gradients | update_quadrature_points |
                   update_JxW_values | update_normal_vectors)
-      : fe_values(mapping, fe, QGauss<dim>(quadrature_degree), update_flags)
+      : fe_values(mapping, fe, quadrature, update_flags)
       , fe_interface_values(mapping,
                             fe,
-                            QGauss<dim - 1>(quadrature_degree),
+                            quadrature_face,
                             interface_update_flags)
     {}
 
@@ -166,12 +165,10 @@ namespace Step12
                   scratch_data.fe_values.get_fe(),
                   scratch_data.fe_values.get_quadrature(),
                   scratch_data.fe_values.get_update_flags())
-      , fe_interface_values(
-          scratch_data.fe_values
-            .get_mapping(), // TODO: implement for fe_interface_values
-          scratch_data.fe_values.get_fe(),
-          scratch_data.fe_interface_values.get_quadrature(),
-          scratch_data.fe_interface_values.get_update_flags())
+      , fe_interface_values(scratch_data.fe_interface_values.get_mapping(),
+                            scratch_data.fe_interface_values.get_fe(),
+                            scratch_data.fe_interface_values.get_quadrature(),
+                            scratch_data.fe_interface_values.get_update_flags())
     {}
 
     FEValues<dim>          fe_values;
@@ -232,8 +229,11 @@ namespace Step12
     const MappingQ1<dim> mapping;
 
     // Furthermore we want to use DG elements.
-    FE_DGQ<dim>     fe;
-    DoFHandler<dim> dof_handler;
+    const FE_DGQ<dim> fe;
+    DoFHandler<dim>   dof_handler;
+
+    const QGauss<dim>     quadrature;
+    const QGauss<dim - 1> quadrature_face;
 
     // The next four members represent the linear system to be solved.
     // <code>system_matrix</code> and <code>right_hand_side</code> are generated
@@ -255,6 +255,8 @@ namespace Step12
     : mapping()
     , fe(1)
     , dof_handler(triangulation)
+    , quadrature(fe.tensor_degree() + 1)
+    , quadrature_face(fe.tensor_degree() + 1)
   {}
 
 
@@ -298,10 +300,11 @@ namespace Step12
     const BoundaryValues<dim> boundary_function;
 
     // This is the function that will be executed for each cell.
-    auto cell_worker = [&](const Iterator &  cell,
-                           ScratchData<dim> &scratch_data,
-                           CopyData &        copy_data) {
-      const unsigned int n_dofs = scratch_data.fe_values.get_fe().dofs_per_cell;
+    const auto cell_worker = [&](const Iterator &  cell,
+                                 ScratchData<dim> &scratch_data,
+                                 CopyData &        copy_data) {
+      const unsigned int n_dofs =
+        scratch_data.fe_values.get_fe().n_dofs_per_cell();
       copy_data.reinit(cell, n_dofs);
       scratch_data.fe_values.reinit(cell);
 
@@ -330,10 +333,10 @@ namespace Step12
     // This is the function called for boundary faces and consists of a normal
     // integration using FEFaceValues. New is the logic to decide if the term
     // goes into the system matrix (outflow) or the right-hand side (inflow).
-    auto boundary_worker = [&](const Iterator &    cell,
-                               const unsigned int &face_no,
-                               ScratchData<dim> &  scratch_data,
-                               CopyData &          copy_data) {
+    const auto boundary_worker = [&](const Iterator &    cell,
+                                     const unsigned int &face_no,
+                                     ScratchData<dim> &  scratch_data,
+                                     CopyData &          copy_data) {
       scratch_data.fe_interface_values.reinit(cell, face_no);
       const FEFaceValuesBase<dim> &fe_face =
         scratch_data.fe_interface_values.get_fe_face_values(0);
@@ -373,14 +376,14 @@ namespace Step12
     // This is the function called on interior faces. The arguments specify
     // cells, face and subface indices (for adaptive refinement). We just pass
     // them along to the reinit() function of FEInterfaceValues.
-    auto face_worker = [&](const Iterator &    cell,
-                           const unsigned int &f,
-                           const unsigned int &sf,
-                           const Iterator &    ncell,
-                           const unsigned int &nf,
-                           const unsigned int &nsf,
-                           ScratchData<dim> &  scratch_data,
-                           CopyData &          copy_data) {
+    const auto face_worker = [&](const Iterator &    cell,
+                                 const unsigned int &f,
+                                 const unsigned int &sf,
+                                 const Iterator &    ncell,
+                                 const unsigned int &nf,
+                                 const unsigned int &nsf,
+                                 ScratchData<dim> &  scratch_data,
+                                 CopyData &          copy_data) {
       FEInterfaceValues<dim> &fe_iv = scratch_data.fe_interface_values;
       fe_iv.reinit(cell, f, sf, ncell, nf, nsf);
       const auto &q_points = fe_iv.get_quadrature_points();
@@ -402,7 +405,7 @@ namespace Step12
           for (unsigned int i = 0; i < n_dofs; ++i)
             for (unsigned int j = 0; j < n_dofs; ++j)
               copy_data_face.cell_matrix(i, j) +=
-                fe_iv.jump(i, qpoint) // [\phi_i]
+                fe_iv.jump_in_shape_values(i, qpoint) // [\phi_i]
                 *
                 fe_iv.shape_value((beta_dot_n > 0), j, qpoint) // phi_j^{upwind}
                 * beta_dot_n                                   // (\beta . n)
@@ -417,9 +420,9 @@ namespace Step12
     // no hanging node constraints in DG discretizations, we use an empty
     // object here as this allows us to use its `copy_local_to_global`
     // functionality.
-    AffineConstraints<double> constraints;
+    const AffineConstraints<double> constraints;
 
-    auto copier = [&](const CopyData &c) {
+    const auto copier = [&](const CopyData &c) {
       constraints.distribute_local_to_global(c.cell_matrix,
                                              c.cell_rhs,
                                              c.local_dof_indices,
@@ -434,9 +437,7 @@ namespace Step12
         }
     };
 
-    const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
-
-    ScratchData<dim> scratch_data(mapping, fe, n_gauss_points);
+    ScratchData<dim> scratch_data(mapping, fe, quadrature, quadrature_face);
     CopyData         copy_data;
 
     // Here, we finally handle the assembly. We pass in ScratchData and
@@ -476,7 +477,7 @@ namespace Step12
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
 
     // then assign the matrix to it and set the right block size:
-    preconditioner.initialize(system_matrix, fe.dofs_per_cell);
+    preconditioner.initialize(system_matrix, fe.n_dofs_per_cell());
 
     // After these preparations we are ready to start the linear solver.
     solver.solve(system_matrix, solution, right_hand_side, preconditioner);
@@ -542,24 +543,25 @@ namespace Step12
   void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
     const std::string filename = "solution-" + std::to_string(cycle) + ".vtk";
-    std::cout << "  Writing solution to <" << filename << ">" << std::endl;
+    std::cout << "  Writing solution to <" << filename << '>' << std::endl;
     std::ofstream output(filename);
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "u", DataOut<dim>::type_dof_data);
 
-    data_out.build_patches();
+    data_out.build_patches(mapping);
 
     data_out.write_vtk(output);
 
     {
       Vector<float> values(triangulation.n_active_cells());
-      VectorTools::integrate_difference(dof_handler,
+      VectorTools::integrate_difference(mapping,
+                                        dof_handler,
                                         solution,
-                                        ZeroFunction<dim>(),
+                                        Functions::ZeroFunction<dim>(),
                                         values,
-                                        QGauss<dim>(fe.degree + 1),
+                                        quadrature,
                                         VectorTools::Linfty_norm);
       const double l_infty =
         VectorTools::compute_global_error(triangulation,

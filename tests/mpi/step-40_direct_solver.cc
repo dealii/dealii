@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -159,8 +159,10 @@ namespace Step40
     system_matrix.reinit(
       mpi_communicator,
       csp,
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
+      Utilities::MPI::all_gather(mpi_communicator,
+                                 dof_handler.n_locally_owned_dofs()),
+      Utilities::MPI::all_gather(mpi_communicator,
+                                 dof_handler.n_locally_owned_dofs()),
       Utilities::MPI::this_mpi_process(mpi_communicator));
   }
 
@@ -289,7 +291,9 @@ namespace Step40
               << triangulation.n_global_active_cells() << std::endl
               << "      ";
         const auto n_locally_owned_active_cells_per_processor =
-          triangulation.compute_n_locally_owned_active_cells_per_processor();
+          Utilities::MPI::all_gather(
+            triangulation.get_communicator(),
+            triangulation.n_locally_owned_active_cells());
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
@@ -302,7 +306,8 @@ namespace Step40
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          pcout << dof_handler.compute_n_locally_owned_dofs_per_processor()[i]
+          pcout << Utilities::MPI::all_gather(
+                     mpi_communicator, dof_handler.n_locally_owned_dofs())[i]
                 << '+';
         pcout << std::endl;
 

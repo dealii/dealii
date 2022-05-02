@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,14 +39,14 @@ test2d(const VectorTools::NormType norm)
   const unsigned int dim = 2;
   const unsigned int N   = 4;
   Table<dim, double> coefficients(4, 4);
-  for (unsigned int i = 0; i < N; i++)
-    for (unsigned int j = 0; j < N; j++)
+  for (unsigned int i = 0; i < N; ++i)
+    for (unsigned int j = 0; j < N; ++j)
       coefficients(i, j) = i * N + j;
 
   std::pair<std::vector<unsigned int>, std::vector<double>> res =
     FESeries::process_coefficients<2, double>(coefficients, pred_ind, norm);
 
-  for (unsigned int i = 0; i < res.first.size(); i++)
+  for (unsigned int i = 0; i < res.first.size(); ++i)
     deallog << res.first[i] << " : " << res.second[i] << std::endl;
 }
 

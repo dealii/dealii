@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,8 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/polynomials_rannacher_turek.h>
-#include <deal.II/base/std_cxx14/memory.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -194,7 +195,7 @@ template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 PolynomialsRannacherTurek<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsRannacherTurek<dim>>(*this);
+  return std::make_unique<PolynomialsRannacherTurek<dim>>(*this);
 }
 
 

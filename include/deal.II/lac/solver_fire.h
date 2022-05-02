@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,8 +84,6 @@ DEAL_II_NAMESPACE_OPEN
  * <a href="http://onlinelibrary.wiley.com/doi/10.1002/pamm.201110246/full">
  * Energy-Minimization in Atomic-to-Continuum Scale-Bridging Methods </a> by
  * Eidel et al. 2011.
- *
- * @author Vishal Boddu, Denis Davydov, 2017
  */
 template <typename VectorType = Vector<double>>
 class SolverFIRE : public SolverBase<VectorType>
@@ -134,11 +132,6 @@ public:
    */
   SolverFIRE(SolverControl &       solver_control,
              const AdditionalData &data = AdditionalData());
-
-  /**
-   * Virtual destructor.
-   */
-  virtual ~SolverFIRE();
 
   /**
    * Obtain a set of variables @p x that minimize an objective function
@@ -225,12 +218,6 @@ SolverFIRE<VectorType>::SolverFIRE(SolverControl &       solver_control,
                                    const AdditionalData &data)
   : SolverBase<VectorType>(solver_control)
   , additional_data(data)
-{}
-
-
-
-template <typename VectorType>
-SolverFIRE<VectorType>::~SolverFIRE()
 {}
 
 

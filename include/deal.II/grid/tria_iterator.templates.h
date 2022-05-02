@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,9 +82,12 @@ TriaRawIterator<Accessor>::operator=(const TriaRawIterator<Accessor> &i)
 
 
 template <typename Accessor>
-inline bool
-TriaRawIterator<Accessor>::
-operator==(const TriaRawIterator<Accessor> &other) const
+template <typename OtherAccessor>
+inline
+  typename std::enable_if<std::is_convertible<OtherAccessor, Accessor>::value,
+                          bool>::type
+  TriaRawIterator<Accessor>::operator==(
+    const TriaRawIterator<OtherAccessor> &other) const
 {
   return accessor == other.accessor;
 }
@@ -92,8 +95,8 @@ operator==(const TriaRawIterator<Accessor> &other) const
 
 template <typename Accessor>
 inline bool
-TriaRawIterator<Accessor>::
-operator!=(const TriaRawIterator<Accessor> &other) const
+TriaRawIterator<Accessor>::operator!=(
+  const TriaRawIterator<Accessor> &other) const
 {
   return !(*this == other);
 }
@@ -409,8 +412,8 @@ TriaActiveIterator<Accessor>::operator=(const TriaActiveIterator<Accessor> &i)
 template <typename Accessor>
 template <class OtherAccessor>
 inline TriaActiveIterator<Accessor> &
-TriaActiveIterator<Accessor>::
-operator=(const TriaActiveIterator<OtherAccessor> &i)
+TriaActiveIterator<Accessor>::operator=(
+  const TriaActiveIterator<OtherAccessor> &i)
 {
   this->accessor.copy_from(i.accessor);
   return *this;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,22 +15,22 @@
 
 
 /**
- * @defgroup hp hp finite element support
+ * @defgroup hp hp-finite element support
  *
- * Classes and functions that have to do with hp finite elements. The step-27
+ * Classes and functions that have to do with hp-finite elements. The step-27
  * tutorial program gives an overview of how to use the classes in this
  * namespace. A slightly more exotic application is given in step-46.
  *
- * The hp namespace implements the algorithms and data structures used for
- * the hp framework in deal.II. An overview over the details of how these
+ * The hp-namespace implements the algorithms and data structures used for
+ * the hp-framework in deal.II. An overview over the details of how these
  * algorithms work and what data structures are used is given in the
- * @ref hp_paper "hp paper".
+ * @ref hp_paper "hp-paper".
  */
 
 /**
- * @defgroup hpcollection hp Collections
+ * @defgroup hpcollection hp-Collections
  *
- * In the implementation of the hp finite element method, each cell might have
+ * In the implementation of the hp-finite element method, each cell might have
  * a different finite element associated with it. To handle this, the
  * hp::DoFHandler must have a whole set of finite element classes associated
  * with it. This concept is represented by the hp::FECollection class: Objects
@@ -82,14 +82,14 @@
  * element object. This same observation also holds for the other collection
  * classes.
  *
- * It is customary that within an hp finite element program, one keeps
+ * It is customary that within an hp-finite element program, one keeps
  * collections of finite elements and quadrature formulas with the same number
  * of elements, each element of the one collection matching the element in the
  * other. This is not necessary, but it often makes coding a lot simpler. If a
  * collection of mappings is used, the same holds for hp::MappingCollection
  * objects as well.
  *
- * Whenever p adaptivity is considered in an hp finite element program,
+ * Whenever p-adaptivity is considered in an hp-finite element program,
  * a hierarchy of finite elements needs to be established to determine
  * succeeding finite elements for refinement and preceding ones for coarsening.
  * Typically, this hierarchy considers how finite element spaces are nested:
@@ -109,7 +109,7 @@
 
 
 /**
- * A namespace for the implementation of hp finite element specific algorithms
+ * A namespace for the implementation of hp-finite element specific algorithms
  * and data structures.
  *
  * @ingroup hp

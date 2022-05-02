@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -34,21 +34,25 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "*.inp"
     PATTERN "*.ipynb"
     PATTERN "step*/CMakeLists.txt"
-    PATTERN "doxygen/CMakeLists.txt"
     #
     # Special files:
     #
     PATTERN "output.reference.dat"              # step-39
     PATTERN "postprocess.pl"                    # step-39
     PATTERN "obstacle.pbm"                      # step-42
-    PATTERN "untitled.geo"                      # step-49
-    PATTERN "untitled.msh"                      # step-49
+    PATTERN "example.geo"                       # step-49
+    PATTERN "example.msh"                       # step-49
     PATTERN "topography.txt.gz"                 # step-53
     PATTERN "input/initial_mesh_3d.vtk"         # step-54
     PATTERN "input/DTMB-5415_bulbous_bow.iges"  # step-54
     )
 
   IF(DEAL_II_COMPILE_EXAMPLES)
+    #
+    # Make sure that there are no deprecated functions used in the tutorials.
+    #
+    STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
+
     #
     # Set up all executables:
     #
@@ -62,7 +66,7 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
       #
       # Extract dependency information from CMakeLists.txt file.
       #
-      SET(_dependency_string TRUE)
+      SET(_setup FALSE)
       IF(EXISTS "${_directory}/CMakeLists.txt")
         FILE(STRINGS "${_directory}/CMakeLists.txt" _dependency_string
           REGEX "^IF.*DEAL_II.* # keep in one line$"
@@ -70,22 +74,17 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
         STRING(REPLACE "IF(" "" _dependency_string "${_dependency_string}")
         STRING(REPLACE ") # keep in one line" "" _dependency_string "${_dependency_string}")
         IF("${_dependency_string}" STREQUAL "")
-          SET(_dependency_string "TRUE")
+          SET(_setup TRUE)
         ELSE()
-          SET(_dependency_string "NOT (${_dependency_string})")
+          # if the dependency string evaluates to TRUE then the example
+          # CMakeLists.txt encounters a fatal error - we want the opposite logic
+          # here so add a NOT.
+          EVALUATE_EXPRESSION("
+            IF(NOT (${_dependency_string}))
+              SET(_setup TRUE)
+            ENDIF()")
         ENDIF()
       ENDIF()
-
-      #
-      # Now evaluate the _dependency_string and store the result in _setup.
-      # We have to be careful - ${_dependency_string} evaluating to true
-      # means that not all dependencies are fulfilled.
-      #
-      SET(_setup FALSE)
-      EVALUATE_EXPRESSION("
-        IF(${_dependency_string})
-          SET(_setup TRUE)
-        ENDIF()")
 
       IF(_setup)
         FOREACH(_build ${DEAL_II_BUILD_TYPES})
@@ -119,6 +118,24 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
         MESSAGE(STATUS "  ${_name} - dependencies not satisfied")
       ENDIF()
 
+    ENDFOREACH()
+
+    # the same as above but for the examples folder
+    FILE(GLOB _steps
+      ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/*.cc)
+    FOREACH(_step ${_steps})
+      GET_FILENAME_COMPONENT(_name ${_step} NAME_WE)
+
+        FOREACH(_build ${DEAL_II_BUILD_TYPES})
+          STRING(TOLOWER ${_build} _build_lowercase)
+          ADD_EXECUTABLE(${_name}.${_build_lowercase} ${_step})
+          DEAL_II_INSOURCE_SETUP_TARGET(${_name}.${_build_lowercase} ${_build})
+
+          SET_TARGET_PROPERTIES(${_name}.${_build_lowercase}
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
+            )
+        ENDFOREACH()
     ENDFOREACH()
   ENDIF()
 

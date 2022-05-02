@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,8 +29,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Given a list of names to search for (provided by add()), objects of this
  * class provide an index list of the selected data.
- *
- * @author Guido Kanschat, 2009
  */
 class NamedSelection
 {

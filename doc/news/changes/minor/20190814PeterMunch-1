@@ -1,4 +1,0 @@
-New: Generalize internal::DoFHandlerImplementation::Policy::ParallelDistributed such that it uses 
-the new definition of CellId.
-<br>
-(Peter Munch, 2019/08/14)

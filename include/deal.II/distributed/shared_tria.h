@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,6 @@
 #include <functional>
 #include <list>
 #include <set>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -70,6 +69,11 @@ namespace parallel
      * about cells owned by other processors with the exception of a single
      * layer of ghost cells around their own part of the domain.
      *
+     * As a consequence of storing the entire mesh on each processor, active
+     * cells need to be flagged for refinement or coarsening consistently on
+     * all processors if you want to adapt them, regardless of being classified
+     * as locally owned, ghost or artificial.
+     *
      * The class is also useful in cases where compute time and memory
      * considerations dictate that the program needs to be run in parallel,
      * but where algorithmic concerns require that every processor knows
@@ -91,13 +95,11 @@ namespace parallel
      * including ways that are dictated by the application and not by the
      * desire to minimize the length of the interface between subdomains owned
      * by processors (as is done by the METIS and Zoltan packages, both of
-     * which are options for partitioning). Both the DoFHandler and
-     * hp::DoFHandler classes know how to enumerate degrees of freedom in ways
-     * appropriate for the partitioned mesh.
+     * which are options for partitioning). The DoFHandler class knows how to
+     * enumerate degrees of freedom in ways appropriate for the partitioned
+     * mesh.
      *
-     * @author Denis Davydov, 2015
      * @ingroup distributed
-     *
      */
     template <int dim, int spacedim = dim>
     class Triangulation
@@ -230,14 +232,28 @@ namespace parallel
       /**
        * Constructor.
        *
-       * If @p allow_aritifical_cells is true, this class will behave similar
-       * to parallel::distributed::Triangulation in that there will be locally
-       * owned, ghost and artificial cells.
+       * The flag @p allow_artificial_cells can be used to enable artificial
+       * cells. If enabled, this class will behave similarly
+       * to parallel::distributed::Triangulation and
+       * parallel::fullydistributed::Triangulation in the sense that there will
+       * be locally owned cells, a single layer of ghost cells, and
+       * artificial cells. However, one should not forget that in contrast to
+       * those parallel triangulations all cells are duplicated on all
+       * processes, leading in most cases to significantly more artificial
+       * cells.
        *
-       * Otherwise all non-locally owned cells are considered ghost.
+       * If artificial cells are disabled, all non-locally owned cells are
+       * considered ghost cells. This might lead to very expensive ghost-value
+       * update steps. While in the case of artificial cells, ghost-value
+       * updates lead to communication only with the direct process neighbors in
+       * a point-to-point fashion, these degenerate to an operation in which
+       * every process communicates with every other process (an "all-to-all"
+       * communication) if no artificial cells are available. If such
+       * ghost-value updates are the bottleneck in your code, you may want to
+       * consider enabling artificial cells.
        */
       Triangulation(
-        MPI_Comm mpi_communicator,
+        const MPI_Comm &mpi_communicator,
         const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing =
           (dealii::Triangulation<dim, spacedim>::none),
         const bool     allow_artificial_cells = false,
@@ -276,10 +292,10 @@ namespace parallel
                            const std::vector<CellData<dim>> &  cells,
                            const SubCellData &subcelldata) override;
 
-      /*
+      /**
        * @copydoc Triangulation::create_triangulation()
        *
-       * @note Not inmplemented yet.
+       * @note Not implemented yet.
        */
       virtual void
       create_triangulation(
@@ -335,19 +351,11 @@ namespace parallel
       get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
 
       /**
-       * Return allow_artificial_cells , namely true if artificial cells are
+       * Return allow_artificial_cells, namely true if artificial cells are
        * allowed.
        */
       bool
       with_artificial_cells() const;
-
-    protected:
-      /**
-       * Override the function to update the number cache so we can fill data
-       * like @p level_ghost_owners.
-       */
-      virtual void
-      update_number_cache() override;
 
     private:
       /**
@@ -469,6 +477,73 @@ namespace parallel
 
 #endif
 } // namespace parallel
+
+
+namespace internal
+{
+  namespace parallel
+  {
+    namespace shared
+    {
+      /**
+       * This class temporarily modifies the subdomain ID of all active cells to
+       * their respective "true" owner.
+       *
+       * The modification only happens on parallel::shared::Triangulation
+       * objects with artificial cells, and persists for the lifetime of an
+       * instantiation of this class.
+       *
+       * The TemporarilyRestoreSubdomainIds class should only be used for
+       * temporary read-only purposes. For example, whenever your implementation
+       * requires to treat artificial cells temporarily as locally relevant to
+       * access their dof indices.
+       *
+       * This class has effect only if artificial cells are allowed. Without
+       * artificial cells, the current subdomain IDs already correspond to the
+       * true subdomain IDs. See the @ref GlossArtificialCell "glossary"
+       * for more information about artificial cells.
+       */
+      template <int dim, int spacedim = dim>
+      class TemporarilyRestoreSubdomainIds : public Subscriptor
+      {
+      public:
+        /**
+         * Constructor.
+         *
+         * Stores the subdomain ID of all active cells if the provided
+         * Triangulation is of type parallel::shared::Triangulation.
+         *
+         * Replaces them by their true subdomain ID equivalent.
+         */
+        TemporarilyRestoreSubdomainIds(
+          const Triangulation<dim, spacedim> &tria);
+
+        /**
+         * Destructor.
+         *
+         * Returns the subdomain ID of all active cells on the
+         * parallel::shared::Triangulation into their previous state.
+         */
+        ~TemporarilyRestoreSubdomainIds();
+
+      private:
+        /**
+         * The modified parallel::shared::Triangulation.
+         */
+        const SmartPointer<
+          const dealii::parallel::shared::Triangulation<dim, spacedim>>
+          shared_tria;
+
+        /**
+         * A vector that temporarily stores the subdomain IDs on all active
+         * cells before they have been modified on the
+         * parallel::shared::Triangulation.
+         */
+        std::vector<unsigned int> saved_subdomain_ids;
+      };
+    } // namespace shared
+  }   // namespace parallel
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 

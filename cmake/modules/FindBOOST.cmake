@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 - 2019 by the deal.II authors
+## Copyright (C) 2014 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -86,12 +86,6 @@ ENDIF()
 UNSET(Boost_NO_BOOST_CMAKE)
 
 IF(Boost_FOUND)
-  #
-  # Remove "pthread" from Boost_LIBRARIES. Threading, if necessary, is
-  # already set up via configure_1_threads.cmake.
-  #
-  LIST(REMOVE_ITEM Boost_LIBRARIES "pthread")
-
   SET(BOOST_VERSION_MAJOR "${Boost_MAJOR_VERSION}")
   SET(BOOST_VERSION_MINOR "${Boost_MINOR_VERSION}")
   SET(BOOST_VERSION_SUBMINOR "${Boost_SUBMINOR_VERSION}")

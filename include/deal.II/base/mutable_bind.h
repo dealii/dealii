@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,10 +19,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/patterns.h>
-#include <deal.II/base/std_cxx14/utility.h>
 #include <deal.II/base/std_cxx17/tuple.h>
 
 #include <tuple>
+#include <utility>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -77,8 +77,6 @@ namespace Utilities
    *  exp.parse_arguments("3.0 : 4");
    *  exp(); // calls example_function(p, 3.0, 4);
    * @endcode
-   *
-   * @authors Luca Heltai, Matthias Maier, 2019.
    */
   template <typename ReturnType, class... FunctionArgs>
   class MutableBind
@@ -96,7 +94,7 @@ namespace Utilities
      * each arguments separately.
      */
     template <class FunctionType>
-    MutableBind(FunctionType function, FunctionArgs &&... arguments);
+    MutableBind(FunctionType function, FunctionArgs &&...arguments);
 
     /**
      * Construct a MutableBind object specifying the function, and
@@ -107,7 +105,7 @@ namespace Utilities
 
     /**
      * Construct a MutableBind object specifying only the function. By default,
-     * the arguments are left to their defult constructor values.
+     * the arguments are left to their default constructor values.
      */
     template <class FunctionType>
     MutableBind(FunctionType function);
@@ -131,7 +129,7 @@ namespace Utilities
      * operator()() is called, using move semantic.
      */
     void
-    set_arguments(FunctionArgs &&... arguments);
+    set_arguments(FunctionArgs &&...arguments);
 
     /**
      * Parse the arguments to use in @p function from a string, for next time
@@ -147,9 +145,9 @@ namespace Utilities
      * the conversion
      */
     void
-    parse_arguments(const std::string &                           value_string,
-                    const std::unique_ptr<Patterns::PatternBase> &pattern =
-                      Patterns::Tools::Convert<TupleType>::to_pattern());
+    parse_arguments(const std::string &          value_string,
+                    const Patterns::PatternBase &pattern =
+                      *Patterns::Tools::Convert<TupleType>::to_pattern());
 
   private:
     /**
@@ -184,13 +182,11 @@ namespace Utilities
    * bound.parse_arguments("3: 4.0");
    * bound(); // will execute my_function(3, 4.0);
    * @endcode
-   *
-   * @authors Luca Heltai, Matthias Maier, 2019.
    */
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(ReturnType (*function)(FunctionArgs...),
-               typename identity<FunctionArgs>::type &&... arguments);
+               typename identity<FunctionArgs>::type &&...arguments);
 
   /**
    * Same as above, using a std::function object.
@@ -198,7 +194,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(std::function<ReturnType(FunctionArgs...)>,
-               typename identity<FunctionArgs>::type &&... arguments);
+               typename identity<FunctionArgs>::type &&...arguments);
 
   /**
    * Create a MutableBind object from a function pointer, with uninitialized
@@ -228,7 +224,7 @@ namespace Utilities
   template <class FunctionType>
   MutableBind<ReturnType, FunctionArgs...>::MutableBind(
     FunctionType function,
-    FunctionArgs &&... arguments)
+    FunctionArgs &&...arguments)
     : function(function)
     , arguments(std::make_tuple(std::move(arguments)...))
   {}
@@ -265,7 +261,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   void
   MutableBind<ReturnType, FunctionArgs...>::set_arguments(
-    FunctionArgs &&... args)
+    FunctionArgs &&...args)
   {
     arguments = std::make_tuple(std::move(args)...);
   }
@@ -284,8 +280,8 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   void
   MutableBind<ReturnType, FunctionArgs...>::parse_arguments(
-    const std::string &                           value_string,
-    const std::unique_ptr<Patterns::PatternBase> &pattern)
+    const std::string &          value_string,
+    const Patterns::PatternBase &pattern)
   {
     arguments =
       Patterns::Tools::Convert<TupleType>::to_value(value_string, pattern);
@@ -296,7 +292,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(ReturnType (*function)(FunctionArgs...),
-               typename identity<FunctionArgs>::type &&... arguments)
+               typename identity<FunctionArgs>::type &&...arguments)
   {
     return MutableBind<ReturnType, FunctionArgs...>(function,
                                                     std::move(arguments)...);
@@ -316,7 +312,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(std::function<ReturnType(FunctionArgs...)> function,
-               typename identity<FunctionArgs>::type &&... arguments)
+               typename identity<FunctionArgs>::type &&...arguments)
   {
     return MutableBind<ReturnType, FunctionArgs...>(function,
                                                     std::move(arguments)...);

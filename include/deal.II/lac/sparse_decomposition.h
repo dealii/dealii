@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,10 +101,6 @@ DEAL_II_NAMESPACE_OPEN
  * decomposition. Additionally, if that decomposition needs fine tuned
  * diagonal strengthening on a per row basis, it may override the
  * get_strengthen_diagonal() method.
- *
- * @author Stephen "Cheffo" Kolaroff, 2002, based on SparseILU implementation
- * by Wolfgang Bangerth; unified interface: Ralf Hartmann, 2003; extension for
- * full compatibility with LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <typename number>
 class SparseLUDecomposition : protected SparseMatrix<number>,
@@ -243,7 +239,6 @@ public:
    * <i>M</i> being this matrix.
    *
    * Source and destination must not be the same vector.
-   *
    */
   template <class OutVector, class InVector>
   void

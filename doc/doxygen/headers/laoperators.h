@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,6 +44,8 @@
  * LinearOperator <code>op</code> that performs above computation when
  * applied on a vector, one can write:
  * @code
+ * #include <deal.II/lac/linear_operator_tools.h>
+ *
  * dealii::SparseMatrix<double> A, B, C;
  * double k;
  * // Setup and assembly...
@@ -116,6 +118,8 @@
  *
  * As an example consider the addition of multiple vectors:
  * @code
+ *   #include <deal.II/lac/linear_operator_tools.h>
+ *
  *   dealii::Vector<double> a, b, c, d;
  *   // ..
  *   dealii::Vector<double> result = a + b - c + d;
@@ -178,8 +182,15 @@
  *   Vector<double> residual =  b - op_a * x; // computes the residual at this point
  * @endcode
  *
- * The step-20 tutorial program has a detailed usage example of the
+ * @note The step-20 tutorial program has a detailed usage example of the
  * PackagedOperation class.
+ *
+ * @note Many use cases of LinearOperator lead to intermediate expressions
+ * requiring a PackagedOperation. In order to include all necessary header
+ * files in one go consider using
+ * @code
+ * #include <deal.II/lac/linear_operator_tools.h>
+ * @endcode
  *
  *
  * @ingroup LAC

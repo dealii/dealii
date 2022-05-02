@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,7 +94,7 @@ check()
   if (dim == 1)
     tr.refine_global(2);
 
-  FE_Q<dim>       element(QIterated<1>(QTrapez<1>(), 3));
+  FE_Q<dim>       element(QIterated<1>(QTrapezoid<1>(), 3));
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 

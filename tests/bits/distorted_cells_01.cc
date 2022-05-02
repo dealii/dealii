@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,11 +48,11 @@ check(const unsigned int testcase)
   switch (testcase)
     {
       case 1:
-        deallog << "Pinched cell in " << dim << "d" << std::endl;
+        deallog << "Pinched cell in " << dim << 'd' << std::endl;
         vertices[0] = vertices[1];
         break;
       case 2:
-        deallog << "Twisted cell in " << dim << "d" << std::endl;
+        deallog << "Twisted cell in " << dim << 'd' << std::endl;
         std::swap(vertices[0], vertices[1]);
         break;
       default:
@@ -82,6 +82,11 @@ check(const unsigned int testcase)
       deallog << dcv.distorted_cells.size() << " distorted cells" << std::endl;
       Assert(dcv.distorted_cells.front() == coarse_grid.begin(0),
              ExcInternalError());
+    }
+  catch (ExceptionBase &exc)
+    {
+      deallog << exc.get_exc_name() << std::endl;
+      flag = true;
     }
 
   Assert(flag == true, ExcInternalError());

@@ -1,6 +1,6 @@
 ﻿// ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,16 +15,17 @@
 
 
 
-// validate hp decision algorithms on grid coarsening
-// that depend on the composition of h and p adaptivity flags
+// validate hp-decision algorithms on grid coarsening
+// that depend on the composition of h- and p-adaptivity flags
 
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/refinement.h>
 
@@ -34,11 +35,11 @@
 
 template <int dim>
 void
-validate(const Triangulation<dim> &tria, const hp::DoFHandler<dim> &dh)
+validate(const Triangulation<dim> &tria, const DoFHandler<dim> &dh)
 {
   deallog << "ncells: " << tria.n_global_active_cells() << " fe_indices:";
   for (const auto &cell : dh.active_cell_iterators())
-    deallog << " " << cell->active_fe_index();
+    deallog << ' ' << cell->active_fe_index();
   deallog << std::endl;
 }
 
@@ -46,16 +47,13 @@ validate(const Triangulation<dim> &tria, const hp::DoFHandler<dim> &dh)
 
 template <int dim>
 void
-setup(Triangulation<dim> &         tria,
-      hp::DoFHandler<dim> &        dh,
-      const hp::FECollection<dim> &fes)
+setup(Triangulation<dim> &tria, const DoFHandler<dim> &dh)
 {
-  // Initialize triangulation and dofhandler.
+  // Initialize triangulation.
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
-  dh.initialize(tria, fes);
 
-  // Set h and p flags on all cells.
+  // Set h- and p-flags on all cells.
   for (const auto &cell : dh.active_cell_iterators())
     {
       cell->set_coarsen_flag();
@@ -75,19 +73,22 @@ test()
 
   deallog << "starting situation: ";
   {
-    Triangulation<dim>  tria;
-    hp::DoFHandler<dim> dh;
-    setup(tria, dh, fes);
+    Triangulation<dim> tria;
+    DoFHandler<dim>    dh(tria);
+    setup(tria, dh);
+    dh.distribute_dofs(fes);
+
     validate(tria, dh);
   }
 
   deallog << "full h&p flags" << std::endl;
   {
-    deallog << " default behaviour: ";
+    deallog << " default behavior: ";
     {
-      Triangulation<dim>  tria;
-      hp::DoFHandler<dim> dh;
-      setup(tria, dh, fes);
+      Triangulation<dim> tria;
+      DoFHandler<dim>    dh(tria);
+      setup(tria, dh);
+      dh.distribute_dofs(fes);
 
       tria.execute_coarsening_and_refinement();
 
@@ -96,9 +97,10 @@ test()
 
     deallog << " force p over h   : ";
     {
-      Triangulation<dim>  tria;
-      hp::DoFHandler<dim> dh;
-      setup(tria, dh, fes);
+      Triangulation<dim> tria;
+      DoFHandler<dim>    dh(tria);
+      setup(tria, dh);
+      dh.distribute_dofs(fes);
 
       hp::Refinement::force_p_over_h(dh);
       tria.execute_coarsening_and_refinement();
@@ -108,9 +110,10 @@ test()
 
     deallog << " choose p over h  : ";
     {
-      Triangulation<dim>  tria;
-      hp::DoFHandler<dim> dh;
-      setup(tria, dh, fes);
+      Triangulation<dim> tria;
+      DoFHandler<dim>    dh(tria);
+      setup(tria, dh);
+      dh.distribute_dofs(fes);
 
       hp::Refinement::choose_p_over_h(dh);
       tria.execute_coarsening_and_refinement();
@@ -122,11 +125,12 @@ test()
 
   deallog << "full p flags" << std::endl;
   {
-    deallog << " default behaviour: ";
+    deallog << " default behavior: ";
     {
-      Triangulation<dim>  tria;
-      hp::DoFHandler<dim> dh;
-      setup(tria, dh, fes);
+      Triangulation<dim> tria;
+      DoFHandler<dim>    dh(tria);
+      setup(tria, dh);
+      dh.distribute_dofs(fes);
 
       dh.begin_active()->clear_coarsen_flag();
       tria.execute_coarsening_and_refinement();
@@ -136,9 +140,10 @@ test()
 
     deallog << " force p over h   : ";
     {
-      Triangulation<dim>  tria;
-      hp::DoFHandler<dim> dh;
-      setup(tria, dh, fes);
+      Triangulation<dim> tria;
+      DoFHandler<dim>    dh(tria);
+      setup(tria, dh);
+      dh.distribute_dofs(fes);
 
       dh.begin_active()->clear_coarsen_flag();
       hp::Refinement::force_p_over_h(dh);
@@ -149,9 +154,10 @@ test()
 
     deallog << " choose p over h  : ";
     {
-      Triangulation<dim>  tria;
-      hp::DoFHandler<dim> dh;
-      setup(tria, dh, fes);
+      Triangulation<dim> tria;
+      DoFHandler<dim>    dh(tria);
+      setup(tria, dh);
+      dh.distribute_dofs(fes);
 
       dh.begin_active()->clear_coarsen_flag();
       hp::Refinement::choose_p_over_h(dh);
@@ -164,11 +170,12 @@ test()
 
   deallog << "full h flags" << std::endl;
   {
-    deallog << " default behaviour: ";
+    deallog << " default behavior: ";
     {
-      Triangulation<dim>  tria;
-      hp::DoFHandler<dim> dh;
-      setup(tria, dh, fes);
+      Triangulation<dim> tria;
+      DoFHandler<dim>    dh(tria);
+      setup(tria, dh);
+      dh.distribute_dofs(fes);
 
       dh.begin_active()->clear_future_fe_index();
       tria.execute_coarsening_and_refinement();
@@ -178,9 +185,10 @@ test()
 
     deallog << " force p over h   : ";
     {
-      Triangulation<dim>  tria;
-      hp::DoFHandler<dim> dh;
-      setup(tria, dh, fes);
+      Triangulation<dim> tria;
+      DoFHandler<dim>    dh(tria);
+      setup(tria, dh);
+      dh.distribute_dofs(fes);
 
       dh.begin_active()->clear_future_fe_index();
       hp::Refinement::force_p_over_h(dh);
@@ -191,9 +199,10 @@ test()
 
     deallog << " choose p over h  : ";
     {
-      Triangulation<dim>  tria;
-      hp::DoFHandler<dim> dh;
-      setup(tria, dh, fes);
+      Triangulation<dim> tria;
+      DoFHandler<dim>    dh(tria);
+      setup(tria, dh);
+      dh.distribute_dofs(fes);
 
       dh.begin_active()->clear_future_fe_index();
       hp::Refinement::choose_p_over_h(dh);

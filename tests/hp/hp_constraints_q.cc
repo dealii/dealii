@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// check that computation of hp constraints works for Q elements correctly
+// check that computation of hp-constraints works for Q elements correctly
 
 char logname[] = "output";
 
@@ -32,7 +32,7 @@ test()
   std::vector<unsigned int> degrees;
   for (unsigned int i = 1; i < 4; ++i)
     {
-      fe.push_back(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)));
+      fe.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)));
       degrees.push_back(i);
     }
 

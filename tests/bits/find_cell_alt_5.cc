@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,17 +30,18 @@
 #include "../tests.h"
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
-  MappingQGeneric<3> map(1);
-  Point<3>           p(0.75, 0.75, 0.75);
+  MappingQ<3> map(1);
+  Point<3>    p(0.75, 0.75, 0.75);
 
   std::pair<Triangulation<3>::active_cell_iterator, Point<3>> cell =
     GridTools::find_active_cell_around_point(map, tria, p);
 
   deallog << cell.first << std::endl;
   for (const unsigned int v : GeometryInfo<3>::vertex_indices())
-    deallog << "<" << cell.first->vertex(v) << "> ";
+    deallog << '<' << cell.first->vertex(v) << "> ";
   deallog << "[ " << cell.second << "] ";
   deallog << std::endl;
 

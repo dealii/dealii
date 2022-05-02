@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,7 @@ namespace LinearAlgebra
     template <typename Number>
     BlockVector<Number>::BlockVector(const std::vector<IndexSet> &local_ranges,
                                      const std::vector<IndexSet> &ghost_indices,
-                                     const MPI_Comm               communicator)
+                                     const MPI_Comm &             communicator)
     {
       std::vector<size_type> sizes(local_ranges.size());
       for (unsigned int i = 0; i < local_ranges.size(); ++i)
@@ -76,7 +76,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     BlockVector<Number>::BlockVector(const std::vector<IndexSet> &local_ranges,
-                                     const MPI_Comm               communicator)
+                                     const MPI_Comm &             communicator)
     {
       std::vector<size_type> sizes(local_ranges.size());
       for (unsigned int i = 0; i < local_ranges.size(); ++i)
@@ -211,6 +211,20 @@ namespace LinearAlgebra
 
 
 
+    template <typename Number>
+    template <typename Number2>
+    void
+    BlockVector<Number>::copy_locally_owned_data_from(
+      const BlockVector<Number2> &v)
+    {
+      AssertDimension(this->n_blocks(), v.n_blocks());
+
+      for (unsigned int b = 0; b < this->n_blocks(); ++b)
+        this->block(b).copy_locally_owned_data_from(v.block(b));
+    }
+
+
+
 #ifdef DEAL_II_WITH_PETSC
 
     namespace petsc_helpers
@@ -247,8 +261,8 @@ namespace LinearAlgebra
 
     template <typename Number>
     BlockVector<Number> &
-    BlockVector<Number>::
-    operator=(const PETScWrappers::MPI::BlockVector &petsc_vec)
+    BlockVector<Number>::operator=(
+      const PETScWrappers::MPI::BlockVector &petsc_vec)
     {
       AssertDimension(this->n_blocks(), petsc_vec.n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -269,7 +283,7 @@ namespace LinearAlgebra
                         &start_ptr);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-          const size_type vec_size = this->block(i).local_size();
+          const size_type vec_size = this->block(i).locally_owned_size();
           petsc_helpers::copy_petsc_vector(start_ptr,
                                            start_ptr + vec_size,
                                            this->block(i).begin());
@@ -296,8 +310,8 @@ namespace LinearAlgebra
 
     template <typename Number>
     BlockVector<Number> &
-    BlockVector<Number>::
-    operator=(const TrilinosWrappers::MPI::BlockVector &trilinos_vec)
+    BlockVector<Number>::operator=(
+      const TrilinosWrappers::MPI::BlockVector &trilinos_vec)
     {
       AssertDimension(this->n_blocks(), trilinos_vec.n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -379,8 +393,17 @@ namespace LinearAlgebra
     void
     BlockVector<Number>::zero_out_ghosts() const
     {
+      this->zero_out_ghost_values();
+    }
+
+
+
+    template <typename Number>
+    void
+    BlockVector<Number>::zero_out_ghost_values() const
+    {
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
-        this->block(block).zero_out_ghosts();
+        this->block(block).zero_out_ghost_values();
     }
 
 
@@ -626,14 +649,14 @@ namespace LinearAlgebra
         return -Utilities::MPI::max(
           local_result, this->block(0).partitioner->get_mpi_communicator());
       else
-        return local_result;
+        return local_result != 0;
     }
 
 
 
     template <typename Number>
-    Number BlockVector<Number>::
-           operator*(const VectorSpaceVector<Number> &vv) const
+    Number
+    BlockVector<Number>::operator*(const VectorSpaceVector<Number> &vv) const
     {
       Assert(this->n_blocks() > 0, ExcEmptyObject());
 
@@ -665,9 +688,9 @@ namespace LinearAlgebra
 
       Number local_result = Number();
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        local_result +=
-          this->block(i).mean_value_local() *
-          static_cast<real_type>(this->block(i).partitioner->local_size());
+        local_result += this->block(i).mean_value_local() *
+                        static_cast<real_type>(
+                          this->block(i).partitioner->locally_owned_size());
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(
@@ -827,9 +850,10 @@ namespace LinearAlgebra
 
     template <typename Number>
     inline void
-    BlockVector<Number>::import(const LinearAlgebra::ReadWriteVector<Number> &,
-                                VectorOperation::values,
-                                std::shared_ptr<const CommunicationPatternBase>)
+    BlockVector<Number>::import(
+      const LinearAlgebra::ReadWriteVector<Number> &,
+      VectorOperation::values,
+      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>)
     {
       AssertThrow(false, ExcNotImplemented());
     }
@@ -910,7 +934,7 @@ namespace LinearAlgebra
 
       // in case one vector is empty and the second one is not, the
       // FullMatrix resized to (m,n) will have 0 both in m() and n()
-      // which is how TableBase<N,T>::reinit() works as of deal.ii@8.5.0.
+      // which is how TableBase<N,T>::reinit() works as of deal.II@8.5.0.
       // Since in this case there is nothing to do anyway -- return immediately.
       if (n == 0 || m == 0)
         return;
@@ -926,12 +950,12 @@ namespace LinearAlgebra
         {
           Assert(m == n, ExcDimensionMismatch(m, n));
 
-          for (unsigned int i = 0; i < m; i++)
-            for (unsigned int j = i; j < n; j++)
+          for (unsigned int i = 0; i < m; ++i)
+            for (unsigned int j = i; j < n; ++j)
               matrix(i, j) = this->block(i).inner_product_local(V.block(j));
 
-          for (unsigned int i = 0; i < m; i++)
-            for (unsigned int j = i + 1; j < n; j++)
+          for (unsigned int i = 0; i < m; ++i)
+            for (unsigned int j = i + 1; j < n; ++j)
               matrix(j, i) = matrix(i, j);
         }
       else
@@ -975,19 +999,19 @@ namespace LinearAlgebra
         {
           Assert(m == n, ExcDimensionMismatch(m, n));
 
-          for (unsigned int i = 0; i < m; i++)
+          for (unsigned int i = 0; i < m; ++i)
             {
               res +=
                 matrix(i, i) * this->block(i).inner_product_local(V.block(i));
-              for (unsigned int j = i + 1; j < n; j++)
+              for (unsigned int j = i + 1; j < n; ++j)
                 res += 2. * matrix(i, j) *
                        this->block(i).inner_product_local(V.block(j));
             }
         }
       else
         {
-          for (unsigned int i = 0; i < m; i++)
-            for (unsigned int j = 0; j < n; j++)
+          for (unsigned int i = 0; i < m; ++i)
+            for (unsigned int j = 0; j < n; ++j)
               res +=
                 matrix(i, j) * this->block(i).inner_product_local(V.block(j));
         }
@@ -1018,21 +1042,21 @@ namespace LinearAlgebra
       Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
       Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
 
-      for (unsigned int i = 0; i < n; i++)
+      for (unsigned int i = 0; i < n; ++i)
         {
           // below we make this work gracefully for identity-like matrices in
           // which case the two loops over j won't do any work as A(j,i)==0
           const unsigned int k = std::min(i, m - 1);
           V.block(i).sadd_local(s, matrix(k, i) * b, this->block(k));
-          for (unsigned int j = 0; j < k; j++)
+          for (unsigned int j = 0; j < k; ++j)
             V.block(i).add_local(matrix(j, i) * b, this->block(j));
-          for (unsigned int j = k + 1; j < m; j++)
+          for (unsigned int j = k + 1; j < m; ++j)
             V.block(i).add_local(matrix(j, i) * b, this->block(j));
         }
 
       if (V.block(0).vector_is_ghosted)
         {
-          for (unsigned int i = 0; i < n; i++)
+          for (unsigned int i = 0; i < n; ++i)
             Assert(V.block(i).vector_is_ghosted,
                    ExcMessage(
                      "All blocks should be either in ghosted state or not."));

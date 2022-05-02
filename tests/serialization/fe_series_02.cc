@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,20 +32,22 @@ void
 test()
 {
   // setup
-  hp::FECollection<dim> hp_fe;
-  hp::QCollection<dim>  hp_q;
+  std::vector<unsigned int> n_modes;
+  hp::FECollection<dim>     hp_fe;
+  hp::QCollection<dim>      hp_q;
 
   const unsigned int min_degree = 1, max_degree = 2;
   const QGauss<dim>  quadrature(max_degree + 1);
   const QSorted<dim> quadrature_sorted(quadrature);
   for (unsigned int p = min_degree; p <= max_degree; ++p)
     {
+      n_modes.push_back(max_degree + 1);
       hp_fe.push_back(FE_Q<dim>(p));
       hp_q.push_back(quadrature_sorted);
     }
 
-  FESeries::Legendre<dim> legendre_save(max_degree + 1, hp_fe, hp_q);
-  FESeries::Legendre<dim> legendre_load(max_degree + 1, hp_fe, hp_q);
+  FESeries::Legendre<dim> legendre_save(n_modes, hp_fe, hp_q);
+  FESeries::Legendre<dim> legendre_load(n_modes, hp_fe, hp_q);
 
   // create transformation matrices
   legendre_save.precalculate_all_transformation_matrices();

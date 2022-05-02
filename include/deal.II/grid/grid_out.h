@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -253,18 +253,6 @@ namespace GridOutFlags
     unsigned int n_extra_curved_line_points;
 
     /**
-     * Based on the vertices of the face and #n_boundary_face_points
-     * additional points a tensor product mesh (transformed to the real space)
-     * of (#n_boundary_face_points+2)<sup>dim-1</sup> points is plotted on
-     * each boundary face.
-     *
-     * @deprecated Use n_extra_curved_line_points instead, which has
-     * a more precise name. For compatibility this is implemented as a
-     * reference to n_extra_curved_line_points.
-     */
-    DEAL_II_DEPRECATED unsigned int &n_boundary_face_points;
-
-    /**
      * Boolean indicating whether or not interior lines should be plotted with
      * <tt>n_extra_curved_line_points</tt> line segments.
      */
@@ -290,19 +278,6 @@ namespace GridOutFlags
             const unsigned int n_extra_curved_line_points      = 2,
             const bool         curved_inner_cells              = false,
             const bool         write_additional_boundary_lines = true);
-
-    /**
-     * Copy constructor. Needed since this class (for backwards compatibility)
-     * has a reference member variable.
-     */
-    Gnuplot(const Gnuplot &flags);
-
-    /**
-     * Copy operator. Needed since this class (for backwards compatibility)
-     * has a reference member variable.
-     */
-    Gnuplot &
-    operator=(const Gnuplot &flags);
 
     /**
      * Declare parameters in ParameterHandler.
@@ -379,7 +354,7 @@ namespace GridOutFlags
      * the vertices of the face.
      *
      * This number is only used if the mapping used is not simply the standard
-     * $Q_1$ mapping (i.e., an object of kind MappingQGeneric(1)) that may
+     * $Q_1$ mapping (i.e., an object of kind MappingQ(1)) that may
      * describe edges of cells as curved and that will then be approximated
      * using line segments with a number of intermediate points as described
      * by the current variable.
@@ -949,7 +924,7 @@ namespace GridOutFlags
  *
  * Usage is simple: either you use the direct form
  * @code
- *   ofstream output_file("some_filename");
+ *   std::ofstream output_file("some_filename");
  *   GridOut().write_gnuplot (tria, output_file);
  * @endcode
  * if you know which format you want to have, or if you want the format to be
@@ -957,8 +932,8 @@ namespace GridOutFlags
  * @code
  *   GridOut::OutputFormat grid_format =
  *     GridOut::parse_output_format(get_format_name_from_somewhere());
- *   ofstream output_file("some_filename"
- *                        + GridOut::default_suffix(output_format));
+ *   std::ofstream output_file("some_filename"
+ *                             + GridOut::default_suffix(output_format));
  *   GridOut().write (tria, output_file, output_format);
  * @endcode
  * The function <tt>get_output_format_names()</tt> provides a list of possible
@@ -1013,9 +988,6 @@ namespace GridOutFlags
  *
  * @ingroup grid
  * @ingroup output
- * @author Wolfgang Bangerth, Guido Kanschat, Luca Heltai, Stefan Nauber,
- * Christian Wülker
- * @date 1999 - 2013
  */
 class GridOut
 {
@@ -1125,6 +1097,53 @@ public:
   template <int dim, int spacedim>
   void
   write_msh(const Triangulation<dim, spacedim> &tria, std::ostream &out) const;
+
+#ifdef DEAL_II_GMSH_WITH_API
+  /**
+   * Write the triangulation in any format supported by gmsh API.
+   *
+   * Gmsh API allows writing its output in several formats through their C++
+   * API. This function translates a Triangulation object into a gmsh collection
+   * of entities and calls the gmsh::write() method with the filename passed as
+   * argument. This method generates a different entity for each unique pair of
+   * non default manifold id and boundary id, and writes a gmsh physical group
+   * for each unique combination, allowing you to read back the triangulation
+   * using the GridIn::read_msh() method that takes a string as argument.
+   *
+   * In particular, all cell objects with non default boundary id or non
+   * default manifold id are grouped in a unique physical tag, whose name
+   * contains the boundary and manifold indicators. The names are constructed
+   * using Patterns::Tools::to_value() applied to a `std::map<std::string, int>`
+   * where the keys are either `MaterialID`, `BoundaryID`, or `ManifoldID`,
+   * i.e., a cell with material id 1, and manifold id 3 would be grouped in a
+   * physical tag (whose numbering is not specified), named
+   * `MaterialID:1, ManifoldID:3`.
+   *
+   * For example, calling the method with a hyper ball grid refined once,
+   * would results in the following physical tags defined in the output file:
+   * @code
+   * MeshFormat
+   * 4.1 0 8
+   * \$EndMeshFormat
+   * \$PhysicalNames
+   * 3
+   * 1 1 "ManifoldID:0"
+   * 1 2 "BoundaryID:-1, ManifoldID:1"
+   * 2 3 "ManifoldID:1"
+   * \$EndPhysicalNames
+   * \$Entities
+   * ...
+   * @endcode
+   *
+   * The special boundary id `-1` is used to indicate internal boundaries. The
+   * internal boundaries must be specified whenever it is necessary to specify
+   * a non-flat manifold id.
+   */
+  template <int dim, int spacedim>
+  void
+  write_msh(const Triangulation<dim, spacedim> &tria,
+            const std::string &                 filename) const;
+#endif
 
   /**
    * Write the triangulation in the ucd format.
@@ -1295,8 +1314,6 @@ public:
    *
    * The companion GridIn::read_vtk function can be used to read VTK files
    * generated with this method.
-   *
-   * @author Luca Heltai, 2018
    */
   template <int dim, int spacedim>
   void
@@ -1307,17 +1324,18 @@ public:
    *
    * Due to the way this function writes data to the output stream,
    * the resulting output files correspond to a faithful representation
-   * of the mesh in that all cells are visible for visualization. However,
+   * of the mesh in that all cells are visible for visualization. In general,
    * the data is not in a format that allows reading this file in again
    * through the GridIn class. This is because every vertex of the mesh is
    * duplicated as many times as there are adjacent cells. In other words,
    * every cell has its own, separate set of vertices that are at the
    * same location as the vertices of other cells, but are separately
-   * numbered. If such a file is read in through the GridIn class, then
-   * that will result in a mesh that has the correct cells and vertex
-   * locations, but because the vertices are logically separate (though at
-   * the same locations) all cells are unconnected and have no neighbors
-   * across faces.
+   * numbered.
+   *
+   * In order to create a file that can be read with the GridIn class,
+   * the flag GridOutFlags::Vtu::serialize_triangulation must be set to true. In
+   * this case, the generated vtu file will contain the triangulation in a xml
+   * section which is ignored by general vtu readers.
    */
   template <int dim, int spacedim>
   void

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,12 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-// check constraints on hp dofhandler with 2 neighboring cells where one
+// check constraints on hp-dofhandler with 2 neighboring cells where one
 // cell is enriched and nother is not.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_enriched.h>
@@ -31,7 +32,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -84,7 +84,7 @@ template <int dim>
 void
 test2cells(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
 {
-  deallog << "2cells: " << dim << " " << p_feq << " " << p_feen << std::endl;
+  deallog << "2cells: " << dim << ' ' << p_feq << ' ' << p_feen << std::endl;
   Triangulation<dim> triangulation;
   {
     Triangulation<dim> triangulationL;
@@ -103,14 +103,14 @@ test2cells(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
                                         triangulation);
   }
 
-  hp::DoFHandler<dim>     dof_handler(triangulation);
+  DoFHandler<dim>         dof_handler(triangulation);
   EnrichmentFunction<dim> function;
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Enriched<dim>(FE_Q<dim>(p_feq)));
   fe_collection.push_back(
     FE_Enriched<dim>(FE_Q<dim>(p_feen), FE_Q<dim>(1), &function));
-  // push back to be able to resolve hp constrains:
+  // push back to be able to resolve hp-constrains:
   fe_collection.push_back(FE_Enriched<dim>(FE_Q<dim>(p_feen)));
 
   dof_handler.begin_active()->set_active_fe_index(1); // POU
@@ -129,7 +129,7 @@ test2cells(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
   // output to check if all is good:
   std::vector<Vector<double>> shape_functions;
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < dof_handler.n_dofs(); s++)
+  for (unsigned int s = 0; s < dof_handler.n_dofs(); ++s)
     {
       Vector<double> shape_function;
       shape_function.reinit(dof_handler.n_dofs());
@@ -151,21 +151,21 @@ test2cells(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
       shape_functions.push_back(shape_function);
     }
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
   Vector<float> fe_index(triangulation.n_active_cells());
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (unsigned int index = 0; cell != endc; ++cell, ++index)
     {
       fe_index[index] = cell->active_fe_index();
     }
   data_out.add_data_vector(fe_index, "fe_index");
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(patches);

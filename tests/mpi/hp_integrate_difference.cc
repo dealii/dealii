@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,6 +61,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -71,7 +72,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/trilinos_vector.h>
@@ -129,7 +129,7 @@ test()
                                  FE_Q<dim>(2),
                                  FE_Q<dim>(3),
                                  FE_Q<dim>(4));
-  hp::DoFHandler<dim>         dof_handler(tr);
+  DoFHandler<dim>             dof_handler(tr);
 
   // set DoF indices as described at the top of the file
   for (auto &cell : dof_handler.active_cell_iterators())

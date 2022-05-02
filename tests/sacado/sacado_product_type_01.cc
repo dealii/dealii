@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,7 @@ check()
 int
 main()
 {
-  typedef Sacado::Fad::DFad<double> Sdouble;
+  using Sdouble = Sacado::Fad::DFad<double>;
   initlog();
 
 

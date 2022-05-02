@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,7 +68,7 @@ test()
 
     deallog << "owning_ranks_of_ghosts:" << std::endl;
     for (auto i : owning_ranks_of_ghosts)
-      deallog << i << " ";
+      deallog << i << ' ';
     deallog << std::endl;
 
     deallog << "requesters:" << std::endl;
@@ -86,7 +86,7 @@ test()
     Utilities::MPI::Partitioner v(local_owned, local_relevant, comm);
 
     for (unsigned int i = 0; i < v.ghost_targets().size(); ++i)
-      for (unsigned int j = 0; j < v.ghost_targets()[i].second; j++)
+      for (unsigned int j = 0; j < v.ghost_targets()[i].second; ++j)
         deallog << v.ghost_targets()[i].first << std::endl;
   }
 }

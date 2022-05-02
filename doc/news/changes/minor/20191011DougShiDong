@@ -1,7 +1,0 @@
-Fixed: Take in account p::d::Triangulation when using
-DoFHandler<dim, spacedim>::n_boundary_dofs() and its
-hp version. It now returns locally owned dofs instead
-of attempting a global count.
-<br>
-(Doug Shi-Dong, 2019/10/11)
-

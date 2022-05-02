@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -99,7 +99,7 @@ test(const Triangulation<dim> &tr)
 
       for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
         for (unsigned int j = 0; j < fe_values.dofs_per_cell; ++j)
-          for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+          for (const auto q : fe_values.quadrature_point_indices())
             {
               mass_matrix[cell->index()](i, j) += fe_values.shape_value(i, q) *
                                                   fe_values.shape_value(j, q) *

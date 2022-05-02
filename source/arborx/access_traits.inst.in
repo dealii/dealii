@@ -1,0 +1,59 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2021 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+for (DIM : DIMENSIONS; SCALAR : REAL_SCALARS)
+  {
+#if DIM > 1
+    DEAL_II_NAMESPACE_OPEN
+    namespace ArborXWrappers
+    {
+      template PointIntersectPredicate::PointIntersectPredicate(
+        const std::vector<dealii::Point<DIM, SCALAR>> &points);
+      template PointNearestPredicate::PointNearestPredicate(
+        const std::vector<dealii::Point<DIM, SCALAR>> &points,
+        const unsigned int                             n_nearest_neighbors);
+
+      template BoundingBoxIntersectPredicate::BoundingBoxIntersectPredicate(
+        const std::vector<dealii::BoundingBox<DIM, SCALAR>> &bb);
+      template BoundingBoxNearestPredicate::BoundingBoxNearestPredicate(
+        const std::vector<dealii::BoundingBox<DIM, SCALAR>> &bb,
+        const unsigned int n_nearest_neighbors);
+
+      template SphereIntersectPredicate::SphereIntersectPredicate(
+        const std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>
+          &spheres);
+      template SphereNearestPredicate::SphereNearestPredicate(
+        const std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>
+          &                spheres,
+        const unsigned int n_nearest_neighbors);
+    \}
+    DEAL_II_NAMESPACE_CLOSE
+
+    namespace ArborX
+    {
+      template struct AccessTraits<std::vector<dealii::Point<DIM, SCALAR>>,
+                                   PrimitivesTag>;
+
+      template struct AccessTraits<
+        std::vector<dealii::BoundingBox<DIM, SCALAR>>,
+        PrimitivesTag>;
+
+      template struct AccessTraits<
+        std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>,
+        PrimitivesTag>;
+    \}
+#endif
+  }

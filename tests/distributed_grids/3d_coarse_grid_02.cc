@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,10 @@ test(const char *filename)
   const char *p = strrchr(filename, '/');
   deallog.push(p);
 
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
+  parallel::distributed::Triangulation<dim> tr(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::none,
+    parallel::distributed::Triangulation<dim>::communicate_vertices_to_p4est);
 
   GridIn<dim> gi;
   gi.attach_triangulation(tr);

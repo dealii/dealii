@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,6 @@ DEAL_II_NAMESPACE_OPEN
  * </ul>
  *
  * @ingroup textoutput
- * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003, 2011
  */
 class LogStream : public Subscriptor
 {
@@ -130,8 +129,9 @@ public:
 
 
   /**
-   * Standard constructor. The standard output stream to
-   * <tt>std::cout</tt>.
+   * Standard constructor. The constructor sets the output stream to
+   * <tt>std::cout</tt> and the depth to zero. (Use attach() and
+   * depth_console() to change this.)
    */
   LogStream();
 
@@ -322,6 +322,13 @@ private:
   mutable Threads::ThreadLocalStorage<std::stack<std::string>> prefixes;
 
   /**
+   * We record the thread id of the thread creating this object. We need
+   * this information to "steal" the current prefix from this "parent"
+   * thread on first use of deallog on a new thread.
+   */
+  std::thread::id parent_thread;
+
+  /**
    * Default stream, where the output is to go to. This stream defaults to
    * <tt>std::cout</tt>, but can be set to another stream through the
    * constructor.
@@ -373,7 +380,7 @@ private:
   get_stream();
 
   /**
-   * We use tbb's thread local storage facility to generate a stringstream for
+   * We use our thread local storage facility to generate a stringstream for
    * every thread that sends log messages.
    */
   Threads::ThreadLocalStorage<std::shared_ptr<std::ostringstream>> outstreams;
@@ -408,8 +415,6 @@ operator<<(LogStream &log, const T &t)
 
 /**
  * The standard log object of deal.II:
- *
- * @author Guido Kanschat, 1999
  */
 extern LogStream deallog;
 

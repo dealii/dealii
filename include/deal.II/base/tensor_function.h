@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  * the <tt>Function</tt> class, one can ask for a specific component only, or
  * use the <tt>vector_value</tt> function, which however does not return the
  * value, but rather writes it into the address provided by its second
- * argument. The reason for the different behaviour of the classes is that in
+ * argument. The reason for the different behavior of the classes is that in
  * the case of tensor valued functions, the size of the argument is known to
  * the compiler a priori, such that the correct amount of memory can be
  * allocated on the stack for the return value; on the other hand, for the
@@ -51,7 +51,6 @@ DEAL_II_NAMESPACE_OPEN
  * them the size can be determined similarly simply.
  *
  * @ingroup functions
- * @author Guido Kanschat, 1999
  */
 template <int rank, int dim, typename Number = double>
 class TensorFunction
@@ -126,7 +125,6 @@ public:
  * value. Obviously, all derivates of this function are zero.
  *
  * @ingroup functions
- * @author Matthias Maier, 2013
  */
 template <int rank, int dim, typename Number = double>
 class ConstantTensorFunction : public TensorFunction<rank, dim, Number>
@@ -179,7 +177,6 @@ private:
  * derivates of this function are zero.
  *
  * @ingroup functions
- * @author Matthias Maier, 2013
  */
 template <int rank, int dim, typename Number = double>
 class ZeroTensorFunction : public ConstantTensorFunction<rank, dim, Number>

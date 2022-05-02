@@ -447,7 +447,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: FE_Enriched finite element class implements the partition of unitity
+  New: FE_Enriched finite element class implements the partition of unity
   method which allows to enrich the finite element space based on a priori
   knowledge about solution.
   <br>

@@ -78,7 +78,7 @@ test()
   v.update_ghost_values();
   v.print(deallog.get_file_stream(), 12, false, false);
 
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   double *    values_dev  = v.get_values();
   const auto &partitioner = v.get_partitioner();
   set_value<<<1, 1>>>(values_dev,

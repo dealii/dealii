@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,8 +57,8 @@ main()
   prm.leave_subsection();
 
   prm.print_parameters(deallog.get_file_stream(),
-                       ParameterHandler::Text,
-                       false);
+                       ParameterHandler::Text |
+                         ParameterHandler::KeepDeclarationOrder);
 
   deallog << std::boolalpha;
   deallog << "Subsection \"Section 3\" of root exists: "

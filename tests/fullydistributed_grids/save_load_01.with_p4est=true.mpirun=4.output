@@ -1,0 +1,87 @@
+
+DEAL:0:2d:save::n_levels:                  4
+DEAL:0:2d:save::n_cells:                   57
+DEAL:0:2d:save::n_active_cells:            43
+DEAL:0:2d:save::has_hanging_nodes:         false
+DEAL:0:2d:save::
+DEAL:0:2d:load::n_levels:                  4
+DEAL:0:2d:load::n_cells:                   57
+DEAL:0:2d:load::n_active_cells:            43
+DEAL:0:2d:load::has_hanging_nodes:         false
+DEAL:0:2d:load::
+DEAL:0:3d:save::n_levels:                  4
+DEAL:0:3d:save::n_cells:                   361
+DEAL:0:3d:save::n_active_cells:            316
+DEAL:0:3d:save::has_hanging_nodes:         false
+DEAL:0:3d:save::
+DEAL:0:3d:load::n_levels:                  4
+DEAL:0:3d:load::n_cells:                   361
+DEAL:0:3d:load::n_active_cells:            316
+DEAL:0:3d:load::has_hanging_nodes:         false
+DEAL:0:3d:load::
+
+DEAL:1:2d:save::n_levels:                  4
+DEAL:1:2d:save::n_cells:                   57
+DEAL:1:2d:save::n_active_cells:            43
+DEAL:1:2d:save::has_hanging_nodes:         false
+DEAL:1:2d:save::
+DEAL:1:2d:load::n_levels:                  4
+DEAL:1:2d:load::n_cells:                   57
+DEAL:1:2d:load::n_active_cells:            43
+DEAL:1:2d:load::has_hanging_nodes:         false
+DEAL:1:2d:load::
+DEAL:1:3d:save::n_levels:                  4
+DEAL:1:3d:save::n_cells:                   361
+DEAL:1:3d:save::n_active_cells:            316
+DEAL:1:3d:save::has_hanging_nodes:         false
+DEAL:1:3d:save::
+DEAL:1:3d:load::n_levels:                  4
+DEAL:1:3d:load::n_cells:                   361
+DEAL:1:3d:load::n_active_cells:            316
+DEAL:1:3d:load::has_hanging_nodes:         false
+DEAL:1:3d:load::
+
+
+DEAL:2:2d:save::n_levels:                  4
+DEAL:2:2d:save::n_cells:                   57
+DEAL:2:2d:save::n_active_cells:            43
+DEAL:2:2d:save::has_hanging_nodes:         false
+DEAL:2:2d:save::
+DEAL:2:2d:load::n_levels:                  4
+DEAL:2:2d:load::n_cells:                   57
+DEAL:2:2d:load::n_active_cells:            43
+DEAL:2:2d:load::has_hanging_nodes:         false
+DEAL:2:2d:load::
+DEAL:2:3d:save::n_levels:                  4
+DEAL:2:3d:save::n_cells:                   361
+DEAL:2:3d:save::n_active_cells:            316
+DEAL:2:3d:save::has_hanging_nodes:         false
+DEAL:2:3d:save::
+DEAL:2:3d:load::n_levels:                  4
+DEAL:2:3d:load::n_cells:                   361
+DEAL:2:3d:load::n_active_cells:            316
+DEAL:2:3d:load::has_hanging_nodes:         false
+DEAL:2:3d:load::
+
+
+DEAL:3:2d:save::n_levels:                  4
+DEAL:3:2d:save::n_cells:                   57
+DEAL:3:2d:save::n_active_cells:            43
+DEAL:3:2d:save::has_hanging_nodes:         false
+DEAL:3:2d:save::
+DEAL:3:2d:load::n_levels:                  4
+DEAL:3:2d:load::n_cells:                   57
+DEAL:3:2d:load::n_active_cells:            43
+DEAL:3:2d:load::has_hanging_nodes:         false
+DEAL:3:2d:load::
+DEAL:3:3d:save::n_levels:                  4
+DEAL:3:3d:save::n_cells:                   361
+DEAL:3:3d:save::n_active_cells:            316
+DEAL:3:3d:save::has_hanging_nodes:         false
+DEAL:3:3d:save::
+DEAL:3:3d:load::n_levels:                  4
+DEAL:3:3d:load::n_cells:                   361
+DEAL:3:3d:load::n_active_cells:            316
+DEAL:3:3d:load::has_hanging_nodes:         false
+DEAL:3:3d:load::
+

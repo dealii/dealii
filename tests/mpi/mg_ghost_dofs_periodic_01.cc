@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -93,7 +93,7 @@ test()
                     << cell->level_subdomain_id() << ": ";
             cell->get_mg_dof_indices(dof_indices);
             for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-              deallog << dof_indices[i] << " ";
+              deallog << dof_indices[i] << ' ';
             deallog << std::endl;
           }
     }

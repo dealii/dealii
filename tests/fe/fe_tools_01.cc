@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,10 +49,10 @@ main()
   test_fe<1>("FE_Q(1)");
   test_fe<1>("FE_Q(2)");
   test_fe<1>("FE_Q<1>(2)");
-  test_fe<1>("FE_Q(QIterated(QTrapez(),2))");
+  test_fe<1>("FE_Q(QIterated(QTrapezoid(),2))");
   test_fe<1>("FE_Q(QGaussLobatto(4))");
   test_fe<1>("FE_Q(3)");
-  test_fe<1>("FE_Q(QIterated(QTrapez(),3))");
+  test_fe<1>("FE_Q(QIterated(QTrapezoid(),3))");
   test_fe<2>("FE_Q(1)");
   test_fe<2>("FE_Q<2>(2)");
   test_fe<2>("FE_Q<dim>(2)");
@@ -61,7 +61,7 @@ main()
   test_fe<2>("FE_RaviartThomas(1)");
   test_fe<2>("FE_Q(QGaussLobatto(3))");
   test_fe<2>("FE_Q(QGaussLobatto(4))");
-  test_fe<2>("FE_Q(QIterated(QTrapez(),3))");
+  test_fe<2>("FE_Q(QIterated(QTrapezoid(),3))");
   test_fe<3>("FE_Q(1)");
   test_fe<1>("FESystem<1>[FE_Q<dim>(2)^dim-FE_DGQ<d>(1)]");
   test_fe<2>("FESystem<2>[FE_Q<2>(2)^dim-FE_DGQ<2>(1)]");

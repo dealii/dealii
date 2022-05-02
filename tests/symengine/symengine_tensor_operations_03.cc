@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -390,7 +390,7 @@ print(Stream &                          stream,
       const Tensor<1, dim, NumberType> &t)
 {
   for (unsigned int i = 0; i < dim; ++i)
-    stream << name << "[" << i << "]: " << t[i] << std::endl;
+    stream << name << '[' << i << "]: " << t[i] << std::endl;
 }
 template <typename Stream, int dim, typename NumberType>
 void
@@ -400,7 +400,7 @@ print(Stream &                          stream,
 {
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
-      stream << name << "[" << i << "][" << j << "]: " << t[i][j] << std::endl;
+      stream << name << '[' << i << "][" << j << "]: " << t[i][j] << std::endl;
 }
 template <typename Stream, int dim, typename NumberType>
 void
@@ -411,7 +411,7 @@ print(Stream &                          stream,
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
       for (unsigned int k = 0; k < dim; ++k)
-        stream << name << "[" << i << "][" << j << "][" << k
+        stream << name << '[' << i << "][" << j << "][" << k
                << "]: " << t[i][j][k] << std::endl;
 }
 template <typename Stream, int dim, typename NumberType>
@@ -424,7 +424,7 @@ print(Stream &                          stream,
     for (unsigned int j = 0; j < dim; ++j)
       for (unsigned int k = 0; k < dim; ++k)
         for (unsigned int l = 0; l < dim; ++l)
-          stream << name << "[" << i << "][" << j << "][" << k << "][" << l
+          stream << name << '[' << i << "][" << j << "][" << k << "][" << l
                  << "]: " << t[i][j][k][l] << std::endl;
 }
 

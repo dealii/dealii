@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,8 @@ int
 main()
 {
   initlog();
+
+  CHECK_ALL(Q, 1, 1);
 
   CHECK_ALL(Q, 1, 2);
   CHECK_ALL(Q, 2, 2);

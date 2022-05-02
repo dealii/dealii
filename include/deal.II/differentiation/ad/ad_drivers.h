@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -143,8 +143,6 @@ namespace Differentiation
      *         from, operations performed with auto-differentiable numbers.
      * @tparam T An arbitrary type resulting from the application of
      *         the SFINAE idiom to selectively specialize this class.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename ADNumberType, typename ScalarType, typename T = void>
     struct TapedDrivers
@@ -515,8 +513,6 @@ namespace Differentiation
      *         from, operations performed with auto-differentiable numbers.
      * @tparam T An arbitrary type resulting from the application of
      *         the SFINAE idiom to selectively specialize this class.
-     *
-     * @author Jean-Paul Pelteret, 2017
      */
     template <typename ADNumberType, typename ScalarType, typename T = void>
     struct TapelessDrivers

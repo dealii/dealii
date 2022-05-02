@@ -29,7 +29,7 @@ DEAL::  Relative interpolation error before constraints: 2.75611e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.75611e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
+DEAL::Testing FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)]
 DEAL::  Relative interpolation error before constraints: 7.91056e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 7.91056e-17
@@ -44,22 +44,22 @@ DEAL::  Relative interpolation error before constraints: 5.97019e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 5.97019e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
+DEAL::Testing FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)]
 DEAL::  Relative interpolation error before constraints: 1.34247e-16
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 1.34247e-16
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)]
+DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)]
 DEAL::  Relative interpolation error before constraints: 3.54830e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 3.54830e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)]
+DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)]
 DEAL::  Relative interpolation error before constraints: 5.83856e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 5.83856e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
+DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)]
 DEAL::  Relative interpolation error before constraints: 1.33132e-16
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 1.33132e-16
@@ -74,7 +74,7 @@ DEAL::  Relative interpolation error before constraints: 3.46821e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 3.46821e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
+DEAL::Testing FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)]
 DEAL::  Relative interpolation error before constraints: 4.89000e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 4.89000e-17
@@ -89,22 +89,22 @@ DEAL::  Relative interpolation error before constraints: 8.14885e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 8.14885e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
+DEAL::Testing FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)]
 DEAL::  Relative interpolation error before constraints: 9.93093e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 9.93093e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)]
+DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(1)-FE_DGQ<1>(2)]
 DEAL::  Relative interpolation error before constraints: 2.78970e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.78970e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)]
+DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(2)-FE_DGQ<1>(3)]
 DEAL::  Relative interpolation error before constraints: 8.08266e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 8.08266e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapez(),3))-FE_DGQ<1>(4)]
+DEAL::Testing FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)] vs. FESystem<1>[FE_Q<1>(QIterated(QTrapezoid(),3))-FE_DGQ<1>(4)]
 DEAL::  Relative interpolation error before constraints: 8.56312e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 8.56312e-17
@@ -681,7 +681,7 @@ DEAL::  Relative interpolation error before constraints: 2.58740e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 3.05076e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
+DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)]
 DEAL::  Relative interpolation error before constraints: 4.66041e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.65622e-17
@@ -702,28 +702,28 @@ DEAL::  Relative interpolation error before constraints: 5.67509e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 7.50065e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
+DEAL::Testing FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)]
 DEAL::  Relative interpolation error before constraints: 7.61491e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 4.78540e-17
 DEAL::  Relative difference after constraints: 3.11829e-18
 DEAL::  Relative interpolation error before constraints: 5.18110e-17
 DEAL::  Relative difference after constraints: 1.46883e-18
-DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
+DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
 DEAL::  Relative interpolation error before constraints: 2.76390e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.65622e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 3.71506e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
+DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
 DEAL::  Relative interpolation error before constraints: 5.96732e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 4.78540e-17
 DEAL::  Relative difference after constraints: 3.11829e-18
 DEAL::  Relative interpolation error before constraints: 7.44029e-17
 DEAL::  Relative difference after constraints: 1.75253e-18
-DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
+DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)]
 DEAL::  Relative interpolation error before constraints: 8.31175e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 4.42735e-17
@@ -744,7 +744,7 @@ DEAL::  Relative interpolation error before constraints: 1.93771e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.73617e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
+DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)]
 DEAL::  Relative interpolation error before constraints: 2.20742e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.07227e-17
@@ -765,28 +765,28 @@ DEAL::  Relative interpolation error before constraints: 3.90047e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 4.36639e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
+DEAL::Testing FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)]
 DEAL::  Relative interpolation error before constraints: 3.45267e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 4.19092e-17
 DEAL::  Relative difference after constraints: 1.71641e-17
 DEAL::  Relative interpolation error before constraints: 4.17866e-17
 DEAL::  Relative difference after constraints: 7.38745e-18
-DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
+DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(2)]
 DEAL::  Relative interpolation error before constraints: 2.06376e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.15602e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.49342e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
+DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(3)]
 DEAL::  Relative interpolation error before constraints: 3.44832e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 3.44628e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 4.35517e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapez(),3))-FE_DGQ<2>(4)]
+DEAL::Testing FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)] vs. FESystem<2>[FE_Q<2>(QIterated(QTrapezoid(),3))-FE_DGQ<2>(4)]
 DEAL::  Relative interpolation error before constraints: 4.22847e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 3.89847e-17
@@ -36039,7 +36039,7 @@ DEAL::  Relative interpolation error before constraints: 2.16493e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.91082e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
+DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)]
 DEAL::  Relative interpolation error before constraints: 3.38046e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.42069e-17
@@ -36066,7 +36066,7 @@ DEAL::  Relative interpolation error before constraints: 3.51705e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 5.35390e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
+DEAL::Testing FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)]
 DEAL::  Relative interpolation error before constraints: 5.17699e-17
 DEAL::  Relative difference after constraints: 6.04407e-18
 DEAL::  Relative interpolation error before constraints: 2.99355e-17
@@ -36075,7 +36075,7 @@ DEAL::  Relative interpolation error before constraints: 3.30115e-17
 DEAL::  Relative difference after constraints: 1.33244e-17
 DEAL::  Relative interpolation error before constraints: 3.77699e-17
 DEAL::  Relative difference after constraints: 3.19257e-18
-DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
+DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
 DEAL::  Relative interpolation error before constraints: 2.45907e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.42069e-17
@@ -36084,7 +36084,7 @@ DEAL::  Relative interpolation error before constraints: 2.83885e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.65518e-17
 DEAL::  Relative difference after constraints: 9.30871e-18
-DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
+DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
 DEAL::  Relative interpolation error before constraints: 3.90233e-17
 DEAL::  Relative difference after constraints: 8.34555e-18
 DEAL::  Relative interpolation error before constraints: 2.99355e-17
@@ -36093,7 +36093,7 @@ DEAL::  Relative interpolation error before constraints: 3.30115e-17
 DEAL::  Relative difference after constraints: 1.33244e-17
 DEAL::  Relative interpolation error before constraints: 5.27465e-17
 DEAL::  Relative difference after constraints: 4.10399e-18
-DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
+DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)]
 DEAL::  Relative interpolation error before constraints: 4.91413e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 3.14496e-17
@@ -36120,7 +36120,7 @@ DEAL::  Relative interpolation error before constraints: 1.55734e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 1.77427e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
+DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)]
 DEAL::  Relative interpolation error before constraints: 1.20921e-17
 DEAL::  Relative difference after constraints: 3.41576e-18
 DEAL::  Relative interpolation error before constraints: 1.13316e-17
@@ -36147,7 +36147,7 @@ DEAL::  Relative interpolation error before constraints: 1.95424e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 2.19124e-17
 DEAL::  Relative difference after constraints: 0.00000
-DEAL::Testing FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
+DEAL::Testing FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)]
 DEAL::  Relative interpolation error before constraints: 1.60698e-17
 DEAL::  Relative difference after constraints: 3.57251e-18
 DEAL::  Relative interpolation error before constraints: 1.97625e-17
@@ -36156,7 +36156,7 @@ DEAL::  Relative interpolation error before constraints: 1.80186e-17
 DEAL::  Relative difference after constraints: 2.23224e-17
 DEAL::  Relative interpolation error before constraints: 2.03558e-17
 DEAL::  Relative difference after constraints: 1.60194e-17
-DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
+DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)]
 DEAL::  Relative interpolation error before constraints: 1.30394e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 1.77023e-17
@@ -36165,7 +36165,7 @@ DEAL::  Relative interpolation error before constraints: 2.09755e-17
 DEAL::  Relative difference after constraints: 0.00000
 DEAL::  Relative interpolation error before constraints: 1.75232e-17
 DEAL::  Relative difference after constraints: 5.20048e-18
-DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
+DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(2)-FE_DGQ<3>(3)]
 DEAL::  Relative interpolation error before constraints: 1.91101e-17
 DEAL::  Relative difference after constraints: 1.71430e-18
 DEAL::  Relative interpolation error before constraints: 1.99181e-17
@@ -36174,7 +36174,7 @@ DEAL::  Relative interpolation error before constraints: 2.10111e-17
 DEAL::  Relative difference after constraints: 1.12697e-17
 DEAL::  Relative interpolation error before constraints: 2.18116e-17
 DEAL::  Relative difference after constraints: 9.61888e-19
-DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapez(),3))-FE_DGQ<3>(4)]
+DEAL::Testing FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)] vs. FESystem<3>[FE_Q<3>(QIterated(QTrapezoid(),3))-FE_DGQ<3>(4)]
 DEAL::  Relative interpolation error before constraints: 1.62973e-17
 DEAL::  Relative difference after constraints: 3.04434e-18
 DEAL::  Relative interpolation error before constraints: 1.93547e-17

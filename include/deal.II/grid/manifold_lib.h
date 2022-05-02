@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,9 +24,18 @@
 
 #include <deal.II/grid/manifold.h>
 
-#include <boost/container/small_vector.hpp>
-
 DEAL_II_NAMESPACE_OPEN
+
+// forward declaration
+namespace internal
+{
+  namespace MappingQImplementation
+  {
+    template <int, int>
+    class InverseQuadraticApproximation;
+  }
+} // namespace internal
+
 
 /**
  * Manifold description for a polar coordinate system.
@@ -56,8 +65,6 @@ DEAL_II_NAMESPACE_OPEN
  * make any sense.
  *
  * @ingroup manifold
- *
- * @author Luca Heltai, Mauro Bardelloni, 2014-2016
  */
 template <int dim, int spacedim = dim>
 class PolarManifold : public ChartManifold<dim, spacedim, spacedim>
@@ -224,8 +231,6 @@ private:
  * ball. (See also the extensive discussion in step-65.)
  *
  * @ingroup manifold
- *
- * @author Mauro Bardelloni, Luca Heltai, Daniel Arndt, 2016, 2017
  */
 template <int dim, int spacedim = dim>
 class SphericalManifold : public Manifold<dim, spacedim>
@@ -380,8 +385,6 @@ private:
  * run time exception whenever spacedim is not equal to three.
  *
  * @ingroup manifold
- *
- * @author Luca Heltai, Daniel Arndt, 2014, 2017
  */
 template <int dim, int spacedim = dim>
 class CylindricalManifold : public ChartManifold<dim, spacedim, 3>
@@ -448,7 +451,7 @@ public:
   get_new_point(const ArrayView<const Point<spacedim>> &surrounding_points,
                 const ArrayView<const double> &         weights) const override;
 
-protected:
+private:
   /**
    * A vector orthogonal to the normal direction.
    */
@@ -464,11 +467,15 @@ protected:
    */
   const Point<spacedim> point_on_axis;
 
-private:
   /**
    * Relative tolerance to measure zero distances.
    */
-  double tolerance;
+  const double tolerance;
+
+  /**
+   * The direction vector perpendicular to both direction and normal_direction.
+   */
+  const Tensor<1, spacedim> dxn;
 };
 
 /**
@@ -501,8 +508,6 @@ private:
  * @image html elliptical_hyper_shell.png
  *
  * @ingroup manifold
- *
- * @author Stefano Dominici, 2018
  */
 template <int dim, int spacedim = dim>
 class EllipticalManifold : public ChartManifold<dim, spacedim, spacedim>
@@ -518,7 +523,6 @@ public:
    * manifold.
    * @param eccentricity Eccentricity of the
    * manifold $e\in\left]0,1\right[$.
-   *
    */
   EllipticalManifold(const Point<spacedim> &    center,
                      const Tensor<1, spacedim> &major_axis_direction,
@@ -546,7 +550,7 @@ public:
   push_forward_gradient(const Point<spacedim> &chart_point) const override;
 
 
-protected:
+private:
   /**
    * The direction vector of the major axis.
    */
@@ -561,7 +565,6 @@ protected:
   const double cosh_u;
   const double sinh_u;
 
-private:
   /**
    * @copydoc ChartManifold::get_periodicity()
    *
@@ -586,8 +589,6 @@ private:
  * actually one the inverse of the other.
  *
  * @ingroup manifold
- *
- * @author Luca Heltai, 2014
  */
 template <int dim, int spacedim = dim, int chartdim = dim>
 class FunctionManifold : public ChartManifold<dim, spacedim, chartdim>
@@ -601,6 +602,10 @@ public:
    *
    * The tolerance argument is used in debug mode to actually check that the
    * two functions are one the inverse of the other.
+   *
+   * Note: the object constructed in this way stores pointers to the
+   * push_forward and  pull_back functions. Therefore, one must guarantee that
+   * the function objects are destroyed only after the constructed manifold.
    */
   FunctionManifold(
     const Function<chartdim> & push_forward_function,
@@ -616,12 +621,12 @@ public:
    * This constructor is useful because it allows creating function objects at
    * the place of calling the constructor without having to name and later
    * delete these objects. This allows the following idiom:
-   * FunctionManifold<dim> manifold(std_cxx14::make_unique<MyPushForward>(...),
-   *                                std_cxx14::make_unique<MyPullBack>(...));
+   * FunctionManifold<dim> manifold(std::make_unique<MyPushForward>(...),
+   *                                std::make_unique<MyPullBack>(...));
    */
   FunctionManifold(
-    std::unique_ptr<Function<chartdim>> push_forward_function,
-    std::unique_ptr<Function<spacedim>> pull_back_function,
+    std::unique_ptr<Function<chartdim>> push_forward,
+    std::unique_ptr<Function<spacedim>> pull_back,
     const Tensor<1, chartdim> &         periodicity = Tensor<1, chartdim>(),
     const double                        tolerance   = 1e-10);
 
@@ -777,8 +782,6 @@ private:
  * GridGenerator::torus.
  *
  * @ingroup manifold
- *
- * @author Timo Heister, 2016
  */
 template <int dim>
 class TorusManifold : public ChartManifold<dim, 3, 3>
@@ -863,7 +866,7 @@ private:
  * nature of the manifold that is originally contained in one <i>coarse</i>
  * mesh layer will be applied to more than one <i>fine</i> mesh layer once the
  * mesh gets refined. Note that the mechanisms of
- * TransfiniteInterpolationManifold are also built into the MappingQGeneric
+ * TransfiniteInterpolationManifold are also built into the MappingQ
  * class when only a surface of a cell is subject to a curved description,
  * ensuring that even the default case without this manifold gets optimal
  * convergence rates when applying curved boundary descriptions.
@@ -960,8 +963,6 @@ private:
  * axis-aligned bounding boxes.
  *
  * @ingroup manifold
- *
- * @author Martin Kronbichler, Luca Heltai, 2017
  */
 template <int dim, int spacedim = dim>
 class TransfiniteInterpolationManifold : public Manifold<dim, spacedim>
@@ -1145,6 +1146,14 @@ private:
    * use a FlatManifold description.
    */
   FlatManifold<dim> chart_manifold;
+
+  /**
+   * A vector of quadratic approximations to the inverse map from real points
+   * to chart points for each of the coarse mesh cells.
+   */
+  std::vector<internal::MappingQImplementation::
+                InverseQuadraticApproximation<dim, spacedim>>
+    quadratic_approximation;
 
   /**
    * The connection to Triangulation::signals::clear that must be reset once

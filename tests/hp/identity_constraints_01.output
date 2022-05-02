@@ -1,0 +1,10 @@
+
+DEAL:1d::Total constraints:          0
+DEAL:1d::  Inhomogenous constraints: 0
+DEAL:1d::  Identity constraints:     0
+DEAL:2d::Total constraints:          2
+DEAL:2d::  Inhomogenous constraints: 0
+DEAL:2d::  Identity constraints:     0
+DEAL:3d::Total constraints:          20
+DEAL:3d::  Inhomogenous constraints: 0
+DEAL:3d::  Identity constraints:     4

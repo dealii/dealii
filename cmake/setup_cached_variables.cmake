@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -164,6 +164,11 @@ OPTION(DEAL_II_UNITY_BUILD
   "Compile the library by concatenating together source files to form a few large targets instead of many small ones. This lowers total compilation wall time by about 25%."
   OFF)
 MARK_AS_ADVANCED(DEAL_II_UNITY_BUILD)
+
+OPTION(DEAL_II_EARLY_DEPRECATIONS
+  "Enable deprecation warnings for features deprecated since the last release."
+  OFF)
+MARK_AS_ADVANCED(DEAL_II_EARLY_DEPRECATIONS)
 
 SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"

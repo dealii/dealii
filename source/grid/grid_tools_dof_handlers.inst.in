@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,7 +43,8 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS;
         ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type
         find_active_cell_around_point(const X &,
                                       const Point<deal_II_space_dimension> &,
-                                      const std::vector<bool> &);
+                                      const std::vector<bool> &,
+                                      const double);
 
       template std::pair<
         dealii::internal::ActiveCellIterator<deal_II_dimension,
@@ -54,7 +55,21 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS;
         const Mapping<deal_II_dimension, deal_II_space_dimension> &,
         const X &,
         const Point<deal_II_space_dimension> &,
-        const std::vector<bool> &);
+        const std::vector<bool> &,
+        const double);
+
+      template std::vector<
+        std::pair<dealii::internal::ActiveCellIterator<deal_II_dimension,
+                                                       deal_II_space_dimension,
+                                                       X>::type,
+                  Point<deal_II_dimension>>>
+      find_all_active_cells_around_point(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const X &,
+        const Point<deal_II_space_dimension> &,
+        const double,
+        const std::pair<typename X::active_cell_iterator,
+                        Point<deal_II_dimension>> &);
 
       template std::vector<
         std::pair<dealii::internal::ActiveCellIterator<deal_II_dimension,
@@ -139,14 +154,15 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     \{
 
       template std::pair<
-        hp::DoFHandler<deal_II_dimension,
-                       deal_II_space_dimension>::active_cell_iterator,
+        dealii::DoFHandler<deal_II_dimension,
+                           deal_II_space_dimension>::active_cell_iterator,
         Point<deal_II_dimension>>
       find_active_cell_around_point(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
           &,
-        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const Point<deal_II_space_dimension> &);
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Point<deal_II_space_dimension> &,
+        const double);
 
     \}
 #endif
@@ -200,8 +216,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
-     Container : DOFHANDLER_TEMPLATES)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace GridTools
@@ -209,11 +224,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 
       template std::map<
         types::global_dof_index,
-        std::vector<Container<deal_II_dimension,
-                              deal_II_space_dimension>::active_cell_iterator>>
-      get_dof_to_support_patch_map<
-        Container<deal_II_dimension, deal_II_space_dimension>>(
-        Container<deal_II_dimension, deal_II_space_dimension> &dof_handler);
+        std::vector<DoFHandler<deal_II_dimension,
+                               deal_II_space_dimension>::active_cell_iterator>>
+      get_dof_to_support_patch_map<deal_II_dimension, deal_II_space_dimension>(
+        DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler);
 
     \}
 #endif
@@ -227,7 +241,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 // types are the same for sequential and parallel containers; consequently, we
 // get duplicate instantiation errors if we instantiate for *all* container
 // types, rather than only the sequential ones
-for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
+for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER;
      deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
@@ -235,19 +249,21 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
     namespace GridTools
     \{
 
-      template bool orthogonal_equality<X::active_face_iterator>(
+      template bool
+      orthogonal_equality<X::active_face_iterator>(
         std::bitset<3> &,
         const X::active_face_iterator &,
         const X::active_face_iterator &,
-        const int,
+        const unsigned int,
         const Tensor<1, deal_II_space_dimension> &,
         const FullMatrix<double> &);
 
-      template bool orthogonal_equality<X::face_iterator>(
+      template bool
+      orthogonal_equality<X::face_iterator>(
         std::bitset<3> &,
         const X::face_iterator &,
         const X::face_iterator &,
-        const int,
+        const unsigned int,
         const Tensor<1, deal_II_space_dimension> &,
         const FullMatrix<double> &);
 
@@ -255,7 +271,7 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
       orthogonal_equality<X::active_face_iterator>(
         const X::active_face_iterator &,
         const X::active_face_iterator &,
-        const int,
+        const unsigned int,
         const Tensor<1, deal_II_space_dimension> &,
         const FullMatrix<double> &);
 
@@ -263,16 +279,27 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
       orthogonal_equality<X::face_iterator>(
         const X::face_iterator &,
         const X::face_iterator &,
-        const int,
+        const unsigned int,
         const Tensor<1, deal_II_space_dimension> &,
         const FullMatrix<double> &);
 
+    \}
+#endif
+  }
+
+for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
+     deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools
+    \{
       template void
       collect_periodic_faces<X>(
         const X &,
         const types::boundary_id,
         const types::boundary_id,
-        const int,
+        const unsigned int,
         std::vector<PeriodicFacePair<X::cell_iterator>> &,
         const Tensor<1, X::space_dimension> &,
         const FullMatrix<double> &);
@@ -281,7 +308,7 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
       collect_periodic_faces<X>(
         const X &,
         const types::boundary_id,
-        const int,
+        const unsigned int,
         std::vector<PeriodicFacePair<X::cell_iterator>> &,
         const Tensor<1, X::space_dimension> &,
         const FullMatrix<double> &);
@@ -307,7 +334,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                                                    deal_II_space_dimension> &,
         const types::boundary_id,
         const types::boundary_id,
-        const int,
+        const unsigned int,
         std::vector<PeriodicFacePair<parallel::distributed::Triangulation<
           deal_II_dimension,
           deal_II_space_dimension>::cell_iterator>> &,
@@ -324,7 +351,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const parallel::distributed::Triangulation<deal_II_dimension,
                                                    deal_II_space_dimension> &,
         const types::boundary_id,
-        const int,
+        const unsigned int,
         std::vector<PeriodicFacePair<parallel::distributed::Triangulation<
           deal_II_dimension,
           deal_II_space_dimension>::cell_iterator>> &,
@@ -355,7 +382,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                                               deal_II_space_dimension> &,
         const types::boundary_id,
         const types::boundary_id,
-        const int,
+        const unsigned int,
         std::vector<PeriodicFacePair<parallel::shared::Triangulation<
           deal_II_dimension,
           deal_II_space_dimension>::cell_iterator>> &,
@@ -372,7 +399,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const parallel::shared::Triangulation<deal_II_dimension,
                                               deal_II_space_dimension> &,
         const types::boundary_id,
-        const int,
+        const unsigned int,
         std::vector<PeriodicFacePair<parallel::shared::Triangulation<
           deal_II_dimension,
           deal_II_space_dimension>::cell_iterator>> &,

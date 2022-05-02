@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,7 @@ check()
 {
   const unsigned int  n_points = 10;
   std::vector<double> x(n_points), y(n_points);
-  for (unsigned int i = 0; i < n_points; i++)
+  for (unsigned int i = 0; i < n_points; ++i)
     {
       x[i] = i + 0.5 * std::sin(i);
       y[i] = i + std::cos(i * i);

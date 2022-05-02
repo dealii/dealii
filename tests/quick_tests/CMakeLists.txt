@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2019 by the deal.II authors
+## Copyright (C) 2013 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -66,11 +66,11 @@ MACRO(make_quicktest test_basename build_name mpi_run)
 
   # this is a hack to make sure the -OK file is deleted
   # even if compilation fails.
-  ADD_CUSTOM_TARGET(kill-${_target}-OK
-        COMMAND rm -f ${_target}-OK
+  ADD_CUSTOM_TARGET(reset-${_target}-OK
+    COMMAND ${CMAKE_COMMAND} -E remove -f ${_target}-OK
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  ADD_DEPENDENCIES(${_target} kill-${_target}-OK)
+  ADD_DEPENDENCIES(${_target} reset-${_target}-OK)
 
   ADD_TEST(NAME ${_target}
     COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.run -DTEST=${_target}
@@ -92,9 +92,7 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
 ENDFOREACH()
 
 # Test whether thread affinity is well behaved
-IF (DEAL_II_WITH_THREADS)
 make_quicktest("affinity" ${_mybuild} "")
-ENDIF()
 
 # Test if MPI is configured correctly
 IF (DEAL_II_WITH_MPI)
@@ -102,8 +100,13 @@ IF (DEAL_II_WITH_MPI)
 ENDIF()
 
 # Test if TBB works correctly
-IF (DEAL_II_WITH_THREADS)
+IF (DEAL_II_WITH_TBB)
   make_quicktest("tbb" ${_mybuild} "")
+ENDIF()
+
+# test taskflow
+IF (DEAL_II_WITH_TASKFLOW)
+  make_quicktest("taskflow" ${_mybuild} "")
 ENDIF()
 
 # Test p4est. This test exposes a bug in OpenMPI 1.3 and 1.4
@@ -150,11 +153,6 @@ ENDIF()
 # Test HDF5
 IF (DEAL_II_WITH_HDF5)
   make_quicktest("hdf5" ${_mybuild} "")
-ENDIF()
-
-# Test Nanoflann
-IF (DEAL_II_WITH_NANOFLANN)
-  make_quicktest("nanoflann" ${_mybuild} "")
 ENDIF()
 
 # Test Arpack

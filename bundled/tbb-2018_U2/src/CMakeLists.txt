@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -45,7 +45,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wtautological-overlap-compare=0")
 
 SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 INCLUDE_DIRECTORIES(
-  ${THREADS_BUNDLED_INCLUDE_DIRS}
+  ${TBB_BUNDLED_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/rml/include
   )
 

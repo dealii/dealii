@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@ char logname[] = "output";
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -35,8 +36,6 @@ char logname[] = "output";
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
@@ -97,22 +96,20 @@ main()
   fe.push_back(FE_Q<2>(1));
   fe.push_back(FE_Q<2>(2));
 
-  hp::DoFHandler<2> dof_handler(triangulation);
+  DoFHandler<2> dof_handler(triangulation);
 
   // distribute fe_indices randomly
   unsigned int cell_no = 0;
-  for (hp::DoFHandler<2>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell, ++cell_no)
     cell->set_active_fe_index(0);
-  (++dof_handler.begin_active())->set_active_fe_index(1);
+  (std::next(dof_handler.begin_active()))->set_active_fe_index(1);
   dof_handler.distribute_dofs(fe);
 
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
-  for (hp::DoFHandler<2>::active_cell_iterator cell =
-         dof_handler.begin_active();
+  for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {

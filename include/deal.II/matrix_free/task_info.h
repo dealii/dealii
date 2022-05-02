@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,8 +40,6 @@ namespace internal
   /**
    * An interface for the worker object that runs the various operations we
    * want to perform during the matrix-free loop.
-   *
-   * @author Katharina Kormann, Martin Kronbichler, 2018
    */
   struct MFWorkerInterface
   {
@@ -64,7 +62,7 @@ namespace internal
     virtual void
     vector_compress_finish() = 0;
 
-    /// Zeros part of the vector accroding to a given range as stored in
+    /// Zeros part of the vector according to a given range as stored in
     /// DoFInfo
     virtual void
     zero_dst_vector_range(const unsigned int range_index) = 0;
@@ -80,31 +78,30 @@ namespace internal
     virtual void
     cell(const std::pair<unsigned int, unsigned int> &cell_range) = 0;
 
+    /// Runs the cell work specified by MatrixFree::loop or
+    /// MatrixFree::cell_loop
+    virtual void
+    cell(const unsigned int range_index) = 0;
+
     /// Runs the body of the work on interior faces specified by
     /// MatrixFree::loop
     virtual void
-    face(const std::pair<unsigned int, unsigned int> &face_range) = 0;
+    face(const unsigned int range_index) = 0;
 
     /// Runs the body of the work on boundary faces specified by
     /// MatrixFree::loop
     virtual void
-    boundary(const std::pair<unsigned int, unsigned int> &face_range) = 0;
+    boundary(const unsigned int range_index) = 0;
   };
 
 
 
   namespace MatrixFreeFunctions
   {
-    // forward declaration of internal data structure
-    template <typename Number>
-    struct ConstraintValues;
-
     /**
      * A struct that collects all information related to parallelization with
      * threads: The work is subdivided into tasks that can be done
      * independently.
-     *
-     * @author Katharina Kormann, Martin Kronbichler, 2011, 2018
      */
     struct TaskInfo
     {
@@ -139,26 +136,29 @@ namespace internal
       loop(MFWorkerInterface &worker) const;
 
       /**
-       * Determines the position of cells with ghosts for distributed-memory
-       * calculations.
+       * Make the number of cells which can only be treated in the
+       * communication overlap divisible by the vectorization length.
        */
       void
-      collect_boundary_cells(const unsigned int n_active_cells,
-                             const unsigned int n_active_and_ghost_cells,
-                             const unsigned int vectorization_length,
-                             std::vector<unsigned int> &boundary_cells);
+      make_boundary_cells_divisible(std::vector<unsigned int> &boundary_cells);
 
       /**
        * Sets up the blocks for running the cell loop based on the options
        * controlled by the input arguments.
        *
-       * @param boundary_cells A list of cells that need to exchange data prior
-       * to performing computations. These will be given a certain id in the
-       * partitioning.
+       * @param cells_with_comm A list of cells that need to exchange data
+       * prior to performing computations. These will be given a certain id in
+       * the partitioning to make sure cell loops that overlap communication
+       * with communication have the ghost data ready.
        *
        * @param dofs_per_cell Gives an expected value for the number of degrees
        * of freedom on a cell, which is used to determine the block size for
        * interleaving cell and face integrals.
+       *
+       * @param categories_are_hp Defines whether
+       * `cell_vectorization_categories` is originating from a hp-adaptive
+       * computation with variable polynomial degree or a user-defined
+       * variant.
        *
        * @param cell_vectorization_categories This set of categories defines
        * the cells that should be grouped together inside the lanes of a
@@ -169,6 +169,10 @@ namespace internal
        * categories defined by the previous variables should be separated
        * strictly or whether it is allowed to insert lower categories into the
        * next high one(s).
+       *
+       * @param parent_relation This data field is used to specify which cells
+       * have the same parent cell. Cells with the same ancestor are grouped
+       * together into the same batch(es) with vectorization across cells.
        *
        * @param renumbering When leaving this function, the vector contains a
        * new numbering of the cells that aligns with the grouping stored in
@@ -182,10 +186,12 @@ namespace internal
        */
       void
       create_blocks_serial(
-        const std::vector<unsigned int> &boundary_cells,
+        const std::vector<unsigned int> &cells_with_comm,
         const unsigned int               dofs_per_cell,
+        const bool                       categories_are_hp,
         const std::vector<unsigned int> &cell_vectorization_categories,
         const bool                       cell_vectorization_categories_strict,
+        const std::vector<unsigned int> &parent_relation,
         std::vector<unsigned int> &      renumbering,
         std::vector<unsigned char> &     incompletely_filled_vectorization);
 
@@ -245,7 +251,7 @@ namespace internal
        * some SIMD lanes in VectorizedArray would not be filled for a given
        * cell batch index.
        *
-       * @param hp_bool Defines whether we are in hp mode or not
+       * @param hp_bool Defines whether we are in hp-mode or not
        */
       void
       make_thread_graph_partition_color(
@@ -284,7 +290,7 @@ namespace internal
        * some SIMD lanes in VectorizedArray would not be filled for a given
        * cell batch index.
        *
-       * @param hp_bool Defines whether we are in hp mode or not
+       * @param hp_bool Defines whether we are in hp-mode or not
        */
       void
       make_thread_graph_partition_partition(
@@ -315,7 +321,7 @@ namespace internal
        * some SIMD lanes in VectorizedArray would not be filled for a given
        * cell batch index.
        *
-       * @param hp_bool Defines whether we are in hp mode or not
+       * @param hp_bool Defines whether we are in hp-mode or not
        */
       void
       make_thread_graph(const std::vector<unsigned int> &cell_active_fe_index,
@@ -335,7 +341,7 @@ namespace internal
         DynamicSparsityPattern &          connectivity_blocks) const;
 
       /**
-       * Function to create coloring on the second layer within each
+       * %Function to create coloring on the second layer within each
        * partition.
        */
       void
@@ -348,7 +354,7 @@ namespace internal
         std::vector<unsigned int> &      partition_color_list);
 
       /**
-       * Function to create partitioning on the second layer within each
+       * %Function to create partitioning on the second layer within each
        * partition.
        */
       void
@@ -468,6 +474,19 @@ namespace internal
       std::vector<unsigned int> cell_partition_data;
 
       /**
+       * Like cell_partition_data but with precomputed subranges for each
+       * active fe index. The start and end point of a partition is given
+       * by cell_partition_data_hp_ptr.
+       */
+      std::vector<unsigned int> cell_partition_data_hp;
+
+      /**
+       * Pointers within cell_partition_data_hp, indicating the start and end
+       * of a partition.
+       */
+      std::vector<unsigned int> cell_partition_data_hp_ptr;
+
+      /**
        * This is a linear storage of all partitions of inner faces, building a
        * range of indices of the form face_partition_data[idx] to
        * face_partition_data[idx+1] within the integer list of all interior
@@ -477,6 +496,19 @@ namespace internal
       std::vector<unsigned int> face_partition_data;
 
       /**
+       * Like face_partition_data but with precomputed subranges for each
+       * active fe index pair. The start and end point of a partition is given
+       * by face_partition_data_hp_ptr.
+       */
+      std::vector<unsigned int> face_partition_data_hp;
+
+      /**
+       * Pointers within face_partition_data_hp, indicating the start and end
+       * of a partition.
+       */
+      std::vector<unsigned int> face_partition_data_hp_ptr;
+
+      /**
        * This is a linear storage of all partitions of boundary faces,
        * building a range of indices of the form boundary_partition_data[idx]
        * to boundary_partition_data[idx+1] within the integer list of all
@@ -484,6 +516,19 @@ namespace internal
        * partition_row_index.
        */
       std::vector<unsigned int> boundary_partition_data;
+
+      /**
+       * Like boundary_partition_data but with precomputed subranges for each
+       * active fe index. The start and end point of a partition is given
+       * by boundary_partition_data_hp_ptr.
+       */
+      std::vector<unsigned int> boundary_partition_data_hp;
+
+      /**
+       * Pointers within boundary_partition_data_hp, indicating the start and
+       * end of a partition.
+       */
+      std::vector<unsigned int> boundary_partition_data_hp_ptr;
 
       /**
        * This is a linear storage of all partitions of interior faces on
@@ -565,6 +610,16 @@ namespace internal
       MPI_Comm communicator;
 
       /**
+       * Shared-memory MPI communicator
+       */
+      MPI_Comm communicator_sm;
+
+      /**
+       * Assert that vectors passed to the MatrixFree loops are not ghosted.
+       */
+      bool allow_ghosted_vectors_in_loops;
+
+      /**
        * Rank of MPI process
        */
       unsigned int my_pid;
@@ -574,11 +629,6 @@ namespace internal
        */
       unsigned int n_procs;
     };
-
-    /**
-     * Typedef to deprecated name.
-     */
-    using SizeInfo DEAL_II_DEPRECATED = TaskInfo;
 
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal

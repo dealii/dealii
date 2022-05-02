@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -192,8 +192,6 @@ namespace FEValuesExtractors
    * module.
    *
    * @ingroup feaccess vector_valued
-   *
-   * @author Andrew McBride, 2009
    */
   template <int rank>
   struct SymmetricTensor
@@ -241,8 +239,6 @@ namespace FEValuesExtractors
    * module.
    *
    * @ingroup feaccess vector_valued
-   *
-   * @author Denis Davydov, 2013
    */
   template <int rank>
   struct Tensor

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,8 +64,6 @@ class LAPACKFullMatrix;
  * programs, see
  * @ref Instantiations
  * for details.
- *
- * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2004
  */
 template <typename number>
 class FullMatrix : public Table<2, number>
@@ -246,13 +244,14 @@ public:
    * matrix coincide.
    */
   template <int dim>
-  void copy_to(Tensor<2, dim> &   T,
-               const size_type    src_r_i = 0,
-               const size_type    src_r_j = dim - 1,
-               const size_type    src_c_i = 0,
-               const size_type    src_c_j = dim - 1,
-               const unsigned int dst_r   = 0,
-               const unsigned int dst_c   = 0) const;
+  void
+  copy_to(Tensor<2, dim> &   T,
+          const size_type    src_r_i = 0,
+          const size_type    src_r_j = dim - 1,
+          const size_type    src_c_i = 0,
+          const size_type    src_c_j = dim - 1,
+          const unsigned int dst_r   = 0,
+          const unsigned int dst_c   = 0) const;
 
   /**
    * Copy a subset of the rows and columns of another matrix into the current

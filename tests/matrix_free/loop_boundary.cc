@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,13 +83,15 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
     for (unsigned int cell = range.first; cell < range.second; ++cell)
       {
         eval.reinit(cell);
-        eval.gather_evaluate(in, false, true);
+        eval.gather_evaluate(in, EvaluationFlags::gradients);
         for (unsigned int q = 0; q < eval.n_q_points; ++q)
           {
             eval.submit_gradient(eval.get_gradient(q), q);
             eval.submit_value(eval.quadrature_point(q).square(), q);
           }
-        eval.integrate_scatter(true, true, out);
+        eval.integrate_scatter(EvaluationFlags::values |
+                                 EvaluationFlags::gradients,
+                               out);
       }
   };
 
@@ -107,14 +109,14 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
     for (unsigned int face = range.first; face < range.second; ++face)
       {
         eval.reinit(face);
-        eval.gather_evaluate(in, true, false);
+        eval.gather_evaluate(in, EvaluationFlags::values);
         for (unsigned int q = 0; q < eval.n_q_points; ++q)
           {
             eval.submit_value(eval.quadrature_point(q).square() -
                                 6. * eval.get_value(q),
                               q);
           }
-        eval.integrate_scatter(true, false, out);
+        eval.integrate_scatter(EvaluationFlags::values, out);
       }
   };
 
@@ -131,7 +133,7 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
                                matrix_free.n_inner_face_batches() +
                                  matrix_free.n_boundary_face_batches()));
   ref.compress(VectorOperation::add);
-  in.zero_out_ghosts();
+  in.zero_out_ghost_values();
 
   std::function<void(const MatrixFree<dim> &,
                      LinearAlgebra::distributed::Vector<double> &,
@@ -207,7 +209,7 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
             in,
             std::make_pair(0U, matrix_free.n_cell_batches()));
   ref.compress(VectorOperation::add);
-  in.zero_out_ghosts();
+  in.zero_out_ghost_values();
 
   matrix_free.cell_loop(cell_func, test, in, true);
   test -= ref;

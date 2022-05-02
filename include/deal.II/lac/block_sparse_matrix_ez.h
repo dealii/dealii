@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,6 @@ class BlockVector;
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Guido Kanschat, 2002, 2003
  */
 template <typename Number>
 class BlockSparseMatrixEZ : public Subscriptor

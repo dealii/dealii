@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 DEAL_II_CONSTEXPR const SymmetricTensor<2, dim>
                         Physics::Elasticity::StandardTensors<dim>::I
-#  ifndef DEAL_II_HAVE_CXX14_CONSTEXPR
+#  ifdef DEAL_II_CXX14_CONSTEXPR_BUG
   = unit_symmetric_tensor<dim>()
 #  endif
   ;
@@ -34,7 +34,7 @@ DEAL_II_CONSTEXPR const SymmetricTensor<2, dim>
 template <int dim>
 DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
                         Physics::Elasticity::StandardTensors<dim>::S
-#  ifndef DEAL_II_HAVE_CXX14_CONSTEXPR
+#  ifdef DEAL_II_CXX14_CONSTEXPR_BUG
   = identity_tensor<dim>()
 #  endif
   ;
@@ -44,7 +44,7 @@ DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
 template <int dim>
 DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
                         Physics::Elasticity::StandardTensors<dim>::IxI
-#  ifndef DEAL_II_HAVE_CXX14_CONSTEXPR
+#  ifdef DEAL_II_CXX14_CONSTEXPR_BUG
   = outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>())
 #  endif
   ;
@@ -54,7 +54,7 @@ DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
 template <int dim>
 DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
                         Physics::Elasticity::StandardTensors<dim>::dev_P
-#  ifndef DEAL_II_HAVE_CXX14_CONSTEXPR
+#  ifdef DEAL_II_CXX14_CONSTEXPR_BUG
   = deviator_tensor<dim>()
 #  endif
   ;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,7 +58,7 @@ main()
 
   const FEValuesExtractors::Scalar extractor_sclr(0);
 
-  typedef Sacado::Fad::DFad<double>     ad_type;
+  using ad_type                              = Sacado::Fad::DFad<double>;
   DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
   DoFHandler<dim>::active_cell_iterator endc = dof_handler.end();
   for (; cell != endc; ++cell)

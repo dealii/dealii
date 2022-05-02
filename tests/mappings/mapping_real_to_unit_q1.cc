@@ -74,7 +74,7 @@ test_real_to_unit_cell()
     }
 
 
-  MappingQGeneric<dim, spacedim> map(1);
+  MappingQ<dim, spacedim> map(1);
 
   typename Triangulation<dim, spacedim>::active_cell_iterator cell =
     triangulation.begin_active();

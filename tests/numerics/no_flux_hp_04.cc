@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,8 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -24,7 +26,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -74,7 +75,7 @@ template <int dim>
 void
 test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
 {
-  hp::DoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   deallog << "FE=" << fe[0].get_name() << std::endl;
@@ -86,7 +87,7 @@ test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
   VectorTools::compute_no_normal_flux_constraints(dof, 0, boundary_ids, cm);
   cm.close();
 
-  hp::DoFHandler<dim> dh(tr);
+  DoFHandler<dim> dh(tr);
   dh.distribute_dofs(fe);
 
   Vector<double> v(dh.n_dofs());
@@ -99,7 +100,7 @@ test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
     if (std::fabs(v(i)) < 1e-12)
       v(i) = 0;
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dh);
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -107,8 +108,9 @@ test(const Triangulation<dim> &tr, const hp::FECollection<dim> &fe)
       dim, DataComponentInterpretation::component_is_part_of_vector);
 
   data_out.add_data_vector(v,
+
                            "x",
-                           DataOut<dim, hp::DoFHandler<dim>>::type_dof_data,
+                           DataOut<dim>::type_dof_data,
                            data_component_interpretation);
   data_out.build_patches(fe[0].degree);
 
@@ -132,7 +134,7 @@ test_hyper_sphere()
   for (unsigned int degree = 1; degree < 6 - dim; ++degree)
     {
       hp::FECollection<dim> fe(
-        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapez<1>(), degree)), dim));
+        FESystem<dim>(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), degree)), dim));
       test(tr, fe);
     }
 }

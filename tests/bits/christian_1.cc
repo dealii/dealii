@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,6 @@ namespace DoFToolsEx
  * one Vector be enough?
  *
  * @param
- *
  */
 template <int dim, class InVector, class OutVector>
 void
@@ -74,7 +73,7 @@ DoFToolsEx::transfer(const DoFHandler<dim> &source_dof,
   InVector local_dofs(source_dof.get_fe().dofs_per_cell);
 
   // iterate over all active source cells
-  typedef typename DoFHandler<dim>::active_cell_iterator cell_iterator;
+  using cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
   cell_iterator cell = source_dof.begin_active(), endc = source_dof.end();
   for (; cell != endc; ++cell)
     {

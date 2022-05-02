@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,7 +19,6 @@
 #include "../tests.h"
 
 #include "dof_tools_common.h"
-#include "dof_tools_common_fake_hp.h"
 
 // check
 //   DoFTools::
@@ -31,9 +30,9 @@
 
 
 
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   // test doesn't make much sense if
   // no boundary dofs exist
@@ -45,8 +44,7 @@ check_this(const DoFHandlerType &dof_handler)
   set.insert(0);
   DoFTools::map_dof_to_boundary_indices(dof_handler, set, map);
 
-  std::map<types::boundary_id, const Function<DoFHandlerType::dimension> *>
-    boundary_ids;
+  std::map<types::boundary_id, const Function<dim> *> boundary_ids;
   boundary_ids[0] = nullptr;
   const types::global_dof_index n_boundary_dofs =
     dof_handler.n_boundary_dofs(boundary_ids);
@@ -86,7 +84,7 @@ check_this(const DoFHandlerType &dof_handler)
                ++c)
             deallog << sp.block(block_row.first, col)
                          .column_number(block_row.second, c)
-                    << " ";
+                    << ' ';
           deallog << std::endl;
         }
     }

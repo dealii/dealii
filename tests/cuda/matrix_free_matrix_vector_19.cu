@@ -50,7 +50,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double Number;
+  using Number = double;
 
   parallel::shared::Triangulation<dim> tria(
     MPI_COMM_WORLD,
@@ -101,7 +101,7 @@ test()
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
 
-  MappingQGeneric<dim>                  mapping(fe_degree);
+  MappingQ<dim>                         mapping(fe_degree);
   CUDAWrappers::MatrixFree<dim, Number> mf_data;
   const QGauss<1>                       quad(fe_degree + 1);
   typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData
@@ -117,7 +117,7 @@ test()
                  fe_degree,
                  Number,
                  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>
-                                                                mf(mf_data, coef_size);
+    mf(mf_data, coef_size);
   LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev(
     owned_set, MPI_COMM_WORLD);
   LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev(

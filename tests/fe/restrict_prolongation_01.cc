@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2018 by the deal.II authors
+ * Copyright (C) 1999 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -143,7 +143,7 @@ check(const FiniteElement<dim, spacedim> &fe,
             const double expected = (i == j) ? 1. : 0.;
             if (std::fabs(result(i, j) - expected) > 1.e-12)
               {
-                deallog << i << " " << j << " " << result(i, j) << std::endl;
+                deallog << i << ' ' << j << ' ' << result(i, j) << std::endl;
                 is_identity = false;
               }
           }

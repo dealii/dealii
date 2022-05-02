@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -110,7 +110,7 @@ test()
           {
             std::vector<std::shared_ptr<MyQData>> qpd =
               data_storage.get_data(cell);
-            for (unsigned int q = 0; q < rhs.size(); q++)
+            for (unsigned int q = 0; q < rhs.size(); ++q)
               qpd[q]->value = my_func.value(q_points[q]);
           }
 
@@ -123,7 +123,7 @@ test()
           {
             std::vector<std::shared_ptr<MyQData>> qpd =
               data_storage.get_data(cell);
-            for (unsigned int q = 0; q < rhs.size(); q++)
+            for (unsigned int q = 0; q < rhs.size(); ++q)
               AssertThrow(qpd[q]->value == default_value,
                           ExcWrongValue(qpd[q]->value,
                                         default_value,

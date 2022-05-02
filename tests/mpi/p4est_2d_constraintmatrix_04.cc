@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,44 +55,6 @@ const double T0 = 1.0;
 const double T1 = 2.0;
 
 
-
-template <int dim>
-class FilteredDataOut : public DataOut<dim>
-{
-public:
-  FilteredDataOut(const unsigned int subdomain_id)
-    : subdomain_id(subdomain_id)
-  {}
-
-  virtual typename DataOut<dim>::cell_iterator
-  first_cell()
-  {
-    auto cell = this->triangulation->begin_active();
-    while ((cell != this->triangulation->end()) &&
-           (cell->subdomain_id() != subdomain_id))
-      ++cell;
-
-    return cell;
-  }
-
-  virtual typename DataOut<dim>::cell_iterator
-  next_cell(const typename DataOut<dim>::cell_iterator &old_cell)
-  {
-    if (old_cell != this->triangulation->end())
-      {
-        const IteratorFilters::SubdomainEqualTo predicate(subdomain_id);
-
-        return ++(
-          FilteredIterator<typename Triangulation<dim>::active_cell_iterator>(
-            predicate, old_cell));
-      }
-    else
-      return old_cell;
-  }
-
-private:
-  const unsigned int subdomain_id;
-};
 
 template <int dim>
 class TemperatureInitialValues : public Function<dim>
@@ -287,7 +249,32 @@ test()
 
   std::vector<std::string> solution_names(1, "T");
 
-  FilteredDataOut<dim> data_out(tr.locally_owned_subdomain());
+  DataOut<dim> data_out;
+  data_out.set_cell_selection(
+    [](const Triangulation<dim> &t) {
+      auto cell = t.begin_active();
+      while ((cell != t.end()) &&
+             (cell->subdomain_id() != t.locally_owned_subdomain()))
+        ++cell;
+
+      return cell;
+    },
+
+    [](const Triangulation<dim> &                        t,
+       const typename Triangulation<dim>::cell_iterator &old_cell) ->
+    typename Triangulation<dim>::cell_iterator {
+      if (old_cell != t.end())
+        {
+          const IteratorFilters::SubdomainEqualTo predicate(
+            t.locally_owned_subdomain());
+
+          return ++(
+            FilteredIterator<typename Triangulation<dim>::active_cell_iterator>(
+              predicate, old_cell));
+        }
+      else
+        return old_cell;
+    });
   data_out.attach_dof_handler(dofh);
 
   data_out.add_data_vector(x_rel, solution_names);

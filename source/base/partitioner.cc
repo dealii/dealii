@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,9 +58,45 @@ namespace Utilities
 
 
 
+    Partitioner::Partitioner(const types::global_dof_index local_size,
+                             const types::global_dof_index ghost_size,
+                             const MPI_Comm &              communicator)
+      : global_size(Utilities::MPI::sum<types::global_dof_index>(local_size,
+                                                                 communicator))
+      , locally_owned_range_data(global_size)
+      , local_range_data{0, local_size}
+      , n_ghost_indices_data(ghost_size)
+      , n_import_indices_data(0)
+      , n_ghost_indices_in_larger_set(0)
+      , my_pid(Utilities::MPI::this_mpi_process(communicator))
+      , n_procs(Utilities::MPI::n_mpi_processes(communicator))
+      , communicator(communicator)
+      , have_ghost_indices(true)
+    {
+      types::global_dof_index prefix_sum = 0;
+
+#ifdef DEAL_II_WITH_MPI
+      const int ierr =
+        MPI_Exscan(&local_size,
+                   &prefix_sum,
+                   1,
+                   Utilities::MPI::mpi_type_id_for_type<decltype(prefix_sum)>,
+                   MPI_SUM,
+                   communicator);
+      AssertThrowMPI(ierr);
+#endif
+
+      local_range_data = {prefix_sum, prefix_sum + local_size};
+
+      locally_owned_range_data.add_range(prefix_sum, prefix_sum + local_size);
+      locally_owned_range_data.compress();
+    }
+
+
+
     Partitioner::Partitioner(const IndexSet &locally_owned_indices,
                              const IndexSet &ghost_indices_in,
-                             const MPI_Comm  communicator_in)
+                             const MPI_Comm &communicator_in)
       : global_size(
           static_cast<types::global_dof_index>(locally_owned_indices.size()))
       , n_ghost_indices_data(0)
@@ -78,7 +114,7 @@ namespace Utilities
 
 
     Partitioner::Partitioner(const IndexSet &locally_owned_indices,
-                             const MPI_Comm  communicator_in)
+                             const MPI_Comm &communicator_in)
       : global_size(
           static_cast<types::global_dof_index>(locally_owned_indices.size()))
       , n_ghost_indices_data(0)
@@ -193,7 +229,7 @@ namespace Utilities
           return;
         }
 
-      types::global_dof_index my_size = local_size();
+      types::global_dof_index my_size = locally_owned_size();
 
       // Allow non-zero start index for the vector. Part 1:
       // Assume for now that the index set of rank 0 starts with 0
@@ -224,9 +260,10 @@ namespace Utilities
       // information.
       if (local_range_data.first == 0 && my_shift != 0)
         {
-          const types::global_dof_index old_local_size = local_size();
-          local_range_data.first                       = my_shift;
-          local_range_data.second = my_shift + old_local_size;
+          const types::global_dof_index old_locally_owned_size =
+            locally_owned_size();
+          local_range_data.first  = my_shift;
+          local_range_data.second = my_shift + old_locally_owned_size;
         }
 
       std::vector<unsigned int> owning_ranks_of_ghosts(
@@ -259,8 +296,8 @@ namespace Utilities
               {
                 Assert(i >= ghost_targets_data.back().first,
                        ExcInternalError(
-                         "Expect result of ConsensusAlgorithmsProcess to be "
-                         "sorted"));
+                         "Expect result of ConsensusAlgorithms::Process to be "
+                         "sorted."));
                 if (i == ghost_targets_data.back().first)
                   ghost_targets_data.back().second++;
                 else
@@ -359,9 +396,7 @@ namespace Utilities
       if (larger_ghost_index_set.size() == 0)
         {
           ghost_indices_subset_chunks_by_rank_data.clear();
-          ghost_indices_subset_data.emplace_back(local_size(),
-                                                 local_size() +
-                                                   n_ghost_indices());
+          ghost_indices_subset_data.emplace_back(0, n_ghost_indices());
           n_ghost_indices_in_larger_set = n_ghost_indices_data;
         }
       else
@@ -408,7 +443,7 @@ namespace Utilities
           for (unsigned int p = 0; p < ghost_targets_data.size(); ++p)
             {
               unsigned int last_index = numbers::invalid_unsigned_int - 1;
-              for (unsigned int ii = 0; ii < ghost_targets_data[p].second; ii++)
+              for (unsigned int ii = 0; ii < ghost_targets_data[p].second; ++ii)
                 {
                   const unsigned int i = shift + ii;
                   if (expanded_numbering[i] == last_index + 1)

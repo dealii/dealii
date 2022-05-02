@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -107,7 +107,7 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
   std::vector<unsigned int> block_component(n_stress_components +
                                               n_gamma_components,
                                             1);
-  for (unsigned int ii = 0; ii < n_stress_components; ii++)
+  for (unsigned int ii = 0; ii < n_stress_components; ++ii)
     block_component[ii] = 0;
 
   DoFRenumbering::component_wise(dof_handler);
@@ -123,7 +123,7 @@ MixedElastoPlasticity<dim>::make_grid_and_dofs()
           << std::endl
           << "Total number of cells: " << triangulation.n_cells() << std::endl
           << "Number of degrees of freedom: " << dof_handler.n_dofs() << " = ("
-          << n_stress_dof << " + " << n_gamma_dof << ")" << std::endl;
+          << n_stress_dof << " + " << n_gamma_dof << ')' << std::endl;
 
   // following step-22 use of simple compressed block sparsity pattern for
   // efficiency
@@ -193,7 +193,7 @@ MixedElastoPlasticity<dim>::assemble_system()
   unsigned int cc = 0;
   for (; cell != endc; ++cell) // loop over all cells
     {
-      deallog << ++cc << " ";
+      deallog << ++cc << ' ';
       cell_matrix = 0;
       cell_rhs    = 0;
 
@@ -218,16 +218,16 @@ check()
 {
   static const unsigned int dim = 3;
   {
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dim; ++i)
       {
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dim; ++j)
           {
             TableIndices<2> indices(i, j);
             unsigned int    unrolled =
               Tensor<2, dim>::component_to_unrolled_index(indices);
-            deallog << i << " " << j << " -> " << unrolled << std::endl;
+            deallog << i << ' ' << j << " -> " << unrolled << std::endl;
             indices = Tensor<2, dim>::unrolled_to_component_indices(unrolled);
-            deallog << unrolled << " -> " << indices[0] << " " << indices[1]
+            deallog << unrolled << " -> " << indices[0] << ' ' << indices[1]
                     << std::endl;
           }
       }

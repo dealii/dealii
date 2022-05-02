@@ -1,0 +1,17 @@
+# Listing of Parameters
+# ---------------------
+subsection Minimal Surface Problem
+  # Selection for the formulation and corresponding AD framework to be used.
+  #   formulation = 0 : Unassisted implementation (full hand linearization)
+  #   formulation = 1 : Automated linearization of the finite element
+  #                     residual 
+  #   formulation = 2 : Automated computation of finite element
+  #                     residual and linearization using a 
+  #                     variational formulation
+  set Formulation = 0
+
+  # The maximum acceptable tolerance for the linear system residual
+  set Tolerance   = 0.01
+end
+
+

@@ -1,0 +1,10 @@
+New: When calling `cell->vertex_dof_index(...)` on a DoFHandler that
+uses the hp capability, then one needed to provide the last argument
+indicating what the active fe index is. But for cells, there can only
+be one active fe index, so leaving the last argument at its default
+value is now interpreted as using the active fe index of the cell. The
+argument still needs to be provided if the `vertex_dof_index()`
+function is called on faces, edges, or vertices.
+<br>
+(Wolfgang Bangerth, 2021/07/02)
+

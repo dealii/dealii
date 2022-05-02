@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 by the deal.II authors
+## Copyright (C) 2017 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -17,22 +17,20 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
+  data_out.cc
   particle.cc
-  particle_accessor.cc
-  particle_iterator.cc
   particle_handler.cc
   generators.cc
   property_pool.cc
-  data_out.cc
+  utilities.cc
   )
 
 SET(_inst
+  data_out.inst.in
   particle.inst.in
-  particle_accessor.inst.in
-  particle_iterator.inst.in
   particle_handler.inst.in
   generators.inst.in
-  data_out.inst.in
+  utilities.inst.in
   )
 
 FILE(GLOB _header

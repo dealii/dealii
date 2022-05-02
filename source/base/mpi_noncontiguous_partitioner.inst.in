@@ -21,32 +21,10 @@ for (S : REAL_SCALARS)
     \{
       namespace MPI
       \{
-        template class NoncontiguousPartitioner<S>;
-
         template void
-        NoncontiguousPartitioner<S>::update_values(
-          std::vector<S> &      dst,
-          const std::vector<S> &src) const;
-
-        template void
-        NoncontiguousPartitioner<S>::update_values(
-          AlignedVector<S> &      dst,
-          const AlignedVector<S> &src) const;
-
-        template void
-        NoncontiguousPartitioner<S>::update_values(
-          ArrayView<S> &      dst,
-          const ArrayView<S> &src) const;
-
-        template void
-        NoncontiguousPartitioner<S>::update_values(
-          LinearAlgebra::Vector<S> &      dst,
-          const LinearAlgebra::Vector<S> &src) const;
-
-        template void
-        NoncontiguousPartitioner<S>::update_values(
-          LinearAlgebra::distributed::Vector<S> &      dst,
-          const LinearAlgebra::distributed::Vector<S> &src) const;
+        NoncontiguousPartitioner::export_to_ghosted_array(
+          const ArrayView<const S> &src,
+          const ArrayView<S> &      dst) const;
       \}
     \}
   }

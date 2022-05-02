@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,7 @@ public:
     Point<dim>              p;
     for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
       {
-        for (unsigned int d = 0; d < dim; d++)
+        for (unsigned int d = 0; d < dim; ++d)
           p[d] = p_vec[d][v];
         res[v] = value(p);
       }
@@ -159,7 +159,7 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
       {
         FEEvaluation<dim, fe_degree, n_q_points_1d, 1, double> fe_eval(
           *data, fe_index);
-        const unsigned int n_cells    = data->n_macro_cells();
+        const unsigned int n_cells    = data->n_cell_batches();
         const unsigned int n_q_points = fe_eval.n_q_points;
 
         qp_data.reinit(n_cells, n_q_points);
@@ -266,7 +266,7 @@ test_with_hanging_nodes(const FiniteElement<dim> &fe, const unsigned int p)
 }
 
 
-// same as above but for multiple fes
+// same as above but for multiple FEs
 template <int fe_degree, int n_q_points_1d, int dim>
 void
 test_with_hanging_nodes(const std::vector<const FiniteElement<dim> *> &fes,

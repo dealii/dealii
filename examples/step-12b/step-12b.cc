@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -29,11 +29,8 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -106,8 +103,7 @@ namespace Step12
   {
     (void)component;
     AssertIndexRange(component, 1);
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    AssertDimension(values.size(), points.size());
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {
@@ -129,9 +125,9 @@ namespace Step12
   {
     Assert(dim >= 2, ExcNotImplemented());
 
-    Point<dim> wind_field;
-    wind_field(0) = -p(1);
-    wind_field(1) = p(0);
+    Tensor<1, dim> wind_field;
+    wind_field[0] = -p[1];
+    wind_field[1] = p[0];
     wind_field /= wind_field.norm();
 
     return wind_field;
@@ -515,7 +511,7 @@ namespace Step12
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
 
     // then assign the matrix to it and set the right block size:
-    preconditioner.initialize(system_matrix, fe.dofs_per_cell);
+    preconditioner.initialize(system_matrix, fe.n_dofs_per_cell());
 
     // After these preparations we are ready to start the linear solver.
     solver.solve(system_matrix, solution, right_hand_side, preconditioner);
@@ -579,7 +575,7 @@ namespace Step12
     // First write the grid in eps format.
     {
       const std::string filename = "grid-" + std::to_string(cycle) + ".eps";
-      deallog << "Writing grid to <" << filename << ">" << std::endl;
+      deallog << "Writing grid to <" << filename << '>' << std::endl;
       std::ofstream eps_output(filename);
 
       GridOut grid_out;
@@ -589,7 +585,7 @@ namespace Step12
     // Then output the solution in gnuplot format.
     {
       const std::string filename = "sol-" + std::to_string(cycle) + ".gnuplot";
-      deallog << "Writing solution to <" << filename << ">" << std::endl;
+      deallog << "Writing solution to <" << filename << '>' << std::endl;
       std::ofstream gnuplot_output(filename);
 
       DataOut<dim> data_out;

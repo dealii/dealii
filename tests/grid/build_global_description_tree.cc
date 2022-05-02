@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019-2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,14 +27,6 @@
 #include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/numerics/rtree.h>
-
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/geometry/index/detail/serialization.hpp>
-#include <boost/optional.hpp>
-#include <boost/serialization/array.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/signals2.hpp>
 
 #include <algorithm>
 #include <utility>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,10 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/ndarray.h>
+
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/grid_tools.h>
@@ -26,12 +29,18 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <deal.II/physics/transformations.h>
+
+#include <array>
 #include <cmath>
 #include <limits>
 
 
 DEAL_II_NAMESPACE_OPEN
 
+// work around the problem that doxygen for some reason lists all template
+// specializations in this file
+#ifndef DOXYGEN
 
 namespace GridGenerator
 {
@@ -229,7 +238,8 @@ namespace GridGenerator
         /**
          * Create a serial/parallel distributed triangulation.
          */
-        void create_triangulation(
+        void
+        create_triangulation(
           Triangulation<2> &                            tria_grid,
           std::vector<GridTools::PeriodicFacePair<
             typename Triangulation<2>::cell_iterator>> *periodic_faces) const
@@ -252,7 +262,8 @@ namespace GridGenerator
         /**
          * Specialization for parallel fully-distributed triangulations.
          */
-        void create_triangulation(
+        void
+        create_triangulation(
           parallel::fullydistributed::Triangulation<2> &parallel_grid,
           std::vector<GridTools::PeriodicFacePair<
             typename Triangulation<2>::cell_iterator>> *periodic_faces) const
@@ -267,16 +278,16 @@ namespace GridGenerator
         // number of global refinements
         const unsigned int refinements;
 
-        // numer of subdivisions of coarse grid in blocks 1 and 4
+        // number of subdivisions of coarse grid in blocks 1 and 4
         const unsigned int n_subdivision_x_0;
 
-        // numer of subdivisions of coarse grid in blocks 2 and 5
+        // number of subdivisions of coarse grid in blocks 2 and 5
         const unsigned int n_subdivision_x_1;
 
-        // numer of subdivisions of coarse grid in blocks 3 and 6
+        // number of subdivisions of coarse grid in blocks 3 and 6
         const unsigned int n_subdivision_x_2;
 
-        // numer of subdivisions  of coarse grid in all blocks (normal to
+        // number of subdivisions  of coarse grid in all blocks (normal to
         // airfoil or in y-direction, respectively)
         const unsigned int n_subdivision_y;
 
@@ -284,7 +295,7 @@ namespace GridGenerator
         // (C-Mesh) that arises after interpolation in blocks 1 and 4
         const double height;
 
-        // lenght block 3 and 6
+        // length block 3 and 6
         const double length_b2;
 
         // factor to move points G and I horizontal to the right, i.e. make
@@ -407,7 +418,7 @@ namespace GridGenerator
          *  airfoil points.
          */
         static std::array<std::vector<Point<2>>, 2>
-        joukowski(const Point<2>     centerpoint,
+        joukowski(const Point<2> &   centerpoint,
                   const unsigned int number_points,
                   const unsigned int factor)
         {
@@ -431,7 +442,7 @@ namespace GridGenerator
 
 
             // find index in vector to nose point (min) and tail point (max)
-            for (unsigned int i = 0; i < jouk_points.size(); i++)
+            for (unsigned int i = 0; i < jouk_points.size(); ++i)
               {
                 if (jouk_points[i](0) < nose_x_coordinate)
                   {
@@ -446,9 +457,9 @@ namespace GridGenerator
               }
 
             // copy point on upper side of airfoil
-            for (unsigned int i = tail_index; i < jouk_points.size(); i++)
+            for (unsigned int i = tail_index; i < jouk_points.size(); ++i)
               upper_points.emplace_back(jouk_points[i]);
-            for (unsigned int i = 0; i <= nose_index; i++)
+            for (unsigned int i = 0; i <= nose_index; ++i)
               upper_points.emplace_back(jouk_points[i]);
             std::reverse(upper_points.begin(), upper_points.end());
 
@@ -525,7 +536,7 @@ namespace GridGenerator
           // (number_points) equidistant points.
           const double theta = 2 * numbers::PI / number_points;
           // first point is leading edge then counterclockwise
-          for (unsigned int i = 0; i < number_points; i++)
+          for (unsigned int i = 0; i < number_points; ++i)
             circle_points.emplace_back(center[0] - radius * cos(i * theta),
                                        center[1] - radius * sin(i * theta));
 
@@ -536,7 +547,8 @@ namespace GridGenerator
          * Joukowski transformation of circle points created by function
          * joukowski_circle().
          *
-         * @param[in] circle_points Vector containing oints of joukowski circle.
+         * @param[in] circle_points Vector containing points of joukowski
+         * circle.
          * @return joukowski_points Vector containing joukowski airfoil points.
          */
         static std::vector<Point<2>>
@@ -545,7 +557,7 @@ namespace GridGenerator
           std::vector<Point<2>> joukowski_points(circle_points.size());
 
           // transform each point
-          for (unsigned int i = 0; i < circle_points.size(); i++)
+          for (unsigned int i = 0; i < circle_points.size(); ++i)
             {
               const double               chi = circle_points[i](0);
               const double               eta = circle_points[i](1);
@@ -562,7 +574,7 @@ namespace GridGenerator
          * by interpolation among factor*number_points NACA-airfoil points to
          * obtain a better approximation of the airfoil geometry
          *
-         * @param[in] serialnumber NACA serial numer for different airfoil
+         * @param[in] serialnumber NACA serial number for different airfoil
          * shapes (so far only 4-digit-series implemented).
          * @param[in] number_points Number of required airfoil points for each
          *  side to being conform with amount of cells along the airfoil after
@@ -607,7 +619,7 @@ namespace GridGenerator
                            const unsigned int number_points,
                            const bool         is_upper)
         {
-          Assert(serialnumber.length() == 4,
+          Assert(serialnumber.size() == 4,
                  ExcMessage("This NACA-serial number is not implemented!"));
 
           return naca_create_points_4_digits(serialnumber,
@@ -648,7 +660,7 @@ namespace GridGenerator
           std::vector<Point<2>> naca_points;
 
           if (digit_0 == 0 && digit_1 == 0) // is symmetric
-            for (unsigned int i = 0; i < number_points; i++)
+            for (unsigned int i = 0; i < number_points; ++i)
               {
                 const double x = i * 1 / (1.0 * number_points - 1);
                 const double y_t =
@@ -663,7 +675,7 @@ namespace GridGenerator
                   naca_points.emplace_back(x, -y_t);
               }
           else // is asymmetric
-            for (unsigned int i = 0; i < number_points; i++)
+            for (unsigned int i = 0; i < number_points; ++i)
               {
                 const double m = 1.0 * digit_0 / 100; // max. chamber
                 const double p = 1.0 * digit_1 / 10; // location of max. chamber
@@ -682,7 +694,7 @@ namespace GridGenerator
                   5 * t *
                   (0.2969 * std::pow(x, 0.5) - 0.126 * x -
                    0.3516 * std::pow(x, 2) + 0.2843 * std::pow(x, 3) -
-                   0.1036 * std::pow(x, 4)); // half thicknes at a position x
+                   0.1036 * std::pow(x, 4)); // half thickness at a position x
 
                 const double theta = std::atan(dy_c);
 
@@ -761,7 +773,7 @@ namespace GridGenerator
 
           // calculate arclength
           std::vector<double> arclength_L(non_equidistant_points.size(), 0);
-          for (unsigned int i = 0; i < non_equidistant_points.size() - 1; i++)
+          for (unsigned int i = 0; i < non_equidistant_points.size() - 1; ++i)
             arclength_L[i + 1] =
               arclength_L[i] +
               non_equidistant_points[i + 1].distance(non_equidistant_points[i]);
@@ -781,7 +793,7 @@ namespace GridGenerator
 
 
           // loop over all subsections
-          for (unsigned int j = 0, i = 1; j < n_points - 1; j++)
+          for (unsigned int j = 0, i = 1; j < n_points - 1; ++j)
             {
               // get reference left and right end of this section
               const auto Lj  = arclength_L[j];
@@ -808,7 +820,8 @@ namespace GridGenerator
          * Create 6 coarse grids based on points A-L (class fields) and merges
          * them to one triangulation.
          */
-        void make_coarse_grid(Triangulation<2> &tria) const
+        void
+        make_coarse_grid(Triangulation<2> &tria) const
         {
           // create vector of serial triangulations for each block and
           // temporary storage for merging them
@@ -893,7 +906,8 @@ namespace GridGenerator
          * - 4: upper far-field side
          * - 5: lower far-field side
          */
-        static void set_boundary_ids(Triangulation<2> &tria)
+        static void
+        set_boundary_ids(Triangulation<2> &tria)
         {
           for (auto cell : tria.active_cell_iterators())
             for (unsigned int f : GeometryInfo<2>::face_indices())
@@ -933,23 +947,20 @@ namespace GridGenerator
          * x-axis (by definition of points A-L), blocks 1&4, 2&4 and 3&6 can be
          * interpolated with the same geometric computations Consider a
          * bias_factor and incline_factor during interpolation to obtain a more
-         * dense mesh next to airfoil geometry and recieve an inclined boundary
+         * dense mesh next to airfoil geometry and receive an inclined boundary
          * between block 2&3 and 5&6, respectively
          */
-        void interpolate(Triangulation<2> &tria) const
+        void
+        interpolate(Triangulation<2> &tria) const
         {
           // array storing the information if a vertex was processed
           std::vector<bool> vertex_processed(tria.n_vertices(), false);
 
           // rotation matrix for clockwise rotation of block 1 by angle gamma
-          Tensor<2, 2, double> rotation_matrix_1, rotation_matrix_2;
-
-          rotation_matrix_1[0][0] = +std::cos(-gamma);
-          rotation_matrix_1[0][1] = -std::sin(-gamma);
-          rotation_matrix_1[1][0] = +std::sin(-gamma);
-          rotation_matrix_1[1][1] = +std::cos(-gamma);
-
-          rotation_matrix_2 = transpose(rotation_matrix_1);
+          const Tensor<2, 2, double> rotation_matrix_1 =
+            Physics::Transformations::Rotations::rotation_matrix_2d(-gamma);
+          const Tensor<2, 2, double> rotation_matrix_2 =
+            transpose(rotation_matrix_1);
 
           // horizontal offset in order to place coarse-grid node A in the
           // origin
@@ -980,7 +991,7 @@ namespace GridGenerator
                     // 1 so that A(0) is on y-axis so that faces AD and BC are
                     // horizontal. This simplifies the computation of the
                     // required indices for interpolation (all x-nodes are
-                    // positiv) Move trapeze to be in first quadrant by addig
+                    // positive) Move trapeze to be in first quadrant by adding
                     // trapeze_offset
                     Point<2, double> node_;
                     if (cell.material_id() == id_block_1)
@@ -1141,14 +1152,15 @@ namespace GridGenerator
 
 
 
-    void internal_create_triangulation(
+    void
+    internal_create_triangulation(
       Triangulation<2, 2> &                            tria,
       std::vector<GridTools::PeriodicFacePair<
         typename Triangulation<2, 2>::cell_iterator>> *periodic_faces,
       const AdditionalData &                           additional_data)
     {
       MeshGenerator mesh_generator(additional_data);
-      // Cast the the triangulation to the right type so that the right
+      // Cast the triangulation to the right type so that the right
       // specialization of the function create_triangulation is picked up.
       if (auto parallel_tria =
             dynamic_cast<dealii::parallel::distributed::Triangulation<2, 2> *>(
@@ -1163,7 +1175,8 @@ namespace GridGenerator
     }
 
     template <>
-    void create_triangulation(Triangulation<1, 1> &, const AdditionalData &)
+    void
+    create_triangulation(Triangulation<1, 1> &, const AdditionalData &)
     {
       Assert(false, ExcMessage("Airfoils only exist for 2D and 3D!"));
     }
@@ -1171,10 +1184,11 @@ namespace GridGenerator
 
 
     template <>
-    void create_triangulation(Triangulation<1, 1> &,
-                              std::vector<GridTools::PeriodicFacePair<
-                                typename Triangulation<1, 1>::cell_iterator>> &,
-                              const AdditionalData &)
+    void
+    create_triangulation(Triangulation<1, 1> &,
+                         std::vector<GridTools::PeriodicFacePair<
+                           typename Triangulation<1, 1>::cell_iterator>> &,
+                         const AdditionalData &)
     {
       Assert(false, ExcMessage("Airfoils only exist for 2D and 3D!"));
     }
@@ -1182,8 +1196,9 @@ namespace GridGenerator
 
 
     template <>
-    void create_triangulation(Triangulation<2, 2> & tria,
-                              const AdditionalData &additional_data)
+    void
+    create_triangulation(Triangulation<2, 2> & tria,
+                         const AdditionalData &additional_data)
     {
       internal_create_triangulation(tria, nullptr, additional_data);
     }
@@ -1191,7 +1206,8 @@ namespace GridGenerator
 
 
     template <>
-    void create_triangulation(
+    void
+    create_triangulation(
       Triangulation<2, 2> &                            tria,
       std::vector<GridTools::PeriodicFacePair<
         typename Triangulation<2, 2>::cell_iterator>> &periodic_faces,
@@ -1203,7 +1219,8 @@ namespace GridGenerator
 
 
     template <>
-    void create_triangulation(
+    void
+    create_triangulation(
       Triangulation<3, 3> &                            tria,
       std::vector<GridTools::PeriodicFacePair<
         typename Triangulation<3, 3>::cell_iterator>> &periodic_faces,
@@ -1242,10 +1259,11 @@ namespace GridGenerator
 
 
     template <int spacedim>
-    void colorize_subdivided_hyper_rectangle(Triangulation<1, spacedim> &tria,
-                                             const Point<spacedim> &,
-                                             const Point<spacedim> &,
-                                             const double)
+    void
+    colorize_subdivided_hyper_rectangle(Triangulation<1, spacedim> &tria,
+                                        const Point<spacedim> &,
+                                        const Point<spacedim> &,
+                                        const double)
     {
       for (typename Triangulation<1, spacedim>::cell_iterator cell =
              tria.begin();
@@ -1303,12 +1321,9 @@ namespace GridGenerator
                 Assert(false, ExcInternalError());
             }
 
-      for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-             tria.begin();
-           cell != tria.end();
-           ++cell)
+      for (const auto &cell : tria.cell_iterators())
         {
-          char id = 0;
+          types::material_id id = 0;
           for (unsigned int d = 0; d < dim; ++d)
             if (cell->center()(d) > 0)
               id += (1 << d);
@@ -1321,10 +1336,11 @@ namespace GridGenerator
      * Assign boundary number zero to the inner shell boundary and 1 to the
      * outer.
      */
-    void colorize_hyper_shell(Triangulation<2> &tria,
-                              const Point<2> &,
-                              const double,
-                              const double)
+    void
+    colorize_hyper_shell(Triangulation<2> &tria,
+                         const Point<2> &,
+                         const double,
+                         const double)
     {
       // In spite of receiving geometrical
       // data, we do this only based on
@@ -1346,10 +1362,11 @@ namespace GridGenerator
      * Assign boundary number zero to the inner shell boundary and 1 to the
      * outer.
      */
-    void colorize_hyper_shell(Triangulation<3> &tria,
-                              const Point<3> &,
-                              const double,
-                              const double)
+    void
+    colorize_hyper_shell(Triangulation<3> &tria,
+                         const Point<3> &,
+                         const double,
+                         const double)
     {
       // the following uses a good amount
       // of knowledge about the
@@ -1429,10 +1446,11 @@ namespace GridGenerator
      * shell boundary, two to the face with x=0, three to the face with y=0,
      * four to the face with z=0.
      */
-    void colorize_quarter_hyper_shell(Triangulation<3> &tria,
-                                      const Point<3> &  center,
-                                      const double      inner_radius,
-                                      const double      outer_radius)
+    void
+    colorize_quarter_hyper_shell(Triangulation<3> &tria,
+                                 const Point<3> &  center,
+                                 const double      inner_radius,
+                                 const double      outer_radius)
     {
       if (tria.n_cells() != 3)
         AssertThrow(false, ExcNotImplemented());
@@ -1578,6 +1596,7 @@ namespace GridGenerator
   }
 
 
+
   template <int dim, int spacedim>
   void
   hyper_cube(Triangulation<dim, spacedim> &tria,
@@ -1597,6 +1616,8 @@ namespace GridGenerator
     hyper_rectangle(tria, p1, p2, colorize);
   }
 
+
+
   template <int dim>
   void
   simplex(Triangulation<dim> &tria, const std::vector<Point<dim>> &vertices)
@@ -1605,14 +1626,14 @@ namespace GridGenerator
     Assert(dim > 1, ExcNotImplemented());
     Assert(dim < 4, ExcNotImplemented());
 
-#ifdef DEBUG
+#  ifdef DEBUG
     Tensor<2, dim> vector_matrix;
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int c = 1; c <= dim; ++c)
         vector_matrix[c - 1][d] = vertices[c](d) - vertices[0](d);
     Assert(determinant(vector_matrix) > 0.,
            ExcMessage("Vertices of simplex must form a right handed system"));
-#endif
+#  endif
 
     // Set up the vertices by first copying into points.
     std::vector<Point<dim>> points = vertices;
@@ -1709,11 +1730,52 @@ namespace GridGenerator
   }
 
 
-  void moebius(Triangulation<3> & tria,
-               const unsigned int n_cells,
-               const unsigned int n_rotations,
-               const double       R,
-               const double       r)
+
+  template <int dim, int spacedim>
+  void
+  reference_cell(Triangulation<dim, spacedim> &tria,
+                 const ReferenceCell &         reference_cell)
+  {
+    AssertDimension(dim, reference_cell.get_dimension());
+
+    if (reference_cell == ReferenceCells::get_hypercube<dim>())
+      {
+        GridGenerator::hyper_cube(tria, 0, 1);
+      }
+    else
+      {
+        // Create an array that contains the vertices of the reference cell.
+        // We can query these points from ReferenceCell, but then we have
+        // to embed them into the spacedim-dimensional space.
+        std::vector<Point<spacedim>> vertices(reference_cell.n_vertices());
+        for (const unsigned int v : reference_cell.vertex_indices())
+          {
+            const Point<dim> this_vertex = reference_cell.vertex<dim>(v);
+            for (unsigned int d = 0; d < dim; ++d)
+              vertices[v][d] = this_vertex[d];
+            // Point<spacedim> initializes everything to zero, so any remaining
+            // elements are left at zero and we don't have to explicitly pad
+            // from 'dim' to 'spacedim' here.
+          }
+
+        // Then make one cell out of these vertices. They are ordered correctly
+        // already, so we just need to enumerate them
+        std::vector<CellData<dim>> cells(1);
+        cells[0].vertices.resize(reference_cell.n_vertices());
+        for (const unsigned int v : reference_cell.vertex_indices())
+          cells[0].vertices[v] = v;
+
+        // Turn all of this into a triangulation
+        tria.create_triangulation(vertices, cells, {});
+      }
+  }
+
+  void
+  moebius(Triangulation<3> & tria,
+          const unsigned int n_cells,
+          const unsigned int n_rotations,
+          const double       R,
+          const double       r)
   {
     const unsigned int dim = 3;
     Assert(n_cells > 4,
@@ -1746,38 +1808,50 @@ namespace GridGenerator
 
     unsigned int offset = 0;
 
+    // This Triangulation is constructed using the UCD numbering scheme since,
+    // in that numbering, the front face is first and the back face is second,
+    // which is more convenient for creating a moebius
     std::vector<CellData<dim>> cells(n_cells);
     for (unsigned int i = 0; i < n_cells; ++i)
       {
         for (unsigned int j = 0; j < 2; ++j)
           {
-            cells[i].vertices[0 + 4 * j] = offset + 0 + 4 * j;
-            cells[i].vertices[1 + 4 * j] = offset + 3 + 4 * j;
-            cells[i].vertices[2 + 4 * j] = offset + 2 + 4 * j;
-            cells[i].vertices[3 + 4 * j] = offset + 1 + 4 * j;
+            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[0 + 4 * j]] =
+              offset + 0 + 4 * j;
+            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[1 + 4 * j]] =
+              offset + 3 + 4 * j;
+            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[2 + 4 * j]] =
+              offset + 2 + 4 * j;
+            cells[i].vertices[GeometryInfo<3>::ucd_to_deal[3 + 4 * j]] =
+              offset + 1 + 4 * j;
           }
         offset += 4;
         cells[i].material_id = 0;
       }
 
     // now correct the last four vertices
-    cells[n_cells - 1].vertices[4] = (0 + n_rotations) % 4;
-    cells[n_cells - 1].vertices[5] = (3 + n_rotations) % 4;
-    cells[n_cells - 1].vertices[6] = (2 + n_rotations) % 4;
-    cells[n_cells - 1].vertices[7] = (1 + n_rotations) % 4;
+    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[4]] =
+      (0 + n_rotations) % 4;
+    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[5]] =
+      (3 + n_rotations) % 4;
+    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[6]] =
+      (2 + n_rotations) % 4;
+    cells[n_cells - 1].vertices[GeometryInfo<3>::ucd_to_deal[7]] =
+      (1 + n_rotations) % 4;
 
-    GridReordering<dim>::invert_all_cells_of_negative_grid(vertices, cells);
-    tria.create_triangulation_compatibility(vertices, cells, SubCellData());
+    GridTools::invert_all_negative_measure_cells(vertices, cells);
+    tria.create_triangulation(vertices, cells, SubCellData());
   }
 
 
 
   template <>
-  void torus<2, 3>(Triangulation<2, 3> &tria,
-                   const double         R,
-                   const double         r,
-                   const unsigned int,
-                   const double)
+  void
+  torus<2, 3>(Triangulation<2, 3> &tria,
+              const double         R,
+              const double         r,
+              const unsigned int,
+              const double)
   {
     Assert(R > r,
            ExcMessage("Outer radius R must be greater than the inner "
@@ -1809,105 +1883,102 @@ namespace GridGenerator
     // Right Hand Orientation
     cells[0].vertices[0] = 0;
     cells[0].vertices[1] = 4;
-    cells[0].vertices[2] = 7;
-    cells[0].vertices[3] = 3;
+    cells[0].vertices[2] = 3;
+    cells[0].vertices[3] = 7;
     cells[0].material_id = 0;
 
     cells[1].vertices[0] = 1;
     cells[1].vertices[1] = 5;
-    cells[1].vertices[2] = 4;
-    cells[1].vertices[3] = 0;
+    cells[1].vertices[2] = 0;
+    cells[1].vertices[3] = 4;
     cells[1].material_id = 0;
 
     cells[2].vertices[0] = 2;
     cells[2].vertices[1] = 6;
-    cells[2].vertices[2] = 5;
-    cells[2].vertices[3] = 1;
+    cells[2].vertices[2] = 1;
+    cells[2].vertices[3] = 5;
     cells[2].material_id = 0;
 
     cells[3].vertices[0] = 3;
     cells[3].vertices[1] = 7;
-    cells[3].vertices[2] = 6;
-    cells[3].vertices[3] = 2;
+    cells[3].vertices[2] = 2;
+    cells[3].vertices[3] = 6;
     cells[3].material_id = 0;
 
     cells[4].vertices[0] = 4;
     cells[4].vertices[1] = 8;
-    cells[4].vertices[2] = 11;
-    cells[4].vertices[3] = 7;
+    cells[4].vertices[2] = 7;
+    cells[4].vertices[3] = 11;
     cells[4].material_id = 0;
 
     cells[5].vertices[0] = 5;
     cells[5].vertices[1] = 9;
-    cells[5].vertices[2] = 8;
-    cells[5].vertices[3] = 4;
+    cells[5].vertices[2] = 4;
+    cells[5].vertices[3] = 8;
     cells[5].material_id = 0;
 
     cells[6].vertices[0] = 6;
     cells[6].vertices[1] = 10;
-    cells[6].vertices[2] = 9;
-    cells[6].vertices[3] = 5;
+    cells[6].vertices[2] = 5;
+    cells[6].vertices[3] = 9;
     cells[6].material_id = 0;
 
     cells[7].vertices[0] = 7;
     cells[7].vertices[1] = 11;
-    cells[7].vertices[2] = 10;
-    cells[7].vertices[3] = 6;
+    cells[7].vertices[2] = 6;
+    cells[7].vertices[3] = 10;
     cells[7].material_id = 0;
 
     cells[8].vertices[0] = 8;
     cells[8].vertices[1] = 12;
-    cells[8].vertices[2] = 15;
-    cells[8].vertices[3] = 11;
+    cells[8].vertices[2] = 11;
+    cells[8].vertices[3] = 15;
     cells[8].material_id = 0;
 
     cells[9].vertices[0] = 9;
     cells[9].vertices[1] = 13;
-    cells[9].vertices[2] = 12;
-    cells[9].vertices[3] = 8;
+    cells[9].vertices[2] = 8;
+    cells[9].vertices[3] = 12;
     cells[9].material_id = 0;
 
     cells[10].vertices[0] = 10;
     cells[10].vertices[1] = 14;
-    cells[10].vertices[2] = 13;
-    cells[10].vertices[3] = 9;
+    cells[10].vertices[2] = 9;
+    cells[10].vertices[3] = 13;
     cells[10].material_id = 0;
 
     cells[11].vertices[0] = 11;
     cells[11].vertices[1] = 15;
-    cells[11].vertices[2] = 14;
-    cells[11].vertices[3] = 10;
+    cells[11].vertices[2] = 10;
+    cells[11].vertices[3] = 14;
     cells[11].material_id = 0;
 
     cells[12].vertices[0] = 12;
     cells[12].vertices[1] = 0;
-    cells[12].vertices[2] = 3;
-    cells[12].vertices[3] = 15;
+    cells[12].vertices[2] = 15;
+    cells[12].vertices[3] = 3;
     cells[12].material_id = 0;
 
     cells[13].vertices[0] = 13;
     cells[13].vertices[1] = 1;
-    cells[13].vertices[2] = 0;
-    cells[13].vertices[3] = 12;
+    cells[13].vertices[2] = 12;
+    cells[13].vertices[3] = 0;
     cells[13].material_id = 0;
 
     cells[14].vertices[0] = 14;
     cells[14].vertices[1] = 2;
-    cells[14].vertices[2] = 1;
-    cells[14].vertices[3] = 13;
+    cells[14].vertices[2] = 13;
+    cells[14].vertices[3] = 1;
     cells[14].material_id = 0;
 
     cells[15].vertices[0] = 15;
     cells[15].vertices[1] = 3;
-    cells[15].vertices[2] = 2;
-    cells[15].vertices[3] = 14;
+    cells[15].vertices[2] = 14;
+    cells[15].vertices[3] = 2;
     cells[15].material_id = 0;
 
-    // Must call this to be able to create a
-    // correct triangulation in dealii, read
-    // GridReordering<> doc
-    GridReordering<dim, spacedim>::reorder_cells(cells);
-    tria.create_triangulation_compatibility(vertices, cells, SubCellData());
+    GridTools::consistently_order_cells(cells);
+    tria.create_triangulation(vertices, cells, SubCellData());
 
     tria.set_all_manifold_ids(0);
     tria.set_manifold(0, TorusManifold<2>(R, r));
@@ -1916,11 +1987,12 @@ namespace GridGenerator
 
 
   template <>
-  void torus<3, 3>(Triangulation<3, 3> &tria,
-                   const double         R,
-                   const double         r,
-                   const unsigned int   n_cells_toroidal,
-                   const double         phi)
+  void
+  torus<3, 3>(Triangulation<3, 3> &tria,
+              const double         R,
+              const double         r,
+              const unsigned int   n_cells_toroidal,
+              const double         phi)
   {
     Assert(R > r,
            ExcMessage("Outer radius R must be greater than the inner "
@@ -2068,7 +2140,7 @@ namespace GridGenerator
 
     // Check that the order of the vertices makes sense, i.e., the volume of the
     // cell is positive.
-    Assert(GridTools::volume(tria) > 0.,
+    Assert(GridTools::volume(tria, get_default_linear_mapping(tria)) > 0.,
            ExcMessage(
              "The volume of the cell is not greater than zero. "
              "This could be due to the wrong ordering of the vertices."));
@@ -2077,26 +2149,29 @@ namespace GridGenerator
 
 
   template <>
-  void parallelogram(Triangulation<3> &,
-                     const Point<3> (&/*corners*/)[3],
-                     const bool /*colorize*/)
+  void
+  parallelogram(Triangulation<3> &,
+                const Point<3> (&/*corners*/)[3],
+                const bool /*colorize*/)
   {
     Assert(false, ExcNotImplemented());
   }
 
   template <>
-  void parallelogram(Triangulation<1> &,
-                     const Point<1> (&/*corners*/)[1],
-                     const bool /*colorize*/)
+  void
+  parallelogram(Triangulation<1> &,
+                const Point<1> (&/*corners*/)[1],
+                const bool /*colorize*/)
   {
     Assert(false, ExcNotImplemented());
   }
 
   // Implementation for 2D only
   template <>
-  void parallelogram(Triangulation<2> &tria,
-                     const Point<2> (&corners)[2],
-                     const bool colorize)
+  void
+  parallelogram(Triangulation<2> &tria,
+                const Point<2> (&corners)[2],
+                const bool colorize)
   {
     Point<2>                    origin;
     std::array<Tensor<1, 2>, 2> edges;
@@ -2143,11 +2218,11 @@ namespace GridGenerator
   template <int dim>
   void
   subdivided_parallelepiped(Triangulation<dim> &tria,
-#ifndef _MSC_VER
+#  ifndef _MSC_VER
                             const unsigned int (&n_subdivisions)[dim],
-#else
+#  else
                             const unsigned int *n_subdivisions,
-#endif
+#  endif
                             const Point<dim> (&corners)[dim],
                             const bool colorize)
   {
@@ -2167,11 +2242,6 @@ namespace GridGenerator
   // Parallelepiped implementation in 1d, 2d, and 3d. @note The
   // implementation in 1d is similar to hyper_rectangle(), and in 2d is
   // similar to parallelogram().
-  //
-  // The GridReordering::reorder_grid is made use of towards the end of
-  // this function. Thus the triangulation is explicitly constructed for
-  // all dim here since it is slightly different in that respect
-  // (cf. hyper_rectangle(), parallelogram()).
   template <int dim, int spacedim>
   void
   subdivided_parallelepiped(Triangulation<dim, spacedim> &              tria,
@@ -2390,7 +2460,7 @@ namespace GridGenerator
     // Create triangulation
     // reorder the cells to ensure that they satisfy the convention for
     // edge and face directions
-    GridReordering<dim>::reorder_cells(cells, true);
+    GridTools::consistently_order_cells(cells);
     tria.create_triangulation(points, cells, SubCellData());
 
     // Finally assign boundary indicators according to hyper_rectangle
@@ -2457,7 +2527,7 @@ namespace GridGenerator
       }
 
     // calculate deltas and validate input
-    std::vector<Point<spacedim>> delta(dim);
+    std::array<Point<spacedim>, dim> delta;
     for (unsigned int i = 0; i < dim; ++i)
       {
         Assert(repetitions[i] >= 1, ExcInvalidRepetitions(repetitions[i]));
@@ -2614,8 +2684,9 @@ namespace GridGenerator
             std::reverse(step_sizes[i].begin(), step_sizes[i].end());
           }
 
+#  ifdef DEBUG
         double x = 0;
-        for (unsigned int j = 0; j < step_sizes.at(i).size(); j++)
+        for (unsigned int j = 0; j < step_sizes.at(i).size(); ++j)
           x += step_sizes[i][j];
         Assert(std::fabs(x - (p2(i) - p1(i))) <= 1e-12 * std::fabs(x),
                ExcMessage(
@@ -2623,6 +2694,7 @@ namespace GridGenerator
                  Utilities::int_to_string(i) +
                  " must be equal to the distance of the two given "
                  "points in this coordinate direction."));
+#  endif
       }
 
 
@@ -2808,11 +2880,11 @@ namespace GridGenerator
 
   template <>
   void
-    subdivided_hyper_rectangle(Triangulation<1> &                      tria,
-                               const std::vector<std::vector<double>> &spacing,
-                               const Point<1> &                        p,
-                               const Table<1, types::material_id> &material_id,
-                               const bool                          colorize)
+  subdivided_hyper_rectangle(Triangulation<1> &                      tria,
+                             const std::vector<std::vector<double>> &spacing,
+                             const Point<1> &                        p,
+                             const Table<1, types::material_id> &material_id,
+                             const bool                          colorize)
   {
     Assert(spacing.size() == 1, ExcInvalidRepetitionsDimension(1));
 
@@ -2821,7 +2893,7 @@ namespace GridGenerator
     Assert(spacing[0].size() == n_cells, ExcInvalidRepetitionsDimension(1));
 
     double delta = std::numeric_limits<double>::max();
-    for (unsigned int i = 0; i < n_cells; i++)
+    for (unsigned int i = 0; i < n_cells; ++i)
       {
         Assert(spacing[0][i] >= 0, ExcInvalidRepetitions(-1));
         delta = std::min(delta, spacing[0][i]);
@@ -2838,7 +2910,7 @@ namespace GridGenerator
       }
     // create the cells
     unsigned int n_val_cells = 0;
-    for (unsigned int i = 0; i < n_cells; i++)
+    for (unsigned int i = 0; i < n_cells; ++i)
       if (material_id[i] != numbers::invalid_material_id)
         n_val_cells++;
 
@@ -2866,22 +2938,20 @@ namespace GridGenerator
 
   template <>
   void
-    subdivided_hyper_rectangle(Triangulation<2> &                      tria,
-                               const std::vector<std::vector<double>> &spacing,
-                               const Point<2> &                        p,
-                               const Table<2, types::material_id> &material_id,
-                               const bool                          colorize)
+  subdivided_hyper_rectangle(Triangulation<2> &                      tria,
+                             const std::vector<std::vector<double>> &spacing,
+                             const Point<2> &                        p,
+                             const Table<2, types::material_id> &material_id,
+                             const bool                          colorize)
   {
     Assert(spacing.size() == 2, ExcInvalidRepetitionsDimension(2));
 
     std::vector<unsigned int> repetitions(2);
-    unsigned int              n_cells = 1;
-    double                    delta   = std::numeric_limits<double>::max();
-    for (unsigned int i = 0; i < 2; i++)
+    double                    delta = std::numeric_limits<double>::max();
+    for (unsigned int i = 0; i < 2; ++i)
       {
         repetitions[i] = spacing[i].size();
-        n_cells *= repetitions[i];
-        for (unsigned int j = 0; j < repetitions[i]; j++)
+        for (unsigned int j = 0; j < repetitions[i]; ++j)
           {
             Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
             delta = std::min(delta, spacing[i][j]);
@@ -2908,8 +2978,8 @@ namespace GridGenerator
 
     // create the cells
     unsigned int n_val_cells = 0;
-    for (unsigned int i = 0; i < material_id.size(0); i++)
-      for (unsigned int j = 0; j < material_id.size(1); j++)
+    for (unsigned int i = 0; i < material_id.size(0); ++i)
+      for (unsigned int j = 0; j < material_id.size(1); ++j)
         if (material_id[i][j] != numbers::invalid_material_id)
           n_val_cells++;
 
@@ -2960,24 +3030,22 @@ namespace GridGenerator
 
   template <>
   void
-    subdivided_hyper_rectangle(Triangulation<3> &                      tria,
-                               const std::vector<std::vector<double>> &spacing,
-                               const Point<3> &                        p,
-                               const Table<3, types::material_id> &material_id,
-                               const bool                          colorize)
+  subdivided_hyper_rectangle(Triangulation<3> &                      tria,
+                             const std::vector<std::vector<double>> &spacing,
+                             const Point<3> &                        p,
+                             const Table<3, types::material_id> &material_id,
+                             const bool                          colorize)
   {
     const unsigned int dim = 3;
 
     Assert(spacing.size() == dim, ExcInvalidRepetitionsDimension(dim));
 
-    std::vector<unsigned int> repetitions(dim);
-    unsigned int              n_cells = 1;
-    double                    delta   = std::numeric_limits<double>::max();
-    for (unsigned int i = 0; i < dim; i++)
+    std::array<unsigned int, dim> repetitions;
+    double                        delta = std::numeric_limits<double>::max();
+    for (unsigned int i = 0; i < dim; ++i)
       {
         repetitions[i] = spacing[i].size();
-        n_cells *= repetitions[i];
-        for (unsigned int j = 0; j < repetitions[i]; j++)
+        for (unsigned int j = 0; j < repetitions[i]; ++j)
           {
             Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
             delta = std::min(delta, spacing[i][j]);
@@ -3010,9 +3078,9 @@ namespace GridGenerator
 
     // create the cells
     unsigned int n_val_cells = 0;
-    for (unsigned int i = 0; i < material_id.size(0); i++)
-      for (unsigned int j = 0; j < material_id.size(1); j++)
-        for (unsigned int k = 0; k < material_id.size(2); k++)
+    for (unsigned int i = 0; i < material_id.size(0); ++i)
+      for (unsigned int j = 0; j < material_id.size(1); ++j)
+        for (unsigned int k = 0; k < material_id.size(2); ++k)
           if (material_id[i][j][k] != numbers::invalid_material_id)
             n_val_cells++;
 
@@ -3087,8 +3155,8 @@ namespace GridGenerator
     // are >= 1, and calculate deltas
     // convert repetitions from double
     // to int by taking the ceiling.
-    std::vector<Point<spacedim>> delta(dim);
-    unsigned int                 repetitions[dim];
+    std::array<Point<spacedim>, dim> delta;
+    std::array<unsigned int, dim>    repetitions;
     for (unsigned int i = 0; i < dim; ++i)
       {
         Assert(holes[i] >= 1,
@@ -3189,19 +3257,20 @@ namespace GridGenerator
 
 
   template <>
-  void plate_with_a_hole(Triangulation<1> & /*tria*/,
-                         const double /*inner_radius*/,
-                         const double /*outer_radius*/,
-                         const double /*pad_bottom*/,
-                         const double /*pad_top*/,
-                         const double /*pad_left*/,
-                         const double /*pad_right*/,
-                         const Point<1> /*center*/,
-                         const types::manifold_id /*polar_manifold_id*/,
-                         const types::manifold_id /*tfi_manifold_id*/,
-                         const double /*L*/,
-                         const unsigned int /*n_slices*/,
-                         const bool /*colorize*/)
+  void
+  plate_with_a_hole(Triangulation<1> & /*tria*/,
+                    const double /*inner_radius*/,
+                    const double /*outer_radius*/,
+                    const double /*pad_bottom*/,
+                    const double /*pad_top*/,
+                    const double /*pad_left*/,
+                    const double /*pad_right*/,
+                    const Point<1> & /*center*/,
+                    const types::manifold_id /*polar_manifold_id*/,
+                    const types::manifold_id /*tfi_manifold_id*/,
+                    const double /*L*/,
+                    const unsigned int /*n_slices*/,
+                    const bool /*colorize*/)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -3209,11 +3278,12 @@ namespace GridGenerator
 
 
   template <>
-  void channel_with_cylinder(Triangulation<1> & /*tria*/,
-                             const double /*shell_region_width*/,
-                             const unsigned int /*n_shells*/,
-                             const double /*skewness*/,
-                             const bool /*colorize*/)
+  void
+  channel_with_cylinder(Triangulation<1> & /*tria*/,
+                        const double /*shell_region_width*/,
+                        const unsigned int /*n_shells*/,
+                        const double /*skewness*/,
+                        const bool /*colorize*/)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -3251,19 +3321,20 @@ namespace GridGenerator
 
 
   template <>
-  void plate_with_a_hole(Triangulation<2> &       tria,
-                         const double             inner_radius,
-                         const double             outer_radius,
-                         const double             pad_bottom,
-                         const double             pad_top,
-                         const double             pad_left,
-                         const double             pad_right,
-                         const Point<2>           new_center,
-                         const types::manifold_id polar_manifold_id,
-                         const types::manifold_id tfi_manifold_id,
-                         const double             L,
-                         const unsigned int /*n_slices*/,
-                         const bool colorize)
+  void
+  plate_with_a_hole(Triangulation<2> &       tria,
+                    const double             inner_radius,
+                    const double             outer_radius,
+                    const double             pad_bottom,
+                    const double             pad_top,
+                    const double             pad_left,
+                    const double             pad_right,
+                    const Point<2> &         new_center,
+                    const types::manifold_id polar_manifold_id,
+                    const types::manifold_id tfi_manifold_id,
+                    const double             L,
+                    const unsigned int /*n_slices*/,
+                    const bool colorize)
   {
     const bool with_padding =
       pad_bottom > 0 || pad_top > 0 || pad_left > 0 || pad_right > 0;
@@ -3434,19 +3505,20 @@ namespace GridGenerator
 
 
   template <>
-  void plate_with_a_hole(Triangulation<3> &       tria,
-                         const double             inner_radius,
-                         const double             outer_radius,
-                         const double             pad_bottom,
-                         const double             pad_top,
-                         const double             pad_left,
-                         const double             pad_right,
-                         const Point<3>           new_center,
-                         const types::manifold_id polar_manifold_id,
-                         const types::manifold_id tfi_manifold_id,
-                         const double             L,
-                         const unsigned int       n_slices,
-                         const bool               colorize)
+  void
+  plate_with_a_hole(Triangulation<3> &       tria,
+                    const double             inner_radius,
+                    const double             outer_radius,
+                    const double             pad_bottom,
+                    const double             pad_top,
+                    const double             pad_left,
+                    const double             pad_right,
+                    const Point<3> &         new_center,
+                    const types::manifold_id polar_manifold_id,
+                    const types::manifold_id tfi_manifold_id,
+                    const double             L,
+                    const unsigned int       n_slices,
+                    const bool               colorize)
   {
     Triangulation<2> tria_2;
     plate_with_a_hole(tria_2,
@@ -3483,11 +3555,12 @@ namespace GridGenerator
 
 
   template <>
-  void channel_with_cylinder(Triangulation<2> & tria,
-                             const double       shell_region_width,
-                             const unsigned int n_shells,
-                             const double       skewness,
-                             const bool         colorize)
+  void
+  channel_with_cylinder(Triangulation<2> & tria,
+                        const double       shell_region_width,
+                        const unsigned int n_shells,
+                        const double       skewness,
+                        const bool         colorize)
   {
     Assert(0.0 <= shell_region_width && shell_region_width < 0.05,
            ExcMessage("The width of the shell region must be less than 0.05 "
@@ -3712,11 +3785,12 @@ namespace GridGenerator
 
 
   template <>
-  void channel_with_cylinder(Triangulation<3> & tria,
-                             const double       shell_region_width,
-                             const unsigned int n_shells,
-                             const double       skewness,
-                             const bool         colorize)
+  void
+  channel_with_cylinder(Triangulation<3> & tria,
+                        const double       shell_region_width,
+                        const unsigned int n_shells,
+                        const double       skewness,
+                        const bool         colorize)
   {
     Triangulation<2> tria_2;
     channel_with_cylinder(
@@ -3826,27 +3900,7 @@ namespace GridGenerator
 
   template <>
   void
-    hyper_cube_slit(Triangulation<1> &, const double, const double, const bool)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-
-  template <>
-  void enclosed_hyper_cube(Triangulation<1> &,
-                           const double,
-                           const double,
-                           const double,
-                           const bool)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-
-  template <>
-  void hyper_L(Triangulation<1> &, const double, const double, const bool)
+  hyper_cube_slit(Triangulation<1> &, const double, const double, const bool)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -3855,15 +3909,11 @@ namespace GridGenerator
 
   template <>
   void
-    hyper_ball(Triangulation<1> &, const Point<1> &, const double, const bool)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-
-  template <>
-  void cylinder(Triangulation<1> &, const double, const double)
+  enclosed_hyper_cube(Triangulation<1> &,
+                      const double,
+                      const double,
+                      const double,
+                      const bool)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -3872,7 +3922,7 @@ namespace GridGenerator
 
   template <>
   void
-    truncated_cone(Triangulation<1> &, const double, const double, const double)
+  hyper_L(Triangulation<1> &, const double, const double, const bool)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -3880,7 +3930,96 @@ namespace GridGenerator
 
 
   template <>
-  void hyper_shell(Triangulation<1> &,
+  void
+  hyper_ball(Triangulation<1> &, const Point<1> &, const double, const bool)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+
+  template <>
+  void
+  hyper_ball_balanced(Triangulation<1> &, const Point<1> &, const double)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+
+  template <>
+  void
+  cylinder(Triangulation<1> &, const double, const double)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+  template <>
+  void
+  subdivided_cylinder(Triangulation<1> &,
+                      const unsigned int,
+                      const double,
+                      const double)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+
+  template <>
+  void
+  truncated_cone(Triangulation<1> &, const double, const double, const double)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+
+  template <>
+  void
+  hyper_shell(Triangulation<1> &,
+              const Point<1> &,
+              const double,
+              const double,
+              const unsigned int,
+              const bool)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+  template <>
+  void
+  cylinder_shell(Triangulation<1> &,
+                 const double,
+                 const double,
+                 const double,
+                 const unsigned int,
+                 const unsigned int)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+  template <>
+  void
+  quarter_hyper_ball(Triangulation<1> &, const Point<1> &, const double)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+  template <>
+  void
+  half_hyper_ball(Triangulation<1> &, const Point<1> &, const double)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+  template <>
+  void
+  half_hyper_shell(Triangulation<1> &,
                    const Point<1> &,
                    const double,
                    const double,
@@ -3891,59 +4030,24 @@ namespace GridGenerator
   }
 
   template <>
-  void cylinder_shell(Triangulation<1> &,
-                      const double,
+  void
+  quarter_hyper_shell(Triangulation<1> &,
+                      const Point<1> &,
                       const double,
                       const double,
                       const unsigned int,
-                      const unsigned int)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-  template <>
-  void quarter_hyper_ball(Triangulation<1> &, const Point<1> &, const double)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-  template <>
-  void half_hyper_ball(Triangulation<1> &, const Point<1> &, const double)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-  template <>
-  void half_hyper_shell(Triangulation<1> &,
-                        const Point<1> &,
-                        const double,
-                        const double,
-                        const unsigned int,
-                        const bool)
+                      const bool)
   {
     Assert(false, ExcNotImplemented());
   }
 
   template <>
-  void quarter_hyper_shell(Triangulation<1> &,
-                           const Point<1> &,
-                           const double,
-                           const double,
-                           const unsigned int,
-                           const bool)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-  template <>
-  void enclosed_hyper_cube(Triangulation<2> &tria,
-                           const double      left,
-                           const double      right,
-                           const double      thickness,
-                           const bool        colorize)
+  void
+  enclosed_hyper_cube(Triangulation<2> &tria,
+                      const double      left,
+                      const double      right,
+                      const double      thickness,
+                      const bool        colorize)
   {
     Assert(left < right,
            ExcMessage("Invalid left-to-right bounds of enclosed hypercube"));
@@ -3984,10 +4088,11 @@ namespace GridGenerator
 
   // Implementation for 2D only
   template <>
-  void hyper_cube_slit(Triangulation<2> &tria,
-                       const double      left,
-                       const double      right,
-                       const bool        colorize)
+  void
+  hyper_cube_slit(Triangulation<2> &tria,
+                  const double      left,
+                  const double      right,
+                  const bool        colorize)
   {
     const double             rl2                 = (right + left) / 2;
     const Point<2>           vertices[10]        = {Point<2>(left, left),
@@ -4028,10 +4133,11 @@ namespace GridGenerator
 
 
   template <>
-  void truncated_cone(Triangulation<2> &triangulation,
-                      const double      radius_0,
-                      const double      radius_1,
-                      const double      half_length)
+  void
+  truncated_cone(Triangulation<2> &triangulation,
+                 const double      radius_0,
+                 const double      radius_1,
+                 const double      half_length)
   {
     Point<2> vertices_tmp[4];
 
@@ -4068,10 +4174,11 @@ namespace GridGenerator
 
   // Implementation for 2D only
   template <>
-  void hyper_L(Triangulation<2> &tria,
-               const double      a,
-               const double      b,
-               const bool        colorize)
+  void
+  hyper_L(Triangulation<2> &tria,
+          const double      a,
+          const double      b,
+          const bool        colorize)
   {
     const Point<2> vertices[8]    = {Point<2>(a, a),
                                   Point<2>((a + b) / 2, a),
@@ -4167,20 +4274,16 @@ namespace GridGenerator
     // compute cells to remove
     std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>
       cells_to_remove;
-    std::copy_if(
-      rectangle.active_cell_iterators().begin(),
-      rectangle.active_cell_iterators().end(),
-      std::inserter(cells_to_remove, cells_to_remove.end()),
-      [&](
-        const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
-        -> bool {
-        for (unsigned int d = 0; d < dim; ++d)
+    for (const auto &cell : rectangle.active_cell_iterators())
+      {
+        bool remove_cell = true;
+        for (unsigned int d = 0; d < dim && remove_cell; ++d)
           if ((n_cells_to_remove[d] > 0 && cell->center()[d] >= cut_step[d]) ||
               (n_cells_to_remove[d] < 0 && cell->center()[d] <= cut_step[d]))
-            return false;
-
-        return true;
-      });
+            remove_cell = false;
+        if (remove_cell)
+          cells_to_remove.insert(cell);
+      }
 
     GridGenerator::create_triangulation_with_removed_cells(rectangle,
                                                            cells_to_remove,
@@ -4191,10 +4294,11 @@ namespace GridGenerator
 
   // Implementation for 2D only
   template <>
-  void hyper_ball(Triangulation<2> &tria,
-                  const Point<2> &  p,
-                  const double      radius,
-                  const bool        internal_manifolds)
+  void
+  hyper_ball(Triangulation<2> &tria,
+             const Point<2> &  p,
+             const double      radius,
+             const bool        internal_manifolds)
   {
     // equilibrate cell sizes at
     // transition from the inner part
@@ -4236,12 +4340,13 @@ namespace GridGenerator
 
 
   template <>
-  void hyper_shell(Triangulation<2> & tria,
-                   const Point<2> &   center,
-                   const double       inner_radius,
-                   const double       outer_radius,
-                   const unsigned int n_cells,
-                   const bool         colorize)
+  void
+  hyper_shell(Triangulation<2> & tria,
+              const Point<2> &   center,
+              const double       inner_radius,
+              const double       outer_radius,
+              const unsigned int n_cells,
+              const bool         colorize)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
@@ -4358,9 +4463,10 @@ namespace GridGenerator
 
   // Implementation for 2D only
   template <>
-  void cylinder(Triangulation<2> &tria,
-                const double      radius,
-                const double      half_length)
+  void
+  cylinder(Triangulation<2> &tria,
+           const double      radius,
+           const double      half_length)
   {
     Point<2> p1(-half_length, -radius);
     Point<2> p2(half_length, radius);
@@ -4387,25 +4493,37 @@ namespace GridGenerator
       }
   }
 
+  template <>
+  void
+  subdivided_cylinder(Triangulation<2> &,
+                      const unsigned int,
+                      const double,
+                      const double)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
 
 
   // Implementation for 2D only
   template <>
-  void cylinder_shell(Triangulation<2> &,
-                      const double,
-                      const double,
-                      const double,
-                      const unsigned int,
-                      const unsigned int)
+  void
+  cylinder_shell(Triangulation<2> &,
+                 const double,
+                 const double,
+                 const double,
+                 const unsigned int,
+                 const unsigned int)
   {
     Assert(false, ExcNotImplemented());
   }
 
 
   template <>
-  void quarter_hyper_ball(Triangulation<2> &tria,
-                          const Point<2> &  p,
-                          const double      radius)
+  void
+  quarter_hyper_ball(Triangulation<2> &tria,
+                     const Point<2> &  p,
+                     const double      radius)
   {
     const unsigned int dim = 2;
 
@@ -4466,9 +4584,10 @@ namespace GridGenerator
 
 
   template <>
-  void half_hyper_ball(Triangulation<2> &tria,
-                       const Point<2> &  p,
-                       const double      radius)
+  void
+  half_hyper_ball(Triangulation<2> &tria,
+                  const Point<2> &  p,
+                  const double      radius)
   {
     // equilibrate cell sizes at
     // transition from the inner part
@@ -4532,12 +4651,13 @@ namespace GridGenerator
 
   // Implementation for 2D only
   template <>
-  void half_hyper_shell(Triangulation<2> & tria,
-                        const Point<2> &   center,
-                        const double       inner_radius,
-                        const double       outer_radius,
-                        const unsigned int n_cells,
-                        const bool         colorize)
+  void
+  half_hyper_shell(Triangulation<2> & tria,
+                   const Point<2> &   center,
+                   const double       inner_radius,
+                   const double       outer_radius,
+                   const unsigned int n_cells,
+                   const bool         colorize)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
@@ -4615,12 +4735,13 @@ namespace GridGenerator
 
 
   template <>
-  void quarter_hyper_shell(Triangulation<2> & tria,
-                           const Point<2> &   center,
-                           const double       inner_radius,
-                           const double       outer_radius,
-                           const unsigned int n_cells,
-                           const bool         colorize)
+  void
+  quarter_hyper_shell(Triangulation<2> & tria,
+                      const Point<2> &   center,
+                      const double       inner_radius,
+                      const double       outer_radius,
+                      const unsigned int n_cells,
+                      const bool         colorize)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
@@ -4699,10 +4820,11 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void hyper_cube_slit(Triangulation<3> &tria,
-                       const double      left,
-                       const double      right,
-                       const bool        colorize)
+  void
+  hyper_cube_slit(Triangulation<3> &tria,
+                  const double      left,
+                  const double      right,
+                  const bool        colorize)
   {
     const double rl2 = (right + left) / 2;
     const double len = (right - left) / 2.;
@@ -4747,11 +4869,12 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void enclosed_hyper_cube(Triangulation<3> &tria,
-                           const double      left,
-                           const double      right,
-                           const double      thickness,
-                           const bool        colorize)
+  void
+  enclosed_hyper_cube(Triangulation<3> &tria,
+                      const double      left,
+                      const double      right,
+                      const double      thickness,
+                      const bool        colorize)
   {
     Assert(left < right,
            ExcMessage("Invalid left-to-right bounds of enclosed hypercube"));
@@ -4800,10 +4923,11 @@ namespace GridGenerator
 
 
   template <>
-  void truncated_cone(Triangulation<3> &triangulation,
-                      const double      radius_0,
-                      const double      radius_1,
-                      const double      half_length)
+  void
+  truncated_cone(Triangulation<3> &triangulation,
+                 const double      radius_0,
+                 const double      radius_1,
+                 const double      half_length)
   {
     Assert(triangulation.n_cells() == 0,
            ExcMessage("The output triangulation object needs to be empty."));
@@ -4820,7 +4944,7 @@ namespace GridGenerator
                                          n_slices,
                                          2 * half_length,
                                          triangulation);
-    GridTools::rotate(numbers::PI / 2, 1, triangulation);
+    GridTools::rotate(Tensor<1, 3>({0., 1., 0.}), numbers::PI_2, triangulation);
     GridTools::shift(Tensor<1, 3>({-half_length, 0.0, 0.0}), triangulation);
     // At this point we have a cylinder. Multiply the y and z coordinates by a
     // factor that scales (with x) linearly between radius_0 and radius_1 to fix
@@ -4852,10 +4976,11 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void hyper_L(Triangulation<3> &tria,
-               const double      a,
-               const double      b,
-               const bool        colorize)
+  void
+  hyper_L(Triangulation<3> &tria,
+          const double      a,
+          const double      b,
+          const bool        colorize)
   {
     // we slice out the top back right
     // part of the cube
@@ -4922,10 +5047,11 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void hyper_ball(Triangulation<3> &tria,
-                  const Point<3> &  p,
-                  const double      radius,
-                  const bool        internal_manifold)
+  void
+  hyper_ball(Triangulation<3> &tria,
+             const Point<3> &  p,
+             const double      radius,
+             const bool        internal_manifold)
   {
     const double a =
       1. / (1 + std::sqrt(3.0)); // equilibrate cell sizes at transition
@@ -4989,10 +5115,367 @@ namespace GridGenerator
 
 
 
+  void
+  non_standard_orientation_mesh(Triangulation<2> & tria,
+                                const unsigned int n_rotate_middle_square)
+  {
+    AssertThrow(n_rotate_middle_square < 4,
+                ExcMessage("The number of rotation by pi/2 of the right square "
+                           "must be in the half-open range [0,4)."))
+
+      constexpr unsigned int dim = 2;
+
+    const unsigned int         n_cells = 5;
+    std::vector<CellData<dim>> cells(n_cells);
+
+    // Corner points of the cube [0,1]^2
+    const std::vector<Point<dim>> vertices = {Point<dim>(0, 0),  // 0
+                                              Point<dim>(1, 0),  // 1
+                                              Point<dim>(0, 1),  // 2
+                                              Point<dim>(1, 1),  // 3
+                                              Point<dim>(2, 0),  // 4
+                                              Point<dim>(2, 1),  // 5
+                                              Point<dim>(3, 0),  // 6
+                                              Point<dim>(3, 1),  // 7
+                                              Point<dim>(1, -1), // 8
+                                              Point<dim>(2, -1), // 9
+                                              Point<dim>(1, 2),  // 10
+                                              Point<dim>(2, 2)}; // 11
+
+
+    // consistent orientation
+    unsigned int cell_vertices[n_cells][4] = {{0, 1, 2, 3},
+                                              {1, 4, 3, 5}, // rotating cube
+                                              {8, 9, 1, 4},
+                                              {4, 6, 5, 7},
+                                              {3, 5, 10, 11}};
+
+    switch (n_rotate_middle_square)
+      {
+        case /* rotate right square */ 1:
+          {
+            cell_vertices[1][0] = 4;
+            cell_vertices[1][1] = 5;
+            cell_vertices[1][2] = 1;
+            cell_vertices[1][3] = 3;
+            break;
+          }
+
+        case /* rotate right square */ 2:
+          {
+            cell_vertices[1][0] = 5;
+            cell_vertices[1][1] = 3;
+            cell_vertices[1][2] = 4;
+            cell_vertices[1][3] = 1;
+            break;
+          }
+
+        case /* rotate right square */ 3:
+          {
+            cell_vertices[1][0] = 3;
+            cell_vertices[1][1] = 1;
+            cell_vertices[1][2] = 5;
+            cell_vertices[1][3] = 4;
+            break;
+          }
+
+        default /* 0 */:
+          break;
+      } // switch
+
+    cells.resize(n_cells, CellData<dim>());
+
+    for (unsigned int cell_index = 0; cell_index < n_cells; ++cell_index)
+      {
+        for (const unsigned int vertex_index :
+             GeometryInfo<dim>::vertex_indices())
+          {
+            cells[cell_index].vertices[vertex_index] =
+              cell_vertices[cell_index][vertex_index];
+            cells[cell_index].material_id = 0;
+          }
+      }
+
+    tria.create_triangulation(vertices, cells, SubCellData());
+  }
+
+
+  void
+  non_standard_orientation_mesh(Triangulation<3> &tria,
+                                const bool        face_orientation,
+                                const bool        face_flip,
+                                const bool        face_rotation,
+                                const bool        manipulate_left_cube)
+  {
+    constexpr unsigned int dim = 3;
+
+    const unsigned int         n_cells = 2;
+    std::vector<CellData<dim>> cells(n_cells);
+
+    // Corner points of the cube [0,1]^3
+    const std::vector<Point<dim>> vertices = {Point<dim>(0, 0, 0),  // 0
+                                              Point<dim>(1, 0, 0),  // 1
+                                              Point<dim>(0, 1, 0),  // 2
+                                              Point<dim>(1, 1, 0),  // 3
+                                              Point<dim>(0, 0, 1),  // 4
+                                              Point<dim>(1, 0, 1),  // 5
+                                              Point<dim>(0, 1, 1),  // 6
+                                              Point<dim>(1, 1, 1),  // 7
+                                              Point<dim>(2, 0, 0),  // 8
+                                              Point<dim>(2, 1, 0),  // 9
+                                              Point<dim>(2, 0, 1),  // 10
+                                              Point<dim>(2, 1, 1)}; // 11
+
+    unsigned int cell_vertices[n_cells][8] = {
+      {0, 1, 2, 3, 4, 5, 6, 7},    // unit cube
+      {1, 8, 3, 9, 5, 10, 7, 11}}; // shifted cube
+
+    // binary to case number
+    const unsigned int this_case = 4 * static_cast<int>(face_orientation) +
+                                   2 * static_cast<int>(face_flip) +
+                                   static_cast<int>(face_rotation);
+
+    if (manipulate_left_cube)
+      {
+        switch (this_case)
+          {
+            case 0:
+              {
+                cell_vertices[0][0] = 1;
+                cell_vertices[0][1] = 0;
+                cell_vertices[0][2] = 5;
+                cell_vertices[0][3] = 4;
+                cell_vertices[0][4] = 3;
+                cell_vertices[0][5] = 2;
+                cell_vertices[0][6] = 7;
+                cell_vertices[0][7] = 6;
+                break;
+              }
+
+            case 1:
+              {
+                cell_vertices[0][0] = 5;
+                cell_vertices[0][1] = 4;
+                cell_vertices[0][2] = 7;
+                cell_vertices[0][3] = 6;
+                cell_vertices[0][4] = 1;
+                cell_vertices[0][5] = 0;
+                cell_vertices[0][6] = 3;
+                cell_vertices[0][7] = 2;
+                break;
+              }
+
+            case 2:
+              {
+                cell_vertices[0][0] = 7;
+                cell_vertices[0][1] = 6;
+                cell_vertices[0][2] = 3;
+                cell_vertices[0][3] = 2;
+                cell_vertices[0][4] = 5;
+                cell_vertices[0][5] = 4;
+                cell_vertices[0][6] = 1;
+                cell_vertices[0][7] = 0;
+                break;
+              }
+            case 3:
+              {
+                cell_vertices[0][0] = 3;
+                cell_vertices[0][1] = 2;
+                cell_vertices[0][2] = 1;
+                cell_vertices[0][3] = 0;
+                cell_vertices[0][4] = 7;
+                cell_vertices[0][5] = 6;
+                cell_vertices[0][6] = 5;
+                cell_vertices[0][7] = 4;
+                break;
+              }
+
+            case 4:
+              {
+                cell_vertices[0][0] = 0;
+                cell_vertices[0][1] = 1;
+                cell_vertices[0][2] = 2;
+                cell_vertices[0][3] = 3;
+                cell_vertices[0][4] = 4;
+                cell_vertices[0][5] = 5;
+                cell_vertices[0][6] = 6;
+                cell_vertices[0][7] = 7;
+                break;
+              }
+
+            case 5:
+              {
+                cell_vertices[0][0] = 2;
+                cell_vertices[0][1] = 3;
+                cell_vertices[0][2] = 6;
+                cell_vertices[0][3] = 7;
+                cell_vertices[0][4] = 0;
+                cell_vertices[0][5] = 1;
+                cell_vertices[0][6] = 4;
+                cell_vertices[0][7] = 5;
+                break;
+              }
+
+            case 6:
+              {
+                cell_vertices[0][0] = 6;
+                cell_vertices[0][1] = 7;
+                cell_vertices[0][2] = 4;
+                cell_vertices[0][3] = 5;
+                cell_vertices[0][4] = 2;
+                cell_vertices[0][5] = 3;
+                cell_vertices[0][6] = 0;
+                cell_vertices[0][7] = 1;
+                break;
+              }
+
+            case 7:
+              {
+                cell_vertices[0][0] = 4;
+                cell_vertices[0][1] = 5;
+                cell_vertices[0][2] = 0;
+                cell_vertices[0][3] = 1;
+                cell_vertices[0][4] = 6;
+                cell_vertices[0][5] = 7;
+                cell_vertices[0][6] = 2;
+                cell_vertices[0][7] = 3;
+                break;
+              }
+          } // switch
+      }
+    else
+      {
+        switch (this_case)
+          {
+            case 0:
+              {
+                cell_vertices[1][0] = 8;
+                cell_vertices[1][1] = 1;
+                cell_vertices[1][2] = 10;
+                cell_vertices[1][3] = 5;
+                cell_vertices[1][4] = 9;
+                cell_vertices[1][5] = 3;
+                cell_vertices[1][6] = 11;
+                cell_vertices[1][7] = 7;
+                break;
+              }
+
+            case 1:
+              {
+                cell_vertices[1][0] = 10;
+                cell_vertices[1][1] = 5;
+                cell_vertices[1][2] = 11;
+                cell_vertices[1][3] = 7;
+                cell_vertices[1][4] = 8;
+                cell_vertices[1][5] = 1;
+                cell_vertices[1][6] = 9;
+                cell_vertices[1][7] = 3;
+                break;
+              }
+
+            case 2:
+              {
+                cell_vertices[1][0] = 11;
+                cell_vertices[1][1] = 7;
+                cell_vertices[1][2] = 9;
+                cell_vertices[1][3] = 3;
+                cell_vertices[1][4] = 10;
+                cell_vertices[1][5] = 5;
+                cell_vertices[1][6] = 8;
+                cell_vertices[1][7] = 1;
+                break;
+              }
+
+            case 3:
+              {
+                cell_vertices[1][0] = 9;
+                cell_vertices[1][1] = 3;
+                cell_vertices[1][2] = 8;
+                cell_vertices[1][3] = 1;
+                cell_vertices[1][4] = 11;
+                cell_vertices[1][5] = 7;
+                cell_vertices[1][6] = 10;
+                cell_vertices[1][7] = 5;
+                break;
+              }
+
+            case 4:
+              {
+                cell_vertices[1][0] = 1;
+                cell_vertices[1][1] = 8;
+                cell_vertices[1][2] = 3;
+                cell_vertices[1][3] = 9;
+                cell_vertices[1][4] = 5;
+                cell_vertices[1][5] = 10;
+                cell_vertices[1][6] = 7;
+                cell_vertices[1][7] = 11;
+                break;
+              }
+
+            case 5:
+              {
+                cell_vertices[1][0] = 5;
+                cell_vertices[1][1] = 10;
+                cell_vertices[1][2] = 1;
+                cell_vertices[1][3] = 8;
+                cell_vertices[1][4] = 7;
+                cell_vertices[1][5] = 11;
+                cell_vertices[1][6] = 3;
+                cell_vertices[1][7] = 9;
+                break;
+              }
+
+            case 6:
+              {
+                cell_vertices[1][0] = 7;
+                cell_vertices[1][1] = 11;
+                cell_vertices[1][2] = 5;
+                cell_vertices[1][3] = 10;
+                cell_vertices[1][4] = 3;
+                cell_vertices[1][5] = 9;
+                cell_vertices[1][6] = 1;
+                cell_vertices[1][7] = 8;
+                break;
+              }
+
+            case 7:
+              {
+                cell_vertices[1][0] = 3;
+                cell_vertices[1][1] = 9;
+                cell_vertices[1][2] = 7;
+                cell_vertices[1][3] = 11;
+                cell_vertices[1][4] = 1;
+                cell_vertices[1][5] = 8;
+                cell_vertices[1][6] = 5;
+                cell_vertices[1][7] = 10;
+                break;
+              }
+          } // switch
+      }
+
+    cells.resize(n_cells, CellData<dim>());
+
+    for (unsigned int cell_index = 0; cell_index < n_cells; ++cell_index)
+      {
+        for (const unsigned int vertex_index :
+             GeometryInfo<dim>::vertex_indices())
+          {
+            cells[cell_index].vertices[vertex_index] =
+              cell_vertices[cell_index][vertex_index];
+            cells[cell_index].material_id = 0;
+          }
+      }
+
+    tria.create_triangulation(vertices, cells, SubCellData());
+  }
+
+
+
   template <int spacedim>
-  void hyper_sphere(Triangulation<spacedim - 1, spacedim> &tria,
-                    const Point<spacedim> &                p,
-                    const double                           radius)
+  void
+  hyper_sphere(Triangulation<spacedim - 1, spacedim> &tria,
+               const Point<spacedim> &                p,
+               const double                           radius)
   {
     Triangulation<spacedim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh, p, radius);
@@ -5007,40 +5490,35 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void cylinder(Triangulation<3> &tria,
-                const double      radius,
-                const double      half_length)
+  void
+  subdivided_cylinder(Triangulation<3> & tria,
+                      const unsigned int x_subdivisions,
+                      const double       radius,
+                      const double       half_length)
   {
     // Copy the base from hyper_ball<3>
     // and transform it to yz
-    const double d            = radius / std::sqrt(2.0);
-    const double a            = d / (1 + std::sqrt(2.0));
-    Point<3>     vertices[24] = {
-      Point<3>(-d, -half_length, -d),
-      Point<3>(d, -half_length, -d),
-      Point<3>(-a, -half_length, -a),
-      Point<3>(a, -half_length, -a),
-      Point<3>(-a, -half_length, a),
-      Point<3>(a, -half_length, a),
-      Point<3>(-d, -half_length, d),
-      Point<3>(d, -half_length, d),
-      Point<3>(-d, 0, -d),
-      Point<3>(d, 0, -d),
-      Point<3>(-a, 0, -a),
-      Point<3>(a, 0, -a),
-      Point<3>(-a, 0, a),
-      Point<3>(a, 0, a),
-      Point<3>(-d, 0, d),
-      Point<3>(d, 0, d),
-      Point<3>(-d, half_length, -d),
-      Point<3>(d, half_length, -d),
-      Point<3>(-a, half_length, -a),
-      Point<3>(a, half_length, -a),
-      Point<3>(-a, half_length, a),
-      Point<3>(a, half_length, a),
-      Point<3>(-d, half_length, d),
-      Point<3>(d, half_length, d),
-    };
+    const double d = radius / std::sqrt(2.0);
+    const double a = d / (1 + std::sqrt(2.0));
+
+    std::vector<Point<3>> vertices;
+    const double          initial_height   = -half_length;
+    const double          height_increment = 2. * half_length / x_subdivisions;
+
+    for (unsigned int rep = 0; rep < (x_subdivisions + 1); ++rep)
+      {
+        const double height = initial_height + height_increment * rep;
+
+        vertices.emplace_back(Point<3>(-d, height, -d));
+        vertices.emplace_back(Point<3>(d, height, -d));
+        vertices.emplace_back(Point<3>(-a, height, -a));
+        vertices.emplace_back(Point<3>(a, height, -a));
+        vertices.emplace_back(Point<3>(-a, height, a));
+        vertices.emplace_back(Point<3>(a, height, a));
+        vertices.emplace_back(Point<3>(-d, height, d));
+        vertices.emplace_back(Point<3>(d, height, d));
+      }
+
     // Turn cylinder such that y->x
     for (auto &vertex : vertices)
       {
@@ -5049,18 +5527,29 @@ namespace GridGenerator
         vertex(0)      = h;
       }
 
-    int cell_vertices[10][8] = {{0, 1, 8, 9, 2, 3, 10, 11},
-                                {0, 2, 8, 10, 6, 4, 14, 12},
-                                {2, 3, 10, 11, 4, 5, 12, 13},
-                                {1, 7, 9, 15, 3, 5, 11, 13},
-                                {6, 4, 14, 12, 7, 5, 15, 13}};
-    for (unsigned int i = 0; i < 5; ++i)
-      for (unsigned int j = 0; j < 8; ++j)
-        cell_vertices[i + 5][j] = cell_vertices[i][j] + 8;
+    std::vector<std::vector<int>> cell_vertices;
+    cell_vertices.push_back({0, 1, 8, 9, 2, 3, 10, 11});
+    cell_vertices.push_back({0, 2, 8, 10, 6, 4, 14, 12});
+    cell_vertices.push_back({2, 3, 10, 11, 4, 5, 12, 13});
+    cell_vertices.push_back({1, 7, 9, 15, 3, 5, 11, 13});
+    cell_vertices.push_back({6, 4, 14, 12, 7, 5, 15, 13});
 
-    std::vector<CellData<3>> cells(10, CellData<3>());
+    for (unsigned int rep = 1; rep < x_subdivisions; ++rep)
+      {
+        for (unsigned int i = 0; i < 5; ++i)
+          {
+            std::vector<int> new_cell_vertices(8);
+            for (unsigned int j = 0; j < 8; ++j)
+              new_cell_vertices[j] = cell_vertices[i][j] + 8 * rep;
+            cell_vertices.push_back(new_cell_vertices);
+          }
+      }
 
-    for (unsigned int i = 0; i < 10; ++i)
+    unsigned int n_cells = x_subdivisions * 5;
+
+    std::vector<CellData<3>> cells(n_cells, CellData<3>());
+
+    for (unsigned int i = 0; i < n_cells; ++i)
       {
         for (unsigned int j = 0; j < 8; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
@@ -5082,16 +5571,17 @@ namespace GridGenerator
     // interior if one of its vertices
     // is at coordinates '+-a' as set
     // above
-    Triangulation<3>::cell_iterator cell = tria.begin();
-    Triangulation<3>::cell_iterator end  = tria.end();
-
     tria.set_all_manifold_ids_on_boundary(0);
 
-    for (; cell != end; ++cell)
+    // Tolerance is calculated using the minimal length defining
+    // the cylinder
+    const double tolerance = 1e-5 * std::min(radius, half_length);
+
+    for (const auto &cell : tria.cell_iterators())
       for (unsigned int i : GeometryInfo<3>::face_indices())
         if (cell->at_boundary(i))
           {
-            if (cell->face(i)->center()(0) > half_length - 1.e-5)
+            if (cell->face(i)->center()(0) > half_length - tolerance)
               {
                 cell->face(i)->set_boundary_id(2);
                 cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
@@ -5108,7 +5598,7 @@ namespace GridGenerator
                         numbers::flat_manifold_id);
                     }
               }
-            else if (cell->face(i)->center()(0) < -half_length + 1.e-5)
+            else if (cell->face(i)->center()(0) < -half_length + tolerance)
               {
                 cell->face(i)->set_boundary_id(1);
                 cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
@@ -5129,11 +5619,21 @@ namespace GridGenerator
     tria.set_manifold(0, CylindricalManifold<3>());
   }
 
+  // Implementation for 3D only
+  template <>
+  void
+  cylinder(Triangulation<3> &tria,
+           const double      radius,
+           const double      half_length)
+  {
+    subdivided_cylinder(tria, 2, radius, half_length);
+  }
 
   template <>
-  void quarter_hyper_ball(Triangulation<3> &tria,
-                          const Point<3> &  center,
-                          const double      radius)
+  void
+  quarter_hyper_ball(Triangulation<3> &tria,
+                     const Point<3> &  center,
+                     const double      radius)
   {
     const unsigned int dim = 3;
 
@@ -5229,9 +5729,10 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void half_hyper_ball(Triangulation<3> &tria,
-                       const Point<3> &  center,
-                       const double      radius)
+  void
+  half_hyper_ball(Triangulation<3> &tria,
+                  const Point<3> &  center,
+                  const double      radius)
   {
     // These are for the two lower squares
     const double d = radius / std::sqrt(2.0);
@@ -5332,18 +5833,131 @@ namespace GridGenerator
   }
 
 
+
+  template <int dim>
+  void
+  hyper_ball_balanced(Triangulation<dim> &tria,
+                      const Point<dim> &  p,
+                      const double        radius)
+  {
+    // We create the ball by duplicating the information in each dimension at
+    // a time by appropriate rotations, starting from the quarter ball. The
+    // rotations make sure we do not generate inverted cells that would appear
+    // if we tried the slightly simpler approach to simply mirror the cells.
+    //
+    // Make the rotations easy by centering at the origin now and shifting by p
+    // later.
+
+    Triangulation<dim> tria_piece;
+    GridGenerator::quarter_hyper_ball(tria_piece, Point<dim>(), radius);
+
+    for (unsigned int round = 0; round < dim; ++round)
+      {
+        Triangulation<dim> tria_copy;
+        tria_copy.copy_triangulation(tria_piece);
+        tria_piece.clear();
+        std::vector<Point<dim>> new_points(tria_copy.n_vertices());
+        if (round == 0)
+          for (unsigned int v = 0; v < tria_copy.n_vertices(); ++v)
+            {
+              // rotate by 90 degrees counterclockwise
+              new_points[v][0] = -tria_copy.get_vertices()[v][1];
+              new_points[v][1] = tria_copy.get_vertices()[v][0];
+              if (dim == 3)
+                new_points[v][2] = tria_copy.get_vertices()[v][2];
+            }
+        else if (round == 1)
+          {
+            for (unsigned int v = 0; v < tria_copy.n_vertices(); ++v)
+              {
+                // rotate by 180 degrees along the xy plane
+                new_points[v][0] = -tria_copy.get_vertices()[v][0];
+                new_points[v][1] = -tria_copy.get_vertices()[v][1];
+                if (dim == 3)
+                  new_points[v][2] = tria_copy.get_vertices()[v][2];
+              }
+          }
+        else if (round == 2)
+          for (unsigned int v = 0; v < tria_copy.n_vertices(); ++v)
+            {
+              // rotate by 180 degrees along the xz plane
+              Assert(dim == 3, ExcInternalError());
+              new_points[v][0] = -tria_copy.get_vertices()[v][0];
+              new_points[v][1] = tria_copy.get_vertices()[v][1];
+              new_points[v][2] = -tria_copy.get_vertices()[v][2];
+            }
+        else
+          Assert(false, ExcInternalError());
+
+
+        // the cell data is exactly the same as before
+        std::vector<CellData<dim>> cells;
+        cells.reserve(tria_copy.n_cells());
+        for (const auto &cell : tria_copy.cell_iterators())
+          {
+            CellData<dim> data;
+            for (unsigned int v : GeometryInfo<dim>::vertex_indices())
+              data.vertices[v] = cell->vertex_index(v);
+            data.material_id = cell->material_id();
+            data.manifold_id = cell->manifold_id();
+            cells.push_back(data);
+          }
+
+        Triangulation<dim> rotated_tria;
+        rotated_tria.create_triangulation(new_points, cells, SubCellData());
+
+        // merge the triangulations - this will make sure that the duplicate
+        // vertices in the interior are absorbed
+        if (round == dim - 1)
+          merge_triangulations(tria_copy, rotated_tria, tria, 1e-12 * radius);
+        else
+          merge_triangulations(tria_copy,
+                               rotated_tria,
+                               tria_piece,
+                               1e-12 * radius);
+      }
+
+    for (const auto &cell : tria.cell_iterators())
+      if (cell->center().norm_square() > 0.4 * radius)
+        cell->set_manifold_id(1);
+      else
+        cell->set_all_manifold_ids(numbers::flat_manifold_id);
+    GridTools::shift(p, tria);
+
+    tria.set_all_manifold_ids_on_boundary(0);
+    tria.set_manifold(0, SphericalManifold<dim>(p));
+  }
+
+
+
   template <>
-  void hyper_shell(Triangulation<3> & tria,
-                   const Point<3> &   p,
-                   const double       inner_radius,
-                   const double       outer_radius,
-                   const unsigned int n_cells,
-                   const bool         colorize)
+  void
+  hyper_shell(Triangulation<3> & tria,
+              const Point<3> &   p,
+              const double       inner_radius,
+              const double       outer_radius,
+              const unsigned int n_cells,
+              const bool         colorize)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
 
-    const unsigned int n = (n_cells == 0) ? 6 : n_cells;
+    unsigned int n_refinement_steps = 0;
+    unsigned int n_cells_coarsened  = n_cells;
+    if (n_cells != 96 && n_cells > 12)
+      while (n_cells_coarsened > 12 && n_cells_coarsened % 4 == 0)
+        {
+          ++n_refinement_steps;
+          n_cells_coarsened /= 4;
+        }
+    Assert(n_cells == 0 || n_cells == 6 || n_cells == 12 || n_cells == 96 ||
+             (n_refinement_steps > 0 &&
+              (n_cells_coarsened == 6 || n_cells_coarsened == 12)),
+           ExcMessage("Invalid number of coarse mesh cells"));
+
+    const unsigned int n = n_refinement_steps > 0 ?
+                             4 * n_cells_coarsened :
+                             ((n_cells == 0) ? 6 : n_cells);
 
     const double             irad = inner_radius / std::sqrt(3.0);
     const double             orad = outer_radius / std::sqrt(3.0);
@@ -5360,112 +5974,168 @@ namespace GridGenerator
                                                         {-1, +1, +1}, //
                                                         {+1, +1, +1}}};
 
-    // Start with the shell bounded by
-    // two nested cubes
-    if (n == 6)
+    switch (n)
       {
-        for (unsigned int i = 0; i < 8; ++i)
-          vertices.push_back(p + hexahedron[i] * irad);
-        for (unsigned int i = 0; i < 8; ++i)
-          vertices.push_back(p + hexahedron[i] * orad);
-
-        const unsigned int n_cells                   = 6;
-        const int          cell_vertices[n_cells][8] = {
-          {8, 9, 10, 11, 0, 1, 2, 3},    // bottom
-          {9, 11, 1, 3, 13, 15, 5, 7},   // right
-          {12, 13, 4, 5, 14, 15, 6, 7},  // top
-          {8, 0, 10, 2, 12, 4, 14, 6},   // left
-          {8, 9, 0, 1, 12, 13, 4, 5},    // front
-          {10, 2, 11, 3, 14, 6, 15, 7}}; // back
-
-        cells.resize(n_cells, CellData<3>());
-
-        for (unsigned int i = 0; i < n_cells; ++i)
+        case 6:
           {
-            for (const unsigned int j : GeometryInfo<3>::vertex_indices())
-              cells[i].vertices[j] = cell_vertices[i][j];
-            cells[i].material_id = 0;
-          }
+            // Start with the shell bounded by two nested cubes
+            for (unsigned int i = 0; i < 8; ++i)
+              vertices.push_back(p + hexahedron[i] * irad);
+            for (unsigned int i = 0; i < 8; ++i)
+              vertices.push_back(p + hexahedron[i] * orad);
 
-        tria.create_triangulation(vertices, cells, SubCellData());
-      }
-    // A more regular subdivision can
-    // be obtained by two nested
-    // rhombic dodecahedra
+            const unsigned int n_cells                   = 6;
+            const int          cell_vertices[n_cells][8] = {
+              {8, 9, 10, 11, 0, 1, 2, 3},    // bottom
+              {9, 11, 1, 3, 13, 15, 5, 7},   // right
+              {12, 13, 4, 5, 14, 15, 6, 7},  // top
+              {8, 0, 10, 2, 12, 4, 14, 6},   // left
+              {8, 9, 0, 1, 12, 13, 4, 5},    // front
+              {10, 2, 11, 3, 14, 6, 15, 7}}; // back
 
-    else if (n == 12)
-      {
-        // Octahedron inscribed in the cube [-1,1]^3
-        static const std::array<Point<3>, 6> octahedron = {{{-1, 0, 0}, //
-                                                            {1, 0, 0},  //
-                                                            {0, -1, 0}, //
-                                                            {0, 1, 0},  //
-                                                            {0, 0, -1}, //
-                                                            {0, 0, 1}}};
+            cells.resize(n_cells, CellData<3>());
 
-        for (unsigned int i = 0; i < 8; ++i)
-          vertices.push_back(p + hexahedron[i] * irad);
-        for (unsigned int i = 0; i < 6; ++i)
-          vertices.push_back(p + octahedron[i] * inner_radius);
-        for (unsigned int i = 0; i < 8; ++i)
-          vertices.push_back(p + hexahedron[i] * orad);
-        for (unsigned int i = 0; i < 6; ++i)
-          vertices.push_back(p + octahedron[i] * outer_radius);
-
-        const unsigned int n_cells            = 12;
-        const unsigned int rhombi[n_cells][4] = {{10, 4, 0, 8},
-                                                 {4, 13, 8, 6},
-                                                 {10, 5, 4, 13},
-                                                 {1, 9, 10, 5},
-                                                 {9, 7, 5, 13},
-                                                 {7, 11, 13, 6},
-                                                 {9, 3, 7, 11},
-                                                 {1, 12, 9, 3},
-                                                 {12, 2, 3, 11},
-                                                 {2, 8, 11, 6},
-                                                 {12, 0, 2, 8},
-                                                 {1, 10, 12, 0}};
-
-        cells.resize(n_cells, CellData<3>());
-
-        for (unsigned int i = 0; i < n_cells; ++i)
-          {
-            for (unsigned int j = 0; j < 4; ++j)
+            for (unsigned int i = 0; i < n_cells; ++i)
               {
-                cells[i].vertices[j]     = rhombi[i][j];
-                cells[i].vertices[j + 4] = rhombi[i][j] + 14;
+                for (const unsigned int j : GeometryInfo<3>::vertex_indices())
+                  cells[i].vertices[j] = cell_vertices[i][j];
+                cells[i].material_id = 0;
               }
-            cells[i].material_id = 0;
+
+            tria.create_triangulation(vertices, cells, SubCellData());
+            break;
           }
-
-        tria.create_triangulation(vertices, cells, SubCellData());
-      }
-    else if (n == 96)
-      {
-        // create a triangulation based on the 12-cell version. This function
-        // was needed before SphericalManifold was written: it manually
-        // adjusted the interior vertices to lie along concentric
-        // spheres. Nowadays we can just refine globally:
-        Triangulation<3> tmp;
-        hyper_shell(tmp, p, inner_radius, outer_radius, 12);
-        tmp.refine_global(1);
-
-        // now copy the resulting level 1 cells into the new triangulation,
-        cells.resize(tmp.n_active_cells(), CellData<3>());
-        for (const auto &cell : tmp.active_cell_iterators())
+        case 12:
           {
-            const unsigned int cell_index = cell->active_cell_index();
-            for (const unsigned int v : GeometryInfo<3>::vertex_indices())
-              cells[cell_index].vertices[v] = cell->vertex_index(v);
-            cells[cell_index].material_id = 0;
-          }
+            // A more regular subdivision can be obtained by two nested rhombic
+            // dodecahedra
+            //
+            // Octahedron inscribed in the cube [-1,1]^3
+            static const std::array<Point<3>, 6> octahedron = {{{-1, 0, 0}, //
+                                                                {1, 0, 0},  //
+                                                                {0, -1, 0}, //
+                                                                {0, 1, 0},  //
+                                                                {0, 0, -1}, //
+                                                                {0, 0, 1}}};
 
-        tria.create_triangulation(tmp.get_vertices(), cells, SubCellData());
+            for (unsigned int i = 0; i < 8; ++i)
+              vertices.push_back(p + hexahedron[i] * irad);
+            for (unsigned int i = 0; i < 6; ++i)
+              vertices.push_back(p + octahedron[i] * inner_radius);
+            for (unsigned int i = 0; i < 8; ++i)
+              vertices.push_back(p + hexahedron[i] * orad);
+            for (unsigned int i = 0; i < 6; ++i)
+              vertices.push_back(p + octahedron[i] * outer_radius);
+
+            const unsigned int n_cells            = 12;
+            const unsigned int rhombi[n_cells][4] = {{10, 4, 0, 8},
+                                                     {4, 13, 8, 6},
+                                                     {10, 5, 4, 13},
+                                                     {1, 9, 10, 5},
+                                                     {9, 7, 5, 13},
+                                                     {7, 11, 13, 6},
+                                                     {9, 3, 7, 11},
+                                                     {1, 12, 9, 3},
+                                                     {12, 2, 3, 11},
+                                                     {2, 8, 11, 6},
+                                                     {12, 0, 2, 8},
+                                                     {1, 10, 12, 0}};
+
+            cells.resize(n_cells, CellData<3>());
+
+            for (unsigned int i = 0; i < n_cells; ++i)
+              {
+                for (unsigned int j = 0; j < 4; ++j)
+                  {
+                    cells[i].vertices[j]     = rhombi[i][j];
+                    cells[i].vertices[j + 4] = rhombi[i][j] + 14;
+                  }
+                cells[i].material_id = 0;
+              }
+
+            tria.create_triangulation(vertices, cells, SubCellData());
+            break;
+          }
+        case 24:
+        case 48:
+          {
+            // These two meshes are created by first creating a mesh of the
+            // 6-cell/12-cell version, refining globally, and removing the
+            // outer half of the cells. For 192 and more cells, we do this
+            // iteratively several times, always refining and removing the
+            // outer half. Thus, the outer radius for the start is larger and
+            // set as 2^n_refinement_steps such that it exactly gives the
+            // desired radius in the end. It would have been slightly less
+            // code to treat refinement steps recursively for 192 cells or
+            // beyond, but unfortunately we could end up with the 96 cell case
+            // which is not what we want. Thus, we need to implement a loop
+            // manually here.
+            Triangulation<3>   tmp;
+            const unsigned int outer_radius_factor = 1 << n_refinement_steps;
+            hyper_shell(tmp,
+                        p,
+                        inner_radius,
+                        outer_radius_factor * outer_radius -
+                          (outer_radius_factor - 1) * inner_radius,
+                        n / 4);
+            for (unsigned int r = 0; r < n_refinement_steps; ++r)
+              {
+                tmp.refine_global(1);
+                std::set<Triangulation<3>::active_cell_iterator>
+                  cells_to_remove;
+
+                // We remove all cells which do not have exactly four vertices
+                // at the inner radius (plus some tolerance).
+                for (const auto &cell : tmp.active_cell_iterators())
+                  {
+                    unsigned int n_vertices_inside = 0;
+                    for (const auto v : GeometryInfo<3>::vertex_indices())
+                      if ((cell->vertex(v) - p).norm_square() <
+                          inner_radius * inner_radius * (1 + 1e-12))
+                        ++n_vertices_inside;
+                    if (n_vertices_inside < 4)
+                      cells_to_remove.insert(cell);
+                  }
+
+                AssertDimension(cells_to_remove.size(),
+                                tmp.n_active_cells() / 2);
+                if (r == n_refinement_steps - 1)
+                  create_triangulation_with_removed_cells(tmp,
+                                                          cells_to_remove,
+                                                          tria);
+                else
+                  {
+                    Triangulation<3> copy;
+                    create_triangulation_with_removed_cells(tmp,
+                                                            cells_to_remove,
+                                                            copy);
+                    tmp = std::move(copy);
+                    tmp.set_all_manifold_ids(0);
+                    tmp.set_manifold(0, SphericalManifold<3>(p));
+                  }
+              }
+            break;
+          }
+        case 96:
+          {
+            // create a triangulation based on the 12-cell version. This
+            // function was needed before SphericalManifold was written: it
+            // manually adjusted the interior vertices to lie along concentric
+            // spheres. Nowadays we can just refine globally:
+            Triangulation<3> tmp;
+            hyper_shell(tmp, p, inner_radius, outer_radius, 12);
+            tmp.refine_global(1);
+            flatten_triangulation(tmp, tria);
+            break;
+          }
+        default:
+          {
+            Assert(false, ExcMessage("Invalid number of coarse mesh cells."));
+          }
       }
-    else
-      {
-        Assert(false, ExcMessage("Invalid number of coarse mesh cells."));
-      }
+
+    if (n_cells > 0)
+      AssertDimension(tria.n_global_active_cells(), n_cells);
 
     if (colorize)
       colorize_hyper_shell(tria, p, inner_radius, outer_radius);
@@ -5477,12 +6147,13 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void half_hyper_shell(Triangulation<3> &tria,
-                        const Point<3> &  center,
-                        const double      inner_radius,
-                        const double      outer_radius,
-                        const unsigned int /*n_cells*/,
-                        const bool colorize)
+  void
+  half_hyper_shell(Triangulation<3> &tria,
+                   const Point<3> &  center,
+                   const double      inner_radius,
+                   const double      outer_radius,
+                   const unsigned int /*n_cells*/,
+                   const bool colorize)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
@@ -5577,12 +6248,13 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void quarter_hyper_shell(Triangulation<3> & tria,
-                           const Point<3> &   center,
-                           const double       inner_radius,
-                           const double       outer_radius,
-                           const unsigned int n,
-                           const bool         colorize)
+  void
+  quarter_hyper_shell(Triangulation<3> & tria,
+                      const Point<3> &   center,
+                      const double       inner_radius,
+                      const double       outer_radius,
+                      const unsigned int n,
+                      const bool         colorize)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
@@ -5645,12 +6317,13 @@ namespace GridGenerator
 
   // Implementation for 3D only
   template <>
-  void cylinder_shell(Triangulation<3> & tria,
-                      const double       length,
-                      const double       inner_radius,
-                      const double       outer_radius,
-                      const unsigned int n_radial_cells,
-                      const unsigned int n_axial_cells)
+  void
+  cylinder_shell(Triangulation<3> & tria,
+                 const double       length,
+                 const double       inner_radius,
+                 const double       outer_radius,
+                 const unsigned int n_radial_cells,
+                 const unsigned int n_axial_cells)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
@@ -5803,7 +6476,11 @@ namespace GridGenerator
 
     // reorder the cells to ensure that they satisfy the convention for
     // edge and face directions
-    GridReordering<dim, spacedim>::reorder_cells(cells, true);
+    if (std::all_of(cells.begin(), cells.end(), [](const auto &cell) {
+          return cell.vertices.size() ==
+                 ReferenceCells::get_hypercube<dim>().n_vertices();
+        }))
+      GridTools::consistently_order_cells(cells);
     result.clear();
     result.create_triangulation(vertices, cells, subcell_data);
   }
@@ -5967,12 +6644,12 @@ namespace GridGenerator
                           Triangulation<dim, spacedim> &      result)
   {
     AssertDimension(dim, extents.size());
-#ifdef DEBUG
+#  ifdef DEBUG
     for (const auto &extent : extents)
       Assert(0 < extent,
              ExcMessage("The Triangulation must be copied at least one time in "
                         "each coordinate dimension."));
-#endif
+#  endif
     const BoundingBox<spacedim> bbox(input.get_vertices());
     const auto &                min = bbox.get_boundary_points().first;
     const auto &                max = bbox.get_boundary_points().second;
@@ -6036,7 +6713,7 @@ namespace GridGenerator
           1e-6 * input.begin_active()->diameter());
         // delete_duplicated_vertices also deletes any unused vertices
         // deal with any reordering issues created by delete_duplicated_vertices
-        GridReordering<dim>::reorder_cells(output_cell_data, true);
+        GridTools::consistently_order_cells(output_cell_data);
         // clean up the boundary ids of the boundary objects: note that we
         // have to do this after delete_duplicated_vertices so that boundary
         // objects are actually duplicated at this point
@@ -6251,7 +6928,7 @@ namespace GridGenerator
       // mode)
       if (0 < manifold_priorities.size())
         {
-#ifdef DEBUG
+#  ifdef DEBUG
           // check that the provided manifold_priorities is valid
           std::vector<types::manifold_id> sorted_manifold_priorities =
             manifold_priorities;
@@ -6284,7 +6961,7 @@ namespace GridGenerator
               const std::string m = message.str();
               Assert(false, ExcMessage(m));
             }
-#endif
+#  endif
           return manifold_priorities;
         }
       // otherwise use the default ranking: ascending order, but TFI manifolds
@@ -6434,12 +7111,12 @@ namespace GridGenerator
 
     // use all of this to finally create the extruded 3d
     // triangulation.  it is not necessary to call
-    // GridReordering<3,3>::reorder_cells because the cells we have
+    // GridTools::consistently_order_cells() because the cells we have
     // constructed above are automatically correctly oriented. this is
     // because the 2d base mesh is always correctly oriented, and
     // extruding it automatically yields a correctly oriented 3d mesh,
     // as discussed in the edge orientation paper mentioned in the
-    // introduction to the GridReordering class.
+    // introduction to the @ref reordering "reordering module".
     result.create_triangulation(points, cells, subcell_data);
 
     for (auto manifold_id_it = priorities.rbegin();
@@ -6478,12 +7155,13 @@ namespace GridGenerator
 
 
   template <>
-  void hyper_cube_with_cylindrical_hole(Triangulation<1> &,
-                                        const double,
-                                        const double,
-                                        const double,
-                                        const unsigned int,
-                                        const bool)
+  void
+  hyper_cube_with_cylindrical_hole(Triangulation<1> &,
+                                   const double,
+                                   const double,
+                                   const double,
+                                   const unsigned int,
+                                   const bool)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -6491,12 +7169,13 @@ namespace GridGenerator
 
 
   template <>
-  void hyper_cube_with_cylindrical_hole(Triangulation<2> &triangulation,
-                                        const double      inner_radius,
-                                        const double      outer_radius,
-                                        const double,       // width,
-                                        const unsigned int, // width_repetition,
-                                        const bool colorize)
+  void
+  hyper_cube_with_cylindrical_hole(Triangulation<2> &triangulation,
+                                   const double      inner_radius,
+                                   const double      outer_radius,
+                                   const double,       // width,
+                                   const unsigned int, // width_repetition,
+                                   const bool colorize)
   {
     const int dim = 2;
 
@@ -6706,12 +7385,13 @@ namespace GridGenerator
 
 
   template <>
-  void hyper_cube_with_cylindrical_hole(Triangulation<3> & triangulation,
-                                        const double       inner_radius,
-                                        const double       outer_radius,
-                                        const double       L,
-                                        const unsigned int Nz,
-                                        const bool         colorize)
+  void
+  hyper_cube_with_cylindrical_hole(Triangulation<3> & triangulation,
+                                   const double       inner_radius,
+                                   const double       outer_radius,
+                                   const double       L,
+                                   const unsigned int Nz,
+                                   const bool         colorize)
   {
     const int dim = 3;
 
@@ -6823,112 +7503,677 @@ namespace GridGenerator
     triangulation.set_manifold(0, CylindricalManifold<3>(2));
   }
 
+
+
   template <int dim, int spacedim1, int spacedim2>
   void
   flatten_triangulation(const Triangulation<dim, spacedim1> &in_tria,
                         Triangulation<dim, spacedim2> &      out_tria)
   {
-    const parallel::distributed::Triangulation<dim, spacedim1> *pt =
-      dynamic_cast<
-        const parallel::distributed::Triangulation<dim, spacedim1> *>(&in_tria);
+    Assert((dynamic_cast<
+              const parallel::distributed::Triangulation<dim, spacedim1> *>(
+              &in_tria) == nullptr),
+           ExcMessage(
+             "This function cannot be used on "
+             "parallel::distributed::Triangulation objects as inputs."));
+    Assert(in_tria.has_hanging_nodes() == false,
+           ExcMessage("This function does not work for meshes that have "
+                      "hanging nodes."));
 
-    (void)pt;
-    Assert(
-      pt == nullptr,
-      ExcMessage(
-        "Cannot use this function on parallel::distributed::Triangulation."));
-
-    std::vector<Point<spacedim2>> v;
-    std::vector<CellData<dim>>    cells;
-    SubCellData                   subcelldata;
 
     const unsigned int spacedim = std::min(spacedim1, spacedim2);
     const std::vector<Point<spacedim1>> &in_vertices = in_tria.get_vertices();
 
-    v.resize(in_vertices.size());
+    // Create an array of vertices, with components either truncated
+    // or extended by zeroes.
+    std::vector<Point<spacedim2>> v(in_vertices.size());
     for (unsigned int i = 0; i < in_vertices.size(); ++i)
       for (unsigned int d = 0; d < spacedim; ++d)
         v[i][d] = in_vertices[i][d];
 
-    cells.resize(in_tria.n_active_cells());
-    typename Triangulation<dim, spacedim1>::active_cell_iterator
-      cell = in_tria.begin_active(),
-      endc = in_tria.end();
-
-    for (unsigned int id = 0; cell != endc; ++cell, ++id)
+    std::vector<CellData<dim>> cells(in_tria.n_active_cells());
+    for (const auto &cell : in_tria.active_cell_iterators())
       {
-        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+        const unsigned int id = cell->active_cell_index();
+
+        cells[id].vertices.resize(cell->n_vertices());
+        for (const auto i : cell->vertex_indices())
           cells[id].vertices[i] = cell->vertex_index(i);
         cells[id].material_id = cell->material_id();
         cells[id].manifold_id = cell->manifold_id();
       }
 
-    if (dim > 1)
+    SubCellData subcelldata;
+    switch (dim)
       {
-        typename Triangulation<dim, spacedim1>::active_face_iterator
-          face = in_tria.begin_active_face(),
-          endf = in_tria.end_face();
-
-        // Face counter for both dim == 2 and dim == 3
-        unsigned int f = 0;
-        switch (dim)
+        case 1:
           {
-            case 2:
-              {
-                subcelldata.boundary_lines.resize(in_tria.n_active_faces());
-                for (; face != endf; ++face)
-                  if (face->at_boundary())
-                    {
-                      for (unsigned int i = 0;
-                           i < GeometryInfo<dim>::vertices_per_face;
-                           ++i)
-                        subcelldata.boundary_lines[f].vertices[i] =
-                          face->vertex_index(i);
-                      subcelldata.boundary_lines[f].boundary_id =
-                        face->boundary_id();
-                      subcelldata.boundary_lines[f].manifold_id =
-                        face->manifold_id();
-                      ++f;
-                    }
-                subcelldata.boundary_lines.resize(f);
-              }
-              break;
-            case 3:
-              {
-                subcelldata.boundary_quads.resize(in_tria.n_active_faces());
-                for (; face != endf; ++face)
-                  if (face->at_boundary())
-                    {
-                      for (unsigned int i = 0;
-                           i < GeometryInfo<dim>::vertices_per_face;
-                           ++i)
-                        subcelldata.boundary_quads[f].vertices[i] =
-                          face->vertex_index(i);
-                      subcelldata.boundary_quads[f].boundary_id =
-                        face->boundary_id();
-                      subcelldata.boundary_quads[f].manifold_id =
-                        face->manifold_id();
-                      ++f;
-                    }
-                subcelldata.boundary_quads.resize(f);
-              }
-              break;
-            default:
-              Assert(false, ExcInternalError());
+            // Nothing to do in 1d
+            break;
           }
+
+        case 2:
+          {
+            std::vector<bool> user_flags_line;
+            in_tria.save_user_flags_line(user_flags_line);
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .clear_user_flags_line();
+
+            // Loop over all the faces of the triangulation and create
+            // objects that describe their boundary and manifold ids.
+            for (const auto &face : in_tria.active_face_iterators())
+              {
+                if (face->at_boundary())
+                  {
+                    CellData<1> boundary_line;
+
+                    boundary_line.vertices.resize(face->n_vertices());
+                    for (const auto i : face->vertex_indices())
+                      boundary_line.vertices[i] = face->vertex_index(i);
+                    boundary_line.boundary_id = face->boundary_id();
+                    boundary_line.manifold_id = face->manifold_id();
+
+                    subcelldata.boundary_lines.emplace_back(
+                      std::move(boundary_line));
+                  }
+                else
+                  // The face is not at the boundary. We won't have to set
+                  // boundary_ids (that is not possible for interior faces), but
+                  // we need to do something if the manifold-id is not the
+                  // default.
+                  //
+                  // We keep track via the user flags whether we have already
+                  // dealt with a face or not. (We need to do that here because
+                  // we will return to interior faces twice, once for each
+                  // neighbor, whereas we only touch each of the boundary faces
+                  // above once.)
+                  if ((face->user_flag_set() == false) &&
+                      (face->manifold_id() != numbers::flat_manifold_id))
+                  {
+                    CellData<1> boundary_line;
+
+                    boundary_line.vertices.resize(face->n_vertices());
+                    for (const auto i : face->vertex_indices())
+                      boundary_line.vertices[i] = face->vertex_index(i);
+                    boundary_line.boundary_id =
+                      numbers::internal_face_boundary_id;
+                    boundary_line.manifold_id = face->manifold_id();
+
+                    subcelldata.boundary_lines.emplace_back(
+                      std::move(boundary_line));
+
+                    face->set_user_flag();
+                  }
+              }
+
+            // Reset the user flags to their previous values:
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .load_user_flags_line(user_flags_line);
+
+            break;
+          }
+
+        case 3:
+          {
+            std::vector<bool> user_flags_line;
+            in_tria.save_user_flags_line(user_flags_line);
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .clear_user_flags_line();
+
+            std::vector<bool> user_flags_quad;
+            in_tria.save_user_flags_quad(user_flags_quad);
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .clear_user_flags_quad();
+
+            // Loop over all the faces of the triangulation and create
+            // objects that describe their boundary and manifold ids.
+            for (const auto &face : in_tria.active_face_iterators())
+              {
+                if (face->at_boundary())
+                  {
+                    CellData<2> boundary_face;
+
+                    boundary_face.vertices.resize(face->n_vertices());
+                    for (const auto i : face->vertex_indices())
+                      boundary_face.vertices[i] = face->vertex_index(i);
+                    boundary_face.boundary_id = face->boundary_id();
+                    boundary_face.manifold_id = face->manifold_id();
+
+                    subcelldata.boundary_quads.emplace_back(
+                      std::move(boundary_face));
+
+                    // Then also loop over the edges and do the same. We would
+                    // accidentally create duplicates for edges that are part of
+                    // two boundary faces. To avoid this, use the user_flag on
+                    // edges to mark those that we have already visited. (Note
+                    // how we save and restore those above and below.)
+                    for (unsigned int e = 0; e < face->n_lines(); ++e)
+                      if (face->line(e)->user_flag_set() == false)
+                        {
+                          const typename Triangulation<dim,
+                                                       spacedim1>::line_iterator
+                                      edge = face->line(e);
+                          CellData<1> boundary_edge;
+
+                          boundary_edge.vertices.resize(edge->n_vertices());
+                          for (const auto i : edge->vertex_indices())
+                            boundary_edge.vertices[i] = edge->vertex_index(i);
+                          boundary_edge.boundary_id = edge->boundary_id();
+                          boundary_edge.manifold_id = edge->manifold_id();
+
+                          subcelldata.boundary_lines.emplace_back(
+                            std::move(boundary_edge));
+
+                          edge->set_user_flag();
+                        }
+                  }
+                else
+                  // The face is not at the boundary. We won't have to set
+                  // boundary_ids (that is not possible for interior faces), but
+                  // we need to do something if the manifold-id is not the
+                  // default.
+                  //
+                  // We keep track via the user flags whether we have already
+                  // dealt with a face or not. (We need to do that here because
+                  // we will return to interior faces twice, once for each
+                  // neighbor, whereas we only touch each of the boundary faces
+                  // above once.)
+                  //
+                  // Note that if we have already dealt with a face, then we
+                  // have also already dealt with the edges and don't have
+                  // to worry about that any more separately.
+                  if (face->user_flag_set() == false)
+                  {
+                    if (face->manifold_id() != numbers::flat_manifold_id)
+                      {
+                        CellData<2> boundary_face;
+
+                        boundary_face.vertices.resize(face->n_vertices());
+                        for (const auto i : face->vertex_indices())
+                          boundary_face.vertices[i] = face->vertex_index(i);
+                        boundary_face.boundary_id =
+                          numbers::internal_face_boundary_id;
+                        boundary_face.manifold_id = face->manifold_id();
+
+                        subcelldata.boundary_quads.emplace_back(
+                          std::move(boundary_face));
+
+                        face->set_user_flag();
+                      }
+
+                    // Then also loop over the edges of this face. Because every
+                    // boundary edge must also be a part of a boundary face, we
+                    // can ignore these. But it is possible that we have already
+                    // encountered an interior edge through a previous face, and
+                    // in that case we have to just ignore it
+                    for (unsigned int e = 0; e < face->n_lines(); ++e)
+                      if (face->line(e)->at_boundary() == false)
+                        if (face->line(e)->user_flag_set() == false)
+                          {
+                            const typename Triangulation<dim, spacedim1>::
+                              line_iterator edge = face->line(e);
+                            CellData<1>     boundary_edge;
+
+                            boundary_edge.vertices.resize(edge->n_vertices());
+                            for (const auto i : edge->vertex_indices())
+                              boundary_edge.vertices[i] = edge->vertex_index(i);
+                            boundary_edge.boundary_id =
+                              numbers::internal_face_boundary_id;
+                            boundary_edge.manifold_id = edge->manifold_id();
+
+                            subcelldata.boundary_lines.emplace_back(
+                              std::move(boundary_edge));
+
+                            edge->set_user_flag();
+                          }
+                  }
+              }
+
+            // Reset the user flags to their previous values:
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .load_user_flags_line(user_flags_line);
+            const_cast<Triangulation<dim, spacedim1> &>(in_tria)
+              .load_user_flags_quad(user_flags_quad);
+
+            break;
+          }
+        default:
+          Assert(false, ExcInternalError());
       }
+
     out_tria.create_triangulation(v, cells, subcelldata);
   }
 
 
 
+  template <int dim, int spacedim>
+  void
+  convert_hypercube_to_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
+                                    Triangulation<dim, spacedim> &out_tria)
+  {
+    Assert(dim > 1, ExcNotImplemented());
+
+    Triangulation<dim, spacedim> temp_tria;
+    if (in_tria.n_global_levels() > 1)
+      {
+        AssertThrow(!in_tria.has_hanging_nodes(), ExcNotImplemented());
+        flatten_triangulation(in_tria, temp_tria);
+      }
+    const Triangulation<dim, spacedim> &ref_tria =
+      in_tria.n_global_levels() > 1 ? temp_tria : in_tria;
+
+    /* static tables with the definitions of cells, faces and edges by its
+     * vertices for 2D and 3D. For the inheritance of the manifold_id,
+     * definitions of inner-faces and boundary-faces are required. In case of
+     * 3D, also inner-edges and boundary-edges need to be defined.
+     */
+
+    /* Cell definition 2D:
+     * A quadrilateral element is converted to 8 simplices elements. Each
+     * triangle is defined by 3 vertices.
+     */
+    static const ndarray<unsigned int, 8, 3> table_2D_cell = {{{{0, 6, 4}},
+                                                               {{8, 4, 6}},
+                                                               {{8, 6, 5}},
+                                                               {{1, 5, 6}},
+                                                               {{2, 4, 7}},
+                                                               {{8, 7, 4}},
+                                                               {{8, 5, 7}},
+                                                               {{3, 7, 5}}}};
+
+    /* Cell definition 3D:
+     * A hexahedron element is converted to 24 tetrahedron elements. Each
+     * tetrahedron is defined by 4 vertices.
+     */
+    static const ndarray<unsigned int, 24, 4> vertex_ids_for_cells_3d = {
+      {{{0, 1, 12, 10}},  {{2, 3, 11, 12}},  {{7, 6, 11, 13}},
+       {{5, 4, 13, 10}},  {{0, 2, 8, 12}},   {{4, 6, 13, 8}},
+       {{5, 13, 7, 9}},   {{1, 9, 3, 12}},   {{0, 8, 4, 10}},
+       {{1, 5, 9, 10}},   {{3, 7, 11, 9}},   {{2, 6, 8, 11}},
+       {{12, 13, 10, 9}}, {{12, 13, 9, 11}}, {{12, 13, 11, 8}},
+       {{12, 13, 8, 10}}, {{13, 8, 10, 4}},  {{13, 10, 9, 5}},
+       {{13, 9, 11, 7}},  {{13, 11, 8, 6}},  {{10, 12, 9, 1}},
+       {{9, 12, 11, 3}},  {{11, 12, 8, 2}},  {{8, 12, 10, 0}}}};
+
+    /* Boundary-faces 2D:
+     * After converting, each of the 4 quadrilateral faces is defined by faces
+     * of 2 different triangles, i.e., lines. Note that lines are defined by 2
+     * vertices.
+     */
+    static const ndarray<unsigned int, 4, 2, 2>
+      vertex_ids_for_boundary_faces_2d = {{{{{{0, 4}}, {{4, 2}}}},
+                                           {{{{1, 5}}, {{5, 3}}}},
+                                           {{{{0, 6}}, {{6, 1}}}},
+                                           {{{{2, 7}}, {{7, 3}}}}}};
+
+    /* Boundary-faces 3D:
+     * After converting, each of the 6 hexahedron faces corresponds to faces of
+     * 4 different tetrahedron faces, i.e., triangles. Note that a triangle is
+     * defined by 3 vertices.
+     */
+    static const ndarray<unsigned int, 6, 4, 3>
+      vertex_ids_for_boundary_faces_3d = {
+        {{{{{0, 4, 8}}, {{4, 8, 6}}, {{8, 6, 2}}, {{0, 2, 8}}}},
+         {{{{1, 3, 9}}, {{3, 9, 7}}, {{9, 7, 5}}, {{1, 9, 5}}}},
+         {{{{0, 1, 10}}, {{1, 10, 5}}, {{10, 5, 4}}, {{0, 10, 4}}}},
+         {{{{2, 3, 11}}, {{3, 11, 7}}, {{11, 7, 6}}, {{2, 11, 6}}}},
+         {{{{0, 1, 12}}, {{1, 12, 3}}, {{12, 3, 2}}, {{0, 12, 2}}}},
+         {{{{4, 5, 13}}, {{5, 13, 7}}, {{13, 7, 6}}, {{4, 13, 6}}}}}};
+
+    /* Inner-faces 2D:
+     * The converted triangulation based on simplices has 8 faces that do not
+     * form the boundary, i.e. inner-faces, each defined by 2 vertices.
+     */
+    static const ndarray<unsigned int, 8, 2> vertex_ids_for_inner_faces_2d = {
+      {{{6, 4}},
+       {{6, 8}},
+       {{6, 5}},
+       {{4, 8}},
+       {{8, 5}},
+       {{7, 4}},
+       {{7, 8}},
+       {{7, 5}}}};
+
+    /* Inner-faces 3D:
+     * The converted triangulation based on simplices has 72 faces that do not
+     * form the boundary, i.e. inner-faces, each defined by 3 vertices.
+     */
+    static const ndarray<unsigned int, 72, 3> vertex_ids_for_inner_faces_3d = {
+      {{{0, 12, 10}},  {{12, 1, 10}},  {{12, 1, 9}},  {{12, 3, 9}},
+       {{12, 2, 11}},  {{12, 3, 11}},  {{12, 0, 8}},  {{12, 2, 8}},
+       {{9, 13, 5}},   {{13, 7, 9}},   {{11, 7, 13}}, {{11, 6, 13}},
+       {{4, 8, 13}},   {{6, 8, 13}},   {{4, 13, 10}}, {{13, 5, 10}},
+       {{10, 9, 5}},   {{10, 9, 1}},   {{11, 9, 7}},  {{11, 9, 3}},
+       {{8, 11, 2}},   {{8, 11, 6}},   {{8, 10, 0}},  {{8, 10, 4}},
+       {{12, 3, 9}},   {{12, 9, 11}},  {{12, 3, 11}}, {{3, 9, 11}},
+       {{2, 12, 8}},   {{2, 12, 11}},  {{2, 11, 8}},  {{8, 12, 11}},
+       {{0, 12, 10}},  {{0, 12, 8}},   {{0, 8, 10}},  {{8, 10, 12}},
+       {{12, 1, 10}},  {{12, 1, 9}},   {{1, 10, 9}},  {{10, 9, 12}},
+       {{10, 8, 4}},   {{10, 8, 13}},  {{4, 13, 8}},  {{4, 13, 10}},
+       {{10, 9, 13}},  {{10, 9, 5}},   {{13, 5, 10}}, {{13, 5, 9}},
+       {{13, 7, 9}},   {{13, 7, 11}},  {{9, 11, 13}}, {{9, 11, 7}},
+       {{8, 11, 13}},  {{8, 11, 6}},   {{6, 13, 8}},  {{6, 13, 11}},
+       {{12, 13, 10}}, {{12, 13, 8}},  {{8, 10, 13}}, {{8, 10, 12}},
+       {{12, 13, 10}}, {{12, 13, 9}},  {{10, 9, 13}}, {{10, 9, 12}},
+       {{12, 13, 9}},  {{12, 13, 11}}, {{9, 11, 13}}, {{9, 11, 12}},
+       {{12, 13, 11}}, {{12, 13, 8}},  {{8, 11, 13}}, {{8, 11, 12}}}};
+
+    /* Inner-edges 3D:
+     * The converted triangulation based on simplices has 60 edges that do not
+     * coincide with the boundary, i.e. inner-edges, each defined by 2 vertices.
+     */
+    static const ndarray<unsigned int, 60, 2> vertex_ids_for_inner_edges_3d = {
+      {{{12, 10}}, {{12, 9}},  {{12, 11}}, {{12, 8}},  {{9, 13}},  {{11, 13}},
+       {{8, 13}},  {{10, 13}}, {{10, 9}},  {{9, 11}},  {{11, 8}},  {{8, 10}},
+       {{12, 9}},  {{12, 11}}, {{11, 9}},  {{12, 8}},  {{12, 11}}, {{11, 8}},
+       {{12, 8}},  {{12, 10}}, {{10, 8}},  {{12, 10}}, {{12, 9}},  {{9, 10}},
+       {{13, 10}}, {{13, 8}},  {{8, 10}},  {{13, 10}}, {{13, 9}},  {{9, 10}},
+       {{13, 11}}, {{13, 9}},  {{11, 9}},  {{13, 11}}, {{13, 8}},  {{11, 8}},
+       {{12, 13}}, {{8, 10}},  {{8, 13}},  {{10, 13}}, {{8, 12}},  {{10, 12}},
+       {{12, 13}}, {{10, 9}},  {{10, 13}}, {{9, 13}},  {{10, 12}}, {{9, 12}},
+       {{12, 13}}, {{9, 11}},  {{9, 13}},  {{11, 13}}, {{9, 12}},  {{11, 12}},
+       {{12, 13}}, {{11, 8}},  {{11, 13}}, {{8, 13}},  {{11, 12}}, {{8, 12}}}};
+
+    /* Boundary-edges 3D:
+     * For each of the 6 boundary-faces of the hexahedron, there are 8 edges (of
+     * different tetrahedrons) that coincide with the boundary, i.e.
+     * boundary-edges. Each boundary-edge is defined by 2 vertices. 4 of these
+     * edges are new (they are placed in the middle of a presently existing
+     * face); the other 4 coincide with edges present in the hexahedral
+     * triangulation. The new 4 edges inherit the manifold id of the relevant
+     * face, but the other 4 need to be copied from the input and thus do not
+     * require a lookup table.
+     */
+    static const ndarray<unsigned int, 6, 4, 2>
+      vertex_ids_for_new_boundary_edges_3d = {
+        {{{{{4, 8}}, {{6, 8}}, {{0, 8}}, {{2, 8}}}},
+         {{{{5, 9}}, {{7, 9}}, {{1, 9}}, {{3, 9}}}},
+         {{{{4, 10}}, {{5, 10}}, {{0, 10}}, {{1, 10}}}},
+         {{{{6, 11}}, {{7, 11}}, {{2, 11}}, {{3, 11}}}},
+         {{{{2, 12}}, {{3, 12}}, {{0, 12}}, {{1, 12}}}},
+         {{{{6, 13}}, {{7, 13}}, {{4, 13}}, {{5, 13}}}}}};
+
+    std::vector<Point<spacedim>> vertices;
+    std::vector<CellData<dim>>   cells;
+    SubCellData                  subcell_data;
+
+    // store for each vertex and face the assigned index so that we only
+    // assign them a value once
+    std::vector<unsigned int> old_to_new_vertex_indices(
+      ref_tria.n_vertices(), numbers::invalid_unsigned_int);
+    std::vector<unsigned int> face_to_new_vertex_indices(
+      ref_tria.n_faces(), numbers::invalid_unsigned_int);
+
+    // We first have to create all of the new vertices. To do this, we loop over
+    // all cells and on each cell
+    // (i) copy the existing vertex locations (and record their new indices in
+    // the 'old_to_new_vertex_indices' vector),
+    // (ii) create new midpoint vertex locations for each face (and record their
+    // new indices in the 'face_to_new_vertex_indices' vector),
+    // (iii) create new midpoint vertex locations for each cell (dim = 2 only)
+    for (const auto &cell : ref_tria)
+      {
+        // temporary array storing the global indices of each cell entity in the
+        // sequence: vertices, edges/faces, cell
+        std::array<unsigned int, dim == 2 ? 9 : 14> local_vertex_indices;
+
+        // (i) copy the existing vertex locations
+        for (const auto v : cell.vertex_indices())
+          {
+            const auto v_global = cell.vertex_index(v);
+
+            if (old_to_new_vertex_indices[v_global] ==
+                numbers::invalid_unsigned_int)
+              {
+                old_to_new_vertex_indices[v_global] = vertices.size();
+                vertices.push_back(cell.vertex(v));
+              }
+
+            AssertIndexRange(v, local_vertex_indices.size());
+            local_vertex_indices[v] = old_to_new_vertex_indices[v_global];
+          }
+
+        // (ii) create new midpoint vertex locations for each face
+        for (const auto f : cell.face_indices())
+          {
+            const auto f_global = cell.face_index(f);
+
+            if (face_to_new_vertex_indices[f_global] ==
+                numbers::invalid_unsigned_int)
+              {
+                face_to_new_vertex_indices[f_global] = vertices.size();
+                vertices.push_back(
+                  cell.face(f)->center(/*respect_manifold*/ true));
+              }
+
+            AssertIndexRange(cell.n_vertices() + f,
+                             local_vertex_indices.size());
+            local_vertex_indices[cell.n_vertices() + f] =
+              face_to_new_vertex_indices[f_global];
+          }
+
+        // (iii) create new midpoint vertex locations for each cell
+        if (dim == 2)
+          {
+            AssertIndexRange(cell.n_vertices() + cell.n_faces(),
+                             local_vertex_indices.size());
+            local_vertex_indices[cell.n_vertices() + cell.n_faces()] =
+              vertices.size();
+            vertices.push_back(cell.center(/*respect_manifold*/ true));
+          }
+
+        // helper function for creating cells and subcells
+        const auto add_cell = [&](const unsigned int struct_dim,
+                                  const auto &       index_vertices,
+                                  const unsigned int material_or_boundary_id,
+                                  const unsigned int manifold_id = 0) {
+          // sub-cell data only has to be stored if the information differs
+          // from the default
+          if (struct_dim < dim &&
+              (material_or_boundary_id == numbers::internal_face_boundary_id &&
+               manifold_id == numbers::flat_manifold_id))
+            return;
+
+          if (struct_dim == dim) // cells
+            {
+              if (dim == 2)
+                {
+                  AssertDimension(index_vertices.size(), 3);
+                }
+              else if (dim == 3)
+                {
+                  AssertDimension(index_vertices.size(), 4);
+                }
+
+              CellData<dim> cell_data(index_vertices.size());
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
+                  cell_data.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                  cell_data.material_id =
+                    material_or_boundary_id; // inherit material id
+                  cell_data.manifold_id =
+                    manifold_id; // inherit cell-manifold id
+                }
+              cells.push_back(cell_data);
+            }
+          else if (dim == 2 && struct_dim == 1) // an edge of a simplex
+            {
+              Assert(index_vertices.size() == 2, ExcInternalError());
+              CellData<1> boundary_line(2);
+              boundary_line.boundary_id = material_or_boundary_id;
+              boundary_line.manifold_id = manifold_id;
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
+                  boundary_line.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                }
+              subcell_data.boundary_lines.push_back(boundary_line);
+            }
+          else if (dim == 3 && struct_dim == 2) // a face of a tetrahedron
+            {
+              Assert(index_vertices.size() == 3, ExcInternalError());
+              CellData<2> boundary_quad(3);
+              boundary_quad.material_id = material_or_boundary_id;
+              boundary_quad.manifold_id = manifold_id;
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
+                  boundary_quad.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                }
+              subcell_data.boundary_quads.push_back(boundary_quad);
+            }
+          else if (dim == 3 && struct_dim == 1) // an edge of a tetrahedron
+            {
+              Assert(index_vertices.size() == 2, ExcInternalError());
+              CellData<1> boundary_line(2);
+              boundary_line.boundary_id = material_or_boundary_id;
+              boundary_line.manifold_id = manifold_id;
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
+                  boundary_line.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                }
+              subcell_data.boundary_lines.push_back(boundary_line);
+            }
+          else
+            {
+              Assert(false, ExcNotImplemented());
+            }
+        };
+
+        const auto material_id_cell = cell.material_id();
+
+        // create cells one by one
+        if (dim == 2)
+          {
+            // get cell-manifold id from current quad cell
+            const auto manifold_id_cell = cell.manifold_id();
+            // inherit cell manifold
+            for (const auto &cell_vertices : table_2D_cell)
+              add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
+
+            // inherit inner manifold (faces)
+            for (const auto &face_vertices : vertex_ids_for_inner_faces_2d)
+              // set inner tri-faces according to cell-manifold of quad
+              // element, set invalid b_id, since we do not want to modify
+              // b_id inside
+              add_cell(1,
+                       face_vertices,
+                       numbers::internal_face_boundary_id,
+                       manifold_id_cell);
+          }
+        else if (dim == 3)
+          {
+            // get cell-manifold id from current quad cell
+            const auto manifold_id_cell = cell.manifold_id();
+            // inherit cell manifold
+            for (const auto &cell_vertices : vertex_ids_for_cells_3d)
+              add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
+
+            // set manifold of inner FACES of tets according to
+            // hex-cell-manifold
+            for (const auto &face_vertices : vertex_ids_for_inner_faces_3d)
+              add_cell(2,
+                       face_vertices,
+                       numbers::internal_face_boundary_id,
+                       manifold_id_cell);
+
+            // set manifold of inner EDGES of tets according to
+            // hex-cell-manifold
+            for (const auto &edge_vertices : vertex_ids_for_inner_edges_3d)
+              add_cell(1,
+                       edge_vertices,
+                       numbers::internal_face_boundary_id,
+                       manifold_id_cell);
+          }
+        else
+          Assert(false, ExcNotImplemented());
+
+        // Set up sub-cell data.
+        for (const auto f : cell.face_indices())
+          {
+            const auto bid = cell.face(f)->boundary_id();
+            const auto mid = cell.face(f)->manifold_id();
+
+            // process boundary-faces: set boundary and manifold ids
+            if (dim == 2) // 2D boundary-faces
+              {
+                for (const auto &face_vertices :
+                     vertex_ids_for_boundary_faces_2d[f])
+                  add_cell(1, face_vertices, bid, mid);
+              }
+            else if (dim == 3) // 3D boundary-faces
+              {
+                // set manifold ids of tet-boundary-faces according to
+                // hex-boundary-faces
+                for (const auto &face_vertices :
+                     vertex_ids_for_boundary_faces_3d[f])
+                  add_cell(2, face_vertices, bid, mid);
+                // set manifold ids of new tet-boundary-edges according to
+                // hex-boundary-faces
+                for (const auto &edge_vertices :
+                     vertex_ids_for_new_boundary_edges_3d[f])
+                  add_cell(1, edge_vertices, bid, mid);
+              }
+            else
+              Assert(false, ExcNotImplemented());
+          }
+
+        // set manifold ids of edges that were already present in the
+        // triangulation.
+        if (dim == 3)
+          {
+            for (const auto e : cell.line_indices())
+              {
+                auto edge = cell.line(e);
+                // Rather than use add_cell(), which does additional index
+                // translation, just add edges directly into subcell_data since
+                // we already know the correct global vertex indices.
+                CellData<1> edge_data;
+                edge_data.vertices[0] =
+                  old_to_new_vertex_indices[edge->vertex_index(0)];
+                edge_data.vertices[1] =
+                  old_to_new_vertex_indices[edge->vertex_index(1)];
+                edge_data.boundary_id = edge->boundary_id();
+                edge_data.manifold_id = edge->manifold_id();
+
+                subcell_data.boundary_lines.push_back(std::move(edge_data));
+              }
+          }
+      }
+
+    out_tria.create_triangulation(vertices, cells, subcell_data);
+  }
+
+
+
+  template <int spacedim>
+  void
+  convert_hypercube_to_simplex_mesh(const Triangulation<1, spacedim> &in_tria,
+                                    Triangulation<1, spacedim> &      out_tria)
+  {
+    out_tria.copy_triangulation(in_tria);
+    return;
+  }
+
+
+
   template <template <int, int> class MeshType, int dim, int spacedim>
-#ifndef _MSC_VER
+#  ifndef _MSC_VER
   std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
            typename MeshType<dim, spacedim>::face_iterator>
-#else
+#  else
   typename ExtractBoundaryMesh<MeshType, dim, spacedim>::return_type
-#endif
+#  endif
   extract_boundary_mesh(const MeshType<dim, spacedim> &     volume_mesh,
                         MeshType<dim - 1, spacedim> &       surface_mesh,
                         const std::set<types::boundary_id> &boundary_ids)
@@ -6979,7 +8224,7 @@ namespace GridGenerator
     Table<2, unsigned int> swap_matrix(
       GeometryInfo<spacedim>::faces_per_cell,
       GeometryInfo<dim - 1>::vertices_per_cell);
-    for (unsigned int i1 = 0; i1 < GeometryInfo<spacedim>::faces_per_cell; i1++)
+    for (unsigned int i1 = 0; i1 < GeometryInfo<spacedim>::faces_per_cell; ++i1)
       {
         for (unsigned int i2 = 0; i2 < GeometryInfo<dim - 1>::vertices_per_cell;
              i2++)
@@ -7096,7 +8341,7 @@ namespace GridGenerator
     if (dim == 2)
       {
         for (const auto &cell : surface_mesh.active_cell_iterators())
-          for (unsigned int vertex = 0; vertex < 2; vertex++)
+          for (unsigned int vertex = 0; vertex < 2; ++vertex)
             if (cell->face(vertex)->at_boundary())
               cell->face(vertex)->set_boundary_id(0);
       }
@@ -7201,16 +8446,205 @@ namespace GridGenerator
     std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
              typename MeshType<dim, spacedim>::face_iterator>
       surface_to_volume_mapping;
-    for (unsigned int i = 0; i < temporary_map_boundary_cell_face.size(); i++)
+    for (unsigned int i = 0; i < temporary_map_boundary_cell_face.size(); ++i)
       surface_to_volume_mapping[temporary_map_boundary_cell_face[i].first] =
         temporary_map_boundary_cell_face[i].second.first;
 
     return surface_to_volume_mapping;
   }
 
+
+
+  template <int dim, int spacedim>
+  void
+  subdivided_hyper_rectangle_with_simplices(
+    Triangulation<dim, spacedim> &   tria,
+    const std::vector<unsigned int> &repetitions,
+    const Point<dim> &               p1,
+    const Point<dim> &               p2,
+    const bool                       colorize)
+  {
+    AssertDimension(dim, spacedim);
+
+    AssertThrow(colorize == false, ExcNotImplemented());
+
+    std::vector<Point<spacedim>> vertices;
+    std::vector<CellData<dim>>   cells;
+
+    if (dim == 2)
+      {
+        // determine cell sizes
+        const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
+                            (p2[1] - p1[1]) / repetitions[1]);
+
+        // create vertices
+        for (unsigned int j = 0; j <= repetitions[1]; ++j)
+          for (unsigned int i = 0; i <= repetitions[0]; ++i)
+            vertices.push_back(
+              Point<spacedim>(p1[0] + dx[0] * i, p1[1] + dx[1] * j));
+
+        // create cells
+        for (unsigned int j = 0; j < repetitions[1]; ++j)
+          for (unsigned int i = 0; i < repetitions[0]; ++i)
+            {
+              // create reference QUAD cell
+              std::array<unsigned int, 4> quad{{
+                (j + 0) * (repetitions[0] + 1) + i + 0, //
+                (j + 0) * (repetitions[0] + 1) + i + 1, //
+                (j + 1) * (repetitions[0] + 1) + i + 0, //
+                (j + 1) * (repetitions[0] + 1) + i + 1  //
+              }};                                       //
+
+              // TRI cell 0
+              {
+                CellData<dim> tri;
+                tri.vertices = {quad[0], quad[1], quad[2]};
+                cells.push_back(tri);
+              }
+
+              // TRI cell 1
+              {
+                CellData<dim> tri;
+                tri.vertices = {quad[3], quad[2], quad[1]};
+                cells.push_back(tri);
+              }
+            }
+      }
+    else if (dim == 3)
+      {
+        // determine cell sizes
+        const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
+                            (p2[1] - p1[1]) / repetitions[1],
+                            (p2[2] - p1[2]) / repetitions[2]);
+
+        // create vertices
+        for (unsigned int k = 0; k <= repetitions[2]; ++k)
+          for (unsigned int j = 0; j <= repetitions[1]; ++j)
+            for (unsigned int i = 0; i <= repetitions[0]; ++i)
+              vertices.push_back(Point<spacedim>(p1[0] + dx[0] * i,
+                                                 p1[1] + dx[1] * j,
+                                                 p1[2] + dx[2] * k));
+
+        // create cells
+        for (unsigned int k = 0; k < repetitions[2]; ++k)
+          for (unsigned int j = 0; j < repetitions[1]; ++j)
+            for (unsigned int i = 0; i < repetitions[0]; ++i)
+              {
+                // create reference HEX cell
+                std::array<unsigned int, 8> quad{
+                  {(k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                     (j + 0) * (repetitions[0] + 1) + i + 0,
+                   (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                     (j + 0) * (repetitions[0] + 1) + i + 1,
+                   (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                     (j + 1) * (repetitions[0] + 1) + i + 0,
+                   (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                     (j + 1) * (repetitions[0] + 1) + i + 1,
+                   (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                     (j + 0) * (repetitions[0] + 1) + i + 0,
+                   (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                     (j + 0) * (repetitions[0] + 1) + i + 1,
+                   (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                     (j + 1) * (repetitions[0] + 1) + i + 0,
+                   (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                     (j + 1) * (repetitions[0] + 1) + i + 1}};
+
+                // TET cell 0
+                {
+                  CellData<dim> cell;
+                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                    cell.vertices = {{quad[0], quad[1], quad[2], quad[4]}};
+                  else
+                    cell.vertices = {{quad[0], quad[1], quad[3], quad[5]}};
+
+                  cells.push_back(cell);
+                }
+
+                // TET cell 1
+                {
+                  CellData<dim> cell;
+                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                    cell.vertices = {{quad[2], quad[1], quad[3], quad[7]}};
+                  else
+                    cell.vertices = {{quad[0], quad[3], quad[2], quad[6]}};
+                  cells.push_back(cell);
+                }
+
+                // TET cell 2
+                {
+                  CellData<dim> cell;
+                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                    cell.vertices = {{quad[1], quad[4], quad[5], quad[7]}};
+                  else
+                    cell.vertices = {{quad[0], quad[4], quad[5], quad[6]}};
+                  cells.push_back(cell);
+                }
+
+                // TET cell 3
+                {
+                  CellData<dim> cell;
+                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                    cell.vertices = {{quad[2], quad[4], quad[7], quad[6]}};
+                  else
+                    cell.vertices = {{quad[3], quad[5], quad[7], quad[6]}};
+                  cells.push_back(cell);
+                }
+
+                // TET cell 4
+                {
+                  CellData<dim> cell;
+                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                    cell.vertices = {{quad[1], quad[2], quad[4], quad[7]}};
+                  else
+                    cell.vertices = {{quad[0], quad[3], quad[6], quad[5]}};
+                  cells.push_back(cell);
+                }
+              }
+      }
+    else
+      {
+        AssertThrow(colorize == false, ExcNotImplemented());
+      }
+
+    // actually create triangulation
+    tria.create_triangulation(vertices, cells, SubCellData());
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  subdivided_hyper_cube_with_simplices(Triangulation<dim, spacedim> &tria,
+                                       const unsigned int repetitions,
+                                       const double       p1,
+                                       const double       p2,
+                                       const bool         colorize)
+  {
+    if (dim == 2)
+      {
+        subdivided_hyper_rectangle_with_simplices(
+          tria, {{repetitions, repetitions}}, {p1, p1}, {p2, p2}, colorize);
+      }
+    else if (dim == 3)
+      {
+        subdivided_hyper_rectangle_with_simplices(
+          tria,
+          {{repetitions, repetitions, repetitions}},
+          {p1, p1, p1},
+          {p2, p2, p2},
+          colorize);
+      }
+    else
+      {
+        AssertThrow(false, ExcNotImplemented())
+      }
+  }
+
 } // namespace GridGenerator
 
 // explicit instantiations
-#include "grid_generator.inst"
+#  include "grid_generator.inst"
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE

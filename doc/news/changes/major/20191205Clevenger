@@ -1,4 +1,0 @@
-New: Implementation of the IDR(s) Krylov solver for non-symmetric, 
-indefinite linear systems.
-<br>
-(Thomas Clevenger, 2019/12/05)

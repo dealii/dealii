@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,7 +89,7 @@ test()
       mf_data);
     mf.vmult(out, in);
     out -= ref;
-    deallog << "Error with " << fe_degree + 2 << "^" << dim
+    deallog << "Error with " << fe_degree + 2 << '^' << dim
             << " quadrature points: " << out.l2_norm() << std::endl;
   }
 
@@ -100,7 +100,7 @@ test()
     MatrixFreeTest<dim, fe_degree, double, Vector<double>, 100> mf(mf_data);
     mf.vmult(out, in);
     out -= ref;
-    deallog << "Error with " << 100 << "^" << dim
+    deallog << "Error with " << 100 << '^' << dim
             << " quadrature points: " << out.l2_norm() << std::endl;
   }
   {
@@ -108,7 +108,7 @@ test()
     MatrixFreeTest<dim, fe_degree, double, Vector<double>, 200> mf(mf_data);
     mf.vmult(out, in);
     out -= ref;
-    deallog << "Error with " << 200 << "^" << dim
+    deallog << "Error with " << 200 << '^' << dim
             << " quadrature points: " << out.l2_norm() << std::endl;
   }
   {
@@ -116,7 +116,7 @@ test()
     MatrixFreeTest<dim, fe_degree, double, Vector<double>, 500> mf(mf_data);
     mf.vmult(out, in);
     out -= ref;
-    deallog << "Error with " << 500 << "^" << dim
+    deallog << "Error with " << 500 << '^' << dim
             << " quadrature points: " << out.l2_norm() << std::endl;
   }
   {
@@ -124,7 +124,7 @@ test()
     MatrixFreeTest<dim, fe_degree, double, Vector<double>, 1000> mf(mf_data);
     mf.vmult(out, in);
     out -= ref;
-    deallog << "Error with " << 1000 << "^" << dim
+    deallog << "Error with " << 1000 << '^' << dim
             << " quadrature points: " << out.l2_norm() << std::endl;
   }
 }

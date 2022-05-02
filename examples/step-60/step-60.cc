@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -70,8 +70,8 @@
 // class. The structure of deal.II, as many modern numerical libraries, is
 // organized following a Directed Acyclic Graph (DAG). A DAG is a directed graph
 // with topological ordering: each node structurally represents an object, and
-// is connected to child nodes by one (or more) oriented edges, from the parent
-// to the child. The most significant example of this structure is the
+// is connected to non-root nodes by one (or more) oriented edges, from the
+// parent to the child. The most significant example of this structure is the
 // Triangulation and its Triangulation::cell_iterator structure. From a
 // Triangulation (the main node), we can access each cell (children nodes of the
 // triangulation). From the cells themselves we can access over all vertices of
@@ -247,12 +247,12 @@ namespace Step60
       // $\Gamma$.
       unsigned int initial_embedded_refinement = 8;
 
-      // The list of boundary ids where we impose homogeneous Dirichlet boundary
-      // conditions. On the remaining boundary ids (if any), we impose
-      // homogeneous Neumann boundary conditions.
-      // As a default problem we have zero Dirichlet boundary conditions on
+      // The list of boundary ids where we impose (possibly inhomogeneous)
+      // Dirichlet boundary conditions. On the remaining boundary ids (if any),
+      // we impose homogeneous Neumann boundary conditions. As a default problem
+      // we have zero Dirichlet boundary conditions on
       // $\partial \Omega$
-      std::list<types::boundary_id> homogeneous_dirichlet_ids{0, 1, 2, 3};
+      std::list<types::boundary_id> dirichlet_ids{0, 1, 2, 3};
 
       // FiniteElement degree of the embedding space: $V_h(\Omega)$
       unsigned int embedding_space_finite_element_degree = 1;
@@ -364,11 +364,21 @@ namespace Step60
 
     std::unique_ptr<Mapping<dim, spacedim>> embedded_mapping;
 
-    // We do the same thing to specify the value of the function $g$,
-    // which is what we want our solution to be in the embedded space.
+    // We do the same thing to specify the value of the forcing term $f$.
     // In this case the Function is a scalar one.
     ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
+      embedding_rhs_function;
+
+    // Then, we specify the value of the function $g$, which is what we want
+    // our solution to be in the embedded space.
+    // Again, in this case the Function is a scalar one.
+    ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
       embedded_value_function;
+
+    // Finally, the value of the Dirichlet boundary conditions on $\partial
+    // \Omega$ is specified.
+    ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
+      embedding_dirichlet_boundary_function;
 
     // Similarly to what we have done with the Functions::ParsedFunction class,
     // we repeat the same for the ReductionControl class, allowing us to
@@ -387,7 +397,7 @@ namespace Step60
     AffineConstraints<double> constraints;
 
     Vector<double> solution;
-    Vector<double> rhs;
+    Vector<double> embedding_rhs;
 
     Vector<double> lambda;
     Vector<double> embedded_rhs;
@@ -526,8 +536,7 @@ namespace Step60
     add_parameter("Local refinements steps near embedded domain",
                   delta_refinement);
 
-    add_parameter("Homogeneous Dirichlet boundary ids",
-                  homogeneous_dirichlet_ids);
+    add_parameter("Dirichlet boundary ids", dirichlet_ids);
 
     add_parameter("Use displacement in embedded interface", use_displacement);
 
@@ -556,7 +565,10 @@ namespace Step60
     const Parameters &parameters)
     : parameters(parameters)
     , embedded_configuration_function("Embedded configuration", spacedim)
+    , embedding_rhs_function("Embedding rhs function")
     , embedded_value_function("Embedded value")
+    , embedding_dirichlet_boundary_function(
+        "Embedding Dirichlet boundary conditions")
     , schur_solver_control("Schur solver control")
     , monitor(std::cout, TimerOutput::summary, TimerOutput::cpu_and_wall_times)
   {
@@ -581,8 +593,14 @@ namespace Step60
                                    "R*cos(2*pi*x)+Cx; R*sin(2*pi*x)+Cy");
       });
 
+    embedding_rhs_function.declare_parameters_call_back.connect(
+      []() -> void { ParameterAcceptor::prm.set("Function expression", "0"); });
+
     embedded_value_function.declare_parameters_call_back.connect(
       []() -> void { ParameterAcceptor::prm.set("Function expression", "1"); });
+
+    embedding_dirichlet_boundary_function.declare_parameters_call_back.connect(
+      []() -> void { ParameterAcceptor::prm.set("Function expression", "0"); });
 
     schur_solver_control.declare_parameters_call_back.connect([]() -> void {
       ParameterAcceptor::prm.set("Max steps", "1000");
@@ -594,7 +612,7 @@ namespace Step60
   // @sect3{Set up}
   //
   // The function `DistributedLagrangeProblem::setup_grids_and_dofs()` is used
-  // to set up the finite element spaces. Notice how `std_cxx14::make_unique` is
+  // to set up the finite element spaces. Notice how `std::make_unique` is
   // used to create objects wrapped inside `std::unique_ptr` objects.
   template <int dim, int spacedim>
   void DistributedLagrangeProblem<dim, spacedim>::setup_grids_and_dofs()
@@ -603,7 +621,7 @@ namespace Step60
 
     // Initializing $\Omega$: constructing the Triangulation and wrapping it
     // into a `std::unique_ptr` object
-    space_grid = std_cxx14::make_unique<Triangulation<spacedim>>();
+    space_grid = std::make_unique<Triangulation<spacedim>>();
 
     // Next, we actually create the triangulation using
     // GridGenerator::hyper_cube(). The last argument is set to true: this
@@ -617,22 +635,22 @@ namespace Step60
     // GridTools::Cache with it.
     space_grid->refine_global(parameters.initial_refinement);
     space_grid_tools_cache =
-      std_cxx14::make_unique<GridTools::Cache<spacedim, spacedim>>(*space_grid);
+      std::make_unique<GridTools::Cache<spacedim, spacedim>>(*space_grid);
 
     // The same is done with the embedded grid. Since the embedded grid is
     // deformed, we first need to setup the deformation mapping. We do so in the
     // following few lines:
-    embedded_grid = std_cxx14::make_unique<Triangulation<dim, spacedim>>();
+    embedded_grid = std::make_unique<Triangulation<dim, spacedim>>();
     GridGenerator::hyper_cube(*embedded_grid);
     embedded_grid->refine_global(parameters.initial_embedded_refinement);
 
-    embedded_configuration_fe = std_cxx14::make_unique<FESystem<dim, spacedim>>(
+    embedded_configuration_fe = std::make_unique<FESystem<dim, spacedim>>(
       FE_Q<dim, spacedim>(
         parameters.embedded_configuration_finite_element_degree),
       spacedim);
 
     embedded_configuration_dh =
-      std_cxx14::make_unique<DoFHandler<dim, spacedim>>(*embedded_grid);
+      std::make_unique<DoFHandler<dim, spacedim>>(*embedded_grid);
 
     embedded_configuration_dh->distribute_dofs(*embedded_configuration_fe);
     embedded_configuration.reinit(embedded_configuration_dh->n_dofs());
@@ -671,16 +689,13 @@ namespace Step60
 
     if (parameters.use_displacement == true)
       embedded_mapping =
-        std_cxx14::make_unique<MappingQEulerian<dim, Vector<double>, spacedim>>(
+        std::make_unique<MappingQEulerian<dim, Vector<double>, spacedim>>(
           parameters.embedded_configuration_finite_element_degree,
           *embedded_configuration_dh,
           embedded_configuration);
     else
       embedded_mapping =
-        std_cxx14::make_unique<MappingFEField<dim,
-                                              spacedim,
-                                              Vector<double>,
-                                              DoFHandler<dim, spacedim>>>(
+        std::make_unique<MappingFEField<dim, spacedim, Vector<double>>>(
           *embedded_configuration_dh, embedded_configuration);
 
     setup_embedded_dofs();
@@ -772,7 +787,7 @@ namespace Step60
         for (auto &cell : cells)
           {
             cell->set_refine_flag();
-            for (unsigned int face_no : GeometryInfo<spacedim>::face_indices())
+            for (const auto face_no : cell->face_indices())
               if (!cell->at_boundary(face_no))
                 cell->neighbor(face_no)->set_refine_flag();
           }
@@ -831,21 +846,20 @@ namespace Step60
 
   // We now set up the DoFs of $\Omega$ and $\Gamma$: since they are
   // fundamentally independent (except for the fact that $\Omega$'s mesh is more
-  // refined "around"
-  // $\Gamma$) the procedure is standard.
+  // refined "around" $\Gamma$) the procedure is standard.
   template <int dim, int spacedim>
   void DistributedLagrangeProblem<dim, spacedim>::setup_embedding_dofs()
   {
-    space_dh = std_cxx14::make_unique<DoFHandler<spacedim>>(*space_grid);
-    space_fe = std_cxx14::make_unique<FE_Q<spacedim>>(
+    space_dh = std::make_unique<DoFHandler<spacedim>>(*space_grid);
+    space_fe = std::make_unique<FE_Q<spacedim>>(
       parameters.embedding_space_finite_element_degree);
     space_dh->distribute_dofs(*space_fe);
 
     DoFTools::make_hanging_node_constraints(*space_dh, constraints);
-    for (auto id : parameters.homogeneous_dirichlet_ids)
+    for (auto id : parameters.dirichlet_ids)
       {
         VectorTools::interpolate_boundary_values(
-          *space_dh, id, Functions::ZeroFunction<spacedim>(), constraints);
+          *space_dh, id, embedding_dirichlet_boundary_function, constraints);
       }
     constraints.close();
 
@@ -855,7 +869,7 @@ namespace Step60
     stiffness_sparsity.copy_from(dsp);
     stiffness_matrix.reinit(stiffness_sparsity);
     solution.reinit(space_dh->n_dofs());
-    rhs.reinit(space_dh->n_dofs());
+    embedding_rhs.reinit(space_dh->n_dofs());
 
     deallog << "Embedding dofs: " << space_dh->n_dofs() << std::endl;
   }
@@ -863,9 +877,8 @@ namespace Step60
   template <int dim, int spacedim>
   void DistributedLagrangeProblem<dim, spacedim>::setup_embedded_dofs()
   {
-    embedded_dh =
-      std_cxx14::make_unique<DoFHandler<dim, spacedim>>(*embedded_grid);
-    embedded_fe = std_cxx14::make_unique<FE_Q<dim, spacedim>>(
+    embedded_dh = std::make_unique<DoFHandler<dim, spacedim>>(*embedded_grid);
+    embedded_fe = std::make_unique<FE_Q<dim, spacedim>>(
       parameters.embedded_space_finite_element_degree);
     embedded_dh->distribute_dofs(*embedded_fe);
 
@@ -918,11 +931,13 @@ namespace Step60
     {
       TimerOutput::Scope timer_section(monitor, "Assemble system");
 
-      // Embedding stiffness matrix $K$, and the right hand side $G$.
+      // Embedding stiffness matrix $K$ and right hand sides $F$ and $G$.
       MatrixTools::create_laplace_matrix(
         *space_dh,
         QGauss<spacedim>(2 * space_fe->degree + 1),
         stiffness_matrix,
+        embedding_rhs_function,
+        embedding_rhs,
         static_cast<const Function<spacedim> *>(nullptr),
         constraints);
 
@@ -982,9 +997,9 @@ namespace Step60
     SolverCG<Vector<double>> solver_cg(schur_solver_control);
     auto S_inv = inverse_operator(S, solver_cg, PreconditionIdentity());
 
-    lambda = S_inv * embedded_rhs;
+    lambda = S_inv * (C * K_inv * embedding_rhs - embedded_rhs);
 
-    solution = K_inv * Ct * lambda;
+    solution = K_inv * (embedding_rhs - Ct * lambda);
 
     constraints.distribute(solution);
   }
@@ -1012,7 +1027,7 @@ namespace Step60
     // embedded_mapping to the DataOut::build_patches function. The mapping will
     // take care of outputting the result on the actual deformed configuration.
 
-    DataOut<dim, DoFHandler<dim, spacedim>> embedded_out;
+    DataOut<dim, spacedim> embedded_out;
 
     std::ofstream embedded_out_file("embedded.vtu");
 

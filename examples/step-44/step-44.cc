@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2019 by the deal.II authors and
+ * Copyright (C) 2010 - 2020 by the deal.II authors and
  *                              & Jean-Paul Pelteret and Andrew McBride
  *
  * This file is part of the deal.II library.
@@ -43,7 +43,7 @@
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/fe/fe_dgp_monomial.h>
+#include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
@@ -488,7 +488,7 @@ namespace Step44
 
   // As discussed in the Introduction, Neo-Hookean materials are a type of
   // hyperelastic materials.  The entire domain is assumed to be composed of a
-  // compressible neo-Hookean material.  This class defines the behaviour of
+  // compressible neo-Hookean material.  This class defines the behavior of
   // this material within a three-field formulation.  Compressible neo-Hookean
   // materials can be described by a strain-energy function (SEF) $ \Psi =
   // \Psi_{\text{iso}}(\overline{\mathbf{b}}) + \Psi_{\text{vol}}(\widetilde{J})
@@ -821,13 +821,10 @@ namespace Step44
     // object (see the @ref threads module for more information on this).
     //
     // We declare such structures for the computation of tangent (stiffness)
-    // matrix, right hand side, static condensation, and for updating
+    // matrix and right hand side vector, static condensation, and for updating
     // quadrature points:
-    struct PerTaskData_K;
-    struct ScratchData_K;
-
-    struct PerTaskData_RHS;
-    struct ScratchData_RHS;
+    struct PerTaskData_ASM;
+    struct ScratchData_ASM;
 
     struct PerTaskData_SC;
     struct ScratchData_SC;
@@ -844,29 +841,22 @@ namespace Step44
 
     void determine_component_extractors();
 
+    // Create Dirichlet constraints for the incremental displacement field:
+    void make_constraints(const int it_nr);
+
     // Several functions to assemble the system and right hand side matrices
     // using multithreading. Each of them comes as a wrapper function, one
     // that is executed to do the work in the WorkStream model on one cell,
     // and one that copies the work done on this one cell into the global
     // object that represents it:
-    void assemble_system_tangent();
+    void assemble_system();
 
-    void assemble_system_tangent_one_cell(
+    void assemble_system_one_cell(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      ScratchData_K &                                       scratch,
-      PerTaskData_K &                                       data) const;
+      ScratchData_ASM &                                     scratch,
+      PerTaskData_ASM &                                     data) const;
 
-    void copy_local_to_global_K(const PerTaskData_K &data);
-
-    void assemble_system_rhs();
-
-    void assemble_system_rhs_one_cell(
-      const typename DoFHandler<dim>::active_cell_iterator &cell,
-      ScratchData_RHS &                                     scratch,
-      PerTaskData_RHS &                                     data) const;
-
-    void copy_local_to_global_rhs(const PerTaskData_RHS &data);
-
+    // And similar to perform global static condensation:
     void assemble_sc();
 
     void assemble_sc_one_cell(
@@ -875,9 +865,6 @@ namespace Step44
       PerTaskData_SC &                                      data);
 
     void copy_local_to_global_sc(const PerTaskData_SC &data);
-
-    // Apply Dirichlet boundary conditions on the displacement field
-    void make_constraints(const int &it_nr);
 
     // Create and update the quadrature points. Here, no data needs to be
     // copied into a global object, so the copy_local_to_global function is
@@ -1050,20 +1037,19 @@ namespace Step44
     // The Finite Element System is composed of dim continuous displacement
     // DOFs, and discontinuous pressure and dilatation DOFs. In an attempt to
     // satisfy the Babuska-Brezzi or LBB stability conditions (see Hughes
-    // (2000)), we setup a $Q_n \times DGPM_{n-1} \times DGPM_{n-1}$
-    // system. $Q_2 \times DGPM_1 \times DGPM_1$ elements satisfy this
-    // condition, while $Q_1 \times DGPM_0 \times DGPM_0$ elements do
+    // (2000)), we setup a $Q_n \times DGP_{n-1} \times DGP_{n-1}$
+    // system. $Q_2 \times DGP_1 \times DGP_1$ elements satisfy this
+    // condition, while $Q_1 \times DGP_0 \times DGP_0$ elements do
     // not. However, it has been shown that the latter demonstrate good
     // convergence characteristics nonetheless.
     fe(FE_Q<dim>(parameters.poly_degree),
        dim, // displacement
-       FE_DGPMonomial<dim>(parameters.poly_degree - 1),
+       FE_DGP<dim>(parameters.poly_degree - 1),
        1, // pressure
-       FE_DGPMonomial<dim>(parameters.poly_degree - 1),
-       1)
-    , // dilatation
-    dof_handler(triangulation)
-    , dofs_per_cell(fe.dofs_per_cell)
+       FE_DGP<dim>(parameters.poly_degree - 1),
+       1) // dilatation
+    , dof_handler(triangulation)
+    , dofs_per_cell(fe.n_dofs_per_cell())
     , u_fe(first_u_component)
     , p_fe(p_component)
     , J_fe(J_component)
@@ -1093,10 +1079,11 @@ namespace Step44
   // constraint $\widetilde{J}=1$ on the initial solution field. The constraint
   // corresponds to the determinant of the deformation gradient in the
   // undeformed configuration, which is the identity tensor. We use
-  // FE_DGPMonomial bases to interpolate the dilatation field, thus we can't
+  // FE_DGP bases to interpolate the dilatation field, thus we can't
   // simply set the corresponding dof to unity as they correspond to the
-  // monomial coefficients. Thus we use the VectorTools::project function to do
-  // the work for us. The VectorTools::project function requires an argument
+  // coefficients of a truncated Legendre polynomial.
+  // Thus we use the VectorTools::project function to do the work for us.
+  // The VectorTools::project function requires an argument
   // indicating the hanging node constraints. We have none in this program
   // So we have to create a constraint object. In its original state, constraint
   // objects are unsorted, and have to be sorted (using the
@@ -1159,22 +1146,26 @@ namespace Step44
   // using TBB. Our main tool for this is the WorkStream class (see the @ref
   // threads module for more information).
 
-  // Firstly we deal with the tangent matrix assembly structures.  The
-  // PerTaskData object stores local contributions.
+  // Firstly we deal with the tangent matrix and right-hand side assembly
+  // structures. The PerTaskData object stores local contributions to the global
+  // system.
   template <int dim>
-  struct Solid<dim>::PerTaskData_K
+  struct Solid<dim>::PerTaskData_ASM
   {
     FullMatrix<double>                   cell_matrix;
+    Vector<double>                       cell_rhs;
     std::vector<types::global_dof_index> local_dof_indices;
 
-    PerTaskData_K(const unsigned int dofs_per_cell)
+    PerTaskData_ASM(const unsigned int dofs_per_cell)
       : cell_matrix(dofs_per_cell, dofs_per_cell)
+      , cell_rhs(dofs_per_cell)
       , local_dof_indices(dofs_per_cell)
     {}
 
     void reset()
     {
       cell_matrix = 0.0;
+      cell_rhs    = 0.0;
     }
   };
 
@@ -1184,30 +1175,37 @@ namespace Step44
   // gradient and symmetric gradient vector which we will use during the
   // assembly.
   template <int dim>
-  struct Solid<dim>::ScratchData_K
+  struct Solid<dim>::ScratchData_ASM
   {
-    FEValues<dim> fe_values;
+    FEValues<dim>     fe_values;
+    FEFaceValues<dim> fe_face_values;
 
     std::vector<std::vector<double>>                  Nx;
     std::vector<std::vector<Tensor<2, dim>>>          grad_Nx;
     std::vector<std::vector<SymmetricTensor<2, dim>>> symm_grad_Nx;
 
-    ScratchData_K(const FiniteElement<dim> &fe_cell,
-                  const QGauss<dim> &       qf_cell,
-                  const UpdateFlags         uf_cell)
+    ScratchData_ASM(const FiniteElement<dim> &fe_cell,
+                    const QGauss<dim> &       qf_cell,
+                    const UpdateFlags         uf_cell,
+                    const QGauss<dim - 1> &   qf_face,
+                    const UpdateFlags         uf_face)
       : fe_values(fe_cell, qf_cell, uf_cell)
-      , Nx(qf_cell.size(), std::vector<double>(fe_cell.dofs_per_cell))
+      , fe_face_values(fe_cell, qf_face, uf_face)
+      , Nx(qf_cell.size(), std::vector<double>(fe_cell.n_dofs_per_cell()))
       , grad_Nx(qf_cell.size(),
-                std::vector<Tensor<2, dim>>(fe_cell.dofs_per_cell))
+                std::vector<Tensor<2, dim>>(fe_cell.n_dofs_per_cell()))
       , symm_grad_Nx(qf_cell.size(),
                      std::vector<SymmetricTensor<2, dim>>(
-                       fe_cell.dofs_per_cell))
+                       fe_cell.n_dofs_per_cell()))
     {}
 
-    ScratchData_K(const ScratchData_K &rhs)
+    ScratchData_ASM(const ScratchData_ASM &rhs)
       : fe_values(rhs.fe_values.get_fe(),
                   rhs.fe_values.get_quadrature(),
                   rhs.fe_values.get_update_flags())
+      , fe_face_values(rhs.fe_face_values.get_fe(),
+                       rhs.fe_face_values.get_quadrature(),
+                       rhs.fe_face_values.get_update_flags())
       , Nx(rhs.Nx)
       , grad_Nx(rhs.grad_Nx)
       , symm_grad_Nx(rhs.symm_grad_Nx)
@@ -1234,77 +1232,6 @@ namespace Step44
     }
   };
 
-  // Next, the same approach is used for the right-hand side assembly.  The
-  // PerTaskData object again stores local contributions and the ScratchData
-  // object the shape function object and precomputed values vector:
-  template <int dim>
-  struct Solid<dim>::PerTaskData_RHS
-  {
-    Vector<double>                       cell_rhs;
-    std::vector<types::global_dof_index> local_dof_indices;
-
-    PerTaskData_RHS(const unsigned int dofs_per_cell)
-      : cell_rhs(dofs_per_cell)
-      , local_dof_indices(dofs_per_cell)
-    {}
-
-    void reset()
-    {
-      cell_rhs = 0.0;
-    }
-  };
-
-
-  template <int dim>
-  struct Solid<dim>::ScratchData_RHS
-  {
-    FEValues<dim>     fe_values;
-    FEFaceValues<dim> fe_face_values;
-
-    std::vector<std::vector<double>>                  Nx;
-    std::vector<std::vector<SymmetricTensor<2, dim>>> symm_grad_Nx;
-
-    ScratchData_RHS(const FiniteElement<dim> &fe_cell,
-                    const QGauss<dim> &       qf_cell,
-                    const UpdateFlags         uf_cell,
-                    const QGauss<dim - 1> &   qf_face,
-                    const UpdateFlags         uf_face)
-      : fe_values(fe_cell, qf_cell, uf_cell)
-      , fe_face_values(fe_cell, qf_face, uf_face)
-      , Nx(qf_cell.size(), std::vector<double>(fe_cell.dofs_per_cell))
-      , symm_grad_Nx(qf_cell.size(),
-                     std::vector<SymmetricTensor<2, dim>>(
-                       fe_cell.dofs_per_cell))
-    {}
-
-    ScratchData_RHS(const ScratchData_RHS &rhs)
-      : fe_values(rhs.fe_values.get_fe(),
-                  rhs.fe_values.get_quadrature(),
-                  rhs.fe_values.get_update_flags())
-      , fe_face_values(rhs.fe_face_values.get_fe(),
-                       rhs.fe_face_values.get_quadrature(),
-                       rhs.fe_face_values.get_update_flags())
-      , Nx(rhs.Nx)
-      , symm_grad_Nx(rhs.symm_grad_Nx)
-    {}
-
-    void reset()
-    {
-      const unsigned int n_q_points      = Nx.size();
-      const unsigned int n_dofs_per_cell = Nx[0].size();
-      for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-        {
-          Assert(Nx[q_point].size() == n_dofs_per_cell, ExcInternalError());
-          Assert(symm_grad_Nx[q_point].size() == n_dofs_per_cell,
-                 ExcInternalError());
-          for (unsigned int k = 0; k < n_dofs_per_cell; ++k)
-            {
-              Nx[q_point][k]           = 0.0;
-              symm_grad_Nx[q_point][k] = 0.0;
-            }
-        }
-    }
-  };
 
   // Then we define structures to assemble the statically condensed tangent
   // matrix. Recall that we wish to solve for a displacement-based formulation.
@@ -1522,24 +1449,7 @@ namespace Step44
     // Setup the sparsity pattern and tangent matrix
     tangent_matrix.clear();
     {
-      const types::global_dof_index n_dofs_u = dofs_per_block[u_dof];
-      const types::global_dof_index n_dofs_p = dofs_per_block[p_dof];
-      const types::global_dof_index n_dofs_J = dofs_per_block[J_dof];
-
-      BlockDynamicSparsityPattern dsp(n_blocks, n_blocks);
-
-      dsp.block(u_dof, u_dof).reinit(n_dofs_u, n_dofs_u);
-      dsp.block(u_dof, p_dof).reinit(n_dofs_u, n_dofs_p);
-      dsp.block(u_dof, J_dof).reinit(n_dofs_u, n_dofs_J);
-
-      dsp.block(p_dof, u_dof).reinit(n_dofs_p, n_dofs_u);
-      dsp.block(p_dof, p_dof).reinit(n_dofs_p, n_dofs_p);
-      dsp.block(p_dof, J_dof).reinit(n_dofs_p, n_dofs_J);
-
-      dsp.block(J_dof, u_dof).reinit(n_dofs_J, n_dofs_u);
-      dsp.block(J_dof, p_dof).reinit(n_dofs_J, n_dofs_p);
-      dsp.block(J_dof, J_dof).reinit(n_dofs_J, n_dofs_J);
-      dsp.collect_sizes();
+      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
 
       // The global system matrix initially has the following structure
       // @f{align*}
@@ -1584,10 +1494,7 @@ namespace Step44
 
     // We then set up storage vectors
     system_rhs.reinit(dofs_per_block);
-    system_rhs.collect_sizes();
-
     solution_n.reinit(dofs_per_block);
-    solution_n.collect_sizes();
 
     // ...and finally set up the quadrature
     // point history:
@@ -1613,7 +1520,7 @@ namespace Step44
     element_indices_p.clear();
     element_indices_J.clear();
 
-    for (unsigned int k = 0; k < fe.dofs_per_cell; ++k)
+    for (unsigned int k = 0; k < fe.n_dofs_per_cell(); ++k)
       {
         const unsigned int k_group = fe.system_to_base_index(k).first.first;
         if (k_group == u_dof)
@@ -1726,7 +1633,8 @@ namespace Step44
     scratch.fe_values[J_fe].get_function_values(
       scratch.solution_total, scratch.solution_values_J_total);
 
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values.quadrature_point_indices())
       lqph[q_point]->update_values(scratch.solution_grads_u_total[q_point],
                                    scratch.solution_values_p_total[q_point],
                                    scratch.solution_values_J_total[q_point]);
@@ -1743,7 +1651,7 @@ namespace Step44
   {
     std::cout << std::endl
               << "Timestep " << time.get_timestep() << " @ " << time.current()
-              << "s" << std::endl;
+              << 's' << std::endl;
 
     BlockVector<double> newton_update(dofs_per_block);
 
@@ -1760,30 +1668,39 @@ namespace Step44
     // nonlinear problem.  Since the problem is fully nonlinear and we are
     // using a full Newton method, the data stored in the tangent matrix and
     // right-hand side vector is not reusable and must be cleared at each
-    // Newton step.  We then initially build the right-hand side vector to
+    // Newton step. We then initially build the linear system and
     // check for convergence (and store this value in the first iteration).
     // The unconstrained DOFs of the rhs vector hold the out-of-balance
-    // forces. The building is done before assembling the system matrix as the
-    // latter is an expensive operation and we can potentially avoid an extra
-    // assembly process by not assembling the tangent matrix when convergence
-    // is attained.
+    // forces, and collectively determine whether or not the equilibrium
+    // solution has been attained.
+    //
+    // Although for this particular problem we could potentially construct the
+    // RHS vector before assembling the system matrix, for the sake of
+    // extensibility we choose not to do so. The benefit to assembling the RHS
+    // vector and system matrix separately is that the latter is an expensive
+    // operation and we can potentially avoid an extra assembly process by not
+    // assembling the tangent matrix when convergence is attained. However, this
+    // makes parallelizing the code using MPI more difficult. Furthermore, when
+    // extending the problem to the transient case additional contributions to
+    // the RHS may result from the time discretization and application of
+    // constraints for the velocity and acceleration fields.
     unsigned int newton_iteration = 0;
     for (; newton_iteration < parameters.max_iterations_NR; ++newton_iteration)
       {
-        std::cout << " " << std::setw(2) << newton_iteration << " "
+        std::cout << ' ' << std::setw(2) << newton_iteration << ' '
                   << std::flush;
 
-        tangent_matrix = 0.0;
-        system_rhs     = 0.0;
-
-        assemble_system_rhs();
-        get_error_residual(error_residual);
-
-        if (newton_iteration == 0)
-          error_residual_0 = error_residual;
+        // We construct the linear system, but hold off on solving it
+        // (a step that should be significantly more expensive than assembly):
+        make_constraints(newton_iteration);
+        assemble_system();
 
         // We can now determine the normalized residual error and check for
         // solution convergence:
+        get_error_residual(error_residual);
+        if (newton_iteration == 0)
+          error_residual_0 = error_residual;
+
         error_residual_norm = error_residual;
         error_residual_norm.normalize(error_residual_0);
 
@@ -1797,26 +1714,22 @@ namespace Step44
           }
 
         // If we have decided that we want to continue with the iteration, we
-        // assemble the tangent, make and impose the Dirichlet constraints,
-        // and do the solve of the linearised system:
-        assemble_system_tangent();
-        make_constraints(newton_iteration);
-        constraints.condense(tangent_matrix, system_rhs);
-
+        // solve the linearized system:
         const std::pair<unsigned int, double> lin_solver_output =
           solve_linear_system(newton_update);
 
+        // We can now determine the normalized Newton update error:
         get_error_update(newton_update, error_update);
         if (newton_iteration == 0)
           error_update_0 = error_update;
 
-        // We can now determine the normalized Newton update error, and
-        // perform the actual update of the solution increment for the current
-        // time step, update all quadrature point information pertaining to
-        // this new displacement and stress state and continue iterating:
         error_update_norm = error_update;
         error_update_norm.normalize(error_update_0);
 
+        // Lastly, since we implicitly accept the solution step we can perform
+        // the actual update of the solution increment for the current time
+        // step, update all quadrature point information pertaining to
+        // this new displacement and stress state and continue iterating:
         solution_delta += newton_update;
         update_qph_incremental(solution_delta);
 
@@ -1851,19 +1764,19 @@ namespace Step44
   template <int dim>
   void Solid<dim>::print_conv_header()
   {
-    static const unsigned int l_width = 155;
+    static const unsigned int l_width = 150;
 
     for (unsigned int i = 0; i < l_width; ++i)
-      std::cout << "_";
+      std::cout << '_';
     std::cout << std::endl;
 
-    std::cout << "                 SOLVER STEP                  "
+    std::cout << "               SOLVER STEP               "
               << " |  LIN_IT   LIN_RES    RES_NORM    "
               << " RES_U     RES_P      RES_J     NU_NORM     "
               << " NU_U       NU_P       NU_J " << std::endl;
 
     for (unsigned int i = 0; i < l_width; ++i)
-      std::cout << "_";
+      std::cout << '_';
     std::cout << std::endl;
   }
 
@@ -1872,10 +1785,10 @@ namespace Step44
   template <int dim>
   void Solid<dim>::print_conv_footer()
   {
-    static const unsigned int l_width = 155;
+    static const unsigned int l_width = 150;
 
     for (unsigned int i = 0; i < l_width; ++i)
-      std::cout << "_";
+      std::cout << '_';
     std::cout << std::endl;
 
     const std::pair<double, double> error_dil = get_error_dilation();
@@ -1914,7 +1827,7 @@ namespace Step44
           quadrature_point_history.get_data(cell);
         Assert(lqph.size() == n_q_points, ExcInternalError());
 
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const unsigned int q_point : fe_values.quadrature_point_indices())
           {
             const double det_F_qp = lqph[q_point]->get_det_F();
             const double JxW      = fe_values.JxW(q_point);
@@ -1948,7 +1861,7 @@ namespace Step44
           quadrature_point_history.get_data(cell);
         Assert(lqph.size() == n_q_points, ExcInternalError());
 
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const unsigned int q_point : fe_values.quadrature_point_indices())
           {
             const double det_F_qp   = lqph[q_point]->get_det_F();
             const double J_tilde_qp = lqph[q_point]->get_J_tilde();
@@ -2022,58 +1935,52 @@ namespace Step44
   }
 
 
-  // @sect4{Solid::assemble_system_tangent}
+  // @sect4{Solid::assemble_system}
 
   // Since we use TBB for assembly, we simply setup a copy of the
   // data structures required for the process and pass them, along
-  // with the memory addresses of the assembly functions to the
-  // WorkStream object for processing. Note that we must ensure that
-  // the matrix is reset before any assembly operations can occur.
+  // with the assembly functions to the WorkStream object for processing. Note
+  // that we must ensure that the matrix and RHS vector are reset before any
+  // assembly operations can occur. Furthermore, since we are describing a
+  // problem with Neumann BCs, we will need the face normals and so must specify
+  // this in the face update flags.
   template <int dim>
-  void Solid<dim>::assemble_system_tangent()
+  void Solid<dim>::assemble_system()
   {
-    timer.enter_subsection("Assemble tangent matrix");
-    std::cout << " ASM_K " << std::flush;
+    timer.enter_subsection("Assemble system");
+    std::cout << " ASM_SYS " << std::flush;
 
     tangent_matrix = 0.0;
+    system_rhs     = 0.0;
 
     const UpdateFlags uf_cell(update_values | update_gradients |
                               update_JxW_values);
+    const UpdateFlags uf_face(update_values | update_normal_vectors |
+                              update_JxW_values);
 
-    PerTaskData_K per_task_data(dofs_per_cell);
-    ScratchData_K scratch_data(fe, qf_cell, uf_cell);
+    PerTaskData_ASM per_task_data(dofs_per_cell);
+    ScratchData_ASM scratch_data(fe, qf_cell, uf_cell, qf_face, uf_face);
 
     // The syntax used here to pass data to the WorkStream class
-    // is discussed in step-14. We need to use this particular
-    // call to WorkStream because assemble_system_tangent_one_cell
-    // is a constant function and copy_local_to_global_K is
-    // non-constant.
+    // is discussed in step-13.
     WorkStream::run(
       dof_handler.active_cell_iterators(),
       [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
-             ScratchData_K &                                       scratch,
-             PerTaskData_K &                                       data) {
-        this->assemble_system_tangent_one_cell(cell, scratch, data);
+             ScratchData_ASM &                                     scratch,
+             PerTaskData_ASM &                                     data) {
+        this->assemble_system_one_cell(cell, scratch, data);
       },
-      [this](const PerTaskData_K &data) { this->copy_local_to_global_K(data); },
+      [this](const PerTaskData_ASM &data) {
+        this->constraints.distribute_local_to_global(data.cell_matrix,
+                                                     data.cell_rhs,
+                                                     data.local_dof_indices,
+                                                     tangent_matrix,
+                                                     system_rhs);
+      },
       scratch_data,
       per_task_data);
 
     timer.leave_subsection();
-  }
-
-  // This function adds the local contribution to the system matrix.
-  // Note that we choose not to use the constraint matrix to do the
-  // job for us because the tangent matrix and residual processes have
-  // been split up into two separate functions.
-  template <int dim>
-  void Solid<dim>::copy_local_to_global_K(const PerTaskData_K &data)
-  {
-    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-      for (unsigned int j = 0; j < dofs_per_cell; ++j)
-        tangent_matrix.add(data.local_dof_indices[i],
-                           data.local_dof_indices[j],
-                           data.cell_matrix(i, j));
   }
 
   // Of course, we still have to define how we assemble the tangent matrix
@@ -2085,10 +1992,10 @@ namespace Step44
   // $\textrm{grad}\ \boldsymbol{\varphi} = \textrm{Grad}\ \boldsymbol{\varphi}
   // \ \mathbf{F}^{-1}$.
   template <int dim>
-  void Solid<dim>::assemble_system_tangent_one_cell(
+  void Solid<dim>::assemble_system_one_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    ScratchData_K &                                       scratch,
-    PerTaskData_K &                                       data) const
+    ScratchData_ASM &                                     scratch,
+    PerTaskData_ASM &                                     data) const
   {
     data.reset();
     scratch.reset();
@@ -2099,10 +2006,11 @@ namespace Step44
       quadrature_point_history.get_data(cell);
     Assert(lqph.size() == n_q_points, ExcInternalError());
 
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values.quadrature_point_indices())
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
-        for (unsigned int k = 0; k < dofs_per_cell; ++k)
+        for (const unsigned int k : scratch.fe_values.dof_indices())
           {
             const unsigned int k_group = fe.system_to_base_index(k).first.first;
 
@@ -2124,10 +2032,10 @@ namespace Step44
           }
       }
 
-    // Now we build the local cell stiffness matrix. Since the global and
-    // local system matrices are symmetric, we can exploit this property by
-    // building only the lower half of the local matrix and copying the values
-    // to the upper half.  So we only assemble half of the
+    // Now we build the local cell stiffness matrix and RHS vector. Since the
+    // global and local system matrices are symmetric, we can exploit this
+    // property by building only the lower half of the local matrix and copying
+    // the values to the upper half.  So we only assemble half of the
     // $\mathsf{\mathbf{k}}_{uu}$, $\mathsf{\mathbf{k}}_{\widetilde{p}
     // \widetilde{p}} = \mathbf{0}$, $\mathsf{\mathbf{k}}_{\widetilde{J}
     // \widetilde{J}}$ blocks, while the whole
@@ -2137,30 +2045,84 @@ namespace Step44
     //
     // In doing so, we first extract some configuration dependent variables
     // from our quadrature history objects for the current quadrature point.
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+    for (const unsigned int q_point :
+         scratch.fe_values.quadrature_point_indices())
       {
-        const Tensor<2, dim>          tau = lqph[q_point]->get_tau();
-        const SymmetricTensor<4, dim> Jc  = lqph[q_point]->get_Jc();
-        const double d2Psi_vol_dJ2        = lqph[q_point]->get_d2Psi_vol_dJ2();
-        const double det_F                = lqph[q_point]->get_det_F();
+        const SymmetricTensor<2, dim> tau     = lqph[q_point]->get_tau();
+        const Tensor<2, dim>          tau_ns  = lqph[q_point]->get_tau();
+        const SymmetricTensor<4, dim> Jc      = lqph[q_point]->get_Jc();
+        const double                  det_F   = lqph[q_point]->get_det_F();
+        const double                  p_tilde = lqph[q_point]->get_p_tilde();
+        const double                  J_tilde = lqph[q_point]->get_J_tilde();
+        const double dPsi_vol_dJ   = lqph[q_point]->get_dPsi_vol_dJ();
+        const double d2Psi_vol_dJ2 = lqph[q_point]->get_d2Psi_vol_dJ2();
         const SymmetricTensor<2, dim> &I =
           Physics::Elasticity::StandardTensors<dim>::I;
 
+        // These two tensors store some precomputed data. Their use will
+        // explained shortly.
+        SymmetricTensor<2, dim> symm_grad_Nx_i_x_Jc;
+        Tensor<1, dim>          grad_Nx_i_comp_i_x_tau;
+
         // Next we define some aliases to make the assembly process easier to
-        // follow
+        // follow.
         const std::vector<double> &                 N = scratch.Nx[q_point];
         const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
           scratch.symm_grad_Nx[q_point];
         const std::vector<Tensor<2, dim>> &grad_Nx = scratch.grad_Nx[q_point];
         const double                       JxW = scratch.fe_values.JxW(q_point);
 
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        for (const unsigned int i : scratch.fe_values.dof_indices())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
             const unsigned int i_group = fe.system_to_base_index(i).first.first;
 
-            for (unsigned int j = 0; j <= i; ++j)
+            // We first compute the contributions
+            // from the internal forces.  Note, by
+            // definition of the rhs as the negative
+            // of the residual, these contributions
+            // are subtracted.
+            if (i_group == u_dof)
+              data.cell_rhs(i) -= (symm_grad_Nx[i] * tau) * JxW;
+            else if (i_group == p_dof)
+              data.cell_rhs(i) -= N[i] * (det_F - J_tilde) * JxW;
+            else if (i_group == J_dof)
+              data.cell_rhs(i) -= N[i] * (dPsi_vol_dJ - p_tilde) * JxW;
+            else
+              Assert(i_group <= J_dof, ExcInternalError());
+
+            // Before we go into the inner loop, we have one final chance to
+            // introduce some optimizations. We've already taken into account
+            // the symmetry of the system, and we can now precompute some
+            // common terms that are repeatedly applied in the inner loop.
+            // We won't be excessive here, but will rather focus on expensive
+            // operations, namely those involving the rank-4 material stiffness
+            // tensor and the rank-2 stress tensor.
+            //
+            // What we may observe is that both of these tensors are contracted
+            // with shape function gradients indexed on the "i" DoF. This
+            // implies that this particular operation remains constant as we
+            // loop over the "j" DoF. For that reason, we can extract this from
+            // the inner loop and save the many operations that, for each
+            // quadrature point and DoF index "i" and repeated over index "j"
+            // are required to double contract a rank-2 symmetric tensor with a
+            // rank-4 symmetric tensor, and a rank-1 tensor with a rank-2
+            // tensor.
+            //
+            // At the loss of some readability, this small change will reduce
+            // the assembly time of the symmetrized system by about half when
+            // using the simulation default parameters, and becomes more
+            // significant as the h-refinement level increases.
+            if (i_group == u_dof)
+              {
+                symm_grad_Nx_i_x_Jc    = symm_grad_Nx[i] * Jc;
+                grad_Nx_i_comp_i_x_tau = grad_Nx[i][component_i] * tau_ns;
+              }
+
+            // Now we're prepared to compute the tangent matrix contributions:
+            for (const unsigned int j :
+                 scratch.fe_values.dof_indices_ending_at(i))
               {
                 const unsigned int component_j =
                   fe.system_to_component_index(j).first;
@@ -2174,13 +2136,13 @@ namespace Step44
                 if ((i_group == j_group) && (i_group == u_dof))
                   {
                     // The material contribution:
-                    data.cell_matrix(i, j) += symm_grad_Nx[i] * Jc * //
+                    data.cell_matrix(i, j) += symm_grad_Nx_i_x_Jc *  //
                                               symm_grad_Nx[j] * JxW; //
 
                     // The geometrical stress contribution:
                     if (component_i == component_j)
-                      data.cell_matrix(i, j) += grad_Nx[i][component_i] * tau *
-                                                grad_Nx[j][component_j] * JxW;
+                      data.cell_matrix(i, j) +=
+                        grad_Nx_i_comp_i_x_tau * grad_Nx[j][component_j] * JxW;
                   }
                 // Next is the $\mathsf{\mathbf{k}}_{ \widetilde{p} u}$
                 // contribution
@@ -2203,132 +2165,6 @@ namespace Step44
           }
       }
 
-    // Finally, we need to copy the lower half of the local matrix into the
-    // upper half:
-    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-      for (unsigned int j = i + 1; j < dofs_per_cell; ++j)
-        data.cell_matrix(i, j) = data.cell_matrix(j, i);
-  }
-
-  // @sect4{Solid::assemble_system_rhs}
-  // The assembly of the right-hand side process is similar to the
-  // tangent matrix, so we will not describe it in too much detail.
-  // Note that since we are describing a problem with Neumann BCs,
-  // we will need the face normals and so must specify this in the
-  // update flags.
-  template <int dim>
-  void Solid<dim>::assemble_system_rhs()
-  {
-    timer.enter_subsection("Assemble system right-hand side");
-    std::cout << " ASM_R " << std::flush;
-
-    system_rhs = 0.0;
-
-    const UpdateFlags uf_cell(update_values | update_gradients |
-                              update_JxW_values);
-    const UpdateFlags uf_face(update_values | update_normal_vectors |
-                              update_JxW_values);
-
-    PerTaskData_RHS per_task_data(dofs_per_cell);
-    ScratchData_RHS scratch_data(fe, qf_cell, uf_cell, qf_face, uf_face);
-
-    WorkStream::run(
-      dof_handler.active_cell_iterators(),
-      [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
-             ScratchData_RHS &                                     scratch,
-             PerTaskData_RHS &                                     data) {
-        this->assemble_system_rhs_one_cell(cell, scratch, data);
-      },
-      [this](const PerTaskData_RHS &data) {
-        this->copy_local_to_global_rhs(data);
-      },
-      scratch_data,
-      per_task_data);
-
-    timer.leave_subsection();
-  }
-
-
-
-  template <int dim>
-  void Solid<dim>::copy_local_to_global_rhs(const PerTaskData_RHS &data)
-  {
-    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-      system_rhs(data.local_dof_indices[i]) += data.cell_rhs(i);
-  }
-
-
-
-  template <int dim>
-  void Solid<dim>::assemble_system_rhs_one_cell(
-    const typename DoFHandler<dim>::active_cell_iterator &cell,
-    ScratchData_RHS &                                     scratch,
-    PerTaskData_RHS &                                     data) const
-  {
-    data.reset();
-    scratch.reset();
-    scratch.fe_values.reinit(cell);
-    cell->get_dof_indices(data.local_dof_indices);
-
-    const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
-      quadrature_point_history.get_data(cell);
-    Assert(lqph.size() == n_q_points, ExcInternalError());
-
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-      {
-        const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
-
-        for (unsigned int k = 0; k < dofs_per_cell; ++k)
-          {
-            const unsigned int k_group = fe.system_to_base_index(k).first.first;
-
-            if (k_group == u_dof)
-              scratch.symm_grad_Nx[q_point][k] = symmetrize(
-                scratch.fe_values[u_fe].gradient(k, q_point) * F_inv);
-            else if (k_group == p_dof)
-              scratch.Nx[q_point][k] =
-                scratch.fe_values[p_fe].value(k, q_point);
-            else if (k_group == J_dof)
-              scratch.Nx[q_point][k] =
-                scratch.fe_values[J_fe].value(k, q_point);
-            else
-              Assert(k_group <= J_dof, ExcInternalError());
-          }
-      }
-
-    for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-      {
-        const SymmetricTensor<2, dim> tau     = lqph[q_point]->get_tau();
-        const double                  det_F   = lqph[q_point]->get_det_F();
-        const double                  J_tilde = lqph[q_point]->get_J_tilde();
-        const double                  p_tilde = lqph[q_point]->get_p_tilde();
-        const double dPsi_vol_dJ = lqph[q_point]->get_dPsi_vol_dJ();
-
-        const std::vector<double> &                 N = scratch.Nx[q_point];
-        const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
-          scratch.symm_grad_Nx[q_point];
-        const double JxW = scratch.fe_values.JxW(q_point);
-
-        // We first compute the contributions
-        // from the internal forces.  Note, by
-        // definition of the rhs as the negative
-        // of the residual, these contributions
-        // are subtracted.
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          {
-            const unsigned int i_group = fe.system_to_base_index(i).first.first;
-
-            if (i_group == u_dof)
-              data.cell_rhs(i) -= (symm_grad_Nx[i] * tau) * JxW;
-            else if (i_group == p_dof)
-              data.cell_rhs(i) -= N[i] * (det_F - J_tilde) * JxW;
-            else if (i_group == J_dof)
-              data.cell_rhs(i) -= N[i] * (dPsi_vol_dJ - p_tilde) * JxW;
-            else
-              Assert(i_group <= J_dof, ExcInternalError());
-          }
-      }
-
     // Next we assemble the Neumann contribution. We first check to see it the
     // cell face exists on a boundary on which a traction is applied and add
     // the contribution if this is the case.
@@ -2337,8 +2173,8 @@ namespace Step44
         {
           scratch.fe_face_values.reinit(cell, face);
 
-          for (unsigned int f_q_point = 0; f_q_point < n_q_points_f;
-               ++f_q_point)
+          for (const unsigned int f_q_point :
+               scratch.fe_face_values.quadrature_point_indices())
             {
               const Tensor<1, dim> &N =
                 scratch.fe_face_values.normal_vector(f_q_point);
@@ -2362,7 +2198,7 @@ namespace Step44
               const double         pressure  = p0 * parameters.p_p0 * time_ramp;
               const Tensor<1, dim> traction  = pressure * N;
 
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              for (const unsigned int i : scratch.fe_values.dof_indices())
                 {
                   const unsigned int i_group =
                     fe.system_to_base_index(i).first.first;
@@ -2380,198 +2216,196 @@ namespace Step44
                 }
             }
         }
+
+    // Finally, we need to copy the lower half of the local matrix into the
+    // upper half:
+    for (const unsigned int i : scratch.fe_values.dof_indices())
+      for (const unsigned int j :
+           scratch.fe_values.dof_indices_starting_at(i + 1))
+        data.cell_matrix(i, j) = data.cell_matrix(j, i);
   }
+
+
 
   // @sect4{Solid::make_constraints}
   // The constraints for this problem are simple to describe.
-  // However, since we are dealing with an iterative Newton method,
-  // it should be noted that any displacement constraints should only
-  // be specified at the zeroth iteration and subsequently no
-  // additional contributions are to be made since the constraints
-  // are already exactly satisfied.
+  // In this particular example, the boundary values will be calculated for
+  // the two first iterations of Newton's algorithm. In general, one would
+  // build non-homogeneous constraints in the zeroth iteration (that is, when
+  // `apply_dirichlet_bc == true` in the code block that follows) and build
+  // only the corresponding homogeneous constraints in the following step. While
+  // the current example has only homogeneous constraints, previous experiences
+  // have shown that a common error is forgetting to add the extra condition
+  // when refactoring the code to specific uses. This could lead to errors that
+  // are hard to debug. In this spirit, we choose to make the code more verbose
+  // in terms of what operations are performed at each Newton step.
   template <int dim>
-  void Solid<dim>::make_constraints(const int &it_nr)
+  void Solid<dim>::make_constraints(const int it_nr)
   {
-    std::cout << " CST " << std::flush;
-
-    // Since the constraints are different at different Newton iterations, we
-    // need to clear the constraints matrix and completely rebuild
-    // it. However, after the first iteration, the constraints remain the same
-    // and we can simply skip the rebuilding step if we do not clear it.
-    if (it_nr > 1)
-      return;
-    constraints.clear();
+    // Since we (a) are dealing with an iterative Newton method, (b) are using
+    // an incremental formulation for the displacement, and (c) apply the
+    // constraints to the incremental displacement field, any non-homogeneous
+    // constraints on the displacement update should only be specified at the
+    // zeroth iteration. No subsequent contributions are to be made since the
+    // constraints will be exactly satisfied after that iteration.
     const bool apply_dirichlet_bc = (it_nr == 0);
 
-    // In this particular example, the boundary values will be calculated for
-    // the two first iterations of Newton's algorithm. In general, one would
-    // build non-homogeneous constraints in the zeroth iteration (that is, when
-    // `apply_dirichlet_bc == true`) and build only the corresponding
-    // homogeneous constraints in the following step. While the current
-    // example has only homogeneous constraints, previous experiences have
-    // shown that a common error is forgetting to add the extra condition when
-    // refactoring the code to specific uses. This could lead errors that are
-    // hard to debug. In this spirit, we choose to make the code more verbose
-    // in terms of what operations are performed at each Newton step.
-    //
-    // The boundary conditions for the indentation problem are as follows: On
-    // the -x, -y and -z faces (IDs 0,2,4) we set up a symmetry condition to
-    // allow only planar movement while the +x and +z faces (IDs 1,5) are
-    // traction free. In this contrived problem, part of the +y face (ID 3) is
-    // set to have no motion in the x- and z-component. Finally, as described
-    // earlier, the other part of the +y face has an the applied pressure but
-    // is also constrained in the x- and z-directions.
-    //
-    // In the following, we will have to tell the function interpolation
-    // boundary values which components of the solution vector should be
-    // constrained (i.e., whether it's the x-, y-, z-displacements or
-    // combinations thereof). This is done using ComponentMask objects (see
-    // @ref GlossComponentMask) which we can get from the finite element if we
-    // provide it with an extractor object for the component we wish to
-    // select. To this end we first set up such extractor objects and later
-    // use it when generating the relevant component masks:
-    const FEValuesExtractors::Scalar x_displacement(0);
-    const FEValuesExtractors::Scalar y_displacement(1);
-
-    {
-      const int boundary_id = 0;
-
-      if (apply_dirichlet_bc == true)
-        VectorTools::interpolate_boundary_values(
-          dof_handler,
-          boundary_id,
-          Functions::ZeroFunction<dim>(n_components),
-          constraints,
-          fe.component_mask(x_displacement));
-      else
-        VectorTools::interpolate_boundary_values(
-          dof_handler,
-          boundary_id,
-          Functions::ZeroFunction<dim>(n_components),
-          constraints,
-          fe.component_mask(x_displacement));
-    }
-    {
-      const int boundary_id = 2;
-
-      if (apply_dirichlet_bc == true)
-        VectorTools::interpolate_boundary_values(
-          dof_handler,
-          boundary_id,
-          Functions::ZeroFunction<dim>(n_components),
-          constraints,
-          fe.component_mask(y_displacement));
-      else
-        VectorTools::interpolate_boundary_values(
-          dof_handler,
-          boundary_id,
-          Functions::ZeroFunction<dim>(n_components),
-          constraints,
-          fe.component_mask(y_displacement));
-    }
-
-    if (dim == 3)
+    // Furthermore, after the first Newton iteration within a timestep, the
+    // constraints remain the same and we do not need to modify or rebuild them
+    // so long as we do not clear the @p constraints object.
+    if (it_nr > 1)
       {
-        const FEValuesExtractors::Scalar z_displacement(2);
+        std::cout << " --- " << std::flush;
+        return;
+      }
+
+    std::cout << " CST " << std::flush;
+
+    if (apply_dirichlet_bc)
+      {
+        // At the zeroth Newton iteration we wish to apply the full set of
+        // non-homogeneous and homogeneous constraints that represent the
+        // boundary conditions on the displacement increment. Since in general
+        // the constraints may be different at each time step, we need to clear
+        // the constraints matrix and completely rebuild it. An example case
+        // would be if a surface is accelerating; in such a scenario the change
+        // in displacement is non-constant between each time step.
+        constraints.clear();
+
+        // The boundary conditions for the indentation problem in 3D are as
+        // follows: On the -x, -y and -z faces (IDs 0,2,4) we set up a symmetry
+        // condition to allow only planar movement while the +x and +z faces
+        // (IDs 1,5) are traction free. In this contrived problem, part of the
+        // +y face (ID 3) is set to have no motion in the x- and z-component.
+        // Finally, as described earlier, the other part of the +y face has an
+        // the applied pressure but is also constrained in the x- and
+        // z-directions.
+        //
+        // In the following, we will have to tell the function interpolation
+        // boundary values which components of the solution vector should be
+        // constrained (i.e., whether it's the x-, y-, z-displacements or
+        // combinations thereof). This is done using ComponentMask objects (see
+        // @ref GlossComponentMask) which we can get from the finite element if we
+        // provide it with an extractor object for the component we wish to
+        // select. To this end we first set up such extractor objects and later
+        // use it when generating the relevant component masks:
+        const FEValuesExtractors::Scalar x_displacement(0);
+        const FEValuesExtractors::Scalar y_displacement(1);
 
         {
-          const int boundary_id = 3;
+          const int boundary_id = 0;
 
-          if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement) |
-               fe.component_mask(z_displacement)));
-          else
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement) |
-               fe.component_mask(z_displacement)));
+          VectorTools::interpolate_boundary_values(
+            dof_handler,
+            boundary_id,
+            Functions::ZeroFunction<dim>(n_components),
+            constraints,
+            fe.component_mask(x_displacement));
         }
         {
-          const int boundary_id = 4;
+          const int boundary_id = 2;
 
-          if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              fe.component_mask(z_displacement));
-          else
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              fe.component_mask(z_displacement));
+          VectorTools::interpolate_boundary_values(
+            dof_handler,
+            boundary_id,
+            Functions::ZeroFunction<dim>(n_components),
+            constraints,
+            fe.component_mask(y_displacement));
         }
 
-        {
-          const int boundary_id = 6;
+        if (dim == 3)
+          {
+            const FEValuesExtractors::Scalar z_displacement(2);
 
-          if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement) |
-               fe.component_mask(z_displacement)));
-          else
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement) |
-               fe.component_mask(z_displacement)));
-        }
+            {
+              const int boundary_id = 3;
+
+              VectorTools::interpolate_boundary_values(
+                dof_handler,
+                boundary_id,
+                Functions::ZeroFunction<dim>(n_components),
+                constraints,
+                (fe.component_mask(x_displacement) |
+                 fe.component_mask(z_displacement)));
+            }
+            {
+              const int boundary_id = 4;
+
+              VectorTools::interpolate_boundary_values(
+                dof_handler,
+                boundary_id,
+                Functions::ZeroFunction<dim>(n_components),
+                constraints,
+                fe.component_mask(z_displacement));
+            }
+
+            {
+              const int boundary_id = 6;
+
+              VectorTools::interpolate_boundary_values(
+                dof_handler,
+                boundary_id,
+                Functions::ZeroFunction<dim>(n_components),
+                constraints,
+                (fe.component_mask(x_displacement) |
+                 fe.component_mask(z_displacement)));
+            }
+          }
+        else
+          {
+            {
+              const int boundary_id = 3;
+
+              VectorTools::interpolate_boundary_values(
+                dof_handler,
+                boundary_id,
+                Functions::ZeroFunction<dim>(n_components),
+                constraints,
+                (fe.component_mask(x_displacement)));
+            }
+            {
+              const int boundary_id = 6;
+
+              VectorTools::interpolate_boundary_values(
+                dof_handler,
+                boundary_id,
+                Functions::ZeroFunction<dim>(n_components),
+                constraints,
+                (fe.component_mask(x_displacement)));
+            }
+          }
       }
     else
       {
-        {
-          const int boundary_id = 3;
+        // As all Dirichlet constraints are fulfilled exactly after the zeroth
+        // Newton iteration, we want to ensure that no further modification are
+        // made to those entries. This implies that we want to convert
+        // all non-homogeneous Dirichlet constraints into homogeneous ones.
+        //
+        // In this example the procedure to do this is quite straightforward,
+        // and in fact we can (and will) circumvent any unnecessary operations
+        // when only homogeneous boundary conditions are applied.
+        // In a more general problem one should be mindful of hanging node
+        // and periodic constraints, which may also introduce some
+        // inhomogeneities. It might then be advantageous to keep disparate
+        // objects for the different types of constraints, and merge them
+        // together once the homogeneous Dirichlet constraints have been
+        // constructed.
+        if (constraints.has_inhomogeneities())
+          {
+            // Since the affine constraints were finalized at the previous
+            // Newton iteration, they may not be modified directly. So
+            // we need to copy them to another temporary object and make
+            // modification there. Once we're done, we'll transfer them
+            // back to the main @p constraints object.
+            AffineConstraints<double> homogeneous_constraints(constraints);
+            for (unsigned int dof = 0; dof != dof_handler.n_dofs(); ++dof)
+              if (homogeneous_constraints.is_inhomogeneously_constrained(dof))
+                homogeneous_constraints.set_inhomogeneity(dof, 0.0);
 
-          if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement)));
-          else
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement)));
-        }
-        {
-          const int boundary_id = 6;
-
-          if (apply_dirichlet_bc == true)
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement)));
-          else
-            VectorTools::interpolate_boundary_values(
-              dof_handler,
-              boundary_id,
-              Functions::ZeroFunction<dim>(n_components),
-              constraints,
-              (fe.component_mask(x_displacement)));
-        }
+            constraints.clear();
+            constraints.copy_from(homogeneous_constraints);
+          }
       }
 
     constraints.close();
@@ -3362,7 +3196,8 @@ namespace Step44
     solution_name.emplace_back("dilatation");
 
     DataOutBase::VtkFlags output_flags;
-    output_flags.write_higher_order_cells = true;
+    output_flags.write_higher_order_cells       = true;
+    output_flags.physical_units["displacement"] = "m";
     data_out.set_flags(output_flags);
 
     data_out.attach_dof_handler(dof_handler);

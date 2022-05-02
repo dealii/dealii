@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -151,13 +151,9 @@ check(const FiniteElement<dim> &fe)
   for (unsigned int level = 0; level < tr.n_levels(); ++level)
     DoFRenumbering::component_wise(mg_dof_handler, level);
 
-  std::vector<std::set<unsigned int>> boundary_indices(tr.n_levels());
-  std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-  Functions::ZeroFunction<dim> dirichlet_bc(fe.n_components());
-  dirichlet_boundary[3] = &dirichlet_bc;
-
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+  mg_constrained_dofs.initialize(mg_dof_handler);
+  mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {3});
 
   MGTransferPrebuilt<Vector<double>> transfer(mg_constrained_dofs);
   transfer.build(mg_dof_handler);

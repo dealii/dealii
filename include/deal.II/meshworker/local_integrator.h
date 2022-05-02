@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,8 +51,6 @@ namespace MeshWorker
    * true, the function will cause an exception ExcPureFunction.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat
-   * @date 2012
    */
   template <int dim, int spacedim = dim, typename number = double>
   class LocalIntegrator : public Subscriptor

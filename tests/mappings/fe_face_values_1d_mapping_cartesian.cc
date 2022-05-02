@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,7 @@ plot_faces(Mapping<dim> &                           mapping,
       // now print some data on the shape
       // functions
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-        deallog << "shape_function " << i << ":" << std::endl
+        deallog << "shape_function " << i << ':' << std::endl
                 << "  phi=" << fe_values.shape_value(i, 0) << std::endl
                 << "  grad phi=" << fe_values.shape_grad(i, 0) << std::endl
                 << "  grad^2 phi=" << fe_values.shape_hessian(i, 0)
@@ -123,7 +123,7 @@ plot_subfaces(Mapping<dim> &                           mapping,
         // now print some data on the shape
         // functions
         for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-          deallog << "shape_function " << i << ":" << std::endl
+          deallog << "shape_function " << i << ':' << std::endl
                   << "  phi=" << fe_values.shape_value(i, 0) << std::endl
                   << "  grad phi=" << fe_values.shape_grad(i, 0) << std::endl
                   << "  grad^2 phi=" << fe_values.shape_hessian(i, 0)

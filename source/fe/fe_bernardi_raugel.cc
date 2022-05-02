@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,6 @@
 #include <deal.II/base/polynomials_p.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 
@@ -31,10 +30,15 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 
 DEAL_II_NAMESPACE_OPEN
+
+// TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+// adjust_line_dof_index_for_line_orientation_table fields, and write tests
+// similar to bits/face_orientation_and_fe_q_*
 
 template <int dim>
 FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
@@ -52,7 +56,7 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
   Assert(dim == 2 || dim == 3, ExcImpossibleInDim(dim));
   Assert(p == 1, ExcMessage("Only BR1 elements are available"));
 
-  // const unsigned int n_dofs = this->dofs_per_cell;
+  // const unsigned int n_dofs = this->n_dofs_per_cell();
 
   this->mapping_kind = {mapping_none};
   // These must be done first, since
@@ -62,6 +66,10 @@ FE_BernardiRaugel<dim>::FE_BernardiRaugel(const unsigned int p)
   // Set up the generalized support
   // points
   initialize_support_points();
+
+  // We need to initialize the dof permutation table and the one for the sign
+  // change.
+  initialize_quad_dof_index_permutation_and_sign_change();
 }
 
 
@@ -77,12 +85,24 @@ FE_BernardiRaugel<dim>::get_name() const
 }
 
 
+template <int dim>
+void
+FE_BernardiRaugel<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+{
+  // for 1D and 2D, do nothing
+  if (dim < 3)
+    return;
+
+  // TODO: Implement this for this class
+  return;
+}
+
 
 template <int dim>
 std::unique_ptr<FiniteElement<dim, dim>>
 FE_BernardiRaugel<dim>::clone() const
 {
-  return std_cxx14::make_unique<FE_BernardiRaugel<dim>>(*this);
+  return std::make_unique<FE_BernardiRaugel<dim>>(*this);
 }
 
 
@@ -97,8 +117,8 @@ FE_BernardiRaugel<dim>::convert_generalized_support_point_values_to_dof_values(
          ExcDimensionMismatch(support_point_values.size(),
                               this->generalized_support_points.size()));
   AssertDimension(support_point_values[0].size(), dim);
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  Assert(nodal_values.size() == this->n_dofs_per_cell(),
+         ExcDimensionMismatch(nodal_values.size(), this->n_dofs_per_cell()));
 
   std::vector<Tensor<1, dim>> normals;
   for (unsigned int i : GeometryInfo<dim>::face_indices())
@@ -150,7 +170,7 @@ FE_BernardiRaugel<dim>::initialize_support_points()
 {
   // The support points for our shape functions are the vertices and
   // the face midpoints, for a total of #vertices + #faces points
-  this->generalized_support_points.resize(this->dofs_per_cell);
+  this->generalized_support_points.resize(this->n_dofs_per_cell());
 
   // We need dim copies of each vertex for the first dim*vertices_per_cell
   // generalized support points
@@ -177,7 +197,6 @@ FE_BernardiRaugel<dim>::initialize_support_points()
     }
 }
 
-template class FE_BernardiRaugel<1>;
 template class FE_BernardiRaugel<2>;
 template class FE_BernardiRaugel<3>;
 

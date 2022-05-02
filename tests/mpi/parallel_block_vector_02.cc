@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,7 +87,7 @@ test()
     AssertDimension(i + 1, (unsigned int)w.block(i)(1));
 
   // zero out ghosts, now all processors except processor 1 should have 0.
-  w.zero_out_ghosts();
+  w.zero_out_ghost_values();
   for (unsigned int i = 0; i < 3; ++i)
     if (myid == 0)
       {

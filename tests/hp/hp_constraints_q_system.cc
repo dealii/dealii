@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// check that computation of hp constraints works for FESystem(FE_Q) elements
+// check that computation of hp-constraints works for FESystem(FE_Q) elements
 // correctly on a uniformly refined mesh for functions of degree q
 
 char logname[] = "output";
@@ -34,7 +34,7 @@ test()
   for (unsigned int i = 1; i < 4; ++i)
     {
       fe.push_back(FESystem<dim>(
-        FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)), 1, FE_DGQ<dim>(i + 1), 1));
+        FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)), 1, FE_DGQ<dim>(i + 1), 1));
       degrees.push_back(i);
     }
 

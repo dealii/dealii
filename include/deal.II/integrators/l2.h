@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,8 +37,6 @@ namespace LocalIntegrators
    * @brief Local integrators related to <i>L<sup>2</sup></i>-inner products.
    *
    * @ingroup Integrators
-   * @author Guido Kanschat
-   * @date 2010
    */
   namespace L2
   {
@@ -54,9 +52,6 @@ namespace LocalIntegrators
      * @param fe The FEValues object describing the local trial function
      * space. #update_values and #update_JxW_values must be set.
      * @param factor A constant that multiplies the mass matrix.
-     *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim>
     void
@@ -108,9 +103,6 @@ namespace LocalIntegrators
      * @param weights The weights, $\omega(x)$, evaluated at the quadrature
      * points in the finite element (size must be equal to the number of
      * quadrature points in the element).
-     *
-     * @author Guido Kanschat
-     * @date 2014
      */
     template <int dim>
     void
@@ -162,9 +154,6 @@ namespace LocalIntegrators
      * points in the finite element (size must be equal to the number of
      * quadrature points in the element).
      * @param factor A constant that multiplies the result.
-     *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim, typename number>
     void
@@ -195,9 +184,6 @@ namespace LocalIntegrators
      * at the quadrature points in the finite element (size of each component
      * must be equal to the number of quadrature points in the element).
      * @param factor A constant that multiplies the result.
-     *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim, typename number>
     void
@@ -246,9 +232,6 @@ namespace LocalIntegrators
      * first cell.
      * @param factor2 A constant that multiplies the shape functions for the
      * second cell.
-     *
-     * @author Guido Kanschat
-     * @date 2008, 2009, 2010
      */
     template <int dim>
     void
@@ -261,8 +244,8 @@ namespace LocalIntegrators
                 const double             factor1 = 1.,
                 const double             factor2 = 1.)
     {
-      const unsigned int n1_dofs      = fe1.dofs_per_cell;
-      const unsigned int n2_dofs      = fe2.dofs_per_cell;
+      const unsigned int n1_dofs      = fe1.n_dofs_per_cell();
+      const unsigned int n2_dofs      = fe2.n_dofs_per_cell();
       const unsigned int n_components = fe1.get_fe().n_components();
 
       Assert(n1_dofs == n2_dofs, ExcNotImplemented());

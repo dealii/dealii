@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -209,7 +209,7 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
           &                  patches,
         const DataOutFilter &data_filter,
         const std::string &  filename,
-        MPI_Comm             comm);
+        const MPI_Comm &     comm);
 
       template void
       write_filtered_data(

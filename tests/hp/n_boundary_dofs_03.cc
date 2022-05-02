@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
@@ -35,7 +37,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include "../tests.h"
@@ -61,8 +62,8 @@ test()
   // assign boundary ids
   triangulation.begin()->face(0)->set_boundary_id(12);
   triangulation.begin()->face(1)->set_boundary_id(13);
-  (++triangulation.begin())->face(0)->set_boundary_id(14);
-  (++triangulation.begin())->face(1)->set_boundary_id(15);
+  std::next(triangulation.begin())->face(0)->set_boundary_id(14);
+  std::next(triangulation.begin())->face(1)->set_boundary_id(15);
 
 
   hp::FECollection<1, spacedim> fe;
@@ -70,10 +71,10 @@ test()
     FESystem<1, spacedim>(FE_Q<1, spacedim>(1), 1, FE_DGQ<1, spacedim>(1), 1));
   fe.push_back(FESystem<1, spacedim>(FE_Q<1, spacedim>(2), 2));
 
-  hp::DoFHandler<1, spacedim> dof_handler(triangulation);
+  DoFHandler<1, spacedim> dof_handler(triangulation);
 
   unsigned int index = 0;
-  for (typename hp::DoFHandler<1, spacedim>::active_cell_iterator cell =
+  for (typename DoFHandler<1, spacedim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell, ++index)

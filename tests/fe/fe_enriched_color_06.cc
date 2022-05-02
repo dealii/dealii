@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
  * The function return FE_Collection which is then printed to test.
  */
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -32,7 +33,6 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -97,9 +97,9 @@ main(int argc, char **argv)
   MPILogInitAll                    all;
 
   // Make basic grid
-  const unsigned int  dim = 2;
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  const unsigned int dim = 2;
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler(triangulation);
   GridGenerator::hyper_cube(triangulation, -2, 2);
   triangulation.refine_global(2);
 
@@ -114,11 +114,11 @@ main(int argc, char **argv)
   for (unsigned int i = 0; i < vec_predicates.size(); ++i)
     {
       // constant function.
-      ConstantFunction<dim> func(10 + i); // constant function
+      Functions::ConstantFunction<dim> func(10 + i); // constant function
       vec_enrichments.push_back(std::make_shared<ConstantFunction<dim>>(func));
     }
 
-  // Construct helper class to construct fe collection
+  // Construct helper class to construct FE collection
   FE_Q<dim>                         fe_base(2);
   FE_Q<dim>                         fe_enriched(1);
   static ColorEnriched::Helper<dim> fe_space(fe_base,

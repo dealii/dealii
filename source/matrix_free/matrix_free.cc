@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,8 +25,5 @@
 DEAL_II_NAMESPACE_OPEN
 
 #include "matrix_free.inst"
-
-template struct internal::MatrixFreeFunctions::ShapeInfo<double>;
-template struct internal::MatrixFreeFunctions::ShapeInfo<float>;
 
 DEAL_II_NAMESPACE_CLOSE

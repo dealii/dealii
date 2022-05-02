@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,18 +74,16 @@ test()
 
   Point<2> test_point(250, 195);
   std::cout << "Checking Point " << test_point << std::endl;
-  try
+  auto current_cell = GridTools::find_active_cell_around_point(MappingQ<2>(1),
+                                                               triangulation,
+                                                               test_point);
+  if (current_cell.first.state() == IteratorState::valid)
     {
-      std::pair<Triangulation<2>::active_cell_iterator, Point<2>> current_cell =
-        GridTools::find_active_cell_around_point(MappingQGeneric<2>(1),
-                                                 triangulation,
-                                                 test_point);
-
       deallog << "cell: index = " << current_cell.first->index()
               << " level = " << current_cell.first->level() << std::endl;
       deallog << " pos: " << current_cell.second << std::endl;
     }
-  catch (GridTools::ExcPointNotFound<2> &e)
+  else
     {
       deallog << "outside" << std::endl;
     }

@@ -1,0 +1,7 @@
+New: FEInterfaceViews now has functions get_*_function_values() and 
+get_*_function_values_from_local_dof_values() to evaluate solution 
+values across cell faces, such as the jump in (or average of) values, 
+gradients, and Hessians. With these functions, FEInterfaceValues 
+can now be used with automatic differentiation.
+<br>
+(Jiaqi Zhang, 2021/08/11)

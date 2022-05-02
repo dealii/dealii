@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,8 +27,8 @@ template <int dim>
 void
 check()
 {
-  typedef Tensor<3, dim> T;
-  T                      t;
+  using T = Tensor<3, dim>;
+  T t;
   for (unsigned int i = 0; i < T::n_independent_components; ++i)
     t[T::unrolled_to_component_indices(i)] = (i + 1) * (i + 2);
 

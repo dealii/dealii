@@ -1,0 +1,55 @@
+DEAL::-----------------------------------
+DEAL::2d, p=1, max_p=4
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Legendre coefficients:
+DEAL::1.33227e-15
+DEAL::smoothness:
+DEAL::inf
+DEAL::expected smoothness:
+DEAL::inf
+DEAL::-----------------------------------
+DEAL::2d, p=2, max_p=5
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Legendre coefficients:
+DEAL::7.27596e-12
+DEAL::smoothness:
+DEAL::1.00000
+DEAL::expected smoothness:
+DEAL::1.00000
+DEAL::-----------------------------------
+DEAL::3d, p=1, max_p=4
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Legendre coefficients:
+DEAL::1.77636e-15
+DEAL::smoothness:
+DEAL::inf
+DEAL::expected smoothness:
+DEAL::inf
+DEAL::-----------------------------------
+DEAL::3d, p=3, max_p=6
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Legendre coefficients:
+DEAL::1.38017e-11
+DEAL::smoothness:
+DEAL::2.00000
+DEAL::expected smoothness:
+DEAL::2.00000
+DEAL::-----------------------------------
+DEAL::3d, p=4, max_p=7
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Legendre coefficients:
+DEAL::1.31877e-11
+DEAL::smoothness:
+DEAL::2.00000
+DEAL::expected smoothness:
+DEAL::2.00000
+DEAL::-----------------------------------
+DEAL::3d, p=3, max_p=6
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Legendre coefficients:
+DEAL::0.00000
+DEAL::smoothness:
+DEAL::inf
+DEAL::expected smoothness:
+DEAL::inf
+DEAL::Ok

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,7 @@ template <int dim>
 class Local : public Subscriptor
 {
 public:
-  typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+  using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
   void
   cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
@@ -151,7 +151,7 @@ test_simple(DoFHandler<dim> &dofs, bool faces)
   local.cells = true;
   local.faces = faces;
 
-  MappingQGeneric<dim> mapping(1);
+  MappingQ<dim> mapping(1);
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
   info_box.initialize_gauss_quadrature(1, 1, 1);

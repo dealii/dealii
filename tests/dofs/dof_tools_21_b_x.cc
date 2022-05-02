@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,7 @@
 //                                 dealii::AffineConstraints<double> &,
 //                                 const std::vector<bool>  &,
 //                                 bool, bool, bool)
-// for correct behaviour on non standard oriented meshes.
+// for correct behavior on non standard oriented meshes.
 //
 // a redux of why the 21_b test failed starting in r29525. in essence,
 // what it boils down is that the new code did not implement the
@@ -58,7 +58,8 @@ std::ofstream logfile("output");
  */
 
 /* The 2D case */
-void generate_grid(Triangulation<2> &triangulation)
+void
+generate_grid(Triangulation<2> &triangulation)
 {
   Point<2> vertices_1[] = {
     Point<2>(-1., -3.),
@@ -107,28 +108,79 @@ void generate_grid(Triangulation<2> &triangulation)
   face_2->set_boundary_id(43);
 }
 
+/* The 2D in 3D case */
+void
+generate_grid(Triangulation<2, 3> &triangulation)
+{
+  Point<3> vertices_1[] = {
+    Point<3>(-1., -3., 0.),
+    Point<3>(+1., -3., 0.),
+    Point<3>(-1., -1., 0.),
+    Point<3>(+1., -1., 0.),
+    Point<3>(-1., +1., 0.),
+    Point<3>(+1., +1., 0.),
+    Point<3>(-1., +3., 0.),
+    Point<3>(+1., +3., 0.),
+  };
+  std::vector<Point<3>> vertices(&vertices_1[0], &vertices_1[8]);
+
+  std::vector<CellData<2>> cells(2, CellData<2>());
+
+  /* cell 0 */
+  int cell_vertices_0[GeometryInfo<2>::vertices_per_cell] = {0, 1, 2, 3};
+
+  /* cell 1 */
+  int cell_vertices_1[GeometryInfo<2>::vertices_per_cell] = {7, 6, 5, 4};
+
+  for (const unsigned int j : GeometryInfo<2>::vertex_indices())
+    {
+      cells[0].vertices[j] = cell_vertices_0[j];
+      cells[1].vertices[j] = cell_vertices_1[j];
+    }
+  cells[0].material_id = 0;
+  cells[1].material_id = 0;
+
+  triangulation.create_triangulation(vertices, cells, SubCellData());
+
+  Triangulation<2, 3>::cell_iterator cell_1 = triangulation.begin();
+  Triangulation<2, 3>::cell_iterator cell_2 = cell_1++;
+  Triangulation<2, 3>::face_iterator face_1;
+  Triangulation<2, 3>::face_iterator face_2;
+
+  // Look for the two outermost faces:
+  for (const unsigned int j : GeometryInfo<2>::face_indices())
+    {
+      if (cell_1->face(j)->center()(1) > 2.9)
+        face_1 = cell_1->face(j);
+      if (cell_2->face(j)->center()(1) < -2.9)
+        face_2 = cell_2->face(j);
+    }
+  face_1->set_boundary_id(42);
+  face_2->set_boundary_id(43);
+}
+
 
 /*
  * Print out all face DoFs and support points as well as the actual
  * matching via make_periodicity_constraints
  */
-template <int dim>
+template <int dim, int spacedim>
 void
-print_matching(DoFHandler<dim> &dof_handler)
+print_matching(DoFHandler<dim, spacedim> &dof_handler)
 {
-  const FiniteElement<dim> &fe = dof_handler.get_fe();
-  MappingQ<dim>             mapping(1);
+  const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
+  MappingQ<dim, spacedim>             mapping(1);
 
-  AffineConstraints<double> constraint_matrix;
-  std::vector<Point<dim>>   support_points(dof_handler.n_dofs());
-  DoFTools::map_dofs_to_support_points<dim>(mapping,
-                                            dof_handler,
-                                            support_points);
+  AffineConstraints<double>    constraint_matrix;
+  std::vector<Point<spacedim>> support_points(dof_handler.n_dofs());
+  DoFTools::map_dofs_to_support_points<dim, spacedim>(mapping,
+                                                      dof_handler,
+                                                      support_points);
 
   // Look for the two outermost faces:
-  typename DoFHandler<dim>::face_iterator face_1 =
-    (++dof_handler.begin(0))->face(2);
-  typename DoFHandler<dim>::face_iterator face_2 =
+  typename DoFHandler<dim, spacedim>::face_iterator face_1 =
+    (std::next(dof_handler.begin(0)))->face(2);
+  typename DoFHandler<dim, spacedim>::face_iterator face_2 =
     dof_handler.begin(0)->face(2);
 
   // Determine the orientation of the two faces:
@@ -175,14 +227,27 @@ main()
   logfile << std::setprecision(4);
   deallog.attach(logfile);
 
-  // Generate a triangulation and match:
-  Triangulation<2> triangulation;
-  FE_Q<2>          fe(1);
-  DoFHandler<2>    dof_handler;
+  {
+    // Generate a triangulation and match:
+    Triangulation<2> triangulation;
+    FE_Q<2>          fe(1);
+    DoFHandler<2>    dof_handler(triangulation);
 
-  generate_grid(triangulation);
-  dof_handler.initialize(triangulation, fe);
-  print_matching(dof_handler);
+    generate_grid(triangulation);
+    dof_handler.distribute_dofs(fe);
+    print_matching(dof_handler);
+  }
+
+  {
+    // Generate a triangulation and match:
+    Triangulation<2, 3> triangulation;
+    FE_Q<2, 3>          fe(1);
+    DoFHandler<2, 3>    dof_handler(triangulation);
+
+    generate_grid(triangulation);
+    dof_handler.distribute_dofs(fe);
+    print_matching(dof_handler);
+  }
 
   return 0;
 }

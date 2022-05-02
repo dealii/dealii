@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,12 +16,13 @@
 
 
 // Like hp/matrices, but only the boundary mass matrices for vector-valued
-// (non-primitive) hp objects are being tested.
+// (non-primitive) hp-objects are being tested.
 
 
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
@@ -35,7 +36,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
@@ -95,7 +95,7 @@ check()
   hp::FECollection<dim> element;
   element.push_back(
     FESystem<dim>(FE_RaviartThomasNodal<dim>(1), 1, FE_DGQ<dim>(1), 1));
-  hp::DoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
   MySquareFunction<dim>                               coefficient;

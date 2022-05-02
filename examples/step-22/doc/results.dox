@@ -278,7 +278,7 @@ is not a good choice in 3D - a full decomposition needs many new entries that
 
 
 
-<h3>Possible Extensions</h3>
+<h3>Possibilities for extensions</h3>
 
 <a name="improved-solver">
 <h4>Improved linear solver in 3D</h4>
@@ -346,6 +346,7 @@ mesh-independent number of iterations, say 10 to 30. We have seen such a
 candidate in step-16: multigrid.
 
 <h5>Block Schur complement preconditioner</h5>
+<a name="block-schur"></a>
 Even with a good preconditioner for $A$, we still
 need to solve of the same linear system repeatedly (with different
 right hand sides, though) in order to make the Schur complement solve
@@ -791,4 +792,3 @@ then we get images where the fault line is curved:
     </td>
   </tr>
 </table>
-

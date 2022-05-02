@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// cell->set_dof_values_by_interpolation can not work properly in the hp
+// cell->set_dof_values_by_interpolation can not work properly in the hp-
 // context when called on non-active cells because these do not have a
 // finite element associated with them
 //
@@ -25,6 +25,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -32,8 +33,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -47,7 +46,7 @@ template <int dim>
 void
 test()
 {
-  deallog << dim << "D" << std::endl;
+  deallog << dim << 'D' << std::endl;
 
   // create a hp::DoFHandler with different finite elements on the
   // cells. note that we skip setting active_fe_indices on inactive
@@ -58,10 +57,10 @@ test()
 
   hp::FECollection<dim> fe;
   for (unsigned int i = 1; i < 5; ++i)
-    fe.push_back(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)));
+    fe.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)));
 
-  hp::DoFHandler<dim> dof_handler(tr);
-  for (typename hp::DoFHandler<dim>::cell_iterator cell = dof_handler.begin();
+  DoFHandler<dim> dof_handler(tr);
+  for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin();
        cell != dof_handler.end();
        ++cell)
     if (cell->has_children() == false)
@@ -73,14 +72,14 @@ test()
 
   // do the test where we set data on the coarsest cell with an
   // explicit Q1 space
-  typename hp::DoFHandler<dim>::cell_iterator cell = dof_handler.begin(0);
-  Vector<double>                              local(fe[0].dofs_per_cell);
+  typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin(0);
+  Vector<double>                          local(fe[0].dofs_per_cell);
   for (unsigned int i = 0; i < local.size(); ++i)
     local(i) = i;
   cell->set_dof_values_by_interpolation(local, solution, 0);
 
   // for comparison purposes, also output the values of DoFs on all cells
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)

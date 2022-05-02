@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,6 @@
 
 
 // a un-hp-ified version of hp/step-13
-
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -193,7 +188,7 @@ namespace Evaluation
     //     data_out.build_patches ();
 
     //     std::ostringstream filename;
-    //     filename << output_name_base << "-"
+    //     filename << output_name_base << '-'
     //       << this->refinement_cycle
     //       << data_out.default_suffix (output_format)
     //       << std::ends;
@@ -352,7 +347,7 @@ namespace LaplaceSolver
   void
   Solver<dim>::assemble_linear_system(LinearSystem &linear_system)
   {
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    using active_cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
     const unsigned int n_threads = MultithreadInfo::n_threads();
     std::vector<std::pair<active_cell_iterator, active_cell_iterator>>
@@ -723,7 +718,7 @@ run_simulation(
 
   for (unsigned int step = 0; true; ++step)
     {
-      deallog << step << " " << std::flush;
+      deallog << step << ' ' << std::flush;
 
       solver.solve_problem();
 
@@ -800,6 +795,7 @@ solve_problem(const std::string &solver_name)
 int
 main()
 {
+  std::ofstream logfile("output");
   try
     {
       deallog << std::setprecision(2);

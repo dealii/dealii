@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,10 +41,10 @@ main()
   csp.add(1, 2);
   csp.compress();
 
-  deallog << "blocks: " << csp.n_block_rows() << "x" << csp.n_block_cols()
+  deallog << "blocks: " << csp.n_block_rows() << 'x' << csp.n_block_cols()
           << std::endl;
-  deallog << "size: " << csp.n_rows() << "x" << csp.n_cols() << std::endl;
-  deallog << "size block(1,0):" << csp.block(1, 0).n_rows() << "x"
+  deallog << "size: " << csp.n_rows() << 'x' << csp.n_cols() << std::endl;
+  deallog << "size block(1,0):" << csp.block(1, 0).n_rows() << 'x'
           << csp.block(1, 0).n_cols() << std::endl;
 
   csp.print(deallog.get_file_stream());
@@ -55,7 +55,7 @@ main()
       deallog << "row " << i << ": ";
 
       for (unsigned int j = 0; j < csp.row_length(i); ++j)
-        deallog << csp.column_number(i, j) << " ";
+        deallog << csp.column_number(i, j) << ' ';
 
       deallog << std::endl;
     }

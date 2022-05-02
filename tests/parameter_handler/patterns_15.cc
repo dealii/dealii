@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,6 @@
 // test add_parameters with ComponentMask.
 
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/component_mask.h>
 
@@ -32,7 +31,7 @@ main()
 {
   initlog();
 
-  typedef ComponentMask T;
+  using T = ComponentMask;
 
   T a;
   a = Convert<T>::to_value("true,false,true");

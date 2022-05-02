@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,13 +19,21 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/mg_level_object.h>
+
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/tria.h>
 
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations
+#ifndef DOXYGEN
+template <int, int>
+class DoFHandler;
+#endif
 
 
 /*!@addtogroup mapping */
@@ -34,16 +42,14 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class implements a caching strategy for objects of the MappingQ family
- * in terms of the MappingQGeneric::compute_mapping_support_points() function,
- * which is used in all operations of MappingQGeneric. The information of the
+ * in terms of the MappingQ::compute_mapping_support_points() function,
+ * which is used in all operations of MappingQ. The information of the
  * mapping is pre-computed by the MappingQCache::initialize() function.
  *
  * The use of this class is discussed extensively in step-65.
- *
- * @author Martin Kronbichler, 2019
  */
 template <int dim, int spacedim = dim>
-class MappingQCache : public MappingQGeneric<dim, spacedim>
+class MappingQCache : public MappingQ<dim, spacedim>
 {
 public:
   /**
@@ -78,13 +84,27 @@ public:
 
   /**
    * Initialize the data cache by computing the mapping support points for all
-   * cells (on all levels) of the given triangulation. Note that the cache is
-   * invalidated upon the signal Triangulation::Signals::any_change of the
-   * underlying triangulation.
+   * cells (on all levels) of the given triangulation.
+   *
+   * @note The cache is invalidated upon the signal
+   * Triangulation::Signals::any_change of the underlying triangulation.
    */
   void
-  initialize(const Triangulation<dim, spacedim> &  triangulation,
-             const MappingQGeneric<dim, spacedim> &mapping);
+  initialize(const Mapping<dim, spacedim> &      mapping,
+             const Triangulation<dim, spacedim> &triangulation);
+
+  /**
+   * Initialize the data cache by computing the mapping support points for all
+   * cells (on all levels) of the given triangulation.
+   *
+   * @note The cache is invalidated upon the signal
+   * Triangulation::Signals::any_change of the underlying triangulation.
+   *
+   * @deprecated Use initialize() version above instead.
+   */
+  DEAL_II_DEPRECATED void
+  initialize(const Triangulation<dim, spacedim> &triangulation,
+             const MappingQ<dim, spacedim> &     mapping);
 
   /**
    * Initialize the data cache by letting the function given as an argument
@@ -114,6 +134,84 @@ public:
                &compute_points_on_cell);
 
   /**
+   * Initialize the data cache by computing the mapping support points for all
+   * cells (on all levels) of the given triangulation and a given @p mapping
+   * and transforming these points via the function @p transformation_function.
+   *
+   * The bool @p function_describes_relative_displacement indicates that
+   * the function @p transformation_function maps to absolute coordinates.
+   * If the parameter is set to true, the return value of the function is
+   * interpreted as relative deformation and the result is eventually added
+   * to the original point for the support points eventually used by this class.
+   *
+   * This function calls the previous function so the comments regarding
+   * threading listed above apply also here.
+   *
+   * @note The cache is invalidated upon the signal
+   * Triangulation::Signals::any_change of the underlying triangulation.
+   */
+  void
+  initialize(const Mapping<dim, spacedim> &      mapping,
+             const Triangulation<dim, spacedim> &tria,
+             const std::function<Point<spacedim>(
+               const typename Triangulation<dim, spacedim>::cell_iterator &,
+               const Point<spacedim> &)> &       transformation_function,
+             const bool function_describes_relative_displacement);
+
+  /**
+   * The same as above but taking a dealii::Function object.
+   */
+  void
+  initialize(const Mapping<dim, spacedim> &      mapping,
+             const Triangulation<dim, spacedim> &tria,
+             const Function<spacedim> &          transformation_function,
+             const bool function_describes_relative_displacement);
+
+  /**
+   * Initialize the data cache of the active cells by a discrete field
+   * (specified
+   * by @p dof_handler and @p vector) that describes the absolute or
+   * relative position of each support point.
+   *
+   * @note By using this function for reinitialization, this class behaves like
+   *   MappingFEField (vector_describes_relative_displacement == false) or
+   *   MappingQEulerian (vector_describes_relative_displacement == true), but
+   *   with much more efficient operations internally.
+   */
+  template <typename VectorType>
+  void
+  initialize(const Mapping<dim, spacedim> &   mapping,
+             const DoFHandler<dim, spacedim> &dof_handler,
+             const VectorType &               vector,
+             const bool vector_describes_relative_displacement);
+
+  /**
+   * Initialize the data cache of all non-artificial cells by a solution
+   * (specified by @p dof_handler and a set of @p vectors on all levels of the
+   * triangulation) that describes the absolute or relative position of each
+   * support point.
+   *
+   * @note By using this function for reinitialization, this class behaves like
+   *   MappingFEField (vector_describes_relative_displacement == false) or
+   *   MappingQEulerian (vector_describes_relative_displacement == true), but
+   *   with much more efficient operations internally.
+   */
+  template <typename VectorType>
+  void
+  initialize(const Mapping<dim, spacedim> &   mapping,
+             const DoFHandler<dim, spacedim> &dof_handler,
+             const MGLevelObject<VectorType> &vectors,
+             const bool vector_describes_relative_displacement);
+
+  /**
+   * @copydoc Mapping<dim,spacedim>::get_vertices()
+   */
+  virtual boost::container::small_vector<Point<spacedim>,
+                                         GeometryInfo<dim>::vertices_per_cell>
+  get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+    const override;
+
+  /**
    * Return the memory consumption (in bytes) of the cache.
    */
   std::size_t
@@ -121,7 +219,7 @@ public:
 
 protected:
   /**
-   * This is the main function overriden from the base class MappingQGeneric.
+   * This is the main function overridden from the base class MappingQ.
    */
   virtual std::vector<Point<spacedim>>
   compute_mapping_support_points(
@@ -142,6 +240,12 @@ private:
    * this class goes out of scope.
    */
   boost::signals2::connection clear_signal;
+
+  /**
+   * Specifies if support_point_cache has been set up for the cells on the
+   * levels.
+   */
+  bool uses_level_info;
 };
 
 /*@}*/

@@ -38,7 +38,8 @@ test()
   // attach a sparse matrix to it
   TrilinosWrappers::SparseMatrix A(sparsity);
 
-  TrilinosWrappers::SparseMatrix::const_iterator k = A.begin(), j = ++A.begin();
+  TrilinosWrappers::SparseMatrix::const_iterator k = A.begin(),
+                                                 j = std::next(A.begin());
 
   AssertThrow(k < j, ExcInternalError());
   AssertThrow(j > k, ExcInternalError());

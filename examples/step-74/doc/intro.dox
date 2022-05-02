@@ -1,0 +1,139 @@
+<br>
+
+<i>
+This program was contributed by Jiaqi Zhang and Timo Heister.
+<br>
+This material is based upon work partly supported by the National
+Science Foundation Award DMS-2028346, OAC-2015848, EAR-1925575, by the Computational
+Infrastructure in Geodynamics initiative (CIG), through the NSF under Award
+EAR-0949446 and EAR-1550901 and The University of California -- Davis.
+</i>
+
+@dealiiTutorialDOI{10.5281/zenodo.5812174,https://zenodo.org/badge/DOI/10.5281/zenodo.5812174.svg}
+
+<a name="Intro"></a>
+<h1><em>Symmetric interior penalty Galerkin</em> (SIPG) method for Poisson's equation</h1>
+
+<h3>Overview</h3>
+In this tutorial, we display the usage of the FEInterfaceValues class,
+which is designed for assembling face terms arising from discontinuous Galerkin (DG) methods.
+The FEInterfaceValues class provides an easy way to obtain the jump
+and the average of shape functions and of the solution across cell faces.
+This tutorial includes the following topics.
+<ol>
+  <li> The SIPG method for Poisson's equation, which has already been used in step-39 and step-59.
+  <li> Assembling of face terms using FEInterfaceValues and the system matrix using MeshWorker::mesh_loop(), which is similar to step-12.
+  <li> Adaptive mesh refinement using an error estimator.
+  <li> Two test cases: convergence test for a smooth function and adaptive mesh refinement test for a singular solution.
+</ol>
+
+<h3>The equation</h3>
+In this example, we consider Poisson's equation
+@f[
+- \nabla \cdot \left( \nu  \nabla u\right) = f  \qquad   \mbox{in } \Omega,
+@f]
+subject to the boundary condition
+@f[
+u = g_D \qquad \mbox{on } \partial \Omega.
+@f]
+For simplicity, we assume that the diffusion coefficient $\nu$ is constant here.
+Note that if $\nu$ is discontinuous, we need to take this into account when computing jump terms
+on cell faces.
+
+We denote the mesh by ${\mathbb T}_h$, and $K\in{\mathbb T}_h$ is a mesh cell.
+The sets of interior and boundary faces are denoted by ${\mathbb F}^i_h$ and ${\mathbb F}^b_h$
+respectively. Let $K^0$ and $K^1$ be the two cells sharing a face $f\in F_h^i$,
+and $\mathbf n$ be the outer normal vector of $K^0$. Then the jump
+operator is given by the "here minus there" formula,
+@f[
+\jump{v} = v^0 - v^1
+@f]
+and the averaging operator as
+@f[
+\average{v} = \frac{v^0 + v^1}{2}
+@f]
+respectively. Note that when $f\subset \partial \Omega$, we define $\jump{v} = v$ and
+$\average{v}=v$.
+The discretization using the SIPG is given by the following weak formula
+(more details can be found in @cite di2011mathematical and the references therein)
+@f{align*}
+&\sum_{K\in {\mathbb T}_h} (\nabla v_h, \nu \nabla u_h)_K\\
+&-\sum_{F \in F_h^i} \left\{
+    \left< \jump{v_h}, \nu\average{ \nabla u_h} \cdot  \mathbf n \right>_F
+   +\left<\average{ \nabla v_h }\cdot \mathbf n,\nu\jump{u_h}\right>_F
+   -\left<\jump{v_h},\nu \sigma \jump{u_h} \right>_F
+  \right\}\\
+&-\sum_{F \in F_h^b} \left\{
+    \left<v_h, \nu  \nabla u_h\cdot \mathbf n \right>_F
+  + \left< \nabla v_h \cdot \mathbf n , \nu u_h\right>_F
+  - \left< v_h,\nu \sigma u_h\right>_F
+  \right\}\\
+&=(v_h, f)_\Omega
+  - \sum_{F \in F_h^b} \left\{
+    \left< \nabla v_h \cdot \mathbf n, \nu g_D\right>_F - \left<v_h,\nu \sigma g_D\right>_F
+  \right\}.
+@f}
+
+
+<h3>The penalty parameter</h3>
+The penalty parameter is defined as $\sigma = \gamma/h_f$, where $h_f$ a local length scale associated
+with the cell face; here we choose an approximation of the length of the cell in the direction normal to the face:
+$\frac 1{h_f} = \frac 12 \left(\frac 1{h_K} + \frac 1{h_{K'}}\right)$,
+where $K,K'$ are the two cells adjacent to the face $f$ and we we
+compute $h_K = \frac{|K|}{|f|}$.
+
+In the formula above, $\gamma$ is the penalization constant.
+To ensure the discrete coercivity, the penalization constant has to be large enough @cite ainsworth2007posteriori.
+People do not really have consensus on which of the formulas proposed
+in the literature should be used. (This is similar to the situation
+discussed in the "Results" section of step-47.)
+One can just pick a large constant, while other options could be the multiples of $(p+1)^2$ or $p(p+1)$. In this code,
+we follow step-39 and use $\gamma = p(p+1)$.
+
+
+<h3>A posteriori error estimator</h3>
+In this example, with a slight modification, we use the error estimator by Karakashian and Pascal @cite karakashian2003posteriori
+@f[
+\eta^2 = \sum_{K \in {\mathbb T}_h} \eta^2_{K} +  \sum_{f_i \in {\mathbb F}^i_h}  \eta^2_{f_i} + \sum_{f_b \in F^i_b}\eta^2_{f_b}
+@f]
+where
+@f{align*}{
+\eta^2_{K} &= h_K^2 \left\| f + \nu \Delta u_h \right\|_K^2,
+\\
+\eta^2_{f_i} &= \sigma \left\| \jump{u_h}  \right\|_f^2   +  h_f \left\|  \jump{\nu \nabla u_h} \cdot \mathbf n   \right\|_f^2,
+\\
+\eta_{f_b}^2 &=  \sigma \left\| u_h-g_D \right\|_f^2.
+@f}
+Here we use $\sigma = \gamma/h_f$ instead of $\gamma^2/h_f$ for the jump terms of $u_h$ (the first term in $\eta^2_{f_i}$ and $\eta_{f_b}^2$).
+
+In order to compute this estimator, in each cell $K$ we compute
+@f{align*}{
+\eta_{c}^2 &= h_K^2 \left\| f + \nu \Delta u_h \right\|_K^2,
+\\
+\eta_{f}^2 &= \sum_{f\in \partial K}\lbrace \sigma \left\| \jump{u_h}  \right\|_f^2   +  h_f \left\|  \jump{\nu \nabla u_h} \cdot \mathbf n  \right\|_f^2 \rbrace,
+\\
+\eta_{b}^2 &= \sum_{f\in \partial K \cap \partial \Omega}  \sigma \left\| (u_h -g_D)  \right\|_f^2.
+@f}
+Then the square of the error estimate per cell is
+@f[
+\eta_\text{local}^2 =\eta_{c}^2+0.5\eta_{f}^2+\eta_{b}^2.
+@f]
+The factor of $0.5$ results from the fact that the overall error
+estimator includes each interior face only once, and so the estimators per cell
+count it with a factor of one half for each of the two adjacent cells.
+Note that we compute $\eta_\text{local}^2$ instead of $\eta_\text{local}$ to simplify the implementation.
+The error estimate square per cell is then stored in a global vector, whose $l_1$ norm is equal to $\eta^2$.
+
+<h3>The test case</h3>
+In the first test problem, we run a convergence test using a smooth manufactured solution with $\nu =1$ in 2D
+@f{align*}{
+u&=\sin(2\pi x)\sin(2\pi y), &\qquad\qquad &(x,y)\in\Omega=(0,1)\times (0,1),
+\\
+u&=0,                        &\qquad\qquad &\text{on } \partial \Omega,
+@f}
+and $f= 8\pi^2 u$. We compute errors against the manufactured solution and evaluate the convergence rate.
+
+In the second test, we choose Functions::LSingularityFunction on a L-shaped domain (GridGenerator::hyper_L) in 2D.
+The solution is given in the polar coordinates by $u(r,\phi) = r^{\frac{2}{3}}\sin \left(\frac{2}{3}\phi \right)$,
+which has a singularity at the origin. An error estimator is constructed to detect the region with large errors,
+according to which the mesh is refined adaptively.

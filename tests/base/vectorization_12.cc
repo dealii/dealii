@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,7 +38,7 @@ test()
   std::stringstream reference_stream;
   for (unsigned int i = 0; i < n - 1; ++i)
     {
-      reference_stream << Number(i + 1) << " ";
+      reference_stream << Number(i + 1) << ' ';
     }
   reference_stream << Number(n);
 

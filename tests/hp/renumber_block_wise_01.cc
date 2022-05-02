@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,7 @@
 #include <deal.II/base/function_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 
 #include <deal.II/fe/fe_dgp.h>
@@ -35,7 +36,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/vector.h>
@@ -46,12 +46,11 @@
 
 template <int dim>
 std::vector<types::global_dof_index>
-get_dofs(const hp::DoFHandler<dim> &dof)
+get_dofs(const DoFHandler<dim> &dof)
 {
   std::vector<types::global_dof_index> local;
   std::vector<types::global_dof_index> global;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof.begin_active();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
     {
@@ -68,7 +67,7 @@ get_dofs(const hp::DoFHandler<dim> &dof)
 
 template <int dim>
 void
-check_renumbering(hp::DoFHandler<dim> &dof)
+check_renumbering(DoFHandler<dim> &dof)
 {
   // do component-wise and save the
   // results
@@ -100,10 +99,10 @@ check()
   if (dim == 1)
     tr.refine_global(2);
 
-  hp::DoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   {
     bool coin = false;
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+    for (typename DoFHandler<dim>::active_cell_iterator cell =
            dof.begin_active();
          cell != dof.end();
          ++cell)

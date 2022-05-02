@@ -1,5 +1,0 @@
-Fixed: FESubfaceValues::reinit() would previously throw an exception when 
-called on a face behind a refined periodic neighbor. This case is now 
-handled properly.
-<br>
-(Peter Munch, 2019/11/03)

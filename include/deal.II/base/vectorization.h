@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,7 +59,7 @@
       "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #  endif
 
-#  if defined(_MSC_VER)
+#  ifdef _MSC_VER
 #    include <intrin.h>
 #  elif defined(__ALTIVEC__)
 #    include <altivec.h>
@@ -92,8 +92,6 @@ struct EnableIfScalar<VectorizedArray<Number, width>>
 
 /**
  * An iterator for VectorizedArray.
- *
- * @author Peter Munch, 2019
  */
 template <typename T>
 class VectorizedArrayIterator
@@ -144,7 +142,8 @@ public:
    * Dereferencing operator (const version): returns the value of the current
    * lane.
    */
-  const typename T::value_type &operator*() const
+  const typename T::value_type &
+  operator*() const
   {
     AssertIndexRange(lane, T::size());
     return (*data)[lane];
@@ -178,7 +177,7 @@ public:
   }
 
   /**
-   * This operator advances the iterator by @p offet lanes and returns a
+   * This operator advances the iterator by @p offset lanes and returns a
    * reference to <tt>*this</tt>.
    */
   VectorizedArrayIterator<T> &
@@ -247,13 +246,41 @@ private:
  *   Couriously Recurring Template Pattern (see
  *   https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) in this
  *   class to avoid having to resort to `virtual` member functions.
- *
- * @author Peter Munch, 2019
  */
 template <typename T, std::size_t width>
 class VectorizedArrayBase
 {
 public:
+  /**
+   * Default constructor.
+   */
+  VectorizedArrayBase() = default;
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArrayBase(const std::initializer_list<U> &list)
+  {
+    auto i0 = this->begin();
+    auto i1 = list.begin();
+
+    for (; i1 != list.end(); ++i0, ++i1)
+      {
+        Assert(
+          i0 != this->end(),
+          ExcMessage(
+            "Initializer list exceeds size of this VectorizedArray object."));
+
+        *i0 = *i1;
+      }
+
+    for (; i0 != this->end(); ++i0)
+      {
+        *i0 = 0.0;
+      }
+  }
+
   /**
    * Return the number of elements in the array.
    */
@@ -388,8 +415,6 @@ public:
  * @tparam Number underlying data type
  * @tparam width  vector length (optional; if not set, the maximal width of the
  *                architecture is used)
- *
- * @author Katharina Kormann, Martin Kronbichler, Peter Munch, 2010, 2011, 2019
  */
 template <typename Number, std::size_t width>
 class VectorizedArray
@@ -400,15 +425,6 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = Number;
-
-  /**
-   * This gives the number of elements collected in this class. In the general
-   * case, there is only one element. Specializations use SIMD intrinsics and
-   * can work on multiple elements at the same time.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 1;
 
   static_assert(width == 1,
                 "You specified an illegal width that is not supported.");
@@ -428,6 +444,14 @@ public:
   }
 
   /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<Number, width>, 1>(list)
+  {}
+
+  /**
    * This function assigns a scalar to this class.
    */
   DEAL_II_ALWAYS_INLINE
@@ -443,7 +467,8 @@ public:
    * specialization).
    */
   DEAL_II_ALWAYS_INLINE
-  Number &operator[](const unsigned int comp)
+  Number &
+  operator[](const unsigned int comp)
   {
     (void)comp;
     AssertIndexRange(comp, 1);
@@ -455,7 +480,8 @@ public:
    * without specialization).
    */
   DEAL_II_ALWAYS_INLINE
-  const Number &operator[](const unsigned int comp) const
+  const Number &
+  operator[](const unsigned int comp) const
   {
     (void)comp;
     AssertIndexRange(comp, 1);
@@ -702,12 +728,6 @@ private:
 
 
 
-// We need to have a separate declaration for static const members
-template <typename Number, std::size_t width>
-const unsigned int VectorizedArray<Number, width>::n_array_elements;
-
-
-
 /**
  * @name Packing and unpacking of a VectorizedArray
  */
@@ -740,7 +760,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
-                             make_vectorized_array(const typename VectorizedArrayType::value_type &u)
+make_vectorized_array(const typename VectorizedArrayType::value_type &u)
 {
   static_assert(
     std::is_same<VectorizedArrayType,
@@ -755,7 +775,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
 
 
 /**
- * Load size() data items from memory into the the VectorizedArray @p out,
+ * Load size() data items from memory into the VectorizedArray @p out,
  * starting at the given addresses and with given offset, each entry from the
  * offset providing one element of the vectorized array.
  *
@@ -771,7 +791,7 @@ gather(VectorizedArray<Number, width> &   out,
        const std::array<Number *, width> &ptrs,
        const unsigned int                 offset)
 {
-  for (unsigned int v = 0; v < width; v++)
+  for (unsigned int v = 0; v < width; ++v)
     out.data[v] = ptrs[v][offset];
 }
 
@@ -948,13 +968,6 @@ public:
   using value_type = double;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 8;
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -967,6 +980,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<double, 8>, 8>(list)
+  {}
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -983,7 +1004,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  double &operator[](const unsigned int comp)
+  double &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 8);
     return *(reinterpret_cast<double *>(&data) + comp);
@@ -993,7 +1015,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const double &operator[](const unsigned int comp) const
+  const double &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 8);
     return *(reinterpret_cast<const double *>(&data) + comp);
@@ -1006,7 +1029,7 @@ public:
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
-    // if the compiler supports vector arithmetics, we can simply use +=
+    // if the compiler supports vector arithmetic, we can simply use +=
     // operator on the given data type. this allows the compiler to combine
     // additions with multiplication (fused multiply-add) if those
     // instructions are available. Otherwise, we need to use the built-in
@@ -1502,13 +1525,6 @@ public:
   using value_type = float;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 16;
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -1521,6 +1537,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<float, 16>, 16>(list)
+  {}
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -1537,7 +1561,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  float &operator[](const unsigned int comp)
+  float &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 16);
     return *(reinterpret_cast<float *>(&data) + comp);
@@ -1547,7 +1572,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const float &operator[](const unsigned int comp) const
+  const float &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 16);
     return *(reinterpret_cast<const float *>(&data) + comp);
@@ -1560,7 +1586,7 @@ public:
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
-    // if the compiler supports vector arithmetics, we can simply use +=
+    // if the compiler supports vector arithmetic, we can simply use +=
     // operator on the given data type. this allows the compiler to combine
     // additions with multiplication (fused multiply-add) if those
     // instructions are available. Otherwise, we need to use the built-in
@@ -2152,13 +2178,6 @@ public:
   using value_type = double;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -2171,6 +2190,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<double, 4>, 4>(list)
+  {}
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -2187,7 +2214,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  double &operator[](const unsigned int comp)
+  double &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<double *>(&data) + comp);
@@ -2197,7 +2225,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const double &operator[](const unsigned int comp) const
+  const double &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<const double *>(&data) + comp);
@@ -2210,7 +2239,7 @@ public:
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
-    // if the compiler supports vector arithmetics, we can simply use +=
+    // if the compiler supports vector arithmetic, we can simply use +=
     // operator on the given data type. this allows the compiler to combine
     // additions with multiplication (fused multiply-add) if those
     // instructions are available. Otherwise, we need to use the built-in
@@ -2665,13 +2694,6 @@ public:
   using value_type = float;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 8;
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -2684,6 +2706,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<float, 8>, 8>(list)
+  {}
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -2700,7 +2730,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  float &operator[](const unsigned int comp)
+  float &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 8);
     return *(reinterpret_cast<float *>(&data) + comp);
@@ -2710,7 +2741,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const float &operator[](const unsigned int comp) const
+  const float &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 8);
     return *(reinterpret_cast<const float *>(&data) + comp);
@@ -2723,7 +2755,7 @@ public:
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
-    // if the compiler supports vector arithmetics, we can simply use +=
+    // if the compiler supports vector arithmetic, we can simply use +=
     // operator on the given data type. this allows the compiler to combine
     // additions with multiplication (fused multiply-add) if those
     // instructions are available. Otherwise, we need to use the built-in
@@ -3212,13 +3244,6 @@ public:
   using value_type = double;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 2;
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -3231,6 +3256,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<double, 2>, 2>(list)
+  {}
 
   /**
    * This function can be used to set all data fields to a given scalar.
@@ -3247,7 +3280,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  double &operator[](const unsigned int comp)
+  double &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 2);
     return *(reinterpret_cast<double *>(&data) + comp);
@@ -3257,7 +3291,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const double &operator[](const unsigned int comp) const
+  const double &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 2);
     return *(reinterpret_cast<const double *>(&data) + comp);
@@ -3655,13 +3690,6 @@ public:
   using value_type = float;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
-
-  /**
    * This function can be used to set all data fields to a given scalar.
    */
 
@@ -3679,6 +3707,14 @@ public:
     this->operator=(scalar);
   }
 
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<float, 4>, 4>(list)
+  {}
+
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
   operator=(const float x)
@@ -3691,7 +3727,8 @@ public:
    * Access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  float &operator[](const unsigned int comp)
+  float &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<float *>(&data) + comp);
@@ -3701,7 +3738,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const float &operator[](const unsigned int comp) const
+  const float &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<const float *>(&data) + comp);
@@ -4136,13 +4174,6 @@ public:
   using value_type = double;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 2;
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -4155,6 +4186,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<double, 2>, 2>(list)
+  {}
 
   /**
    * This function assigns a scalar to this class.
@@ -4176,7 +4215,8 @@ public:
    * Access operator. The component must be either 0 or 1.
    */
   DEAL_II_ALWAYS_INLINE
-  double &operator[](const unsigned int comp)
+  double &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 2);
     return *(reinterpret_cast<double *>(&data) + comp);
@@ -4186,7 +4226,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const double &operator[](const unsigned int comp) const
+  const double &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 2);
     return *(reinterpret_cast<const double *>(&data) + comp);
@@ -4377,13 +4418,6 @@ public:
   using value_type = float;
 
   /**
-   * This gives the number of vectors collected in this class.
-   *
-   * @deprecated Use VectorizedArrayBase::size() instead.
-   */
-  DEAL_II_DEPRECATED static const unsigned int n_array_elements = 4;
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -4396,6 +4430,14 @@ public:
   {
     this->operator=(scalar);
   }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<float, 4>, 4>(list)
+  {}
 
   /**
    * This function assigns a scalar to this class.
@@ -4417,7 +4459,8 @@ public:
    * Access operator. The component must be between 0 and 3.
    */
   DEAL_II_ALWAYS_INLINE
-  float &operator[](const unsigned int comp)
+  float &
+  operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<float *>(&data) + comp);
@@ -4427,7 +4470,8 @@ public:
    * Constant access operator.
    */
   DEAL_II_ALWAYS_INLINE
-  const float &operator[](const unsigned int comp) const
+  const float &
+  operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 4);
     return *(reinterpret_cast<const float *>(&data) + comp);
@@ -4698,7 +4742,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator+(const Number &u, const VectorizedArray<Number, width> &v)
+operator+(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
   return tmp += v;
@@ -4714,7 +4758,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator+(const double u, const VectorizedArray<float, width> &v)
+operator+(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = u;
   return tmp += v;
@@ -4728,7 +4772,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator+(const VectorizedArray<Number, width> &v, const Number &u)
+operator+(const VectorizedArray<Number, width> &v, const Number &u)
 {
   return u + v;
 }
@@ -4743,7 +4787,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator+(const VectorizedArray<float, width> &v, const double u)
+operator+(const VectorizedArray<float, width> &v, const double u)
 {
   return u + v;
 }
@@ -4756,7 +4800,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator-(const Number &u, const VectorizedArray<Number, width> &v)
+operator-(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
   return tmp -= v;
@@ -4772,7 +4816,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator-(const double u, const VectorizedArray<float, width> &v)
+operator-(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
   return tmp -= v;
@@ -4786,7 +4830,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator-(const VectorizedArray<Number, width> &v, const Number &u)
+operator-(const VectorizedArray<Number, width> &v, const Number &u)
 {
   VectorizedArray<Number, width> tmp = u;
   return v - tmp;
@@ -4802,7 +4846,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator-(const VectorizedArray<float, width> &v, const double u)
+operator-(const VectorizedArray<float, width> &v, const double u)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
   return v - tmp;
@@ -4816,7 +4860,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator*(const Number &u, const VectorizedArray<Number, width> &v)
+operator*(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
   return tmp *= v;
@@ -4832,7 +4876,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator*(const double u, const VectorizedArray<float, width> &v)
+operator*(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
   return tmp *= v;
@@ -4846,7 +4890,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator*(const VectorizedArray<Number, width> &v, const Number &u)
+operator*(const VectorizedArray<Number, width> &v, const Number &u)
 {
   return u * v;
 }
@@ -4861,7 +4905,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator*(const VectorizedArray<float, width> &v, const double u)
+operator*(const VectorizedArray<float, width> &v, const double u)
 {
   return u * v;
 }
@@ -4874,7 +4918,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator/(const Number &u, const VectorizedArray<Number, width> &v)
+operator/(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
   return tmp /= v;
@@ -4890,7 +4934,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator/(const double u, const VectorizedArray<float, width> &v)
+operator/(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
   return tmp /= v;
@@ -4904,7 +4948,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator/(const VectorizedArray<Number, width> &v, const Number &u)
+operator/(const VectorizedArray<Number, width> &v, const Number &u)
 {
   VectorizedArray<Number, width> tmp = u;
   return v / tmp;
@@ -4920,7 +4964,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
-                             operator/(const VectorizedArray<float, width> &v, const double u)
+operator/(const VectorizedArray<float, width> &v, const double u)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
   return v / tmp;
@@ -5017,7 +5061,7 @@ enum class SIMDComparison : int
  * whenever the control flow itself would depend on (computed) data. For
  * example, in case of a scalar data type the statement
  * <code>(left < right) ? true_value : false_value</code>
- * could have been also implementd using an <code>if</code>-statement:
+ * could have been also implemented using an <code>if</code>-statement:
  * @code
  * if (left < right)
  *     result = true_value;
@@ -5170,8 +5214,7 @@ compare_and_apply_mask(const VectorizedArray<float, 8> &left,
     _mm256_cmp_ps(left.data, right.data, static_cast<int>(predicate));
 
   VectorizedArray<float, 8> result;
-  result.data = _mm256_or_ps(_mm256_and_ps(mask, true_values.data),
-                             _mm256_andnot_ps(mask, false_values.data));
+  result.data = _mm256_blendv_ps(false_values.data, true_values.data, mask);
   return result;
 }
 
@@ -5187,8 +5230,7 @@ compare_and_apply_mask(const VectorizedArray<double, 4> &left,
     _mm256_cmp_pd(left.data, right.data, static_cast<int>(predicate));
 
   VectorizedArray<double, 4> result;
-  result.data = _mm256_or_pd(_mm256_and_pd(mask, true_values.data),
-                             _mm256_andnot_pd(mask, false_values.data));
+  result.data = _mm256_blendv_pd(false_values.data, true_values.data, mask);
   return result;
 }
 
@@ -5273,6 +5315,22 @@ compare_and_apply_mask(const VectorizedArray<double, 2> &left,
 
 #  endif
 #endif // DOXYGEN
+
+
+namespace internal
+{
+  template <typename T>
+  struct VectorizedArrayTrait
+  {
+    using value_type = T;
+  };
+
+  template <typename T, std::size_t width>
+  struct VectorizedArrayTrait<VectorizedArray<T, width>>
+  {
+    using value_type = T;
+  };
+} // namespace internal
 
 
 DEAL_II_NAMESPACE_CLOSE
@@ -5431,6 +5489,30 @@ namespace std
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
       values[i] = std::pow(x[i], p);
+    ::dealii::VectorizedArray<Number, width> out;
+    out.load(&values[0]);
+    return out;
+  }
+
+
+
+  /**
+   * Raises the given number @p x to the power @p p for a vectorized data
+   * field. The result is returned as vectorized array in the form
+   * <tt>{pow(x[0],p[0]), pow(x[1],p[1]), ...,
+   * pow(x[size()-1],p[size()-1])}</tt>.
+   *
+   * @relatesalso VectorizedArray
+   */
+  template <typename Number, std::size_t width>
+  inline ::dealii::VectorizedArray<Number, width>
+  pow(const ::dealii::VectorizedArray<Number, width> &x,
+      const ::dealii::VectorizedArray<Number, width> &p)
+  {
+    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
+         ++i)
+      values[i] = std::pow(x[i], p[i]);
     ::dealii::VectorizedArray<Number, width> out;
     out.load(&values[0]);
     return out;

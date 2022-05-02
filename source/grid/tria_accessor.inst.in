@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,97 +15,45 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_struct_dimension : DIMENSIONS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : DIMENSIONS)
   {
-    template class TriaAccessorBase<1, deal_II_dimension>;
-#if deal_II_dimension >= 2
-    template class TriaAccessorBase<2, deal_II_dimension>;
+#if deal_II_struct_dimension <= deal_II_dimension && \
+  deal_II_dimension <= deal_II_space_dimension
+    template class TriaAccessorBase<deal_II_struct_dimension,
+                                    deal_II_dimension,
+                                    deal_II_space_dimension>;
+    template class TriaAccessor<deal_II_struct_dimension,
+                                deal_II_dimension,
+                                deal_II_space_dimension>;
+    template class TriaRawIterator<TriaAccessor<deal_II_struct_dimension,
+                                                deal_II_dimension,
+                                                deal_II_space_dimension>>;
+    template class TriaIterator<TriaAccessor<deal_II_struct_dimension,
+                                             deal_II_dimension,
+                                             deal_II_space_dimension>>;
+    template class TriaActiveIterator<TriaAccessor<deal_II_struct_dimension,
+                                                   deal_II_dimension,
+                                                   deal_II_space_dimension>>;
 #endif
-#if deal_II_dimension >= 3
-    template class TriaAccessorBase<3, deal_II_dimension>;
-#endif
+  }
 
-    template class TriaAccessor<1, deal_II_dimension, deal_II_dimension>;
-#if deal_II_dimension >= 2
-    template class TriaAccessor<2, deal_II_dimension, deal_II_dimension>;
-#endif
-#if deal_II_dimension >= 3
-    template class TriaAccessor<3, deal_II_dimension, deal_II_dimension>;
-#endif
 
-
-    template class CellAccessor<deal_II_dimension>;
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template class CellAccessor<deal_II_dimension, deal_II_space_dimension>;
     template class TriaRawIterator<
-      TriaAccessor<1, deal_II_dimension, deal_II_dimension>>;
-    template class TriaRawIterator<CellAccessor<deal_II_dimension>>;
+      CellAccessor<deal_II_dimension, deal_II_space_dimension>>;
     template class TriaIterator<
-      TriaAccessor<1, deal_II_dimension, deal_II_dimension>>;
-    template class TriaIterator<CellAccessor<deal_II_dimension>>;
+      CellAccessor<deal_II_dimension, deal_II_space_dimension>>;
     template class TriaActiveIterator<
-      TriaAccessor<1, deal_II_dimension, deal_II_dimension>>;
-    template class TriaActiveIterator<CellAccessor<deal_II_dimension>>;
-
-
-#if deal_II_dimension >= 2
-    template class TriaRawIterator<
-      TriaAccessor<2, deal_II_dimension, deal_II_dimension>>;
-    template class TriaIterator<
-      TriaAccessor<2, deal_II_dimension, deal_II_dimension>>;
-    template class TriaActiveIterator<
-      TriaAccessor<2, deal_II_dimension, deal_II_dimension>>;
+      CellAccessor<deal_II_dimension, deal_II_space_dimension>>;
 #endif
+  }
 
-#if deal_II_dimension >= 3
-    template class TriaRawIterator<
-      TriaAccessor<3, deal_II_dimension, deal_II_dimension>>;
-    template class TriaIterator<
-      TriaAccessor<3, deal_II_dimension, deal_II_dimension>>;
-    template class TriaActiveIterator<
-      TriaAccessor<3, deal_II_dimension, deal_II_dimension>>;
-    template class CellAccessor<1, 3>;
-#endif
-
-#if deal_II_dimension == 1
-    template class TriaAccessorBase<1, deal_II_dimension, 2>;
-    template class TriaAccessorBase<1, deal_II_dimension, 3>;
-
-    template class TriaAccessor<1, deal_II_dimension, 2>;
-    template class TriaAccessor<1, deal_II_dimension, 3>;
-
-
-#endif
-#if deal_II_dimension == 2
-    template class TriaAccessorBase<1, deal_II_dimension, 3>;
-    template class TriaAccessorBase<2, deal_II_dimension, 3>;
-
-    template class TriaAccessor<1, deal_II_dimension, 3>;
-    template class TriaAccessor<2, deal_II_dimension, 3>;
-#endif
-
-#if deal_II_dimension != 3
-    template class CellAccessor<deal_II_dimension, deal_II_dimension + 1>;
-    template class TriaRawIterator<
-      TriaAccessor<1, deal_II_dimension, deal_II_dimension + 1>>;
-    template class TriaRawIterator<
-      CellAccessor<deal_II_dimension, deal_II_dimension + 1>>;
-    template class TriaIterator<
-      TriaAccessor<1, deal_II_dimension, deal_II_dimension + 1>>;
-    template class TriaIterator<
-      CellAccessor<deal_II_dimension, deal_II_dimension + 1>>;
-    template class TriaActiveIterator<
-      TriaAccessor<1, deal_II_dimension, deal_II_dimension + 1>>;
-    template class TriaActiveIterator<
-      CellAccessor<deal_II_dimension, deal_II_dimension + 1>>;
-
-
-#  if deal_II_dimension == 2
-    template class TriaRawIterator<
-      TriaAccessor<2, deal_II_dimension, deal_II_dimension + 1>>;
-    template class TriaIterator<
-      TriaAccessor<2, deal_II_dimension, deal_II_dimension + 1>>;
-    template class TriaActiveIterator<
-      TriaAccessor<2, deal_II_dimension, deal_II_dimension + 1>>;
-#  endif
-
-#endif
+for (deal_II_space_dimension : DIMENSIONS)
+  {
+    template class TriaAccessor<0, 1, deal_II_space_dimension>;
+    template class TriaIterator<TriaAccessor<0, 1, deal_II_space_dimension>>;
   }

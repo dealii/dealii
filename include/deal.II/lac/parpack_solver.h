@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -206,8 +206,6 @@ extern "C"
  * <code>pdseupd</code>, <code>pdnaupd</code>, <code>pdsaupd</code> work and
  * also how to set the parameters appropriately please take a look into the
  * PARPACK manual.
- *
- * @author Denis Davydov, 2015, 2017
  */
 template <typename VectorType>
 class PArpackSolver : public Subscriptor

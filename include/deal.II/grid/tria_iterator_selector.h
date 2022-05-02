@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,8 +73,6 @@ namespace internal
      * The same applies for the @p face_iterator types, since lines have no
      * substructures apart from vertices, which are handled in a different
      * way, however.
-     *
-     * @author Wolfgang Bangerth, 1998
      */
     template <int spacedim>
     struct Iterators<1, spacedim>
@@ -135,8 +133,6 @@ namespace internal
      *    using face_iterator = line_iterator;
      *    using active_face_iterator = active_line_iterator;
      *  @endcode
-     *
-     * @author Wolfgang Bangerth, 1998
      */
     template <int spacedim>
     struct Iterators<2, spacedim>
@@ -180,8 +176,6 @@ namespace internal
      *    using face_iterator = quad_iterator;
      *    using active_face_iterator = active_quad_iterator;
      *  @endcode
-     *
-     * @author Wolfgang Bangerth, 1998
      */
     template <int spacedim>
     struct Iterators<3, spacedim>

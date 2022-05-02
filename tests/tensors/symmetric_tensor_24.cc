@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@ template <int dim>
 void
 check()
 {
-  typedef SymmetricTensor<2, dim> S;
+  using S = SymmetricTensor<2, dim>;
   for (unsigned int i = 0; i < S::n_independent_components; ++i)
     {
       deallog << i << "  --  " << S::unrolled_to_component_indices(i)
@@ -49,6 +49,9 @@ main()
   check<1>();
   check<2>();
   check<3>();
+  check<4>();
+  check<5>();
+  check<6>();
 
   deallog << "OK" << std::endl;
 }

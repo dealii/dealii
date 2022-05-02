@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,14 +17,13 @@
 
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -45,7 +44,7 @@ public:
   FESystem<dim> continuous_fe;
   FESystem<dim> discontinuous_fe;
 
-  hp::DoFHandler<dim>   dof_handler;
+  DoFHandler<dim>       dof_handler;
   hp::FECollection<dim> fe_collection;
 };
 
@@ -77,9 +76,9 @@ MixedFECollection<dim>::run()
   // looping over all cells and assigning the FE_DG object to the first cell
   // that comes up -- works. looping over all cells and assigning the FE_DG
   // object to the interior cells -- doesn't work.
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       //          if (cell == dof_handler.begin_active()) // this works

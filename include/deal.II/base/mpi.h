@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,9 +19,14 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
+#include <deal.II/base/template_constraints.h>
 
+#include <boost/signals2.hpp>
+
+#include <complex>
 #include <map>
 #include <numeric>
 #include <set>
@@ -41,6 +46,9 @@ using MPI_Op       = int;
 #  ifndef MPI_COMM_SELF
 #    define MPI_COMM_SELF 0
 #  endif
+#  ifndef MPI_COMM_NULL
+#    define MPI_COMM_NULL 0
+#  endif
 #  ifndef MPI_REQUEST_NULL
 #    define MPI_REQUEST_NULL 0
 #  endif
@@ -52,6 +60,9 @@ using MPI_Op       = int;
 #  endif
 #  ifndef MPI_SUM
 #    define MPI_SUM 0
+#  endif
+#  ifndef MPI_LOR
+#    define MPI_LOR 0
 #  endif
 #endif
 
@@ -71,19 +82,7 @@ using MPI_Op       = int;
  * 4. const_cast the given expression @p expr to this new type.
  */
 #ifdef DEAL_II_WITH_MPI
-#  if DEAL_II_MPI_VERSION_GTE(3, 0)
-
-#    define DEAL_II_MPI_CONST_CAST(expr) (expr)
-
-#  else
-
-#    include <type_traits>
-
-#    define DEAL_II_MPI_CONST_CAST(expr)     \
-      const_cast<typename std::remove_const< \
-        typename std::remove_pointer<decltype(expr)>::type>::type *>(expr)
-
-#  endif
+#  define DEAL_II_MPI_CONST_CAST(expr) (expr)
 #endif
 
 
@@ -105,6 +104,23 @@ class IndexSet;
 namespace Utilities
 {
   /**
+   * Given the total number of elements @p total_size, create an evenly
+   * distributed 1:1 partitioning of the elements for across @p n_partitions.
+   * The local sizes will be equal to the @p total_size divided by the number
+   * of partitions plus the remainder being divided amongst the first
+   * processes. Each process will store a contiguous subset of indices, and the
+   * index set on process p+1 starts at the index one larger than the last one
+   * stored on process p.
+   * For example, a @p total_size of 11 with 3 processes will result
+   * in the IndexSets { [0,4), [4,8), [8,11)] }, and this function will
+   * return the @p my_partition_id 's IndexSet.
+   */
+  IndexSet
+  create_evenly_distributed_partitioning(const unsigned int my_partition_id,
+                                         const unsigned int n_partitions,
+                                         const IndexSet::size_type total_size);
+
+  /**
    * A namespace for utility functions that abstract certain operations using
    * the Message Passing Interface (MPI) or provide fallback operations in
    * case deal.II is configured not to use MPI at all.
@@ -113,6 +129,36 @@ namespace Utilities
    */
   namespace MPI
   {
+    /**
+     * A template variable that is `true` if the template argument `T` is a data
+     * type that is natively supported by MPI, and `false` otherwise. This
+     * variable can be used together with `std::enable_if` to selectively allow
+     * template functions only for those data types for which the template type
+     * is supported by MPI. The variable is, in essence, a concept in the sense
+     * of C++20.
+     */
+    template <typename T>
+    constexpr bool is_mpi_type = is_same_as_any_of<T,
+                                                   char,
+                                                   signed short,
+                                                   signed int,
+                                                   signed long,
+                                                   signed long long,
+                                                   signed char,
+                                                   unsigned char,
+                                                   unsigned short,
+                                                   unsigned int,
+                                                   unsigned long int,
+                                                   unsigned long long,
+                                                   float,
+                                                   double,
+                                                   long double,
+                                                   bool,
+                                                   std::complex<float>,
+                                                   std::complex<double>,
+                                                   std::complex<long double>,
+                                                   wchar_t>::value;
+
     /**
      * Return the number of MPI processes there exist in the given
      * @ref GlossMPICommunicator "communicator"
@@ -134,6 +180,14 @@ namespace Utilities
      */
     unsigned int
     this_mpi_process(const MPI_Comm &mpi_communicator);
+
+    /**
+     * Return a vector of the ranks (within @p comm_large) of a subset of
+     * processes specified by @p comm_small.
+     */
+    const std::vector<unsigned int>
+    mpi_processes_within_communicator(const MPI_Comm &comm_large,
+                                      const MPI_Comm &comm_small);
 
     /**
      * Consider an unstructured communication pattern where every process in
@@ -254,7 +308,8 @@ namespace Utilities
       /**
        * Access the stored communicator.
        */
-      const MPI_Comm &operator*() const
+      const MPI_Comm &
+      operator*() const
       {
         return comm;
       }
@@ -314,7 +369,7 @@ namespace Utilities
       {
       public:
         /**
-         * Constructor. Blocks until it can aquire the lock.
+         * Constructor. Blocks until it can acquire the lock.
          */
         explicit ScopedLock(CollectiveMutex &mutex, const MPI_Comm &comm)
           : mutex(mutex)
@@ -353,13 +408,13 @@ namespace Utilities
       ~CollectiveMutex();
 
       /**
-       * Aquire the mutex and, if necessary, wait until we can do so.
+       * Acquire the mutex and, if necessary, wait until we can do so.
        *
        * This is a collective call that needs to be executed by all processors
        * in the communicator.
        */
       void
-      lock(MPI_Comm comm);
+      lock(const MPI_Comm &comm);
 
       /**
        * Release the lock.
@@ -368,7 +423,7 @@ namespace Utilities
        * in the communicator.
        */
       void
-      unlock(MPI_Comm comm);
+      unlock(const MPI_Comm &comm);
 
     private:
       /**
@@ -410,9 +465,11 @@ namespace Utilities
      *   organization = {Springer}
      * }
      * @endcode
+     *
+     * @deprecated Use MPI_Comm_create_group directly
      */
 #ifdef DEAL_II_WITH_MPI
-    int
+    DEAL_II_DEPRECATED_EARLY int
     create_group(const MPI_Comm & comm,
                  const MPI_Group &group,
                  const int        tag,
@@ -420,16 +477,28 @@ namespace Utilities
 #endif
 
     /**
-     * Given the number of locally owned elements @p local_size,
-     * create a 1:1 partitioning of the of elements across the MPI communicator @p comm.
-     * The total size of elements is the sum of @p local_size across the MPI communicator.
-     * Each process will store contiguous subset of indices, and the index set
-     * on process p+1 starts at the index one larger than the last one stored on
-     * process p.
+     * Given the number of locally owned elements @p locally_owned_size,
+     * create a 1:1 partitioning of the of elements across the MPI
+     * communicator @p comm. The total size of elements is the sum of
+     * @p locally_owned_size across the MPI communicator.  Each process will
+     * store contiguous subset of indices, and the index set on process p+1
+     * starts at the index one larger than the last one stored on process p.
      */
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm &           comm,
-                                  const IndexSet::size_type &local_size);
+    create_ascending_partitioning(const MPI_Comm &          comm,
+                                  const IndexSet::size_type locally_owned_size);
+
+    /**
+     * Given the total number of elements @p total_size, create an evenly
+     * distributed 1:1 partitioning of the elements across the
+     * MPI communicator @p comm.
+     * Uses @p comm to determine number of partitions and processor ID to call the
+     * @p create_evenly_distributed_partitioning() function above.
+     */
+    IndexSet
+    create_evenly_distributed_partitioning(
+      const MPI_Comm &          comm,
+      const IndexSet::size_type total_size);
 
 #ifdef DEAL_II_WITH_MPI
     /**
@@ -453,6 +522,57 @@ namespace Utilities
                                 const Iterator  end,
                                 const MPI_Comm &comm);
 #endif
+
+
+    /**
+     * Create a object that contains an `MPI_Datatype` that represents @p n_bytes bytes.
+     *
+     * The resulting data type can be used in MPI send/receive or MPI IO to
+     * process messages of sizes larger than 2 GB with MPI_Byte as the
+     * underlying data type. This helper is required for MPI versions before 4.0
+     * because routines like `MPI_Send`
+     * use a signed interger for the @p count variable. Instead, you can use this
+     * data type with the appropriate size set to the size of your message and
+     * by passing
+     * 1 as the @p count.
+     *
+     * @note The function does not just return an object of type `MPI_Datatype`
+     *   because such objects need to be destroyed by a call to `MPI_Type_free`
+     *   and it is easy to forget to do so (thereby creating a resource leak).
+     *   Rather, the function returns an object that *points* to such an
+     *   `MPI_Datatype` object, but also has a "deleter" function that ensures
+     *   that `MPI_Type_free` is called whenever the object returned by this
+     *   function goes out of scope.
+     *
+     * Usage example:
+     * <code>
+     * std::vector<char> buffer;
+     * [...]
+     * if (buffer.size()<(1U<<31))
+     * {                               // less than 2GB of data
+     *   MPI_Send(buffer.data(), buffer.size(), MPI_BYTE, dest, tag, comm);
+     * }
+     * else
+     * {                               // more than 2GB of data
+     *   const auto bigtype =
+     *     Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size());
+     *   MPI_Send(buffer.data(), 1, *bigtype, dest, tag, comm);
+     * }
+     * </code>
+     * Alternatively, the code in the `else` branch can be simplified to
+     * the following:
+     * <code>
+     * [...]
+     * else
+     * {                               // more than 2GB of data
+     *   MPI_Send(buffer.data(), 1,
+     *            *Utilities::MPI::create_mpi_data_type_n_bytes(buffer.size()),
+     *            dest, tag, comm);
+     * }
+     * </code>
+     */
+    std::unique_ptr<MPI_Datatype, void (*)(MPI_Datatype *)>
+    create_mpi_data_type_n_bytes(const std::size_t n_bytes);
 
     /**
      * Return the sum over all processors of the value @p t. This function is
@@ -642,6 +762,66 @@ namespace Utilities
         const ArrayView<T> &      minima);
 
     /**
+     * Performs a <i>logical or</i> operation over all processors of the value
+     * @p t. The <i>logical or</i> operator `||` returns the boolean value
+     * `true` if either or all operands are `true` and returns `false`
+     * otherwise. If the provided value @p t corresponds to `0` in its
+     * associated data type `T`, it will be interpreted as `false`, and `true`
+     * otherwise. Data type `T` must be of type `integral`, i.e., `bool`,
+     * `char`, `short`, `int`, `long`, or any of their variations.
+     *
+     * This function is collective over all processors given in the
+     * @ref GlossMPICommunicator "communicator".
+     * If deal.II is not configured for use of MPI, this function simply
+     * returns the value of @p value. This function corresponds to the
+     * <code>MPI_Allreduce</code> function, i.e., all processors receive the
+     * result of this operation.
+     *
+     * @note Sometimes, not all processors need a result and in that case one
+     * would call the <code>MPI_Reduce</code> function instead of the
+     * <code>MPI_Allreduce</code> function. The latter is at most twice as
+     * expensive, so if you are concerned about performance, it may be
+     * worthwhile investigating whether your algorithm indeed needs the result
+     * everywhere.
+     */
+    template <typename T>
+    T
+    logical_or(const T &t, const MPI_Comm &mpi_communicator);
+
+    /**
+     * Like the previous function, but performs the <i>logical or</i> operation
+     * on each element of an array. In other words, the i-th element of the
+     * results array is the result of the <i>logical or</i> operation applied on
+     * the i-th entries of the input arrays from each processor. T and U must
+     * decay to the same type, e.g., they just differ by one of them having a
+     * const type qualifier and the other not.
+     *
+     * Input and output arrays may be the same.
+     *
+     * @note Depending on your standard library, this function may not work with
+     *   specializations of `std::vector` for the data type `bool`. In that
+     *   case, use a different container or data type.
+     */
+    template <typename T, typename U>
+    void
+    logical_or(const T &values, const MPI_Comm &mpi_communicator, U &results);
+
+    /**
+     * Like the previous function, but performs the <i>logical or</i> operation
+     * on each element of an array as specified by the ArrayView arguments.
+     * In other words, the i-th element of the results array is the result of
+     * the <i>logical or</i> operation applied on the i-th entries of the input
+     * arrays from each processor.
+     *
+     * Input and output arrays may be the same.
+     */
+    template <typename T>
+    void
+    logical_or(const ArrayView<const T> &values,
+               const MPI_Comm &          mpi_communicator,
+               const ArrayView<T> &      results);
+
+    /**
      * A data structure to store the result of the min_max_avg() function.
      * The structure stores the minimum, maximum, and average of one
      * value contributed by each processor that participates in an
@@ -722,8 +902,9 @@ namespace Utilities
     /**
      * Same as above but returning the sum, average, minimum, maximum,
      * process id of minimum and maximum as a collective operation on the
-     * given MPI @ref GlossMPICommunicator "communicator" @p mpi_communicator
-     * for each entry of the vector.
+     * given MPI
+     * @ref GlossMPICommunicator "communicator"
+     * @p mpi_communicator for each entry of the vector.
      *
      * @note This function performs a single reduction sweep.
      *
@@ -737,8 +918,9 @@ namespace Utilities
     /**
      * Same as above but returning the sum, average, minimum, maximum,
      * process id of minimum and maximum as a collective operation on the
-     * given MPI @ref GlossMPICommunicator "communicator" @p mpi_communicator
-     * for each entry of the ArrayView.
+     * given MPI
+     * @ref GlossMPICommunicator "communicator"
+     * @p mpi_communicator for each entry of the ArrayView.
      *
      * @note This function performs a single reduction sweep.
      *
@@ -859,7 +1041,7 @@ namespace Utilities
        *
        * The object @p request needs to exist when MPI_Finalize is called, which means the
        * request is typically statically allocated. Otherwise, you need to call
-       * unregister_request() before the request goes out of scope. Note that is
+       * unregister_request() before the request goes out of scope. Note that it
        * is acceptable for a request to be already waited on (and consequently
        * reset to MPI_REQUEST_NULL).
        *
@@ -887,6 +1069,32 @@ namespace Utilities
        */
       static void
       unregister_request(MPI_Request &request);
+
+      /**
+       * A structure that has boost::signal objects to register a call back
+       * to run after MPI init or finalize.
+       *
+       * For documentation on signals, see
+       * http://www.boost.org/doc/libs/release/libs/signals2 .
+       */
+      struct Signals
+      {
+        /**
+         * A signal that is triggered immediately after we have
+         * initialized the MPI context with <code>MPI_Init()</code>.
+         */
+        boost::signals2::signal<void()> at_mpi_init;
+
+        /**
+         * A signal that is triggered just before we close the MPI context
+         * with <code>MPI_Finalize()</code>. It can be used to deallocate
+         * statically allocated MPI resources that need to be deallocated
+         * before <code>MPI_Finalize()</code> is called.
+         */
+        boost::signals2::signal<void()> at_mpi_finalize;
+      };
+
+      static Signals signals;
 
     private:
       /**
@@ -925,8 +1133,6 @@ namespace Utilities
      *
      * @return A map from the rank (unsigned int) of the process
      *  which sent the data and object received.
-     *
-     * @author Giovanni Alzetta, Luca Heltai, 2017
      */
     template <typename T>
     std::map<unsigned int, T>
@@ -945,8 +1151,6 @@ namespace Utilities
      *  processes in the MPI communicator. Each entry contains the object
      *  received from the processor with the corresponding rank within the
      *  communicator.
-     *
-     * @author Giovanni Alzetta, Luca Heltai, 2017
      */
     template <typename T>
     std::vector<T>
@@ -966,14 +1170,138 @@ namespace Utilities
      *  processes in the MPI communicator. Each entry contains the object
      *  received from the processor with the corresponding rank within the
      *  communicator. All other processes receive an empty vector.
-     *
-     * @author Benjamin Brands, 2017
      */
     template <typename T>
     std::vector<T>
     gather(const MPI_Comm &   comm,
            const T &          object_to_send,
            const unsigned int root_process = 0);
+
+    /**
+     * This function sends an object @p object_to_send from the process @p root_process
+     * to all other processes.
+     *
+     * This function is a generalization of the classic `MPI_Bcast` function
+     * that accepts arbitrary data types `T`, as long as Utilities::pack()
+     * (which in turn uses `boost::serialize`, see in Utilities::pack() for
+     * details) accepts `T` as an argument.
+     *
+     * @note Be aware that this function is typically a lot more
+     * expensive than an `MPI_Bcast` because the function will use
+     * boost::serialization to (de)serialize, and execute a second
+     * `MPI_Bcast` to transmit the size before sending the data
+     * itself. On the other hand, if you have a single element of
+     * a data type `T` that is natively supported by MPI, then the
+     * compiler will choose another broadcast() overload that is efficient.
+     * If you have an array of such elements, you should use the other
+     * broadcast() function in this namespace that takes a pointer and a count
+     * argument.
+     *
+     * @param[in] comm MPI communicator.
+     * @param[in] object_to_send An object to send to all processes.
+     * @param[in] root_process The process that sends the object to all
+     * processes. By default the process with rank 0 is the root process.
+     *
+     * @tparam T Any type for which the Utilities::pack() and
+     *   Utilities::unpack() functions can be used to convert the object
+     *   into an array of `char`. The compiler will not select this function
+     *   if `T` is a type that is natively supported by MPI and instead
+     *   use a more efficient overload.
+     *
+     * @return On the root process, return a copy of @p object_to_send.
+     *   On every other process, return a copy of the object sent by
+     *   the @p root_process.
+     */
+    template <typename T>
+    typename std::enable_if<is_mpi_type<T> == false, T>::type
+    broadcast(const MPI_Comm &   comm,
+              const T &          object_to_send,
+              const unsigned int root_process = 0);
+
+    /**
+     * This function sends an object @p object_to_send from the process @p root_process
+     * to all other processes.
+     *
+     * This function is wrapper around the `MPI_Bcast` function selected
+     * by the compiler whenever `T` is a data type natively supported by
+     * MPI.
+     *
+     * @param[in] comm MPI communicator.
+     * @param[in] object_to_send An object to send to all processes.
+     * @param[in] root_process The process that sends the object to all
+     * processes. By default the process with rank 0 is the root process.
+     *
+     * @tparam T Any type. The compiler will only select this function
+     *   if `T` is a type that is natively supported by MPI. It will choose
+     *   the other overloaded version of this function if that is not
+     *   the case.
+     *
+     * @return On the root process, return a copy of @p object_to_send.
+     *   On every other process, return a copy of the object sent by
+     *   the @p root_process.
+     */
+    template <typename T>
+    typename std::enable_if<is_mpi_type<T> == true, T>::type
+    broadcast(const MPI_Comm &   comm,
+              const T &          object_to_send,
+              const unsigned int root_process = 0);
+
+    /**
+     * Broadcast the information in @p buffer from @p root to all
+     * other ranks.
+     *
+     * Like `MPI_Bcast` but with support to send data with a @p count
+     * bigger than 2^31. The datatype to send needs to be supported
+     * directly by MPI and is automatically deduced from T.
+     *
+     * Throws an exception if any MPI command fails.
+     *
+     * @param buffer Buffer of @p count objects.
+     * @param count The number of objects to send. All processes need
+     *              to specify the correct size.
+     * @param root The rank of the process with the data.
+     * @param comm The MPI communicator to use.
+     */
+    template <typename T>
+    void
+    broadcast(T *                buffer,
+              const size_t       count,
+              const unsigned int root,
+              const MPI_Comm &   comm);
+
+    /**
+     * A function that combines values @p local_value from all processes
+     * via a user-specified binary operation @p combiner on the @p root_process.
+     * As such this function is similar to MPI_Reduce (and
+     * Utilities::MPI::min/max()): however on the one hand due to the
+     * user-specified binary operation it is slower for built-in types but
+     * on the other hand general object types, including ones that store
+     * variable amounts of data, can be handled.
+     *
+     * In contrast to all_reduce, the result will be only available on a
+     * single rank. On all other processes, the returned value is undefined.
+     */
+    template <typename T>
+    T
+    reduce(const T &                                     local_value,
+           const MPI_Comm &                              comm,
+           const std::function<T(const T &, const T &)> &combiner,
+           const unsigned int                            root_process = 0);
+
+    /**
+     * A function that combines values @p local_value from all processes
+     * via a user-specified binary operation @p combiner and distributes the
+     * result back to all processes. As such this function is similar to
+     * MPI_Allreduce (if it were implemented by a global reduction followed
+     * by a broadcast step) but due to the user-specified binary operation also
+     * general object types, including ones that store variable amounts of data,
+     * can be handled.
+     */
+    template <typename T>
+    T
+    all_reduce(const T &                                     local_value,
+               const MPI_Comm &                              comm,
+               const std::function<T(const T &, const T &)> &combiner);
 
     /**
      * Given a partitioned index set space, compute the owning MPI process rank
@@ -1016,8 +1344,6 @@ namespace Utilities
      * @return List containing the MPI process rank for each entry in the index
      *         set @p indices_to_look_up. The order coincides with the order
      *         within the ElementIterator.
-     *
-     * @author Peter Munch, 2019
      */
     std::vector<unsigned int>
     compute_index_owner(const IndexSet &owned_indices,
@@ -1042,17 +1368,204 @@ namespace Utilities
     std::set<T>
     compute_set_union(const std::set<T> &set, const MPI_Comm &comm);
 
-#ifndef DOXYGEN
-    // declaration for an internal function that lives in mpi.templates.h
+
+
+    /* --------------------------- inline functions ------------------------- */
+
     namespace internal
     {
+      /**
+       * Given a pointer to an object of class T, the functions in this
+       * namespace return the matching
+       * `MPI_Datatype` to be used for MPI communication.
+       */
+      namespace MPIDataTypes
+      {
+#ifdef DEAL_II_WITH_MPI
+        inline MPI_Datatype
+        mpi_type_id(const bool *)
+        {
+          return MPI_CXX_BOOL;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const char *)
+        {
+          return MPI_CHAR;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const signed char *)
+        {
+          return MPI_SIGNED_CHAR;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const wchar_t *)
+        {
+          return MPI_WCHAR;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const short *)
+        {
+          return MPI_SHORT;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const int *)
+        {
+          return MPI_INT;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const long int *)
+        {
+          return MPI_LONG;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const long long int *)
+        {
+          return MPI_LONG_LONG;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const unsigned char *)
+        {
+          return MPI_UNSIGNED_CHAR;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const unsigned short *)
+        {
+          return MPI_UNSIGNED_SHORT;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const unsigned int *)
+        {
+          return MPI_UNSIGNED;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const unsigned long int *)
+        {
+          return MPI_UNSIGNED_LONG;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const unsigned long long int *)
+        {
+          return MPI_UNSIGNED_LONG_LONG;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const float *)
+        {
+          return MPI_FLOAT;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const double *)
+        {
+          return MPI_DOUBLE;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const long double *)
+        {
+          return MPI_LONG_DOUBLE;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const std::complex<float> *)
+        {
+          return MPI_COMPLEX;
+        }
+
+
+
+        inline MPI_Datatype
+        mpi_type_id(const std::complex<double> *)
+        {
+          return MPI_DOUBLE_COMPLEX;
+        }
+#endif
+      } // namespace MPIDataTypes
+    }   // namespace internal
+
+
+
+#ifdef DEAL_II_WITH_MPI
+    /**
+     * A template variable that translates from the data type given as
+     * template argument to the corresponding
+     * `MPI_Datatype` to be used for MPI communication.
+     *
+     * As an example, the value of `mpi_type_id_for_type<int>` is `MPI_INT`. A
+     * common way to use this variable is when sending an object `obj`
+     * via MPI functions to another process, and using
+     * `mpi_type_id_for_type<decltype(obj)>` to infer the correct MPI type to
+     * use for the communication.
+     *
+     * The type `T` given here must be one of the data types supported
+     * by MPI, such as `int` or `double`. It may not be an array of
+     * objects of such a type, or a pointer to an object of such a
+     * type. The compiler will produce an error if this requirement is
+     * not satisfied.
+     */
+    template <typename T>
+    const MPI_Datatype
+      mpi_type_id_for_type = internal::MPIDataTypes::mpi_type_id(
+        static_cast<std::remove_cv_t<std::remove_reference_t<T>> *>(nullptr));
+#endif
+
+#ifndef DOXYGEN
+    namespace internal
+    {
+      // declaration for an internal function that lives in mpi.templates.h
       template <typename T>
       void
       all_reduce(const MPI_Op &            mpi_op,
                  const ArrayView<const T> &values,
                  const MPI_Comm &          mpi_communicator,
                  const ArrayView<T> &      output);
-    }
+    } // namespace internal
+
+
 
     // Since these depend on N they must live in the header file
     template <typename T, unsigned int N>
@@ -1065,6 +1578,8 @@ namespace Utilities
                            ArrayView<T>(sums, N));
     }
 
+
+
     template <typename T, unsigned int N>
     void
     max(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&maxima)[N])
@@ -1075,6 +1590,8 @@ namespace Utilities
                            ArrayView<T>(maxima, N));
     }
 
+
+
     template <typename T, unsigned int N>
     void
     min(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&minima)[N])
@@ -1084,6 +1601,25 @@ namespace Utilities
                            mpi_communicator,
                            ArrayView<T>(minima, N));
     }
+
+
+
+    template <typename T, unsigned int N>
+    void
+    logical_or(const T (&values)[N],
+               const MPI_Comm &mpi_communicator,
+               T (&results)[N])
+    {
+      static_assert(std::is_integral<T>::value,
+                    "The MPI_LOR operation only allows integral data types.");
+
+      internal::all_reduce(MPI_LOR,
+                           ArrayView<const T>(values, N),
+                           mpi_communicator,
+                           ArrayView<T>(results, N));
+    }
+
+
 
     template <typename T>
     std::map<unsigned int, T>
@@ -1111,7 +1647,7 @@ namespace Utilities
         else
           send_to.emplace_back(m.first);
 
-      const unsigned int n_point_point_communications =
+      const unsigned int n_expected_incoming_messages =
         Utilities::MPI::compute_n_point_to_point_communications(comm, send_to);
 
       // Protect the following communication:
@@ -1122,7 +1658,7 @@ namespace Utilities
       // processors, we need to visit one of the two scopes below. Otherwise,
       // no other action is required by this mpi process, and we can safely
       // return.
-      if (send_to.size() == 0 && n_point_point_communications == 0)
+      if (send_to.size() == 0 && n_expected_incoming_messages == 0)
         return received_objects;
 
       const int mpi_tag =
@@ -1137,7 +1673,8 @@ namespace Utilities
           if (rank_obj.first != my_proc)
             {
               const auto &rank   = rank_obj.first;
-              buffers_to_send[i] = Utilities::pack(rank_obj.second);
+              buffers_to_send[i] = Utilities::pack(rank_obj.second,
+                                                   /*allow_compression=*/false);
               const int ierr     = MPI_Isend(buffers_to_send[i].data(),
                                          buffers_to_send[i].size(),
                                          MPI_CHAR,
@@ -1154,7 +1691,7 @@ namespace Utilities
       {
         std::vector<char> buffer;
         // We do this on a first come/first served basis
-        for (unsigned int i = 0; i < n_point_point_communications; ++i)
+        for (unsigned int i = 0; i < n_expected_incoming_messages; ++i)
           {
             // Probe what's going on. Take data from the first available sender
             MPI_Status status;
@@ -1182,7 +1719,9 @@ namespace Utilities
             Assert(received_objects.find(rank) == received_objects.end(),
                    ExcInternalError(
                      "I should not receive again from this rank"));
-            received_objects[rank] = Utilities::unpack<T>(buffer);
+            received_objects[rank] =
+              Utilities::unpack<T>(buffer,
+                                   /*allow_compression=*/false);
           }
       }
 
@@ -1196,10 +1735,15 @@ namespace Utilities
 #  endif // deal.II with MPI
     }
 
+
+
     template <typename T>
     std::vector<T>
     all_gather(const MPI_Comm &comm, const T &object)
     {
+      if (job_supports_mpi() == false)
+        return {object};
+
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
       std::vector<T> v(1, object);
@@ -1215,8 +1759,9 @@ namespace Utilities
       std::vector<int> size_all_data(n_procs, 0);
 
       // Exchanging the size of each buffer
-      MPI_Allgather(
+      int ierr = MPI_Allgather(
         &n_local_data, 1, MPI_INT, size_all_data.data(), 1, MPI_INT, comm);
+      AssertThrowMPI(ierr);
 
       // Now computing the displacement, relative to recvbuf,
       // at which to store the incoming buffer
@@ -1229,14 +1774,15 @@ namespace Utilities
       std::vector<char> received_unrolled_buffer(rdispls.back() +
                                                  size_all_data.back());
 
-      MPI_Allgatherv(buffer.data(),
-                     n_local_data,
-                     MPI_CHAR,
-                     received_unrolled_buffer.data(),
-                     size_all_data.data(),
-                     rdispls.data(),
-                     MPI_CHAR,
-                     comm);
+      ierr = MPI_Allgatherv(buffer.data(),
+                            n_local_data,
+                            MPI_CHAR,
+                            received_unrolled_buffer.data(),
+                            size_all_data.data(),
+                            rdispls.data(),
+                            MPI_CHAR,
+                            comm);
+      AssertThrowMPI(ierr);
 
       std::vector<T> received_objects(n_procs);
       for (unsigned int i = 0; i < n_procs; ++i)
@@ -1251,6 +1797,8 @@ namespace Utilities
       return received_objects;
 #  endif
     }
+
+
 
     template <typename T>
     std::vector<T>
@@ -1332,6 +1880,119 @@ namespace Utilities
       return received_objects;
 #  endif
     }
+
+
+
+    template <typename T>
+    void
+    broadcast(T *                buffer,
+              const size_t       count,
+              const unsigned int root,
+              const MPI_Comm &   comm)
+    {
+#  ifndef DEAL_II_WITH_MPI
+      (void)buffer;
+      (void)count;
+      (void)root;
+      (void)comm;
+#  else
+      Assert(root < n_mpi_processes(comm),
+             ExcMessage("Invalid root rank specified."));
+
+      // MPI_Bcast's count is a signed int, so send at most 2^31 in each
+      // iteration:
+      const size_t max_send_count = std::numeric_limits<signed int>::max();
+
+      size_t total_sent_count = 0;
+      while (total_sent_count < count)
+        {
+          const size_t current_count =
+            std::min(count - total_sent_count, max_send_count);
+
+          const int ierr = MPI_Bcast(buffer + total_sent_count,
+                                     current_count,
+                                     mpi_type_id_for_type<decltype(*buffer)>,
+                                     root,
+                                     comm);
+          AssertThrowMPI(ierr);
+          total_sent_count += current_count;
+        }
+#  endif
+    }
+
+
+
+    template <typename T>
+    typename std::enable_if<is_mpi_type<T> == false, T>::type
+    broadcast(const MPI_Comm &   comm,
+              const T &          object_to_send,
+              const unsigned int root_process)
+    {
+#  ifndef DEAL_II_WITH_MPI
+      (void)comm;
+      (void)root_process;
+      return object_to_send;
+#  else
+      const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
+      AssertIndexRange(root_process, n_procs);
+      (void)n_procs;
+
+      std::vector<char> buffer;
+      std::size_t       buffer_size = numbers::invalid_size_type;
+
+      // On the root process, pack the data and determine what the
+      // buffer size needs to be.
+      if (this_mpi_process(comm) == root_process)
+        {
+          buffer      = Utilities::pack(object_to_send, false);
+          buffer_size = buffer.size();
+        }
+
+      // Exchange the size of buffer
+      int ierr = MPI_Bcast(&buffer_size,
+                           1,
+                           mpi_type_id_for_type<decltype(buffer_size)>,
+                           root_process,
+                           comm);
+      AssertThrowMPI(ierr);
+
+      // If not on the root process, correctly size the buffer to
+      // receive the data, then do exactly that.
+      if (this_mpi_process(comm) != root_process)
+        buffer.resize(buffer_size);
+
+      broadcast(buffer.data(), buffer_size, root_process, comm);
+
+      if (Utilities::MPI::this_mpi_process(comm) == root_process)
+        return object_to_send;
+      else
+        return Utilities::unpack<T>(buffer, false);
+#  endif
+    }
+
+
+
+    template <typename T>
+    typename std::enable_if<is_mpi_type<T> == true, T>::type
+    broadcast(const MPI_Comm &   comm,
+              const T &          object_to_send,
+              const unsigned int root_process)
+    {
+#  ifndef DEAL_II_WITH_MPI
+      (void)comm;
+      (void)root_process;
+      return object_to_send;
+#  else
+
+      T   object = object_to_send;
+      int ierr =
+        MPI_Bcast(&object, 1, mpi_type_id_for_type<T>, root_process, comm);
+      AssertThrowMPI(ierr);
+
+      return object;
+#  endif
+    }
+
 
 
 #  ifdef DEAL_II_WITH_MPI

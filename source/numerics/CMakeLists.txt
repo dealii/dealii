@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,12 +18,11 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_unity_include_src
   data_out.cc
   data_out_faces.cc
-  data_out_stack.cc
   data_out_rotation.cc
+  data_out_stack.cc
   data_postprocessor.cc
   dof_output_operator.cc
   histogram.cc
-  kdtree.cc
   matrix_tools_once.cc
   matrix_tools.cc
   time_dependent.cc
@@ -39,6 +38,7 @@ SET(_separate_src
   data_out_dof_data.cc
   data_out_dof_data_inst2.cc
   data_out_dof_data_codim.cc
+  data_out_resample.cc
   derivative_approximation.cc
   error_estimator_1d.cc
   error_estimator.cc
@@ -48,6 +48,7 @@ SET(_separate_src
   matrix_creator_inst2.cc
   matrix_creator_inst3.cc
   point_value_history.cc
+  smoothness_estimator.cc
   solution_transfer.cc
   solution_transfer_inst2.cc
   solution_transfer_inst3.cc
@@ -56,8 +57,6 @@ SET(_separate_src
   vector_tools_interpolate.cc
   vector_tools_point_value.cc
   vector_tools_project.cc
-  vector_tools_project_inst2.cc
-  vector_tools_project_inst3.cc
   vector_tools_project_hp.cc
   vector_tools_project_codim.cc
   vector_tools_project_qp.cc
@@ -79,6 +78,7 @@ SET(_inst
   data_out_dof_data_codim.inst.in
   data_out_faces.inst.in
   data_out.inst.in
+  data_out_resample.inst.in
   data_out_rotation.inst.in
   data_out_stack.inst.in
   data_postprocessor.inst.in
@@ -90,6 +90,7 @@ SET(_inst
   matrix_creator.inst.in
   matrix_tools.inst.in
   point_value_history.inst.in
+  smoothness_estimator.inst.in
   solution_transfer.inst.in
   time_dependent.inst.in
   vector_tools_boundary.inst.in

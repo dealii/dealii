@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -108,7 +108,7 @@ test_boundary_values(const FiniteElement<dim> &fe)
 
   GridGenerator::hyper_cube(triangulation);
   MappingQ<dim>      mapping(2);
-  QIterated<dim - 1> face_quadrature(QTrapez<1>(), 5);
+  QIterated<dim - 1> face_quadrature(QTrapezoid<1>(), 5);
 
   double old_max_disp_error = 0.0;
   double old_max_velo_error = 0.0;

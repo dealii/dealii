@@ -1,8 +1,0 @@
-Changed: The GridOut::write_svg() function now no longer outputs the
-cell level and number by default; this also obviates the need for the
-colorbar and the caption. This is achieved by changing the defaults in
-the constructor of the GridOutFlags::Svg structure. This likely comes
-closer to what most users want to see from this function -- namely,
-just the mesh for inclusion into text.
-<br>
-(Wolfgang Bangerth, 2019/08/05)

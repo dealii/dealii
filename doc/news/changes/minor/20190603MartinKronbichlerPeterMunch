@@ -1,6 +1,0 @@
-Improved: A number of places in deal.II previously called `MPI_Allgather`
-followed by some local sums to compute prefix sums. Now the more appropriate
-`MPI_Exscan` is used instead, which improves scalability of setup routines on
-more than 10k processors.
-<br>
-(Martin Kronbichler, Peter Munch, 2019/06/03)

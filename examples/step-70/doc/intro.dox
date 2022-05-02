@@ -1,0 +1,535 @@
+<br>
+
+<i>This program was contributed by Luca Heltai (International School for
+Advanced Studies, Trieste), Bruno Blais (Polytechnique Montréal),
+and Rene Gassmöller (University of California Davis)
+</i>
+
+@dealiiTutorialDOI{10.5281/zenodo.3829064,https://zenodo.org/badge/DOI/10.5281/zenodo.3829064.svg}
+
+
+<h1>Introduction</h1>
+
+<h3>Massively parallel non-matching grid simulations of fluid structure interaction problems</h3>
+
+In this tutorial we consider a mixing problem in the laminar flow regime.
+Such problems occur in a wide range of applications ranging from chemical engineering to power
+generation (e.g. turbomachinery). Mixing problems are particularly hard to solve numerically,
+because they often involve a container (with fixed boundaries, and possibly
+complex geometries such as baffles), represented by the domain $\Omega$,
+and one (or more) immersed and rotating impellers (represented by the domain $\Omega^{\text{imp}}$).
+The domain in which we would like to solve the flow equations is the (time
+dependent) difference between the two domains, namely:
+$\Omega\setminus\Omega^{\text{imp}}$.
+
+For rotating impellers, the use of Arbitrary Lagrangian Eulerian formulations
+(in which the fluid domain -- along with the mesh! -- is smoothly deformed to follow the deformations
+of the immersed solid) is not possible, unless only small times (i.e.,
+small fluid domain deformations) are considered. If one wants to track the
+evolution of the flow across multiple rotations of the impellers, the resulting
+deformed grid would simply be too distorted to be useful.
+
+In this case, a viable alternative strategy would be to use non-matching
+methods (similarly to what we have done in step-60), where a background fixed
+grid (that may or may not be locally refined in time to better capture the solid
+motion) is coupled with a rotating, independent, grid.
+
+In order to maintain the same notations used in step-60, we use $\Omega$ to
+denote the domain in ${\mathbb R}^{\text{spacedim}}$ representing the container of both
+the fluid and the impeller, and we use $\Gamma$ in ${\mathbb R}^{\text{dim}}$ to denote
+either the full impeller (when its `spacedim` measure is non-negligible, i.e.,
+when we can represent it as a grid of dimension `dim` equal to `spacedim`),
+a co-dimension one representation of a thin impeller, or just the boundary of
+the full impeller.
+
+The domain $\Gamma$ is embedded in $\Omega$ ($\Gamma \subseteq \Omega$) and it
+is non-matching: It does not, in general, align with any of the
+features of the volume mesh. We solve a partial differential equation on $\Omega$,
+enforcing some conditions on the solution of the problem on the embedded
+domain $\Gamma$ by some penalization techniques. In the current case,
+the condition is that the velocity of the fluid at points on $\Gamma$
+equal the velocity of the solid impeller at that point.
+
+The technique we describe here is presented in the literature using one of many
+names: the <b>immersed finite element method</b> and the <b>fictitious boundary
+method</b> among others.  The main principle is that the discretization of the
+two grids are kept completely independent. In the present tutorial, this
+approach is used to solve for the motion of a viscous fluid, described by the
+Stokes equation, that is agitated by a rigid non-deformable impeller.
+
+Thus, the equations solved in $\Omega$ are the Stokes equations for a creeping
+flow (i.e. a flow where $\text{Re}\rightarrow 0$) and a no-slip boundary
+condition is applied on the moving *embedded domain* $\Gamma$ associated with
+the impeller. However, this tutorial could be readily extended
+to other equations (e.g. the Navier-Stokes equations, linear elasticity
+equation, etc.). It can be seen as a natural extension of step-60 that
+enables the solution of large problems using a distributed parallel computing
+architecture via MPI.
+
+However, contrary to step-60, the Dirichlet boundary conditions on $\Gamma$
+are imposed weakly instead of through the use of Lagrange multipliers, and we
+concentrate on dealing with the coupling of two fully distributed
+triangulations (a combination that was not possible in the implementation of
+step-60).
+
+There are two interesting scenarios that occur when one wants to enforce
+conditions on the embedded domain $\Gamma$:
+
+- The geometrical dimension `dim` of the embedded domain $\Gamma$ is the same of
+the domain $\Omega$ (`spacedim`), that is, the spacedim-dimensional measure of
+$\Gamma$ is not zero. In this case, the imposition of the Dirichlet boundary
+boundary condition on $\Gamma$ is done through a volumetric penalization. If the
+applied penalization only depends on the velocity, this is often referred
+to as $\mathcal{L}^2$ penalization whereas if the penalization depends
+on both the velocity and its gradient, it is an $\mathcal{H}^1$ penalization.
+The case of the $\mathcal{L}^2$ penalization is very similar to a Darcy-type
+approach. Both $\mathcal{L}^2$ and $\mathcal{H}^1$ penalizations have been
+analyzed extensively (see, for example, @cite Angot1999).
+
+- The embedded domain $\Gamma$ has an intrinsic dimension `dim` which is smaller
+than that of $\Omega$ (`spacedim`), thus its spacedim-dimensional measure is
+zero; for example it is a curve embedded in a two dimensional domain, or a
+surface embedded in a three-dimensional domain. This is of course
+physically impossible, but one may consider very thin sheets of metal
+moving in a fluid as essentially lower-dimensional if the thickness of
+the sheet is negligible. In this case, the boundary
+condition is imposed weakly on $\Gamma$ by applying the
+<a href="https://en.wikipedia.org/wiki/Joachim_Nitsche">Nitsche</a> method (see
+@cite Freund1995).
+
+Both approaches have very similar requirements and result in highly
+similar formulations. Thus, we treat them almost in the same way.
+
+In this tutorial program we are not interested in further details on $\Gamma$:
+we assume that the dimension of the embedded domain (`dim`) is always smaller by
+one or equal with respect to the dimension of the embedding domain $\Omega$
+(`spacedim`).
+
+We are going to solve the following differential problem: given a sufficiently
+regular function $g$ on $\Gamma$, find the solution $(\textbf{u},p)$ to
+
+@f{eqnarray*}
+  -\Delta \mathbf{u} + \nabla p &=& 0,\\
+  -\nabla \cdot \textbf{u} &=& 0,\\
+  \textbf{u} &=& \textbf{g}  \text{ in } \Gamma,\\
+  \textbf{u} &=& 0 \text{ on } \partial\Omega.
+@f}
+
+This equation, which we have normalized by scaling the time units in
+such a way that the viscosity has a numerical value of 1, describes
+slow, viscous flow such as honey or lava.
+The main goal of this tutorial is to show how to impose the velocity field
+condition $\mathbf{u} = \mathbf{g}$ on a non-matching $\Gamma$ in a weak way,
+using a penalization method. A more extensive discussion of the Stokes
+problem including body forces, different boundary conditions, and solution
+strategies can be found in step-22.
+
+Let us start by considering the Stokes problem alone, in the entire domain
+$\Omega$. We look for a velocity field $\mathbf{u}$ and a pressure field $p$
+that satisfy the Stokes equations with homogeneous boundary conditions
+on $\partial\Omega$.
+
+The weak form of the Stokes equations is obtained by first writing it in vector
+form as
+@f{eqnarray*}
+  \begin{pmatrix}
+    {-\Delta \textbf{u} + \nabla p}
+    \\
+    {-\textrm{div}\;\textbf{u}}
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+  0
+  \\
+  0
+  \end{pmatrix},
+@f}
+forming the dot product from the left with a vector-valued test
+function $\phi = \begin{pmatrix}\textbf{v} \\ q\end{pmatrix}$, and integrating
+over the domain $\Omega$, yielding the following set of equations:
+@f{eqnarray*}
+  (\mathrm v,
+   -\Delta \textbf{u} + \nabla p)_{\Omega}
+  -
+  (q,\textrm{div}\; \textbf{u})_{\Omega}
+  =
+  0
+@f}
+which has to hold for all test functions $\phi = \begin{pmatrix}\textbf{v}
+\\ q\end{pmatrix}$.
+
+
+Integrating by parts and exploiting the boundary conditions on $\partial\Omega$,
+we obtain the following variational problem:
+@f{eqnarray*}{
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - (\textrm{div}\; \textbf{v}, p)_{\Omega}
+ - (q, \textrm{div}\; \textbf{u})_{\Omega}&=& 0
+@f}
+
+where $(\cdot, \cdot)_{\Omega}$ represents the $L^2$ scalar
+product. This is the same variational form used in step-22.
+
+This variational formulation does not take into account the embedded domain.
+Contrary to step-60, we do not enforce strongly the constraints of
+$\textbf{u}$ on $\Gamma$, but enforce them weakly via a penalization term.
+
+The analysis of this weak imposition of the boundary condition depends on the
+spacedim-dimensional measure of $\Gamma$ as either positive (if `dim` is equal
+to `spacedim`) or zero (if `dim` is smaller than `spacedim`). We discuss both
+scenarios.
+
+
+<h4>Co-dimension one case</h4>
+
+In this case, we assume that $\Gamma$ is the boundary of the actual impeller,
+that is, a closed curve embedded in a two-dimensional domain or a closed
+surface in a three-dimensional domain. The idea of this method starts by
+considering a weak imposition of the Dirichlet boundary condition on $\Gamma$,
+following the Nitsche method. This is achieved by using the following modified formulation
+on the fluid domain, where no strong conditions on the test functions on $\Gamma$ are imposed:
+
+@f{multline*}{
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega\setminus\Omega^{\text{imp}}} - (\textrm{div}\;  \textbf{v}, p)_{\Omega\setminus\Omega^{\text{imp}}}
+  - (q, \textrm{div}\; \textbf{u})_{\Omega\setminus\Omega^{\text{imp}}} \\
+  - (\textbf{v},\nabla \textbf{u} \cdot \textbf{n})_{\Gamma}
+  + (\textbf{v}\cdot \textbf{n},p)_{\Gamma} \\
+ -  (\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
+ + (q, \textbf{u} \cdot \textbf{n})_{\Gamma}
+ + \beta (\textbf{v},\textbf{u})_{\Gamma} \\
+=  - (\nabla\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma} + (q, \textbf{g} \cdot \textbf{n})_{\Gamma}
+ + \beta (\textbf{v},\textbf{g})_{\Gamma}.
+@f}
+
+The integrals over $\Gamma$ are lower-dimensional integrals. It can be shown (see
+@cite Freund1995) that there exists a positive constant
+$C_1$ so that if $\beta > C_1$, the weak imposition of the boundary will
+be consistent and stable. The first two additional integrals on $\Gamma$ (the
+second line in the equation above) appear naturally after integrating by parts,
+when one does not assume that $\mathbf{v}$ is zero on
+$\Gamma$.
+
+The third line in the equation above contains two terms that are added to ensure
+consistency of the weak form, and a stabilization term, that is there to enforce
+the boundary condition with an error which is consistent with the approximation
+error. The consistency terms and the stabilization term are added to the
+right hand side with the actual boundary data $\mathbf{g}$.
+
+When $\mathbf{u}$ satisfies the condition $\mathbf{u}=\mathbf{g}$ on $\Gamma$,
+all the consistency and stability integrals on $\Gamma$ cancel out, and one is
+left with the usual weak form of Stokes flow, that is, the above formulation is
+consistent.
+
+We note that an alternative (non-symmetric) formulation can be used :
+
+@f{multline*}{
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega\setminus\Omega^{\text{imp}}} -  (\textrm{div}\;  \textbf{v}, p)_{\Omega\setminus\Omega^{\text{imp}}}
+  - (q, \textrm{div}\; \textbf{u})_{\Omega\setminus\Omega^{\text{imp}}} \\
+  -(\textbf{v},\nabla \textbf{u} \cdot \textbf{n})_{\Gamma}
+  + (\textbf{v}\cdot \textbf{n},p)_{\Gamma} \\
+   +(\nabla\textbf{v}\cdot \textbf{n},\textbf{u})_{\Gamma}
+ - (q, \textbf{u} \cdot \textbf{n})_{\Gamma}
+ + \beta (\textbf{v},\textbf{u})_{\Gamma} \\
+=   (\nabla\textbf{v}\cdot \textbf{n},\textbf{g})_{\Gamma} - (q, \textbf{g} \cdot \textbf{n})_{\Gamma}
+ + \beta (\textbf{v},\textbf{g})_{\Gamma}.
+@f}
+Note the different sign of the first terms on the third and fourth lines.
+In this case, the stability and consistency conditions become $\beta > 0$. In
+the symmetric case, the value of $\beta$ is dependent on $h$, and it is in
+general chosen such that $\beta = C h^{-1} $ with $h$
+a measure of size of the face being integrated and $C$ a constant such that
+$1 \leq C \leq 10$. This is as one usually does with the Nitsche
+penalty method to enforcing Dirichlet boundary conditions.
+
+The non-symmetric approach, on the other hand, is related to how one
+enforced continuity for the non-symmetric interior penalty method for
+discontinuous Galerkin methods (the "NIPG" method @cite Riviere1999).
+Even if the non-symmetric case seems advantageous w.r.t.
+possible choices of stabilization parameters, we opt for the symmetric
+discretization, since in this case it can be shown that the dual problem is
+also consistent, leading to a solution where not only the energy norm of the
+solution converges with the correct order, but also its $L^2$
+norm. Furthermore, the resulting matrix remains symmetric.
+
+The above formulation works under the assumption that the domain is discretized
+exactly. However, if the deformation of the impeller is a rigid body
+motion, it is possible to artificially extend the solution of the Stokes
+problem inside the propeller itself, since a rigid body motion is also a
+solution to the Stokes problem. The idea is then to solve the same problem,
+inside $\Omega^{\text{imp}}$, imposing the same boundary conditions on
+$\Gamma$, using the same penalization technique, and testing with test
+functions $\mathbf{v}$ which are globally continuous over $\Omega$.
+
+This results in the following (intermediate) formulation:
+@f{multline*}{
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - (\textrm{div}\;  \textbf{v}, p)_{\Omega}
+  - (q, \textrm{div}\; \textbf{u})_{\Omega} \\
+  - (\textbf{v},  \lbrack \nabla \textbf{u} \rbrack \cdot \textbf{n})_{\Gamma}
+  + (\textbf{v}\cdot \textbf{n},\lbrack p \rbrack )_{\Gamma} \\
+ -  (\lbrack \nabla\textbf{v} \rbrack \cdot \textbf{n},\textbf{u})_{\Gamma}
+ + (\lbrack q \rbrack, \textbf{u} \cdot n)_{\Gamma}
+ + 2\beta (\textbf{v},\textbf{u})_{\Gamma} \\
+=  - (\lbrack \nabla\textbf{v}\rbrack\cdot \textbf{n},\textbf{g})_{\Gamma} + (\lbrack q\rbrack, \textbf{g} \cdot n)_{\Gamma}
+ + 2\beta (\textbf{v},\textbf{g})_{\Gamma},
+@f}
+where the jump terms, denoted with $\lbrack \cdot \rbrack$, are computed with
+respect to a fixed orientation of the normal vector $\textbf{n}$. The
+factor of 2 appears in front of $\beta$ since we see every part of
+$\Gamma$ twice, once from within the fluid and once from within the
+obstacle moving around in it. (For all of the other integrals over
+$\Gamma$, we visit each part of $\Gamma$ twice, but with opposite
+signs, and consequently get the jump terms.)
+
+Here we notice that, unlike in discontinuous Galerkin methods, the test
+and trial functions are continuous across $\Gamma$. Moreover, if $\Gamma$ is
+not aligned with cell boundaries, all the jump terms are also zero, since, in
+general, finite element function spaces are smooth inside each cell, and if
+$\Gamma$ cuts through an element intersecting its boundary only at a finite
+number of points, all the contributions on $\Gamma$, with the exception of
+the stabilization ones, can be neglected from the formulation, resulting in
+the following final form of the variational formulation:
+
+@f{multline*}{
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - (\textrm{div}\;  \textbf{v}, p)_{\Omega}
+  - (q, \textrm{div}\; \textbf{u})_{\Omega}  + 2\beta (\textbf{v},\textbf{u})_{\Gamma} \\
+=  2\beta (\textbf{v},\textbf{g})_{\Gamma}.
+@f}
+
+In step-60, the imposition of the constraint
+required the addition of new variables in the form of Lagrange multipliers.
+This is not the case for this tutorial program. The imposition of the
+boundary condition using Nitsche's method only modifies the system matrix
+and the right-hand side without adding additional unknowns.
+However, the velocity vector $\textbf{u}$ on the embedded domain will not match
+exactly the prescribed velocity $\textbf{g}$, but only up to a numerical error
+which is in the same order as the interpolation error of the finite element
+method. Furthermore, as in step-60, we still need to integrate over the
+non-matching embedded grid in order to construct the boundary term necessary
+to impose the boundary condition over $\Gamma$.
+
+
+<h4>Co-dimension zero case</h4>
+
+In this case, $\Gamma$ has the same dimension, but is embedded into
+$\Omega$. We can think of this as a thick object moving around in the fluid.
+In the case of $\mathcal{L}^2$ penalization, the additional penalization
+term can be interpreted as a Darcy term within $\Gamma$, resulting in:
+
+@f{eqnarray*}
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - & (\textrm{div}\;  \textbf{v}, p)_{\Omega}
+  - (q, \textrm{div}\; \textbf{u})_{\Omega}  + \beta (\textbf{v},\textbf{u})_{\Gamma}
+=  \beta (\textbf{v},\textbf{g})_{\Gamma}.
+@f}
+
+Here, integrals over $\Gamma$ are simply integrals over a part of the volume.
+The $\mathcal{L}^2$ penalization thus consists in adding a volumetric term that
+constrains the velocity of the fluid to adhere to the velocity of the rigid body
+within $\Gamma$. Also in this case, $\beta$ must be chosen sufficiently large
+in order to ensure that the Dirichlet boundary condition in $\Gamma$ is
+sufficiently respected, but not too high in order to maintain the proper
+conditioning of the system matrix.
+
+A $\mathcal{H}^1$ penalization may be constructed in a similar manner, with the
+addition of a viscous component to the penalization that dampens the velocity
+gradient within $\Gamma$:
+
+@f{eqnarray*}{
+(\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - & (\textrm{div}\;  \textbf{v}, p)_{\Omega}
+  - (q, \textrm{div}\; \textbf{u})_{\Omega}
+  + \beta_1 (\textbf{v},\textbf{u})_{\Gamma}
+  + \beta_2 (\nabla \textbf{v}, \nabla \textbf{u})_{\Gamma}
+=  \beta_1 (\textbf{v},\textbf{g})_{\Gamma}
++ \beta_2 (\nabla \textbf{v}, \nabla \textbf{g})_{\Gamma}.
+@f}
+
+Notice that the $L^2$ penalization (`dim` equal to `spacedim`) and the Nitsche
+penalization (`dim` equal to `spacedim-1`) result in the exact same numerical
+implementation, thanks to the dimension independent capabilities of deal.II.
+
+
+<h4>Representation of Ω and Γ</h4>
+
+In this tutorial, both the embedded grid $\Gamma$ and the embedding
+grid are described using a parallel::distributed::Triangulation. These two
+triangulations can be built from functions in the GridGenerator namespace or by reading
+a mesh file produced with another application (e.g. GMSH, see the
+discussion in step-49). This is slightly
+more general than what was previously done in step-60.
+
+The addition of the immersed boundary method, whether
+it is in the `dim=spacedim` or `dim<spacedim` case, only introduces
+additional terms in the system matrix and the right-hand side of the
+system which result from the integration over $\Gamma$. This does not
+modify the number of variables for which the problem
+must be solved. The challenge is thus related to the integrals
+that must be carried over $\Gamma$.
+
+As usual in finite elements we split this integral into contributions from all
+cells of the triangulation used to
+discretize $\Gamma$, we transform the integral on $K$ to an integral on the
+reference element $\hat K$, where $F_{K}$ is the mapping from $\hat K$ to $K$,
+and compute the integral on $\hat K$ using a quadrature formula. For example:
+
+\f[
+\beta (\textbf{v},\textbf{u})_{\Gamma} =  \sum_{K\in \Gamma} \int_{\hat K}
+\hat{\textbf{u}}(\hat x) (\textbf{v} \circ F_{K}) (\hat x) J_K (\hat x) \mathrm{d} \hat x =
+\sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat{\textbf{u}}(\hat x_i)  (\textbf{v} \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
+\f]
+
+Computing this sum is non-trivial because we have to evaluate $(v_j \circ F_{K})
+(\hat x_i)$. In general, if $\Gamma$ and $\Omega$ are not aligned, the point
+$y_i = F_{K}(\hat x_i)$ is completely arbitrary with respect to $\Omega$, and unless
+we figure out a way to interpolate all basis functions of $V_h(\Omega)$ on an
+arbitrary point on $\Omega$, we cannot compute the integral needed.
+
+
+To evaluate $(v_j \circ F_{K}) (\hat x_i)$ the following steps needs to be
+taken (as shown in the picture below):
+
+- For a given cell $K$ in $\Gamma$ compute the real point $y_i \dealcoloneq F_{K} (\hat
+x_i)$, where $x_i$ is one of the quadrature points used for the integral on $K
+\subseteq \Gamma$. This is the easy part:
+FEValues::quadrature_point() gives us the real-space locations of all
+quadrature points.
+
+- Find the cell of $\Omega$ in which $y_i$ lies. We shall call this element $T$.
+
+- Find the reference coordinates within $T$ of $y_i$. For this, we
+need the inverse of the mapping $G_T$ that
+transforms the reference element $\hat T$ into the element $T$: $\hat y_i = G^{-1}_{T} (y_i)$.
+
+- Evaluate the basis function $v_j$ of the $\Omega$ mesh at this
+  point $\hat y_i$. This is, again, relatively simple using FEValues.
+
+
+<p align="center"> <img
+  src="https://www.dealii.org/images/steps/developer/step-60.C_interpolation.png"
+  alt=""> </p>
+
+In step-60, the second through fourth steps above were computed by calling, in turn,
+
+- GridTools::find_active_cell_around_point(), followed by
+
+- Mapping::transform_real_to_unit_cell(). We then
+
+- construct a custom Quadrature formula, containing the point in the reference
+ cell and then
+
+- construct an FEValues object, with the given quadrature formula, and
+ initialized with the cell obtained in the first step.
+
+Although this approach could work for the present case, it does not lends itself
+readily to parallel simulations using distributed triangulations. Indeed,
+since the position of the quadrature points on the cells of the
+embedded domain $\Gamma$ do not match that of the embedding triangulation
+and since $\Gamma$ is constantly moving, this would require that the triangulation representing
+$\Gamma$ be stored in it's entirety for all of the processors. As the number
+of processor and the number of cells in $\Gamma$ increases, this leads
+to a severe bottleneck in terms of memory. Consequently, an alternative strategy is sought
+in this step.
+
+
+<h4>Using particles to track Γ</h4>
+
+Remember that for both the penalization approach ($\mathcal{L}^2$ or $\mathcal{H}^1$)
+and the Nitsche method, we want to compute integrals that are approximated by
+the quadrature. That is, we need to compute
+\f[
+\beta (\textbf{v},\textbf{u})_{\Gamma} =
+\sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat{\textbf{u}}(\hat x_i)  (\textbf{v} \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
+\f]
+If you followed the discussion above, then you will recall that $\textbf{u}$
+and $\textbf{v}$ are shape functions defined on the fluid mesh.
+The only things defined on the solid mesh are:
+$F_K(\hat x_i)$, which is the location of a quadrature point on a solid cell that
+is part of $\Gamma$, $J_K$ is the determinant of its Jacobian, and $w_i$ the corresponding
+quadrature weight.
+
+The important part to realize is now this: $w_i$ is a property of
+the quadrature formula and does not change with time. Furthermore,
+the Jacobian matrix of $F_K$ itself changes as the solid obstacle
+moves around in the fluid, but because the solid is considered
+non-deforming (it only translates and rotates, but doesn't dilate),
+the determinant of the Jacobian remains constant. As a consequence,
+the product $J_K(\hat x_i) w_i$ (which we typically denote by `JxW`)
+remains constant for each quadrature point. So the only thing we need
+keep track of are the positions $x_i=F_K(\hat x_i)$ -- but these
+move with the velocity of the solid domain.
+
+In other words, we don't actually need to keep the solid mesh at all.
+All we need is the positions $x_i(t)$ and corresponding `JxW` values.
+Since both of these properties are point-properties (or point-vectors) that are
+attached to the solid material, they can be idealized as a set of disconnected
+infinitesimally small "particles", which carry the required `JxW` information with the
+movement of the solid. deal.II has the ability to distribute and
+store such a set of particles in large-scale parallel computations in the form of
+the ParticleHandler class (for details on the implementation see @cite GLHPW2018),
+and we will make use of this functionality in this tutorial.
+
+Thus, the approach taken in this step is as follows:
+- Create a parallel::distributed::Triangulation for the domain $\Gamma$;
+- Create Particles::Particle at the positions of the quadrature points on $\Gamma$;
+- Call the Particles::ParticleHandler::insert_global_particles() function,
+  to distribute the particles across processors, *following the solid
+  triangulation*;
+- Attach the `JxW` values as a "property" to each Particles::Particle object.
+
+This structure is relatively expensive to generate, but must only be generated
+once per simulation. Once the Particles::ParticleHandler is generated and the
+required information is attached to the particle, the integrals over $\Gamma$
+can be carried out by exploiting the fact that particles are grouped cellwise
+inside ParticleHandler, allowing us to:
+- Looping over all cells of $\Omega$ that contain at least one particle
+- Looping over all particles in the given cell
+- Compute the integrals and fill the global matrix.
+
+Since the Particles::ParticleHandler can manage the exchange of particles from
+one processor to the other, the embedded
+triangulation can be moved or deformed by displacing the particles.
+The only constraint associated with this displacement is that particles should
+be displaced by a distance that is no larger than the size of one
+cell. That's because that is the limit to which
+Particles::ParticleHandler can track which cell a particle that leaves
+its current cell now resides in.
+
+Once the entire problem (the Stokes problem and the immersed boundary
+imposition) is assembled,
+the final saddle point problem is solved by an iterative solver, applied to the
+Schur complement $S$ (whose construction is described, for example, in step-22),
+and we construct $S$ using LinearOperator classes.
+
+
+<h3>The testcase</h3>
+
+The problem we solve here is a demonstration of the time-reversibility of Stokes
+flow. This is often illustrated in science education experiments with a
+Taylor-Couette flow and dye droplets that revert back to their original shape
+after the fluid has been displaced in a periodic manner.
+
+@htmlonly
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/p08_KlTKP50" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+@endhtmlonly
+
+In the present problem, a very viscous fluid is agitated by the rotation of
+an impeller, which, in 2D, is modeled by a rectangular grid. The impeller
+rotates for a given number of revolutions, after which the flow is reversed such
+that the same number of revolutions is carried out in the opposite direction. We
+recall that since the Stokes equations are self-adjoint, creeping flows are
+reversible. Consequently, if the impeller motion is reversed in the opposite
+direction, the fluid should return to its original position. In the present
+case, this is illustrated by inserting a circle of passive tracer particles that
+are advected by the fluid and which return to their original position, thus
+demonstrating the time-reversibility of the flow.
+
+
+<h3> More references</h3>
+
+This tutorial program uses a number of techniques on imposing velocity
+conditions on non-matching interfaces in the interior of the fluid.
+For more background material, you may want to look up the following references:
+@cite Freund1995,
+@cite Angot1999,
+@cite Glowinski1999,
+@cite Boffi2008,
+@cite Heltai2012.

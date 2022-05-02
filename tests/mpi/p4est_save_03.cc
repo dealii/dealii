@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -166,7 +166,7 @@ test()
         deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
       }
     deallog << "Checksum: " << tr.get_checksum() << std::endl;
-    deallog << "sum: " << norm << " " << norm2 << std::endl;
+    deallog << "sum: " << norm << ' ' << norm2 << std::endl;
   }
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

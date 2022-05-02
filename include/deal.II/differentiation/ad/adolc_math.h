@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -123,7 +123,7 @@ namespace std
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(log)
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(log10)
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(sqrt)
-#    if defined(DEAL_II_ADOLC_WITH_ATRIG_ERF)
+#    ifdef DEAL_II_ADOLC_WITH_ATRIG_ERF
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(erf)
   inline adouble
   erfc(const adouble &x)
@@ -153,7 +153,7 @@ namespace std
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(sinh)
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(cosh)
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(tanh)
-#    if defined(DEAL_II_ADOLC_WITH_ATRIG_ERF)
+#    ifdef DEAL_II_ADOLC_WITH_ATRIG_ERF
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(asinh)
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(acosh)
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(atanh)

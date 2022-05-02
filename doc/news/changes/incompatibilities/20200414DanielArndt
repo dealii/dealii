@@ -1,5 +1,0 @@
-Removed: For LinearAlgebra::distributed::Vector, deprecated overloads of the
-member operator=(), sadd(), equ(), local_range(), n_ghost_entries(),
-ghost_elements() and ghost_entries() have been removed.
-<br>
-(Daniel Arndt, 2020/04/13)

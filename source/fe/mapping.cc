@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,19 +20,31 @@
 
 #include <deal.II/grid/tria.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#ifdef DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
+#  define BOOST_ALLOW_DEPRECATED_HEADERS
+#endif
+#include <boost/geometry.hpp>
+#ifdef DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
+#  undef BOOST_ALLOW_DEPRECATED_HEADERS
+#endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+boost::container::small_vector<Point<spacedim>,
+                               GeometryInfo<dim>::vertices_per_cell>
 Mapping<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
-  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-    {
-      vertices[i] = cell->vertex(i);
-    }
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<dim>::vertices_per_cell>
+    vertices;
+  for (const unsigned int i : cell->vertex_indices())
+    vertices.push_back(cell->vertex(i));
+
   return vertices;
 }
 
@@ -77,6 +89,44 @@ Mapping<dim, spacedim>::get_bounding_box(
 
 
 template <int dim, int spacedim>
+void
+Mapping<dim, spacedim>::fill_fe_immersed_surface_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &,
+  const NonMatching::ImmersedSurfaceQuadrature<dim> &,
+  const typename Mapping<dim, spacedim>::InternalDataBase &,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &)
+  const
+{
+  AssertThrow(false, ExcNotImplemented());
+}
+
+
+
+template <int dim, int spacedim>
+void
+Mapping<dim, spacedim>::transform_points_real_to_unit_cell(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<spacedim>> &                    real_points,
+  const ArrayView<Point<dim>> &                               unit_points) const
+{
+  AssertDimension(real_points.size(), unit_points.size());
+  for (unsigned int i = 0; i < real_points.size(); ++i)
+    {
+      try
+        {
+          unit_points[i] = transform_real_to_unit_cell(cell, real_points[i]);
+        }
+      catch (typename Mapping<dim>::ExcTransformationFailed &)
+        {
+          unit_points[i]    = Point<dim>();
+          unit_points[i][0] = std::numeric_limits<double>::infinity();
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
 Point<dim - 1>
 Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -115,6 +165,76 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   return {};
 }
 
+
+
+#ifndef DOXYGEN
+template <int dim, int spacedim>
+void
+Mapping<dim, spacedim>::fill_fe_face_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const unsigned int                                          face_no,
+  const hp::QCollection<dim - 1> &                            quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  // base class version, implement overridden function in derived classes
+  AssertDimension(quadrature.size(), 1);
+  fill_fe_face_values(cell, face_no, quadrature[0], internal_data, output_data);
+}
+
+
+
+template <int dim, int spacedim>
+void
+Mapping<dim, spacedim>::fill_fe_face_values(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const unsigned int                                          face_no,
+  const Quadrature<dim - 1> &                                 quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+    &output_data) const
+{
+  Assert(false,
+         ExcMessage("Use of a deprecated interface, please implement "
+                    "fill_fe_face_values taking a hp::QCollection argument"));
+  (void)cell;
+  (void)face_no;
+  (void)quadrature;
+  (void)internal_data;
+  (void)output_data;
+}
+
+
+
+template <int dim, int spacedim>
+std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+Mapping<dim, spacedim>::get_face_data(
+  const UpdateFlags               update_flags,
+  const hp::QCollection<dim - 1> &quadrature) const
+{
+  // base class version, implement overridden function in derived classes
+  return get_face_data(update_flags, quadrature[0]);
+}
+
+
+
+template <int dim, int spacedim>
+std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+Mapping<dim, spacedim>::get_face_data(
+  const UpdateFlags          update_flags,
+  const Quadrature<dim - 1> &quadrature) const
+{
+  Assert(false,
+         ExcMessage("Use of a deprecated interface, please implement "
+                    "fill_fe_face_values taking a hp::QCollection argument"));
+  (void)update_flags;
+  (void)quadrature;
+
+  return std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>();
+}
+#endif
+
 /* ---------------------------- InternalDataBase --------------------------- */
 
 
@@ -133,7 +253,25 @@ Mapping<dim, spacedim>::InternalDataBase::memory_consumption() const
 }
 
 
-/*------------------------------ InternalData ------------------------------*/
+/* ------------------------------ Global functions ------------------------- */
+
+template <int dim, int spacedim>
+const Mapping<dim, spacedim> &
+get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation)
+{
+  const auto &reference_cells = triangulation.get_reference_cells();
+  Assert(reference_cells.size() == 1,
+         ExcMessage(
+           "This function can only work for triangulations that "
+           "use only a single cell type -- for example, only triangles "
+           "or only quadrilaterals. For mixed meshes, there is no "
+           "single linear mapping object that can be used for all "
+           "cells of the triangulation. The triangulation you are "
+           "passing to this function uses multiple cell types."));
+
+  return reference_cells.front()
+    .template get_default_linear_mapping<dim, spacedim>();
+}
 
 
 

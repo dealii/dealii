@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,8 +79,8 @@ template <int dim,
 class BlockLaplace : public Subscriptor
 {
 public:
-  typedef typename BlockVectorType::value_type value_type;
-  typedef typename BlockVectorType::size_type  size_type;
+  using value_type = typename BlockVectorType::value_type;
+  using size_type  = typename BlockVectorType::size_type;
 
   BlockLaplace()
     : Subscriptor()
@@ -224,7 +224,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   DoFTools::extract_locally_relevant_dofs(dof, locally_relevant_dofs);
 
   // Dirichlet BC
-  ZeroFunction<dim>                                   zero_function;
+  Functions::ZeroFunction<dim>                        zero_function;
   std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   dirichlet_boundary[0] = &zero_function;
 
@@ -239,7 +239,8 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
 
   // level constraints:
   MGConstrainedDoFs mg_constrained_dofs;
-  mg_constrained_dofs.initialize(dof, dirichlet_boundary);
+  mg_constrained_dofs.initialize(dof);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
   MappingQ<dim> mapping(fe_degree + 1);
 
@@ -292,11 +293,11 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   }
 
   // set up multigrid in analogy to step-37
-  typedef BlockLaplace<dim,
-                       fe_degree,
-                       n_q_points_1d,
-                       LinearAlgebra::distributed::BlockVector<number>>
-    LevelMatrixType;
+  using LevelMatrixType =
+    BlockLaplace<dim,
+                 fe_degree,
+                 n_q_points_1d,
+                 LinearAlgebra::distributed::BlockVector<number>>;
 
   MGLevelObject<LevelMatrixType>         mg_matrices;
   MGLevelObject<MatrixFree<dim, number>> mg_level_data;
@@ -346,7 +347,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int nb)
   MGCoarseIterative<LevelMatrixType, number> mg_coarse;
   mg_coarse.initialize(mg_matrices[0]);
 
-  typedef PreconditionJacobi<LevelMatrixType> SMOOTHER;
+  using SMOOTHER = PreconditionJacobi<LevelMatrixType>;
   MGSmootherPrecondition<LevelMatrixType,
                          SMOOTHER,
                          LinearAlgebra::distributed::BlockVector<number>>

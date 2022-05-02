@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
     template class RungeKutta<V<S>>;
     template class ExplicitRungeKutta<V<S>>;
+    template class LowStorageRungeKutta<V<S>>;
     template class ImplicitRungeKutta<V<S>>;
     template class EmbeddedExplicitRungeKutta<V<S>>;
   }
@@ -26,6 +27,7 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
     template class RungeKutta<LinearAlgebra::distributed::V<S>>;
     template class ExplicitRungeKutta<LinearAlgebra::distributed::V<S>>;
+    template class LowStorageRungeKutta<LinearAlgebra::distributed::V<S>>;
     template class ImplicitRungeKutta<LinearAlgebra::distributed::V<S>>;
     template class EmbeddedExplicitRungeKutta<LinearAlgebra::distributed::V<S>>;
   }
@@ -34,6 +36,7 @@ for (V : EXTERNAL_PARALLEL_VECTORS)
   {
     template class RungeKutta<V>;
     template class ExplicitRungeKutta<V>;
+    template class LowStorageRungeKutta<V>;
     template class ImplicitRungeKutta<V>;
     template class EmbeddedExplicitRungeKutta<V>;
   }

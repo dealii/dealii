@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -96,7 +96,8 @@ public:
       {
         fe_eval.reinit(cell);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                         EvaluationFlags::hessians);
 
         // compare values with the ones the FEValues
         // gives us. Those are seen as reference
@@ -107,7 +108,7 @@ public:
             fe_val.get_function_gradients(src, reference_grads);
             fe_val.get_function_hessians(src, reference_hess);
 
-            for (int q = 0; q < (int)fe_eval.n_q_points; q++)
+            for (int q = 0; q < (int)fe_eval.n_q_points; ++q)
               {
                 errors[0] +=
                   std::fabs(fe_eval.get_value(q)[j] - reference_values[q]);

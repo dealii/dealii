@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,10 +65,10 @@ check(FiniteElement<dim> &fe)
              cell != dh.end(level);
              ++cell)
           {
-            deallog << "cell " << cell->id() << ":" << std::endl;
+            deallog << "cell " << cell->id() << ':' << std::endl;
             cell->get_mg_dof_indices(local_dofs);
             for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
-              deallog << local_dofs[i] << " ";
+              deallog << local_dofs[i] << ' ';
             deallog << std::endl;
           }
       }
@@ -88,10 +88,10 @@ check(FiniteElement<dim> &fe)
              cell != dh.end(level);
              ++cell)
           {
-            deallog << "cell " << cell->id() << ":" << std::endl;
+            deallog << "cell " << cell->id() << ':' << std::endl;
             cell->get_mg_dof_indices(local_dofs);
             for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
-              deallog << local_dofs[i] << " ";
+              deallog << local_dofs[i] << ' ';
             deallog << std::endl;
           }
       }

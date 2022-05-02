@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,7 +57,7 @@ test(const unsigned int degree)
        ++cell)
     {
       fe_values.reinit(cell);
-      for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+      for (const auto q : fe_values.quadrature_point_indices())
         AssertThrow(fe_values.shape_value(0, q) == 1, ExcInternalError());
     }
 

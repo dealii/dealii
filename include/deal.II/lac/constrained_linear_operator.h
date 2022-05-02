@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,7 +53,6 @@ DEAL_II_NAMESPACE_OPEN
  * @ref constraints
  * module.
  *
- * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @note Currently, this function may not work correctly for distributed data
  * structures.
@@ -128,16 +127,14 @@ distribute_constraints_linear_operator(
     v.compress(VectorOperation::add);
   };
 
-  // lambda capture expressions are a C++14 feature...
-  const auto vmult_add = return_op.vmult_add;
-  return_op.vmult      = [vmult_add](Range &v, const Domain &u) {
+  return_op.vmult = [vmult_add = return_op.vmult_add](Range &       v,
+                                                      const Domain &u) {
     v = 0.;
     vmult_add(v, u);
   };
 
-  // lambda capture expressions are a C++14 feature...
-  const auto Tvmult_add = return_op.Tvmult_add;
-  return_op.Tvmult      = [Tvmult_add](Domain &v, const Range &u) {
+  return_op.Tvmult = [Tvmult_add = return_op.Tvmult_add](Domain &     v,
+                                                         const Range &u) {
     v = 0.;
     Tvmult_add(v, u);
   };
@@ -152,7 +149,6 @@ distribute_constraints_linear_operator(
  * constrained degrees of freedom, i.e. all entries of the result vector that
  * correspond to unconstrained degrees of freedom are set to zero.
  *
- * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @relatesalso LinearOperator
  * @ingroup constraints
@@ -193,16 +189,14 @@ project_to_constrained_linear_operator(
     v.compress(VectorOperation::add);
   };
 
-  // lambda capture expressions are a C++14 feature...
-  const auto vmult_add = return_op.vmult_add;
-  return_op.vmult      = [vmult_add](Range &v, const Domain &u) {
+  return_op.vmult = [vmult_add = return_op.vmult_add](Range &       v,
+                                                      const Domain &u) {
     v = 0.;
     vmult_add(v, u);
   };
 
-  // lambda capture expressions are a C++14 feature...
-  const auto Tvmult_add = return_op.Tvmult_add;
-  return_op.Tvmult      = [Tvmult_add](Domain &v, const Range &u) {
+  return_op.Tvmult = [Tvmult_add = return_op.Tvmult_add](Domain &     v,
+                                                         const Range &u) {
     v = 0.;
     Tvmult_add(v, u);
   };
@@ -240,7 +234,6 @@ project_to_constrained_linear_operator(
  * @ref constraints
  * module.
  *
- * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @note Currently, this function may not work correctly for distributed data
  * structures.
@@ -287,7 +280,6 @@ constrained_linear_operator(
  * @ref constraints
  * module.
  *
- * @author Mauro Bardelloni, Matthias Maier, 2015
  *
  * @note Currently, this function may not work correctly for distributed data
  * structures.
@@ -318,9 +310,7 @@ constrained_right_hand_side(
     v += Ct * (right_hand_side - linop * *k);
   };
 
-  // lambda capture expressions are a C++14 feature...
-  const auto apply_add = return_comp.apply_add;
-  return_comp.apply    = [apply_add](Range &v) {
+  return_comp.apply = [apply_add = return_comp.apply_add](Range &v) {
     v = 0.;
     apply_add(v);
   };

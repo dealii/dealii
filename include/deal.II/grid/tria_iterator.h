@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -167,11 +167,10 @@ class TriaActiveIterator;
  * add functionality.
  *
  * The accessors provided by the library consist of two groups, determined by
- * whether they access the data of Triangulation objects or
- * DoFHandler/hp::DoFHandler objects. They are derived from TriaAccessor and
- * DoFAccessor, respectively. Each group also has specialized accessors for
- * cells (as opposed to faces and lines) that offer more functionality such as
- * accessing neighbors.
+ * whether they access the data of Triangulation objects or DoFHandler objects.
+ * They are derived from TriaAccessor and DoFAccessor, respectively. Each group
+ * also has specialized accessors for cells (as opposed to faces and lines) that
+ * offer more functionality such as accessing neighbors.
  *
  * @attention It seems impossible to preserve constness of a triangulation
  * through iterator usage. Thus, if you declare pointers to a <tt>const</tt>
@@ -225,8 +224,6 @@ class TriaActiveIterator;
  * @ref Triangulation
  * @ingroup grid
  * @ingroup Iterators
- * @author Wolfgang Bangerth, 1998
- * @author documentation update Guido Kanschat, 2004
  */
 template <typename Accessor>
 class TriaRawIterator
@@ -328,19 +325,21 @@ public:
    * like <tt>(*i).index ();</tt>
    *
    * This function has to be specialized explicitly for the different @p
-   * Pointees, to allow an
+   * Pointers, to allow an
    * <tt>iterator<1,TriangulationLevel<1>::LinesData></tt> to point to
    * <tt>tria->lines.cells[index]</tt> while for one dimension higher it has
    * to point to <tt>tria->quads.cells[index]</tt>.
    *
    * You must not dereference invalid or past the end iterators.
    */
-  const Accessor &operator*() const;
+  const Accessor &
+  operator*() const;
 
   /**
    * Dereferencing operator, non-@p const version.
    */
-  Accessor &operator*();
+  Accessor &
+  operator*();
 
   /**
    * Dereferencing operator, returns a reference of the cell pointed to. Usage
@@ -348,12 +347,14 @@ public:
    *
    * There is a @p const and a non-@p const version.
    */
-  const Accessor *operator->() const;
+  const Accessor *
+  operator->() const;
 
   /**
    * Dereferencing operator, non-@p const version.
    */
-  Accessor *operator->();
+  Accessor *
+  operator->();
 
 
   /**
@@ -379,8 +380,10 @@ public:
   /**
    * Compare for equality.
    */
-  bool
-  operator==(const TriaRawIterator &) const;
+  template <typename OtherAccessor = Accessor>
+  typename std::enable_if<std::is_convertible<OtherAccessor, Accessor>::value,
+                          bool>::type
+  operator==(const TriaRawIterator<OtherAccessor> &) const;
 
   /**
    * Compare for inequality.
@@ -805,7 +808,7 @@ public:
     const Triangulation<Accessor::dimension, Accessor::space_dimension> *parent,
     const int                                                            level,
     const int                                                            index,
-    const typename Accessor::AccessorData *local_data = 0);
+    const typename Accessor::AccessorData *local_data = nullptr);
 
   /**
    * This is a conversion operator (constructor) which takes another iterator
@@ -992,7 +995,8 @@ inline TriaRawIterator<Accessor>::TriaRawIterator(
 
 
 template <typename Accessor>
-inline const Accessor &TriaRawIterator<Accessor>::operator*() const
+inline const Accessor &
+TriaRawIterator<Accessor>::operator*() const
 {
   Assert(Accessor::structure_dimension != Accessor::dimension ||
            state() == IteratorState::valid,
@@ -1007,7 +1011,8 @@ inline const Accessor &TriaRawIterator<Accessor>::operator*() const
 
 
 template <typename Accessor>
-inline Accessor &TriaRawIterator<Accessor>::operator*()
+inline Accessor &
+TriaRawIterator<Accessor>::operator*()
 {
   Assert(Accessor::structure_dimension != Accessor::dimension ||
            state() == IteratorState::valid,
@@ -1031,7 +1036,8 @@ TriaRawIterator<Accessor>::access_any() const
 
 
 template <typename Accessor>
-inline const Accessor *TriaRawIterator<Accessor>::operator->() const
+inline const Accessor *
+TriaRawIterator<Accessor>::operator->() const
 {
   return &(this->operator*());
 }
@@ -1039,7 +1045,8 @@ inline const Accessor *TriaRawIterator<Accessor>::operator->() const
 
 
 template <typename Accessor>
-inline Accessor *TriaRawIterator<Accessor>::operator->()
+inline Accessor *
+TriaRawIterator<Accessor>::operator->()
 {
   return &(this->operator*());
 }
@@ -1057,8 +1064,8 @@ TriaRawIterator<Accessor>::state() const
 
 template <typename Accessor>
 inline bool
-TriaRawIterator<Accessor>::
-operator<(const TriaRawIterator<Accessor> &other) const
+TriaRawIterator<Accessor>::operator<(
+  const TriaRawIterator<Accessor> &other) const
 {
   Assert(state() != IteratorState::invalid,
          ExcDereferenceInvalidObject(accessor));
@@ -1081,8 +1088,8 @@ operator<(const TriaRawIterator<Accessor> &other) const
 
 template <typename Accessor>
 inline bool
-TriaRawIterator<Accessor>::
-operator>(const TriaRawIterator<Accessor> &other) const
+TriaRawIterator<Accessor>::operator>(
+  const TriaRawIterator<Accessor> &other) const
 {
   return (other < *this);
 }
@@ -1119,7 +1126,7 @@ inline void
 TriaRawIterator<Accessor>::print(StreamType &out) const
 {
   if (Accessor::structure_dimension == Accessor::dimension)
-    out << accessor.level() << "." << accessor.index();
+    out << accessor.level() << '.' << accessor.index();
   else
     out << accessor.index();
 }
@@ -1222,8 +1229,6 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
  * Print the address to which this iterator points to @p out. The address is
  * given by the pair <tt>(level,index)</tt>, where @p index is an index
  * relative to the level in which the object is that is pointed to.
- *
- * @author Wolfgang Bangerth, 1998
  */
 template <typename Accessor>
 inline std::ostream &
@@ -1239,8 +1244,6 @@ operator<<(std::ostream &out, const TriaRawIterator<Accessor> &i)
  * Print the address to which this iterator points to @p out. The address is
  * given by the pair <tt>(level,index)</tt>, where @p index is an index
  * relative to the level in which the object is that is pointed to.
- *
- * @author Wolfgang Bangerth, 1998
  */
 template <typename Accessor>
 inline std::ostream &
@@ -1256,8 +1259,6 @@ operator<<(std::ostream &out, const TriaIterator<Accessor> &i)
  * Print the address to which this iterator points to @p out. The address is
  * given by the pair <tt>(level,index)</tt>, where @p index is an index
  * relative to the level in which the object is that is pointed to.
- *
- * @author Wolfgang Bangerth, 1998
  */
 template <typename Accessor>
 inline std::ostream &

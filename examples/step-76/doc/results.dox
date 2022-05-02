@@ -1,0 +1,165 @@
+<h1>Results</h1>
+
+Running the program with the default settings on a machine with 40 processes
+produces the following output:
+
+@code
+Running with 40 MPI processes
+Vectorization over 8 doubles = 512 bits (AVX512)
+Number of degrees of freedom: 27.648.000 ( = 5 [vars] x 25.600 [cells] x 216 [dofs/cell/var] )
+Time step size: 0.000295952, minimal h: 0.0075, initial transport scaling: 0.00441179
+Time:       0, dt:   0.0003, norm rho:  5.385e-16, rho * u:  1.916e-16, energy: 1.547e-15
++--------------------------------------+------------------+------------+------------------+
+| Total wallclock time elapsed         |     17.52s    10 |     17.52s |     17.52s    11 |
+|                                      |                  |                               |
+| Section                  | no. calls |   min time  rank |   avg time |   max time  rank |
++--------------------------------------+------------------+------------+------------------+
+| compute errors           |         1 |  0.009594s    16 |  0.009705s |  0.009819s     8 |
+| compute transport speed  |        22 |    0.1366s     0 |    0.1367s |    0.1368s    18 |
+| output                   |         1 |     1.233s     0 |     1.233s |     1.233s    32 |
+| rk time stepping total   |       100 |     8.746s    35 |     8.746s |     8.746s     0 |
+| rk_stage - integrals L_h |       500 |     8.742s    36 |     8.742s |     8.743s     2 |
++--------------------------------------+------------------+------------+------------------+
+@endcode
+
+and the following visual output:
+
+<table align="center" class="doxtable" style="width:85%">
+  <tr>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_010.png" alt="" width="100%">
+    </td>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_025.png" alt="" width="100%">
+    </td>
+  </tr>
+  <tr>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_050.png" alt="" width="100%">
+    </td>
+    <td>
+        <img src="https://www.dealii.org/images/steps/developer/step-67.pressure_100.png" alt="" width="100%">
+    </td>
+  </tr>
+</table>
+
+As a reference, the results of step-67 using FCL are:
+
+@code
+Running with 40 MPI processes
+Vectorization over 8 doubles = 512 bits (AVX512)
+Number of degrees of freedom: 27.648.000 ( = 5 [vars] x 25.600 [cells] x 216 [dofs/cell/var] )
+Time step size: 0.000295952, minimal h: 0.0075, initial transport scaling: 0.00441179
+Time:       0, dt:   0.0003, norm rho:  5.385e-16, rho * u:  1.916e-16, energy: 1.547e-15
++-------------------------------------------+------------------+------------+------------------+
+| Total wallclock time elapsed              |     13.33s     0 |     13.34s |     13.35s    34 |
+|                                           |                  |                               |
+| Section                       | no. calls |   min time  rank |   avg time |   max time  rank |
++-------------------------------------------+------------------+------------+------------------+
+| compute errors                |         1 |  0.007977s    10 |  0.008053s |  0.008161s    30 |
+| compute transport speed       |        22 |    0.1228s    34 |    0.2227s |    0.3845s     0 |
+| output                        |         1 |     1.255s     3 |     1.257s |     1.259s    27 |
+| rk time stepping total        |       100 |     11.15s     0 |     11.32s |     11.42s    34 |
+| rk_stage - integrals L_h      |       500 |     8.719s    10 |     8.932s |     9.196s     0 |
+| rk_stage - inv mass + vec upd |       500 |     1.944s     0 |     2.377s |      2.55s    10 |
++-------------------------------------------+------------------+------------+------------------+
+@endcode
+
+By the modifications shown in this tutorial, we were able to achieve a speedup of
+27% for the Runge-Kutta stages.
+
+<h3>Possibilities for extensions</h3>
+
+The algorithms are easily extendable to higher dimensions: a high-dimensional
+<a href="https://github.com/hyperdeal/hyperdeal/blob/a9e67b4e625ff1dde2fed93ad91cdfacfaa3acdf/include/hyper.deal/operators/advection/advection_operation.h#L219-L569">advection operator based on cell-centric loops</a>
+is part of the hyper.deal library. An extension of cell-centric loops
+to locally-refined meshes is more involved.
+
+<h4>Extension to the compressible Navier-Stokes equations</h4>
+
+The solver presented in this tutorial program can also be extended to the
+compressible Navier–Stokes equations by adding viscous terms, as also
+suggested in step-67. To keep as much of the performance obtained here despite
+the additional cost of elliptic terms, e.g. via an interior penalty method, that
+tutorial has proposed to switch the basis from FE_DGQ to FE_DGQHermite like in
+the step-59 tutorial program. The reasoning behind this switch is that in the
+case of FE_DGQ all values of neighboring cells (i.e., $k+1$ layers) are needed,
+whilst in the case of FE_DGQHermite only 2 layers, making the latter
+significantly more suitable for higher degrees. The additional layers have to be,
+on the one hand, loaded from main memory during flux computation and, one the
+other hand, have to be communicated. Using the shared-memory capabilities
+introduced in this tutorial, the second point can be eliminated on a single
+compute node or its influence can be reduced in a hybrid context.
+
+<h4>Block Gauss-Seidel-like preconditioners</h4>
+
+Cell-centric loops could be used to create block Gauss-Seidel preconditioners
+that are multiplicative within one process and additive over processes. These
+type of preconditioners use during flux computation, in contrast to Jacobi-type
+preconditioners, already updated values from neighboring cells. The following
+pseudo-code visualizes how this could in principal be achieved:
+
+@code
+// vector monitor if cells have been updated or not
+Vector<Number> visit_flags(data.n_cell_batches () + data.n_ghost_cell_batches ());
+
+// element centric loop with a modified kernel
+data.template loop_cell_centric<VectorType, VectorType>(
+  [&](const auto &data, auto &dst, const auto &src, const auto cell_range) {
+
+    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
+      {
+        // cell integral as usual (not shown)
+
+        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+          {
+            const auto boundary_id = data.get_faces_by_cells_boundary_id(cell, face)[0];
+
+            if (boundary_id == numbers::internal_face_boundary_id)
+              {
+                phi_p.reinit(cell, face);
+
+                const auto flags = phi_p.read_cell_data(visit_flags);
+                const auto all_neighbors_have_been_updated =
+                  std::min(flags.begin(),
+                           flags().begin() + data.n_active_entries_per_cell_batch(cell) == 1;
+
+                if(all_neighbors_have_been_updated)
+                  phi_p.gather_evaluate(dst, EvaluationFlags::values);
+                else
+                  phi_p.gather_evaluate(src, EvaluationFlags::values);
+
+                // continue as usual (not shown)
+              }
+            else
+              {
+                // boundary integral as usual (not shown)
+              }
+          }
+
+        // continue as above and apply your favorite algorithm to invert
+        // the cell-local operator (not shown)
+
+        // make cells as updated
+        phi.set_cell_data(visit_flags, VectorizedArrayType(1.0));
+      }
+  },
+  dst,
+  src,
+  true,
+  MatrixFree<dim, Number, VectorizedArrayType>::DataAccessOnFaces::values);
+@endcode
+
+For this purpose, one can exploit the cell-data vector capabilities of
+MatrixFree and the range-based iteration capabilities of VectorizedArray.
+
+Please note that in the given example we process <code>VectorizedArrayType::size()</code>
+number of blocks, since each lane corresponds to one block. We consider blocks
+as updated if all blocks processed by a vector register have been updated. In
+the case of Cartesian meshes this is a reasonable approach, however, for
+general unstructured meshes this conservative approach might lead to a decrease in the
+efficiency of the preconditioner. A reduction of cells processed in parallel
+by explicitly reducing the number of lanes used by <code>VectorizedArrayType</code>
+might increase the quality of the preconditioner, but with the cost that each
+iteration might be more expensive. This dilemma leads us to a further
+"possibility for extension": vectorization within an element.

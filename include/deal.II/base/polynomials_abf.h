@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,8 +48,6 @@ DEAL_II_NAMESPACE_OPEN
  * Q<sub>k,k+2,k</sub>, Q<sub>k,k,k+2</sub>)</i> in 2D and 3D, resp.
  *
  * @ingroup Polynomials
- * @author Oliver Kayser-Herold, based on code from Guido Kanschat
- * @date 2006
  */
 template <int dim>
 class PolynomialsABF : public TensorPolynomialsBase<dim>
@@ -100,7 +98,7 @@ public:
   n_polynomials(const unsigned int degree);
 
   /**
-   * @copydoc TensorPolynomialsBase<dim>::clone()
+   * @copydoc TensorPolynomialsBase::clone()
    */
   virtual std::unique_ptr<TensorPolynomialsBase<dim>>
   clone() const override;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +37,7 @@ namespace parallel
   {
     template <int dim, int spacedim>
     Triangulation<dim, spacedim>::Triangulation(
-      MPI_Comm mpi_communicator,
+      const MPI_Comm &mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                      smooth_grid,
       const bool     allow_artificial_cells,
@@ -282,14 +282,11 @@ namespace parallel
 #  ifdef DEBUG
       {
         // Assert that each cell is owned by a processor
-        unsigned int n_my_cells = 0;
-        typename parallel::shared::Triangulation<dim,
-                                                 spacedim>::active_cell_iterator
-          cell = this->begin_active(),
-          endc = this->end();
-        for (; cell != endc; ++cell)
-          if (cell->is_locally_owned())
-            n_my_cells += 1;
+        const unsigned int n_my_cells = std::count_if(
+          this->begin_active(),
+          typename Triangulation<dim, spacedim>::active_cell_iterator(
+            this->end()),
+          [](const auto &i) { return (i.is_locally_owned()); });
 
         const unsigned int total_cells =
           Utilities::MPI::sum(n_my_cells, this->get_communicator());
@@ -301,13 +298,11 @@ namespace parallel
       // cell is owned by a processor
       if (settings & construct_multigrid_hierarchy)
         {
-          unsigned int n_my_cells = 0;
-          typename parallel::shared::Triangulation<dim, spacedim>::cell_iterator
-            cell = this->begin(),
-            endc = this->end();
-          for (; cell != endc; ++cell)
-            if (cell->is_locally_owned_on_level())
-              n_my_cells += 1;
+          const unsigned int n_my_cells =
+            std::count_if(this->begin(), this->end(), [](const auto &i) {
+              return (i.is_locally_owned_on_level());
+            });
+
 
           const unsigned int total_cells =
             Utilities::MPI::sum(n_my_cells, this->get_communicator());
@@ -409,8 +404,8 @@ namespace parallel
     {
       Assert(
         (dynamic_cast<
-           const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
-           &other_tria) == nullptr),
+           const dealii::parallel::DistributedTriangulationBase<dim, spacedim>
+             *>(&other_tria) == nullptr),
         ExcMessage(
           "Cannot use this function on parallel::distributed::Triangulation."));
 
@@ -418,18 +413,6 @@ namespace parallel
         other_tria);
       partition();
       this->update_number_cache();
-    }
-
-
-
-    template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::update_number_cache()
-    {
-      parallel::TriangulationBase<dim, spacedim>::update_number_cache();
-
-      if (settings & construct_multigrid_hierarchy)
-        parallel::TriangulationBase<dim, spacedim>::fill_level_ghost_owners();
     }
   } // namespace shared
 } // namespace parallel
@@ -478,6 +461,59 @@ namespace parallel
 
 
 #endif
+
+
+
+namespace internal
+{
+  namespace parallel
+  {
+    namespace shared
+    {
+      template <int dim, int spacedim>
+      TemporarilyRestoreSubdomainIds<dim, spacedim>::
+        TemporarilyRestoreSubdomainIds(const Triangulation<dim, spacedim> &tria)
+        : shared_tria(
+            dynamic_cast<
+              const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
+              &tria))
+      {
+        if (shared_tria && shared_tria->with_artificial_cells())
+          {
+            // Save the current set of subdomain IDs, and set subdomain IDs
+            // to the "true" owner of each cell.
+            const std::vector<types::subdomain_id> &true_subdomain_ids =
+              shared_tria->get_true_subdomain_ids_of_cells();
+
+            saved_subdomain_ids.resize(shared_tria->n_active_cells());
+            for (const auto &cell : shared_tria->active_cell_iterators())
+              {
+                const unsigned int index   = cell->active_cell_index();
+                saved_subdomain_ids[index] = cell->subdomain_id();
+                cell->set_subdomain_id(true_subdomain_ids[index]);
+              }
+          }
+      }
+
+
+
+      template <int dim, int spacedim>
+      TemporarilyRestoreSubdomainIds<dim, spacedim>::
+        ~TemporarilyRestoreSubdomainIds()
+      {
+        if (shared_tria && shared_tria->with_artificial_cells())
+          {
+            // Undo the subdomain modification.
+            for (const auto &cell : shared_tria->active_cell_iterators())
+              {
+                const unsigned int index = cell->active_cell_index();
+                cell->set_subdomain_id(saved_subdomain_ids[index]);
+              }
+          }
+      }
+    } // namespace shared
+  }   // namespace parallel
+} // namespace internal
 
 
 /*-------------- Explicit Instantiations -------------------------------*/

@@ -1,4 +1,0 @@
-Changed: The step-5 program no longer uses EPS to output the solutions,
-but the far more modern VTK/VTU format.
-<br>
-(Wolfgang Bangerth, 2019/08/03)

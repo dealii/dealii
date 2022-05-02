@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,7 +42,7 @@ template <int dim>
 void
 test()
 {
-  deallog << dim << "D" << std::endl;
+  deallog << dim << 'D' << std::endl;
 
   // create a 2x1 (or 2x1x1) mesh and refine the leftmost cell
   Triangulation<dim>        triangulation;
@@ -68,16 +68,17 @@ test()
   deallog << dim << " 1/periodicity_factor: " << 1. / periodicity_factor
           << std::endl;
 
-  DoFTools::make_periodicity_constraints(dof_handler.begin(0)->face(0),
-                                         (++dof_handler.begin(0))->face(1),
-                                         cm,
-                                         ComponentMask(),
-                                         true,
-                                         false,
-                                         false,
-                                         FullMatrix<double>(),
-                                         std::vector<unsigned int>(),
-                                         periodicity_factor);
+  DoFTools::make_periodicity_constraints(
+    dof_handler.begin(0)->face(0),
+    (std::next(dof_handler.begin(0)))->face(1),
+    cm,
+    ComponentMask(),
+    true,
+    false,
+    false,
+    FullMatrix<double>(),
+    std::vector<unsigned int>(),
+    periodicity_factor);
   cm.print(deallog.get_file_stream());
 }
 

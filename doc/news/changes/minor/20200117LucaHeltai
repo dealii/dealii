@@ -1,3 +1,0 @@
-New: Utilities::compress() and Utilities::decompress() allow to compress and decompress a string using gzip.
-<br>
-(Luca Heltai, Nicola Giuliani, 2020/01/17)

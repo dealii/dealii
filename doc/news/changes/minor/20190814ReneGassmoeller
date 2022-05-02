@@ -1,4 +1,0 @@
-Added: Add a Particles::Generators namespace and a first implementation that
-generates particles at regular position in the reference domain.
-<br>
-(Rene Gassmoeller, 2019/08/14)

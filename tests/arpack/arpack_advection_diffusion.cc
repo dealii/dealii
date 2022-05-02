@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -33,7 +33,6 @@
  * We test that the computed vectors are eigenvectors and mass-normal, i.e.
  * a) (A*x_i-\lambda*B*x_i).L2() == 0
  * b) x_i*B*x_i = 1
- *
  */
 
 #include <deal.II/base/function.h>

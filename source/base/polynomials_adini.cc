@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,8 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/polynomials_adini.h>
-#include <deal.II/base/std_cxx14/memory.h>
+
+#include <memory>
 
 #define ENTER_COEFFICIENTS(                                   \
   koefs, z, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) \
@@ -260,7 +261,7 @@ template <int dim>
 std::unique_ptr<ScalarPolynomialsBase<dim>>
 PolynomialsAdini<dim>::clone() const
 {
-  return std_cxx14::make_unique<PolynomialsAdini<dim>>(*this);
+  return std::make_unique<PolynomialsAdini<dim>>(*this);
 }
 
 

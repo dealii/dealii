@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,9 +79,7 @@ DEAL_II_NAMESPACE_OPEN
  * free to implement them and send them to us for inclusion.
  *
  * @ingroup memory
- * @author Wolfgang Bangerth, documentation updated by Guido Kanschat, David
  * Wells
- * @date 2000, 2015
  */
 namespace MemoryConsumption
 {
@@ -308,7 +306,7 @@ namespace MemoryConsumption
   inline std::size_t
   memory_consumption(const std::string &s)
   {
-    return sizeof(s) + s.length();
+    return sizeof(s) + s.size();
   }
 
 

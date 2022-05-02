@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,17 +17,13 @@
 
 // a un-hp-ified version of hp/step-7
 
-
-#include "../tests.h"
-std::ofstream logfile("output");
-
-
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/smartpointer.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -40,7 +36,6 @@ std::ofstream logfile("output");
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -459,7 +454,7 @@ HelmholtzProblem<dim>::process_solution(const unsigned int cycle)
                                     VectorTools::H1_seminorm);
   const double H1_error = difference_per_cell.l2_norm();
 
-  const QTrapez<1>     q_trapez;
+  const QTrapezoid<1>  q_trapez;
   const QIterated<dim> q_iterated(q_trapez, 5);
   VectorTools::integrate_difference(dof_handler,
                                     solution,
@@ -549,7 +544,7 @@ HelmholtzProblem<dim>::run()
 
       gmv_filename += ".gmv";
 
-      DataOut<dim, DoFHandler<dim>> data_out;
+      DataOut<dim> data_out;
       data_out.attach_dof_handler(dof_handler);
       data_out.add_data_vector(solution, "solution");
 
@@ -664,6 +659,7 @@ HelmholtzProblem<dim>::run()
 int
 main()
 {
+  std::ofstream logfile("output");
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);
 

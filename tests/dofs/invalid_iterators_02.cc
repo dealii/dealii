@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,10 +17,9 @@
 // test is for hp::DoFHandler
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -29,10 +28,10 @@ template <int dim>
 void
 check()
 {
-  typename hp::DoFHandler<dim>::active_cell_iterator invalid_1;
+  typename DoFHandler<dim>::active_cell_iterator invalid_1;
 
   // try copy constructor
-  typename hp::DoFHandler<dim>::active_cell_iterator invalid_2 = invalid_1;
+  typename DoFHandler<dim>::active_cell_iterator invalid_2 = invalid_1;
 
   // now also try copy operator
   invalid_1 = invalid_2;

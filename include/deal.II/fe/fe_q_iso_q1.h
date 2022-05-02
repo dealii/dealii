@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,20 +30,24 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Implementation of a scalar Lagrange finite element @p Qp-iso-Q1 that
- * defines the finite element space of continuous, piecewise linear elements
- * with @p p subdivisions in each coordinate direction. It yields an element
- * with the same number of degrees of freedom as the @p Qp elements but using
- * linear interpolation instead of higher order one. This type of element is
- * also called macro element in the literature as it really consists of
- * several smaller elements, namely <i>p</i><tt><sup>dim</sup></tt> such
- * sub-cells.
+ * Implementation of a scalar Lagrange finite element @p Qp-iso-Q1
+ * that defines the finite element space of continuous, piecewise
+ * linear elements with @p p subdivisions in each coordinate
+ * direction. It yields an element with the same number of degrees of
+ * freedom as the @p Qp elements but using linear interpolation
+ * instead of higher order one. In other words, on every cell, the
+ * shape functions are not of higher order polynomial degree
+ * interpolating a set of node points, but are piecewise (bi-,
+ * tri-)linear *within* the cell and interpolating the same set of
+ * node points. This type of element is also called *macro element* in
+ * the literature as it can be seen as consisting of several smaller
+ * elements, namely <i>p</i><tt><sup>dim</sup></tt> such sub-cells.
  *
  * The numbering of degrees of freedom is done in exactly the same way as in
  * FE_Q of degree @p p. See there for a detailed description on how degrees of
  * freedom are numbered within one element.
  *
- * This element represents a Q-linear finite element space on a reduced mesh
+ * This element represents a Q-linear finite element space on a reduced mesh of
  * size <i>h/p</i>. Its effect is equivalent to using FE_Q of degree one on a
  * finer mesh by a factor @p p if an equivalent quadrature is used. However,
  * this element reduces the flexibility in the choice of (adaptive) mesh size
@@ -51,7 +55,7 @@ DEAL_II_NAMESPACE_OPEN
  * other hand, comparing this element with @p p subdivisions to the FE_Q
  * element of degree @p p on the same mesh shows that the convergence is
  * typically much worse for smooth problems. In particular, @p Qp elements
- * achieve interpolation orders of <i>h<sup>p+1</sup></i> in the L2 norm,
+ * achieve interpolation orders of <i>h<sup>p+1</sup></i> in the $L_2$ norm,
  * whereas these elements reach only <i>(h/p)<sup>2</sup></i>. For these two
  * reasons, this element is usually not very useful as a standalone. In
  * addition, any evaluation of face terms on the boundaries within the
@@ -71,11 +75,19 @@ DEAL_II_NAMESPACE_OPEN
  * solution and stabilization techniques are used that work for linears but
  * not higher order elements. </li>
  *
- * <li> Stokes/Navier Stokes systems such as the one discussed in step-22 could be
- * solved with Q2-iso-Q1 elements for velocities instead of Q2 elements.
- * Combined with Q1 pressures they give a stable mixed element pair. However,
- * they perform worse than the standard (Taylor-Hood $Q_2\times Q_1$)
- * approach in most situations.  </li>
+ * <li> Stokes/Navier Stokes systems such as the one discussed in
+ * step-22 could be solved with Q2-iso-Q1 elements for velocities
+ * instead of $Q_2$ elements.  Combined with $Q_1$ pressures they give
+ * a stable mixed element pair. However, they perform worse than the
+ * standard (Taylor-Hood $Q_2\times Q_1$) approach in most
+ * situations. (See, for example, @cite Boffi2011 .)  This combination
+ * of subdivided elements for the velocity and non-subdivided elements
+ * for the pressure is sometimes called the "Bercovier-Pironneau
+ * element" and dates back to around the same time as the Taylor-Hood
+ * element (namely, the mid-1970s). For more information, see the
+ * paper by Bercovier and Pironneau from 1979 @cite Bercovier1979, and
+ * for the origins of the comparable Taylor-Hood element see
+ * @cite Taylor73 from 1973.</li>
  *
  * <li> Preconditioning systems of FE_Q systems of higher order @p p with a
  * preconditioner based on @p Qp-iso-Q1 elements: Some preconditioners like
@@ -106,15 +118,9 @@ DEAL_II_NAMESPACE_OPEN
  * element compared to FE_Q. This is because DoFTools::make_sparsity_pattern
  * assumes coupling between all degrees of freedom within the element, whereas
  * FE_Q_iso_Q1 with more than one subdivision does have less coupling.
- *
- * @author Martin Kronbichler, 2013
  */
 template <int dim, int spacedim = dim>
-class FE_Q_iso_Q1
-  : public FE_Q_Base<
-      TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>,
-      dim,
-      spacedim>
+class FE_Q_iso_Q1 : public FE_Q_Base<dim, spacedim>
 {
 public:
   /**
@@ -123,6 +129,11 @@ public:
    * both elements produce the same number of degrees of freedom.
    */
   FE_Q_iso_Q1(const unsigned int n_subdivisions);
+
+  /**
+   * Construct a FE_Q_iso_Q1 element with a given vector of support points.
+   */
+  FE_Q_iso_Q1(const std::vector<Point<1>> &support_points);
 
   /**
    * Return a string that uniquely identifies a finite element. This class

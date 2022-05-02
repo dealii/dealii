@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -55,9 +55,9 @@
 
 using namespace MeshWorker;
 
-typedef Sacado::Fad::DFad<double>   Sdouble;
-typedef Sacado::Fad::DFad<Sdouble>  SSdouble;
-typedef Sacado::Rad::ADvar<Sdouble> RSdouble;
+using Sdouble  = Sacado::Fad::DFad<double>;
+using SSdouble = Sacado::Fad::DFad<Sdouble>;
+using RSdouble = Sacado::Rad::ADvar<Sdouble>;
 
 template <int dim, int spacedim>
 void
@@ -114,7 +114,7 @@ test()
   auto cell = dh.begin_active();
   auto endc = dh.end();
 
-  typedef decltype(cell) Iterator;
+  using Iterator = decltype(cell);
 
   FEValuesExtractors::Scalar scalar(0);
 
@@ -131,8 +131,6 @@ test()
     const auto &local_dof_values = s.get_local_dof_values("solution", energy);
     const auto &u                = s.get_values("solution", scalar, energy);
     const auto &grad_u           = s.get_gradients("solution", scalar, energy);
-
-    c = 0;
 
     c.local_dof_indices[0] = s.get_local_dof_indices();
 
@@ -178,7 +176,7 @@ test()
 int
 main()
 {
-  initlog(1);
+  initlog(true);
   MultithreadInfo::set_thread_limit(1); // to make output deterministic
 
   test<2, 2>();

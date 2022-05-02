@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,9 +15,9 @@
 
 
 
-// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp
+// have a 2x2 coarse mesh (or 2x2x1) and verify DoF indices in the hp-
 // case with an FECollection that contains a FE_Q(4) and a FE_Q(2) element.
-// the hp code will unify DoF indices on boundaries between all subdomains.
+// the hp-code will unify DoF indices on boundaries between all subdomains.
 //
 // in this testcase, each cell has a face neighbor which is
 //  - locally owned with the same active_fe_index
@@ -29,19 +29,23 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <numeric>
 
 #include "../tests.h"
+
+#include "hp_unify_dof_indices.h"
 
 
 template <int dim>
@@ -68,28 +72,22 @@ test()
   fe.push_back(FE_Q<dim>(4));
   fe.push_back(FE_Q<dim>(2));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
-  for (auto &cell : dof_handler.active_cell_iterators())
+  DoFHandler<dim> dof_handler(triangulation);
+  for (const auto &cell : dof_handler.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
     {
-      if (cell->is_locally_owned())
-        {
-          if (cell->id().to_string() == "0_0:")
-            cell->set_active_fe_index(0);
-          if (cell->id().to_string() == "1_0:")
-            cell->set_active_fe_index(0);
-          if (cell->id().to_string() == "2_0:")
-            cell->set_active_fe_index(1);
-          if (cell->id().to_string() == "3_0:")
-            cell->set_active_fe_index(1);
-        }
+      if (cell->id().to_string() == "0_0:")
+        cell->set_active_fe_index(0);
+      if (cell->id().to_string() == "1_0:")
+        cell->set_active_fe_index(0);
+      if (cell->id().to_string() == "2_0:")
+        cell->set_active_fe_index(1);
+      if (cell->id().to_string() == "3_0:")
+        cell->set_active_fe_index(1);
     }
   dof_handler.distribute_dofs(fe);
 
-  deallog << "Processor: " << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-          << std::endl;
-  deallog << "  n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs()
-          << std::endl;
-  deallog << "  n_global_dofs: " << dof_handler.n_dofs() << std::endl;
+  log_dof_diagnostics(dof_handler);
 }
 
 

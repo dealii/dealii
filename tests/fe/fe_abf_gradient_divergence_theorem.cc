@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,8 +89,8 @@ test(const Triangulation<dim> &tr,
         {
           deallog << i << ": ( ";
           for (unsigned int d = 0; d < dim; ++d)
-            deallog << cell->vertex(i)[d] << " ";
-          deallog << ")" << std::endl;
+            deallog << cell->vertex(i)[d] << ' ';
+          deallog << ')' << std::endl;
         }
 
       bool cell_ok = true;
@@ -104,7 +104,7 @@ test(const Triangulation<dim> &tr,
               ss << "component=" << c << ", dof=" << i << std::endl;
 
               Tensor<1, dim> bulk_integral;
-              for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+              for (const auto q : fe_values.quadrature_point_indices())
                 {
                   bulk_integral += fe_values[single_component].gradient(i, q) *
                                    fe_values.JxW(q);
@@ -114,9 +114,7 @@ test(const Triangulation<dim> &tr,
               for (const unsigned int face : GeometryInfo<dim>::face_indices())
                 {
                   fe_face_values.reinit(cell, face);
-                  for (unsigned int q = 0;
-                       q < fe_face_values.n_quadrature_points;
-                       ++q)
+                  for (const auto q : fe_face_values.quadrature_point_indices())
                     {
                       boundary_integral +=
                         fe_face_values[single_component].value(i, q) *

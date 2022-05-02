@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,9 +42,8 @@ main(int argc, char *argv[])
 
   auto op_b = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
 
-  typedef LinearOperator<TrilinosWrappers::MPI::Vector,
-                         TrilinosWrappers::MPI::Vector>
-    Op_MPI;
+  using Op_MPI = LinearOperator<TrilinosWrappers::MPI::Vector,
+                                TrilinosWrappers::MPI::Vector>;
 
   auto op_c = block_diagonal_operator<2, TrilinosWrappers::MPI::BlockVector>(
     std::array<Op_MPI, 2>({{op_a, op_a}}));

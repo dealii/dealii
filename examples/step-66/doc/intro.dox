@@ -1,0 +1,284 @@
+<br>
+
+<i>
+This program was contributed by Fabian Castelli.
+
+A version of this code was presented and discussed in
+@cite castelli2021numerical
+G.F. Castelli: Numerical Investigation of Cahn-Hilliard-Type Phase-Field
+Models for Battery Active %Particles, PhD thesis, Karlsruhe Institute of
+Technology (KIT), 2021.
+
+Fabian Castelli acknowledges financial support by the German Research
+Foundation (DFG) through the Research Training Group 2218 SiMET -- Simulation
+of mechano-electro-thermal processes in lithium-ion batteries, project number
+281041241.
+
+Finally Fabian Castelli would like to thank Timo Heister for the encouragement
+and advice in writing this tutorial.
+</i>
+
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+The aim of this tutorial program is to demonstrate how to solve a nonlinear
+problem using Newton's method within the matrix-free framework. This tutorial
+combines several techniques already introduced in step-15, step-16, step-37,
+step-48 and others.
+
+
+<h3>Problem formulation</h3>
+On the unit circle $\Omega = \bigl\{ x \in \mathbb{R}^2 : \|x\| \leq 1 \bigr\}$
+we consider the following nonlinear elliptic boundary value problem subject to a
+homogeneous Dirichlet boundary condition: Find a function
+$u\colon\Omega\to\mathbb{R}$ such that it holds:
+@f{align*}
+    - \Delta u &= \exp(u) & \quad & \text{in } \Omega,\\
+             u &= 0       & \quad & \text{on } \partial\Omega.
+@f}
+This problem is also called the <i>Gelfand problem</i> and is a typical example
+for problems from combustion theory, see for example
+@cite bebernes1989mathematical.
+
+
+<h3>Discretization with finite elements</h3>
+As usual, we first derive the weak formulation for this problem by multiplying
+with a smooth test function $v\colon\Omega\to\mathbb{R}$ respecting the
+boundary condition and integrating over the domain $\Omega$. Integration by
+parts and putting the term from the right hand side to the left yields the weak
+formulation: Find a function $u\colon\Omega\to\mathbb{R}$ such that for all
+test functions $v$ it holds:
+@f{align*}{
+ \int_\Omega \nabla v \cdot \nabla u \,\mathrm{d}x
+ -
+ \int_\Omega v \exp(u) \,\mathrm{d}x
+ =
+ 0.
+@f}
+
+Choosing the Lagrangian finite element space $V_h \dealcoloneq
+\bigl\{ v \in C(\overline{\Omega}) : v|_Q \in \mathbb{Q}_p \text{ for all }
+Q \in \mathcal{T}_h \bigr\} \cap H_0^1(\Omega)$, which directly incorporates
+the homogeneous Dirichlet boundary condition, we can define a basis
+$\{\varphi_i\}_{i=1,\dots,N}$ and thus it suffices to test only with those
+basis functions. So the discrete problem reads as follows: Find $u_h\in V_h$
+such that for all $i=1,\dots,N$ it holds:
+@f{align*}{
+ F(u_h)
+ \dealcoloneq
+ \int_\Omega \nabla \varphi_i \cdot \nabla u_h \,\mathrm{d}x
+ -
+ \int_\Omega \varphi_i \exp(u_h) \,\mathrm{d}x \stackrel{!}{=} 0.
+@f}
+As each finite element function is a linear combination of the basis functions
+$\{\varphi_i\}_{i=1,\dots,N}$, we can identify the finite element solution by
+a vector from $\mathbb{R}^N$ consisting of the unknown values in each degree of
+freedom (DOF). Thus, we define the nonlinear function
+$F\colon\mathbb{R}^N\to\mathbb{R}^N$ representing the discrete nonlinear
+problem.
+
+To solve this nonlinear problem we use Newton's method. So given an
+initial guess $u_h^0\in V_h$, which already fulfills the Dirichlet boundary
+condition, we determine a sequence of Newton steps $\bigl( u_h^n \bigr)_n$ by
+successively applying the following scheme:
+@f{align*}{
+ &\text{Solve for } s_h^n\in V_h: \quad & F'(u_h^n)[s_h^n] &= -F(u_h^n),\\
+ &\text{Update: }                       & u_h^{n+1} &= u_h^n + s_h^n.
+@f}
+So in each Newton step we have to solve a linear problem $A\,x = b$, where the
+system matrix $A$ is represented by the Jacobian
+$F'(u_h^n)[\,\cdot\,]\colon\mathbb{R}^N\to\mathbb{R}^N$ and the right hand side
+$b$ by the negative residual $-F(u_h^n)$. The solution vector $x$ is in that
+case the Newton update of the $n$-th Newton step. Note, that we assume an
+initial guess $u_h^0$, which already fulfills the Dirichlet boundary conditions
+of the problem formulation (in fact this could also be an inhomogeneous
+Dirichlet boundary condition) and thus the Newton updates $s_h$ satisfy a
+homogeneous Dirichlet condition.
+
+Until now we only tested with the basis functions, however, we can also
+represent any function of $V_h$ as linear combination of basis functions. More
+mathematically this means, that every element of $V_h$ can be
+identified with a vector $U\in\mathbb{R}^N$ via the representation formula:
+$u_h = \sum_{i=1}^N U_i \varphi_i$. So using this we can give an expression for
+the discrete Jacobian and the residual:
+@f{align*}{
+ A_{ij} = \bigl( F'(u_h^n) \bigr)_{ij}
+ &=
+ \int_\Omega \nabla\varphi_i \cdot \nabla \varphi_j \,\mathrm{d} x
+ -
+ \int_\Omega \varphi_i \, \exp( u_h^n ) \varphi_j \,\mathrm{d} x,\\
+ b_{i} = \bigl( F(u_h^n) \bigr)_{i}
+ &=
+ \int_\Omega \nabla\varphi_i \cdot \nabla u_h^n \,\mathrm{d} x
+ -
+ \int_\Omega \varphi_i \, \exp( u_h^n ) \,\mathrm{d} x.
+@f}
+Compared to step-15 we could also have formed the Fréchet derivative of the
+nonlinear function corresponding to the strong formulation of the problem and
+discretized it afterwards. However, in the end we would get the same set of
+discrete equations.
+
+
+<h3>Numerical linear algebra</h3>
+Note, how the system matrix, actually the Jacobian, depends on the previous
+Newton step $A = F'(u^n)$. Hence we need to tell the function that computes
+the system matrix about the solution at the last Newton step. In an
+implementation with a classical <code>assemble_system()</code> function we
+would gather this information from the last Newton step during assembly by the
+use of the member functions FEValuesBase::get_function_values() and
+FEValuesBase::get_function_gradients(). This is how step-15, for
+example, does things.
+The <code>assemble_system()</code>
+function would then looks like:
+@code
+template <int dim>
+void GelfandProblem<dim>::assemble_system()
+{
+  system_matrix = 0;
+  system_rhs    = 0;
+
+  const QGauss<dim> quadrature_formula(fe.degree + 1);
+  FEValues<dim>     fe_values(fe,
+                          quadrature_formula,
+                          update_values | update_gradients | update_JxW_values);
+
+  const unsigned int n_q_points    = fe_values.n_quadrature_points;
+  const unsigned int dofs_per_cell = fe_values.dofs_per_cell;
+
+  FullMatrix<double>                   cell_matrix(dofs_per_cell);
+  Vector<double>                       cell_rhs(dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+  std::vector<Tensor<1, dim>> newton_step_gradients(n_q_points);
+  std::vector<double>         newton_step_values(n_q_points);
+
+
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    {
+      cell_matrix = 0.0;
+      cell_rhs    = 0.0;
+
+      fe_values.reinit(cell);
+
+      fe_values.get_function_values(solution, newton_step_values);
+      fe_values.get_function_gradients(solution, newton_step_gradients);
+
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        {
+          const double nonlinearity = std::exp(newton_step_values[q]);
+          const double dx           = fe_values.JxW(q);
+
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            {
+              const double         phi_i      = fe_values.shape_value(i, q);
+              const Tensor<1, dim> grad_phi_i = fe_values.shape_grad(i, q);
+
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                {
+                  const double         phi_j      = fe_values.shape_value(j, q);
+                  const Tensor<1, dim> grad_phi_j = fe_values.shape_grad(j, q);
+
+                  cell_matrix(i, j) +=
+                    (grad_phi_i * grad_phi_j - phi_i * nonlinearity * phi_j) *
+                    dx;
+                }
+
+              cell_rhs(i) += (-grad_phi_i * newton_step_gradients[q] +
+                              phi_i * newton_step_values[q]) *
+                             dx;
+            }
+        }
+
+      cell->get_dof_indices(local_dof_indices);
+
+      constraints.distribute_local_to_global(
+        cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
+    }
+}
+@endcode
+
+Since we want to solve this problem without storing a matrix, we need to tell
+the matrix-free operator this information before we use it. Therefore in the
+derived class <code>JacobianOperator</code> we will implement a function
+called <code>evaluate_newton_step</code>, which will process the information of
+the last Newton step prior to the usage of the matrix-vector implementation.
+Furthermore we want to use a geometric multigrid (GMG) preconditioner for the
+linear solver, so in order to apply the multilevel operators we need to pass the
+last Newton step also to these operators. This is kind of a tricky task, since
+the vector containing the last Newton step has to be interpolated to all levels
+of the triangulation. In the code this task will be done by the function
+MGTransferMatrixFree::interpolate_to_mg(). Note, a fundamental difference to
+the previous cases, where we set up and used a geometric multigrid
+preconditioner, is the fact, that we can reuse the MGTransferMatrixFree object
+for the computation of all Newton steps. So we can save some work here by
+defining a class variable and using an already set up MGTransferMatrixFree
+object <code>mg_transfer</code> that was initialized in the
+<code>setup_system()</code> function.
+@code
+template <int dim, int fe_degree>
+void GelfandProblem<dim, fe_degree>::compute_update()
+{
+  TimerOutput::Scope t(computing_timer, "compute update");
+
+  solution.update_ghost_values();
+
+  system_matrix.evaluate_newton_step(solution);
+
+  mg_transfer.interpolate_to_mg(dof_handler, mg_solution, solution);
+
+
+  // Set up options for the multilevel preconditioner
+  // ...
+
+  for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
+    {
+      mg_matrices[level].evaluate_newton_step(mg_solution[level]);
+    }
+
+  // Define the actual preconditioner
+  // ...
+
+  // Solve the linear system
+  // ...
+}
+@endcode
+
+The function evaluating the nonlinearity works basically in the same way as the
+function <code>evaluate_coefficient</code> from step-37 evaluating a coefficient
+function. The idea is to use an FEEvaluation object to evaluate the Newton step
+and store the expression in a table for all cells and all quadrature points:
+@code
+template <int dim, int fe_degree, typename number>
+void JacobianOperator<dim, fe_degree, number>::evaluate_newton_step(
+  const LinearAlgebra::distributed::Vector<number> &newton_step)
+{
+  const unsigned int n_cells = this->data->n_cell_batches();
+
+  FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*this->data);
+
+  nonlinear_values.reinit(n_cells, phi.n_q_points);
+
+  for (unsigned int cell = 0; cell < n_cells; ++cell)
+    {
+      phi.reinit(cell);
+      phi.read_dof_values_plain(newton_step);
+      phi.evaluate(EvaluationFlags::values);
+
+      for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        {
+          nonlinear_values(cell, q) = std::exp(phi.get_value(q));
+        }
+    }
+}
+@endcode
+
+
+<h3>%Triangulation</h3>
+As said in step-37, the matrix-free method gets more efficient if we choose a
+higher order finite element space. Since we want to solve the problem on the
+$d$-dimensional unit ball, it would be good to have an appropriate boundary
+approximation to overcome convergence issues. For this reason we use an
+isoparametric approach with the MappingQ class to recover the smooth
+boundary as well as the mapping for inner cells. In addition, to get a good
+triangulation in total we make use of the TransfiniteInterpolationManifold.

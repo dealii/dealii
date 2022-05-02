@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -103,7 +103,6 @@ DEAL_II_NAMESPACE_OPEN
  * restore().
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 1999
  */
 template <int dim, int spacedim = dim>
 class PersistentTriangulation : public Triangulation<dim, spacedim>
@@ -112,8 +111,8 @@ public:
   /**
    * Make the dimension available in function templates.
    */
-  static const unsigned int dimension      = dim;
-  static const unsigned int spacedimension = spacedim;
+  static constexpr unsigned int dimension      = dim;
+  static const unsigned int     spacedimension = spacedim;
 
   /**
    * Build up the triangulation from the coarse grid in future. Copy smoothing
@@ -202,10 +201,10 @@ public:
                        const std::vector<CellData<dim>> &  cells,
                        const SubCellData &subcelldata) override;
 
-  /*
+  /**
    * @copydoc Triangulation::create_triangulation()
    *
-   * @note Not inmplemented yet.
+   * @note Not implemented yet.
    */
   virtual void
   create_triangulation(
@@ -218,6 +217,7 @@ public:
    * Throw an error, since this function is not useful in the context of this
    * class.
    */
+  DEAL_II_DEPRECATED
   virtual void
   create_triangulation_compatibility(
     const std::vector<Point<spacedim>> &vertices,

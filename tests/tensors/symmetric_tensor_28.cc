@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,8 @@ test()
 
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
-      deallog << (i + 1) * (j + 1) << " " << (int)s[i][j] << " " << (int)t[i][j]
-              << " " << (int)u[i][j] << std::endl;
+      deallog << (i + 1) * (j + 1) << ' ' << (int)s[i][j] << ' ' << (int)t[i][j]
+              << ' ' << (int)u[i][j] << std::endl;
 }
 
 

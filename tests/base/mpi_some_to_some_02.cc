@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,7 @@ test(const unsigned int max_particles,
   auto my_proc = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   // Test some fake structure, similar to particles
-  typedef typename std::pair<unsigned int, Point<dim>> particle;
+  using particle = typename std::pair<unsigned int, Point<dim>>;
 
 
   unsigned int          n_local_particles = random_index(max_particles);
@@ -86,7 +86,7 @@ test(const unsigned int max_particles,
       std::vector<unsigned int> shared_procs(shared_procs_set.begin(),
                                              shared_procs_set.end());
 
-      deallog << "Proc " << my_proc << "/" << n_procs << ": sharing with  "
+      deallog << "Proc " << my_proc << '/' << n_procs << ": sharing with  "
               << Patterns::Tools::to_string(shared_procs_set) << std::endl;
       for (unsigned int i = 0; i < n_local_particles * shared_fraction; ++i)
         shared_particles[shared_procs[random_index(shared_procs.size())]]

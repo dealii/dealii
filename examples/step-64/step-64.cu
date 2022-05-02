@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2019 by the deal.II authors
+ * Copyright (C) 2019 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -17,7 +17,7 @@
  * Authors: Bruno Turcksin, Daniel Arndt, Oak Ridge National Laboratory, 2019
  */
 
-// First include the necessary files from the deal.II libary known from the
+// First include the necessary files from the deal.II library known from the
 // previous tutorials.
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -133,8 +133,9 @@ namespace Step64
       : coef(coef)
     {}
 
-    __device__ void
-    operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const;
+    __device__ void operator()(
+      CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
+        *fe_eval) const;
 
   private:
     double coef;
@@ -149,8 +150,9 @@ namespace Step64
   // the two terms on the left-hand side correspond to the two function calls
   // here:
   template <int dim, int fe_degree>
-  __device__ void HelmholtzOperatorQuad<dim, fe_degree>::
-                  operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval) const
+  __device__ void HelmholtzOperatorQuad<dim, fe_degree>::operator()(
+    CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
+      *fe_eval) const
   {
     fe_eval->submit_value(coef * fe_eval->get_value());
     fe_eval->submit_gradient(fe_eval->get_gradient());
@@ -256,15 +258,15 @@ namespace Step64
   // We can ask the parallel triangulation for the number of active, locally
   // owned cells but only have a DoFHandler object at hand. Since
   // DoFHandler::get_triangulation() returns a Triangulation object, not a
-  // parallel::Triangulation object, we have to downcast the return value. This
-  // is safe to do here because we know that the triangulation is a
+  // parallel::TriangulationBase object, we have to downcast the return value.
+  // This is safe to do here because we know that the triangulation is a
   // parallel:distributed::Triangulation object in fact.
   template <int dim, int fe_degree>
   HelmholtzOperator<dim, fe_degree>::HelmholtzOperator(
     const DoFHandler<dim> &          dof_handler,
     const AffineConstraints<double> &constraints)
   {
-    MappingQGeneric<dim> mapping(fe_degree);
+    MappingQ<dim> mapping(fe_degree);
     typename CUDAWrappers::MatrixFree<dim, double>::AdditionalData
       additional_data;
     additional_data.mapping_update_flags = update_values | update_gradients |
@@ -275,7 +277,7 @@ namespace Step64
 
 
     const unsigned int n_owned_cells =
-      dynamic_cast<const parallel::Triangulation<dim> *>(
+      dynamic_cast<const parallel::TriangulationBase<dim> *>(
         &dof_handler.get_triangulation())
         ->n_locally_owned_active_cells();
     coef.reinit(Utilities::pow(fe_degree + 1, dim) * n_owned_cells);
@@ -366,7 +368,7 @@ namespace Step64
     // In addition, we also keep a solution vector with CPU storage such that we
     // can view and display the solution as usual.
     LinearAlgebra::distributed::Vector<double, MemorySpace::Host>
-                                                                  ghost_solution_host;
+      ghost_solution_host;
     LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> solution_dev;
     LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
       system_rhs_dev;
@@ -395,7 +397,8 @@ namespace Step64
     dof_handler.distribute_dofs(fe);
 
     locally_owned_dofs = dof_handler.locally_owned_dofs();
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
     system_rhs_dev.reinit(locally_owned_dofs, mpi_communicator);
 
     constraints.clear();
@@ -450,7 +453,7 @@ namespace Step64
                             update_values | update_quadrature_points |
                               update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     Vector<double> cell_rhs(dofs_per_cell);
@@ -486,7 +489,7 @@ namespace Step64
 
 
   // This solve() function finally contains the calls to the new classes
-  // previously dicussed. Here we don't use any preconditioner, i.e.
+  // previously discussed. Here we don't use any preconditioner, i.e.,
   // precondition by the identity matrix, to focus just on the peculiarities of
   // the CUDAWrappers::MatrixFree framework. Of course, in a real application
   // the choice of a suitable preconditioner is crucial but we have at least the
@@ -606,7 +609,7 @@ namespace Step64
 // the machine, there is nothing we can do about it: All MPI ranks on
 // that machine need to share it. But if there are more than one GPU,
 // then it is better to address different graphic cards for different
-// processes. The choice below is based on the MPI proccess id by
+// processes. The choice below is based on the MPI process id by
 // assigning GPUs round robin to GPU ranks. (To work correctly, this
 // scheme assumes that the MPI ranks on one machine are
 // consecutive. If that were not the case, then the rank-GPU

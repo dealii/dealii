@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -92,8 +92,8 @@ namespace Step50
     FE_Q<dim>                                 fe;
     DoFHandler<dim>                           mg_dof_handler;
 
-    typedef TrilinosWrappers::SparseMatrix matrix_t;
-    typedef TrilinosWrappers::MPI::Vector  vector_t;
+    using matrix_t = TrilinosWrappers::SparseMatrix;
+    using vector_t = TrilinosWrappers::MPI::Vector;
 
     matrix_t system_matrix;
 
@@ -209,7 +209,8 @@ namespace Step50
                          true);
 
     mg_constrained_dofs.clear();
-    mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+    mg_constrained_dofs.initialize(mg_dof_handler);
+    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
 
     const unsigned int n_levels = triangulation.n_global_levels();
 
@@ -396,10 +397,13 @@ namespace Step50
     SolverControl         coarse_solver_control(1000, 1e-10, false, false);
     SolverGMRES<vector_t> coarse_solver(coarse_solver_control);
     PreconditionIdentity  id;
-    MGCoarseGridLACIteration<SolverGMRES<vector_t>, vector_t>
+    MGCoarseGridIterativeSolver<vector_t,
+                                SolverGMRES<vector_t>,
+                                matrix_t,
+                                PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
-    typedef TrilinosWrappers::PreconditionJacobi         Smoother;
+    using Smoother = TrilinosWrappers::PreconditionJacobi;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices);
     mg_smoother.set_steps(2);

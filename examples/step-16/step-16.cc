@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2018 by the deal.II authors
+ * Copyright (C) 2003 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -37,12 +37,9 @@
 #include <deal.II/lac/precondition.h>
 
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -338,7 +335,7 @@ namespace Step16
     FEValues<dim> &fe_values = scratch_data.fe_values;
     fe_values.reinit(cell);
 
-    const unsigned int dofs_per_cell = fe_values.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = fe_values.get_fe().n_dofs_per_cell();
     const unsigned int n_q_points    = fe_values.get_quadrature().size();
 
     copy_data.reinit(cell, dofs_per_cell);
@@ -349,7 +346,6 @@ namespace Step16
       {
         const double coefficient =
           (fe_values.get_quadrature_points()[q][0] < 0.0) ? 1.0 : 0.1;
-        //(cell->center().square() < 0.5 * 0.5) ? 10.0:1.0;
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
@@ -436,10 +432,8 @@ namespace Step16
     std::vector<AffineConstraints<double>> boundary_constraints(n_levels);
     for (unsigned int level = 0; level < n_levels; ++level)
       {
-        IndexSet dofset;
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                      level,
-                                                      dofset);
+        const IndexSet dofset =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
         boundary_constraints[level].reinit(dofset);
         boundary_constraints[level].add_lines(
           mg_constrained_dofs.get_refinement_edge_indices(level));
@@ -590,7 +584,7 @@ namespace Step16
 
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
     std::cout << "   Number of CG iterations: " << solver_control.last_step()
-              << "\n"
+              << '\n'
               << std::endl;
     constraints.distribute(solution);
   }

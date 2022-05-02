@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,6 +34,7 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -41,7 +42,6 @@
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -79,12 +79,12 @@ test(const unsigned int degree_center,
   fe_collection.push_back(FESystem<dim>(FE_Q<dim>(degree_center), dim));
 
   // prepare DoFHandler
-  hp::DoFHandler<dim> dh(tria);
+  DoFHandler<dim> dh(tria);
 
   for (const auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned() && cell->id().to_string() == "1_0:")
       {
-        // set different fe on center cell
+        // set different FE on center cell
         cell->set_active_fe_index(1);
 
 #ifdef DEBUG
@@ -114,6 +114,9 @@ test(const unsigned int degree_center,
   constraints.close();
 
   // ------ verify -----
+  std::vector<IndexSet> locally_owned_dofs_per_processor =
+    Utilities::MPI::all_gather(dh.get_communicator(), dh.locally_owned_dofs());
+
   IndexSet locally_active_dofs;
   DoFTools::extract_locally_active_dofs(dh, locally_active_dofs);
 
@@ -122,13 +125,13 @@ test(const unsigned int degree_center,
       deallog << "constraints:" << std::endl;
       constraints.print(deallog.get_file_stream());
     }
-  deallog << "consistent? "
-          << constraints.is_consistent_in_parallel(
-               dh.locally_owned_dofs_per_processor(),
-               locally_active_dofs,
-               MPI_COMM_WORLD,
-               true)
-          << std::endl;
+  deallog
+    << "consistent? "
+    << constraints.is_consistent_in_parallel(locally_owned_dofs_per_processor,
+                                             locally_active_dofs,
+                                             MPI_COMM_WORLD,
+                                             true)
+    << std::endl;
 
   deallog << "OK" << std::endl;
 }

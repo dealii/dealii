@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,7 +88,8 @@ test()
               for (unsigned int q = 0; q < fiv.get_quadrature().size(); ++q)
                 for (unsigned int i = 0; i < fiv.n_current_interface_dofs();
                      ++i)
-                  Assert(std::abs(fiv.jump(i, q)) <= 1e-12, ExcInternalError());
+                  Assert(std::abs(fiv.jump_in_shape_values(i, q)) <= 1e-12,
+                         ExcInternalError());
             }
 
       deallog << "Twist " << twist << "*pi/2 seems to work just fine..."

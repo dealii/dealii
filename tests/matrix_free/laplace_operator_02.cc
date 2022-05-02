@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,8 @@
 
 
 
-// the same as laplace_operator_01, but tests heterogeneous Laplace operator.
+// the same as laplace_operator_01 (excluding the extra detection tests), but
+// tests heterogeneous Laplace operator.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
@@ -71,7 +72,7 @@ public:
     Point<dim>              p;
     for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
       {
-        for (unsigned int d = 0; d < dim; d++)
+        for (unsigned int d = 0; d < dim; ++d)
           p[d] = p_vec[d][v];
         res[v] = value(p);
       }
@@ -89,8 +90,8 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double number;
-  F<dim>         function(3, 1);
+  using number = double;
+  F<dim> function(3, 1);
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
@@ -163,7 +164,7 @@ test()
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> fe_eval(*mf_data);
 
-    const unsigned int n_cells    = mf_data->n_macro_cells();
+    const unsigned int n_cells    = mf_data->n_cell_batches();
     const unsigned int n_q_points = fe_eval.n_q_points;
 
     coefficient->reinit(n_cells, n_q_points);
@@ -267,32 +268,18 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  deallog.push(Utilities::int_to_string(myid));
+  mpi_initlog();
+  deallog.push("0");
 
-  if (myid == 0)
-    {
-      initlog();
-      deallog << std::setprecision(4);
+  deallog.push("2d");
+  test<2, 1>();
+  test<2, 2>();
+  deallog.pop();
 
-      deallog.push("2d");
-      test<2, 1>();
-      test<2, 2>();
-      deallog.pop();
-
-      deallog.push("3d");
-      test<3, 1>();
-      test<3, 2>();
-      deallog.pop();
-    }
-  else
-    {
-      test<2, 1>();
-      test<2, 2>();
-      test<3, 1>();
-      test<3, 2>();
-    }
+  deallog.push("3d");
+  test<3, 1>();
+  test<3, 2>();
+  deallog.pop();
 }

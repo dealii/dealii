@@ -4,18 +4,18 @@ DEAL:2d::processor 1: 52 locally owned active cells
 DEAL:2d::processor 2: 52 locally owned active cells
 DEAL:2d::processor 3: 48 locally owned active cells
 DEAL:2d::processor 4: 52 locally owned active cells
-DEAL:2d::processor 0: 5.27680e+07 weight
-DEAL:2d::processor 1: 5.20000e+07 weight
-DEAL:2d::processor 2: 5.20000e+07 weight
-DEAL:2d::processor 3: 4.80000e+07 weight
-DEAL:2d::processor 4: 5.20000e+07 weight
+DEAL:2d::processor 0: 52768 weight
+DEAL:2d::processor 1: 52000 weight
+DEAL:2d::processor 2: 52000 weight
+DEAL:2d::processor 3: 48000 weight
+DEAL:2d::processor 4: 52000 weight
 DEAL:3d::processor 0: 13920 locally owned active cells
 DEAL:3d::processor 1: 1640 locally owned active cells
 DEAL:3d::processor 2: 13920 locally owned active cells
 DEAL:3d::processor 3: 1648 locally owned active cells
 DEAL:3d::processor 4: 1640 locally owned active cells
-DEAL:3d::processor 0: 1.64429e+09 weight
-DEAL:3d::processor 1: 1.64000e+09 weight
-DEAL:3d::processor 2: 1.64429e+09 weight
-DEAL:3d::processor 3: 1.64800e+09 weight
-DEAL:3d::processor 4: 1.64000e+09 weight
+DEAL:3d::processor 0: 1644288 weight
+DEAL:3d::processor 1: 1640000 weight
+DEAL:3d::processor 2: 1644288 weight
+DEAL:3d::processor 3: 1648000 weight
+DEAL:3d::processor 4: 1640000 weight

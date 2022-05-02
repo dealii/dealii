@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -185,8 +185,6 @@ namespace MeshWorker
    * performed.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat
-   * @date 2010
    */
   template <class INFOBOX, class DOFINFO, int dim, int spacedim, class ITERATOR>
   void
@@ -245,8 +243,7 @@ namespace MeshWorker
     info.post_cell(dof_info);
 
     if (integrate_interior_face || integrate_boundary)
-      for (const unsigned int face_no : GeometryInfo<
-             ITERATOR::AccessorType::Container::dimension>::face_indices())
+      for (const unsigned int face_no : cell->face_indices())
         {
           typename ITERATOR::AccessorType::Container::face_iterator face =
             cell->face(face_no);
@@ -431,7 +428,6 @@ namespace MeshWorker
    * arguments.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim,
             int spacedim,
@@ -491,7 +487,6 @@ namespace MeshWorker
    * virtual functions in LocalIntegrator.
    *
    * @ingroup MeshWorker
-   * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim, class ITERATOR, class ASSEMBLER>
   void

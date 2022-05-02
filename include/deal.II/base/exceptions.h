@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,6 @@ DEAL_II_NAMESPACE_OPEN
  * derived from it.
  *
  * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 class ExceptionBase : public std::exception
 {
@@ -62,7 +61,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~ExceptionBase() noexcept override;
+  virtual ~ExceptionBase() noexcept override = default;
 
   /**
    * Copy operator. This operator is deleted since exception objects
@@ -143,20 +142,14 @@ protected:
   const char *exc;
 
   /**
-   * A backtrace to the position where the problem happened, if the system
-   * supports this.
-   */
-  mutable char **stacktrace;
-
-  /**
-   * The number of stacktrace frames that are stored in the previous variable.
+   * The number of stacktrace frames that are stored in the following variable.
    * Zero if the system does not support stack traces.
    */
   int n_stacktrace_frames;
 
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
   /**
-   * array of pointers that contains the raw stack trace
+   * Array of pointers that contains the raw stack trace.
    */
   void *raw_stacktrace[25];
 #endif
@@ -191,7 +184,6 @@ private:
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
  * deal.II headers have been included.
  *
- * @author Wolfgang Bangerth, November 1997
  * @ingroup Exceptions
  */
 #  define DeclException0(Exception0)                \
@@ -467,7 +459,6 @@ private:
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
  * deal.II headers have been included.
  *
- * @author Wolfgang Bangerth, November 1997
  * @ingroup Exceptions
  */
 #  define DeclException0(Exception0) \
@@ -746,7 +737,19 @@ namespace StandardExceptions
    */
   DeclException1(ExcFileNotOpen,
                  std::string,
-                 << "Could not open file " << arg1 << ".");
+                 << "Could not open file " << arg1
+                 << "."
+                    "\n\n"
+                    "If this happens during an operation that tries to read "
+                    "data: you may be "
+                    "trying to read from a file that doesn't exist or that is "
+                    "not readable given its file permissions."
+                    "\n\n"
+                    "If this happens during an operation that tries to write "
+                    "data: you may be trying to write to a file to which file "
+                    "or directory permissions do not allow you to write. A "
+                    "typical example is where you specify an output file in "
+                    "a directory that does not exist.");
 
   /**
    * Exception denoting a part of the library or application program that has
@@ -881,7 +884,7 @@ namespace StandardExceptions
                  int,
                  int,
                  << "You are trying to execute functionality that is "
-                 << "impossible in dimensions <" << arg1 << "," << arg2
+                 << "impossible in dimensions <" << arg1 << ',' << arg2
                  << "> or simply does not make any sense.");
 
 
@@ -914,25 +917,25 @@ namespace StandardExceptions
   DeclException2(ExcDimensionMismatch,
                  std::size_t,
                  std::size_t,
-                 << "Dimension " << arg1 << " not equal to " << arg2 << ".");
+                 << "Dimension " << arg1 << " not equal to " << arg2 << '.');
 
   /**
    * The first dimension should be either equal to the second or the third,
    * but it is neither.
    */
   DeclException3(ExcDimensionMismatch2,
-                 int,
-                 int,
-                 int,
+                 std::size_t,
+                 std::size_t,
+                 std::size_t,
                  << "Dimension " << arg1 << " neither equal to " << arg2
-                 << " nor to " << arg3 << ".");
+                 << " nor to " << arg3 << '.');
 
   /**
    * This exception indicates that an index is not within the expected range.
    * For example, it may be that you are trying to access an element of a
    * vector which does not exist.
    *
-   * The constructor takes three <tt>int</tt> arguments, namely
+   * The constructor takes three <tt>std::size_t</tt> arguments, namely
    * <ol>
    * <li> the violating index
    * <li> the lower bound
@@ -941,10 +944,10 @@ namespace StandardExceptions
    */
   DeclException3(
     ExcIndexRange,
-    int,
-    int,
-    int,
-    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
+    std::size_t,
+    std::size_t,
+    std::size_t,
+    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ','
     << arg3 << ")."
     << (arg2 == arg3 ?
           " In the current case, this half-open range is in fact empty, "
@@ -974,7 +977,7 @@ namespace StandardExceptions
     T,
     T,
     T,
-    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
+    << "Index " << arg1 << " is not in the half-open range [" << arg2 << ','
     << arg3 << ")."
     << (arg2 == arg3 ?
           " In the current case, this half-open range is in fact empty, "
@@ -990,7 +993,7 @@ namespace StandardExceptions
                  int,
                  int,
                  << "Number " << arg1 << " must be larger than or equal "
-                 << arg2 << ".");
+                 << arg2 << '.');
 
   /**
    * A generic exception definition for the ExcLowerRange above.
@@ -1000,7 +1003,7 @@ namespace StandardExceptions
                  T,
                  T,
                  << "Number " << arg1 << " must be larger than or equal "
-                 << arg2 << ".");
+                 << arg2 << '.');
 
   /**
    * This exception indicates that the first argument should be an integer
@@ -1073,9 +1076,16 @@ namespace StandardExceptions
    * argument zero. In other cases, this exception is thrown.
    */
   DeclExceptionMsg(ExcScalarAssignmentOnlyForZeroValue,
-                   "You are trying an operation of the form 'vector=s' with "
-                   "a nonzero scalar value 's'. However, such assignments "
-                   "are only allowed if the right hand side is zero.");
+                   "You are trying an operation of the form 'vector = C', "
+                   "'matrix = C', or 'tensor = C' with a nonzero scalar value "
+                   "'C'. However, such assignments are only allowed if the "
+                   "C is zero, since the semantics for assigning any other "
+                   "value are not clear. For example: one could interpret "
+                   "assigning a matrix a value of 1 to mean the matrix has a "
+                   "norm of 1, the matrix is the identity matrix, or the "
+                   "matrix contains only 1s. Similar problems exist with "
+                   "vectors and tensors. Hence, to avoid this ambiguity, such "
+                   "assignments are not permitted.");
 
   /**
    * This function requires support for the LAPACK library.
@@ -1093,17 +1103,6 @@ namespace StandardExceptions
     ExcNeedsMPI,
     "You are attempting to use functionality that is only available "
     "if deal.II was configured to use MPI.");
-
-  /**
-   * This function requires support for the NetCDF library.
-   *
-   * @deprecated Support for NetCDF in deal.II is deprecated.
-   */
-  DeclExceptionMsg(
-    ExcNeedsNetCDF,
-    "You are attempting to use functionality that is only available "
-    "if deal.II was configured to use NetCDF, but cmake did not "
-    "find a valid NetCDF library.");
 
   /**
    * This function requires support for the FunctionParser library.
@@ -1142,6 +1141,15 @@ namespace StandardExceptions
 #endif
   //@}
 
+  /**
+   * This function requires support for the Exodus II library.
+   */
+  DeclExceptionMsg(
+    ExcNeedsExodusII,
+    "You are attempting to use functionality that is only available if deal.II "
+    "was configured to use Trilinos' SEACAS library (which provides ExodusII), "
+    "but cmake did not find a valid SEACAS library.");
+
 #ifdef DEAL_II_WITH_MPI
   /**
    * Exception for MPI errors. This exception is only defined if
@@ -1163,7 +1171,6 @@ namespace StandardExceptions
    * function.
    *
    * @ingroup Exceptions
-   * @author David Wells, 2016
    */
   class ExcMPI : public dealii::ExceptionBase
   {
@@ -1176,6 +1183,40 @@ namespace StandardExceptions
     const int error_code;
   };
 #endif // DEAL_II_WITH_MPI
+
+
+
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+  /**
+   * Exception for ExodusII errors. This exception is only defined if
+   * <code>deal.II</code> is compiled with SEACAS support, which is available
+   * through Trilinos. This function should be used with the convenience macro
+   * AssertThrowExodusII.
+   *
+   * @ingroup Exceptions
+   */
+  class ExcExodusII : public ExceptionBase
+  {
+  public:
+    /**
+     * Constructor.
+     *
+     * @param error_code The error code returned by an ExodusII function.
+     */
+    ExcExodusII(const int error_code);
+
+    /**
+     * Print a description of the error to the given stream.
+     */
+    virtual void
+    print_info(std::ostream &out) const override;
+
+    /**
+     * Store the error code.
+     */
+    const int error_code;
+  };
+#endif // DEAL_II_TRILINOS_WITH_SEACAS
 } /*namespace StandardExceptions*/
 
 
@@ -1245,10 +1286,22 @@ namespace deal_II_exceptions
    * still call abort(), e.g. when an exception is caught during exception
    * handling.
    *
+   * @see enable_abort_on_exception
    * @see Exceptions
    */
   void
   disable_abort_on_exception();
+
+  /**
+   * Calling this function switches on the use of <tt>std::abort()</tt> when
+   * an exception is created using the Assert() macro, instead of throwing it.
+   * This restores the standard behavior.
+   *
+   * @see disable_abort_on_exception
+   * @see Exceptions
+   */
+  void
+  enable_abort_on_exception();
 
   /**
    * The functions in this namespace are in connection with the Assert and
@@ -1269,7 +1322,7 @@ namespace deal_II_exceptions
     /**
      * An enum describing how to treat an exception in issue_error_noreturn.
      */
-    enum ExceptionHandling
+    enum class ExceptionHandling
     {
       /**
        * Abort the program by calling <code>std::abort</code> unless
@@ -1287,7 +1340,7 @@ namespace deal_II_exceptions
      * This routine does the main work for the exception generation mechanism
      * used in the <tt>Assert</tt> and <tt>AssertThrow</tt> macros: as the
      * name implies, this function either ends by throwing an exception (if
-     * @p handling is throw_on_exception, or @p handling is try_abort_exception
+     * @p handling is ExceptionHandling::throw_on_exception, or @p handling is try_abort_exception
      * and deal_II_exceptions::disable_abort_on_exception is false) or with a
      * call to <tt>abort</tt> (if @p handling is try_abort_exception and
      * deal_II_exceptions::disable_abort_on_exception is true).
@@ -1308,13 +1361,14 @@ namespace deal_II_exceptions
                          const char *      function,
                          const char *      cond,
                          const char *      exc_name,
-                         ExceptionType     e) {
+                         ExceptionType     e)
+    {
       // Fill the fields of the exception object
       e.set_fields(file, line, function, cond, exc_name);
 
       switch (handling)
         {
-          case abort_or_throw_on_exception:
+          case ExceptionHandling::abort_or_throw_on_exception:
             {
               if (dealii::deal_II_exceptions::internals::
                     allow_abort_on_exception)
@@ -1325,7 +1379,7 @@ namespace deal_II_exceptions
                   throw e;
                 }
             }
-          case throw_on_exception:
+          case ExceptionHandling::throw_on_exception:
             throw e;
           // this function should never return (and AssertNothrow can);
           // something must have gone wrong in the error handling code for us
@@ -1338,7 +1392,8 @@ namespace deal_II_exceptions
     /**
      * Internal function that does the work of issue_error_nothrow.
      */
-    void do_issue_error_nothrow(const ExceptionBase &e) noexcept;
+    void
+    do_issue_error_nothrow(const ExceptionBase &e) noexcept;
 
     /**
      * Exception generation mechanism in case we must not throw.
@@ -1412,7 +1467,6 @@ namespace deal_II_exceptions
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEBUG
 #  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
@@ -1420,7 +1474,7 @@ namespace deal_II_exceptions
       {                                                                  \
         if (__builtin_expect(!(cond), false))                            \
           ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-            ::dealii::deal_II_exceptions::internals::                    \
+            ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
               abort_or_throw_on_exception,                               \
             __FILE__,                                                    \
             __LINE__,                                                    \
@@ -1434,7 +1488,7 @@ namespace deal_II_exceptions
       {                                                                  \
         if (!(cond))                                                     \
           ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-            ::dealii::deal_II_exceptions::internals::                    \
+            ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
               abort_or_throw_on_exception,                               \
             __FILE__,                                                    \
             __LINE__,                                                    \
@@ -1476,7 +1530,6 @@ namespace deal_II_exceptions
  *
  * @note Active in DEBUG mode only
  * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEBUG
 #  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
@@ -1525,14 +1578,14 @@ namespace deal_II_exceptions
  *
  * @note Active in both DEBUG and RELEASE modes
  * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEAL_II_HAVE_BUILTIN_EXPECT
 #  define AssertThrow(cond, exc)                                       \
     {                                                                  \
       if (__builtin_expect(!(cond), false))                            \
         ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-          ::dealii::deal_II_exceptions::internals::throw_on_exception, \
+          ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+            throw_on_exception,                                        \
           __FILE__,                                                    \
           __LINE__,                                                    \
           __PRETTY_FUNCTION__,                                         \
@@ -1545,7 +1598,8 @@ namespace deal_II_exceptions
     {                                                                  \
       if (!(cond))                                                     \
         ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-          ::dealii::deal_II_exceptions::internals::throw_on_exception, \
+          ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+            throw_on_exception,                                        \
           __FILE__,                                                    \
           __LINE__,                                                    \
           __PRETTY_FUNCTION__,                                         \
@@ -1554,6 +1608,41 @@ namespace deal_II_exceptions
           exc);                                                        \
     }
 #endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+
+
+namespace deal_II_exceptions
+{
+  namespace internals
+  {
+    /**
+     * A function that compares two values for equality, after converting to a
+     * common type to avoid compiler warnings when comparing objects of
+     * different types (e.g., unsigned and signed variables).
+     */
+    template <typename T, typename U>
+    inline constexpr bool
+    compare_for_equality(const T &t, const U &u)
+    {
+      using common_type = typename std::common_type<T, U>::type;
+      return static_cast<common_type>(t) == static_cast<common_type>(u);
+    }
+
+
+    /**
+     * A function that compares two values with `operator<`, after converting to
+     * a common type to avoid compiler warnings when comparing objects of
+     * different types (e.g., unsigned and signed variables).
+     */
+    template <typename T, typename U>
+    inline constexpr bool
+    compare_less_than(const T &t, const U &u)
+    {
+      using common_type = typename std::common_type<T, U>::type;
+      return (static_cast<common_type>(t) < static_cast<common_type>(u));
+    }
+  } // namespace internals
+} // namespace deal_II_exceptions
+
 
 /**
  * Special assertion for dimension mismatch.
@@ -1574,15 +1663,10 @@ namespace deal_II_exceptions
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Guido Kanschat 2007
  */
-#define AssertDimension(dim1, dim2)                                            \
-  Assert(static_cast<typename ::dealii::internal::argument_type<void(          \
-             typename std::common_type<decltype(dim1),                         \
-                                       decltype(dim2)>::type)>::type>(dim1) == \
-           static_cast<typename ::dealii::internal::argument_type<void(        \
-             typename std::common_type<decltype(dim1),                         \
-                                       decltype(dim2)>::type)>::type>(dim2),   \
+#define AssertDimension(dim1, dim2)                                           \
+  Assert(::dealii::deal_II_exceptions::internals::compare_for_equality(dim1,  \
+                                                                       dim2), \
          dealii::ExcDimensionMismatch((dim1), (dim2)))
 
 
@@ -1602,7 +1686,6 @@ namespace deal_II_exceptions
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Guido Kanschat 2010
  */
 #define AssertVectorVectorDimension(VEC, DIM1, DIM2) \
   AssertDimension(VEC.size(), DIM1);                 \
@@ -1619,6 +1702,7 @@ namespace internal
   // https://stackoverflow.com/questions/13842468/comma-in-c-c-macro
   template <typename T>
   struct argument_type;
+
   template <typename T, typename U>
   struct argument_type<T(U)>
   {
@@ -1644,16 +1728,10 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Guido Kanschat, Daniel Arndt, 2007, 2018
  */
 #define AssertIndexRange(index, range)                                         \
   Assert(                                                                      \
-    static_cast<typename ::dealii::internal::argument_type<void(               \
-        typename std::common_type<decltype(index), decltype(range)>::type)>::  \
-                  type>(index) <                                               \
-      static_cast<typename ::dealii::internal::argument_type<void(             \
-        typename std::common_type<decltype(index), decltype(range)>::type)>::  \
-                    type>(range),                                              \
+    ::dealii::deal_II_exceptions::internals::compare_less_than(index, range),  \
     dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<void( \
       typename std::common_type<decltype(index), decltype(range)>::type)>::    \
                                 type>((index), 0, (range)))
@@ -1676,11 +1754,17 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Wolfgang Bangerth, 2015
  */
 #define AssertIsFinite(number)               \
   Assert(dealii::numbers::is_finite(number), \
          dealii::ExcNumberNotFinite(std::complex<double>(number)))
+
+/**
+ * Assert that a geometric object is not used. This assertion is used when
+ * constructing triangulations and should normally not be used inside user
+ * codes.
+ */
+#define AssertIsNotUsed(obj) Assert((obj)->used() == false, ExcInternalError())
 
 #ifdef DEAL_II_WITH_MPI
 /**
@@ -1702,7 +1786,6 @@ namespace internal
  *
  * @note Active only if deal.II is compiled with MPI
  * @ingroup Exceptions
- * @author David Wells, 2016
  */
 #  define AssertThrowMPI(error_code) \
     AssertThrow(error_code == MPI_SUCCESS, dealii::ExcMPI(error_code))
@@ -1728,7 +1811,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Bruno Turcksin, 2016
  */
 #  ifdef DEBUG
 #    define AssertCuda(error_code)      \
@@ -1756,7 +1838,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Daniel Arndt, 2018
  */
 #  ifdef DEBUG
 #    define AssertNothrowCuda(error_code)      \
@@ -1767,6 +1848,36 @@ namespace internal
       {                                   \
         (void)(error_code);               \
       }
+#  endif
+
+/**
+ * An assertion that checks that the kernel was launched and executed
+ * successfully.
+ *
+ * @note This and similar macro names are examples of preprocessor definitions
+ * in the deal.II library that are not prefixed by a string that likely makes
+ * them unique to deal.II. As a consequence, it is possible that other
+ * libraries your code interfaces with define the same name, and the result
+ * will be name collisions (see
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
+ * this macro, as well as all other macros defined by deal.II that are not
+ * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
+ * the header <code>deal.II/base/undefine_macros.h</code> after all other
+ * deal.II headers have been included.
+ *
+ * @ingroup Exceptions
+ */
+#  ifdef DEBUG
+#    define AssertCudaKernel()                                \
+      {                                                       \
+        cudaError_t local_error_code = cudaPeekAtLastError(); \
+        AssertCuda(local_error_code);                         \
+        local_error_code = cudaDeviceSynchronize();           \
+        AssertCuda(local_error_code)                          \
+      }
+#  else
+#    define AssertCudaKernel() \
+      {}
 #  endif
 
 /**
@@ -1785,7 +1896,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Bruno Turcksin, 2018
  */
 #  ifdef DEBUG
 #    define AssertCusparse(error_code)                                      \
@@ -1816,7 +1926,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Daniel Arndt, 2018
  */
 #  ifdef DEBUG
 #    define AssertNothrowCusparse(error_code)                               \
@@ -1848,7 +1957,6 @@ namespace internal
  * deal.II headers have been included.
  *
  * @ingroup Exceptions
- * @author Bruno Turcksin, 2018
  */
 #  ifdef DEBUG
 #    define AssertCusolver(error_code)                                      \
@@ -1865,6 +1973,28 @@ namespace internal
 #  endif
 
 #endif
+
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+/**
+ * Assertion that checks that the error code produced by calling an ExodusII
+ * routine is equal to EX_NOERR (which is zero).
+ *
+ * @note This and similar macro names are examples of preprocessor definitions
+ * in the deal.II library that are not prefixed by a string that likely makes
+ * them unique to deal.II. As a consequence, it is possible that other
+ * libraries your code interfaces with define the same name, and the result
+ * will be name collisions (see
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
+ * this macro, as well as all other macros defined by deal.II that are not
+ * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
+ * the header <code>deal.II/base/undefine_macros.h</code> after all other
+ * deal.II headers have been included.
+ *
+ * @ingroup Exceptions
+ */
+#  define AssertThrowExodusII(error_code) \
+    AssertThrow(error_code == 0, ExcExodusII(error_code));
+#endif // DEAL_II_TRILINOS_WITH_SEACAS
 
 using namespace StandardExceptions;
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,22 +79,22 @@ test()
             complete_renumbering.begin());
   unsigned int                offset = renumbering.size();
   const std::vector<IndexSet> locally_owned_dofs_per_processor =
-    dofh.compute_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD, dofh.locally_owned_dofs());
   for (unsigned int i = 1; i < nprocs; ++i)
     {
       if (myid == i)
         MPI_Send(&renumbering[0],
                  renumbering.size(),
-                 Utilities::MPI::internal::mpi_type_id(
-                   &complete_renumbering[0]),
+                 Utilities::MPI::mpi_type_id_for_type<decltype(
+                   complete_renumbering[0])>,
                  0,
                  i,
                  MPI_COMM_WORLD);
       else if (myid == 0)
         MPI_Recv(&complete_renumbering[offset],
                  locally_owned_dofs_per_processor[i].n_elements(),
-                 Utilities::MPI::internal::mpi_type_id(
-                   &complete_renumbering[0]),
+                 Utilities::MPI::mpi_type_id_for_type<decltype(
+                   complete_renumbering[0])>,
                  i,
                  i,
                  MPI_COMM_WORLD,

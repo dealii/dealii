@@ -1,0 +1,16 @@
+
+DEAL::n_cells:100
+DEAL::criteria:[b>0,e>0]
+DEAL::  refinement_fraction:0.1 coarsening_fraction:0.1
+DEAL::    n_refine_flags:10 n_coarsen_flags:10
+DEAL::  refinement_fraction:0.1 coarsening_fraction:0.
+DEAL::    n_refine_flags:10 n_coarsen_flags:0
+DEAL::  refinement_fraction:0. coarsening_fraction:0.1
+DEAL::    n_refine_flags:0 n_coarsen_flags:10
+DEAL::criteria:[b=0,e>0]
+DEAL::  refinement_fraction:0.1 coarsening_fraction:0.1
+DEAL::    n_refine_flags:10 n_coarsen_flags:10
+DEAL::  refinement_fraction:0.1 coarsening_fraction:0.
+DEAL::    n_refine_flags:10 n_coarsen_flags:0
+DEAL::  refinement_fraction:0. coarsening_fraction:0.1
+DEAL::    n_refine_flags:0 n_coarsen_flags:10

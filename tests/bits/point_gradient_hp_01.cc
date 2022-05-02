@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,12 +14,14 @@
 // ---------------------------------------------------------------------
 
 
-// check VectorTools::point_gradient for a hp dofhandler.
+// check VectorTools::point_gradient for a hp-dofhandler.
 
 
 
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/quadrature_lib.h>
+
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -28,7 +30,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/vector.h>
@@ -146,15 +147,15 @@ check()
   make_mesh(tria);
 
   hp::FECollection<dim> fe;
-  fe.push_back(FE_Q<dim>(QIterated<1>(QTrapez<1>(), 3)));
-  fe.push_back(FE_Q<dim>(QIterated<1>(QTrapez<1>(), 4)));
-  fe.push_back(FE_Q<dim>(QIterated<1>(QTrapez<1>(), 5)));
+  fe.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), 3)));
+  fe.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), 4)));
+  fe.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), 5)));
 
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell)
     {
       cell->set_active_fe_index(Testing::rand() % fe.size());

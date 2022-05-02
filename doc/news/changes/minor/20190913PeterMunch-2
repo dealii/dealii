@@ -1,5 +1,0 @@
-New: Allow to create TriangulationDescription::Description
-by groups, in which only one process actually creates 
-TriangulationDescription::Descriptions and distributes them within the group.
-<br>
-(Peter Munch, 2019/09/13)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,6 @@ namespace PETScWrappers
      * not all elements.
      *
      * @ingroup PETScWrappers
-     * @author Guido Kanschat, Roy Stogner, Wolfgang Bangerth, 2004
      */
     class const_iterator
     {
@@ -203,12 +202,14 @@ namespace PETScWrappers
       /**
        * Dereferencing operator.
        */
-      const Accessor &operator*() const;
+      const Accessor &
+      operator*() const;
 
       /**
        * Dereferencing operator.
        */
-      const Accessor *operator->() const;
+      const Accessor *
+      operator->() const;
 
       /**
        * Comparison. True, if both iterators point to the same matrix
@@ -279,7 +280,6 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    * @ingroup Matrix1
-   * @author Wolfgang Bangerth, 2004
    */
   class MatrixBase : public Subscriptor
   {
@@ -756,7 +756,6 @@ namespace PETScWrappers
     MatrixBase &
     add(const PetscScalar factor, const MatrixBase &other);
 
-
     /**
      * Matrix-vector multiplication: let <i>dst = M*src</i> with <i>M</i>
      * being this matrix.
@@ -1163,13 +1162,15 @@ namespace PETScWrappers
     }
 
 
-    inline const const_iterator::Accessor &const_iterator::operator*() const
+    inline const const_iterator::Accessor &
+    const_iterator::operator*() const
     {
       return accessor;
     }
 
 
-    inline const const_iterator::Accessor *const_iterator::operator->() const
+    inline const const_iterator::Accessor *
+    const_iterator::operator->() const
     {
       return &accessor;
     }

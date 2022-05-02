@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,6 @@
 
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <memory>
 
@@ -31,7 +30,7 @@ main()
 {
   initlog();
 
-  typedef std::unique_ptr<FunctionParser<3>> T;
+  using T = std::unique_ptr<FunctionParser<3>>;
 
   T a;
   a = Convert<T>::to_value("x*y,y-t");

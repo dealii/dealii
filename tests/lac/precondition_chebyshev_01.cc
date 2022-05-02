@@ -61,19 +61,19 @@ check()
 
   deallog << "Exact inverse:     ";
   for (unsigned int i = 0; i < size; ++i)
-    deallog << in(i) / m(i, i) << " ";
+    deallog << in(i) / m(i, i) << ' ';
   deallog << std::endl;
 
   deallog << "Check  vmult orig: ";
   prec.vmult(out, in);
   for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << " ";
+    deallog << out(i) << ' ';
   deallog << std::endl;
 
   deallog << "Check Tvmult orig: ";
   prec.Tvmult(out, in);
   for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << " ";
+    deallog << out(i) << ' ';
   deallog << std::endl;
 
   Vector<double> matrix_diagonal(size);
@@ -86,13 +86,13 @@ check()
   deallog << "Check  vmult diag: ";
   prec.vmult(out, in);
   for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << " ";
+    deallog << out(i) << ' ';
   deallog << std::endl;
 
   deallog << "Check Tvmult diag: ";
   prec.Tvmult(out, in);
   for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << " ";
+    deallog << out(i) << ' ';
   deallog << std::endl;
 }
 

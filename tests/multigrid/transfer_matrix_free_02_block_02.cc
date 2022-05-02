@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -112,12 +112,12 @@ check(const unsigned int fe_degree)
       const std::vector<const DoFHandler<dim> *> mgdof_ptr{&mgdof_1, &mgdof_2};
 
       std::vector<MGConstrainedDoFs> mg_constrained_dofs_vector(2);
-      ZeroFunction<dim>              zero_function;
-      std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-      dirichlet_boundary[0] = &zero_function;
       for (unsigned int i = 0; i < mgdof_ptr.size(); ++i)
-        mg_constrained_dofs_vector[i].initialize(*mgdof_ptr[i],
-                                                 dirichlet_boundary);
+        {
+          mg_constrained_dofs_vector[i].initialize(*mgdof_ptr[i]);
+          mg_constrained_dofs_vector[i].make_zero_boundary_constraints(
+            *mgdof_ptr[i], {0});
+        }
 
       // build reference
       std::vector<MGTransferMatrixFree<dim, Number>> transfer_ref;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2019 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,6 +37,25 @@ DEAL_II_NAMESPACE_OPEN
 #  include <umfpack.h>
 #endif
 
+
+namespace
+{
+  /**
+   * For a given matrix, compute a reasonable "grain size" when parallelizing
+   * some copying and sorting operations. The grain size is the minimal number
+   * of rows each thread should work on. We define it by assuming that
+   * dealing with 1000 matrix entries is a reasonable lower bound for parallel
+   * operations.
+   */
+  template <typename SparseMatrixType>
+  unsigned int
+  parallel_grainsize(const SparseMatrixType &matrix)
+  {
+    const unsigned int avg_entries_per_row =
+      matrix.n_nonzero_elements() / matrix.m();
+    return std::max(1000 / avg_entries_per_row, 1u);
+  }
+} // namespace
 
 
 SparseDirectUMFPACK::~SparseDirectUMFPACK()
@@ -116,31 +135,37 @@ SparseDirectUMFPACK::sort_arrays(const SparseMatrix<number> &matrix)
   // column index of the second entry in a row
   //
   // ignore rows with only one or no entry
-  for (size_type row = 0; row < matrix.m(); ++row)
-    {
-      // we may have to move some elements that are left of the diagonal
-      // but presently after the diagonal entry to the left, whereas the
-      // diagonal entry has to move to the right. we could first figure out
-      // where to move everything to, but for simplicity we just make a
-      // series of swaps instead (this is kind of a single run of
-      // bubble-sort, which gives us the desired result since the array is
-      // already "almost" sorted)
-      //
-      // in the first loop, the condition in the while-header also checks
-      // that the row has at least two entries and that the diagonal entry
-      // is really in the wrong place
-      long int cursor = Ap[row];
-      while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] > Ai[cursor + 1]))
+  parallel::apply_to_subranges(
+    0,
+    matrix.m(),
+    [this](const size_type row_begin, const size_type row_end) {
+      for (size_type row = row_begin; row < row_end; ++row)
         {
-          std::swap(Ai[cursor], Ai[cursor + 1]);
+          // we may have to move some elements that are left of the diagonal
+          // but presently after the diagonal entry to the left, whereas the
+          // diagonal entry has to move to the right. we could first figure out
+          // where to move everything to, but for simplicity we just make a
+          // series of swaps instead (this is kind of a single run of
+          // bubble-sort, which gives us the desired result since the array is
+          // already "almost" sorted)
+          //
+          // in the first loop, the condition in the while-header also checks
+          // that the row has at least two entries and that the diagonal entry
+          // is really in the wrong place
+          long int cursor = Ap[row];
+          while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] > Ai[cursor + 1]))
+            {
+              std::swap(Ai[cursor], Ai[cursor + 1]);
 
-          std::swap(Ax[cursor], Ax[cursor + 1]);
-          if (numbers::NumberTraits<number>::is_complex == true)
-            std::swap(Az[cursor], Az[cursor + 1]);
+              std::swap(Ax[cursor], Ax[cursor + 1]);
+              if (numbers::NumberTraits<number>::is_complex == true)
+                std::swap(Az[cursor], Az[cursor + 1]);
 
-          ++cursor;
+              ++cursor;
+            }
         }
-    }
+    },
+    parallel_grainsize(matrix));
 }
 
 
@@ -150,20 +175,26 @@ void
 SparseDirectUMFPACK::sort_arrays(const SparseMatrixEZ<number> &matrix)
 {
   // same thing for SparseMatrixEZ
-  for (size_type row = 0; row < matrix.m(); ++row)
-    {
-      long int cursor = Ap[row];
-      while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] > Ai[cursor + 1]))
+  parallel::apply_to_subranges(
+    0,
+    matrix.m(),
+    [this](const size_type row_begin, const size_type row_end) {
+      for (size_type row = row_begin; row < row_end; ++row)
         {
-          std::swap(Ai[cursor], Ai[cursor + 1]);
+          long int cursor = Ap[row];
+          while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] > Ai[cursor + 1]))
+            {
+              std::swap(Ai[cursor], Ai[cursor + 1]);
 
-          std::swap(Ax[cursor], Ax[cursor + 1]);
-          if (numbers::NumberTraits<number>::is_complex == true)
-            std::swap(Az[cursor], Az[cursor + 1]);
+              std::swap(Ax[cursor], Ax[cursor + 1]);
+              if (numbers::NumberTraits<number>::is_complex == true)
+                std::swap(Az[cursor], Az[cursor + 1]);
 
-          ++cursor;
+              ++cursor;
+            }
         }
-    }
+    },
+    parallel_grainsize(matrix));
 }
 
 
@@ -177,34 +208,42 @@ SparseDirectUMFPACK::sort_arrays(const BlockSparseMatrix<number> &matrix)
   // first. however, that means that there may be as many entries per row
   // in the wrong place as there are block columns. we can do the same
   // thing as above, but we have to do it multiple times
-  for (size_type row = 0; row < matrix.m(); ++row)
-    {
-      long int cursor = Ap[row];
-      for (size_type block = 0; block < matrix.n_block_cols(); ++block)
+  parallel::apply_to_subranges(
+    0,
+    matrix.m(),
+    [this, &matrix](const size_type row_begin, const size_type row_end) {
+      for (size_type row = row_begin; row < row_end; ++row)
         {
-          // find the next out-of-order element
-          while ((cursor < Ap[row + 1] - 1) && (Ai[cursor] < Ai[cursor + 1]))
-            ++cursor;
-
-          // if there is none, then just go on
-          if (cursor == Ap[row + 1] - 1)
-            break;
-
-          // otherwise swap this entry with successive ones as long as
-          // necessary
-          long int element = cursor;
-          while ((element < Ap[row + 1] - 1) && (Ai[element] > Ai[element + 1]))
+          long int cursor = Ap[row];
+          for (size_type block = 0; block < matrix.n_block_cols(); ++block)
             {
-              std::swap(Ai[element], Ai[element + 1]);
+              // find the next out-of-order element
+              while ((cursor < Ap[row + 1] - 1) &&
+                     (Ai[cursor] < Ai[cursor + 1]))
+                ++cursor;
 
-              std::swap(Ax[element], Ax[element + 1]);
-              if (numbers::NumberTraits<number>::is_complex == true)
-                std::swap(Az[cursor], Az[cursor + 1]);
+              // if there is none, then just go on
+              if (cursor == Ap[row + 1] - 1)
+                break;
 
-              ++element;
+              // otherwise swap this entry with successive ones as long as
+              // necessary
+              long int element = cursor;
+              while ((element < Ap[row + 1] - 1) &&
+                     (Ai[element] > Ai[element + 1]))
+                {
+                  std::swap(Ai[element], Ai[element + 1]);
+
+                  std::swap(Ax[element], Ax[element + 1]);
+                  if (numbers::NumberTraits<number>::is_complex == true)
+                    std::swap(Az[element], Az[element + 1]);
+
+                  ++element;
+                }
             }
         }
-    }
+    },
+    parallel_grainsize(matrix));
 }
 
 
@@ -256,36 +295,31 @@ SparseDirectUMFPACK::factorize(const Matrix &matrix)
 
   // then copy over matrix elements. note that for sparse matrices,
   // iterators are sorted so that they traverse each row from start to end
-  // before moving on to the next row. however, this isn't true for block
-  // matrices, so we have to do a bit of book keeping
-  {
-    // have an array that for each row points to the first entry not yet
-    // written to
-    std::vector<long int> row_pointers = Ap;
+  // before moving on to the next row.
+  parallel::apply_to_subranges(
+    0,
+    matrix.m(),
+    [this, &matrix](const size_type row_begin, const size_type row_end) {
+      for (size_type row = row_begin; row < row_end; ++row)
+        {
+          long int index = Ap[row];
+          for (typename Matrix::const_iterator p = matrix.begin(row);
+               p != matrix.end(row);
+               ++p)
+            {
+              // write entry into the first free one for this row
+              Ai[index] = p->column();
+              Ax[index] = std::real(p->value());
+              if (numbers::NumberTraits<number>::is_complex == true)
+                Az[index] = std::imag(p->value());
 
-    // loop over the elements of the matrix row by row, as suggested in the
-    // documentation of the sparse matrix iterator class
-    for (size_type row = 0; row < matrix.m(); ++row)
-      {
-        for (typename Matrix::const_iterator p = matrix.begin(row);
-             p != matrix.end(row);
-             ++p)
-          {
-            // write entry into the first free one for this row
-            Ai[row_pointers[row]] = p->column();
-            Ax[row_pointers[row]] = std::real(p->value());
-            if (numbers::NumberTraits<number>::is_complex == true)
-              Az[row_pointers[row]] = std::imag(p->value());
-
-            // then move pointer ahead
-            ++row_pointers[row];
-          }
-      }
-
-    // at the end, we should have written all rows completely
-    for (size_type i = 0; i < Ap.size() - 1; ++i)
-      Assert(row_pointers[i] == Ap[i + 1], ExcInternalError());
-  }
+              // then move pointer ahead
+              ++index;
+            }
+          Assert(index == Ap[row + 1], ExcInternalError());
+        }
+    },
+    parallel_grainsize(matrix));
 
   // make sure that the elements in each row are sorted. we have to be more
   // careful for block sparse matrices, so ship this task out to a

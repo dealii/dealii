@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,6 +71,12 @@ namespace python
      */
     unsigned int
     n_active_cells() const;
+
+    /**
+     * Return the number of cells.
+     */
+    unsigned int
+    n_cells() const;
 
     /*! @copydoc GridGenerator::hyper_cube
      */
@@ -236,8 +242,15 @@ namespace python
     /*! @copydoc GridGenerator::merge_triangulations
      */
     void
-    merge_triangulations(TriangulationWrapper &triangulation_1,
-                         TriangulationWrapper &triangulation_2);
+    merge_triangulations(boost::python::list &triangulations,
+                         const double duplicated_vertex_tolerance = 1.0e-12,
+                         const bool   copy_manifold_ids           = false);
+
+    /*! @copydoc GridGenerator::replicate_triangulation
+     */
+    void
+    replicate_triangulation(TriangulationWrapper &tria_in,
+                            boost::python::list & extents);
 
     /*! @copydoc GridGenerator::flatten_triangulation
      */
@@ -261,12 +274,16 @@ namespace python
     void
     transform(boost::python::object &transformation);
 
+    /*! @copydoc GridGenerator::convert_hypercube_to_simplex_mesh
+     */
+    void
+    convert_hypercube_to_simplex_mesh(TriangulationWrapper &tria_out);
+
     /*! @copydoc GridTools::find_active_cell_around_point
      */
     CellAccessorWrapper
-    find_active_cell_around_point(
-      PointWrapper &         p,
-      MappingQGenericWrapper mapping = MappingQGenericWrapper());
+    find_active_cell_around_point(PointWrapper &  p,
+                                  MappingQWrapper mapping = MappingQWrapper());
 
     /*! @copydoc GridTools::find_cells_adjacent_to_vertex
      */
@@ -300,6 +317,13 @@ namespace python
     boost::python::list
     active_cells();
 
+    /**
+     * Return the list of cell accessors associated to the underlying
+     * Triangulation.
+     */
+    boost::python::list
+    cells();
+
     /*! @copydoc GridTools::minimal_cell_diameter
      */
     double
@@ -313,8 +337,8 @@ namespace python
     /*! @copydoc GridTools::compute_aspect_ratio_of_cells
      */
     boost::python::list
-    compute_aspect_ratio_of_cells(const MappingQGenericWrapper &mapping,
-                                  const QuadratureWrapper &     quadrature);
+    compute_aspect_ratio_of_cells(const MappingQWrapper &  mapping,
+                                  const QuadratureWrapper &quadrature);
 
     /**
      * Write mesh to the output file @filename according to the given data

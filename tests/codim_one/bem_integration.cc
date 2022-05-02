@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -186,7 +186,8 @@ LaplaceKernelIntegration<dim>::term_D(const Tensor<1, 3> &r,
 }
 
 
-double integration(Point<3> point)
+double
+integration(Point<3> point)
 {
   Triangulation<2, 3> square;
   GridGenerator::hyper_cube<2, 3>(square, 0, 2);

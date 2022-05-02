@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 by the deal.II authors
+## Copyright (C) 2017 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,3 +18,4 @@
 #
 
 CONFIGURE_FEATURE(GMSH)
+SET(DEAL_II_GMSH_WITH_API ${GMSH_WITH_API})

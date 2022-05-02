@@ -38,6 +38,11 @@ void
 write_vtk(const parallel::distributed::Triangulation<dim, spacedim> &tria,
           const char *                                               filename)
 {
+  AssertThrow(tria.are_vertices_communicated_to_p4est(),
+              ExcMessage("To use this function the flag "
+                         "Settings::communicate_vertices_to_p4est "
+                         "must be set in the triangulation."));
+
   deallog << "Checksum: " << tria.get_checksum() << std::endl;
 
   tria.write_mesh_vtk(filename);
@@ -62,14 +67,18 @@ template <int dim, int spacedim>
 void
 test(std::ostream & /*out*/)
 {
-  parallel::distributed::Triangulation<dim, spacedim> tr(MPI_COMM_WORLD);
+  parallel::distributed::Triangulation<dim, spacedim> tr(
+    MPI_COMM_WORLD,
+    Triangulation<dim, spacedim>::none,
+    parallel::distributed::Triangulation<dim, spacedim>::
+      communicate_vertices_to_p4est);
 
   GridGenerator::torus(tr, 1, 0.2);
   tr.reset_all_manifolds();
   tr.refine_global();
 
   tr.begin_active()->set_refine_flag();
-  (++(tr.begin_active()))->set_refine_flag();
+  (std::next((tr.begin_active())))->set_refine_flag();
 
   tr.execute_coarsening_and_refinement();
 
@@ -80,7 +89,7 @@ test(std::ostream & /*out*/)
   dh.distribute_dofs(fe);
   deallog << "dofs " << dh.n_dofs() << std::endl;
 
-  DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+  DataOut<dim, spacedim> data_out;
   data_out.attach_triangulation(tr);
   Vector<float> subdomain(tr.n_active_cells());
   for (unsigned int i = 0; i < subdomain.size(); ++i)

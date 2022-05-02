@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -466,7 +466,7 @@ template <typename number>
 void
 SparseMatrixEZ<number>::print(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   const_iterator       i = begin();
   const const_iterator e = end();
@@ -487,7 +487,7 @@ SparseMatrixEZ<number>::print_formatted(std::ostream &     out,
                                         const char *       zero_string,
                                         const double       denominator) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   Assert(m() != 0, ExcNotInitialized());
   Assert(n() != 0, ExcNotInitialized());
 
@@ -499,13 +499,13 @@ SparseMatrixEZ<number>::print_formatted(std::ostream &     out,
   if (scientific)
     {
       out.setf(std::ios::scientific, std::ios::floatfield);
-      if (!width)
+      if (width == 0u)
         width = precision + 7;
     }
   else
     {
       out.setf(std::ios::fixed, std::ios::floatfield);
-      if (!width)
+      if (width == 0u)
         width = precision + 2;
     }
 
@@ -533,7 +533,7 @@ template <typename number>
 void
 SparseMatrixEZ<number>::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // first the simple objects,
   // bracketed in [...]
@@ -551,7 +551,7 @@ SparseMatrixEZ<number>::block_write(std::ostream &out) const
 
   out << ']';
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -565,7 +565,7 @@ template <typename number>
 void
 SparseMatrixEZ<number>::block_read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   char c;
   int  n;

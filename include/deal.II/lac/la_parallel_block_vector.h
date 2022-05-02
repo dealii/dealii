@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,6 @@ namespace LinearAlgebra
      *
      * @see
      * @ref GlossBlockLA "Block (linear algebra)"
-     * @author Katharina Kormann, Martin Kronbichler, 2011
      */
     template <typename Number>
     class BlockVector : public BlockVectorBase<Vector<Number>>,
@@ -152,12 +151,6 @@ namespace LinearAlgebra
        * fail if there is no conversion path from <tt>OtherNumber</tt> to
        * <tt>Number</tt>. Note that you may lose accuracy when copying to a
        * BlockVector with data elements with less accuracy.
-       *
-       * Older versions of gcc did not honor the @p explicit keyword on
-       * template constructors. In such cases, it is easy to accidentally
-       * write code that can be very inefficient, since the compiler starts
-       * performing hidden conversions. To avoid this, this function is
-       * disabled if we have detected a broken compiler during configuration.
        */
       template <typename OtherNumber>
       explicit BlockVector(const BlockVector<OtherNumber> &v);
@@ -174,13 +167,13 @@ namespace LinearAlgebra
        */
       BlockVector(const std::vector<IndexSet> &local_ranges,
                   const std::vector<IndexSet> &ghost_indices,
-                  const MPI_Comm               communicator);
+                  const MPI_Comm &             communicator);
 
       /**
        * Same as above but the ghost indices are assumed to be empty.
        */
       BlockVector(const std::vector<IndexSet> &local_ranges,
-                  const MPI_Comm               communicator);
+                  const MPI_Comm &             communicator);
 
       /**
        * Destructor.
@@ -327,7 +320,6 @@ namespace LinearAlgebra
        * i.e., whenever a non-zero ghost element is found, it is compared to
        * the value on the owning processor and an exception is thrown if these
        * elements do not agree.
-       *
        */
       virtual void
       compress(::dealii::VectorOperation::values operation) override;
@@ -350,15 +342,47 @@ namespace LinearAlgebra
        * After calling this method, read access to ghost elements of the
        * vector is forbidden and an exception is thrown. Only write access to
        * ghost elements is allowed in this state.
+       *
+       * @deprecated Use zero_out_ghost_values() instead.
+       */
+      DEAL_II_DEPRECATED void
+      zero_out_ghosts() const;
+
+
+      /**
+       * This method zeros the entries on ghost dofs, but does not touch
+       * locally owned DoFs.
+       *
+       * After calling this method, read access to ghost elements of the
+       * vector is forbidden and an exception is thrown. Only write access to
+       * ghost elements is allowed in this state.
        */
       void
-      zero_out_ghosts() const;
+      zero_out_ghost_values() const;
 
       /**
        * Return if this Vector contains ghost elements.
        */
       bool
       has_ghost_elements() const;
+
+      /**
+       * This method copies the data in the locally owned range from another
+       * distributed vector @p src into the calling vector. As opposed to
+       * operator= that also includes ghost entries, this operation ignores
+       * the ghost range. The only prerequisite is that the local range on the
+       * calling vector and the given vector @p src are the same on all
+       * processors. It is explicitly allowed that the two vectors have
+       * different ghost elements that might or might not be related to each
+       * other.
+       *
+       * Since no data exchange is performed, make sure that neither @p src
+       * nor the calling vector have pending communications in order to obtain
+       * correct results.
+       */
+      template <typename Number2>
+      void
+      copy_locally_owned_data_from(const BlockVector<Number2> &src);
 
       /**
        * This is a collective add operation that adds a whole set of values
@@ -464,11 +488,10 @@ namespace LinearAlgebra
        * improve performance.
        */
       virtual void
-      import(
-        const LinearAlgebra::ReadWriteVector<Number> &  V,
-        VectorOperation::values                         operation,
-        std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-          std::shared_ptr<const CommunicationPatternBase>()) override;
+      import(const LinearAlgebra::ReadWriteVector<Number> &V,
+             VectorOperation::values                       operation,
+             std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+               communication_pattern = {}) override;
 
       /**
        * Return the scalar product of two vectors.
@@ -709,7 +732,6 @@ namespace LinearAlgebra
  * exchanges the data of the two vectors.
  *
  * @relatesalso BlockVector
- * @author Katharina Kormann, Martin Kronbichler, 2011
  */
 template <typename Number>
 inline void
@@ -723,8 +745,6 @@ swap(LinearAlgebra::distributed::BlockVector<Number> &u,
 /**
  * Declare dealii::LinearAlgebra::distributed::BlockVector as distributed
  * vector.
- *
- * @author Uwe Koecher, 2017
  */
 template <typename Number>
 struct is_serial_vector<LinearAlgebra::distributed::BlockVector<Number>>

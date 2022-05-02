@@ -1,5 +1,0 @@
-New: Add a new parameter to CUDAWrappers::MatrixFree::AdditionalData to choose
-between graph coloring and atomics in CUDAWrappers::MatrixFree::cell_loop().
-The atomic implementation is faster on Pascal and newer architectures.
-<br>
-(Bruno Turcksin, 2019/08/08)

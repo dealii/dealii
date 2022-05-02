@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,7 @@ test()
         GeometryInfo<dim>::unit_normal_vector[i];
       deallog << "Direction " << i << " = " << unit_normal_vector << std::endl;
       // check consistency with other arrays within GeometryInfo
-      for (unsigned int j = 0; j < dim; j++)
+      for (unsigned int j = 0; j < dim; ++j)
         {
           const double obtained = unit_normal_vector[j];
           const double expected =

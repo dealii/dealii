@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2019 by the deal.II authors
+ * Copyright (C) 2007 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -31,10 +31,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -66,8 +63,7 @@ namespace Step30
                             const unsigned int /*component*/ = 0) const override
     {
       (void)points;
-      Assert(values.size() == points.size(),
-             ExcDimensionMismatch(values.size(), points.size()));
+      AssertDimension(values.size(), points.size());
 
       std::fill(values.begin(), values.end(), 0.);
     }
@@ -82,8 +78,7 @@ namespace Step30
                             std::vector<double> &          values,
                             const unsigned int /*component*/ = 0) const override
     {
-      Assert(values.size() == points.size(),
-             ExcDimensionMismatch(values.size(), points.size()));
+      AssertDimension(values.size(), points.size());
 
       for (unsigned int i = 0; i < values.size(); ++i)
         {
@@ -113,8 +108,7 @@ namespace Step30
     void value_list(const std::vector<Point<dim>> &points,
                     std::vector<Point<dim>> &      values) const
     {
-      Assert(values.size() == points.size(),
-             ExcDimensionMismatch(values.size(), points.size()));
+      AssertDimension(values.size(), points.size());
 
       for (unsigned int i = 0; i < points.size(); ++i)
         {
@@ -376,7 +370,7 @@ namespace Step30
                             (GeometryInfo<dim>::faces_per_cell *
                                GeometryInfo<dim>::max_children_per_face +
                              1) *
-                              fe.dofs_per_cell);
+                              fe.n_dofs_per_cell());
 
     DoFTools::make_flux_sparsity_pattern(dof_handler, sparsity_pattern);
 
@@ -403,7 +397,7 @@ namespace Step30
   template <int dim>
   void DGMethod<dim>::assemble_system()
   {
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs(dofs_per_cell);
     std::vector<types::global_dof_index> dofs_neighbor(dofs_per_cell);
 
@@ -451,7 +445,7 @@ namespace Step30
 
         cell->get_dof_indices(dofs);
 
-        for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const auto face_no : cell->face_indices())
           {
             const auto face = cell->face(face_no);
 
@@ -500,7 +494,7 @@ namespace Step30
                     // Now we loop over all subfaces, i.e. the children and
                     // possibly grandchildren of the current face.
                     for (unsigned int subface_no = 0;
-                         subface_no < face->number_of_children();
+                         subface_no < face->n_active_descendants();
                          ++subface_no)
                       {
                         // To get the cell behind the current subface we can
@@ -646,7 +640,7 @@ namespace Step30
 
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
 
-    preconditioner.initialize(system_matrix, fe.dofs_per_cell);
+    preconditioner.initialize(system_matrix, fe.n_dofs_per_cell());
 
     solver.solve(system_matrix, solution, right_hand_side, preconditioner);
   }
@@ -724,7 +718,7 @@ namespace Step30
           Point<dim> jump;
           Point<dim> area;
 
-          for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+          for (const auto face_no : cell->face_indices())
             {
               const auto face = cell->face(face_no);
 
@@ -750,7 +744,7 @@ namespace Step30
                       unsigned int neighbor2 = cell->neighbor_face_no(face_no);
                       // Now we loop over all subfaces,
                       for (unsigned int subface_no = 0;
-                           subface_no < face->number_of_children();
+                           subface_no < face->n_active_descendants();
                            ++subface_no)
                         {
                           // get an iterator pointing to the cell behind the
@@ -839,12 +833,11 @@ namespace Step30
                           std::pair<unsigned int, unsigned int>
                             neighbor_face_subface =
                               cell->neighbor_of_coarser_neighbor(face_no);
-                          Assert(neighbor_face_subface.first <
-                                   GeometryInfo<dim>::faces_per_cell,
+                          Assert(neighbor_face_subface.first < cell->n_faces(),
                                  ExcInternalError());
                           Assert(neighbor_face_subface.second <
                                    neighbor->face(neighbor_face_subface.first)
-                                     ->number_of_children(),
+                                     ->n_active_descendants(),
                                  ExcInternalError());
                           Assert(neighbor->neighbor_child_on_subface(
                                    neighbor_face_subface.first,

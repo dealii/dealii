@@ -1,5 +1,0 @@
-New: The namespace Utilities::MPI::ConsensusAlgorithms has been added. It 
-provides efficient implementations for communication patterns (PEX and NBX) to 
-retrieve data from other processes in a dynamic-sparse way.
-<br>
-(Peter Munch, Martin Kronbichler, 2019/06/03)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -92,7 +92,7 @@ test()
       dof_handler.distribute_dofs(fe);
 
       Vector<double> interpolant(dof_handler.n_dofs());
-      VectorTools::interpolate_based_on_material_id(MappingQGeneric<dim>(1),
+      VectorTools::interpolate_based_on_material_id(MappingQ<dim>(1),
                                                     dof_handler,
                                                     functions,
                                                     interpolant);

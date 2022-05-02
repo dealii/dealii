@@ -1,0 +1,89 @@
+
+DEAL:2d::Testing FESystem<2>[FE_DGQHermite<2>(1)^2] on 128 DoFs
+DEAL:2d::Norm of difference to no-gather:         0.00
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQHermite<2>(1)^2] on 512 DoFs
+DEAL:2d::Norm of difference to no-gather:         0.00
+DEAL:2d::Norm of difference to sum of scalar:     2.27e-16
+DEAL:2d::Norm of difference to single scalar:     2.27e-16
+DEAL:2d::Norm of difference to single scalar:     1.70e-16
+DEAL:2d::Testing FESystem<2>[FE_DGQHermite<2>(3)^2] on 512 DoFs
+DEAL:2d::Norm of difference to no-gather:         3.18e-16
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQHermite<2>(3)^2] on 2048 DoFs
+DEAL:2d::Norm of difference to no-gather:         3.37e-16
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQHermite<2>(5)^2] on 1152 DoFs
+DEAL:2d::Norm of difference to no-gather:         2.76e-16
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQHermite<2>(5)^2] on 4608 DoFs
+DEAL:2d::Norm of difference to no-gather:         2.48e-16
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQHermite<2>(7)^2] on 2048 DoFs
+DEAL:2d::Norm of difference to no-gather:         0.00
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQHermite<2>(7)^2] on 8192 DoFs
+DEAL:2d::Norm of difference to no-gather:         0.00
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQHermite<3>(1)^3] on 192 DoFs
+DEAL:3d::Norm of difference to no-gather:         0.00
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQHermite<3>(1)^3] on 1536 DoFs
+DEAL:3d::Norm of difference to no-gather:         0.00
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQHermite<3>(3)^3] on 1536 DoFs
+DEAL:3d::Norm of difference to no-gather:         5.35e-16
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQHermite<3>(3)^3] on 12288 DoFs
+DEAL:3d::Norm of difference to no-gather:         2.72e-16
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQHermite<3>(5)^3] on 5184 DoFs
+DEAL:3d::Norm of difference to no-gather:         2.73e-16
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQHermite<3>(7)^3] on 12288 DoFs
+DEAL:3d::Norm of difference to no-gather:         0.00
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00

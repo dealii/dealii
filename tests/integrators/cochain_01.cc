@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -99,7 +99,7 @@ template <int dim>
 void
 test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
-  MappingQGeneric<dim> mapping(1);
+  MappingQ<dim> mapping(1);
   // Initialize DofHandler for a
   // block system with local blocks
   DoFHandler<dim> dof(tr);

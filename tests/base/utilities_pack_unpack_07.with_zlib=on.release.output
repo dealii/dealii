@@ -1,8 +1,0 @@
-
-DEAL::unpacked array: 80000
-DEAL::packed array without compression: 80048
-DEAL::packed array with compression: 14697
-DEAL::unpacked array: 80000
-DEAL::packed array without compression: 80048
-DEAL::packed array with compression: 75550
-DEAL::OK!

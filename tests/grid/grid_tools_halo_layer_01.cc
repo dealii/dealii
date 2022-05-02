@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,7 +38,7 @@ write_mat_id_to_file(const Triangulation<dim> &tria)
                                                     endc  = tria.end();
   for (; cell != endc; ++cell, ++count)
     {
-      deallog << count << " " << static_cast<int>(cell->material_id())
+      deallog << count << ' ' << static_cast<int>(cell->material_id())
               << std::endl;
     }
   deallog << std::endl;
@@ -55,7 +55,7 @@ test()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
 
-  typedef typename Triangulation<dim>::active_cell_iterator cell_iterator;
+  using cell_iterator = typename Triangulation<dim>::active_cell_iterator;
 
   // Mark a small block at the corner of the hypercube
   cell_iterator cell = tria.begin_active(), endc = tria.end();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -100,7 +100,8 @@ namespace python
     /**
      * Return the scalar product of the vectors representing two points.
      */
-    double operator*(const PointWrapper &p) const;
+    double
+    operator*(const PointWrapper &p) const;
 
     /**
      * Add an offset to a point.
@@ -129,7 +130,8 @@ namespace python
     /**
      * Multiply the coordinates of the point by a factor.
      */
-    PointWrapper operator*(const double factor) const;
+    PointWrapper
+    operator*(const double factor) const;
 
     /**
      * Add another point.
@@ -233,7 +235,7 @@ namespace python
      */
     void *point;
 
-    friend class MappingQGenericWrapper;
+    friend class MappingQWrapper;
   };
 
 

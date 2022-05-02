@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,13 +78,13 @@ test()
   prepare_vector(b);
   prepare_vector(c);
 
-  for (auto iterator = a.begin(); iterator != a.end(); iterator++)
+  for (auto iterator = a.begin(); iterator != a.end(); ++iterator)
     *iterator = static_cast<double>(Testing::rand()) / RAND_MAX;
 
-  for (auto iterator = b.begin(); iterator != b.end(); iterator++)
+  for (auto iterator = b.begin(); iterator != b.end(); ++iterator)
     *iterator = static_cast<double>(Testing::rand()) / RAND_MAX;
 
-  for (auto iterator = c.begin(); iterator != c.end(); iterator++)
+  for (auto iterator = c.begin(); iterator != c.end(); ++iterator)
     *iterator = static_cast<double>(Testing::rand()) / RAND_MAX;
 
   a.compress(VectorOperation::insert);

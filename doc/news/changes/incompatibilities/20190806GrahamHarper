@@ -1,7 +1,0 @@
-Changed: mapping.h referred to different kinds of mappings in an enum 
-MappingType; however, since it's an enum, MappingType is a misleading name. 
-All instances of MappingType and mapping_type have been changed to 
-MappingKind and mapping_kind, respectively. The documentation has been 
-updated in order to reflect these changes as well.
-<br>
-(Graham Harper, 2019/08/06)

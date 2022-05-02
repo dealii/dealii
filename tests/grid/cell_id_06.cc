@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,6 +42,6 @@ main()
          {id0, id3}, // grand child (false, true)
          {id0, id4}} // cell with different coarse-cell id (false, false)
   )
-    deallog << pair.first.is_parent_of(pair.second) << " "
+    deallog << pair.first.is_parent_of(pair.second) << ' '
             << pair.first.is_ancestor_of(pair.second) << std::endl;
 }

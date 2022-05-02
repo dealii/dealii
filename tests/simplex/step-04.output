@@ -1,0 +1,15 @@
+
+DEAL::Solving problem in 2 space dimensions.
+DEAL::   Number of active cells: 512
+DEAL::   Total number of cells: 512
+DEAL::   Number of degrees of freedom: 289
+DEAL:cg::Starting value 11.6837
+DEAL:cg::Convergence step 33 value 6.23059e-17
+DEAL::   33 CG iterations needed to obtain convergence.
+DEAL::Solving problem in 3 space dimensions.
+DEAL::   Number of active cells: 12288
+DEAL::   Total number of cells: 12288
+DEAL::   Number of degrees of freedom: 2457
+DEAL:cg::Starting value 13.9291
+DEAL:cg::Convergence step 50 value 5.74165e-13
+DEAL::   50 CG iterations needed to obtain convergence.

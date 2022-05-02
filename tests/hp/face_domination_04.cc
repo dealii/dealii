@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 // neighboring RTNodal of degree k=1,2.
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgq.h>
@@ -31,7 +32,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -44,7 +44,7 @@
 const unsigned int dim = 2;
 
 void
-print_dofs(const hp::DoFHandler<2>::active_cell_iterator &cell)
+print_dofs(const DoFHandler<2>::active_cell_iterator &cell)
 {
   deallog << "DoFs on cell=" << cell << ": ";
 
@@ -81,7 +81,7 @@ main()
                                             FE_Q<dim>(i + 2),
                                             1));
 
-      hp::DoFHandler<dim> dof_handler(triangulation);
+      DoFHandler<dim> dof_handler(triangulation);
 
       dof_handler.begin_active()->set_active_fe_index(1);
 
@@ -89,7 +89,7 @@ main()
 
       deallog << "RTNodal of degree " << i << std::endl;
       print_dofs(dof_handler.begin_active());
-      print_dofs(++dof_handler.begin_active());
+      print_dofs(std::next(dof_handler.begin_active()));
 
       AffineConstraints<double> constraints;
       constraints.clear();

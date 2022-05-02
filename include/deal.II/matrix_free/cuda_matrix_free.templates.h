@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 
+#  include <deal.II/base/cuda.h>
 #  include <deal.II/base/cuda_size.h>
 #  include <deal.II/base/graph_coloring.h>
 
@@ -31,13 +32,12 @@
 #  include <deal.II/fe/fe_dgq.h>
 #  include <deal.II/fe/fe_values.h>
 
-#  include <deal.II/grid/filtered_iterator.h>
-
 #  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
 #  include <deal.II/matrix_free/shape_info.h>
 
 #  include <cuda_runtime_api.h>
 
+#  include <cmath>
 #  include <functional>
 
 
@@ -47,80 +47,85 @@ namespace CUDAWrappers
 {
   namespace internal
   {
-    // These variables are stored in the device constant memory.
-    constexpr unsigned int max_elem_degree = 10;
+    constexpr unsigned int data_array_size =
+      (mf_max_elem_degree + 1) * (mf_max_elem_degree + 1);
+
+    // Default initialized to false
+    extern std::array<std::atomic_bool, mf_n_concurrent_objects> used_objects;
 
     template <typename NumberType>
-    using DataArray = NumberType[(max_elem_degree + 1) * (max_elem_degree + 1)];
+    using DataArray = NumberType[data_array_size];
 
-    __constant__ double
-      global_shape_values_d[(max_elem_degree + 1) * (max_elem_degree + 1)];
-    __constant__ float
-      global_shape_values_f[(max_elem_degree + 1) * (max_elem_degree + 1)];
+    // These variables are stored in the device constant memory.
+    // Shape values
+    __constant__ double global_shape_values_d[mf_n_concurrent_objects]
+                                             [data_array_size];
+    __constant__ float global_shape_values_f[mf_n_concurrent_objects]
+                                            [data_array_size];
+    // Shape gradients
+    __constant__ double global_shape_gradients_d[mf_n_concurrent_objects]
+                                                [data_array_size];
+    __constant__ float global_shape_gradients_f[mf_n_concurrent_objects]
+                                               [data_array_size];
+    // for collocation methods
+    __constant__ double global_co_shape_gradients_d[mf_n_concurrent_objects]
+                                                   [data_array_size];
+    __constant__ float global_co_shape_gradients_f[mf_n_concurrent_objects]
+                                                  [data_array_size];
 
     template <typename Number>
     __host__ __device__ inline DataArray<Number> &
-             get_global_shape_values();
+             get_global_shape_values(unsigned int i);
 
     template <>
     __host__ __device__ inline DataArray<double> &
-             get_global_shape_values<double>()
+             get_global_shape_values<double>(unsigned int i)
     {
-      return global_shape_values_d;
+      return global_shape_values_d[i];
     }
 
     template <>
     __host__ __device__ inline DataArray<float> &
-             get_global_shape_values<float>()
+             get_global_shape_values<float>(unsigned int i)
     {
-      return global_shape_values_f;
+      return global_shape_values_f[i];
     }
-
-    __constant__ double
-      global_shape_gradients_d[(max_elem_degree + 1) * (max_elem_degree + 1)];
-    __constant__ float
-      global_shape_gradients_f[(max_elem_degree + 1) * (max_elem_degree + 1)];
 
     template <typename Number>
     __host__ __device__ inline DataArray<Number> &
-             get_global_shape_gradients();
+             get_global_shape_gradients(unsigned int i);
 
     template <>
     __host__ __device__ inline DataArray<double> &
-             get_global_shape_gradients<double>()
+             get_global_shape_gradients<double>(unsigned int i)
     {
-      return global_shape_gradients_d;
+      return global_shape_gradients_d[i];
     }
 
     template <>
     __host__ __device__ inline DataArray<float> &
-             get_global_shape_gradients<float>()
+             get_global_shape_gradients<float>(unsigned int i)
     {
-      return global_shape_gradients_f;
+      return global_shape_gradients_f[i];
     }
 
     // for collocation methods
-    __constant__ double global_co_shape_gradients_d[(max_elem_degree + 1) *
-                                                    (max_elem_degree + 1)];
-    __constant__ float  global_co_shape_gradients_f[(max_elem_degree + 1) *
-                                                   (max_elem_degree + 1)];
-
     template <typename Number>
     __host__ __device__ inline DataArray<Number> &
-             get_global_co_shape_gradients();
+             get_global_co_shape_gradients(unsigned int i);
 
     template <>
     __host__ __device__ inline DataArray<double> &
-             get_global_co_shape_gradients<double>()
+             get_global_co_shape_gradients<double>(unsigned int i)
     {
-      return global_co_shape_gradients_d;
+      return global_co_shape_gradients_d[i];
     }
 
     template <>
     __host__ __device__ inline DataArray<float> &
-             get_global_co_shape_gradients<float>()
+             get_global_co_shape_gradients<float>(unsigned int i)
     {
-      return global_co_shape_gradients_f;
+      return global_co_shape_gradients_f[i];
     }
 
     template <typename Number>
@@ -226,7 +231,8 @@ namespace CUDAWrappers
       std::vector<Point<dim, Number>>      q_points_host;
       std::vector<Number>                  JxW_host;
       std::vector<Number>                  inv_jacobian_host;
-      std::vector<unsigned int>            constraint_mask_host;
+      std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
+        constraint_mask_host;
       // Local buffer
       std::vector<types::global_dof_index> local_dof_indices;
       FEValues<dim>                        fe_values;
@@ -238,7 +244,7 @@ namespace CUDAWrappers
       const unsigned int                   q_points_per_cell;
       const UpdateFlags &                  update_flags;
       const unsigned int                   padding_length;
-      HangingNodes<dim>                    hanging_nodes;
+      dealii::internal::MatrixFreeFunctions::HangingNodes<dim> hanging_nodes;
     };
 
 
@@ -265,8 +271,15 @@ namespace CUDAWrappers
       , lexicographic_inv(shape_info.lexicographic_numbering)
       , update_flags(update_flags)
       , padding_length(data->get_padding_length())
-      , hanging_nodes(fe_degree, dof_handler, lexicographic_inv)
+      , hanging_nodes(dof_handler.get_triangulation())
     {
+      cudaError_t error_code = cudaMemcpyToSymbol(
+        constraint_weights,
+        shape_info.data.front().subface_interpolation_matrices[0].data(),
+        sizeof(double) *
+          shape_info.data.front().subface_interpolation_matrices[0].size());
+      AssertCuda(error_code);
+
       local_dof_indices.resize(data->dofs_per_cell);
       lexicographic_dof_indices.resize(dofs_per_cell);
     }
@@ -277,7 +290,9 @@ namespace CUDAWrappers
     void
     ReinitHelper<dim, Number>::setup_color_arrays(const unsigned int n_colors)
     {
-      data->n_cells.resize(n_colors);
+      // We need at least three colors when we are using CUDA-aware MPI and
+      // overlapping the communication
+      data->n_cells.resize(std::max(n_colors, 3U), 0);
       data->grid_dim.resize(n_colors);
       data->block_dim.resize(n_colors);
       data->local_to_global.resize(n_colors);
@@ -367,10 +382,14 @@ namespace CUDAWrappers
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         lexicographic_dof_indices[i] = local_dof_indices[lexicographic_inv[i]];
 
-      hanging_nodes.setup_constraints(lexicographic_dof_indices,
-                                      cell,
+      const ArrayView<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
+        cell_id_view(constraint_mask_host[cell_id]);
+
+      hanging_nodes.setup_constraints(cell,
                                       partitioner,
-                                      constraint_mask_host[cell_id]);
+                                      {lexicographic_inv},
+                                      lexicographic_dof_indices,
+                                      cell_id_view);
 
       memcpy(&local_to_global_host[cell_id * padding_length],
              lexicographic_dof_indices.data(),
@@ -479,10 +498,11 @@ namespace CUDAWrappers
                          n_cells * dim * dim * padding_length);
         }
 
-      alloc_and_copy(&data->constraint_mask[color],
-                     ArrayView<const unsigned int>(constraint_mask_host.data(),
-                                                   constraint_mask_host.size()),
-                     n_cells);
+      alloc_and_copy(
+        &data->constraint_mask[color],
+        ArrayView<const dealii::internal::MatrixFreeFunctions::ConstraintKinds>(
+          constraint_mask_host.data(), constraint_mask_host.size()),
+        n_cells);
     }
 
 
@@ -495,7 +515,7 @@ namespace CUDAWrappers
       const AffineConstraints<number> &constraints)
     {
       std::vector<types::global_dof_index> local_dof_indices(
-        cell->get_fe().dofs_per_cell);
+        cell->get_fe().n_dofs_per_cell());
       cell->get_dof_indices(local_dof_indices);
       constraints.resolve_indices(local_dof_indices);
 
@@ -567,7 +587,7 @@ namespace CUDAWrappers
         local_cell + cells_per_block * (blockIdx.x + gridDim.x * blockIdx.y);
 
       Number *gq[dim];
-      for (int d = 0; d < dim; ++d)
+      for (unsigned int d = 0; d < dim; ++d)
         gq[d] = &gradients[d][local_cell * Functor::n_q_points];
 
       SharedData<dim, Number> shared_data(
@@ -603,7 +623,51 @@ namespace CUDAWrappers
     : n_dofs(0)
     , constrained_dofs(nullptr)
     , padding_length(0)
+    , my_id(-1)
+    , dof_handler(nullptr)
   {}
+
+
+
+  template <int dim, typename Number>
+  MatrixFree<dim, Number>::~MatrixFree()
+  {
+    free();
+  }
+
+
+
+  template <int dim, typename Number>
+  template <typename IteratorFiltersType>
+  void
+  MatrixFree<dim, Number>::reinit(const Mapping<dim> &             mapping,
+                                  const DoFHandler<dim> &          dof_handler,
+                                  const AffineConstraints<Number> &constraints,
+                                  const Quadrature<1> &            quad,
+                                  const IteratorFiltersType &iterator_filter,
+                                  const AdditionalData &     additional_data)
+  {
+    const auto &triangulation = dof_handler.get_triangulation();
+    if (const auto parallel_triangulation =
+          dynamic_cast<const parallel::TriangulationBase<dim> *>(
+            &triangulation))
+      internal_reinit(mapping,
+                      dof_handler,
+                      constraints,
+                      quad,
+                      iterator_filter,
+                      std::make_shared<const MPI_Comm>(
+                        parallel_triangulation->get_communicator()),
+                      additional_data);
+    else
+      internal_reinit(mapping,
+                      dof_handler,
+                      constraints,
+                      quad,
+                      iterator_filter,
+                      nullptr,
+                      additional_data);
+  }
 
 
 
@@ -615,20 +679,13 @@ namespace CUDAWrappers
                                   const Quadrature<1> &            quad,
                                   const AdditionalData &additional_data)
   {
-    const auto &triangulation = dof_handler.get_triangulation();
-    if (const auto parallel_triangulation =
-          dynamic_cast<const parallel::TriangulationBase<dim> *>(
-            &triangulation))
-      internal_reinit(mapping,
-                      dof_handler,
-                      constraints,
-                      quad,
-                      std::make_shared<const MPI_Comm>(
-                        parallel_triangulation->get_communicator()),
-                      additional_data);
-    else
-      internal_reinit(
-        mapping, dof_handler, constraints, quad, nullptr, additional_data);
+    IteratorFilters::LocallyOwnedCell locally_owned_cell_filter;
+    reinit(mapping,
+           dof_handler,
+           constraints,
+           quad,
+           locally_owned_cell_filter,
+           additional_data);
   }
 
 
@@ -654,15 +711,19 @@ namespace CUDAWrappers
   MatrixFree<dim, Number>::get_data(unsigned int color) const
   {
     Data data_copy;
-    data_copy.q_points        = q_points[color];
+    if (q_points.size() > 0)
+      data_copy.q_points = q_points[color];
+    if (inv_jacobian.size() > 0)
+      data_copy.inv_jacobian = inv_jacobian[color];
+    if (JxW.size() > 0)
+      data_copy.JxW = JxW[color];
     data_copy.local_to_global = local_to_global[color];
-    data_copy.inv_jacobian    = inv_jacobian[color];
-    data_copy.JxW             = JxW[color];
-    data_copy.constraint_mask = constraint_mask[color];
+    data_copy.id              = my_id;
     data_copy.n_cells         = n_cells[color];
     data_copy.padding_length  = padding_length;
     data_copy.row_start       = row_start[color];
     data_copy.use_coloring    = use_coloring;
+    data_copy.constraint_mask = constraint_mask[color];
 
     return data_copy;
   }
@@ -694,6 +755,9 @@ namespace CUDAWrappers
     constraint_mask.clear();
 
     Utilities::CUDA::free(constrained_dofs);
+
+    internal::used_objects[my_id].store(false);
+    my_id = -1;
   }
 
 
@@ -785,8 +849,12 @@ namespace CUDAWrappers
   MatrixFree<dim, Number>::evaluate_coefficients(Functor func) const
   {
     for (unsigned int i = 0; i < n_colors; ++i)
-      internal::evaluate_coeff<dim, Number, Functor>
-        <<<grid_dim[i], block_dim[i]>>>(func, get_data(i));
+      if (n_cells[i] > 0)
+        {
+          internal::evaluate_coeff<dim, Number, Functor>
+            <<<grid_dim[i], block_dim[i]>>>(func, get_data(i));
+          AssertCudaKernel();
+        }
   }
 
 
@@ -817,19 +885,25 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
+  template <typename IteratorFiltersType>
   void
   MatrixFree<dim, Number>::internal_reinit(
     const Mapping<dim> &             mapping,
-    const DoFHandler<dim> &          dof_handler,
+    const DoFHandler<dim> &          dof_handler_,
     const AffineConstraints<Number> &constraints,
     const Quadrature<1> &            quad,
+    const IteratorFiltersType &      iterator_filter,
     std::shared_ptr<const MPI_Comm>  comm,
     const AdditionalData             additional_data)
   {
+    dof_handler = &dof_handler_;
+
     if (typeid(Number) == typeid(double))
       cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte);
 
-    const UpdateFlags &update_flags = additional_data.mapping_update_flags;
+    UpdateFlags update_flags = additional_data.mapping_update_flags;
+    if (update_flags & update_gradients)
+      update_flags |= update_JxW_values;
 
     if (additional_data.parallelization_scheme != parallel_over_elem &&
         additional_data.parallelization_scheme != parallel_in_elem)
@@ -837,13 +911,15 @@ namespace CUDAWrappers
 
     this->parallelization_scheme = additional_data.parallelization_scheme;
     this->use_coloring           = additional_data.use_coloring;
+    this->overlap_communication_computation =
+      additional_data.overlap_communication_computation;
 
     // TODO: only free if we actually need arrays of different length
     free();
 
-    n_dofs = dof_handler.n_dofs();
+    n_dofs = dof_handler->n_dofs();
 
-    const FiniteElement<dim> &fe = dof_handler.get_fe();
+    const FiniteElement<dim> &fe = dof_handler->get_fe();
 
     fe_degree = fe.degree;
     // TODO this should be a templated parameter
@@ -858,7 +934,7 @@ namespace CUDAWrappers
     padding_length = 1 << static_cast<unsigned int>(
                        std::ceil(dim * std::log2(fe_degree + 1.)));
 
-    dofs_per_cell     = fe.dofs_per_cell;
+    dofs_per_cell     = fe.n_dofs_per_cell();
     q_points_per_cell = std::pow(n_q_points_1d, dim);
 
     const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(
@@ -873,29 +949,44 @@ namespace CUDAWrappers
     unsigned int size_co_shape_values =
       n_q_points_1d * n_q_points_1d * sizeof(Number);
 
+    // Check if we already a part of the constant memory allocated to us. If
+    // not, we try to get a block of memory.
+    bool found_id = false;
+    while (!found_id)
+      {
+        ++my_id;
+        Assert(
+          my_id < static_cast<int>(mf_n_concurrent_objects),
+          ExcMessage(
+            "Maximum number of concurrent MatrixFree objects reached. Increase mf_n_concurrent_objects"));
+        bool f = false;
+        found_id =
+          internal::used_objects[my_id].compare_exchange_strong(f, true);
+      }
+
     cudaError_t cuda_error =
-      cudaMemcpyToSymbol(internal::get_global_shape_values<Number>(),
+      cudaMemcpyToSymbol(internal::get_global_shape_values<Number>(0),
                          shape_info.data.front().shape_values.data(),
                          size_shape_values,
-                         0,
+                         my_id * internal::data_array_size * sizeof(Number),
                          cudaMemcpyHostToDevice);
     AssertCuda(cuda_error);
 
     if (update_flags & update_gradients)
       {
         cuda_error =
-          cudaMemcpyToSymbol(internal::get_global_shape_gradients<Number>(),
+          cudaMemcpyToSymbol(internal::get_global_shape_gradients<Number>(0),
                              shape_info.data.front().shape_gradients.data(),
                              size_shape_values,
-                             0,
+                             my_id * internal::data_array_size * sizeof(Number),
                              cudaMemcpyHostToDevice);
         AssertCuda(cuda_error);
 
         cuda_error =
-          cudaMemcpyToSymbol(internal::get_global_co_shape_gradients<Number>(),
+          cudaMemcpyToSymbol(internal::get_global_co_shape_gradients<Number>(0),
                              shape_info_co.data.front().shape_gradients.data(),
                              size_co_shape_values,
-                             0,
+                             my_id * internal::data_array_size * sizeof(Number),
                              cudaMemcpyHostToDevice);
         AssertCuda(cuda_error);
       }
@@ -904,15 +995,11 @@ namespace CUDAWrappers
     cells_per_block = cells_per_block_shmem(dim, fe_degree);
 
     internal::ReinitHelper<dim, Number> helper(
-      this, mapping, fe, quad, shape_info, dof_handler, update_flags);
+      this, mapping, fe, quad, shape_info, *dof_handler, update_flags);
 
     // Create a graph coloring
-    using CellFilter =
-      FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
-    CellFilter begin(IteratorFilters::LocallyOwnedCell(),
-                     dof_handler.begin_active());
-    CellFilter end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
-    std::vector<std::vector<CellFilter>> graph;
+    CellFilter begin(iterator_filter, dof_handler->begin_active());
+    CellFilter end(iterator_filter, dof_handler->end());
 
     if (begin != end)
       {
@@ -926,11 +1013,61 @@ namespace CUDAWrappers
           }
         else
           {
-            // If we are not using coloring, all the cells belong to the same
-            // color.
-            graph.resize(1, std::vector<CellFilter>());
-            for (auto cell = begin; cell != end; ++cell)
-              graph[0].emplace_back(cell);
+            graph.clear();
+            if (additional_data.overlap_communication_computation)
+              {
+                // We create one color (1) with the cells on the boundary of the
+                // local domain and two colors (0 and 2) with the interior
+                // cells.
+                graph.resize(3, std::vector<CellFilter>());
+
+                std::vector<bool> ghost_vertices(
+                  dof_handler->get_triangulation().n_vertices(), false);
+
+                for (const auto cell :
+                     dof_handler->get_triangulation().active_cell_iterators())
+                  if (cell->is_ghost())
+                    for (unsigned int i = 0;
+                         i < GeometryInfo<dim>::vertices_per_cell;
+                         i++)
+                      ghost_vertices[cell->vertex_index(i)] = true;
+
+                std::vector<dealii::FilteredIterator<dealii::TriaActiveIterator<
+                  dealii::DoFCellAccessor<dim, dim, false>>>>
+                  inner_cells;
+
+                for (auto cell = begin; cell != end; ++cell)
+                  {
+                    bool ghost_vertex = false;
+
+                    for (unsigned int i = 0;
+                         i < GeometryInfo<dim>::vertices_per_cell;
+                         i++)
+                      if (ghost_vertices[cell->vertex_index(i)])
+                        {
+                          ghost_vertex = true;
+                          break;
+                        }
+
+                    if (ghost_vertex)
+                      graph[1].emplace_back(cell);
+                    else
+                      inner_cells.emplace_back(cell);
+                  }
+                for (unsigned i = 0; i < inner_cells.size(); ++i)
+                  if (i < inner_cells.size() / 2)
+                    graph[0].emplace_back(inner_cells[i]);
+                  else
+                    graph[2].emplace_back(inner_cells[i]);
+              }
+            else
+              {
+                // If we are not using coloring, all the cells belong to the
+                // same color.
+                graph.resize(1, std::vector<CellFilter>());
+                for (auto cell = begin; cell != end; ++cell)
+                  graph[0].emplace_back(cell);
+              }
           }
       }
     n_colors = graph.size();
@@ -940,10 +1077,10 @@ namespace CUDAWrappers
     IndexSet locally_relevant_dofs;
     if (comm)
       {
-        DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                                locally_relevant_dofs);
+        locally_relevant_dofs =
+          DoFTools::extract_locally_relevant_dofs(*dof_handler);
         partitioner = std::make_shared<Utilities::MPI::Partitioner>(
-          dof_handler.locally_owned_dofs(), locally_relevant_dofs, *comm);
+          dof_handler->locally_owned_dofs(), locally_relevant_dofs, *comm);
       }
     for (unsigned int i = 0; i < n_colors; ++i)
       {
@@ -991,8 +1128,8 @@ namespace CUDAWrappers
             unsigned int i_constraint = 0;
             for (unsigned int i = 0; i < n_local_dofs; ++i)
               {
-                // is_constrained uses a global dof id but constrained_dofs_host
-                // works on the local id
+                // is_constrained uses a global dof id but
+                // constrained_dofs_host works on the local id
                 if (constraints.is_constrained(partitioner->local_to_global(i)))
                   {
                     constrained_dofs_host[i_constraint] = i;
@@ -1002,7 +1139,7 @@ namespace CUDAWrappers
           }
         else
           {
-            const unsigned int n_local_dofs = dof_handler.n_dofs();
+            const unsigned int n_local_dofs = dof_handler->n_dofs();
             unsigned int       i_constraint = 0;
             for (unsigned int i = 0; i < n_local_dofs; ++i)
               {
@@ -1039,11 +1176,15 @@ namespace CUDAWrappers
   {
     // Execute the loop on the cells
     for (unsigned int i = 0; i < n_colors; ++i)
-      internal::apply_kernel_shmem<dim, Number, Functor>
-        <<<grid_dim[i], block_dim[i]>>>(func,
-                                        get_data(i),
-                                        src.get_values(),
-                                        dst.get_values());
+      if (n_cells[i] > 0)
+        {
+          internal::apply_kernel_shmem<dim, Number, Functor>
+            <<<grid_dim[i], block_dim[i]>>>(func,
+                                            get_data(i),
+                                            src.get_values(),
+                                            dst.get_values());
+          AssertCudaKernel();
+        }
   }
 
 
@@ -1061,17 +1202,70 @@ namespace CUDAWrappers
     if (src.get_partitioner().get() == partitioner.get() &&
         dst.get_partitioner().get() == partitioner.get())
       {
-        src.update_ghost_values();
+        // This code is inspired to the code in TaskInfo::loop.
+        if (overlap_communication_computation)
+          {
+            src.update_ghost_values_start(0);
+            // In parallel, it's possible that some processors do not own any
+            // cells.
+            if (n_cells[0] > 0)
+              {
+                internal::apply_kernel_shmem<dim, Number, Functor>
+                  <<<grid_dim[0], block_dim[0]>>>(func,
+                                                  get_data(0),
+                                                  src.get_values(),
+                                                  dst.get_values());
+                AssertCudaKernel();
+              }
+            src.update_ghost_values_finish();
 
-        // Execute the loop on the cells
-        for (unsigned int i = 0; i < n_colors; ++i)
-          internal::apply_kernel_shmem<dim, Number, Functor>
-            <<<grid_dim[i], block_dim[i]>>>(func,
-                                            get_data(i),
-                                            src.get_values(),
-                                            dst.get_values());
-        dst.compress(VectorOperation::add);
-        src.zero_out_ghosts();
+            // In serial this color does not exist because there are no ghost
+            // cells
+            if (n_cells[1] > 0)
+              {
+                internal::apply_kernel_shmem<dim, Number, Functor>
+                  <<<grid_dim[1], block_dim[1]>>>(func,
+                                                  get_data(1),
+                                                  src.get_values(),
+                                                  dst.get_values());
+                AssertCudaKernel();
+                // We need a synchronization point because we don't want
+                // CUDA-aware MPI to start the MPI communication until the
+                // kernel is done.
+                cudaDeviceSynchronize();
+              }
+
+            dst.compress_start(0, VectorOperation::add);
+            // When the mesh is coarse it is possible that some processors do
+            // not own any cells
+            if (n_cells[2] > 0)
+              {
+                internal::apply_kernel_shmem<dim, Number, Functor>
+                  <<<grid_dim[2], block_dim[2]>>>(func,
+                                                  get_data(2),
+                                                  src.get_values(),
+                                                  dst.get_values());
+                AssertCudaKernel();
+              }
+            dst.compress_finish(VectorOperation::add);
+          }
+        else
+          {
+            src.update_ghost_values();
+
+            // Execute the loop on the cells
+            for (unsigned int i = 0; i < n_colors; ++i)
+              if (n_cells[i] > 0)
+                {
+                  internal::apply_kernel_shmem<dim, Number, Functor>
+                    <<<grid_dim[i], block_dim[i]>>>(func,
+                                                    get_data(i),
+                                                    src.get_values(),
+                                                    dst.get_values());
+                }
+            dst.compress(VectorOperation::add);
+          }
+        src.zero_out_ghost_values();
       }
     else
       {
@@ -1081,14 +1275,19 @@ namespace CUDAWrappers
         LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
           ghosted_dst(ghosted_src);
         ghosted_src = src;
+        ghosted_dst = dst;
 
         // Execute the loop on the cells
         for (unsigned int i = 0; i < n_colors; ++i)
-          internal::apply_kernel_shmem<dim, Number, Functor>
-            <<<grid_dim[i], block_dim[i]>>>(func,
-                                            get_data(i),
-                                            ghosted_src.get_values(),
-                                            ghosted_dst.get_values());
+          if (n_cells[i] > 0)
+            {
+              internal::apply_kernel_shmem<dim, Number, Functor>
+                <<<grid_dim[i], block_dim[i]>>>(func,
+                                                get_data(i),
+                                                ghosted_src.get_values(),
+                                                ghosted_dst.get_values());
+              AssertCudaKernel();
+            }
 
         // Add the ghosted values
         ghosted_dst.compress(VectorOperation::add);
@@ -1125,6 +1324,7 @@ namespace CUDAWrappers
                                                       src.size(),
                                                       src.get_values(),
                                                       dst.get_values());
+    AssertCudaKernel();
   }
 
 
@@ -1140,9 +1340,10 @@ namespace CUDAWrappers
     internal::copy_constrained_dofs<Number>
       <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
                                                       n_constrained_dofs,
-                                                      src.local_size(),
+                                                      src.locally_owned_size(),
                                                       src.get_values(),
                                                       dst.get_values());
+    AssertCudaKernel();
   }
 
 
@@ -1170,6 +1371,7 @@ namespace CUDAWrappers
                                                       dst.size(),
                                                       val,
                                                       dst.get_values());
+    AssertCudaKernel();
   }
 
 
@@ -1183,9 +1385,10 @@ namespace CUDAWrappers
     internal::set_constrained_dofs<Number>
       <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
                                                       n_constrained_dofs,
-                                                      dst.local_size(),
+                                                      dst.locally_owned_size(),
                                                       val,
                                                       dst.get_values());
+    AssertCudaKernel();
   }
 
 

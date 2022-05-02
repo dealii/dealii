@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2018 by the deal.II authors
+//    Copyright (C) 2017 - 2020 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -29,7 +29,7 @@ int
 main()
 {
   initlog();
-
+#if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
   SUNDIALS::IDA<Vector<double>> ida_solver;
   (void)ida_solver;
   deallog << "IDA OK" << std::endl;
@@ -37,6 +37,7 @@ main()
   SUNDIALS::KINSOL<Vector<double>> kinsol_solver;
   (void)kinsol_solver;
   deallog << "KINSOL OK" << std::endl;
+#endif
 
   SUNDIALS::ARKode<Vector<double>> arkode_solver;
   (void)arkode_solver;

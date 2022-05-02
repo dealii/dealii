@@ -19,9 +19,9 @@ the aspect ratio of the generated output is actually 1:1, i.e. a
 circle is drawn as a circle on your screen, rather than as an
 ellipse. The third line switches off the key in the graphic, as that
 will only print information (the filename) which is not that important
-right now. Similarly, the third and fourth disable tic marks. The plot
-is then generated with a specific line width ("`lw`", here set to 4)
-and line type ("`lt`", here chosen by saying that the line should be
+right now. Similarly, the fourth and fifth disable tick marks. The plot
+is then generated with a specific line width ("lw", here set to 4)
+and line type ("lt", here chosen by saying that the line should be
 drawn using the RGB color "black").
 
 The following table shows the triangulated computational domain for $Q_1$,
@@ -100,7 +100,8 @@ cells.
 
 
 The second purpose of the program was to compute the value of pi to
-good accuracy. This is the output of this part of the program:
+good accuracy. This is the output of this part of the program the last
+time it was updated:
 @code
 Output of grids into gnuplot files:
 ===================================
@@ -118,83 +119,91 @@ Computation of Pi by the area:
 ==============================
 Degree = 1
 cells      eval.pi            error
-    5 1.9999999999999993 1.1416e+00    -
-   20 2.8284271247461890 3.1317e-01 1.87
-   80 3.0614674589207174 8.0125e-02 1.97
-  320 3.1214451522580511 2.0148e-02 1.99
- 1280 3.1365484905459380 5.0442e-03 2.00
- 5120 3.1403311569547516 1.2615e-03 2.00
+    5 1.9999999999999984 1.1416e+00    -
+   20 2.8284271247461947 3.1317e-01 1.87
+   80 3.0614674589207289 8.0125e-02 1.97
+  320 3.1214451522579965 2.0148e-02 1.99
+ 1280 3.1365484905461294 5.0442e-03 2.00
+ 5120 3.1403311569547410 1.2615e-03 2.00
 
 Degree = 2
 cells      eval.pi            error
-    5 3.1045694996615860 3.7023e-02    -
-   20 3.1391475703122267 2.4451e-03 3.92
-   80 3.1414377167038290 1.5494e-04 3.98
-  320 3.1415829366419006 9.7169e-06 4.00
- 1280 3.1415920457576898 6.0783e-07 4.00
- 5120 3.1415926155921117 3.7998e-08 4.00
+    5 3.1045694996615865 3.7023e-02    -
+   20 3.1391475703122351 2.4451e-03 3.92
+   80 3.1414377167038401 1.5494e-04 3.98
+  320 3.1415829366418513 9.7169e-06 4.00
+ 1280 3.1415920457578785 6.0783e-07 4.00
+ 5120 3.1415926155920988 3.7998e-08 4.00
 
 Degree = 3
 cells      eval.pi            error
-    5 3.1410033851499288 5.8927e-04    -
-   20 3.1415830393583839 9.6142e-06 5.94
-   80 3.1415925017363797 1.5185e-07 5.98
-  320 3.1415926512106696 2.3791e-09 6.00
- 1280 3.1415926535525927 3.7200e-11 6.00
- 5120 3.1415926535892100 5.8302e-13 6.00
+    5 3.1410033851499315 5.8927e-04    -
+   20 3.1415830393583946 9.6142e-06 5.94
+   80 3.1415925017363939 1.5185e-07 5.98
+  320 3.1415926512106185 2.3792e-09 6.00
+ 1280 3.1415926535527783 3.7015e-11 6.01
+ 5120 3.1415926535891936 5.9952e-13 5.95
 
 Degree = 4
 cells      eval.pi            error
-    5 3.1415871927401131 5.4608e-06    -
-   20 3.1415926314742428 2.2116e-08 7.95
-   80 3.1415926535026202 8.7173e-11 7.99
-  320 3.1415926535894498 3.4350e-13 7.99
- 1280 3.1415926535897896 3.4671e-15 6.63
- 5120 3.1415926535897909 2.4009e-15 0.53
+    5 3.1415871927401144 5.4608e-06    -
+   20 3.1415926314742491 2.2116e-08 7.95
+   80 3.1415926535026268 8.7166e-11 7.99
+  320 3.1415926535894005 3.9257e-13 7.79
+ 1280 3.1415926535899774 1.8430e-13 1.09
+ 5120 3.1415926535897669 2.6201e-14 2.81
 
 Computation of Pi by the perimeter:
 ===================================
 Degree = 1
 cells      eval.pi            error
-    5 2.8284271247461898 3.1317e-01    -
-   20 3.0614674589207178 8.0125e-02 1.97
-   80 3.1214451522580520 2.0148e-02 1.99
-  320 3.1365484905459389 5.0442e-03 2.00
- 1280 3.1403311569547525 1.2615e-03 2.00
- 5120 3.1412772509327724 3.1540e-04 2.00
+    5 2.8284271247461903 3.1317e-01    -
+   20 3.0614674589207187 8.0125e-02 1.97
+   80 3.1214451522580493 2.0148e-02 1.99
+  320 3.1365484905459371 5.0442e-03 2.00
+ 1280 3.1403311569547530 1.2615e-03 2.00
+ 5120 3.1412772509327755 3.1540e-04 2.00
 
 Degree = 2
 cells      eval.pi            error
-    5 3.1248930668550594 1.6700e-02    -
-   20 3.1404050605605449 1.1876e-03 3.81
-   80 3.1415157631807009 7.6890e-05 3.95
-  320 3.1415878042798613 4.8493e-06 3.99
- 1280 3.1415923498174534 3.0377e-07 4.00
- 5120 3.1415926345931995 1.8997e-08 4.00
+    5 3.1248930668550590 1.6700e-02    -
+   20 3.1404050605605454 1.1876e-03 3.81
+   80 3.1415157631807005 7.6890e-05 3.95
+  320 3.1415878042798600 4.8493e-06 3.99
+ 1280 3.1415923498174543 3.0377e-07 4.00
+ 5120 3.1415926345931982 1.8997e-08 4.00
 
 Degree = 3
 cells      eval.pi            error
-    5 3.1414940401456048 9.8613e-05    -
+    5 3.1414940401456053 9.8613e-05    -
    20 3.1415913432549156 1.3103e-06 6.23
-   80 3.1415926341726910 1.9417e-08 6.08
-  320 3.1415926532906897 2.9910e-10 6.02
- 1280 3.1415926535851355 4.6578e-12 6.00
- 5120 3.1415926535897190 7.4216e-14 5.97
+   80 3.1415926341726905 1.9417e-08 6.08
+  320 3.1415926532906924 2.9910e-10 6.02
+ 1280 3.1415926535851346 4.6585e-12 6.00
+ 5120 3.1415926535897158 7.7272e-14 5.91
 
 Degree = 4
 cells      eval.pi            error
-    5 3.1415921029432572 5.5065e-07     -
-   20 3.1415926513737595 2.2160e-09  7.96
-   80 3.1415926535810712 8.7222e-12  7.99
-  320 3.1415926535897576 3.5525e-14  7.94
- 1280 3.1415926535897936 4.6729e-16  6.25
- 5120 3.1415926535897918 1.4929e-15 -1.68
+    5 3.1415921029432572 5.5065e-07    -
+   20 3.1415926513737582 2.2160e-09 7.96
+   80 3.1415926535810699 8.7232e-12 7.99
+  320 3.1415926535897576 3.5527e-14 7.94
+ 1280 3.1415926535897896 3.5527e-15 3.32
+ 5120 3.1415926535897940 8.8818e-16 2.00
 @endcode
 
+@note Once the error reaches a level on the
+  order of $10^{-13}$ to $10^{-15}$, it is essentially dominated by
+  round-off and consequently dominated by what precisely the library is doing
+  in internal computations. Since these things change, the precise values
+  and errors change from release to release at these round-off levels,
+  though the overall order of errors should of course remain the same.
+  See also the comment below in the section on
+  <a href="#extensions">Possibilities for extensions</a> about how to compute
+  these results more accurately.
 
-
-One of the immediate observations from the output is that in all cases the
-values converge quickly to the true value of
+One of the immediate observations from the output above is that in all cases
+the values converge quickly to the true value of
 $\pi=3.141592653589793238462643$. Note that for the $Q_4$ mapping, we are
 already in the regime of roundoff errors and the convergence rate levels off,
 which is already quite a lot. However, also note that for the $Q_1$ mapping,
@@ -217,3 +226,97 @@ convergence. (This effect is also discussed in detail in the following
 publication: A. Bonito, A. Demlow, and J. Owen: "A priori error
 estimates for finite element approximations to eigenvalues and
 eigenfunctions of the Laplace-Beltrami operator", submitted, 2018.)
+
+
+
+<h3>Possibilities for extensions</h3>
+<a name="extensions"></a>
+
+As the table of numbers copied from the output of the program shows above,
+it is not very difficult to compute the value of $\pi$ to 13 or 15 digits. But,
+the output also shows that once we approach the level of accuracy with which
+`double` precision numbers store information (namely, with roughly 16 digits
+of accuracy), we no longer see the expected convergence order and the error
+no longer decreases with mesh refinement as anticipated. This is because both
+within this code and within the many computations that happen within deal.II
+itself, each operation incurs an error on the order of $10^{-16}$; adding
+such errors many times over then results in an error that may be on the
+order of $10^{-14}$, which will dominate the discretization error after
+a number of refinement steps and consequently destroy the convergence rate.
+
+The question is whether one can do anything about this. One thought is to
+use a higher-precision data type. For example, one could think of declaring
+both the `area` and `perimeter` variables in `compute_pi_by_area()` and
+`compute_pi_by_perimeter()` with data type `long double`. `long double`
+is a data type that is not well specified in the C++ standard but at least
+on Intel processors has around 19, instead of around 16, digits of accuracy.
+If we were to do that, we would get results that differ from the ones shown
+above. However, maybe counter-intuitively, they are not uniformly better.
+For example, when computing $\pi$ by the area, at the time of writing
+these sentences we get these values with `double` precision for degree 4:
+@code
+    5 3.1415871927401144 5.4608e-06    -
+   20 3.1415926314742491 2.2116e-08 7.95
+   80 3.1415926535026268 8.7166e-11 7.99
+  320 3.1415926535894005 3.9257e-13 7.79
+ 1280 3.1415926535899774 1.8430e-13 1.09
+ 5120 3.1415926535897669 2.6201e-14 2.81
+@endcode
+On the other hand, the results are as follows when using `long double`:
+@code
+ cells      eval.pi            error
+    5 3.1415871927401136 5.4608e-06    -
+   20 3.1415926314742446 2.2116e-08 7.95
+   80 3.1415926535026215 8.7172e-11 7.99
+  320 3.1415926535894516 3.4157e-13 8.00
+ 1280 3.1415926535897918 1.5339e-15 7.80
+ 5120 3.1415926535897927 5.2649e-16 1.54
+@endcode
+Indeed, here we get results that are approximately 50 times as accurate.
+On the other hand, when computing $\pi$ by the perimeter, we get this with
+`double` precision:
+@code
+    5 3.1415921029432572 5.5065e-07    -
+   20 3.1415926513737582 2.2160e-09 7.96
+   80 3.1415926535810699 8.7232e-12 7.99
+  320 3.1415926535897576 3.5527e-14 7.94
+ 1280 3.1415926535897896 3.5527e-15 3.32
+ 5120 3.1415926535897940 8.8818e-16 2.00
+@endcode
+Whereas we get the following with `long double`:
+@code
+    5 3.1415921029432572 5.5065e-07     -
+   20 3.1415926513737595 2.2160e-09  7.96
+   80 3.1415926535810703 8.7230e-12  7.99
+  320 3.1415926535897576 3.5705e-14  7.93
+ 1280 3.1415926535897918 1.3785e-15  4.70
+ 5120 3.1415926535897944 1.3798e-15 -0.00
+@endcode
+Here, using `double` precision is more accurate by about a factor of
+two. (Of course, in all cases, we have computed $\pi$ with more
+accuracy than any engineer would ever want to know.)
+
+What explains this unpredictability? In general, round-off errors can
+be thought of as random, and add up in ways that are not worth thinking
+too much about; we should therefore always treat any accuracy beyond, say,
+thirteen digits as suspect. Thus, it is probably not worth spending
+too much time on wondering why we get different winners and losers in the
+data type exchange from `double` and `long double`. The accuracy of the
+results is also largely not determined by the precision of the data type
+in which we accumulate each cell's (or face's) contributions, but the
+accuracy of what deal.II gives us via FEValues::JxW() and FEFaceValues::JxW(),
+which always uses `double` precision and which we cannot directly affect.
+
+But there are cases where one can do something about the precision, and it
+is worth at least mentioning the name of the most well-known algorithm in
+this area. Specifically, what we are doing when we add contributions into
+the `area` and `perimeter` values is that we are adding together *positive*
+numbers as we do here. In general, the round-off errors associated with each
+of these numbers is random, and if we add up contributions of substantially
+different sizes, then we will likely be dominated by the error in the largest
+contributions. One can avoid this by adding up numbers sorted by their
+size, and this may then result in marginally more accurate end results.
+The algorithm that implements this is typically called
+<a href="https://en.wikipedia.org/wiki/Kahan_summation_algorithm">Kahan's summation algorithm</a>.
+While one could play with it in the current context, it is likely not going
+to improve the accuracy in ways that will truly matter.

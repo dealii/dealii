@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2016 - 2019 by the deal.II authors
+ * Copyright (C) 2016 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -55,13 +55,10 @@ namespace LA
 #include <deal.II/lac/petsc_precondition.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_q.h>
@@ -129,8 +126,8 @@ namespace Step55
     InverseMatrix<Matrix, Preconditioner>::vmult(VectorType &      dst,
                                                  const VectorType &src) const
     {
-      SolverControl solver_control(src.size(), 1e-8 * src.l2_norm());
-      SolverCG<LA::MPI::Vector> cg(solver_control);
+      SolverControl        solver_control(src.size(), 1e-8 * src.l2_norm());
+      SolverCG<VectorType> cg(solver_control);
       dst = 0;
 
       try
@@ -206,19 +203,22 @@ namespace Step55
     const double R_x = p[0];
     const double R_y = p[1];
 
-    const double pi  = numbers::PI;
-    const double pi2 = pi * pi;
-    values[0] =
-      -1.0L / 2.0L * (-2 * sqrt(25.0 + 4 * pi2) + 10.0) *
-        exp(R_x * (-2 * sqrt(25.0 + 4 * pi2) + 10.0)) -
-      0.4 * pi2 * exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) +
-      0.1 * pow(-sqrt(25.0 + 4 * pi2) + 5.0, 2) *
-        exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi);
-    values[1] = 0.2 * pi * (-sqrt(25.0 + 4 * pi2) + 5.0) *
-                  exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) -
-                0.05 * pow(-sqrt(25.0 + 4 * pi2) + 5.0, 3) *
-                  exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) /
-                  pi;
+    constexpr double pi  = numbers::PI;
+    constexpr double pi2 = numbers::PI * numbers::PI;
+
+    values[0] = -1.0L / 2.0L * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0) *
+                  std::exp(R_x * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0)) -
+                0.4 * pi2 * std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                  std::cos(2 * R_y * pi) +
+                0.1 * std::pow(-std::sqrt(25.0 + 4 * pi2) + 5.0, 2) *
+                  std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                  std::cos(2 * R_y * pi);
+    values[1] = 0.2 * pi * (-std::sqrt(25.0 + 4 * pi2) + 5.0) *
+                  std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                  std::sin(2 * R_y * pi) -
+                0.05 * std::pow(-std::sqrt(25.0 + 4 * pi2) + 5.0, 3) *
+                  std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                  std::sin(2 * R_y * pi) / pi;
     values[2] = 0;
   }
 
@@ -232,7 +232,7 @@ namespace Step55
     {}
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  value) const override;
+                              Vector<double> &  values) const override;
   };
 
   template <int dim>
@@ -242,27 +242,30 @@ namespace Step55
     const double R_x = p[0];
     const double R_y = p[1];
 
-    const double pi  = numbers::PI;
-    const double pi2 = pi * pi;
-    values[0] =
-      -exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * cos(2 * R_y * pi) + 1;
-    values[1] = (1.0L / 2.0L) * (-sqrt(25.0 + 4 * pi2) + 5.0) *
-                exp(R_x * (-sqrt(25.0 + 4 * pi2) + 5.0)) * sin(2 * R_y * pi) /
-                pi;
+    constexpr double pi  = numbers::PI;
+    constexpr double pi2 = numbers::PI * numbers::PI;
+
+    values[0] = -std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                  std::cos(2 * R_y * pi) +
+                1;
+    values[1] = (1.0L / 2.0L) * (-std::sqrt(25.0 + 4 * pi2) + 5.0) *
+                std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
+                std::sin(2 * R_y * pi) / pi;
     values[2] =
-      -1.0L / 2.0L * exp(R_x * (-2 * sqrt(25.0 + 4 * pi2) + 10.0)) -
+      -1.0L / 2.0L * std::exp(R_x * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0)) -
       2.0 *
         (-6538034.74494422 +
-         0.0134758939981709 * exp(4 * sqrt(25.0 + 4 * pi2))) /
-        (-80.0 * exp(3 * sqrt(25.0 + 4 * pi2)) +
-         16.0 * sqrt(25.0 + 4 * pi2) * exp(3 * sqrt(25.0 + 4 * pi2))) -
-      1634508.68623606 * exp(-3.0 * sqrt(25.0 + 4 * pi2)) /
-        (-10.0 + 2.0 * sqrt(25.0 + 4 * pi2)) +
-      (-0.00673794699908547 * exp(sqrt(25.0 + 4 * pi2)) +
-       3269017.37247211 * exp(-3 * sqrt(25.0 + 4 * pi2))) /
-        (-8 * sqrt(25.0 + 4 * pi2) + 40.0) +
-      0.00336897349954273 * exp(1.0 * sqrt(25.0 + 4 * pi2)) /
-        (-10.0 + 2.0 * sqrt(25.0 + 4 * pi2));
+         0.0134758939981709 * std::exp(4 * std::sqrt(25.0 + 4 * pi2))) /
+        (-80.0 * std::exp(3 * std::sqrt(25.0 + 4 * pi2)) +
+         16.0 * std::sqrt(25.0 + 4 * pi2) *
+           std::exp(3 * std::sqrt(25.0 + 4 * pi2))) -
+      1634508.68623606 * std::exp(-3.0 * std::sqrt(25.0 + 4 * pi2)) /
+        (-10.0 + 2.0 * std::sqrt(25.0 + 4 * pi2)) +
+      (-0.00673794699908547 * std::exp(std::sqrt(25.0 + 4 * pi2)) +
+       3269017.37247211 * std::exp(-3 * std::sqrt(25.0 + 4 * pi2))) /
+        (-8 * std::sqrt(25.0 + 4 * pi2) + 40.0) +
+      0.00336897349954273 * std::exp(1.0 * std::sqrt(25.0 + 4 * pi2)) /
+        (-10.0 + 2.0 * std::sqrt(25.0 + 4 * pi2));
   }
 
 
@@ -329,12 +332,12 @@ namespace Step55
             (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
     , computing_timer(mpi_communicator,
                       pcout,
-                      TimerOutput::summary,
+                      TimerOutput::never,
                       TimerOutput::wall_times)
   {}
 
 
-  // The Kovasnay flow is defined on the domain [-0.5, 1.5]^2, which we
+  // The Kovasznay flow is defined on the domain [-0.5, 1.5]^2, which we
   // create by passing the min and max values to GridGenerator::hyper_cube.
   template <int dim>
   void StokesProblem<dim>::make_grid()
@@ -379,21 +382,21 @@ namespace Step55
     owned_partitioning[1] =
       dof_handler.locally_owned_dofs().get_view(n_u, n_u + n_p);
 
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    const IndexSet locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
     relevant_partitioning.resize(2);
     relevant_partitioning[0] = locally_relevant_dofs.get_view(0, n_u);
     relevant_partitioning[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
 
     // Setting up the constraints for boundary conditions and hanging nodes
-    // is identical to step-40. Rven though we don't have any hanging nodes
+    // is identical to step-40. Even though we don't have any hanging nodes
     // because we only perform global refinement, it is still a good idea
     // to put this function call in, in case adaptive refinement gets
     // introduced later.
     {
       constraints.reinit(locally_relevant_dofs);
 
-      FEValuesExtractors::Vector velocities(0);
+      const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       VectorTools::interpolate_boundary_values(dof_handler,
                                                0,
@@ -422,7 +425,7 @@ namespace Step55
           else
             coupling[c][d] = DoFTools::none;
 
-      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      BlockDynamicSparsityPattern dsp(relevant_partitioning);
 
       DoFTools::make_sparsity_pattern(
         dof_handler, coupling, dsp, constraints, false);
@@ -450,19 +453,17 @@ namespace Step55
           else
             coupling[c][d] = DoFTools::none;
 
-      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      BlockDynamicSparsityPattern dsp(relevant_partitioning);
 
       DoFTools::make_sparsity_pattern(
         dof_handler, coupling, dsp, constraints, false);
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        dof_handler.compute_locally_owned_dofs_per_processor(),
+        Utilities::MPI::all_gather(mpi_communicator,
+                                   dof_handler.locally_owned_dofs()),
         mpi_communicator,
         locally_relevant_dofs);
-      preconditioner_matrix.reinit(owned_partitioning,
-                                   //      owned_partitioning,
-                                   dsp,
-                                   mpi_communicator);
+      preconditioner_matrix.reinit(owned_partitioning, dsp, mpi_communicator);
     }
 
     // Finally, we construct the block vectors with the right sizes. The
@@ -496,7 +497,7 @@ namespace Step55
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);

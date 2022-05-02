@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,7 @@ test()
 
   for (; it_0 != support_points_0.end(); ++it_0, ++it_1)
     {
-      deallog << it_0->second << " " << it_1->second << std::endl;
+      deallog << it_0->second << ' ' << it_1->second << std::endl;
     }
 }
 

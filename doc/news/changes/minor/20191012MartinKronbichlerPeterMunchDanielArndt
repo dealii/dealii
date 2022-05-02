@@ -1,6 +1,0 @@
-New: The class VectorizedArray now provides STL-like member functions:
-VectorizedArray::size() returns the number of array elements and
-VectorizedArray:begin() as well as VectorizedArray::end() provide iterators
-enabling range-based iterations.
-<br>
-(Martin Kronbichler, Peter Munch, Daniel Arndt, 2019/10/12)

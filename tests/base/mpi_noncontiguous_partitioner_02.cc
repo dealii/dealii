@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,10 +75,10 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
 
   // ... has (symm)
   for (const auto &cell : dof_handler.active_cell_iterators())
-    if (cell->active() && cell->is_locally_owned())
+    if (cell->is_active() && cell->is_locally_owned())
       {
         auto c = cell->center();
-        for (unsigned int i = 0; i < dim; i++)
+        for (unsigned int i = 0; i < dim; ++i)
           c[i] = c[i] / delta;
 
         const auto lid = static_cast<unsigned int>(norm_point_to_lex(c));
@@ -98,14 +98,14 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
 
   if (dim == 2 && dir == 0)
     {
-      for (unsigned int j = 0, c = start * n_points_face; j < end; j++)
-        for (unsigned int i = start; i < n_points_1D; i++)
+      for (unsigned int j = 0, c = start * n_points_face; j < end; ++j)
+        for (unsigned int i = start; i < n_points_1D; ++i)
           indices_want.push_back(c++);
     }
   else if (dim == 2 && dir == 1)
     {
-      for (unsigned int j = 0; j < n_points_1D; j++)
-        for (unsigned int i = start; i < end; i++)
+      for (unsigned int j = 0; j < n_points_1D; ++j)
+        for (unsigned int i = start; i < end; ++i)
           indices_want.push_back(j * n_points_face + i);
     }
   else
@@ -114,28 +114,30 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
   if (do_revert)
     std::reverse(indices_want.begin(), indices_want.end());
 
-  Utilities::MPI::NoncontiguousPartitioner<double> vector(indices_has,
-                                                          indices_want,
-                                                          comm);
+  Utilities::MPI::NoncontiguousPartitioner vector(indices_has,
+                                                  indices_want,
+                                                  comm);
 
   AlignedVector<double> src(indices_has.size());
-  for (unsigned int i = 0; i < indices_has.size(); i++)
+  for (unsigned int i = 0; i < indices_has.size(); ++i)
     src[i] = indices_has[i];
 
 
   AlignedVector<double> dst(indices_want.size());
 
-  vector.update_values(dst, src);
+  vector.export_to_ghosted_array(ArrayView<const double>(src.data(),
+                                                         src.size()),
+                                 ArrayView<double>(dst.data(), dst.size()));
 
-  for (size_t i = 0; i < src.size(); i++)
-    deallog << static_cast<int>(src[i]) << " ";
+  for (size_t i = 0; i < src.size(); ++i)
+    deallog << static_cast<int>(src[i]) << ' ';
   deallog << std::endl;
-  for (size_t i = 0; i < dst.size(); i++)
-    deallog << static_cast<int>(dst[i]) << " ";
+  for (size_t i = 0; i < dst.size(); ++i)
+    deallog << static_cast<int>(dst[i]) << ' ';
   deallog << std::endl << std::endl;
 
 
-  for (size_t i = 0; i < dst.size(); i++)
+  for (size_t i = 0; i < dst.size(); ++i)
     AssertDimension(dst[i], indices_want[i]);
 }
 
@@ -143,7 +145,7 @@ template <int dim>
 void
 test_dim(const MPI_Comm &comm, const bool do_revert)
 {
-  for (int dir = 0; dir < dim; dir++)
+  for (int dir = 0; dir < dim; ++dir)
     test<dim>(comm, do_revert, dir);
 }
 

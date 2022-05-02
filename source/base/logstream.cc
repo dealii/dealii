@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,8 @@ LogStream::Prefix::~Prefix()
 
 
 LogStream::LogStream()
-  : std_out(&std::cout)
+  : parent_thread(std::this_thread::get_id())
+  , std_out(&std::cout)
   , file(nullptr)
   , std_depth(0)
   , file_depth(10000)
@@ -90,7 +91,7 @@ LogStream::~LogStream()
   // if there was anything left in the stream that is current to this
   // thread, make sure we flush it before it gets lost
   {
-    if (get_stream().str().length() > 0)
+    if (get_stream().str().size() > 0)
       {
         // except the situation is not quite that simple. if this object is
         // the 'deallog' object, then it is destroyed upon exit of the
@@ -106,7 +107,7 @@ LogStream::~LogStream()
         // (note that we can't issue an assertion here either since Assert
         // may want to write to 'deallog' itself, and AssertThrow will
         // throw an exception that can't be caught)
-        if ((this == &deallog) && file)
+        if ((this == &deallog) && (file != nullptr))
           *std_out << ("You still have content that was written to 'deallog' "
                        "but not flushed to the screen or a file while the "
                        "program is being terminated. This would lead to a "
@@ -203,7 +204,7 @@ LogStream::operator<<(std::ostream &(*p)(std::ostream &))
       if (get_prefixes().size() <= std_depth)
         *std_out << stream.str();
 
-      if (file && (get_prefixes().size() <= file_depth))
+      if ((file != nullptr) && (get_prefixes().size() <= file_depth))
         *file << stream.str() << std::flush;
 
       // Start a new string:
@@ -381,7 +382,6 @@ LogStream::log_thread_id(const bool flag)
 std::stack<std::string> &
 LogStream::get_prefixes() const
 {
-#ifdef DEAL_II_WITH_THREADS
   bool                     exists         = false;
   std::stack<std::string> &local_prefixes = prefixes.get(exists);
 
@@ -389,25 +389,12 @@ LogStream::get_prefixes() const
   // from the initial thread that created logstream.
   if (!exists)
     {
-      const tbb::enumerable_thread_specific<std::stack<std::string>> &impl =
-        prefixes.get_implementation();
-
-      // The thread that created this LogStream object should be the first
-      // in tbb's enumerable_thread_specific container.
-      const tbb::enumerable_thread_specific<
-        std::stack<std::string>>::const_iterator first_elem = impl.begin();
-
-      if (first_elem != impl.end())
-        {
-          local_prefixes = *first_elem;
-        }
+      auto it = prefixes.data.find(parent_thread);
+      if (it != prefixes.data.end())
+        local_prefixes = it->second;
     }
 
   return local_prefixes;
-
-#else
-  return prefixes.get();
-#endif
 }
 
 
@@ -427,7 +414,7 @@ LogStream::print_line_head()
         *std_out << head << ':';
     }
 
-  if (file && (get_prefixes().size() <= file_depth))
+  if ((file != nullptr) && (get_prefixes().size() <= file_depth))
     {
       if (print_thread_id)
         *file << '[' << thread << ']';

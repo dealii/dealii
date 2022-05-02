@@ -66,8 +66,8 @@ test()
 
   if (myid == 0)
     {
-      deallog << myid * 2 << ":" << v(myid * 2) << std::endl;
-      deallog << myid * 2 + 1 << ":" << v(myid * 2 + 1) << std::endl;
+      deallog << myid * 2 << ':' << v(myid * 2) << std::endl;
+      deallog << myid * 2 + 1 << ':' << v(myid * 2 + 1) << std::endl;
     }
 
   // import ghosts onto all procs

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,8 +42,7 @@ template <int dim, typename number>
 void
 compare_indices(const MatrixFree<dim, number> *mf_data)
 {
-  const unsigned int     n_batches  = mf_data->n_macro_cells();
-  constexpr unsigned int batch_size = VectorizedArray<number>::size();
+  const unsigned int n_batches = mf_data->n_cell_batches();
   for (unsigned int batch_no = 0; batch_no < n_batches; ++batch_no)
     {
       const unsigned int n_lanes_filled =
@@ -58,9 +57,9 @@ compare_indices(const MatrixFree<dim, number> *mf_data)
                     << "versus get_cell_level_and_index() = ("
                     << level_index_pair.first << ", " << level_index_pair.second
                     << ")\n";
-          AssertThrow((cell->level() == level_index_pair.first),
+          AssertThrow(cell->level() == level_index_pair.first,
                       ExcMessage("mismatching cell levels"));
-          AssertThrow((cell->index() == level_index_pair.second),
+          AssertThrow(cell->index() == level_index_pair.second,
                       ExcMessage("mismatching cell indices"));
         }
     }

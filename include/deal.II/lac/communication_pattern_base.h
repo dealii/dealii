@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,59 +13,25 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_communication_pattern_base_h
-#define dealii_communication_pattern_base_h
+#ifndef dealii_lac_communication_pattern_base_h
+#define dealii_lac_communication_pattern_base_h
 
-#include <deal.II/base/config.h>
-
-#include <deal.II/base/mpi.h>
+#include <deal.II/base/communication_pattern_base.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-// Forward declaration
-#ifndef DOXYGEN
-class IndexSet;
-#endif
+DEAL_II_WARNING(
+  "This file is deprecated. Use deal.II/base/communication_pattern_base.h instead!")
 
 namespace LinearAlgebra
 {
   /**
-   * CommunicationPattern is an abstract class that is used to define a
-   * communication plan that can be called repeatedly to efficiently obtain
-   * off-processor elements. The idea is to decouple the communication pattern
-   * from the data that needs to be communicated. The goal is to reuse the same
-   * communication pattern for different containers.
-   * This is similar to the way SparseMatrix and SparsityPattern works.
-   *
-   * @author Bruno Turcksin, 2015.
+   * Alias for Utilities::MPI::CommunicationPatternBase. This class was
+   * originally defined in the LinearAlgebra namespace but is now used for more
+   * general purposes.
    */
-  class CommunicationPatternBase
-  {
-  public:
-    /**
-     * Destructor.
-     */
-    virtual ~CommunicationPatternBase() = default;
-
-    /**
-     * Reinitialize the communication pattern. The first argument
-     * `vector_space_vector_index_set` is the index set associated to a
-     * VectorSpaceVector object. The second argument
-     * `read_write_vector_index_set` is the index set associated to a
-     * ReadWriteVector object.
-     */
-    virtual void
-    reinit(const IndexSet &vector_space_vector_index_set,
-           const IndexSet &read_write_vector_index_set,
-           const MPI_Comm &communicator) = 0;
-
-    /**
-     * Return a constant reference to the underlying MPI communicator.
-     */
-    virtual const MPI_Comm &
-    get_mpi_communicator() const = 0;
-  };
-
+  using CommunicationPatternBase DEAL_II_DEPRECATED =
+    Utilities::MPI::CommunicationPatternBase;
 } // end of namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE

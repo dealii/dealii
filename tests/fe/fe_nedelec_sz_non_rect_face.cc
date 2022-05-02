@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -251,13 +251,13 @@ namespace Maxwell
         // Store computed values at quad points:
         fe_values[E_re].get_function_values(solution, sol);
 
-        // Calc values of curlE from fe solution:
+        // Calc values of curlE from FE solution:
         cell->get_dof_indices(local_dof_indices);
         // Loop over quad points to calculate solution:
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           {
             // Split exact solution into real/imaginary parts:
-            for (unsigned int component = 0; component < dim; component++)
+            for (unsigned int component = 0; component < dim; ++component)
               {
                 exactsol[component]     = exactsol_list[q_point][component];
                 exactcurlsol[component] = exactcurlsol_list[q_point][component];
@@ -295,7 +295,12 @@ namespace Maxwell
 
     // FE_Nedelec boundary condition.
     VectorTools::project_boundary_values_curl_conforming_l2(
-      dof_handler, 0, exact_solution, 0, constraints);
+      dof_handler,
+      0,
+      exact_solution,
+      0,
+      constraints,
+      StaticMappingQ1<dim>::mapping);
 
 
     constraints.close();
@@ -371,10 +376,10 @@ namespace Maxwell
                                          rhs_value_list);
 
         // Loop over all element quad points:
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           {
             // store rhs value at this q point & turn into tensor
-            for (unsigned int component = 0; component < dim; component++)
+            for (unsigned int component = 0; component < dim; ++component)
               {
                 rhs_value_vector[component] =
                   rhs_value_list[q_point](component);

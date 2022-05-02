@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,11 +16,14 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
+#include <deal.II/distributed/repartitioning_policy_tools.h>
 
 #include <deal.II/grid/grid_tools.h>
+
+#include <fstream>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -40,7 +43,8 @@ namespace parallel
   namespace fullydistributed
   {
     template <int dim, int spacedim>
-    Triangulation<dim, spacedim>::Triangulation(MPI_Comm mpi_communicator)
+    Triangulation<dim, spacedim>::Triangulation(
+      const MPI_Comm &mpi_communicator)
       : parallel::DistributedTriangulationBase<dim, spacedim>(mpi_communicator)
       , settings(TriangulationDescription::Settings::default_setting)
       , partitioner([](dealii::Triangulation<dim, spacedim> &tria,
@@ -74,13 +78,15 @@ namespace parallel
         this->set_mesh_smoothing(
           static_cast<
             typename dealii::Triangulation<dim, spacedim>::MeshSmoothing>(
-            dealii::Triangulation<dim>::none |
+            dealii::Triangulation<dim, spacedim>::none |
             Triangulation<dim, spacedim>::limit_level_difference_at_vertices));
       else
         this->set_mesh_smoothing(
           static_cast<
             typename dealii::Triangulation<dim, spacedim>::MeshSmoothing>(
-            dealii::Triangulation<dim>::none));
+            dealii::Triangulation<dim, spacedim>::none));
+
+      this->set_mesh_smoothing(construction_data.smoothing);
 
       // clear internal data structures
       this->coarse_cell_id_to_coarse_cell_index_vector.clear();
@@ -138,9 +144,37 @@ namespace parallel
           // create a copy of cell_infos such that we can sort them
           auto cell_infos = construction_data.cell_infos;
 
+          // sort cell_infos on each level separately (as done in
+          // dealii::Triangulation::create_triangulation())
+          for (auto &cell_info : cell_infos)
+            std::sort(cell_info.begin(),
+                      cell_info.end(),
+                      [&](TriangulationDescription::CellData<dim> a,
+                          TriangulationDescription::CellData<dim> b) {
+                        const CellId a_id(a.id);
+                        const CellId b_id(b.id);
+
+                        const auto a_coarse_cell_index =
+                          this->coarse_cell_id_to_coarse_cell_index(
+                            a_id.get_coarse_cell_id());
+                        const auto b_coarse_cell_index =
+                          this->coarse_cell_id_to_coarse_cell_index(
+                            b_id.get_coarse_cell_id());
+
+                        // according to their coarse-cell index and if that is
+                        // same according to their cell id (the result is that
+                        // cells on each level are sorted according to their
+                        // index on that level - what we need in the following
+                        // operations)
+                        if (a_coarse_cell_index != b_coarse_cell_index)
+                          return a_coarse_cell_index < b_coarse_cell_index;
+                        else
+                          return a_id < b_id;
+                      });
+
           // 4a) set all cells artificial (and set the actual
           //     (level_)subdomain_ids in the next step)
-          for (auto cell = this->begin(); cell != this->end(); ++cell)
+          for (const auto &cell : this->cell_iterators())
             {
               if (cell->is_active())
                 cell->set_subdomain_id(
@@ -151,7 +185,9 @@ namespace parallel
             }
 
           // 4b) set actual (level_)subdomain_ids
-          for (unsigned int level = 0; level < cell_infos.size(); ++level)
+          for (unsigned int level = 0;
+               level < cell_infos.size() && !cell_infos[level].empty();
+               ++level)
             {
               auto cell      = this->begin(level);
               auto cell_info = cell_infos[level].begin();
@@ -173,7 +209,8 @@ namespace parallel
             }
         }
 
-      update_number_cache();
+      this->update_number_cache();
+      this->update_cell_relations();
     }
 
 
@@ -185,10 +222,20 @@ namespace parallel
       const std::vector<dealii::CellData<dim>> &cells,
       const SubCellData &                       subcelldata)
     {
-      AssertThrow(
+      Assert(
         currently_processing_create_triangulation_for_internal_usage,
         ExcMessage(
-          "Use the other create_triangulation() function to create triangulations of type parallel::fullydistributed::Triangulation.!"));
+          "You have called the method parallel::fullydistributed::Triangulation::create_triangulation() \n"
+          "that takes 3 arguments. If you have not called this function directly, \n"
+          "it might have been called via a function from the GridGenerator or GridIn \n"
+          "namespace. To be able to setup a fully-distributed Triangulation with these \n"
+          "utility functions nevertheless, please follow the following three steps:\n"
+          "  1) call the utility function for a (serial) Triangulation, \n"
+          "     a parallel::shared::Triangulation, or a parallel::distributed::Triangulation object,\n"
+          "  2) use the functions TriangulationDescription::Utilities::create_description_from_triangulation() \n"
+          "     or ::create_description_from_triangulation_in_groups() to create the \n"
+          "     description of the local partition, and\n"
+          "  3) pass the created description to parallel::fullydistributed::Triangulation::create_triangulation()."));
 
       dealii::Triangulation<dim, spacedim>::create_triangulation(vertices,
                                                                  cells,
@@ -221,7 +268,7 @@ namespace parallel
                          *>(&other_tria) == nullptr)
         {
           serial_tria =
-            std_cxx14::make_unique<dealii::Triangulation<dim, spacedim>>();
+            std::make_unique<dealii::Triangulation<dim, spacedim>>();
 
           // actually copy the serial triangulation
           serial_tria->copy_triangulation(other_tria);
@@ -241,10 +288,9 @@ namespace parallel
 
       // create construction data
       const auto construction_data = TriangulationDescription::Utilities::
-        create_description_from_triangulation(
-          *other_tria_ptr,
-          this->mpi_communicator,
-          this->is_multilevel_hierarchy_constructed());
+        create_description_from_triangulation(*other_tria_ptr,
+                                              this->mpi_communicator,
+                                              this->settings);
 
       // finally create triangulation
       this->create_triangulation(construction_data);
@@ -267,13 +313,40 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
-    Triangulation<dim, spacedim>::update_number_cache()
+    Triangulation<dim, spacedim>::set_partitioner(
+      const RepartitioningPolicyTools::Base<dim, spacedim> &partitioner,
+      const TriangulationDescription::Settings &            settings)
     {
-      parallel::Triangulation<dim, spacedim>::update_number_cache();
+      this->partitioner_distributed = &partitioner;
+      this->settings                = settings;
+    }
 
-      if (settings &
-          TriangulationDescription::Settings::construct_multigrid_hierarchy)
-        parallel::Triangulation<dim, spacedim>::fill_level_ghost_owners();
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::repartition()
+    {
+      // signal that repartitioning has started
+      this->signals.pre_distributed_repartition();
+
+      // create construction_data with the help of the partitioner
+      const auto construction_data = TriangulationDescription::Utilities::
+        create_description_from_triangulation(
+          *this,
+          this->partitioner_distributed->partition(*this),
+          this->settings);
+
+      // clear old content
+      this->clear();
+      this->coarse_cell_id_to_coarse_cell_index_vector.clear();
+      this->coarse_cell_index_to_coarse_cell_id_vector.clear();
+
+      // use construction_data to set up new triangulation
+      this->create_triangulation(construction_data);
+
+      // signal that repartitioning has completed
+      this->signals.post_distributed_repartition();
     }
 
 
@@ -297,16 +370,6 @@ namespace parallel
 
       return dealii::Triangulation<dim, spacedim>::
         prepare_coarsening_and_refinement();
-    }
-
-
-
-    template <int dim, int spacedim>
-    bool
-    Triangulation<dim, spacedim>::has_hanging_nodes() const
-    {
-      Assert(false, ExcNotImplemented());
-      return false;
     }
 
 
@@ -372,6 +435,331 @@ namespace parallel
       return coarse_cell_id;
     }
 
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::update_cell_relations()
+    {
+      // Reorganize memory for local_cell_relations.
+      this->local_cell_relations.clear();
+      this->local_cell_relations.reserve(this->n_locally_owned_active_cells());
+
+      for (const auto &cell : this->active_cell_iterators())
+        if (cell->is_locally_owned())
+          this->local_cell_relations.emplace_back(
+            cell, Triangulation<dim, spacedim>::CELL_PERSIST);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::save(const std::string &filename) const
+    {
+#ifdef DEAL_II_WITH_MPI
+      AssertThrow(this->cell_attached_data.pack_callbacks_variable.size() == 0,
+                  ExcNotImplemented());
+
+      Assert(
+        this->cell_attached_data.n_attached_deserialize == 0,
+        ExcMessage(
+          "Not all SolutionTransfer objects have been deserialized after the last call to load()."));
+      Assert(this->n_cells() > 0,
+             ExcMessage("Can not save() an empty Triangulation."));
+
+      const int myrank =
+        Utilities::MPI::this_mpi_process(this->mpi_communicator);
+      const int mpisize =
+        Utilities::MPI::n_mpi_processes(this->mpi_communicator);
+
+      // Compute global offset for each rank.
+      unsigned int n_locally_owned_cells = this->n_locally_owned_active_cells();
+
+      unsigned int global_first_cell = 0;
+
+      int ierr = MPI_Exscan(&n_locally_owned_cells,
+                            &global_first_cell,
+                            1,
+                            MPI_UNSIGNED,
+                            MPI_SUM,
+                            this->mpi_communicator);
+      AssertThrowMPI(ierr);
+
+      global_first_cell *= sizeof(unsigned int);
+
+
+      if (myrank == 0)
+        {
+          std::string   fname = std::string(filename) + ".info";
+          std::ofstream f(fname.c_str());
+          f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_global_active_cells"
+            << std::endl
+            << 4 << " "
+            << Utilities::MPI::n_mpi_processes(this->mpi_communicator) << " "
+            << this->cell_attached_data.pack_callbacks_fixed.size() << " "
+            << this->cell_attached_data.pack_callbacks_variable.size() << " "
+            << this->n_global_active_cells() << std::endl;
+        }
+
+      // Save cell attached data.
+      this->save_attached_data(global_first_cell,
+                               this->n_global_active_cells(),
+                               filename);
+
+      // Save triangulation description.
+      {
+        MPI_Info info;
+        int      ierr = MPI_Info_create(&info);
+        AssertThrowMPI(ierr);
+
+        const std::string fname_tria = filename + "_triangulation.data";
+
+        // Open file.
+        MPI_File fh;
+        ierr = MPI_File_open(this->mpi_communicator,
+                             fname_tria.c_str(),
+                             MPI_MODE_CREATE | MPI_MODE_WRONLY,
+                             info,
+                             &fh);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_File_set_size(fh, 0); // delete the file contents
+        AssertThrowMPI(ierr);
+        // this barrier is necessary, because otherwise others might already
+        // write while one core is still setting the size to zero.
+        ierr = MPI_Barrier(this->mpi_communicator);
+        AssertThrowMPI(ierr);
+        ierr = MPI_Info_free(&info);
+        AssertThrowMPI(ierr);
+        // ------------------
+
+        // Create construction data.
+        const auto construction_data = TriangulationDescription::Utilities::
+          create_description_from_triangulation(*this,
+                                                this->mpi_communicator,
+                                                this->settings);
+
+        // Pack.
+        std::vector<char> buffer;
+        dealii::Utilities::pack(construction_data, buffer, false);
+
+        // Write offsets to file.
+        unsigned int buffer_size = buffer.size();
+
+        unsigned int offset = 0;
+
+        ierr = MPI_Exscan(&buffer_size,
+                          &offset,
+                          1,
+                          MPI_UNSIGNED,
+                          MPI_SUM,
+                          this->mpi_communicator);
+        AssertThrowMPI(ierr);
+
+        // Write offsets to file.
+        ierr = MPI_File_write_at(fh,
+                                 myrank * sizeof(unsigned int),
+                                 &buffer_size,
+                                 1,
+                                 MPI_UNSIGNED,
+                                 MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        // Write buffers to file.
+        ierr = MPI_File_write_at(fh,
+                                 mpisize * sizeof(unsigned int) +
+                                   offset, // global position in file
+                                 buffer.data(),
+                                 buffer.size(), // local buffer
+                                 MPI_CHAR,
+                                 MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_File_close(&fh);
+        AssertThrowMPI(ierr);
+      }
+#else
+      (void)filename;
+
+      AssertThrow(false, ExcNeedsMPI());
+#endif
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::load(const std::string &filename)
+    {
+#ifdef DEAL_II_WITH_MPI
+      Assert(this->n_cells() == 0,
+             ExcMessage("load() only works if the Triangulation is empty!"));
+
+      // Compute global offset for each rank.
+      unsigned int n_locally_owned_cells = this->n_locally_owned_active_cells();
+
+      unsigned int global_first_cell = 0;
+
+      int ierr = MPI_Exscan(&n_locally_owned_cells,
+                            &global_first_cell,
+                            1,
+                            MPI_UNSIGNED,
+                            MPI_SUM,
+                            this->mpi_communicator);
+      AssertThrowMPI(ierr);
+
+      global_first_cell *= sizeof(unsigned int);
+
+
+      unsigned int version, numcpus, attached_count_fixed,
+        attached_count_variable, n_global_active_cells;
+      {
+        std::string   fname = std::string(filename) + ".info";
+        std::ifstream f(fname.c_str());
+        AssertThrow(f.fail() == false, ExcIO());
+        std::string firstline;
+        getline(f, firstline); // skip first line
+        f >> version >> numcpus >> attached_count_fixed >>
+          attached_count_variable >> n_global_active_cells;
+      }
+
+      AssertThrow(version == 4,
+                  ExcMessage("Incompatible version found in .info file."));
+      Assert(this->n_global_active_cells() == n_global_active_cells,
+             ExcMessage("Number of global active cells differ!"));
+
+      // Load description and construct the triangulation.
+      {
+        const int myrank =
+          Utilities::MPI::this_mpi_process(this->mpi_communicator);
+        const int mpisize =
+          Utilities::MPI::n_mpi_processes(this->mpi_communicator);
+
+        AssertDimension(numcpus, mpisize);
+
+        // Open file.
+        MPI_Info info;
+        int      ierr = MPI_Info_create(&info);
+        AssertThrowMPI(ierr);
+
+        const std::string fname_tria = filename + "_triangulation.data";
+
+        MPI_File fh;
+        ierr = MPI_File_open(this->mpi_communicator,
+                             fname_tria.c_str(),
+                             MPI_MODE_RDONLY,
+                             info,
+                             &fh);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_Info_free(&info);
+        AssertThrowMPI(ierr);
+
+        // Read offsets from file.
+        unsigned int buffer_size;
+
+        ierr = MPI_File_read_at(fh,
+                                myrank * sizeof(unsigned int),
+                                &buffer_size,
+                                1,
+                                MPI_UNSIGNED,
+                                MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        unsigned int offset = 0;
+
+        ierr = MPI_Exscan(&buffer_size,
+                          &offset,
+                          1,
+                          MPI_UNSIGNED,
+                          MPI_SUM,
+                          this->mpi_communicator);
+        AssertThrowMPI(ierr);
+
+        // Read buffers from file.
+        std::vector<char> buffer(buffer_size);
+        ierr = MPI_File_read_at(fh,
+                                mpisize * sizeof(unsigned int) +
+                                  offset, // global position in file
+                                buffer.data(),
+                                buffer.size(), // local buffer
+                                MPI_CHAR,
+                                MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        ierr = MPI_File_close(&fh);
+        AssertThrowMPI(ierr);
+
+        auto construction_data = dealii::Utilities::template unpack<
+          TriangulationDescription::Description<dim, spacedim>>(buffer, false);
+
+        // WARNING: serialization cannot handle the MPI communicator
+        // which is the reason why we have to set it here explicitly
+        construction_data.comm = this->mpi_communicator;
+
+        this->create_triangulation(construction_data);
+      }
+
+      // clear all of the callback data, as explained in the documentation of
+      // register_data_attach()
+      this->cell_attached_data.n_attached_data_sets = 0;
+      this->cell_attached_data.n_attached_deserialize =
+        attached_count_fixed + attached_count_variable;
+
+      // Load attached cell data, if any was stored.
+      this->load_attached_data(global_first_cell,
+                               this->n_global_active_cells(),
+                               this->n_locally_owned_active_cells(),
+                               filename,
+                               attached_count_fixed,
+                               attached_count_variable);
+
+      this->update_cell_relations();
+      this->update_periodic_face_map();
+      this->update_number_cache();
+#else
+      (void)filename;
+
+      AssertThrow(false, ExcNeedsMPI());
+#endif
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::load(const std::string &filename,
+                                       const bool         autopartition)
+    {
+      (void)autopartition;
+      load(filename);
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim, spacedim>::update_number_cache()
+    {
+      dealii::parallel::TriangulationBase<dim, spacedim>::update_number_cache();
+
+      // additionally update the number of global coarse cells
+      types::coarse_cell_id number_of_global_coarse_cells = 0;
+
+      for (const auto &cell : this->active_cell_iterators())
+        if (!cell->is_artificial())
+          number_of_global_coarse_cells =
+            std::max(number_of_global_coarse_cells,
+                     cell->id().get_coarse_cell_id());
+
+      number_of_global_coarse_cells =
+        Utilities::MPI::max(number_of_global_coarse_cells,
+                            this->mpi_communicator) +
+        1;
+
+      this->number_cache.number_of_global_coarse_cells =
+        number_of_global_coarse_cells;
+    }
 
 
   } // namespace fullydistributed

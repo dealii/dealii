@@ -43,7 +43,7 @@ we will focus on the simpler Stokes system.
 Note that when deriving the more general compressible Navier-Stokes equations,
 the diffusion is modeled as the divergence of the stress tensor
 @f{eqnarray*}
-  \tau = - \mu (2\varepsilon(\textbf{u}) - \frac{2}{3}\nabla \cdot \textbf{u} I),
+  \tau = - \mu \left(2\varepsilon(\textbf{u}) - \frac{2}{3}\nabla \cdot \textbf{u} I\right),
 @f}
 where $\mu$ is the viscosity of the fluid. With the assumption of $\mu=1$
 (assume constant viscosity and non-dimensionalize the equation by dividing out
@@ -60,7 +60,7 @@ are continuous), the formulations are equivalent:
 @f{eqnarray*}
   \textrm{div}\; \tau
   = -2\textrm{div}\;\varepsilon(\textbf{u})
-  = -\triangle \textbf{u} + \nabla \cdot (\nabla\textbf{u})^T
+  = -\triangle \textbf{u} - \nabla \cdot (\nabla\textbf{u})^T
   = -\triangle \textbf{u}.
 @f}
 This is because the $i$th entry of  $\nabla \cdot (\nabla\textbf{u})^T$ is given by:
@@ -70,7 +70,8 @@ This is because the $i$th entry of  $\nabla \cdot (\nabla\textbf{u})^T$ is given
 = \sum_j \frac{\partial}{\partial x_j} [(\nabla\textbf{u})]_{j,i}
 = \sum_j \frac{\partial}{\partial x_j} \frac{\partial}{\partial x_i} \textbf{u}_j
 = \sum_j \frac{\partial}{\partial x_i} \frac{\partial}{\partial x_j} \textbf{u}_j
-= \frac{\partial}{\partial x_i} \textrm{div}\; \textbf{u}
+= \frac{\partial}{\partial x_i}
+  \underbrace{\textrm{div}\; \textbf{u}}_{=0}
 = 0.
 @f}
 If you can not assume the above mentioned regularity, or if your viscosity is
@@ -586,6 +587,25 @@ InnerPreconditioner@<dim@>::%type</code> and automatically get the correct
 preconditioner class. Because of the similarity of the interfaces of the two
 classes, we will be able to use them interchangeably using the same syntax in
 all places.
+
+
+<h4> Is this how one should solve the Stokes equations? </h4>
+
+The discussions above showed *one* way in which the linear system that
+results from the Stokes equations can be solved, and because the
+tutorial programs are teaching tools that makes sense. But is this the
+way this system of equations *should* be solved?
+
+The answer to this is no. The primary bottleneck with the approach,
+already identified above, is that we have to repeatedly solve linear
+systems with $A$ inside the Schur complement, and because we don't
+have a good preconditioner for the Schur complement, these solves just
+have to happen too often. A better approach is to use a block
+decomposition, which is based on an observation of Silvester and
+Wathen @cite SW94 and explained in much greater detail in
+@cite elman2005 . An implementation of this alternative approach is
+discussed below, in the section on a <a href="#block-schur">block Schur
+complementation preconditioner</a> in the results section of this program.
 
 
 <h4> A note on the structure of the linear system </h4>

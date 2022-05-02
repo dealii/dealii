@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -29,17 +30,15 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include "../tests.h"
 
 
 
 template <int dim>
 void
-check_cells(const hp::DoFHandler<dim> &dof_handler)
+check_cells(const DoFHandler<dim> &dof_handler)
 {
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -57,15 +56,15 @@ check_cells(const hp::DoFHandler<dim> &dof_handler)
 
 
 void
-check_faces(const hp::DoFHandler<1> &)
+check_faces(const DoFHandler<1> &)
 {}
 
 
 template <int dim>
 void
-check_faces(const hp::DoFHandler<dim> &dof_handler)
+check_faces(const DoFHandler<dim> &dof_handler)
 {
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -86,20 +85,20 @@ check_faces(const hp::DoFHandler<dim> &dof_handler)
 
 
 void
-check_edges(const hp::DoFHandler<1> &)
+check_edges(const DoFHandler<1> &)
 {}
 
 
 void
-check_edges(const hp::DoFHandler<2> &)
+check_edges(const DoFHandler<2> &)
 {}
 
 
 template <int dim>
 void
-check_edges(const hp::DoFHandler<dim> &dof_handler)
+check_edges(const DoFHandler<dim> &dof_handler)
 {
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -139,9 +138,9 @@ test()
   fe_collection.push_back(FE_Q<dim>(3));
   fe_collection.push_back(FE_Q<dim>(4));
 
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,11 +76,23 @@ Multigrid<VectorType>::set_cycle(typename Multigrid<VectorType>::Cycle c)
 
 template <typename VectorType>
 void
-Multigrid<VectorType>::set_edge_matrices(const MGMatrixBase<VectorType> &down,
-                                         const MGMatrixBase<VectorType> &up)
+Multigrid<VectorType>::set_edge_matrices(
+  const MGMatrixBase<VectorType> &edge_out,
+  const MGMatrixBase<VectorType> &edge_in)
 {
-  edge_out = &down;
-  edge_in  = &up;
+  this->edge_out = &edge_out;
+  this->edge_in  = &edge_in;
+}
+
+
+
+template <typename VectorType>
+void
+Multigrid<VectorType>::set_edge_in_matrix(
+  const MGMatrixBase<VectorType> &edge_in)
+{
+  this->edge_out = nullptr;
+  this->edge_in  = &edge_in;
 }
 
 
@@ -88,11 +100,11 @@ Multigrid<VectorType>::set_edge_matrices(const MGMatrixBase<VectorType> &down,
 template <typename VectorType>
 void
 Multigrid<VectorType>::set_edge_flux_matrices(
-  const MGMatrixBase<VectorType> &down,
-  const MGMatrixBase<VectorType> &up)
+  const MGMatrixBase<VectorType> &edge_down,
+  const MGMatrixBase<VectorType> &edge_up)
 {
-  edge_down = &down;
-  edge_up   = &up;
+  this->edge_down = &edge_down;
+  this->edge_up   = &edge_up;
 }
 
 
@@ -115,6 +127,7 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
   this->signals.pre_smoother_step(false, level);
 
   // compute residual on level, which includes the (CG) edge matrix
+  this->signals.residual_step(true, level);
   matrix->vmult(level, t[level], solution[level]);
   if (edge_out != nullptr)
     {
@@ -129,6 +142,7 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
       edge_down->vmult(level, t[level - 1], solution[level]);
       defect[level - 1] -= t[level - 1];
     }
+  this->signals.residual_step(false, level);
 
   this->signals.restriction(true, level);
   transfer->restrict_and_add(level, defect[level - 1], t[level]);
@@ -139,11 +153,10 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
 
   // do coarse grid correction
   this->signals.prolongation(true, level);
-  transfer->prolongate(level, t[level], solution[level - 1]);
+  transfer->prolongate_and_add(level, solution[level], solution[level - 1]);
   this->signals.prolongation(false, level);
 
-  solution[level] += t[level];
-
+  this->signals.edge_prolongation(true, level);
   // get in contribution from edge matrices to the defect
   if (edge_in != nullptr)
     {
@@ -155,6 +168,7 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
       edge_up->Tvmult(level, t[level], solution[level - 1]);
       defect[level] -= t[level];
     }
+  this->signals.edge_prolongation(false, level);
 
   // post-smoothing
   this->signals.post_smoother_step(true, level);
@@ -187,6 +201,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
   this->signals.pre_smoother_step(false, level);
 
   // compute residual on level, which includes the (CG) edge matrix
+  this->signals.residual_step(true, level);
   matrix->vmult(level, t[level], solution[level]);
   if (edge_out != nullptr)
     edge_out->vmult_add(level, t[level], solution[level]);
@@ -198,6 +213,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
     edge_down->vmult(level, defect2[level - 1], solution[level]);
   else
     defect2[level - 1] = typename VectorType::value_type(0.);
+  this->signals.residual_step(false, level);
 
   this->signals.restriction(true, level);
   transfer->restrict_and_add(level, defect2[level - 1], t[level]);
@@ -223,6 +239,8 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
   this->signals.prolongation(true, level);
   transfer->prolongate(level, t[level], solution[level - 1]);
   this->signals.prolongation(false, level);
+
+  this->signals.edge_prolongation(true, level);
   solution[level] += t[level];
 
   // get in contribution from edge matrices to the defect
@@ -237,6 +255,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
       edge_up->Tvmult(level, t[level], solution[level - 1]);
       defect2[level] -= t[level];
     }
+  this->signals.edge_prolongation(false, level);
 
   // post-smoothing
   this->signals.post_smoother_step(true, level);
@@ -251,12 +270,17 @@ void
 Multigrid<VectorType>::cycle()
 {
   // The defect vector has been initialized by copy_to_mg. Now adjust the
-  // other vectors.
-  solution.resize(minlevel, maxlevel);
-  t.resize(minlevel, maxlevel);
-  if (cycle_type != v_cycle)
+  // other vectors. First out a check if we have the right number of levels.
+  if (solution.min_level() != minlevel || solution.max_level() != maxlevel)
+    {
+      solution.resize(minlevel, maxlevel);
+      t.resize(minlevel, maxlevel);
+    }
+  if (cycle_type != v_cycle &&
+      (defect2.min_level() != minlevel || defect2.max_level() != maxlevel))
     defect2.resize(minlevel, maxlevel);
 
+  // And now we go and reinit the vectors on the levels.
   for (unsigned int level = minlevel; level <= maxlevel; ++level)
     {
       // the vectors for level>minlevel will be overwritten by the apply()
@@ -280,10 +304,14 @@ void
 Multigrid<VectorType>::vcycle()
 {
   // The defect vector has been initialized by copy_to_mg. Now adjust the
-  // other vectors.
-  solution.resize(minlevel, maxlevel);
-  t.resize(minlevel, maxlevel);
+  // other vectors. First out a check if we have the right number of levels.
+  if (solution.min_level() != minlevel || solution.max_level() != maxlevel)
+    {
+      solution.resize(minlevel, maxlevel);
+      t.resize(minlevel, maxlevel);
+    }
 
+  // And now we go and reinit the vectors on the levels.
   for (unsigned int level = minlevel; level <= maxlevel; ++level)
     {
       solution[level].reinit(defect[level], level > minlevel);
@@ -340,6 +368,26 @@ Multigrid<VectorType>::connect_post_smoother_step(
   const std::function<void(const bool, const unsigned int)> &slot)
 {
   return this->signals.post_smoother_step.connect(slot);
+}
+
+
+
+template <typename VectorType>
+boost::signals2::connection
+Multigrid<VectorType>::connect_residual_step(
+  const std::function<void(const bool, const unsigned int)> &slot)
+{
+  return this->signals.residual_step.connect(slot);
+}
+
+
+
+template <typename VectorType>
+boost::signals2::connection
+Multigrid<VectorType>::connect_edge_prolongation(
+  const std::function<void(const bool, const unsigned int)> &slot)
+{
+  return this->signals.edge_prolongation.connect(slot);
 }
 
 

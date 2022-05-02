@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,8 +44,12 @@ QuadratureSelector<dim>::create_quadrature(const std::string &s,
         return QMilne<dim>();
       else if (s == "simpson")
         return QSimpson<dim>();
+      // The following name is DEAL_II_DEPRECATED and should be
+      // removed once the 'using' declaration is removed.
       else if (s == "trapez")
-        return QTrapez<dim>();
+        return QTrapezoid<dim>();
+      else if (s == "trapezoid")
+        return QTrapezoid<dim>();
       else if (s == "weddle")
         return QWeddle<dim>();
     }

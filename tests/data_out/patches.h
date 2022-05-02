@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,23 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
       const unsigned int nsub  = p + 1;
       const unsigned int nsubp = nsub + 1;
 
-      patch.n_subdivisions = nsub;
+#ifdef DEAL_II_HAVE_CXX17
+      if constexpr (dim > 0)
+        patch.n_subdivisions = nsub;
+#else
+      if (dim > 0)
+        const_cast<unsigned int &>(patch.n_subdivisions) = nsub;
+#endif
+
+#ifdef DEAL_II_HAVE_CXX17
+      if constexpr (dim > 0)
+        patch.reference_cell = ReferenceCells::get_hypercube<dim>();
+#else
+      if (dim > 0)
+        const_cast<ReferenceCell &>(patch.reference_cell) =
+          ReferenceCells::get_hypercube<dim>();
+#endif
+
       for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         for (unsigned int d = 0; d < spacedim; ++d)
           patch.vertices[v](d) =
@@ -82,9 +98,9 @@ create_continuous_patches(std::vector<DataOutBase::Patch<dim, dim>> &patches,
   unsigned int n2 = (dim >= 2) ? n_cells : 1;
   unsigned int n3 = (dim >= 3) ? n_cells : 1;
 
-  QTrapez<dim>   trapez;
-  QTrapez<1>     trapez1d;
-  QIterated<dim> trapezsub(trapez1d, n_sub);
+  QTrapezoid<dim> trapez;
+  QTrapezoid<1>   trapez1d;
+  QIterated<dim>  trapezsub(trapez1d, n_sub);
 
   Point<dim> midpoint;
   for (unsigned int d = 0; d < dim; ++d)
@@ -98,6 +114,7 @@ create_continuous_patches(std::vector<DataOutBase::Patch<dim, dim>> &patches,
         {
           DataOutBase::Patch<dim, dim> patch;
           patch.n_subdivisions = n_sub;
+          patch.reference_cell = ReferenceCells::get_hypercube<dim>();
           for (unsigned int k = 0; k < trapez.size(); ++k)
             {
               Point<dim> p = trapez.point(k);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,5 +19,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     template class Mapping<deal_II_dimension, deal_II_space_dimension>;
+
+    template const Mapping<deal_II_dimension, deal_II_space_dimension>
+      &get_default_linear_mapping(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension>
+          &triangulation);
 #endif
   }

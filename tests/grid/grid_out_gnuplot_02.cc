@@ -1,6 +1,7 @@
+
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,18 +51,21 @@ public:
 };
 
 // overloads to get multiple grids for multiple dim and spacedim combinations
-void make_grid(Triangulation<2, 2> &triangulation)
+void
+make_grid(Triangulation<2, 2> &triangulation)
 {
   GridGenerator::hyper_shell(triangulation, Point<2>(), 2.0, 6.0, 12);
 }
 
-void make_grid(Triangulation<2, 3> &triangulation)
+void
+make_grid(Triangulation<2, 3> &triangulation)
 {
   GridGenerator::hyper_sphere(triangulation, Point<3>(), 6.0);
   triangulation.refine_global(1); // need more cells
 }
 
-void make_grid(Triangulation<3, 3> &triangulation)
+void
+make_grid(Triangulation<3, 3> &triangulation)
 {
   GridGenerator::hyper_shell(triangulation, Point<3>(), 2.0, 6.0, 12);
   triangulation.refine_global(0);
@@ -87,8 +91,8 @@ gnuplot_output(const GridOutFlags::Gnuplot &flags)
   triangulation.execute_coarsening_and_refinement();
 
   FESystem<dim, spacedim>   displacement_fe(FE_Q<dim, spacedim>(1), spacedim);
-  DoFHandler<dim, spacedim> displacement_dof_handler;
-  displacement_dof_handler.initialize(triangulation, displacement_fe);
+  DoFHandler<dim, spacedim> displacement_dof_handler(triangulation);
+  displacement_dof_handler.distribute_dofs(displacement_fe);
 
   Vector<double> displacements(displacement_dof_handler.n_dofs());
   VectorTools::interpolate(displacement_dof_handler,

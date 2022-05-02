@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,9 +94,6 @@ class SparseMatrix;
  * preconditioner, at the beginning of their program and each time the solver is
  * started (that is several times e.g. in a nonlinear iteration) this
  * preselected solver and preconditioner is called.
- *
- * @author Ralf Hartmann, 1999; extension for full compatibility with
- * LinearOperator class: Jean-Paul Pelteret, 2015
  */
 template <typename MatrixType = SparseMatrix<double>,
           typename VectorType = dealii::Vector<double>>

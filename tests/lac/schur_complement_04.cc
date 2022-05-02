@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,8 +94,8 @@ main(int argc, char **argv)
 
        */
 
-      const unsigned int                    rc = 1;
-      typedef TrilinosWrappers::MPI::Vector VectorType;
+      const unsigned int rc = 1;
+      using VectorType      = TrilinosWrappers::MPI::Vector;
 
       TrilinosWrappers::SparseMatrix A(rc, rc, rc);
       TrilinosWrappers::SparseMatrix B(rc, rc, rc);

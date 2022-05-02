@@ -1,0 +1,34 @@
+
+DEAL::dim = 1
+DEAL::quadrature sizes first call
+DEAL::inside 0
+DEAL::outside 1
+DEAL::surface 0
+DEAL::
+DEAL::quadrature sizes second call
+DEAL::inside 0
+DEAL::outside 1
+DEAL::surface 0
+DEAL::
+DEAL::dim = 2
+DEAL::quadrature sizes first call
+DEAL::inside 0
+DEAL::outside 1
+DEAL::surface 0
+DEAL::
+DEAL::quadrature sizes second call
+DEAL::inside 0
+DEAL::outside 1
+DEAL::surface 0
+DEAL::
+DEAL::dim = 3
+DEAL::quadrature sizes first call
+DEAL::inside 0
+DEAL::outside 1
+DEAL::surface 0
+DEAL::
+DEAL::quadrature sizes second call
+DEAL::inside 0
+DEAL::outside 1
+DEAL::surface 0
+DEAL::

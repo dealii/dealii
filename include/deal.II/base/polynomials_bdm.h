@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,8 +94,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  *
  * @ingroup Polynomials
- * @author Guido Kanschat
- * @date 2003, 2005, 2009
  */
 template <int dim>
 class PolynomialsBDM : public TensorPolynomialsBase<dim>
@@ -146,7 +144,7 @@ public:
   n_polynomials(const unsigned int degree);
 
   /**
-   * @copydoc TensorPolynomialsBase<dim>::clone()
+   * @copydoc TensorPolynomialsBase::clone()
    */
   virtual std::unique_ptr<TensorPolynomialsBase<dim>>
   clone() const override;

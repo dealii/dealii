@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_enriched.h>
@@ -31,7 +32,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -100,7 +100,7 @@ test5()
 
   std::vector<Vector<double>> shape_functions;
   std::vector<std::string>    names;
-  for (unsigned int s = 0; s < dof_handler.n_dofs(); s++)
+  for (unsigned int s = 0; s < dof_handler.n_dofs(); ++s)
     {
       names.push_back(std::string("N_") + dealii::Utilities::int_to_string(s));
 
@@ -115,7 +115,7 @@ test5()
   {
     const unsigned int    global_dof = 11;
     const Vector<double> &solution   = shape_functions[global_dof];
-    QTrapez<dim>          quadrature;
+    QTrapezoid<dim>       quadrature;
     FEValues<dim>         fe_values(fe, quadrature, update_values);
 
     const unsigned int  n_q_points = quadrature.size();
@@ -135,7 +135,7 @@ test5()
         // find out which
         unsigned int local_dof = 0;
         cell->get_dof_indices(local_dof_indices);
-        for (; local_dof < dofs_per_cell; local_dof++)
+        for (; local_dof < dofs_per_cell; ++local_dof)
           if (local_dof_indices[local_dof] == global_dof)
             break;
 
@@ -144,7 +144,7 @@ test5()
         fe_values.get_function_values(solution, solution_values);
 
         deallog << " cell=" << cell->center() << std::endl;
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           {
             // find non-zero shape_value
             deallog << " qp=" << q_points[q_point]
@@ -164,7 +164,7 @@ test5()
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(patches);

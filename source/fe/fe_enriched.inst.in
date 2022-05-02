@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,7 +25,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       \{
         template bool
         find_connection_between_subdomains(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+          const DoFHandler<deal_II_dimension, deal_II_space_dimension>
             &dof_handler,
           const predicate_function<deal_II_dimension, deal_II_space_dimension>
             &predicate_1,
@@ -35,7 +35,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
         template unsigned int
         color_predicates(
-          const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>
+          const DoFHandler<deal_II_dimension, deal_II_space_dimension>
             &dof_handler,
           const std::vector<
             predicate_function<deal_II_dimension, deal_II_space_dimension>> &,
@@ -44,8 +44,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
         template void
         set_cellwise_color_set_and_fe_index(
-          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>
-            &dof_handler,
+          DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
           const std::vector<
             predicate_function<deal_II_dimension, deal_II_space_dimension>>
             &                              predicates,

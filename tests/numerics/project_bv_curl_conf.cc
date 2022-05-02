@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,7 +68,12 @@ test_boundary_values(const FiniteElement<dim> &fe)
 
   constraints.clear();
   VectorTools::project_boundary_values_curl_conforming_l2(
-    dof_handler, 0, boundary_function, 0, constraints);
+    dof_handler,
+    0,
+    boundary_function,
+    0,
+    constraints,
+    StaticMappingQ1<dim>::mapping);
   constraints.close();
   constraints.print(deallog.get_file_stream());
 }

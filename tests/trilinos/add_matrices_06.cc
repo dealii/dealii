@@ -49,8 +49,8 @@ test(TrilinosWrappers::SparseMatrix &m)
   m2.compress(VectorOperation::insert);
   m3.compress(VectorOperation::insert);
 
-  deallog << "Matrix nonzeros: " << m.n_nonzero_elements() << " "
-          << m2.n_nonzero_elements() << " " << m3.n_nonzero_elements()
+  deallog << "Matrix nonzeros: " << m.n_nonzero_elements() << ' '
+          << m2.n_nonzero_elements() << ' ' << m3.n_nonzero_elements()
           << std::endl;
 
   m.copy_from(m2);
@@ -63,7 +63,7 @@ test(TrilinosWrappers::SparseMatrix &m)
   prec.initialize(m);
 
   m.vmult(dst, src);
-  deallog << "Vector norm: " << dst.l2_norm() << " ";
+  deallog << "Vector norm: " << dst.l2_norm() << ' ';
 
   prec.vmult(dst, src);
   deallog << dst.l2_norm() << std::endl;
@@ -72,7 +72,7 @@ test(TrilinosWrappers::SparseMatrix &m)
   m.add(0.06, m3);
 
   m.vmult(dst, src);
-  deallog << "Vector norm: " << dst.l2_norm() << " ";
+  deallog << "Vector norm: " << dst.l2_norm() << ' ';
 
   prec.vmult(dst, src);
   deallog << dst.l2_norm() << std::endl;

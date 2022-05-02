@@ -30,7 +30,6 @@ DEAL::
 DEAL::{\it Default:} true
 DEAL::
 DEAL::
-DEAL::{\it Possible values:} A boolean value (true or false)
 DEAL::\item {\it Parameter name:} {\tt First double}
 DEAL::\phantomsection\label{parameters:First Class/First double}
 DEAL::\label{parameters:First_20Class/First_20double}
@@ -41,10 +40,9 @@ DEAL::\index[prmindexfull]{First Class!First double}
 DEAL::{\it Value:} 7.7
 DEAL::
 DEAL::
-DEAL::{\it Default:} 7.700000
+DEAL::{\it Default:} 7.7
 DEAL::
 DEAL::
-DEAL::{\it Possible values:} A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$
 DEAL::\item {\it Parameter name:} {\tt First int}
 DEAL::\phantomsection\label{parameters:First Class/First int}
 DEAL::\label{parameters:First_20Class/First_20int}
@@ -58,7 +56,6 @@ DEAL::
 DEAL::{\it Default:} 3
 DEAL::
 DEAL::
-DEAL::{\it Possible values:} An integer $n$ such that $-2147483648\leq n \leq 2147483647$
 DEAL::\item {\it Parameter name:} {\tt First string}
 DEAL::\phantomsection\label{parameters:First Class/First string}
 DEAL::\label{parameters:First_20Class/First_20string}
@@ -72,7 +69,6 @@ DEAL::
 DEAL::{\it Default:} hello
 DEAL::
 DEAL::
-DEAL::{\it Possible values:} Any string
 DEAL::\end{itemize}
 DEAL::
 DEAL::\subsection{Parameters in section \tt Second Class}
@@ -92,7 +88,6 @@ DEAL::
 DEAL::{\it Default:} false
 DEAL::
 DEAL::
-DEAL::{\it Possible values:} A boolean value (true or false)
 DEAL::\item {\it Parameter name:} {\tt Second double}
 DEAL::\phantomsection\label{parameters:Second Class/Second double}
 DEAL::\label{parameters:Second_20Class/Second_20double}
@@ -103,10 +98,9 @@ DEAL::\index[prmindexfull]{Second Class!Second double}
 DEAL::{\it Value:} 9.9
 DEAL::
 DEAL::
-DEAL::{\it Default:} 9.900000
+DEAL::{\it Default:} 9.9
 DEAL::
 DEAL::
-DEAL::{\it Possible values:} A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$
 DEAL::\item {\it Parameter name:} {\tt Second int}
 DEAL::\phantomsection\label{parameters:Second Class/Second int}
 DEAL::\label{parameters:Second_20Class/Second_20int}
@@ -120,7 +114,6 @@ DEAL::
 DEAL::{\it Default:} 5
 DEAL::
 DEAL::
-DEAL::{\it Possible values:} An integer $n$ such that $-2147483648\leq n \leq 2147483647$
 DEAL::\item {\it Parameter name:} {\tt Second string}
 DEAL::\phantomsection\label{parameters:Second Class/Second string}
 DEAL::\label{parameters:Second_20Class/Second_20string}
@@ -134,5 +127,4 @@ DEAL::
 DEAL::{\it Default:} bye bye
 DEAL::
 DEAL::
-DEAL::{\it Possible values:} Any string
 DEAL::\end{itemize}

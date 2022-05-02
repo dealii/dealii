@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,7 @@ test1()
   const auto res = Utilities::inverse_Hilbert_space_filling_curve(points, 4);
 
   for (const auto &p : res)
-    deallog << p[0] << " " << p[1] << std::endl;
+    deallog << p[0] << ' ' << p[1] << std::endl;
 }
 
 // https://github.com/aditi137/Hilbert/blob/master/Hilbert/test.py
@@ -88,12 +88,12 @@ void
 test2()
 {
   deallog << "test2:" << std::endl;
-  std::vector<std::array<std::uint64_t, 3>> points = {{5, 10, 20}};
+  std::vector<std::array<std::uint64_t, 3>> points = {{{5, 10, 20}}};
 
   const auto res = Utilities::inverse_Hilbert_space_filling_curve<3>(points, 5);
 
   for (const auto &p : res)
-    deallog << p[0] << " " << p[1] << " " << p[2] << std::endl;
+    deallog << p[0] << ' ' << p[1] << ' ' << p[2] << std::endl;
 }
 
 

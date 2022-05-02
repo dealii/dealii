@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2018 by the deal.II authors
+ * Copyright (C) 2006 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -15,7 +15,8 @@
 
  *
  * Authors: Wolfgang Bangerth, Texas A&M University, 2006, 2007;
- *          Denis Davydov, University of Erlangen-Nuremberg, 2016.
+ *          Denis Davydov, University of Erlangen-Nuremberg, 2016;
+ *          Marc Fehling, Colorado State University, 2020.
  */
 
 
@@ -36,10 +37,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -47,19 +45,21 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
-// These are the new files we need. The first and second provide <i>hp</i>
-// versions of the DoFHandler and FEValues classes as described in the
-// introduction of this program. The last one provides Fourier transformation
-// class on the unit cell.
-#include <deal.II/hp/dof_handler.h>
+// These are the new files we need. The first and second provide the
+// FECollection and the <i>hp</i> version of the FEValues class as described in
+// the introduction of this program. The next one provides the functionality
+// for automatic $hp$-adaptation, for which we will use the estimation
+// algorithms based on decaying series expansion coefficients that are part of
+// the last two files.
+#include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
+#include <deal.II/hp/refinement.h>
 #include <deal.II/fe/fe_series.h>
+#include <deal.II/numerics/smoothness_estimator.h>
 
-// The last set of include files are standard C++ headers. We need support for
-// complex numbers when we compute the Fourier transform.
+// The last set of include files are standard C++ headers.
 #include <fstream>
 #include <iostream>
-#include <complex>
 
 
 // Finally, this is as in previous programs:
@@ -75,12 +75,10 @@ namespace Step27
   // main difference is that we have merged the refine_grid and output_results
   // functions into one since we will also want to output some of the
   // quantities used in deciding how to refine the mesh (in particular the
-  // estimated smoothness of the solution). There is also a function that
-  // computes this estimated smoothness, as discussed in the introduction.
+  // estimated smoothness of the solution).
   //
   // As far as member variables are concerned, we use the same structure as
-  // already used in step-6, but instead of a regular DoFHandler we use an
-  // object of type hp::DoFHandler, and we need collections instead of
+  // already used in step-6, but we need collections instead of
   // individual finite element, quadrature, and face quadrature objects. We
   // will fill these collections in the constructor of the class. The last
   // variable, <code>max_degree</code>, indicates the maximal polynomial
@@ -99,21 +97,14 @@ namespace Step27
     void assemble_system();
     void solve();
     void create_coarse_grid();
-    void estimate_smoothness(Vector<float> &smoothness_indicators);
     void postprocess(const unsigned int cycle);
-    std::pair<bool, unsigned int> predicate(const TableIndices<dim> &indices);
 
     Triangulation<dim> triangulation;
 
-    hp::DoFHandler<dim>      dof_handler;
+    DoFHandler<dim>          dof_handler;
     hp::FECollection<dim>    fe_collection;
     hp::QCollection<dim>     quadrature_collection;
     hp::QCollection<dim - 1> face_quadrature_collection;
-
-    hp::QCollection<dim>                    fourier_q_collection;
-    std::shared_ptr<FESeries::Fourier<dim>> fourier;
-    std::vector<double>                     ln_k;
-    Table<dim, std::complex<double>>        fourier_coefficients;
 
     AffineConstraints<double> constraints;
 
@@ -158,7 +149,7 @@ namespace Step27
   // @sect4{LaplaceProblem::LaplaceProblem constructor}
 
   // The constructor of this class is fairly straightforward. It associates
-  // the hp::DoFHandler object with the triangulation, and then sets the
+  // the DoFHandler object with the triangulation, and then sets the
   // maximal polynomial degree to 7 (in 1d and 2d) or 5 (in 3d and higher). We
   // do so because using higher order polynomial degrees becomes prohibitively
   // expensive, especially in higher space dimensions.
@@ -167,23 +158,6 @@ namespace Step27
   // face quadrature objects. We start with quadratic elements, and each
   // quadrature formula is chosen so that it is appropriate for the matching
   // finite element in the hp::FECollection object.
-  //
-  // Finally, we initialize FESeries::Fourier object which will be used to
-  // calculate coefficient in Fourier series as described in the introduction.
-  // In addition to the hp::FECollection, we need to provide quadrature rules
-  // hp::QCollection for integration on the reference cell.
-  //
-  // In order to resize fourier_coefficients Table, we use the following
-  // auxiliary function
-  template <int dim, typename T>
-  void resize(Table<dim, T> &coeff, const unsigned int N)
-  {
-    TableIndices<dim> size;
-    for (unsigned int d = 0; d < dim; d++)
-      size[d] = N;
-    coeff.reinit(size);
-  }
-
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem()
     : dof_handler(triangulation)
@@ -195,48 +169,6 @@ namespace Step27
         quadrature_collection.push_back(QGauss<dim>(degree + 1));
         face_quadrature_collection.push_back(QGauss<dim - 1>(degree + 1));
       }
-
-    // As described in the introduction, we define the Fourier vectors ${\bf
-    // k}$ for which we want to compute Fourier coefficients of the solution
-    // on each cell as follows. In 2d, we will need coefficients corresponding
-    // to vectors ${\bf k}=(2 \pi i, 2\pi j)^T$ for which $\sqrt{i^2+j^2}\le N$,
-    // with $i,j$ integers and $N$ being the maximal polynomial degree we use
-    // for the finite elements in this program. The FESeries::Fourier class'
-    // constructor first parameter $N$ defines the number of coefficients in 1D
-    // with the total number of coefficients being $N^{dim}$. Although we will
-    // not use coefficients corresponding to
-    // $\sqrt{i^2+j^2}> N$ and $i+j==0$, the overhead of their calculation is
-    // minimal. The transformation matrices for each FiniteElement will be
-    // calculated only once the first time they are required in the course of
-    // hp-adaptive refinement. Because we work on the unit cell, we can do all
-    // this work without a mapping from reference to real cell and consequently
-    // can precalculate these matrices. The calculation of expansion
-    // coefficients for a particular set of local degrees of freedom on a given
-    // cell then follows as a simple matrix-vector product.
-    // The 3d case is handled analogously.
-    const unsigned int N = max_degree;
-
-    // We will need to assemble the matrices that do the Fourier transforms
-    // for each of the finite elements we deal with, i.e. the matrices ${\cal
-    // F}_{{\bf k},j}$ defined in the introduction. We have to do that for
-    // each of the finite elements in use. To that end we need a quadrature
-    // rule. In this example we use the same quadrature formula for each
-    // finite element, namely that is obtained by iterating a
-    // 2-point Gauss formula as many times as the maximal exponent we use for
-    // the term $e^{i{\bf k}\cdot{\bf x}}$:
-    QGauss<1>      base_quadrature(2);
-    QIterated<dim> quadrature(base_quadrature, N);
-    for (unsigned int i = 0; i < fe_collection.size(); i++)
-      fourier_q_collection.push_back(quadrature);
-
-    // Now we are ready to set-up the FESeries::Fourier object
-    fourier = std::make_shared<FESeries::Fourier<dim>>(N,
-                                                       fe_collection,
-                                                       fourier_q_collection);
-
-    // We need to resize the matrix of fourier coefficients according to the
-    // number of modes N.
-    resize(fourier_coefficients, N);
   }
 
 
@@ -255,7 +187,7 @@ namespace Step27
   // This function is again a verbatim copy of what we already did in
   // step-6. Despite function calls with exactly the same names and arguments,
   // the algorithms used internally are different in some aspect since the
-  // dof_handler variable here is an hp object.
+  // dof_handler variable here is in $hp$-mode.
   template <int dim>
   void LaplaceProblem<dim>::setup_system()
   {
@@ -297,17 +229,17 @@ namespace Step27
   // polynomial degrees on different cells, the matrices and vectors holding
   // local contributions do not have the same size on all cells. At the
   // beginning of the loop over all cells, we therefore each time have to
-  // resize them to the correct size (given by
-  // <code>dofs_per_cell</code>). Because these classes are implement in such
-  // a way that reducing the size of a matrix or vector does not release the
-  // currently allocated memory (unless the new size is zero), the process of
-  // resizing at the beginning of the loop will only require re-allocation of
-  // memory during the first few iterations. Once we have found in a cell with
-  // the maximal finite element degree, no more re-allocations will happen
-  // because all subsequent <code>reinit</code> calls will only set the size
-  // to something that fits the currently allocated memory. This is important
-  // since allocating memory is expensive, and doing so every time we visit a
-  // new cell would take significant compute time.
+  // resize them to the correct size (given by <code>dofs_per_cell</code>).
+  // Because these classes are implemented in such a way that reducing the size
+  // of a matrix or vector does not release the currently allocated memory
+  // (unless the new size is zero), the process of resizing at the beginning of
+  // the loop will only require re-allocation of memory during the first few
+  // iterations. Once we have found in a cell with the maximal finite element
+  // degree, no more re-allocations will happen because all subsequent
+  // <code>reinit</code> calls will only set the size to something that fits the
+  // currently allocated memory. This is important since allocating memory is
+  // expensive, and doing so every time we visit a new cell would take
+  // significant compute time.
   template <int dim>
   void LaplaceProblem<dim>::assemble_system()
   {
@@ -326,7 +258,7 @@ namespace Step27
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
-        const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
 
         cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
         cell_matrix = 0;
@@ -403,8 +335,7 @@ namespace Step27
     // Let us start with computing estimated error and smoothness indicators,
     // which each are one number for each active cell of our
     // triangulation. For the error indicator, we use the KellyErrorEstimator
-    // class as always. Estimating the smoothness is done in the respective
-    // function of this class; that function is discussed further down below:
+    // class as always.
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate(
       dof_handler,
@@ -413,9 +344,21 @@ namespace Step27
       solution,
       estimated_error_per_cell);
 
-
+    // Estimating the smoothness is performed with the method of decaying
+    // expansion coefficients as outlined in the introduction. We will first
+    // need to create an object capable of transforming the finite element
+    // solution on every single cell into a sequence of Fourier series
+    // coefficients. The SmoothnessEstimator namespace offers a factory function
+    // for such a FESeries::Fourier object that is optimized for the process of
+    // estimating smoothness. The actual determination of the decay of Fourier
+    // coefficients on every individual cell then happens in the last function.
     Vector<float> smoothness_indicators(triangulation.n_active_cells());
-    estimate_smoothness(smoothness_indicators);
+    FESeries::Fourier<dim> fourier =
+      SmoothnessEstimator::Fourier::default_fe_series(fe_collection);
+    SmoothnessEstimator::Fourier::coefficient_decay(fourier,
+                                                    dof_handler,
+                                                    solution,
+                                                    smoothness_indicators);
 
     // Next we want to generate graphical output. In addition to the two
     // estimated quantities derived above, we would also like to output the
@@ -430,7 +373,7 @@ namespace Step27
     // that element. The result we put into a vector with one element per
     // cell. The DataOut class requires this to be a vector of
     // <code>float</code> or <code>double</code>, even though our values are
-    // all integers, so that it what we use:
+    // all integers, so that is what we use:
     {
       Vector<float> fe_degrees(triangulation.n_active_cells());
       for (const auto &cell : dof_handler.active_cell_iterators())
@@ -439,12 +382,8 @@ namespace Step27
 
       // With now all data vectors available -- solution, estimated errors and
       // smoothness indicators, and finite element degrees --, we create a
-      // DataOut object for graphical output and attach all data. Note that
-      // the DataOut class has a second template argument (which defaults to
-      // DoFHandler@<dim@>, which is why we have never seen it in previous
-      // tutorial programs) that indicates the type of DoF handler to be
-      // used. Here, we have to use the hp::DoFHandler class:
-      DataOut<dim, hp::DoFHandler<dim>> data_out;
+      // DataOut object for graphical output and attach all data:
+      DataOut<dim> data_out;
 
       data_out.attach_dof_handler(dof_handler);
       data_out.add_data_vector(solution, "solution");
@@ -476,52 +415,51 @@ namespace Step27
       // $h$ decreased. The strategy we choose here is that we look at the
       // smoothness indicators of those cells that are flagged for refinement,
       // and increase $p$ for those with a smoothness larger than a certain
-      // threshold. For this, we first have to determine the maximal and
-      // minimal values of the smoothness indicators of all flagged cells,
-      // which we do using a loop over all cells and comparing current minimal
-      // and maximal values. (We start with the minimal and maximal values of
-      // <i>all</i> cells, a range within which the minimal and maximal values
-      // on cells flagged for refinement must surely lie.) Absent any better
-      // strategies, we will then set the threshold above which will increase
-      // $p$ instead of reducing $h$ as the mean value between minimal and
-      // maximal smoothness indicators on cells flagged for refinement:
-      float max_smoothness = *std::min_element(smoothness_indicators.begin(),
-                                               smoothness_indicators.end()),
-            min_smoothness = *std::max_element(smoothness_indicators.begin(),
-                                               smoothness_indicators.end());
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->refine_flag_set())
-          {
-            max_smoothness =
-              std::max(max_smoothness,
-                       smoothness_indicators(cell->active_cell_index()));
-            min_smoothness =
-              std::min(min_smoothness,
-                       smoothness_indicators(cell->active_cell_index()));
-          }
-      const float threshold_smoothness = (max_smoothness + min_smoothness) / 2;
+      // relative threshold. In other words, for every cell for which (i) the
+      // refinement flag is set, (ii) the smoothness indicator is larger than
+      // the threshold, and (iii) we still have a finite element with a
+      // polynomial degree higher than the current one in the finite element
+      // collection, we will assign a future FE index that corresponds to a
+      // polynomial with degree one higher than it currently is. The following
+      // function is capable of doing exactly this. Absent any better
+      // strategies, we will set the threshold via interpolation between the
+      // minimal and maximal smoothness indicators on cells flagged for
+      // refinement. Since the corner singularities are strongly localized, we
+      // will favor $p$- over $h$-refinement quantitatively. We achieve this
+      // with a low threshold by setting a small interpolation factor of 0.2. In
+      // the same way, we deal with cells that are going to be coarsened and
+      // decrease their polynomial degree when their smoothness indicator is
+      // below the corresponding threshold determined on cells to be coarsened.
+      hp::Refinement::p_adaptivity_from_relative_threshold(
+        dof_handler, smoothness_indicators, 0.2, 0.2);
 
-      // With this, we can go back, loop over all cells again, and for those
-      // cells for which (i) the refinement flag is set, (ii) the smoothness
-      // indicator is larger than the threshold, and (iii) we still have a
-      // finite element with a polynomial degree higher than the current one
-      // in the finite element collection, we then increase the polynomial
-      // degree and in return remove the flag indicating that the cell should
-      // undergo bisection. For all other cells, the refinement flags remain
-      // untouched:
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->refine_flag_set() &&
-            (smoothness_indicators(cell->active_cell_index()) >
-             threshold_smoothness) &&
-            (cell->active_fe_index() + 1 < fe_collection.size()))
-          {
-            cell->clear_refine_flag();
-            cell->set_active_fe_index(cell->active_fe_index() + 1);
-          }
+      // The above function only determines whether the polynomial degree will
+      // change via future FE indices, but does not manipulate the
+      // $h$-refinement flags. So for cells that are flagged for both refinement
+      // categories, we prefer $p$- over $h$-refinement. The following function
+      // call ensures that only one of $p$- or $h$-refinement is imposed, and
+      // not both at once.
+      hp::Refinement::choose_p_over_h(dof_handler);
+
+      // For grid adaptive refinement, we ensure a 2:1 mesh balance by limiting
+      // the difference of refinement levels of neighboring cells to one by
+      // calling Triangulation::prepare_coarsening_and_refinement(). We would
+      // like to achieve something similar for the p-levels of neighboring
+      // cells: levels of future finite elements are not allowed to differ by
+      // more than a specified difference. With its default parameters, a call
+      // of hp::Refinement::limit_p_level_difference() ensures that their level
+      // difference is limited to one. This will not necessarily decrease the
+      // number of hanging nodes in the domain, but makes sure that high order
+      // polynomials are not constrained to much lower polynomials on faces,
+      // e.g., fifth order to second order polynomials.
+      triangulation.prepare_coarsening_and_refinement();
+      hp::Refinement::limit_p_level_difference(dof_handler);
 
       // At the end of this procedure, we then refine the mesh. During this
       // process, children of cells undergoing bisection inherit their mother
-      // cell's finite element index:
+      // cell's finite element index. Further, future finite element indices
+      // will turn into active ones, so that the new finite elements will be
+      // assigned to cells after the next call of DoFHandler::distribute_dofs().
       triangulation.execute_coarsening_and_refinement();
     }
   }
@@ -529,50 +467,34 @@ namespace Step27
 
   // @sect4{LaplaceProblem::create_coarse_grid}
 
-  // The following function is used when creating the initial grid. It is a
-  // specialization for the 2d case, i.e. a corresponding function needs to be
-  // implemented if the program is run in anything other then 2d. The function
-  // is actually stolen from step-14 and generates the same mesh used already
-  // there, i.e. the square domain with the square hole in the middle. The
-  // meaning of the different parts of this function are explained in the
-  // documentation of step-14:
-  template <>
-  void LaplaceProblem<2>::create_coarse_grid()
+  // The following function is used when creating the initial grid. The grid we
+  // would like to create is actually similar to the one from step-14, i.e., the
+  // square domain with the square hole in the middle. It can be generated by
+  // exactly the same function. However, since its implementation is only a
+  // specialization of the 2d case, we will present a different way of creating
+  // this domain which is dimension independent.
+  //
+  // We first create a hypercube triangulation with enough cells so that it
+  // already holds our desired domain $[-1,1]^d$, subdivided into $4^d$ cells.
+  // We then remove those cells in the center of the domain by testing the
+  // coordinate values of the vertices on each cell. In the end, we refine the
+  // so created grid globally as usual.
+  template <int dim>
+  void LaplaceProblem<dim>::create_coarse_grid()
   {
-    const unsigned int dim = 2;
+    Triangulation<dim> cube;
+    GridGenerator::subdivided_hyper_cube(cube, 4, -1., 1.);
 
-    const std::vector<Point<2>> vertices = {
-      {-1.0, -1.0}, {-0.5, -1.0}, {+0.0, -1.0}, {+0.5, -1.0}, {+1.0, -1.0}, //
-      {-1.0, -0.5}, {-0.5, -0.5}, {+0.0, -0.5}, {+0.5, -0.5}, {+1.0, -0.5}, //
-      {-1.0, +0.0}, {-0.5, +0.0}, {+0.5, +0.0}, {+1.0, +0.0},               //
-      {-1.0, +0.5}, {-0.5, +0.5}, {+0.0, +0.5}, {+0.5, +0.5}, {+1.0, +0.5}, //
-      {-1.0, +1.0}, {-0.5, +1.0}, {+0.0, +1.0}, {+0.5, +1.0}, {+1.0, +1.0}};
+    std::set<typename Triangulation<dim>::active_cell_iterator> cells_to_remove;
+    for (const auto &cell : cube.active_cell_iterators())
+      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+        if (cell->vertex(v).square() < .1)
+          cells_to_remove.insert(cell);
 
-    const std::vector<std::array<int, GeometryInfo<dim>::vertices_per_cell>>
-      cell_vertices = {{{0, 1, 5, 6}},
-                       {{1, 2, 6, 7}},
-                       {{2, 3, 7, 8}},
-                       {{3, 4, 8, 9}},
-                       {{5, 6, 10, 11}},
-                       {{8, 9, 12, 13}},
-                       {{10, 11, 14, 15}},
-                       {{12, 13, 17, 18}},
-                       {{14, 15, 19, 20}},
-                       {{15, 16, 20, 21}},
-                       {{16, 17, 21, 22}},
-                       {{17, 18, 22, 23}}};
+    GridGenerator::create_triangulation_with_removed_cells(cube,
+                                                           cells_to_remove,
+                                                           triangulation);
 
-    const unsigned int n_cells = cell_vertices.size();
-
-    std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
-    for (unsigned int i = 0; i < n_cells; ++i)
-      {
-        for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
-          cells[i].vertices[j] = cell_vertices[i][j];
-        cells[i].material_id = 0;
-      }
-
-    triangulation.create_triangulation(vertices, cells, SubCellData());
     triangulation.refine_global(3);
   }
 
@@ -581,8 +503,7 @@ namespace Step27
   // @sect4{LaplaceProblem::run}
 
   // This function implements the logic of the program, as did the respective
-  // function in most of the previous programs already, see for example
-  // step-6.
+  // function in most of the previous programs already, see for example step-6.
   //
   // Basically, it contains the adaptive loop: in the first iteration create a
   // coarse grid, and then set up the linear system, assemble it, solve, and
@@ -611,118 +532,6 @@ namespace Step27
         assemble_system();
         solve();
         postprocess(cycle);
-      }
-  }
-
-
-  // @sect4{LaplaceProblem::estimate_smoothness}
-
-  // As described in the introduction, we will need to take the maximum
-  // absolute value of fourier coefficients which correspond to $k$-vector
-  // $|{\bf k}|= const$. To filter the coefficients Table we
-  // will use the FESeries::process_coefficients() which requires a predicate
-  // to be specified. The predicate should operate on TableIndices and return
-  // a pair of <code>bool</code> and <code>unsigned int</code>. The latter
-  // is the value of the map from TableIndicies to unsigned int.  It is
-  // used to define subsets of coefficients from which we search for the one
-  // with highest absolute value, i.e. $l^\infty$-norm. The <code>bool</code>
-  // parameter defines which indices should be used in processing. In the
-  // current case we are interested in coefficients which correspond to
-  // $0 < i*i+j*j < N*N$ and $0 < i*i+j*j+k*k < N*N$ in 2D and 3D, respectively.
-  template <int dim>
-  std::pair<bool, unsigned int>
-  LaplaceProblem<dim>::predicate(const TableIndices<dim> &ind)
-  {
-    unsigned int v = 0;
-    for (unsigned int i = 0; i < dim; i++)
-      v += ind[i] * ind[i];
-    if (v > 0 && v < max_degree * max_degree)
-      return std::make_pair(true, v);
-    else
-      return std::make_pair(false, v);
-  }
-
-  // This last function of significance implements the algorithm to estimate
-  // the smoothness exponent using the algorithms explained in detail in the
-  // introduction. We will therefore only comment on those points that are of
-  // implementational importance.
-  template <int dim>
-  void
-  LaplaceProblem<dim>::estimate_smoothness(Vector<float> &smoothness_indicators)
-  {
-    // Since most of the hard work is done for us in FESeries::Fourier and
-    // we set up the object of this class in the constructor, what we are left
-    // to do here is apply this class to calculate coefficients and then
-    // perform linear regression to fit their decay slope.
-
-
-    // First thing to do is to loop over all cells and do our work there, i.e.
-    // to locally do the Fourier transform and estimate the decay coefficient.
-    // We will use the following array as a scratch array in the loop to store
-    // local DoF values:
-    Vector<double> local_dof_values;
-
-    // Then here is the loop:
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      {
-        // Inside the loop, we first need to get the values of the local
-        // degrees of freedom (which we put into the
-        // <code>local_dof_values</code> array after setting it to the right
-        // size) and then need to compute the Fourier transform by multiplying
-        // this vector with the matrix ${\cal F}$ corresponding to this finite
-        // element. This is done by calling FESeries::Fourier::calculate(),
-        // that has to be provided with the <code>local_dof_values</code>,
-        // <code>cell->active_fe_index()</code> and a Table to store
-        // coefficients.
-        local_dof_values.reinit(cell->get_fe().dofs_per_cell);
-        cell->get_dof_values(solution, local_dof_values);
-
-        fourier->calculate(local_dof_values,
-                           cell->active_fe_index(),
-                           fourier_coefficients);
-
-        // The next thing, as explained in the introduction, is that we wanted
-        // to only fit our exponential decay of Fourier coefficients to the
-        // largest coefficients for each possible value of $|{\bf k}|$. To
-        // this end, we use FESeries::process_coefficients() to rework
-        // coefficients into the desired format. We'll only take those Fourier
-        // coefficients with the largest magnitude for a given value of $|{\bf
-        // k}|$ and thereby need to use VectorTools::Linfty_norm:
-        std::pair<std::vector<unsigned int>, std::vector<double>> res =
-          FESeries::process_coefficients<dim>(
-            fourier_coefficients,
-            [this](const TableIndices<dim> &indices) {
-              return this->predicate(indices);
-            },
-            VectorTools::Linfty_norm);
-
-        Assert(res.first.size() == res.second.size(), ExcInternalError());
-
-        // The first vector in the <code>std::pair</code> will store values of
-        // the predicate, that is $i*i+j*j= const$ or $i*i+j*j+k*k = const$ in
-        // 2D or 3D respectively. This vector will be the same for all the cells
-        // so we can calculate logarithms of the corresponding Fourier vectors
-        // $|{\bf k}|$ only once in the whole hp-refinement cycle:
-        if (ln_k.size() == 0)
-          {
-            ln_k.resize(res.first.size(), 0);
-            for (unsigned int f = 0; f < ln_k.size(); f++)
-              ln_k[f] =
-                std::log(2.0 * numbers::PI * std::sqrt(1. * res.first[f]));
-          }
-
-        // We have to calculate the logarithms of absolute values of
-        // coefficients and use it in a linear regression fit to obtain $\mu$.
-        for (double &residual_element : res.second)
-          residual_element = std::log(residual_element);
-
-        std::pair<double, double> fit =
-          FESeries::linear_regression(ln_k, res.second);
-
-        // The final step is to compute the Sobolev index $s=\mu-\frac d2$ and
-        // store it in the vector of estimated values for each cell:
-        smoothness_indicators(cell->active_cell_index()) =
-          -fit.first - 1. * dim / 2;
       }
   }
 } // namespace Step27

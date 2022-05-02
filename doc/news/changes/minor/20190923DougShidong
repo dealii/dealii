@@ -1,5 +1,0 @@
-Fixed: When called with update_volume_elements, MappingFEField had an
-assertion that accidentally checked the wrong field's size. This is
-now fixed.
-<br>
-(Doug Shi-Dong, 2019/09/23)

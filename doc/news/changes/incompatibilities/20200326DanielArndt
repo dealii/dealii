@@ -1,4 +1,0 @@
-Removed: The deprecated FEValuesBase::get_all_normal_vectors() function has been
-removed. Use FEValuesBase::get_normal_vectors() instead.
-<br>
-(Daniel Arndt, 2020/03/26)

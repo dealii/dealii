@@ -53,7 +53,7 @@ IntegratedLegendreSZ::get_coefficients(const unsigned int k)
 
   // To maintain stability, delay the division (multiplication by a) until the
   // end.
-  for (unsigned int i = 1; i <= k - 2; i++)
+  for (unsigned int i = 1; i <= k - 2; ++i)
     {
       coefficients[i] = b * coefficients_km1[i - 1] - c * coefficients_km2[i];
     }

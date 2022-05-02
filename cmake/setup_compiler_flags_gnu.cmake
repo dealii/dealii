@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,19 +21,31 @@
 #
 
 IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.9" )
-  MESSAGE(WARNING "\n"
-    "deal.II requires support for features of C++11 that are not present in\n"
-    "versions of GCC prior to 4.9."
+    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.0" )
+  MESSAGE(FATAL_ERROR "\n"
+    "deal.II requires support for features of C++14 that are not present in\n"
+    "versions of GCC prior to 5.0."
     )
 ENDIF()
 
 IF( CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND
     CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.0" )
-  MESSAGE(WARNING "\n"
-    "deal.II requires support for features of C++11 that are not present in\n"
+  MESSAGE(FATAL_ERROR "\n"
+    "deal.II requires support for features of C++14 that are not present in\n"
     "versions of Clang prior to 4.0."
     )
+ENDIF()
+
+# Correspondence between AppleClang version and upstream Clang version:
+# https://en.wikipedia.org/wiki/Xcode#Xcode_7.0_-_11.x_(since_Free_On-Device_Development)
+IF (POLICY CMP0025)
+  IF( CMAKE_CXX_COMPILER_ID MATCHES "AppleClang" AND
+      CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0" )
+    MESSAGE(FATAL_ERROR "\n"
+      "deal.II requires support for features of C++14 that are not present in\n"
+      "versions of AppleClang prior to 9.0."
+      )
+  ENDIF()
 ENDIF()
 
 
@@ -64,6 +76,7 @@ ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wall")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wextra")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wmissing-braces")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Woverloaded-virtual")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wpointer-arith")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsign-compare")
@@ -98,7 +111,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-psabi")
 # Disable warnings regarding improper direct memory access
 # if compiling without C++17 support
 #
-IF(NOT DEAL_II_WITH_CXX17)
+IF(NOT DEAL_II_HAVE_CXX17)
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-class-memaccess")
 ENDIF()
 
@@ -173,6 +186,12 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-all-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
+
+  #
+  # Disable assert() in deal.II and user projects in release mode
+  #
+  LIST(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
+  LIST(APPEND DEAL_II_USER_DEFINITIONS_RELEASE "NDEBUG")
 
   #
   # There are many places in the library where we create a new typedef and then

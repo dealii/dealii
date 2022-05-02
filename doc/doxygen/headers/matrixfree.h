@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -292,7 +292,7 @@ digraph G
  * array. The access granularity in terms of a <i>cell index</i> is controlled
  * by the auxiliary field internal::MatrixFreeFunctions::DoFInfo::row_starts
  * that is similar to the rowstart index in a compressed matrix storage. The
- * scheme supports variable lengths because we support hp adaptivity and index
+ * scheme supports variable lengths because we support hp-adaptivity and index
  * indirections due to constraints that are contained in the main index
  * array. Due to vectorization over cells, the access granularity would
  * initially be in terms of <i>cell batches</i>. However, we must be able to
@@ -318,7 +318,7 @@ digraph G
  * </ol>
  * </li>
  *
- * <li>Information to extract the FE index in hp adaptive computations.</li>
+ * <li>Information to extract the FE index in hp-adaptive computations.</li>
  * <li>Information about the 'first access' into a particular vector entry
  * that is used to zero out the entries in a destination vectors within the
  * MatrixFree::loop shortly before accessing them the first time. This is used
@@ -408,7 +408,7 @@ digraph G
  * element. We use an auxiliary index array that points to the start of the
  * data for each cell, namely the `data_index_offsets` field for the
  * Jacobians, JxW values, and normal vectors, and `quadrature_point_offsets`
- * for the quadrature points. This offset enables hp adaptivity with variable
+ * for the quadrature points. This offset enables hp-adaptivity with variable
  * lengths of fields similar to what is done for DoFInfo, but it also enables
  * something we call <i>geometry compression</i>. In order to reduce the data
  * access, we detect simple geometries of cells where Jacobians are constant

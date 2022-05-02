@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,8 +54,9 @@ test()
   tr.repartition();
 
   const auto n_locally_owned_active_cells_per_processor =
-    tr.compute_n_locally_owned_active_cells_per_processor();
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    Utilities::MPI::all_gather(tr.get_communicator(),
+                               tr.n_locally_owned_active_cells());
+  if (myid == 0)
     for (unsigned int p = 0; p < numproc; ++p)
       deallog << "processor " << p << ": "
               << n_locally_owned_active_cells_per_processor[p]

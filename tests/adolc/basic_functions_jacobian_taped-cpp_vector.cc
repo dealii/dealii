@@ -41,11 +41,11 @@ test_reset_vector_values(const bool reset_values, const int tape_index)
   std::vector<adouble> y(m, 1.0);
 
   if (reset_values == false)
-    for (unsigned int i = 0; i < n; i++)
+    for (unsigned int i = 0; i < n; ++i)
       xp[i] = (i + 1.0) / (2.0 + i);
 
   trace_on(tape_index);
-  for (unsigned int i = 0; i < n; i++)
+  for (unsigned int i = 0; i < n; ++i)
     {
       x[i] <<= xp[i];
       for (unsigned int j = 0; j < m; ++j)
@@ -59,7 +59,7 @@ test_reset_vector_values(const bool reset_values, const int tape_index)
 
   // --- Change values ---
   if (reset_values == true)
-    for (unsigned int i = 0; i < n; i++)
+    for (unsigned int i = 0; i < n; ++i)
       xp[i] = (i + 1.0) / (2.0 + i);
 
   // --- Functions ---
@@ -84,9 +84,9 @@ test_reset_vector_values(const bool reset_values, const int tape_index)
   jacobian(tape_index, m, n, xp.data(), J);
 
   deallog << "Function jacobian J:" << std::endl;
-  for (unsigned int j = 0; j < m; j++)
+  for (unsigned int j = 0; j < m; ++j)
     {
-      for (unsigned int i = 0; i < n; i++)
+      for (unsigned int i = 0; i < n; ++i)
         deallog << J[j][i] << (i < n - 1 ? "," : "");
 
       deallog << std::endl;
@@ -97,7 +97,7 @@ test_reset_vector_values(const bool reset_values, const int tape_index)
   delete[] f;
   f = nullptr;
 
-  for (unsigned int j = 0; j < m; j++)
+  for (unsigned int j = 0; j < m; ++j)
     delete[] J[j];
   delete[] J;
   J = nullptr;

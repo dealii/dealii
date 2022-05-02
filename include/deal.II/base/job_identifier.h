@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,7 +67,7 @@ public:
   operator()() const;
 
   /**
-   * Function to identify the presently running program.
+   * %Function to identify the presently running program.
    */
   static const JobIdentifier &
   get_dealjobid();

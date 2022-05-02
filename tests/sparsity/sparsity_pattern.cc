@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,8 +36,8 @@ main()
   SparsityPattern    sp1((N - 1) * (N - 1), (N - 1) * (N - 1), 5);
   FDMatrix(N, N).five_point_structure(sp1);
   sp1.compress();
-  deallog << sp1.n_rows() << " " << sp1.n_cols() << " " << sp1.bandwidth()
-          << " " << sp1.n_nonzero_elements() << std::endl;
+  deallog << sp1.n_rows() << ' ' << sp1.n_cols() << ' ' << sp1.bandwidth()
+          << ' ' << sp1.n_nonzero_elements() << std::endl;
   for (unsigned int i = 0; i < sp1.n_rows(); ++i)
     deallog << sp1.row_length(i) << std::endl;
   sp1.print_gnuplot(deallog.get_file_stream());
@@ -46,8 +46,8 @@ main()
   // off-diagonals
   SparsityPattern sp2(sp1, 10, 2);
   sp2.compress();
-  deallog << sp2.n_rows() << " " << sp2.n_cols() << " " << sp2.bandwidth()
-          << " " << sp2.n_nonzero_elements() << std::endl;
+  deallog << sp2.n_rows() << ' ' << sp2.n_cols() << ' ' << sp2.bandwidth()
+          << ' ' << sp2.n_nonzero_elements() << std::endl;
   for (unsigned int i = 0; i < sp2.n_rows(); ++i)
     deallog << sp2.row_length(i) << std::endl;
   sp2.print_gnuplot(deallog.get_file_stream());
@@ -62,8 +62,8 @@ main()
     sp3.add(0, i);
   sp3.symmetrize();
   sp3.compress();
-  deallog << sp3.n_rows() << " " << sp3.n_cols() << " " << sp3.bandwidth()
-          << " " << sp3.n_nonzero_elements() << std::endl;
+  deallog << sp3.n_rows() << ' ' << sp3.n_cols() << ' ' << sp3.bandwidth()
+          << ' ' << sp3.n_nonzero_elements() << std::endl;
   for (unsigned int i = 0; i < sp3.n_rows(); ++i)
     deallog << sp3.row_length(i) << std::endl;
   sp3.print_gnuplot(deallog.get_file_stream());

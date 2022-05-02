@@ -1,0 +1,25 @@
+
+DEAL::Solve problem on TRI mesh:
+DEAL::   on parallel::fullydistributed::Triangulation
+DEAL::Solver stopped within 111 - 115 iterations
+DEAL::
+DEAL::Solve problem on QUAD mesh:
+DEAL::   on parallel::distributed::Triangulation
+DEAL::Solver stopped within 96 - 100 iterations
+DEAL::
+DEAL::Solve problem on TET mesh:
+DEAL::   on parallel::fullydistributed::Triangulation
+DEAL::Solver stopped within 154 - 158 iterations
+DEAL::
+DEAL::Solve problem on HEX mesh:
+DEAL::   on parallel::distributed::Triangulation
+DEAL::Solver stopped within 132 - 136 iterations
+DEAL::
+DEAL::Solve problem on WEDGE mesh:
+DEAL::   on parallel::fullydistributed::Triangulation
+DEAL::Solver stopped within 194 - 198 iterations
+DEAL::
+DEAL::Solve problem on PYRAMID mesh:
+DEAL::   on parallel::fullydistributed::Triangulation
+DEAL::Solver stopped within 81 - 85 iterations
+DEAL::

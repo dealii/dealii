@@ -1,5 +1,0 @@
-New: CUDAWrappers::FEEvaluation::get_dof_values() and
-CUDAWrappers::FEEvaluation::submit_dof_values() provide access to the values
-stored for the degrees of freedom.
-<br>
-(Daniel Arndt, 2019/07/09)

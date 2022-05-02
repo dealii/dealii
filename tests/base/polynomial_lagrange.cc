@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,10 +82,10 @@ main()
   initlog();
   deallog << std::setprecision(3);
 
-  QTrapez<1>   trapez;
-  QSimpson<1>  simpson;
-  QIterated<1> equi7(trapez, 6);
-  QIterated<1> equi10(trapez, 9);
+  QTrapezoid<1> trapez;
+  QSimpson<1>   simpson;
+  QIterated<1>  equi7(trapez, 6);
+  QIterated<1>  equi10(trapez, 9);
 
   QGauss<1> g2(2);
   QGauss<1> g3(3);

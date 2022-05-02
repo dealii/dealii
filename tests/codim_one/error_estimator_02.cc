@@ -162,10 +162,11 @@ check()
     deallog << error(i) << std::endl;
 
   {
-    DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+    DataOut<dim, spacedim> data_out;
     data_out.attach_dof_handler(dof);
-    data_out.add_data_vector(
-      v, "solution", DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data);
+    data_out.add_data_vector(v,
+                             "solution",
+                             DataOut<dim, spacedim>::type_dof_data);
     data_out.add_data_vector(error, "error");
     data_out.build_patches();
     std::string filename = spacedim == 2 ? "solution-2d-" : "solution-3d-";

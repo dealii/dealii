@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,6 +82,8 @@ test(TrilinosWrappers::SparseMatrix &m)
   norm_sqr += rnd * rnd;
 
   m.clear_row(N / 2, rnd);
+
+  Assert(m.el(N / 2, N / 2) == rnd, ExcInternalError());
 
   deallog << m.frobenius_norm() << ' ' << std::sqrt(norm_sqr) << std::endl;
   deallog << m.n_nonzero_elements() << ' ' << nnz << std::endl;

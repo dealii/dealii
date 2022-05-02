@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,9 +53,6 @@ namespace MeshWorker
      * completely different.
      *
      * @note In the current implementation, only cell data can be written.
-     *
-     * @author Guido Kanschat
-     * @date 2011, 2012
      */
     class GnuplotPatch
     {

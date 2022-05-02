@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,9 @@ check()
   dof_handler.distribute_dofs(fe);
 
   QGauss<dim>   quadrature(3);
-  FEValues<dim> fe_values(fe, quadrature, update_values | update_q_points);
+  FEValues<dim> fe_values(fe,
+                          quadrature,
+                          update_values | update_quadrature_points);
   fe_values.reinit(dof_handler.begin_active());
 
   for (unsigned int q = 0; q < quadrature.size(); ++q)

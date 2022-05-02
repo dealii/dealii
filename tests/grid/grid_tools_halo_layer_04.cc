@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,12 +15,12 @@
 
 
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/numerics/data_out.h>
 
@@ -28,29 +28,29 @@
 
 template <int dim>
 void
-write_active_fe_index_to_file(const hp::DoFHandler<dim> &dof_handler)
+write_active_fe_index_to_file(const DoFHandler<dim> &dof_handler)
 {
-  int                                                count = 0;
-  typename hp::DoFHandler<dim>::active_cell_iterator cell  = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  int                                            count = 0;
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell, ++count)
     {
-      deallog << count << " " << cell->active_fe_index() << std::endl;
+      deallog << count << ' ' << cell->active_fe_index() << std::endl;
     }
   deallog << std::endl;
 }
 
 template <int dim>
 void
-write_vtk(const hp::DoFHandler<dim> &dof_handler, const std::string filename)
+write_vtk(const DoFHandler<dim> &dof_handler, const std::string filename)
 {
   Vector<double> active_fe_index(
     dof_handler.get_triangulation().n_active_cells());
-  int                                                count = 0;
-  typename hp::DoFHandler<dim>::active_cell_iterator cell  = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
+  int                                            count = 0;
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
   for (; cell != endc; ++cell, ++count)
     {
       active_fe_index[count] = cell->active_fe_index();
@@ -61,11 +61,11 @@ write_vtk(const hp::DoFHandler<dim> &dof_handler, const std::string filename)
       1, DataComponentInterpretation::component_is_scalar);
   const std::vector<std::string> data_names(1, "active_fe_index");
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
   data_out.add_data_vector(active_fe_index,
                            data_names,
-                           DataOut<dim, hp::DoFHandler<dim>>::type_cell_data,
+                           DataOut<dim>::type_cell_data,
                            data_component_interpretation);
   data_out.build_patches();
 
@@ -83,9 +83,9 @@ test()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
 
-  typedef typename hp::DoFHandler<dim>::active_cell_iterator cell_iterator;
+  using cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
 
   // Mark a small block at the corner of the hypercube
   cell_iterator cell = dof_handler.begin_active(), endc = dof_handler.end();
@@ -114,7 +114,7 @@ test()
     write_vtk(dof_handler, filename.c_str());
   }
 
-  // Compute a halo layer around active fe index 2 and set it to active fe index
+  // Compute a halo layer around active FE index 2 and set it to active FE index
   // 3
   std::function<bool(const cell_iterator &)> predicate =
     IteratorFilters::ActiveFEIndexEqualTo(2, true);

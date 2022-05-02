@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// common framework to check hp constraints
+// common framework to check hp-constraints
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_lib.h>
@@ -22,6 +22,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_abf.h>
@@ -42,7 +43,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -67,10 +67,10 @@ void
 do_check(const Triangulation<dim> &   triangulation,
          const hp::FECollection<dim> &fe)
 {
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   // distribute fe_indices randomly
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+  for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
@@ -304,10 +304,10 @@ test_with_2d_deformed_refined_mesh(const hp::FECollection<dim> &fe)
             triangulation.begin_active()->set_refine_flag();
             break;
           case 1:
-            (++(triangulation.begin_active()))->set_refine_flag();
+            (std::next((triangulation.begin_active())))->set_refine_flag();
             break;
           case 2:
-            (++(++(triangulation.begin_active())))->set_refine_flag();
+            (std::next((++(triangulation.begin_active()))))->set_refine_flag();
             break;
           default:
             Assert(false, ExcNotImplemented());
@@ -349,11 +349,11 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
 
   if (do_refine)
     {
-      (++triangulation.begin_active())->set_refine_flag();
+      (std::next(triangulation.begin_active()))->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
     }
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
 
   // for every pair of finite elements,
@@ -369,9 +369,9 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
         deallog << "Testing " << fe[fe1].get_name() << " vs. "
                 << fe[fe2].get_name() << std::endl;
 
-        // set fe on coarse cell to 'i', on
+        // set FE on coarse cell to 'i', on
         // all fine cells to 'j'
-        typename hp::DoFHandler<dim>::active_cell_iterator cell =
+        typename DoFHandler<dim>::active_cell_iterator cell =
           dof_handler.begin_active();
         cell->set_active_fe_index(fe1);
         ++cell;

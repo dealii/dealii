@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,11 +41,10 @@
 
 template <int dim>
 void
-print_dofs(const hp::DoFHandler<dim> &dof)
+print_dofs(const DoFHandler<dim> &dof)
 {
   std::vector<types::global_dof_index> v;
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
-         dof.begin_active();
+  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
     {
@@ -62,7 +61,7 @@ print_dofs(const hp::DoFHandler<dim> &dof)
 
 template <int dim>
 void
-check_renumbering(hp::DoFHandler<dim> &dof)
+check_renumbering(DoFHandler<dim> &dof)
 {
   for (unsigned int i = 0; i < dof.get_fe_collection().size(); ++i)
     {
@@ -90,10 +89,10 @@ check()
   if (dim == 1)
     tr.refine_global(2);
 
-  hp::DoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   {
     bool coin = false;
-    for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+    for (typename DoFHandler<dim>::active_cell_iterator cell =
            dof.begin_active();
          cell != dof.end();
          ++cell)

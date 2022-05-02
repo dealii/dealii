@@ -1,5 +1,5 @@
 
-DEAL::Test with MappingQGeneric in 2D on 12 cells:
+DEAL::Test with MappingQ in 2D on 12 cells:
 DEAL::Testing 2D with point 0.8000000000 0.000000000 tolerance 1.000000000e-08
 DEAL::Cell: 0_1:2 unit point 2.615834610e-20 1.000000000
 DEAL::Cell: 2_1:3 unit point 1.000000000 1.000000000
@@ -203,7 +203,7 @@ DEAL::Testing 2D with point -0.7071067812 0.7071067812 tolerance 1.000000000e-08
 DEAL::Cell: 1_1:0 unit point 0.2500000000 9.777199125e-11
 DEAL::
 DEAL::
-DEAL::Test with MappingQGeneric in 2D on 48 cells:
+DEAL::Test with MappingQ in 2D on 48 cells:
 DEAL::Testing 2D with point 0.8000000000 0.000000000 tolerance 1.000000000e-08
 DEAL::Cell: 0_2:22 unit point -5.001540069e-12 1.000000000
 DEAL::Cell: 2_2:33 unit point 1.000000000 1.000000000
@@ -455,7 +455,7 @@ DEAL::Testing 2D with point -0.7071067812 0.7071067812 tolerance 1.000000000e-08
 DEAL::Cell: 1_2:00 unit point 0.5000000000 0.000000000
 DEAL::
 DEAL::
-DEAL::Test with MappingQGeneric in 3D on 48 cells:
+DEAL::Test with MappingQ in 3D on 48 cells:
 DEAL::Testing 3D with point 0.8000000000 0.000000000 4.898587197e-17 tolerance 1.000000000e-08
 DEAL::Cell: 1_1:2 unit point 1.000000000 1.000000000 1.000000000
 DEAL::Cell: 1_1:3 unit point 8.316724501e-17 1.000000000 1.000000000
@@ -943,7 +943,7 @@ DEAL::Testing 3D with point 0.05868060999 0.08076693067 0.9950041653 tolerance 1
 DEAL::Cell: 2_1:5 unit point 0.07446169019 3.662117048e-05 0.1025974553
 DEAL::
 DEAL::
-DEAL::Test with MappingQGeneric in 3D on 384 cells:
+DEAL::Test with MappingQ in 3D on 384 cells:
 DEAL::Testing 3D with point 0.8000000000 0.000000000 4.898587197e-17 tolerance 1.000000000e-08
 DEAL::Cell: 1_2:27 unit point 1.000000000 1.000000000 1.000000000
 DEAL::Cell: 1_2:36 unit point -8.454658402e-13 1.000000000 1.000000000

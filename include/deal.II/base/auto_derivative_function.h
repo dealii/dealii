@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,6 @@ DEAL_II_NAMESPACE_OPEN
  * defined function class.
  *
  * @ingroup functions
- * @author Ralf Hartmann, 2001
  */
 template <int dim>
 class AutoDerivativeFunction : public Function<dim>

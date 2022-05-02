@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -110,7 +110,8 @@ struct IncompressibleNeoHookeanPrincipalStretches
       {
         const NumberType &                lambda_squared = eig_C[d].first;
         const Tensor<1, dim, NumberType> &N              = eig_C[d].second;
-        C_inv += (1.0 / lambda_squared) * symmetrize(outer_product(N, N));
+        C_inv +=
+          NumberType(1.0 / lambda_squared) * symmetrize(outer_product(N, N));
       }
 
     const SymmetricTensor<2, dim, NumberType> I =
@@ -123,9 +124,9 @@ template <int dim, typename number_t, enum AD::NumberTypes ad_type_code>
 void
 test_NH(const bool nontrivial_initial_values)
 {
-  typedef AD::ScalarFunction<dim, ad_type_code, number_t> ADHelper;
-  typedef typename ADHelper::ad_type                      ADNumberType;
-  typedef typename ADHelper::scalar_type                  ScalarNumberType;
+  using ADHelper         = AD::ScalarFunction<dim, ad_type_code, number_t>;
+  using ADNumberType     = typename ADHelper::ad_type;
+  using ScalarNumberType = typename ADHelper::scalar_type;
 
   std::cout << "*** Standard definition of incompressible NeoHookean material, "
             << "dim = " << Utilities::to_string(dim) << ", "
@@ -139,7 +140,7 @@ test_NH(const bool nontrivial_initial_values)
   FullMatrix<ScalarNumberType> D2psi;
 
   // Function and its derivatives
-  typedef IncompressibleNeoHookean<dim, ADNumberType> func_ad;
+  using func_ad = IncompressibleNeoHookean<dim, ADNumberType>;
 
   // Setup the variable components and choose a value at which to
   // evaluate the tape
@@ -224,8 +225,8 @@ test_NH(const bool nontrivial_initial_values)
     ad_helper.extract_gradient_component(Dpsi, C_dof);
 
   // Verify the result
-  typedef IncompressibleNeoHookean<dim, ScalarNumberType> func;
-  static const ScalarNumberType                           tol =
+  using func = IncompressibleNeoHookean<dim, ScalarNumberType>;
+  static const ScalarNumberType tol =
     1e5 * std::numeric_limits<ScalarNumberType>::epsilon();
   std::cout << "psi:              " << psi << std::endl;
   std::cout << "func::psi(C):     " << func::psi(C) << std::endl;
@@ -256,9 +257,9 @@ void
 test_NH_eigen_stress(const enum SymmetricTensorEigenvectorMethod method,
                      const bool nontrivial_initial_values)
 {
-  typedef AD::VectorFunction<dim, ad_type_code, number_t> ADHelper;
-  typedef typename ADHelper::ad_type                      ADNumberType;
-  typedef typename ADHelper::scalar_type                  ScalarNumberType;
+  using ADHelper         = AD::VectorFunction<dim, ad_type_code, number_t>;
+  using ADNumberType     = typename ADHelper::ad_type;
+  using ScalarNumberType = typename ADHelper::scalar_type;
 
   std::cout
     << "*** Principal stretch definition of incompressible NeoHookean material (from stress), "
@@ -274,7 +275,7 @@ test_NH_eigen_stress(const enum SymmetricTensorEigenvectorMethod method,
   FullMatrix<ScalarNumberType> D2psi;
 
   // Function and its derivatives
-  typedef IncompressibleNeoHookeanPrincipalStretches<dim, ADNumberType> func_ad;
+  using func_ad = IncompressibleNeoHookeanPrincipalStretches<dim, ADNumberType>;
 
   // Setup the variable components and choose a value at which to
   // evaluate the tape
@@ -368,8 +369,8 @@ test_NH_eigen_stress(const enum SymmetricTensorEigenvectorMethod method,
     ad_helper.extract_value_component(Dpsi, C_dof);
 
   // Verify the result
-  typedef IncompressibleNeoHookean<dim, ScalarNumberType> func;
-  static const ScalarNumberType                           tol_val =
+  using func = IncompressibleNeoHookean<dim, ScalarNumberType>;
+  static const ScalarNumberType tol_val =
     (nontrivial_initial_values ?
        1e-4 :
        1e6 * std::numeric_limits<ScalarNumberType>::epsilon());

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
  * results in the correct constraints despite the bug.
  */
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -36,7 +37,6 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -52,7 +52,7 @@
 // used only for debugging
 template <int dim>
 void
-plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
+plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
 {
   deallog << "...start plotting shape function" << std::endl;
   deallog << "Patches for output: " << patches << std::endl;
@@ -132,16 +132,16 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
         << std::endl;
       GridOut grid_out;
       grid_out.write_gnuplot(dof_handler.get_triangulation(), f);
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
 
       DoFTools::write_gnuplot_dof_support_point_info(f, support_points);
 
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
 
       deallog << "...finished printing support points" << std::endl;
     }
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
@@ -152,7 +152,7 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
     }
   data_out.add_data_vector(fe_index, "fe_index");
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(patches);
@@ -222,10 +222,10 @@ main(int argc, char **argv)
   MPILogInitAll                    all;
 
   // Make basic grid
-  const unsigned int  dim = 2;
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler(triangulation);
-  Point<dim>          p1(0, 0), p2(3, 1);
+  const unsigned int dim = 2;
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler(triangulation);
+  Point<dim>         p1(0, 0), p2(3, 1);
   GridGenerator::subdivided_hyper_rectangle(triangulation, {3, 1}, p1, p2);
 
   // Make predicates resulting in three adjacent domains
@@ -242,11 +242,12 @@ main(int argc, char **argv)
   for (unsigned int i = 0; i < vec_predicates.size(); ++i)
     {
       // constant function.
-      ConstantFunction<dim> func(10 + i); // constant function
-      vec_enrichments.push_back(std::make_shared<ConstantFunction<dim>>(func));
+      Functions::ConstantFunction<dim> func(10 + i); // constant function
+      vec_enrichments.push_back(
+        std::make_shared<Functions::ConstantFunction<dim>>(func));
     }
 
-  // Construct helper class to construct fe collection
+  // Construct helper class to construct FE collection
   FE_Q<dim> fe_base(2);
   FE_Q<dim> fe_enriched(1);
 

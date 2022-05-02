@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -20,7 +20,6 @@
  * We test that the computed vectors are eigenvectors and mass-normal, i.e.
  * a) (A*x_i-\lambda*B*x_i).L2() == 0
  * b) x_i*B*x_i = 1
- *
  */
 
 #include <deal.II/base/index_set.h>
@@ -58,9 +57,9 @@ const unsigned int dim = 2; // run in 2d to save time
 
 const double eps = 1e-10;
 
-template <typename DoFHandlerType>
+template <int dim>
 std::vector<IndexSet>
-locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
+locally_owned_dofs_per_subdomain(const DoFHandler<dim> &dof_handler)
 {
   std::vector<types::subdomain_id> subdomain_association(dof_handler.n_dofs());
   DoFTools::get_subdomain_association(dof_handler, subdomain_association);
@@ -101,7 +100,7 @@ locally_owned_dofs_per_subdomain(const DoFHandlerType &dof_handler)
       index_sets[this_subdomain].add_range(i_min, subdomain_association.size());
     }
 
-  for (unsigned int i = 0; i < n_subdomains; i++)
+  for (unsigned int i = 0; i < n_subdomains; ++i)
     index_sets[i].compress();
 
   return index_sets;
@@ -182,7 +181,7 @@ test()
                                   constraints,
                                   /* keep constrained dofs */ true);
   std::vector<types::global_dof_index> n_locally_owned_dofs(n_mpi_processes);
-  for (unsigned int i = 0; i < n_mpi_processes; i++)
+  for (unsigned int i = 0; i < n_mpi_processes; ++i)
     n_locally_owned_dofs[i] = locally_owned_dofs_per_processor[i].n_elements();
 
   SparsityTools::distribute_sparsity_pattern(csp,
@@ -282,7 +281,7 @@ test()
     const double                      shift = 4.0;
     std::vector<std::complex<double>> lambda(eigenfunctions.size());
 
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       eigenfunctions[i] = 0.;
 
 
@@ -290,7 +289,7 @@ test()
                                             /*tolerance (global)*/ 0.0,
                                             /*reduce (w.r.t. initial)*/ 1.e-13);
 
-    typedef TrilinosWrappers::MPI::Vector  VectorType;
+    using VectorType = TrilinosWrappers::MPI::Vector;
     SolverGMRES<VectorType>                solver_c(inner_control_c);
     TrilinosWrappers::PreconditionIdentity preconditioner;
 
@@ -349,7 +348,7 @@ test()
           }
       }
 
-    for (unsigned int i = 0; i < eigenvalues.size(); i++)
+    for (unsigned int i = 0; i < eigenvalues.size(); ++i)
       deallog << eigenvalues[i] << std::endl;
 
     // make sure that we have eigenvectors and they are mass-normal:

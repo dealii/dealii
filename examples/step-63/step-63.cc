@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -38,13 +38,10 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -391,8 +388,7 @@ namespace Step63
                                       std::vector<double> &          values,
                                       const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    AssertDimension(values.size(), points.size());
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = RightHandSide<dim>::value(points[i], component);
@@ -442,8 +438,7 @@ namespace Step63
                                        std::vector<double> &          values,
                                        const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    AssertDimension(values.size(), points.size());
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = BoundaryValues<dim>::value(points[i], component);
@@ -701,7 +696,7 @@ namespace Step63
     copy_data.level = cell->level();
 
     const unsigned int dofs_per_cell =
-      scratch_data.fe_values.get_fe().dofs_per_cell;
+      scratch_data.fe_values.get_fe().n_dofs_per_cell();
     copy_data.dofs_per_cell = dofs_per_cell;
     copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
 
@@ -819,9 +814,8 @@ namespace Step63
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
       {
-        IndexSet locally_owned_level_dof_indices;
-        DoFTools::extract_locally_relevant_level_dofs(
-          dof_handler, level, locally_owned_level_dof_indices);
+        const IndexSet locally_owned_level_dof_indices =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
         boundary_constraints[level].reinit(locally_owned_level_dof_indices);
         boundary_constraints[level].add_lines(
           mg_constrained_dofs.get_refinement_edge_indices(level));
@@ -888,7 +882,7 @@ namespace Step63
   // relaxation parameter.
 
   // Since multiplicative methods tend to be more powerful than additive method,
-  // fewer smoothing steps are required to see convergence indepedent of mesh
+  // fewer smoothing steps are required to see convergence independent of mesh
   // size. The same holds for block smoothers over point smoothers. This is
   // reflected in the choice for the number of smoothing steps for each type of
   // smoother below.
@@ -918,9 +912,9 @@ namespace Step63
         using Smoother = PreconditionSOR<SparseMatrix<double>>;
 
         auto smoother =
-          std_cxx14::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
-                                                        Smoother,
-                                                        Vector<double>>>();
+          std::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
+                                                  Smoother,
+                                                  Vector<double>>>();
         smoother->initialize(mg_matrices,
                              Smoother::AdditionalData(fe.degree == 1 ? 1.0 :
                                                                        0.62));
@@ -931,9 +925,9 @@ namespace Step63
       {
         using Smoother = PreconditionJacobi<SparseMatrix<double>>;
         auto smoother =
-          std_cxx14::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
-                                                        Smoother,
-                                                        Vector<double>>>();
+          std::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
+                                                  Smoother,
+                                                  Vector<double>>>();
         smoother->initialize(mg_matrices,
                              Smoother::AdditionalData(fe.degree == 1 ? 0.6667 :
                                                                        0.47));
@@ -991,7 +985,7 @@ namespace Step63
 
         if (settings.smoother_type == "block SOR")
           {
-            auto smoother = std_cxx14::make_unique<MGSmootherPrecondition<
+            auto smoother = std::make_unique<MGSmootherPrecondition<
               SparseMatrix<double>,
               RelaxationBlockSOR<SparseMatrix<double>, double, Vector<double>>,
               Vector<double>>>();
@@ -1001,7 +995,7 @@ namespace Step63
           }
         else if (settings.smoother_type == "block Jacobi")
           {
-            auto smoother = std_cxx14::make_unique<
+            auto smoother = std::make_unique<
               MGSmootherPrecondition<SparseMatrix<double>,
                                      RelaxationBlockJacobi<SparseMatrix<double>,
                                                            double,
@@ -1223,7 +1217,7 @@ namespace Step63
 } // namespace Step63
 
 
-// @sect4{The <code>main</code> function}
+// @sect3{The <code>main</code> function}
 
 // Finally, the main function is like most tutorials. The only
 // interesting bit is that we require the user to pass a `.prm` file

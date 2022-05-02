@@ -17,9 +17,11 @@ maximum wavespeed method</i> based on a first-order <i>graph viscosity</i>
 for solving Euler's equations of gas dynamics @cite GuermondPopov2016. As
 such it is presented primarily for educational purposes. For actual
 research computations you might want to consider exploring a corresponding
-high-performance implementation of a second-order accurate scheme that uses
-<i>convex limiting</i> techniques, and strong stability-preserving (SSP)
-time integration, see @cite GuermondEtAl2018.
+<a href="https://github.com/conservation-laws/ryujin">high-performance
+implementation of a second-order accurate scheme</a> that uses <i>convex
+limiting</i> techniques, and strong stability-preserving (SSP) time
+integration, see @cite GuermondEtAl2018
+(<a href="https://conservation-laws.43-1.org/">website</a>).
 
 @dealiiTutorialDOI{10.5281/zenodo.3698223,https://zenodo.org/badge/DOI/10.5281/zenodo.3698223.svg}
 
@@ -161,9 +163,9 @@ $\mathbf{u}(\mathbf{x},t)$ remains in $\mathcal{B}$.
 
 <h4>Variational versus collocation-type discretizations</h4>
 
-Following Step-9, Step-12, and Step-33, at this point it might look tempting
-to base a discretization of Euler's equations on a (semi-discrete) variational
-formulation:
+Following Step-9, Step-12, Step-33, and Step-67, at this point it might look
+tempting to base a discretization of Euler's equations on a (semi-discrete)
+variational formulation:
 @f{align*}
   (\partial_t\mathbf{u}_{h},\textbf{v}_h)_{L^2(\Omega)}
   - ( \mathbb{f}(\mathbf{u}_{h}) ,\text{grad} \, \textbf{v}_{h})_{L^2(\Omega)}
@@ -191,7 +193,10 @@ techniques (see the early work of @cite Brooks1982 and @cite Johnson1986). They
 have proven to be some of the best approaches for simulations in the subsonic
 shockless regime and similarly benign situations.
 
-However, in the transonic and supersonic regime, and shock-hydrodynamics
+<!-- In particular, tutorial Step-67 focuses on Euler's equation of gas
+dynamics in the subsonic regime using dG techniques. -->
+
+However, in the transonic and supersonic regimes, and shock-hydrodynamics
 applications the use of variational schemes might be questionable. In fact,
 at the time of this writing, most shock-hydrodynamics codes are still
 firmly grounded on finite volume methods. The main reason for failure of
@@ -242,15 +247,15 @@ vector-valued DoFHandler (i.e. initialized with an FESystem) it is possible
 to compute the block-matrices (required in order to advance the solution)
 with relative ease. However, the interactions that have to be computed in
 the context of time-explicit collocation-type schemes (such as finite
-differences and/or the scheme presented in this tutorial)  can be are
+differences and/or the scheme presented in this tutorial) can be
 better described as <i>interactions between nodes</i> (not between DOFs).
 In addition, in our case we do not solve a linear equation in order to
 advance the solution. This leaves very little reason to use vector-valued
 finite element spaces both in theory and/or practice.
 
 We will use the usual Lagrange finite elements: let $\{\mathbf{x}_i\}_{i \in
-\mathcal{V}}$ denote the set of all support points (see @ref GlossSupport "this
-glossary entry"), where $\mathbf{x}_i \in \mathbb{R}^d$. Then each index $i \in
+\mathcal{V}}$ denote the set of all support points (see @ref GlossSupport "this glossary entry"),
+where $\mathbf{x}_i \in \mathbb{R}^d$. Then each index $i \in
 \mathcal{V}$ uniquely identifies a support point $\mathbf{x}_i$, as well as a
 scalar-valued shape function $\phi_i$. With this notation at hand we can define
 the (explicit time stepping) scheme as:
@@ -317,9 +322,9 @@ $t_n$:
 @f{align*}
 &\textbf{for } i \in \mathcal{V} \\
 &\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} \leftarrow
-\texttt{gather\_cij\_vectors} (\textbf{c}, \mathcal{I}(i)) \\
+\mathtt{gather\_cij\_vectors} (\textbf{c}, \mathcal{I}(i)) \\
 &\ \ \ \ \{\textbf{U}_j^n\}_{j \in \mathcal{I}(i)} \leftarrow
-\texttt{gather\_state\_vectors} (\textbf{U}^n, \mathcal{I}(i)) \\
+\mathtt{gather\_state\_vectors} (\textbf{U}^n, \mathcal{I}(i)) \\
 &\ \ \ \ \ \textbf{U}_i^{n+1} \leftarrow \mathbf{U}_i^{n} \\
 &\ \ \ \ \textbf{for } j \in \mathcal{I}(i)\backslash\{i\} \\
 &\ \ \ \ \ \ \ \  \texttt{compute } d_{ij} \\
@@ -327,7 +332,7 @@ $t_n$:
 &\ \ \ \ \ \ \ \  \textbf{U}_i^{n+1} \leftarrow \textbf{U}_i^{n+1} - \frac{\tau_n}{m_i}
  \mathbb{f}(\mathbf{U}_j^{n})\cdot \mathbf{c}_{ij} + d_{ij} \mathbf{U}_j^{n} \\
 &\ \ \ \ \textbf{end} \\
-&\ \ \ \ \texttt{scatter\_updated\_state} (\textbf{U}_i^{n+1}) \\
+&\ \ \ \ \mathtt{scatter\_updated\_state} (\textbf{U}_i^{n+1}) \\
 &\textbf{end}
 @f}
 
@@ -336,8 +341,8 @@ We note here that:
 - Here $\textbf{c}$ and $\textbf{U}^n$ are a global matrix and a global vector
 containing all the vectors $\mathbf{c}_{ij}$ and all the states
 $\mathbf{U}_j^n$ respectively.
-- $\texttt{gather\_cij\_vectors}$, $\texttt{gather\_state\_vectors}$, and
-$\texttt{scatter\_updated\_state}$ are hypothetical implementations that
+- $\mathtt{gather\_cij\_vectors}$, $\mathtt{gather\_state\_vectors}$, and
+$\mathtt{scatter\_updated\_state}$ are hypothetical implementations that
 either collect (from) or write (into) global matrices and vectors.
 - If we assume a Cartesian mesh in two space
 dimensions, first-order polynomial space $\mathbb{Q}^1$, and that
@@ -361,7 +366,7 @@ compute all $d_{ij}$ in a separate step prior to actually performing above
 update. The core principle remains unchanged, though: we do not loop over
 cells but rather over all edges of the sparsity graph.
 
-@note It is not uncommon to encounter such fully algebraic schemes (i.e.
+@note It is not uncommon to encounter such fully-algebraic schemes (i.e.
 no bilinear forms, no cell loops, and no quadrature) outside of the finite
 element community in the wider CFD community. There is a rich history of
 application of this kind of schemes, also called <i>edge-based</i> or
@@ -369,7 +374,7 @@ application of this kind of schemes, also called <i>edge-based</i> or
 @cite Rainald2008 for a historical overview). However, it is important to
 highlight that the algebraic structure of the scheme (presented in this
 tutorial) and the node-loops are not just a performance gimmick. Actually, the
-structure of this scheme was borne out of theoretical necessity: the proof of
+structure of this scheme was born out of theoretical necessity: the proof of
 pointwise stability of the scheme hinges on the specific algebraic structure of
 the scheme. In addition, it is not possible to compute the algebraic
 viscosities $d_{ij}$ using cell-loops since they depend nonlinearly on
@@ -411,12 +416,17 @@ For the case of the reflecting boundary conditions we will proceed as follows:
     @f{align*}
     \mathbf{m}_i \dealcoloneq \mathbf{m}_i - (\widehat{\boldsymbol{\nu}}_i
     \cdot \mathbf{m}_i)  \widehat{\boldsymbol{\nu}}_i \ \
-    \text{for all }\mathbf{x}_i \in \partial\Omega^r
+    \text{where} \ \
+    \widehat{\boldsymbol{\nu}}_i \dealcoloneq
+    \frac{\int_{\partial\Omega} \phi_i \widehat{\boldsymbol{\nu}} \,
+    \, \mathrm{d}\mathbf{s}}{\big|\int_{\partial\Omega} \phi_i
+    \widehat{\boldsymbol{\nu}} \, \mathrm{d}\mathbf{s}\big|}
+    \ \ \text{for all }\mathbf{x}_i \in \partial\Omega^r
+    \ \ \ \ \boldsymbol{(1)}
     @f}
-  that removes the normal component of $\mathbf{m}$. Here the definition of
-  nodal normal $\widehat{\boldsymbol{\nu}}_i$ is very much arbitrary (there is
-  no unique definition) but it should be consistent upon refinement with the
-  underlying geometry.
+  that removes the normal component of $\mathbf{m}$. This is a somewhat
+  naive idea that preserves a few fundamental properties of the PDE as we
+  explain below.
 
 This is approach is usually called "explicit treatment of boundary conditions".
 The well seasoned finite element person might find this approach questionable.
@@ -450,26 +460,37 @@ integrate in space and time $\int_{\Omega}\int_{t_1}^{t_2}$ we would obtain
 @f{align*}
 \int_{\Omega} \rho(\mathbf{x},t_2) \, \mathrm{d}\mathbf{x} =
 \int_{\Omega} \rho(\mathbf{x},t_1) \, \mathrm{d}\mathbf{x} \ , \ \
-\int_{\Omega} E(\mathbf{x},t_2) \, \mathrm{d}\mathbf{x} =
-\int_{\Omega} E(\mathbf{x},t_1) \, \mathrm{d}\mathbf{x} \ , \ \
-\int_{\Omega} \mathbf{m}(\mathbf{x},t_2) \, \mathrm{d}\mathbf{x} =
-\int_{\Omega} \mathbf{m}(\mathbf{x},t_1) \, \mathrm{d}\mathbf{x}
+\int_{\Omega} \mathbf{m}(\mathbf{x},t_2) \, \mathrm{d}\mathbf{x}
 + \int_{t_1}^{t_2} \! \int_{\partial\Omega} p \boldsymbol{\nu} \,
-\mathrm{d}\mathbf{s} \mathrm{d}t\, .
+\mathrm{d}\mathbf{s} \mathrm{d}t =
+\int_{\Omega} \mathbf{m}(\mathbf{x},t_1) \,
+\mathrm{d}\mathbf{x} \ , \ \
+\int_{\Omega} E(\mathbf{x},t_2) \, \mathrm{d}\mathbf{x} =
+\int_{\Omega} E(\mathbf{x},t_1) \, \mathrm{d}\mathbf{x} \ \ \ \
+\boldsymbol{(2)}
 @f}
-Note that momentum is not a conserved quantity (interaction with walls leads to
-momentum gain/loss). Even though we will not use reflecting boundary conditions
-in the entirety of the domain, we would like to know that our implementation of
+Note that momentum is NOT a conserved quantity (interaction with walls leads to
+momentum gain/loss): however $\mathbf{m}$ has to satisfy a momentum balance.
+Even though we will not use reflecting boundary conditions in the entirety of
+the domain, we would like to know that our implementation of reflecting
 boundary conditions is consistent with the conservation properties mentioned
-above. In order to guarantee such conservation property it is necessary to
-modify the values of the vectors $\mathbf{c}_{ij}$ as follows
+above. In particular, if we use the projection $\boldsymbol{(1)}$ in the
+entirety of the domain the following discrete mass-balance can be guaranteed:
 @f{align*}
-\mathbf{c}_{ij} \dealcoloneq \mathbf{c}_{ij} + \int_{\partial \Omega^r}
-(\boldsymbol{\nu}_j - \boldsymbol{\nu}(\mathbf{s})) \phi_i \phi_j \,
-\mathrm{d}\mathbf{s}
-\ \ \text{whenever both }\mathbf{x}_i\text{ and }\mathbf{x}_j \text{ lie on the
-boundary}
+\sum_{i \in \mathcal{V}} m_i \rho_i^{n+1} =
+\sum_{i \in \mathcal{V}} m_i \rho_i^{n} \ , \ \
+\sum_{i \in \mathcal{V}} m_i \mathbf{m}_i^{n+1}
++ \tau_n \int_{\partial\Omega} \Big(\sum_{i \in \mathcal{V}} p_i^{n} \phi_i\Big)
+\widehat{\boldsymbol{\nu}} \mathrm{d}\mathbf{s} =
+\sum_{i \in \mathcal{V}} m_i \mathbf{m}_i^{n} \ , \ \
+\sum_{i \in \mathcal{V}} m_i E_i^{n+1} = \sum_{i \in \mathcal{V}} m_i
+E_i^{n} \ \ \ \
+\boldsymbol{(3)}
 @f}
-This consistent modification of the $\mathbf{c}_{ij}$ is a direct consequence
-of simple integration by parts arguments, see page 12 of @cite GuermondEtAl2018
-for more details.
+where $p_i$ is the pressure at the nodes that lie at the boundary. Clearly
+$\boldsymbol{(3)}$ is the discrete counterpart of $\boldsymbol{(2)}$. The
+proof of identity $\boldsymbol{(3)}$ is omitted, but we briefly mention that
+it hinges on the definition of the <i>nodal normal</i>
+$\widehat{\boldsymbol{\nu}}_i$ provided in $\boldsymbol{(1)}$. We also note that
+this enforcement of reflecting boundary conditions is different from the one
+originally advanced in @cite GuermondEtAl2018.

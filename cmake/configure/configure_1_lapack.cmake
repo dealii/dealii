@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -34,28 +34,29 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     SET(CMAKE_REQUIRED_LIBRARIES
       ${DEAL_II_LINKER_FLAGS_SAVED} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
       )
-    # Push -pthread as well:
-    ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-pthread")
 
     CHECK_C_SOURCE_COMPILES("
-      char daxpy_(); char dgeev_(); char dgeevx_(); char dgelsd_(); char
-      dgemm_(); char dgemv_(); char dgeqrf_(); char dgesdd_(); char
-      dgesvd_(); char dgetrf_(); char dgetri_(); char dgetrs_(); char
-      dorgqr_(); char dormqr_(); char dstev_(); char dsyevx_(); char
-      dsygv_(); char dsygvx_(); char dtrtrs_(); char saxpy_(); char
-      sgeev_(); char sgeevx_(); char sgelsd_(); char sgemm_(); char
-      sgemv_(); char sgeqrf_(); char sgesdd_(); char sgesvd_(); char
-      sgetrf_(); char sgetri_(); char sgetrs_(); char sorgqr_(); char
-      sormqr_(); char sstev_(); char ssyevx_(); char ssygv_(); char
-      ssygvx_(); char strtrs_();
+      #define MANGLE(name, NAME) ${DEAL_II_FORTRAN_MANGLE}
+
+      char MANGLE(daxpy, DAXPY)(); char MANGLE(dgeev, DGEEV)(); char MANGLE(dgeevx, DGEEVX)(); char MANGLE(dgelsd, DGELSD)();
+      char MANGLE(dgemm, DGEMM)(); char MANGLE(dgemv, DGEMV)(); char MANGLE(dgeqrf, DGEQRF)(); char MANGLE(dgesdd, DGESDD)();
+      char MANGLE(dgesvd, DGESVD)(); char MANGLE(dgetrf, DGETRF)(); char MANGLE(dgetri, DGETRI)(); char MANGLE(dgetrs, DGETRS)();
+      char MANGLE(dorgqr, DORGQR)(); char MANGLE(dormqr, DORMQR)(); char MANGLE(dstev, DSTEV)(); char MANGLE(dsyevx, DSYEVX)();
+      char MANGLE(dsygv, DSYGV)(); char MANGLE(dsygvx, DSYGVX)(); char MANGLE(dtrtrs, DTRTRS)(); char MANGLE(saxpy, SAXPY)();
+      char MANGLE(sgeev, SGEEV)(); char MANGLE(sgeevx, SGEEVX)(); char MANGLE(sgelsd, SGELSD)(); char MANGLE(sgemm, SGEMM)();
+      char MANGLE(sgemv, SGEMV)(); char MANGLE(sgeqrf, SGEQRF)(); char MANGLE(sgesdd, SGESDD)(); char MANGLE(sgesvd, SGESVD)();
+      char MANGLE(sgetrf, SGETRF)(); char MANGLE(sgetri, SGETRI)(); char MANGLE(sgetrs, SGETRS)(); char MANGLE(sorgqr, SORGQR)();
+      char MANGLE(sormqr, SORMQR)(); char MANGLE(sstev, SSTEV)(); char MANGLE(ssyevx, SSYEVX)(); char MANGLE(ssygv, SSYGV)();
+      char MANGLE(ssygvx, SSYGVX)(); char MANGLE(strtrs, STRTRS)();
       int main(){
-        daxpy_ (); dgeev_ (); dgeevx_ (); dgelsd_ (); dgemm_ (); dgemv_ ();
-        dgeqrf_ (); dgesdd_ (); dgesvd_ (); dgetrf_ (); dgetri_ (); dgetrs_
-        (); dorgqr_ (); dormqr_ (); dstev_ (); dsyevx_ (); dsygv_ ();
-        dsygvx_ (); dtrtrs_ (); saxpy_ (); sgeev_ (); sgeevx_ (); sgelsd_
-        (); sgemm_ (); sgemv_ (); sgeqrf_ (); sgesdd_ (); sgesvd_ ();
-        sgetrf_ (); sgetri_ (); sgetrs_ (); sorgqr_ (); sormqr_ (); sstev_
-        (); ssyevx_ (); ssygv_ (); ssygvx_ (); strtrs_ ();
+        MANGLE(daxpy, DAXPY)(); MANGLE(dgeev, DGEEV)(); MANGLE(dgeevx, DGEEVX)(); MANGLE(dgelsd, DGELSD)(); MANGLE(dgemm, DGEMM)();
+        MANGLE(dgemv, DGEMV)(); MANGLE(dgeqrf, DGEQRF)(); MANGLE(dgesdd, DGESDD)(); MANGLE(dgesvd, DGESVD)(); MANGLE(dgetrf, DGETRF)();
+        MANGLE(dgetri, DGETRI)(); MANGLE(dgetrs, DGETRS)(); MANGLE(dorgqr, DORGQR)(); MANGLE(dormqr, DORMQR)(); MANGLE(dstev, DSTEV)();
+        MANGLE(dsyevx, DSYEVX)(); MANGLE(dsygv, DSYGV)(); MANGLE(dsygvx, DSYGVX)(); MANGLE(dtrtrs, DTRTRS)(); MANGLE(saxpy, SAXPY)();
+        MANGLE(sgeev, SGEEV)(); MANGLE(sgeevx, SGEEVX)(); MANGLE(sgelsd, SGELSD)(); MANGLE(sgemm, SGEMM)(); MANGLE(sgemv, SGEMV)();
+        MANGLE(sgeqrf, SGEQRF)(); MANGLE(sgesdd, SGESDD)(); MANGLE(sgesvd, SGESVD)(); MANGLE(sgetrf, SGETRF)(); MANGLE(sgetri, SGETRI)();
+        MANGLE(sgetrs, SGETRS)(); MANGLE(sorgqr, SORGQR)(); MANGLE(sormqr, SORMQR)(); MANGLE(sstev, SSTEV)(); MANGLE(ssyevx, SSYEVX)();
+        MANGLE(ssygv, SSYGV)(); MANGLE(ssygvx, SSYGVX)(); MANGLE(strtrs, STRTRS)();
 
         return 0;
       }"

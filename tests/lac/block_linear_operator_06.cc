@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +20,7 @@
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -32,10 +32,10 @@
 
 #include "../tests.h"
 
-#define PRINTME(name, var)                               \
-  deallog << "Block vector: " name << ":" << std::endl;  \
-  for (unsigned int i = 0; i < var.n_blocks(); ++i)      \
-    deallog << "[block " << i << " ]  " << var.block(i); \
+#define PRINTME(name, var)                                            \
+  deallog << "Block vector: " name << ':' << std::endl;               \
+  for (unsigned int i = 0; i < var.n_blocks(); ++i)                   \
+    deallog << "[block " << i << " ]  " << var.block(i) << std::endl; \
   deallog << std::endl;
 
 
@@ -52,9 +52,9 @@ main()
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
 
-  MappingQGeneric<dim> mapping_q1(1);
-  FESystem<dim>        fe(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1);
-  DoFHandler<dim>      dof_handler(triangulation);
+  MappingQ<dim>   mapping_q1(1);
+  FESystem<dim>   fe(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1);
+  DoFHandler<dim> dof_handler(triangulation);
 
   dof_handler.distribute_dofs(fe);
 
@@ -112,7 +112,7 @@ main()
   auto op_b11 = linear_operator(a.block(1, 1));
 
   std::array<std::array<decltype(op_b00), 2>, 2> temp{
-    {{op_b00, op_b01}, {op_b10, op_b11}}};
+    {{{op_b00, op_b01}}, {{op_b10, op_b11}}}};
   auto op_b = block_operator<2, 2, BlockVector<double>>(temp);
 
   // vmult:

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/sparsity_pattern.h>
@@ -23,6 +22,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <memory>
 #include <set>
 
 #ifdef DEAL_II_WITH_MPI
@@ -69,24 +69,23 @@ namespace SparsityTools
       AssertThrow(false, ExcMETISNotInstalled());
 #else
 
-      // generate the data structures for
-      // METIS. Note that this is particularly
-      // simple, since METIS wants exactly our
-      // compressed row storage format. we only
-      // have to set up a few auxiliary arrays
-      idx_t n    = static_cast<signed int>(sparsity_pattern.n_rows()),
-            ncon = 1, // number of balancing constraints (should be >0)
-        nparts =
-          static_cast<int>(n_partitions), // number of subdomains to create
-        dummy;                            // the numbers of edges cut by the
-      // resulting partition
+      // Generate the data structures for METIS. Note that this is particularly
+      // simple, since METIS wants exactly our compressed row storage format.
+      // We only have to set up a few auxiliary arrays and convert from our
+      // unsigned cell weights to signed ones.
+      idx_t n = static_cast<signed int>(sparsity_pattern.n_rows());
+
+      idx_t ncon = 1; // number of balancing constraints (should be >0)
 
       // We can not partition n items into more than n parts. METIS will
       // generate non-sensical output (everything is owned by a single process)
       // and complain with a message (but won't return an error code!):
       // ***Cannot bisect a graph with 0 vertices!
       // ***You are trying to partition a graph into too many parts!
-      nparts = std::min(n, nparts);
+      idx_t nparts =
+        std::min(n,
+                 static_cast<idx_t>(
+                   n_partitions)); // number of subdomains to create
 
       // use default options for METIS
       idx_t options[METIS_NOPTIONS];
@@ -110,7 +109,7 @@ namespace SparsityTools
 
       std::vector<idx_t> int_partition_indices(sparsity_pattern.n_rows());
 
-      // Setup cell weighting option
+      // Set up cell weighting option
       std::vector<idx_t> int_cell_weights;
       if (cell_weights.size() > 0)
         {
@@ -134,6 +133,7 @@ namespace SparsityTools
       // Select which type of partitioning to create
 
       // Use recursive if the number of partitions is less than or equal to 8
+      idx_t dummy; // output: # of edges cut by the resulting partition
       if (nparts <= 8)
         ierr = METIS_PartGraphRecursive(&n,
                                         &ncon,
@@ -210,7 +210,7 @@ namespace SparsityTools
       // set global degrees of freedom
       auto n_dofs = graph->n_rows();
 
-      for (unsigned int i = 0; i < n_dofs; i++)
+      for (unsigned int i = 0; i < n_dofs; ++i)
         {
           globalID[i] = i;
           localID[i]  = i; // Same as global ids.
@@ -311,8 +311,7 @@ namespace SparsityTools
       (void)cell_weights;
 
       // MPI environment must have been initialized by this point.
-      std::unique_ptr<Zoltan> zz =
-        std_cxx14::make_unique<Zoltan>(MPI_COMM_SELF);
+      std::unique_ptr<Zoltan> zz = std::make_unique<Zoltan>(MPI_COMM_SELF);
 
       // General parameters
       // DEBUG_LEVEL call must precede the call to LB_METHOD
@@ -389,7 +388,7 @@ namespace SparsityTools
 
       // copy from export_to_part to partition_indices, whose part_ids != 0.
       Assert(export_to_part != nullptr, ExcInternalError());
-      for (int i = 0; i < num_export; i++)
+      for (int i = 0; i < num_export; ++i)
         partition_indices[export_local_ids[i]] = export_to_part[i];
 #endif
     }
@@ -465,7 +464,7 @@ namespace SparsityTools
     return 0;
 #else
     // coloring algorithm is run in serial by each processor.
-    std::unique_ptr<Zoltan> zz = std_cxx14::make_unique<Zoltan>(MPI_COMM_SELF);
+    std::unique_ptr<Zoltan> zz = std::make_unique<Zoltan>(MPI_COMM_SELF);
 
     // Coloring parameters
     // DEBUG_LEVEL must precede all other calls
@@ -495,7 +494,7 @@ namespace SparsityTools
     std::vector<int> color_exp(num_objects);
 
     // Set ids for which coloring needs to be done
-    for (int i = 0; i < num_objects; i++)
+    for (int i = 0; i < num_objects; ++i)
       global_ids[i] = i;
 
     // Call ZOLTAN coloring algorithm
@@ -914,21 +913,6 @@ namespace SparsityTools
 #ifdef DEAL_II_WITH_MPI
 
   void
-  gather_sparsity_pattern(DynamicSparsityPattern &     dsp,
-                          const std::vector<IndexSet> &owned_rows_per_processor,
-                          const MPI_Comm &             mpi_comm,
-                          const IndexSet &             ghost_range)
-  {
-    const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
-    gather_sparsity_pattern(dsp,
-                            owned_rows_per_processor[myid],
-                            mpi_comm,
-                            ghost_range);
-  }
-
-
-
-  void
   gather_sparsity_pattern(DynamicSparsityPattern &dsp,
                           const IndexSet &        locally_owned_rows,
                           const MPI_Comm &        mpi_comm,
@@ -1071,7 +1055,7 @@ namespace SparsityTools
         const auto rlen = dsp.row_length(row);
 
         // skip empty lines
-        if (!rlen)
+        if (rlen == 0)
           continue;
 
         // save entries
@@ -1153,7 +1137,7 @@ namespace SparsityTools
         BlockDynamicSparsityPattern::size_type rlen = dsp.row_length(row);
 
         // skip empty lines
-        if (!rlen)
+        if (rlen == 0)
           continue;
 
         // save entries
@@ -1198,14 +1182,13 @@ namespace SparsityTools
       unsigned int idx = 0;
       for (const auto &sparsity_line : send_data)
         {
-          const int ierr =
-            MPI_Isend(DEAL_II_MPI_CONST_CAST(sparsity_line.second.data()),
-                      sparsity_line.second.size(),
-                      DEAL_II_DOF_INDEX_MPI_TYPE,
-                      sparsity_line.first,
-                      mpi_tag,
-                      mpi_comm,
-                      &requests[idx++]);
+          const int ierr = MPI_Isend(sparsity_line.second.data(),
+                                     sparsity_line.second.size(),
+                                     DEAL_II_DOF_INDEX_MPI_TYPE,
+                                     sparsity_line.first,
+                                     mpi_tag,
+                                     mpi_comm,
+                                     &requests[idx++]);
           AssertThrowMPI(ierr);
         }
     }
@@ -1254,7 +1237,7 @@ namespace SparsityTools
     }
 
     // complete all sends, so that we can safely destroy the buffers.
-    if (requests.size())
+    if (requests.size() > 0)
       {
         const int ierr =
           MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);

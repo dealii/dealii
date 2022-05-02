@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,7 @@ check(const FE_Q<dim> &fe, const std::string &name)
   const std::vector<unsigned int> n =
     FETools::hierarchic_to_lexicographic_numbering<dim>(fe.degree);
   for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-    deallog << n[i] << " ";
+    deallog << n[i] << ' ';
   deallog << std::endl;
 }
 

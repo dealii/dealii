@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,7 +80,7 @@ public:
     Point<dim>              p;
     for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
       {
-        for (unsigned int d = 0; d < dim; d++)
+        for (unsigned int d = 0; d < dim; ++d)
           p[d] = p_vec[d][v];
         res[v] = value(p);
       }
@@ -156,7 +156,7 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
 
         VectorType field(dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
         VectorTools::project<dim, VectorType, dim>(
-          MappingQGeneric<dim>(1),
+          MappingQ<dim>(1),
           dof_handler,
           constraints,
           quadrature_formula,

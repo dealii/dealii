@@ -1,0 +1,94 @@
+
+DEAL:0:2d/2d::Before copying particle id 0 has first property 0.00000 and last property 0.112702 and position 0.112702 0.112702
+DEAL:0:2d/2d::Before copying particle id 1 has first property 0.00000 and last property 0.500000 and position 0.500000 0.112702
+DEAL:0:2d/2d::Before copying particle id 2 has first property 0.00000 and last property 0.887298 and position 0.887298 0.112702
+DEAL:0:2d/2d::Before copying particle id 3 has first property 0.00000 and last property 0.112702 and position 0.112702 0.500000
+DEAL:0:2d/2d::Before copying particle id 4 has first property 0.00000 and last property 0.500000 and position 0.500000 0.500000
+DEAL:0:2d/2d::Before copying particle id 5 has first property 0.00000 and last property 0.887298 and position 0.887298 0.500000
+DEAL:0:2d/2d::Before copying particle id 6 has first property 0.00000 and last property 0.112702 and position 0.112702 0.887298
+DEAL:0:2d/2d::Before copying particle id 7 has first property 0.00000 and last property 0.500000 and position 0.500000 0.887298
+DEAL:0:2d/2d::Before copying particle id 8 has first property 0.00000 and last property 0.887298 and position 0.887298 0.887298
+DEAL:0:2d/2d::After copying particle id 0 has first property 0.00000 and last property 0.112702 and position 0.112702 0.112702
+DEAL:0:2d/2d::After copying particle id 1 has first property 0.00000 and last property 0.500000 and position 0.500000 0.112702
+DEAL:0:2d/2d::After copying particle id 2 has first property 0.00000 and last property 0.887298 and position 0.887298 0.112702
+DEAL:0:2d/2d::After copying particle id 3 has first property 0.00000 and last property 0.112702 and position 0.112702 0.500000
+DEAL:0:2d/2d::After copying particle id 4 has first property 0.00000 and last property 0.500000 and position 0.500000 0.500000
+DEAL:0:2d/2d::After copying particle id 5 has first property 0.00000 and last property 0.887298 and position 0.887298 0.500000
+DEAL:0:2d/2d::After copying particle id 6 has first property 0.00000 and last property 0.112702 and position 0.112702 0.887298
+DEAL:0:2d/2d::After copying particle id 7 has first property 0.00000 and last property 0.500000 and position 0.500000 0.887298
+DEAL:0:2d/2d::After copying particle id 8 has first property 0.00000 and last property 0.887298 and position 0.887298 0.887298
+DEAL:0:2d/2d::OK
+DEAL:0:2d/3d::Before copying particle id 0 has first property 0.00000 and last property 0.112702 and position 0.112702 0.112702 0.00000
+DEAL:0:2d/3d::Before copying particle id 1 has first property 0.00000 and last property 0.500000 and position 0.500000 0.112702 0.00000
+DEAL:0:2d/3d::Before copying particle id 2 has first property 0.00000 and last property 0.887298 and position 0.887298 0.112702 0.00000
+DEAL:0:2d/3d::Before copying particle id 3 has first property 0.00000 and last property 0.112702 and position 0.112702 0.500000 0.00000
+DEAL:0:2d/3d::Before copying particle id 4 has first property 0.00000 and last property 0.500000 and position 0.500000 0.500000 0.00000
+DEAL:0:2d/3d::Before copying particle id 5 has first property 0.00000 and last property 0.887298 and position 0.887298 0.500000 0.00000
+DEAL:0:2d/3d::Before copying particle id 6 has first property 0.00000 and last property 0.112702 and position 0.112702 0.887298 0.00000
+DEAL:0:2d/3d::Before copying particle id 7 has first property 0.00000 and last property 0.500000 and position 0.500000 0.887298 0.00000
+DEAL:0:2d/3d::Before copying particle id 8 has first property 0.00000 and last property 0.887298 and position 0.887298 0.887298 0.00000
+DEAL:0:2d/3d::After copying particle id 0 has first property 0.00000 and last property 0.112702 and position 0.112702 0.112702 0.00000
+DEAL:0:2d/3d::After copying particle id 1 has first property 0.00000 and last property 0.500000 and position 0.500000 0.112702 0.00000
+DEAL:0:2d/3d::After copying particle id 2 has first property 0.00000 and last property 0.887298 and position 0.887298 0.112702 0.00000
+DEAL:0:2d/3d::After copying particle id 3 has first property 0.00000 and last property 0.112702 and position 0.112702 0.500000 0.00000
+DEAL:0:2d/3d::After copying particle id 4 has first property 0.00000 and last property 0.500000 and position 0.500000 0.500000 0.00000
+DEAL:0:2d/3d::After copying particle id 5 has first property 0.00000 and last property 0.887298 and position 0.887298 0.500000 0.00000
+DEAL:0:2d/3d::After copying particle id 6 has first property 0.00000 and last property 0.112702 and position 0.112702 0.887298 0.00000
+DEAL:0:2d/3d::After copying particle id 7 has first property 0.00000 and last property 0.500000 and position 0.500000 0.887298 0.00000
+DEAL:0:2d/3d::After copying particle id 8 has first property 0.00000 and last property 0.887298 and position 0.887298 0.887298 0.00000
+DEAL:0:2d/3d::OK
+DEAL:0:3d/3d::Before copying particle id 0 has first property 0.00000 and last property 0.112702 and position 0.112702 0.112702 0.112702
+DEAL:0:3d/3d::Before copying particle id 1 has first property 0.00000 and last property 0.500000 and position 0.500000 0.112702 0.112702
+DEAL:0:3d/3d::Before copying particle id 2 has first property 0.00000 and last property 0.887298 and position 0.887298 0.112702 0.112702
+DEAL:0:3d/3d::Before copying particle id 3 has first property 0.00000 and last property 0.112702 and position 0.112702 0.500000 0.112702
+DEAL:0:3d/3d::Before copying particle id 4 has first property 0.00000 and last property 0.500000 and position 0.500000 0.500000 0.112702
+DEAL:0:3d/3d::Before copying particle id 5 has first property 0.00000 and last property 0.887298 and position 0.887298 0.500000 0.112702
+DEAL:0:3d/3d::Before copying particle id 6 has first property 0.00000 and last property 0.112702 and position 0.112702 0.887298 0.112702
+DEAL:0:3d/3d::Before copying particle id 7 has first property 0.00000 and last property 0.500000 and position 0.500000 0.887298 0.112702
+DEAL:0:3d/3d::Before copying particle id 8 has first property 0.00000 and last property 0.887298 and position 0.887298 0.887298 0.112702
+DEAL:0:3d/3d::Before copying particle id 9 has first property 0.00000 and last property 0.112702 and position 0.112702 0.112702 0.500000
+DEAL:0:3d/3d::Before copying particle id 10 has first property 0.00000 and last property 0.500000 and position 0.500000 0.112702 0.500000
+DEAL:0:3d/3d::Before copying particle id 11 has first property 0.00000 and last property 0.887298 and position 0.887298 0.112702 0.500000
+DEAL:0:3d/3d::Before copying particle id 12 has first property 0.00000 and last property 0.112702 and position 0.112702 0.500000 0.500000
+DEAL:0:3d/3d::Before copying particle id 13 has first property 0.00000 and last property 0.500000 and position 0.500000 0.500000 0.500000
+DEAL:0:3d/3d::Before copying particle id 14 has first property 0.00000 and last property 0.887298 and position 0.887298 0.500000 0.500000
+DEAL:0:3d/3d::Before copying particle id 15 has first property 0.00000 and last property 0.112702 and position 0.112702 0.887298 0.500000
+DEAL:0:3d/3d::Before copying particle id 16 has first property 0.00000 and last property 0.500000 and position 0.500000 0.887298 0.500000
+DEAL:0:3d/3d::Before copying particle id 17 has first property 0.00000 and last property 0.887298 and position 0.887298 0.887298 0.500000
+DEAL:0:3d/3d::Before copying particle id 18 has first property 0.00000 and last property 0.112702 and position 0.112702 0.112702 0.887298
+DEAL:0:3d/3d::Before copying particle id 19 has first property 0.00000 and last property 0.500000 and position 0.500000 0.112702 0.887298
+DEAL:0:3d/3d::Before copying particle id 20 has first property 0.00000 and last property 0.887298 and position 0.887298 0.112702 0.887298
+DEAL:0:3d/3d::Before copying particle id 21 has first property 0.00000 and last property 0.112702 and position 0.112702 0.500000 0.887298
+DEAL:0:3d/3d::Before copying particle id 22 has first property 0.00000 and last property 0.500000 and position 0.500000 0.500000 0.887298
+DEAL:0:3d/3d::Before copying particle id 23 has first property 0.00000 and last property 0.887298 and position 0.887298 0.500000 0.887298
+DEAL:0:3d/3d::Before copying particle id 24 has first property 0.00000 and last property 0.112702 and position 0.112702 0.887298 0.887298
+DEAL:0:3d/3d::Before copying particle id 25 has first property 0.00000 and last property 0.500000 and position 0.500000 0.887298 0.887298
+DEAL:0:3d/3d::Before copying particle id 26 has first property 0.00000 and last property 0.887298 and position 0.887298 0.887298 0.887298
+DEAL:0:3d/3d::After copying particle id 0 has first property 0.00000 and last property 0.112702 and position 0.112702 0.112702 0.112702
+DEAL:0:3d/3d::After copying particle id 1 has first property 0.00000 and last property 0.500000 and position 0.500000 0.112702 0.112702
+DEAL:0:3d/3d::After copying particle id 2 has first property 0.00000 and last property 0.887298 and position 0.887298 0.112702 0.112702
+DEAL:0:3d/3d::After copying particle id 3 has first property 0.00000 and last property 0.112702 and position 0.112702 0.500000 0.112702
+DEAL:0:3d/3d::After copying particle id 4 has first property 0.00000 and last property 0.500000 and position 0.500000 0.500000 0.112702
+DEAL:0:3d/3d::After copying particle id 5 has first property 0.00000 and last property 0.887298 and position 0.887298 0.500000 0.112702
+DEAL:0:3d/3d::After copying particle id 6 has first property 0.00000 and last property 0.112702 and position 0.112702 0.887298 0.112702
+DEAL:0:3d/3d::After copying particle id 7 has first property 0.00000 and last property 0.500000 and position 0.500000 0.887298 0.112702
+DEAL:0:3d/3d::After copying particle id 8 has first property 0.00000 and last property 0.887298 and position 0.887298 0.887298 0.112702
+DEAL:0:3d/3d::After copying particle id 9 has first property 0.00000 and last property 0.112702 and position 0.112702 0.112702 0.500000
+DEAL:0:3d/3d::After copying particle id 10 has first property 0.00000 and last property 0.500000 and position 0.500000 0.112702 0.500000
+DEAL:0:3d/3d::After copying particle id 11 has first property 0.00000 and last property 0.887298 and position 0.887298 0.112702 0.500000
+DEAL:0:3d/3d::After copying particle id 12 has first property 0.00000 and last property 0.112702 and position 0.112702 0.500000 0.500000
+DEAL:0:3d/3d::After copying particle id 13 has first property 0.00000 and last property 0.500000 and position 0.500000 0.500000 0.500000
+DEAL:0:3d/3d::After copying particle id 14 has first property 0.00000 and last property 0.887298 and position 0.887298 0.500000 0.500000
+DEAL:0:3d/3d::After copying particle id 15 has first property 0.00000 and last property 0.112702 and position 0.112702 0.887298 0.500000
+DEAL:0:3d/3d::After copying particle id 16 has first property 0.00000 and last property 0.500000 and position 0.500000 0.887298 0.500000
+DEAL:0:3d/3d::After copying particle id 17 has first property 0.00000 and last property 0.887298 and position 0.887298 0.887298 0.500000
+DEAL:0:3d/3d::After copying particle id 18 has first property 0.00000 and last property 0.112702 and position 0.112702 0.112702 0.887298
+DEAL:0:3d/3d::After copying particle id 19 has first property 0.00000 and last property 0.500000 and position 0.500000 0.112702 0.887298
+DEAL:0:3d/3d::After copying particle id 20 has first property 0.00000 and last property 0.887298 and position 0.887298 0.112702 0.887298
+DEAL:0:3d/3d::After copying particle id 21 has first property 0.00000 and last property 0.112702 and position 0.112702 0.500000 0.887298
+DEAL:0:3d/3d::After copying particle id 22 has first property 0.00000 and last property 0.500000 and position 0.500000 0.500000 0.887298
+DEAL:0:3d/3d::After copying particle id 23 has first property 0.00000 and last property 0.887298 and position 0.887298 0.500000 0.887298
+DEAL:0:3d/3d::After copying particle id 24 has first property 0.00000 and last property 0.112702 and position 0.112702 0.887298 0.887298
+DEAL:0:3d/3d::After copying particle id 25 has first property 0.00000 and last property 0.500000 and position 0.500000 0.887298 0.887298
+DEAL:0:3d/3d::After copying particle id 26 has first property 0.00000 and last property 0.887298 and position 0.887298 0.887298 0.887298
+DEAL:0:3d/3d::OK

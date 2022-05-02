@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,9 +19,9 @@
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
-#  include <deal.II/lac/communication_pattern_base.h>
+#  include <deal.II/base/communication_pattern_base.h>
 
 #  include <Tpetra_Export.hpp>
 #  include <Tpetra_Import.hpp>
@@ -37,7 +37,7 @@ namespace LinearAlgebra
     /**
      * This class implements a wrapper to Tpetra::Import and Tpetra::Export.
      */
-    class CommunicationPattern : public CommunicationPatternBase
+    class CommunicationPattern : public Utilities::MPI::CommunicationPatternBase
     {
     public:
       /**

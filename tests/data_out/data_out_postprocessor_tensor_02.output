@@ -1,0 +1,42 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       16
+DEAL::   Number of degrees of freedom: 50
+DEAL:cg::Starting value 0.279006
+DEAL:cg::Convergence step 11 value 3.55007e-13
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="64" NumberOfCells="16" >
+  <Points>
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
+AQAAAAADAAAAAwAAdQAAAA==eNqFkdENACEIQ7tZV2MzV7uED66QoiTG2tQXUCAOcmWJzl18mEzlZga/3jhhsjdO80YViwuXXdeM7HchPl4cLQ7tOJIJmt7HjOlTfD7e4Zg+Lpz8d/GDd07LjBnsO+iZQzuGZIJLD1zus2vLkUyU/gCxEj+h
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAAABAAAAAQAAaQAAAA==eNoNwwVSAkAAAMADpaQ7pEGluyT//yt2ZzaEECJ+GPXTmAnjJk2Z9suMWfPmLFi0bMmKVevWbNj025ZtO/bs2nfgyKFjf/zz14lT585cuHTtyo1b9+48ePTsyYv/3rx69+HLp2+r3gfh
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAEAAAABAAAAAMQAAAA==eNpjYWBg4ABiHiAWAGIRIJYAYhkgVgBiFSDWAGIdIDYAYhMgtgBiGyB2AGIAM0ACIQ==
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAABAAAAAQAAAACwAAAA==eNrj5EQFAATYAJE=
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float32" Name="displacement" NumberOfComponents="3" format="binary">
+AQAAAAADAAAAAwAAegAAAA==eNpjYCAMWLsbbVTfeNsQqybya6eNCuNSG2LNaWI3tw3MsrbBZw6yGhl1ddttRba2+NyDrJeJ4ZX1fNm51vjU41KDyxxkNyC7DZc5yGpwAVxqkM3EFQ7IanCFP6nhgMscZIArHJD1IscpLj/iShu4zKEkrSIDAI4LYGU=
+    </DataArray>
+    <DataArray type="Float32" Name="strain" NumberOfComponents="9" format="binary">
+AQAAAAAJAAAACQAAIgIAAA==eNqdVr8vREEQfufH0ZAoRCSu4golpbenQiQqhYR/gUgkGi0V0ZHoUGklChHebCIhBFEqqCUS0YlCI+Ybs42bzW1um+/lvW+/mdmZnXlZlrbat9ddwOrHg6v/XqpVP2bkfUCL07f+Jt+Alk6KLayFry0XcKhUrf3/PnFUzvv2Lv9sMVo64Cxld/IeaOmkxtVZG5a9wP3utuI/Z6PjrDa7mMv+gBZnd+DPB6ClA583b3uFA4xxvk9KwgFOv87VxTVf/il6ljfkPdDSAWfnekU4QEsnJRdYLdl7HvCwUqmL/+T9gG7Pr8bwDLR0wFlbLROegZZOiq2U1ZIt0s11v+gALR1wDiv7cm4BLZ8nx7tkL9A6Q3Cmnk6FA2w9W3BGLvL74xGJHRjJaf75NSo+Ay0d+Pw4WJa9wBinUVxcq/7l+Un2Ai0dcLjWSWueYjWfci/YBqktYltk+OzY11x9ziM5dRyz19i9pYOa57Mr9AyLGIdz4DQXyKk3cuo4l6Q5NX0Gh2uCtDbI0kmNi2u00FotuFYpa3LxnSkCWjrwme+e0zvoYhy+wxd6ly/4LvtmbGlPoYCWDmqee5PXHuWtMwSHe5zXXue51+VGzyy4V3rtmaYOONxzvfZeUwc1z73baw+PchrdC54pnmeJ15li6oDDM4l0Npk68JlnG+mMM88QHJ6RpLOSeFY2lQud2RTQ0oHPPPtJ/wGinEZxpdhKWb+GgHOA
+    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,13 +67,13 @@ main()
 
   // we had the matrices precomputed up to Q4 for 1d, Q3 for 2d and Q2 for 3d
   for (unsigned int degree = 1; degree <= 4; ++degree)
-    test<1>(FE_Q<1>(QIterated<1>(QTrapez<1>(), degree)));
+    test<1>(FE_Q<1>(QIterated<1>(QTrapezoid<1>(), degree)));
 
   // test the standard version (non-equidistant) as well
   test<1>(FE_Q<1>(4));
 
   for (unsigned int degree = 1; degree <= 3; ++degree)
-    test<2>(FE_Q<2>(QIterated<1>(QTrapez<1>(), degree)));
+    test<2>(FE_Q<2>(QIterated<1>(QTrapezoid<1>(), degree)));
 
   test<2>(FE_Q<2>(4));
 

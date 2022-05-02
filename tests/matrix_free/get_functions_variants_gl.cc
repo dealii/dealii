@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,7 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
 public:
-  typedef Vector<Number> VectorType;
+  using VectorType = Vector<Number>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};
@@ -85,11 +85,11 @@ private:
 
 template <int dim, int fe_degree, typename Number>
 void
-MatrixFreeTest<dim, fe_degree, Number>::
-operator()(const MatrixFree<dim, Number> &data,
-           VectorType &,
-           const VectorType &                           src,
-           const std::pair<unsigned int, unsigned int> &cell_range) const
+MatrixFreeTest<dim, fe_degree, Number>::operator()(
+  const MatrixFree<dim, Number> &data,
+  VectorType &,
+  const VectorType &                           src,
+  const std::pair<unsigned int, unsigned int> &cell_range) const
 {
   FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(data);
   FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval2(data);
@@ -100,27 +100,28 @@ operator()(const MatrixFree<dim, Number> &data,
     {
       fe_eval.reinit(cell);
       fe_eval.read_dof_values(src);
-      fe_eval.evaluate(true, true, true);
+      fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                       EvaluationFlags::hessians);
 
       // only for values (additional test)
       fe_eval2.reinit(cell);
       fe_eval2.read_dof_values(src);
-      fe_eval2.evaluate(true, false, false);
+      fe_eval2.evaluate(EvaluationFlags::values);
 
       // only gradients
       fe_eval3.reinit(cell);
       fe_eval3.read_dof_values(src);
-      fe_eval3.evaluate(false, true, false);
+      fe_eval3.evaluate(EvaluationFlags::gradients);
 
       // only values and gradients
       fe_eval4.reinit(cell);
       fe_eval4.read_dof_values(src);
-      fe_eval4.evaluate(true, true, false);
+      fe_eval4.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
       // only laplacians
       fe_eval5.reinit(cell);
       fe_eval5.read_dof_values(src);
-      fe_eval5.evaluate(false, false, true);
+      fe_eval5.evaluate(EvaluationFlags::hessians);
 
 
       // compare values with the values that we get

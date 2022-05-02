@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <boost/python.hpp>
 
@@ -29,28 +29,28 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace python
 {
-  class MappingQGenericWrapper
+  class MappingQWrapper
   {
   public:
     /**
      * Copy constructor.
      */
-    MappingQGenericWrapper(const MappingQGenericWrapper &other);
+    MappingQWrapper(const MappingQWrapper &other);
 
     /**
      * Default constructor.
      */
-    MappingQGenericWrapper();
+    MappingQWrapper();
 
     /**
      * Constructor.
      */
-    MappingQGenericWrapper(const int dim, const int spacedim, const int degree);
+    MappingQWrapper(const int dim, const int spacedim, const int degree);
 
     /**
      * Destructor.
      */
-    ~MappingQGenericWrapper();
+    ~MappingQWrapper();
 
     /*! @copydoc Mapping::transform_unit_to_real_cell
      */

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2019 by the deal.II authors
+// Copyright (C) 2011 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,9 +61,6 @@ namespace DynamicSparsityPatternIterators
    * row and column number (or alternatively the index within the complete
    * sparsity pattern). It does not allow modifying the sparsity pattern
    * itself.
-   *
-   * @author Wolfgang Bangerth
-   * @date 2015
    */
   class Accessor
   {
@@ -228,12 +225,14 @@ namespace DynamicSparsityPatternIterators
     /**
      * Dereferencing operator.
      */
-    const Accessor &operator*() const;
+    const Accessor &
+    operator*() const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor *operator->() const;
+    const Accessor *
+    operator->() const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
@@ -307,18 +306,16 @@ namespace DynamicSparsityPatternIterators
  *
  * <h3>Usage</h3>
  *
- * Use this class as follows:
+ * Usage of this class is explained in step-2 (without constraints) and step-6
+ * (with AffineConstraints) and typically looks as follows:
  * @code
  * DynamicSparsityPattern dynamic_pattern (dof_handler.n_dofs());
  * DoFTools::make_sparsity_pattern (dof_handler,
- *                                  dynamic_pattern);
- * constraints.condense (dynamic_pattern);
- *
+ *                                  dynamic_pattern,
+ *                                  constraints);
  * SparsityPattern sp;
  * sp.copy_from (dynamic_pattern);
  * @endcode
- *
- * @author Timo Heister, 2008
  */
 class DynamicSparsityPattern : public Subscriptor
 {
@@ -477,7 +474,7 @@ public:
 
   /**
    * Construct and store in this object the sparsity pattern corresponding to
-   * the product of transposed @p left and and non-transpose @p right sparsity pattern.
+   * the product of transposed @p left and non-transpose @p right sparsity pattern.
    */
   template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
   void
@@ -939,14 +936,16 @@ namespace DynamicSparsityPatternIterators
 
 
 
-  inline const Accessor &Iterator::operator*() const
+  inline const Accessor &
+  Iterator::operator*() const
   {
     return accessor;
   }
 
 
 
-  inline const Accessor *Iterator::operator->() const
+  inline const Accessor *
+  Iterator::operator->() const
   {
     return &accessor;
   }
@@ -1094,7 +1093,7 @@ DynamicSparsityPattern::column_number(const size_type row,
   Assert(rowset.size() == 0 || rowset.is_element(row), ExcInternalError());
 
   const size_type local_row =
-    rowset.size() ? rowset.index_within_set(row) : row;
+    rowset.size() != 0u ? rowset.index_within_set(row) : row;
   AssertIndexRange(index, lines[local_row].entries.size());
   return lines[local_row].entries[index];
 }
@@ -1182,7 +1181,7 @@ DynamicSparsityPattern::end(const size_type r) const
 {
   AssertIndexRange(r, n_rows());
 
-  unsigned int row = r + 1;
+  const size_type row = r + 1;
   if (row == n_rows())
     return {this};
   else

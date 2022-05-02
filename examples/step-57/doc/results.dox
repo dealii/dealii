@@ -401,4 +401,6 @@ multigrid is needed. See below.
 For larger computations, especially in 3d, it is necessary to implement MPI
 parallel solvers and preconditioners. A good starting point would be step-55,
 which uses algebraic multigrid for the velocity block for the Stokes
-equations.
+equations. Another option would be to take a look at the list of codes
+in the <a href="https://www.dealii.org/code-gallery.html">deal.II code
+gallery</a>, which already contains parallel Navier-Stokes solvers.

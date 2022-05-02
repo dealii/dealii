@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -90,7 +90,7 @@ check_this(const FiniteElement<dim, spacedim> &fe,
   if (fe.n_components() != 1)
     return;
 
-  // ignore this check if this fe has already
+  // ignore this check if this FE has already
   // been treated
   static std::set<std::string> already_checked;
   if (already_checked.find(fe.get_name()) != already_checked.end())

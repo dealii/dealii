@@ -1,0 +1,1284 @@
+
+DEAL::Number of active cells: 128
+DEAL::Number of degrees of freedom: 81
+DEAL::
+DEAL::Time step 1 at t=0.0156250
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 15 CG iterations.
+DEAL::   Total energy: 3.90638
+DEAL::Time step 2 at t=0.0312500
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 3.80538
+DEAL::Time step 3 at t=0.0468750
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 3.65034
+DEAL::Time step 4 at t=0.0625000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 3.46038
+DEAL::Time step 5 at t=0.0781250
+DEAL::   u-equation: 12 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 3.26055
+DEAL::Time step 6 at t=0.0937500
+DEAL::   u-equation: 12 CG iterations.
+DEAL::   v-equation: 15 CG iterations.
+DEAL::   Total energy: 3.08004
+DEAL::Time step 7 at t=0.109375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 15 CG iterations.
+DEAL::   Total energy: 2.94980
+DEAL::Time step 8 at t=0.125000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 2.89971
+DEAL::Time step 9 at t=0.140625
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 2.95543
+DEAL::Time step 10 at t=0.156250
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 3.13530
+DEAL::Time step 11 at t=0.171875
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 3.44753
+DEAL::Time step 12 at t=0.187500
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 3.88833
+DEAL::Time step 13 at t=0.203125
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 4.44121
+DEAL::Time step 14 at t=0.218750
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 5.07771
+DEAL::Time step 15 at t=0.234375
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 5.75983
+DEAL::Time step 16 at t=0.250000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 6.44388
+DEAL::Time step 17 at t=0.265625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 7.08546
+DEAL::Time step 18 at t=0.281250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 7.64493
+DEAL::Time step 19 at t=0.296875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.09274
+DEAL::Time step 20 at t=0.312500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.41371
+DEAL::Time step 21 at t=0.328125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.60966
+DEAL::Time step 22 at t=0.343750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.69979
+DEAL::Time step 23 at t=0.359375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.71877
+DEAL::Time step 24 at t=0.375000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.71239
+DEAL::Time step 25 at t=0.390625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.73160
+DEAL::Time step 26 at t=0.406250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.82544
+DEAL::Time step 27 at t=0.421875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 9.03399
+DEAL::Time step 28 at t=0.437500
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 9.38242
+DEAL::Time step 29 at t=0.453125
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 9.87692
+DEAL::Time step 30 at t=0.468750
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 10.5033
+DEAL::Time step 31 at t=0.484375
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 11.2287
+DEAL::Time step 32 at t=0.500000
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 12.0055
+DEAL::Time step 33 at t=0.515625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 15 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 34 at t=0.531250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 35 at t=0.546875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 36 at t=0.562500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 37 at t=0.578125
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 38 at t=0.593750
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 39 at t=0.609375
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 40 at t=0.625000
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 41 at t=0.640625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 42 at t=0.656250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 43 at t=0.671875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 44 at t=0.687500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 45 at t=0.703125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 46 at t=0.718750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 47 at t=0.734375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 48 at t=0.750000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 49 at t=0.765625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 50 at t=0.781250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 51 at t=0.796875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 52 at t=0.812500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 53 at t=0.828125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 54 at t=0.843750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 55 at t=0.859375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 56 at t=0.875000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 57 at t=0.890625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 58 at t=0.906250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 59 at t=0.921875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 60 at t=0.937500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 61 at t=0.953125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 62 at t=0.968750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 63 at t=0.984375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 64 at t=1.00000
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 65 at t=1.01562
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 66 at t=1.03125
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 67 at t=1.04688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 68 at t=1.06250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 69 at t=1.07812
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 70 at t=1.09375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 71 at t=1.10938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 72 at t=1.12500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 73 at t=1.14062
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 74 at t=1.15625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 75 at t=1.17188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 76 at t=1.18750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 77 at t=1.20312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 78 at t=1.21875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 79 at t=1.23438
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 80 at t=1.25000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 81 at t=1.26562
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 82 at t=1.28125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 83 at t=1.29688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 84 at t=1.31250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 85 at t=1.32812
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 86 at t=1.34375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 87 at t=1.35938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 88 at t=1.37500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 89 at t=1.39062
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 90 at t=1.40625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 91 at t=1.42188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 92 at t=1.43750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 93 at t=1.45312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 94 at t=1.46875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 95 at t=1.48438
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 96 at t=1.50000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 97 at t=1.51562
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 98 at t=1.53125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 99 at t=1.54688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 100 at t=1.56250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 101 at t=1.57812
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 102 at t=1.59375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 103 at t=1.60938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 104 at t=1.62500
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 105 at t=1.64062
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 106 at t=1.65625
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 107 at t=1.67188
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 108 at t=1.68750
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 109 at t=1.70312
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 110 at t=1.71875
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 111 at t=1.73438
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 112 at t=1.75000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 113 at t=1.76562
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 114 at t=1.78125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 115 at t=1.79688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 116 at t=1.81250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 117 at t=1.82812
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 118 at t=1.84375
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 119 at t=1.85938
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 120 at t=1.87500
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 121 at t=1.89062
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 122 at t=1.90625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 123 at t=1.92188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 124 at t=1.93750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 125 at t=1.95312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 126 at t=1.96875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 127 at t=1.98438
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 128 at t=2.00000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 129 at t=2.01562
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 130 at t=2.03125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 131 at t=2.04688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 132 at t=2.06250
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 133 at t=2.07812
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 134 at t=2.09375
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 135 at t=2.10938
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 136 at t=2.12500
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 137 at t=2.14062
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 138 at t=2.15625
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 139 at t=2.17188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 140 at t=2.18750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 141 at t=2.20312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 142 at t=2.21875
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 143 at t=2.23438
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 144 at t=2.25000
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 145 at t=2.26562
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 146 at t=2.28125
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 147 at t=2.29688
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 148 at t=2.31250
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 149 at t=2.32812
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 150 at t=2.34375
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 151 at t=2.35938
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 152 at t=2.37500
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 153 at t=2.39062
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 154 at t=2.40625
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 155 at t=2.42188
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 156 at t=2.43750
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 157 at t=2.45312
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 158 at t=2.46875
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 159 at t=2.48438
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 160 at t=2.50000
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 161 at t=2.51562
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 162 at t=2.53125
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 163 at t=2.54688
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 164 at t=2.56250
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 165 at t=2.57812
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 166 at t=2.59375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 167 at t=2.60938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 168 at t=2.62500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 169 at t=2.64062
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 170 at t=2.65625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 171 at t=2.67188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 172 at t=2.68750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 173 at t=2.70312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 174 at t=2.71875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 175 at t=2.73438
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 176 at t=2.75000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 177 at t=2.76562
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 178 at t=2.78125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 179 at t=2.79688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 180 at t=2.81250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 181 at t=2.82812
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 182 at t=2.84375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 183 at t=2.85938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 184 at t=2.87500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 185 at t=2.89062
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 186 at t=2.90625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 187 at t=2.92188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 188 at t=2.93750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 189 at t=2.95312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 190 at t=2.96875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 191 at t=2.98438
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 192 at t=3.00000
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 193 at t=3.01562
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 194 at t=3.03125
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 195 at t=3.04688
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 196 at t=3.06250
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 197 at t=3.07812
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 198 at t=3.09375
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 199 at t=3.10938
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 200 at t=3.12500
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 201 at t=3.14062
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 202 at t=3.15625
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 203 at t=3.17188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 204 at t=3.18750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 205 at t=3.20312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 206 at t=3.21875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 207 at t=3.23438
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 208 at t=3.25000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 209 at t=3.26562
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 210 at t=3.28125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 211 at t=3.29688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 212 at t=3.31250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 213 at t=3.32812
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 214 at t=3.34375
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 215 at t=3.35938
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 216 at t=3.37500
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 217 at t=3.39062
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 218 at t=3.40625
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 219 at t=3.42188
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 220 at t=3.43750
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 221 at t=3.45312
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 222 at t=3.46875
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 223 at t=3.48438
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 224 at t=3.50000
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 225 at t=3.51562
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 226 at t=3.53125
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 227 at t=3.54688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 228 at t=3.56250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 229 at t=3.57812
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 230 at t=3.59375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 231 at t=3.60938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 232 at t=3.62500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 233 at t=3.64062
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 234 at t=3.65625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 235 at t=3.67188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 236 at t=3.68750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 237 at t=3.70312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 238 at t=3.71875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 239 at t=3.73438
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 240 at t=3.75000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 241 at t=3.76562
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 242 at t=3.78125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 243 at t=3.79688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 244 at t=3.81250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 245 at t=3.82812
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 246 at t=3.84375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 247 at t=3.85938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 248 at t=3.87500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 249 at t=3.89062
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 250 at t=3.90625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 251 at t=3.92188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 252 at t=3.93750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 253 at t=3.95312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 254 at t=3.96875
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 255 at t=3.98438
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 256 at t=4.00000
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 257 at t=4.01562
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 258 at t=4.03125
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 259 at t=4.04688
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 260 at t=4.06250
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 261 at t=4.07812
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 262 at t=4.09375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 263 at t=4.10938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 264 at t=4.12500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 265 at t=4.14062
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 266 at t=4.15625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 267 at t=4.17188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 268 at t=4.18750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 269 at t=4.20312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 270 at t=4.21875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 271 at t=4.23438
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 272 at t=4.25000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 273 at t=4.26562
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 274 at t=4.28125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 275 at t=4.29688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 276 at t=4.31250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 277 at t=4.32812
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 278 at t=4.34375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 279 at t=4.35938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 280 at t=4.37500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 281 at t=4.39062
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 282 at t=4.40625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 283 at t=4.42188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 284 at t=4.43750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 285 at t=4.45312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 286 at t=4.46875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 13 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 287 at t=4.48438
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 288 at t=4.50000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 289 at t=4.51562
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 290 at t=4.53125
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 291 at t=4.54688
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 292 at t=4.56250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 293 at t=4.57812
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 294 at t=4.59375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 295 at t=4.60938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 296 at t=4.62500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 297 at t=4.64062
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 298 at t=4.65625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 299 at t=4.67188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 300 at t=4.68750
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 301 at t=4.70312
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 302 at t=4.71875
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 303 at t=4.73438
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 304 at t=4.75000
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 305 at t=4.76562
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 306 at t=4.78125
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 307 at t=4.79688
+DEAL::   u-equation: 14 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 308 at t=4.81250
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 309 at t=4.82812
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 310 at t=4.84375
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 311 at t=4.85938
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 312 at t=4.87500
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 313 at t=4.89062
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 314 at t=4.90625
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 315 at t=4.92188
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 316 at t=4.93750
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 317 at t=4.95312
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 318 at t=4.96875
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 319 at t=4.98438
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410
+DEAL::Time step 320 at t=5.00000
+DEAL::   u-equation: 13 CG iterations.
+DEAL::   v-equation: 14 CG iterations.
+DEAL::   Total energy: 8.06410

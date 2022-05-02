@@ -116,7 +116,7 @@ test()
   }
   deallog << "From all ghosts: ";
   for (unsigned int i = 0; i < locally_owned_array.size(); ++i)
-    deallog << locally_owned_array[i] << " ";
+    deallog << locally_owned_array[i] << ' ';
   deallog << std::endl;
 
   // send only the array in w
@@ -142,7 +142,7 @@ test()
   }
   deallog << "From reduced ghosts 1: ";
   for (unsigned int i = 0; i < locally_owned_array.size(); ++i)
-    deallog << locally_owned_array[i] << " ";
+    deallog << locally_owned_array[i] << ' ';
   deallog << std::endl;
 
   // send only the array in x
@@ -168,7 +168,7 @@ test()
   }
   deallog << "From reduced ghosts 2: ";
   for (unsigned int i = 0; i < locally_owned_array.size(); ++i)
-    deallog << locally_owned_array[i] << " ";
+    deallog << locally_owned_array[i] << ' ';
   deallog << std::endl;
 
   // now send a tight array from x and add into the existing entries
@@ -186,7 +186,7 @@ test()
     requests);
   deallog << "From tight reduced ghosts 2: ";
   for (unsigned int i = 0; i < locally_owned_array.size(); ++i)
-    deallog << locally_owned_array[i] << " ";
+    deallog << locally_owned_array[i] << ' ';
   deallog << std::endl;
 }
 

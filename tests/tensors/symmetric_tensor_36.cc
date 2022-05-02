@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,8 @@
 // from NumberType2
 template <int rank,
           int dim,
-          template <int, int, typename> class TensorType,
+          template <int, int, typename>
+          class TensorType,
           typename NumberType1,
           typename NumberType2>
 typename std::enable_if<!std::is_constructible<NumberType1, NumberType2>::value,
@@ -40,7 +41,8 @@ test_tensor_constructor(const std::string &, const std::string &)
 
 template <int rank,
           int dim,
-          template <int, int, typename> class TensorType,
+          template <int, int, typename>
+          class TensorType,
           typename NumberType1,
           typename NumberType2>
 typename std::enable_if<std::is_constructible<NumberType1, NumberType2>::value,
@@ -48,8 +50,8 @@ typename std::enable_if<std::is_constructible<NumberType1, NumberType2>::value,
 test_tensor_constructor(const std::string &type1, const std::string &type2)
 {
   deallog << "Rank " << rank << ", "
-          << "Dim " << dim << ":"
-          << "  From " << type2 << " To " << type1 << " ... " << std::flush;
+          << "Dim " << dim << ':' << "  From " << type2 << " To " << type1
+          << " ... " << std::flush;
   TensorType<rank, dim, NumberType2> tmp2;
   TensorType<rank, dim, NumberType1> tmp1(tmp2);
   deallog << "OK" << std::endl;
@@ -57,7 +59,8 @@ test_tensor_constructor(const std::string &type1, const std::string &type2)
 
 template <int rank,
           int dim,
-          template <int, int, typename> class TensorType,
+          template <int, int, typename>
+          class TensorType,
           typename NumberType1>
 void
 test_fixed_NT_2(const std::string &type1)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 #include <deal.II/base/parsed_function.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -40,7 +41,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
@@ -290,13 +290,15 @@ struct ParameterCollection
   void
   print();
 
-  void set_enrichment_point(Point<2> &p, const unsigned int i)
+  void
+  set_enrichment_point(Point<2> &p, const unsigned int i)
   {
     AssertDimension(dim, 2);
     p(0) = points_enrichments[2 * i];
     p(1) = points_enrichments[2 * i + 1];
   }
-  void set_enrichment_point(Point<3> &p, const unsigned int i)
+  void
+  set_enrichment_point(Point<3> &p, const unsigned int i)
   {
     AssertDimension(dim, 3);
     p(0) = points_enrichments[3 * i];
@@ -572,7 +574,7 @@ ParameterCollection::print()
   for (unsigned int i = 0; i < points_enrichments.size(); i = i + dim)
     {
       for (int d = 0; d < dim; ++d)
-        std::cout << points_enrichments[i + d] << " ";
+        std::cout << points_enrichments[i + d] << ' ';
 
       std::cout << std::endl;
     }
@@ -752,7 +754,7 @@ EstimateEnrichmentFunction::assemble_system()
       rhs_values.resize(n_q_points);
       rhs.value_list(fe_values.get_quadrature_points(), rhs_values);
 
-      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
+      for (const auto q_index : fe_values.quadrature_point_indices())
         {
           double radius = center.distance(fe_values.quadrature_point(q_index));
 
@@ -813,11 +815,12 @@ void
 EstimateEnrichmentFunction::refine_grid()
 {
   Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
-  KellyErrorEstimator<1>::estimate(dof_handler,
-                                   QGauss<1 - 1>(3),
-                                   typename FunctionMap<1>::type(),
-                                   solution,
-                                   estimated_error_per_cell);
+  KellyErrorEstimator<1>::estimate(
+    dof_handler,
+    QGauss<1 - 1>(3),
+    std::map<types::boundary_id, const Function<1> *>{},
+    solution,
+    estimated_error_per_cell);
   GridRefinement::refine_and_coarsen_fixed_number(triangulation,
                                                   estimated_error_per_cell,
                                                   0.2,
@@ -922,7 +925,7 @@ EstimateEnrichmentFunction::~EstimateEnrichmentFunction()
 
 template <int dim>
 void
-plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
+plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
 {
   std::cout << "...start plotting shape function" << std::endl;
   std::cout << "Patches for output: " << patches << std::endl;
@@ -1000,16 +1003,16 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
         << std::endl;
       GridOut grid_out;
       grid_out.write_gnuplot(dof_handler.get_triangulation(), f);
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
 
       DoFTools::write_gnuplot_dof_support_point_info(f, support_points);
 
-      f << "e" << std::endl;
+      f << 'e' << std::endl;
 
       std::cout << "...finished printing support points" << std::endl;
     }
 
-  DataOut<dim, hp::DoFHandler<dim>> data_out;
+  DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);
 
   // get material ids:
@@ -1020,7 +1023,7 @@ plot_shape_function(hp::DoFHandler<dim> &dof_handler, unsigned int patches = 5)
     }
   data_out.add_data_vector(fe_index, "fe_index");
 
-  for (unsigned int i = 0; i < shape_functions.size(); i++)
+  for (unsigned int i = 0; i < shape_functions.size(); ++i)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(patches);
@@ -1080,8 +1083,8 @@ protected:
   ParameterCollection prm;
   unsigned int        n_enriched_cells;
 
-  Triangulation<dim>  triangulation;
-  hp::DoFHandler<dim> dof_handler;
+  Triangulation<dim> triangulation;
+  DoFHandler<dim>    dof_handler;
 
   std::shared_ptr<const hp::FECollection<dim>> fe_collection;
   hp::QCollection<dim>                         q_collection;
@@ -1109,7 +1112,7 @@ protected:
   std::vector<SigmaFunction<dim>> vec_rhs;
 
   using cell_iterator_function = std::function<Function<dim> *(
-    const typename hp::DoFHandler<dim>::active_cell_iterator &)>;
+    const typename DoFHandler<dim>::active_cell_iterator &)>;
 
   std::vector<std::shared_ptr<Function<dim>>> vec_enrichments;
   std::vector<predicate_function<dim>>        vec_predicates;
@@ -1158,7 +1161,6 @@ LaplaceProblem<dim>::initialize()
    * set up basic grid which is a hyper cube or hyper ball based on
    * parameter file. Refine as per the global refinement value in the
    * parameter file.
-   *
    */
   if (prm.shape == 1)
     GridGenerator::hyper_cube(triangulation, -prm.size / 2.0, prm.size / 2.0);
@@ -1305,9 +1307,9 @@ LaplaceProblem<dim>::make_enrichment_functions()
       else
         {
           pcout << "Dummy function added at " << i << std::endl;
-          ConstantFunction<dim> func(0);
+          Functions::ConstantFunction<dim> func(0);
           vec_enrichments.push_back(
-            std::make_shared<ConstantFunction<dim>>(func));
+            std::make_shared<Functions::ConstantFunction<dim>>(func));
         }
     }
 }
@@ -1350,7 +1352,7 @@ LaplaceProblem<dim>::build_fe_space()
         {
           pcout << "...start print fe indices" << std::endl;
 
-          // print fe index
+          // print FE index
           const std::string base_filename =
             "fe_indices" + dealii::Utilities::int_to_string(dim) + "_p" +
             dealii::Utilities::int_to_string(0);
@@ -1367,12 +1369,12 @@ LaplaceProblem<dim>::build_fe_space()
             << "plot '-' using 1:2 with lines notitle, '-' with labels point pt 2 offset 1,1 notitle"
             << std::endl;
           GridOut().write_gnuplot(triangulation, f);
-          f << "e" << std::endl;
+          f << 'e' << std::endl;
 
           for (auto it : dof_handler.active_cell_iterators())
             f << it->center() << " \"" << it->active_fe_index() << "\"\n";
 
-          f << std::flush << "e" << std::endl;
+          f << std::flush << 'e' << std::endl;
           pcout << "...finished print fe indices" << std::endl;
         }
 
@@ -1397,12 +1399,12 @@ LaplaceProblem<dim>::build_fe_space()
             << "plot '-' using 1:2 with lines notitle, '-' with labels point pt 2 offset 1,1 notitle"
             << std::endl;
           GridOut().write_gnuplot(triangulation, f);
-          f << "e" << std::endl;
+          f << 'e' << std::endl;
 
           for (auto it : dof_handler.active_cell_iterators())
             f << it->center() << " \"" << it->index() << "\"\n";
 
-          f << std::flush << "e" << std::endl;
+          f << std::flush << 'e' << std::endl;
 
           pcout << "...end print cell indices" << std::endl;
         }
@@ -1521,7 +1523,7 @@ LaplaceProblem<dim>::assemble_system()
                                   tmp_rhs_value);
 
             // add tmp to the total one at quadrature points
-            for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+            for (const auto q_point : fe_values.quadrature_point_indices())
               {
                 rhs_value[q_point] += tmp_rhs_value[q_point];
               }
@@ -1534,7 +1536,7 @@ LaplaceProblem<dim>::assemble_system()
         cell_system_matrix = 0;
         cell_rhs           = 0;
 
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for (const auto q_point : fe_values.quadrature_point_indices())
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
               for (unsigned int j = i; j < dofs_per_cell; ++j)
@@ -1600,15 +1602,16 @@ LaplaceProblem<dim>::refine_grid()
   for (unsigned int i = 0; i < q_collection.size(); ++i)
     q_collection_face.push_back(QGauss<dim - 1>(1));
 
-  KellyErrorEstimator<dim>::estimate(dof_handler,
-                                     q_collection_face,
-                                     typename FunctionMap<dim>::type(),
-                                     localized_solution,
-                                     local_error_per_cell,
-                                     ComponentMask(),
-                                     nullptr,
-                                     n_mpi_processes,
-                                     this_mpi_process);
+  KellyErrorEstimator<dim>::estimate(
+    dof_handler,
+    q_collection_face,
+    std::map<types::boundary_id, const Function<dim> *>{},
+    localized_solution,
+    local_error_per_cell,
+    ComponentMask(),
+    nullptr,
+    n_mpi_processes,
+    this_mpi_process);
   const unsigned int n_local_cells =
     GridTools::count_cells_with_subdomain_association(triangulation,
                                                       this_mpi_process);
@@ -1667,7 +1670,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle)
       filename += ".vtk";
       std::ofstream output(filename.c_str());
 
-      DataOut<dim, hp::DoFHandler<dim>> data_out;
+      DataOut<dim> data_out;
       data_out.attach_dof_handler(dof_handler);
       data_out.add_data_vector(localized_solution, "solution");
       if (prm.exact_soln_expr != "")
@@ -1723,9 +1726,9 @@ LaplaceProblem<dim>::process_solution()
     }
 
   pcout << "refinement h_smallest Dofs L2_norm H1_norm" << std::endl;
-  pcout << prm.global_refinement << " "
-        << prm.size / std::pow(2.0, prm.global_refinement) << " "
-        << dof_handler.n_dofs() << " " << L2_error << " " << H1_error
+  pcout << prm.global_refinement << ' '
+        << prm.size / std::pow(2.0, prm.global_refinement) << ' '
+        << dof_handler.n_dofs() << ' ' << L2_error << ' ' << H1_error
         << std::endl;
 }
 
@@ -1738,7 +1741,7 @@ LaplaceProblem<dim>::run()
   pcout << "...run problem" << std::endl;
   double norm_soln_old(0), norm_rel_change_old(1);
 
-  // Run making grids and building fe space only once.
+  // Run making grids and building FE space only once.
   initialize();
   build_fe_space();
 
@@ -1779,7 +1782,7 @@ LaplaceProblem<dim>::run()
           Vector<float> difference_per_cell(triangulation.n_active_cells());
           VectorTools::integrate_difference(dof_handler,
                                             localized_solution,
-                                            ZeroFunction<dim>(),
+                                            Functions::ZeroFunction<dim>(),
                                             difference_per_cell,
                                             q_collection,
                                             VectorTools::H1_norm);

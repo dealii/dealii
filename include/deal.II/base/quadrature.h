@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,16 +33,20 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Base class for quadrature formulae in arbitrary dimensions. This class
- * stores quadrature points and weights on the unit line [0,1], unit square
- * [0,1]x[0,1], etc.
+ * stores quadrature points and weights in the coordinate system of
+ * a reference cell (see the ReferenceCell class) and as such serves to
+ * represent quadrature points and weights on the unit line segment
+ * $[0,1]$ in 1d, on the unit square or unit triangle in 2d, as well as
+ * the unit tetrahedron, cube, pyramid, and wedge reference cells in 3d.
  *
  * There are a number of derived classes, denoting concrete integration
  * formulae. Their names are prefixed by <tt>Q</tt>. Refer to the list of
  * derived classes for more details.
  *
- * The schemes for higher dimensions are typically tensor products of the one-
- * dimensional formulae, but refer to the section on implementation detail
- * below.
+ * At least for quadrilaterals and hexahedra (or, more precisely, since we work
+ * on reference cells: for the unit square and the unit cube), quadrature
+ * formulas are typically tensor products of one-dimensional formulas (see also
+ * the section on implementation detail below).
  *
  * In order to allow for dimension independent programming, a quadrature
  * formula of dimension zero exists. Since an integral over zero dimensions is
@@ -53,17 +57,20 @@ DEAL_II_NAMESPACE_OPEN
  * of these formulae is their use in QProjector, which will create a useful
  * formula of dimension one out of them.
  *
+ *
  * <h3>Mathematical background</h3>
  *
  * For each quadrature formula we denote by <tt>m</tt>, the maximal degree of
- * polynomials integrated exactly. This number is given in the documentation
- * of each formula. The order of the integration error is <tt>m+1</tt>, that
- * is, the error is the size of the cell to the <tt>m+1</tt> by the Bramble-
- * Hilbert Lemma. The number <tt>m</tt> is to be found in the documentation of
- * each concrete formula. For the optimal formulae QGauss we have $m = 2N-1$,
- * where N is the constructor parameter to QGauss. The tensor product formulae
- * are exact on tensor product polynomials of degree <tt>m</tt> in each space
- * direction, but they are still only of <tt>m+1</tt>st order.
+ * polynomials integrated exactly on the reference cell the quadrature
+ * formula corresponds to. This number is given in the documentation
+ * of each formula. The *order* of the integration error is <tt>m+1</tt>, that
+ * is, the error is the size of the cell to the <tt>m+1</tt> by the
+ * Bramble-Hilbert Lemma. The number <tt>m</tt> is to be found in the
+ * documentation of each concrete formula. For the optimal formulae QGauss we
+ * have $m = 2N-1$, where $N$ is the constructor parameter to QGauss. The tensor
+ * product formulae are exact on tensor product polynomials of degree <tt>m</tt>
+ * in each space direction, but they are still only of <tt>(m+1)</tt>st order.
+ *
  *
  * <h3>Implementation details</h3>
  *
@@ -73,13 +80,7 @@ DEAL_II_NAMESPACE_OPEN
  * one dimension. There is a special constructor to generate a quadrature
  * formula from two others.  For example, the QGauss@<dim@> formulae include
  * <i>N<sup>dim</sup></i> quadrature points in <tt>dim</tt> dimensions, where
- * N is the constructor parameter of QGauss.
- *
- * @note Instantiations for this template are provided for dimensions 0, 1, 2,
- * and 3 (see the section on
- * @ref Instantiations).
- *
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005, 2009
+ * $N$ is the constructor parameter of QGauss.
  */
 template <int dim>
 class Quadrature : public Subscriptor
@@ -87,9 +88,10 @@ class Quadrature : public Subscriptor
 public:
   /**
    * Define an alias for a quadrature that acts on an object of one dimension
-   * less. For cells, this would then be a face quadrature.
+   * less. For cells, this would then be a face quadrature. A sub quadrature of
+   * a 0-dimensional quadrature is defined as still being 0-dimensional.
    */
-  using SubQuadrature = Quadrature<dim - 1>;
+  using SubQuadrature = Quadrature<dim == 0 ? 0 : dim - 1>;
 
   /**
    * Constructor.
@@ -126,6 +128,9 @@ public:
    * This constructor does not require that constant functions are integrated
    * exactly. Therefore, it is appropriate if the one-dimensional formula
    * is defined with respect to a weighting function.
+   *
+   * If dim == 0, the resulting quadrature formula will be a single Point<0>
+   * having unit weight.
    */
   explicit Quadrature(const Quadrature<dim != 1 ? 1 : 0> &quadrature_1d);
 
@@ -235,7 +240,8 @@ public:
 
   /**
    * Write or read the data of this object to or from a stream for the purpose
-   * of serialization.
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -313,8 +319,6 @@ protected:
  *
  * @note Each constructor can only be used in the dimension matching the
  * number of arguments.
- *
- * @author Guido Kanschat, 2005
  */
 template <int dim>
 class QAnisotropic : public Quadrature<dim>
@@ -362,8 +366,6 @@ public:
  * The aim of this class is to provide a low order formula, where the error
  * constant can be tuned by increasing the number of quadrature points. This
  * is useful in integrating non-differentiable functions on cells.
- *
- * @author Wolfgang Bangerth 1999
  */
 template <int dim>
 class QIterated : public Quadrature<dim>
@@ -371,9 +373,25 @@ class QIterated : public Quadrature<dim>
 public:
   /**
    * Constructor. Iterate the given quadrature formula <tt>n_copies</tt> times
-   * in each direction.
+   * in each direction. The result is a tensor product quadrature formula
+   * defined on the unit hypercube (i.e., the line segment, unit square, or
+   * unit cube in 1d, 2d, and 3d respectively).
    */
   QIterated(const Quadrature<1> &base_quadrature, const unsigned int n_copies);
+
+  /**
+   * Constructor. Iterate the given quadrature formula on the given subintervals
+   * defined by adjacent points in @p intervals in each direction. The resulting
+   * quadrature rule will have `base_quadrature.size() * (intervals.size() - 1)`
+   * quadrature points if no quadrature point of `base_quadrature` is positioned
+   * on the boundaries. The result is a tensor product quadrature formula
+   * defined on the unit hypercube (i.e., the line segment, unit square, or
+   * unit cube in 1d, 2d, and 3d respectively).
+   *
+   * @note We require that `intervals.front() == 0` and `interval.back() == 1`.
+   */
+  QIterated(const Quadrature<1> &        base_quadrature,
+            const std::vector<Point<1>> &intervals);
 
   /**
    * Exception
@@ -466,15 +484,22 @@ Quadrature<dim>::serialize(Archive &ar, const unsigned int)
 template <>
 Quadrature<0>::Quadrature(const unsigned int);
 template <>
-Quadrature<0>::Quadrature(const Quadrature<-1> &, const Quadrature<1> &);
+Quadrature<0>::Quadrature(const Quadrature<0>::SubQuadrature &,
+                          const Quadrature<1> &);
 template <>
 Quadrature<0>::Quadrature(const Quadrature<1> &);
+template <>
+Quadrature<0>::Quadrature(const Point<0> &);
 
 template <>
 Quadrature<1>::Quadrature(const Quadrature<0> &, const Quadrature<1> &);
 
 template <>
 Quadrature<1>::Quadrature(const Quadrature<0> &);
+
+template <>
+QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
+                        const unsigned int   n_copies);
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE

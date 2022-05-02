@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,8 @@
 
 
 
-void check_this(Triangulation<3> &tria)
+void
+check_this(Triangulation<3> &tria)
 {
   // look at all faces, not only
   // active ones
@@ -53,7 +54,8 @@ void check_this(Triangulation<3> &tria)
 }
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
   deallog << "Initial check" << std::endl;
   check_this(tria);

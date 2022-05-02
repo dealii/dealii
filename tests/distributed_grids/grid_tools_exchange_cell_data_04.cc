@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/grid/cell_id.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
@@ -44,40 +45,70 @@ test()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
 
-  std::set<std::string> output;
+  std::map<CellId, std::string> input;
+  std::set<std::string>         output;
 
-  typedef
-    typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-                 cell_iterator;
-  typedef double DT;
-  int            counter = 0;
+  using cell_iterator =
+    typename parallel::distributed::Triangulation<dim>::active_cell_iterator;
+  using DT = double;
+  std::map<CellId, int> map;
+  int                   counter = 0;
+
+  std::map<unsigned int, std::set<dealii::types::subdomain_id>>
+    vertices_with_ghost_neighbors =
+      GridTools::compute_vertices_with_ghost_neighbors(tria);
+
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+        {
+          const std::map<unsigned int,
+                         std::set<dealii::types::subdomain_id>>::const_iterator
+            neighbor_subdomains_of_vertex =
+              vertices_with_ghost_neighbors.find(cell->vertex_index(v));
+
+          if (neighbor_subdomains_of_vertex !=
+              vertices_with_ghost_neighbors.end())
+            {
+              map[cell->id()] = ++counter;
+              break;
+            }
+        }
+    }
+
   GridTools::
     exchange_cell_data_to_ghosts<DT, parallel::distributed::Triangulation<dim>>(
       tria,
       [&](const cell_iterator &cell) -> std_cxx17::optional<DT> {
-        ++counter;
+        const auto         counter = map[cell->id()];
+        std::ostringstream oss;
         if (counter % 2 == 0)
           {
             DT value = counter;
 
-            deallog << "pack " << cell->id() << " " << value << std::endl;
+            oss << "pack " << cell->id() << ' ' << value;
+            input[cell->id()] = oss.str();
             return value;
           }
         else
           {
-            deallog << "skipping " << cell->id() << ' ' << counter << std::endl;
+            oss << "skipping " << cell->id() << ' ' << counter;
+            input[cell->id()] = oss.str();
             return std_cxx17::optional<DT>();
           }
       },
       [&](const cell_iterator &cell, const DT &data) {
         std::ostringstream oss;
-        oss << "unpack " << cell->id() << " " << data << " from "
+        oss << "unpack " << cell->id() << ' ' << data << " from "
             << cell->subdomain_id();
 
         output.insert(oss.str());
       });
 
   // sort the output because it will come in in random order
+  for (auto &it : input)
+    deallog << it.second << std::endl;
   for (auto &it : output)
     deallog << it << std::endl;
 }

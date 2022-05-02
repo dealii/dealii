@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2018 by the deal.II authors
+ * Copyright (C) 2009 - 2020 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -211,7 +211,7 @@ namespace Step37
   LaplaceOperator<dim, fe_degree, number>::evaluate_coefficient(
     const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*this->data);
 
     coefficient.reinit(n_cells, phi.n_q_points);
@@ -238,15 +238,15 @@ namespace Step37
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(coefficient.size(0), data.n_macro_cells());
+        AssertDimension(coefficient.size(0), data.n_cell_batches());
         AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(false, true);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q), q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -307,7 +307,7 @@ namespace Step37
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(coefficient.size(0), data.n_macro_cells());
+        AssertDimension(coefficient.size(0), data.n_cell_batches());
         AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
@@ -317,11 +317,11 @@ namespace Step37
               phi.submit_dof_value(VectorizedArray<number>(), j);
             phi.submit_dof_value(make_vectorized_array<number>(1.), i);
 
-            phi.evaluate(false, true);
+            phi.evaluate(EvaluationFlags::gradients);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q),
                                   q);
-            phi.integrate(false, true);
+            phi.integrate(EvaluationFlags::gradients);
             diagonal[i] = phi.get_dof_value(i);
           }
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -490,18 +490,18 @@ namespace Step37
     FEEvaluation<dim, degree_finite_element> phi(
       *system_matrix.get_matrix_free());
     for (unsigned int cell = 0;
-         cell < system_matrix.get_matrix_free()->n_macro_cells();
+         cell < system_matrix.get_matrix_free()->n_cell_batches();
          ++cell)
       {
         phi.reinit(cell);
         phi.read_dof_values_plain(solution);
-        phi.evaluate(false, true);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
             phi.submit_gradient(-coefficient(cell, q) * phi.get_gradient(q), q);
             phi.submit_value(forcing.value(phi.quadrature_point(q)), q);
           }
-        phi.integrate(true, true);
+        phi.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
         phi.distribute_local_to_global(system_rhs);
       }
     system_rhs.compress(VectorOperation::add);
@@ -595,7 +595,7 @@ namespace Step37
                                       solution,
                                       ManufacturedSolution<dim>(),
                                       errors,
-                                      QIterated<dim>(QTrapez<1>(), 4),
+                                      QIterated<dim>(QTrapezoid<1>(), 4),
                                       VectorTools::NormType::Linfty_norm);
     double max_cell_error = 1.0;
     if (errors.begin() != errors.end())

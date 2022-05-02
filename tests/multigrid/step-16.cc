@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -182,7 +182,7 @@ LaplaceProblem<dim>::setup_system()
   std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-  MappingQGeneric<dim> mapping(1);
+  MappingQ<dim> mapping(1);
   VectorTools::interpolate_boundary_values(mapping,
                                            mg_dof_handler,
                                            dirichlet_boundary,
@@ -193,7 +193,8 @@ LaplaceProblem<dim>::setup_system()
   system_matrix.reinit(sparsity_pattern);
 
   mg_constrained_dofs.clear();
-  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+  mg_constrained_dofs.initialize(mg_dof_handler);
+  mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
   const unsigned int n_levels = triangulation.n_levels();
 
   mg_interface_matrices.resize(0, n_levels - 1);
@@ -398,7 +399,7 @@ LaplaceProblem<dim>::assemble_multigrid()
           else
             {
               cell_matrix(i, j) = 0;
-              std::cout << i << " " << j << "\n";
+              std::cout << i << ' ' << j << "\n";
             }
 
 
@@ -454,8 +455,8 @@ LaplaceProblem<dim>::solve()
   MGCoarseGridHouseholder<> coarse_grid_solver;
   coarse_grid_solver.initialize(coarse_matrix);
 
-  typedef PreconditionSOR<SparseMatrix<double>> Smoother;
-  GrowingVectorMemory<>                         vector_memory;
+  using Smoother = PreconditionSOR<SparseMatrix<double>>;
+  GrowingVectorMemory<> vector_memory;
   MGSmootherRelaxation<SparseMatrix<double>, Smoother, Vector<double>>
     mg_smoother;
   mg_smoother.initialize(mg_matrices);

@@ -1,4 +1,0 @@
-New: Added two new overloads of FEValues::reinit() that take face and subface
-iterators instead of face and subface numbers.
-<br>
-(David Wells, 2019/10/27)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,8 +77,8 @@ test()
       std::vector<std::string> filenames;
       filenames.push_back("output.vtu");
       {
-        std::ofstream master("output.pvtu");
-        data_out.write_pvtu_record(master, filenames);
+        std::ofstream pvtu_output("output.pvtu");
+        data_out.write_pvtu_record(pvtu_output, filenames);
       }
 
       cat_file("output.vtu");

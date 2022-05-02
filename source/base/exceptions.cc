@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,10 @@
 
 #ifdef DEAL_II_WITH_MPI
 #  include <mpi.h>
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+#  include <exodusII.h>
 #endif
 
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
@@ -55,11 +59,15 @@ namespace deal_II_exceptions
     bool allow_abort_on_exception = true;
   } // namespace internals
 
+
+
   void
   set_additional_assert_output(const std::string &p)
   {
     internals::get_additional_assert_output() = p;
   }
+
+
 
   void
   suppress_stacktrace_in_exceptions()
@@ -67,10 +75,20 @@ namespace deal_II_exceptions
     internals::show_stacktrace = false;
   }
 
+
+
   void
   disable_abort_on_exception()
   {
     internals::allow_abort_on_exception = false;
+  }
+
+
+
+  void
+  enable_abort_on_exception()
+  {
+    internals::allow_abort_on_exception = true;
   }
 } // namespace deal_II_exceptions
 
@@ -82,7 +100,6 @@ ExceptionBase::ExceptionBase()
   , function("")
   , cond("")
   , exc("")
-  , stacktrace(nullptr)
   , n_stacktrace_frames(0)
   , what_str("")
 {
@@ -99,23 +116,18 @@ ExceptionBase::ExceptionBase(const ExceptionBase &exc)
   , function(exc.function)
   , cond(exc.cond)
   , exc(exc.exc)
-  , stacktrace(nullptr)
-  , // don't copy stacktrace to avoid double de-allocation problem
-  n_stacktrace_frames(0)
+  , n_stacktrace_frames(exc.n_stacktrace_frames)
   , what_str("") // don't copy the error message, it gets generated dynamically
                  // by what()
 {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
-  std::fill(std::begin(raw_stacktrace), std::end(raw_stacktrace), nullptr);
+  // Copy the raw_stacktrace pointers. We don't own them, they just point to the
+  // addresses of symbols in the executable's/library's symbol tables -- and as
+  // a consequence, it is safe to copy these pointers
+  std::copy(std::begin(exc.raw_stacktrace),
+            std::end(exc.raw_stacktrace),
+            std::begin(raw_stacktrace));
 #endif
-}
-
-
-
-ExceptionBase::~ExceptionBase() noexcept
-{
-  free(stacktrace); // free(nullptr) is allowed
-  stacktrace = nullptr;
 }
 
 
@@ -143,27 +155,18 @@ ExceptionBase::set_fields(const char *f,
 #endif
 }
 
+
+
 const char *
 ExceptionBase::what() const noexcept
 {
   // If no error c_string was generated so far, do it now:
   if (what_str.empty())
-    {
-#ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
-      // We have deferred the symbol lookup to this point to avoid costly
-      // runtime penalties due to linkage of external libraries by
-      // backtrace_symbols.
-
-      // first delete old stacktrace if necessary
-      free(stacktrace); // free(nullptr) is allowed
-      stacktrace = backtrace_symbols(raw_stacktrace, n_stacktrace_frames);
-#endif
-
-      generate_message();
-    }
+    generate_message();
 
   return what_str.c_str();
 }
+
 
 
 const char *
@@ -222,6 +225,15 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
 
   if (deal_II_exceptions::internals::show_stacktrace == false)
     return;
+
+  char **stacktrace = nullptr;
+#ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
+  // We have deferred the symbol lookup to this point to avoid costly
+  // runtime penalties due to linkage of external libraries by
+  // backtrace_symbols.
+  stacktrace = backtrace_symbols(raw_stacktrace, n_stacktrace_frames);
+#endif
+
 
   // if there is a stackframe stored, print it
   out << std::endl;
@@ -299,6 +311,9 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
       if (functionname == "main")
         break;
     }
+
+  free(stacktrace); // free(nullptr) is allowed
+  stacktrace = nullptr;
 }
 
 
@@ -317,10 +332,25 @@ ExceptionBase::generate_message() const
                 << "--------------------------------------------------------"
                 << std::endl;
 
-      // print out general data
+      // Print out general data
       print_exc_data(converter);
-      // print out exception specific data
-      print_info(converter);
+
+      // Print out exception specific data. Put this into another stringstream
+      // object for now so that we can break long lines and print them in a
+      // more easily read way
+      {
+        std::ostringstream message;
+        print_info(message);
+
+        const auto message_in_lines =
+          Utilities::break_text_into_lines(message.str(), 70);
+
+        // Put the message into the stream that will be output.
+        for (const auto &line : message_in_lines)
+          converter << "    " << line << '\n';
+      }
+
+
       print_stack_trace(converter);
 
       if (!deal_II_exceptions::internals::get_additional_assert_output()
@@ -347,9 +377,9 @@ ExceptionBase::generate_message() const
 
 
 
-#ifdef DEAL_II_WITH_MPI
 namespace StandardExceptions
 {
+#ifdef DEAL_II_WITH_MPI
   ExcMPI::ExcMPI(const int error_code)
     : error_code(error_code)
   {}
@@ -395,10 +425,32 @@ namespace StandardExceptions
           << std::endl;
       }
     out << "The numerical value of the original error code is " << error_code
-        << "." << std::endl;
+        << '.' << std::endl;
   }
-} // namespace StandardExceptions
 #endif // DEAL_II_WITH_MPI
+
+
+
+#ifdef DEAL_II_TRILINOS_WITH_SEACAS
+  ExcExodusII::ExcExodusII(const int error_code)
+    : error_code(error_code)
+  {
+    // To avoid including yet another header in exceptions.h we assume that
+    // EX_NOERR is zero. Check that here:
+    static_assert(EX_NOERR == 0,
+                  "EX_NOERR is assumed to be zero in all versions of ExodusII");
+  }
+
+
+
+  void
+  ExcExodusII::print_info(std::ostream &out) const
+  {
+    out << "Error code is " << error_code << '\n';
+    out << "String description: " << ex_strerror(error_code) << '\n';
+  }
+#endif // DEAL_II_TRILINOS_WITH_SEACAS
+} // namespace StandardExceptions
 
 namespace deal_II_exceptions
 {
@@ -425,7 +477,7 @@ namespace deal_II_exceptions
 #ifdef DEAL_II_WITH_MPI
       int is_initialized;
       MPI_Initialized(&is_initialized);
-      if (is_initialized)
+      if (is_initialized != 0)
         {
           // do the same as in Utilities::MPI::n_mpi_processes() here,
           // but without error checking to not throw again.

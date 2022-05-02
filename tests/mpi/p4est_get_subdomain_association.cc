@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,7 +61,7 @@ test()
 
   const std::vector<types::global_dof_index>
     n_locally_owned_dofs_per_processor =
-      dofh.compute_n_locally_owned_dofs_per_processor();
+      Utilities::MPI::all_gather(MPI_COMM_WORLD, dofh.n_locally_owned_dofs());
   if (myid == 1)
     {
       deallog << "dofh.n_dofs() " << n_locally_owned_dofs_per_processor

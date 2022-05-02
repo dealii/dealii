@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,6 +21,8 @@
 #   P4EST_INCLUDE_DIRS
 #   P4EST_WITH_MPI
 #   P4EST_WITH_ZLIB
+#   P4EST_WITH_VTK_BINARY
+#   P4EST_WITH_SEARCH_LOCAL
 #   P4EST_VERSION
 #   P4EST_VERSION_MAJOR
 #   P4EST_VERSION_MINOR
@@ -112,7 +114,13 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_MPI_STRING
     REGEX "#define.*P4EST_MPI 1")
   IF("${P4EST_MPI_STRING}" STREQUAL "")
-    SET(P4EST_WITH_MPI FALSE)
+    FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_MPI_STRING
+      REGEX "#define.*P4EST_ENABLE_MPI")
+    IF("${P4EST_MPI_STRING}" STREQUAL "")
+      SET(P4EST_WITH_MPI FALSE)
+    ELSE()
+      SET(P4EST_WITH_MPI TRUE)
+    ENDIF()
   ELSE()
     SET(P4EST_WITH_MPI TRUE)
   ENDIF()
@@ -121,7 +129,7 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   # Is p4est built against zlib?
   #
   FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_ZLIB_STRING
-    REGEX "#define.*P4EST_HAVE_ZLIB 1")
+    REGEX "^#define.*P4EST_HAVE_ZLIB")
   IF("${P4EST_ZLIB_STRING}" STREQUAL "")
     SET(P4EST_WITH_ZLIB FALSE)
   ELSE()
@@ -129,10 +137,32 @@ IF(EXISTS ${P4EST_INCLUDE_DIR}/p4est_config.h)
   ENDIF()
 
   #
+  # Is binary vtk output enabled?
+  #
+  FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_VTK_BINARY_STRING
+    REGEX "#define.*P4EST_ENABLE_VTK_BINARY 1")
+  IF("${P4EST_VTK_BINARY_STRING}" STREQUAL "")
+    SET(P4EST_WITH_VTK_BINARY FALSE)
+  ELSE()
+    SET(P4EST_WITH_VTK_BINARY TRUE)
+  ENDIF()
+  
+  #
+  # Does p4est have search local?
+  #
+  FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_base.h" P4EST_SEARCH_LOCAL_STRING
+    REGEX "#define.*P4EST_SEARCH_LOCAL")
+  IF("${P4EST_SEARCH_LOCAL_STRING}" STREQUAL "")
+    SET(P4EST_WITH_SEARCH_LOCAL FALSE)
+  ELSE()
+    SET(P4EST_WITH_SEARCH_LOCAL TRUE)
+  ENDIF()
+
+  #
   # Extract version numbers:
   #
   FILE(STRINGS "${P4EST_INCLUDE_DIR}/p4est_config.h" P4EST_VERSION
-    REGEX "#define P4EST_VERSION \"")
+    REGEX "^[ \t]*#[ \t]*define[ \t]+P4EST_VERSION \"")
   STRING(REGEX REPLACE "^.*P4EST_VERSION.*\"([0-9]+.*)\".*" "\\1"
     P4EST_VERSION "${P4EST_VERSION}"
     )

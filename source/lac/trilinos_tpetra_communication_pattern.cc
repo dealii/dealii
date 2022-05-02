@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,19 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
-#  ifdef DEAL_II_WITH_MPI
+#  include <deal.II/base/index_set.h>
 
-#    include <deal.II/base/index_set.h>
+#  include <Tpetra_Map.hpp>
 
-#    include <Tpetra_Map.hpp>
-
-#    include <memory>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -66,10 +62,10 @@ namespace LinearAlgebra
       // Source map is vector_space_vector_map. This map must have uniquely
       // owned GID.
       tpetra_import =
-        std_cxx14::make_unique<Tpetra::Import<int, types::global_dof_index>>(
+        std::make_unique<Tpetra::Import<int, types::global_dof_index>>(
           read_write_vector_map, vector_space_vector_map);
       tpetra_export =
-        std_cxx14::make_unique<Tpetra::Export<int, types::global_dof_index>>(
+        std::make_unique<Tpetra::Export<int, types::global_dof_index>>(
           read_write_vector_map, vector_space_vector_map);
     }
 
@@ -100,7 +96,5 @@ namespace LinearAlgebra
 } // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
-
-#  endif
 
 #endif

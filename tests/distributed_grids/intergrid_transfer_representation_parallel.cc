@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2019 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,7 +89,7 @@ test(unsigned n_refinements)
   InterGridMap<DoFHandler<dim>> grid_1_to_2_map;
   grid_1_to_2_map.make_mapping(dof_handler1, dof_handler2);
 
-  typedef std::vector<std::map<types::global_dof_index, float>> TransferRep;
+  using TransferRep = std::vector<std::map<types::global_dof_index, float>>;
   TransferRep transfer_representation;
   DoFTools::compute_intergrid_transfer_representation(
     dof_handler1, 0, dof_handler2, 0, grid_1_to_2_map, transfer_representation);

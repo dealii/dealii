@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,7 @@ template <int dim, int fe_degree>
 void
 test(const bool hanging_nodes = true)
 {
-  typedef double number;
+  using number = double;
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
@@ -158,7 +158,7 @@ test(const bool hanging_nodes = true)
       const double t = sparse_matrix.diag_element(glob_index);
       if (std::abs(d - t) / t > 1e-10)
         {
-          deallog << glob_index << " " << d << " != " << t << std::endl;
+          deallog << glob_index << ' ' << d << " != " << t << std::endl;
         }
     }
 

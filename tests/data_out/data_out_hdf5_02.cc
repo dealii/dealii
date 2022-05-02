@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,6 +41,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
       const unsigned int nsubp = nsub + 1;
 
       patch.n_subdivisions = nsub;
+      patch.reference_cell = ReferenceCells::get_hypercube<dim>();
       for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         for (unsigned int d = 0; d < spacedim; ++d)
           patch.vertices[v](d) =

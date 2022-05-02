@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,7 +49,7 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
 public:
-  typedef std::vector<Vector<Number> *> VectorType;
+  using VectorType = std::vector<Vector<Number> *>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in)
@@ -87,11 +87,11 @@ private:
 
 template <int dim, int fe_degree, typename Number>
 void
-MatrixFreeTest<dim, fe_degree, Number>::
-operator()(const MatrixFree<dim, Number> &data,
-           std::vector<Vector<Number> *> &dst,
-           const std::vector<Vector<Number> *> &,
-           const std::pair<unsigned int, unsigned int> &cell_range) const
+MatrixFreeTest<dim, fe_degree, Number>::operator()(
+  const MatrixFree<dim, Number> &data,
+  std::vector<Vector<Number> *> &dst,
+  const std::vector<Vector<Number> *> &,
+  const std::pair<unsigned int, unsigned int> &cell_range) const
 {
   FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(data);
   const unsigned int                     n_q_points    = fe_eval.n_q_points;
@@ -140,7 +140,7 @@ operator()(const MatrixFree<dim, Number> &data,
             submit[d] = gradients[q * dim + d];
           fe_eval.submit_gradient(submit, q);
         }
-      fe_eval.integrate(true, true);
+      fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
       fe_eval.distribute_local_to_global(*dst[0]);
     }
 }
@@ -151,7 +151,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double               number;
+  using number = double;
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);

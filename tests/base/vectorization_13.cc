@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,8 +31,23 @@ do_test(const VectorizedArrayType                      array,
 
   auto exponentiated_array = std::pow(array, number);
 
-  for (unsigned int i = 0; i < VectorizedArrayType::size(); i++)
-    deallog << exponentiated_array[i] << " ";
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
+    deallog << exponentiated_array[i] << ' ';
+  deallog << std::endl;
+}
+
+
+template <typename VectorizedArrayType>
+void
+do_test(const VectorizedArrayType array, const VectorizedArrayType number)
+{
+  deallog << "  test " << VectorizedArrayType::size() << " array elements"
+          << std::endl;
+
+  auto exponentiated_array = std::pow(array, number);
+
+  for (unsigned int i = 0; i < VectorizedArrayType::size(); ++i)
+    deallog << exponentiated_array[i] << ' ';
   deallog << std::endl;
 }
 
@@ -45,18 +60,30 @@ main()
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 512
   do_test(VectorizedArray<double, 8>(2.0), 3.0);
   do_test(VectorizedArray<float, 16>(2.0), 3.0);
+
+  do_test(VectorizedArray<double, 8>(2.0), VectorizedArray<double, 8>(3.0));
+  do_test(VectorizedArray<float, 16>(2.0), VectorizedArray<float, 16>(3.0));
 #endif
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 256
   do_test(VectorizedArray<double, 4>(2.0), 3.0);
   do_test(VectorizedArray<float, 8>(2.0), 3.0);
+
+  do_test(VectorizedArray<double, 4>(2.0), VectorizedArray<double, 4>(3.0));
+  do_test(VectorizedArray<float, 8>(2.0), VectorizedArray<float, 8>(3.0));
 #endif
 
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128
   do_test(VectorizedArray<double, 2>(2.0), 3.0);
   do_test(VectorizedArray<float, 4>(2.0), 3.0);
+
+  do_test(VectorizedArray<double, 2>(2.0), VectorizedArray<double, 2>(3.0));
+  do_test(VectorizedArray<float, 4>(2.0), VectorizedArray<float, 4>(3.0));
 #endif
 
   do_test(VectorizedArray<double, 1>(2.0), 3.0);
   do_test(VectorizedArray<float, 1>(2.0), 3.0);
+
+  do_test(VectorizedArray<double, 1>(2.0), VectorizedArray<double, 1>(3.0));
+  do_test(VectorizedArray<float, 1>(2.0), VectorizedArray<float, 1>(3.0));
 }

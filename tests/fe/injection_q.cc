@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,6 +29,6 @@ test()
   deallog << std::setprecision(10);
   for (unsigned int i = 1; i < 4; ++i)
     for (unsigned int j = i; j < 4; ++j)
-      do_check(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)),
-               FE_Q<dim>(QIterated<1>(QTrapez<1>(), j)));
+      do_check(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)),
+               FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), j)));
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,12 +74,12 @@ run(unsigned int degree, unsigned int n_q_points)
   UpdateFlags            flags = update_quadrature_points; // dummy
 
   FESubfaceValues<dim> sub_face(fe, quad, flags);
-  sub_face.reinit(CellId(0, {1}).to_cell(tria), 0, 0);
+  sub_face.reinit(tria.create_cell_iterator(CellId(0, {1})), 0, 0);
   for (auto p : sub_face.get_quadrature_points())
     deallog << p << std::endl;
   deallog << std::endl;
 
-  sub_face.reinit(CellId(0, {1}).to_cell(tria), 1, 0);
+  sub_face.reinit(tria.create_cell_iterator(CellId(0, {1})), 1, 0);
   for (auto p : sub_face.get_quadrature_points())
     deallog << p << std::endl;
   deallog << std::endl;

@@ -26,6 +26,7 @@
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
 
 #include <iostream>
 
@@ -38,20 +39,12 @@ test()
   const unsigned int N      = 200;
   const unsigned int n_dofs = N * N;
 
-  // build the sparse matrix
-  MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes =
-    Utilities::MPI::n_mpi_processes(mpi_communicator);
-  const unsigned int my_id = Utilities::MPI::this_mpi_process(mpi_communicator);
-  Assert(n_dofs % n_mpi_processes == 0, ExcInternalError());
-  const unsigned int n_local_dofs = n_dofs / n_mpi_processes;
-  IndexSet           locally_owned_dofs(n_dofs);
-  locally_owned_dofs.add_range(my_id * n_dofs / n_mpi_processes,
-                               (my_id + 1) * n_dofs / n_mpi_processes);
-  IndexSet               locally_relevant_dofs = locally_owned_dofs;
-  DynamicSparsityPattern dsp(n_dofs);
-  for (unsigned int i = 0; i < N; i++)
-    for (unsigned int j = 0; j < N; j++)
+  DynamicSparsityPattern dsp(n_dofs, n_dofs);
+  // An older version of this test relied on PETSc doing dynamic allocation, but
+  // we require sparsity patterns in constructors now so we need the sparsity
+  // pattern ahead of time - hence this is done twice
+  for (unsigned int i = 0; i < N; ++i)
+    for (unsigned int j = 0; j < N; ++j)
       {
         const unsigned int global = i * N + j;
         dsp.add(global, global);
@@ -77,10 +70,15 @@ test()
           }
       }
 
+  SparsityPattern sparsity_pattern;
+  sparsity_pattern.copy_from(dsp);
+  IndexSet all_dofs(n_dofs);
+  all_dofs.add_range(0, n_dofs);
+
   PETScWrappers::MPI::SparseMatrix matrix;
-  matrix.reinit(locally_owned_dofs, locally_owned_dofs, dsp, mpi_communicator);
-  for (unsigned int i = 0; i < N; i++)
-    for (unsigned int j = 0; j < N; j++)
+  matrix.reinit(all_dofs, all_dofs, sparsity_pattern, PETSC_COMM_WORLD);
+  for (unsigned int i = 0; i < N; ++i)
+    for (unsigned int j = 0; j < N; ++j)
       {
         const unsigned int global = i * N + j;
         matrix.add(global, global, 4);
@@ -110,9 +108,9 @@ test()
   // then do a single matrix-vector
   // multiplication with subsequent formation
   // of the matrix norm
-  PETScWrappers::MPI::Vector v1(PETSC_COMM_WORLD, n_dofs, n_dofs);
-  PETScWrappers::MPI::Vector v2(PETSC_COMM_WORLD, n_dofs, n_dofs);
-  for (unsigned int i = 0; i < n_dofs; ++i)
+  PETScWrappers::MPI::Vector v1(PETSC_COMM_WORLD, N * N, N * N);
+  PETScWrappers::MPI::Vector v2(PETSC_COMM_WORLD, N * N, N * N);
+  for (unsigned int i = 0; i < N * N; ++i)
     v1(i) = i;
   matrix.vmult(v2, v1);
 

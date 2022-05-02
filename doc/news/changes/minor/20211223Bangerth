@@ -1,0 +1,7 @@
+Deprecated: The Threads::new_thread() functions have been
+deprecated. These functions return a Threads::Thread object, which is
+a class that had previously been deprecated, and should no longer be
+used: use the `std::thread` or `std::jthread` classes and related
+functionality instead.
+<br>
+(Wolfgang Bangerth, 2021/12/23)

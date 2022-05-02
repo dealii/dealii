@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -59,8 +59,6 @@ namespace OpenCASCADE
    * TopoDS_Edge when projecting on a face. In this case, the vertices of the
    * face would be collapsed to the edge, and your surrounding points would
    * not be lying on the given shape, raising an exception.
-   *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
   class NormalProjectionManifold : public FlatManifold<dim, spacedim>
@@ -130,8 +128,6 @@ namespace OpenCASCADE
    * the triangulation to be refined is close to the boundary of the given
    * TopoDS_Shape, or when the direction you use at construction time does not
    * intersect the shape. An exception is thrown when this happens.
-   *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
   class DirectionalProjectionManifold : public FlatManifold<dim, spacedim>
@@ -227,8 +223,6 @@ namespace OpenCASCADE
    * TopoDS_Shape, or when the normal direction estimated from the surrounding
    * points does not intersect the shape.  An exception is thrown when this
    * happens.
-   *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
   class NormalToMeshProjectionManifold : public FlatManifold<dim, spacedim>
@@ -290,8 +284,6 @@ namespace OpenCASCADE
    * surrounding points actually live on the Manifold, i.e., calling
    * OpenCASCADE::closest_point() on those points leaves them untouched. If
    * this is not the case, an ExcPointNotOnManifold is thrown.
-   *
-   * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
   class ArclengthProjectionLineManifold : public ChartManifold<dim, spacedim, 1>
@@ -351,8 +343,6 @@ namespace OpenCASCADE
    * Manifold description for the face of a CAD imported using OpenCASCADE.
    *
    * @ingroup manifold
-   *
-   * @author Andrea Mola, Mauro Bardelloni, 2016
    */
   template <int dim, int spacedim>
   class NURBSPatchManifold : public ChartManifold<dim, spacedim, 2>

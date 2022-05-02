@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -367,7 +367,8 @@ Vector<Number>::sadd(const Number x, const Number a, const Vector<Number> &v)
 
 template <typename Number>
 template <typename Number2>
-Number Vector<Number>::operator*(const Vector<Number2> &v) const
+Number
+Vector<Number>::operator*(const Vector<Number2> &v) const
 {
   Assert(size() != 0, ExcEmptyObject());
 
@@ -833,7 +834,7 @@ Vector<Number>::print(std::ostream &     out,
                       const bool         across) const
 {
   Assert(size() != 0, ExcEmptyObject());
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   std::ios::fmtflags old_flags     = out.flags();
   unsigned int       old_precision = out.precision(precision);
@@ -852,7 +853,7 @@ Vector<Number>::print(std::ostream &     out,
       out << values[i] << std::endl;
   out << std::endl;
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
   // reset output format
   out.flags(old_flags);
   out.precision(old_precision);
@@ -864,7 +865,7 @@ template <typename Number>
 void
 Vector<Number>::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 
   // other version of the following
   //  out << size() << std::endl << '[';
@@ -888,7 +889,7 @@ Vector<Number>::block_write(std::ostream &out) const
   const char outro = ']';
   out.write(&outro, 1);
 
-  AssertThrow(out, ExcIO());
+  AssertThrow(out.fail() == false, ExcIO());
 }
 
 
@@ -897,7 +898,7 @@ template <typename Number>
 void
 Vector<Number>::block_read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  AssertThrow(in.fail() == false, ExcIO());
 
   size_type sz;
 

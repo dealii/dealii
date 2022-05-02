@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,7 +38,7 @@ print_constant_modes(const FiniteElement<dim> &fe)
   for (unsigned int r = 0; r < constant_modes.n_rows(); ++r)
     {
       for (unsigned int c = 0; c < constant_modes.n_cols(); ++c)
-        deallog << constant_modes(r, c) << " ";
+        deallog << constant_modes(r, c) << ' ';
       deallog << std::endl;
     }
   deallog << std::endl;

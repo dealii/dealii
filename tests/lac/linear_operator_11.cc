@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -236,8 +236,8 @@ Step4<dim>::solve()
     deallog.pop();
   }
 
-  typedef TrilinosWrappers::MPI::Vector VectorType;
-  VectorType                            output(solution);
+  using VectorType = TrilinosWrappers::MPI::Vector;
+  VectorType output(solution);
   {
     deallog.push("Trilinos_CG_SSOR");
     output = 0;

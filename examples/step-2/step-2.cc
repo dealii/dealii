@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2019 by the deal.II authors
+ * Copyright (C) 1999 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -21,8 +21,6 @@
 // The first few includes are just like in the previous program, so do not
 // require additional comments:
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
 // However, the next file is new. We need this include file for the
@@ -75,12 +73,13 @@ void make_grid(Triangulation<2> &triangulation)
   for (unsigned int step = 0; step < 3; ++step)
     {
       for (auto &cell : triangulation.active_cell_iterators())
-        for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
+        for (const auto v : cell->vertex_indices())
           {
             const double distance_from_center =
               center.distance(cell->vertex(v));
 
-            if (std::fabs(distance_from_center - inner_radius) < 1e-10)
+            if (std::fabs(distance_from_center - inner_radius) <=
+                1e-6 * inner_radius)
               {
                 cell->set_refine_flag();
                 break;

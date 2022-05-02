@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 by the deal.II authors
+## Copyright (C) 2016 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -37,11 +37,15 @@ IF(DEAL_II_COMPONENT_PYTHON_BINDINGS)
   # component manually.
   #
   UNSET(Boost_FOUND)
+  # On case-insensitive file systems, FindBOOST.cmake and FindBoost.cmake are indistinguishable.
+  # Make sure FindBoost.cmake from CMake installation is found.
+  LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
   IF(${BOOST_VERSION} VERSION_LESS 1.67)
     _FIND_PACKAGE(Boost 1.59 COMPONENTS python REQUIRED)
   ELSE()
     _FIND_PACKAGE(Boost 1.67 COMPONENTS python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} REQUIRED)
   ENDIF()
+  LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
   IF(NOT Boost_FOUND)
     MESSAGE(FATAL_ERROR

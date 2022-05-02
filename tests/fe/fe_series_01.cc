@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,11 @@ test_1d()
   QIterated<dim> quadrature(base_quadrature, N);
   q_collection.push_back(quadrature);
 
-  FESeries::Fourier<dim> fourier(N, fe_collection, q_collection);
+  const std::vector<unsigned int> n_coefficients_per_direction(1, N);
+
+  FESeries::Fourier<dim> fourier(n_coefficients_per_direction,
+                                 fe_collection,
+                                 q_collection);
 
   Vector<double> local_dof_values(2);
   local_dof_values[0]                     = 0;
@@ -77,12 +81,12 @@ test_1d()
                     fourier_coefficients);
 
   deallog << "calculated:" << std::endl;
-  for (unsigned int i = 0; i < N; i++)
-    deallog << fourier_coefficients[i].real() << " "
+  for (unsigned int i = 0; i < N; ++i)
+    deallog << fourier_coefficients[i].real() << ' '
             << fourier_coefficients[i].imag() << std::endl;
   deallog << "exact:" << std::endl;
-  for (unsigned int i = 0; i < N; i++)
-    deallog << exact[i].real() << " " << exact[i].imag() << std::endl;
+  for (unsigned int i = 0; i < N; ++i)
+    deallog << exact[i].real() << ' ' << exact[i].imag() << std::endl;
 }
 
 

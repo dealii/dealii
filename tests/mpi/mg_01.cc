@@ -92,7 +92,7 @@ test()
                 if (cell->level_subdomain_id() != 4294967294)
                   deallog << cell->level_subdomain_id();
                 else
-                  deallog << "-";
+                  deallog << '-';
               deallog << std::endl;
             }
           deallog << std::endl;

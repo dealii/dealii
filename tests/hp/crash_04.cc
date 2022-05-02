@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,13 +18,13 @@
 // trigger a problem in DerivativeApproximation with memory handling
 
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_dgq.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -44,7 +44,7 @@ test()
 
   hp::FECollection<dim> fe_collection(FE_DGQ<dim>(1));
 
-  hp::DoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe_collection);
 
   Vector<double> v(dof_handler.n_dofs());

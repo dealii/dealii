@@ -1,5 +1,0 @@
-Changed: The parallel::Triangulation class has been renamed to parallel::TriangulationBase
-to better reflect its purpose of a base to a series of parallel triangulations such as
-parallel::distributed::Triangulation or parallel::shared::Triangulation.
-<br>
-(Peter Munch, 2019/08/19)

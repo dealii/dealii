@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2019 by the deal.II authors
+ * Copyright (C) 2007 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -36,12 +36,9 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_in.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_values.h>
@@ -207,10 +204,10 @@ namespace Step33
     // the function with different input vector data types, so we templatize
     // on it as well:
     template <typename InputVector>
-    static void compute_flux_matrix(
-      const InputVector &                            W,
-      std::array<std::array<typename InputVector::value_type, dim>,
-                 EulerEquations<dim>::n_components> &flux)
+    static void compute_flux_matrix(const InputVector &W,
+                                    ndarray<typename InputVector::value_type,
+                                            EulerEquations<dim>::n_components,
+                                            dim> &     flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
@@ -253,8 +250,9 @@ namespace Step33
       const double                                                alpha,
       std::array<typename InputVector::value_type, n_components> &normal_flux)
     {
-      std::array<std::array<typename InputVector::value_type, dim>,
-                 EulerEquations<dim>::n_components>
+      ndarray<typename InputVector::value_type,
+              EulerEquations<dim>::n_components,
+              dim>
         iflux, oflux;
 
       compute_flux_matrix(Wplus, iflux);
@@ -361,7 +359,7 @@ namespace Step33
                    const Vector<double> &boundary_values,
                    const DataVector &    Wminus)
     {
-      for (unsigned int c = 0; c < n_components; c++)
+      for (unsigned int c = 0; c < n_components; ++c)
         switch (boundary_kind[c])
           {
             case inflow_boundary:
@@ -411,7 +409,7 @@ namespace Step33
                 // orthogonal to the surface normal.  This creates sensitivities
                 // of across the velocity components.
                 typename DataVector::value_type vdotn = 0;
-                for (unsigned int d = 0; d < dim; d++)
+                for (unsigned int d = 0; d < dim; ++d)
                   {
                     vdotn += Wplus[d] * normal_vector[d];
                   }
@@ -447,7 +445,7 @@ namespace Step33
                                   const Vector<double> & solution,
                                   Vector<double> &       refinement_indicators)
     {
-      const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
       std::vector<unsigned int> dofs(dofs_per_cell);
 
       const QMidpoint<dim> quadrature_formula;
@@ -1115,7 +1113,7 @@ namespace Step33
       prm.declare_entry("mesh",
                         "grid.inp",
                         Patterns::Anything(),
-                        "intput file name");
+                        "input file name");
 
       prm.declare_entry("diffusion power",
                         "2.0",
@@ -1259,7 +1257,7 @@ namespace Step33
       {
         std::vector<std::string> expressions(EulerEquations<dim>::n_components,
                                              "0.0");
-        for (unsigned int di = 0; di < EulerEquations<dim>::n_components; di++)
+        for (unsigned int di = 0; di < EulerEquations<dim>::n_components; ++di)
           expressions[di] =
             prm.get("w_" + Utilities::int_to_string(di) + " value");
         initial_conditions.initialize(
@@ -1439,7 +1437,7 @@ namespace Step33
   template <int dim>
   void ConservationLaw<dim>::assemble_system()
   {
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
 
     std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
     std::vector<types::global_dof_index> dof_indices_neighbor(dofs_per_cell);
@@ -1486,7 +1484,7 @@ namespace Step33
         // whether we are working on an external or internal face; if it is an
         // external face, the fourth argument denoting the degrees of freedom
         // indices of the neighbor is ignored, so we pass an empty vector):
-        for (unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const auto face_no : cell->face_indices())
           if (cell->at_boundary(face_no))
             {
               fe_v_face.reinit(cell, face_no);
@@ -1758,7 +1756,7 @@ namespace Step33
           W_old[q][c] +=
             old_solution(dof_indices[i]) * fe_v.shape_value_component(i, q, c);
 
-          for (unsigned int d = 0; d < dim; d++)
+          for (unsigned int d = 0; d < dim; ++d)
             {
               grad_W[q][c][d] += independent_local_dof_values[i] *
                                  fe_v.shape_grad_component(i, q, c)[d];
@@ -1776,12 +1774,12 @@ namespace Step33
     // terms of autodifferentiation variables, so that the Jacobian
     // contributions can later easily be computed from it:
 
-    std::vector<std::array<std::array<Sacado::Fad::DFad<double>, dim>,
-                           EulerEquations<dim>::n_components>>
+    std::vector<ndarray<Sacado::Fad::DFad<double>,
+                        EulerEquations<dim>::n_components,
+                        dim>>
       flux(n_q_points);
 
-    std::vector<
-      std::array<std::array<double, dim>, EulerEquations<dim>::n_components>>
+    std::vector<ndarray<double, EulerEquations<dim>::n_components, dim>>
       flux_old(n_q_points);
 
     std::vector<
@@ -1857,14 +1855,14 @@ namespace Step33
                      fe_v.shape_value_component(i, point, component_i) *
                      fe_v.JxW(point);
 
-            for (unsigned int d = 0; d < dim; d++)
+            for (unsigned int d = 0; d < dim; ++d)
               R_i -=
                 (parameters.theta * flux[point][component_i][d] +
                  (1.0 - parameters.theta) * flux_old[point][component_i][d]) *
                 fe_v.shape_grad_component(i, point, component_i)[d] *
                 fe_v.JxW(point);
 
-            for (unsigned int d = 0; d < dim; d++)
+            for (unsigned int d = 0; d < dim; ++d)
               R_i +=
                 1.0 *
                 std::pow(fe_v.get_cell()->diameter(),
@@ -1925,14 +1923,14 @@ namespace Step33
     const unsigned int n_independent_variables =
       (external_face == false ? 2 * dofs_per_cell : dofs_per_cell);
 
-    for (unsigned int i = 0; i < dofs_per_cell; i++)
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
       {
         independent_local_dof_values[i] = current_solution(dof_indices[i]);
         independent_local_dof_values[i].diff(i, n_independent_variables);
       }
 
     if (external_face == false)
-      for (unsigned int i = 0; i < dofs_per_cell; i++)
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           independent_neighbor_dof_values[i] =
             current_solution(dof_indices_neighbor[i]);
@@ -2014,7 +2012,7 @@ namespace Step33
         parameters.boundary_conditions[boundary_id].values.vector_value_list(
           fe_v.get_quadrature_points(), boundary_values);
 
-        for (unsigned int q = 0; q < n_q_points; q++)
+        for (unsigned int q = 0; q < n_q_points; ++q)
           {
             EulerEquations<dim>::compute_Wminus(
               parameters.boundary_conditions[boundary_id].kind,

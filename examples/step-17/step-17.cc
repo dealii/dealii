@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2019 by the deal.II authors
+ * Copyright (C) 2000 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -34,10 +34,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_system.h>
@@ -187,7 +184,7 @@ namespace Step17
     virtual void vector_value(const Point<dim> &p,
                               Vector<double> &  values) const override
     {
-      Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
+      AssertDimension(values.size(), dim);
       Assert(dim >= 2, ExcInternalError());
 
       Point<dim> point_1, point_2;
@@ -212,8 +209,7 @@ namespace Step17
     {
       const unsigned int n_points = points.size();
 
-      Assert(value_list.size() == n_points,
-             ExcDimensionMismatch(value_list.size(), n_points));
+      AssertDimension(value_list.size(), n_points);
 
       for (unsigned int p = 0; p < n_points; ++p)
         RightHandSide<dim>::vector_value(points[p], value_list[p]);
@@ -436,7 +432,7 @@ namespace Step17
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -983,7 +979,7 @@ namespace Step17
           pcout << (p == 0 ? ' ' : '+')
                 << (DoFTools::count_dofs_with_subdomain_association(dof_handler,
                                                                     p));
-        pcout << ")" << std::endl;
+        pcout << ')' << std::endl;
 
         assemble_system();
         const unsigned int n_iterations = solve();
@@ -1001,7 +997,7 @@ namespace Step17
 
 // The <code>main()</code> works the same way as most of the main
 // functions in the other example programs, i.e., it delegates work to
-// the <code>run</code> function of a master object, and only wraps
+// the <code>run</code> function of a managing object, and only wraps
 // everything into some code to catch exceptions:
 int main(int argc, char **argv)
 {

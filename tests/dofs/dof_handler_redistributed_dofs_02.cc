@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,12 +16,12 @@
 // hp::FECollection doesn't recreate the copy.
 
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -38,7 +38,7 @@ main()
   FE_Q<dim, spacedim>             fe(1);
   hp::FECollection<dim, spacedim> fe_collection(fe);
 
-  hp::DoFHandler<dim, spacedim> dh(tria);
+  DoFHandler<dim, spacedim> dh(tria);
   dh.distribute_dofs(fe_collection);
 
   SmartPointer<const hp::FECollection<dim, spacedim>> fe_p(

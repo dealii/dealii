@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------
 #
-# Copyright (C) 2015 - 2019 by the deal.II authors
+# Copyright (C) 2015 - 2020 by the deal.II authors
 #
 # This file is part of the deal.II library.
 #
@@ -57,13 +57,17 @@ class AlignedVectorPrinter(object):
     def __init__(self, typename, val):
         self.typename = typename
         self.val = val
-        self.length = int(self.val['data_end'] - self.val['data_begin'])
+        self.end = self.val['used_elements_end']
+        # evaluate the get() method of the unique_ptr
+        eval_string = "(*("+str(self.val['elements'].type)+"*)("+str(self.val['elements'].address)+")).get()"
+        self.begin = gdb.parse_and_eval(eval_string);
+        self.length = int(self.end - self.begin )
 
     def children(self):
         # The first entry (see the "Pretty Printing API" documentation of GDB)
         # in the tuple should be a name for the child, which should be nothing
         # (the array elements don't have individual names) here.
-        return (("", (self.val['data_begin'] + count).dereference())
+        return (("", (self.begin + count).dereference())
                 for count in range(self.length))
 
     def to_string(self):
@@ -120,16 +124,16 @@ class VectorPrinter(object):
         self.typename = typename
         self.val = val
         a_vec = self.val['values']
-        self.length = int(a_vec['data_end'] - a_vec['data_begin'])
-
-    def children(self):
-        return (("values", self.val['values']),
-                ("thread_loop_partitioner",
-                 self.val['thread_loop_partitioner']))
+        self.end = a_vec['used_elements_end']
+        # evaluate the elements.get() method of the AlignedVector member
+        eval_string = "(*("+str(a_vec['elements'].type)+"*)("+str(a_vec['elements'].address)+")).get()"
+        self.begin = gdb.parse_and_eval(eval_string);
+        self.length = int(self.end - self.begin )
 
     def to_string(self):
-        return "Vector<{}>({})".format(self.val.type.template_argument(0),
-                                       self.length)
+        return ("Vector<{}>({})".format(self.val.type.template_argument(0),
+                                        self.length) +
+                build_output_string(['values'], self.val))
 
 
 class QuadraturePrinter(object):
@@ -211,7 +215,11 @@ def register_dealii_printers():
         ['TriaRawIterator', 'TriaIterator', 'TriaActiveIterator'],
         QuadraturePrinter:
         ['Quadrature', 'QGauss', 'QGaussLobatto', 'QMidpoint', 'QSimpson',
-         'QTrapez', 'QMilne', 'QWeddle', 'QGaussLog', 'QGaussLogR',
+         'QTrapezoid',
+         # The following name has been deprecated in deal.II 9.3 and can
+         # be removed at a later time.
+         'QTrapez',
+         'QMilne', 'QWeddle', 'QGaussLog', 'QGaussLogR',
          'QGaussOneOverR', 'QSorted', 'QTelles', 'QGaussChebyshev',
          'QGaussRadauChebyshev', 'QIterated', 'QAnisotropic']
     }

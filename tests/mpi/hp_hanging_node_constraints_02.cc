@@ -26,15 +26,16 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -78,18 +79,17 @@ test()
   fe_collection.push_back(void_fe);
   fe_collection.push_back(solid_fe);
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
-  dof_handler.set_fe(fe_collection);
+  DoFHandler<dim> dof_handler(triangulation);
 
   // Assign void_fe to all the cells with x < 0.5
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        if (cell->center()(0) < 0.5)
-          cell->set_active_fe_index(0);
-        else
-          cell->set_active_fe_index(1);
-      }
+  for (const auto &cell : dof_handler.active_cell_iterators() |
+                            IteratorFilters::LocallyOwnedCell())
+    {
+      if (cell->center()(0) < 0.5)
+        cell->set_active_fe_index(0);
+      else
+        cell->set_active_fe_index(1);
+    }
 
   dof_handler.distribute_dofs(fe_collection);
 

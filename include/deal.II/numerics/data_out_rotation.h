@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -109,39 +109,28 @@ namespace internal
  * It is in the responsibility of the user to make sure that the radial
  * variable attains only non-negative values.
  *
- * @pre This class only makes sense if the first template argument,
- * <code>dim</code> equals the dimension of the DoFHandler type given as the
- * second template argument, i.e., if <code>dim ==
- * DoFHandlerType::dimension</code>. This redundancy is a historical relic
- * from the time where the library had only a single DoFHandler class and this
- * class consequently only a single template argument.
- *
  * @ingroup output
- * @author Wolfgang Bangerth, 2000
  */
-template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+template <int dim, int spacedim = dim>
 class DataOutRotation
-  : public DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension + 1>
+  : public DataOut_DoFData<dim, dim + 1, spacedim, spacedim + 1>
 {
+  static_assert(dim == spacedim, "Not implemented for dim != spacedim.");
+
 public:
   /**
-   * An abbreviation for the dimension of the DoFHandler object we work with.
-   * Faces are then <code>dimension-1</code> dimensional objects.
+   * Dimension parameters for the patches.
    */
-  static const unsigned int dimension = DoFHandlerType::dimension;
-
-  /**
-   * An abbreviation for the spatial dimension within which the triangulation
-   * and DoFHandler are embedded in.
-   */
-  static const unsigned int space_dimension = DoFHandlerType::space_dimension;
+  static constexpr int patch_dim      = dim + 1;
+  static constexpr int patch_spacedim = spacedim + 1;
 
   /**
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
   using cell_iterator =
-    typename DataOut_DoFData<DoFHandlerType, dimension + 1>::cell_iterator;
+    typename DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
+      cell_iterator;
 
   /**
    * This is the central function of this class since it builds the list of
@@ -208,13 +197,21 @@ private:
    */
   void
   build_one_patch(
-    const cell_iterator *cell,
-    internal::DataOutRotationImplementation::ParallelData<dimension,
-                                                          space_dimension>
-      &data,
-    std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>
-      &my_patches);
+    const cell_iterator *                                                 cell,
+    internal::DataOutRotationImplementation::ParallelData<dim, spacedim> &data,
+    std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> &my_patches);
 };
+
+namespace Legacy
+{
+  /**
+   * @deprecated Use dealii::DataOutRotation without the DoFHandlerType
+   * template instead.
+   */
+  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+  using DataOutRotation DEAL_II_DEPRECATED =
+    dealii::DataOutRotation<dim, DoFHandlerType::space_dimension>;
+} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -366,7 +366,7 @@ namespace Differentiation
       //               >>> File or directory not found! <<<
       // , every time a query is made about a non-existent tape.
       // So either way we have to guard that check with something more
-      // conervative so that we don't output useless messages for our users.
+      // conservative so that we don't output useless messages for our users.
       const std::vector<typename Types<ADNumberType>::tape_index>
                  registered_tape_indices = get_registered_tape_indices();
       const auto it = std::find(registered_tape_indices.begin(),
@@ -620,11 +620,11 @@ namespace Differentiation
           stream << tape_index << "->" << status_tape
                  << (i < (registered_tape_indices.size() - 1) ? "," : "");
         }
-      stream << "\n";
+      stream << '\n';
 
-      stream << "Keep values? " << keep_independent_values() << "\n";
+      stream << "Keep values? " << keep_independent_values() << '\n';
       stream << "Use stored tape buffer sizes? "
-             << use_stored_taped_buffer_sizes << "\n";
+             << use_stored_taped_buffer_sizes << '\n';
     }
 
 
@@ -645,28 +645,28 @@ namespace Differentiation
       ::tapestats(tape_index, counts.data());
       Assert(counts.size() >= 18, ExcInternalError());
       stream
-        << "Tape index: " << tape_index << "\n"
-        << "Number of independent variables: " << counts[0] << "\n"
-        << "Number of dependent variables:   " << counts[1] << "\n"
-        << "Max number of live, active variables: " << counts[2] << "\n"
-        << "Size of taylor stack (number of overwrites): " << counts[3] << "\n"
-        << "Operations buffer size: " << counts[4] << "\n"
-        << "Total number of recorded operations: " << counts[5] << "\n"
-        << "Operations file written or not: " << counts[6] << "\n"
-        << "Overall number of locations: " << counts[7] << "\n"
-        << "Locations file written or not: " << counts[8] << "\n"
-        << "Overall number of values: " << counts[9] << "\n"
-        << "Values file written or not: " << counts[10] << "\n"
-        << "Locations buffer size: " << counts[11] << "\n"
-        << "Values buffer size: " << counts[12] << "\n"
-        << "Taylor buffer size: " << counts[13] << "\n"
-        << "Number of eq_*_prod for sparsity pattern: " << counts[14] << "\n"
+        << "Tape index: " << tape_index << '\n'
+        << "Number of independent variables: " << counts[0] << '\n'
+        << "Number of dependent variables:   " << counts[1] << '\n'
+        << "Max number of live, active variables: " << counts[2] << '\n'
+        << "Size of taylor stack (number of overwrites): " << counts[3] << '\n'
+        << "Operations buffer size: " << counts[4] << '\n'
+        << "Total number of recorded operations: " << counts[5] << '\n'
+        << "Operations file written or not: " << counts[6] << '\n'
+        << "Overall number of locations: " << counts[7] << '\n'
+        << "Locations file written or not: " << counts[8] << '\n'
+        << "Overall number of values: " << counts[9] << '\n'
+        << "Values file written or not: " << counts[10] << '\n'
+        << "Locations buffer size: " << counts[11] << '\n'
+        << "Values buffer size: " << counts[12] << '\n'
+        << "Taylor buffer size: " << counts[13] << '\n'
+        << "Number of eq_*_prod for sparsity pattern: " << counts[14] << '\n'
         << "Use of 'min_op', deferred to 'abs_op' for piecewise calculations: "
-        << counts[15] << "\n"
+        << counts[15] << '\n'
         << "Number of 'abs' calls that can switch branch: " << counts[16]
-        << "\n"
+        << '\n'
         << "Number of parameters (doubles) interchangeable without retaping: "
-        << counts[17] << "\n"
+        << counts[17] << '\n'
         << std::flush;
     }
 
@@ -771,8 +771,8 @@ namespace Differentiation
       // ADOL-C builds only the lower-triangular part of the
       // symmetric Hessian, so we should copy the relevant
       // entries into the upper triangular part.
-      for (unsigned int i = 0; i < n_independent_variables; i++)
-        for (unsigned int j = 0; j < i; j++)
+      for (unsigned int i = 0; i < n_independent_variables; ++i)
+        for (unsigned int j = 0; j < i; ++j)
           hessian[j][i] = hessian[i][j]; // Symmetry
     }
 
@@ -1840,7 +1840,7 @@ namespace Differentiation
       internal::reverse_mode_dependent_variable_activation(
         const_cast<ADNumberType &>(dependent_variables[0]));
       const std::size_t n_independent_variables = independent_variables.size();
-      for (unsigned int i = 0; i < n_independent_variables; i++)
+      for (unsigned int i = 0; i < n_independent_variables; ++i)
         gradient[i] = internal::NumberType<ScalarType>::value(
           ADNumberTraits<ADNumberType>::get_directional_derivative(
             independent_variables[i], 0 /*This number doesn't really matter*/));
@@ -1877,7 +1877,7 @@ namespace Differentiation
       internal::reverse_mode_dependent_variable_activation(
         const_cast<ADNumberType &>(dependent_variables[0]));
       const std::size_t n_independent_variables = independent_variables.size();
-      for (unsigned int i = 0; i < n_independent_variables; i++)
+      for (unsigned int i = 0; i < n_independent_variables; ++i)
         {
           using derivative_type =
             typename ADNumberTraits<ADNumberType>::derivative_type;
@@ -1918,7 +1918,7 @@ namespace Differentiation
              ExcDimensionMismatch(values.size(), dependent_variables.size()));
 
       const std::size_t n_dependent_variables = dependent_variables.size();
-      for (unsigned int i = 0; i < n_dependent_variables; i++)
+      for (unsigned int i = 0; i < n_dependent_variables; ++i)
         values[i] = ADNumberTraits<ADNumberType>::get_scalar_value(
           dependent_variables[i]);
     }
@@ -1965,11 +1965,11 @@ namespace Differentiation
         n_independent_variables,
         dealii::internal::NumberType<accumulation_type>::value(0.0));
 
-      for (unsigned int i = 0; i < n_dependent_variables; i++)
+      for (unsigned int i = 0; i < n_dependent_variables; ++i)
         {
           internal::reverse_mode_dependent_variable_activation(
             const_cast<ADNumberType &>(dependent_variables[i]));
-          for (unsigned int j = 0; j < n_independent_variables; j++)
+          for (unsigned int j = 0; j < n_independent_variables; ++j)
             {
               const accumulation_type df_i_dx_j =
                 ADNumberTraits<ADNumberType>::get_directional_derivative(
@@ -2122,7 +2122,7 @@ namespace Differentiation
       // In forward mode, the gradients are computed from the
       // dependent variables
       const std::size_t n_independent_variables = independent_variables.size();
-      for (unsigned int i = 0; i < n_independent_variables; i++)
+      for (unsigned int i = 0; i < n_independent_variables; ++i)
         gradient[i] = internal::NumberType<ScalarType>::value(
           ADNumberTraits<ADNumberType>::get_directional_derivative(
             dependent_variables[0], i));
@@ -2159,7 +2159,7 @@ namespace Differentiation
       // In forward mode, the gradients are computed from the
       // dependent variables
       const std::size_t n_independent_variables = independent_variables.size();
-      for (unsigned int i = 0; i < n_independent_variables; i++)
+      for (unsigned int i = 0; i < n_independent_variables; ++i)
         {
           using derivative_type =
             typename ADNumberTraits<ADNumberType>::derivative_type;
@@ -2202,7 +2202,7 @@ namespace Differentiation
              ExcDimensionMismatch(values.size(), dependent_variables.size()));
 
       const std::size_t n_dependent_variables = dependent_variables.size();
-      for (unsigned int i = 0; i < n_dependent_variables; i++)
+      for (unsigned int i = 0; i < n_dependent_variables; ++i)
         values[i] = ADNumberTraits<ADNumberType>::get_scalar_value(
           dependent_variables[i]);
     }
@@ -2238,8 +2238,8 @@ namespace Differentiation
 
       // In forward mode, the gradients are computed from the
       // dependent variables
-      for (unsigned int i = 0; i < n_dependent_variables; i++)
-        for (unsigned int j = 0; j < n_independent_variables; j++)
+      for (unsigned int i = 0; i < n_dependent_variables; ++i)
+        for (unsigned int j = 0; j < n_independent_variables; ++j)
           jacobian[i][j] = internal::NumberType<ScalarType>::value(
             ADNumberTraits<ADNumberType>::get_directional_derivative(
               dependent_variables[i], j));

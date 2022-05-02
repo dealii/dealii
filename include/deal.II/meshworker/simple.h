@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,6 @@ namespace MeshWorker
      * (unsigned int)</tt>
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename VectorType>
     class ResidualSimple
@@ -75,22 +74,6 @@ namespace MeshWorker
       void
       initialize(
         const AffineConstraints<typename VectorType::value_type> &constraints);
-
-      /**
-       * @deprecated This function is of no effect. Only the block info
-       * structure in DoFInfo is being used.
-       *
-       * Store information on the local block structure. If the assembler is
-       * initialized with this function, initialize_info() will generate one
-       * local matrix for each block row and column, which will be numbered
-       * lexicographically, row by row.
-       *
-       * In spite of using local block structure, all blocks will be entered
-       * into the same global matrix, disregarding any global block structure.
-       */
-      DEAL_II_DEPRECATED
-      void
-      initialize_local_blocks(const BlockIndices &);
 
       /**
        * Initialize the local data in the DoFInfo object used later for
@@ -164,7 +147,6 @@ namespace MeshWorker
      * and so on.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename MatrixType>
     class MatrixSimple
@@ -267,7 +249,6 @@ namespace MeshWorker
      * local refinement and continuous elements are missing.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename MatrixType>
     class MGMatrixSimple
@@ -451,7 +432,6 @@ namespace MeshWorker
      * objects.
      *
      * @ingroup MeshWorker
-     * @author Guido Kanschat, 2009
      */
     template <typename MatrixType, typename VectorType>
     class SystemSimple : private MatrixSimple<MatrixType>,
@@ -535,6 +515,8 @@ namespace MeshWorker
       residuals = results;
     }
 
+
+
     template <typename VectorType>
     inline void
     ResidualSimple<VectorType>::initialize(
@@ -544,11 +526,6 @@ namespace MeshWorker
     }
 
 
-    template <typename MatrixType>
-    inline void
-    ResidualSimple<MatrixType>::initialize_local_blocks(const BlockIndices &)
-    {}
-
 
     template <typename VectorType>
     template <class DOFINFO>
@@ -557,6 +534,7 @@ namespace MeshWorker
     {
       info.initialize_vectors(residuals.size());
     }
+
 
 
     template <typename VectorType>

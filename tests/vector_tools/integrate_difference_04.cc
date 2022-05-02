@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -93,7 +93,7 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
   solution = interpolated;
 
   Vector<double> cellwise_errors(tria.n_active_cells());
-  QIterated<dim> quadrature(QTrapez<1>(), 5);
+  QIterated<dim> quadrature(QTrapezoid<1>(), 5);
 
   const dealii::Function<dim, double> *w = nullptr;
   VectorTools::integrate_difference(dofh,

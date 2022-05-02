@@ -1,0 +1,89 @@
+
+DEAL::0.00000 1.00000 0.00000
+DEAL:mass_preconditioner_setup::applied
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg::Starting value 2.12132
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg::Convergence step 1 value 0.00000
+DEAL:cg::Convergence step 0 value 0.00000
+DEAL:cg::Starting value 0.00869741
+DEAL:cg::Convergence step 1 value 0.00000
+DEAL:cg::Starting value 0.00551394
+DEAL:cg::Convergence step 1 value 4.33681e-19
+DEAL:cg::Starting value 0.00420341
+DEAL:cg::Convergence step 1 value 1.37142e-18
+DEAL:cg::Starting value 0.0195161
+DEAL:cg::Convergence step 1 value 9.81308e-18
+DEAL:cg::Starting value 0.00509117
+DEAL:cg::Convergence step 1 value 8.67362e-19
+DEAL:cg::Starting value 0.0127279
+DEAL:cg::Convergence step 1 value 3.46945e-18
+DEAL:cg::Starting value 0.0212132
+DEAL:cg::Convergence step 1 value 2.45327e-18
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg::Starting value 0.0212132
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg::Convergence step 1 value 2.45327e-18
+DEAL:cg::Starting value 2.74317e-18
+DEAL:cg::Convergence step 0 value 2.74317e-18
+DEAL:cg::Starting value 2.12132
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg::Convergence step 1 value 0.00000
+DEAL:cg::Convergence step 0 value 0.00000
+DEAL:cg::Starting value 0.235321
+DEAL:cg::Convergence step 1 value 0.00000
+DEAL:cg::Starting value 0.149188
+DEAL:cg::Convergence step 1 value 1.96262e-17
+DEAL:cg::Starting value 0.113729
+DEAL:cg::Convergence step 1 value 0.00000
+DEAL:cg::Starting value 0.528038
+DEAL:cg::Convergence step 1 value 5.55112e-17
+DEAL:cg::Starting value 0.137749
+DEAL:cg::Convergence step 1 value 2.77556e-17
+DEAL:cg::Starting value 0.344373
+DEAL:cg::Convergence step 1 value 8.77708e-17
+DEAL:cg::Starting value 0.573955
+DEAL:cg::Convergence step 1 value 1.75542e-16
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg::Starting value 0.573955
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg::Convergence step 1 value 1.24127e-16
+DEAL:cg::Starting value 7.36006e-17
+DEAL:cg::Convergence step 0 value 7.36006e-17
+DEAL:cg::Starting value 2.12132
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg::Convergence step 1 value 0.00000
+DEAL::0.100000 1.15000 0.150000
+DEAL::0.200000 1.30000 0.300000
+DEAL:cg::Convergence step 0 value 0.00000
+DEAL:cg::Starting value 0.625723
+DEAL:cg::Convergence step 1 value 1.75542e-16
+DEAL:cg::Starting value 0.396692
+DEAL:cg::Convergence step 1 value 1.24127e-16
+DEAL:cg::Starting value 0.302408
+DEAL:cg::Convergence step 1 value 6.20634e-17
+DEAL:cg::Starting value 1.40406
+DEAL:cg::Convergence step 1 value 3.14018e-16
+DEAL:cg::Starting value 0.366277
+DEAL:cg::Convergence step 1 value 5.55112e-17
+DEAL:cg::Starting value 0.915692
+DEAL:cg::Convergence step 1 value 1.11022e-16
+DEAL:cg::Starting value 1.52615
+DEAL:cg::Convergence step 1 value 2.22045e-16
+DEAL:mass_preconditioner_setup::applied
+DEAL:cg::Starting value 1.52615
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg::Convergence step 1 value 0.00000
+DEAL:cg::Starting value 1.98900e-16
+DEAL:cg::Convergence step 0 value 1.98900e-16
+DEAL:cg::Starting value 2.12132
+DEAL:cg:mass_preconditioner_solve::applied
+DEAL:cg::Convergence step 1 value 0.00000
+DEAL::0.300000 1.45000 0.450000
+DEAL::0.400000 1.60000 0.600000
+DEAL::0.500000 1.75000 0.750000
+DEAL::0.600000 1.90000 0.900000
+DEAL::0.700000 2.05000 1.05000
+DEAL::0.800000 2.20000 1.20000
+DEAL::0.900000 2.35000 1.35000
+DEAL::1.00000 2.50000 1.50000

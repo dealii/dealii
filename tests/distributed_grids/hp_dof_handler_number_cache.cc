@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,6 +29,8 @@
 
 #include <deal.II/distributed/tria.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
@@ -38,7 +40,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <cstdlib>
@@ -57,7 +58,7 @@ test()
   hp::FECollection<dim> fe;
   fe.push_back(FESystem<dim>(FE_Q<dim>(3), 2, FE_DGQ<dim>(1), 1));
 
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
@@ -106,10 +107,12 @@ test()
 
       AssertThrow(dof_handler.n_locally_owned_dofs() == N, ExcInternalError());
       AssertThrow(dof_handler.locally_owned_dofs() == all, ExcInternalError());
-      AssertThrow(dof_handler.compute_n_locally_owned_dofs_per_processor() ==
+      AssertThrow(Utilities::MPI::all_gather(
+                    MPI_COMM_SELF, dof_handler.n_locally_owned_dofs()) ==
                     std::vector<types::global_dof_index>(1, N),
                   ExcInternalError());
-      AssertThrow(dof_handler.compute_locally_owned_dofs_per_processor() ==
+      AssertThrow(Utilities::MPI::all_gather(
+                    MPI_COMM_SELF, dof_handler.locally_owned_dofs()) ==
                     std::vector<IndexSet>(1, all),
                   ExcInternalError());
     }

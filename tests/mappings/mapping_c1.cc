@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,9 +72,9 @@ main()
   // vectors are indeed continuous
   // and pointing radially outward at
   // the vertices
-  const QTrapez<1>   quadrature;
-  const MappingC1<2> c1_mapping;
-  FEFaceValues<2>    c1_values(c1_mapping,
+  const QTrapezoid<1> quadrature;
+  const MappingC1<2>  c1_mapping;
+  FEFaceValues<2>     c1_values(c1_mapping,
                             fe,
                             quadrature,
                             update_quadrature_points | update_normal_vectors);

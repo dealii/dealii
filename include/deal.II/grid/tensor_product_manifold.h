@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,11 +19,12 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/manifold.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -58,8 +59,6 @@ DEAL_II_NAMESPACE_OPEN
  * @tparam dim_B Dimension of ChartManifold B.
  * @tparam spacedim_B Spacial dimension of ChartManifold B.
  * @tparam chartdim_B Chart dimension of ChartManifold B.
- *
- * @author Luca Heltai, Timo Heister, 2016
  */
 template <int dim,
           int dim_A,
@@ -216,14 +215,14 @@ TensorProductManifold<dim,
                       spacedim_B,
                       chartdim_B>::clone() const
 {
-  return std_cxx14::make_unique<TensorProductManifold<dim,
-                                                      dim_A,
-                                                      spacedim_A,
-                                                      chartdim_A,
-                                                      dim_B,
-                                                      spacedim_B,
-                                                      chartdim_B>>(*manifold_A,
-                                                                   *manifold_B);
+  return std::make_unique<TensorProductManifold<dim,
+                                                dim_A,
+                                                spacedim_A,
+                                                chartdim_A,
+                                                dim_B,
+                                                spacedim_B,
+                                                chartdim_B>>(*manifold_A,
+                                                             *manifold_B);
 }
 
 template <int dim,

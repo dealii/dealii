@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,8 +21,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -52,12 +50,12 @@ test()
   tria[1].last_active()->set_refine_flag();
   tria[1].execute_coarsening_and_refinement();
 
-  hp::DoFHandler<dim> dh0(tria[0]);
-  hp::DoFHandler<dim> dh1(tria[1]);
+  DoFHandler<dim> dh0(tria[0]);
+  DoFHandler<dim> dh1(tria[1]);
 
-  typedef std::list<std::pair<typename hp::DoFHandler<dim>::cell_iterator,
-                              typename hp::DoFHandler<dim>::cell_iterator>>
-    CellList;
+  using CellList =
+    std::list<std::pair<typename DoFHandler<dim>::cell_iterator,
+                        typename DoFHandler<dim>::cell_iterator>>;
 
   const CellList cell_list = GridTools::get_finest_common_cells(dh0, dh1);
   for (typename CellList::const_iterator cell_pair = cell_list.begin();

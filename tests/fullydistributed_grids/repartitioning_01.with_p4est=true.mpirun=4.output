@@ -1,0 +1,79 @@
+
+DEAL:0:all::n_levels:                  4
+DEAL:0:all::n_cells:                   456
+DEAL:0:all::n_active_cells:            344
+DEAL:0:all::has_hanging_nodes:         false
+DEAL:0:all::
+DEAL:0:all::n_dofs:                             4225
+DEAL:0:all::n_locally_owned_dofs:               1105
+DEAL:0:all::has_hanging_nodes:                  false
+DEAL:0:all::
+DEAL:0:reduced::n_levels:                  4
+DEAL:0:reduced::n_cells:                   796
+DEAL:0:reduced::n_active_cells:            600
+DEAL:0:reduced::has_hanging_nodes:         false
+DEAL:0:reduced::
+DEAL:0:reduced::n_dofs:                             4225
+DEAL:0:reduced::n_locally_owned_dofs:               2145
+DEAL:0:reduced::has_hanging_nodes:                  false
+DEAL:0:reduced::
+
+DEAL:1:all::n_levels:                  4
+DEAL:1:all::n_cells:                   572
+DEAL:1:all::n_active_cells:            432
+DEAL:1:all::has_hanging_nodes:         false
+DEAL:1:all::
+DEAL:1:all::n_dofs:                             4225
+DEAL:1:all::n_locally_owned_dofs:               1040
+DEAL:1:all::has_hanging_nodes:                  false
+DEAL:1:all::
+DEAL:1:reduced::n_levels:                  4
+DEAL:1:reduced::n_cells:                   796
+DEAL:1:reduced::n_active_cells:            600
+DEAL:1:reduced::has_hanging_nodes:         false
+DEAL:1:reduced::
+DEAL:1:reduced::n_dofs:                             4225
+DEAL:1:reduced::n_locally_owned_dofs:               2080
+DEAL:1:reduced::has_hanging_nodes:                  false
+DEAL:1:reduced::
+
+
+DEAL:2:all::n_levels:                  4
+DEAL:2:all::n_cells:                   572
+DEAL:2:all::n_active_cells:            432
+DEAL:2:all::has_hanging_nodes:         false
+DEAL:2:all::
+DEAL:2:all::n_dofs:                             4225
+DEAL:2:all::n_locally_owned_dofs:               1040
+DEAL:2:all::has_hanging_nodes:                  false
+DEAL:2:all::
+DEAL:2:reduced::n_levels:                  1
+DEAL:2:reduced::n_cells:                   1
+DEAL:2:reduced::n_active_cells:            1
+DEAL:2:reduced::has_hanging_nodes:         false
+DEAL:2:reduced::
+DEAL:2:reduced::n_dofs:                             4225
+DEAL:2:reduced::n_locally_owned_dofs:               0
+DEAL:2:reduced::has_hanging_nodes:                  false
+DEAL:2:reduced::
+
+
+DEAL:3:all::n_levels:                  4
+DEAL:3:all::n_cells:                   456
+DEAL:3:all::n_active_cells:            344
+DEAL:3:all::has_hanging_nodes:         false
+DEAL:3:all::
+DEAL:3:all::n_dofs:                             4225
+DEAL:3:all::n_locally_owned_dofs:               1040
+DEAL:3:all::has_hanging_nodes:                  false
+DEAL:3:all::
+DEAL:3:reduced::n_levels:                  1
+DEAL:3:reduced::n_cells:                   1
+DEAL:3:reduced::n_active_cells:            1
+DEAL:3:reduced::has_hanging_nodes:         false
+DEAL:3:reduced::
+DEAL:3:reduced::n_dofs:                             4225
+DEAL:3:reduced::n_locally_owned_dofs:               0
+DEAL:3:reduced::has_hanging_nodes:                  false
+DEAL:3:reduced::
+

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -171,6 +171,24 @@ for (S : REAL_AND_COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
             std::integral_constant<bool, false>) const;
   }
 
+// TrilinosWrappers::SparseMatrix:
+
+for (T : DEAL_II_VEC_TEMPLATES)
+  {
+#ifdef DEAL_II_WITH_TRILINOS
+    template void AffineConstraints<double>::distribute_local_to_global<
+      TrilinosWrappers::SparseMatrix,
+      LinearAlgebra::distributed::T<double>>(
+      const FullMatrix<double> &,
+      const Vector<double> &,
+      const std::vector<size_type> &,
+      TrilinosWrappers::SparseMatrix &,
+      LinearAlgebra::distributed::T<double> &,
+      bool,
+      std::integral_constant<bool, false>) const;
+#endif
+  }
+
 // BlockSparseMatrix:
 
 for (S : REAL_AND_COMPLEX_SCALARS)
@@ -254,6 +272,14 @@ for (S : REAL_AND_COMPLEX_SCALARS; SP : AFFINE_CONSTRAINTS_SP)
       SP &,
       const bool,
       const Table<2, bool> &) const;
+
+    template void AffineConstraints<S>::add_entries_local_to_global<SP>(
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const AffineConstraints<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      SP &,
+      const bool,
+      const Table<2, bool> &) const;
   }
 
 for (S : REAL_AND_COMPLEX_SCALARS; SP : AFFINE_CONSTRAINTS_SP_BLOCK)
@@ -267,6 +293,14 @@ for (S : REAL_AND_COMPLEX_SCALARS; SP : AFFINE_CONSTRAINTS_SP_BLOCK)
 
     template void AffineConstraints<S>::add_entries_local_to_global<SP>(
       const std::vector<AffineConstraints<S>::size_type> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      SP &,
+      const bool,
+      const Table<2, bool> &) const;
+
+    template void AffineConstraints<S>::add_entries_local_to_global<SP>(
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const AffineConstraints<S> &,
       const std::vector<AffineConstraints<S>::size_type> &,
       SP &,
       const bool,

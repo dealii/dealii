@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2018 by the deal.II authors
+ * Copyright (C) 2003 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -13,7 +13,6 @@
  *
  * ---------------------------------------------------------------------
 
- *
  *
  */
 
@@ -103,8 +102,8 @@ namespace Step50
     FE_Q<dim>                            fe;
     DoFHandler<dim>                      mg_dof_handler;
 
-    typedef LA::MPI::SparseMatrix matrix_t;
-    typedef LA::MPI::Vector       vector_t;
+    using matrix_t = LA::MPI::SparseMatrix;
+    using vector_t = LA::MPI::Vector;
 
     matrix_t system_matrix;
 
@@ -416,8 +415,7 @@ namespace Step50
                          local_dof_indices[j]) // ( boundary(i) && boundary(j)
                                                // && i==j )
                    ))
-                {
-                }
+                {}
               else
                 {
                   cell_matrix(i, j) = 0;
@@ -457,7 +455,7 @@ namespace Step50
                                 PreconditionIdentity>
       coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
-    typedef LA::MPI::PreconditionJacobi                  Smoother;
+    using Smoother = LA::MPI::PreconditionJacobi;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);

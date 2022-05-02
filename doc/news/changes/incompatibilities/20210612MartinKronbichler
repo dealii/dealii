@@ -1,0 +1,8 @@
+Updated: FE_RaviartThomasNodal now uses a different polynomial space to allow
+for a simpler use for faces in non-standard orientation. The new polynomials
+are anisotropic tensor products of Lagrange polynomials on the points of a
+Gauss--Lobatto quadrature formula. This change leads to different entries in
+the matrices and constraints, for example, but as the resulting polynomial
+space spans the same polynomials, no change in accuracy should be expected.
+<br>
+(Martin Kronbichler, Katharina Kormann, Konrad Simon, 2021/06/12)

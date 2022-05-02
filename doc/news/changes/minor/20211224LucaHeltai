@@ -1,0 +1,3 @@
+New: Build also a docker image with root user, to be used in github actions directly.
+<br>
+(Luca Heltai, 2021/12/24)

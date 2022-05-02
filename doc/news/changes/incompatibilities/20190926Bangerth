@@ -1,6 +1,0 @@
-Changed: Several variations of the
-DoFTools::make_periodicity_constraints() function expressed the
-`direction` as an `int` variable. But it's really an unsigned
-quantity, and as a consequence was changed to `unsigned int`.
-<br>
-(Wolfgang Bangerth, 2019/09/26)

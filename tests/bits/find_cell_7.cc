@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,8 @@
 // the bug here is the same as in find_cell_6 but when calling the
 // function with hp:: arguments
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q1.h>
 
@@ -32,13 +34,13 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 
 #include "../tests.h"
 
-bool inside(Triangulation<3> &tria, Point<3> &p)
+bool
+inside(Triangulation<3> &tria, Point<3> &p)
 {
   for (Triangulation<3>::cell_iterator cell = tria.begin(0);
        cell != tria.end(0);
@@ -73,14 +75,14 @@ check2()
   deallog << inside(tria, p2) << std::endl;
 
   hp::MappingCollection<3> mappings;
-  mappings.push_back(MappingQGeneric<3>(1));
-  mappings.push_back(MappingQGeneric<3>(1));
+  mappings.push_back(MappingQ<3>(1));
+  mappings.push_back(MappingQ<3>(1));
 
   hp::FECollection<3> fes;
   fes.push_back(FE_Q<3>(1));
   fes.push_back(FE_Q<3>(1));
 
-  hp::DoFHandler<3> dof_handler(tria);
+  DoFHandler<3> dof_handler(tria);
   dof_handler.distribute_dofs(fes);
 
   GridTools::find_active_cell_around_point(mappings,

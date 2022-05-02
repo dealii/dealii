@@ -91,6 +91,8 @@ namespace TrilinosWrappers
       collect_sizes();
     }
 
+
+
     void
     BlockVector::reinit(const std::vector<IndexSet> &parallel_partitioning,
                         const std::vector<IndexSet> &ghost_values,
@@ -117,6 +119,7 @@ namespace TrilinosWrappers
 
       collect_sizes();
     }
+
 
 
     void

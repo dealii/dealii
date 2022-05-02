@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,7 +80,7 @@ do_check(const FiniteElement<dim> &coarse_fe, const FiniteElement<dim> &fine_fe)
         }
 
         // check 2: first to finer cells,
-        // then to finer fe
+        // then to finer FE
         {
           FullMatrix<double> tmp1(coarse_fe.dofs_per_cell,
                                   coarse_fe.dofs_per_cell);

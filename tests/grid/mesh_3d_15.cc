@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,8 @@
 
 
 
-void check_this(Triangulation<3> &tria)
+void
+check_this(Triangulation<3> &tria)
 {
   FE_Q<3> fe(1);
 
@@ -92,9 +93,10 @@ void check_this(Triangulation<3> &tria)
 
 
 
-void check(Triangulation<3> &tria)
+void
+check(Triangulation<3> &tria)
 {
-  (++tria.begin_active())->set_refine_flag();
+  (std::next(tria.begin_active()))->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
   deallog << "Initial check" << std::endl;

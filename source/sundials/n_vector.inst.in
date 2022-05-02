@@ -1,0 +1,128 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2020 - 2021 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+// serial Vector and BlockVector
+for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
+  {
+    template SUNDIALS::internal::NVectorView<V<S>>
+    SUNDIALS::internal::make_nvector_view<>(V<S> &
+#if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#endif
+    );
+    template SUNDIALS::internal::NVectorView<const V<S>>
+    SUNDIALS::internal::make_nvector_view<>(const V<S> &
+#if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#endif
+    );
+    template V<S> *      SUNDIALS::internal::unwrap_nvector<V<S>>(N_Vector);
+    template const V<S> *SUNDIALS::internal::unwrap_nvector_const<V<S>>(
+      N_Vector);
+
+    template class SUNDIALS::internal::NVectorView<V<S>>;
+    template class SUNDIALS::internal::NVectorView<const V<S>>;
+  }
+
+// parallel Vector and BlockVector
+for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
+  {
+    template SUNDIALS::internal::NVectorView<LinearAlgebra::distributed::V<S>>
+    SUNDIALS::internal::make_nvector_view<>(LinearAlgebra::distributed::V<S> &
+#if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#endif
+    );
+    template SUNDIALS::internal::NVectorView<
+      const LinearAlgebra::distributed::V<S>>
+    SUNDIALS::internal::make_nvector_view<>(
+      const LinearAlgebra::distributed::V<S> &
+#if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+      ,
+      SUNContext
+#endif
+    );
+    template LinearAlgebra::distributed::V<S>
+      *SUNDIALS::internal::unwrap_nvector<LinearAlgebra::distributed::V<S>>(
+        N_Vector);
+    template const LinearAlgebra::distributed::V<S> *SUNDIALS::internal::
+      unwrap_nvector_const<LinearAlgebra::distributed::V<S>>(N_Vector);
+
+    template class SUNDIALS::internal::NVectorView<
+      LinearAlgebra::distributed::V<S>>;
+    template class SUNDIALS::internal::NVectorView<
+      const LinearAlgebra::distributed::V<S>>;
+  }
+
+#ifdef DEAL_II_WITH_TRILINOS
+// TrilinosWrappers Vector and BlockVector
+for (V : DEAL_II_VEC_TEMPLATES)
+  {
+    template SUNDIALS::internal::NVectorView<TrilinosWrappers::MPI::V>
+    SUNDIALS::internal::make_nvector_view<>(TrilinosWrappers::MPI::V &
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#  endif
+    );
+    template SUNDIALS::internal::NVectorView<const TrilinosWrappers::MPI::V>
+    SUNDIALS::internal::make_nvector_view<>(const TrilinosWrappers::MPI::V &
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#  endif
+    );
+    template TrilinosWrappers::MPI::V
+      *SUNDIALS::internal::unwrap_nvector<TrilinosWrappers::MPI::V>(N_Vector);
+    template const TrilinosWrappers::MPI::V
+      *SUNDIALS::internal::unwrap_nvector_const<TrilinosWrappers::MPI::V>(
+        N_Vector);
+
+    template class SUNDIALS::internal::NVectorView<TrilinosWrappers::MPI::V>;
+    template class SUNDIALS::internal::NVectorView<
+      const TrilinosWrappers::MPI::V>;
+  }
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+// PETScWrappers Vector and BlockVector
+for (V : DEAL_II_VEC_TEMPLATES)
+  {
+    template SUNDIALS::internal::NVectorView<PETScWrappers::MPI::V>
+    SUNDIALS::internal::make_nvector_view<>(PETScWrappers::MPI::V &
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#  endif
+    );
+    template SUNDIALS::internal::NVectorView<const PETScWrappers::MPI::V>
+    SUNDIALS::internal::make_nvector_view<>(const PETScWrappers::MPI::V &
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                            ,
+                                            SUNContext
+#  endif
+    );
+    template PETScWrappers::MPI::V
+      *SUNDIALS::internal::unwrap_nvector<PETScWrappers::MPI::V>(N_Vector);
+    template const PETScWrappers::MPI::V *
+      SUNDIALS::internal::unwrap_nvector_const<PETScWrappers::MPI::V>(N_Vector);
+
+    template class SUNDIALS::internal::NVectorView<PETScWrappers::MPI::V>;
+    template class SUNDIALS::internal::NVectorView<const PETScWrappers::MPI::V>;
+  }
+#endif

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,8 +20,6 @@
 // Note: This test currently only works in serial and asserts when run with
 // more than one processor.
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -35,6 +33,7 @@
 #include <deal.II/grid/tria.h>
 
 #include <algorithm>
+#include <memory>
 
 #include "../tests.h"
 
@@ -53,7 +52,7 @@ print_dof_numbers(const DoFHandler<dim> &dof)
         cell->get_dof_indices(dof_indices);
         deallog << "cell " << cell->id() << ": ";
         for (types::global_dof_index i : dof_indices)
-          deallog << i << " ";
+          deallog << i << ' ';
         deallog << std::endl;
       }
   for (unsigned int l = 0; l < dof.get_triangulation().n_global_levels(); ++l)
@@ -65,7 +64,7 @@ print_dof_numbers(const DoFHandler<dim> &dof)
             cell->get_mg_dof_indices(dof_indices);
             deallog << "cell " << cell->id() << ": ";
             for (types::global_dof_index i : dof_indices)
-              deallog << i << " ";
+              deallog << i << ' ';
             deallog << std::endl;
           }
     }
@@ -87,8 +86,8 @@ check()
  tr.execute_coarsening_and_refinement();
   */
 
-  auto fe_scalar = std_cxx14::make_unique<dealii::FE_Q<dim>>(1);
-  auto fe = std_cxx14::make_unique<dealii::FESystem<dim>>(*fe_scalar, dim);
+  auto fe_scalar = std::make_unique<dealii::FE_Q<dim>>(1);
+  auto fe        = std::make_unique<dealii::FESystem<dim>>(*fe_scalar, dim);
 
   dealii::DoFHandler<dim> dofhandler(tria);
   dofhandler.distribute_dofs(*fe);
@@ -99,7 +98,7 @@ check()
   dealii::DoFRenumbering::component_wise(dofhandler);
   deallog << "Finished fine lvl renumbering" << std::endl;
 
-  for (unsigned int lvl = 0; lvl < tria.n_global_levels(); lvl++)
+  for (unsigned int lvl = 0; lvl < tria.n_global_levels(); ++lvl)
     {
       dealii::DoFRenumbering::component_wise(dofhandler, lvl);
       deallog << "Finished renumbering on lvl " << lvl << std::endl;

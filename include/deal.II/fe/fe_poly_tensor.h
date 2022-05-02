@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,6 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_polynomials_base.h>
 #include <deal.II/base/thread_management.h>
 
@@ -29,6 +28,7 @@
 
 #include <deal.II/lac/full_matrix.h>
 
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -136,8 +136,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @see TensorPolynomialsBase
  * @ingroup febase
- * @author Guido Kanschat
- * @date 2005
  */
 template <int dim, int spacedim = dim>
 class FE_PolyTensor : public FiniteElement<dim, spacedim>
@@ -227,6 +225,46 @@ protected:
   single_mapping_kind() const;
 
   /**
+   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * (quads) have to be permuted in order to be combined with the correct
+   * shape functions and additionally can change the sign. Given a local
+   * dof @p index on a quad, return the
+   * sign of the permuted shape function, if the face has non-standard
+   * face_orientation, face_flip or face_rotation. In 2D and 1D there is no need
+   * for permutation and consequently it does nothing in this case.
+   *
+   * The permutation itself is returned by
+   * adjust_quad_dof_index_for_face_orientation implemented in the interface
+   * class FiniteElement<dim>.
+   */
+  bool
+  adjust_quad_dof_sign_for_face_orientation(const unsigned int index,
+                                            const unsigned int face_no,
+                                            const bool         face_orientation,
+                                            const bool         face_flip,
+                                            const bool face_rotation) const;
+
+  /**
+   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * (quads) need not only to be permuted in order to be combined with the
+   * correct shape functions. Additionally they may change their sign.
+   *
+   * The constructor of this class fills this table with 'false' values, i.e.,
+   * no sign change at all. Derived finite element classes have to
+   * fill this Table with the correct values, see the documentation in
+   * GeometryInfo<dim> and
+   * this @ref GlossFaceOrientation "glossary entry on face orientation".
+   *
+   * The table must be filled in finite element classes derived
+   * from FE_PolyTensor in a meaningful way since the permutation
+   * pattern and the pattern of sign changes depends on how the finite element
+   * distributes the local dofs on the faces. An example is the function
+   * `initialize_quad_dof_index_permutation_and_sign_change()` in the
+   * FE_RaviartThomas class that fills this table.
+   */
+  std::vector<Table<2, bool>> adjust_quad_dof_sign_for_face_orientation_table;
+
+  /**
    * Returns MappingKind @p i for the finite element.
    */
   MappingKind
@@ -238,17 +276,19 @@ protected:
   virtual std::unique_ptr<
     typename FiniteElement<dim, spacedim>::InternalDataBase>
   get_data(
-    const UpdateFlags update_flags,
-    const Mapping<dim, spacedim> & /*mapping*/,
-    const Quadrature<dim> &quadrature,
+    const UpdateFlags             update_flags,
+    const Mapping<dim, spacedim> &mapping,
+    const Quadrature<dim> &       quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
-      & /*output_data*/) const override
+      &output_data) const override
   {
+    (void)mapping;
+    (void)output_data;
     // generate a new data object and
     // initialize some fields
     std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-          data_ptr   = std_cxx14::make_unique<InternalData>();
+          data_ptr   = std::make_unique<InternalData>();
     auto &data       = dynamic_cast<InternalData &>(*data_ptr);
     data.update_each = requires_update_flags(update_flags);
 
@@ -262,7 +302,7 @@ protected:
     std::vector<Tensor<5, dim>> fourth_derivatives(0);
 
     if (update_flags & (update_values | update_gradients | update_hessians))
-      data.sign_change.resize(this->dofs_per_cell);
+      data.dof_sign_change.resize(this->dofs_per_cell);
 
     // initialize fields only if really
     // necessary. otherwise, don't
@@ -286,16 +326,16 @@ protected:
 
     if (update_flags & update_values)
       {
-        values.resize(this->dofs_per_cell);
-        data.shape_values.reinit(this->dofs_per_cell, n_q_points);
+        values.resize(this->n_dofs_per_cell());
+        data.shape_values.reinit(this->n_dofs_per_cell(), n_q_points);
         if (update_transformed_shape_values)
           data.transformed_shape_values.resize(n_q_points);
       }
 
     if (update_flags & update_gradients)
       {
-        grads.resize(this->dofs_per_cell);
-        data.shape_grads.reinit(this->dofs_per_cell, n_q_points);
+        grads.resize(this->n_dofs_per_cell());
+        data.shape_grads.reinit(this->n_dofs_per_cell(), n_q_points);
         data.transformed_shape_grads.resize(n_q_points);
 
         if (update_transformed_shape_grads)
@@ -304,8 +344,8 @@ protected:
 
     if (update_flags & update_hessians)
       {
-        grad_grads.resize(this->dofs_per_cell);
-        data.shape_grad_grads.reinit(this->dofs_per_cell, n_q_points);
+        grad_grads.resize(this->n_dofs_per_cell());
+        data.shape_grad_grads.reinit(this->n_dofs_per_cell(), n_q_points);
         data.transformed_shape_hessians.resize(n_q_points);
         if (update_transformed_shape_hessian_tensors)
           data.untransformed_shape_hessian_tensors.resize(n_q_points);
@@ -331,13 +371,13 @@ protected:
           if (update_flags & update_values)
             {
               if (inverse_node_matrix.n_cols() == 0)
-                for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+                for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   data.shape_values[i][k] = values[i];
               else
-                for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+                for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   {
                     Tensor<1, dim> add_values;
-                    for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
+                    for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
                       add_values += inverse_node_matrix(j, i) * values[j];
                     data.shape_values[i][k] = add_values;
                   }
@@ -346,13 +386,13 @@ protected:
           if (update_flags & update_gradients)
             {
               if (inverse_node_matrix.n_cols() == 0)
-                for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+                for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   data.shape_grads[i][k] = grads[i];
               else
-                for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+                for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   {
                     Tensor<2, dim> add_grads;
-                    for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
+                    for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
                       add_grads += inverse_node_matrix(j, i) * grads[j];
                     data.shape_grads[i][k] = add_grads;
                   }
@@ -361,13 +401,13 @@ protected:
           if (update_flags & update_hessians)
             {
               if (inverse_node_matrix.n_cols() == 0)
-                for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+                for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   data.shape_grad_grads[i][k] = grad_grads[i];
               else
-                for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+                for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   {
                     Tensor<3, dim> add_grad_grads;
-                    for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
+                    for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
                       add_grad_grads +=
                         inverse_node_matrix(j, i) * grad_grads[j];
                     data.shape_grad_grads[i][k] = add_grad_grads;
@@ -392,11 +432,13 @@ protected:
                                                                        spacedim>
       &output_data) const override;
 
+  using FiniteElement<dim, spacedim>::fill_fe_face_values;
+
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const Mapping<dim, spacedim> &                              mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -458,7 +500,7 @@ protected:
     /**
      * Scratch arrays for intermediate computations
      */
-    mutable std::vector<double>              sign_change;
+    mutable std::vector<double>              dof_sign_change;
     mutable std::vector<Tensor<1, spacedim>> transformed_shape_values;
     // for shape_gradient computations
     mutable std::vector<Tensor<2, spacedim>> transformed_shape_grads;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2019 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,13 +21,14 @@
 #  include <deal.II/base/array_view.h>
 #  include <deal.II/base/mpi.h>
 #  include <deal.II/base/mpi.templates.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/lac/scalapack.templates.h>
 
 #  ifdef DEAL_II_WITH_HDF5
 #    include <hdf5.h>
 #  endif
+
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -183,14 +184,14 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
     }
   int ierr = MPI_Bcast(&n_rows,
                        1,
-                       Utilities::MPI::internal::mpi_type_id(&n_rows),
+                       Utilities::MPI::mpi_type_id_for_type<decltype(n_rows)>,
                        0 /*from root*/,
                        process_grid->mpi_communicator);
   AssertThrowMPI(ierr);
 
   ierr = MPI_Bcast(&n_columns,
                    1,
-                   Utilities::MPI::internal::mpi_type_id(&n_columns),
+                   Utilities::MPI::mpi_type_id_for_type<decltype(n_columns)>,
                    0 /*from root*/,
                    process_grid->mpi_communicator);
   AssertThrowMPI(ierr);
@@ -390,14 +391,15 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
   const int              n = 1;
   const std::vector<int> ranks(n, rank);
   MPI_Group              group_B;
-  MPI_Group_incl(group_A, n, DEAL_II_MPI_CONST_CAST(ranks.data()), &group_B);
+  MPI_Group_incl(group_A, n, ranks.data(), &group_B);
   MPI_Comm communicator_B;
 
   const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_from;
-  Utilities::MPI::create_group(this->grid->mpi_communicator,
-                               group_B,
-                               mpi_tag,
-                               &communicator_B);
+  const int ierr    = MPI_Comm_create_group(this->grid->mpi_communicator,
+                                         group_B,
+                                         mpi_tag,
+                                         &communicator_B);
+  AssertThrowMPI(ierr);
   int n_proc_rows_B = 1, n_proc_cols_B = 1;
   int this_process_row_B = -1, this_process_column_B = -1;
   int blacs_context_B = -1;
@@ -483,7 +485,7 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
   MPI_Group_free(&group_A);
   MPI_Group_free(&group_B);
   if (MPI_COMM_NULL != communicator_B)
-    MPI_Comm_free(&communicator_B);
+    Utilities::MPI::free_communicator(communicator_B);
 
   state = LAPACKSupport::matrix;
 }
@@ -560,14 +562,15 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
   const int              n = 1;
   const std::vector<int> ranks(n, rank);
   MPI_Group              group_B;
-  MPI_Group_incl(group_A, n, DEAL_II_MPI_CONST_CAST(ranks.data()), &group_B);
+  MPI_Group_incl(group_A, n, ranks.data(), &group_B);
   MPI_Comm communicator_B;
 
   const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_to;
-  Utilities::MPI::create_group(this->grid->mpi_communicator,
-                               group_B,
-                               mpi_tag,
-                               &communicator_B);
+  const int ierr    = MPI_Comm_create_group(this->grid->mpi_communicator,
+                                         group_B,
+                                         mpi_tag,
+                                         &communicator_B);
+  AssertThrowMPI(ierr);
   int n_proc_rows_B = 1, n_proc_cols_B = 1;
   int this_process_row_B = -1, this_process_column_B = -1;
   int blacs_context_B = -1;
@@ -653,7 +656,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
   MPI_Group_free(&group_A);
   MPI_Group_free(&group_B);
   if (MPI_COMM_NULL != communicator_B)
-    MPI_Comm_free(&communicator_B);
+    Utilities::MPI::free_communicator(communicator_B);
 }
 
 
@@ -899,10 +902,10 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
       // processes. the same holds for the wrapper/fallback we are using here.
 
       const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_to2;
-      ierr              = Utilities::MPI::create_group(MPI_COMM_WORLD,
-                                          group_union,
-                                          mpi_tag,
-                                          &mpi_communicator_union);
+      ierr              = MPI_Comm_create_group(MPI_COMM_WORLD,
+                                   group_union,
+                                   mpi_tag,
+                                   &mpi_communicator_union);
       AssertThrowMPI(ierr);
 
       /*
@@ -953,10 +956,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
       Cblacs_gridexit(union_blacs_context);
 
       if (mpi_communicator_union != MPI_COMM_NULL)
-        {
-          ierr = MPI_Comm_free(&mpi_communicator_union);
-          AssertThrowMPI(ierr);
-        }
+        Utilities::MPI::free_communicator(mpi_communicator_union);
       ierr = MPI_Group_free(&group_source);
       AssertThrowMPI(ierr);
       ierr = MPI_Group_free(&group_dest);
@@ -1501,10 +1501,10 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
   // distributed matrix
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors =
     compute_eigenvectors ?
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
-                                                          grid,
-                                                          row_block_size) :
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
+                                                    grid,
+                                                    row_block_size) :
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(
         grid->n_process_rows, grid->n_process_columns, grid, 1, 1);
 
   eigenvectors->property = property;
@@ -1832,10 +1832,10 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
   // distributed matrix.
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors =
     compute_eigenvectors ?
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
-                                                          grid,
-                                                          row_block_size) :
-      std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,
+                                                    grid,
+                                                    row_block_size) :
+      std::make_unique<ScaLAPACKMatrix<NumberType>>(
         grid->n_process_rows, grid->n_process_columns, grid, 1, 1);
 
   eigenvectors->property = property;

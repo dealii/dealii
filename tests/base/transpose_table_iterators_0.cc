@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,13 +101,21 @@ main()
   {
     TransposeTable<double> table(2, 2);
 
-    TransposeTableIterators::Accessor<double, true>  a3(&table, 2);
-    TransposeTableIterators::Accessor<double, false> a4(&table, 2);
-    deallog
-      << "Accessors refer to the same entry: "
-      << (&(TransposeTableIterators::Accessor<double, true>(a4).value()) ==
-          &(a3.value()))
-      << std::endl;
+    MatrixTableIterators::Accessor<TransposeTable<double>,
+                                   true,
+                                   MatrixTableIterators::Storage::column_major>
+      a3(&table, 2);
+    MatrixTableIterators::Accessor<TransposeTable<double>,
+                                   false,
+                                   MatrixTableIterators::Storage::column_major>
+      a4(&table, 2);
+    deallog << "Accessors refer to the same entry: "
+            << (&(MatrixTableIterators::Accessor<
+                    TransposeTable<double>,
+                    true,
+                    MatrixTableIterators::Storage::column_major>(a4)
+                    .value()) == &(a3.value()))
+            << std::endl;
   }
 
   // test a non-empty rectangular table

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,6 +38,19 @@ namespace CUDAWrappers
    * Define the number of threads in a warp.
    */
   constexpr int warp_size = 32;
+
+  /**
+   * Define the largest finite element degree that can be solved using
+   * CUDAWrappers::MatrixFree. Changing this number will affect the amount of
+   * constant memory being used.
+   */
+  constexpr unsigned int mf_max_elem_degree = 10;
+
+  /**
+   * Define the maximum number of valid CUDAWrappers::MatrixFree object.
+   * Changing this number will affect the amount of constant memory being used.
+   */
+  constexpr unsigned int mf_n_concurrent_objects = 5;
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE

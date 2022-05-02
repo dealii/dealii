@@ -1,5 +1,0 @@
-New: FESeries::Fourier and FESeries::Legendre have been extended by an
-equality operator (==) and the functionality to save and load previously
-calculated transformation matrices.
-<br>
-(Marc Fehling, 2020/01/16)

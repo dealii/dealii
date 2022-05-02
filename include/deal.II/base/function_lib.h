@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2019 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,6 @@ namespace Functions
    * Together with the function, its derivatives and Laplacian are defined.
    *
    * @ingroup functions
-   * @author: Guido Kanschat, 1999
    */
   template <int dim>
   class SquareFunction : public Function<dim>
@@ -86,7 +85,6 @@ namespace Functions
    * function serves as an example for a vanishing Laplacian.
    *
    * @ingroup functions
-   * @author: Guido Kanschat, 2000
    */
   template <int dim>
   class Q1WedgeFunction : public Function<dim>
@@ -149,7 +147,6 @@ namespace Functions
    * Together with the function, its derivatives and Laplacian are defined.
    *
    * @ingroup functions
-   * @author: Guido Kanschat, 1999
    */
   template <int dim>
   class PillowFunction : public Function<dim>
@@ -217,7 +214,6 @@ namespace Functions
    * $\cos(\pi/2 x_i)$.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 1999
    */
   template <int dim>
   class CosineFunction : public Function<dim>
@@ -286,7 +282,6 @@ namespace Functions
    * operators without bothering about boundary terms.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2010
    */
   template <int dim>
   class CosineGradFunction : public Function<dim>
@@ -333,7 +328,6 @@ namespace Functions
    * Product of exponential functions in each coordinate direction.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 1999
    */
   template <int dim>
   class ExpFunction : public Function<dim>
@@ -387,15 +381,31 @@ namespace Functions
 
 
   /**
-   * Harmonic singularity on the L-shaped domain in 2D.
+   * A function that solves the Laplace equation (with specific
+   * boundary values but zero right hand side) and that has a
+   * singularity at the center of the L-shaped domain in 2D (i.e.,
+   * at the location of the re-entrant corner of this non-convex
+   * domain).
    *
    * The function is given in polar coordinates by $r^{\frac{2}{3}}
-   * \sin(\frac{2}{3} \phi)$ with a singularity at the origin and should be
-   * used with GridGenerator::hyper_L().
+   * \sin(\frac{2}{3} \phi)$ with a singularity at the origin and
+   * should be used with GridGenerator::hyper_L(). Here, $\phi$ is
+   * defined as the *clockwise* angle against the positive $x$-axis.
+   *
+   * This function is often used to illustrate that the solutions of the Laplace
+   * equation
+   * @f[
+   *   -\Delta u = 0
+   * @f]
+   * can be singular even if the boundary values are smooth. (Here, if the
+   * domain is the L-shaped domain $(-1,1)^2 \backslash [0,1]^2$, the
+   * boundary values for $u$ are zero on the two line segments adjacent to the
+   * origin, and equal to $r^{\frac{2}{3}} \sin(\frac{2}{3} \phi)$ on the
+   * remaining parts of the boundary.) The function itself remains bounded on
+   * the domain, but its gradient is of the form $r^{-1/3}$ in the vicinity of
+   * the origin and consequently diverges as one approaches the origin.
    *
    * @ingroup functions
-   * @author Guido Kanschat
-   * @date 1999
    */
   class LSingularityFunction : public Function<2>
   {
@@ -445,7 +455,6 @@ namespace Functions
    * with vanishing curl and divergence.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2010
    */
   class LSingularityGradFunction : public Function<2>
   {
@@ -494,7 +503,6 @@ namespace Functions
    * Singularity on the slit domain in 2D and 3D.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 1999, 2006
    */
   template <int dim>
   class SlitSingularityFunction : public Function<dim>
@@ -541,7 +549,6 @@ namespace Functions
    * Singularity on the slit domain with one Neumann boundary in 2D.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2002
    */
   class SlitHyperSingularityFunction : public Function<2>
   {
@@ -597,7 +604,6 @@ namespace Functions
    * Together with the function, its derivatives and Laplacian are defined.
    *
    * @ingroup functions
-   * @author: Guido Kanschat, 2000
    */
   template <int dim>
   class JumpFunction : public Function<dim>
@@ -659,8 +665,8 @@ namespace Functions
      * calculating the memory usage of trees (e.g., <tt>std::map</tt>) is
      * difficult.
      */
-    std::size_t
-    memory_consumption() const;
+    virtual std::size_t
+    memory_consumption() const override;
 
   protected:
     /**
@@ -701,7 +707,6 @@ namespace Functions
    * Fourier cosine decomposition.
    *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 2001
    */
   template <int dim>
   class FourierCosineFunction : public Function<dim>
@@ -756,7 +761,6 @@ namespace Functions
    * Fourier sine decomposition.
    *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 2001
    */
   template <int dim>
   class FourierSineFunction : public Function<dim>
@@ -807,7 +811,6 @@ namespace Functions
    * $f(x) = \sum_j w_j sin(\sum_i k_i x_i) = Im(\sum_j w_j \exp(i k.x))$.
    *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 2001
    */
   template <int dim>
   class FourierSineSum : public Function<dim>
@@ -862,7 +865,6 @@ namespace Functions
    * \exp(i k.x))$.
    *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 2001
    */
   template <int dim>
   class FourierCosineSum : public Function<dim>
@@ -918,7 +920,6 @@ namespace Functions
    * independently of the radius of the supporting ball.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2002, Luca Heltai, 2019.
    */
   template <int dim>
   class CutOffFunctionBase : public Function<dim>
@@ -957,22 +958,6 @@ namespace Functions
      * Virtual destructor.
      */
     virtual ~CutOffFunctionBase() = default;
-
-    /**
-     * Move the center of the ball to new point <tt>p</tt>.
-     *
-     * @deprecated Use set_center() instead.
-     */
-    DEAL_II_DEPRECATED void
-    new_center(const Point<dim> &p);
-
-    /**
-     * Set the radius of the ball to <tt>r</tt>.
-     *
-     * @deprecated Use set_radius() instead.
-     */
-    DEAL_II_DEPRECATED void
-    new_radius(const double r);
 
     /**
      * Set the center of the ball to the point @p p.
@@ -1047,7 +1032,6 @@ namespace Functions
    * coordinate direction.
    *
    * @ingroup functions
-   * @author Luca Heltai, 2019.
    */
   template <int dim>
   class CutOffFunctionTensorProduct : public CutOffFunctionBase<dim>
@@ -1117,7 +1101,6 @@ namespace Functions
    * valued, it can be restricted to a single component.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2001, 2002
    */
   template <int dim>
   class CutOffFunctionLinfty : public CutOffFunctionBase<dim>
@@ -1166,7 +1149,6 @@ namespace Functions
    * component.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2001, 2002
    */
   template <int dim>
   class CutOffFunctionW1 : public CutOffFunctionBase<dim>
@@ -1219,7 +1201,6 @@ namespace Functions
    * a single component.
    *
    * @ingroup functions
-   * @author Luca Heltai, 2019
    */
   template <int dim>
   class CutOffFunctionC1 : public CutOffFunctionBase<dim>
@@ -1273,7 +1254,6 @@ namespace Functions
    * can be restricted to a single component.
    *
    * @ingroup functions
-   * @author Guido Kanschat, 2001, 2002
    */
   template <int dim>
   class CutOffFunctionCinfty : public CutOffFunctionBase<dim>
@@ -1335,10 +1315,9 @@ namespace Functions
    * bases are negative numbers.
    *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 2006
    */
-  template <int dim>
-  class Monomial : public Function<dim>
+  template <int dim, typename Number = double>
+  class Monomial : public Function<dim, Number>
   {
   public:
     /**
@@ -1347,13 +1326,13 @@ namespace Functions
      * components this object shall represent. All vector components will have
      * the same value.
      */
-    Monomial(const Tensor<1, dim> &exponents,
-             const unsigned int    n_components = 1);
+    Monomial(const Tensor<1, dim, Number> &exponents,
+             const unsigned int            n_components = 1);
 
     /**
      * Function value at one point.
      */
-    virtual double
+    virtual Number
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
@@ -1363,20 +1342,20 @@ namespace Functions
      * #n_components.
      */
     virtual void
-    vector_value(const Point<dim> &p, Vector<double> &values) const override;
+    vector_value(const Point<dim> &p, Vector<Number> &values) const override;
 
     /**
      * Function values at multiple points.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
-               std::vector<double> &          values,
+               std::vector<Number> &          values,
                const unsigned int             component = 0) const override;
 
     /**
      * Function gradient at one point.
      */
-    virtual Tensor<1, dim>
+    virtual Tensor<1, dim, Number>
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
 
@@ -1384,7 +1363,7 @@ namespace Functions
     /**
      * The set of exponents.
      */
-    const Tensor<1, dim> exponents;
+    const Tensor<1, dim, Number> exponents;
   };
 
 
@@ -1419,29 +1398,94 @@ namespace Functions
    * @note The use of the related class InterpolatedUniformGridData is
    * discussed in step-53.
    *
+   *
+   * <h3>Dealing with large data sets</h3>
+   *
+   * This class is often used to interpolate data provided by fairly
+   * large data tables that are expensive to read from disk, and that take
+   * a large amount of memory when replicated on every process of parallel
+   * (MPI) programs.
+   *
+   * The Table class can help with amortizing this cost by using
+   * shared memory to store the data only as often as necessary -- see the
+   * documentation of the TableBase class. Once one has obtained such a
+   * Table object that uses shared memory to store the data only as often
+   * as is necessary, one has to avoid that the current class *copies*
+   * the table into its own member variable. Rather, it is necessary to
+   * use the *move* constructor of this class to take over ownership of
+   * the table and its shared memory space. This can be achieved using
+   * the following extension of the code snippet shown in the
+   * documentation of the TableBase class:
+   * @code
+   *    const unsigned int N=..., M=...;     // table sizes, assumed known
+   *    Table<2,double>    data_table;
+   *    const unsigned int root_rank = 0;
+   *
+   *    if (Utilities::MPI::this_mpi_process(mpi_communicator) == root_rank)
+   *    {
+   *      data_table.resize (N,M);
+   *
+   *      std::ifstream input_file ("data_file.dat");
+   *      ...;                               // read the data from the file
+   *    }
+   *
+   *    // Now distribute to all processes
+   *    data_table.replicate_across_communicator (mpi_communicator, root_rank);
+   *
+   *    // Set up the x- and y-coordinates of the points stored in the
+   *    // data table
+   *    std::array<std::vector<double>, dim> coordinate_values;
+   *    ...;                                 // do what needs to be done
+   *
+   *    // And finally set up the interpolation object. The calls
+   *    // to std::move() make sure that the tables are moved into
+   *    // the memory space of the InterpolateTensorProductGridData
+   *    // object:
+   *    InterpolatedTensorProductGridData<2>
+   *          interpolation_function (std::move(coordinate_values),
+   *                                  std::move(data_table));
+   * @endcode
+   *
+   *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 2013
    */
   template <int dim>
   class InterpolatedTensorProductGridData : public Function<dim>
   {
   public:
     /**
-     * Constructor.
+     * Constructor to initialize this class instance with the data given in @p
+     * data_values.
+     *
      * @param coordinate_values An array of dim arrays. Each of the inner
      * arrays contains the coordinate values $x_0,\ldots, x_{K-1}$ and
      * similarly for the other coordinate directions. These arrays need not
      * have the same size. Obviously, we need dim such arrays for a dim-
      * dimensional function object. The coordinate values within this array
      * are assumed to be strictly ascending to allow for efficient lookup.
+     *
      * @param data_values A dim-dimensional table of data at each of the mesh
-     * points defined by the coordinate arrays above. Note that the Table
+     * points defined by the coordinate arrays above. The data passed in is
+     * copied into internal data structures. Note that the Table
      * class has a number of conversion constructors that allow converting
      * other data types into a table where you specify this argument.
      */
     InterpolatedTensorProductGridData(
       const std::array<std::vector<double>, dim> &coordinate_values,
       const Table<dim, double> &                  data_values);
+
+    /**
+     * Like the previous constructor, but take the arguments as rvalue
+     * references and *move*, instead of *copy* the data. This is often useful
+     * in cases where the data stored in these tables is large and the
+     * information used to initialize the current object is no longer needed
+     * separately. In other words, there is no need to keep the original object
+     * from which this object could copy its information, but it might as well
+     * take over ("move") the data.
+     */
+    InterpolatedTensorProductGridData(
+      std::array<std::vector<double>, dim> &&coordinate_values,
+      Table<dim, double> &&                  data_values);
 
     /**
      * Compute the value of the function set by bilinear interpolation of the
@@ -1470,6 +1514,18 @@ namespace Functions
     virtual Tensor<1, dim>
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
+
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
+
+    /**
+     * Return a reference to the internally stored data.
+     */
+    const Table<dim, double> &
+    get_data() const;
 
   protected:
     /**
@@ -1523,8 +1579,15 @@ namespace Functions
    *
    * @note The use of this class is discussed in step-53.
    *
+   *
+   * <h3>Dealing with large data sets</h3>
+   *
+   * This class supports the same facilities for dealing with large data sets
+   * as the InterpolatedTensorProductGridData class. See there for more
+   * information and example codes.
+   *
+   *
    * @ingroup functions
-   * @author Wolfgang Bangerth, 2013
    */
   template <int dim>
   class InterpolatedUniformGridData : public Function<dim>
@@ -1548,6 +1611,20 @@ namespace Functions
       const std::array<std::pair<double, double>, dim> &interval_endpoints,
       const std::array<unsigned int, dim> &             n_subintervals,
       const Table<dim, double> &                        data_values);
+
+    /**
+     * Like the previous constructor, but take the arguments as rvalue
+     * references and *move*, instead of *copy* the data. This is often useful
+     * in cases where the data stored in these tables is large and the
+     * information used to initialize the current object is no longer needed
+     * separately. In other words, there is no need to keep the original object
+     * from which this object could copy its information, but it might as well
+     * take over ("move") the data.
+     */
+    InterpolatedUniformGridData(
+      std::array<std::pair<double, double>, dim> &&interval_endpoints,
+      std::array<unsigned int, dim> &&             n_subintervals,
+      Table<dim, double> &&                        data_values);
 
     /**
      * Compute the value of the function set by bilinear interpolation of the
@@ -1576,6 +1653,18 @@ namespace Functions
     virtual Tensor<1, dim>
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
+
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
+
+    /**
+     * Return a reference to the internally stored data.
+     */
+    const Table<dim, double> &
+    get_data() const;
 
   private:
     /**
@@ -1606,7 +1695,6 @@ namespace Functions
    * Vector<double> to describe the set of coefficients.
    *
    * @ingroup functions
-   * @author Ángel Rodríguez, 2015
    */
   template <int dim>
   class Polynomial : public Function<dim>
@@ -1645,6 +1733,12 @@ namespace Functions
     virtual Tensor<1, dim>
     gradient(const Point<dim> & p,
              const unsigned int component = 0) const override;
+
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this object.
+     */
+    virtual std::size_t
+    memory_consumption() const override;
 
   private:
     /**

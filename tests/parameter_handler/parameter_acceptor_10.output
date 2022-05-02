@@ -1,0 +1,31 @@
+
+DEAL::Section Name    : Class A
+DEAL::N sections      : 1
+DEAL::Sections        : "Class A"    
+DEAL::
+DEAL::Section Name    : Class B
+DEAL::N sections      : 1
+DEAL::Sections        : "Class B"    
+DEAL::
+DEAL::Section Name    : /Class D/Class D1
+DEAL::N sections      : 2
+DEAL::Sections        : "Class D"    "Class D1"    
+DEAL::
+DEAL::Section Name    : Class D2/
+DEAL::N sections      : 2
+DEAL::Sections        : "Class D"    "Class D2"    
+DEAL::
+DEAL::Section Name    : Class D2D3
+DEAL::N sections      : 3
+DEAL::Sections        : "Class D"    "Class D2"    "Class D2D3"    
+DEAL::
+DEAL::Section Name    : Class D2D3
+DEAL::N sections      : 3
+DEAL::Sections        : "Class D"    "Class D2"    "Class D2D3"    
+DEAL::
+DEAL:parameters:Class A::Parameter A: a
+DEAL:parameters:Class B:Subsection B::Parameter C: c
+DEAL:parameters:Class D:Class D1::Parameter D1: d
+DEAL:parameters:Class D:Class D2::Parameter D2: d
+DEAL:parameters:Class D:Class D2:Class D2D3::Parameter D2D3: e
+DEAL:parameters:Class D:Class D2:Class D2D3:Subsection D2D3::Parameter D2D3: e

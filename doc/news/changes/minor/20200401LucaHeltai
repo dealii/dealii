@@ -1,4 +1,0 @@
-New: Utilities::encode_base64() and Utilities::decode_base64() allow to encode and decode binary strings
-to and from Base64 ASCII format.
-<br>
-(Luca Heltai, 2020/04/01)

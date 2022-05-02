@@ -1,0 +1,43 @@
+
+DEAL:Standard::psi: 15.36294361
+DEAL:Standard::S[0][0]: 13.00000000
+DEAL:Standard::S[0][1]: 0.000000000
+DEAL:Standard::S[1][1]: 13.00000000
+DEAL:Standard::HH[0][0][0][0]: -10.00000000
+DEAL:Standard::HH[0][0][0][1]: 0.000000000
+DEAL:Standard::HH[0][0][1][1]: 0.000000000
+DEAL:Standard::HH[0][1][0][0]: 0.000000000
+DEAL:Standard::HH[0][1][0][1]: -5.000000000
+DEAL:Standard::HH[0][1][1][1]: 0.000000000
+DEAL:Standard::HH[1][1][0][0]: 0.000000000
+DEAL:Standard::HH[1][1][0][1]: 0.000000000
+DEAL:Standard::HH[1][1][1][1]: -10.00000000
+DEAL::--------------------------------------------------
+DEAL:Explicit::psi: 53.40812106
+DEAL:Explicit::S[0][0]: 34.00000000
+DEAL:Explicit::S[0][1]: 0.000000000
+DEAL:Explicit::S[1][1]: 34.00000000
+DEAL:Explicit::HH[0][0][0][0]: 10.00000000
+DEAL:Explicit::HH[0][0][0][1]: 0.000000000
+DEAL:Explicit::HH[0][0][1][1]: -1.000000000
+DEAL:Explicit::HH[0][1][0][0]: 0.000000000
+DEAL:Explicit::HH[0][1][0][1]: 5.500000000
+DEAL:Explicit::HH[0][1][1][1]: 0.000000000
+DEAL:Explicit::HH[1][1][0][0]: -1.000000000
+DEAL:Explicit::HH[1][1][0][1]: 0.000000000
+DEAL:Explicit::HH[1][1][1][1]: 10.00000000
+DEAL::--------------------------------------------------
+DEAL:Implicit::psi: 26.44646255
+DEAL:Implicit::S[0][0]: 21.50000000
+DEAL:Implicit::S[0][1]: 0.000000000
+DEAL:Implicit::S[1][1]: 21.50000000
+DEAL:Implicit::HH[0][0][0][0]: 21.50000000
+DEAL:Implicit::HH[0][0][0][1]: 0.000000000
+DEAL:Implicit::HH[0][0][1][1]: -2.500000000
+DEAL:Implicit::HH[0][1][0][0]: 0.000000000
+DEAL:Implicit::HH[0][1][0][1]: -5.000000000
+DEAL:Implicit::HH[0][1][1][1]: 0.000000000
+DEAL:Implicit::HH[1][1][0][0]: -2.500000000
+DEAL:Implicit::HH[1][1][0][1]: 0.000000000
+DEAL:Implicit::HH[1][1][1][1]: 21.50000000
+DEAL::OK

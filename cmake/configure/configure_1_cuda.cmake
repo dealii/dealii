@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 - 2019 by the deal.II authors
+## Copyright (C) 2016 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -57,29 +57,34 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # CUDA Toolkit 8 is incompatible with C++14,
-    # CUDA Toolkit 9 and CUDA Toolkit 10 are incompatible with C++17.
+    # disable CUDA support older than 10.2:
+    #
+    IF(CUDA_VERSION VERSION_LESS 10.2)
+      MESSAGE(FATAL_ERROR "\n"
+        "deal.II requires CUDA version 10.2 or newer."
+      )
+    ENDIF()
+
+    #
+    # CUDA Toolkit 10 is incompatible with C++17.
     # Make sure that deal.II is configured appropriately
     #
-    MACRO(_cuda_ensure_feature_off _version _feature)
+    MACRO(_cuda_ensure_feature_off _version _cpp_version_bad _cpp_version_good)
       IF(${CUDA_VERSION_MAJOR} EQUAL ${_version})
-        IF(${_feature})
+        IF(${DEAL_II_HAVE_CXX${_cpp_version_bad}})
           SET(${var} FALSE)
           MESSAGE(STATUS "CUDA ${_version} requires ${_feature} to be set to off.")
           SET(CUDA_ADDITIONAL_ERROR_STRING
             ${CUDA_ADDITIONAL_ERROR_STRING}
-            "CUDA ${_version} is not compatible with the C++ standard\n"
-            "enabled by ${_feature}.\n"
-            "Please disable ${_feature}, e.g. by reconfiguring with\n"
-            "  cmake -D${_feature}=OFF ."
+            "CUDA ${_version} is not compatible with the C++${_cpp_version_bad} standard.\n"
+            "Please explicitly set the standard version to C++${_cpp_version_good}, e.g. by reconfiguring with\n"
+            "  cmake -DDEAL_II_CXX_FLAGS=\"-std=c++${_cpp_version_good}\" ."
             )
         ENDIF()
       ENDIF()
     ENDMACRO()
-    _cuda_ensure_feature_off(8 DEAL_II_WITH_CXX14)
-    _cuda_ensure_feature_off(9 DEAL_II_WITH_CXX17)
-    _cuda_ensure_feature_off(10 DEAL_II_WITH_CXX17)
 
+    _cuda_ensure_feature_off(10 17 14)
 
     IF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch[ ]*sm_([0-9]*)")
       SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
@@ -155,7 +160,9 @@ MACRO(FEATURE_CUDA_CONFIGURE_EXTERNAL)
   # compiler:
   #
   SET(CMAKE_CUDA_COMPILER "${CUDA_NVCC_EXECUTABLE}")
-  SET(CMAKE_CUDA_HOST_COMPILER "${CMAKE_CXX_COMPILER}")
+  IF(NOT CMAKE_CUDA_HOST_COMPILER)
+    SET(CMAKE_CUDA_HOST_COMPILER "${CMAKE_CXX_COMPILER}")
+  ENDIF()
   ENABLE_LANGUAGE(CUDA)
 
   MARK_AS_ADVANCED(CMAKE_CUDA_HOST_COMPILER)
@@ -169,9 +176,11 @@ MACRO(FEATURE_CUDA_CONFIGURE_EXTERNAL)
   SET(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_OBJECTS 0)
 
   #
-  # Set up cuda flags:
+  # Disable CUDA_ARCHITECTURES target properties
   #
-  ADD_FLAGS(DEAL_II_CUDA_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+  IF(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+    SET(CMAKE_CUDA_ARCHITECTURES OFF)
+  ENDIF()
 
   # We cannot use -pedantic as compiler flags. nvcc generates code that
   # produces a lot of warnings when pedantic is enabled. So filter out the

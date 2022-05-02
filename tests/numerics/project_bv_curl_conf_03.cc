@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2019 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,8 +39,8 @@ main(int argc, char **argv)
 
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation, 0, 1, true);
-  MappingQ<dim>    mapping(1);
-  ConstraintMatrix constraints;
+  MappingQ<dim>             mapping(1);
+  AffineConstraints<double> constraints;
 
   // Testing cases with only Nedelec Elements in FE_System
   {

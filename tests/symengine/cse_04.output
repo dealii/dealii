@@ -1,0 +1,8 @@
+
+DEAL:SymEngine: No CSE::res: -71420.4290
+DEAL:SymEngine: With CSE::res: -71420.4290
+DEAL:deal.II: Dict, No CSE::res: -71420.4290
+DEAL:deal.II: Dict, With CSE::res: -71420.4290
+DEAL:deal.II: Lambda, No CSE::res: -71420.4290
+DEAL:deal.II: Lambda, With CSE::res: -71420.4290
+DEAL::OK

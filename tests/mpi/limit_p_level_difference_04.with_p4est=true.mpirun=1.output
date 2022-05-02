@@ -1,0 +1,16 @@
+
+DEAL:0::active FE indices after adaptation:
+DEAL:0:: 0_0: 3
+DEAL:0:: 1_0: 2
+DEAL:0:: 2_0: 1
+DEAL:0::OK
+DEAL:0::active FE indices after adaptation:
+DEAL:0:: 0_0: 5
+DEAL:0:: 1_0: 3
+DEAL:0:: 2_0: 1
+DEAL:0::OK
+DEAL:0::active FE indices after adaptation:
+DEAL:0:: 0_0: 7
+DEAL:0:: 1_0: 4
+DEAL:0:: 2_0: 1
+DEAL:0::OK

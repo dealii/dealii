@@ -1,4 +1,0 @@
-New: Class CellDataTransfer has been introduced to transfer cell by cell
-data across meshes in case of refinement/serialization.
-<br>
-(Marc Fehling, 2019/06/26)

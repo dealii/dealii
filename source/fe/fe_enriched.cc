@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,12 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/base/std_cxx14/memory.h>
-
 #include <deal.II/fe/fe_enriched.h>
 #include <deal.II/fe/fe_tools.h>
 
 #include <deal.II/lac/sparsity_tools.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -39,7 +39,7 @@ namespace internal
       {
         std::vector<unsigned int> multiplicities;
         multiplicities.push_back(1); // the first one is non-enriched FE
-        for (unsigned int i = 0; i < functions.size(); i++)
+        for (unsigned int i = 0; i < functions.size(); ++i)
           multiplicities.push_back(functions[i].size());
 
         return multiplicities;
@@ -57,7 +57,7 @@ namespace internal
       {
         std::vector<const FiniteElement<dim, spacedim> *> fes;
         fes.push_back(fe_base);
-        for (unsigned int i = 0; i < fe_enriched.size(); i++)
+        for (unsigned int i = 0; i < fe_enriched.size(); ++i)
           fes.push_back(fe_enriched[i]);
 
         return fes;
@@ -91,7 +91,7 @@ namespace internal
         const unsigned int n_comp_base = fes[0]->n_components();
 
         // start from fe=1 as 0th is always non-enriched FE.
-        for (unsigned int fe = 1; fe < fes.size(); fe++)
+        for (unsigned int fe = 1; fe < fes.size(); ++fe)
           {
             const FE_Nothing<dim> *fe_nothing =
               dynamic_cast<const FE_Nothing<dim> *>(fes[fe]);
@@ -120,7 +120,7 @@ namespace internal
         const std::vector<const FiniteElement<dim, spacedim> *> &fes)
       {
         // start from fe=1 as 0th is always non-enriched FE.
-        for (unsigned int fe = 1; fe < fes.size(); fe++)
+        for (unsigned int fe = 1; fe < fes.size(); ++fe)
           if (dynamic_cast<const FE_Nothing<dim> *>(fes[fe]) == nullptr)
             // this is not FE_Nothing => there will be enrichment
             return true;
@@ -190,8 +190,7 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
                                                        false))
   , enrichments(functions)
   , is_enriched(internal::FE_Enriched::check_if_enriched(fes))
-  , fe_system(
-      std_cxx14::make_unique<FESystem<dim, spacedim>>(fes, multiplicities))
+  , fe_system(std::make_unique<FESystem<dim, spacedim>>(fes, multiplicities))
 {
   // descriptive error are thrown within the function.
   Assert(internal::FE_Enriched::consistency_check(fes,
@@ -204,7 +203,7 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
   // resize to be consistent with all FEs used to construct the FE_Enriched,
   // even though we will never use the 0th element.
   base_no_mult_local_enriched_dofs.resize(fes.size());
-  for (unsigned int fe = 1; fe < fes.size(); fe++)
+  for (unsigned int fe = 1; fe < fes.size(); ++fe)
     base_no_mult_local_enriched_dofs[fe].resize(multiplicities[fe]);
 
   Assert(base_no_mult_local_enriched_dofs.size() == this->n_base_elements(),
@@ -212,7 +211,7 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
                               this->n_base_elements()));
 
   // build the map: (base_no, base_m) -> vector of local element DoFs
-  for (unsigned int system_index = 0; system_index < this->dofs_per_cell;
+  for (unsigned int system_index = 0; system_index < this->n_dofs_per_cell();
        ++system_index)
     {
       const unsigned int base_no =
@@ -249,10 +248,10 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
            m < base_no_mult_local_enriched_dofs[base_no].size();
            m++)
         Assert(base_no_mult_local_enriched_dofs[base_no][m].size() ==
-                 fes[base_no]->dofs_per_cell,
+                 fes[base_no]->n_dofs_per_cell(),
                ExcDimensionMismatch(
                  base_no_mult_local_enriched_dofs[base_no][m].size(),
-                 fes[base_no]->dofs_per_cell));
+                 fes[base_no]->n_dofs_per_cell()));
     }
 }
 
@@ -286,7 +285,7 @@ FE_Enriched<dim, spacedim>::clone() const
   std::vector<const FiniteElement<dim, spacedim> *> fes;
   std::vector<unsigned int>                         multiplicities;
 
-  for (unsigned int i = 0; i < this->n_base_elements(); i++)
+  for (unsigned int i = 0; i < this->n_base_elements(); ++i)
     {
       fes.push_back(&base_element(i));
       multiplicities.push_back(this->element_multiplicity(i));
@@ -332,7 +331,7 @@ FE_Enriched<dim, spacedim>::setup_data(
   // that fes_data points to, to the new InternalData object.
   auto update_each_flags = fes_data->update_each;
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
-        data_ptr = std_cxx14::make_unique<InternalData>(std::move(fes_data));
+        data_ptr = std::make_unique<InternalData>(std::move(fes_data));
   auto &data     = dynamic_cast<InternalData &>(*data_ptr);
 
   // copy update_each from FESystem data:
@@ -366,19 +365,21 @@ FE_Enriched<dim, spacedim>::setup_data(
 template <int dim, int spacedim>
 std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FE_Enriched<dim, spacedim>::get_face_data(
-  const UpdateFlags             update_flags,
-  const Mapping<dim, spacedim> &mapping,
-  const Quadrature<dim - 1> &   quadrature,
+  const UpdateFlags               update_flags,
+  const Mapping<dim, spacedim> &  mapping,
+  const hp::QCollection<dim - 1> &quadrature,
   internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
     &output_data) const
 {
+  AssertDimension(quadrature.size(), 1);
+
   auto data =
     fe_system->get_face_data(update_flags, mapping, quadrature, output_data);
   return setup_data(Utilities::dynamic_unique_cast<
                       typename FESystem<dim, spacedim>::InternalData>(
                       std::move(data)),
                     update_flags,
-                    quadrature);
+                    quadrature[0]);
 }
 
 
@@ -429,19 +430,18 @@ FE_Enriched<dim, spacedim>::initialize(
   Assert(fes.size() == multiplicities.size(),
          ExcDimensionMismatch(fes.size(), multiplicities.size()));
 
-  // Note that we need to skip every fe with multiplicity 0 in the following
+  // Note that we need to skip every FE with multiplicity 0 in the following
   // block of code
   this->base_to_block_indices.reinit(0, 0);
 
-  for (unsigned int i = 0; i < fes.size(); i++)
+  for (unsigned int i = 0; i < fes.size(); ++i)
     if (multiplicities[i] > 0)
       this->base_to_block_indices.push_back(multiplicities[i]);
 
   {
     // If the system is not primitive, these have not been initialized by
     // FiniteElement
-    this->system_to_component_table.resize(this->dofs_per_cell);
-    this->face_system_to_component_table.resize(this->dofs_per_face);
+    this->system_to_component_table.resize(this->n_dofs_per_cell());
 
     FETools::Compositing::build_cell_tables(this->system_to_base_table,
                                             this->system_to_component_table,
@@ -449,11 +449,21 @@ FE_Enriched<dim, spacedim>::initialize(
                                             *this,
                                             false);
 
-    FETools::Compositing::build_face_tables(
-      this->face_system_to_base_table,
-      this->face_system_to_component_table,
-      *this,
-      false);
+    this->face_system_to_component_table.resize(this->n_unique_faces());
+
+    for (unsigned int face_no = 0; face_no < this->n_unique_faces(); ++face_no)
+      {
+        this->face_system_to_component_table[0].resize(
+          this->n_dofs_per_face(face_no));
+
+
+        FETools::Compositing::build_face_tables(
+          this->face_system_to_base_table[face_no],
+          this->face_system_to_component_table[face_no],
+          *this,
+          false,
+          face_no);
+      }
   }
 
   // restriction and prolongation matrices are built on demand
@@ -467,7 +477,7 @@ FE_Enriched<dim, spacedim>::initialize(
   // However, functions like interpolate_boundary_values() need all FEs inside
   // FECollection to be able to provide support points irrespectively whether
   // this FE sits on the boundary or not. Thus for moment just copy support
-  // points from fe system:
+  // points from FE system:
   {
     this->unit_support_points      = fe_system->unit_support_points;
     this->unit_face_support_points = fe_system->unit_face_support_points;
@@ -550,7 +560,7 @@ void
 FE_Enriched<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
+  const hp::QCollection<dim - 1> &                            quadrature,
   const Mapping<dim, spacedim> &                              mapping,
   const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -564,6 +574,8 @@ FE_Enriched<dim, spacedim>::fill_fe_face_values(
          ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
+  AssertDimension(quadrature.size(), 1);
+
   // call FESystem's method to fill everything without enrichment function
   fe_system->fill_fe_face_values(cell,
                                  face_no,
@@ -576,7 +588,7 @@ FE_Enriched<dim, spacedim>::fill_fe_face_values(
 
   if (is_enriched)
     multiply_by_enrichment(
-      quadrature, fe_data, mapping_data, cell, output_data);
+      quadrature[0], fe_data, mapping_data, cell, output_data);
 }
 
 
@@ -649,7 +661,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
   // TODO: do we need it only for dim_1 == dim (i.e. fill_fe_values)?
   if (dim_1 == dim)
-    for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
+    for (unsigned int base_no = 1; base_no < this->n_base_elements(); ++base_no)
       {
         const FiniteElement<dim, spacedim> &base_fe = base_element(base_no);
         typename FiniteElement<dim, spacedim>::InternalDataBase &base_fe_data =
@@ -660,13 +672,15 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
         const UpdateFlags base_flags = base_fe_data.update_each;
 
-        for (unsigned int system_index = 0; system_index < this->dofs_per_cell;
+        for (unsigned int system_index = 0;
+             system_index < this->n_dofs_per_cell();
              ++system_index)
           if (this->system_to_base_table[system_index].first.first == base_no)
             {
               const unsigned int base_index =
                 this->system_to_base_table[system_index].second;
-              Assert(base_index < base_fe.dofs_per_cell, ExcInternalError());
+              Assert(base_index < base_fe.n_dofs_per_cell(),
+                     ExcInternalError());
 
               // now copy. if the shape function is primitive, then there
               // is only one value to be copied, but for non-primitive
@@ -711,7 +725,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
          ExcDimensionMismatch(base_no_mult_local_enriched_dofs.size(),
                               fe_data.enrichment.size()));
   // calculate hessians, gradients and values for each function
-  for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
+  for (unsigned int base_no = 1; base_no < this->n_base_elements(); ++base_no)
     {
       Assert(
         base_no_mult_local_enriched_dofs[base_no].size() ==
@@ -743,7 +757,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                      ExcDimensionMismatch(
                        fe_data.enrichment[base_no][m].hessians.size(),
                        n_q_points));
-              for (unsigned int q = 0; q < n_q_points; q++)
+              for (unsigned int q = 0; q < n_q_points; ++q)
                 fe_data.enrichment[base_no][m].hessians[q] =
                   enrichments[base_no - 1][m](cell)->hessian(
                     mapping_data.quadrature_points[q]);
@@ -756,7 +770,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                      ExcDimensionMismatch(
                        fe_data.enrichment[base_no][m].gradients.size(),
                        n_q_points));
-              for (unsigned int q = 0; q < n_q_points; q++)
+              for (unsigned int q = 0; q < n_q_points; ++q)
                 fe_data.enrichment[base_no][m].gradients[q] =
                   enrichments[base_no - 1][m](cell)->gradient(
                     mapping_data.quadrature_points[q]);
@@ -768,7 +782,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                      ExcDimensionMismatch(
                        fe_data.enrichment[base_no][m].values.size(),
                        n_q_points));
-              for (unsigned int q = 0; q < n_q_points; q++)
+              for (unsigned int q = 0; q < n_q_points; ++q)
                 fe_data.enrichment[base_no][m].values[q] =
                   enrichments[base_no - 1][m](cell)->value(
                     mapping_data.quadrature_points[q]);
@@ -816,7 +830,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
     }
 
   if (flags & update_gradients)
-    for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
+    for (unsigned int base_no = 1; base_no < this->n_base_elements(); ++base_no)
       {
         for (unsigned int m = 0;
              m < base_no_mult_local_enriched_dofs[base_no].size();
@@ -839,7 +853,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
       }
 
   if (flags & update_values)
-    for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
+    for (unsigned int base_no = 1; base_no < this->n_base_elements(); ++base_no)
       {
         for (unsigned int m = 0;
              m < base_no_mult_local_enriched_dofs[base_no].size();
@@ -880,13 +894,15 @@ template <int dim, int spacedim>
 void
 FE_Enriched<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source,
-  FullMatrix<double> &                matrix) const
+  FullMatrix<double> &                matrix,
+  const unsigned int                  face_no) const
 {
   if (const FE_Enriched<dim, spacedim> *fe_enr_other =
         dynamic_cast<const FE_Enriched<dim, spacedim> *>(&source))
     {
       fe_system->get_face_interpolation_matrix(fe_enr_other->get_fe_system(),
-                                               matrix);
+                                               matrix,
+                                               face_no);
     }
   else
     {
@@ -903,14 +919,16 @@ void
 FE_Enriched<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source,
   const unsigned int                  subface,
-  FullMatrix<double> &                matrix) const
+  FullMatrix<double> &                matrix,
+  const unsigned int                  face_no) const
 {
   if (const FE_Enriched<dim, spacedim> *fe_enr_other =
         dynamic_cast<const FE_Enriched<dim, spacedim> *>(&source))
     {
       fe_system->get_subface_interpolation_matrix(fe_enr_other->get_fe_system(),
                                                   subface,
-                                                  matrix);
+                                                  matrix,
+                                                  face_no);
     }
   else
     {
@@ -961,12 +979,14 @@ FE_Enriched<dim, spacedim>::hp_line_dof_identities(
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_Enriched<dim, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<dim, spacedim> &fe_other) const
+  const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int                  face_no) const
 {
   if (const FE_Enriched<dim, spacedim> *fe_enr_other =
         dynamic_cast<const FE_Enriched<dim, spacedim> *>(&fe_other))
     {
-      return fe_system->hp_quad_dof_identities(fe_enr_other->get_fe_system());
+      return fe_system->hp_quad_dof_identities(fe_enr_other->get_fe_system(),
+                                               face_no);
     }
   else
     {
@@ -1065,7 +1085,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     bool
     find_connection_between_subdomains(
-      const hp::DoFHandler<dim, spacedim> &    dof_handler,
+      const DoFHandler<dim, spacedim> &        dof_handler,
       const predicate_function<dim, spacedim> &predicate_1,
       const predicate_function<dim, spacedim> &predicate_2)
     {
@@ -1095,7 +1115,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     unsigned int
     color_predicates(
-      const hp::DoFHandler<dim, spacedim> &                 mesh,
+      const DoFHandler<dim, spacedim> &                     mesh,
       const std::vector<predicate_function<dim, spacedim>> &predicates,
       std::vector<unsigned int> &                           predicate_colors)
     {
@@ -1135,7 +1155,7 @@ namespace ColorEnriched
     template <int dim, int spacedim>
     void
     set_cellwise_color_set_and_fe_index(
-      hp::DoFHandler<dim, spacedim> &                       dof_handler,
+      DoFHandler<dim, spacedim> &                           dof_handler,
       const std::vector<predicate_function<dim, spacedim>> &predicates,
       const std::vector<unsigned int> &                     predicate_colors,
       std::map<unsigned int, std::map<unsigned int, unsigned int>>
@@ -1280,8 +1300,8 @@ namespace ColorEnriched
        * on adjacent cells, an enriched FE [0 0 1] should exist and is
        * found as the least dominating finite element for the two cells by
        * DoFTools::make_hanging_node_constraints, using the above mentioned
-       * hp::FECollection functions. Denoting the fe set in adjacent cells as
-       * {1,3} and {2,3}, this implies that an fe set {3} needs to be added!
+       * hp::FECollection functions. Denoting the FE set in adjacent cells as
+       * {1,3} and {2,3}, this implies that an FE set {3} needs to be added!
        * Based on the predicate configuration, this may not be automatically
        * done without the following special treatment.
        */
@@ -1303,10 +1323,10 @@ namespace ColorEnriched
                   const auto nbr_fe_index =
                     cell->neighbor(face)->active_fe_index();
 
-                  // find corresponding fe set
+                  // find corresponding FE set
                   const auto nbr_fe_set = fe_sets.at(nbr_fe_index);
 
-                  // find intersection of the fe sets: fe_set and nbr_fe_set
+                  // find intersection of the FE sets: fe_set and nbr_fe_set
                   std::set<unsigned int> intersection_set;
                   std::set_intersection(
                     fe_set.begin(),
@@ -1476,7 +1496,7 @@ namespace ColorEnriched
   template <int dim, int spacedim>
   const hp::FECollection<dim, spacedim> &
   Helper<dim, spacedim>::build_fe_collection(
-    hp::DoFHandler<dim, spacedim> &dof_handler)
+    DoFHandler<dim, spacedim> &dof_handler)
   {
     // color the predicates based on connections between corresponding
     // subdomains

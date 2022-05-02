@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ main()
   for (unsigned int m = 0; m < global_matrix.m(); ++m)
     {
       for (unsigned int n = 0; n < global_matrix.n(); ++n)
-        deallog << global_matrix(m, n) << " ";
+        deallog << global_matrix(m, n) << ' ';
       deallog << std::endl;
     }
   deallog << std::endl;
@@ -70,7 +70,7 @@ main()
   for (unsigned int m = 0; m < global_matrix.m(); ++m)
     {
       for (unsigned int n = 0; n < global_matrix.n(); ++n)
-        deallog << global_matrix(m, n) << " ";
+        deallog << global_matrix(m, n) << ' ';
       deallog << std::endl;
     }
   deallog << std::endl;

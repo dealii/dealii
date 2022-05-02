@@ -1,6 +1,6 @@
 //------------------  interpolate_functions_common.h  ------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -86,7 +86,8 @@ public:
       {
         fe_eval.reinit(cell);
         fe_eval.read_dof_values(src);
-        fe_eval.evaluate(true, true, true);
+        fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                         EvaluationFlags::hessians);
 
         for (unsigned int j = 0; j < data.n_components_filled(cell); ++j)
           for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
@@ -125,10 +126,12 @@ public:
       {
         fe_evalm.reinit(face);
         fe_evalm.read_dof_values(src);
-        fe_evalm.evaluate(true, true);
+        fe_evalm.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians);
         fe_evalp.reinit(face);
         fe_evalp.read_dof_values(src);
-        fe_evalp.evaluate(true, true);
+        fe_evalp.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians);
 
         for (unsigned int j = 0; j < VectorizedArray<Number>::size(); ++j)
           {
@@ -141,37 +144,41 @@ public:
                 ++facem_times;
                 ++facep_times;
                 Point<dim> p;
+
+                // interior face
                 for (unsigned int d = 0; d < dim; ++d)
                   p[d] = fe_evalm.quadrature_point(q)[d][j];
                 facem_errors[0] +=
                   std::abs(fe_evalm.get_value(q)[j] - function.value(p, 0));
                 for (unsigned int d = 0; d < dim; ++d)
-                  {
-                    // std::cout << fe_evalm.get_gradient(q)[d][j] << " ";
-                    facem_errors[1] += std::abs(fe_evalm.get_gradient(q)[d][j] -
-                                                function.gradient(p, 0)[d]);
-                  }
+                  facem_errors[1] += std::abs(fe_evalm.get_gradient(q)[d][j] -
+                                              function.gradient(p, 0)[d]);
+                for (unsigned int d = 0; d < dim; ++d)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    facem_errors[2] +=
+                      std::abs(fe_evalm.get_hessian(q)[d][e][j] -
+                               function.hessian(p, 0)[d][e]);
                 double normal_derivative = 0;
                 for (unsigned int d = 0; d < dim; ++d)
                   normal_derivative += function.gradient(p, 0)[d] *
                                        fe_evalm.get_normal_vector(q)[d][j];
                 facem_errors[3] += std::abs(
                   fe_evalm.get_normal_derivative(q)[j] - normal_derivative);
+
+                // exterior face
                 facep_errors[0] +=
                   std::abs(fe_evalp.get_value(q)[j] - function.value(p, 0));
                 for (unsigned int d = 0; d < dim; ++d)
                   facep_errors[1] += std::abs(fe_evalp.get_gradient(q)[d][j] -
                                               function.gradient(p, 0)[d]);
+                for (unsigned int d = 0; d < dim; ++d)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    facep_errors[2] +=
+                      std::abs(fe_evalp.get_hessian(q)[d][e][j] -
+                               function.hessian(p, 0)[d][e]);
                 facep_errors[3] += std::abs(
                   fe_evalp.get_normal_derivative(q)[j] - normal_derivative);
-                // hessians not currently implemented in FEFaceEvaluation
-                // for (unsigned int d=0; d<dim; ++d)
-                //  for (unsigned int e=0; e<dim; ++e)
-                //    facem_errors[2] +=
-                //    std::abs(fe_evalm.get_hessian(q)[d][e][j]-
-                //                                function.hessian(q)[d][e]);
               }
-            // std::cout << std::endl;
           }
       }
   }
@@ -191,7 +198,8 @@ public:
       {
         fe_evalm.reinit(face);
         fe_evalm.read_dof_values(src);
-        fe_evalm.evaluate(true, true);
+        fe_evalm.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
+                          EvaluationFlags::hessians);
 
         for (unsigned int j = 0; j < VectorizedArray<Number>::size(); ++j)
           {
@@ -211,18 +219,17 @@ public:
                   boundary_errors[1] +=
                     std::abs(fe_evalm.get_gradient(q)[d][j] -
                              function.gradient(p, 0)[d]);
+                for (unsigned int d = 0; d < dim; ++d)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    boundary_errors[2] +=
+                      std::abs(fe_evalm.get_hessian(q)[d][e][j] -
+                               function.hessian(p, 0)[d][e]);
                 double normal_derivative = 0;
                 for (unsigned int d = 0; d < dim; ++d)
                   normal_derivative += function.gradient(p, 0)[d] *
                                        fe_evalm.get_normal_vector(q)[d][j];
                 boundary_errors[3] += std::abs(
                   fe_evalm.get_normal_derivative(q)[j] - normal_derivative);
-                // hessians not currently implemented in FEFaceEvaluation
-                // for (unsigned int d=0; d<dim; ++d)
-                //  for (unsigned int e=0; e<dim; ++e)
-                //    boundary_errors[2] +=
-                //    std::abs(fe_evalm.get_hessian(q)[d][e][j]-
-                //                                   function.hessian(q)[d][e]);
               }
           }
       }
@@ -272,24 +279,24 @@ public:
             << std::endl;
     deallog << "Error face- gradients:  " << facem_errors[1] / facem_times
             << std::endl;
-    // deallog << "Error face- Hessians:   " << facem_errors[2]/facem_times <<
-    // std::endl;
+    deallog << "Error face- Hessians:   " << facem_errors[2] / facem_times
+            << std::endl;
     deallog << "Error face- grad*normal:" << facem_errors[3] / facem_times
             << std::endl;
     deallog << "Error face+ values:     " << facep_errors[0] / facep_times
             << std::endl;
     deallog << "Error face+ gradients:  " << facep_errors[1] / facep_times
             << std::endl;
-    // deallog << "Error face+ Hessians:   " << facep_errors[2]/facep_times <<
-    // std::endl;
-    deallog << "Error face+ grad*normal:" << facem_errors[3] / facep_times
+    deallog << "Error face+ Hessians:   " << facep_errors[2] / facep_times
+            << std::endl;
+    deallog << "Error face+ grad*normal:" << facep_errors[3] / facep_times
             << std::endl;
     deallog << "Error face b values:    " << boundary_errors[0] / boundary_times
             << std::endl;
     deallog << "Error face b gradients: " << boundary_errors[1] / boundary_times
             << std::endl;
-    // deallog << "Error face b Hessians:  " <<
-    // boundary_errors[2]/boundary_times << std::endl;
+    deallog << "Error face b Hessians:  " << boundary_errors[2] / boundary_times
+            << std::endl;
     deallog << "Error face b grad*norm: " << boundary_errors[3] / boundary_times
             << std::endl;
     deallog << std::endl;
@@ -329,11 +336,11 @@ do_test(const DoFHandler<dim> &          dof,
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.mapping_update_flags =
-      update_gradients | update_second_derivatives | update_quadrature_points;
+      update_gradients | update_hessians | update_quadrature_points;
     data.mapping_update_flags_boundary_faces =
-      update_gradients | update_second_derivatives | update_quadrature_points;
+      update_gradients | update_hessians | update_quadrature_points;
     data.mapping_update_flags_inner_faces =
-      update_gradients | update_second_derivatives | update_quadrature_points;
+      update_gradients | update_hessians | update_quadrature_points;
     mf_data.reinit(dof, constraints, quad, data);
   }
 

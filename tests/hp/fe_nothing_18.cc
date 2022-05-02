@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 
 #include <deal.II/dofs/dof_accessor.h> //provides information about the degrees of freedom local to a cell
 #include <deal.II/dofs/dof_handler.h> //associate DoF to cells/vertices/lines
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h> //use to renumber DoF to have a better sparsity pattern
 #include <deal.II/dofs/dof_tools.h> //needed for the creation of sparsity patterns of sparse matrices
 
@@ -38,7 +39,6 @@
 #include <deal.II/grid/tria_accessor.h> //these two to loop over cells/faces
 #include <deal.II/grid/tria_iterator.h> // ^
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
@@ -97,8 +97,8 @@ private:
   std::vector<types::global_dof_index> dofs_per_block;
 
   Triangulation<dim>
-                      triangulation; // a triangulation object of the "dim"-dimensional domain;
-  hp::DoFHandler<dim> dof_handler; // is associated with triangulation;
+    triangulation; // a triangulation object of the "dim"-dimensional domain;
+  DoFHandler<dim> dof_handler; // is associated with triangulation;
 
   FESystem<dim>         elasticity_fe;
   FESystem<dim>         elasticity_w_lagrange_fe;
@@ -297,7 +297,7 @@ ElasticProblem<dim>::make_grid()
   triangulationL.begin_active()->set_material_id(0);
   triangulationR.begin_active()->set_material_id(id_of_lagrange_mult);
 
-  for (unsigned int i = 0; i < n_faces_per_cell; i++)
+  for (unsigned int i = 0; i < n_faces_per_cell; ++i)
     {
       triangulationL.begin_active()->face(i)->set_boundary_id(i);
       triangulationR.begin_active()->face(i)->set_boundary_id(n_faces_per_cell +
@@ -318,15 +318,15 @@ ElasticProblem<dim>::setup_system()
 {
   std::vector<unsigned int> block_component(
     n_components, u_block); // init to represent u everywhere
-  for (unsigned int i = 0; i < dim; i++)
+  for (unsigned int i = 0; i < dim; ++i)
     block_component[i + dim] = lambda_block;
 
   //(1) set active FE indices based in material id...
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
-  unsigned int n_lagrange_cells                           = 0;
-  unsigned int n_elasticity_cells                         = 0;
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
+  unsigned int n_lagrange_cells                       = 0;
+  unsigned int n_elasticity_cells                     = 0;
   for (; cell != endc; ++cell) // loop over all cells
     {
       if (cell->material_id() == id_of_lagrange_mult)

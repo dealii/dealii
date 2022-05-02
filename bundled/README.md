@@ -19,12 +19,21 @@ and licensed under the Boost Software License Version 1.0. See
 A full version of the library can be downloaded at http://www.boost.org/.
 
 
+taskflow-*
+--------------
+
+Contains the taskflow project licensed under the MIT license.
+
+A full version of the project project can be downloaded at
+https://taskflow.github.io/.
+
+
 muparser_*
 ----------
 
 Contains the MuParser project licensed under the MIT license.
 
-A full version of the FunctionParser project can be downloaded at
+A full version of the MuParser project can be downloaded at
 http://muparser.beltoforion.de/.
 
 

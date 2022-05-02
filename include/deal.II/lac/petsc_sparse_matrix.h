@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,6 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    * @ingroup Matrix1
-   * @author Wolfgang Bangerth, 2004
    */
   class SparseMatrix : public MatrixBase
   {
@@ -362,7 +361,6 @@ namespace PETScWrappers
      *
      * @ingroup PETScWrappers
      * @ingroup Matrix1
-     * @author Wolfgang Bangerth, 2004
      */
     class SparseMatrix : public MatrixBase
     {

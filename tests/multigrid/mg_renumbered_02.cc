@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -179,7 +179,7 @@ template <int dim>
 class LaplaceProblem
 {
 public:
-  typedef MeshWorker::IntegrationInfo<dim> CellInfo;
+  using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
   LaplaceProblem(const unsigned int deg);
   void
@@ -195,10 +195,10 @@ private:
   void
   refine_local();
 
-  Triangulation<dim>         triangulation;
-  const MappingQGeneric<dim> mapping;
-  FESystem<dim>              fe;
-  DoFHandler<dim>            mg_dof_handler_renumbered;
+  Triangulation<dim>  triangulation;
+  const MappingQ<dim> mapping;
+  FESystem<dim>       fe;
+  DoFHandler<dim>     mg_dof_handler_renumbered;
 
   const unsigned int                             degree;
   std::vector<std::set<types::global_dof_index>> boundary_indices_renumbered;
@@ -248,7 +248,7 @@ LaplaceProblem<dim>::output_gpl(const DoFHandler<dim> &        dof,
 {
   MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = dof.get_fe().tensor_degree();
-  QTrapez<1>         trapez;
+  QTrapezoid<1>      trapez;
   QIterated<dim>     quadrature(trapez, n_gauss_points);
   info_box.cell_quadrature = quadrature;
   info_box.initialize_update_flags();

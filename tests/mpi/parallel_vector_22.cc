@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,10 +57,9 @@ test()
   v *= 2.0;
 
   // check setup of vectors
-  deallog << myid << ":"
-          << "first owned entry: " << v(myid * 2) << std::endl;
-  deallog << myid << ":"
-          << "second owned entry: " << v(myid * 2 + 1) << std::endl;
+  deallog << myid << ':' << "first owned entry: " << v(myid * 2) << std::endl;
+  deallog << myid << ':' << "second owned entry: " << v(myid * 2 + 1)
+          << std::endl;
 
   // set ghost dof on owning processor and maximize
   if (myid)
@@ -71,33 +70,33 @@ test()
   v.update_ghost_values();
 
   // check
-  deallog << myid << ":"
-          << "ghost entry after max from owner: " << v(1) << std::endl;
+  deallog << myid << ':' << "ghost entry after max from owner: " << v(1)
+          << std::endl;
 
   // ghosts are set to zero
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
 
   // minimize
   v.compress(VectorOperation::min);
   v.update_ghost_values();
 
   // check
-  deallog << myid << ":"
-          << "ghost entry after min from zero: " << v(1) << std::endl;
+  deallog << myid << ':' << "ghost entry after min from zero: " << v(1)
+          << std::endl;
 
   // set ghost dof on non-owning processors and minimize
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   if (!myid)
     v(1) = -1.;
   v.compress(VectorOperation::min);
   v.update_ghost_values();
 
   // check
-  deallog << myid << ":"
-          << "ghost entry after min from : " << v(1) << std::endl;
+  deallog << myid << ':' << "ghost entry after min from : " << v(1)
+          << std::endl;
 
   // set vector to 1, zeros in ghosts except on owner where -1. is set
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   v = 1.0;
   if (!myid)
     v(1) = -1.0;
@@ -108,30 +107,30 @@ test()
 
   // even if only one value is set (-1. on owner), the other values
   // contribute a "0" and maximization receives zero and returns it
-  deallog << myid << ":"
-          << "ghost entry after max and partly init: " << v(1) << std::endl;
+  deallog << myid << ':' << "ghost entry after max and partly init: " << v(1)
+          << std::endl;
 
   // however, if the ghost value is set on all processors, the
   // maximum is -1:
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   v    = 1.0;
   v(1) = -1.0;
   v.compress(VectorOperation::max);
   v.update_ghost_values();
-  deallog << myid << ":"
-          << "ghost entry after max and full init: " << v(1) << std::endl;
+  deallog << myid << ':' << "ghost entry after max and full init: " << v(1)
+          << std::endl;
 
   // what happens in case max is called two times and all values were smaller
   // than zero
-  v.zero_out_ghosts();
+  v.zero_out_ghost_values();
   v    = -1.0;
   v(1) = -1.0;
   v.compress(VectorOperation::max);
-  deallog << myid << ":"
-          << "ghost entry after first max: " << v(1) << std::endl;
+  deallog << myid << ':' << "ghost entry after first max: " << v(1)
+          << std::endl;
   v.compress(VectorOperation::max);
-  deallog << myid << ":"
-          << "ghost entry after second max: " << v(1) << std::endl;
+  deallog << myid << ':' << "ghost entry after second max: " << v(1)
+          << std::endl;
 
   if (myid == 0)
     deallog << "OK" << std::endl;

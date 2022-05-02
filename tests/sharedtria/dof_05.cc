@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,9 +57,11 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
   shared_dofs.print(deallog.get_file_stream());
 
   std::vector<IndexSet> shared_dofs_per_proc =
-    shared_dof_handler.compute_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               shared_dof_handler.locally_owned_dofs());
   std::vector<IndexSet> distributed_dofs_per_proc =
-    distributed_dof_handler.compute_locally_owned_dofs_per_processor();
+    Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                               distributed_dof_handler.locally_owned_dofs());
   for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
        ++i)
     Assert(shared_dofs_per_proc[i] == distributed_dofs_per_proc[i],

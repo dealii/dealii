@@ -1,0 +1,4 @@
+Removed: The deprecated versions of DoFTools::count_dofs_per_component()
+and DoFTools::count_dofs_per_block() have been removed.
+<br>
+(Daniel Arndt, 2021/06/01)

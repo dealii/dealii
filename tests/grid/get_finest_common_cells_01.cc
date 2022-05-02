@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2018 by the deal.II authors
+// Copyright (C) 2006 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,8 +21,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -52,9 +50,9 @@ test()
   tria[1].last_active()->set_refine_flag();
   tria[1].execute_coarsening_and_refinement();
 
-  typedef std::list<std::pair<typename Triangulation<dim>::cell_iterator,
-                              typename Triangulation<dim>::cell_iterator>>
-    CellList;
+  using CellList =
+    std::list<std::pair<typename Triangulation<dim>::cell_iterator,
+                        typename Triangulation<dim>::cell_iterator>>;
 
   const CellList cell_list =
     GridTools::get_finest_common_cells(tria[0], tria[1]);

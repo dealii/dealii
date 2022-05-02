@@ -1,4 +1,0 @@
-New: Amend VectorizedArray with a default constructor and 
-a constructor taking a scalar value.
-<br>
-(Peter Munch, 2019/07/29)

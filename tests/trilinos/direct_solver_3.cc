@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -232,13 +232,10 @@ Step4<dim>::assemble_system()
 
           cell->get_dof_indices(local_dof_indices);
           constraints.distribute_local_to_global(cell_matrix,
+                                                 cell_rhs,
                                                  local_dof_indices,
-                                                 system_matrix);
-
-          constraints.distribute_local_to_global(cell_rhs,
-                                                 local_dof_indices,
-                                                 system_rhs,
-                                                 cell_matrix);
+                                                 system_matrix,
+                                                 system_rhs);
           constraints.distribute_local_to_global(cell_rhs_two,
                                                  local_dof_indices,
                                                  system_rhs_two,

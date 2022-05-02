@@ -1,0 +1,5 @@
+New: The new unified function MGTwoLevelTransfer::reinit() selects automatically
+if MGTwoLevelTransfer::reinit_geometric_transfer() or 
+MGTwoLevelTransfer::reinit_polynomial_transfer() is needed.
+<br>
+(Peter Munch, 2021/06/23)

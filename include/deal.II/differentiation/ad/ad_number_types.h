@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017, 2019 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,8 +30,6 @@ namespace Differentiation
      * An enumeration to indicate which type of auto-differentiable number
      * is to be used for computations. If a type that is selected for use
      * is not available in the library, a run-time error will be thrown.
-     *
-     * @author Jean-Paul Pelteret, 2017, 2019
      */
     enum class NumberTypes
     {
@@ -86,6 +84,11 @@ namespace Differentiation
        *
        * First derivatives will be computed using reverse mode, while the second
        * derivatives will be computed using forward mode.
+       *
+       * Note that the repeated use of the nested reverse-forward mode results
+       * in a memory leak described in this <a
+       * href="https://github.com/trilinos/Trilinos/issues/7741"> Trilinos
+       * issue.</a>
        */
       sacado_rad_dfad
     };

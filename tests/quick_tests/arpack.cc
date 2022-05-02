@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,7 +97,7 @@ test()
       {
         B.vmult(Bx, eigenvectors[i]);
 
-        for (unsigned int j = 0; j < eigenvectors.size(); j++)
+        for (unsigned int j = 0; j < eigenvectors.size(); ++j)
           Assert(std::abs(eigenvectors[j] * Bx - (i == j)) < precision,
                  ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
                             " and " + Utilities::int_to_string(j) +

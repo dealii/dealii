@@ -7,14 +7,14 @@ DEAL::0 0 100.00
 DEAL::37.50 -12.50 75.00
 DEAL::-12.50 37.50 75.00
 DEAL::
-DEAL::FE_Q<2>(QIterated(QTrapez(),3))
+DEAL::FE_Q<2>(QIterated(QTrapezoid(),3))
 DEAL::-6.25 -6.25 56.25 56.25
 DEAL::31.25 6.25 93.75 -31.25
 DEAL::0 0 100.00 0
 DEAL::0 0 0 100.00
 DEAL::6.25 31.25 -31.25 93.75
 DEAL::
-DEAL::FE_Q<2>(QIterated(QTrapez(),4))
+DEAL::FE_Q<2>(QIterated(QTrapezoid(),4))
 DEAL::0 0 0 100.00 0
 DEAL::27.34 -3.91 109.38 -54.69 21.88
 DEAL::0 0 100.00 0 0

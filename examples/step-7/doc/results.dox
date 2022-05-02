@@ -183,14 +183,88 @@ are the quadratic and cubic rates in the $L_2$ norm.
 
 
 Finally, the program also generated LaTeX versions of the tables (not shown
-here).
+here) that is written into a file in a way so that it could be
+copy-pasted into a LaTeX document.
 
 
-<h3> Possible extensions </h3>
+<h4> When is the error "small"? </h4>
+
+What we showed above is how to determine the size of the error
+$\|u-u_h\|$ in a number of different norms. We did this primarily
+because we were interested in testing that our solutions *converge*.
+But from an engineering perspective, the question is often more
+practical: How fine do I have to make my mesh so that the error is
+"small enough"? In other words, if in the table above the $H^1$
+semi-norm has been reduced to `4.121e-03`, is this good enough for me
+to sign the blueprint and declare that our numerical simulation showed
+that the bridge is strong enough?
+
+In practice, we are rarely in this situation because I can not
+typically compare the numerical solution $u_h$ against the exact
+solution $u$ in situations that matter -- if I knew $u$, I would not
+have to compute $u_h$. But even if I could, the question to ask in
+general is then: `4.121e-03` *what*? The solution will have physical
+units, say kg-times-meter-squared, and I'm integrating a function with
+units square of the above over the domain, and then take the square
+root. So if the domain is two-dimensional, the units of
+$\|u-u_h\|_{L_2}$ are kg-times-meter-cubed. The question is then: Is
+$4.121\times 10^{-3}$ kg-times-meter-cubed small? That depends on what
+you're trying to simulate: If you're an astronomer used to masses
+measured in solar masses and distances in light years, then yes, this
+is a fantastically small number. But if you're doing atomic physics,
+then no: That's not small, and your error is most certainly not
+sufficiently small; you need a finer mesh.
+
+In other words, when we look at these sorts of numbers, we generally
+need to compare against a "scale". One way to do that is to not look
+at the *absolute* error $\|u-u_h\|$ in whatever norm, but at the
+*relative* error $\|u-u_h\|/\|u\|$. If this ratio is $10^{-5}$, then
+you know that *on average*, the difference between $u$ and $u_h$ is
+0.001 per cent -- probably small enough for engineering purposes.
+
+How do we compute $\|u\|$? We just need to do an integration loop over
+all cells, quadrature points on these cells, and then sum things up
+and take the square root at the end. But there is a simpler way often
+used: You can call
+@code
+    Vector<double> zero_vector (dof_handler.n_dofs());
+    Vector<float> norm_per_cell(triangulation.n_active_cells());
+    VectorTools::integrate_difference(dof_handler,
+                                      zero_vector,
+                                      Solution<dim>(),
+                                      norm_per_cell,
+                                      QGauss<dim>(fe->degree + 1),
+                                      VectorTools::L2_norm);
+@endcode
+which computes $\|u-0\|_{L_2}$. Alternatively, if you're particularly
+lazy and don't feel like creating the `zero_vector`, you could use
+that if the mesh is not too coarse, then $\|u\| \approx \|u_h\|$, and
+we can compute $\|u\| \approx \|u_h\|=\|0-u_h\|$ by calling
+@code
+    Vector<float> norm_per_cell(triangulation.n_active_cells());
+    VectorTools::integrate_difference(dof_handler,
+                                      solution,
+                                      ZeroFunction<dim>(),
+                                      norm_per_cell,
+                                      QGauss<dim>(fe->degree + 1),
+                                      VectorTools::L2_norm);
+@endcode
+In both cases, one then only has to combine the vector of cellwise
+norms into one global norm as we already do in the program, by calling
+@code
+    const double L2_norm =
+      VectorTools::compute_global_error(triangulation,
+                                        norm_per_cell,
+                                        VectorTools::L2_norm);
+@endcode
+
+
+
+<h3> Possibilities for extensions </h3>
 
 <h4> Higher Order Elements </h4>
 
-Go ahead and run the program with higher order elements (Q3, Q4, ...). You
+Go ahead and run the program with higher order elements ($Q_3$, $Q_4$, ...). You
 will notice that assertions in several parts of the code will trigger (for
 example in the generation of the filename for the data output). You might have to address these,
 but it should not be very hard to get the program to work!
@@ -202,14 +276,22 @@ unfair but typical) metric to compare them, is to look at the error as a
 function of the number of unknowns.
 
 To see this, create a plot in log-log style with the number of unknowns on the
-x axis and the L2 error on the y axis. You can add reference lines for
+$x$ axis and the $L_2$ error on the $y$ axis. You can add reference lines for
 $h^2=N^{-1}$ and $h^3=N^{-3/2}$ and check that global and adaptive refinement
-follow those.
+follow those. If one makes the (not completely unreasonable)
+assumption that with a good linear solver, the computational effort is
+proportional to the number of unknowns $N$, then it is clear that an
+error reduction of ${\cal O}(N^{-3/2})$ is substantially better than a
+reduction of the form ${\cal O}(N^{-1})$: That is, that adaptive
+refinement gives us the desired error level with less computational
+work than if we used global refinement. This is not a particularly
+surprising conclusion, but it's worth checking these sorts of
+assumptions in practice.
 
-Note that changing the half width of the peaks influences if adaptive or
-global refinement is more efficient (if the solution is very smooth, local
-refinement does not give any advantage over global refinement). Verify this.
-
-Finally, a more fair comparison would be to plot runtime (switch to release
-mode first!) instead of number of unknowns on the x axis. Picking a better
-linear solver might be appropriate though.
+Of course, a fairer comparison would be to plot runtime (switch to release
+mode first!) instead of number of unknowns on the $x$ axis. If you
+plotted run time against the number of unknowns by timing each
+refinement step (e.g., using the Timer class), you will notice that
+the linear solver is not perfect -- its run time grows faster than
+proportional to the linear system size -- and picking a better
+linear solver might be appropriate for this kind of comparison.

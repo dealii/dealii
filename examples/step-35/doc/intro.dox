@@ -260,5 +260,3 @@ with $U_m = 1.5$, i.e. the inflow boundary conditions correspond to Poiseuille f
 Finally, on the right vertical wall we impose the condition that the vertical component of the velocity
 and the pressure should both be zero.
 The final time $T=10$.
-
-

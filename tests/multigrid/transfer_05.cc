@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2019 by the deal.II authors
+// Copyright (C) 2006 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,11 +105,9 @@ check(const unsigned int fe_degree)
       mgdof.distribute_dofs(fe);
       mgdof.distribute_mg_dofs();
 
-      MGConstrainedDoFs                                   mg_constrained_dofs;
-      ZeroFunction<dim>                                   zero_function;
-      std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
-      dirichlet_boundary[0] = &zero_function;
-      mg_constrained_dofs.initialize(mgdof, dirichlet_boundary);
+      MGConstrainedDoFs mg_constrained_dofs;
+      mg_constrained_dofs.initialize(mgdof);
+      mg_constrained_dofs.make_zero_boundary_constraints(mgdof, {0});
 
       // build reference non-block
       MGTransferMatrixFree<dim, Number> transfer_ref(mg_constrained_dofs);

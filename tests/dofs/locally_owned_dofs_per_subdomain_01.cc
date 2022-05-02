@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2019 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 
 #include <deal.II/base/logstream.h>
 
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
@@ -29,7 +30,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 
 #include <fstream>
@@ -56,7 +56,7 @@ main()
   tria.refine_global(1);
   GridTools::partition_triangulation(n_subdomains, tria);
 
-  hp::DoFHandler<dim> hp_dof_handler(tria);
+  DoFHandler<dim> hp_dof_handler(tria);
   for (auto &cell : hp_dof_handler.active_cell_iterators())
     {
       if (cell == hp_dof_handler.begin_active())

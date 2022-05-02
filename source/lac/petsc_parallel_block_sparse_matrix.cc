@@ -32,6 +32,7 @@ namespace PETScWrappers
     }
 
 
+#  ifndef DOXYGEN
     void
     BlockSparseMatrix::reinit(const size_type n_block_rows,
                               const size_type n_block_columns)
@@ -55,6 +56,7 @@ namespace PETScWrappers
             this->sub_objects[r][c] = p;
           }
     }
+#  endif
 
     void
     BlockSparseMatrix::reinit(const std::vector<IndexSet> &      rows,
@@ -131,6 +133,17 @@ namespace PETScWrappers
         index_sets.push_back(this->block(i, 0).locally_owned_range_indices());
 
       return index_sets;
+    }
+
+    BlockSparseMatrix::size_type
+    BlockSparseMatrix::n_nonzero_elements() const
+    {
+      size_type n_nonzero = 0;
+      for (size_type rows = 0; rows < this->n_block_rows(); ++rows)
+        for (size_type cols = 0; cols < this->n_block_cols(); ++cols)
+          n_nonzero += this->block(rows, cols).n_nonzero_elements();
+
+      return n_nonzero;
     }
 
     const MPI_Comm &

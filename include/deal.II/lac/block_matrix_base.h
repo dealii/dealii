@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2019 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,8 +50,6 @@ class MatrixIterator;
 
 /**
  * Namespace in which iterators in block matrices are implemented.
- *
- * @author Wolfgang Bangerth, 2004
  */
 namespace BlockMatrixIterators
 {
@@ -289,7 +287,7 @@ namespace BlockMatrixIterators
 
 
 /**
- * Blocked matrix class. The behaviour of objects of this type is almost as
+ * Blocked matrix class. The behavior of objects of this type is almost as
  * for the usual matrix objects, with most of the functions being implemented
  * in both classes. The main difference is that the matrix represented by this
  * object is composed of an array of matrices (e.g. of type
@@ -346,7 +344,6 @@ namespace BlockMatrixIterators
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
- * @author Wolfgang Bangerth, 2000, 2004
  */
 template <typename MatrixType>
 class BlockMatrixBase : public Subscriptor
@@ -2513,7 +2510,7 @@ BlockMatrixBase<MatrixType>::print(std::ostream &out,
     for (unsigned int col = 0; col < n_block_cols(); ++col)
       {
         if (!alternative_output)
-          out << "Block (" << row << ", " << col << ")" << std::endl;
+          out << "Block (" << row << ", " << col << ')' << std::endl;
 
         block(row, col).print(out, alternative_output);
       }

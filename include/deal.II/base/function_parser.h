@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,10 +45,10 @@ class Vector;
 /**
  * This class implements a function object that gets its value by parsing a
  * string describing this function. It is a wrapper class for the muparser
- * library (see http://muparser.beltoforion.de/). This class lets you evaluate
- * strings such as "sqrt(1-x^2+y^2)" for given values of 'x' and 'y'.  Please
- * refer to the muparser documentation for more information.  This class is
- * used in the step-33 and step-36 tutorial programs (the latter being much
+ * library (see https://beltoforion.de/en/muparser/). This class lets you
+ * evaluate strings such as "sqrt(1-x^2+y^2)" for given values of 'x' and 'y'.
+ * Please refer to the muparser documentation for more information.  This class
+ * is used in the step-33 and step-36 tutorial programs (the latter being much
  * simpler to understand).
  *
  * In addition to the built-in functions of muparser, namely
@@ -146,7 +146,7 @@ class Vector;
  * const double c = vector_function.value(point, 1);
  *
  * // Output the evaluated function
- * deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"
+ * deallog << "Function '" << expressions[0] << ',' << expressions[1] << "'"
  *         << " at " << point
  *         << " is " << result << std::endl;
  * @endcode
@@ -159,7 +159,7 @@ class Vector;
  *
  * The syntax to describe a function follows usual programming practice, and
  * is explained in detail at the homepage of the underlying muparser library
- * at http://muparser.beltoforion.de/ .
+ * at https://beltoforion.de/en/muparser/.
  *
  * For a wrapper of the FunctionParser class that supports ParameterHandler,
  * see Functions::ParsedFunction.
@@ -218,7 +218,6 @@ class Vector;
  * this class is generally faster than SymbolicFunction.
  *
  * @ingroup functions
- * @author Luca Heltai, Timo Heister 2005, 2014
  */
 template <int dim>
 class FunctionParser : public AutoDerivativeFunction<dim>

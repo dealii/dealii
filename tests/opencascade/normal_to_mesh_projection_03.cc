@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2018 by the deal.II authors
+// Copyright (C) 2014 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,13 +22,13 @@
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/manifold_lib.h>
 #include <deal.II/opencascade/utilities.h>
 
 #include <BRepFill.hxx>
@@ -62,7 +62,7 @@ main()
   TopoDS_Face face = BRepFill::Face(edge1, edge2);
 
 
-  NormalToMeshProjectionBoundary<2, 3> manifold(face);
+  NormalToMeshProjectionManifold<2, 3> manifold(face);
 
   Triangulation<2, 3> tria;
   GridGenerator::hyper_cube(tria);
@@ -79,7 +79,7 @@ main()
     FE_Q<2, 3>       fe(2);
     DoFHandler<2, 3> dh(tria);
     dh.distribute_dofs(fe);
-    MappingQGeneric<2, 3> mapping2(2);
+    MappingQ<2, 3>        mapping2(2);
     std::vector<Point<3>> spoints(dh.n_dofs());
     DoFTools::map_dofs_to_support_points(mapping2, dh, spoints);
 

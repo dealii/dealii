@@ -1,19 +1,19 @@
 
 DEAL:1d::50
-DEAL:1d::those should be zero: 0 0 0
+DEAL:1d::those should be zero: 0 1 0
 DEAL:1d::82
-DEAL:1d::those should be zero: 0 0 0
+DEAL:1d::those should be zero: 0 1 0
 DEAL:1d::90
-DEAL:1d::those should be zero: 0 0 0
+DEAL:1d::those should be zero: 0 1 0
 DEAL:1d::90
-DEAL:1d::those should be zero: 0 0 0
+DEAL:1d::those should be zero: 0 1 0
 DEAL:2d::816
-DEAL:2d::those should be zero: 0 0 0
+DEAL:2d::those should be zero: 0 1 0
 DEAL:2d::1264
-DEAL:2d::those should be zero: 0 0 0
+DEAL:2d::those should be zero: 0 1 0
 DEAL:2d::2192
-DEAL:2d::those should be zero: 0 0 0
+DEAL:2d::those should be zero: 0 1 0
 DEAL:3d::13524
-DEAL:3d::those should be zero: 0 0 0
+DEAL:3d::those should be zero: 0 1 0
 DEAL:3d::42768
-DEAL:3d::those should be zero: 0 0 0
+DEAL:3d::those should be zero: 0 1 0

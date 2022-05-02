@@ -1,0 +1,16 @@
+
+DEAL::use_fast_hanging_node_algorithm = true
+DEAL::0   : 12  13  14  
+DEAL::0   : 13  2   1   2   
+DEAL::0   : 14  1   2   1   
+DEAL::0   : 13  1   2   14  
+DEAL::0   : 0   1   2   
+DEAL::0   : 3   1   4   
+DEAL::0   : 5   4   1   
+DEAL::0   : 1   0   5   
+DEAL::0   : 6   5   0   
+DEAL::0   : 7   8   9   10  
+DEAL::0   : 8   12  10  14  
+DEAL::17  : 9   10  3   1   
+DEAL::16  : 10  14  3   1   
+DEAL::

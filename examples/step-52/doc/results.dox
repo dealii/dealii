@@ -10,28 +10,27 @@ The console output contains both errors and, for some of the methods, the
 number of steps they performed:
 @code
 Explicit methods:
-Forward Euler:            error=1.00883
-Third order Runge-Kutta:  error=0.000227982
-Fourth order Runge-Kutta: error=1.90541e-06
+   Forward Euler:            error=1.00883
+   Third order Runge-Kutta:  error=0.000227982
+   Fourth order Runge-Kutta: error=1.90541e-06
 
 Implicit methods:
-Backward Euler:           error=1.03428
-Implicit Midpoint:        error=0.00862702
-Crank-Nicolson:           error=0.00862675
-SDIRK:                    error=0.0042349
+   Backward Euler:           error=1.03428
+   Implicit Midpoint:        error=0.00862702
+   Crank-Nicolson:           error=0.00862675
+   SDIRK:                    error=0.0042349
 
-Embedded %explicit methods:
-Heun-Euler:               error=0.0073012
-                steps performed=284
-Bogacki-Shampine:         error=0.000403281
-                steps performed=181
-Dopri:                    error=0.0165485
-                steps performed=119
-Fehlberg:                 error=0.00104926
-                steps performed=106
-Cash-Karp:                error=8.59366e-07
-                steps performed=107
-
+Embedded explicit methods:
+   Heun-Euler:               error=0.0073012
+                   steps performed=284
+   Bogacki-Shampine:         error=0.000408407
+                   steps performed=181
+   Dopri:                    error=0.000836695
+                   steps performed=120
+   Fehlberg:                 error=0.00248922
+                   steps performed=106
+   Cash-Karp:                error=0.0787735
+                   steps performed=106
 @endcode
 
 As expected the higher order methods give (much) more accurate solutions. We

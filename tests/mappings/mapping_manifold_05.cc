@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_manifold.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -58,7 +58,7 @@ test()
   dof.distribute_dofs(fe);
 
   MappingManifold<dim, spacedim> mapping_manifold;
-  MappingQGeneric<dim, spacedim> mapping_q(1);
+  MappingQ<dim, spacedim>        mapping_q(1);
 
   FEFaceValues<dim, spacedim> fe_values_mapping(mapping_manifold,
                                                 fe,

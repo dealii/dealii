@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,7 @@ template <int dim>
 class TriaTest
 {
 private:
-  typedef typename parallel::distributed::Triangulation<dim> TypeTria;
+  using TypeTria = typename parallel::distributed::Triangulation<dim>;
 
 public:
   TriaTest(const typename dealii::Triangulation<dim>::MeshSmoothing
@@ -337,8 +337,8 @@ TriaTest<dim>::write_vtu(const unsigned int counter) const
           filenames.push_back(output_tag + ".slot-" +
                               Utilities::int_to_string(i, 4) + ".vtu");
         }
-      std::ofstream master_output((output_tag + ".pvtu").c_str());
-      data_out.write_pvtu_record(master_output, filenames);
+      std::ofstream pvtu_output((output_tag + ".pvtu").c_str());
+      data_out.write_pvtu_record(pvtu_output, filenames);
     }
 #else
   (void)counter;

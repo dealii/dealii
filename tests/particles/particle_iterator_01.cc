@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,12 +15,18 @@
 
 
 
-// Like particle_03, but tests the creation and use of a
+// Like particle_handler_serial_01, but tests the creation and use of a
 // particle iterator from the created particle.
 
 #include <deal.II/base/array_view.h>
 
+#include <deal.II/fe/mapping_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/particles/particle.h>
+#include <deal.II/particles/particle_handler.h>
 #include <deal.II/particles/particle_iterator.h>
 
 #include "../tests.h"
@@ -31,8 +37,15 @@ void
 test()
 {
   {
-    const unsigned int      n_properties_per_particle = 3;
-    Particles::PropertyPool pool(n_properties_per_particle);
+    Triangulation<dim> tr;
+
+    GridGenerator::hyper_cube(tr);
+    MappingQ<dim>      mapping(1);
+    const unsigned int n_properties_per_particle = 3;
+
+    Particles::ParticleHandler<dim> particle_handler(tr,
+                                                     mapping,
+                                                     n_properties_per_particle);
 
     Point<dim> position;
     position(0) = 0.3;
@@ -51,28 +64,26 @@ test()
     std::vector<double> properties = {0.15, 0.45, 0.75};
 
     Particles::Particle<dim> particle(position, reference_position, index);
-    particle.set_property_pool(pool);
-    particle.set_properties(
+
+    // Insert two identical particles
+    Particles::ParticleIterator<dim> particle_it =
+      particle_handler.insert_particle(particle, tr.begin());
+    particle_it->set_properties(
       ArrayView<double>(&properties[0], properties.size()));
 
-    std::multimap<Particles::internal::LevelInd, Particles::Particle<dim>> map;
+    particle_it = particle_handler.insert_particle(particle, tr.begin());
+    particle_it->set_properties(
+      ArrayView<double>(&properties[0], properties.size()));
 
-    Particles::internal::LevelInd level_index = std::make_pair(0, 0);
-    map.insert(std::make_pair(level_index, particle));
+    // Modify the properties of the second particle
+    particle_it->get_properties()[0] = 0.05;
 
-    particle.get_properties()[0] = 0.05;
-    map.insert(std::make_pair(level_index, particle));
-
-    Particles::ParticleIterator<dim> particle_it(map, map.begin());
-    Particles::ParticleIterator<dim> particle_end(map, map.end());
-
-    for (; particle_it != particle_end; ++particle_it)
+    for (const auto &particle : particle_handler)
       {
-        deallog << "Particle position: " << (*particle_it).get_location()
-                << std::endl
+        deallog << "Particle position: " << particle.get_location() << std::endl
                 << "Particle properties: "
-                << std::vector<double>(particle_it->get_properties().begin(),
-                                       particle_it->get_properties().end())
+                << std::vector<double>(particle.get_properties().begin(),
+                                       particle.get_properties().end())
                 << std::endl;
       }
   }

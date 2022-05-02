@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,7 +106,7 @@ public:
   virtual std::unique_ptr<Manifold<dim>>
   clone() const override
   {
-    return std_cxx14::make_unique<PeriodicHillManifold<dim>>();
+    return std::make_unique<PeriodicHillManifold<dim>>();
   }
 
   virtual Point<dim>

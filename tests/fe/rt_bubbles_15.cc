@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,7 @@ test(const unsigned int degree)
       DoFHandler<dim> dof(tr);
       dof.distribute_dofs(fe_rt_bubbles);
 
-      QTrapez<dim - 1> quadrature;
+      QTrapezoid<dim - 1> quadrature;
 
       FESubfaceValues<dim> fe_values(fe_rt_bubbles,
                                      quadrature,

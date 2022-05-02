@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,6 +87,8 @@ main()
   gen.generate<3, 3>("FE_RaviartThomasNodal(1)");
   gen.generate<2, 2>("FE_Nedelec(1)");
   gen.generate<3, 3>("FE_Nedelec(1)");
+  gen.generate<2, 2>("FE_NedelecSZ(1)");
+  gen.generate<3, 3>("FE_NedelecSZ(1)");
   gen.generate_all_dim("FE_DGPNonparametric(1)");
   gen.generate_all_dim("FE_DGPMonomial(1)");
   gen.generate_all_dim("FE_FaceQ(1)");
@@ -109,6 +111,8 @@ main()
   gen.generate<3, 3>("FE_RaviartThomasNodal(2)");
   gen.generate<2, 2>("FE_Nedelec(2)");
   gen.generate<3, 3>("FE_Nedelec(2)");
+  gen.generate<2, 2>("FE_NedelecSZ(2)");
+  gen.generate<3, 3>("FE_NedelecSZ(2)");
   gen.generate_all_dim("FE_DGPNonparametric(2)");
   gen.generate_all_dim("FE_DGPMonomial(2)");
   gen.generate_all_dim("FE_FaceQ(2)");

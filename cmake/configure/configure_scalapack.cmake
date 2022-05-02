@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 - 2019 by the deal.II authors
+## Copyright (C) 2017 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -28,6 +28,7 @@ MACRO(FEATURE_SCALAPACK_FIND_EXTERNAL var)
     CHECK_MPI_INTERFACE(SCALAPACK ${var})
 
     IF (${var})
+      CLEAR_CMAKE_REQUIRED()
       SET(CMAKE_REQUIRED_LIBRARIES ${SCALAPACK_LIBRARIES} ${LAPACK_LIBRARIES})
       CHECK_C_SOURCE_COMPILES("
         void pdsyevr_();

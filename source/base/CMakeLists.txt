@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -32,11 +32,14 @@ SET(_unity_include_src
   function.cc
   function_cspline.cc
   function_derivative.cc
+  function_signed_distance.cc
   function_lib.cc
   function_lib_cutoff.cc
   function_parser.cc
+  function_restriction.cc
   function_spherical.cc
   function_time.cc
+  function_tools.cc
   geometry_info.cc
   geometric_utilities.cc
   graph_coloring.cc
@@ -46,8 +49,10 @@ SET(_unity_include_src
   logstream.cc
   hdf5.cc
   mpi.cc
+  mpi_compute_index_owner_internal.cc
   mpi_consensus_algorithms.cc
   mpi_noncontiguous_partitioner.cc
+  mpi_remote_point_evaluation.cc
   mu_parser_internal.cc
   multithread_info.cc
   named_selection.cc
@@ -64,6 +69,7 @@ SET(_unity_include_src
   polynomials_abf.cc
   polynomials_adini.cc
   tensor_polynomials_base.cc
+  polynomials_barycentric.cc
   polynomials_bernstein.cc
   polynomials_bdm.cc
   polynomials_bernardi_raugel.cc
@@ -72,10 +78,13 @@ SET(_unity_include_src
   polynomial_space.cc
   polynomials_p.cc
   polynomials_piecewise.cc
+  polynomials_pyramid.cc
   polynomials_rannacher_turek.cc
   polynomials_raviart_thomas.cc
   polynomials_rt_bubbles.cc
+  polynomials_wedge.cc
   process_grid.cc
+  qprojector.cc
   quadrature.cc
   quadrature_lib.cc
   quadrature_selector.cc
@@ -83,6 +92,7 @@ SET(_unity_include_src
   subscriptor.cc
   symbolic_function.cc
   table_handler.cc
+  tensor.cc
   tensor_function.cc
   tensor_function_parser.cc
   tensor_product_polynomials.cc
@@ -122,12 +132,15 @@ SET(_inst
   bounding_box.inst.in
   data_out_base.inst.in
   function.inst.in
+  function_signed_distance.inst.in
+  function_restriction.inst.in
   function_time.inst.in
+  function_tools.inst.in
   incremental_function.inst.in
   geometric_utilities.inst.in
-  hdf5.inst.in
   mpi.inst.in
   mpi_noncontiguous_partitioner.inst.in
+  mpi_remote_point_evaluation.inst.in
   partitioner.inst.in
   partitioner.cuda.inst.in
   polynomials_rannacher_turek.inst.in

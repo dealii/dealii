@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,7 +68,7 @@ check(parallel::distributed::Triangulation<dim> &tria)
     dealii::VectorTools::interpolate_boundary_values(
       dof_handler,
       id,
-      ConstantFunction<dim>(static_cast<double>(id) + 42.0, dim),
+      Functions::ConstantFunction<dim>(static_cast<double>(id) + 42.0, dim),
       constraints);
 
   VectorTools::compute_no_normal_flux_constraints(dof_handler,
@@ -84,7 +84,8 @@ check(parallel::distributed::Triangulation<dim> &tria)
   constraints.print(deallog.get_file_stream());
   deallog << "consistent? "
           << constraints.is_consistent_in_parallel(
-               dof_handler.compute_locally_owned_dofs_per_processor(),
+               Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                          dof_handler.locally_owned_dofs()),
                locally_active_dofs,
                MPI_COMM_WORLD,
                true)

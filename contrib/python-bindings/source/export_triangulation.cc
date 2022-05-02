@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -111,9 +111,18 @@ namespace python
     find_active_cell_around_point,
     1,
     2)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(merge_triangulations_overloads,
+                                         merge_triangulations,
+                                         1,
+                                         3)
 
   const char n_active_cells_docstring[] =
     "Return the number of active cells.                                     \n";
+
+
+
+  const char n_cells_docstring[] =
+    "Return the number of cells.                                            \n";
 
 
 
@@ -319,9 +328,9 @@ namespace python
 
 
 
-  const char merge_docstring[] =
-    "Given two triangulations, create the triangulation that contains       \n"
-    "the cells of both triangulations.                                      \n";
+  const char merge_triangulations_docstring[] =
+    "Given two or more triangulations, create the triangulation that        \n"
+    "contains the cells of given triangulations.                            \n";
 
 
 
@@ -354,6 +363,13 @@ namespace python
 
 
 
+  const char replicate_docstring[] =
+    "Replicate a given triangulation in multiple coordinate axes.          \n"
+    "This function creates a new Triangulation equal to a dim-dimensional  \n"
+    "array of copies of input.                                             \n";
+
+
+
   const char distort_random_docstring[] =
     "Distort the given triangulation by randomly moving around all the      \n"
     "vertices of the grid. The direction of movement of each vertex is      \n"
@@ -372,8 +388,14 @@ namespace python
     "Execute both refinement and coarsening of the Triangulation.           \n";
 
 
+
   const char active_cells_docstring[] =
     "Return the list of active cell accessors of the Triangulation.         \n";
+
+
+
+  const char cells_docstring[] =
+    "Return the list of cell accessors of the Triangulation.                \n";
 
 
 
@@ -457,6 +479,13 @@ namespace python
     "Return the diameter of the largest active cell of a triangulation.    \n";
 
 
+
+  const char convert_hypercube_to_simplex_mesh_docstring[] =
+    "Convert a triangulation consisting only of hypercube cells            \n"
+    "(quadrilaterals, hexahedra) to a triangulation only consisting of     \n"
+    "simplices (triangles, tetrahedra).                                    \n";
+
+
   void
   export_triangulation()
   {
@@ -480,6 +509,10 @@ namespace python
       .def("n_active_cells",
            &TriangulationWrapper::n_active_cells,
            n_active_cells_docstring,
+           boost::python::args("self"))
+      .def("n_cells",
+           &TriangulationWrapper::n_cells,
+           n_cells_docstring,
            boost::python::args("self"))
       .def("minimal_cell_diameter",
            &TriangulationWrapper::minimal_cell_diameter,
@@ -614,8 +647,10 @@ namespace python
            boost::python::args("self", "scaling_factor"))
       .def("merge_triangulations",
            &TriangulationWrapper::merge_triangulations,
-           merge_docstring,
-           boost::python::args("self", "triangulation_1", "triangulation_2"))
+           merge_triangulations_overloads(
+             boost::python::args(
+               "self", "triangulations", "vertex_tolerance", "copy_manifolds"),
+             merge_triangulations_docstring))
       .def("extrude_triangulation",
            &TriangulationWrapper::extrude_triangulation,
            extrude_docstring,
@@ -624,6 +659,10 @@ namespace python
            &TriangulationWrapper::flatten_triangulation,
            flatten_triangulation_docstring,
            boost::python::args("self", "tria_out"))
+      .def("replicate_triangulation",
+           &TriangulationWrapper::replicate_triangulation,
+           replicate_docstring,
+           boost::python::args("self", "tria_in", "extents"))
       .def("distort_random",
            &TriangulationWrapper::distort_random,
            distort_random_overloads(
@@ -633,6 +672,10 @@ namespace python
            &TriangulationWrapper::transform,
            transform_docstring,
            boost::python::args("self", "transformation"))
+      .def("convert_hypercube_to_simplex_mesh",
+           &TriangulationWrapper::convert_hypercube_to_simplex_mesh,
+           convert_hypercube_to_simplex_mesh_docstring,
+           boost::python::args("self", "tria_out"))
       .def("find_active_cell_around_point",
            &TriangulationWrapper::find_active_cell_around_point,
            find_active_cell_around_point_overloads(
@@ -657,6 +700,10 @@ namespace python
       .def("active_cells",
            &TriangulationWrapper::active_cells,
            active_cells_docstring,
+           boost::python::args("self"))
+      .def("cells",
+           &TriangulationWrapper::cells,
+           cells_docstring,
            boost::python::args("self"))
       .def("write",
            &TriangulationWrapper::write,

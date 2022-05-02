@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2019 by the deal.II authors
+ * Copyright (C) 2006 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -36,11 +36,8 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -333,7 +330,7 @@ namespace Step24
                                   quadrature_formula,
                                   update_values | update_JxW_values);
 
-      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
       const unsigned int n_q_points    = quadrature_formula.size();
 
       FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -512,11 +509,11 @@ namespace Step24
 
         detector_data << time;
         for (unsigned int i = 0; i < detector_locations.size(); ++i)
-          detector_data << " "
+          detector_data << ' '
                         << VectorTools::point_value(dof_handler,
                                                     solution_p,
                                                     detector_locations[i])
-                        << " ";
+                        << ' ';
         detector_data << std::endl;
 
         old_solution_p = solution_p;

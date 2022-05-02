@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -260,7 +260,7 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
 #ifdef DEBUG_OUTPUT
       ierr = MPI_Barrier(MPI_COMM_WORLD);
       AssertThrowMPI(ierr);
-      std::cout << "copy_to_mg dst " << level << " " << dst_level.l2_norm()
+      std::cout << "copy_to_mg dst " << level << ' ' << dst_level.l2_norm()
                 << std::endl;
 #endif
     }
@@ -298,7 +298,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
 #ifdef DEBUG_OUTPUT
       int ierr = MPI_Barrier(MPI_COMM_WORLD);
       AssertThrowMPI(ierr);
-      std::cout << "copy_from_mg src " << level << " " << src[level].l2_norm()
+      std::cout << "copy_from_mg src " << level << ' ' << src[level].l2_norm()
                 << std::endl;
       ierr = MPI_Barrier(MPI_COMM_WORLD);
       AssertThrowMPI(ierr);
@@ -323,7 +323,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
         dst.compress(VectorOperation::insert);
         ierr = MPI_Barrier(MPI_COMM_WORLD);
         AssertThrowMPI(ierr);
-        std::cout << "copy_from_mg level=" << level << " " << dst.l2_norm()
+        std::cout << "copy_from_mg level=" << level << ' ' << dst.l2_norm()
                   << std::endl;
       }
 #endif
@@ -432,25 +432,21 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
 
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
     if (dst[level].size() != dof_handler.n_dofs(level) ||
-        dst[level].local_size() !=
+        dst[level].locally_owned_size() !=
           dof_handler.locally_owned_mg_dofs(level).n_elements())
       {
         // In case a ghosted level vector has been initialized, we can simply
         // use that as a template for the vector partitioning. If not, we
         // resort to the locally owned range of the dof handler.
-        if (level <= ghosted_level_vector.max_level() &&
-            ghosted_level_vector[level].size() == dof_handler.n_dofs(level))
+        if (initialize_dof_vector)
+          initialize_dof_vector(level, dst[level]);
+        else if (level <= ghosted_level_vector.max_level() &&
+                 ghosted_level_vector[level].size() ==
+                   dof_handler.n_dofs(level))
           dst[level].reinit(ghosted_level_vector[level], false);
         else
-          {
-            const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
-              (dynamic_cast<
-                const dealii::parallel::TriangulationBase<dim, spacedim> *>(
-                &dof_handler.get_triangulation()));
-            dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-                              tria != nullptr ? tria->get_communicator() :
-                                                MPI_COMM_SELF);
-          }
+          dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                            dof_handler.get_communicator());
       }
     else if ((perform_plain_copy == false &&
               perform_renumbered_plain_copy == false) ||
@@ -460,14 +456,17 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
   if (perform_plain_copy)
     {
       // In this case, we can simply copy the local range.
-      AssertDimension(dst[dst.max_level()].local_size(), src.local_size());
+      AssertDimension(dst[dst.max_level()].locally_owned_size(),
+                      src.locally_owned_size());
       dst[dst.max_level()].copy_locally_owned_data_from(src);
       return;
     }
   else if (perform_renumbered_plain_copy)
     {
-      AssertDimension(dst[dst.max_level()].local_size(), src.local_size());
-      AssertDimension(this_copy_indices.back().n_cols(), src.local_size());
+      AssertDimension(dst[dst.max_level()].locally_owned_size(),
+                      src.locally_owned_size());
+      AssertDimension(this_copy_indices.back().n_cols(),
+                      src.locally_owned_size());
       Assert(copy_indices_level_mine.back().n_rows() == 0, ExcInternalError());
       LinearAlgebra::distributed::Vector<Number> &dst_level =
         dst[dst.max_level()];
@@ -482,7 +481,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
 
   // the ghosted vector should already have the correct local size (but
   // different parallel layout)
-  AssertDimension(ghosted_global_vector.local_size(), src.local_size());
+  AssertDimension(ghosted_global_vector.locally_owned_size(),
+                  src.locally_owned_size());
 
   // copy the source vector to the temporary vector that we hold for the
   // purpose of data exchange
@@ -531,20 +531,22 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
       // In this case, we can simply copy the local range. To avoid having
       // stray data in ghost entries of the destination, make sure to clear
       // them here.
-      dst.zero_out_ghosts();
-      AssertDimension(src[src.max_level()].local_size(), dst.local_size());
+      dst.zero_out_ghost_values();
+      AssertDimension(src[src.max_level()].locally_owned_size(),
+                      dst.locally_owned_size());
       dst.copy_locally_owned_data_from(src[src.max_level()]);
       return;
     }
   else if (perform_renumbered_plain_copy)
     {
-      AssertDimension(src[src.max_level()].local_size(), dst.local_size());
-      AssertDimension(copy_indices.back().n_cols(), dst.local_size());
+      AssertDimension(src[src.max_level()].locally_owned_size(),
+                      dst.locally_owned_size());
+      AssertDimension(copy_indices.back().n_cols(), dst.locally_owned_size());
       Assert(copy_indices_global_mine.back().n_rows() == 0, ExcInternalError());
       Assert(copy_indices_global_mine.back().empty(), ExcInternalError());
       const LinearAlgebra::distributed::Vector<Number> &src_level =
         src[src.max_level()];
-      dst.zero_out_ghosts();
+      dst.zero_out_ghost_values();
       for (unsigned int i = 0; i < copy_indices.back().n_cols(); ++i)
         dst.local_element(i) =
           src_level.local_element(copy_indices.back()(1, i));
@@ -560,20 +562,29 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
     {
       // the ghosted vector should already have the correct local size (but
       // different parallel layout)
-      AssertDimension(ghosted_level_vector[level].local_size(),
-                      src[level].local_size());
+      if (ghosted_level_vector[level].size() > 0)
+        AssertDimension(ghosted_level_vector[level].locally_owned_size(),
+                        src[level].locally_owned_size());
 
       // the first time around, we copy the source vector to the temporary
       // vector that we hold for the purpose of data exchange
       LinearAlgebra::distributed::Vector<Number> &ghosted_vector =
         ghosted_level_vector[level];
-      ghosted_vector = src[level];
-      ghosted_vector.update_ghost_values();
+
+      if (ghosted_level_vector[level].size() > 0)
+        ghosted_vector = src[level];
+
+      const auto ghosted_vector_ptr = (ghosted_level_vector[level].size() > 0) ?
+                                        &ghosted_vector :
+                                        &src[level];
+
+      ghosted_vector_ptr->update_ghost_values();
+
 
       auto copy_unknowns = [&](const Table<2, unsigned int> &indices) {
         for (unsigned int i = 0; i < indices.n_cols(); ++i)
           dst.local_element(indices(0, i)) =
-            ghosted_vector.local_element(indices(1, i));
+            ghosted_vector_ptr->local_element(indices(1, i));
       };
 
       // first copy local unknowns
@@ -602,13 +613,13 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
   // attention, since they belong to the coarse level, but have fine level
   // basis functions
 
-  dst.zero_out_ghosts();
+  dst.zero_out_ghost_values();
   for (unsigned int level = src.min_level(); level <= src.max_level(); ++level)
     {
       // the ghosted vector should already have the correct local size (but
       // different parallel layout)
-      AssertDimension(ghosted_level_vector[level].local_size(),
-                      src[level].local_size());
+      AssertDimension(ghosted_level_vector[level].locally_owned_size(),
+                      src[level].locally_owned_size());
 
       // the first time around, we copy the source vector to the temporary
       // vector that we hold for the purpose of data exchange

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,9 +42,9 @@
 
 // forward declaration of the function that must be provided in the
 // .cc files
-template <typename DoFHandlerType>
+template <int dim>
 void
-check_this(const DoFHandlerType &dof_handler);
+check_this(const DoFHandler<dim> &dof_handler);
 
 
 
@@ -77,7 +77,8 @@ set_boundary_ids(Triangulation<dim> &tria)
 }
 
 
-void set_boundary_ids(Triangulation<1> &)
+void
+set_boundary_ids(Triangulation<1> &)
 {}
 
 
@@ -110,17 +111,8 @@ check(const FiniteElement<dim> &fe, const std::string &name)
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  // setup hp DoFHandler
-  hp::FECollection<dim> fe_collection(fe);
-  hp::DoFHandler<dim>   hp_dof_handler(tria);
-  hp_dof_handler.distribute_dofs(fe_collection);
-
   // call main function in .cc files
-  check_this<DoFHandler<dof_handler.dimension, dof_handler.space_dimension>>(
-    dof_handler);
-  check_this<
-    hp::DoFHandler<hp_dof_handler.dimension, hp_dof_handler.space_dimension>>(
-    hp_dof_handler);
+  check_this(dof_handler);
 }
 
 

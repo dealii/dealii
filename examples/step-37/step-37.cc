@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2019 by the deal.II authors
+ * Copyright (C) 2009 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -281,7 +281,7 @@ namespace Step37
   void LaplaceOperator<dim, fe_degree, number>::evaluate_coefficient(
     const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = this->data->n_macro_cells();
+    const unsigned int n_cells = this->data->n_cell_batches();
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*this->data);
 
     coefficient.reinit(n_cells, phi.n_q_points);
@@ -314,7 +314,7 @@ namespace Step37
   // actually seeing a group of quadrature points of several cells as one
   // block. This is done to enable a higher degree of vectorization.  The
   // number of such "cells" or "cell batches" is stored in MatrixFree and can
-  // be queried through MatrixFree::n_macro_cells(). Compared to the deal.II
+  // be queried through MatrixFree::n_cell_batches(). Compared to the deal.II
   // cell iterators, in this class all cells are laid out in a plain array
   // with no direct knowledge of level or neighborship relations, which makes
   // it possible to index the cells by unsigned integers.
@@ -398,15 +398,15 @@ namespace Step37
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(coefficient.size(0), data.n_macro_cells());
+        AssertDimension(coefficient.size(0), data.n_cell_batches());
         AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
         phi.read_dof_values(src);
-        phi.evaluate(false, true);
+        phi.evaluate(EvaluationFlags::gradients);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q), q);
-        phi.integrate(false, true);
+        phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
       }
   }
@@ -423,7 +423,7 @@ namespace Step37
   // @code
   // src.update_ghost_values();
   // local_apply(*this->data, dst, src, std::make_pair(0U,
-  //                                                   data.n_macro_cells()));
+  //                                                   data.n_cell_batches()));
   // dst.compress(VectorOperation::add);
   // @endcode
   //
@@ -437,7 +437,7 @@ namespace Step37
   // one hand, it will split the update_ghost_values() and compress() calls in
   // a way to allow for overlapping communication and computation. The
   // local_apply function is then called with three cell ranges representing
-  // partitions of the cell range from 0 to MatrixFree::n_macro_cells(). On
+  // partitions of the cell range from 0 to MatrixFree::n_cell_batches(). On
   // the other hand, cell_loop also supports thread parallelism in which case
   // the cell ranges are split into smaller chunks and scheduled in an
   // advanced way that avoids access to the same vector entry by several
@@ -549,7 +549,7 @@ namespace Step37
 
     this->set_constrained_entries_to_one(inverse_diagonal);
 
-    for (unsigned int i = 0; i < inverse_diagonal.local_size(); ++i)
+    for (unsigned int i = 0; i < inverse_diagonal.locally_owned_size(); ++i)
       {
         Assert(inverse_diagonal.local_element(i) > 0.,
                ExcMessage("No diagonal entry in a positive definite operator "
@@ -620,7 +620,7 @@ namespace Step37
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(coefficient.size(0), data.n_macro_cells());
+        AssertDimension(coefficient.size(0), data.n_cell_batches());
         AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
@@ -630,11 +630,11 @@ namespace Step37
               phi.submit_dof_value(VectorizedArray<number>(), j);
             phi.submit_dof_value(make_vectorized_array<number>(1.), i);
 
-            phi.evaluate(false, true);
+            phi.evaluate(EvaluationFlags::gradients);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q),
                                   q);
-            phi.integrate(false, true);
+            phi.integrate(EvaluationFlags::gradients);
             diagonal[i] = phi.get_dof_value(i);
           }
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -688,6 +688,8 @@ namespace Step37
     FE_Q<dim>       fe;
     DoFHandler<dim> dof_handler;
 
+    MappingQ1<dim> mapping;
+
     AffineConstraints<double> constraints;
     using SystemMatrixType =
       LaplaceOperator<dim, degree_finite_element, double>;
@@ -718,29 +720,26 @@ namespace Step37
   // grid, we also need to specifically enable the multigrid hierarchy.
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem()
-    :
 #ifdef DEAL_II_WITH_P4EST
-    triangulation(
-      MPI_COMM_WORLD,
-      Triangulation<dim>::limit_level_difference_at_vertices,
-      parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy)
-    ,
+    : triangulation(MPI_COMM_WORLD,
+                    Triangulation<dim>::limit_level_difference_at_vertices,
+                    parallel::distributed::Triangulation<
+                      dim>::construct_multigrid_hierarchy)
 #else
-    triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
-    ,
+    : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
 #endif
-    fe(degree_finite_element)
+    , fe(degree_finite_element)
     , dof_handler(triangulation)
     , setup_time(0.)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    ,
     // The LaplaceProblem class holds an additional output stream that
     // collects detailed timings about the setup phase. This stream, called
     // time_details, is disabled by default through the @p false argument
     // specified here. For detailed timings, removing the @p false argument
     // prints all the details.
-    time_details(std::cout,
-                 false && Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    , time_details(std::cout,
+                   false &&
+                     Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
   {}
 
 
@@ -790,20 +789,18 @@ namespace Step37
     pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
 
-    IndexSet locally_relevant_dofs;
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    const IndexSet locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(),
-                                             constraints);
+    VectorTools::interpolate_boundary_values(
+      mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
     constraints.close();
     setup_time += time.wall_time();
     time_details << "Distribute DoFs & B.C.     (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
     time.restart();
 
     {
@@ -814,7 +811,8 @@ namespace Step37
         (update_gradients | update_JxW_values | update_quadrature_points);
       std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
         new MatrixFree<dim, double>());
-      system_mf_storage->reinit(dof_handler,
+      system_mf_storage->reinit(mapping,
+                                dof_handler,
                                 constraints,
                                 QGauss<1>(fe.degree + 1),
                                 additional_data);
@@ -828,7 +826,7 @@ namespace Step37
 
     setup_time += time.wall_time();
     time_details << "Setup matrix-free system   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
     time.restart();
 
     // Next, initialize the matrices for the multigrid method on all the
@@ -851,10 +849,8 @@ namespace Step37
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {
-        IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                      level,
-                                                      relevant_dofs);
+        const IndexSet relevant_dofs =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
         AffineConstraints<double> level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(
@@ -869,7 +865,8 @@ namespace Step37
         additional_data.mg_level = level;
         std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
           new MatrixFree<dim, float>());
-        mg_mf_storage_level->reinit(dof_handler,
+        mg_mf_storage_level->reinit(mapping,
+                                    dof_handler,
                                     level_constraints,
                                     QGauss<1>(fe.degree + 1),
                                     additional_data);
@@ -881,7 +878,7 @@ namespace Step37
       }
     setup_time += time.wall_time();
     time_details << "Setup matrix-free levels   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
   }
 
 
@@ -905,20 +902,20 @@ namespace Step37
     FEEvaluation<dim, degree_finite_element> phi(
       *system_matrix.get_matrix_free());
     for (unsigned int cell = 0;
-         cell < system_matrix.get_matrix_free()->n_macro_cells();
+         cell < system_matrix.get_matrix_free()->n_cell_batches();
          ++cell)
       {
         phi.reinit(cell);
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           phi.submit_value(make_vectorized_array<double>(1.0), q);
-        phi.integrate(true, false);
+        phi.integrate(EvaluationFlags::values);
         phi.distribute_local_to_global(system_rhs);
       }
     system_rhs.compress(VectorOperation::add);
 
     setup_time += time.wall_time();
     time_details << "Assemble right hand side   (CPU/wall) " << time.cpu_time()
-                 << "s/" << time.wall_time() << "s" << std::endl;
+                 << "s/" << time.wall_time() << 's' << std::endl;
   }
 
 
@@ -1126,7 +1123,7 @@ namespace Step37
     solution.update_ghost_values();
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");
-    data_out.build_patches();
+    data_out.build_patches(mapping);
 
     DataOutBase::VtkFlags flags;
     flags.compression_level = DataOutBase::VtkFlags::best_speed;
@@ -1157,7 +1154,7 @@ namespace Step37
 
       pcout << "Vectorization over " << n_vect_doubles
             << " doubles = " << n_vect_bits << " bits ("
-            << Utilities::System::get_current_vectorization_level() << ")"
+            << Utilities::System::get_current_vectorization_level() << ')'
             << std::endl;
     }
 

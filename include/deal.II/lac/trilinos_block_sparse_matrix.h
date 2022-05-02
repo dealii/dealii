@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2018 by the deal.II authors
+// Copyright (C) 2008 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,7 +67,6 @@ namespace TrilinosWrappers
    *
    * @ingroup Matrix1 @see
    * @ref GlossBlockLA "Block (linear algebra)"
-   * @author Martin Kronbichler, Wolfgang Bangerth, 2008
    */
   class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>
   {
@@ -148,17 +147,6 @@ namespace TrilinosWrappers
     reinit(const size_type n_block_rows, const size_type n_block_columns);
 
     /**
-     * Resize the matrix, by using an array of Epetra maps to determine the
-     * %parallel distribution of the individual matrices. This function
-     * assumes that a quadratic block matrix is generated.
-     */
-    template <typename BlockSparsityPatternType>
-    void
-    reinit(const std::vector<Epetra_Map> & input_maps,
-           const BlockSparsityPatternType &block_sparsity_pattern,
-           const bool                      exchange_data = false);
-
-    /**
      * Resize the matrix, by using an array of index sets to determine the
      * %parallel distribution of the individual matrices. This function
      * assumes that a quadratic block matrix is generated.
@@ -184,14 +172,13 @@ namespace TrilinosWrappers
      * matrix and the entries stored therein. It uses a threshold to copy only
      * elements whose modulus is larger than the threshold (so zeros in the
      * deal.II matrix can be filtered away).
-     *
-     * @deprecated Use the respective method with IndexSet arguments instead.
      */
-    DEAL_II_DEPRECATED
     void
-    reinit(const std::vector<Epetra_Map> &            input_maps,
-           const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
-           const double                               drop_tolerance = 1e-13);
+    reinit(
+      const std::vector<IndexSet> &              parallel_partitioning,
+      const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
+      const MPI_Comm &                           communicator = MPI_COMM_WORLD,
+      const double                               drop_tolerance = 1e-13);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -239,32 +226,6 @@ namespace TrilinosWrappers
      */
     MPI_Comm
     get_mpi_communicator() const;
-
-    /**
-     * Return a vector of the underlying Trilinos Epetra_Map that sets the
-     * partitioning of the domain space of this block matrix, i.e., the
-     * partitioning of the individual block vectors this matrix has to be
-     * multiplied with.
-     *
-     * @deprecated Use the methods of the individual matrices based on
-     * IndexSet arguments.
-     */
-    DEAL_II_DEPRECATED
-    std::vector<Epetra_Map>
-    domain_partitioner() const;
-
-    /**
-     * Return a vector of the underlying Trilinos Epetra_Map that sets the
-     * partitioning of the range space of this block matrix, i.e., the
-     * partitioning of the individual block vectors that are the result from
-     * matrix-vector products.
-     *
-     * @deprecated Use the methods of the individual matrices based on
-     * IndexSet arguments.
-     */
-    DEAL_II_DEPRECATED
-    std::vector<Epetra_Map>
-    range_partitioner() const;
 
     /**
      * Return the partitioning of the domain space for the individual blocks of
@@ -614,7 +575,6 @@ namespace TrilinosWrappers
        * while retaining compatibility with the Trilinos sparse matrix and
        * preconditioner classes.
        *
-       * @author Jean-Paul Pelteret, 2016
        *
        * @ingroup TrilinosWrappers
        */

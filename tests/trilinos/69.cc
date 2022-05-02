@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,8 +72,8 @@ test(TrilinosWrappers::SparseMatrix &m)
   Assert(m.n_nonzero_elements() - nnz == 0, ExcInternalError());
 
   // now remove the entries of rows N/2 and
-  // N/3. set diagonal entries to rnd
-  const double rnd = Testing::rand();
+  // N/3. set diagonal entries to diag
+  const double diag = Testing::rand();
   for (unsigned int i = 0; i < N; ++i)
     {
       const double s = m.el(N / 2, i);
@@ -84,10 +84,14 @@ test(TrilinosWrappers::SparseMatrix &m)
       const double s = m.el(N / 3, i);
       norm_sqr -= s * s;
     }
-  norm_sqr += 2 * rnd * rnd;
+  norm_sqr += 2 * diag * diag;
 
-  const types::global_dof_index rows[2] = {N / 3, N / 2};
-  m.clear_rows(std::vector<types::global_dof_index>(&rows[0], &rows[2]), rnd);
+  const std::vector<types::global_dof_index> rows = {N / 3, N / 2};
+  m.clear_rows(rows, diag);
+  for (const auto row : rows)
+    {
+      Assert(m.el(row, row) == diag, ExcInternalError());
+    }
 
   deallog << m.frobenius_norm() << ' ' << std::sqrt(norm_sqr) << std::endl;
   deallog << m.n_nonzero_elements() << ' ' << nnz << std::endl;

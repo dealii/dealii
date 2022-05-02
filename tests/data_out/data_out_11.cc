@@ -22,7 +22,7 @@
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -54,7 +54,7 @@ test()
     component_interpretation(
       dim, DataComponentInterpretation::component_is_part_of_vector);
 
-  MappingQGeneric<dim> mapping(2);
+  MappingQ<dim> mapping(2);
 
   // variant 1
   {

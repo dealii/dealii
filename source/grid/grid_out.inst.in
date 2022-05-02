@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,10 @@ for (deal_II_dimension : DIMENSIONS)
 
     template void GridOut::write_msh(const Triangulation<deal_II_dimension> &,
                                      std::ostream &) const;
+#ifdef DEAL_II_GMSH_WITH_API
+    template void GridOut::write_msh(const Triangulation<deal_II_dimension> &,
+                                     const std::string &) const;
+#endif
 
 #if deal_II_dimension != 2
     template void GridOut::write_xfig(
@@ -83,6 +87,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     template void GridOut::write_msh(
       const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
       std::ostream &) const;
+#  ifdef DEAL_II_GMSH_WITH_API
+    template void GridOut::write_msh(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+      const std::string &) const;
+#  endif
     template void GridOut::write_ucd(
       const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
       std::ostream &) const;

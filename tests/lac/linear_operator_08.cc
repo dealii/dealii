@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2015 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -235,30 +235,30 @@ main()
 
     {
       deallog << "PreconditionChebyshev" << std::endl;
-      typedef PreconditionChebyshev<SparseMatrix<double>> PREC;
+      using PREC = PreconditionChebyshev<SparseMatrix<double>>;
       test_preconditioner<PREC>(A, b);
     }
     {
       deallog << "PreconditionIdentity" << std::endl;
-      typedef PreconditionIdentity PREC;
+      using PREC = PreconditionIdentity;
       test_preconditioner<PREC>(A, b);
     }
     {
       deallog << "PreconditionJacobi" << std::endl;
-      typedef PreconditionJacobi<SparseMatrix<double>> PREC;
+      using PREC = PreconditionJacobi<SparseMatrix<double>>;
       test_preconditioner<PREC>(A, b);
     }
     {
       deallog << "PreconditionPSOR" << std::endl;
-      typedef PreconditionPSOR<SparseMatrix<double>> PREC;
-      std::vector<PREC::size_type>                   permutation(b.size());
+      using PREC = PreconditionPSOR<SparseMatrix<double>>;
+      std::vector<PREC::size_type> permutation(b.size());
       std::vector<PREC::size_type> inverse_permutation(b.size());
       test_preconditioner<PREC>(
         A, b, typename PREC::AdditionalData(permutation, inverse_permutation));
     }
     {
       deallog << "PreconditionRichardson" << std::endl;
-      typedef PreconditionRichardson PREC;
+      using PREC = PreconditionRichardson;
       test_preconditioner<PREC>(A, b);
     }
     {
@@ -283,28 +283,28 @@ main()
     }
     {
       deallog << "PreconditionSOR" << std::endl;
-      typedef PreconditionSOR<SparseMatrix<double>> PREC;
+      using PREC = PreconditionSOR<SparseMatrix<double>>;
       test_preconditioner<PREC>(A, b);
     }
     {
       deallog << "PreconditionSSOR" << std::endl;
-      typedef PreconditionSSOR<SparseMatrix<double>> PREC;
+      using PREC = PreconditionSSOR<SparseMatrix<double>>;
       test_preconditioner<PREC>(A, b);
     }
     {
       deallog << "SparseILU" << std::endl;
-      typedef SparseILU<double> PREC;
+      using PREC = SparseILU<double>;
       test_preconditioner<PREC>(A, b);
     }
     {
       deallog << "SparseMIC" << std::endl;
-      typedef SparseMIC<double> PREC;
+      using PREC = SparseMIC<double>;
       test_preconditioner<PREC>(A, b);
     }
     {
       deallog << "SparseVanka" << std::endl;
-      typedef SparseVanka<double>           PREC;
-      typedef typename PREC::AdditionalData PREC_AD;
+      using PREC    = SparseVanka<double>;
+      using PREC_AD = typename PREC::AdditionalData;
       test_preconditioner<PREC>(A, b, PREC_AD(std::vector<bool>(rc, true)));
     }
     deallog.pop();
@@ -316,42 +316,42 @@ main()
 
     {
       deallog << "SolverBicgstab" << std::endl;
-      typedef SolverBicgstab<Vector<double>> SLVR;
+      using SLVR = SolverBicgstab<Vector<double>>;
       test_solver<SLVR>(A, b);
     }
     {
       deallog << "SolverCG" << std::endl;
-      typedef SolverCG<Vector<double>> SLVR;
+      using SLVR = SolverCG<Vector<double>>;
       test_solver<SLVR>(A, b);
     }
     {
       deallog << "SolverFGMRES" << std::endl;
-      typedef SolverFGMRES<Vector<double>> SLVR;
+      using SLVR = SolverFGMRES<Vector<double>>;
       test_solver<SLVR>(A, b);
     }
     {
       deallog << "SolverGMRES" << std::endl;
-      typedef SolverGMRES<Vector<double>> SLVR;
+      using SLVR = SolverGMRES<Vector<double>>;
       test_solver<SLVR>(A, b);
     }
     {
       deallog << "SolverMinRes" << std::endl;
-      typedef SolverMinRes<Vector<double>> SLVR;
+      using SLVR = SolverMinRes<Vector<double>>;
       test_solver<SLVR>(A, b);
     }
     {
       deallog << "SolverQMRS" << std::endl;
-      typedef SolverQMRS<Vector<double>> SLVR;
+      using SLVR = SolverQMRS<Vector<double>>;
       test_solver<SLVR>(A, b);
     }
     {
       deallog << "SolverRelaxation" << std::endl;
-      typedef SolverRelaxation<Vector<double>> SLVR;
+      using SLVR = SolverRelaxation<Vector<double>>;
       test_solver<SLVR>(A, b);
     }
     {
       deallog << "SolverRichardson" << std::endl;
-      typedef SolverRichardson<Vector<double>> SLVR;
+      using SLVR = SolverRichardson<Vector<double>>;
       test_solver<SLVR>(A, b);
     }
     {
@@ -416,7 +416,7 @@ main()
     // === PRECONDITIONERS ===
     {
       deallog << "PreconditionBlockIdentity" << std::endl;
-      typedef PreconditionBlockIdentity<SparseMatrix<double>> PREC;
+      using PREC = PreconditionBlockIdentity<SparseMatrix<double>>;
       test_preconditioner_block<PREC>(A, b);
     }
 

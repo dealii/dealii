@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,8 @@ is_unit_vector(const Tensor<1, dim> &v)
 }
 
 template <int dim>
-bool check_orientation(Tensor<1, dim> v1, Tensor<1, dim> v2)
+bool
+check_orientation(Tensor<1, dim> v1, Tensor<1, dim> v2)
 {
   v1 /= v1.norm();
   v2 /= v2.norm();

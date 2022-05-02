@@ -1,8 +1,0 @@
-Improved: The detection of compression in the mapping data structures of
-MatrixFree has been made more general. It can now also detect when two cells
-(not necessarily adjacent ones) are translations of each other, so that the
-same set of Jacobians can be used on both. This helps the performance of
-matrix-free operator evaluation in case the geometry fits into processor
-caches and the operation is memory-bandwidth limited.
-<br>
-(Martin Kronbichler, 2020/03/14)

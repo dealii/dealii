@@ -4,7 +4,7 @@
   <head>
     <title>Build system internals</title>
     <link href="../screen.css" rel="StyleSheet">
-    <meta name="copyright" content="Copyright (C) 2013 - 2018 by the deal.II Authors">
+    <meta name="copyright" content="Copyright (C) 2013 - 2020 by the deal.II Authors">
     <meta name="keywords" content="deal.II">
   </head>
 
@@ -223,7 +223,7 @@ SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     guarded with DEAL_II_ALLOW_PLATFORM_INTROSPECTION
 
 ./cmake/checks/check_01_cxx_features.cmake
-  - Check for supported C++ language features such as sufficient C++11
+  - Check for supported C++ language features such as sufficient C++14
     support
 
 ./cmake/checks/check_02_compiler_features.cmake
@@ -586,7 +586,7 @@ DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt;        (an option)
 
     <li>
       For internal and external use, for setting necessary compiler flags,
-      e.g. <code>-std=c++11</code> (if available):
+      e.g. <code>-std=c++20</code> (if available):
       <ul>
         <li> <code>DEAL_II_CXX_FLAGS</code>
         <li> <code>DEAL_II_CXX_FLAGS_DEBUG</code>

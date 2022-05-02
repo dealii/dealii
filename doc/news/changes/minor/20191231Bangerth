@@ -1,4 +1,0 @@
-New: The function Threads::TaskGroup::size() allows querying the size
-of a task group.
-<br>
-(Wolfgang Bangerth, 2019/12/31)

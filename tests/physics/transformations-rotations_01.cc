@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,7 +42,8 @@ test_rotation_matrix_3d_z_axis(const double angle)
   Assert(std::abs(determinant(R_z) - 1.0) < 1e-9,
          ExcMessage("Rodrigues rotation matrix determinant is not unity"));
   const Tensor<2, 3> R =
-    Transformations::Rotations::rotation_matrix_3d(Point<3>({0, 0, 1}), angle);
+    Transformations::Rotations::rotation_matrix_3d(Tensor<1, 3>({0., 0., 1.}),
+                                                   angle);
   Assert(std::abs(determinant(R) - 1.0) < 1e-9,
          ExcMessage("Rotation matrix determinant is not unity"));
 
@@ -53,7 +54,7 @@ test_rotation_matrix_3d_z_axis(const double angle)
 }
 
 void
-test_rotation_matrix_3d(const Point<3> &axis, const double angle)
+test_rotation_matrix_3d(const Tensor<1, 3> &axis, const double angle)
 {
   // http://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
   // http://en.wikipedia.org/wiki/Rotation_matrix
@@ -84,8 +85,8 @@ test_rotation_matrix_3d(const Point<3> &axis, const double angle)
          ExcMessage("Incorrect computation of R in 3d"));
 }
 
-Point<3>
-normalise(const Point<3> &p)
+Tensor<1, 3>
+normalise(const Tensor<1, 3> &p)
 {
   Assert(p.norm() > 0.0, ExcMessage("Point vector has zero norm"));
   return p / p.norm();
@@ -146,9 +147,12 @@ main()
   test_rotation_matrix_3d_z_axis(45.0 * deg_to_rad);
   test_rotation_matrix_3d_z_axis(60.0 * deg_to_rad);
 
-  test_rotation_matrix_3d(normalise(Point<3>({1, 1, 1})), 90.0 * deg_to_rad);
-  test_rotation_matrix_3d(normalise(Point<3>({0, 2, 1})), 45.0 * deg_to_rad);
-  test_rotation_matrix_3d(normalise(Point<3>({-1, 3, 2})), 60.0 * deg_to_rad);
+  test_rotation_matrix_3d(normalise(Tensor<1, 3>({1., 1., 1.})),
+                          90.0 * deg_to_rad);
+  test_rotation_matrix_3d(normalise(Tensor<1, 3>({0., 2., 1.})),
+                          45.0 * deg_to_rad);
+  test_rotation_matrix_3d(normalise(Tensor<1, 3>({-1., 3., 2.})),
+                          60.0 * deg_to_rad);
 
   deallog << "OK" << std::endl;
 }

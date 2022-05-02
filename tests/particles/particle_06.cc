@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,8 +29,8 @@ void
 test()
 {
   {
-    const unsigned int      n_properties_per_particle = 3;
-    Particles::PropertyPool pool(n_properties_per_particle);
+    const unsigned int                     n_properties_per_particle = 3;
+    Particles::PropertyPool<dim, spacedim> pool(n_properties_per_particle);
 
     Point<spacedim> position;
 
@@ -70,7 +70,7 @@ test()
     std::vector<char> data(particle.serialized_size_in_bytes());
     void *            write_pointer = static_cast<void *>(&data.front());
 
-    particle.write_data(write_pointer);
+    write_pointer = particle.write_particle_data_to_memory(write_pointer);
 
     const void *read_pointer = static_cast<const void *>(&data.front());
     const Particles::Particle<dim, spacedim> new_particle(read_pointer, &pool);

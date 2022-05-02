@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2018 by the deal.II authors
+// Copyright (C) 2011 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/q_collection.h>
 
@@ -52,7 +51,7 @@ test()
   triangulation.refine_global(1);
 
   // define DoFhandler and FEs
-  FE_Q<2> u(2), u2(QIterated<1>(QTrapez<1>(), 3));
+  FE_Q<2> u(2), u2(QIterated<1>(QTrapezoid<1>(), 3));
 
   hp::FECollection<2> fe_collection;
   fe_collection.push_back(u);
@@ -61,12 +60,12 @@ test()
   hp::FECollection<2> fe_collection2;
   fe_collection2.push_back(u);
 
-  hp::DoFHandler<2> hp_dof_handler(triangulation);
-  hp::DoFHandler<2> hp_dof_handler2(triangulation);
+  DoFHandler<2> hp_dof_handler(triangulation);
+  DoFHandler<2> hp_dof_handler2(triangulation);
 
-  // set different fe for testing
-  hp::DoFHandler<2>::active_cell_iterator cell = hp_dof_handler.begin_active(),
-                                          endc = hp_dof_handler.end();
+  // set different FE for testing
+  DoFHandler<2>::active_cell_iterator cell = hp_dof_handler.begin_active(),
+                                      endc = hp_dof_handler.end();
 
   for (; cell != endc; ++cell)
     cell->set_active_fe_index(1);

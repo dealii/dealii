@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,7 @@ main()
   // threshold and so on
   t.unroll(unrolled);
   deallog << "unrolled:";
-  for (unsigned i = 0; i < 9; i++)
+  for (unsigned i = 0; i < 9; ++i)
     deallog << ' ' << static_cast<double>(unrolled(i));
   deallog << std::endl;
 

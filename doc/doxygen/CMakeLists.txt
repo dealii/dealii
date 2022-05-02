@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -88,6 +88,8 @@ ENDIF()
 # To get at this, find all of the .inst.in files, strip all but the
 # directory name under $CMAKE_SOURCE_DIR/source, and then prepend
 # the build directory to it
+#
+# See options.dox.in where ${_inst_in_dirs} is later added to INCLUDE_PATH.
 FILE(GLOB _inst_in_files
      "${CMAKE_SOURCE_DIR}/source/*/*.inst.in")
 STRING(REPLACE "${CMAKE_SOURCE_DIR}/source/" "" _inst_in_dirs_x "${_inst_in_files}")
@@ -98,8 +100,7 @@ FOREACH (_dir ${_inst_in_dirs_y})
   SET(_inst_in_dirs "${_inst_in_dirs} ${CMAKE_BINARY_DIR}/source/${_dir}")
 ENDFOREACH()
 
-MESSAGE(STATUS "translated this into")
-MESSAGE(STATUS "found ${_inst_in_dirs}")
+MESSAGE(STATUS "Additional doxygen include paths: ${_inst_in_dirs}")
 
 # make sure doxygen sees the extra.sty stylefile:
 SET(_extra_packages "${CMAKE_CURRENT_SOURCE_DIR}/extra")
@@ -296,7 +297,7 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/header.html
     ${CMAKE_CURRENT_BINARY_DIR}/footer.html
     ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/filter
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/filter.pl
     ${_doxygen_depend}
     expand_all_instantiations
   COMMENT "Generating documentation via doxygen."

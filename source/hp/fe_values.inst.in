@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2018 by the deal.II authors
+// Copyright (C) 2010 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,8 +82,7 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
   }
 
-for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : SPACE_DIMENSIONS;
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
      lda : BOOL)
   {
     namespace hp
@@ -92,26 +91,32 @@ for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
 
       template void
       FEValues<deal_II_dimension, deal_II_space_dimension>::reinit(
-        TriaIterator<DoFCellAccessor<
-          dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>,
-          lda>>,
+        const TriaIterator<
+          DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &,
         unsigned int,
         unsigned int,
         unsigned int);
       template void
       FEFaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
-        TriaIterator<DoFCellAccessor<
-          dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>,
-          lda>>,
+        const TriaIterator<
+          DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &,
         unsigned int,
         unsigned int,
         unsigned int,
         unsigned int);
       template void
+      FEFaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
+        const TriaIterator<
+          DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &,
+        const Triangulation<deal_II_dimension,
+                            deal_II_space_dimension>::face_iterator &,
+        unsigned int,
+        unsigned int,
+        unsigned int);
+      template void
       FESubfaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
-        TriaIterator<DoFCellAccessor<
-          dealii::dof_handler<deal_II_dimension, deal_II_space_dimension>,
-          lda>>,
+        const TriaIterator<
+          DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &,
         unsigned int,
         unsigned int,
         unsigned int,

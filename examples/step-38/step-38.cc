@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2019 by the deal.II authors
+ * Copyright (C) 2010 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -38,7 +38,6 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -362,7 +361,7 @@ namespace Step38
                                         update_quadrature_points |
                                         update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -463,12 +462,11 @@ namespace Step38
   template <int spacedim>
   void LaplaceBeltramiProblem<spacedim>::output_results() const
   {
-    DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+    DataOut<dim, spacedim> data_out;
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(
-      solution,
-      "solution",
-      DataOut<dim, DoFHandler<dim, spacedim>>::type_dof_data);
+    data_out.add_data_vector(solution,
+                             "solution",
+                             DataOut<dim, spacedim>::type_dof_data);
     data_out.build_patches(mapping, mapping.get_degree());
 
     const std::string filename =

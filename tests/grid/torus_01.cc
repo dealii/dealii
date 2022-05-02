@@ -65,7 +65,7 @@ test<3, 3>()
   deallog.get_file_stream() << "set view equal xyz" << std::endl
                             << "splot '-' w l" << std::endl;
   GridOut().write_gnuplot(triangulation, deallog.get_file_stream());
-  deallog.get_file_stream() << "e" << std::endl << "pause -1" << std::endl;
+  deallog.get_file_stream() << 'e' << std::endl << "pause -1" << std::endl;
 }
 
 

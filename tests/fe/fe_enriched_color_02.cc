@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,13 +22,13 @@
  * different predicates touch each other.
  */
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_enriched.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_tools.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 #include "../tests.h"
 
@@ -92,7 +92,7 @@ main(int argc, char **argv)
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation, -20, 20);
   triangulation.refine_global(4);
-  hp::DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   // check the coloring function on different set of predicates.
   std::vector<predicate_function<dim>> vec_predicates;

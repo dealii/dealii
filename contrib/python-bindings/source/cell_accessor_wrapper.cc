@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 
 #include <cell_accessor_wrapper.h>
 #include <point_wrapper.h>
+#include <reference_cell_wrapper.h>
 #include <tria_accessor_wrapper.h>
 #include <triangulation_wrapper.h>
 
@@ -678,11 +679,11 @@ namespace python
   CellAccessorWrapper::active() const
   {
     if ((dim == 2) && (spacedim == 2))
-      return internal::cell_cast<2, 2>(cell_accessor)->active();
+      return internal::cell_cast<2, 2>(cell_accessor)->is_active();
     else if ((dim == 2) && (spacedim == 3))
-      return internal::cell_cast<2, 3>(cell_accessor)->active();
+      return internal::cell_cast<2, 3>(cell_accessor)->is_active();
     else
-      return internal::cell_cast<3, 3>(cell_accessor)->active();
+      return internal::cell_cast<3, 3>(cell_accessor)->is_active();
   }
 
 
@@ -754,6 +755,58 @@ namespace python
       return internal::cell_cast<2, 3>(cell_accessor)->vertex_index(i);
     else
       return internal::cell_cast<3, 3>(cell_accessor)->vertex_index(i);
+  }
+
+
+
+  unsigned int
+  CellAccessorWrapper::n_vertices() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cell_cast<2, 2>(cell_accessor)->n_vertices();
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cell_cast<2, 3>(cell_accessor)->n_vertices();
+    else
+      return internal::cell_cast<3, 3>(cell_accessor)->n_vertices();
+  }
+
+
+
+  unsigned int
+  CellAccessorWrapper::n_lines() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cell_cast<2, 2>(cell_accessor)->n_lines();
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cell_cast<2, 3>(cell_accessor)->n_lines();
+    else
+      return internal::cell_cast<3, 3>(cell_accessor)->n_lines();
+  }
+
+
+
+  unsigned int
+  CellAccessorWrapper::n_faces() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cell_cast<2, 2>(cell_accessor)->n_faces();
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cell_cast<2, 3>(cell_accessor)->n_faces();
+    else
+      return internal::cell_cast<3, 3>(cell_accessor)->n_faces();
+  }
+
+
+
+  ReferenceCellWrapper
+  CellAccessorWrapper::reference_cell() const
+  {
+    if ((dim == 2) && (spacedim == 2))
+      return internal::cell_cast<2, 2>(cell_accessor)->reference_cell();
+    else if ((dim == 2) && (spacedim == 3))
+      return internal::cell_cast<2, 3>(cell_accessor)->reference_cell();
+    else
+      return internal::cell_cast<3, 3>(cell_accessor)->reference_cell();
   }
 
 } // namespace python

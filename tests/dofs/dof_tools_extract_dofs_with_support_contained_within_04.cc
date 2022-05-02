@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -122,8 +122,8 @@ test()
   sparse_rhs.reinit(locally_owned_set, locally_relevant_set, MPI_COMM_WORLD);
   rhs.reinit(locally_owned_set, locally_relevant_set, MPI_COMM_WORLD);
 
-  sparse_rhs.zero_out_ghosts();
-  rhs.zero_out_ghosts();
+  sparse_rhs.zero_out_ghost_values();
+  rhs.zero_out_ghost_values();
 
   // assemble RHS which has a local support:
   const std::function<double(const Point<dim> &)> rhs_func =
@@ -241,10 +241,10 @@ test()
           << "plot '-' using 1:2 with lines notitle, '-' with labels point pt 2 offset 1,1 notitle"
           << std::endl;
         GridOut().write_gnuplot(triangulation, f);
-        f << "e" << std::endl;
+        f << 'e' << std::endl;
 
         DoFTools::write_gnuplot_dof_support_point_info(f, support_points);
-        f << "e" << std::endl;
+        f << 'e' << std::endl;
       }
 
       {
@@ -292,9 +292,9 @@ test()
                  ++i)
               filenames.push_back(output_name(i));
 
-            const std::string master_name = "output.pvtu";
-            std::ofstream     pvtu_master(master_name.c_str());
-            data_out.write_pvtu_record(pvtu_master, filenames);
+            const std::string pvtu_filename = "output.pvtu";
+            std::ofstream     pvtu_output(pvtu_filename.c_str());
+            data_out.write_pvtu_record(pvtu_output, filenames);
           }
       }
     }

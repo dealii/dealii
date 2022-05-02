@@ -1,0 +1,44 @@
+# This is a parameter file that can be used to reproduce the two dimensional
+# results of the tutorial program step-70.
+subsection Stokes Immersed Problem
+  set Final time                         = 1
+  set Homogeneous Dirichlet boundary ids = 0
+  set Initial fluid refinement           = 5
+  set Initial solid refinement           = 5
+  set Particle insertion refinement      = 4
+  set Nitsche penalty term               = 100
+  set Number of time steps               = 501
+  set Velocity degree                    = 2
+  set Viscosity                          = 1
+  set Output directory                   = .
+  subsection Angular velocity
+    set Function constants  = 
+    set Function expression = t < .500001 ? 6.283185 : -6.283185 # default: 0
+    set Variable names      = x,y,t
+  end
+  subsection Grid generation
+    set Fluid grid generator              = hyper_cube
+    set Fluid grid generator arguments    = -1: 1: false
+    set Particle grid generator           = hyper_ball
+    set Particle grid generator arguments = 0.3, 0.3: 0.1: false
+    set Solid grid generator              = hyper_rectangle
+    set Solid grid generator arguments    = -.5, -.1: .5, .1: false
+  end
+  
+  subsection Refinement and remeshing
+    set Maximum number of cells        = 20000
+    set Refinement coarsening fraction = 0.3
+    set Refinement fraction            = 0.3
+    set Refinement maximal level       = 8
+    set Refinement minimal level       = 5
+    set Refinement step frequency      = 5
+    set Refinement strategy            = fixed_fraction
+  end
+
+
+  subsection Right hand side
+    set Function constants  = 
+    set Function expression = 0; 0; 0
+    set Variable names      = x,y,t
+  end
+end

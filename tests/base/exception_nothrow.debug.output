@@ -1,0 +1,24 @@
+
+DEAL::Exception: ExcInternalError()
+DEAL::
+--------------------------------------------------------
+An error occurred in file <exception_nothrow.cc> in function
+    int main()
+The violated condition was: 
+    1 == 2
+Additional information: 
+    This exception -- which is used in many places in the library --
+    usually indicates that some condition which the author of the code
+    thought must be satisfied at a certain point in an algorithm, is not
+    fulfilled. An example would be that the first part of an algorithm
+    sorts elements of an array in ascending order, and a second part of
+    the algorithm later encounters an element that is not larger than the
+    previous one.
+    
+    There is usually not very much you can do if you encounter such an
+    exception since it indicates an error in deal.II, not in your own
+    program. Try to come up with the smallest possible program that still
+    demonstrates the error and contact the deal.II mailing lists with it
+    to obtain help.
+--------------------------------------------------------
+

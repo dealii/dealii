@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,6 @@ DEAL_II_NAMESPACE_OPEN
  * <tt>SmartPointer<ABC></tt> is a mutable pointer.
  *
  * @ingroup memory
- * @author Guido Kanschat, Wolfgang Bangerth, 1998 - 2009
  */
 template <typename T, typename P = void>
 class SmartPointer
@@ -149,13 +148,15 @@ public:
    * Dereferencing operator. This operator throws an ExcNotInitialized() if the
    * pointer is a null pointer.
    */
-  T &operator*() const;
+  T &
+  operator*() const;
 
   /**
    * Dereferencing operator. This operator throws an ExcNotInitializedi() if the
    * pointer is a null pointer.
    */
-  T *operator->() const;
+  T *
+  operator->() const;
 
   /**
    * Exchange the pointers of this object and the argument. Since both the
@@ -364,7 +365,8 @@ inline SmartPointer<T, P>::operator T *() const
 
 
 template <typename T, typename P>
-inline T &SmartPointer<T, P>::operator*() const
+inline T &
+SmartPointer<T, P>::operator*() const
 {
   Assert(t != nullptr, ExcNotInitialized());
   Assert(pointed_to_object_is_alive,
@@ -375,7 +377,8 @@ inline T &SmartPointer<T, P>::operator*() const
 
 
 template <typename T, typename P>
-inline T *SmartPointer<T, P>::operator->() const
+inline T *
+SmartPointer<T, P>::operator->() const
 {
   Assert(t != nullptr, ExcNotInitialized());
   Assert(pointed_to_object_is_alive,

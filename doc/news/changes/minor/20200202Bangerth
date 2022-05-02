@@ -1,6 +1,0 @@
-Fixed: Calling DataOut::merge() with objects that were created using a
-mapping and more than one number of subdivisions greater than one
-sometimes resulted in an unwarranted triggering of an assertion. This
-is now fixed.
-<br>
-(Paras Kumar, Wolfgang Bangerth, 2020/02/02)

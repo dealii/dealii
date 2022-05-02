@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,7 @@ template <int dim,
 class MatrixFreeVariant
 {
 public:
-  typedef VectorizedArray<Number> vector_t;
+  using vector_t = VectorizedArray<Number>;
 
   MatrixFreeVariant(const MatrixFree<dim, Number> &data_in)
     : data(data_in)
@@ -89,7 +89,7 @@ test()
   AffineConstraints<double> constraints;
   VectorTools::interpolate_boundary_values(dof,
                                            0,
-                                           ZeroFunction<dim>(),
+                                           Functions::ZeroFunction<dim>(),
                                            constraints);
   constraints.close();
 

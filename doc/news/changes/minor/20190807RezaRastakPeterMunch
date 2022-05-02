@@ -1,4 +1,0 @@
-Fixed: Bug in CellDataStorage that produced error when applying adaptive
-refinement in multi-material grids.
-<br>
-(Reza Rastak, Peter Munch, 2019/08/07)

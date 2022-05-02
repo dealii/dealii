@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,6 +30,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -39,7 +40,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
@@ -88,7 +88,7 @@ namespace Step40
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    hp::DoFHandler<dim>   dof_handler;
+    DoFHandler<dim>       dof_handler;
     hp::FECollection<dim> fe;
 
     IndexSet locally_owned_dofs;
@@ -138,9 +138,9 @@ namespace Step40
   LaplaceProblem<dim>::setup_system()
   {
     // set active_fe_index mostly randomly
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      if (cell->is_locally_owned())
-        cell->set_active_fe_index(cell->active_cell_index() % fe.size());
+    for (const auto &cell : dof_handler.active_cell_iterators() |
+                              IteratorFilters::LocallyOwnedCell())
+      cell->set_active_fe_index(cell->active_cell_index() % fe.size());
 
     dof_handler.distribute_dofs(fe);
 
@@ -171,8 +171,10 @@ namespace Step40
     system_matrix.reinit(
       mpi_communicator,
       csp,
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
-      dof_handler.compute_n_locally_owned_dofs_per_processor(),
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.n_locally_owned_dofs()),
+      Utilities::MPI::all_gather(MPI_COMM_WORLD,
+                                 dof_handler.n_locally_owned_dofs()),
       Utilities::MPI::this_mpi_process(mpi_communicator));
   }
 
@@ -197,9 +199,9 @@ namespace Step40
 
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                                .begin_active(),
-                                                       endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell =
+                                                     dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (; cell != endc; ++cell)
       if (cell->is_locally_owned())
         {
@@ -329,7 +331,9 @@ namespace Step40
               << triangulation.n_global_active_cells() << std::endl
               << "      ";
         const auto n_locally_owned_active_cells_per_processor =
-          triangulation.compute_n_locally_owned_active_cells_per_processor();
+          Utilities::MPI::all_gather(
+            triangulation.get_communicator(),
+            triangulation.n_locally_owned_active_cells());
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
@@ -342,7 +346,8 @@ namespace Step40
         for (unsigned int i = 0;
              i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          pcout << dof_handler.compute_n_locally_owned_dofs_per_processor()[i]
+          pcout << Utilities::MPI::all_gather(
+                     MPI_COMM_WORLD, dof_handler.n_locally_owned_dofs())[i]
                 << '+';
         pcout << std::endl;
 

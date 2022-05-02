@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -134,7 +134,7 @@ check_qph(parallel::distributed::Triangulation<dim> &tr,
           fe_values.get_quadrature_points();
         const std::vector<std::shared_ptr<const MyData>> qpd =
           manager.template get_data<MyData>(cell);
-        for (unsigned int q = 0; q < q_points.size(); q++)
+        for (unsigned int q = 0; q < q_points.size(); ++q)
           {
             const double f_1 = func.value(q_points[q], 0);
             const double f_2 = func.value(q_points[q], 1);
@@ -186,7 +186,7 @@ test()
           data_storage.template initialize<MyData>(cell, rhs.size());
           std::vector<std::shared_ptr<MyData>> qpd =
             data_storage.template get_data<MyData>(cell);
-          for (unsigned int q = 0; q < rhs.size(); q++)
+          for (unsigned int q = 0; q < rhs.size(); ++q)
             {
               qpd[q]->value1 = my_func.value(q_points[q], 0);
               qpd[q]->value2 = my_func.value(q_points[q], 1);

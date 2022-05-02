@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 - 2019 by the deal.II authors
+## Copyright (C) 2018 - 2020 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -57,13 +57,21 @@ CC=clang CXX=clang++ cmake "${ARGS[@]}" "$SRC" || (echo "cmake failed!"; false) 
 
 cmake --build . --target expand_all_instantiations || (echo "make expand_all_instantiations failed!"; false) || exit 3
 
-# finally run it:
+# generate allheaders.h
+(cd include; find . -name '*.h'; cd $SRC/include/; find . -name '*.h') | grep -v allheaders.h | grep -v undefine_macros.h | sed 's|^./|#include <|' | sed 's|$|>|' >include/deal.II/allheaders.h
+
+# finally run clang-tidy on deal.II
+#
 # pipe away stderr (just contains nonsensical "x warnings generated")
 # pipe output to output.txt
-run-clang-tidy.py -p . -quiet -header-filter="$SRC/include/*" 2>error.txt >output.txt
+run-clang-tidy.py -p . -quiet -header-filter "$SRC/include/*" -extra-arg='-DCLANG_TIDY' 2>error.txt >output.txt
 
-if grep -E -q '(warning|error): ' output.txt; then
-    grep -E '(warning|error): ' output.txt
+# grep interesting errors and make sure we remove duplicates:
+grep -E '(warning|error): ' output.txt | sort | uniq >clang-tidy.log
+
+# if we have errors, report them and set exit status to failure
+if [ -s clang-tidy.log ]; then
+    cat clang-tidy.log
     exit 4
 fi
 

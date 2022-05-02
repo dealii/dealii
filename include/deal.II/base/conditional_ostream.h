@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,7 +76,6 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * @ingroup textoutput
- * @author Ralf Hartmann, Wolfgang Bangerth, 2004
  */
 class ConditionalOStream
 {

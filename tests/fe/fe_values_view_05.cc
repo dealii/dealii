@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2018 by the deal.II authors
+// Copyright (C) 2007 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,7 +70,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                                                       scalar_values);
       deallog << "component=" << c << std::endl;
 
-      for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+      for (const auto q : fe_values.quadrature_point_indices())
         {
           deallog << scalar_values[q] << std::endl;
           Assert(std::fabs(scalar_values[q] - vector_values[q](c)) <=
@@ -96,7 +96,7 @@ test_hyper_sphere()
                    1,
                    FE_Q<dim>(2),
                    2,
-                   FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapez<1>(), 3)),
+                   FE_DGQArbitraryNodes<dim>(QIterated<1>(QTrapezoid<1>(), 3)),
                    dim);
   test(tr, fe);
 }

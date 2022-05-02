@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,6 +25,7 @@
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/cell_id.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
@@ -49,28 +50,57 @@ test()
   DoFHandler<dim> dofhandler(tria);
   dofhandler.distribute_dofs(fe);
 
-  std::set<std::string> output;
+  std::set<std::string> input, output;
 
-  typedef typename DoFHandler<dim>::active_cell_iterator cell_iterator;
-  typedef short                                          DT;
-  short                                                  counter = 0;
+  using cell_iterator = typename DoFHandler<dim>::active_cell_iterator;
+  using DT            = short;
+  std::map<CellId, DT> map;
+  short                counter = 0;
+
+  std::map<unsigned int, std::set<dealii::types::subdomain_id>>
+    vertices_with_ghost_neighbors =
+      GridTools::compute_vertices_with_ghost_neighbors(tria);
+
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+        {
+          const std::map<unsigned int,
+                         std::set<dealii::types::subdomain_id>>::const_iterator
+            neighbor_subdomains_of_vertex =
+              vertices_with_ghost_neighbors.find(cell->vertex_index(v));
+
+          if (neighbor_subdomains_of_vertex !=
+              vertices_with_ghost_neighbors.end())
+            {
+              map[cell->id()] = ++counter;
+              break;
+            }
+        }
+    }
+
   GridTools::exchange_cell_data_to_ghosts<DT, DoFHandler<dim>>(
     dofhandler,
     [&](const cell_iterator &cell) {
-      DT value = ++counter;
+      DT                 value = map[cell->id()];
+      std::ostringstream oss;
+      oss << "pack " << cell->id() << ' ' << value;
+      input.insert(oss.str());
 
-      deallog << "pack " << cell->id() << " " << value << std::endl;
       return value;
     },
     [&](const cell_iterator &cell, const DT &data) {
       std::ostringstream oss;
-      oss << "unpack " << cell->id() << " " << data << " from "
+      oss << "unpack " << cell->id() << ' ' << data << " from "
           << cell->subdomain_id();
 
       output.insert(oss.str());
     });
 
   // sort the output because it will come in in random order
+  for (auto &it : input)
+    deallog << it << std::endl;
   for (auto &it : output)
     deallog << it << std::endl;
 }

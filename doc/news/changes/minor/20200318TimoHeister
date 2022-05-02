@@ -1,3 +1,0 @@
-New: DataOut::add_mg_data_vector() allows the user to output solutions on
-multigrid levels.
-<br> (Timo Heister, 2020/03/18)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2019 by the deal.II authors
+// Copyright (C) 2003 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -180,7 +180,7 @@ LaplaceProblem<dim>::setup_system()
   std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
   Functions::ZeroFunction<dim> homogeneous_dirichlet_bc(1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-  MappingQGeneric<dim> mapping(1);
+  MappingQ<dim> mapping(1);
   VectorTools::interpolate_boundary_values(mapping,
                                            mg_dof_handler,
                                            dirichlet_boundary,
@@ -192,7 +192,8 @@ LaplaceProblem<dim>::setup_system()
   system_matrix.reinit(sparsity_pattern);
 
   mg_constrained_dofs.clear();
-  mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
+  mg_constrained_dofs.initialize(mg_dof_handler);
+  mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, {0});
   const unsigned int n_levels = triangulation.n_levels();
 
   mg_interface_matrices.resize(min_level, n_levels - 1);
@@ -381,15 +382,18 @@ LaplaceProblem<dim>::solve()
   SolverCG<LinearAlgebra::distributed::Vector<double>> coarse_solver(
     coarse_solver_control);
   PreconditionIdentity id;
-  MGCoarseGridLACIteration<SolverCG<LinearAlgebra::distributed::Vector<double>>,
-                           LinearAlgebra::distributed::Vector<double>>
+  MGCoarseGridIterativeSolver<
+    LinearAlgebra::distributed::Vector<double>,
+    SolverCG<LinearAlgebra::distributed::Vector<double>>,
+    SparseMatrix<double>,
+    PreconditionIdentity>
     coarse_grid_solver(coarse_solver, mg_matrices[min_level], id);
   deallog << "   Size of coarse grid matrix: " << mg_matrices[min_level].m()
           << std::endl;
 
-  typedef PreconditionChebyshev<SparseMatrix<double>,
-                                LinearAlgebra::distributed::Vector<double>>
-                                                                  Smoother;
+  using Smoother =
+    PreconditionChebyshev<SparseMatrix<double>,
+                          LinearAlgebra::distributed::Vector<double>>;
   GrowingVectorMemory<LinearAlgebra::distributed::Vector<double>> vector_memory;
   MGSmootherPrecondition<SparseMatrix<double>,
                          Smoother,

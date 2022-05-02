@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2018 by the deal.II authors
+// Copyright (C) 2012 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 
 // check that LinearAlgebra::Vector::add_and_dot works correctly for
 // complex-valued vectors
+
+#include <deal.II/base/numbers.h>
 
 #include <deal.II/lac/la_vector.h>
 
@@ -36,7 +38,8 @@ check()
         {
           v1(i) = std::complex<number>(0.1 + 0.005 * i, 1.234 + 12 * i);
           v2(i) = std::complex<number>(-5.2 + 0.18 * i, 42.4242 + 42 * i);
-          v3(i) = std::complex<number>(3.14159 + 2.7183 / (1. + i), 13.);
+          v3(i) =
+            std::complex<number>(numbers::PI + numbers::E / (1. + i), 13.);
         }
       check                             = v1;
       const std::complex<number> factor = std::complex<number>(0.01432);

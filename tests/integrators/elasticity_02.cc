@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2019 by the deal.II authors
+// Copyright (C) 2012 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,22 +62,9 @@ test_boundary(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_values(u,
-                                indices,
-                                VectorSlice<std::vector<std::vector<double>>>(
-                                  uval),
-                                true);
-        fev.get_function_gradients(
-          u,
-          indices,
-          VectorSlice<std::vector<std::vector<Tensor<1, dim>>>>(ugrad),
-          true);
-        nitsche_tangential_residual(w,
-                                    fev,
-                                    make_slice(uval),
-                                    make_slice(ugrad),
-                                    make_slice(null_val),
-                                    17);
+        fev.get_function_values(u, indices, uval, true);
+        fev.get_function_gradients(u, indices, ugrad, true);
+        nitsche_tangential_residual<dim>(w, fev, uval, ugrad, null_val, 17);
         M.vmult(v, u);
         w.add(-1., v);
         deallog << ' ' << w.l2_norm();

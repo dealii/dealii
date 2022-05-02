@@ -170,7 +170,7 @@ Riemann solvers. For the Euler equations, there exist so-called exact Riemann
 solvers -- meaning that the states from both sides are combined in a way that
 is consistent with the Euler equations along a discontinuity -- and
 approximate Riemann solvers, which violate some physical properties and rely
-on other mechanisms to render the scheme accurate overall. Approxiate Riemann
+on other mechanisms to render the scheme accurate overall. Approximate Riemann
 solvers have the advantage of beging cheaper to compute. Most flux functions
 have their origin in the finite volume community, which are similar to DG
 methods with polynomial degree 0 within the cells (called volumes). As the
@@ -349,7 +349,7 @@ in time system compactly as
 \mathcal L_h(t, \mathbf{w}_h),
 @f]
 where we have taken the liberty to also denote the global solution
-vector by $\mathbf{w}_h$ (in addition to the the corresponding finite
+vector by $\mathbf{w}_h$ (in addition to the corresponding finite
 element function). Equivalently, the system above has the form
 @f[
 \frac{\partial \mathbf{w}_h}{\partial t} =
@@ -595,7 +595,7 @@ tend to be smooth on length-scales of a cell (i.e., they have
 small coefficients in the higher polynomial degrees that are missed by
 too few quadrature points, whereas the main solution contribution in the lower
 polynomial degrees is still well-captured -- this is simply a consequence of Taylor's
-theorem. To address this topic, various approaches have been proposed in the
+theorem). To address this topic, various approaches have been proposed in the
 DG literature. One technique is filtering which damps the solution components
 pertaining to higher polynomial degrees. As the chosen nodal basis is not
 hierarchical, this would mean to transform from the nodal basis into a
@@ -623,7 +623,7 @@ keep the number of quadrature points a variable to be specified just as the
 polynomial degree, and note that one would make different choices depending
 also on the flow configuration. The default choice is $p+2$ points -- a bit
 more than the minimum possible of $p+1$ points. The FEEvaluation and
-FEFaceEvaluation classes allow to seemlessly change the number of points by a
+FEFaceEvaluation classes allow to seamlessly change the number of points by a
 template parameter, such that the program does not get more complicated
 because of that.
 

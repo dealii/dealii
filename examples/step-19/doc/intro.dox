@@ -1,0 +1,462 @@
+
+<br>
+
+<i>
+This program was contributed by Wolfgang Bangerth, Rene Gassmoeller, and Peter Munch.
+
+Wolfgang Bangerth acknowledges support through NSF
+awards DMS-1821210, EAR-1550901, and OAC-1835673.
+</i>
+
+@note Support for particles exists in deal.II primarily due to the initial
+  efforts of Rene Gassmoeller. Please acknowledge this work by citing
+  the publication @cite GLHPW2018 if you use particle functionality in your
+  own work.
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+The finite element method in general, and deal.II in particular, were invented
+to solve partial differential equations -- in other words, to solve
+[continuum mechanics](https://en.wikipedia.org/wiki/Continuum_mechanics) problems.
+On the other hand, sometimes one wants to solve problems in which it is useful
+to track individual objects ("particles") and how their positions evolve. If
+this simply leads to a set of ordinary differential equations, for example
+if you want to track the positions of the planets in the solar system over
+time, then deal.II is clearly not your right tool. On the other hand, if
+this evolution is due to the interaction with the solution of partial differential
+equation, or if having a mesh to determine which particles interact
+with others (such as in the
+[smoothed particle hydrodynamics (SPH)](https://en.wikipedia.org/wiki/Smoothed-particle_hydrodynamics)
+method), then deal.II has support for you.
+
+The case we will consider here is how electrically charged particles move through
+an electric field. As motivation, we will consider
+[cathode rays](https://en.wikipedia.org/wiki/Cathode_ray): Electrons emitted by a
+heated piece of metal that is negatively charged (the "cathode"), and that are
+then accelerated by an electric field towards the positively charged electrode
+(the "anode"). The anode is typically ring-shaped so that the majority of
+electrons can fly through the hole in the form of an electron beam. In the olden
+times, they might then have illuminated the screen of a TV built from a
+[cathode ray tube](https://en.wikipedia.org/wiki/Cathode-ray_tube).
+Today, instead, electron beams are useful in
+[X-ray machines](https://en.wikipedia.org/wiki/X-ray_tube),
+[electron beam lithography](https://en.wikipedia.org/wiki/Electron-beam_lithography),
+[electron beam welding](https://en.wikipedia.org/wiki/Electron-beam_welding), and
+a number of other areas.
+
+The equations we will then consider are as follows: First, we need to describe
+the electric field. This is most easily accomplished by noting that the electric
+potential $V$ satisfied the equation
+@f[
+  -\epsilon_0 \Delta V = \rho
+@f]
+where $\epsilon_0$ is the dielectric constant of vacuum, and $\rho$ is the charge
+density. This is augmented by boundary conditions that we will choose as follows:
+@f{align*}{
+  V &= -V_0 && \text{on}\; \Gamma_\text{cathode}\subset\partial\Omega \\
+  V &= +V_0 && \text{on}\; \Gamma_\text{anode}\subset\partial\Omega \\
+  \epsilon\frac{\partial V}{\partial n} &= 0
+   && \text{on}\; \partial\Omega\setminus\Gamma_\text{cathode}\setminus\Gamma_\text{anode}.
+@f}
+In other words, we prescribe voltages $+V_0$ and $-V_0$ at the two electrodes
+and insulating (Neumann) boundary conditions elsewhere. Since the dynamics of the
+particles are purely due to the electric field $\mathbf E=\nabla V$, we could
+as well have prescribed $2V_0$ and $0$ at the two electrodes -- all that matters
+is the voltage difference at the two electrodes.
+
+Given this electric potential $V$ and the electric field $\mathbf E=\nabla V$,
+we can describe the trajectory of the $i$th particle using the differential
+equation
+@f[
+  m {\ddot {\mathbf x}}_i = e\mathbf E,
+@f]
+where $m,e$ are the mass and electric charge of each particle. In practice, it
+is convenient to write this as a system of first-order differential equations
+in the position $\mathbf x$ and velocity $\mathbf v$:
+@f{align*}{
+  {\dot {\mathbf v}}_i &= \frac{e\mathbf E}{m}, \\
+  {\dot {\mathbf x}}_i &= {\mathbf v}_i.
+@f}
+The deal.II class we will use to deal with particles, Particles::ParticleHandler,
+stores particles in a way so that the position $\mathbf x_i$ is part of the
+Particles::ParticleHandler data structures. (It stores particles sorted
+by cell they are in, and consequently needs to know where each particle is.)
+The velocity $\mathbf v_i$, on the other hand, is of no concern to
+Particles::ParticleHandler and consequently we will store it as a
+"property" of each particle that we will update in each time step. Properties
+can also be used to store any other quantity we might care about each particle:
+its charge, or if they were larger than just an electron, its color, mass,
+attitude in space, chemical composition, etc.
+
+There remain two things to discuss to complete the model:
+Where particles start and what the charge density $\rho$ is.
+
+First, historically, cathode rays used very large electric fields to pull
+electrons out of the metal. This produces only a relatively small current. One
+can do better by heating the cathode: a statistical fraction of electrons in that
+case have enough thermal energy to leave the metal; the electric field then just
+has to be strong enough to pull them away from the attraction of their host
+body. We will model this in the following way: We will create a new particle if
+(i) the electric field points away from the electrode, i.e., if
+$\mathbf E \cdot \mathbf n < 0$ where $\mathbf n$ is the normal vector at a
+face pointing out of the domain (into the electrode), and (ii) the electric
+field exceeds a threshold value $|\mathbf E|\ge E_\text{threshold}$. This is
+surely not a sufficiently accurate model for what really happens, but is good
+enough for our current tutorial program.
+
+Second, in principle we would have to model the charge density via
+@f[
+  \rho(\mathbf x) = \sum_i e\delta(\mathbf x-\mathbf x_i).
+@f]
+
+@note
+The issue now is that in reality, a cathode ray tube in an old television
+yields a current of somewhere around a few milli-Amperes. In the much higher
+energy beams of particle accelerators, the current may only be a few
+nano-Ampere. But an Ampere is $6\times 10^{18}$ electrons flowing per
+second. Now, as you will see in the results section, we really only simulate
+a few microseconds ($10^{-5}$ seconds), but that still results in very very
+large numbers of electrons -- far more than we can hope to simulate
+with a program as small as the current one. As a consequence, let us
+presume that each particle represents $N$ electrons. Then the particle
+mass and charge are also $Nm$ and $Ne$ and the equations we have to
+solve are
+@f[
+  (Nm) {\ddot {\mathbf x}}_i = (Ne)\mathbf E,
+@f]
+which is of course exactly the same as above. On the other hand, the charge
+density for these "clumps" of electrons is given by
+@f[
+  \rho(\mathbf x) = \sum_i (Ne)\delta(\mathbf x-\mathbf x_i).
+@f]
+It is this form that we will implement in the program, where $N$ is chosen
+rather large in the program to ensure that the particles actually affect
+the electric field. (This may not be realistic in practice: In most cases,
+there are just not enough electrons to actually affect the overall
+electric field. But realism is not our goal here.)
+
+
+@note One may wonder why the equation for the electric field (or, rather,
+the electric potential) has no time derivative whereas the equations for
+the electron positions do. In essence, this is a modeling assumption: We
+assume that the particles move so slowly that at any given time the
+electric field is in equilibrium. This is saying, in other words, that
+the velocity of the electrons is much less than the speed of light. In
+yet other words, we can rephrase this in terms of the electrode voltage
+$V_0$: Since every volt of electric potential accelerates electrons by
+approximately 600 km/s (neglecting relativistic effects), requiring
+$|\mathbf v_i\|\ll c$ is equivalent to saying that $2V_0 \ll 500 \text{V}$.
+Under this assumption (and the assumption that the total number
+of electrons is small), one can also neglect the creation of
+magnetic fields by the moving charges, which would otherwise also affect
+the movement of the electrons.
+
+
+<h3>Time discretization</h3>
+
+The equations outlined above form a set of coupled differential equations.
+Let us bring them all together in one place again to make that clear:
+@f{align*}{
+  -\epsilon_0 \Delta V &= \sum_i e\delta(\mathbf x-\mathbf x_i)
+  \\
+  {\dot {\mathbf x}}_i &= {\mathbf v}_i,
+  \\
+  {\dot {\mathbf v}}_i &= \frac{e\mathbf E}{m} = \frac{e\mathbf \nabla V}{m}.
+@f}
+Because of the awkward dependence of the electric potential on the
+particle locations, we don't want to solve this as a coupled system
+but instead use a decoupled approach where we first solve for the
+potential in each time step and then the particle locations. (One
+could also do it the other way around, of course.) This is very
+much in the same spirit as we do in step-21, step-31, and step-32,
+to name just a few, and can all be understood in the context of
+the operator splitting methods discussed in step-58.
+
+So, if we denote by an upper index $n$ the time step, and if we
+use a simple time discretization for the ODE, then this means
+that we have to solve the following set of equations in each time
+step:
+@f{align*}{
+  -\epsilon_0 \Delta V^{(n)} &= \sum_i e\delta(\mathbf x-\mathbf x_i^{(n-1)})
+  \\
+  \frac{{\mathbf v}_i^{(n)}-{\mathbf v}_i^{(n-1)}}{\Delta t} &= \frac{e\nabla V^{(n)}}{m}
+  \\
+  \frac{{\mathbf x}_i^{(n)}-{\mathbf x}_i^{(n-1)}}{\Delta t} &= {\mathbf v}_i^{(n)}.
+@f}
+There are of course many better ways to do a time discretization (for
+example the simple [leapfrog scheme](https://en.wikipedia.org/wiki/Leapfrog_integration))
+but this isn't the point of the tutorial program, and so we will be content
+with what we have here. (We will comment on a piece of this puzzle in the
+<a href="#extensions">possibilities for extensions</a> section of this program,
+however.)
+
+There remains the question of how we should choose the time step size $\Delta t$.
+The limitation here is that the Particles::ParticleHandler class needs to
+keep track of which cell each particle is in. This is particularly an issue if
+we are running computations in parallel (say, in step-70) because in that case
+every process only stores those cells it owns plus one layer of "ghost cells".
+That's not relevant here, but in general we should make sure that over the
+course of each time step, a particle moves only from one cell to any
+of its immediate neighbors (face, edge, or vertex neighbors). If we can ensure
+that, then Particles::ParticleHandler is guaranteed to be able to figure out
+which cell a particle ends up in. To do this, a useful rule of thumb
+is that we should choose the time step so that for all particles the expected
+distance the particle moves by is less than one cell diameter:
+@f[
+  \Delta t \le \frac{h_i}{\|\mathbf v_i\|} \qquad\qquad \forall i,
+@f]
+or equivalently
+@f[
+  \Delta t \le \min_i \frac{h_i}{\|\mathbf v_i\|}.
+@f]
+Here, $h_i$ is the length of the shortest edge of the cell on which particle
+$i$ is located -- in essence, a measure of the size of a cell.
+
+On the other hand, a particle might already be at the boundary of one cell
+and the neighboring cell might be once further refined. So then the time to
+cross that *neighboring* cell would actually be half the amount above,
+suggesting
+@f[
+  \Delta t \le \min_i \frac{\tfrac 12 h_i}{\|\mathbf v_i\|}.
+@f]
+
+But even that is not good enough: The formula above updates the particle
+positions in each time using the formula
+@f[
+\frac{{\mathbf x}_i^{(n)}-{\mathbf x}_i^{(n-1)}}{\Delta t} = {\mathbf v}_i^{(n)},
+@f]
+that is, using the *current* velocity ${\mathbf v}_i^{n}$. But we don't have
+the current velocity yet at the time when we need to choose $\Delta t$ -- which
+is after we have updated the potential $V^{(n)}$ but before we update the
+velocity from ${\mathbf v}_i^{(n-1)}$ to ${\mathbf v}_i^{(n)}$. All we have is
+${\mathbf v}_i^{(n-1)}$. So we need an additional safety factor for our final
+choice:
+@f[
+  \Delta t^{(n)} =
+  c_\text{safety} \min_i \frac{\tfrac 12 h_i}{\|\mathbf v_i^{(n-1)}\|}.
+@f]
+How large should $c_\text{safety}$ be? That depends on how much of underestimate
+$\|\mathbf v_i^{(n-1)}\|$ might be compared to $\|\mathbf v_i^{(n)}\|$, and that
+is actually quite easy to assess: A particle created in one time step with
+zero velocity will roughly pick up equal velocity increments in each successive
+time step if the electric field it encounters along the way were roughly
+constant. So the maximal difference between $\|\mathbf v_i^{(n-1)}\|$ and
+$\|\mathbf v_i^{(n)}\|$ would be a factor of two. As a consequence,
+we will choose $c_\text{safety}=0.5$.
+
+There is only one other case we ought to consider: What happens in
+the very first time step? There, any particles to be moved along have just
+been created, but they have a zero velocity. So we don't know what
+velocity we should choose for them. Of course, in all other time steps
+there are also particles that have just been created, but in general,
+the particles with the highest velocity limit the time step size and so the
+newly created particles with their zero velocity don't matter. But if we *only*
+have such particles?
+
+In that case, we can use the following approximation: If a particle
+starts at $\mathbf v^{(0)}=0$, then the update formula tells us that
+@f[
+  {\mathbf v}_i^{(1)} = \frac{e\nabla V^{(1)}}{m} \Delta t,
+@f]
+and consequently
+@f[
+    \frac{{\mathbf x}_i^{(1)}-{\mathbf x}_i^{(0)}}{\Delta t} = {\mathbf v}_i^{(1)},
+@f]
+which we can write as
+@f[
+    {\mathbf x}_i^{(1)} - {\mathbf x}_i^{(0)} = \frac{e\nabla V^{(1)}}{m} \Delta t^2.
+@f]
+Not wanting to move a particle by more than $\frac 12 h_i$ then implies that we should
+choose the time step as
+@f[
+  \Delta t
+  \le
+  \min_i
+  \sqrt{ \frac{h_i m}{e \|\nabla V^{(1)}\| }}.
+@f]
+Using the same argument about neighboring cells possibly being smaller by
+a factor of two then leads to the final formula for time step zero:
+@f[
+  \Delta t
+  =
+  \min_i
+  \sqrt{ \frac{\frac 12 h_i m}{e \|\nabla V^{(1)}\| } }.
+@f]
+
+Strictly speaking, we would have to evaluate the electric potential $V^{(1)}$ at
+the location of each particle, but a good enough approximation is to use the
+maximum of the values at the vertices of the respective cell. (Why the vertices
+and not the midpoint? Because the gradient of the solution of the Laplace equation,
+i.e., the electric field, is largest in corner singularities which are located
+at the vertices of cells.) This has the advantage that we can make good use of the
+FEValues functionality which can recycle pre-computed material as long as the
+quadrature points are the same from one cell to the next.
+
+We could always run this kind of scheme to estimate the difference between
+$\mathbf v_i^{(n-1)}$ and $\mathbf v_i^{(n)}$, but it relies on evaluating the
+electric field $\mathbf E$ on each cell, and that is expensive. As a
+consequence, we will limit this approach to the very first time step.
+
+
+<h3>Spatial discretization</h3>
+
+Having discussed the time discretization, the discussion of the spatial
+discretization is going to be short: We use quadratic finite elements,
+i.e., the space $Q_2$, to approximate the electric potential $V$. The
+mesh is adapted a couple of times during the initial time step. All
+of this is entirely standard if you have read step-6, and the implementation
+does not provide for any kind of surprise.
+
+
+
+<h3>Dealing with particles programmatically</h3>
+
+Adding and moving particles is, in practice, not very difficult in deal.II.
+To add one, the `create_particles()` function of this program simply
+uses a code snippet of the following form:
+@code
+  Particles::Particle<dim> new_particle;
+  new_particle.set_location(location);
+  new_particle.set_reference_location
+      (mapping.transform_real_to_unit_cell(cell, location));
+  new_particle.set_id(n_current_particles);
+
+  particle_handler.insert_particle(new_particle, cell);
+@endcode
+In other words, it is not all that different from inserting an object
+into a `std::set` or `std::map`: Create the object, set its properties
+(here, the current location, its reference cell location, and its id)
+and call `insert_particle`. The only thing that may be surprising is
+the reference location: In order to evaluate things such as
+$\nabla V(\mathbf x_i)$, it is necessary to evaluate finite element
+fields at locations $\mathbf x_i$. But this requires evaluating the
+finite element shape functions at points on the reference cell
+$\hat{\mathbf x}_i$. To make this efficient, every particle doesn't
+just store its location and the cell it is on, but also what location
+that point corresponds to in the cell's reference coordinate system.
+
+Updating a particle's position is then no more difficult: One just has
+to call
+@code
+  particle->set_location(new_location);
+@endcode
+We do this in the `move_particles()` function. The only difference
+is that we then have to tell the Particles::ParticleHandler class
+to also find what cell that position corresponds to (and, when computing
+in parallel, which process owns this cell). For efficiency reason,
+this is most easily done after updating all particles' locations,
+and is achieved via the
+Particles::ParticleHandler::sort_particles_into_subdomains_and_cells()
+function.
+
+There are, of course, times where a particle may leave the domain in
+question. In that case,
+Particles::ParticleHandler::sort_particles_into_subdomains_and_cells()
+can not find a surrounding cell and simply deletes the particle. But, it
+is often useful to track the number of particles that have been lost
+this way, and for this the Particles::ParticleHandler class offers a
+"signal" that one can attach to. We show how to do this in the
+constructor of the main class to count how many particles were lost
+in each time step. Specifically, the way this works is that
+the Particles::ParticleHandler class has a "signal" to which one
+can attach a function that will be executed whenever the signal
+is triggered. Here, this looks as follows:
+@code
+    particle_handler.signals.particle_lost.connect(
+      [this](const typename Particles::ParticleIterator<dim> &        particle,
+             const typename Triangulation<dim>::active_cell_iterator &cell)
+      {
+        this->track_lost_particle(particle, cell);
+      });
+@endcode
+That's a bit of a mouthful, but what's happening is this: We declare
+a lambda function that "captures" the `this` pointer (so that we can access
+member functions of the surrounding object inside the lambda function), and
+that takes two arguments:
+- A reference to the particle that has been "lost".
+- A reference to the cell it was on last.
+The lambda function then simply calls the `CathodeRaySimulator::track_lost_particle`
+function with these arguments. When we attach this lambda function to the
+signal, the Particles::ParticleHandler::sort_particles_into_subdomains_and_cells()
+function will trigger the signal for every particle for which it can't
+find a new home. This gives us the chance to record where the particle
+is, and to record statistics on it.
+
+
+@note In this tutorial program, we insert particles by hand and at
+  locations we specifically choose based on conditions that include
+  the solution of the electrostatic problem. But there are other cases
+  where one primarily wants to use particles as passive objects, for
+  example to trace and visualize the flow field of a fluid flow
+  problem. In those cases, there are numerous functions in the
+  Particles::Generators namespace that can generate particles
+  automatically. One of the functions of this namespace is also used
+  in the step-70 tutorial program, for example.
+
+
+<h3>The test case</h3>
+
+The test case here is not meant to be a realistic depiction of a cathode
+ray tube, but it has the right general characteristics and the point is,
+in any case, only to demonstrate how one would implement deal.II codes
+that use particles.
+
+The following picture shows the geometry that we're going to use:
+
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-19.geometry.png"
+       alt="The geometry used in this program"
+       width="600">
+</p>
+
+In this picture, the parts of the boundary marked in red and blue are the
+cathode, held at an electric potential $V=-V_0$. The part of the cathode shown
+in red is the part that is heated, leading to electrons leaving the metal
+and then being accelerated by the electric field (a few electric
+field lines are also shown). The green part of the boundary is the anode,
+held at $V=+V_0$. The rest of the boundary satisfies a Neumann boundary
+condition.
+
+This setup mimics real devices. The re-entrant corner results in an
+electric potential $V$ whose derivative (the electric field $\mathbf E$)
+has a singularity -- in other words, it becomes very large in the vicinity
+of the corner, allowing it to rip electrons away from the metal. These
+electrons are then accelerated towards the (green) anode which has a
+hole in the middle through which the electrons can escape the device and
+fly on to hit the screen, where they excite the "phosphor" to then emit
+the light that we see from these old-style TV screens. The non-heated
+part of the cathode is not subject
+to the emission of electrons -- in the code, we will mark this as the
+"focussing element" of the tube, because its negative electric voltage
+repels the electrons and makes sure that they do not just fly
+away from the heated part of the cathode perpendicular to the boundary,
+but in fact bend their paths towards the anode on the right.
+
+The electric field lines also shown in the picture illustrate
+that the electric field connects the negative and positive
+electrodes, respectively. The accelerating force the electrons
+experience is along these field lines. Finally, the picture shows the
+mesh used in the computation, illustrating that there are
+singularities at the tip of the re-rentrant corner as well
+as at all places where the boundary conditions change; these
+singularities are visible because the mesh is refined in these
+locations.
+
+Of practical interest is to figure out which fraction of the
+electrons emitted from the cathode actually make it through the
+hole in the anode -- electrons that just bounce into the anode
+itself are not actually doing anything useful other than converting
+electricity into heat. As a consequence, in the `track_lost_particle()`
+function (which is called for each particle that leaves the domain,
+see above), we will estimate where it might have left the domain
+and report this in the output.
+
+
+@note It is worth repeating that neither the geometry used here,
+nor in fact any other aspect of this program is intended to represent
+anything even half-way realistic. Tutorial programs are our tools to
+teach how deal.II works, and we often use situations for which we
+have some kind of intuition since this helps us interpret the output
+of a program, but that's about the extent to which we intend the
+program to do anything of use besides being a teaching tool.

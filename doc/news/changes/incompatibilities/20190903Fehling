@@ -1,6 +1,0 @@
-Changed: The interface to the parallel::CellWeights class was generalized
-by introducing static member functions. This way, users are capable of
-connecting and disconnecting callback functions manually if desired without
-instantiating an object of this class. The legacy interface has been deprecated.
-<br>
-(Marc Fehling, 2019/09/03)

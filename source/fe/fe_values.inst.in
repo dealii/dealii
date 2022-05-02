@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2019 by the deal.II authors
+// Copyright (C) 1998 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,15 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef DOXYGEN
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension
+#  if deal_II_dimension <= deal_II_space_dimension
     template class FEValuesBase<deal_II_dimension, deal_II_space_dimension>;
     template class FEValues<deal_II_dimension, deal_II_space_dimension>;
-    template class FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
-      CellIterator<
-        DoFHandler<deal_II_dimension, deal_II_space_dimension>::cell_iterator>;
 
     template class FEFaceValuesBase<deal_II_dimension, deal_II_space_dimension>;
     template class FEFaceValues<deal_II_dimension, deal_II_space_dimension>;
@@ -48,31 +46,27 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                                                 deal_II_space_dimension>;
       \}
     \}
-#endif
+#  endif
   }
 
 
-for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : SPACE_DIMENSIONS;
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
      lda : BOOL)
   {
-#if deal_II_dimension <= deal_II_space_dimension
+#  if deal_II_dimension <= deal_II_space_dimension
     template void FEValues<deal_II_dimension, deal_II_space_dimension>::reinit(
       const TriaIterator<
-        DoFCellAccessor<dof_handler<deal_II_dimension, deal_II_space_dimension>,
-                        lda>> &);
+        DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &);
     template void
     FEFaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
       const TriaIterator<
-        DoFCellAccessor<dof_handler<deal_II_dimension, deal_II_space_dimension>,
-                        lda>> &,
+        DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &,
       unsigned int);
 
     template void
     FEFaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
       const TriaIterator<
-        DoFCellAccessor<dof_handler<deal_II_dimension, deal_II_space_dimension>,
-                        lda>> &,
+        DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &,
       const TriaIterator<TriaAccessor<deal_II_dimension - 1,
                                       deal_II_dimension,
                                       deal_II_space_dimension>> &);
@@ -80,23 +74,21 @@ for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
     template void
     FESubfaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
       const TriaIterator<
-        DoFCellAccessor<dof_handler<deal_II_dimension, deal_II_space_dimension>,
-                        lda>> &,
+        DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &,
       const unsigned int,
       const unsigned int);
 
     template void
     FESubfaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
       const TriaIterator<
-        DoFCellAccessor<dof_handler<deal_II_dimension, deal_II_space_dimension>,
-                        lda>> &,
+        DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &,
       const TriaIterator<TriaAccessor<deal_II_dimension - 1,
                                       deal_II_dimension,
                                       deal_II_space_dimension>> &,
       const TriaIterator<TriaAccessor<deal_II_dimension - 1,
                                       deal_II_dimension,
                                       deal_II_space_dimension>> &);
-#endif
+#  endif
   }
 
 
@@ -104,7 +96,7 @@ for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
 for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension
+#  if deal_II_dimension <= deal_II_space_dimension
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_values<dealii::VEC>(
@@ -243,7 +235,7 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
           ProductType<dealii::VEC::value_type,
                       dealii::Tensor<3, deal_II_space_dimension>>::type> &)
         const;
-#endif
+#  endif
   }
 
 
@@ -251,131 +243,122 @@ for (VEC : GENERAL_CONTAINER_TYPES; Number : ALL_SCALAR_TYPES;
      deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension
+#  if deal_II_dimension <= deal_II_space_dimension
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_values_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::value_type> &) const;
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_gradients_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::gradient_type> &) const;
+        const VEC<Number> &, std::vector<solution_gradient_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_hessians_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::hessian_type> &) const;
+        const VEC<Number> &, std::vector<solution_hessian_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_laplacians_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::value_type> &) const;
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void
     FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
       get_function_third_derivatives_from_local_dof_values<VEC<Number>>(
         const VEC<Number> &,
-        std::vector<typename OutputType<Number>::third_derivative_type> &)
-        const;
+        std::vector<solution_third_derivative_type<Number>> &) const;
 
 
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_values_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::value_type> &) const;
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_gradients_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::gradient_type> &) const;
+        const VEC<Number> &, std::vector<solution_gradient_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_symmetric_gradients_from_local_dof_values<VEC<Number>>(
         const VEC<Number> &,
-        std::vector<typename OutputType<Number>::symmetric_gradient_type> &)
-        const;
+        std::vector<solution_symmetric_gradient_type<Number>> &) const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_divergences_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::divergence_type> &) const;
+        const VEC<Number> &, std::vector<solution_divergence_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_curls_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::curl_type> &) const;
+        const VEC<Number> &, std::vector<solution_curl_type<Number>> &) const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_hessians_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::hessian_type> &) const;
+        const VEC<Number> &, std::vector<solution_hessian_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_laplacians_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::value_type> &) const;
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_third_derivatives_from_local_dof_values<VEC<Number>>(
         const VEC<Number> &,
-        std::vector<typename OutputType<Number>::third_derivative_type> &)
-        const;
+        std::vector<solution_third_derivative_type<Number>> &) const;
 
 
 
-    template void FEValuesViews::
-      SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>::
-        get_function_values_from_local_dof_values<VEC<Number>>(
-          const VEC<Number> &,
-          std::vector<typename OutputType<Number>::value_type> &) const;
+    template void FEValuesViews::SymmetricTensor<2,
+                                                 deal_II_dimension,
+                                                 deal_II_space_dimension>::
+      get_function_values_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void FEValuesViews::
       SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>::
         get_function_divergences_from_local_dof_values<VEC<Number>>(
-          const VEC<Number> &,
-          std::vector<typename OutputType<Number>::divergence_type> &) const;
+          const VEC<Number> &, std::vector<solution_divergence_type<Number>> &)
+          const;
 
 
 
     template void
     FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
       get_function_values_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::value_type> &) const;
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
 
     template void
     FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
       get_function_divergences_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::divergence_type> &) const;
+        const VEC<Number> &, std::vector<solution_divergence_type<Number>> &)
+        const;
 
     template void
     FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
       get_function_gradients_from_local_dof_values<VEC<Number>>(
-        const VEC<Number> &,
-        std::vector<typename OutputType<Number>::gradient_type> &) const;
-#endif
+        const VEC<Number> &, std::vector<solution_gradient_type<Number>> &)
+        const;
+#  endif
   }
 
 
 for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension
+#  if deal_II_dimension <= deal_II_space_dimension
 
     template void FEValuesBase<deal_II_dimension, deal_II_space_dimension>::
       get_function_values<VEC>(const VEC &, std::vector<VEC::value_type> &)
@@ -505,5 +488,6 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
           dealii::Tensor<3, deal_II_space_dimension, VEC::value_type>>>,
         bool) const;
 
-#endif
+#  endif
   }
+#endif

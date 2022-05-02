@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -151,14 +151,14 @@ check_periodicity(const DoFHandler<2> &dof_handler,
                   const unsigned int   cycle)
 {
   unsigned int n_points = 2;
-  for (unsigned int i = 0; i < cycle; i++)
+  for (unsigned int i = 0; i < cycle; ++i)
     n_points *= 2;
 
   // don't test exactly at the support points, since point_value is not stable
   // there
   const double eps = 1. / (16. * n_points);
 
-  for (unsigned int i = 1; i < n_points; i++)
+  for (unsigned int i = 1; i < n_points; ++i)
     {
       Vector<double> value1(1);
       Vector<double> value2(1);
@@ -187,7 +187,7 @@ check_periodicity(const DoFHandler<2> &dof_handler,
                     << "pass" << std::endl;
         }
     }
-  for (unsigned int i = 1; i < n_points; i++)
+  for (unsigned int i = 1; i < n_points; ++i)
     {
       Vector<double> value1(1);
       Vector<double> value2(1);

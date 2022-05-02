@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------
 #
-# Copyright (C) 2016 by the deal.II authors
+# Copyright (C) 2016 - 2019 by the deal.II authors
 #
 # This file is part of the deal.II library.
 #
@@ -24,7 +24,7 @@ class TestMappingWrapperCube(unittest.TestCase):
         self.triangulation.refine_global(1)
 
     def test_mapping(self):
-        mapping = MappingQGeneric(dim = 2, spacedim = 2, degree = 1)
+        mapping = MappingQ(dim = 2, spacedim = 2, degree = 1)
         p_unit = Point([0.5, 0.5])
         
         for cell in self.triangulation.active_cells():
@@ -41,7 +41,7 @@ class TestMappingWrapperSphere(unittest.TestCase):
         self.triangulation.generate_hyper_sphere(p_center)
 
     def test_mapping(self):
-        mapping = MappingQGeneric(dim = 2, spacedim = 3, degree = 4)
+        mapping = MappingQ(dim = 2, spacedim = 3, degree = 4)
         p_unit = Point([0.5, 0.5])
         
         for cell in self.triangulation.active_cells():

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,8 +54,8 @@ test(const unsigned int size,
     std::make_shared<Utilities::MPI::ProcessGrid>(
       mpi_communicator, size, size, block_size, block_size);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
-        << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << ' ' << block_size << ' ' << grid->get_process_grid_rows()
+        << ' ' << grid->get_process_grid_columns() << std::endl;
 
   // Create SPD matrices of requested size:
   FullMatrix<NumberType> full_A(size), singular_A(size);
@@ -91,8 +91,8 @@ test(const unsigned int size,
 
   if (this_mpi_process == 0)
     {
-      std::cout << "ranks: " << rank_1 << "/" << size << "  &  ";
-      std::cout << rank_2 << "/" << size << std::endl;
+      std::cout << "ranks: " << rank_1 << '/' << size << "  &  ";
+      std::cout << rank_2 << '/' << size << std::endl;
       double norm = full_pseudo_inverse.frobenius_norm();
       full_inverse.add(-1, full_pseudo_inverse);
       norm = full_inverse.frobenius_norm() / norm;

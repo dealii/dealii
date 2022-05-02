@@ -5,7 +5,7 @@ DEAL::1D QGauss OK
 DEAL::1D QGaussLobatto OK
 DEAL::1D QMidPoint OK
 DEAL::1D QSimpson OK
-DEAL::1D QTrapez OK
+DEAL::1D QTrapezoid OK
 DEAL::1D QMilne OK
 DEAL::1D QWeddle OK
 DEAL::1D QGaussChebyshev OK
@@ -21,7 +21,7 @@ DEAL::2D QGauss OK
 DEAL::2D QGaussLobatto OK
 DEAL::2D QMidPoint OK
 DEAL::2D QSimpson OK
-DEAL::2D QTrapez OK
+DEAL::2D QTrapezoid OK
 DEAL::2D QMilne OK
 DEAL::2D QWeddle OK
 DEAL::2D QGaussChebyshev OK
@@ -34,7 +34,7 @@ DEAL::3D QGauss OK
 DEAL::3D QGaussLobatto OK
 DEAL::3D QMidPoint OK
 DEAL::3D QSimpson OK
-DEAL::3D QTrapez OK
+DEAL::3D QTrapezoid OK
 DEAL::3D QMilne OK
 DEAL::3D QWeddle OK
 DEAL::3D QGaussChebyshev OK

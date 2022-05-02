@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,7 +76,7 @@ test()
   const std::vector<types::global_dof_index> dofs_per_block =
     DoFTools::count_dofs_per_fe_block(dof_handler, sub_blocks);
 
-  deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1]
+  deallog << "size: " << dofs_per_block[0] << ' ' << dofs_per_block[1]
           << std::endl;
 
   std::vector<IndexSet> locally_relevant_partitioning;
@@ -102,7 +102,7 @@ test()
   deallog << "relevant: ";
   locally_relevant_dofs.print(deallog);
 
-  typedef typename LA::MPI::BlockSparseMatrix::value_type number;
+  using number = typename LA::MPI::BlockSparseMatrix::value_type;
 
   AffineConstraints<number> constraints(locally_relevant_dofs);
   constraints.close();
@@ -160,9 +160,9 @@ template <int dim>
 void
 test_alt()
 {
-  typedef LA_Trilinos LA;
-  unsigned int        myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  unsigned int        numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  using LA             = LA_Trilinos;
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   if (myid == 0)
     deallog << "numproc=" << numproc << std::endl;
@@ -181,7 +181,7 @@ test_alt()
   const std::vector<types::global_dof_index> dofs_per_block =
     DoFTools::count_dofs_per_fe_block(dof_handler, sub_blocks);
 
-  deallog << "size: " << dofs_per_block[0] << " " << dofs_per_block[1]
+  deallog << "size: " << dofs_per_block[0] << ' ' << dofs_per_block[1]
           << std::endl;
 
   std::vector<IndexSet> locally_relevant_partitioning;

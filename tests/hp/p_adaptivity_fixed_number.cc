@@ -1,6 +1,6 @@
 ﻿// ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,12 +21,13 @@
 
 #include <deal.II/base/geometry_info.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/refinement.h>
 
@@ -38,11 +39,11 @@
 
 template <int dim>
 void
-validate(const hp::DoFHandler<dim> &dh)
+validate(const DoFHandler<dim> &dh)
 {
   deallog << " fe_indices:";
   for (const auto &cell : dh.active_cell_iterators())
-    deallog << " " << cell->future_fe_index();
+    deallog << ' ' << cell->future_fe_index();
   deallog << std::endl;
 }
 
@@ -50,19 +51,15 @@ validate(const hp::DoFHandler<dim> &dh)
 
 template <int dim>
 void
-setup(Triangulation<dim> &         tria,
-      hp::DoFHandler<dim> &        dh,
-      const hp::FECollection<dim> &fes)
+setup(Triangulation<dim> &tria, const DoFHandler<dim> &dh)
 {
-  // Initialize triangulation and dofhandler.
+  // Initialize triangulation.
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
-  dh.initialize(tria, fes);
 
-  // Set all active fe indices to 1.
+  // Set all active FE indices to 1.
   // Flag first half of cells for refinement, and the other half for coarsening.
-  typename hp::DoFHandler<dim>::cell_iterator cell = dh.begin(1),
-                                              endc = dh.end(1);
+  typename DoFHandler<dim>::cell_iterator cell = dh.begin(1), endc = dh.end(1);
   for (unsigned int counter = 0; cell != endc; ++counter, ++cell)
     {
       Assert(!cell->is_active(), ExcInternalError());
@@ -92,17 +89,18 @@ test()
   for (unsigned int d = 1; d <= 3; ++d)
     fes.push_back(FE_Q<dim>(d));
 
-  Triangulation<dim>  tria;
-  hp::DoFHandler<dim> dh;
-  setup(tria, dh, fes);
+  Triangulation<dim> tria;
+  DoFHandler<dim>    dh(tria);
+  setup(tria, dh);
+  dh.distribute_dofs(fes);
 
   deallog << "starting situation" << std::endl;
   validate(dh);
 
 
   // We flag the first half of all cells to be refined and the last half of all
-  // cells to be coarsened for p adapativity. Ultimately, the first quarter of
-  // all cells will be flagged for p refinement, and the last quarter for p
+  // cells to be coarsened for p-adapativity. Ultimately, the first quarter of
+  // all cells will be flagged for p-refinement, and the last quarter for p-
   // coarsening.
 
   const unsigned int n_active = tria.n_active_cells();

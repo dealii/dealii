@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2019 by the deal.II authors
+// Copyright (C) 2015 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,9 +68,6 @@ DEAL_II_NAMESPACE_OPEN
  * problem for hp-hexahedral N&eacute;d&eacute;lec elements with application to
  * eddy current problems</b>, Computers & Structures 181, 41-54, 2017 (see
  * https://doi.org/10.1016/j.compstruc.2016.05.021).
- *
- * @author Ross Kynch
- * @date 2016, 2017, 2018
  */
 template <int dim, int spacedim = dim>
 class FE_NedelecSZ : public FiniteElement<dim, dim>
@@ -83,7 +80,7 @@ public:
    * Constructor for the NedelecSZ element of given @p order. The maximal
    * polynomial degree of the shape functions is `order+1` (in each variable;
    * the total polynomial degree may be higher). If `order = 0`, the element is
-   * linear and has degrees of freedom only on the edges. If `order >=1` the
+   * linear and has degrees of freedom only on the edges. If `order >= 1` the
    * element has degrees of freedom on the edges, faces and volume. For example
    * the 3D version of FE_NedelecSZ has 12 degrees of freedom for `order = 0`
    * and 54 for `degree = 1`. It is important to have enough quadrature points
@@ -182,6 +179,8 @@ protected:
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
       &data) const override;
 
+  using FiniteElement<dim, spacedim>::fill_fe_face_values;
+
   /**
    * Compute information about the shape functions on the cell and face denoted
    * by the first two arguments. Note that this function must recompute the
@@ -191,7 +190,7 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, dim>::cell_iterator &cell,
     const unsigned int                                     face_no,
-    const Quadrature<dim - 1> &                            quadrature,
+    const hp::QCollection<dim - 1> &                       quadrature,
     const Mapping<dim, dim> &                              mapping,
     const typename Mapping<dim, dim>::InternalDataBase &   mapping_internal,
     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim>
@@ -257,6 +256,16 @@ protected:
     mutable std::vector<std::vector<DerivativeForm<1, dim, dim>>> shape_grads;
 
     /**
+     * Storage for shape function hessians on the reference element. We only
+     * pre-compute cell-based DoFs, as the edge- and face-based DoFs depend on
+     * the cell.
+     *
+     * Due to the cell-dependent DoFs, this variable is declared mutable.
+     */
+    mutable std::vector<std::vector<DerivativeForm<2, dim, dim>>>
+      shape_hessians;
+
+    /**
      * Storage for all possible edge parameterization between vertices. These
      * are required in the computation of edge- and face-based DoFs, which are
      * cell-dependent.
@@ -313,7 +322,6 @@ protected:
      *
      * These values change with the orientation of the edges of a physical cell
      * and so must take the "sign" into account when used for computation.
-     *
      */
     std::vector<std::vector<double>> edge_sigma_grads;
 

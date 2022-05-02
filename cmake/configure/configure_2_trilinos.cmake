@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2019 by the deal.II authors
+## Copyright (C) 2012 - 2021 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -17,6 +17,7 @@
 # Configuration for the trilinos library:
 #
 
+SET(FEATURE_TRILINOS_DEPENDS MPI)
 
 MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
   FIND_PACKAGE(TRILINOS)
@@ -38,7 +39,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # Check whether all required modules of trilinos are installed:
     #
     MESSAGE(STATUS
-      "Check whether the found trilinos package contains all required modules:"
+      "Checking whether the found trilinos package contains all required modules:"
       )
 
     FOREACH(_module
@@ -46,9 +47,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       )
       ITEM_MATCHES(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
-        MESSAGE(STATUS "Found ${_module}")
+        MESSAGE(STATUS "  Found ${_module}")
       ELSE()
-        MESSAGE(STATUS "Module ${_module} not found!")
+        MESSAGE(STATUS "  Module ${_module} not found!")
         SET(_modules_missing "${_modules_missing} ${_module}")
         SET(${var} FALSE)
       ENDIF()
@@ -87,37 +88,15 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # Trilinos has to be configured with the same MPI configuration as
     # deal.II.
     #
-    IF( (TRILINOS_WITH_MPI AND NOT DEAL_II_WITH_MPI)
-         OR
-         (NOT TRILINOS_WITH_MPI AND DEAL_II_WITH_MPI))
+    IF(NOT TRILINOS_WITH_MPI)
       MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
-        "Trilinos has to be configured with the same MPI configuration as deal.II."
+        "Trilinos has to have MPI support enabled."
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
-        "has to be configured with the same MPI configuration as deal.II, but found:\n"
-        "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
+        "has to be configured with MPI support, but found:\n"
         "  TRILINOS_WITH_MPI = ${TRILINOS_WITH_MPI}\n"
-        )
-      SET(${var} FALSE)
-    ENDIF()
-
-    #
-    # deal.II has to be configured with MPI if both Trilinos and PETSc are
-    # enabled.
-    #
-    IF(DEAL_II_WITH_TRILINOS AND DEAL_II_WITH_PETSC AND NOT DEAL_II_WITH_MPI)
-      MESSAGE(STATUS "Incompatible configuration settings: "
-        "MPI must be enabled to use both Trilinos and PETSc, as both libraries "
-        "provide mutually incompatible MPI stubs."
-        )
-      SET(TRILINOS_ADDITIONAL_ERROR_STRING
-        ${TRILINOS_ADDITIONAL_ERROR_STRING}
-        "Incompatible Trilinos and PETSc libraries found. Both libraries were "
-        "configured without MPI support and cannot be used at the same time due "
-        "to incompatible MPI stub files. Either reconfigure deal.II, Trilinos, "
-        "and PETSc with MPI support, or disable one of the libraries.\n"
         )
       SET(${var} FALSE)
     ENDIF()
@@ -171,14 +150,14 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       #
       # Check for modules.
       #
-      FOREACH(_optional_module EpetraExt ROL Sacado Tpetra MueLu Zoltan)
+      FOREACH(_optional_module EpetraExt Kokkos MueLu ROL Sacado SEACAS Tpetra Zoltan)
         ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
         IF(_module_found)
-          MESSAGE(STATUS "Found ${_optional_module}")
+          MESSAGE(STATUS "  Found ${_optional_module}")
           STRING(TOUPPER "${_optional_module}" _optional_module_upper)
           SET(DEAL_II_TRILINOS_WITH_${_optional_module_upper} ON)
         ELSE()
-          MESSAGE(STATUS "Module ${_optional_module} not found!")
+          MESSAGE(STATUS "  Module ${_optional_module} not found!")
         ENDIF()
       ENDFOREACH()
 
@@ -188,22 +167,29 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       FOREACH(_optional_tpl MUMPS)
         ITEM_MATCHES(_tpl_found ${_optional_tpl} ${Trilinos_TPL_LIST})
         IF(_tpl_found)
-          MESSAGE(STATUS "Found ${_optional_tpl}")
+          MESSAGE(STATUS "  Found ${_optional_tpl}")
           STRING(TOUPPER "${_optional_tpl}" _optional_tpl_upper)
           SET(DEAL_II_TRILINOS_WITH_${_optional_tpl_upper} ON)
         ELSE()
-          MESSAGE(STATUS "Module ${_optional_tpl} not found!")
+          MESSAGE(STATUS "  Module ${_optional_tpl} not found!")
         ENDIF()
       ENDFOREACH()
     ENDIF()
 
-    IF(DEAL_II_TRILINOS_WITH_TPETRA)
-      #
-      # Check if Tpetra is usable in fact.
-      #
-      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
-      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
-      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+    IF(DEAL_II_TRILINOS_WITH_KOKKOS)
+      CHECK_SYMBOL_EXISTS(
+        "KOKKOS_ENABLE_CUDA"
+        "Kokkos_Macros.hpp"
+        DEAL_II_KOKKOS_CUDA_EXISTS
+        )
+      IF(DEAL_II_KOKKOS_CUDA_EXISTS)
+        # We need to disable SIMD vectorization for CUDA device code.
+        # Otherwise, nvcc compilers from version 9 on will emit an error message like:
+        # "[...] contains a vector, which is not supported in device code". We
+        # would like to set the variable in check_01_cpu_feature but at that point
+        # we don't know if CUDA support is enabled in Kokkos
+        SET(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+      ENDIF()
 
       CHECK_SYMBOL_EXISTS(
         "KOKKOS_ENABLE_CUDA_LAMBDA"
@@ -213,6 +199,27 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       IF(DEAL_II_KOKKOS_LAMBDA_EXISTS)
         ADD_FLAGS(CMAKE_REQUIRED_FLAGS "--expt-extended-lambda")
       ENDIF()
+
+      # We need a recent version of Trilinos to use kokkos_check. We want to use
+      # VERSION_GREATER_EQUAL 13.0 but this requires CMake 3.7
+      IF(TRILINOS_VERSION VERSION_GREATER 12.99)
+        SET(KOKKOS_WITH_OPENMP "")
+        kokkos_check(DEVICES OpenMP RETURN_VALUE KOKKOS_WITH_OPENMP)
+        IF(KOKKOS_WITH_OPENMP)
+          FIND_PACKAGE(OpenMP REQUIRED)
+          ADD_FLAGS(DEAL_II_CXX_FLAGS "${OpenMP_CXX_FLAGS}")
+          ADD_FLAGS(DEAL_II_LINKER_FLAGS "${OpenMP_CXX_FLAGS}")
+        ENDIF()
+      ENDIF()
+    ENDIF()
+
+    IF(DEAL_II_TRILINOS_WITH_TPETRA)
+      #
+      # Check if Tpetra is usable in fact.
+      #
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+
 
       LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
 
@@ -252,7 +259,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       #
       LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
       LIST(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
-      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
 
       LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
 
@@ -283,6 +289,43 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDIF()
     ENDIF()
 
+    # the only thing we use from SEACAS right now is ExodusII, so just check
+    # that it works
+    IF(${DEAL_II_TRILINOS_WITH_SEACAS})
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES})
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <exodusII.h>
+        int
+        main()
+        {
+          int component_word_size = sizeof(double);
+          int floating_point_word_size = 0;
+          float ex_version = 0;
+          const int ex_id = ex_open(\"test.ex\",
+                                    EX_READ,
+                                    &component_word_size,
+                                    &floating_point_word_size,
+                                    &ex_version);
+          ex_close(ex_id);
+          return 0;
+        }
+        "
+        TRILINOS_SEACAS_IS_FUNCTIONAL
+        )
+
+      RESET_CMAKE_REQUIRED()
+
+      IF(NOT TRILINOS_SEACAS_IS_FUNCTIONAL)
+        MESSAGE(
+          STATUS
+          "SEACAS was found but doesn't seem to include ExodusII. Disabling SEACAS support."
+          )
+        SET(DEAL_II_TRILINOS_WITH_SEACAS OFF)
+      ENDIF()
+    ENDIF()
+
     IF(${DEAL_II_TRILINOS_WITH_SACADO})
       #
       # Look for Sacado_config.h - we'll query it to determine C++11 support:
@@ -292,15 +335,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
         NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
         )
-
-      IF(EXISTS ${SACADO_CONFIG_H})
-        #
-        # Determine whether Trilinos was configured with C++11 support and
-        # enabling C++11 in deal.II is mandatory.
-        #
-        FILE(STRINGS "${SACADO_CONFIG_H}" SACADO_CXX11_STRING
-          REGEX "#define HAVE_SACADO_CXX11")
-      ENDIF()
 
       #
       # GCC 6.3.0 has a bug that prevents the creation of complex
@@ -320,7 +354,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
 
       IF(EXISTS ${SACADO_TRAD_HPP})
         LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
-        ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
 
         CHECK_CXX_SOURCE_COMPILES(
           "
@@ -351,15 +384,13 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
       "TrilinosWrappers::BlockSparseMatrix")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
-  IF (TRILINOS_WITH_MPI)
-    SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
-    IF (${DEAL_II_TRILINOS_WITH_TPETRA})
-      SET(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
-      SET(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
-      IF (${DEAL_II_WITH_COMPLEX_NUMBERS})
-        SET(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
-        SET(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
-      ENDIF()
+  SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
+  IF (${DEAL_II_TRILINOS_WITH_TPETRA})
+    SET(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
+    SET(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
+    IF (${DEAL_II_WITH_COMPLEX_NUMBERS})
+      SET(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
+      SET(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
     ENDIF()
   ENDIF()
   IF(${DEAL_II_TRILINOS_WITH_SACADO})

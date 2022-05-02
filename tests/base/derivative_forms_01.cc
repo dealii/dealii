@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,8 +25,8 @@
 // and we compute the first and second derivatives using
 // Sacado
 
-typedef typename Sacado::Fad::DFad<double>  Sdouble;
-typedef typename Sacado::Fad::DFad<Sdouble> SSdouble;
+using Sdouble  = typename Sacado::Fad::DFad<double>;
+using SSdouble = typename Sacado::Fad::DFad<Sdouble>;
 
 template <int dim, int spacedim>
 void

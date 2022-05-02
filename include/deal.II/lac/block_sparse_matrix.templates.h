@@ -183,7 +183,7 @@ BlockSparseMatrix<number>::print_formatted(std::ostream &     out,
   for (size_type r = 0; r < this->n_block_rows(); ++r)
     for (size_type c = 0; c < this->n_block_cols(); ++c)
       {
-        out << "Component (" << r << "," << c << ")" << std::endl;
+        out << "Component (" << r << ',' << c << ')' << std::endl;
         this->block(r, c).print_formatted(
           out, precision, scientific, width, zero_string, denominator);
       }

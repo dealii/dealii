@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2019 by the deal.II authors
+ * Copyright (C) 2018 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -39,10 +39,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
@@ -54,7 +51,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_out_faces.h>
-#include <deal.II/grid/grid_generator.h>
 
 #include <fstream>
 #include <iostream>
@@ -145,8 +141,7 @@ namespace Step61
   void Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
                                     std::vector<Tensor<2, dim>> &  values) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    AssertDimension(points.size(), values.size());
     for (unsigned int p = 0; p < points.size(); ++p)
       values[p] = unit_symmetric_tensor<dim>();
   }
@@ -413,8 +408,8 @@ namespace Step61
                                             update_quadrature_points |
                                             update_JxW_values);
 
-    const unsigned int dofs_per_cell      = fe.dofs_per_cell;
-    const unsigned int dofs_per_cell_dgrt = fe_dgrt.dofs_per_cell;
+    const unsigned int dofs_per_cell      = fe.n_dofs_per_cell();
+    const unsigned int dofs_per_cell_dgrt = fe_dgrt.n_dofs_per_cell();
 
     const unsigned int n_q_points      = fe_values.get_quadrature().size();
     const unsigned int n_q_points_dgrt = fe_values_dgrt.get_quadrature().size();
@@ -526,7 +521,7 @@ namespace Step61
 
             for (unsigned int q = 0; q < n_face_q_points; ++q)
               {
-                const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
+                const Tensor<1, dim> &normal = fe_face_values.normal_vector(q);
 
                 for (unsigned int i = 0; i < dofs_per_cell_dgrt; ++i)
                   {
@@ -667,8 +662,8 @@ namespace Step61
                                             update_quadrature_points |
                                             update_JxW_values);
 
-    const unsigned int dofs_per_cell      = fe.dofs_per_cell;
-    const unsigned int dofs_per_cell_dgrt = fe_dgrt.dofs_per_cell;
+    const unsigned int dofs_per_cell      = fe.n_dofs_per_cell();
+    const unsigned int dofs_per_cell_dgrt = fe_dgrt.n_dofs_per_cell();
 
     const unsigned int n_q_points      = fe_values.get_quadrature().size();
     const unsigned int n_q_points_dgrt = fe_values_dgrt.get_quadrature().size();
@@ -773,7 +768,7 @@ namespace Step61
 
             for (unsigned int q = 0; q < n_face_q_points; ++q)
               {
-                const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
+                const Tensor<1, dim> &normal = fe_face_values.normal_vector(q);
 
                 for (unsigned int i = 0; i < dofs_per_cell_dgrt; ++i)
                   {
@@ -943,7 +938,7 @@ namespace Step61
                 const Tensor<1, dim> true_velocity =
                   exact_velocity.value(fe_face_values_dgrt.quadrature_point(q));
 
-                const Tensor<1, dim> normal =
+                const Tensor<1, dim> &normal =
                   fe_face_values_dgrt.normal_vector(q);
 
                 L2_err_flux_face_sqr_local +=

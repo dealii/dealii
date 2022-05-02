@@ -1,5 +1,0 @@
-New: CUDAWrappers::MatrixFree::initialize_dof_vector() can be used to
-initialize vectors suitable for the parallel partitioning of the degrees of
-freedoms similar to MatrixFree::initialize_dof_vector().
-<br>
-(Daniel Arndt, 2019/07/19)

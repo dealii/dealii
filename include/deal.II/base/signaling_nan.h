@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,7 @@ namespace numbers
   {
     /**
      * A namespace for the implementation of functions that create signaling
-     * NaN objects. This is where the Utilities::signaling_nan() function
+     * NaN objects. This is where the numbers::signaling_nan() function
      * calls into.
      */
     namespace SignalingNaN
@@ -206,10 +206,40 @@ namespace numbers
    * objects is a "signaling NaN" ("NaN" stands for "not a number", and
    * "signaling" implies that at least on platforms where this is supported,
    * any arithmetic operation using them terminates the program). The purpose
-   * of such objects is to use them as markers for uninitialized objects and
-   * arrays that are required to be filled in other places, and to trigger an
-   * error when this later initialization does not happen before the first
-   * use.
+   * of such objects is to use them as markers for invalid objects and
+   * arrays that are required to be initialized to valid values at some point,
+   * and to trigger an error when this later initialization does not happen
+   * before the first use. An example is code such as this:
+   * @code
+   *   double x = numbers::signaling_nan<double>();
+   *   if (some condition)
+   *   {
+   *     ...much code computing a,b,c...
+   *     x = f(a,b,c);
+   *   }
+   *   else
+   *   {
+   *     ...more code...
+   *     // bug: we forgot to assign a value to 'x'.
+   *   }
+   *
+   *   return std::sin(x);
+   * @endcode
+   * The bug is that the `else` branch forgot to write a value into the `x`
+   * variable. If your platform supports signaling NaNs, then this mistake
+   * will become apparent in the last line above because the program is
+   * going to be terminated by a floating point exception: The processor
+   * realizes that the code is attempting to do an operation on the signaling
+   * NaN still stored in `x` and aborts the program, thereby facilitating
+   * an easy way to find what the problem is. This would not have been an easy
+   * bug to find if one had just initialized `x` to zero in the first line
+   * (or just left it uninitialized altogether): In that case, the call to
+   * `std::sin` in the last line would have simply computed the sine of
+   * "something" if `some condition == false`, but this invalid results may
+   * not have been obvious to the calling site and would have required
+   * a substantial amount of debugging to uncover because downstream
+   * computations would simply have been wrong, without any indication of
+   * *why* they are wrong.
    *
    * @tparam T The type of the returned invalid object. This type can either
    * be a scalar, or of type Tensor, SymmetricTensor, or DerivativeForm. Other

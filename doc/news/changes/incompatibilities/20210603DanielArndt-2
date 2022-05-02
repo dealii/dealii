@@ -1,0 +1,5 @@
+Removed: The deprecated overloads of 
+FETools::lexicographic_to_hierarchic_numbering() and
+FETools::hierarchic_to_lexicographic_numbering() have been removed.
+<br>
+(Daniel Arndt, 2021/06/03)

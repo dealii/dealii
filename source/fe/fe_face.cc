@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,6 @@
 
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/fe/fe_face.h>
 #include <deal.II/fe/fe_nothing.h>
@@ -24,6 +23,7 @@
 
 #include <deal.II/lac/householder.h>
 
+#include <memory>
 #include <sstream>
 
 DEAL_II_NAMESPACE_OPEN
@@ -61,12 +61,12 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
 {
   // initialize unit face support points
   const unsigned int codim = dim - 1;
-  this->unit_face_support_points.resize(
+  this->unit_face_support_points[0].resize(
     Utilities::fixed_power<codim>(this->degree + 1));
 
   if (this->degree == 0)
     for (unsigned int d = 0; d < codim; ++d)
-      this->unit_face_support_points[0][d] = 0.5;
+      this->unit_face_support_points[0][0][d] = 0.5;
   else
     {
       std::vector<Point<1>> points =
@@ -85,16 +85,16 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
               if (codim > 2)
                 p(2) = points[iz][0];
 
-              this->unit_face_support_points[k++] = p;
+              this->unit_face_support_points[0][k++] = p;
             }
-      AssertDimension(k, this->unit_face_support_points.size());
+      AssertDimension(k, this->unit_face_support_points[0].size());
     }
 
   // initialize unit support points (this makes it possible to assign initial
   // values to FE_FaceQ)
   this->unit_support_points.resize(GeometryInfo<dim>::faces_per_cell *
-                                   this->unit_face_support_points.size());
-  const unsigned int n_face_dofs = this->unit_face_support_points.size();
+                                   this->unit_face_support_points[0].size());
+  const unsigned int n_face_dofs = this->unit_face_support_points[0].size();
   for (unsigned int i = 0; i < n_face_dofs; ++i)
     for (unsigned int d = 0; d < dim; ++d)
       {
@@ -106,9 +106,9 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
               if (dim == 3 && d == 1)
                 renumber = i / (degree + 1) + (degree + 1) * (i % (degree + 1));
               this->unit_support_points[n_face_dofs * 2 * d + i][e] =
-                this->unit_face_support_points[renumber][c];
+                this->unit_face_support_points[0][renumber][c];
               this->unit_support_points[n_face_dofs * (2 * d + 1) + i][e] =
-                this->unit_face_support_points[renumber][c];
+                this->unit_face_support_points[0][renumber][c];
               this->unit_support_points[n_face_dofs * (2 * d + 1) + i][d] = 1;
               ++c;
             }
@@ -121,7 +121,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_FaceQ<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_FaceQ<dim, spacedim>>(this->degree);
+  return std::make_unique<FE_FaceQ<dim, spacedim>>(this->degree);
 }
 
 
@@ -146,11 +146,13 @@ template <int dim, int spacedim>
 void
 FE_FaceQ<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int                  face_no) const
 {
   get_subface_interpolation_matrix(source_fe,
                                    numbers::invalid_unsigned_int,
-                                   interpolation_matrix);
+                                   interpolation_matrix,
+                                   face_no);
 }
 
 
@@ -160,15 +162,17 @@ void
 FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   const unsigned int                  subface,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int                  face_no) const
 {
   // this function is similar to the respective method in FE_Q
 
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+         ExcDimensionMismatch(interpolation_matrix.n(),
+                              this->n_dofs_per_face(face_no)));
+  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_face));
+                              x_source_fe.n_dofs_per_face(face_no)));
 
   // see if source is a FaceQ element
   if (const FE_FaceQ<dim, spacedim> *source_fe =
@@ -177,16 +181,16 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
       // Make sure that the element for which the DoFs should be constrained
       // is the one with the higher polynomial degree.  Actually the procedure
       // will work also if this assertion is not satisfied. But the matrices
-      // produced in that case might lead to problems in the hp procedures,
+      // produced in that case might lead to problems in the hp-procedures,
       // which use this method.
       Assert(
-        this->dofs_per_face <= source_fe->dofs_per_face,
+        this->n_dofs_per_face(face_no) <= source_fe->n_dofs_per_face(face_no),
         (typename FiniteElement<dim,
                                 spacedim>::ExcInterpolationNotImplemented()));
 
       // generate a quadrature with the unit face support points.
       const Quadrature<dim - 1> face_quadrature(
-        source_fe->get_unit_face_support_points());
+        source_fe->get_unit_face_support_points(face_no));
 
       // Rule of thumb for FP accuracy, that can be expected for a given
       // polynomial degree.  This value is used to cut off values close to
@@ -195,7 +199,7 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
 
       // compute the interpolation matrix by simply taking the value at the
       // support points.
-      for (unsigned int i = 0; i < source_fe->dofs_per_face; ++i)
+      for (unsigned int i = 0; i < source_fe->n_dofs_per_face(face_no); ++i)
         {
           const Point<dim - 1> p =
             subface == numbers::invalid_unsigned_int ?
@@ -203,7 +207,7 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
               GeometryInfo<dim - 1>::child_to_cell_coordinates(
                 face_quadrature.point(i), subface);
 
-          for (unsigned int j = 0; j < this->dofs_per_face; ++j)
+          for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
             {
               double matrix_entry = this->poly_space.compute_value(j, p);
 
@@ -219,17 +223,19 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
             }
         }
 
+#ifdef DEBUG
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1
-      for (unsigned int j = 0; j < source_fe->dofs_per_face; ++j)
+      for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
         {
           double sum = 0.;
 
-          for (unsigned int i = 0; i < this->dofs_per_face; ++i)
+          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
             sum += interpolation_matrix(j, i);
 
           Assert(std::fabs(sum - 1) < eps, ExcInternalError());
         }
+#endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
     {
@@ -250,7 +256,7 @@ FE_FaceQ<dim, spacedim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  return (face_index == (shape_index / this->dofs_per_face));
+  return (face_index == (shape_index / this->n_dofs_per_face(face_index)));
 }
 
 
@@ -336,7 +342,8 @@ FE_FaceQ<dim, spacedim>::hp_line_dof_identities(
           // equivalencies to be recorded
           return std::vector<std::pair<unsigned int, unsigned int>>();
         }
-      else if (fe_other.dofs_per_face == 0)
+      else if (fe_other.n_unique_faces() == 1 &&
+               fe_other.n_dofs_per_face(0) == 0)
         {
           // if the other element has no elements on faces at all,
           // then it would be impossible to enforce any kind of
@@ -360,7 +367,8 @@ FE_FaceQ<dim, spacedim>::hp_line_dof_identities(
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_FaceQ<dim, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<dim, spacedim> &fe_other) const
+  const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int) const
 {
   Assert(dim >= 3, ExcInternalError());
 
@@ -413,7 +421,8 @@ FE_FaceQ<dim, spacedim>::hp_quad_dof_identities(
           // equivalencies to be recorded
           return std::vector<std::pair<unsigned int, unsigned int>>();
         }
-      else if (fe_other.dofs_per_face == 0)
+      else if (fe_other.n_unique_faces() == 1 &&
+               fe_other.n_dofs_per_face(0) == 0)
         {
           // if the other element has no elements on faces at all,
           // then it would be impossible to enforce any kind of
@@ -475,8 +484,8 @@ template <int dim, int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_FaceQ<dim, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     constant_modes(0, i) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(1, 0));
@@ -491,9 +500,9 @@ FE_FaceQ<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   AssertDimension(support_point_values.size(),
                   this->get_unit_support_points().size());
   AssertDimension(support_point_values.size(), nodal_values.size());
-  AssertDimension(this->dofs_per_cell, nodal_values.size());
+  AssertDimension(this->n_dofs_per_cell(), nodal_values.size());
 
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     {
       AssertDimension(support_point_values[i].size(), 1);
 
@@ -513,7 +522,7 @@ FE_FaceQ<1, spacedim>::FE_FaceQ(const unsigned int degree)
       std::vector<bool>(1, true),
       std::vector<ComponentMask>(1, ComponentMask(1, true)))
 {
-  this->unit_face_support_points.resize(1);
+  this->unit_face_support_points[0].resize(1);
 
   // initialize unit support points (this makes it possible to assign initial
   // values to FE_FaceQ)
@@ -527,7 +536,7 @@ template <int spacedim>
 std::unique_ptr<FiniteElement<1, spacedim>>
 FE_FaceQ<1, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_FaceQ<1, spacedim>>(this->degree);
+  return std::make_unique<FE_FaceQ<1, spacedim>>(this->degree);
 }
 
 
@@ -552,11 +561,13 @@ template <int spacedim>
 void
 FE_FaceQ<1, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<1, spacedim> &source_fe,
-  FullMatrix<double> &              interpolation_matrix) const
+  FullMatrix<double> &              interpolation_matrix,
+  const unsigned int                face_no) const
 {
   get_subface_interpolation_matrix(source_fe,
                                    numbers::invalid_unsigned_int,
-                                   interpolation_matrix);
+                                   interpolation_matrix,
+                                   face_no);
 }
 
 
@@ -566,14 +577,18 @@ void
 FE_FaceQ<1, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<1, spacedim> &x_source_fe,
   const unsigned int /*subface*/,
-  FullMatrix<double> &interpolation_matrix) const
+  FullMatrix<double> &interpolation_matrix,
+  const unsigned int  face_no) const
 {
   (void)x_source_fe;
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+  (void)face_no;
+
+  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+         ExcDimensionMismatch(interpolation_matrix.n(),
+                              this->n_dofs_per_face(face_no)));
+  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_face));
+                              x_source_fe.n_dofs_per_face(face_no)));
   interpolation_matrix(0, 0) = 1.;
 }
 
@@ -635,7 +650,8 @@ FE_FaceQ<1, spacedim>::hp_line_dof_identities(
 template <int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_FaceQ<1, spacedim>::hp_quad_dof_identities(
-  const FiniteElement<1, spacedim> &) const
+  const FiniteElement<1, spacedim> &,
+  const unsigned int) const
 {
   // this element is continuous only for the highest dimensional bounding object
   return std::vector<std::pair<unsigned int, unsigned int>>();
@@ -647,8 +663,8 @@ template <int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_FaceQ<1, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
-  for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     constant_modes(0, i) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(1, 0));
@@ -698,7 +714,7 @@ void
 FE_FaceQ<1, spacedim>::fill_fe_face_values(
   const typename Triangulation<1, spacedim>::cell_iterator &,
   const unsigned int face,
-  const Quadrature<0> &,
+  const hp::QCollection<0> &,
   const Mapping<1, spacedim> &,
   const typename Mapping<1, spacedim>::InternalDataBase &,
   const dealii::internal::FEValuesImplementation::MappingRelatedData<1,
@@ -712,7 +728,7 @@ FE_FaceQ<1, spacedim>::fill_fe_face_values(
   const unsigned int foffset = face;
   if (fe_internal.update_each & update_values)
     {
-      for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
+      for (unsigned int k = 0; k < this->n_dofs_per_cell(); ++k)
         output_data.shape_values(k, 0) = 0.;
       output_data.shape_values(foffset, 0) = 1;
     }
@@ -761,7 +777,7 @@ template <int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_FaceP<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_FaceP<dim, spacedim>>(this->degree);
+  return std::make_unique<FE_FaceP<dim, spacedim>>(this->degree);
 }
 
 
@@ -788,7 +804,7 @@ FE_FaceP<dim, spacedim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  return (face_index == (shape_index / this->dofs_per_face));
+  return (face_index == (shape_index / this->n_dofs_per_face(face_index)));
 }
 
 
@@ -861,11 +877,13 @@ template <int dim, int spacedim>
 void
 FE_FaceP<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int                  face_no) const
 {
   get_subface_interpolation_matrix(source_fe,
                                    numbers::invalid_unsigned_int,
-                                   interpolation_matrix);
+                                   interpolation_matrix,
+                                   face_no);
 }
 
 
@@ -875,15 +893,17 @@ void
 FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   const unsigned int                  subface,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double> &                interpolation_matrix,
+  const unsigned int                  face_no) const
 {
   // this function is similar to the respective method in FE_Q
 
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+  Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
+         ExcDimensionMismatch(interpolation_matrix.n(),
+                              this->n_dofs_per_face(face_no)));
+  Assert(interpolation_matrix.m() == x_source_fe.n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_face));
+                              x_source_fe.n_dofs_per_face(face_no)));
 
   // see if source is a FaceP element
   if (const FE_FaceP<dim, spacedim> *source_fe =
@@ -892,10 +912,10 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
       // Make sure that the element for which the DoFs should be constrained
       // is the one with the higher polynomial degree.  Actually the procedure
       // will work also if this assertion is not satisfied. But the matrices
-      // produced in that case might lead to problems in the hp procedures,
+      // produced in that case might lead to problems in the hp-procedures,
       // which use this method.
       Assert(
-        this->dofs_per_face <= source_fe->dofs_per_face,
+        this->n_dofs_per_face(face_no) <= source_fe->n_dofs_per_face(face_no),
         (typename FiniteElement<dim,
                                 spacedim>::ExcInterpolationNotImplemented()));
 
@@ -909,7 +929,8 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
       // zero.
       const double eps = 2e-13 * (this->degree + 1) * (dim - 1);
 
-      FullMatrix<double> mass(face_quadrature.size(), source_fe->dofs_per_face);
+      FullMatrix<double> mass(face_quadrature.size(),
+                              source_fe->n_dofs_per_face(face_no));
 
       for (unsigned int k = 0; k < face_quadrature.size(); ++k)
         {
@@ -919,23 +940,23 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
               GeometryInfo<dim - 1>::child_to_cell_coordinates(
                 face_quadrature.point(k), subface);
 
-          for (unsigned int j = 0; j < source_fe->dofs_per_face; ++j)
+          for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
             mass(k, j) = source_fe->poly_space.compute_value(j, p);
         }
 
       Householder<double> H(mass);
       Vector<double>      v_in(face_quadrature.size());
-      Vector<double>      v_out(source_fe->dofs_per_face);
+      Vector<double>      v_out(source_fe->n_dofs_per_face(face_no));
 
 
       // compute the interpolation matrix by evaluating on the fine side and
       // then solving the least squares problem
-      for (unsigned int i = 0; i < this->dofs_per_face; ++i)
+      for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
         {
           for (unsigned int k = 0; k < face_quadrature.size(); ++k)
             {
               const Point<dim - 1> p =
-                numbers::invalid_unsigned_int ?
+                subface == numbers::invalid_unsigned_int ?
                   face_quadrature.point(k) :
                   GeometryInfo<dim - 1>::child_to_cell_coordinates(
                     face_quadrature.point(k), subface);
@@ -945,7 +966,7 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
           (void)result;
           Assert(result < 1e-12, FETools::ExcLeastSquaresError(result));
 
-          for (unsigned int j = 0; j < source_fe->dofs_per_face; ++j)
+          for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)
             {
               double matrix_entry = v_out(j);
 
@@ -978,9 +999,9 @@ template <int dim, int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FE_FaceP<dim, spacedim>::get_constant_modes() const
 {
-  Table<2, bool> constant_modes(1, this->dofs_per_cell);
+  Table<2, bool> constant_modes(1, this->n_dofs_per_cell());
   for (unsigned int face : GeometryInfo<dim>::face_indices())
-    constant_modes(0, face * this->dofs_per_face) = true;
+    constant_modes(0, face * this->n_dofs_per_face(face)) = true;
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     constant_modes, std::vector<unsigned int>(1, 0));
 }

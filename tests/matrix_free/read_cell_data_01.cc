@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,7 @@ public:
       Triangulation<dim>::limit_level_difference_at_vertices);
     GridGenerator::hyper_cube(tria);
 
-    for (unsigned int i = 0; i < 3; i++)
+    for (unsigned int i = 0; i < 3; ++i)
       {
         tria.begin_active(i)->set_refine_flag();
         tria.execute_coarsening_and_refinement();
@@ -108,10 +108,18 @@ private:
     unsigned int n_cells = data.n_cell_batches() + data.n_ghost_cell_batches();
     cell_ids.resize(n_cells);
 
-    for (unsigned int cell = 0; cell < n_cells; cell++)
-      for (auto lane = 0u; lane < data.n_active_entries_per_cell_batch(cell);
-           lane++)
-        cell_ids[cell][lane] = data.get_cell_iterator(cell, lane)->id();
+    FEEvaluation<dim, 1> fe_eval(data);
+    for (unsigned int cell = 0; cell < n_cells; ++cell)
+      {
+        fe_eval.reinit(cell);
+
+        std::array<CellId, VectorizedArrayType::size()> cell_ids_local;
+        for (auto lane = 0u; lane < data.n_active_entries_per_cell_batch(cell);
+             lane++)
+          cell_ids_local[lane] = data.get_cell_iterator(cell, lane)->id();
+
+        fe_eval.set_cell_data(cell_ids, cell_ids_local);
+      }
   }
 
   void
@@ -121,7 +129,7 @@ private:
                  const std::pair<unsigned int, unsigned int> &pair) const
   {
     FEEvaluation<dim, 1> fe_eval(data);
-    for (auto cell = pair.first; cell < pair.second; cell++)
+    for (auto cell = pair.first; cell < pair.second; ++cell)
       {
         fe_eval.reinit(cell);
         const auto cell_data = fe_eval.read_cell_data(cell_ids);
@@ -140,7 +148,7 @@ private:
   {
     FEFaceEvaluation<dim, 1> fe_eval_m(data, true);
     FEFaceEvaluation<dim, 1> fe_eval_p(data, false);
-    for (auto face = pair.first; face < pair.second; face++)
+    for (auto face = pair.first; face < pair.second; ++face)
       {
         fe_eval_m.reinit(face);
         fe_eval_p.reinit(face);
@@ -167,7 +175,7 @@ private:
                      const std::pair<unsigned int, unsigned int> &pair) const
   {
     FEFaceEvaluation<dim, 1> fe_eval(data, true);
-    for (auto face = pair.first; face < pair.second; face++)
+    for (auto face = pair.first; face < pair.second; ++face)
       {
         fe_eval.reinit(face);
         const auto cell_data = fe_eval.read_cell_data(cell_ids);

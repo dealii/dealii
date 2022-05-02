@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,14 +13,53 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/thread_management.h>
+
 #include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/hp/fe_values.h>
+
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace hp
 {
+  namespace
+  {
+    /**
+     * Given a quadrature collection, create a vector of quadrature collections
+     * with each containing one quadrature rule from the input collection.
+     */
+    template <int q_dim>
+    std::vector<QCollection<q_dim>>
+    translate(const QCollection<q_dim> &q_collection)
+    {
+      std::vector<QCollection<q_dim>> q_collections;
+
+      for (unsigned int q = 0; q < q_collection.size(); ++q)
+        q_collections.emplace_back(q_collection[q]);
+
+      return q_collections;
+    }
+
+    /**
+     * Given a vector of quadrature collections, extract the first quadrature
+     * rule of each collection and construct with these a new collection.
+     */
+    template <int q_dim>
+    QCollection<q_dim>
+    translate(const std::vector<QCollection<q_dim>> &q_collections)
+    {
+      QCollection<q_dim> result;
+
+      for (unsigned int q = 0; q < q_collections.size(); ++q)
+        result.push_back(q_collections[q][0]);
+
+      return result;
+    }
+  } // namespace
+
   // -------------------------- FEValuesBase -------------------------
 
   template <int dim, int q_dim, class FEValuesType>
@@ -33,6 +72,27 @@ namespace hp
     : fe_collection(&fe_collection)
     , mapping_collection(&mapping_collection)
     , q_collection(q_collection)
+    , q_collections(translate(q_collection))
+    , fe_values_table(fe_collection.size(),
+                      mapping_collection.size(),
+                      q_collection.size())
+    , present_fe_values_index(numbers::invalid_unsigned_int,
+                              numbers::invalid_unsigned_int,
+                              numbers::invalid_unsigned_int)
+    , update_flags(update_flags)
+  {}
+
+  template <int dim, int q_dim, class FEValuesType>
+  FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
+    const MappingCollection<dim, FEValuesType::space_dimension>
+      &                                                     mapping_collection,
+    const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
+    const std::vector<QCollection<q_dim>> &                 q_collections,
+    const UpdateFlags                                       update_flags)
+    : fe_collection(&fe_collection)
+    , mapping_collection(&mapping_collection)
+    , q_collection(translate(q_collections))
+    , q_collections(q_collections)
     , fe_values_table(fe_collection.size(),
                       mapping_collection.size(),
                       q_collection.size())
@@ -48,17 +108,66 @@ namespace hp
     const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
     const QCollection<q_dim> &                              q_collection,
     const UpdateFlags                                       update_flags)
-    : fe_collection(&fe_collection)
-    , mapping_collection(
-        &dealii::hp::StaticMappingQ1<dim, FEValuesType::space_dimension>::
-          mapping_collection)
-    , q_collection(q_collection)
-    , fe_values_table(fe_collection.size(), 1, q_collection.size())
-    , present_fe_values_index(numbers::invalid_unsigned_int,
-                              numbers::invalid_unsigned_int,
-                              numbers::invalid_unsigned_int)
-    , update_flags(update_flags)
+    : FEValuesBase(
+        dealii::hp::StaticMappingQ1<dim, FEValuesType::space_dimension>::
+          mapping_collection,
+        fe_collection,
+        q_collection,
+        update_flags)
   {}
+
+
+  template <int dim, int q_dim, class FEValuesType>
+  FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
+    const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
+    const std::vector<QCollection<q_dim>> &                 q_collection,
+    const UpdateFlags                                       update_flags)
+    : FEValuesBase(
+        dealii::hp::StaticMappingQ1<dim, FEValuesType::space_dimension>::
+          mapping_collection,
+        fe_collection,
+        q_collection,
+        update_flags)
+  {}
+
+
+
+  template <int dim, int q_dim, class FEValuesType>
+  FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
+    const FEValuesBase<dim, q_dim, FEValuesType> &other)
+    : Subscriptor(other)
+    , fe_collection(other.fe_collection)
+    , mapping_collection(other.mapping_collection)
+    , q_collection(other.q_collection)
+    , q_collections(other.q_collections)
+    , fe_values_table(other.fe_values_table.size(0),
+                      other.fe_values_table.size(1),
+                      other.fe_values_table.size(2))
+    , present_fe_values_index(other.present_fe_values_index)
+    , update_flags(other.update_flags)
+  {
+    // We've already resized the `fe_values_table` correctly above, but right
+    // now it just contains nullptrs. Create copies of the objects that
+    // `other.fe_values_table` stores
+    Threads::TaskGroup<> task_group;
+    for (unsigned int fe_index = 0; fe_index < other.fe_values_table.size(0);
+         ++fe_index)
+      for (unsigned int m_index = 0; m_index < other.fe_values_table.size(1);
+           ++m_index)
+        for (unsigned int q_index = 0; q_index < other.fe_values_table.size(2);
+             ++q_index)
+          if (other.fe_values_table[fe_index][m_index][q_index].get() !=
+              nullptr)
+            task_group += Threads::new_task([&, fe_index, m_index, q_index]() {
+              fe_values_table[fe_index][m_index][q_index] =
+                std::make_unique<FEValuesType>((*mapping_collection)[m_index],
+                                               (*fe_collection)[fe_index],
+                                               q_collections[q_index],
+                                               update_flags);
+            });
+
+    task_group.join_all();
+  }
 
 
 
@@ -71,26 +180,81 @@ namespace hp
   {
     AssertIndexRange(fe_index, fe_collection->size());
     AssertIndexRange(mapping_index, mapping_collection->size());
-    AssertIndexRange(q_index, q_collection.size());
+    AssertIndexRange(q_index, q_collections.size());
 
 
-    // set the triple of indices
-    // that we want to work with
-    present_fe_values_index = TableIndices<3>(fe_index, mapping_index, q_index);
+    // set the triple of indices that we want to work with
+    present_fe_values_index = {fe_index, mapping_index, q_index};
 
-    // first check whether we
-    // already have an object for
-    // this particular combination
-    // of indices
+    // first check whether we already have an object for this particular
+    // combination of indices
     if (fe_values_table(present_fe_values_index).get() == nullptr)
       fe_values_table(present_fe_values_index) =
-        std::make_shared<FEValuesType>((*mapping_collection)[mapping_index],
+        std::make_unique<FEValuesType>((*mapping_collection)[mapping_index],
                                        (*fe_collection)[fe_index],
-                                       q_collection[q_index],
+                                       q_collections[q_index],
                                        update_flags);
 
     // now there definitely is one!
     return *fe_values_table(present_fe_values_index);
+  }
+
+
+
+  template <int dim, int q_dim, class FEValuesType>
+  void
+  FEValuesBase<dim, q_dim, FEValuesType>::precalculate_fe_values(
+    const std::vector<unsigned int> &fe_indices,
+    const std::vector<unsigned int> &mapping_indices,
+    const std::vector<unsigned int> &q_indices)
+  {
+    AssertDimension(fe_indices.size(), mapping_indices.size());
+    AssertDimension(fe_indices.size(), q_indices.size());
+
+    Threads::TaskGroup<> task_group;
+    for (unsigned int i = 0; i < fe_indices.size(); ++i)
+      {
+        const unsigned int fe_index      = fe_indices[i],
+                           mapping_index = mapping_indices[i],
+                           q_index       = q_indices[i];
+
+        AssertIndexRange(fe_index, fe_collection->size());
+        AssertIndexRange(mapping_index, mapping_collection->size());
+        AssertIndexRange(q_index, q_collections.size());
+
+        task_group +=
+          Threads::new_task([&, fe_index, mapping_index, q_index]() {
+            fe_values_table[fe_index][mapping_index][q_index] =
+              std::make_unique<FEValuesType>(
+                (*mapping_collection)[mapping_index],
+                (*fe_collection)[fe_index],
+                q_collections[q_index],
+                update_flags);
+          });
+      }
+
+    task_group.join_all();
+  }
+
+
+
+  template <int dim, int q_dim, class FEValuesType>
+  void
+  FEValuesBase<dim, q_dim, FEValuesType>::precalculate_fe_values()
+  {
+    const unsigned int        size = fe_collection->size();
+    std::vector<unsigned int> indices(size);
+    std::iota(indices.begin(), indices.end(), 0);
+
+    precalculate_fe_values(/*fe_indices=*/indices,
+                           /*mapping_indices=*/
+                           (mapping_collection->size() > 1) ?
+                             indices :
+                             std::vector<unsigned int>(size, 0),
+                           /*q_indices=*/
+                           (q_collections.size() > 1) ?
+                             indices :
+                             std::vector<unsigned int>(size, 0));
   }
 } // namespace hp
 
@@ -125,22 +289,21 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  template <typename DoFHandlerType, bool lda>
+  template <bool lda>
   void
   FEValues<dim, spacedim>::reinit(
-    const TriaIterator<DoFCellAccessor<DoFHandlerType, lda>> cell,
+    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
     const unsigned int                                       q_index,
     const unsigned int                                       mapping_index,
     const unsigned int                                       fe_index)
   {
-    // determine which indices we
-    // should actually use
+    // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
                  real_fe_index = fe_index;
 
     if (real_q_index == numbers::invalid_unsigned_int)
       {
-        if (this->q_collection.size() > 1)
+        if (this->q_collections.size() > 1)
           real_q_index = cell->active_fe_index();
         else
           real_q_index = 0;
@@ -158,13 +321,11 @@ namespace hp
       real_fe_index = cell->active_fe_index();
 
     // some checks
-    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_q_index, this->q_collections.size());
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell);
   }
@@ -179,8 +340,7 @@ namespace hp
     const unsigned int                                          mapping_index,
     const unsigned int                                          fe_index)
   {
-    // determine which indices we
-    // should actually use
+    // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
                  real_fe_index = fe_index;
 
@@ -194,13 +354,11 @@ namespace hp
       real_fe_index = 0;
 
     // some checks
-    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_q_index, this->q_collections.size());
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell);
   }
@@ -222,6 +380,19 @@ namespace hp
         update_flags)
   {}
 
+  template <int dim, int spacedim>
+  FEFaceValues<dim, spacedim>::FEFaceValues(
+    const hp::MappingCollection<dim, spacedim> & mapping,
+    const hp::FECollection<dim, spacedim> &      fe_collection,
+    const std::vector<hp::QCollection<dim - 1>> &q_collection,
+    const UpdateFlags                            update_flags)
+    : hp::FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
+        mapping,
+        fe_collection,
+        q_collection,
+        update_flags)
+  {}
+
 
   template <int dim, int spacedim>
   FEFaceValues<dim, spacedim>::FEFaceValues(
@@ -236,10 +407,22 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  template <typename DoFHandlerType, bool lda>
+  FEFaceValues<dim, spacedim>::FEFaceValues(
+    const hp::FECollection<dim, spacedim> &      fe_collection,
+    const std::vector<hp::QCollection<dim - 1>> &q_collection,
+    const UpdateFlags                            update_flags)
+    : hp::FEValuesBase<dim, dim - 1, dealii::FEFaceValues<dim, spacedim>>(
+        fe_collection,
+        q_collection,
+        update_flags)
+  {}
+
+
+  template <int dim, int spacedim>
+  template <bool lda>
   void
   FEFaceValues<dim, spacedim>::reinit(
-    const TriaIterator<DoFCellAccessor<DoFHandlerType, lda>> cell,
+    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
     const unsigned int                                       face_no,
     const unsigned int                                       q_index,
     const unsigned int                                       mapping_index,
@@ -252,7 +435,7 @@ namespace hp
 
     if (real_q_index == numbers::invalid_unsigned_int)
       {
-        if (this->q_collection.size() > 1)
+        if (this->q_collections.size() > 1)
           real_q_index = cell->active_fe_index();
         else
           real_q_index = 0;
@@ -270,15 +453,29 @@ namespace hp
       real_fe_index = cell->active_fe_index();
 
     // some checks
-    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_q_index, this->q_collections.size());
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell, face_no);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <bool lda>
+  void
+  FEFaceValues<dim, spacedim>::reinit(
+    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &   cell,
+    const typename Triangulation<dim, spacedim>::face_iterator &face,
+    const unsigned int                                          q_index,
+    const unsigned int                                          mapping_index,
+    const unsigned int                                          fe_index)
+  {
+    const auto face_n = cell->face_iterator_to_index(face);
+    reinit(cell, face_n, q_index, mapping_index, fe_index);
   }
 
 
@@ -307,15 +504,28 @@ namespace hp
       real_fe_index = 0;
 
     // some checks
-    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_q_index, this->q_collections.size());
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell, face_no);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  FEFaceValues<dim, spacedim>::reinit(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const typename Triangulation<dim, spacedim>::face_iterator &face,
+    const unsigned int                                          q_index,
+    const unsigned int                                          mapping_index,
+    const unsigned int                                          fe_index)
+  {
+    const auto face_n = cell->face_iterator_to_index(face);
+    reinit(cell, face_n, q_index, mapping_index, fe_index);
   }
 
 
@@ -349,24 +559,23 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  template <typename DoFHandlerType, bool lda>
+  template <bool lda>
   void
   FESubfaceValues<dim, spacedim>::reinit(
-    const TriaIterator<DoFCellAccessor<DoFHandlerType, lda>> cell,
+    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
     const unsigned int                                       face_no,
     const unsigned int                                       subface_no,
     const unsigned int                                       q_index,
     const unsigned int                                       mapping_index,
     const unsigned int                                       fe_index)
   {
-    // determine which indices we
-    // should actually use
+    // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
                  real_fe_index = fe_index;
 
     if (real_q_index == numbers::invalid_unsigned_int)
       {
-        if (this->q_collection.size() > 1)
+        if (this->q_collections.size() > 1)
           real_q_index = cell->active_fe_index();
         else
           real_q_index = 0;
@@ -384,13 +593,11 @@ namespace hp
       real_fe_index = cell->active_fe_index();
 
     // some checks
-    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_q_index, this->q_collections.size());
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell, face_no, subface_no);
   }
@@ -407,8 +614,7 @@ namespace hp
     const unsigned int                                          mapping_index,
     const unsigned int                                          fe_index)
   {
-    // determine which indices we
-    // should actually use
+    // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
                  real_fe_index = fe_index;
 
@@ -422,13 +628,11 @@ namespace hp
       real_fe_index = 0;
 
     // some checks
-    AssertIndexRange(real_q_index, this->q_collection.size());
+    AssertIndexRange(real_q_index, this->q_collections.size());
     AssertIndexRange(real_mapping_index, this->mapping_collection->size());
     AssertIndexRange(real_fe_index, this->fe_collection->size());
 
-    // now finally actually get the
-    // corresponding object and
-    // initialize it
+    // now finally actually get the corresponding object and initialize it
     this->select_fe_values(real_fe_index, real_mapping_index, real_q_index)
       .reinit(cell, face_no, subface_no);
   }

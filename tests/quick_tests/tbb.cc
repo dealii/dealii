@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,8 +17,6 @@
 
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
-
-#include <tbb/task_scheduler_init.h>
 
 #include <iostream>
 
@@ -71,12 +69,13 @@ test2()
   for (unsigned int i = 0; i < v.size(); ++i)
     v[i] = i + 1;
   int result = 0;
-  WorkStream::run(v.begin(),
-                  v.end(),
-                  &assemble,
-                  std::bind(&copy, std::ref(result), std::placeholders::_1),
-                  scratch_data(),
-                  copy_data());
+  WorkStream::run(
+    v.begin(),
+    v.end(),
+    &assemble,
+    [&result](const copy_data &data) { copy(result, data); },
+    scratch_data(),
+    copy_data());
   std::cout << "result: " << result << std::endl;
 
   if (result != maxi * (maxi + 1) / 2)
@@ -86,8 +85,7 @@ test2()
 int
 main()
 {
-  std::cout << "TBB will use "
-            << tbb::task_scheduler_init::default_num_threads() << " threads."
+  std::cout << "TBB will use " << MultithreadInfo::n_threads() << " threads."
             << std::endl;
 
   test1();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2018 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,8 +42,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Usually, the derived class mg::Matrix, which operates on an MGLevelObject
  * of matrices, will be sufficient for applications.
- *
- * @author Guido Kanschat, 2002
  */
 template <typename VectorType>
 class MGMatrixBase : public Subscriptor
@@ -104,8 +102,6 @@ public:
  * Base class for coarse grid solvers.  This defines the virtual parenthesis
  * operator, being the interface used by multigrid methods. Any implementation
  * will be done by derived classes.
- *
- * @author Guido Kanschat, 2002
  */
 template <typename VectorType>
 class MGCoarseGridBase : public Subscriptor
@@ -170,8 +166,6 @@ public:
  * on block structures, it is not clear whether this case is really useful.
  * Therefore, a tested implementation of this case will be supplied when
  * needed.
- *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2007
  */
 template <typename VectorType>
 class MGTransferBase : public Subscriptor
@@ -198,6 +192,21 @@ public:
              const VectorType & src) const = 0;
 
   /**
+   * Prolongate a vector from level <tt>to_level-1</tt> to level
+   * <tt>to_level</tt>, summing into the previous content of <tt>dst</tt>.
+   *
+   * @arg src is a vector with as many elements as there are degrees of
+   * freedom on the coarser level involved.
+   *
+   * @arg dst has as many elements as there are degrees of freedom on the
+   * finer level.
+   */
+  virtual void
+  prolongate_and_add(const unsigned int to_level,
+                     VectorType &       dst,
+                     const VectorType & src) const;
+
+  /**
    * Restrict a vector from level <tt>from_level</tt> to level
    * <tt>from_level-1</tt> and add this restriction to <tt>dst</tt>. If the
    * region covered by cells on level <tt>from_level</tt> is smaller than that
@@ -210,7 +219,6 @@ public:
    *
    * @arg dst has as many elements as there are degrees of freedom on the
    * coarser level.
-   *
    */
   virtual void
   restrict_and_add(const unsigned int from_level,
@@ -238,8 +246,6 @@ public:
  * vector needs to be overwritten for a new incoming residual. On the other
  * hand, all subsequent operations need to smooth the content already present
  * in the vector @p u given the right hand side, which is done by smooth().
- *
- * @author Guido Kanschat, 2002
  */
 template <typename VectorType>
 class MGSmootherBase : public Subscriptor

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2018 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,6 @@ DEAL_II_NAMESPACE_OPEN
  * @tparam N The number of indices stored in each object.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, Matthias Maier, 2002, 2015
  */
 template <int N>
 class TableIndices
@@ -59,7 +58,9 @@ public:
    * arguments @p indices
    *
    * This constructor will result in a compiler error if
-   * the template argument @p N is different from the number of the arguments.
+   * the number of arguments given is different from the number of the
+   * indices this class stores (i.e., the template argument `N` of
+   * this class), or if any of the arguments is not of some integer type.
    */
   template <typename... T>
   constexpr TableIndices(const T... indices);
@@ -67,12 +68,14 @@ public:
   /**
    * Read-only access the value of the <tt>i</tt>th index.
    */
-  DEAL_II_CONSTEXPR std::size_t operator[](const unsigned int i) const;
+  constexpr std::size_t
+  operator[](const unsigned int i) const;
 
   /**
    * Write access the value of the <tt>i</tt>th index.
    */
-  DEAL_II_CONSTEXPR std::size_t &operator[](const unsigned int i);
+  constexpr std::size_t &
+  operator[](const unsigned int i);
 
   /**
    * Compare two index fields for equality.
@@ -95,7 +98,8 @@ public:
 
   /**
    * Write or read the data of this object to or from a stream for the purpose
-   * of serialization.
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
    */
   template <class Archive>
   void
@@ -115,7 +119,7 @@ protected:
 template <int N>
 template <typename... T>
 constexpr TableIndices<N>::TableIndices(const T... args)
-  : indices{static_cast<const unsigned int>(args)...}
+  : indices{static_cast<std::size_t>(args)...}
 {
   static_assert(internal::TemplateConstraints::all_true<
                   std::is_integral<T>::value...>::value,
@@ -125,8 +129,8 @@ constexpr TableIndices<N>::TableIndices(const T... args)
 
 
 template <int N>
-DEAL_II_CONSTEXPR inline std::size_t TableIndices<N>::
-                                     operator[](const unsigned int i) const
+constexpr inline std::size_t
+TableIndices<N>::operator[](const unsigned int i) const
 {
   AssertIndexRange(i, N);
   return indices[i];
@@ -134,8 +138,8 @@ DEAL_II_CONSTEXPR inline std::size_t TableIndices<N>::
 
 
 template <int N>
-DEAL_II_CONSTEXPR inline std::size_t &TableIndices<N>::
-                                      operator[](const unsigned int i)
+constexpr inline std::size_t &
+TableIndices<N>::operator[](const unsigned int i)
 {
   AssertIndexRange(i, N);
   return indices[i];

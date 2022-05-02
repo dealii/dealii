@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,27 +15,11 @@
 
 
 
-// Test FE_Nothing::operator==()
-
-
-#include <deal.II/base/function.h>
-#include <deal.II/base/quadrature_lib.h>
-
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_tools.h>
+// Test FE_Nothing::operator==(). The base clase operator should suffice
 
 #include <deal.II/fe/fe_nothing.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
 
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/grid/reference_cell.h>
 
 #include "../tests.h"
 
@@ -45,6 +29,7 @@ template <int dim>
 void
 test()
 {
+  deallog << "dim = " << dim << std::endl;
   deallog << std::boolalpha;
   deallog << (FE_Nothing<dim>(1) == FE_Nothing<dim>(1, false)) << std::endl;
   deallog << (FE_Nothing<dim>(1) == FE_Nothing<dim>(2)) << std::endl;
@@ -52,6 +37,30 @@ test()
           << std::endl;
   deallog << (FE_Nothing<dim>(1, true) == FE_Nothing<dim>(2, true))
           << std::endl;
+  if (dim == 2)
+    {
+      deallog << (FE_Nothing<dim>(ReferenceCells::Quadrilateral, 2, true) ==
+                  FE_Nothing<dim>(2, true))
+              << std::endl;
+      deallog << (FE_Nothing<dim>(ReferenceCells::Triangle, 2, true) ==
+                  FE_Nothing<dim>(2, true))
+              << std::endl;
+    }
+  if (dim == 3)
+    {
+      deallog << (FE_Nothing<dim>(ReferenceCells::Hexahedron, 2, true) ==
+                  FE_Nothing<dim>(2, true))
+              << std::endl;
+      deallog << (FE_Nothing<dim>(ReferenceCells::Tetrahedron, 2, true) ==
+                  FE_Nothing<dim>(2, true))
+              << std::endl;
+      deallog << (FE_Nothing<dim>(ReferenceCells::Wedge, 1, false) ==
+                  FE_Nothing<dim>(ReferenceCells::Pyramid, 1, false))
+              << std::endl;
+      deallog << (FE_Nothing<dim>(ReferenceCells::Wedge, 3) ==
+                  FE_Nothing<dim>(3))
+              << std::endl;
+    }
 }
 
 

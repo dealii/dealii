@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2018 by the deal.II authors
+// Copyright (C) 2001 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,8 +72,6 @@ DEAL_II_NAMESPACE_OPEN
  * The class is intended for efficiency, and it does not do a whole lot of
  * error checking. If you apply this mapping to a cell that does not conform
  * to the requirements above, you will get strange results.
- *
- * @author Guido Kanschat, 2001; Ralf Hartmann, 2005
  */
 template <int dim, int spacedim = dim>
 class MappingCartesian : public Mapping<dim, spacedim>
@@ -89,6 +87,9 @@ public:
    */
   virtual bool
   preserves_vertex_locations() const override;
+
+  virtual bool
+  is_compatible_with(const ReferenceCell &reference_cell) const override;
 
   /**
    * @name Mapping points between reference and real cells
@@ -155,8 +156,31 @@ public:
    * @}
    */
 
+  /**
+   * As opposed to the other fill_fe_values() and fill_fe_face_values()
+   * functions that rely on pre-computed information of InternalDataBase, this
+   * function chooses the flexible evaluation path on the cell and points
+   * passed in to the current function.
+   *
+   * @param[in] cell The cell where to evaluate the mapping
+   *
+   * @param[in] unit_points The points in reference coordinates where the
+   * transformation (Jacobians, positions) should be computed.
+   *
+   * @param[in] update_flags The kind of information that should be computed.
+   *
+   * @param[out] output_data A struct containing the evaluated quantities such
+   * as the Jacobian resulting from application of the mapping on the given
+   * cell with its underlying manifolds.
+   */
+  void
+  fill_mapping_data_for_generic_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const ArrayView<const Point<dim>> &                         unit_points,
+    const UpdateFlags                                           update_flags,
+    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
 
-private:
   /**
    * @name Interface with FEValues
    * @{
@@ -177,7 +201,12 @@ private:
   {
   public:
     /**
-     * Constructor.
+     * Default constructor.
+     */
+    InternalData() = default;
+
+    /**
+     * Constructor that initializes the object with a quadrature.
      */
     InternalData(const Quadrature<dim> &quadrature);
 
@@ -204,6 +233,7 @@ private:
     std::vector<Point<dim>> quadrature_points;
   };
 
+private:
   // documentation can be found in Mapping::requires_update_flags()
   virtual UpdateFlags
   requires_update_flags(const UpdateFlags update_flags) const override;
@@ -212,10 +242,12 @@ private:
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
   get_data(const UpdateFlags, const Quadrature<dim> &quadrature) const override;
 
+  using Mapping<dim, spacedim>::get_face_data;
+
   // documentation can be found in Mapping::get_face_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
-  get_face_data(const UpdateFlags          flags,
-                const Quadrature<dim - 1> &quadrature) const override;
+  get_face_data(const UpdateFlags               flags,
+                const hp::QCollection<dim - 1> &quadrature) const override;
 
   // documentation can be found in Mapping::get_subface_data()
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
@@ -232,12 +264,14 @@ private:
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
+  using Mapping<dim, spacedim>::fill_fe_face_values;
+
   // documentation can be found in Mapping::fill_fe_face_values()
   virtual void
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
+    const hp::QCollection<dim - 1> &                            quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
@@ -251,6 +285,15 @@ private:
     const Quadrature<dim - 1> &                                 quadrature,
     const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const override;
+
+  // documentation can be found in Mapping::fill_fe_immersed_surface_values()
+  virtual void
+  fill_fe_immersed_surface_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
   /**
@@ -336,6 +379,36 @@ private:
    */
   void
   maybe_update_jacobian_derivatives(
+    const InternalData &             data,
+    const CellSimilarity::Similarity cell_similarity,
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
+
+
+  /**
+   * Compute the volume elements if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   */
+  void
+  maybe_update_volume_elements(const InternalData &data) const;
+
+  /**
+   * Compute the Jacobians if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   */
+  void
+  maybe_update_jacobians(
+    const InternalData &             data,
+    const CellSimilarity::Similarity cell_similarity,
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
+      &output_data) const;
+
+  /**
+   * Compute the inverse Jacobians if the UpdateFlags of the incoming
+   * InternalData object say that they should be updated.
+   */
+  void
+  maybe_update_inverse_jacobians(
     const InternalData &             data,
     const CellSimilarity::Similarity cell_similarity,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>

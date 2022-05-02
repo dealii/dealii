@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2013 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,13 +75,17 @@ private:
         phi.reinit(cell);
         for (unsigned int block = 0; block < src.n_blocks(); ++block)
           {
-            phi.gather_evaluate(src.block(block), true, true, false);
+            phi.gather_evaluate(src.block(block),
+                                EvaluationFlags::values |
+                                  EvaluationFlags::gradients);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
                 phi.submit_value(Number(10) * phi.get_value(q), q);
                 phi.submit_gradient(phi.get_gradient(q), q);
               }
-            phi.integrate_scatter(true, true, dst.block(block));
+            phi.integrate_scatter(EvaluationFlags::values |
+                                    EvaluationFlags::gradients,
+                                  dst.block(block));
           }
       }
   }
@@ -95,7 +99,7 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  typedef double number;
+  using number = double;
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria);
@@ -210,7 +214,7 @@ test()
 
           out -= ref;
           const double diff_norm = out.linfty_norm();
-          deallog << " " << diff_norm;
+          deallog << ' ' << diff_norm;
         }
       deallog << std::endl;
     }

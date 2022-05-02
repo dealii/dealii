@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2018 by the deal.II authors
+// Copyright (C) 2003 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -116,18 +116,6 @@ DoFHandler<dim> *
 make_dof_handler(const Triangulation<dim> &tria, const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> *dof_handler = new DoFHandler<dim>(tria);
-  dof_handler->distribute_dofs(fe);
-  return dof_handler;
-}
-
-
-
-template <int dim>
-hp::DoFHandler<dim> *
-make_hp_dof_handler(const Triangulation<dim> &   tria,
-                    const hp::FECollection<dim> &fe)
-{
-  hp::DoFHandler<dim> *dof_handler = new hp::DoFHandler<dim>(tria);
   dof_handler->distribute_dofs(fe);
   return dof_handler;
 }

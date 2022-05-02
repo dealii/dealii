@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2019 by the deal.II authors
+// Copyright (C) 2005 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,12 +63,12 @@ TensorFunctionParser<rank, dim, Number>::TensorFunctionParser(
 {
   auto constants_map = Patterns::Tools::Convert<ConstMap>::to_value(
     constants,
-    std_cxx14::make_unique<Patterns::Map>(Patterns::Anything(),
-                                          Patterns::Double(),
-                                          0,
-                                          Patterns::Map::max_int_value,
-                                          ",",
-                                          "="));
+    Patterns::Map(Patterns::Anything(),
+                  Patterns::Double(),
+                  0,
+                  Patterns::Map::max_int_value,
+                  ",",
+                  "="));
   initialize(variable_names,
              expression,
              constants_map,

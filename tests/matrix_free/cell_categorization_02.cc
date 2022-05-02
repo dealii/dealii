@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@
 
 #include <deal.II/fe/fe_q.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
@@ -103,13 +104,13 @@ test()
 
   data.cell_vectorization_categories_strict = true;
   data.cell_vectorization_category.resize(tria.n_active_cells());
-  for (const auto &cell : tria.active_cell_iterators())
-    if (cell->is_locally_owned())
-      {
-        AssertIndexRange(cell->active_cell_index(), tria.n_active_cells());
-        data.cell_vectorization_category[cell->active_cell_index()] =
-          cell->material_id();
-      }
+  for (const auto &cell :
+       tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+    {
+      AssertIndexRange(cell->active_cell_index(), tria.n_active_cells());
+      data.cell_vectorization_category[cell->active_cell_index()] =
+        cell->material_id();
+    }
 
   mf_data.reinit(dof, constraints, QGauss<1>(2), data);
 
@@ -159,7 +160,7 @@ test()
                                 mg_additional_data[level]);
     }
 
-  for (unsigned int i = 0; i < mf_data.n_macro_cells(); ++i)
+  for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)
     {
       const unsigned int m_id = mf_data.get_cell_iterator(i, 0)->material_id();
       for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
@@ -173,7 +174,7 @@ test()
   for (unsigned int level = 0; level <= max_level; ++level)
     {
       const auto &level_data = mg_mf_data[level];
-      for (unsigned int i = 0; i < level_data->n_macro_cells(); ++i)
+      for (unsigned int i = 0; i < level_data->n_cell_batches(); ++i)
         {
           const unsigned int m_id =
             level_data->get_cell_iterator(i, 0)->material_id();

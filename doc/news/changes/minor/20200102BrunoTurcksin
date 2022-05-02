@@ -1,4 +1,0 @@
-New: The function MatrixFree::get_dof_handler() has been templated to enable
-to return either a DoFHandler<dim> or an hp::DoFHandler<dim>.
-<br>
-(Bruno Turcksin, 2020/01/02)

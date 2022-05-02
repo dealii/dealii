@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,5 +18,25 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     template class MappingQCache<deal_II_dimension, deal_II_space_dimension>;
+#endif
+  }
+
+for (deal_II_vec : REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template void
+    MappingQCache<deal_II_dimension, deal_II_space_dimension>::initialize(
+      const Mapping<deal_II_dimension, deal_II_space_dimension> &   mapping,
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
+      const deal_II_vec &                                           vector,
+      const bool vector_describes_relative_displacement);
+
+    template void
+    MappingQCache<deal_II_dimension, deal_II_space_dimension>::initialize(
+      const Mapping<deal_II_dimension, deal_II_space_dimension> &   mapping,
+      const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
+      const MGLevelObject<deal_II_vec> &                            vector,
+      const bool vector_describes_relative_displacement);
 #endif
   }

@@ -33,59 +33,46 @@
 #include "../tests.h"
 
 
-void check(Triangulation<2> &tria)
+void
+check(Triangulation<2> &tria)
 {
   // generate some random points bounded by [0., 0.2)^2 in R^2 space
   // any point in this domain should be inside one of the cells
   Point<2> p(random_value<double>(), random_value<double>() / 8.);
 
-  try
-    {
-      // don't mark any vertex at first
-      std::vector<bool> marked_vertices(tria.n_vertices(), false);
+  // don't mark any vertex at first
+  std::vector<bool> marked_vertices(tria.n_vertices(), false);
 
-      // find the closes vertex to (1.,1.)
-      // (default call to find_closest_vertex() without passing marked_vertices)
-      unsigned int closest_vertex =
-        GridTools::find_closest_vertex(tria, Point<2>(1., 1.));
+  // find the closes vertex to (1.,1.)
+  // (default call to find_closest_vertex() without passing marked_vertices)
+  unsigned int closest_vertex =
+    GridTools::find_closest_vertex(tria, Point<2>(1., 1.));
 
-      // mark the vertex closest to (1.,1.)
-      marked_vertices[closest_vertex] = true;
+  // mark the vertex closest to (1.,1.)
+  marked_vertices[closest_vertex] = true;
 
-      auto vertices = tria.get_vertices();
-      deallog << vertices[closest_vertex] << " is the closest vertex"
-              << std::endl;
+  auto vertices = tria.get_vertices();
+  deallog << vertices[closest_vertex] << " is the closest vertex" << std::endl;
 
-      GridTools::find_active_cell_around_point(tria, p, marked_vertices);
+  auto c = GridTools::find_active_cell_around_point(tria, p, marked_vertices);
 
-      // The test fails if the control reaches here.
-      deallog << "Garbage text to make the diff fail if the control "
-              << "reaches here:"
-              << " Point: " << p;
-      deallog << std::endl; // Flush deallog buffer
-    }
-  catch (const GridTools::ExcPointNotFound<2> &)
+  if (c.state() != IteratorState::valid)
     {
       deallog
-        << "The first call to the function find_closest_vertex() has thrown "
-        << "an exception. It is supposed to throw.";
-      deallog << std::endl;
-
-      // The default function call doesn't throw exceptions
-      // for this use case
-      Triangulation<2>::active_cell_iterator cell =
-        GridTools::find_active_cell_around_point(tria, p);
-
-      // check if the below function call actually finds appropriate cell
-      Assert(p.distance(cell->center()) < cell->diameter() / 2,
-             ExcInternalError());
-      deallog << "Test passed!";
-      deallog << std::endl;
+        << "The first call to the function find_active_cell_around_point()"
+        << std::endl
+        << "has returned an invalid iterator. This is good." << std::endl;
     }
-  catch (...)
-    {
-      Assert(false, ExcInternalError());
-    }
+
+  // The default function call doesn't throw exceptions
+  // for this use case
+  Triangulation<2>::active_cell_iterator cell =
+    GridTools::find_active_cell_around_point(tria, p);
+
+  // check if the below function call actually finds appropriate cell
+  Assert(p.distance(cell->center()) < cell->diameter() / 2, ExcInternalError());
+  deallog << "Test passed!";
+  deallog << std::endl;
 }
 
 

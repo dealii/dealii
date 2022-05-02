@@ -20,12 +20,12 @@
 #include "../tests.h"
 
 #define PRINTBLOCK(name, var)                                \
-  deallog << "Block vector: " name << ":" << std::endl;      \
+  deallog << "Block vector: " name << ':' << std::endl;      \
   for (unsigned int i = 0; i < var.n_blocks(); ++i)          \
     {                                                        \
       deallog << "[block " << i << " ]  ";                   \
       for (unsigned int j = 0; j < var.block(i).size(); ++j) \
-        deallog << var.block(i)[j] << " ";                   \
+        deallog << var.block(i)[j] << ' ';                   \
       deallog << std::endl;                                  \
     }
 

@@ -45,7 +45,7 @@ test()
       const auto p = idx.global_to_local(i);
       AssertDimension(p.first, i / block_size);
       AssertDimension(p.second, i % block_size);
-      deallog << i << " -> (" << p.first << "," << p.second << ")" << std::endl;
+      deallog << i << " -> (" << p.first << ',' << p.second << ')' << std::endl;
     }
 
   deallog << std::endl;

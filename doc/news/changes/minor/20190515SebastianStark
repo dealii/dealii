@@ -1,3 +1,0 @@
-Fixed: Fix a bug in tutorial step-46, which caused the y-displacement (z-displacement in 3d) to be slightly unsymmetric and rectify the interface traction term.
-<br>
-(Sebastian Stark, 2019/05/15)

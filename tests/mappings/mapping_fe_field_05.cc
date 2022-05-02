@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,12 +68,9 @@ test()
   MGTransferMatrixFree<dim, double> transfer;
   transfer.build(dh);
   transfer.interpolate_to_mg(dh, level_vectors, map_vector);
-  MappingFEField<dim,
-                 spacedim,
-                 LinearAlgebra::distributed::Vector<double>,
-                 DoFHandler<dim>>
-                       mapping(dh, level_vectors);
-  MappingQGeneric<dim> mapping_ref(fe.degree);
+  MappingFEField<dim, spacedim, LinearAlgebra::distributed::Vector<double>>
+                mapping(dh, level_vectors);
+  MappingQ<dim> mapping_ref(fe.degree);
 
   QGauss<dim>   quad(1);
   FEValues<dim> fe_values_ref(mapping_ref,
