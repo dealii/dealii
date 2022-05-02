@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/vectorization.h>
 
@@ -3158,9 +3159,8 @@ namespace internal
         (std::is_same<Eval0, EvalGeneral>::value) ? n_dofs_normal :
                                                     n_dofs_tangent;
 
-      const unsigned int component_table[3][3] = {{1, 2, 0},
-                                                  {2, 0, 1},
-                                                  {0, 1, 2}};
+      static constexpr dealii::ndarray<unsigned int, 3, 3> component_table = {
+        {{{1, 2, 0}}, {{2, 0, 1}}, {{0, 1, 2}}}};
       const unsigned int component =
         (dim == 2 && normal_dir == 0 && face_direction == 1) ?
           0 :
@@ -3335,9 +3335,8 @@ namespace internal
         (std::is_same<Eval0, EvalGeneral>::value) ? n_dofs_normal :
                                                     n_dofs_tangent;
 
-      const unsigned int component_table[3][3] = {{1, 2, 0},
-                                                  {2, 0, 1},
-                                                  {0, 1, 2}};
+      static constexpr dealii::ndarray<unsigned int, 3, 3> component_table = {
+        {{{1, 2, 0}}, {{2, 0, 1}}, {{0, 1, 2}}}};
       const unsigned int component =
         (dim == 2 && normal_dir == 0 && face_direction == 1) ?
           0 :

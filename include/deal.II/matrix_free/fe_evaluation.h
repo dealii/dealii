@@ -5725,10 +5725,10 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, VectorizedArrayType>
 FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::get_value(
   const unsigned int q_point) const
 {
-  // Check if Piola transform is required
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
+      // Piola transform is required
 #  ifdef DEBUG
       Assert(this->values_quad_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -5741,23 +5741,22 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::get_value(
       const std::size_t                   nqp = this->n_quadrature_points;
       Tensor<1, dim, VectorizedArrayType> value_out;
 
-      // Cartesian cell
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
         {
+          // Cartesian cell
           const Tensor<2, dim, dealii::VectorizedArray<Number>> jac =
             this->jacobian[1];
           const VectorizedArrayType inv_det = determinant(this->jacobian[0]);
 
+          // J * u * det(J^-1)
           for (unsigned int comp = 0; comp < n_components; ++comp)
             value_out[comp] = this->values_quad[comp * nqp + q_point] *
-                              jac[comp][comp] *
-                              inv_det; // / this->jacobian[0][comp][comp];
+                              jac[comp][comp] * inv_det;
         }
-
-      // Affine or general cell
       else
         {
+          // Affine or general cell
           const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
             (this->cell_type > internal::MatrixFreeFunctions::affine) ?
               this->jacobian[q_point] :
@@ -5786,6 +5785,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::get_value(
     }
   else
     {
+      // No Piola needed
       return BaseClass::get_value(q_point);
     }
 }
@@ -5795,10 +5795,10 @@ inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, VectorizedArrayType>
 FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   get_gradient(const unsigned int q_point) const
 {
-  // Check if Piola transform is required
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
+      // Piola transform is required
 #  ifdef DEBUG
       Assert(this->gradients_quad_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -5811,24 +5811,25 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       const std::size_t nqp = this->n_quadrature_points;
       Tensor<1, dim, Tensor<1, dim, VectorizedArrayType>> grad_out;
 
-      // Cartesian cell
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
         {
+          // Cartesian cell
           const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
             this->jacobian[0];
           const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
           const VectorizedArrayType inv_det = determinant(inv_t_jac);
 
+          // J * grad_quad * J^-1 * det(J^-1)
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int comp = 0; comp < n_components; ++comp)
               grad_out[comp][d] =
                 this->gradients_quad[(comp * dim + d) * nqp + q_point] *
                 inv_t_jac[d][d] * jac[comp][comp] * inv_det;
         }
-      // Affine cell
       else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
+          // Affine cell
           const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
             this->jacobian[0];
           const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
@@ -5853,9 +5854,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                 grad_out[comp][d] = tmp;
               }
         }
-      // General cell TODO
       else
         {
+          // General cell
           // Here we need the jacobian gradient and not the inverse which is
           // stored in this->jacobian_gradients
           AssertThrow(false, ExcNotImplemented());
@@ -5890,40 +5891,41 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
-      // Affine cell
       if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
+          // Affine cell
           // Derivatives are reordered for faces. Need to take this into account
           const VectorizedArrayType inv_det =
             (is_face && dim == 2 && this->get_face_no() < 2) ?
               -determinant(this->jacobian[0]) :
               determinant(this->jacobian[0]);
 
+          // div * det(J^-1)
           divergence = this->gradients_quad[q_point] * inv_det;
           for (unsigned int d = 1; d < dim; ++d)
             divergence +=
               this->gradients_quad[(dim * d + d) * nqp + q_point] * inv_det;
         }
-      // General cell TODO
       else
         {
+          // General cell
           Assert(false, ExcNotImplemented());
         }
     }
   else
     {
-      // Cartesian cell
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
         {
+          // Cartesian cell
           divergence = this->gradients_quad[q_point] * this->jacobian[0][0][0];
           for (unsigned int d = 1; d < dim; ++d)
             divergence += this->gradients_quad[(dim * d + d) * nqp + q_point] *
                           this->jacobian[0][d][d];
         }
-      // cell with general/constant Jacobian
       else
         {
+          // cell with general/constant Jacobian
           const Tensor<2, dim, VectorizedArrayType> &jac =
             this->cell_type == internal::MatrixFreeFunctions::general ?
               this->jacobian[q_point] :
@@ -6039,13 +6041,11 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   submit_value(const Tensor<1, dim, VectorizedArrayType> val_in,
                const unsigned int                        q_point)
 {
-  // Check if Piola transform is required
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
+      // Piola transform is required
       AssertIndexRange(q_point, this->n_quadrature_points);
-
-      // This is not needed, but might be good to check anyway?
       Assert(this->J_value != nullptr,
              internal::ExcMatrixFreeAccessToUninitializedMappingField(
                "update_value"));
@@ -6066,9 +6066,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
             this->values_quad[comp * nqp + q_point] =
               val_in[comp] * weight * jac[comp][comp];
         }
-      // Affine or general cell
       else
         {
+          // Affine or general cell
           const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
             (this->cell_type > internal::MatrixFreeFunctions::affine) ?
               this->jacobian[q_point] :
@@ -6090,7 +6090,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                   -determinant(inv_t_jac) :
                   determinant(inv_t_jac)));
 
-          // J^T * u * w
+          // J^T * u * factor
           for (unsigned int comp = 0; comp < n_components; ++comp)
             {
               this->values_quad[comp * nqp + q_point] =
@@ -6103,6 +6103,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
     }
   else
     {
+      // No Piola transform
       BaseClass::submit_value(val_in, q_point);
     }
 }
@@ -6113,10 +6114,11 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   submit_gradient(const Tensor<2, dim, VectorizedArrayType> grad_in,
                   const unsigned int                        q_point)
 {
-  // Check if Piola transform is required
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
+      // Piola transform is required
+
 #  ifdef DEBUG
       Assert(this->is_reinitialized, ExcNotInitialized());
 #  endif
@@ -6132,10 +6134,10 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
 #  endif
 
       const std::size_t nqp = this->n_quadrature_points;
-      // Cartesian cell
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
         {
+          // Cartesian cell
           const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
             this->jacobian[0];
           const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
@@ -6145,9 +6147,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
               this->gradients_quad[(comp * dim + d) * nqp + q_point] =
                 grad_in[comp][d] * inv_t_jac[d][d] * jac[comp][comp] * weight;
         }
-      // Affine cell
       else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
+          // Affine cell
           const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
             this->jacobian[0];
           const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
@@ -6173,9 +6175,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                 this->gradients_quad[(comp * dim + d) * nqp + q_point] = tmp;
               }
         }
-      // General cell TODO
       else
         {
+          // General cell
           AssertThrow(false, ExcNotImplemented());
         }
     }
@@ -6194,10 +6196,11 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
     const Tensor<1, dim, Tensor<1, dim, VectorizedArrayType>> grad_in,
     const unsigned int                                        q_point)
 {
-  // Check if Piola transform is required
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
+      // Piola transform is required
+
 #  ifdef DEBUG
       Assert(this->is_reinitialized, ExcNotInitialized());
 #  endif
@@ -6213,10 +6216,10 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
 #  endif
 
       const std::size_t nqp = this->n_quadrature_points;
-      // Cartesian cell
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
         {
+          // Cartesian cell
           const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
             this->jacobian[0];
           const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
@@ -6226,9 +6229,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
               this->gradients_quad[(comp * dim + d) * nqp + q_point] =
                 grad_in[comp][d] * inv_t_jac[d][d] * jac[comp][comp] * weight;
         }
-      // Affine cell
       else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
+          // Affine cell
           const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
             this->jacobian[0];
           const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
@@ -6254,9 +6257,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                 this->gradients_quad[(comp * dim + d) * nqp + q_point] = tmp;
               }
         }
-      // General cell TODO
       else
         {
+          // General cell
           AssertThrow(false, ExcNotImplemented());
         }
     }
@@ -6292,9 +6295,10 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
-      // Affine cell
       if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
+          // Affine cell
+
           // Derivatives are reordered for faces. Need to take this into account
           // and 1/inv_det != J_value for faces
           const VectorizedArrayType fac =
@@ -6317,9 +6321,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                 }
             }
         }
-      // General cell TODO
       else
         {
+          // General cell
           AssertThrow(false, ExcNotImplemented());
         }
     }
@@ -6373,7 +6377,6 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
     const SymmetricTensor<2, dim, VectorizedArrayType> sym_grad,
     const unsigned int                                 q_point)
 {
-  // TODO
   AssertThrow(
     this->data->element_type !=
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas,

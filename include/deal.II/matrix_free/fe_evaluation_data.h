@@ -743,6 +743,8 @@ protected:
    * 1, the derivatives are ordered as [dy, dz, dx], face_no = 2 or 3: [dz, dx,
    * dy], and face_no = 5 or 6: [dx, dy, dz]. If the Jacobian also is stored,
    * the components are instead reordered in the same way.
+   * Filled from MappingInfoStorage.jacobians in
+   * include/deal.II/matrix_free/mapping_info.templates.h
    */
   const Tensor<2, dim, Number> *jacobian;
 
