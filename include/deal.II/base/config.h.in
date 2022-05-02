@@ -39,6 +39,7 @@
 #cmakedefine DEAL_II_WITH_ARPACK
 #cmakedefine DEAL_II_WITH_ARBORX
 #cmakedefine DEAL_II_WITH_ASSIMP
+#cmakedefine DEAL_II_WITH_CGAL
 #cmakedefine DEAL_II_WITH_COMPLEX_VALUES
 #cmakedefine DEAL_II_WITH_CUDA
 #cmakedefine DEAL_II_WITH_GINKGO
