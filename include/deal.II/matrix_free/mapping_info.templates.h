@@ -2177,6 +2177,18 @@ namespace internal
                           vv,
                           my_data.jacobians[0][offset + q][d][e]);
                     }
+                  if (face_type[face] <= affine)
+                    for (unsigned int e = 0; e < dim; ++e)
+                      {
+                        const unsigned int ee =
+                          ExtractFaceHelper::reorder_face_derivative_indices<
+                            dim>(interior_face_no, e);
+                        for (unsigned int d = 0; d < dim; ++d)
+                          store_vectorized_array(
+                            jac[d][ee],
+                            vv,
+                            my_data.jacobians[0][offset + q + 1][d][e]);
+                      }
 
                   if (update_flags_faces & update_jacobian_grads)
                     {
@@ -2281,6 +2293,18 @@ namespace internal
                               vv,
                               my_data.jacobians[1][offset + q][d][e]);
                         }
+                      if (face_type[face] <= affine)
+                        for (unsigned int e = 0; e < dim; ++e)
+                          {
+                            const unsigned int ee = ExtractFaceHelper::
+                              reorder_face_derivative_indices<dim>(
+                                exterior_face_no, e);
+                            for (unsigned int d = 0; d < dim; ++d)
+                              store_vectorized_array(
+                                jac[d][ee],
+                                vv,
+                                my_data.jacobians[1][offset + q + 1][d][e]);
+                          }
 
                       if (update_flags_faces & update_jacobian_grads)
                         {
@@ -2762,7 +2786,7 @@ namespace internal
               max_size =
                 std::max(max_size,
                          my_data.data_index_offsets[face] +
-                           (face_type[face] <= affine ? 1 : n_q_points));
+                           (face_type[face] <= affine ? 2 : n_q_points));
             }
 
           const UpdateFlags update_flags_common =

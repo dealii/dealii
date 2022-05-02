@@ -3055,10 +3055,13 @@ namespace internal
     template <typename EvalType>
     static EvalType
     create_evaluator_tensor_product(
-      const MatrixFreeFunctions::UnivariateShapeData<Number> &data,
-      const unsigned int                                      subface_index,
-      const unsigned int                                      direction)
+      const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+      const unsigned int                            subface_index,
+      const unsigned int                            direction)
     {
+      const MatrixFreeFunctions::UnivariateShapeData<Number> &data =
+        (std::is_same<EvalType, EvalNormal>::value) ? shape_info.data.front() :
+                                                      shape_info.data.back();
       if (subface_index >= GeometryInfo<dim>::max_children_per_cell)
         return EvalType(data.shape_values,
                         data.shape_gradients,
@@ -3078,199 +3081,107 @@ namespace internal
     template <bool integrate>
     static void
     evaluate_or_integrate_in_face(
-      const EvaluationFlags::EvaluationFlags        evaluation_flag,
-      const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-      Number *                                      values_dofs,
-      FEEvaluationData<dim, Number, true> &         fe_eval,
-      Number *                                      scratch_data,
-      const unsigned int                            subface_index,
-      const unsigned int                            face_no)
+      const EvaluationFlags::EvaluationFlags evaluation_flag,
+      Number *                               values_dofs,
+      FEEvaluationData<dim, Number, true> &  fe_eval,
+      Number *                               scratch_data,
+      const unsigned int                     subface_index,
+      const unsigned int                     face_no)
     {
-      // TODO. Make sure hanging nodes also are supported.
-      // The following part probably needs a rethink.
-      EvalNormal eval_normal =
-        create_evaluator_tensor_product<EvalNormal>(shape_info.data.front(),
-                                                    subface_index,
-                                                    0);
-      EvalTangent eval_tangent =
-        create_evaluator_tensor_product<EvalTangent>(shape_info.data.back(),
-                                                     subface_index,
-                                                     1);
-
-      // Used for normal faces which are isotropic
-      EvalGeneral eval_general =
-        create_evaluator_tensor_product<EvalGeneral>(shape_info.data.back(),
-                                                     subface_index,
-                                                     0);
-
-      // Note, n_dofs on tangent face
-      const std::size_t n_dofs_tangent = shape_info.dofs_per_component_on_face;
-      const std::size_t n_dofs_normal =
-        n_dofs_tangent - Utilities::pow(fe_degree, dim - 2);
-
       const unsigned int face_direction = face_no / 2;
 
-      if (face_direction == 0)
-        {
-          evaluate_in_face_apply<-1, 0>(
-            eval_general,
-            eval_general,
-            values_dofs,
-            fe_eval,
-            scratch_data,
-            evaluation_flag,
-            n_dofs_normal,
-            std::integral_constant<bool, integrate>());
+      evaluate_in_face_apply<0, EvalNormal, EvalTangent>(
+        values_dofs,
+        fe_eval,
+        scratch_data,
+        evaluation_flag,
+        face_direction,
+        subface_index,
+        std::integral_constant<bool, integrate>());
 
-          values_dofs += 3 * n_dofs_normal;
+      if (dim == 3)
+        evaluate_in_face_apply<1, EvalTangent, EvalNormal>(
+          values_dofs,
+          fe_eval,
+          scratch_data,
+          evaluation_flag,
+          face_direction,
+          subface_index,
+          std::integral_constant<bool, integrate>());
 
-          evaluate_in_face_apply<0, 1>(
-            eval_normal,
-            eval_tangent,
-            values_dofs,
-            fe_eval,
-            scratch_data,
-            evaluation_flag,
-            n_dofs_tangent,
-            std::integral_constant<bool, integrate>());
-
-          values_dofs += 3 * n_dofs_tangent;
-
-          if (dim == 3)
-            {
-              evaluate_in_face_apply<1, 2>(
-                eval_tangent,
-                eval_normal,
-                values_dofs,
-                fe_eval,
-                scratch_data,
-                evaluation_flag,
-                n_dofs_tangent,
-                std::integral_constant<bool, integrate>());
-            }
-        }
-      else if (face_direction == 1)
-        {
-          // NOTE. Take zx-coordinates into account for dim == 3
-          if (dim == 3)
-            evaluate_in_face_apply<1, 0>(
-              eval_tangent,
-              eval_normal,
-              values_dofs,
-              fe_eval,
-              scratch_data,
-              evaluation_flag,
-              n_dofs_tangent,
-              std::integral_constant<bool, integrate>());
-          else
-            evaluate_in_face_apply<0, 0>(
-              eval_normal,
-              eval_tangent,
-              values_dofs,
-              fe_eval,
-              scratch_data,
-              evaluation_flag,
-              n_dofs_tangent,
-              std::integral_constant<bool, integrate>());
-
-          values_dofs += 3 * n_dofs_tangent;
-
-          evaluate_in_face_apply<-1, 1>(
-            eval_general,
-            eval_general,
-            values_dofs,
-            fe_eval,
-            scratch_data,
-            evaluation_flag,
-            n_dofs_normal,
-            std::integral_constant<bool, integrate>());
-
-          values_dofs += 3 * n_dofs_normal;
-
-          if (dim == 3)
-            {
-              // NOTE. Take zx-coordinates into account
-              evaluate_in_face_apply<0, 2>(
-                eval_normal,
-                eval_tangent,
-                values_dofs,
-                fe_eval,
-                scratch_data,
-                evaluation_flag,
-                n_dofs_tangent,
-                std::integral_constant<bool, integrate>());
-            }
-        }
-      else
-        {
-          evaluate_in_face_apply<0, 0>(
-            eval_normal,
-            eval_tangent,
-            values_dofs,
-            fe_eval,
-            scratch_data,
-            evaluation_flag,
-            n_dofs_tangent,
-            std::integral_constant<bool, integrate>());
-
-          values_dofs += 3 * n_dofs_tangent;
-
-          evaluate_in_face_apply<1, 1>(
-            eval_tangent,
-            eval_normal,
-            values_dofs,
-            fe_eval,
-            scratch_data,
-            evaluation_flag,
-            n_dofs_tangent,
-            std::integral_constant<bool, integrate>());
-
-          values_dofs += 3 * n_dofs_tangent;
-
-          if (dim == 3)
-            {
-              evaluate_in_face_apply<-1, 2>(
-                eval_general,
-                eval_general,
-                values_dofs,
-                fe_eval,
-                scratch_data,
-                evaluation_flag,
-                n_dofs_normal,
-                std::integral_constant<bool, integrate>());
-            }
-        }
+      evaluate_in_face_apply<2, EvalGeneral, EvalGeneral>(
+        values_dofs,
+        fe_eval,
+        scratch_data,
+        evaluation_flag,
+        face_direction,
+        subface_index,
+        std::integral_constant<bool, integrate>());
     }
 
     /*
      * Helper function which applies the 1D kernels for on one
      * component in a face. normal_dir indicates the direction of the continuous
      * component of the RT space. std::integral_constant<bool, false> is the
-     * evaluation path, and std::integral_constant<bool, true> bellow is the
-     * integration path.
+     * evaluation path, and std::integral_constant<bool, true> below is the
+     * integration path. These two functions can be fused together since all
+     * offsets and pointers are the exact same.
      */
-    template <int normal_dir, int component, typename Eval0, typename Eval1>
+    template <int normal_dir, typename Eval0, typename Eval1>
     static inline void
     evaluate_in_face_apply(
-      const Eval0 &                          eval0,
-      const Eval1 &                          eval1,
       Number *                               values_dofs,
       FEEvaluationData<dim, Number, true> &  fe_eval,
       Number *                               scratch_data,
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      const std::size_t                      dofs_stride,
+      const unsigned int                     face_direction,
+      const unsigned int                     subface_index,
       std::integral_constant<bool, false>)
     {
-      constexpr std::size_t n_q_points = Utilities::pow(n_q_points_1d, dim - 1);
+      // TODO. Need to make sure hanging nodes work, i.e call
+      // create_eval_tensor_product with correct direction.
+      Eval0 eval0 =
+        create_evaluator_tensor_product<Eval0>(fe_eval.get_shape_info(),
+                                               subface_index,
+                                               0);
+      Eval1 eval1 =
+        create_evaluator_tensor_product<Eval1>(fe_eval.get_shape_info(),
+                                               subface_index,
+                                               0);
 
-      Number *values_quad = fe_eval.begin_values() + n_q_points * component;
+      constexpr std::size_t n_q_points = Utilities::pow(n_q_points_1d, dim - 1);
+      const std::size_t     n_dofs_tangent =
+        fe_eval.get_shape_info().dofs_per_component_on_face;
+      const std::size_t n_dofs_normal =
+        n_dofs_tangent - Utilities::pow(fe_degree, dim - 2);
+      const std::size_t dofs_stride =
+        (std::is_same<Eval0, EvalGeneral>::value) ? n_dofs_normal :
+                                                    n_dofs_tangent;
+
+      const unsigned int component_table[3][3] = {{1, 2, 0},
+                                                  {2, 0, 1},
+                                                  {0, 1, 2}};
+      const unsigned int component =
+        (dim == 2 && normal_dir == 0 && face_direction == 1) ?
+          0 :
+          component_table[face_direction][normal_dir];
+
+      // Initial offsets
+      values_dofs +=
+        3 * ((component == 0) ?
+               0 :
+               ((component == 1) ?
+                  ((face_direction == 0) ? n_dofs_normal : n_dofs_tangent) :
+                  ((face_direction == 2) ? n_dofs_tangent + n_dofs_tangent :
+                                           n_dofs_normal + n_dofs_tangent)));
+      const unsigned int shift = (dim == 2) ? normal_dir / 2 : normal_dir;
+      Number *values_quad      = fe_eval.begin_values() + n_q_points * shift;
       Number *gradients_quad =
-        fe_eval.begin_gradients() + dim * n_q_points * component;
+        fe_eval.begin_gradients() + dim * n_q_points * shift;
       Number *hessians_quad =
-        fe_eval.begin_hessians() + dim * (dim + 1) / 2 * n_q_points * component;
+        fe_eval.begin_hessians() + dim * (dim + 1) / 2 * n_q_points * shift;
 
       // Evaluation path
-
       if ((evaluation_flag & EvaluationFlags::values) &&
           !(evaluation_flag & EvaluationFlags::gradients))
         {
@@ -3393,25 +3304,59 @@ namespace internal
         }
     }
 
-    template <int normal_dir, int component, typename Eval0, typename Eval1>
+    template <int normal_dir, typename Eval0, typename Eval1>
     static inline void
     evaluate_in_face_apply(
-      const Eval0 &                          eval0,
-      const Eval1 &                          eval1,
       Number *                               values_dofs,
       FEEvaluationData<dim, Number, true> &  fe_eval,
       Number *                               scratch_data,
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      const std::size_t                      dofs_stride,
+      const unsigned int                     face_direction,
+      const unsigned int                     subface_index,
       std::integral_constant<bool, true>)
     {
-      constexpr std::size_t n_q_points = Utilities::pow(n_q_points_1d, dim - 1);
+      // TODO. Need to make sure hanging nodes work, i.e call
+      // create_eval_tensor_product with correct direction.
+      Eval0 eval0 =
+        create_evaluator_tensor_product<Eval0>(fe_eval.get_shape_info(),
+                                               subface_index,
+                                               0);
+      Eval1 eval1 =
+        create_evaluator_tensor_product<Eval1>(fe_eval.get_shape_info(),
+                                               subface_index,
+                                               0);
 
-      Number *values_quad = fe_eval.begin_values() + n_q_points * component;
+      constexpr std::size_t n_q_points = Utilities::pow(n_q_points_1d, dim - 1);
+      const std::size_t     n_dofs_tangent =
+        fe_eval.get_shape_info().dofs_per_component_on_face;
+      const std::size_t n_dofs_normal =
+        n_dofs_tangent - Utilities::pow(fe_degree, dim - 2);
+      const std::size_t dofs_stride =
+        (std::is_same<Eval0, EvalGeneral>::value) ? n_dofs_normal :
+                                                    n_dofs_tangent;
+
+      const unsigned int component_table[3][3] = {{1, 2, 0},
+                                                  {2, 0, 1},
+                                                  {0, 1, 2}};
+      const unsigned int component =
+        (dim == 2 && normal_dir == 0 && face_direction == 1) ?
+          0 :
+          component_table[face_direction][normal_dir];
+
+      // Initial offsets
+      values_dofs +=
+        3 * ((component == 0) ?
+               0 :
+               ((component == 1) ?
+                  ((face_direction == 0) ? n_dofs_normal : n_dofs_tangent) :
+                  ((face_direction == 2) ? n_dofs_tangent + n_dofs_tangent :
+                                           n_dofs_normal + n_dofs_tangent)));
+      const unsigned int shift = (dim == 2) ? normal_dir / 2 : normal_dir;
+      Number *values_quad      = fe_eval.begin_values() + n_q_points * shift;
       Number *gradients_quad =
-        fe_eval.begin_gradients() + dim * n_q_points * component;
+        fe_eval.begin_gradients() + dim * n_q_points * shift;
       Number *hessians_quad =
-        fe_eval.begin_hessians() + dim * (dim + 1) / 2 * n_q_points * component;
+        fe_eval.begin_hessians() + dim * (dim + 1) / 2 * n_q_points * shift;
 
       // Integration path
       if ((evaluation_flag & EvaluationFlags::values) &&
@@ -4265,14 +4210,12 @@ namespace internal
                                             (n_q_points_1d < 1) ? 1 :
                                                                   n_q_points_1d,
                                             Number>::
-            template evaluate_or_integrate_in_face<false>(
-              evaluation_flag,
-              shape_info,
-              temp,
-              fe_eval,
-              scratch_data,
-              subface_index,
-              fe_eval.get_face_no());
+            template evaluate_or_integrate_in_face<false>(evaluation_flag,
+                                                          temp,
+                                                          fe_eval,
+                                                          scratch_data,
+                                                          subface_index,
+                                                          fe_eval.get_face_no());
         }
       else if (fe_degree > -1 &&
                subface_index >= GeometryInfo<dim>::max_children_per_cell &&
@@ -4514,7 +4457,6 @@ namespace internal
                                                                   n_q_points_1d,
                                             Number>::
             template evaluate_or_integrate_in_face<true>(integration_flag,
-                                                         shape_info,
                                                          temp,
                                                          fe_eval,
                                                          scratch_data,

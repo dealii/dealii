@@ -735,8 +735,14 @@ protected:
   const Point<dim, Number> *quadrature_points;
 
   /**
-   * A pointer to the Jacobian information of the present cell. Only set to a
-   * useful value if on a non-Cartesian cell.
+   * A pointer to the inverse transpose Jacobian information of the present
+   * cell. Only set to a useful value if on a non-Cartesian cell. If the cell is
+   * Cartesian/affine then the Jacobian is stored at index 1. For faces on
+   * hypercube elements, the derivatives are reorder s.t the derivative
+   * orthogonal to the face is stored last, i.e for dim = 3 and face_no = 0 or
+   * 1, the derivatives are ordered as [dy, dz, dx], face_no = 2 or 3: [dz, dx,
+   * dy], and face_no = 5 or 6: [dx, dy, dz]. If the Jacobian also is stored,
+   * the components are instead reordered in the same way.
    */
   const Tensor<2, dim, Number> *jacobian;
 

@@ -61,7 +61,38 @@ template <int dim, int fe_degree>
 void
 test();
 
+enum TestType : unsigned char
+{
+  values           = 0,
+  values_gradients = 1,
+  gradients        = 2,
+  divergence       = 3
+};
 
+std::string
+enum_to_string(TestType const enum_type)
+{
+  std::string string_type;
+  switch (enum_type)
+    {
+      case TestType::values:
+        string_type = "Values ";
+        break;
+      case TestType::gradients:
+        string_type = "Gradients ";
+        break;
+      case TestType::values_gradients:
+        string_type = "Values and Gradients ";
+        break;
+      case TestType::divergence:
+        string_type = "Divergence ";
+        break;
+      default:
+        AssertThrow(false, ExcNotImplemented());
+        break;
+    }
+  return string_type;
+}
 
 template <int dim,
           int fe_degree,
@@ -70,8 +101,20 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &data_in,
+                 const TestType                 test_type)
+    : data(data_in)
+    , test_type(test_type)
+  {
+    evaluation_flag =
+      (test_type == TestType::values) ?
+        EvaluationFlags::values :
+        ((test_type == TestType::gradients) ?
+           EvaluationFlags::gradients :
+           ((test_type == TestType::values_gradients) ?
+              EvaluationFlags::values | EvaluationFlags::gradients :
+              EvaluationFlags::gradients));
+  };
 
   virtual ~MatrixFreeTest(){};
 
@@ -83,29 +126,23 @@ public:
   {
     FEEvaluation<dim, fe_degree, n_q_points_1d, dim, Number> fe_eval(data);
 
-    // OBS! This will need to be modified once the Piola transform is
-    // implemented
-    unsigned int n_cells =
-      data.get_dof_handler().get_triangulation().n_active_cells();
-    Number piola =
-      (dim == 2) ? n_cells : Utilities::pow((int)std::cbrt(n_cells), 4);
-
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
         fe_eval.reinit(cell);
-        fe_eval.gather_evaluate(src,
-                                EvaluationFlags::values |
-                                  EvaluationFlags::gradients);
+        fe_eval.gather_evaluate(src, evaluation_flag);
 
         for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
           {
-            fe_eval.submit_value(Number(10 * piola) * fe_eval.get_value(q), q);
-            fe_eval.submit_gradient(Number(piola) * fe_eval.get_gradient(q), q);
+            if (test_type < TestType::gradients)
+              fe_eval.submit_value(Number(10) * fe_eval.get_value(q), q);
+            if (test_type == TestType::gradients ||
+                test_type == TestType::values_gradients)
+              fe_eval.submit_gradient(fe_eval.get_gradient(q), q);
+            else if (test_type == TestType::divergence)
+              fe_eval.submit_divergence(fe_eval.get_divergence(q), q);
           }
 
-        fe_eval.integrate_scatter(EvaluationFlags::values |
-                                    EvaluationFlags::gradients,
-                                  dst);
+        fe_eval.integrate_scatter(evaluation_flag, dst);
       }
   };
 
@@ -117,21 +154,19 @@ public:
   };
 
 protected:
-  const MatrixFree<dim, Number> &data;
+  const MatrixFree<dim, Number> &  data;
+  EvaluationFlags::EvaluationFlags evaluation_flag;
+  const TestType                   test_type;
 };
 
 
 template <int dim, int fe_degree, typename Number>
 void
 do_test(const DoFHandler<dim> &          dof,
-        const AffineConstraints<double> &constraints)
+        const AffineConstraints<double> &constraints,
+        const TestType                   test_type)
 {
-  deallog << "Testing " << dof.get_fe().get_name() << std::endl;
-  deallog << "Number of cells: " << dof.get_triangulation().n_active_cells()
-          << std::endl;
-  deallog << "Number of degrees of freedom: " << dof.n_dofs() << std::endl
-          << std::endl;
-
+  deallog << "Testing " << enum_to_string(test_type) << std::endl;
 
   //   constraints.distribute(solution);
   MatrixFree<dim, Number> mf_data;
@@ -157,7 +192,7 @@ do_test(const DoFHandler<dim> &          dof,
     }
 
   // MatrixFree solution
-  MatrixFreeTest<dim, fe_degree, fe_degree + 2, Number> mf(mf_data);
+  MatrixFreeTest<dim, fe_degree, fe_degree + 2, Number> mf(mf_data, test_type);
   mf.test_functions(solution, initial_condition);
 
 
@@ -191,16 +226,23 @@ do_test(const DoFHandler<dim> &          dof,
           {
             const Tensor<1, dim> phi_i = fe_val[velocities].value(i, q) * 10.;
             const Tensor<2, dim> grad_phi_i = fe_val[velocities].gradient(i, q);
+            const Number div_phi_i = fe_val[velocities].divergence(i, q);
 
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
                 const Tensor<1, dim> phi_j = fe_val[velocities].value(j, q);
                 const Tensor<2, dim> grad_phi_j =
                   fe_val[velocities].gradient(j, q);
+                const Number div_phi_j = fe_val[velocities].divergence(j, q);
 
-                local_matrix(i, j) +=
-                  (phi_j * phi_i + scalar_product(grad_phi_i, grad_phi_j)) *
-                  fe_val.JxW(q);
+                if (test_type < TestType::gradients)
+                  local_matrix(i, j) += phi_j * phi_i * fe_val.JxW(q);
+                if (test_type == TestType::gradients ||
+                    test_type == TestType::values_gradients)
+                  local_matrix(i, j) +=
+                    scalar_product(grad_phi_i, grad_phi_j) * fe_val.JxW(q);
+                else if (test_type == TestType::divergence)
+                  local_matrix(i, j) += div_phi_i * div_phi_j * fe_val.JxW(q);
               }
           }
       cell->get_dof_indices(local_dof_indices);
