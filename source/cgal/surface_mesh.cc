@@ -74,7 +74,7 @@ namespace CGALWrappers
 {
   template <typename CGALPointType, int dim, int spacedim>
   void
-  convert_to_cgal_surface_mesh(
+  dealii_cell_to_cgal_surface_mesh(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const Mapping<dim, spacedim> &                              mapping,
     CGAL::Surface_mesh<CGALPointType> &                         mesh)

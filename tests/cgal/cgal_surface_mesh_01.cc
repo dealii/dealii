@@ -54,7 +54,7 @@ test()
       GridGenerator::reference_cell(tria, r_cell);
 
       const auto cell = tria.begin_active();
-      convert_to_cgal_surface_mesh(cell, *mapping, mesh);
+      dealii_cell_to_cgal_surface_mesh(cell, *mapping, mesh);
 
       Assert(mesh.is_valid(), dealii::ExcMessage("The CGAL mesh is not valid"));
       deallog << "deal vertices: " << cell->n_vertices() << ", cgal vertices "
