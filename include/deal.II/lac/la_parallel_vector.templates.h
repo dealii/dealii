@@ -438,22 +438,16 @@ namespace LinearAlgebra
 
           if (new_alloc_size > allocated_size)
             {
-#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
-              Assert(((allocated_size > 0 && data.data() != nullptr) ||
-                      data.data() == nullptr),
-                     ExcInternalError());
-#  else
+#  ifndef DEAL_II_WITH_KOKKOS_BACKEND
               Assert(((allocated_size > 0 && data.values_dev != nullptr) ||
                       data.values_dev == nullptr),
                      ExcInternalError());
-#  endif
 
               Number *new_val_dev;
               Utilities::CUDA::malloc(new_val_dev, new_alloc_size);
-#  ifndef DEAL_II_WITH_KOKKOS_BACKEND
               data.values_dev.reset(new_val_dev);
 #  else
-              Kokkos::resize(data.values, new_alloc_size);
+              Kokkos::realloc(data.values, new_alloc_size);
 #  endif
               allocated_size = new_alloc_size;
             }
@@ -462,7 +456,7 @@ namespace LinearAlgebra
 #  ifndef DEAL_II_WITH_KOKKOS_BACKEND
               data.values_dev.reset();
 #  else
-              Kokkos::resize(data.values, 0);
+              Kokkos::realloc(data.values, 0);
 #  endif
               allocated_size = 0;
             }
