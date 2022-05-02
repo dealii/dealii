@@ -96,6 +96,18 @@ public:
     const ComponentMask &               component_mask = ComponentMask());
 
   /**
+   * Fill the internal data structures with information
+   * about Dirichlet boundary dofs on level @p level.
+   * The indices are restricted to the set of locally relevant
+   * level dofs.
+   */
+  template <int dim, int spacedim>
+  void
+  add_boundary_indices(const DoFHandler<dim, spacedim> &dof,
+                       const unsigned int               level,
+                       const IndexSet &                 boundary_indices);
+
+  /**
    * Add user defined constraints to be used on level @p level.
    *
    * The user can call this function multiple times and any new,
@@ -351,6 +363,25 @@ MGConstrainedDoFs::make_zero_boundary_constraints(
                               boundary_ids,
                               boundary_indices,
                               component_mask);
+}
+
+
+
+template <int dim, int spacedim>
+inline void
+MGConstrainedDoFs::add_boundary_indices(const DoFHandler<dim, spacedim> &dof,
+                                        const unsigned int               level,
+                                        const IndexSet &level_boundary_indices)
+{
+  const unsigned int n_levels = dof.get_triangulation().n_global_levels();
+  if (boundary_indices.size() == 0)
+    {
+      boundary_indices.resize(n_levels);
+      for (unsigned int i = 0; i < n_levels; ++i)
+        boundary_indices[i] = IndexSet(dof.n_dofs(i));
+    }
+  AssertDimension(boundary_indices.size(), n_levels);
+  boundary_indices[level].add_indices(level_boundary_indices);
 }
 
 
