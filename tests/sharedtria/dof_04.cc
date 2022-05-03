@@ -41,7 +41,7 @@
 
 template <int dim>
 void
-test()
+test(const unsigned int n_global_refinements)
 {
   parallel::shared::Triangulation<dim> triangulation(
     MPI_COMM_WORLD,
@@ -54,7 +54,7 @@ test()
   DoFHandler<dim> dof_handler(triangulation);
 
   GridGenerator::hyper_cube(triangulation);
-  triangulation.refine_global(2);
+  triangulation.refine_global(n_global_refinements);
 
   const unsigned int n_refinements[] = {0, 4, 3, 2};
   for (unsigned int i = 0; i < n_refinements[dim]; ++i)
@@ -158,11 +158,18 @@ main(int argc, char *argv[])
 
   MPILogInitAll all;
 
-  deallog.push("2d");
-  test<2>();
+  deallog.push("2d, no global refinements");
+  test<2>(0);
+  deallog.pop();
+
+  // To preserve output with an older version of this test reseed here:
+  Testing::srand(1);
+
+  deallog.push("2d, global refinements");
+  test<2>(2);
   deallog.pop();
 
   deallog.push("3d");
-  test<3>();
+  test<3>(2);
   deallog.pop();
 }
