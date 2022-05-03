@@ -96,8 +96,8 @@ public:
     const ComponentMask &               component_mask = ComponentMask());
 
   /**
-   * Fill the internal data structures with information
-   * about Dirichlet boundary dofs on level @p level.
+   * Add Dirichlet boundary dofs to the internal data structures
+   * on level @p level.
    * The indices are restricted to the set of locally relevant
    * level dofs.
    */
