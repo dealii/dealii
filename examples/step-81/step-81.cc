@@ -436,8 +436,7 @@ namespace Step81
   // absorbing boundary conditions are disabled we simply enforce
   // homogeneous Dirichlet conditions on the tangential component of the
   // electric field. In the context of time-harmonic Maxwell's equations
-  // these are also known as \emph{perfectly conducting boundary
-  // conditions}.
+  // these are also known as perfectly conducting boundary conditions.
 
   template <int dim>
   Maxwell<dim>::Maxwell()
