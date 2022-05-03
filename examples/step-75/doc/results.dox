@@ -118,6 +118,14 @@ to degree six:
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
+This tutorial shows only one particular way how to use parallel
+hp-adaptive finite element methods. In the following paragraphs, you
+will get to know which alternatives are possible. Most of these
+extensions are already part of https://github.com/marcfehling/hpbox/,
+which provides you with implementation examples that you can play
+around with.
+
+
 <h4>Different hp-decision strategies</h4>
 
 The deal.II library offers multiple strategies to decide which type of
