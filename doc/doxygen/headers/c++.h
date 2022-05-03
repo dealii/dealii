@@ -15,14 +15,12 @@
 
 
 /**
- * @defgroup CPP11 deal.II and the C++11 standard
+ * @defgroup CPP11 deal.II and Modern C++ standards
  *
- * Since version 9.0, deal.II requires a compiler that supports at
- * least <a href="http://en.wikipedia.org/wiki/C%2B%2B11">C++11</a>.
- * As part of this, many places in the internal implementation of
- * deal.II are now using features that were only introduced in C++11.
- * That said, deal.II also has functions and classes that make using
- * it with C++11 features easier.
+ * Since version 9.3, deal.II requires a compiler that supports at least
+ * <a href="http://en.wikipedia.org/wiki/C%2B%2B14">C++14</a>. Large parts
+ * of the library now depend on modern language constructs which are
+ * documented here.
  *
  * One example is support for C++11
  * <a href="http://en.wikipedia.org/wiki/C++11#Range-based_for_loop">range-based
@@ -82,44 +80,36 @@
  * @code
  * constexpr Tensor<2, 2> A({{1., 0.}, {0., 1.}});
  * @endcode
- * Some functions such as determinant() are specified as `constexpr` but they
- * require a compiler with C++14 capability. As such, this function is
- * internally declared as:
+ * Some functions such as determinant() are specified as `constexpr`: these rely
+ * on the generalized constexpr support available in C++14. Some functions,
+ * such as unit_symmetric_tensor(), rely on further developments of `constexpr`
+ * only * available in C++17 and newer. As such, this function is declared as
  * @code
  * template <int dim, typename Number>
- * DEAL_II_CONSTEXPR Number determinant(const Tensor<2, dim, Number> &t);
+ * DEAL_II_CONSTEXPR inline SymmetricTensor<2, dim, Number>
+ * unit_symmetric_tensor();
  * @endcode
- * The macro @ref DEAL_II_CONSTEXPR simplifies to `constexpr` if a C++14-capable
- * compiler is available. Otherwise, for old compilers, it ignores
- * DEAL_II_CONSTEXPR altogether.
- * Therefore, with newer compilers, the user can write
+ * The macro @ref DEAL_II_CONSTEXPR expands to `constexpr` if the compiler
+ * supports enough `constexpr` features (such as loops). If the compiler does
+ * not then this macro expands to nothing.
+ *
+ * Functions declared as `constexpr` can be evaluated at compile time. Hence code
+ * like
  * @code
  * constexpr double det_A = determinant(A);
  * @endcode
- * assuming `A` is declared with the `constexpr` specifier. This example shows
- * the performance gains of using `constexpr` because here we performed an
- * operation with $O(\text{dim}^3)$ complexity during compile time, avoiding
- * any runtime cost.
+ * assuming `A` is declared with the `constexpr` specifier, will typically
+ * result in compile-time constants. This example shows the performance gains of
+ * using `constexpr` because here we performed an operation with
+ * $O(\text{dim}^3)$ complexity during compile time, avoiding any runtime cost.
  */
 
 
 
 /**
- * deal.II currently only requires a C++11-conforming compiler, but there are a
- * number of functions and classes from the C++14 standard that are easy to
- * provide also in case the compiler only supports C++11. These are collected
- * in the current namespace.
- *
- * The most notable example is the <a
- * href="https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique">`std::make_unique`</a>
- * function which is arguably an oversight for not having been
- * included in C++11 (given that there is <a
- * href="https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared">`std::make_shared`</a>
- * in C++11).
- *
- * There are other small additions in this namespace that allow us to
- * use C++14 features at this point already, even though we don't
- * require a C++14-compliant compiler.
+ * Previously, deal.II did not require C++14 and provided implementations of some
+ * useful C++14 features in this namespace. Presently, as the library now requires
+ * C++14, usage of this namespace is deprecated.
  *
  * @note If the compiler in use actually does support C++14, then the
  *   contents of this namespace are simply imported classes and
@@ -132,9 +122,9 @@ namespace std_cxx14
 
 
 /**
- * deal.II currently only requires a C++11-conforming compiler, but there are a
+ * deal.II currently only requires a C++14-conforming compiler, but there are a
  * number of functions and classes from the C++17 standard that are easy to
- * provide also in case the compiler only supports C++11. These are collected
+ * provide also in case the compiler only supports C++14. These are collected
  * in the current namespace.
  *
  * The most notable example is the <a
@@ -156,9 +146,9 @@ namespace std_cxx17
 
 
 /**
- * deal.II currently only requires a C++11-conforming compiler, but there are a
+ * deal.II currently only requires a C++14-conforming compiler, but there are a
  * number of functions and classes from the C++20 standard that are easy to
- * provide also in case the compiler only supports C++11. These are collected
+ * provide also in case the compiler only supports C++14. These are collected
  * in the current namespace.
  *
  * One example is the <a
