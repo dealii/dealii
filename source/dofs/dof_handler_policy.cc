@@ -2931,8 +2931,11 @@ namespace internal
         // independently, and then unifies some located at vertices or faces;
         // this leaves us with fewer DoFs than there were before, so use the
         // largest index as the one to determine the size of the index space
-        return NumberCache(
-          *std::max_element(new_numbers.begin(), new_numbers.end()) + 1);
+        if (new_numbers.size() == 0)
+          return NumberCache();
+        else
+          return NumberCache(
+            *std::max_element(new_numbers.begin(), new_numbers.end()) + 1);
       }
 
 
