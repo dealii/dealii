@@ -283,8 +283,10 @@ The example step could be extended in a number of different directions.
     Unfortunately, time-harmonic Maxwell's equations lack the usual notion
     of local smoothing properties, which renders the usual suspects, such
     as a geometric multigrid (see the Multigrid class), largely useless. A
-    possible extension would be to implement a Schwarz preconditioner
-    (based on domain decomposition), or a sweeping preconditioner.
+    possible extension would be to implement an additive Schwarz preconditioner
+    (based on domain decomposition, see for example
+    @cite Gopalakrishnan2003), or a sweeping preconditioner (see for
+    example @cite Ying2012).
   </li>
   <li>
     Another possible extension of the current program is to introduce local
