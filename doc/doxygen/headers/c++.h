@@ -41,16 +41,15 @@
  *   for (auto &cell : triangulation.active_cell_iterators())
  *     cell->set_refine_flag();
  * @endcode
- * This relies on functions such as Triangulation::active_cell_iterators(),
- * and equivalents in the DoF handler classes,
- * DoFHandler::active_cell_iterators(), hp::DoFHandler::active_cell_iterators().
+ * This works in the same way with Triangulation::active_cell_iterators()
+ * and DoFHandler::active_cell_iterators().
  * There are variants of these functions that provide iterator ranges
  * for all cells (not just the active ones) and for cells on individual
  * levels.
  *
  * There are numerous other functions in the library that allow for
  * the idiomatic use of range-based for loops. Examples are
- * GeometryInfo::face_indices(), GeometryInfo::vertex_indices(),
+ * ReferenceCell::face_indices(), ReferenceCell::vertex_indices(),
  * FEValuesBase::quadrature_point_indices(), among many others.
  *
  * C++11 also introduces the concept of
@@ -155,7 +154,7 @@ namespace std_cxx17
  * href="https://en.cppreference.com/w/cpp/ranges/iota_view">`std::ranges::iota_view`</a>
  * class that was introduced to C++ starting with the C++20
  * standard. It is used as the return type for the
- * GeometryInfo::face_indices(), GeometryInfo::vertex_indices(), and
+ * ReferenceCell::face_indices(), ReferenceCell::vertex_indices(), and
  * FEValuesBase::quadrature_point_indices() functions, among others,
  * to support range-based for loops (see @ref CPP11 for examples of
  * range-based for loops, as well as the documentation of the
