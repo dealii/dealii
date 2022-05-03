@@ -5747,7 +5747,10 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::get_value(
           // Cartesian cell
           const Tensor<2, dim, dealii::VectorizedArray<Number>> jac =
             this->jacobian[1];
-          const VectorizedArrayType inv_det = determinant(this->jacobian[0]);
+          const VectorizedArrayType inv_det =
+            (dim == 2) ? this->jacobian[0][0][0] * this->jacobian[0][1][1] :
+                         this->jacobian[0][0][0] * this->jacobian[0][1][1] *
+                           this->jacobian[0][2][2];
 
           // J * u * det(J^-1)
           for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -5818,7 +5821,10 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
           const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
             this->jacobian[0];
           const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
-          const VectorizedArrayType inv_det = determinant(inv_t_jac);
+          const VectorizedArrayType                  inv_det =
+            (dim == 2) ? this->jacobian[0][0][0] * this->jacobian[0][1][1] :
+                                          this->jacobian[0][0][0] * this->jacobian[0][1][1] *
+                           this->jacobian[0][2][2];
 
           // J * grad_quad * J^-1 * det(J^-1)
           for (unsigned int d = 0; d < dim; ++d)
@@ -5891,7 +5897,22 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
-      if (this->cell_type <= internal::MatrixFreeFunctions::affine)
+      if (!is_face &&
+          this->cell_type == internal::MatrixFreeFunctions::cartesian)
+        {
+          // Cartesian cell
+          const VectorizedArrayType inv_det =
+            (dim == 2) ? this->jacobian[0][0][0] * this->jacobian[0][1][1] :
+                         this->jacobian[0][0][0] * this->jacobian[0][1][1] *
+                           this->jacobian[0][2][2];
+
+          // div * det(J^-1)
+          divergence = this->gradients_quad[q_point] * inv_det;
+          for (unsigned int d = 1; d < dim; ++d)
+            divergence +=
+              this->gradients_quad[(dim * d + d) * nqp + q_point] * inv_det;
+        }
+      else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
           // Affine cell
           // Derivatives are reordered for faces. Need to take this into account
@@ -6075,7 +6096,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
               this->jacobian[0];
           const Tensor<2, dim, VectorizedArrayType> &jac =
             (this->cell_type > internal::MatrixFreeFunctions::affine) ?
-              invert(inv_t_jac) :
+              transpose(invert(inv_t_jac)) :
               this->jacobian[1];
 
           // Derivatives are reordered for faces. Need to take this into account
