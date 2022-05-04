@@ -166,6 +166,80 @@ check_fe(FiniteElement<dim> &fe)
               "FAIL ")
         << std::endl;
     }
+
+  {
+    deallog << "Test add_boundary_indices: " << std::endl;
+    // used to test add_boundary_indices()
+    MGConstrainedDoFs mg_constrained_dofs_1;
+    mg_constrained_dofs_1.initialize(dofh);
+
+    MGLevelObject<AffineConstraints<double>> mg_boundary_constraints;
+    mg_boundary_constraints.resize(0, n_levels - 1);
+
+    std::vector<IndexSet> boundary_indices;
+    boundary_indices.resize(n_levels);
+    MGTools::make_boundary_list(dofh, {0}, boundary_indices);
+
+    for (unsigned int level = 0; level < n_levels; ++level)
+      {
+        deallog << "Level " << level << ':' << std::endl;
+
+        IndexSet relevant;
+        DoFTools::extract_locally_relevant_level_dofs(dofh, level, relevant);
+        mg_boundary_constraints[level].reinit(relevant);
+        mg_boundary_constraints[level].add_lines(boundary_indices[level]);
+
+        mg_constrained_dofs_1.add_boundary_indices(dofh,
+                                                   level,
+                                                   boundary_indices[level]);
+        const auto &bi = mg_constrained_dofs_1.get_boundary_indices(level);
+
+        deallog << "get_boundary_indices test:" << std::endl;
+        bi.print(deallog);
+
+        deallog << "relevant:" << std::endl;
+        relevant.print(deallog);
+
+        deallog << ((bi ==
+                     (relevant &
+                      mg_constrained_dofs_ref.get_boundary_indices(level))) ?
+                      "ok " :
+                      "FAIL test")
+                << std::endl;
+      }
+
+    // extract boundary indices from constraint matrices
+    // this is probably how we would use the function add_boundary_indices()
+    mg_constrained_dofs_1.clear();
+    mg_constrained_dofs_1.initialize(dofh);
+    for (unsigned int level = 0; level < n_levels; ++level)
+      {
+        deallog << "Level " << level << ':' << std::endl;
+
+        IndexSet level_boundary_indices(dofh.n_dofs(level));
+        for (auto line : mg_boundary_constraints[level].get_lines())
+          {
+            if (line.entries.size() == 0)
+              {
+                level_boundary_indices.add_index(line.index);
+              }
+          }
+        mg_constrained_dofs_1.add_boundary_indices(dofh,
+                                                   level,
+                                                   level_boundary_indices);
+        const auto &bi = mg_constrained_dofs_1.get_boundary_indices(level);
+
+        IndexSet relevant;
+        DoFTools::extract_locally_relevant_level_dofs(dofh, level, relevant);
+
+        deallog << ((bi ==
+                     (relevant &
+                      mg_constrained_dofs_ref.get_boundary_indices(level))) ?
+                      "ok " :
+                      "FAIL test")
+                << std::endl;
+      }
+  }
 }
 
 
