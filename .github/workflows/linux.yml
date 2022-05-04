@@ -51,21 +51,22 @@ jobs:
     # simple parallel debug build using g++ with simplex configuration enabled
 
     name: linux debug parallel simplex
-    runs-on: [ubuntu-18.04]
+    runs-on: [ubuntu-20.04]
 
     steps:
     - uses: actions/checkout@v2
     - name: modules
       run: |
         sudo apt-get install -y software-properties-common
-        sudo add-apt-repository ppa:ginggs/deal.ii-9.2.0-backports
+        sudo add-apt-repository -y ppa:ginggs/deal.ii-9.3.0-backports
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
             numdiff \
+            libboost-all-dev \
+            libcgal-dev \
             libp4est-dev \
             trilinos-all-dev \
             petsc-dev \
-            libcgal-dev \
             libmetis-dev \
             libhdf5-mpi-dev
     - name: info
@@ -79,6 +80,7 @@ jobs:
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D DEAL_II_CXX_FLAGS='-Werror -std=c++17' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_CGAL="ON" \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_TRILINOS="ON" \
               -D DEAL_II_WITH_PETSC="ON" \
