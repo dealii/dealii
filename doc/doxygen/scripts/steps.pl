@@ -163,32 +163,78 @@ foreach $step (@ARGV)
     foreach $source (split ' ', $buildson) {
         $source =~ s/step-/Step/g;
 
-        # We want to treat the step-6 -> step-40 edge differently. If
-        # it is printed like any other edge, i.e., with step-40
-        # directly below step-6, then we end up with a tangle of lines
-        # because there are so many sub-graphs that originate from
-        # step-6 (with the next node at the same level as step-40) but
-        # where step-40 then feeds with a long line into one of the
-        # programs further down. It looks better if we place step-40 a
-        # couple of levels further down in the graph so that the
-        # higher up parts of the graph consists of the sequential
-        # programs and the lower-down parts to the parallel ones.
-        #
-        # The way to do this is to insert a few invisible nodes (with
-        # invisible edges) between step-6 and step-40.
+        # Some tutorial programs have a large number of ancestors: this gets
+        # particularly noticeable when we switch from sequential to distributed
+        # programs. Moving step-40 down by adding some invisible nodes helps a
+        # lot.
         if ($source eq "Step6" && $destination eq "Step40")
         {
             print "  Step40a [style=\"invis\"];";
             print "  Step40b [style=\"invis\"];";
             print "  Step40c [style=\"invis\"];";
+            print "  Step40d [style=\"invis\"];";
+            print "  Step40e [style=\"invis\"];";
+            print "  Step40f [style=\"invis\"];";
 
             print "  Step6 -> Step40a [style=\"invis\"];";
             print "  Step40a -> Step40b [style=\"invis\"];";
             print "  Step40b -> Step40c [style=\"invis\"];";
-            print "  Step40c -> Step40 [style=\"invis\"];";
+            print "  Step40c -> Step40d [style=\"invis\"];";
+            print "  Step40d -> Step40e [style=\"invis\"];";
+            print "  Step40e -> Step40f [style=\"invis\"];";
+            print "  Step40f -> Step40 [style=\"invis\"];";
 
             print "  Step6 -> Step40 [weight=100,color=\"$colors{$kind_map{$source}}\"];";
         }
+
+        elsif ($source eq "Step6" && $destination eq "Step8")
+        {
+            print "  Step8a [style=\"invis\"];";
+
+            print "  Step6 -> Step8a [style=\"invis\"];";
+            print "  Step8a -> Step8 [style=\"invis\"];";
+
+            print "  Step6 -> Step8";
+        }
+        elsif ($source eq "Step6" && $destination eq "Step15")
+        {
+            print "  Step15a [style=\"invis\"];";
+
+            print "  Step6 -> Step15a [style=\"invis\"];";
+            print "  Step15a -> Step15 [style=\"invis\"];";
+
+            print "  Step6 -> Step15";
+        }
+        elsif ($source eq "Step16" && $destination eq "Step37")
+        {
+            print "  Step37a [style=\"invis\"];";
+            print "  Step37b [style=\"invis\"];";
+            print "  Step37c [style=\"invis\"];";
+            print "  Step37d [style=\"invis\"];";
+
+            print "  Step16 -> Step37a [style=\"invis\"];";
+            print "  Step37a -> Step37b [style=\"invis\"];";
+            print "  Step37b -> Step37c [style=\"invis\"];";
+            print "  Step37c -> Step37d [style=\"invis\"];";
+            print "  Step37d -> Step37 [style=\"invis\"];";
+
+            print "  Step16 -> Step37 [weight=100,color=\"$colors{$kind_map{$source}}\"];";
+        }
+        # This one looks better if it is down a level due to the other
+        # artificial nodes.
+        elsif ($source eq "Step21" && $destination eq "Step22")
+        {
+            print "  Step22a [style=\"invis\"];";
+            print "  Step22b [style=\"invis\"];";
+
+            print "  Step21 -> Step22a [style=\"invis\"];";
+            print "  Step22a -> Step22b [style=\"invis\"];";
+            print "  Step22b -> Step22 [style=\"invis\"];";
+
+            print "  Step21 -> Step22 [weight=100,color=\"$colors{$kind_map{$source}}\"];";
+        }
+
+
 
         # All other edges in the graph
         else
