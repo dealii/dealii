@@ -1,0 +1,29 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2022 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+
+for (dim : DIMENSIONS; spacedim : SPACE_DIMENSIONS; cgal_kernel : CGAL_KERNELS)
+  {
+#if dim <= spacedim
+    template void
+    dealii_cell_to_cgal_surface_mesh<typename cgal_kernel::Point_3,
+                                     dim,
+                                     spacedim>(
+      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+      const Mapping<dim, spacedim> &                              mapping,
+      CGAL::Surface_mesh<typename cgal_kernel::Point_3> &         mesh);
+#endif
+  }
