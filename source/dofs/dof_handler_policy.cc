@@ -2931,8 +2931,11 @@ namespace internal
         // independently, and then unifies some located at vertices or faces;
         // this leaves us with fewer DoFs than there were before, so use the
         // largest index as the one to determine the size of the index space
-        return NumberCache(
-          *std::max_element(new_numbers.begin(), new_numbers.end()) + 1);
+        if (new_numbers.size() == 0)
+          return NumberCache();
+        else
+          return NumberCache(
+            *std::max_element(new_numbers.begin(), new_numbers.end()) + 1);
       }
 
 
@@ -3456,11 +3459,19 @@ namespace internal
 
         std::vector<types::global_dof_index> global_gathered_numbers(
           this->dof_handler->n_dofs(), 0);
-        // as we call DoFRenumbering::subdomain_wise (*dof_handler) from
+        // as we call DoFRenumbering::subdomain_wise(*dof_handler) from
         // distribute_dofs(), we need to support sequential-like input.
         // Distributed-like input from, for example, component_wise renumbering
         // is also supported.
-        if (new_numbers.size() == this->dof_handler->n_dofs())
+        const bool uses_sequential_numbering =
+          new_numbers.size() == this->dof_handler->n_dofs();
+        bool all_use_sequential_numbering = false;
+        Utilities::MPI::internal::all_reduce<bool>(
+          MPI_LAND,
+          ArrayView<const bool>(&uses_sequential_numbering, 1),
+          tr->get_communicator(),
+          ArrayView<bool>(&all_use_sequential_numbering, 1));
+        if (all_use_sequential_numbering)
           {
             global_gathered_numbers = new_numbers;
           }
