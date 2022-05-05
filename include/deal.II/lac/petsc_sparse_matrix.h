@@ -28,6 +28,7 @@
 #    include <vector>
 
 #    include "petscis.h"
+#    include "petscistypes.h"
 
 DEAL_II_NAMESPACE_OPEN
 // forward declaration
