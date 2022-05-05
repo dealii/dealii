@@ -40,8 +40,7 @@ test()
   {
     Triangulation<3, 3> volume_tria;
     GridGenerator::cylinder(volume_tria);
-    std::set<types::boundary_id> boundary_ids;
-    boundary_ids.insert(0);
+    const std::set<types::boundary_id> boundary_ids = {0};
     GridGenerator::extract_boundary_mesh(volume_tria, tria, boundary_ids);
   }
   tria.set_all_manifold_ids(0);

@@ -316,9 +316,8 @@ test(const unsigned int n_ref = 0)
   }
 
   // now go through all GMG levels:
-  std::set<types::boundary_id> dirichlet_boundary_ids;
-  dirichlet_boundary_ids.insert(0);
-  MGConstrainedDoFs mg_constrained_dofs;
+  const std::set<types::boundary_id> dirichlet_boundary_ids = {0};
+  MGConstrainedDoFs                  mg_constrained_dofs;
   mg_constrained_dofs.initialize(dof_handler);
   mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
                                                      dirichlet_boundary_ids);

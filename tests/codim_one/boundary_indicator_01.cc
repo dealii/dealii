@@ -90,8 +90,7 @@ main()
 
     // now extract a mesh of the 5
     // surface faces
-    std::set<types::boundary_id> boundary_ids;
-    boundary_ids.insert(0);
+    const std::set<types::boundary_id> boundary_ids = {0};
     GridGenerator::extract_boundary_mesh(volume_mesh,
                                          boundary_mesh,
                                          boundary_ids);

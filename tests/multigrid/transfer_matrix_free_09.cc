@@ -74,8 +74,7 @@ check(const FiniteElement<dim> &fe)
 
       deallog << "no. cells: " << tr.n_global_active_cells() << std::endl;
 
-      std::set<types::boundary_id> dirichlet_boundary;
-      dirichlet_boundary.insert(0);
+      const std::set<types::boundary_id> dirichlet_boundary = {0};
       mg_constrained_dofs.initialize(mgdof);
       mg_constrained_dofs.make_zero_boundary_constraints(mgdof,
                                                          dirichlet_boundary);

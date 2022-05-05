@@ -58,10 +58,8 @@ check_fe(FiniteElement<dim> &fe, ComponentMask &component_mask)
   dofh.distribute_dofs(fe);
   dofh.distribute_mg_dofs();
 
-  MGConstrainedDoFs            mg_constrained_dofs;
-  std::set<types::boundary_id> boundary_indicators;
-
-  boundary_indicators.insert(0);
+  MGConstrainedDoFs                  mg_constrained_dofs;
+  const std::set<types::boundary_id> boundary_indicators = {0};
   mg_constrained_dofs.initialize(dofh);
   mg_constrained_dofs.make_zero_boundary_constraints(dofh,
                                                      boundary_indicators,
