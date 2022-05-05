@@ -11641,35 +11641,35 @@ Triangulation<dim, spacedim>::create_triangulation(
 
 
   /*
-      When the triangulation is a manifold (dim < spacedim), the normal field
-      provided from the map class depends on the order of the vertices.
-      It may happen that this normal field is discontinuous.
-      The following code takes care that this is not the case by setting the
-      cell direction flag on those cell that produce the wrong orientation.
+      When the triangulation is a manifold (dim < spacedim) and made of
+      quadrilaterals, the normal field provided from the map class depends on
+      the order of the vertices. It may happen that this normal field is
+      discontinuous. The following code takes care that this is not the case by
+      setting the cell direction flag on those cell that produce the wrong
+      orientation.
 
-      To determine if 2 neighbours have the same or opposite orientation
-      we use a table of truth.
-      Its entries are indexes by the local indices of the common face.
-      For example if two elements share a face, and this face is
-      face 0 for element 0 and face 1 for element 1, then
-      table(0,1) will tell whether the orientation are the same (true) or
-      opposite (false).
+      To determine if 2 neighbours have the same or opposite orientation we use
+      a table of truth. Its entries are indexes by the local indices of the
+      common face. For example if two elements share a face, and this face is
+      face 0 for element 0 and face 1 for element 1, then table(0,1) will tell
+      whether the orientation are the same (true) or opposite (false).
 
-      Even though there may be a combinatorial/graph theory argument to get
-      this table in any dimension, I tested by hand all the different possible
-      cases in 1D and 2D to generate the table.
+      Even though there may be a combinatorial/graph theory argument to get this
+      table in any dimension, I tested by hand all the different possible cases
+      in 1D and 2D to generate the table.
 
       Assuming that a surface respects the standard orientation for 2d meshes,
       the tables of truth are symmetric and their true values are the following
-      1D curves:  (0,1)
-      2D surface: (0,1),(0,2),(1,3),(2,3)
+
+      - 1D curves:  (0,1)
+      - 2D surface: (0,1),(0,2),(1,3),(2,3)
 
       We store this data using an n_faces x n_faces full matrix, which is
      actually much bigger than the minimal data required, but it makes the code
      more readable.
 
     */
-  if (dim < spacedim)
+  if (dim < spacedim && all_reference_cells_are_hyper_cube())
     {
       Table<2, bool> correct(GeometryInfo<dim>::faces_per_cell,
                              GeometryInfo<dim>::faces_per_cell);
