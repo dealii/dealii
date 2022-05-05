@@ -1,0 +1,5 @@
+Changed: All functions `n_nonzero_elements()`, which are members of the
+SparseMatrix and SparsityPattern family of classes, now always return
+`std::uint64_t` instead of types::global_dof_index.
+<br>
+(Marc Fehling, 2022/04/04)

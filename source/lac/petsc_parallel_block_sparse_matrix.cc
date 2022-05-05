@@ -135,10 +135,10 @@ namespace PETScWrappers
       return index_sets;
     }
 
-    BlockSparseMatrix::size_type
+    std::uint64_t
     BlockSparseMatrix::n_nonzero_elements() const
     {
-      size_type n_nonzero = 0;
+      std::uint64_t n_nonzero = 0;
       for (size_type rows = 0; rows < this->n_block_rows(); ++rows)
         for (size_type cols = 0; cols < this->n_block_cols(); ++cols)
           n_nonzero += this->block(rows, cols).n_nonzero_elements();

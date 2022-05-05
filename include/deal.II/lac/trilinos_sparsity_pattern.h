@@ -712,7 +712,7 @@ namespace TrilinosWrappers
     /**
      * Return the number of nonzero elements of this sparsity pattern.
      */
-    size_type
+    std::uint64_t
     n_nonzero_elements() const;
 
     /**

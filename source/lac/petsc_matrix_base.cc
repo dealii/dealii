@@ -286,14 +286,16 @@ namespace PETScWrappers
 
 
 
-  MatrixBase::size_type
+  std::uint64_t
   MatrixBase::n_nonzero_elements() const
   {
     MatInfo              mat_info;
     const PetscErrorCode ierr = MatGetInfo(matrix, MAT_GLOBAL_SUM, &mat_info);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return static_cast<size_type>(mat_info.nz_used);
+    // MatInfo logs quantities as PetscLogDouble. So we need to cast it to match
+    // out interface.
+    return static_cast<std::uint64_t>(mat_info.nz_used);
   }
 
 
