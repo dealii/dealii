@@ -758,7 +758,7 @@ namespace Step81
               }
             else
               {
-                Assert(!face->at_boundary(), ExcMessage("oops!"));
+                // We are on an interior face:
                 const auto face_index = cell->face_iterator_to_index(face);
 
                 const auto id1 = cell->material_id();
