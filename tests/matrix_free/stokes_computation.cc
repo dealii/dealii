@@ -1102,8 +1102,7 @@ namespace StokesClass
     mg_matrices.resize(0, n_levels - 1);
 
     mg_constrained_dofs.clear();
-    std::set<types::boundary_id> dirichlet_boundary;
-    dirichlet_boundary.insert(0);
+    const std::set<types::boundary_id> dirichlet_boundary = {0};
     mg_constrained_dofs.initialize(dof_handler_u);
     mg_constrained_dofs.make_zero_boundary_constraints(dof_handler_u,
                                                        dirichlet_boundary);

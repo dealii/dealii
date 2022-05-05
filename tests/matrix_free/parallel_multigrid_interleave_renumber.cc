@@ -384,11 +384,10 @@ do_test(DoFHandler<dim> &dof)
   deallog << std::endl;
   deallog << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
-  const unsigned int           fe_degree = dof.get_fe().degree;
-  MappingQ<dim>                mapping(fe_degree + 1);
-  LaplaceOperator<dim, double> fine_matrix;
-  std::set<types::boundary_id> dirichlet_boundaries;
-  dirichlet_boundaries.insert(0);
+  const unsigned int                 fe_degree = dof.get_fe().degree;
+  MappingQ<dim>                      mapping(fe_degree + 1);
+  LaplaceOperator<dim, double>       fine_matrix;
+  const std::set<types::boundary_id> dirichlet_boundaries = {0};
   fine_matrix.initialize(mapping, dof, dirichlet_boundaries);
 
   LinearAlgebra::distributed::Vector<double> in, sol;

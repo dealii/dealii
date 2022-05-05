@@ -160,9 +160,7 @@ test(const FESystem<dim> &fe)
 
   dof_handler.distribute_dofs(fe);
 
-  std::set<types::boundary_id> no_normal_flux_boundaries;
-  no_normal_flux_boundaries.insert(0);
-  no_normal_flux_boundaries.insert(1);
+  const std::set<types::boundary_id> no_normal_flux_boundaries = {0, 1};
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   if (fe.dofs_per_vertex > 0)
     VectorTools::compute_no_normal_flux_constraints(

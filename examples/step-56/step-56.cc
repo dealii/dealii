@@ -525,8 +525,7 @@ namespace Step56
         // sparsity patterns and matrices for each level. The resize()
         // function of MGLevelObject<T> will destroy all existing contained
         // objects.
-        std::set<types::boundary_id> zero_boundary_ids;
-        zero_boundary_ids.insert(0);
+        const std::set<types::boundary_id> zero_boundary_ids = {0};
 
         mg_constrained_dofs.clear();
         mg_constrained_dofs.initialize(velocity_dof_handler);
