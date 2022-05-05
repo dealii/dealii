@@ -189,7 +189,7 @@ const auto phi_i = real_part.value(i, q_point) - 1.0i * imag_part.value(i, q_poi
 @endcode
 
 This $\phi_i$ variable doesn't need to be scaled in this way, we may choose
-any arbitrary scaling consents $a$ and $b$. If we choose this scaling, the
+any arbitrary scaling constants $a$ and $b$. If we choose this scaling, the
 $\phi_j$ must also be modified with the same scaling, as follows:
 
 @code

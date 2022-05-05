@@ -45,11 +45,11 @@ equations</a>
 @f{align*}
   \frac{\partial}{\partial t} \mathbf{H} + \nabla \times \mathbf{E} &= -\mathbf{M}_a,
   \\
-  \nabla \cdot \mathbf{H} &= \rho,
+  \nabla \cdot \mathbf{H} &= \rho_m,
   \\
   \frac{\partial}{\partial t} (\varepsilon\mathbf{E}) - \nabla\times(\mu^{-1}\mathbf{H}) &= - \mathbf{J}_a,
   \\
-  \nabla\cdot(\varepsilon\mathbf{E}) &= \rho_m.
+  \nabla\cdot(\varepsilon\mathbf{E}) &= \rho.
 @f}
 Here, $\nabla\times$ is the curl operator, $\nabla\cdot$ is the divergence
 operator, $\varepsilon$ is the
@@ -163,7 +163,7 @@ typical electric current strength $J_0$, i.e., the strength of the
 prescribed dipole source at location $a$ in the $e_i$ direction in Cartesian
 coordinates (here, $\delta$ is the Dirac delta operator).
 @f[
-\mathbf{J}_a = J_0 e_i\delta(x-a)
+\mathbf{J}_a = J_0 \mathbf{e}_i\delta(x-a)
 @f]
   </li>
 </ol>
@@ -200,7 +200,7 @@ Accordingly, our rescaled equations are
   -i\mu_r \hat{\mathbf{H}} + \hat{\nabla} \times \hat{\mathbf{E}}
   &= -\hat{\mathbf{M}}_a,
   \\
-  \hat{\nabla} \cdot (\mu_r\hat{\mathbf{H}}) &= \frac{1}{i}\hat{\nabla}
+  \hat{\nabla} \cdot (\mu_r\hat{\mathbf{H}}) &= \frac{1}{i\omega}\hat{\nabla}
   \cdot \hat{\mathbf{M}}_a,
   \\
   i\varepsilon_r\hat{\mathbf{E}} + \nabla\times(\mu^{-1}\mathbf{H})
@@ -377,7 +377,7 @@ the discretized variational problem is:
 @f]
 
 <h3>Perfectly Matched Layer</h3>
-The SPP amplitude is negatively effected by the absorbing boundary condition and
+The SPP amplitude is negatively affected by the absorbing boundary condition and
 this causes the solution image to be distorted. In order to reduce the resonance
 and distortion in our solutions, we are implementing a Perfectly Matched Layer
 (PML) in the scattering configuration.

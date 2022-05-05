@@ -81,7 +81,7 @@ namespace Step81
   // The Parameters class inherits ParameterAcceptor, and instantiates all the
   // coefficients in our variational equations.
   // These coefficients are passed through ParameterAcceptor and are editable
-  // through a .prm file
+  // through a .prm file.
   // More explanation on the use and inheritance from the ParameterAcceptor
   // can be found in step-60.
 
@@ -101,7 +101,7 @@ namespace Step81
   // J_a is the strength and orientation of the dipole. As mentioned in the
   // rescaling,
   // @f[
-  // \mathbf{J}_a = J_0 e_i\delta(x-a)
+  // \mathbf{J}_a = J_0 \mathbf{e}_i\delta(x-a)
   // @f]
   // It is a rank 1 tensor
   // that depends on the private dipole_position, dipole_radius,
@@ -480,6 +480,9 @@ namespace Step81
   // Additionally, a material interface is introduced by setting the
   // material id of the upper half ($y>0$) to 1 and of the lower half
   // ($y<0$) of the computational domain to 2.
+  // We are using a block decomposition into real and imaginary matrices
+  // for the solution matrices. More details on this are available
+  // under the Results section.
 
   template <int dim>
   void Maxwell<dim>::make_grid()
@@ -783,7 +786,6 @@ namespace Step81
                         auto B = perfectly_matched_layer.b_matrix(position);
                         auto C = perfectly_matched_layer.c_matrix(position);
                         sigma  = invert(C) * sigma * invert(B);
-                        ;
                       };
 
                     const auto normal = fe_face_values.normal_vector(q_point);
