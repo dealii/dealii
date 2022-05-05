@@ -458,6 +458,37 @@ public:
    */
 
   /**
+   * Return the $d$-dimensional volume of the reference cell that corresponds
+   * to the current object, where $d$ is the dimension of the space it lives
+   * in. For example, since the quadrilateral reference cell is $[0,1]^2$,
+   * its volume is one, whereas the volume of the reference triangle is
+   * 0.5 because it occupies the area $\{0 \le x,y \le 1, x+y\le 1\}$.
+   *
+   * For ReferenceCells::Vertex, the reference cell is a zero-dimensional
+   * point in a zero-dimensional space. As a consequence, one cannot
+   * meaningfully define a volume for it. The function returns one for
+   * this case, because this makes it possible to define useful quadrature
+   * rules based on the center of a reference cell and its volume.
+   */
+  double
+  volume() const;
+
+  /**
+   * Return the barycenter of the reference cell that corresponds
+   * to the current object. The function is not called `center()` because
+   * one can define the center of an object in a number of different ways
+   * whereas the barycenter of a reference cell $K$ is unambiguously defined as
+   * @f[
+   *   \mathbf x_K = \frac{1}{V} \int_K \mathbf x \; dx
+   * @f]
+   * where $V$ is the volume of the reference cell (see also the volume()
+   * function).
+   */
+  template <int dim>
+  Point<dim>
+  barycenter() const;
+
+  /**
    * Return true if the given point is inside the reference cell of the present
    * space dimension up to some tolerance. This function accepts an additional
    * parameter (which defaults to zero) which specifies by how much the point
@@ -1918,6 +1949,61 @@ ReferenceCell::d_linear_shape_function_gradient(const Point<dim> & xi,
   Assert(false, ExcNotImplemented());
 
   return Point<dim>(+0.0, +0.0, +0.0);
+}
+
+
+
+inline double
+ReferenceCell::volume() const
+{
+  if (*this == ReferenceCells::Vertex)
+    return 0;
+  else if (*this == ReferenceCells::Line)
+    return 1;
+  else if (*this == ReferenceCells::Triangle)
+    return 1. / 2.;
+  else if (*this == ReferenceCells::Quadrilateral)
+    return 1;
+  else if (*this == ReferenceCells::Tetrahedron)
+    return 1. / 6.;
+  else if (*this == ReferenceCells::Wedge)
+    return 1. / 2.;
+  else if (*this == ReferenceCells::Pyramid)
+    return 4. / 3.;
+  else if (*this == ReferenceCells::Hexahedron)
+    return 1;
+
+  Assert(false, ExcNotImplemented());
+  return 0.0;
+}
+
+
+
+template <int dim>
+inline Point<dim>
+ReferenceCell::barycenter() const
+{
+  AssertDimension(dim, get_dimension());
+
+  if (*this == ReferenceCells::Vertex)
+    return Point<dim>();
+  else if (*this == ReferenceCells::Line)
+    return Point<dim>(1. / 2.);
+  else if (*this == ReferenceCells::Triangle)
+    return Point<dim>(1. / 3., 1. / 3.);
+  else if (*this == ReferenceCells::Quadrilateral)
+    return Point<dim>(1. / 2., 1. / 2.);
+  else if (*this == ReferenceCells::Tetrahedron)
+    return Point<dim>(1. / 4., 1. / 4., 1. / 4.);
+  else if (*this == ReferenceCells::Wedge)
+    return Point<dim>(1. / 3, 1. / 3, 1. / 2.);
+  else if (*this == ReferenceCells::Pyramid)
+    return Point<dim>(0, 0, 1. / 4.);
+  else if (*this == ReferenceCells::Hexahedron)
+    return Point<dim>(1. / 2., 1. / 2., 1. / 2.);
+
+  Assert(false, ExcNotImplemented());
+  return Point<dim>();
 }
 
 
