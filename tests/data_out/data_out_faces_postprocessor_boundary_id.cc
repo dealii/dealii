@@ -112,7 +112,7 @@ main()
   deallog << std::setprecision(2);
 
   test<2>();
-  test<2>();
+  test<3>();
 
   return 0;
 }
