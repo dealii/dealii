@@ -196,6 +196,44 @@ DataPostprocessorTensor<dim>::get_needed_update_flags() const
 
 
 
+namespace DataPostprocessors
+{
+  template <int dim>
+  BoundaryIds<dim>::BoundaryIds()
+    : DataPostprocessorScalar<dim>("boundary_id", update_quadrature_points)
+  {}
+
+
+  template <int dim>
+  void
+  BoundaryIds<dim>::evaluate_scalar_field(
+    const DataPostprocessorInputs::Scalar<dim> &inputs,
+    std::vector<Vector<double>> &               computed_quantities) const
+  {
+    AssertDimension(computed_quantities.size(), inputs.solution_values.size());
+
+    const typename DoFHandler<dim>::active_cell_iterator cell =
+      inputs.template get_cell<dim>();
+    const unsigned int face = inputs.get_face_number();
+
+    for (auto &output : computed_quantities)
+      {
+        AssertDimension(output.size(), 1);
+
+        // By default, DataOutFaces is only run on faces at the boundary of the
+        // domain. But one can instruct it to also run on internal faces, and in
+        // that case we cannot ask for the boundary id. Rather, we output -1, as
+        // described in the documentation.
+        if (cell->at_boundary(face))
+          output(0) = cell->face(face)->boundary_id();
+        else
+          output(0) = -1;
+      }
+  }
+} // namespace DataPostprocessors
+
+
+
 // explicit instantiation
 #include "data_postprocessor.inst"
 

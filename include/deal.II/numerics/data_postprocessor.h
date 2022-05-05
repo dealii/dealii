@@ -1274,6 +1274,57 @@ private:
 
 
 
+/**
+ * A namespace that contains concrete implementations of data
+ * postprocessors, i.e., non-abstract classes based on DataPostprocessor
+ * or on the intermediate classes DataPostprocessorScalar,
+ * DataPostprocessorVector, or DataPostprocessorTensor.
+ */
+namespace DataPostprocessors
+{
+  /**
+   * A concrete data postprocessor class that can be used to output the
+   * boundary ids of all faces. This is often useful to identify bugs in
+   * the assignment of boundary indicators when reading meshes from input
+   * files. See the usage example in the
+   * @ref GlossBoundaryIndicator "glossary entry on boundary ids"
+   * to see how this class can be used.
+   *
+   * @note This class is intended for use with DataOutFaces, not DataOut.
+   *   This is because it provides information about the *faces* of a
+   *   triangulation, not about cell-based information.
+   *
+   * By default, the DataOutFaces class function only generates
+   * output for faces that lie on the boundary of the domain, and on these
+   * faces, boundary indicators are available. But one can also
+   * instruct DataOutFaces to run on internal faces as
+   * well (by providing an argument to the constructor of the class).
+   * At these internal faces, no boundary indicator is available because,
+   * of course, the face is not actually at the boundary. For these
+   * faces, the current class then outputs -1 as an indicator.
+   */
+  template <int dim>
+  class BoundaryIds : public DataPostprocessorScalar<dim>
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    BoundaryIds();
+
+    /**
+     * The principal function of this class. It puts the boundary id
+     * of each face into the appropriate output fields.
+     */
+    virtual void
+    evaluate_scalar_field(
+      const DataPostprocessorInputs::Scalar<dim> &inputs,
+      std::vector<Vector<double>> &computed_quantities) const override;
+  };
+} // namespace DataPostprocessors
+
+
+
 #ifndef DOXYGEN
 // -------------------- template functions ----------------------
 
