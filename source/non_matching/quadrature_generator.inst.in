@@ -19,10 +19,12 @@ for (deal_II_dimension : DIMENSIONS)
     namespace NonMatching
     \{
       template class QuadratureGenerator<deal_II_dimension>;
+      template class DiscreteQuadratureGenerator<deal_II_dimension>;
 
 #if 1 < deal_II_dimension
       template class FaceQuadratureGenerator<deal_II_dimension>;
 #endif
+      template class DiscreteFaceQuadratureGenerator<deal_II_dimension>;
 
       namespace internal
       \{
@@ -75,4 +77,19 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
     template class NonMatching::internal::QuadratureGeneratorImplementation::
       UpThroughDimensionCreator<deal_II_dimension, deal_II_space_dimension>;
 #endif
+  }
+
+for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
+  {
+    template NonMatching::DiscreteQuadratureGenerator<deal_II_dimension>::
+      DiscreteQuadratureGenerator(const hp::QCollection<1> &,
+                                  const DoFHandler<deal_II_dimension> &,
+                                  const VEC &,
+                                  const AdditionalData &);
+
+    template NonMatching::DiscreteFaceQuadratureGenerator<deal_II_dimension>::
+      DiscreteFaceQuadratureGenerator(const hp::QCollection<1> &,
+                                      const DoFHandler<deal_II_dimension> &,
+                                      const VEC &,
+                                      const AdditionalData &);
   }

@@ -105,11 +105,40 @@ test_plane_cuts_through_center()
 
 
 
+/*
+ * Test the 1D-specialization of the FaceQuadratureGenerator class.
+ * Set up a 1D-box [0,1] and a level set function: psi(x) = x - 0.5,
+ * so that the level set function is negative at the left face and positive at
+ * the right. Generate quadrature rules at both faces and check that a single
+ * quadrature point at the inside/outside quadrature at the left/right face is
+ * generated.
+ */
+void
+test_1D()
+{
+  deallog << "test_1D" << std::endl;
+
+  const int                             dim = 1;
+  Point<dim>                            center(.5);
+  const Tensor<1, dim>                  normal = Point<dim>::unit_vector(0);
+  const Functions::LevelSet::Plane<dim> levelset(center, normal);
+
+  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    {
+      deallog << "face = " << f << std::endl;
+      create_and_print_quadratures(levelset, f);
+      deallog << std::endl;
+    }
+}
+
+
+
 int
 main()
 {
   initlog();
 
+  test_1D();
   test_plane_cuts_through_center<2>();
   test_plane_cuts_through_center<3>();
 }

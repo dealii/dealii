@@ -310,78 +310,17 @@ private:
 };
 
 
+
 /**
- * Implementation of the MGTransferBase interface for which the transfer
- * operations is implemented in a matrix-free way based on the interpolation
- * matrices of the underlying finite element. This requires considerably less
- * memory than MGTransferPrebuilt and can also be considerably faster than
- * that variant.
- *
- * This class works with LinearAlgebra::distributed::BlockVector and
- * performs exactly the same transfer operations for each block as
- * MGTransferMatrixFree.
- * Both the cases that the same DoFHandler is used for all the blocks
- * and that each block uses its own DoFHandler are supported.
+ * Base class of MGTransferBlockMatrixFree. While MGTransferBlockMatrixFree
+ * constains all the setup routines of the transfer operators for the blocks,
+ * this class simply applies them, e.g., for restricting and prolongating.
  */
-template <int dim, typename Number>
-class MGTransferBlockMatrixFree
+template <int dim, typename Number, typename TransferType>
+class MGTransferBlockMatrixFreeBase
   : public MGTransferBase<LinearAlgebra::distributed::BlockVector<Number>>
 {
 public:
-  /**
-   * Constructor without constraint matrices. Use this constructor only with
-   * discontinuous finite elements or with no local refinement.
-   */
-  MGTransferBlockMatrixFree() = default;
-
-  /**
-   * Constructor with constraints. Equivalent to the default constructor
-   * followed by initialize_constraints().
-   */
-  MGTransferBlockMatrixFree(const MGConstrainedDoFs &mg_constrained_dofs);
-
-  /**
-   * Same as above for the case that each block has its own DoFHandler.
-   */
-  MGTransferBlockMatrixFree(
-    const std::vector<MGConstrainedDoFs> &mg_constrained_dofs);
-
-  /**
-   * Destructor.
-   */
-  virtual ~MGTransferBlockMatrixFree() override = default;
-
-  /**
-   * Initialize the constraints to be used in build().
-   */
-  void
-  initialize_constraints(const MGConstrainedDoFs &mg_constrained_dofs);
-
-  /**
-   * Same as above for the case that each block has its own DoFHandler.
-   */
-  void
-  initialize_constraints(
-    const std::vector<MGConstrainedDoFs> &mg_constrained_dofs);
-
-  /**
-   * Reset the object to the state it had right after the default constructor.
-   */
-  void
-  clear();
-
-  /**
-   * Actually build the information for the prolongation for each level.
-   */
-  void
-  build(const DoFHandler<dim, dim> &dof_handler);
-
-  /**
-   * Same as above for the case that each block has its own DoFHandler.
-   */
-  void
-  build(const std::vector<const DoFHandler<dim, dim> *> &dof_handler);
-
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
    * <tt>to_level</tt> using the embedding matrices of the underlying finite
@@ -482,28 +421,105 @@ public:
     const;
 
   /**
-   * Memory used by this object.
-   */
-  std::size_t
-  memory_consumption() const;
-
-  /**
    * This class can both be used with a single DoFHandler
    * or a separate DoFHandler for each block.
    */
   static const bool supports_dof_handler_vector = true;
 
-private:
+protected:
   /**
    * Non-block matrix-free versions of transfer operation.
    */
-  std::vector<MGTransferMatrixFree<dim, Number>> matrix_free_transfer_vector;
+  std::vector<TransferType> matrix_free_transfer_vector;
 
   /**
    * A flag to indicate whether the same DoFHandler is used for all
    * the components or if each block has its own DoFHandler.
    */
-  const bool same_for_all;
+  bool same_for_all;
+};
+
+
+
+/**
+ * Implementation of the MGTransferBase interface for which the transfer
+ * operations is implemented in a matrix-free way based on the interpolation
+ * matrices of the underlying finite element. This requires considerably less
+ * memory than MGTransferPrebuilt and can also be considerably faster than
+ * that variant.
+ *
+ * This class works with LinearAlgebra::distributed::BlockVector and
+ * performs exactly the same transfer operations for each block as
+ * MGTransferMatrixFree.
+ * Both the cases that the same DoFHandler is used for all the blocks
+ * and that each block uses its own DoFHandler are supported.
+ */
+template <int dim, typename Number>
+class MGTransferBlockMatrixFree
+  : public MGTransferBlockMatrixFreeBase<dim,
+                                         Number,
+                                         MGTransferMatrixFree<dim, Number>>
+{
+public:
+  /**
+   * Constructor without constraint matrices. Use this constructor only with
+   * discontinuous finite elements or with no local refinement.
+   */
+  MGTransferBlockMatrixFree() = default;
+
+  /**
+   * Constructor with constraints. Equivalent to the default constructor
+   * followed by initialize_constraints().
+   */
+  MGTransferBlockMatrixFree(const MGConstrainedDoFs &mg_constrained_dofs);
+
+  /**
+   * Same as above for the case that each block has its own DoFHandler.
+   */
+  MGTransferBlockMatrixFree(
+    const std::vector<MGConstrainedDoFs> &mg_constrained_dofs);
+
+  /**
+   * Destructor.
+   */
+  virtual ~MGTransferBlockMatrixFree() override = default;
+
+  /**
+   * Initialize the constraints to be used in build().
+   */
+  void
+  initialize_constraints(const MGConstrainedDoFs &mg_constrained_dofs);
+
+  /**
+   * Same as above for the case that each block has its own DoFHandler.
+   */
+  void
+  initialize_constraints(
+    const std::vector<MGConstrainedDoFs> &mg_constrained_dofs);
+
+  /**
+   * Reset the object to the state it had right after the default constructor.
+   */
+  void
+  clear();
+
+  /**
+   * Actually build the information for the prolongation for each level.
+   */
+  void
+  build(const DoFHandler<dim, dim> &dof_handler);
+
+  /**
+   * Same as above for the case that each block has its own DoFHandler.
+   */
+  void
+  build(const std::vector<const DoFHandler<dim, dim> *> &dof_handler);
+
+  /**
+   * Memory used by this object.
+   */
+  std::size_t
+  memory_consumption() const;
 };
 
 
@@ -607,10 +623,10 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename TransferType>
 template <typename Number2, int spacedim>
 void
-MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
   const DoFHandler<dim, spacedim> &                               dof_handler,
   MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
   const LinearAlgebra::distributed::BlockVector<Number2> &        src) const
@@ -629,10 +645,10 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename TransferType>
 template <typename Number2, int spacedim>
 void
-MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
   const std::vector<const DoFHandler<dim, spacedim> *> &          dof_handler,
   MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
   const LinearAlgebra::distributed::BlockVector<Number2> &        src) const
@@ -646,61 +662,9 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
   const unsigned int min_level = dst.min_level();
   const unsigned int max_level = dst.max_level();
 
-  // this function is normally called within the Multigrid class with
-  // dst == defect level block vector. At first run this vector is not
-  // initialized. Do this below:
-  {
-    const parallel::TriangulationBase<dim, spacedim> *tria =
-      (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-        &(dof_handler[0]->get_triangulation())));
-    for (unsigned int i = 1; i < n_blocks; ++i)
-      AssertThrow(
-        (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-           &(dof_handler[0]->get_triangulation())) == tria),
-        ExcMessage("The DoFHandler use different Triangulations!"));
-
-    MGLevelObject<bool> do_reinit;
-    do_reinit.resize(min_level, max_level);
-    for (unsigned int level = min_level; level <= max_level; ++level)
-      {
-        do_reinit[level] = false;
-        if (dst[level].n_blocks() != n_blocks)
-          {
-            do_reinit[level] = true;
-            continue; // level
-          }
-        for (unsigned int b = 0; b < n_blocks; ++b)
-          {
-            LinearAlgebra::distributed::Vector<Number> &v = dst[level].block(b);
-            if (v.size() !=
-                  dof_handler[b]->locally_owned_mg_dofs(level).size() ||
-                v.locally_owned_size() !=
-                  dof_handler[b]->locally_owned_mg_dofs(level).n_elements())
-              {
-                do_reinit[level] = true;
-                break; // b
-              }
-          }
-      }
-
-    for (unsigned int level = min_level; level <= max_level; ++level)
-      {
-        if (do_reinit[level])
-          {
-            dst[level].reinit(n_blocks);
-            for (unsigned int b = 0; b < n_blocks; ++b)
-              {
-                LinearAlgebra::distributed::Vector<Number> &v =
-                  dst[level].block(b);
-                v.reinit(dof_handler[b]->locally_owned_mg_dofs(level),
-                         dof_handler[b]->get_communicator());
-              }
-            dst[level].collect_sizes();
-          }
-        else
-          dst[level] = 0;
-      }
-  }
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    if (dst[level].n_blocks() != n_blocks)
+      dst[level].reinit(n_blocks);
 
   // FIXME: this a quite ugly as we need a temporary object:
   MGLevelObject<LinearAlgebra::distributed::Vector<Number>> dst_non_block(
@@ -708,8 +672,6 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
 
   for (unsigned int b = 0; b < n_blocks; ++b)
     {
-      for (unsigned int l = min_level; l <= max_level; ++l)
-        dst_non_block[l].reinit(dst[l].block(b));
       const unsigned int data_block = same_for_all ? 0 : b;
       matrix_free_transfer_vector[data_block].copy_to_mg(*dof_handler[b],
                                                          dst_non_block,
@@ -718,12 +680,15 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
       for (unsigned int l = min_level; l <= max_level; ++l)
         dst[l].block(b) = dst_non_block[l];
     }
+
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    dst[level].collect_sizes();
 }
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename TransferType>
 template <typename Number2, int spacedim>
 void
-MGTransferBlockMatrixFree<dim, Number>::copy_from_mg(
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
   const DoFHandler<dim, spacedim> &                 dof_handler,
   LinearAlgebra::distributed::BlockVector<Number2> &dst,
   const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
@@ -736,10 +701,10 @@ MGTransferBlockMatrixFree<dim, Number>::copy_from_mg(
   copy_from_mg(mg_dofs, dst, src);
 }
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename TransferType>
 template <typename Number2, int spacedim>
 void
-MGTransferBlockMatrixFree<dim, Number>::copy_from_mg(
+MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
   const std::vector<const DoFHandler<dim, spacedim> *> &dof_handler,
   LinearAlgebra::distributed::BlockVector<Number2> &    dst,
   const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)

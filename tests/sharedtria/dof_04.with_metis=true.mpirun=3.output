@@ -1,20 +1,29 @@
 
-DEAL:0:2d::n_dofs: 818
-DEAL:0:2d::n_dofs: 1754
-DEAL:0:2d::n_dofs: 3056
+DEAL:0:2d, no global refinements::n_dofs: 114
+DEAL:0:2d, no global refinements::n_dofs: 272
+DEAL:0:2d, no global refinements::n_dofs: 652
+DEAL:0:2d, global refinements::n_dofs: 818
+DEAL:0:2d, global refinements::n_dofs: 1754
+DEAL:0:2d, global refinements::n_dofs: 3056
 DEAL:0:3d::n_dofs: 13282
 DEAL:0:3d::n_dofs: 41826
 
-DEAL:1:2d::n_dofs: 818
-DEAL:1:2d::n_dofs: 1754
-DEAL:1:2d::n_dofs: 3056
+DEAL:1:2d, no global refinements::n_dofs: 114
+DEAL:1:2d, no global refinements::n_dofs: 272
+DEAL:1:2d, no global refinements::n_dofs: 652
+DEAL:1:2d, global refinements::n_dofs: 818
+DEAL:1:2d, global refinements::n_dofs: 1754
+DEAL:1:2d, global refinements::n_dofs: 3056
 DEAL:1:3d::n_dofs: 13282
 DEAL:1:3d::n_dofs: 41826
 
 
-DEAL:2:2d::n_dofs: 818
-DEAL:2:2d::n_dofs: 1754
-DEAL:2:2d::n_dofs: 3056
+DEAL:2:2d, no global refinements::n_dofs: 114
+DEAL:2:2d, no global refinements::n_dofs: 272
+DEAL:2:2d, no global refinements::n_dofs: 652
+DEAL:2:2d, global refinements::n_dofs: 818
+DEAL:2:2d, global refinements::n_dofs: 1754
+DEAL:2:2d, global refinements::n_dofs: 3056
 DEAL:2:3d::n_dofs: 13282
 DEAL:2:3d::n_dofs: 41826
 

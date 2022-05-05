@@ -23,7 +23,6 @@
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor_accessors.h>
-#include <deal.II/base/utilities.h>
 
 #ifdef DEAL_II_WITH_ADOLC
 #  include <adolc/adouble.h> // Taped double
@@ -31,9 +30,6 @@
 
 #include <cmath>
 #include <ostream>
-#include <utility>
-#include <vector>
-
 
 DEAL_II_NAMESPACE_OPEN
 

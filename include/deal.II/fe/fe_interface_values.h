@@ -1954,6 +1954,126 @@ public:
    * @}
    */
 
+
+
+  /**
+   * @name Access to jumps in the function values and derivatives
+   * @{
+   */
+
+  /**
+   * Return the jump in the values of the
+   * finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
+   */
+  template <class InputVector>
+  void
+  get_jump_in_function_values(
+    const InputVector &                            fe_function,
+    std::vector<typename InputVector::value_type> &values) const;
+
+  /**
+   * Return the jump in the gradients of the
+   * finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   *
+   * @dealiiRequiresUpdateFlags{update_gradients}
+   */
+  template <class InputVector>
+  void
+  get_jump_in_function_gradients(
+    const InputVector &fe_function,
+    std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
+      &gradients) const;
+
+  /**
+   * Return the jump in the Hessians of the
+   * finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   * @dealiiRequiresUpdateFlags{update_hessians}
+   */
+  template <class InputVector>
+  void
+  get_jump_in_function_hessians(
+    const InputVector &fe_function,
+    std::vector<Tensor<2, spacedim, typename InputVector::value_type>>
+      &hessians) const;
+
+  /**
+   * Return the jump in the third derivatives of the
+   * the finite element function characterized by <tt>fe_function</tt> at
+   * the quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   *
+   * @dealiiRequiresUpdateFlags{update_third_derivatives}
+   */
+  template <class InputVector>
+  void
+  get_jump_in_function_third_derivatives(
+    const InputVector &fe_function,
+    std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
+      &third_derivatives) const;
+
+  //@}
+
+  /**
+   * @name Access to the average of the function values and derivatives
+   */
+  //@{
+
+  /**
+   * Return the average of the values of the
+   * finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   *
+   * @dealiiRequiresUpdateFlags{update_values}
+   */
+  template <class InputVector>
+  void
+  get_average_of_function_values(
+    const InputVector &                            fe_function,
+    std::vector<typename InputVector::value_type> &values) const;
+
+  /**
+   * Return the average of the gradients of the
+   * the finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   * @dealiiRequiresUpdateFlags{update_gradients}
+   */
+  template <class InputVector>
+  void
+  get_average_of_function_gradients(
+    const InputVector &fe_function,
+    std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
+      &gradients) const;
+
+  /**
+   * Return the average of the Hessians of the
+   * the finite element function characterized by <tt>fe_function</tt> at the
+   * quadrature points of the cell interface selected the last time
+   * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
+   * @dealiiRequiresUpdateFlags{update_hessians}
+   */
+  template <class InputVector>
+  void
+  get_average_of_function_hessians(
+    const InputVector &fe_function,
+    std::vector<Tensor<2, spacedim, typename InputVector::value_type>>
+      &hessians) const;
+
+  /**
+   * @}
+   */
+
+
+
   /**
    * @name Extractors Methods to extract individual components
    * @{
@@ -2715,6 +2835,120 @@ FEInterfaceValues<dim, spacedim>::jump_3rd_derivative(
 
 
 
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_jump_in_function_values(
+  const InputVector &                            fe_function,
+  std::vector<typename InputVector::value_type> &values) const
+{
+  AssertDimension(values.size(), n_quadrature_points);
+
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_jump_in_function_values(fe_function, values);
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_jump_in_function_gradients(
+  const InputVector &fe_function,
+  std::vector<Tensor<1, spacedim, typename InputVector::value_type>> &gradients)
+  const
+{
+  AssertDimension(gradients.size(), n_quadrature_points);
+
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_jump_in_function_gradients(fe_function,
+                                                          gradients);
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_jump_in_function_hessians(
+  const InputVector &fe_function,
+  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> &hessians)
+  const
+{
+  AssertDimension(hessians.size(), n_quadrature_points);
+
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_jump_in_function_hessians(fe_function, hessians);
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_jump_in_function_third_derivatives(
+  const InputVector &fe_function,
+  std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
+    &third_derivatives) const
+{
+  AssertDimension(third_derivatives.size(), n_quadrature_points);
+
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_jump_in_function_third_derivatives(
+    fe_function, third_derivatives);
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_average_of_function_values(
+  const InputVector &                            fe_function,
+  std::vector<typename InputVector::value_type> &values) const
+{
+  AssertDimension(values.size(), n_quadrature_points);
+
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_average_of_function_values(fe_function, values);
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_average_of_function_gradients(
+  const InputVector &fe_function,
+  std::vector<Tensor<1, spacedim, typename InputVector::value_type>> &gradients)
+  const
+{
+  AssertDimension(gradients.size(), n_quadrature_points);
+
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_average_of_function_gradients(fe_function,
+                                                             gradients);
+}
+
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void
+FEInterfaceValues<dim, spacedim>::get_average_of_function_hessians(
+  const InputVector &fe_function,
+  std::vector<Tensor<2, spacedim, typename InputVector::value_type>> &hessians)
+  const
+{
+  AssertDimension(hessians.size(), n_quadrature_points);
+
+  const FEValuesExtractors::Scalar scalar(0);
+  this->operator[](scalar).get_average_of_function_hessians(fe_function,
+                                                            hessians);
+}
+
+
+
 /*------------ Inline functions: FEInterfaceValues------------*/
 template <int dim, int spacedim>
 inline const FEInterfaceViews::Scalar<dim, spacedim>
@@ -2777,7 +3011,7 @@ namespace FEInterfaceViews
 
     AssertDimension(interface_dof_indices.size(), local_dof_values.size());
 
-    for (unsigned int i = 0; i < interface_dof_indices.size(); ++i)
+    for (unsigned int i : this->fe_interface->dof_indices())
       local_dof_values[i] = dof_values(interface_dof_indices[i]);
   }
 
@@ -3084,9 +3318,6 @@ namespace FEInterfaceViews
   {
     AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
 
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
-
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
@@ -3130,9 +3361,6 @@ namespace FEInterfaceViews
   {
     AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
 
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
-
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
@@ -3172,9 +3400,6 @@ namespace FEInterfaceViews
       &gradients) const
   {
     AssertDimension(gradients.size(), this->fe_interface->n_quadrature_points);
-
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
 
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
@@ -3216,9 +3441,6 @@ namespace FEInterfaceViews
     const
   {
     AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
-
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
 
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
@@ -3262,9 +3484,6 @@ namespace FEInterfaceViews
   {
     AssertDimension(gradients.size(), this->fe_interface->n_quadrature_points);
 
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
-
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
@@ -3305,9 +3524,6 @@ namespace FEInterfaceViews
       &hessians) const
   {
     AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
-
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
 
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
@@ -3350,11 +3566,7 @@ namespace FEInterfaceViews
   {
     AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
 
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
-
-    for (unsigned int dof_index = 0; dof_index < interface_dof_indices.size();
-         ++dof_index)
+    for (unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)
@@ -3398,11 +3610,7 @@ namespace FEInterfaceViews
     AssertDimension(third_derivatives.size(),
                     this->fe_interface->n_quadrature_points);
 
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
-
-    for (unsigned int dof_index = 0; dof_index < interface_dof_indices.size();
-         ++dof_index)
+    for (unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)
@@ -3747,9 +3955,6 @@ namespace FEInterfaceViews
   {
     AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
 
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
-
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
@@ -3793,9 +3998,6 @@ namespace FEInterfaceViews
   {
     AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
 
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
-
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
@@ -3835,9 +4037,6 @@ namespace FEInterfaceViews
       &gradients) const
   {
     AssertDimension(gradients.size(), this->fe_interface->n_quadrature_points);
-
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
 
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
@@ -3879,9 +4078,6 @@ namespace FEInterfaceViews
     const
   {
     AssertDimension(values.size(), this->fe_interface->n_quadrature_points);
-
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
 
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
@@ -3925,9 +4121,6 @@ namespace FEInterfaceViews
   {
     AssertDimension(gradients.size(), this->fe_interface->n_quadrature_points);
 
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
-
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
@@ -3968,9 +4161,6 @@ namespace FEInterfaceViews
       &hessians) const
   {
     AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
-
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
 
     for (const auto dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
@@ -4013,11 +4203,7 @@ namespace FEInterfaceViews
   {
     AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
 
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
-
-    for (unsigned int dof_index = 0; dof_index < interface_dof_indices.size();
-         ++dof_index)
+    for (unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)
@@ -4061,11 +4247,7 @@ namespace FEInterfaceViews
     AssertDimension(third_derivatives.size(),
                     this->fe_interface->n_quadrature_points);
 
-    const auto &interface_dof_indices =
-      this->fe_interface->get_interface_dof_indices();
-
-    for (unsigned int dof_index = 0; dof_index < interface_dof_indices.size();
-         ++dof_index)
+    for (unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)

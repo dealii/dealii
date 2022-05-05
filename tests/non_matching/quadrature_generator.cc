@@ -135,7 +135,7 @@ test_constant_level_sets_both_signs()
 // (0, 0 ,0), (0, 0, l), (0, l, 0), (l, 0, 0), in 3D.
 // where l is the edge length.
 // This is a good test because we know that the inside weights should sum to the
-// area/volume: $V = l^{dim}/dim!$, and that the the surface weights should sum
+// area/volume: $V = l^{dim}/dim!$, and that the surface weights should sum
 // to $S = \sqrt(2) l$ in 2D and $S = \sqrt(3)/2 l^2$ in 3D.
 template <int dim>
 void

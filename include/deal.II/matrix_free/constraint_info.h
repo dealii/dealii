@@ -125,8 +125,11 @@ namespace internal
       this->plain_dof_indices_per_cell.resize(n_cells);
       this->constraint_indicator_per_cell.resize(n_cells);
 
-      if (use_fast_hanging_node_algorithm &&
-          dof_handler.get_triangulation().has_hanging_nodes())
+      // note: has_hanging_nodes() is a global operatrion
+      const bool has_hanging_nodes =
+        dof_handler.get_triangulation().has_hanging_nodes();
+
+      if (use_fast_hanging_node_algorithm && has_hanging_nodes)
         {
           hanging_nodes = std::make_unique<HangingNodes<dim>>(
             dof_handler.get_triangulation());

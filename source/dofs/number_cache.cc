@@ -28,8 +28,7 @@ namespace internal
   namespace DoFHandlerImplementation
   {
     NumberCache::NumberCache()
-      : n_global_dofs(0)
-      , n_locally_owned_dofs(0)
+      : NumberCache(0)
     {}
 
 

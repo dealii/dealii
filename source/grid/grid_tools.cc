@@ -6290,7 +6290,7 @@ namespace GridTools
                              mpi_communicator);
     AssertThrowMPI(ierr);
 
-    // Now computing the the displacement, relative to recvbuf,
+    // Now computing the displacement, relative to recvbuf,
     // at which to store the incoming data
     std::vector<int> rdispls(n_procs);
     rdispls[0] = 0;

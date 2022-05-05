@@ -20,19 +20,6 @@ for (deal_II_dimension : DIMENSIONS;
     template struct dealii::internal::
       FEEvaluationFactory<deal_II_dimension, deal_II_scalar_vectorized>;
 
-    template struct dealii::internal::
-      FEFaceEvaluationFactory<deal_II_dimension, deal_II_scalar_vectorized>;
-
-    template struct dealii::internal::FEFaceEvaluationGatherFactory<
-      deal_II_dimension,
-      double,
-      deal_II_scalar_vectorized>;
-
-    template struct dealii::internal::FEFaceEvaluationGatherFactory<
-      deal_II_dimension,
-      float,
-      deal_II_scalar_vectorized>;
-
     // inverse mass
     template struct dealii::internal::
       CellwiseInverseMassFactory<deal_II_dimension, deal_II_scalar_vectorized>;

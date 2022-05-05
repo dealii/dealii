@@ -562,7 +562,7 @@ namespace Step19
 
   // Let us now turn to the functions that deal with particles. The first one
   // is about the creation of particles. As mentioned in the introduction,
-  // we want to create a particle at points of the cathode if the the electric
+  // we want to create a particle at points of the cathode if the electric
   // field $\mathbf E=\nabla V$ exceeds a certain threshold, i.e., if
   // $|\mathbf E| \ge E_\text{threshold}$, and if furthermore the electric field
   // points into the domain (i.e., if $\mathbf E \cdot \mathbf n < 0$). As is

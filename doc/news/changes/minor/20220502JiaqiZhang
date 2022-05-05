@@ -1,0 +1,4 @@
+New: MGConstrainedDoFs now has a function add_boundary_indices()
+to add boundary indices on levels.
+<br>
+(Jiaqi Zhang, 2021/05/02)

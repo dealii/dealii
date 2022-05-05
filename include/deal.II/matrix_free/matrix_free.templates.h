@@ -1064,8 +1064,7 @@ namespace internal
     std::vector<MatrixFreeFunctions::DoFInfo> &         dof_info,
     MatrixFreeFunctions::FaceSetup<dim> &               face_setup,
     MatrixFreeFunctions::ConstraintValues<double> &     constraint_values,
-    const bool use_vector_data_exchanger_full,
-    const bool use_fast_hanging_node_algorithm_in)
+    const bool use_vector_data_exchanger_full)
   {
     if (do_face_integrals)
       face_setup.initialize(dof_handler[0]->get_triangulation(),
@@ -1091,7 +1090,7 @@ namespace internal
 
     bool cell_categorization_enabled = !cell_vectorization_category.empty();
 
-    bool use_fast_hanging_node_algorithm = use_fast_hanging_node_algorithm_in;
+    bool use_fast_hanging_node_algorithm = true;
 
     if (use_fast_hanging_node_algorithm)
       {
@@ -1160,16 +1159,21 @@ namespace internal
             dof_info[no].fe_index_conversion[fe_index].clear();
             for (unsigned int c = 0; c < dof_info[no].n_base_elements; ++c)
               {
-                dof_info[no].n_components[c] = fe.element_multiplicity(c);
+                dof_info[no].n_components[c] =
+                  fe.element_multiplicity(c) *
+                  fe.base_element(c).n_components();
                 for (unsigned int l = 0; l < dof_info[no].n_components[c]; ++l)
                   {
                     dof_info[no].component_to_base_index.push_back(c);
                     dof_info[no]
                       .component_dof_indices_offset[fe_index]
-                      .push_back(dof_info[no]
-                                   .component_dof_indices_offset[fe_index]
-                                   .back() +
-                                 fe.base_element(c).n_dofs_per_cell());
+                      .push_back(
+                        dof_info[no]
+                          .component_dof_indices_offset[fe_index]
+                          .back() +
+                        shape_infos(dof_info[no].global_base_element_offset + c,
+                                    fe_index)
+                          .dofs_per_component_on_cell);
                     dof_info[no].fe_index_conversion[fe_index].push_back(
                       fe.base_element(c).degree);
                   }
@@ -1825,8 +1829,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
     dof_info,
     face_setup,
     constraint_values,
-    additional_data.communicator_sm != MPI_COMM_SELF,
-    additional_data.use_fast_hanging_node_algorithm);
+    additional_data.communicator_sm != MPI_COMM_SELF);
 
   // set constraint pool from the std::map and reorder the indices
   std::vector<const std::vector<double> *> constraints(

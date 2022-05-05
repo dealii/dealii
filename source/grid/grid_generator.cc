@@ -1160,7 +1160,7 @@ namespace GridGenerator
       const AdditionalData &                           additional_data)
     {
       MeshGenerator mesh_generator(additional_data);
-      // Cast the the triangulation to the right type so that the right
+      // Cast the triangulation to the right type so that the right
       // specialization of the function create_triangulation is picked up.
       if (auto parallel_tria =
             dynamic_cast<dealii::parallel::distributed::Triangulation<2, 2> *>(

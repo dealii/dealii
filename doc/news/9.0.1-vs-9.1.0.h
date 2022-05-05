@@ -1910,7 +1910,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: TimerOutput now dynamically adjust to the the width of Section column.
+  Improved: TimerOutput now dynamically adjust to the width of Section column.
   <br>
   (Denis Davydov, 2018/05/29)
  </li>

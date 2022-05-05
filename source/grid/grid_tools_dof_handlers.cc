@@ -1458,7 +1458,7 @@ namespace GridTools
         else
           // If not, it asks for the parent of the cell, until it finds the
           // parent cell with the refinement level equal to the min_level and
-          // inserts that parent cell into the the set of uniform_cells, as the
+          // inserts that parent cell into the set of uniform_cells, as the
           // set of cells with the coarsest common refinement level.
           {
             typename Container::cell_iterator parent = *patch_cell;

@@ -18,6 +18,8 @@
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/lapack_templates.h>
 
+#include <array>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace

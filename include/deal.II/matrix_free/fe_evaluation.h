@@ -2303,6 +2303,14 @@ public:
                     VectorType &output_vector);
 
   /**
+   * Return an object that can be thought of as an array containing all indices
+   * from zero to @p dofs_per_cell. This allows to write code using
+   * range-based for loops.
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  dof_indices() const;
+
+  /**
    * The number of degrees of freedom of a single component on the cell for
    * the underlying evaluation object. Usually close to
    * static_dofs_per_component, but the number depends on the actual element
@@ -2699,6 +2707,14 @@ public:
   integrate_scatter(const bool  integrate_values,
                     const bool  integrate_gradients,
                     VectorType &output_vector);
+
+  /**
+   * Return an object that can be thought of as an array containing all indices
+   * from zero to @p dofs_per_cell. This allows to write code using
+   * range-based for loops.
+   */
+  std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+  dof_indices() const;
 
   /**
    * The number of degrees of freedom of a single component on the cell for
@@ -6958,7 +6974,7 @@ FEEvaluation<dim,
                       internal::MatrixFreeFunctions::GeometryType::affine)
                     {
                       // affine case: quadrature points are not available but
-                      // have to be computed from the the corner point and the
+                      // have to be computed from the corner point and the
                       // Jacobian
                       Point<dim, VectorizedArrayType> point =
                         this->mapping_data->quadrature_points
@@ -7247,11 +7263,9 @@ namespace internal
             typename VectorizedArrayType,
             typename VectorType,
             typename EvaluatorType,
-            typename std::enable_if<
-              internal::has_begin<VectorType> &&
-                std::is_same<decltype(std::declval<VectorType>().begin()),
-                             Number *>::value,
-              VectorType>::type * = nullptr>
+            typename std::enable_if<internal::has_begin<VectorType> &&
+                                      !IsBlockVector<VectorType>::value,
+                                    VectorType>::type * = nullptr>
   VectorizedArrayType *
   check_vector_access_inplace(const EvaluatorType &fe_eval, VectorType &vector)
   {
@@ -7297,11 +7311,9 @@ namespace internal
             typename VectorizedArrayType,
             typename VectorType,
             typename EvaluatorType,
-            typename std::enable_if<
-              !internal::has_begin<VectorType> ||
-                !std::is_same<decltype(std::declval<VectorType>().begin()),
-                              Number *>::value,
-              VectorType>::type * = nullptr>
+            typename std::enable_if<!internal::has_begin<VectorType> ||
+                                      IsBlockVector<VectorType>::value,
+                                    VectorType>::type * = nullptr>
   VectorizedArrayType *
   check_vector_access_inplace(const EvaluatorType &, VectorType &)
   {
@@ -7552,6 +7564,25 @@ FEEvaluation<dim,
       integrate(integration_flag, this->begin_dof_values());
       this->distribute_local_to_global(destination);
     }
+}
+
+
+
+template <int dim,
+          int fe_degree,
+          int n_q_points_1d,
+          int n_components_,
+          typename Number,
+          typename VectorizedArrayType>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+FEEvaluation<dim,
+             fe_degree,
+             n_q_points_1d,
+             n_components_,
+             Number,
+             VectorizedArrayType>::dof_indices() const
+{
+  return {0U, dofs_per_cell};
 }
 
 
@@ -8351,6 +8382,25 @@ FEFaceEvaluation<dim,
       integrate(integration_flag);
       this->distribute_local_to_global(destination);
     }
+}
+
+
+
+template <int dim,
+          int fe_degree,
+          int n_q_points_1d,
+          int n_components_,
+          typename Number,
+          typename VectorizedArrayType>
+inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+FEFaceEvaluation<dim,
+                 fe_degree,
+                 n_q_points_1d,
+                 n_components_,
+                 Number,
+                 VectorizedArrayType>::dof_indices() const
+{
+  return {0U, dofs_per_cell};
 }
 
 

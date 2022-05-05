@@ -2140,7 +2140,7 @@ namespace DoFTools
 
           if (constraints_are_cyclic)
             {
-              if (std::abs(cycle_constraint_factor - 1.) > eps)
+              if (std::abs(cycle_constraint_factor - number(1.)) > eps)
                 affine_constraints.add_line(dof_left);
             }
           else
@@ -2169,10 +2169,10 @@ namespace DoFTools
               // just very small due to roundoff. Of course, constraining x2 in
               // terms of x1 has the same problem. So one chooses x1 = b/a*x2 if
               // |b|<|a|, and x2 = a/b*x1 if |a|<|b|.
-              Assert(
-                std::abs(constraint_factor) < 1e10,
-                ExcMessage(
-                  "The periodicity constraint is too large. The parameter periodicity_factor might be too large or too small."));
+              Assert(std::abs(constraint_factor) < 1e10,
+                     ExcMessage("The periodicity constraint is too large. "
+                                "The parameter periodicity_factor might "
+                                "be too large or too small."));
             }
         } /* for dofs_per_face */
     }

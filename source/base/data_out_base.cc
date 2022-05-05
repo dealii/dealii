@@ -7895,7 +7895,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const double                      cur_time,
   const MPI_Comm &                  comm) const
 {
-  unsigned int local_node_cell_count[2], global_node_cell_count[2];
+  std::uint64_t local_node_cell_count[2], global_node_cell_count[2];
 
 #ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make sure the compiler does not warn about
@@ -7919,7 +7919,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   int       ierr   = MPI_Allreduce(local_node_cell_count,
                            global_node_cell_count,
                            2,
-                           MPI_UNSIGNED,
+                           MPI_UINT64_T,
                            MPI_SUM,
                            comm);
   AssertThrowMPI(ierr);
@@ -8230,7 +8230,7 @@ DataOutBase::write_hdf5_parallel(
   hid_t pt_data_dataspace, pt_data_dataset, pt_data_file_dataspace,
     pt_data_memory_dataspace;
   herr_t status;
-  unsigned int local_node_cell_count[2];
+  std::uint64_t local_node_cell_count[2];
   hsize_t count[2], offset[2], node_ds_dim[2], cell_ds_dim[2];
   std::vector<double> node_data_vec;
   std::vector<unsigned int> cell_data_vec;
@@ -8264,21 +8264,21 @@ DataOutBase::write_hdf5_parallel(
   // Compute the global total number of nodes/cells and determine the offset of
   // the data for this process
 
-  unsigned int global_node_cell_count[2] = {0, 0};
-  unsigned int global_node_cell_offsets[2] = {0, 0};
+  std::uint64_t global_node_cell_count[2] = {0, 0};
+  std::uint64_t global_node_cell_offsets[2] = {0, 0};
 
 #  ifdef DEAL_II_WITH_MPI
   ierr = MPI_Allreduce(local_node_cell_count,
                        global_node_cell_count,
                        2,
-                       MPI_UNSIGNED,
+                       MPI_UINT64_T,
                        MPI_SUM,
                        comm);
   AssertThrowMPI(ierr);
   ierr = MPI_Exscan(local_node_cell_count,
                     global_node_cell_offsets,
                     2,
-                    MPI_UNSIGNED,
+                    MPI_UINT64_T,
                     MPI_SUM,
                     comm);
   AssertThrowMPI(ierr);
@@ -9075,34 +9075,34 @@ XDMFEntry::XDMFEntry()
 
 
 
-XDMFEntry::XDMFEntry(const std::string &filename,
-                     const double       time,
-                     const unsigned int nodes,
-                     const unsigned int cells,
-                     const unsigned int dim)
+XDMFEntry::XDMFEntry(const std::string & filename,
+                     const double        time,
+                     const std::uint64_t nodes,
+                     const std::uint64_t cells,
+                     const unsigned int  dim)
   : XDMFEntry(filename, filename, time, nodes, cells, dim, dim)
 {}
 
 
 
-XDMFEntry::XDMFEntry(const std::string &mesh_filename,
-                     const std::string &solution_filename,
-                     const double       time,
-                     const unsigned int nodes,
-                     const unsigned int cells,
-                     const unsigned int dim)
+XDMFEntry::XDMFEntry(const std::string & mesh_filename,
+                     const std::string & solution_filename,
+                     const double        time,
+                     const std::uint64_t nodes,
+                     const std::uint64_t cells,
+                     const unsigned int  dim)
   : XDMFEntry(mesh_filename, solution_filename, time, nodes, cells, dim, dim)
 {}
 
 
 
-XDMFEntry::XDMFEntry(const std::string &mesh_filename,
-                     const std::string &solution_filename,
-                     const double       time,
-                     const unsigned int nodes,
-                     const unsigned int cells,
-                     const unsigned int dim,
-                     const unsigned int spacedim)
+XDMFEntry::XDMFEntry(const std::string & mesh_filename,
+                     const std::string & solution_filename,
+                     const double        time,
+                     const std::uint64_t nodes,
+                     const std::uint64_t cells,
+                     const unsigned int  dim,
+                     const unsigned int  spacedim)
   : valid(true)
   , h5_sol_filename(solution_filename)
   , h5_mesh_filename(mesh_filename)

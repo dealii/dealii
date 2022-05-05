@@ -179,6 +179,11 @@ public:
   struct AdditionalData
   {
     /**
+     * Provide the type of the surrounding MatrixFree class.
+     */
+    using MatrixFreeType = MatrixFree<dim, Number, VectorizedArrayType>;
+
+    /**
      * Collects options for task parallelism. See the documentation of the
      * member variable MatrixFree::AdditionalData::tasks_parallel_scheme for a
      * thorough description.
@@ -224,8 +229,7 @@ public:
       const bool         overlap_communication_computation    = true,
       const bool         hold_all_faces_to_owned_cells        = false,
       const bool         cell_vectorization_categories_strict = false,
-      const bool         allow_ghosted_vectors_in_loops       = true,
-      const bool         use_fast_hanging_node_algorithm      = true)
+      const bool         allow_ghosted_vectors_in_loops       = true)
       : tasks_parallel_scheme(tasks_parallel_scheme)
       , tasks_block_size(tasks_block_size)
       , mapping_update_flags(mapping_update_flags)
@@ -241,7 +245,6 @@ public:
       , cell_vectorization_categories_strict(
           cell_vectorization_categories_strict)
       , allow_ghosted_vectors_in_loops(allow_ghosted_vectors_in_loops)
-      , use_fast_hanging_node_algorithm(use_fast_hanging_node_algorithm)
       , communicator_sm(MPI_COMM_SELF)
     {}
 
@@ -268,7 +271,6 @@ public:
       , cell_vectorization_categories_strict(
           other.cell_vectorization_categories_strict)
       , allow_ghosted_vectors_in_loops(other.allow_ghosted_vectors_in_loops)
-      , use_fast_hanging_node_algorithm(other.use_fast_hanging_node_algorithm)
       , communicator_sm(other.communicator_sm)
     {}
 
@@ -296,9 +298,8 @@ public:
       cell_vectorization_category   = other.cell_vectorization_category;
       cell_vectorization_categories_strict =
         other.cell_vectorization_categories_strict;
-      allow_ghosted_vectors_in_loops  = other.allow_ghosted_vectors_in_loops;
-      use_fast_hanging_node_algorithm = other.use_fast_hanging_node_algorithm;
-      communicator_sm                 = other.communicator_sm;
+      allow_ghosted_vectors_in_loops = other.allow_ghosted_vectors_in_loops;
+      communicator_sm                = other.communicator_sm;
 
       return *this;
     }
@@ -534,11 +535,6 @@ public:
      * difference is only in whether the initial non-ghosted state is restored.
      */
     bool allow_ghosted_vectors_in_loops;
-
-    /**
-     * Flag that allows to disable the fast hanging-node algorithm.
-     */
-    bool use_fast_hanging_node_algorithm;
 
     /**
      * Shared-memory MPI communicator. Default: MPI_COMM_SELF.

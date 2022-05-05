@@ -34,7 +34,6 @@
 #include <algorithm>
 #include <initializer_list>
 #include <iosfwd>
-#include <iterator>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

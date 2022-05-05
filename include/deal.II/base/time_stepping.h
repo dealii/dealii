@@ -767,6 +767,10 @@ namespace TimeStepping
      */
     struct Status : public TimeStepping<VectorType>::Status
     {
+      Status()
+        : method(invalid)
+      {}
+
       runge_kutta_method             method;
       embedded_runge_kutta_time_step exit_delta_t;
       unsigned int                   n_iterations;

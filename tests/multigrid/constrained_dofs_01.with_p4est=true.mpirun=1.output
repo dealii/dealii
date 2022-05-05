@@ -32,3 +32,36 @@ DEAL:0::{[0,1], [4,5], 8}
 DEAL:0::relevant:
 DEAL:0::{[0,8]}
 DEAL:0::ok ok 
+DEAL:0::Test add_boundary_indices: 
+DEAL:0::Level 0:
+DEAL:0::get_boundary_indices test:
+DEAL:0::{[0,3]}
+DEAL:0::relevant:
+DEAL:0::{[0,3]}
+DEAL:0::ok 
+DEAL:0::Level 1:
+DEAL:0::get_boundary_indices test:
+DEAL:0::{[0,2], [4,8]}
+DEAL:0::relevant:
+DEAL:0::{[0,8]}
+DEAL:0::ok 
+DEAL:0::Level 2:
+DEAL:0::get_boundary_indices test:
+DEAL:0::{[0,2], 4, 6, 9, [11,12], [14,15], [18,20], [22,24]}
+DEAL:0::relevant:
+DEAL:0::{[0,24]}
+DEAL:0::ok 
+DEAL:0::Level 3:
+DEAL:0::get_boundary_indices test:
+DEAL:0::{[0,1], [4,5], 8}
+DEAL:0::relevant:
+DEAL:0::{[0,8]}
+DEAL:0::ok 
+DEAL:0::Level 0:
+DEAL:0::ok 
+DEAL:0::Level 1:
+DEAL:0::ok 
+DEAL:0::Level 2:
+DEAL:0::ok 
+DEAL:0::Level 3:
+DEAL:0::ok 

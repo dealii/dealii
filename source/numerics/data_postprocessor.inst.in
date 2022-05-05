@@ -24,4 +24,9 @@ for (deal_II_dimension : DIMENSIONS)
     template class DataPostprocessorScalar<deal_II_dimension>;
     template class DataPostprocessorVector<deal_II_dimension>;
     template class DataPostprocessorTensor<deal_II_dimension>;
+
+    namespace DataPostprocessors
+    \{
+      template class BoundaryIds<deal_II_dimension>;
+    \}
   }

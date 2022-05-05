@@ -32,39 +32,7 @@ code is written, without having to look up the exact definition of something.
 
 <h3>Notes on deal.II indentation</h3>
 
-<p>deal.II uses <code>clang-format</code> 11.1 to normalize indentation. A
-style file is provided at
-@code
-  \${SOURCE_DIR}/.clang-format
-@endcode
-
-<p>Before a commit, you should run
-@code
-  clang-format -i <file>
-@endcode
-on each of your files. This will make sure indentation is conforming to the
-style guidelines outlined in this page.
-
-This is cumbersome. Consequently, and more easily, you can just run
-@code
-  make indent
-@endcode
-in whatever directory you set up the library to be compiled in, to indent all
-source files that have been changed recently. If you want to make sure that
-the indenting is correct for all your commits, you might want to set up a
-pre-commit hook. One way to do so, is to copy
-<code>\${SOURCE_DIR}/contrib/git-hooks/pre-commit</code> to
-<code>\${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
-executable.
-
-If the system you are working on has more than one version of
-<code>clang-format</code> installed (or if it is not in the path)
-you should replace the above <code>make indent</code> command with
-@code
-  make DEAL_II_CLANG_FORMAT=/path/to/clang-11.1/clang-format indent
-@endcode
-to point to the correct executable.
-</p>
+See deal.II's wiki on github: <a href="https://github.com/dealii/dealii/wiki/Indentation">Indentation</a>
 
 <h3>Style issues</h3>
 

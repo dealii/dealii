@@ -1,0 +1,4 @@
+Changed: Improved: The internal indexing in FESystem::fill_fe_values() has been
+improved and is now about twice as fast.
+<br>
+(David Wells, 2022/04/30)

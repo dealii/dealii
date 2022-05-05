@@ -138,6 +138,36 @@ namespace CallgrindWrapper
     return cycles;
   }
 
+
+
+  /**
+   * A function that counts the cycles necessary to execute the given function
+   * argument. The following are therefore equivalent:
+   * @code
+   *   start_instrumentation();
+   *   my_function();
+   *   const auto cycles = stop_instrumentation();
+   * @endcode
+   * and
+   * @code
+   *   const auto cycles = count_cycles([](){ my_function(); });
+   * @endcode
+   * If the call to `my_function()` involves arguments or code pieces that
+   * access variables in the environment of the place where the function is
+   * called, then one can of course capture these variables in the construction
+   * of the lambda function and instead call variations such as
+   * @code
+   *   const auto cycles = count_cycles([&](){ my_function(); });
+   * @endcode
+   */
+  template <typename Func>
+  inline std::uint64_t
+  count_cycles(Func &&f)
+  {
+    start_instrumentation();
+    f();
+    return stop_instrumentation();
+  }
 } // namespace CallgrindWrapper
 
 #endif

@@ -149,8 +149,8 @@ check()
   for (unsigned int i = 0; i < v.size(); ++i)
     v(i) = std::complex<double>(0, 1);
 
-  const DataPostprocessors::ComplexMagnitude<dim> complex_magnitude;
-  const DataPostprocessors::ComplexPhase<dim>     complex_phase;
+  const ::DataPostprocessors::ComplexMagnitude<dim> complex_magnitude;
+  const ::DataPostprocessors::ComplexPhase<dim>     complex_phase;
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);

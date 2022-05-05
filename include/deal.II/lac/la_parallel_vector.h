@@ -23,7 +23,9 @@
 #include <deal.II/base/memory_space_data.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/numbers.h>
+#include <deal.II/base/parallel.h>
 #include <deal.II/base/partitioner.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/lac/vector_operation.h>

@@ -28,6 +28,8 @@
 #include <utility>
 #include <vector>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Comm.h>
 #  include <Epetra_Map.h>
@@ -39,8 +41,6 @@
 #    include <Epetra_SerialComm.h>
 #  endif
 #endif
-
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>

@@ -2176,6 +2176,8 @@ namespace GridGenerator
    *   if (i != numbers::flat_manifold_id)
    *     out_tria.set_manifold(i, in_tria.get_manifold(i));
    * @endcode
+   *
+   * @ingroup simplex
    */
   template <int dim, int spacedim>
   void

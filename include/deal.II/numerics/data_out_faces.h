@@ -126,8 +126,15 @@ public:
       cell_iterator;
 
   /**
-   * Constructor determining whether a surface mesh (default) or the whole
-   * wire basket is written.
+   * Constructor.
+   *
+   * @param[in] surface_only If `true`, then this class only generates
+   *   output on faces that lie on the boundary of the domain. This
+   *   is typically what this class is used for: To output information
+   *   about the solution, fluxes, and other quantities that live on
+   *   the boundary of the domain. On the other hand, it is sometimes
+   *   useful to also visualize data on internal faces. This is
+   *   facilitated by setting this argument to `false`.
    */
   DataOutFaces(const bool surface_only = true);
 

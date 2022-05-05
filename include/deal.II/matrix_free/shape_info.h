@@ -100,9 +100,18 @@ namespace internal
       tensor_symmetric_plus_dg0 = 5,
 
       /**
-       * Shape functions without an tensor product properties.
+       * Special case of the FE_RaviartThomasNodal element with anisotropic
+       * tensor product shape functions, i.e degree (k + 1) in normal direction,
+       * and k in tangential direction.
        */
-      tensor_none = 6
+      tensor_raviart_thomas = 6,
+
+      /**
+       * Shape functions without a tensor product properties.
+       */
+      tensor_none = 7
+
+
     };
 
 

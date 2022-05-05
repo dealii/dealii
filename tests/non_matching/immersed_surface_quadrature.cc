@@ -33,7 +33,9 @@ print_quadrature(
 {
   for (unsigned int i = 0; i < quadrature.size(); ++i)
     {
-      deallog << quadrature.point(i) << ", " << quadrature.weight(i) << ", "
+      if (dim > 0) // Can't print 0-dim points.
+        deallog << quadrature.point(i);
+      deallog << ", " << quadrature.weight(i) << ", "
               << quadrature.normal_vector(i) << std::endl;
     }
 }
@@ -108,6 +110,7 @@ main()
   construct_quadrature_and_print_points<3, 3>();
 
   // Face quadrature
+  construct_quadrature_and_print_points<0, 1>();
   construct_quadrature_and_print_points<1, 2>();
   construct_quadrature_and_print_points<2, 3>();
 }

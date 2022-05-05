@@ -1,0 +1,5 @@
+New: FEInterfaceValues now has functions get_*_function_values() to evaluate solution 
+values across cell faces, such as the jump in (or average of) values, 
+gradients, and Hessians.
+<br>
+(Jiaqi Zhang, 2022/04/11)
