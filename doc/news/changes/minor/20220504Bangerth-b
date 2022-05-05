@@ -1,0 +1,4 @@
+New: There is now a function ReferenceCell::get_midpoint_quadrature()
+that generalizes QMidpoint.
+<br>
+(Wolfgang Bangerth, 2022/05/05)
