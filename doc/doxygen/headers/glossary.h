@@ -381,7 +381,10 @@
  * when the mesh consists of quadrilateral or hexahedral meshes. When using
  * simplex meshes (triangular, tetrahedral), FE_SimplexP is the right choice.
  * Mixed meshes will require a bit more work, but the general idea should be
- * clear.
+ * clear. In general, which element you choose (include FE_Nothing) does not
+ * matter since the actual data at evaluation points is ignored by the
+ * postprocessor; the only thing that matters is that the element you choose
+ * is compatible with the shape of the cells used in the mesh.
  *
  * @note Boundary indicators are inherited from mother faces and edges to
  * their children upon mesh refinement. Some more information about boundary
