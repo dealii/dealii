@@ -34,6 +34,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -412,6 +413,35 @@ LaplaceProblem<dim>::setup_dofs()
   VectorTools::interpolate_boundary_values(
     mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
   constraints.close();
+
+  // Renumber DoFs
+  typename MatrixFree<dim, float>::AdditionalData additional_data;
+  additional_data.tasks_parallel_scheme =
+    MatrixFree<dim, float>::AdditionalData::none;
+
+  std::set<types::boundary_id> dirichlet_boundary;
+  dirichlet_boundary.insert(0);
+  mg_constrained_dofs.initialize(dof_handler);
+  mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
+                                                     dirichlet_boundary);
+
+  for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
+    {
+      IndexSet relevant_dofs;
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
+                                                    level,
+                                                    relevant_dofs);
+      AffineConstraints<double> level_constraints;
+      level_constraints.reinit(relevant_dofs);
+      level_constraints.add_lines(
+        mg_constrained_dofs.get_boundary_indices(level));
+      level_constraints.close();
+      additional_data.mg_level = level;
+
+      DoFRenumbering::matrix_free_data_locality(dof_handler,
+                                                level_constraints,
+                                                additional_data);
+    }
 }
 
 
