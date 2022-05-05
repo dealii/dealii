@@ -1246,6 +1246,7 @@ namespace LinearAlgebra
               import_data.data(), partitioner->n_import_indices()),
             compress_requests);
         }
+#endif
 #else
       (void)communication_channel;
       (void)operation;
