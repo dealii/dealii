@@ -127,7 +127,6 @@ public:
 
     DoFRenumbering::matrix_free_data_locality(dof_handler,
                                               constraints,
-                                              data,
                                               addit_data);
 
     constraints.clear();
