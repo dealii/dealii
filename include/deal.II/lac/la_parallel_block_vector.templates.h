@@ -423,6 +423,16 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
+    BlockVector<Number>::set_ghost_state(const bool ghosted) const
+    {
+      for (unsigned int block = 0; block < this->n_blocks(); ++block)
+        this->block(block).set_ghost_state(ghosted);
+    }
+
+
+
+    template <typename Number>
+    void
     BlockVector<Number>::reinit(const VectorSpaceVector<Number> &V,
                                 const bool omit_zeroing_entries)
     {
