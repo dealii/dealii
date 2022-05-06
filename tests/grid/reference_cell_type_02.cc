@@ -18,13 +18,8 @@
 
 #include <deal.II/base/quadrature_lib.h>
 
-#include <deal.II/fe/fe_pyramid_p.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_simplex_p.h>
-#include <deal.II/fe/fe_simplex_p_bubbles.h>
-#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe_wedge_p.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -56,24 +51,10 @@ test(const ReferenceCell &reference_cell)
   else if (reference_cell == ReferenceCells::Hexahedron)
     q = std::make_unique<QGauss<dim>>(2);
 
-  std::unique_ptr<FiniteElement<dim>> fe;
-  if (reference_cell == ReferenceCells::Line)
-    fe = std::make_unique<FE_Q<dim>>(1);
-  else if (reference_cell == ReferenceCells::Triangle)
-    fe = std::make_unique<FE_SimplexP<dim>>(1);
-  else if (reference_cell == ReferenceCells::Quadrilateral)
-    fe = std::make_unique<FE_Q<dim>>(1);
-  else if (reference_cell == ReferenceCells::Tetrahedron)
-    fe = std::make_unique<FE_SimplexP<dim>>(1);
-  else if (reference_cell == ReferenceCells::Wedge)
-    fe = std::make_unique<FE_WedgeP<dim>>(1);
-  else if (reference_cell == ReferenceCells::Pyramid)
-    fe = std::make_unique<FE_PyramidP<dim>>(1);
-  else if (reference_cell == ReferenceCells::Hexahedron)
-    fe = std::make_unique<FE_Q<dim>>(1);
+  FE_Nothing<dim> fe(reference_cell);
 
   // Set up the objects to compute an integral on the reference cell
-  FEValues<dim> fe_values(*fe, *q, update_JxW_values);
+  FEValues<dim> fe_values(fe, *q, update_JxW_values);
   fe_values.reinit(triangulation.begin_active());
 
   double volume = 0;
