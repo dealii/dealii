@@ -361,10 +361,16 @@ namespace LinearAlgebra
       zero_out_ghost_values() const;
 
       /**
-       * Return if this Vector contains ghost elements.
+       * Return if any of the blocks in this vector contains ghost elements.
        */
       bool
       has_ghost_elements() const;
+
+      /**
+       * Change the ghost state of all blocks in this vector to @p ghosted.
+       */
+      void
+      set_ghost_state(const bool ghosted) const;
 
       /**
        * This method copies the data in the locally owned range from another
