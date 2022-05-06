@@ -12,7 +12,7 @@ DEAL:3D::ReferenceCell: Tet
 DEAL:3D::  computed barycenter = 0.250000 0.250000 0.250000
 DEAL:3D::  self-reported barycenter = 0.250000 0.250000 0.250000
 DEAL:3D::ReferenceCell: Pyramid
-DEAL:3D::  computed barycenter = 2.08167e-17 6.24500e-17 0.250000
+DEAL:3D::  computed barycenter = 0 0 0.250000
 DEAL:3D::  self-reported barycenter = 0.00000 0.00000 0.250000
 DEAL:3D::ReferenceCell: Wedge
 DEAL:3D::  computed barycenter = 0.333333 0.333333 0.500000
