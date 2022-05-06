@@ -115,9 +115,8 @@ main()
 
     save_mesh(volume_mesh);
 
-    Triangulation<dim - 1, dim> boundary_mesh;
-    set<types::boundary_id>     boundary_ids;
-    boundary_ids.insert(0);
+    Triangulation<dim - 1, dim>   boundary_mesh;
+    const set<types::boundary_id> boundary_ids = {0};
 
     surface_to_volume_mapping =
       GridGenerator::extract_boundary_mesh(volume_mesh,

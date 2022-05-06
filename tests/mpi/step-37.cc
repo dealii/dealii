@@ -244,8 +244,7 @@ namespace Step37
     const unsigned int nlevels = triangulation.n_global_levels();
     mg_matrices.resize(0, nlevels - 1);
 
-    std::set<types::boundary_id> dirichlet_boundary;
-    dirichlet_boundary.insert(0);
+    const std::set<types::boundary_id> dirichlet_boundary = {0};
     mg_constrained_dofs.initialize(dof_handler);
     mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
                                                        dirichlet_boundary);
@@ -325,11 +324,10 @@ namespace Step37
       DoFTools::make_hanging_node_constraints(
         dof_handler, hanging_nodes_laplace_constraints);
 
-      std::set<types::boundary_id> dirichlet_boundary_ids;
+      const std::set<types::boundary_id> dirichlet_boundary_ids = {0};
       std::map<types::boundary_id, const Function<dim> *>
                                dirichlet_boundary_functions;
       PotentialBCFunction<dim> bc_func(240, Point<dim>());
-      dirichlet_boundary_ids.insert(0);
       dirichlet_boundary_functions[0] = &bc_func;
       VectorTools::interpolate_boundary_values(*mapping.get(),
                                                dof_handler,

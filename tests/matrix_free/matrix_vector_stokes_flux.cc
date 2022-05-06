@@ -158,9 +158,7 @@ test()
   stokes_sub_blocks[dim] = 1;
   DoFRenumbering::component_wise(dof_handler, stokes_sub_blocks);
 
-  std::set<types::boundary_id> no_normal_flux_boundaries;
-  no_normal_flux_boundaries.insert(0);
-  no_normal_flux_boundaries.insert(1);
+  const std::set<types::boundary_id> no_normal_flux_boundaries = {0, 1};
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::compute_normal_flux_constraints(dof_handler,
                                                0,

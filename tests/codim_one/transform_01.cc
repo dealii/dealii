@@ -70,9 +70,7 @@ main()
   static SphericalManifold<3 - 1, 3> surface_description;
   triangulation.set_manifold(0, surface_description);
 
-  std::set<types::boundary_id> boundary_ids;
-  boundary_ids.insert(0);
-
+  const std::set<types::boundary_id> boundary_ids = {0};
   GridGenerator::extract_boundary_mesh(volume_mesh,
                                        triangulation,
                                        boundary_ids);

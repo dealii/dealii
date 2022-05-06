@@ -5479,8 +5479,7 @@ namespace GridGenerator
   {
     Triangulation<spacedim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh, p, radius);
-    std::set<types::boundary_id> boundary_ids;
-    boundary_ids.insert(0);
+    const std::set<types::boundary_id> boundary_ids = {0};
     GridGenerator::extract_boundary_mesh(volume_mesh, tria, boundary_ids);
     tria.set_all_manifold_ids(0);
     tria.set_manifold(0, SphericalManifold<spacedim - 1, spacedim>(p));

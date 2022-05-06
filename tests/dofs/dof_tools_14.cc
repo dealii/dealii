@@ -38,7 +38,6 @@ check_this(const DoFHandler<dim> &dof_handler)
   deallog << dof_handler.n_boundary_dofs(fm) << std::endl;
 
   // with std::set
-  std::set<types::boundary_id> s;
-  s.insert(0);
+  const std::set<types::boundary_id> s = {0};
   deallog << dof_handler.n_boundary_dofs(s) << std::endl;
 }

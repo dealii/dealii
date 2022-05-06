@@ -229,9 +229,7 @@ run()
             << (int)triangulation.begin_active()->face(f)->boundary_id()
             << std::endl;
 
-  std::set<types::boundary_id> no_normal_flux_boundaries;
-  no_normal_flux_boundaries.insert(0);
-  no_normal_flux_boundaries.insert(2);
+  const std::set<types::boundary_id> no_normal_flux_boundaries = {0, 2};
   VectorTools::compute_no_normal_flux_constraints(dof_handler,
                                                   0,
                                                   no_normal_flux_boundaries,

@@ -419,8 +419,7 @@ LaplaceProblem<dim>::setup_dofs()
   additional_data.tasks_parallel_scheme =
     MatrixFree<dim, float>::AdditionalData::none;
 
-  std::set<types::boundary_id> dirichlet_boundary;
-  dirichlet_boundary.insert(0);
+  const std::set<types::boundary_id> dirichlet_boundary = {0};
   mg_constrained_dofs.initialize(dof_handler);
   mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
                                                      dirichlet_boundary);
@@ -471,8 +470,7 @@ LaplaceProblem<dim>::setup_matrix_free()
   const unsigned int nlevels = triangulation.n_global_levels();
   mg_matrices.resize(0, nlevels - 1);
 
-  std::set<types::boundary_id> dirichlet_boundary;
-  dirichlet_boundary.insert(0);
+  const std::set<types::boundary_id> dirichlet_boundary = {0};
   mg_constrained_dofs.initialize(dof_handler);
   mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
                                                      dirichlet_boundary);

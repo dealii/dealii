@@ -90,9 +90,8 @@ test()
   AffineConstraints<double> constraints;
   constraints.reinit(relevant_set);
   DoFTools::make_hanging_node_constraints(dofh, constraints);
-  std::set<types::boundary_id> no_normal_flux_boundaries;
-  no_normal_flux_boundaries.insert(0);
-  const unsigned int degree = 1;
+  const std::set<types::boundary_id> no_normal_flux_boundaries = {0};
+  const unsigned int                 degree                    = 1;
   VectorTools::compute_no_normal_flux_constraints(
     dofh, 0, no_normal_flux_boundaries, constraints, MappingQ<dim>(degree));
   constraints.close();

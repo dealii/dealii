@@ -81,8 +81,7 @@ namespace Step38
   Extract_Mesh_Test<spacedim>::run()
   {
     GridGenerator::hyper_cube(volume_mesh_triangulation);
-    std::set<types::boundary_id> boundary_ids;
-    boundary_ids.insert(0);
+    const std::set<types::boundary_id> boundary_ids = {0};
 
     space_dof_handler.distribute_dofs(space_fe);
 

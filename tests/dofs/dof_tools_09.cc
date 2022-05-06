@@ -30,11 +30,10 @@ void
 check_this(const DoFHandler<dim> &dof_handler)
 {
   std::vector<types::global_dof_index> map(dof_handler.n_dofs());
-  std::set<types::boundary_id>         boundary_ids;
-
   // check for boundary id 0 alone
-  boundary_ids.insert(0);
-  DoFTools::map_dof_to_boundary_indices(dof_handler, map);
+  std::set<types::boundary_id> boundary_ids = {0};
+
+  DoFTools::map_dof_to_boundary_indices(dof_handler, boundary_ids, map);
   for (unsigned int i = 0; i < map.size(); ++i)
     deallog << (map[i] == numbers::invalid_dof_index ?
                   -1 :
@@ -44,7 +43,7 @@ check_this(const DoFHandler<dim> &dof_handler)
 
   // check for boundary id 0 and 1
   boundary_ids.insert(1);
-  DoFTools::map_dof_to_boundary_indices(dof_handler, map);
+  DoFTools::map_dof_to_boundary_indices(dof_handler, boundary_ids, map);
   for (unsigned int i = 0; i < map.size(); ++i)
     deallog << (map[i] == numbers::invalid_dof_index ?
                   -1 :

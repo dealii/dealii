@@ -582,11 +582,10 @@ namespace Step66
     mg_matrices.resize(0, nlevels - 1);
     mg_solution.resize(0, nlevels - 1);
 
-    std::set<types::boundary_id> dirichlet_boundary;
-    dirichlet_boundary.insert(0);
+    const std::set<types::boundary_id> dirichlet_boundary_ids = {0};
     mg_constrained_dofs.initialize(dof_handler);
     mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
-                                                       dirichlet_boundary);
+                                                       dirichlet_boundary_ids);
 
     mg_transfer.initialize_constraints(mg_constrained_dofs);
     mg_transfer.build(dof_handler);
