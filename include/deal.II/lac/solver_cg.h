@@ -389,6 +389,302 @@ SolverCG<VectorType>::compute_eigs_and_cond(
 
 
 
+namespace internal
+{
+  namespace SolverCG
+  {
+    // Detector class to find out whether the MatrixType in SolverCG has a
+    // vmult function that takes two additional std::function objects, which
+    // we use to run the operation on slices of the vector during the
+    // matrix-vector product, and whether PreconditionerType can run
+    // operations on an individual element
+    template <typename MatrixType,
+              typename VectorType,
+              typename PreconditionerType>
+    struct supports_vmult_with_std_functions
+    {
+    private:
+      // this will work always
+      static bool
+      detect_matrix(...);
+
+      // this detector will work only if we have
+      // "... MatrixType::vmult(VectorType, const VectorType,
+      // const std::function<...>&, const std::function<...>&) const"
+      template <typename MatrixType2>
+      static decltype(std::declval<MatrixType2 const>().vmult(
+        std::declval<VectorType &>(),
+        std::declval<const VectorType &>(),
+        std::declval<const std::function<void(const unsigned int,
+                                              const unsigned int)> &>(),
+        std::declval<const std::function<void(const unsigned int,
+                                              const unsigned int)> &>()))
+      detect_matrix(const MatrixType2 &);
+
+      // this will work always
+      static bool
+      detect_preconditioner(...);
+
+      // this detector will work only if we have
+      // "... PreconditionerType::vmult(std::size_t, std::size_t, Number, const
+      // VectorType, const std::function<...>&, const std::function<...>&)
+      // const"
+      template <typename PreconditionerType2>
+      static decltype(
+        std::declval<PreconditionerType2 const>().apply_to_subrange(
+          std::size_t(),
+          std::size_t(),
+          std::declval<const typename PreconditionerType2::value_type *>(),
+          std::declval<typename PreconditionerType2::value_type *>()))
+      detect_preconditioner(const PreconditionerType2 &);
+
+    public:
+      // finally here we check if both our detectors have void return
+      // type. This will happen if the compiler can use the second detector,
+      // otherwise SFINAE let's it work with the more general first one that
+      // is bool
+      static const bool value =
+        !std::is_same<decltype(detect_matrix(std::declval<MatrixType>())),
+                      bool>::value &&
+        !std::is_same<decltype(detect_preconditioner(
+                        std::declval<PreconditionerType>())),
+                      bool>::value;
+    };
+
+    // We need to have a separate declaration for static const members
+    template <typename T, typename U, typename V>
+    const bool supports_vmult_with_std_functions<T, U, V>::value;
+
+    /**
+     * Internal function to run one iteration of the conjugate gradient solver
+     * for standard matrix and preconditioner arguments.
+     */
+    template <typename Number,
+              typename VectorType,
+              typename MatrixType,
+              typename PreconditionerType,
+              typename std::enable_if<
+                !supports_vmult_with_std_functions<MatrixType,
+                                                   VectorType,
+                                                   PreconditionerType>::value,
+                int>::type * = nullptr>
+    void
+    do_cg_iteration(const MatrixType &        A,
+                    const PreconditionerType &preconditioner,
+                    const typename dealii::SolverCG<VectorType>::AdditionalData
+                      &                additional_data,
+                    const unsigned int iteration,
+                    VectorType &       x,
+                    VectorType &       r,
+                    VectorType &       p,
+                    VectorType &       v,
+                    VectorType &       z,
+                    Number &           r_dot_preconditioner_dot_r,
+                    Number &           alpha,
+                    Number &           beta,
+                    double &           residual_norm,
+                    const Number /*old_alpha*/,
+                    const Number /*old_beta*/)
+    {
+      const Number old_r_dot_preconditioner_dot_r = r_dot_preconditioner_dot_r;
+
+      if (std::is_same<PreconditionerType, PreconditionIdentity>::value ==
+          false)
+        {
+          preconditioner.vmult(v, r);
+          r_dot_preconditioner_dot_r = r * v;
+        }
+      else
+        r_dot_preconditioner_dot_r = residual_norm * residual_norm;
+
+      const VectorType &direction =
+        std::is_same<PreconditionerType, PreconditionIdentity>::value ? r : v;
+
+      if (iteration > 1)
+        {
+          Assert(std::abs(old_r_dot_preconditioner_dot_r) != 0.,
+                 ExcDivideByZero());
+          beta = r_dot_preconditioner_dot_r / old_r_dot_preconditioner_dot_r;
+          if (additional_data.use_flexible_variant)
+            beta -= (r * z) / old_r_dot_preconditioner_dot_r;
+          p.sadd(beta, 1., direction);
+        }
+      else
+        p.equ(1., direction);
+
+      if (additional_data.use_flexible_variant)
+        z.swap(v);
+
+      A.vmult(v, p);
+
+      const Number p_dot_A_dot_p = p * v;
+      Assert(std::abs(p_dot_A_dot_p) != 0., ExcDivideByZero());
+      alpha = r_dot_preconditioner_dot_r / p_dot_A_dot_p;
+
+      x.add(alpha, p);
+      residual_norm = std::sqrt(std::abs(r.add_and_dot(-alpha, v, r)));
+    }
+
+    /**
+     * Internal function to run one iteration of the conjugate gradient solver
+     * for matrices and preconditioners that support interleaving the vector
+     * updates with the matrix-vector product.
+     */
+    template <typename Number,
+              typename VectorType,
+              typename MatrixType,
+              typename PreconditionerType,
+              typename std::enable_if<
+                supports_vmult_with_std_functions<MatrixType,
+                                                  VectorType,
+                                                  PreconditionerType>::value,
+                int>::type * = nullptr>
+    void
+    do_cg_iteration(
+      const MatrixType &        A,
+      const PreconditionerType &preconditioner,
+      const typename dealii::SolverCG<VectorType>::AdditionalData &,
+      const unsigned int iteration,
+      VectorType &       x_vector,
+      VectorType &       r_vector,
+      VectorType &       p_vector,
+      VectorType &       v_vector,
+      VectorType &,
+      Number &     r_dot_preconditioner_dot_r,
+      Number &     alpha,
+      Number &     beta,
+      double &     residual_norm,
+      const Number old_alpha,
+      const Number old_beta)
+    {
+      const auto operation_before_loop = [&](const unsigned int start_range,
+                                             const unsigned int end_range) {
+        Number *                       x = x_vector.begin() + start_range;
+        Number *                       r = r_vector.begin() + start_range;
+        Number *                       p = p_vector.begin() + start_range;
+        Number *                       v = v_vector.begin() + start_range;
+        constexpr unsigned int         grain_size = 32;
+        std::array<Number, grain_size> prec_r;
+        if (iteration == 1)
+          {
+            for (unsigned int j = start_range; j < end_range; j += grain_size)
+              {
+                const unsigned int length = std::min(grain_size, end_range - j);
+                preconditioner.apply_on_subrange(j, length, r, prec_r.data());
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  {
+                    p[i] = prec_r[i];
+                    v[i] = Number();
+                  }
+                p += length;
+                r += length;
+                v += length;
+              }
+          }
+        else if (iteration % 2 == 0)
+          {
+            for (unsigned int j = start_range; j < end_range; j += grain_size)
+              {
+                const unsigned int length = std::min(grain_size, end_range - j);
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  r[i] -= alpha * v[i];
+                preconditioner.apply_on_subrange(j, length, r, prec_r.data());
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  {
+                    p[i] = beta * p[i] + prec_r[i];
+                    v[i] = Number();
+                  }
+                p += length;
+                r += length;
+                v += length;
+              }
+          }
+        else
+          {
+            const Number alpha_plus_alpha_old = alpha + old_alpha / old_beta;
+            const Number alpha_old_beta_old   = old_alpha / old_beta;
+            for (unsigned int j = start_range; j < end_range; j += grain_size)
+              {
+                const unsigned int length = std::min(grain_size, end_range - j);
+                preconditioner.apply_on_subrange(j, length, r, prec_r.data());
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  {
+                    x[i] += alpha_plus_alpha_old * p[i] +
+                            alpha_old_beta_old * prec_r[i];
+                    r[i] -= alpha * v[i];
+                  }
+                preconditioner.apply_on_subrange(j, length, r, prec_r.data());
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  {
+                    p[i] = beta * p[i] + prec_r[i];
+                    v[i] = 0.;
+                  }
+                p += length;
+                r += length;
+                v += length;
+                x += length;
+              }
+          }
+      };
+
+      std::array<Number, 7> local_sums = {};
+      const auto operation_after_loop  = [&](const unsigned int start_range,
+                                            const unsigned int end_range) {
+        Number *                       x = x_vector.begin() + start_range;
+        Number *                       r = r_vector.begin() + start_range;
+        Number *                       p = p_vector.begin() + start_range;
+        Number *                       v = v_vector.begin() + start_range;
+        constexpr unsigned int         grain_size = 32;
+        std::array<Number, grain_size> prec_r;
+        std::array<Number, grain_size> prec_v;
+        for (unsigned int j = start_range; j < end_range; j += grain_size)
+          {
+            const unsigned int length = std::min(grain_size, end_range - j);
+            preconditioner.apply_on_subrange(j, length, r, prec_r.data());
+            preconditioner.apply_on_subrange(j, length, v, prec_v.data());
+            for (unsigned int i = 0; i < length; ++i)
+              {
+                local_sums[0] += p[i] * v[i];
+                local_sums[1] += v[i] * v[i];
+                local_sums[2] += r[i] * v[i];
+                local_sums[3] += r[i] * r[i];
+                local_sums[4] += r[i] * prec_v[i];
+                local_sums[5] += v[i] * prec_v[i];
+                local_sums[6] += r[i] * prec_r[i];
+              }
+          }
+      };
+
+      A.vmult(v_vector, p_vector, operation_before_loop, operation_after_loop);
+
+      Utilities::MPI::sum(dealii::ArrayView<const double>(local_sums.begin(),
+                                                          7),
+                          r_vector.get_mpi_communicator(),
+                          dealii::ArrayView<double>(local_sums.begin_raw(), 7));
+
+      const Number p_dot_A_dot_p = local_sums[0];
+      Assert(std::abs(p_dot_A_dot_p) != 0., ExcDivideByZero());
+
+      const Number old_r_dot_preconditioner_dot_r = local_sums[6];
+      alpha         = old_r_dot_preconditioner_dot_r / p_dot_A_dot_p;
+      residual_norm = std::sqrt(local_sums[3] + 2 * local_sums[2] +
+                                alpha * alpha * local_sums[1]);
+
+      r_dot_preconditioner_dot_r =
+        old_r_dot_preconditioner_dot_r -
+        alpha * (2. * local_sums[4] - alpha * local_sums[5]);
+      beta = r_dot_preconditioner_dot_r / old_r_dot_preconditioner_dot_r;
+    }
+  } // namespace SolverCG
+} // namespace internal
+
+
+
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
@@ -442,6 +738,8 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
   number r_dot_preconditioner_dot_r = number();
   number beta                       = number();
   number alpha                      = number();
+  number old_beta                   = number();
+  number old_alpha                  = number();
 
   // compute residual. if vector is zero, then short-circuit the full
   // computation
@@ -461,46 +759,25 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
   while (solver_state == SolverControl::iterate)
     {
       it++;
-      const number old_alpha                      = alpha;
-      const number old_r_dot_preconditioner_dot_r = r_dot_preconditioner_dot_r;
 
-      if (std::is_same<PreconditionerType, PreconditionIdentity>::value ==
-          false)
-        {
-          preconditioner.vmult(v, r);
-          r_dot_preconditioner_dot_r = r * v;
-        }
-      else
-        r_dot_preconditioner_dot_r = residual_norm * residual_norm;
+      internal::SolverCG::do_cg_iteration(A,
+                                          preconditioner,
+                                          additional_data,
+                                          it,
+                                          x,
+                                          r,
+                                          p,
+                                          v,
+                                          z,
+                                          r_dot_preconditioner_dot_r,
+                                          alpha,
+                                          beta,
+                                          residual_norm,
+                                          old_alpha,
+                                          old_beta);
 
-      const VectorType &direction =
-        std::is_same<PreconditionerType, PreconditionIdentity>::value ? r : v;
-
-      if (it > 1)
-        {
-          Assert(std::abs(old_r_dot_preconditioner_dot_r) != 0.,
-                 ExcDivideByZero());
-          beta = r_dot_preconditioner_dot_r / old_r_dot_preconditioner_dot_r;
-          if (determine_beta_by_flexible_formula)
-            beta -= (r * z) / old_r_dot_preconditioner_dot_r;
-          p.sadd(beta, 1., direction);
-        }
-      else
-        p.equ(1., direction);
-
-      // Make sure to recall P^{-1} * r until the next iteration -> put it
-      // into vector z
-      if (determine_beta_by_flexible_formula)
-        z.swap(v);
-
-      A.vmult(v, p);
-
-      const number p_dot_A_dot_p = p * v;
-      Assert(std::abs(p_dot_A_dot_p) != 0., ExcDivideByZero());
-      alpha = r_dot_preconditioner_dot_r / p_dot_A_dot_p;
-
-      x.add(alpha, p);
-      residual_norm = std::sqrt(std::abs(r.add_and_dot(-alpha, v, r)));
+      old_alpha = alpha;
+      old_beta = beta;
 
       print_vectors(it, x, r, p);
 

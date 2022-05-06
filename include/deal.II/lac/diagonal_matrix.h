@@ -197,6 +197,15 @@ public:
   Tvmult_add(VectorType &dst, const VectorType &src) const;
 
   /**
+   * Apply the preconditioner only on a subrange of elements on the vector.
+   */
+  void
+  apply_on_subrange(const std::size_t index_of_first_unknown,
+                    const std::size_t length,
+                    const value_type *src,
+                    value_type *      dst) const;
+
+  /**
    * Initialize vector @p dst to have the same size and partition as
    * @p diagonal member of this class.
    *
@@ -400,6 +409,28 @@ DiagonalMatrix<VectorType>::Tvmult_add(VectorType &      dst,
                                        const VectorType &src) const
 {
   vmult_add(dst, src);
+}
+
+
+
+template <typename VectorType>
+void
+DiagonalMatrix<VectorType>::apply_on_subrange(
+  const std::size_t index_of_first_unknown,
+  const std::size_t length,
+  const value_type *src,
+  value_type *      dst) const
+{
+  AssertIndexRange(index_of_first_unknown,
+                   diagonal.locally_owned_elements().n_elements());
+  AssertIndexRange(index_of_first_unknown + length,
+                   diagonal.locally_owned_elements().n_elements() + 1);
+
+  const value_type *diagonal_entry = diagonal.begin() + index_of_first_unknown;
+
+  DEAL_II_OPENMP_SIMD_PRAGMA
+  for (std::size_t i = 0; i < length; ++i)
+    dst[i] = diagonal_entry[i] * src[i];
 }
 
 
