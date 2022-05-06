@@ -1076,24 +1076,25 @@ namespace LinearAlgebra
     {
 #if defined DEAL_II_WITH_KOKKOS_BACKEND
       if (data.values_sm_ptr != nullptr)
-        std::fill_n(data.values_sm_ptr.get() + partitioner->locally_owned_size(),
+        std::fill_n(data.values_sm_ptr.get() +
+                      partitioner->locally_owned_size(),
                     partitioner->n_ghost_indices(),
-		    Number()); 
-#if defined(DEAL_II_COMPILER_CUDA_AWARE)  
+                    Number());
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE)
       if (data.has_data_on_host())
         Kokkos::deep_copy(
-          Kokkos::subview(
-            data.values, 
-	    Kokkos::make_pair(
-              partitioner->locally_owned_size(), 
-	      partitioner->locally_owned_size() + partitioner->n_ghost_indices())), 0);
-#endif
+          Kokkos::subview(data.values,
+                          Kokkos::make_pair(partitioner->locally_owned_size(),
+                                            partitioner->locally_owned_size() +
+                                              partitioner->n_ghost_indices())),
+          0);
+#  endif
 #else
       if (data.has_data_on_host())
         std::fill_n(data.data() + partitioner->locally_owned_size(),
                     partitioner->n_ghost_indices(),
                     Number());
-#if defined(DEAL_II_COMPILER_CUDA_AWARE)
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE)
       if (data.values_dev != nullptr)
         {
           const cudaError_t cuda_error_code =
@@ -1103,7 +1104,7 @@ namespace LinearAlgebra
                        partitioner->n_ghost_indices() * sizeof(Number));
           AssertCuda(cuda_error_code);
         }
-#endif
+#  endif
 #endif
 
       vector_is_ghosted = false;
@@ -1153,11 +1154,11 @@ namespace LinearAlgebra
                     reinterpret_cast<void **>(&new_val),
                     64,
                     sizeof(Number) * partitioner->n_import_indices());
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
-		  import_data.values_sm_ptr.reset(new_val);
-#else
-                  import_data.values.reset(new_val);
-#endif
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
+                  import_data.values_sm_ptr.reset(new_val);
+#  else
+                import_data.values.reset(new_val);
+#  endif
                 }
             }
         }
@@ -1202,15 +1203,15 @@ namespace LinearAlgebra
         {
 #    ifdef DEAL_II_WITH_KOKKOS_BACKEND
           partitioner->import_from_ghosted_array_start(
-	    operation,
-	    communication_channel,
-	    ArrayView<Number, MemorySpace::CUDA>(
-	      data.data() + partitioner->locally_owned_size(),
-	      partitioner->n_ghost_indices()),
-	    ArrayView<Number, MemorySpace::CUDA>(
+            operation,
+            communication_channel,
+            ArrayView<Number, MemorySpace::CUDA>(
+              data.data() + partitioner->locally_owned_size(),
+              partitioner->n_ghost_indices()),
+            ArrayView<Number, MemorySpace::CUDA>(
               import_data.data(), partitioner->n_import_indices()),
-	    compress_requests);  
-#else
+            compress_requests);
+#    else
           partitioner->import_from_ghosted_array_start(
             operation,
             communication_channel,
@@ -1220,33 +1221,33 @@ namespace LinearAlgebra
             ArrayView<Number, MemorySpace::CUDA>(
               import_data.values_dev.get(), partitioner->n_import_indices()),
             compress_requests);
-#endif
+#    endif
         }
       else
 #  endif
         {
-#    ifdef DEAL_II_WITH_KOKKOS_BACKEND
-          partitioner->import_from_ghosted_array_start(
-            operation,
-	    communication_channel,
-	    ArrayView<Number, MemorySpace::Host>(
-              data.values_sm_ptr.get() + partitioner->locally_owned_size(),
-	      partitioner->n_ghost_indices()),
-	    ArrayView<Number, MemorySpace::Host>(
-              import_data.values_sm_ptr.get(), partitioner->n_import_indices()),
-	    compress_requests);
-#else 
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
           partitioner->import_from_ghosted_array_start(
             operation,
             communication_channel,
             ArrayView<Number, MemorySpace::Host>(
-              data.data() + partitioner->locally_owned_size(),
+              data.values_sm_ptr.get() + partitioner->locally_owned_size(),
               partitioner->n_ghost_indices()),
             ArrayView<Number, MemorySpace::Host>(
-              import_data.data(), partitioner->n_import_indices()),
+              import_data.values_sm_ptr.get(), partitioner->n_import_indices()),
             compress_requests);
+#  else
+        partitioner->import_from_ghosted_array_start(
+          operation,
+          communication_channel,
+          ArrayView<Number, MemorySpace::Host>(
+            data.data() + partitioner->locally_owned_size(),
+            partitioner->n_ghost_indices()),
+          ArrayView<Number, MemorySpace::Host>(import_data.data(),
+                                               partitioner->n_import_indices()),
+          compress_requests);
+#  endif
         }
-#endif
 #else
       (void)communication_channel;
       (void)operation;
@@ -1273,22 +1274,22 @@ namespace LinearAlgebra
     defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
       if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
         {
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#    ifdef DEAL_II_WITH_KOKKOS_BACKEND
           Assert(partitioner->n_import_indices() == 0 ||
-	   	   import_data.data() != nullptr,
+                   import_data.data() != nullptr,
                  ExcNotInitialized());
-	  partitioner
-  	    ->import_from_ghosted_array_finish<Number, MemorySpace::CUDA>(
-  	      operation,
-	      ArrayView<const Number, MemorySpace::CUDA>(
-	        import_data.data(), partitioner->n_import_indices()),
-	      ArrayView<Number, MemorySpace::CUDA>(
-  	        data.data(), partitioner->locally_owned_size()),
-	      ArrayView<Number, MemorySpace::CUDA>(
-  	        data.data() + partitioner->locally_owned_size(),
+          partitioner
+            ->import_from_ghosted_array_finish<Number, MemorySpace::CUDA>(
+              operation,
+              ArrayView<const Number, MemorySpace::CUDA>(
+                import_data.data(), partitioner->n_import_indices()),
+              ArrayView<Number, MemorySpace::CUDA>(
+                data.data(), partitioner->locally_owned_size()),
+              ArrayView<Number, MemorySpace::CUDA>(
+                data.data() + partitioner->locally_owned_size(),
                 partitioner->n_ghost_indices()),
-	      compress_requests);    
-#else
+              compress_requests);
+#    else
           Assert(partitioner->n_import_indices() == 0 ||
                    import_data.values_dev != nullptr,
                  ExcNotInitialized());
@@ -1303,43 +1304,44 @@ namespace LinearAlgebra
                 data.values_dev.get() + partitioner->locally_owned_size(),
                 partitioner->n_ghost_indices()),
               compress_requests);
-#endif
+#    endif
         }
       else
 #  endif
         {
-#ifdef DEAL_II_WITH_KOKKOS_BACKEND
+#  ifdef DEAL_II_WITH_KOKKOS_BACKEND
           Assert(partitioner->n_import_indices() == 0 ||
-		   import_data.values_sm_ptr.get() != nullptr,
-       	         ExcNotInitialized());
-	  partitioner
-  	    ->import_from_ghosted_array_finish<Number, MemorySpace::Host>(
-   	      operation,
-	      ArrayView<const Number, MemorySpace::Host>(
-  	        import_data.values_sm_ptr.get(), partitioner->n_import_indices()),
-	      ArrayView<Number, MemorySpace::Host>(
-  	        data.values_sm_ptr.get(), partitioner->locally_owned_size()),
-	      ArrayView<Number, MemorySpace::Host>(
-  	        data.values_sm_ptr.get() + partitioner->locally_owned_size(),
-		partitioner->n_ghost_indices()),
-	      compress_requests);    
-          std::cout << "after import_from_ghosted_array_finish" << std::endl; 
-#else
-          Assert(partitioner->n_import_indices() == 0 ||
-                   import_data.has_data_on_host(),
+                   import_data.values_sm_ptr.get() != nullptr,
                  ExcNotInitialized());
           partitioner
             ->import_from_ghosted_array_finish<Number, MemorySpace::Host>(
               operation,
               ArrayView<const Number, MemorySpace::Host>(
-                import_data.data(), partitioner->n_import_indices()),
+                import_data.values_sm_ptr.get(),
+                partitioner->n_import_indices()),
               ArrayView<Number, MemorySpace::Host>(
-                data.data(), partitioner->locally_owned_size()),
+                data.values_sm_ptr.get(), partitioner->locally_owned_size()),
               ArrayView<Number, MemorySpace::Host>(
-                data.data() + partitioner->locally_owned_size(),
+                data.values_sm_ptr.get() + partitioner->locally_owned_size(),
                 partitioner->n_ghost_indices()),
               compress_requests);
-#endif
+          std::cout << "after import_from_ghosted_array_finish" << std::endl;
+#  else
+        Assert(partitioner->n_import_indices() == 0 ||
+                 import_data.has_data_on_host(),
+               ExcNotInitialized());
+        partitioner
+          ->import_from_ghosted_array_finish<Number, MemorySpace::Host>(
+            operation,
+            ArrayView<const Number, MemorySpace::Host>(
+              import_data.data(), partitioner->n_import_indices()),
+            ArrayView<Number, MemorySpace::Host>(
+              data.data(), partitioner->locally_owned_size()),
+            ArrayView<Number, MemorySpace::Host>(
+              data.data() + partitioner->locally_owned_size(),
+              partitioner->n_ghost_indices()),
+            compress_requests);
+#  endif
         }
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
@@ -1459,17 +1461,17 @@ namespace LinearAlgebra
 #  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
         defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
 #    ifdef DEAL_II_WITH_KOKKOS_BACKEND
-       partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
-         communication_channel,
-	 ArrayView<const Number, MemorySpace::Host>(
-  	   data.values_sm_ptr.get(), partitioner->locally_owned_size()),
-	 ArrayView<Number, MemorySpace::Host>(import_data.values_sm_ptr.get(),
-           		                      partitioner->n_import_indices()),
-	 ArrayView<Number, MemorySpace::Host>(
-  	   data.values_sm_ptr.get() + partitioner->locally_owned_size(),
-	   partitioner->n_ghost_indices()),
-	 update_ghost_values_requests);  
-#else
+      partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
+        communication_channel,
+        ArrayView<const Number, MemorySpace::Host>(
+          data.values_sm_ptr.get(), partitioner->locally_owned_size()),
+        ArrayView<Number, MemorySpace::Host>(import_data.values_sm_ptr.get(),
+                                             partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::Host>(
+          data.values_sm_ptr.get() + partitioner->locally_owned_size(),
+          partitioner->n_ghost_indices()),
+        update_ghost_values_requests);
+#    else
       partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
         communication_channel,
         ArrayView<const Number, MemorySpace::Host>(
@@ -1480,20 +1482,20 @@ namespace LinearAlgebra
           data.data() + partitioner->locally_owned_size(),
           partitioner->n_ghost_indices()),
         update_ghost_values_requests);
-#endif
+#    endif
 #  else
-#    ifdef DEAL_II_WITH_KOKKOS_BACKEND 
-        partitioner->export_to_ghosted_array_start<Number, MemorySpace::CUDA>(
-  	  communication_channel,
-	  ArrayView<const Number, MemorySpace::CUDA>(
-  	    data.data(), partitioner->locally_owned_size()),
-	  ArrayView<Number, MemorySpace::CUDA>(import_data.data(),
-        	 	                       partitioner->n_import_indices()),
-	  ArrayView<Number, MemorySpace::CUDA>(
-	    data.data() + partitioner->locally_owned_size(),
-	    partitioner->n_ghost_indices()),
-	  update_ghost_values_requests); 
-#else
+#    ifdef DEAL_II_WITH_KOKKOS_BACKEND
+      partitioner->export_to_ghosted_array_start<Number, MemorySpace::CUDA>(
+        communication_channel,
+        ArrayView<const Number, MemorySpace::CUDA>(
+          data.data(), partitioner->locally_owned_size()),
+        ArrayView<Number, MemorySpace::CUDA>(import_data.data(),
+                                             partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::CUDA>(
+          data.data() + partitioner->locally_owned_size(),
+          partitioner->n_ghost_indices()),
+        update_ghost_values_requests);
+#    else
       partitioner->export_to_ghosted_array_start<Number, MemorySpace::CUDA>(
         communication_channel,
         ArrayView<const Number, MemorySpace::CUDA>(
@@ -1504,7 +1506,7 @@ namespace LinearAlgebra
           data.values_dev.get() + partitioner->locally_owned_size(),
           partitioner->n_ghost_indices()),
         update_ghost_values_requests);
-#endif
+#    endif
 #  endif
 
 #else
@@ -1531,33 +1533,33 @@ namespace LinearAlgebra
 
 #  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
         defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
-#    ifdef DEAL_II_WITH_KOKKOS_BACKEND   
+#    ifdef DEAL_II_WITH_KOKKOS_BACKEND
           partitioner->export_to_ghosted_array_finish(
-	    ArrayView<Number, MemorySpace::Host>(
-  	      data.values_sm_ptr.get() + partitioner->locally_owned_size(),
-	      partitioner->n_ghost_indices()),
-	    update_ghost_values_requests); 
-#else
+            ArrayView<Number, MemorySpace::Host>(
+              data.values_sm_ptr.get() + partitioner->locally_owned_size(),
+              partitioner->n_ghost_indices()),
+            update_ghost_values_requests);
+#    else
           partitioner->export_to_ghosted_array_finish(
             ArrayView<Number, MemorySpace::Host>(
               data.data() + partitioner->locally_owned_size(),
               partitioner->n_ghost_indices()),
             update_ghost_values_requests);
-#endif
+#    endif
 #  else
-#    ifdef DEAL_II_WITH_KOKKOS_BACKEND   
+#    ifdef DEAL_II_WITH_KOKKOS_BACKEND
           partitioner->export_to_ghosted_array_finish(
-  	    ArrayView<Number, MemorySpace::CUDA>(
-  	      data.data() + partitioner->locally_owned_size(),
-	      partitioner->n_ghost_indices()),
-	    update_ghost_values_requests);   
-#else
+            ArrayView<Number, MemorySpace::CUDA>(
+              data.data() + partitioner->locally_owned_size(),
+              partitioner->n_ghost_indices()),
+            update_ghost_values_requests);
+#    else
           partitioner->export_to_ghosted_array_finish(
             ArrayView<Number, MemorySpace::CUDA>(
               data.values_dev.get() + partitioner->locally_owned_size(),
               partitioner->n_ghost_indices()),
             update_ghost_values_requests);
-#endif
+#    endif
 #  endif
         }
 
@@ -1610,8 +1612,8 @@ namespace LinearAlgebra
       std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
       if (communication_pattern.get() == nullptr)
         {
-          // Split the IndexSet of V in locally owned elements and ghost indices
-          // then create the communication pattern
+          // Split the IndexSet of V in locally owned elements and ghost
+          // indices then create the communication pattern
           IndexSet locally_owned_elem = locally_owned_elements();
           IndexSet ghost_indices      = V.get_stored_elements();
           ghost_indices.subtract_set(locally_owned_elem);
@@ -2426,8 +2428,8 @@ namespace LinearAlgebra
         out.setf(std::ios::fixed, std::ios::floatfield);
 
         // to make the vector write out all the information in order, use as
-        // many barriers as there are processors and start writing when it's our
-        // turn
+        // many barriers as there are processors and start writing when it's
+        // our turn
 #ifdef DEAL_II_WITH_MPI
       if (partitioner->n_mpi_processes() > 1)
         for (unsigned int i = 0; i < partitioner->this_mpi_process(); ++i)
