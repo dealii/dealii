@@ -52,9 +52,8 @@ class PreconditionIdentity;
  * solution vector must be passed as template argument, and defaults to
  * dealii::Vector<double>.
  *
- * @note This version of CG is taken from D. Braess's book "Finite Elements".
- * It requires a symmetric preconditioner (i.e., for example, SOR is not a
- * possible choice).
+ * @note The CG method requires a symmetric preconditioner (i.e., for example,
+ * SOR is not a possible choice).
  *
  *
  * <h3>Eigenvalue computation</h3>
@@ -322,19 +321,22 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
 {
   using number = typename VectorType::value_type;
 
-  SolverControl::State conv = SolverControl::iterate;
+  SolverControl::State solver_state = SolverControl::iterate;
 
   LogStream::Prefix prefix("cg");
 
   // Memory allocation
-  typename VectorMemory<VectorType>::Pointer g_pointer(this->memory);
-  typename VectorMemory<VectorType>::Pointer d_pointer(this->memory);
-  typename VectorMemory<VectorType>::Pointer h_pointer(this->memory);
+  typename VectorMemory<VectorType>::Pointer r_pointer(this->memory);
+  typename VectorMemory<VectorType>::Pointer p_pointer(this->memory);
+  typename VectorMemory<VectorType>::Pointer v_pointer(this->memory);
 
-  // define some aliases for simpler access
-  VectorType &g = *g_pointer;
-  VectorType &d = *d_pointer;
-  VectorType &h = *h_pointer;
+  // Define some aliases for simpler access, using the variables 'r' for the
+  // residual b - A*x, 'p' for the search direction, and 'v' for the auxiliary
+  // vector. This naming convention is used e.g. by the description on
+  // https://en.wikipedia.org/wiki/Conjugate_gradient_method
+  VectorType &r = *r_pointer;
+  VectorType &p = *p_pointer;
+  VectorType &v = *v_pointer;
 
   // Should we build the matrix for eigenvalue computations?
   const bool do_eigenvalues =
@@ -349,82 +351,68 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
 
   // resize the vectors, but do not set the values since they'd be overwritten
   // soon anyway.
-  g.reinit(x, true);
-  d.reinit(x, true);
-  h.reinit(x, true);
+  r.reinit(x, true);
+  p.reinit(x, true);
+  v.reinit(x, true);
 
-  int    it        = 0;
-  number gh        = number();
-  number beta      = number();
-  number alpha     = number();
-  number old_alpha = number();
+  int    it                         = 0;
+  number r_dot_preconditioner_dot_r = number();
+  number beta                       = number();
+  number alpha                      = number();
 
   // compute residual. if vector is zero, then short-circuit the full
   // computation
   if (!x.all_zero())
     {
-      A.vmult(g, x);
-      g.add(-1., b);
+      A.vmult(r, x);
+      r.sadd(-1., 1., b);
     }
   else
-    g.equ(-1., b);
+    r.equ(1., b);
 
-  double res = g.l2_norm();
-  conv       = this->iteration_status(0, res, x);
-  if (conv != SolverControl::iterate)
+  double residual_norm = r.l2_norm();
+  solver_state         = this->iteration_status(0, residual_norm, x);
+  if (solver_state != SolverControl::iterate)
     return;
 
-  while (conv == SolverControl::iterate)
+  while (solver_state == SolverControl::iterate)
     {
       it++;
-      old_alpha = alpha;
+      const number old_alpha                      = alpha;
+      const number old_r_dot_preconditioner_dot_r = r_dot_preconditioner_dot_r;
+
+      if (std::is_same<PreconditionerType, PreconditionIdentity>::value ==
+          false)
+        {
+          preconditioner.vmult(v, r);
+          r_dot_preconditioner_dot_r = r * v;
+        }
+      else
+        r_dot_preconditioner_dot_r = residual_norm * residual_norm;
+
+      const VectorType &direction =
+        std::is_same<PreconditionerType, PreconditionIdentity>::value ? r : v;
 
       if (it > 1)
         {
-          if (std::is_same<PreconditionerType, PreconditionIdentity>::value ==
-              false)
-            {
-              preconditioner.vmult(h, g);
-              beta = gh;
-              Assert(std::abs(beta) != 0., ExcDivideByZero());
-              gh   = g * h;
-              beta = gh / beta;
-              d.sadd(beta, -1., h);
-            }
-          else
-            {
-              beta = gh;
-              gh   = res * res;
-              beta = gh / beta;
-              d.sadd(beta, -1., g);
-            }
+          Assert(std::abs(old_r_dot_preconditioner_dot_r) != 0.,
+                 ExcDivideByZero());
+          beta = r_dot_preconditioner_dot_r / old_r_dot_preconditioner_dot_r;
+          p.sadd(beta, 1., direction);
         }
       else
-        {
-          if (std::is_same<PreconditionerType, PreconditionIdentity>::value ==
-              false)
-            {
-              preconditioner.vmult(h, g);
-              d.equ(-1., h);
-              gh = g * h;
-            }
-          else
-            {
-              d.equ(-1., g);
-              gh = res * res;
-            }
-        }
+        p.equ(1., direction);
 
-      A.vmult(h, d);
+      A.vmult(v, p);
 
-      alpha = d * h;
-      Assert(std::abs(alpha) != 0., ExcDivideByZero());
-      alpha = gh / alpha;
+      const number p_dot_A_dot_p = p * v;
+      Assert(std::abs(p_dot_A_dot_p) != 0., ExcDivideByZero());
+      alpha = r_dot_preconditioner_dot_r / p_dot_A_dot_p;
 
-      x.add(alpha, d);
-      res = std::sqrt(std::abs(g.add_and_dot(alpha, h, g)));
+      x.add(alpha, p);
+      residual_norm = std::sqrt(std::abs(r.add_and_dot(-alpha, v, r)));
 
-      print_vectors(it, x, g, d);
+      print_vectors(it, x, r, p);
 
       if (it > 1)
         {
@@ -443,7 +431,7 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
                                 all_condition_numbers_signal);
         }
 
-      conv = this->iteration_status(it, res, x);
+      solver_state = this->iteration_status(it, residual_norm, x);
     }
 
   compute_eigs_and_cond(diagonal,
@@ -451,10 +439,8 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
                         eigenvalues_signal,
                         condition_number_signal);
 
-  // in case of failure: throw exception
-  if (conv != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence(it, res));
-  // otherwise exit as normal
+  AssertThrow(solver_state == SolverControl::success,
+              SolverControl::NoConvergence(it, residual_norm));
 }
 
 
