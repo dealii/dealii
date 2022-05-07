@@ -1710,7 +1710,7 @@ public:
    * indicating a boundary face.
    */
   types::boundary_id
-  get_boundary_id(const unsigned int macro_face) const;
+  get_boundary_id(const unsigned int face_batch_index) const;
 
   /**
    * Return the boundary ids for the faces within a cell, using the cells'
@@ -1898,7 +1898,7 @@ public:
    * faces.
    */
   std::pair<unsigned int, unsigned int>
-  get_face_category(const unsigned int macro_face) const;
+  get_face_category(const unsigned int face_batch_index) const;
 
   /**
    * Queries whether or not the indexation has been set.
@@ -2388,14 +2388,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_ghost_inner_face_batches() const
 template <int dim, typename Number, typename VectorizedArrayType>
 inline types::boundary_id
 MatrixFree<dim, Number, VectorizedArrayType>::get_boundary_id(
-  const unsigned int macro_face) const
+  const unsigned int face_batch_index) const
 {
-  Assert(macro_face >= task_info.boundary_partition_data[0] &&
-           macro_face < task_info.boundary_partition_data.back(),
-         ExcIndexRange(macro_face,
+  Assert(face_batch_index >= task_info.boundary_partition_data[0] &&
+           face_batch_index < task_info.boundary_partition_data.back(),
+         ExcIndexRange(face_batch_index,
                        task_info.boundary_partition_data[0],
                        task_info.boundary_partition_data.back()));
-  return types::boundary_id(face_info.faces[macro_face].exterior_face_no);
+  return types::boundary_id(face_info.faces[face_batch_index].exterior_face_no);
 }
 
 
@@ -2734,10 +2734,10 @@ template <int dim, typename Number, typename VectorizedArrayType>
 inline const internal::MatrixFreeFunctions::FaceToCellTopology<
   VectorizedArrayType::size()> &
 MatrixFree<dim, Number, VectorizedArrayType>::get_face_info(
-  const unsigned int macro_face) const
+  const unsigned int face_batch_index) const
 {
-  AssertIndexRange(macro_face, face_info.faces.size());
-  return face_info.faces[macro_face];
+  AssertIndexRange(face_batch_index, face_info.faces.size());
+  return face_info.faces[face_batch_index];
 }
 
 
@@ -2798,31 +2798,33 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_category(
 template <int dim, typename Number, typename VectorizedArrayType>
 inline std::pair<unsigned int, unsigned int>
 MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
-  const unsigned int macro_face) const
+  const unsigned int face_batch_index) const
 {
-  AssertIndexRange(macro_face, face_info.faces.size());
+  AssertIndexRange(face_batch_index, face_info.faces.size());
   if (dof_info[0].cell_active_fe_index.empty())
     return std::make_pair(0U, 0U);
 
   std::pair<unsigned int, unsigned int> result;
-  for (unsigned int v = 0; v < VectorizedArrayType::size() &&
-                           face_info.faces[macro_face].cells_interior[v] !=
-                             numbers::invalid_unsigned_int;
+  for (unsigned int v = 0;
+       v < VectorizedArrayType::size() &&
+       face_info.faces[face_batch_index].cells_interior[v] !=
+         numbers::invalid_unsigned_int;
        ++v)
     result.first = std::max(
       result.first,
-      dof_info[0]
-        .cell_active_fe_index[face_info.faces[macro_face].cells_interior[v]]);
-  if (face_info.faces[macro_face].cells_exterior[0] !=
+      dof_info[0].cell_active_fe_index[face_info.faces[face_batch_index]
+                                         .cells_interior[v]]);
+  if (face_info.faces[face_batch_index].cells_exterior[0] !=
       numbers::invalid_unsigned_int)
-    for (unsigned int v = 0; v < VectorizedArrayType::size() &&
-                             face_info.faces[macro_face].cells_exterior[v] !=
-                               numbers::invalid_unsigned_int;
+    for (unsigned int v = 0;
+         v < VectorizedArrayType::size() &&
+         face_info.faces[face_batch_index].cells_exterior[v] !=
+           numbers::invalid_unsigned_int;
          ++v)
       result.second = std::max(
         result.first,
-        dof_info[0]
-          .cell_active_fe_index[face_info.faces[macro_face].cells_exterior[v]]);
+        dof_info[0].cell_active_fe_index[face_info.faces[face_batch_index]
+                                           .cells_exterior[v]]);
   else
     result.second = numbers::invalid_unsigned_int;
   return result;
