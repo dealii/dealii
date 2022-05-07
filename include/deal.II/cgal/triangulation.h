@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/cgal/utilities.h>
@@ -25,7 +26,9 @@
 #ifdef DEAL_II_WITH_CGAL
 #  include <boost/hana.hpp>
 
+#  include <CGAL/Polyhedron_3.h>
 #  include <CGAL/Surface_mesh.h>
+#  include <CGAL/Triangulation_2.h>
 #  include <CGAL/Triangulation_3.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -103,6 +106,24 @@ namespace CGALWrappers
   cgal_triangulation_to_dealii_triangulation(
     const CGALTriangulation &     cgal_triangulation,
     Triangulation<dim, spacedim> &dealii_triangulation);
+
+  /**
+   * Construct a deal.II surface triangulation starting from a
+   * CGAL::Surface_mesh or a CGAL::Polyhedron_3.
+   *
+   * These types can both represent a polyhedral surface made of general
+   * polygons. Deal.II only supports triangle or quadrilateral triangulations,
+   * and this function will throw an exception if the input surface mesh
+   * contains polygonal faces with more than 4 vertices per face.
+   *
+   * @tparam CGAL_MeshType
+   * @param cgal_mesh
+   * @param triangulation
+   */
+  template <typename CGAL_MeshType>
+  void
+  cgal_surface_mesh_to_dealii_triangulation(const CGAL_MeshType &cgal_mesh,
+                                            Triangulation<2, 3> &triangulation);
 
 
 
@@ -249,6 +270,123 @@ namespace CGALWrappers
           }
       }
     dealii_triangulation.create_triangulation(vertices, cells, subcell_data);
+  }
+
+
+
+  template <typename CGAL_MeshType>
+  void
+  cgal_surface_mesh_to_dealii_triangulation(const CGAL_MeshType &cgal_mesh,
+                                            Triangulation<2, 3> &triangulation)
+  {
+    Assert(triangulation.n_cells() == 0,
+           ExcMessage(
+             "Triangulation must be empty upon calling this function."));
+
+    auto is_surface_mesh =
+      boost::hana::is_valid([](auto &&obj) -> decltype(obj.faces()) {});
+
+    auto is_polyhedral =
+      boost::hana::is_valid([](auto &&obj) -> decltype(obj.facets_begin()) {});
+
+    // Collect Vertices and cells
+    std::vector<dealii::Point<3>> vertices;
+    std::vector<CellData<2>>      cells;
+    SubCellData                   subcell_data;
+
+    // Different loops for Polyhedron or Surface_mesh types
+    if constexpr (decltype(is_surface_mesh(cgal_mesh)){})
+      {
+        AssertThrow(cgal_mesh.num_vertices() > 0,
+                    ExcMessage("CGAL surface mesh is empty."));
+        vertices.reserve(cgal_mesh.num_vertices());
+        std::map<typename CGAL_MeshType::Vertex_index, unsigned int> vertex_map;
+        {
+          unsigned int i = 0;
+          for (const auto &v : cgal_mesh.vertices())
+            {
+              vertices.emplace_back(CGALWrappers::cgal_point_to_dealii_point<3>(
+                cgal_mesh.point(v)));
+              vertex_map[v] = i++;
+            }
+        }
+
+        // Collect CellData
+        for (const auto &face : cgal_mesh.faces())
+          {
+            const auto face_vertices =
+              CGAL::vertices_around_face(cgal_mesh.halfedge(face), cgal_mesh);
+
+            AssertThrow(face_vertices.size() == 3 || face_vertices.size() == 4,
+                        ExcMessage("Only triangle or quadrilateral surface "
+                                   "meshes are supported in deal.II"));
+
+            CellData<2> c(face_vertices.size());
+            auto        it_vertex = c.vertices.begin();
+            for (const auto &v : face_vertices)
+              {
+                *(it_vertex++) = vertex_map[v];
+              }
+
+            if (face_vertices.size() == 4)
+              std::swap(c.vertices[3], c.vertices[2]);
+
+            cells.emplace_back(c);
+          }
+      }
+    else if constexpr (decltype(is_polyhedral(cgal_mesh)){})
+      {
+        AssertThrow(cgal_mesh.size_of_vertices() > 0,
+                    ExcMessage("CGAL surface mesh is empty."));
+        vertices.reserve(cgal_mesh.size_of_vertices());
+        std::map<decltype(cgal_mesh.vertices_begin()), unsigned int> vertex_map;
+        {
+          unsigned int i = 0;
+          for (auto it = cgal_mesh.vertices_begin();
+               it != cgal_mesh.vertices_end();
+               ++it)
+            {
+              vertices.emplace_back(
+                CGALWrappers::cgal_point_to_dealii_point<3>(it->point()));
+              vertex_map[it] = i++;
+            }
+        }
+
+        // Loop over faces of Polyhedron, fill CellData
+        for (auto face = cgal_mesh.facets_begin();
+             face != cgal_mesh.facets_end();
+             ++face)
+          {
+            auto               j                 = face->facet_begin();
+            const unsigned int vertices_per_face = CGAL::circulator_size(j);
+            AssertThrow(vertices_per_face == 3 || vertices_per_face == 4,
+                        ExcMessage("Only triangle or quadrilateral surface "
+                                   "meshes are supported in deal.II. You "
+                                   "tried to read a mesh where a face has " +
+                                   std::to_string(vertices_per_face) +
+                                   " vertices per face."));
+
+            CellData<2> c(vertices_per_face);
+            auto        it = c.vertices.begin();
+            for (unsigned int i = 0; i < vertices_per_face; ++i)
+              {
+                *(it++) = vertex_map[j->vertex()];
+                ++j;
+              }
+
+            if (vertices_per_face == 4)
+              std::swap(c.vertices[3], c.vertices[2]);
+
+            cells.emplace_back(c);
+          }
+      }
+    else
+      {
+        AssertThrow(false,
+                    ExcInternalError(
+                      "Unsupported CGAL surface triangulation type."));
+      }
+    triangulation.create_triangulation(vertices, cells, subcell_data);
   }
 #  endif
 } // namespace CGALWrappers
