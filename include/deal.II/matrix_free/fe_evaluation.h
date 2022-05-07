@@ -6599,6 +6599,19 @@ FEEvaluation<dim,
   (void)dof_no;
   (void)first_selected_component;
 
+  Assert(
+    this->data->dofs_per_component_on_cell > 0,
+    ExcMessage(
+      "There is nothing useful you can do with an FEEvaluation object with "
+      "FE_Nothing, i.e., without DoFs! If you have passed to "
+      "MatrixFree::reinit() a collection of finite elements also containing "
+      "FE_Nothing, please check - before creating FEEvaluation - the category "
+      "of the current range by calling either "
+      "MatrixFree::get_cell_range_category(range) or "
+      "MatrixFree::get_face_range_category(range). The returned category "
+      "is the index of the active FE, which you can use to exclude "
+      "FE_Nothing."));
+
 #  ifdef DEBUG
   // print error message when the dimensions do not match. Propose a possible
   // fix
