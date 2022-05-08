@@ -160,60 +160,65 @@ namespace VectorTools
           dof_values_system.reserve(
             dof.get_fe_collection().max_dofs_per_face());
 
-          // TODO: get support for each face -> PR #10764
-          const unsigned int face_no = 0;
-
           // before we start with the loop over all cells create an hp::FEValues
           // object that holds the interpolation points of all finite elements
           // that may ever be in use
           const dealii::hp::FECollection<dim, spacedim> &finite_elements =
             dof.get_fe_collection();
-          dealii::hp::QCollection<dim - 1> q_collection;
+          std::vector<dealii::hp::QCollection<dim - 1>> q_collection(
+            finite_elements.size());
           for (unsigned int f = 0; f < finite_elements.size(); ++f)
-            {
-              const FiniteElement<dim, spacedim> &fe = finite_elements[f];
+            for (unsigned int face_no = 0;
+                 face_no < (finite_elements[f].n_unique_faces() == 1 ?
+                              1 :
+                              finite_elements[f].reference_cell().n_faces());
+                 ++face_no)
+              {
+                const FiniteElement<dim, spacedim> &fe = finite_elements[f];
 
-              // generate a quadrature rule on the face from the unit support
-              // points. this will be used to obtain the quadrature points on
-              // the real cell's face
-              //
-              // to do this, we check whether the FE has support points on the
-              // face at all:
-              if (fe.has_face_support_points(face_no))
-                q_collection.push_back(Quadrature<dim - 1>(
-                  fe.get_unit_face_support_points(face_no)));
-              else
-                {
-                  // if not, then we should try a more clever way. the idea is
-                  // that a finite element may not offer support points for all
-                  // its shape functions, but maybe only some. if it offers
-                  // support points for the components we are interested in in
-                  // this function, then that's fine. if not, the function we
-                  // call in the finite element will raise an exception. the
-                  // support points for the other shape functions are left
-                  // uninitialized (well, initialized by the default
-                  // constructor), since we don't need them anyway.
-                  //
-                  // As a detour, we must make sure we only query
-                  // face_system_to_component_index if the index corresponds to
-                  // a primitive shape function. since we know that all the
-                  // components we are interested in are primitive (by the above
-                  // check), we can safely put such a check in front
-                  std::vector<Point<dim - 1>> unit_support_points(
-                    fe.n_dofs_per_face(face_no));
+                // generate a quadrature rule on the face from the unit support
+                // points. this will be used to obtain the quadrature points on
+                // the real cell's face
+                //
+                // to do this, we check whether the FE has support points on the
+                // face at all:
+                if (fe.has_face_support_points(face_no))
+                  q_collection[f].push_back(Quadrature<dim - 1>(
+                    fe.get_unit_face_support_points(face_no)));
+                else
+                  {
+                    // if not, then we should try a more clever way. the idea is
+                    // that a finite element may not offer support points for
+                    // all its shape functions, but maybe only some. if it
+                    // offers support points for the components we are
+                    // interested in in this function, then that's fine. if not,
+                    // the function we call in the finite element will raise an
+                    // exception. the support points for the other shape
+                    // functions are left uninitialized (well, initialized by
+                    // the default constructor), since we don't need them
+                    // anyway.
+                    //
+                    // As a detour, we must make sure we only query
+                    // face_system_to_component_index if the index corresponds
+                    // to a primitive shape function. since we know that all the
+                    // components we are interested in are primitive (by the
+                    // above check), we can safely put such a check in front
+                    std::vector<Point<dim - 1>> unit_support_points(
+                      fe.n_dofs_per_face(face_no));
 
-                  for (unsigned int i = 0; i < fe.n_dofs_per_face(face_no); ++i)
-                    if (fe.is_primitive(fe.face_to_cell_index(i, face_no)))
-                      if (component_mask[fe.face_system_to_component_index(
-                                             i, face_no)
-                                           .first] == true)
-                        unit_support_points[i] =
-                          fe.unit_face_support_point(i, face_no);
+                    for (unsigned int i = 0; i < fe.n_dofs_per_face(face_no);
+                         ++i)
+                      if (fe.is_primitive(fe.face_to_cell_index(i, face_no)))
+                        if (component_mask[fe.face_system_to_component_index(
+                                               i, face_no)
+                                             .first] == true)
+                          unit_support_points[i] =
+                            fe.unit_face_support_point(i, face_no);
 
-                  q_collection.push_back(
-                    Quadrature<dim - 1>(unit_support_points));
-                }
-            }
+                    q_collection[f].push_back(
+                      Quadrature<dim - 1>(unit_support_points));
+                  }
+              }
           // now that we have a q_collection object with all the right
           // quadrature points, create an hp::FEFaceValues object that we can
           // use to evaluate the boundary values at
@@ -283,16 +288,9 @@ namespace VectorTools
 
                       if (fe_is_system)
                         {
-                          // resize array. avoid construction of a memory
-                          // allocating temporary if possible
-                          if (dof_values_system.size() <
-                              fe.n_dofs_per_face(face_no))
-                            dof_values_system.resize(
-                              fe.n_dofs_per_face(face_no),
-                              Vector<number>(fe.n_components()));
-                          else
-                            dof_values_system.resize(
-                              fe.n_dofs_per_face(face_no));
+                          dof_values_system.resize(fe.n_dofs_per_face(face_no),
+                                                   Vector<number>(
+                                                     fe.n_components()));
 
                           function_map.find(boundary_component)
                             ->second->vector_value_list(dof_locations,
