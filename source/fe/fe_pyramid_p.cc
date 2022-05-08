@@ -97,9 +97,21 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
 
   if (degree == 1)
     {
-      for (const unsigned int i : ReferenceCells::Pyramid.vertex_indices())
+      for (const auto i : this->reference_cell().vertex_indices())
         this->unit_support_points.emplace_back(
-          ReferenceCells::Pyramid.vertex<dim>(i));
+          this->reference_cell().template vertex<dim>(i));
+
+      this->unit_face_support_points.resize(this->reference_cell().n_faces());
+
+      for (const auto f : this->reference_cell().face_indices())
+        {
+          const auto face_reference_cell =
+            this->reference_cell().face_reference_cell(f);
+
+          for (const auto i : face_reference_cell.vertex_indices())
+            this->unit_face_support_points[f].emplace_back(
+              face_reference_cell.template vertex<dim - 1>(i));
+        }
     }
   else
     Assert(false, ExcNotImplemented());

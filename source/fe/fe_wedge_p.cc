@@ -105,19 +105,36 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
 {
   AssertDimension(dim, 3);
 
-  if (degree == 1)
+  Assert(1 <= degree && degree <= 2, ExcNotImplemented());
+
+  FE_SimplexP<2> fe_triangle(degree);
+  FE_Q<1>        fe_line(degree);
+  FE_Q<2>        fe_quad(degree);
+
+  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     {
-      for (const unsigned int i : ReferenceCells::Wedge.vertex_indices())
-        this->unit_support_points.emplace_back(
-          ReferenceCells::Wedge.vertex<dim>(i));
+      const auto pair = this->degree == 1 ? internal::wedge_table_1[i] :
+                                            internal::wedge_table_2[i];
+
+      this->unit_support_points.emplace_back(
+        fe_triangle.get_unit_support_points()[pair[0]][0],
+        fe_triangle.get_unit_support_points()[pair[0]][1],
+        fe_line.get_unit_support_points()[pair[1]][0]);
     }
-  else
-    {
-      // TODO: Wedge elements work for higher degrees, but we don't currently
-      // fill their support points. Leaving the array empty is valid, however,
-      // and will simply result in an error when someone tries to access the
-      // array.
-    }
+
+  this->unit_face_support_points.resize(this->reference_cell().n_faces());
+
+  for (const auto f : this->reference_cell().face_indices())
+    if (this->reference_cell().face_reference_cell(f) ==
+        ReferenceCells::Triangle)
+      for (const auto &p : fe_triangle.get_unit_support_points())
+        this->unit_face_support_points[f].emplace_back(p[0], p[1]);
+    else if (this->reference_cell().face_reference_cell(f) ==
+             ReferenceCells::Quadrilateral)
+      for (const auto &p : fe_quad.get_unit_support_points())
+        this->unit_face_support_points[f].emplace_back(p[0], p[1]);
+    else
+      Assert(false, ExcInternalError());
 }
 
 
