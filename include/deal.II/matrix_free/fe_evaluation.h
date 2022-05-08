@@ -7269,6 +7269,10 @@ namespace internal
   VectorizedArrayType *
   check_vector_access_inplace(const EvaluatorType &fe_eval, VectorType &vector)
   {
+    // for user-defined cell batches this functionality is not supported
+    if (fe_eval.get_current_cell_index() == numbers::invalid_unsigned_int)
+      return nullptr;
+
     const unsigned int cell     = fe_eval.get_cell_or_face_batch_id();
     const auto &       dof_info = fe_eval.get_dof_info();
 
