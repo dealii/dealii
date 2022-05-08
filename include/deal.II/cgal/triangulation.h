@@ -18,15 +18,15 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/grid/tria.h>
-
-#include <deal.II/cgal/utilities.h>
-
 #ifdef DEAL_II_WITH_CGAL
+
+#  include <deal.II/grid/tria.h>
+
 #  include <boost/hana.hpp>
 
 #  include <CGAL/Surface_mesh.h>
 #  include <CGAL/Triangulation_3.h>
+#  include <deal.II/cgal/utilities.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -95,8 +95,8 @@ namespace CGALWrappers
    * input Triangulation `dealii_triangulation`. If this is not the case, an
    * exception is thrown.
    *
-   * @param cgal_triangulation
-   * @param dealii_triangulation
+   * @param[in] cgal_triangulation The input CGAL triangulation.
+   * @param[out] dealii_triangulation The output deal.II triangulation.
    */
   template <typename CGALTriangulation, int dim, int spacedim>
   void
@@ -117,12 +117,15 @@ namespace CGALWrappers
            ExcMessage(
              "The triangulation you pass to this function should be a valid "
              "CGAL triangulation."));
-    using CGALPoint = typename CGALTriangulation::Point;
-    std::vector<CGALPoint> cgal_points(points.size());
-    std::transform(
-      points.begin(), points.end(), cgal_points.begin(), [](const auto &p) {
-        return CGALWrappers::dealii_point_to_cgal_point<CGALPoint>(p);
-      });
+
+    std::vector<typename CGALTriangulation::Point> cgal_points(points.size());
+    std::transform(points.begin(),
+                   points.end(),
+                   cgal_points.begin(),
+                   [](const auto &p) {
+                     return CGALWrappers::dealii_point_to_cgal_point<
+                       typename CGALTriangulation::Point>(p);
+                   });
 
     triangulation.insert(cgal_points.begin(), cgal_points.end());
     Assert(triangulation.is_valid(),
@@ -149,19 +152,18 @@ namespace CGALWrappers
     Assert(dealii_triangulation.n_cells() == 0,
            ExcMessage("The output triangulation object needs to be empty."));
 
-    const auto nv = cgal_triangulation.number_of_vertices();
-
-    // Deal.II storage data structures
-    std::vector<Point<spacedim>> vertices(nv);
-    std::vector<CellData<dim>>   cells;
-    SubCellData                  subcell_data;
+    // deal.II storage data structures
+    std::vector<Point<spacedim>> vertices(
+      cgal_triangulation.number_of_vertices());
+    std::vector<CellData<dim>> cells;
+    SubCellData                subcell_data;
 
     // CGAL storage data structures
     std::map<typename CGALTriangulation::Vertex_handle, unsigned int>
       vertex_map;
     {
       unsigned int i = 0;
-      for (auto v : cgal_triangulation.finite_vertex_handles())
+      for (const auto &v : cgal_triangulation.finite_vertex_handles())
         {
           vertices[i] =
             CGALWrappers::cgal_point_to_dealii_point<spacedim>(v->point());
@@ -169,10 +171,10 @@ namespace CGALWrappers
         }
     }
 
-    auto has_faces = boost::hana::is_valid(
+    const auto has_faces = boost::hana::is_valid(
       [](auto &&obj) -> decltype(obj.finite_face_handles()) {});
 
-    auto has_cells = boost::hana::is_valid(
+    const auto has_cells = boost::hana::is_valid(
       [](auto &&obj) -> decltype(obj.finite_cell_handles()) {});
 
     // Different loops for Triangulation_2 and Triangulation_3 types.
@@ -180,23 +182,32 @@ namespace CGALWrappers
       {
         // This is a non-degenerate Triangulation_2
         if (cgal_triangulation.dimension() == 2)
-          for (const auto f : cgal_triangulation.finite_face_handles())
+          for (const auto &f : cgal_triangulation.finite_face_handles())
             {
-              CellData<dim> cell(3);
-              for (unsigned int i = 0; i < 3; ++i)
+              CellData<dim> cell(ReferenceCells::Triangle.n_vertices());
+              for (unsigned int i = 0;
+                   i < ReferenceCells::Triangle.n_vertices();
+                   ++i)
                 cell.vertices[i] = vertex_map[f->vertex(i)];
               cells.push_back(cell);
             }
         else if (cgal_triangulation.dimension() == 1)
           // This is a degenerate Triangulation_2, made of edges
-          for (const auto e : cgal_triangulation.finite_edges())
+          for (const auto &e : cgal_triangulation.finite_edges())
             {
               // An edge is idenfied by a face and a vertex index in the face
               const auto &  f = e.first;
               const auto &  i = e.second;
-              CellData<dim> cell(2);
+              CellData<dim> cell(ReferenceCells::Line.n_vertices());
               unsigned int  id = 0;
-              for (unsigned int j = 0; j < 3; ++j)
+              // Since an edge is identified by a face (a triangle) and the
+              // index of the opposite vertex to the edge, we can use this logic
+              // to infer the indices of the vertices of the edge: loop over all
+              // vertices, and keep only those that are not the opposite vertex
+              // of the edge.
+              for (unsigned int j = 0;
+                   j < ReferenceCells::Triangle.n_vertices();
+                   ++j)
                 if (j != i)
                   cell.vertices[id++] = vertex_map[f->vertex(j)];
               cells.push_back(cell);
@@ -210,35 +221,44 @@ namespace CGALWrappers
       {
         // This is a non-degenerate Triangulation_3
         if (cgal_triangulation.dimension() == 3)
-          for (const auto c : cgal_triangulation.finite_cell_handles())
+          for (const auto &c : cgal_triangulation.finite_cell_handles())
             {
-              CellData<dim> cell(4);
-              for (unsigned int i = 0; i < 4; ++i)
+              CellData<dim> cell(ReferenceCells::Tetrahedron.n_vertices());
+              for (unsigned int i = 0;
+                   i < ReferenceCells::Tetrahedron.n_vertices();
+                   ++i)
                 cell.vertices[i] = vertex_map[c->vertex(i)];
               cells.push_back(cell);
             }
         else if (cgal_triangulation.dimension() == 2)
           // This is a degenerate Triangulation_3, made of triangles
-          for (const auto facet : cgal_triangulation.finite_facets())
+          for (const auto &facet : cgal_triangulation.finite_facets())
             {
               // A facet is idenfied by a cell and the opposite vertex index in
               // the face
               const auto &  c = facet.first;
               const auto &  i = facet.second;
-              CellData<dim> cell(3);
+              CellData<dim> cell(ReferenceCells::Triangle.n_vertices());
               unsigned int  id = 0;
-              for (unsigned int j = 0; j < 4; ++j)
+              // Since a face is identified by a cell (a tetrahedron) and the
+              // index of the opposite vertex to the face, we can use this logic
+              // to infer the indices of the vertices of the face: loop over all
+              // vertices, and keep only those that are not the opposite vertex
+              // of the face.
+              for (unsigned int j = 0;
+                   j < ReferenceCells::Tetrahedron.n_vertices();
+                   ++j)
                 if (j != i)
                   cell.vertices[id++] = vertex_map[c->vertex(j)];
               cells.push_back(cell);
             }
         else if (cgal_triangulation.dimension() == 1)
           // This is a degenerate Triangulation_3, made of edges
-          for (const auto edge : cgal_triangulation.finite_edges())
+          for (const auto &edge : cgal_triangulation.finite_edges())
             {
               // An edge is idenfied by a cell and its two vertices
               const auto &[c, i, j] = edge;
-              CellData<dim> cell(2);
+              CellData<dim> cell(ReferenceCells::Line.n_vertices());
               cell.vertices[0] = vertex_map[c->vertex(i)];
               cell.vertices[1] = vertex_map[c->vertex(j)];
               cells.push_back(cell);
