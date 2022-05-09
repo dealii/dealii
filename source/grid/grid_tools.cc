@@ -485,7 +485,7 @@ namespace GridTools
         face_cell_data.boundary_id = face->boundary_id();
         face_cell_data.manifold_id = face->manifold_id();
 
-        face_data.insert(face_cell_data);
+        face_data.insert(std::move(face_cell_data));
       }
 
       /**
@@ -596,7 +596,7 @@ namespace GridTools
 
                     line_cell_data.boundary_id = line->boundary_id();
                     line_cell_data.manifold_id = line->manifold_id();
-                    line_data.insert(line_cell_data);
+                    line_data.insert(std::move(line_cell_data));
                   }
               }
           }
