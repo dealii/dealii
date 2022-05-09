@@ -1,0 +1,10 @@
+Changed: The class MappingQ now applies a high-order mapping to a cells in the
+mesh, not just the ones touching the boundary. This makes the class completely
+equivalent to the previous class MappingQGeneric. All functionality in the
+latter class has been integrated into the MappingQ class. This avoids errors
+with curved manifolds in the interior of the domain, where MappingQ could lead
+to gaps or overlaps in the computational domain. In case the slightly better
+performance of using MappingQ1 in interior cells is desired,
+hp::MappingCollection can be used to replicate the old behavior.
+<br>
+(Martin Kronbichler, 2021/07/10)
