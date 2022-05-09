@@ -853,20 +853,20 @@ namespace PETScWrappers
   /* ----------------- PreconditionBDDC -------------------- */
 
   PreconditionBDDC::AdditionalData::AdditionalData(
-    const bool                    use_vertices_,
-    const bool                    use_edges_,
-    const bool                    use_faces_,
-    const bool                    symmetric_,
-    const unsigned int            coords_cdim_,
-    const types::global_dof_index coords_n_,
-    const PetscReal *             coords_data_)
+    const bool                    use_vertices,
+    const bool                    use_edges,
+    const bool                    use_faces,
+    const bool                    symmetric,
+    const unsigned int            coords_cdim,
+    const types::global_dof_index coords_n,
+    const PetscReal *             coords_data)
     : use_vertices(use_vertices)
-    , use_edges(use_edges_)
-    , use_faces(use_faces_)
-    , symmetric(symmetric_)
-    , coords_cdim(coords_cdim_)
-    , coords_n(coords_n_)
-    , coords_data(coords_data_)
+    , use_edges(use_edges)
+    , use_faces(use_faces)
+    , symmetric(symmetric)
+    , coords_cdim(coords_cdim)
+    , coords_n(coords_n)
+    , coords_data(coords_data)
   {}
 
   PreconditionBDDC::PreconditionBDDC(const MPI_Comm        comm,

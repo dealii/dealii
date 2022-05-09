@@ -977,12 +977,12 @@ namespace PETScWrappers
        * than what is exposed here.
        */
       AdditionalData(const bool                    use_vertices = true,
-                     const bool                    use_edges_    = false,
-                     const bool                    use_faces_    = false,
-                     const bool                    symmetric_    = false,
-                     const unsigned int            coords_cdim_  = 0,
-                     const types::global_dof_index coords_n_     = 0,
-                     const PetscReal *             coords_data_  = nullptr);
+                     const bool                    use_edges    = false,
+                     const bool                    use_faces    = false,
+                     const bool                    symmetric    = false,
+                     const unsigned int            coords_cdim  = 0,
+                     const types::global_dof_index coords_n     = 0,
+                     const PetscReal *             coords_data  = nullptr);
 
       /**
        * This flag sets the use of degrees of freedom in the vertices of the
