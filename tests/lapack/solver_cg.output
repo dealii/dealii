@@ -29,7 +29,7 @@ DEAL:no-fail:cg::Condition number estimate: 53.54
 DEAL:no-fail:cg::Condition number estimate: 54.75
 DEAL:no-fail:cg::Failure step 10 value 0.1496
 DEAL:no-fail:cg::Final Eigenvalues:  0.1363 0.6565 1.499 2.357 3.131 3.994 5.392 6.576 7.464
-DEAL:no-fail::Exception: SolverControl::NoConvergence(it, residual_norm)
+DEAL:no-fail::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:no:cg::Starting value 11.00
 DEAL:no:cg::Condition number estimate: 11.01
 DEAL:no:cg::Condition number estimate: 21.10
