@@ -976,7 +976,7 @@ namespace PETScWrappers
        * Constructor. Note that BDDC offers a lot more options to set
        * than what is exposed here.
        */
-      AdditionalData(const bool                    use_vertices_ = true,
+      AdditionalData(const bool                    use_vertices = true,
                      const bool                    use_edges_    = false,
                      const bool                    use_faces_    = false,
                      const bool                    symmetric_    = false,
