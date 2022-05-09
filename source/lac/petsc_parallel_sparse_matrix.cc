@@ -539,7 +539,6 @@ namespace PETScWrappers
       // for the usefulness of this option
       // read the documentation of this
       // class.
-      // if (preset_nonzero_locations == true)
 
       // In the MATIS case, we use the local matrix instead
       Mat local_matrix;
