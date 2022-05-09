@@ -534,7 +534,7 @@ namespace PETScWrappers
       // key here is that we can use the
       // matrix set routines that set an
       // entire row at once, not a single
-      // entry at a time
+      // entry at a time.
       //
       // for the usefulness of this option
       // read the documentation of this
