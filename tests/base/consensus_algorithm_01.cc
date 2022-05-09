@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test ConsensusAlgorithms::AnonymousProcess.
+// Test ConsensusAlgorithms::selection().
 
 #include <deal.II/base/mpi_consensus_algorithms.h>
 
@@ -30,31 +30,26 @@ test(const MPI_Comm &comm)
   using T1 = unsigned int;
   using T2 = unsigned int;
 
-  dealii::Utilities::MPI::ConsensusAlgorithms::AnonymousProcess<T1, T2> process(
-    [&]() {
-      std::vector<unsigned int> result{(my_rank + 1) % n_rank};
-      return result;
-    },
-    [&](const unsigned int other_rank, std::vector<T1> &send_buffer) {
-      send_buffer.push_back(my_rank);
-    },
-    [&](const unsigned int &   other_rank,
-        const std::vector<T1> &buffer_recv,
-        std::vector<T2> &      request_buffer) {
-      AssertDimension(other_rank, buffer_recv.front());
-      deallog << "ConsensusAlgorithmProcess::answer_request() passed!"
-              << std::endl;
-      request_buffer.push_back(my_rank);
-    },
-    [&](const unsigned int other_rank, const std::vector<T2> &recv_buffer) {
-      AssertDimension(other_rank, recv_buffer.front());
-      deallog << "ConsensusAlgorithmProcess::function_read_answer() passed!"
-              << std::endl;
-    });
-
   const auto sources =
-    dealii::Utilities::MPI::ConsensusAlgorithms::Selector<T1, T2>(process, comm)
-      .run();
+    dealii::Utilities::MPI::ConsensusAlgorithms::selector<T1, T2>(
+      /* target_processes: */
+      std::vector<unsigned int>{(my_rank + 1) % n_rank},
+      /* create_request: */
+      [my_rank](const unsigned int) { return std::vector<T1>({my_rank}); },
+      /* answer_request: */
+      [my_rank](const unsigned int other_rank, const std::vector<T1> &request) {
+        AssertDimension(other_rank, request.front());
+        deallog << "ConsensusAlgorithmProcess::answer_request() passed!"
+                << std::endl;
+        return std::vector<T2>({my_rank});
+      },
+      /* process_answer: */
+      [](const unsigned int other_rank, const std::vector<T2> &answer) {
+        AssertDimension(other_rank, answer.front());
+        deallog << "ConsensusAlgorithmProcess::function_read_answer() passed!"
+                << std::endl;
+      },
+      comm);
 
   for (const auto &i : sources)
     deallog << i << ' ';

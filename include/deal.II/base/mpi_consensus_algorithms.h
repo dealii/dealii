@@ -29,8 +29,74 @@ namespace Utilities
   namespace MPI
   {
     /**
-     * A namespace for consensus algorithms designed for dynamic-sparse
-     * communication patterns.
+     * A namespace for algorithms that implement the task of communicating
+     * in a dynamic-sparse way. In computer science, this is often called a
+     * <a href="https://en.wikipedia.org/wiki/Consensus_algorithm">consensus
+     * problem</a>.
+     *
+     * The problem consensus algorithms are trying to solve is this: Let's
+     * say you have $P$ processes that work together via MPI. Each (or at
+     * least some) of these want to send information to some of the other
+     * processes, or request information from other processes. No process
+     * knows which other process wants to communicate with them. The challenge
+     * is to determine who needs to talk to whom and what information needs to
+     * be sent, and to come up with an algorithm that ensures that this
+     * communication happens.
+     *
+     * That this is not a trivial problem can be seen by an analogy of the
+     * postal service. There, some senders may request information from some
+     * other participants in the postal service. So they send a letter that
+     * requests the information, but the recipients do not know how many such
+     * letters they need to expect (or that they should expect any at all).
+     * They also do not know how long they need to keep checking their mailbox
+     * for incoming requests. The recipients can be considered reliable,
+     * however: We can assume that everyone who is sent a request puts a
+     * letter with the answer in the mail. This time at least the recipients
+     * of these answers know that they are waiting for these answers because
+     * they have previously sent a request. They do not know in advance,
+     * however, when the answer will arrive and how long to wait. The goal of
+     * a consensus algorithm is then to come up with a strategy in which every
+     * participant can say who they want to send requests to, what that
+     * request is, and is then guaranteed an answer. The algorithm will only
+     * return when all requests by all participants have been answered and the
+     * answer delivered to the requesters.
+     *
+     * The problem is generally posed in terms of *requests* and *answers*.
+     * In practice, either of these two may be empty messages. For example,
+     * processes may simply want to send information to others that they know
+     * these others need; in this case, the "answer" message may be empty
+     * and its meaning is simply an affirmation that the information was
+     * received. Similarly, in some cases processes simply need to inform
+     * others that they want information, but the destination process knows
+     * what information is being requested (based on where in the program
+     * the request happens) and can send that information without there be
+     * any identifying information in the request; in that case, the
+     * request message may be empty and simply serve to identify the
+     * requester. (Each message can be queried for its sender.)
+     *
+     * As mentioned in the first paragraph, the algorithms we are interested
+     * in are "dynamic-sparse":
+     * - Dynamic: By the time the algorithm is called, the other processes do
+     *   not know yet that they have to answer requests.
+     * - Sparse: Each process only has to communicate with a small subset of
+     *   processes of the MPI communicator.
+     *
+     * In order to run the communication algorithms, users of this class have
+     * to provide a number of pieces of information:
+     * - An MPI communicator.
+     * - On each process, a list of ranks of processes to communicate with.
+     * - Functionality to pack/unpack data to send as either the original
+     *   request or as part of the answer.
+     * This information is typically either provided as direct objects (for
+     * the first two of the points above), or as function objects (for the
+     * third point above). In the latter case, the function objects are often
+     * simply lambda functions declared right in the context where one wants
+     * to run a consensus algorithm; these lambda functions may then reference
+     * variables that are active at the point of declaration of the lambda
+     * function, such as variables local to the surrounding function.
+     *
+     * This namespace provides several implementations of consensus algorithms,
+     * such as the nbx(), pex(), serial(), and selector() functions.
      *
      * @ingroup MPI
      */
@@ -124,69 +190,9 @@ namespace Utilities
 
 
       /**
-       * A base class for algorithms that implement the task of coming up with
-       * communication patterns to retrieve data from other processes in a
-       * dynamic-sparse way. In computer science, this is often called a
-       * <a href="https://en.wikipedia.org/wiki/Consensus_algorithm">consensus
-       * problem</a>.
-       *
-       * The problem consensus algorithms are trying to solve is this: Let's
-       * say you have $P$ processes that work together via MPI. Each (or at
-       * least some) of these want to send information to some of the other
-       * processes, or request information from other processes. No process
-       * knows which other process wants to communicate with them. The challenge
-       * is to determine who needs to talk to whom and what information needs to
-       * be sent, and to come up with an algorithm that ensures that this
-       * communication happens.
-       *
-       * That this is not a trivial problem can be seen by an analogy of the
-       * postal service. There, some senders may request information from some
-       * other participants in the postal service. So they send a letter that
-       * requests the information, but the recipients do not know how many such
-       * letters they need to expect (or that they should expect any at all).
-       * They also do not know how long they need to keep checking their mailbox
-       * for incoming requests. The recipients can be considered reliable,
-       * however: We can assume that everyone who is sent a request puts a
-       * letter with the answer in the mail. This time at least the recipients
-       * of these answers know that they are waiting for these answers because
-       * they have previously sent a request. They do not know in advance,
-       * however, when the answer will arrive and how long to wait. The goal of
-       * a consensus algorithm is then to come up with a strategy in which every
-       * participant can say who they want to send requests to, what that
-       * request is, and is then guaranteed an answer. The algorithm will only
-       * return when all requests by all participants have been answered and the
-       * answer delivered to the requesters.
-       *
-       * The problem is generally posed in terms of *requests* and *answers*.
-       * In practice, either of these two may be empty messages. For example,
-       * processes may simply want to send information to others that they know
-       * these others need; in this case, the "answer" message may be empty
-       * and its meaning is simply an affirmation that the information was
-       * received. Similarly, in some cases processes simply need to inform
-       * others that they want information, but the destination process knows
-       * what information is being requested (based on where in the program
-       * the request happens) and can send that information without there be
-       * any identifying information in the request; in that case, the
-       * request message may be empty and simply serve to identify the
-       * requester. (Each message can be queried for its sender.)
-       *
-       * As mentioned in the first paragraph, the algorithms we are interested
-       * in are "dynamic-sparse":
-       * - Dynamic: By the time the algorithm is called, the other processes do
-       *   not know yet that they have to answer requests.
-       * - Sparse: Each process only has to communicate with a small subset of
-       *   processes of the MPI communicator.
-       *
-       * In order to run the communication algorithms, users of this class have
-       * to provide a number of pieces of information:
-       * - An MPI communicator.
-       * - On each process, a list of ranks of processes to communicate with.
-       * - Functionality to pack/unpack data to send as either the original
-       *   request or as part of the answer.
-       * This information is encoded through the `virtual` functions of classes
-       * derived from ConsensusAlgorithm::Process, and the constructor of the
-       * current class receives an object of a type derived from that class as
-       * an argument.
+       * A base class for algorithms that implement consensus algorithms,
+       * see the documentation of the surrounding namespace for more
+       * information.
        *
        * This base class only introduces a basic interface to achieve
        * these goals, while derived classes implement different algorithms
@@ -462,6 +468,34 @@ namespace Utilities
         clean_up_and_end_communication(const MPI_Comm &comm);
       };
 
+
+      /**
+       * This function implements a concrete algorithm for the
+       * consensus algorithms problem (see the documentation of the
+       * surrounding namespace), using only point-to-point
+       * communications and a single IBarrier. This algorithm is suitable
+       * for very large process counts because it does not require the
+       * allocation of arrays with size proportional to the number of processes.
+       *
+       * @note This class closely follows @cite hoefler2010scalable, but our
+       *   implementation also deals with payloads.
+       *
+       * @tparam T1 The type of the elements of the vector to be sent.
+       * @tparam T2 The type of the elements of the vector to be received.
+       */
+      template <typename T1, typename T2>
+      std::vector<unsigned int>
+      nbx(const std::vector<unsigned int> &targets,
+          const std::function<std::vector<T1>(const unsigned int)>
+            &create_request,
+          const std::function<std::vector<T2>(const unsigned int,
+                                              const std::vector<T1> &)>
+            &answer_request,
+          const std::function<void(const unsigned int, const std::vector<T2> &)>
+            &             process_answer,
+          const MPI_Comm &comm);
+
+
       /**
        * This class implements a concrete algorithm for the
        * ConsensusAlgorithms::Interface base class, using a two step approach.
@@ -611,6 +645,45 @@ namespace Utilities
 
 
       /**
+       * This function implements a concrete algorithm for the
+       * consensus algorithms problem (see the documentation of the
+       * surrounding namespace), using a two step approach.
+       * In the first step the source ranks are determined and in the second
+       * step a static sparse data exchange is performed. This algorithm is most
+       * suitable for relatively small process counts -- say, less than 100.
+       *
+       * @note In contrast to NBX, this class splits the same
+       *   task into two distinct steps. In the first step, all processes
+       *   are identified who want to send a request to this process. In the
+       *   second step, the data is exchanged. However, since - in the
+       *   second step - now it is clear how many requests have to be answered,
+       *   i.e. when this process can stop waiting for requests, no IBarrier is
+       *   needed.
+       *
+       * @note Under the hood, this function uses
+       *   Utilities::MPI::compute_point_to_point_communication_pattern()
+       *   to determine the source processes, which itself is based on the
+       *   NBX-algorithm from @cite hoefler2010scalable that is implemented
+       *   in the ConsensusAlgorithms::NBX class (a sister class to the
+       *   current one).
+       *
+       * @tparam T1 The type of the elements of the vector to be sent.
+       * @tparam T2 The type of the elements of the vector to be received.
+       */
+      template <typename T1, typename T2>
+      std::vector<unsigned int>
+      pex(const std::vector<unsigned int> &targets,
+          const std::function<std::vector<T1>(const unsigned int)>
+            &create_request,
+          const std::function<std::vector<T2>(const unsigned int,
+                                              const std::vector<T1> &)>
+            &answer_request,
+          const std::function<void(const unsigned int, const std::vector<T2> &)>
+            &             process_answer,
+          const MPI_Comm &comm);
+
+
+      /**
        * A serial fall back for the above classes to allow programming
        * independently of whether MPI is used or not.
        */
@@ -655,6 +728,30 @@ namespace Utilities
                                      const std::vector<T2> &)> &process_answer,
             const MPI_Comm &                                    comm) override;
       };
+
+
+
+      /**
+       * This function implements a concrete algorithm for the
+       * consensus algorithms problem (see the documentation of the
+       * surrounding namespace), as a fall-back option for the case
+       * where the communicator provided has only one rank (or when
+       * MPI is simply not used at all).
+       *
+       * @tparam T1 The type of the elements of the vector to be sent.
+       * @tparam T2 The type of the elements of the vector to be received.
+       */
+      template <typename T1, typename T2>
+      std::vector<unsigned int>
+      pex(const std::vector<unsigned int> &targets,
+          const std::function<std::vector<T1>(const unsigned int)>
+            &create_request,
+          const std::function<std::vector<T2>(const unsigned int,
+                                              const std::vector<T1> &)>
+            &answer_request,
+          const std::function<void(const unsigned int, const std::vector<T2> &)>
+            &             process_answer,
+          const MPI_Comm &comm);
 
 
 
@@ -722,6 +819,35 @@ namespace Utilities
         // Pointer to the actual ConsensusAlgorithms::Interface implementation.
         std::shared_ptr<Interface<T1, T2>> consensus_algo;
       };
+
+
+
+      /**
+       * This function implements a concrete algorithm for the
+       * consensus algorithms problem (see the documentation of the
+       * surrounding namespace). In particular, it delegates its work
+       * to one of the other functions in this namespace depending on the number
+       * of processes in the MPI communicator. For a small number of processes
+       * it uses pex() and for a large number of processes nbx(). The threshold
+       * depends if the program is compiled in debug or release mode, but the
+       * goal is to always use the most efficient algorithm for however many
+       * processes participate in the communication.
+       *
+       * @tparam T1 The type of the elements of the vector to be sent.
+       * @tparam T2 The type of the elements of the vector to be received.
+       */
+      template <typename T1, typename T2>
+      std::vector<unsigned int>
+      selector(
+        const std::vector<unsigned int> &targets,
+        const std::function<std::vector<T1>(const unsigned int)>
+          &create_request,
+        const std::function<std::vector<T2>(const unsigned int,
+                                            const std::vector<T1> &)>
+          &answer_request,
+        const std::function<void(const unsigned int, const std::vector<T2> &)>
+          &             process_answer,
+        const MPI_Comm &comm);
 
 
 
@@ -797,6 +923,81 @@ namespace Utilities
       };
 
 
+#ifndef DOXYGEN
+      // Implementation of the functions in this namespace.
+
+      template <typename T1, typename T2>
+      std::vector<unsigned int>
+      nbx(const std::vector<unsigned int> &targets,
+          const std::function<std::vector<T1>(const unsigned int)>
+            &create_request,
+          const std::function<std::vector<T2>(const unsigned int,
+                                              const std::vector<T1> &)>
+            &answer_request,
+          const std::function<void(const unsigned int, const std::vector<T2> &)>
+            &             process_answer,
+          const MPI_Comm &comm)
+      {
+        return NBX<T1, T2>().run(
+          targets, create_request, answer_request, process_answer, comm);
+      }
+
+
+
+      template <typename T1, typename T2>
+      std::vector<unsigned int>
+      pex(const std::vector<unsigned int> &targets,
+          const std::function<std::vector<T1>(const unsigned int)>
+            &create_request,
+          const std::function<std::vector<T2>(const unsigned int,
+                                              const std::vector<T1> &)>
+            &answer_request,
+          const std::function<void(const unsigned int, const std::vector<T2> &)>
+            &             process_answer,
+          const MPI_Comm &comm)
+      {
+        return PEX<T1, T2>().run(
+          targets, create_request, answer_request, process_answer, comm);
+      }
+
+
+
+      template <typename T1, typename T2>
+      std::vector<unsigned int>
+      serial(const std::vector<unsigned int> &targets,
+             const std::function<std::vector<T1>(const unsigned int)>
+               &create_request,
+             const std::function<std::vector<T2>(const unsigned int,
+                                                 const std::vector<T1> &)>
+               &                                                 answer_request,
+             const std::function<void(const unsigned int,
+                                      const std::vector<T2> &)> &process_answer,
+             const MPI_Comm &                                    comm)
+      {
+        return Serial<T1, T2>().run(
+          targets, create_request, answer_request, process_answer, comm);
+      }
+
+
+
+      template <typename T1, typename T2>
+      std::vector<unsigned int>
+      selector(
+        const std::vector<unsigned int> &targets,
+        const std::function<std::vector<T1>(const unsigned int)>
+          &create_request,
+        const std::function<std::vector<T2>(const unsigned int,
+                                            const std::vector<T1> &)>
+          &answer_request,
+        const std::function<void(const unsigned int, const std::vector<T2> &)>
+          &             process_answer,
+        const MPI_Comm &comm)
+      {
+        return Selector<T1, T2>().run(
+          targets, create_request, answer_request, process_answer, comm);
+      }
+
+
 
       template <typename T1, typename T2>
       AnonymousProcess<T1, T2>::AnonymousProcess(
@@ -859,6 +1060,7 @@ namespace Utilities
           function_read_answer(other_rank, recv_buffer);
       }
 
+#endif
 
 
     } // namespace ConsensusAlgorithms

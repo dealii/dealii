@@ -1177,12 +1177,11 @@ namespace FETools
         Assert(answer.size() == 0, ExcInternalError());
       };
 
-      Utilities::MPI::ConsensusAlgorithms::Selector<char, char>().run(
-        destinations,
-        create_request,
-        answer_request,
-        read_answer,
-        communicator);
+      Utilities::MPI::ConsensusAlgorithms::selector<char, char>(destinations,
+                                                                create_request,
+                                                                answer_request,
+                                                                read_answer,
+                                                                communicator);
     }
 
 
