@@ -528,7 +528,7 @@ namespace PETScWrappers
       ISLocalToGlobalMappingDestroy(&l2gmap_col);
 
       // next preset the exact given matrix
-      // entries with zeros. this doesn't avoid any
+      // entries with zeros. This doesn't avoid any
       // memory allocations, but it at least
       // avoids some searches later on. the
       // key here is that we can use the
