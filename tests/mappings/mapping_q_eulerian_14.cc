@@ -217,7 +217,7 @@ test(const unsigned int n_ref = 0)
   AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-  constraints_euler.close();
+  constraints.close();
 
   // MG constraints:
   MGConstrainedDoFs mg_constrained_dofs_euler;
