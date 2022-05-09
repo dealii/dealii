@@ -1885,6 +1885,24 @@ public:
                       const unsigned int hp_active_fe_index = 0) const;
 
   /**
+   * Return the category the current batch range of cells was assigned to.
+   * Categories run between the given values in the field
+   * AdditionalData::cell_vectorization_category for non-hp-DoFHandler types
+   * and return the active FE index in the hp-adaptive case.
+   */
+  unsigned int
+  get_cell_range_category(
+    const std::pair<unsigned int, unsigned int> cell_batch_range) const;
+
+  /**
+   * Return the category of the cells on the two sides of the current batch
+   * range of faces.
+   */
+  std::pair<unsigned int, unsigned int>
+  get_face_range_category(
+    const std::pair<unsigned int, unsigned int> face_batch_range) const;
+
+  /**
    * Return the category the current batch of cells was assigned to. Categories
    * run between the given values in the field
    * AdditionalData::cell_vectorization_category for non-hp-DoFHandler types
@@ -1894,7 +1912,7 @@ public:
   get_cell_category(const unsigned int cell_batch_index) const;
 
   /**
-   * Return the category on the cells on the two sides of the current batch of
+   * Return the category of the cells on the two sides of the current batch of
    * faces.
    */
   std::pair<unsigned int, unsigned int>
@@ -2776,6 +2794,44 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_quadrature(
   return mapping_info.face_data[quad_index]
     .descriptor[active_fe_index]
     .quadrature;
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+inline unsigned int
+MatrixFree<dim, Number, VectorizedArrayType>::get_cell_range_category(
+  const std::pair<unsigned int, unsigned int> range) const
+{
+  const auto result = get_cell_category(range.first);
+
+#  ifdef DEBUG
+  for (unsigned int i = range.first; i < range.second; ++i)
+    Assert(result == get_cell_category(i),
+           ExcMessage(
+             "The cell batches of the range have different categories!"));
+#  endif
+
+  return result;
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
+inline std::pair<unsigned int, unsigned int>
+MatrixFree<dim, Number, VectorizedArrayType>::get_face_range_category(
+  const std::pair<unsigned int, unsigned int> range) const
+{
+  const auto result = get_face_category(range.first);
+
+#  ifdef DEBUG
+  for (unsigned int i = range.first; i < range.second; ++i)
+    Assert(result == get_face_category(i),
+           ExcMessage(
+             "The face batches of the range have different categories!"));
+#  endif
+
+  return result;
 }
 
 
