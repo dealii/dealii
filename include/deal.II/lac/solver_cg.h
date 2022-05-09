@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/vectorization.h>
 
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
@@ -118,21 +119,26 @@ namespace LinearAlgebra
  * @endcode
  * where the two given functions run before and after the matrix-vector
  * product, respectively, and the `PreconditionerType` needs to provide a
- * function with the signature
+ * function either the signature
+ * @code
+ * Number PreconditionerType::apply(unsigned int index, const Number src) const
+ * @endcode
+ * to apply the action of the preconditioner on a single element (effectively
+ * being a diagonal preconditioner), or the signature
  * @code
  * void PreconditionerType::apply_to_subrange(unsigned int start_range,
  *                                            unsigned int end_range,
- *                                            const Number* src_ptr,
- *                                            Number* dst_ptr)
+ *                                            const Number* src_ptr_to_subrange,
+ *                                            Number* dst_ptr_to_subrange)
  * @endcode
-
- * where the pointers `src_ptr` and `dst_ptr` point to the location in the
- * vector where the operation should be applied to. The functions passed to
- * `MatrixType::vmult` take as arguments a sub-range among the locally owned
- * elements of the vector, defined as half-open intervals. The intervals are
- * designed to be scheduled close to the time the matrix-vector product
- * touches those entries in the `src` and `dst` vectors, respectively, with
- * the requirement that
+ * where the pointers `src_ptr_to_subrange` and `dst_ptr_to_subrange` point to
+ * the location in the vector where the operation should be applied to. If both
+ * functions are given, the more optimized `apply` path is selected. The
+ * functions passed to `MatrixType::vmult` take as arguments a sub-range among
+ * the locally owned elements of the vector, defined as half-open
+ * intervals. The intervals are designed to be scheduled close to the time the
+ * matrix-vector product touches those entries in the `src` and `dst` vectors,
+ * respectively, with the requirement that
  * <ul>
  * <li> the matrix-vector product may only access an entry in `src` or `dst`
  * once the `operation_before_matrix_vector_product` has been run on that
@@ -466,78 +472,12 @@ namespace internal
 {
   namespace SolverCG
   {
-    // Detector class to find out whether the MatrixType in SolverCG has a
-    // vmult function that takes two additional std::function objects, which
-    // we use to run the operation on slices of the vector during the
-    // matrix-vector product, and whether PreconditionerType can run
-    // operations on an individual element
-    template <typename MatrixType,
-              typename VectorType,
-              typename PreconditionerType>
-    struct supports_vmult_with_std_functions
-    {
-    private:
-      // this will work always
-      static bool
-      detect_matrix(...);
-
-      // this detector will work only if we have
-      // "... MatrixType::vmult(VectorType, const VectorType,
-      // const std::function<...>&, const std::function<...>&) const"
-      template <typename MatrixType2>
-      static decltype(std::declval<MatrixType2 const>().vmult(
-        std::declval<VectorType &>(),
-        std::declval<const VectorType &>(),
-        std::declval<const std::function<void(const unsigned int,
-                                              const unsigned int)> &>(),
-        std::declval<const std::function<void(const unsigned int,
-                                              const unsigned int)> &>()))
-      detect_matrix(const MatrixType2 &);
-
-      // this will work always
-      static bool
-      detect_preconditioner(...);
-
-      // this detector will work only if we have
-      // "... PreconditionerType::vmult(std::size_t, std::size_t, Number, const
-      // VectorType, const std::function<...>&, const std::function<...>&)
-      // const"
-      template <typename PreconditionerType2>
-      static decltype(
-        std::declval<PreconditionerType2 const>().apply_to_subrange(
-          0U,
-          0U,
-          std::declval<const typename PreconditionerType2::value_type *>(),
-          std::declval<typename PreconditionerType2::value_type *>()))
-      detect_preconditioner(const PreconditionerType2 &);
-
-    public:
-      // finally here we check if both our detectors have void return
-      // type. This will happen if the compiler can use the second detector,
-      // otherwise SFINAE let's it work with the more general first one that
-      // is bool
-      static const bool value =
-        !std::is_same<decltype(detect_matrix(std::declval<MatrixType>())),
-                      bool>::value &&
-        !std::is_same<decltype(detect_preconditioner(
-                        std::declval<PreconditionerType>())),
-                      bool>::value &&
-        std::is_same<
-          VectorType,
-          LinearAlgebra::distributed::Vector<typename VectorType::value_type,
-                                             MemorySpace::Host>>::value;
-    };
-
-
-
-    // We need to have a separate declaration for static const members
-    template <typename T, typename U, typename V>
-    const bool supports_vmult_with_std_functions<T, U, V>::value;
-
-
-
-    // Internal class to run one iteration of the conjugate gradient solver
-    // for standard matrix and preconditioner arguments.
+    // This base class is used to select different variants of the conjugate
+    // gradient solver. The default variant is used for standard matrix and
+    // preconditioner arguments, as provided by the derived class
+    // IterationWork below, but there is also a specialized variant further
+    // down that uses SFINAE to identify whether matrices and preconditioners
+    // support special operations on sub-ranges of the vectors.
     template <typename VectorType,
               typename MatrixType,
               typename PreconditionerType>
@@ -621,14 +561,51 @@ namespace internal
 
         residual_norm = r.l2_norm();
       }
+    };
+
+
+
+    // Implementation of a conjugate gradient operation with matrices and
+    // preconditioners without special capabilities
+    template <typename VectorType,
+              typename MatrixType,
+              typename PreconditionerType,
+              typename = int>
+    struct IterationWorker
+      : public IterationWorkerBase<VectorType, MatrixType, PreconditionerType>
+    {
+      using BaseClass =
+        IterationWorkerBase<VectorType, MatrixType, PreconditionerType>;
+
+      IterationWorker(const MatrixType &        A,
+                      const PreconditionerType &preconditioner,
+                      const bool                flexible,
+                      VectorMemory<VectorType> &memory,
+                      VectorType &              x)
+        : BaseClass(A, preconditioner, flexible, memory, x)
+      {}
+
+      using BaseClass::A;
+      using BaseClass::alpha;
+      using BaseClass::beta;
+      using BaseClass::p;
+      using BaseClass::preconditioner;
+      using BaseClass::r;
+      using BaseClass::r_dot_preconditioner_dot_r;
+      using BaseClass::residual_norm;
+      using BaseClass::v;
+      using BaseClass::x;
+      using BaseClass::z;
 
       void
       do_iteration(const unsigned int iteration_index)
       {
+        using Number = typename VectorType::value_type;
+
         const Number previous_r_dot_preconditioner_dot_r =
           r_dot_preconditioner_dot_r;
-        previous_alpha = alpha;
-        previous_beta  = beta;
+        this->previous_alpha = alpha;
+        this->previous_beta  = beta;
 
         if (std::is_same<PreconditionerType, PreconditionIdentity>::value ==
             false)
@@ -648,14 +625,14 @@ namespace internal
                    ExcDivideByZero());
             beta =
               r_dot_preconditioner_dot_r / previous_r_dot_preconditioner_dot_r;
-            if (flexible)
+            if (this->flexible)
               beta -= (r * z) / previous_r_dot_preconditioner_dot_r;
             p.sadd(beta, 1., direction);
           }
         else
           p.equ(1., direction);
 
-        if (flexible)
+        if (this->flexible)
           z.swap(v);
 
         A.vmult(v, p);
@@ -674,30 +651,48 @@ namespace internal
     };
 
 
+    // In the following, we provide a specialization of the above
+    // IterationWorker class that picks up particular features in the matrix
+    // and preconditioners.
 
-    // Actual class with the basic operation implemented in
-    // IterationWorkerBase
-    template <typename VectorType,
-              typename MatrixType,
-              typename PreconditionerType,
-              typename = int>
-    struct IterationWorker
-      : public IterationWorkerBase<VectorType, MatrixType, PreconditionerType>
-    {
-      IterationWorker(const MatrixType &        A,
-                      const PreconditionerType &preconditioner,
-                      const bool                flexible,
-                      VectorMemory<VectorType> &memory,
-                      VectorType &              x)
-        : IterationWorkerBase<VectorType, MatrixType, PreconditionerType>(
-            A,
-            preconditioner,
-            flexible,
-            memory,
-            x)
-      {}
-    };
+    // a helper type-trait that leverage SFINAE to figure out if MatrixType has
+    // ... MatrixType::vmult(VectorType &, const VectorType&,
+    // std::function<...>, std::function<...>) const
+    template <typename MatrixType, typename VectorType>
+    using vmult_functions_t = decltype(std::declval<MatrixType const>().vmult(
+      std::declval<VectorType &>(),
+      std::declval<const VectorType &>(),
+      std::declval<
+        const std::function<void(const unsigned int, const unsigned int)> &>(),
+      std::declval<const std::function<void(const unsigned int,
+                                            const unsigned int)> &>()));
 
+    template <typename MatrixType, typename VectorType>
+    constexpr bool has_vmult_functions =
+      is_supported_operation<vmult_functions_t, MatrixType, VectorType>;
+
+    // a helper type-trait that leverage SFINAE to figure out if
+    // PreconditionerType has ... PreconditionerType::apply_to_subrange(const
+    // unsigned int, const unsigned int, const Number*, Number*) const
+    template <typename PreconditionerType>
+    using apply_to_subrange_t =
+      decltype(std::declval<PreconditionerType const>()
+                 .apply_to_subrange(0U, 0U, nullptr, nullptr));
+
+    template <typename PreconditionerType>
+    constexpr bool has_apply_to_subrange =
+      is_supported_operation<apply_to_subrange_t, PreconditionerType>;
+
+    // a helper type-trait that leverage SFINAE to figure out if
+    // PreconditionerType has ... PreconditionerType::apply(const
+    // unsigned int, const Number) const
+    template <typename PreconditionerType>
+    using apply_t =
+      decltype(std::declval<PreconditionerType const>().apply(0U, 0.0));
+
+    template <typename PreconditionerType>
+    constexpr bool has_apply =
+      is_supported_operation<apply_t, PreconditionerType>;
 
 
     // Internal function to run one iteration of the conjugate gradient solver
@@ -710,14 +705,17 @@ namespace internal
       VectorType,
       MatrixType,
       PreconditionerType,
-      typename std::enable_if<
-        supports_vmult_with_std_functions<MatrixType,
-                                          VectorType,
-                                          PreconditionerType>::value,
-        int>::type>
+      typename std::enable_if<has_vmult_functions<MatrixType, VectorType> &&
+                                (has_apply_to_subrange<PreconditionerType> ||
+                                 has_apply<PreconditionerType>)&&std::
+                                  is_same<VectorType,
+                                          LinearAlgebra::distributed::Vector<
+                                            typename VectorType::value_type,
+                                            MemorySpace::Host>>::value,
+                              int>::type>
       : public IterationWorkerBase<VectorType, MatrixType, PreconditionerType>
     {
-      static constexpr unsigned int grain_size = 32;
+      using Number = typename VectorType::value_type;
 
       IterationWorker(const MatrixType &        A,
                       const PreconditionerType &preconditioner,
@@ -732,169 +730,217 @@ namespace internal
             x)
       {}
 
+      // This is the main iteration function, that will use some of the
+      // specialized functions below
       void
       do_iteration(const unsigned int iteration_index)
       {
-        using Number = typename VectorType::value_type;
+        std::array<VectorizedArray<Number>, 7> vectorized_sums = {};
 
-        const auto operation_before_loop = [&](const unsigned int start_range,
-                                               const unsigned int end_range) {
-          Number *                       x = this->x.begin() + start_range;
-          Number *                       r = this->r.begin() + start_range;
-          Number *                       p = this->p.begin() + start_range;
-          Number *                       v = this->v.begin() + start_range;
-          std::array<Number, grain_size> prec_r;
-          if (iteration_index == 1)
-            {
-              for (unsigned int j = start_range; j < end_range; j += grain_size)
-                {
-                  const unsigned int length =
-                    std::min(grain_size, end_range - j);
-                  this->preconditioner.apply_to_subrange(j,
-                                                         length,
-                                                         r,
-                                                         prec_r.data());
-                  DEAL_II_OPENMP_SIMD_PRAGMA
-                  for (unsigned int i = 0; i < length; ++i)
-                    {
-                      p[i] = prec_r[i];
-                      v[i] = Number();
-                    }
-                  p += length;
-                  r += length;
-                  v += length;
-                }
-            }
-          else if (iteration_index % 2 == 0)
-            {
-              for (unsigned int j = start_range; j < end_range; j += grain_size)
-                {
-                  const unsigned int length =
-                    std::min(grain_size, end_range - j);
-                  DEAL_II_OPENMP_SIMD_PRAGMA
-                  for (unsigned int i = 0; i < length; ++i)
-                    r[i] -= this->alpha * v[i];
-                  this->preconditioner.apply_to_subrange(j,
-                                                         length,
-                                                         r,
-                                                         prec_r.data());
-                  DEAL_II_OPENMP_SIMD_PRAGMA
-                  for (unsigned int i = 0; i < length; ++i)
-                    {
-                      p[i] = this->beta * p[i] + prec_r[i];
-                      v[i] = Number();
-                    }
-                  p += length;
-                  r += length;
-                  v += length;
-                }
-            }
-          else
-            {
-              const Number alpha_plus_previous_alpha_over_beta =
-                this->alpha + this->previous_alpha / this->previous_beta;
-              const Number previous_alpha_over_beta =
-                this->previous_alpha / this->previous_beta;
-              for (unsigned int j = start_range; j < end_range; j += grain_size)
-                {
-                  const unsigned int length =
-                    std::min(grain_size, end_range - j);
-                  this->preconditioner.apply_to_subrange(j,
-                                                         length,
-                                                         r,
-                                                         prec_r.data());
-                  DEAL_II_OPENMP_SIMD_PRAGMA
-                  for (unsigned int i = 0; i < length; ++i)
-                    {
-                      x[i] += alpha_plus_previous_alpha_over_beta * p[i] -
-                              previous_alpha_over_beta * prec_r[i];
-                      r[i] -= this->alpha * v[i];
-                    }
-                  this->preconditioner.apply_to_subrange(j,
-                                                         length,
-                                                         r,
-                                                         prec_r.data());
-                  DEAL_II_OPENMP_SIMD_PRAGMA
-                  for (unsigned int i = 0; i < length; ++i)
-                    {
-                      p[i] = this->beta * p[i] + prec_r[i];
-                      v[i] = Number();
-                    }
-                  p += length;
-                  r += length;
-                  v += length;
-                  x += length;
-                }
-            }
-        };
+        this->A.vmult(
+          this->v,
+          this->p,
+          [&](const unsigned int begin, const unsigned int end) {
+            operation_before_loop(iteration_index, begin, end);
+          },
+          [&](const unsigned int begin, const unsigned int end) {
+            operation_after_loop(begin, end, vectorized_sums);
+          });
 
-        std::array<Number, 7> local_sums = {};
-        const auto operation_after_loop  = [&](const unsigned int start_range,
-                                              const unsigned int end_range) {
-          const Number *                 x = this->x.begin() + start_range;
-          const Number *                 r = this->r.begin() + start_range;
-          const Number *                 p = this->p.begin() + start_range;
-          const Number *                 v = this->v.begin() + start_range;
-          std::array<Number, grain_size> prec_r;
-          std::array<Number, grain_size> prec_v;
-          for (unsigned int j = start_range; j < end_range; j += grain_size)
-            {
-              const unsigned int length = std::min(grain_size, end_range - j);
-              this->preconditioner.apply_to_subrange(j,
-                                                     length,
-                                                     r,
-                                                     prec_r.data());
-              this->preconditioner.apply_to_subrange(j,
-                                                     length,
-                                                     v,
-                                                     prec_v.data());
-              for (unsigned int i = 0; i < length; ++i)
-                {
-                  local_sums[0] += p[i] * v[i];
-                  local_sums[1] += v[i] * v[i];
-                  local_sums[2] += r[i] * v[i];
-                  local_sums[3] += r[i] * r[i];
-                  local_sums[4] += r[i] * prec_v[i];
-                  local_sums[5] += v[i] * prec_v[i];
-                  local_sums[6] += r[i] * prec_r[i];
-                }
-              p += length;
-              v += length;
-              r += length;
-            }
-        };
+        std::array<Number, 7> scalar_sums;
+        for (unsigned int i = 0; i < 7; ++i)
+          scalar_sums[i] = vectorized_sums[i][0];
+        for (unsigned int l = 1; l < VectorizedArray<Number>::size(); ++l)
+          for (unsigned int i = 0; i < 7; ++i)
+            scalar_sums[i] += vectorized_sums[i][l];
 
-        this->A.vmult(this->v,
-                      this->p,
-                      operation_before_loop,
-                      operation_after_loop);
-
-        Utilities::MPI::sum(dealii::ArrayView<const Number>(local_sums.data(),
+        Utilities::MPI::sum(dealii::ArrayView<const Number>(scalar_sums.data(),
                                                             7),
                             this->r.get_mpi_communicator(),
-                            dealii::ArrayView<Number>(local_sums.data(), 7));
+                            dealii::ArrayView<Number>(scalar_sums.data(), 7));
 
         this->previous_alpha = this->alpha;
         this->previous_beta  = this->beta;
 
-        const Number p_dot_A_dot_p = local_sums[0];
+        const Number p_dot_A_dot_p = scalar_sums[0];
         Assert(std::abs(p_dot_A_dot_p) != 0., ExcDivideByZero());
 
-        const Number previous_r_dot_preconditioner_dot_r = local_sums[6];
+        const Number previous_r_dot_preconditioner_dot_r = scalar_sums[6];
         this->alpha = previous_r_dot_preconditioner_dot_r / p_dot_A_dot_p;
         this->residual_norm = std::sqrt(
-          local_sums[3] +
-          this->alpha * (-2. * local_sums[2] + this->alpha * local_sums[1]));
+          scalar_sums[3] +
+          this->alpha * (-2. * scalar_sums[2] + this->alpha * scalar_sums[1]));
 
         this->r_dot_preconditioner_dot_r =
           previous_r_dot_preconditioner_dot_r +
-          this->alpha * (-2. * local_sums[4] + this->alpha * local_sums[5]);
+          this->alpha * (-2. * scalar_sums[4] + this->alpha * scalar_sums[5]);
 
         this->beta = this->r_dot_preconditioner_dot_r /
                      previous_r_dot_preconditioner_dot_r;
       }
 
-      void
+      // Function that we use if the PreconditionerType implements an apply()
+      // function
+      template <typename U = void>
+      typename std::enable_if<has_apply<PreconditionerType>, U>::type
+      operation_before_loop(const unsigned int iteration_index,
+                            const unsigned int start_range,
+                            const unsigned int end_range) const
+      {
+        Number *               x       = this->x.begin();
+        Number *               r       = this->r.begin();
+        Number *               p       = this->p.begin();
+        Number *               v       = this->v.begin();
+        const Number           alpha   = this->alpha;
+        const Number           beta    = this->beta;
+        constexpr unsigned int n_lanes = VectorizedArray<Number>::size();
+        const unsigned int     end_regular =
+          start_range + (end_range - start_range) / n_lanes * n_lanes;
+        if (iteration_index == 1)
+          {
+            // Vectorize by hand since compilers are often pretty bad at
+            // doing these steps automatically even with
+            // DEAL_II_OPENMP_SIMD_PRAGMA
+            for (unsigned int j = start_range; j < end_regular; j += n_lanes)
+              {
+                VectorizedArray<Number> rj, pj;
+                rj.load(r + j);
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int l = 0; l < n_lanes; ++l)
+                  pj[l] = this->preconditioner.apply(j + l, rj[l]);
+                pj.store(p + j);
+                rj = VectorizedArray<Number>();
+                rj.store(v + j);
+              }
+            for (unsigned int j = end_regular; j < end_range; ++j)
+              {
+                p[j] = this->preconditioner.apply(j, r[j]);
+                v[j] = Number();
+              }
+          }
+        else if (iteration_index % 2 == 0)
+          {
+            for (unsigned int j = start_range; j < end_regular; j += n_lanes)
+              {
+                VectorizedArray<Number> rj, vj, pj, prec_rj;
+                rj.load(r + j);
+                vj.load(v + j);
+                rj -= alpha * vj;
+                rj.store(r + j);
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int l = 0; l < n_lanes; ++l)
+                  prec_rj[l] = this->preconditioner.apply(j + l, rj[l]);
+                pj.load(p + j);
+                pj = beta * pj + prec_rj;
+                pj.store(p + j);
+                rj = VectorizedArray<Number>();
+                rj.store(v + j);
+              }
+            for (unsigned int j = end_regular; j < end_range; ++j)
+              {
+                r[j] -= alpha * v[j];
+                p[j] = beta * p[j] + this->preconditioner.apply(j, r[j]);
+                v[j] = Number();
+              }
+          }
+        else
+          {
+            const Number alpha_plus_previous_alpha_over_beta =
+              alpha + this->previous_alpha / this->previous_beta;
+            const Number previous_alpha_over_beta =
+              this->previous_alpha / this->previous_beta;
+            for (unsigned int j = start_range; j < end_regular; j += n_lanes)
+              {
+                VectorizedArray<Number> rj, vj, pj, xj, prec_rj, prec_vj;
+                xj.load(x + j);
+                pj.load(p + j);
+                xj += alpha_plus_previous_alpha_over_beta * pj;
+                rj.load(r + j);
+                vj.load(v + j);
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int l = 0; l < n_lanes; ++l)
+                  {
+                    prec_rj[l] = this->preconditioner.apply(j + l, rj[l]);
+                    prec_vj[l] = this->preconditioner.apply(j + l, vj[l]);
+                  }
+                xj -= previous_alpha_over_beta * prec_rj;
+                xj.store(x + j);
+                rj -= alpha * vj;
+                rj.store(r + j);
+                prec_rj -= alpha * prec_vj;
+                pj = beta * pj + prec_rj;
+                pj.store(p + j);
+                rj = VectorizedArray<Number>();
+                rj.store(v + j);
+              }
+            for (unsigned int j = end_regular; j < end_range; ++j)
+              {
+                x[j] += alpha_plus_previous_alpha_over_beta * p[j];
+                x[j] -= previous_alpha_over_beta *
+                        this->preconditioner.apply(j, r[j]);
+                r[j] -= alpha * v[j];
+                p[j] = beta * p[j] + this->preconditioner.apply(j, r[j]);
+                v[j] = Number();
+              }
+          }
+      }
+
+      // Function that we use if the PreconditionerType implements an apply()
+      // function
+      template <typename U = void>
+      typename std::enable_if<has_apply<PreconditionerType>, U>::type
+      operation_after_loop(
+        const unsigned int                      start_range,
+        const unsigned int                      end_range,
+        std::array<VectorizedArray<Number>, 7> &vectorized_sums) const
+      {
+        const Number *                         r       = this->r.begin();
+        const Number *                         p       = this->p.begin();
+        const Number *                         v       = this->v.begin();
+        std::array<VectorizedArray<Number>, 7> my_sums = {};
+        constexpr unsigned int n_lanes = VectorizedArray<Number>::size();
+        const unsigned int     end_regular =
+          start_range + (end_range - start_range) / n_lanes * n_lanes;
+        for (unsigned int j = start_range; j < end_regular; j += n_lanes)
+          {
+            VectorizedArray<Number> pj, vj, rj, prec_vj, prec_rj;
+            pj.load(p + j);
+            vj.load(v + j);
+            rj.load(r + j);
+            DEAL_II_OPENMP_SIMD_PRAGMA
+            for (unsigned int l = 0; l < n_lanes; ++l)
+              {
+                prec_vj[l] = this->preconditioner.apply(j + l, vj[l]);
+                prec_rj[l] = this->preconditioner.apply(j + l, rj[l]);
+              }
+            my_sums[0] += pj * vj;
+            my_sums[1] += vj * vj;
+            my_sums[2] += rj * vj;
+            my_sums[3] += rj * rj;
+            my_sums[4] += rj * prec_vj;
+            my_sums[5] += vj * prec_vj;
+            my_sums[6] += rj * prec_rj;
+          }
+        for (unsigned int j = end_regular; j < end_range; ++j)
+          {
+            const Number prec_v = this->preconditioner.apply(j, v[j]);
+            const Number prec_r = this->preconditioner.apply(j, r[j]);
+            my_sums[0][0] += p[j] * v[j];
+            my_sums[1][0] += v[j] * v[j];
+            my_sums[2][0] += r[j] * v[j];
+            my_sums[3][0] += r[j] * r[j];
+            my_sums[4][0] += r[j] * prec_v;
+            my_sums[5][0] += v[j] * prec_v;
+            my_sums[6][0] += r[j] * prec_r;
+          }
+        for (unsigned int i = 0; i < vectorized_sums.size(); ++i)
+          vectorized_sums[i] += my_sums[i];
+      }
+
+      // Function that we use if the PreconditionerType implements an apply()
+      // function
+      template <typename U = void>
+      typename std::enable_if<has_apply<PreconditionerType>, U>::type
       finalize_after_convergence(const unsigned int iteration_index)
       {
         if (iteration_index % 2 == 1)
@@ -912,12 +958,216 @@ namespace internal
             const Number previous_alpha_over_beta =
               this->previous_alpha / this->previous_beta;
 
+            DEAL_II_OPENMP_SIMD_PRAGMA
+            for (unsigned int j = 0; j < end_range; ++j)
+              {
+                x[j] += alpha_plus_previous_alpha_over_beta * p[j] -
+                        previous_alpha_over_beta *
+                          this->preconditioner.apply(j, r[j]);
+              }
+          }
+      }
+
+      // Function that we use if the PreconditionerType does not implement an
+      // apply() function, where we instead need to choose the
+      // apply_to_subrange function
+      template <typename U = void>
+      typename std::enable_if<!has_apply<PreconditionerType>, U>::type
+      operation_before_loop(const unsigned int iteration_index,
+                            const unsigned int start_range,
+                            const unsigned int end_range) const
+      {
+        Number *                       x     = this->x.begin() + start_range;
+        Number *                       r     = this->r.begin() + start_range;
+        Number *                       p     = this->p.begin() + start_range;
+        Number *                       v     = this->v.begin() + start_range;
+        const Number                   alpha = this->alpha;
+        const Number                   beta  = this->beta;
+        constexpr unsigned int         grain_size = 128;
+        std::array<Number, grain_size> prec_r;
+        if (iteration_index == 1)
+          {
+            for (unsigned int j = start_range; j < end_range; j += grain_size)
+              {
+                const unsigned int length = std::min(grain_size, end_range - j);
+                this->preconditioner.apply_to_subrange(j,
+                                                       j + length,
+                                                       r,
+                                                       prec_r.data());
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  {
+                    p[i] = prec_r[i];
+                    v[i] = Number();
+                  }
+                p += length;
+                r += length;
+                v += length;
+              }
+          }
+        else if (iteration_index % 2 == 0)
+          {
+            for (unsigned int j = start_range; j < end_range; j += grain_size)
+              {
+                const unsigned int length = std::min(grain_size, end_range - j);
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  r[i] -= this->alpha * v[i];
+                this->preconditioner.apply_to_subrange(j,
+                                                       j + length,
+                                                       r,
+                                                       prec_r.data());
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  {
+                    p[i] = this->beta * p[i] + prec_r[i];
+                    v[i] = Number();
+                  }
+                p += length;
+                r += length;
+                v += length;
+              }
+          }
+        else
+          {
+            const Number alpha_plus_previous_alpha_over_beta =
+              this->alpha + this->previous_alpha / this->previous_beta;
+            const Number previous_alpha_over_beta =
+              this->previous_alpha / this->previous_beta;
+            for (unsigned int j = start_range; j < end_range; j += grain_size)
+              {
+                const unsigned int length = std::min(grain_size, end_range - j);
+                this->preconditioner.apply_to_subrange(j,
+                                                       j + length,
+                                                       r,
+                                                       prec_r.data());
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  {
+                    x[i] += alpha_plus_previous_alpha_over_beta * p[i] -
+                            previous_alpha_over_beta * prec_r[i];
+                    r[i] -= this->alpha * v[i];
+                  }
+                this->preconditioner.apply_to_subrange(j,
+                                                       j + length,
+                                                       r,
+                                                       prec_r.data());
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (unsigned int i = 0; i < length; ++i)
+                  {
+                    p[i] = this->beta * p[i] + prec_r[i];
+                    v[i] = Number();
+                  }
+                p += length;
+                r += length;
+                v += length;
+                x += length;
+              }
+          }
+      }
+
+      // Function that we use if the PreconditionerType does not implement an
+      // apply() function and where we instead need to use the
+      // apply_to_subrange function
+      template <typename U = void>
+      typename std::enable_if<!has_apply<PreconditionerType>, U>::type
+      operation_after_loop(
+        const unsigned int                      start_range,
+        const unsigned int                      end_range,
+        std::array<VectorizedArray<Number>, 7> &vectorized_sums) const
+      {
+        const Number *                         r          = this->r.begin();
+        const Number *                         p          = this->p.begin();
+        const Number *                         v          = this->v.begin();
+        std::array<VectorizedArray<Number>, 7> my_sums    = {};
+        constexpr unsigned int                 grain_size = 128;
+        Assert(grain_size % VectorizedArray<Number>::size() == 0,
+               ExcNotImplemented());
+        const unsigned int end_regular =
+          start_range + (end_range - start_range) / grain_size * grain_size;
+        std::array<Number, grain_size> prec_r;
+        std::array<Number, grain_size> prec_v;
+        for (unsigned int j = start_range; j < end_regular; j += grain_size)
+          {
+            this->preconditioner.apply_to_subrange(j,
+                                                   j + grain_size,
+                                                   r + j,
+                                                   prec_r.data());
+            this->preconditioner.apply_to_subrange(j,
+                                                   j + grain_size,
+                                                   v + j,
+                                                   prec_v.data());
+            VectorizedArray<Number> pj, vj, rj, prec_vj, prec_rj;
+            for (unsigned int i = 0; i < grain_size;
+                 i += VectorizedArray<Number>::size())
+              {
+                pj.load(p + j + i);
+                vj.load(v + j + i);
+                rj.load(r + j + i);
+                prec_rj.load(prec_r.data() + i);
+                prec_vj.load(prec_v.data() + i);
+
+                my_sums[0] += pj * vj;
+                my_sums[1] += vj * vj;
+                my_sums[2] += rj * vj;
+                my_sums[3] += rj * rj;
+                my_sums[4] += rj * prec_vj;
+                my_sums[5] += vj * prec_vj;
+                my_sums[6] += rj * prec_rj;
+              }
+          }
+        const unsigned int length = end_range - end_regular;
+        AssertIndexRange(length, grain_size);
+        this->preconditioner.apply_to_subrange(end_regular,
+                                               end_regular + length,
+                                               r + end_regular,
+                                               prec_r.data());
+        this->preconditioner.apply_to_subrange(end_regular,
+                                               end_regular + length,
+                                               v + end_regular,
+                                               prec_v.data());
+        for (unsigned int j = end_regular; j < end_range; ++j)
+          {
+            my_sums[0][0] += p[j] * v[j];
+            my_sums[1][0] += v[j] * v[j];
+            my_sums[2][0] += r[j] * v[j];
+            my_sums[3][0] += r[j] * r[j];
+            my_sums[4][0] += r[j] * prec_v[j - end_regular];
+            my_sums[5][0] += v[j] * prec_v[j - end_regular];
+            my_sums[6][0] += r[j] * prec_r[j - end_regular];
+          }
+        for (unsigned int i = 0; i < vectorized_sums.size(); ++i)
+          vectorized_sums[i] += my_sums[i];
+      }
+
+      // Function that we use if the PreconditionerType does not implement an
+      // apply() function, where we instead need to choose the
+      // apply_to_subrange function
+      template <typename U = void>
+      typename std::enable_if<!has_apply<PreconditionerType>, U>::type
+      finalize_after_convergence(const unsigned int iteration_index)
+      {
+        if (iteration_index % 2 == 1)
+          this->x.add(this->alpha, this->p);
+        else
+          {
+            const unsigned int end_range = this->x.locally_owned_size();
+
+            Number *     x = this->x.begin();
+            Number *     r = this->r.begin();
+            Number *     p = this->p.begin();
+            const Number alpha_plus_previous_alpha_over_beta =
+              this->alpha + this->previous_alpha / this->previous_beta;
+            const Number previous_alpha_over_beta =
+              this->previous_alpha / this->previous_beta;
+
+            constexpr unsigned int         grain_size = 128;
             std::array<Number, grain_size> prec_r;
             for (unsigned int j = 0; j < end_range; j += grain_size)
               {
                 const unsigned int length = std::min(grain_size, end_range - j);
                 this->preconditioner.apply_to_subrange(j,
-                                                       length,
+                                                       j + length,
                                                        r,
                                                        prec_r.data());
                 DEAL_II_OPENMP_SIMD_PRAGMA

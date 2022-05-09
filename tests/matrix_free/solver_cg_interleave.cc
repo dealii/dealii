@@ -115,6 +115,8 @@ private:
 };
 
 
+// Preconditioner class without any apply or apply_to_subrange function, as
+// opposed to deal.II's DiagonalMatrix
 template <typename Number>
 struct MyDiagonalMatrix
 {
@@ -128,6 +130,45 @@ struct MyDiagonalMatrix
   {
     dst = src;
     dst.scale(vec);
+  }
+
+  const LinearAlgebra::distributed::Vector<Number> &vec;
+};
+
+
+
+// Preconditioner class only proving an apply_to_subrange function,
+template <typename Number>
+struct DiagonalMatrixSubrange
+{
+  DiagonalMatrixSubrange(const LinearAlgebra::distributed::Vector<Number> &vec)
+    : vec(vec)
+  {}
+
+  void
+  vmult(LinearAlgebra::distributed::Vector<Number> &      dst,
+        const LinearAlgebra::distributed::Vector<Number> &src) const
+  {
+    dst = src;
+    dst.scale(vec);
+  }
+
+  void
+  apply_to_subrange(const unsigned int begin_range,
+                    const unsigned int end_range,
+                    const Number *     src_pointer_to_current_range,
+                    Number *           dst_pointer_to_current_range) const
+  {
+    AssertIndexRange(begin_range, vec.locally_owned_elements().n_elements());
+    AssertIndexRange(end_range, vec.locally_owned_elements().n_elements() + 1);
+
+    const Number *     diagonal_entry = vec.begin() + begin_range;
+    const unsigned int length         = end_range - begin_range;
+
+    DEAL_II_OPENMP_SIMD_PRAGMA
+    for (unsigned int i = 0; i < length; ++i)
+      dst_pointer_to_current_range[i] =
+        diagonal_entry[i] * src_pointer_to_current_range[i];
   }
 
   const LinearAlgebra::distributed::Vector<Number> &vec;
@@ -189,6 +230,7 @@ test(const unsigned int fe_degree)
   // Step 1: solve with CG solver for a matrix that does not support the
   // interleaving operation
   {
+    deallog << "CG solver without interleaving support" << std::endl;
     SolverControl        control(200, 1e-2 * rhs.l2_norm());
     SolverCG<VectorType> solver(control);
     solver.solve(mf, sol, rhs, preconditioner);
@@ -198,6 +240,7 @@ test(const unsigned int fe_degree)
   // Step 2: solve with CG solver for a matrix that does support the
   // interleaving operation
   {
+    deallog << "CG solver with interleaving support" << std::endl;
     sol = 0;
     HelmholtzOperator<dim, number> matrix(mf_data);
     SolverControl                  control(200, 1e-2 * rhs.l2_norm());
@@ -209,12 +252,29 @@ test(const unsigned int fe_degree)
   // Step 3: solve with CG solver for a matrix that does support but a
   // preconditioner that does not support the interleaving operation
   {
+    deallog << "CG solver with matrix with interleaving support but "
+            << "no preconditioner" << std::endl;
     sol = 0;
     HelmholtzOperator<dim, number> matrix(mf_data);
     MyDiagonalMatrix               simple_diagonal(preconditioner.get_vector());
     SolverControl                  control(200, 1e-2 * rhs.l2_norm());
     SolverCG<VectorType>           solver(control);
     solver.solve(matrix, sol, rhs, simple_diagonal);
+    deallog << "Norm of the solution: " << sol.l2_norm() << std::endl;
+  }
+
+  // Step 4: solve with CG solver for a matrix that does support the
+  // interleaving operation and a preconditioner that only supports the
+  // apply_to_subrange function
+  {
+    deallog << "CG solver with interleaving support and "
+            << "preconditioner working on subrange" << std::endl;
+    sol = 0;
+    HelmholtzOperator<dim, number> matrix(mf_data);
+    DiagonalMatrixSubrange diagonal_subrange(preconditioner.get_vector());
+    SolverControl          control(200, 1e-2 * rhs.l2_norm());
+    SolverCG<VectorType>   solver(control);
+    solver.solve(matrix, sol, rhs, diagonal_subrange);
     deallog << "Norm of the solution: " << sol.l2_norm() << std::endl;
   }
 }
