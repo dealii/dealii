@@ -28,6 +28,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Forward declarations:
+#ifndef DOXYGEN
+template <int dim>
+class FiniteElementData;
+#endif
+
 /**
  * A namespace solely for the purpose of defining the Domination enum as well
  * as associated operators.
@@ -192,6 +198,13 @@ namespace internal
      * First index of an object within a face.
      */
     std::vector<std::vector<unsigned int>> first_object_index_on_face;
+
+    /**
+     * Function that fills the fields based on a provided finite element.
+     */
+    template <int dim>
+    static GenericDoFsPerObject
+    generate(const FiniteElementData<dim> &fe);
   };
 } // namespace internal
 
@@ -957,6 +970,80 @@ FiniteElementData<dim>::get_first_face_quad_index(
   return first_quad_index_of_faces[first_quad_index_of_faces.size() == 1 ?
                                      0 :
                                      face_no];
+}
+
+template <int dim>
+internal::GenericDoFsPerObject
+internal::GenericDoFsPerObject::generate(const FiniteElementData<dim> &fe)
+{
+  const auto reference_cell = fe.reference_cell();
+
+  internal::GenericDoFsPerObject result;
+
+  result.dofs_per_object_exclusive.resize(dim + 1);
+  result.dofs_per_object_inclusive.resize(dim + 1);
+  result.object_index.resize(dim + 1);
+
+  unsigned int counter = 0;
+
+  for (unsigned int v : reference_cell.vertex_indices())
+    {
+      const auto c = fe.template n_dofs_per_object<0>(v);
+
+      result.dofs_per_object_exclusive[0].emplace_back(c);
+      result.dofs_per_object_inclusive[0].emplace_back(c);
+      result.object_index[0].emplace_back(counter);
+
+      counter += c;
+    }
+
+  if (dim >= 2)
+    for (unsigned int l : reference_cell.line_indices())
+      {
+        const auto c = fe.template n_dofs_per_object<1>(l);
+
+        result.dofs_per_object_exclusive[1].emplace_back(c);
+        result.dofs_per_object_inclusive[1].emplace_back(
+          c + 2 * fe.template n_dofs_per_object<0>());
+        result.object_index[1].emplace_back(counter);
+
+        counter += c;
+      }
+
+  if (dim == 3)
+    for (unsigned int f : reference_cell.face_indices())
+      {
+        const auto c = fe.template n_dofs_per_object<2>(f);
+
+        result.dofs_per_object_exclusive[2].emplace_back(c);
+        result.dofs_per_object_inclusive[2].emplace_back(fe.n_dofs_per_face(f));
+        result.object_index[2].emplace_back(counter);
+
+        counter += c;
+      }
+
+  {
+    result.dofs_per_object_exclusive[dim].emplace_back(
+      fe.template n_dofs_per_object<dim>());
+    result.dofs_per_object_inclusive[dim].emplace_back(fe.n_dofs_per_cell());
+    result.object_index[dim].emplace_back(counter);
+  }
+
+  result.first_object_index_on_face.resize(dim);
+  for (unsigned int face_no : reference_cell.face_indices())
+    {
+      result.first_object_index_on_face[0].emplace_back(0);
+
+      if (dim >= 2)
+        result.first_object_index_on_face[1].emplace_back(
+          fe.get_first_face_line_index(face_no));
+
+      if (dim == 3)
+        result.first_object_index_on_face[2].emplace_back(
+          fe.get_first_face_quad_index(face_no));
+    }
+
+  return result;
 }
 
 
