@@ -860,7 +860,7 @@ namespace PETScWrappers
     const unsigned int            coords_cdim_,
     const types::global_dof_index coords_n_,
     const PetscReal *             coords_data_)
-    : use_vertices(use_vertices_)
+    : use_vertices(use_vertices)
     , use_edges(use_edges_)
     , use_faces(use_faces_)
     , symmetric(symmetric_)
