@@ -1,0 +1,3 @@
+New: The PetscWrappers::PreconditionBDDC preconditioner has been implemented. It requires a special matrix type (IS), which is initialized with the new function PetscWrappers::reinit_IS.
+<br>
+(Nicolas Barnafi, 2022/05/10)

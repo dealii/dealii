@@ -962,7 +962,6 @@ namespace PETScWrappers
    * PETSc.
    *
    * @ingroup PETScWrappers
-   * @author Nicolas Barnafi, 2022
    */
   class PreconditionBDDC : public PreconditionBase
   {
