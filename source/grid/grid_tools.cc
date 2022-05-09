@@ -571,23 +571,33 @@ namespace GridTools
         if (dim > 1)
           {
             for (const unsigned int face_n : cell->face_indices())
-              face_data.insert_face_data(cell->face(face_n));
+              // We don't need to insert anything if we have default values
+              {
+                const auto face = cell->face(face_n);
+                if (face->boundary_id() != numbers::internal_face_boundary_id ||
+                    face->manifold_id() != numbers::flat_manifold_id)
+                  face_data.insert_face_data(face);
+              }
           }
         // Save line data
         if (dim == 3)
           {
             for (unsigned int line_n = 0; line_n < cell->n_lines(); ++line_n)
               {
-                const auto  line = cell->line(line_n);
-                CellData<1> line_cell_data;
-                for (unsigned int vertex_n = 0; vertex_n < line->n_vertices();
-                     ++vertex_n)
-                  line_cell_data.vertices[vertex_n] =
-                    line->vertex_index(vertex_n);
-                line_cell_data.boundary_id = line->boundary_id();
-                line_cell_data.manifold_id = line->manifold_id();
+                const auto line = cell->line(line_n);
+                // We don't need to insert anything if we have default values
+                if (line->boundary_id() != numbers::internal_face_boundary_id ||
+                    line->manifold_id() != numbers::flat_manifold_id)
+                  {
+                    CellData<1> line_cell_data(line->n_vertices());
+                    for (unsigned int vertex_n : line->vertex_indices())
+                      line_cell_data.vertices[vertex_n] =
+                        line->vertex_index(vertex_n);
 
-                line_data.insert(line_cell_data);
+                    line_cell_data.boundary_id = line->boundary_id();
+                    line_cell_data.manifold_id = line->manifold_id();
+                    line_data.insert(line_cell_data);
+                  }
               }
           }
       }
