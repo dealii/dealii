@@ -53,7 +53,11 @@ class PreconditionIdentity;
  * dealii::Vector<double>.
  *
  * @note The CG method requires a symmetric preconditioner (i.e., for example,
- * SOR is not a possible choice).
+ * SOR is not a possible choice). There is a variant of the solver,
+ * SolverFlexibleCG, that allows to use a variable preconditioner or a
+ * preconditioner with some slight non-symmetry (like weighted Schwarz
+ * methods), by using a different formula for the step length in the
+ * computation of the next search direction.
  *
  *
  * <h3>Eigenvalue computation</h3>
@@ -228,7 +232,77 @@ protected:
    */
   boost::signals2::signal<void(const std::vector<double> &)>
     all_eigenvalues_signal;
+
+  /**
+   * Flag to indicate whether the classical Fletcher--Reeves update formula
+   * for the parameter $\beta_k$ (standard CG algorithm, minimal storage
+   * needs) or the flexible conjugate gradient method with Polak-Ribiere
+   * formula for $\beta_k$ should be used. This base class implementation of
+   * SolverCG will always use the former method, whereas the derived class
+   * SolverFlexibleCG will use the latter.
+   */
+  bool determine_beta_by_flexible_formula;
 };
+
+
+
+/**
+ * This class implements a flexible variant of the conjugate gradient method,
+ * which is based on a different formula to compute $\beta_k$ in the process
+ * of constructing a new search direction that is A-orthogonal against the
+ * previous one. Rather than using the Fletcher--Reeves update formula with
+ * $\beta_k = \frac{\mathbf{r}^T_{k+1} \mathbf{z}^T_{k+1}}{\mathbf{r}^T_{k}
+ * \mathbf{z}^T_{k}}$ for computing the new search direction (here
+ * $\mathbf{r}_{k+1}$ is the residual in step $k+1$ and $\mathbf{z}_{k+1} =
+ * P^{-1} \mathbf{r}_{k+1}$) as in the classical conjugate gradient algorithm,
+ * this class selects the Polak-Ribiere formula $\beta_k =
+ * \frac{\mathbf{r}^T_{k+1} \left(\mathbf{z}^T_{k+1} -
+ * \mathbf{z}^T_{k}\right)}{\mathbf{r}^T_{k} \mathbf{z}^T_{k}}$. The
+ * additional term $\mathbf{r}^T_{k+1} \mathbf{z}^T_{k}$ is zero for linear
+ * symmetric-positive definite preconditioners due to the construction of the
+ * search directions, so the behavior of SolverFlexibleCG is equivalent for
+ * those kinds of situations and merely increases costs by requiring an
+ * additional stored vector and associated vector operations. While there are
+ * no theoretical guarantees for convergence as in the classical CG algorithm,
+ * the current class has been documented to be much more robust for variable
+ * preconditioners (e.g., involving some iterative inverse that is not fully
+ * converged) or a preconditioner with some slight non-symmetry (like weighted
+ * Schwarz methods), which results from the local optimality of the search
+ * direction with at least as good progress as the locally optimal steepest
+ * descent method.
+ */
+template <typename VectorType = Vector<double>>
+class SolverFlexibleCG : public SolverCG<VectorType>
+{
+public:
+  /**
+   * Declare type for container size.
+   */
+  using size_type = types::global_dof_index;
+
+  /**
+   * Standardized data struct to pipe additional data to the solver.
+   * Here, it doesn't store anything but just exists for consistency
+   * with the other solver classes.
+   */
+  struct AdditionalData
+  {};
+
+  /**
+   * Constructor.
+   */
+  SolverFlexibleCG(SolverControl &           cn,
+                   VectorMemory<VectorType> &mem,
+                   const AdditionalData &    data = AdditionalData());
+
+  /**
+   * Constructor. Use an object of type GrowingVectorMemory as a default to
+   * allocate memory.
+   */
+  SolverFlexibleCG(SolverControl &       cn,
+                   const AdditionalData &data = AdditionalData());
+};
+
 
 /*@}*/
 
@@ -236,12 +310,15 @@ protected:
 
 #ifndef DOXYGEN
 
+
+
 template <typename VectorType>
 SolverCG<VectorType>::SolverCG(SolverControl &           cn,
                                VectorMemory<VectorType> &mem,
                                const AdditionalData &    data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
+  , determine_beta_by_flexible_formula(false)
 {}
 
 
@@ -250,6 +327,7 @@ template <typename VectorType>
 SolverCG<VectorType>::SolverCG(SolverControl &cn, const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
+  , determine_beta_by_flexible_formula(false)
 {}
 
 
@@ -329,14 +407,17 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
   typename VectorMemory<VectorType>::Pointer r_pointer(this->memory);
   typename VectorMemory<VectorType>::Pointer p_pointer(this->memory);
   typename VectorMemory<VectorType>::Pointer v_pointer(this->memory);
+  typename VectorMemory<VectorType>::Pointer z_pointer(this->memory);
 
   // Define some aliases for simpler access, using the variables 'r' for the
   // residual b - A*x, 'p' for the search direction, and 'v' for the auxiliary
   // vector. This naming convention is used e.g. by the description on
-  // https://en.wikipedia.org/wiki/Conjugate_gradient_method
+  // https://en.wikipedia.org/wiki/Conjugate_gradient_method. The variable 'z'
+  // gets only used for the flexible variant of the CG method.
   VectorType &r = *r_pointer;
   VectorType &p = *p_pointer;
   VectorType &v = *v_pointer;
+  VectorType &z = *z_pointer;
 
   // Should we build the matrix for eigenvalue computations?
   const bool do_eigenvalues =
@@ -354,6 +435,8 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
   r.reinit(x, true);
   p.reinit(x, true);
   v.reinit(x, true);
+  if (determine_beta_by_flexible_formula)
+    z.reinit(x, true);
 
   int    it                         = 0;
   number r_dot_preconditioner_dot_r = number();
@@ -398,10 +481,17 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
           Assert(std::abs(old_r_dot_preconditioner_dot_r) != 0.,
                  ExcDivideByZero());
           beta = r_dot_preconditioner_dot_r / old_r_dot_preconditioner_dot_r;
+          if (determine_beta_by_flexible_formula)
+            beta -= (r * z) / old_r_dot_preconditioner_dot_r;
           p.sadd(beta, 1., direction);
         }
       else
         p.equ(1., direction);
+
+      // Make sure to recall P^{-1} * r until the next iteration -> put it
+      // into vector z
+      if (determine_beta_by_flexible_formula)
+        z.swap(v);
 
       A.vmult(v, p);
 
@@ -488,6 +578,27 @@ SolverCG<VectorType>::connect_eigenvalues_slot(
     {
       return eigenvalues_signal.connect(slot);
     }
+}
+
+
+
+template <typename VectorType>
+SolverFlexibleCG<VectorType>::SolverFlexibleCG(SolverControl &           cn,
+                                               VectorMemory<VectorType> &mem,
+                                               const AdditionalData &)
+  : SolverCG<VectorType>(cn, mem)
+{
+  this->determine_beta_by_flexible_formula = true;
+}
+
+
+
+template <typename VectorType>
+SolverFlexibleCG<VectorType>::SolverFlexibleCG(SolverControl &cn,
+                                               const AdditionalData &)
+  : SolverCG<VectorType>(cn)
+{
+  this->determine_beta_by_flexible_formula = true;
 }
 
 
