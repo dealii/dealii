@@ -478,7 +478,7 @@ namespace GridTools
       void
       insert_face_data(const FaceIteratorType &face)
       {
-        CellData<dim - 1> face_cell_data;
+        CellData<dim - 1> face_cell_data(face->n_vertices());
         for (unsigned int vertex_n = 0; vertex_n < face->n_vertices();
              ++vertex_n)
           face_cell_data.vertices[vertex_n] = face->vertex_index(vertex_n);
@@ -593,7 +593,6 @@ namespace GridTools
                     for (unsigned int vertex_n : line->vertex_indices())
                       line_cell_data.vertices[vertex_n] =
                         line->vertex_index(vertex_n);
-
                     line_cell_data.boundary_id = line->boundary_id();
                     line_cell_data.manifold_id = line->manifold_id();
                     line_data.insert(std::move(line_cell_data));
@@ -5251,6 +5250,7 @@ namespace GridTools
                 ExcMessage("The input Triangulation cannot "
                            "have hanging nodes."));
 
+    AssertThrow(tria.all_reference_cells_are_hyper_cube(), ExcNotImplemented());
 
     bool has_cells_with_more_than_dim_faces_on_boundary = true;
     bool has_cells_with_dim_faces_on_boundary           = false;
@@ -5473,7 +5473,7 @@ namespace GridTools
       {
         if (cells_to_remove[cell->active_cell_index()] == false)
           {
-            CellData<dim> c;
+            CellData<dim> c(cell->n_vertices());
             for (const unsigned int v : cell->vertex_indices())
               c.vertices[v] = cell->vertex_index(v);
             c.manifold_id = cell->manifold_id();
@@ -5512,7 +5512,7 @@ namespace GridTools
             }
           if (dim == 3)
             {
-              CellData<2> quad;
+              CellData<2> quad(face->n_vertices());
               for (const unsigned int v : face->vertex_indices())
                 quad.vertices[v] = face->vertex_index(v);
               quad.boundary_id = face->boundary_id();
