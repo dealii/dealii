@@ -1,0 +1,9 @@
+Improved: GridTools::get_coarse_mesh_description() no longer returns subcell data
+corresponding to default values (i.e., when the manifold_id is
+numbers::flat_manifold_id and when the boundary_id is
+numbers::internal_face_boundary_id). By skipping this data, which is not required by
+Triangulation::create_triangulation(), the total amount of data returned by this
+function is significantly lowered (and, therefore, so is the cost of creating a new
+Triangulation from the output).
+<br>
+(David Wells, 2022/05/09)
