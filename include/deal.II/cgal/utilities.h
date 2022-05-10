@@ -27,6 +27,7 @@
 #  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
 #  include <CGAL/Mesh_criteria_3.h>
 #  include <CGAL/Mesh_triangulation_3.h>
+#  include <CGAL/Polygon_mesh_processing/corefinement.h>
 #  include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
 #  include <CGAL/Polyhedral_mesh_domain_with_features_3.h>
 #  include <CGAL/Simple_cartesian.h>
@@ -59,6 +60,16 @@ namespace CGALWrappers
 #  else
   using ConcurrencyTag = CGAL::Sequential_tag;
 #  endif
+
+  enum class BooleanOperation
+  {
+    compute_corefinement = 1 << 0, ///< Corefine the two surfaces
+    compute_difference   = 1 << 1, ///< Compute the boolean difference of the
+                                   ///< first input argument minus the second
+    compute_intersection =
+      1 << 2,               ///< Compute the intersection of the input arguments
+    compute_union = 1 << 3, ///< Compute the union of the input arguments
+  };
 
   /**
    * Convert from deal.II Point to any compatible CGAL point.
@@ -103,6 +114,45 @@ namespace CGALWrappers
   cgal_surface_mesh_to_cgal_coarse_triangulation(
     CGAL::Surface_mesh<typename C3t3::Point::Point> &surface_mesh,
     C3t3 &                                           triangulation);
+
+  /**
+   * Given two triangulated surface meshes, execute a boolean operation on them,
+   * and store the result in another surface mesh.
+   *
+   * The corefinement of two triangulated surface meshes can naturally be used
+   * for computing Boolean operations on the volumes bounded by surfaces,
+   * according to the chosen BooleanOperation. See BooleanOperation for a list
+   * of available operations. As an example consider the following case with a
+   * cube and the green polyhedron.
+   *
+   * @image html hedra_cube.png
+   *
+   * The shaded regions in the following show the results of the intersection,
+   * union, difference and corefinement between a cube and the green polyhedron.
+   *
+   * @image html boolean_intersection.png
+   * @image html boolean_union.png
+   * @image html boolean_difference.png
+   * @image html corefinement.png
+   *
+   * See the CGAL documentation for an extended discussion and several examples:
+   * https://doc.cgal.org/latest/Polygon_mesh_processing/index.html#title14
+   *
+   * @param[in] surface_mesh_1 The first surface mesh.
+   * @param[in] surface_mesh_2 The second surface mesh.
+   * @param[in] boolean_operation See BooleanOperation for the list of the
+   * allowed operations.
+   * @param[out] output_surface_mesh The surface mesh with the result of
+   * the boolean operation. Notice that in case of corefinement only, the
+   * corefined mesh will be the first one.
+   */
+  template <typename CGALPointType>
+  void
+  compute_boolean_operation(
+    const CGAL::Surface_mesh<CGALPointType> &surface_mesh_1,
+    const CGAL::Surface_mesh<CGALPointType> &surface_mesh_2,
+    const BooleanOperation &                 boolean_operation,
+    CGAL::Surface_mesh<CGALPointType> &      output_surface_mesh);
 } // namespace CGALWrappers
 
 #  ifndef DOXYGEN
@@ -175,6 +225,56 @@ namespace CGALWrappers
                                             criteria,
                                             CGAL::parameters::no_perturb(),
                                             CGAL::parameters::no_exude());
+  }
+
+
+
+  template <typename CGALPointType>
+  void
+  compute_boolean_operation(
+    const CGAL::Surface_mesh<CGALPointType> &surface_mesh_1,
+    const CGAL::Surface_mesh<CGALPointType> &surface_mesh_2,
+    const BooleanOperation &                 boolean_operation,
+    CGAL::Surface_mesh<CGALPointType> &      output_surface_mesh)
+  {
+    Assert(
+      output_surface_mesh.is_empty() && CGAL::is_closed(surface_mesh_1) &&
+        CGAL::is_closed(surface_mesh_2),
+      ExcMessage(
+        "The output surface_mesh must be empty upon calling this function"));
+    bool res      = false;
+    auto surf_1   = surface_mesh_1;
+    auto surf_2   = surface_mesh_2;
+    namespace PMP = CGAL::Polygon_mesh_processing;
+    switch (boolean_operation)
+      {
+        case BooleanOperation::compute_union:
+          res = PMP::corefine_and_compute_union(surf_1,
+                                                surf_2,
+                                                output_surface_mesh);
+          break;
+        case BooleanOperation::compute_intersection:
+          res = PMP::corefine_and_compute_intersection(surf_1,
+                                                       surf_2,
+                                                       output_surface_mesh);
+          break;
+        case BooleanOperation::compute_difference:
+          res = PMP::corefine_and_compute_difference(surf_1,
+                                                     surf_2,
+                                                     output_surface_mesh);
+          break;
+        case BooleanOperation::compute_corefinement:
+          PMP::corefine(surf_1,
+                        surf_2); // both surfaces are corefined
+          output_surface_mesh = std::move(surf_1);
+          res                 = true;
+          break;
+        default:
+          output_surface_mesh.clear();
+          break;
+      }
+    Assert(res,
+           ExcMessage("The boolean operation was not succesfully computed."));
   }
 } // namespace CGALWrappers
 #  endif

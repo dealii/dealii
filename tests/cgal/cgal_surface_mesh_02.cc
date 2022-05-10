@@ -43,6 +43,7 @@ using C3t3          = CGAL::Mesh_complex_3_in_triangulation_3<Tr,
                                                      Mesh_domain::Corner_index,
                                                      Mesh_domain::Curve_index>;
 
+
 void
 test()
 {
@@ -50,6 +51,7 @@ test()
                                         "input_grids/tetrahedron.off"};
   CGAL::Surface_mesh<CGALPoint>  sm;
   C3t3                           tria;
+
   for (const auto &name : fnames)
     {
       std::ifstream input(name);
