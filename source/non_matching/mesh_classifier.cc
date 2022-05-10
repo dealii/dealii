@@ -320,7 +320,7 @@ namespace NonMatching
 
         Assert(fe_collection[i].has_face_support_points(),
                ExcMessage(
-                 "The elements in the FECollection of the incoming DoFHandler"
+                 "The elements in the FECollection of the incoming DoFHandler "
                  "must have face support points."));
       }
   }

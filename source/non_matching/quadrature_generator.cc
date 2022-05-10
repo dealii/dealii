@@ -1653,8 +1653,8 @@ namespace NonMatching
     Assert(
       q_generator.get_quadratures().indefinite.size() == 0,
       ExcMessage(
-        "Generation of quadrature rules failed. This can mean that the level"
-        "set function is degenerate in some way, e.g. oscillating extremely"
+        "Generation of quadrature rules failed. This can mean that the level "
+        "set function is degenerate in some way, e.g. oscillating extremely "
         "rapidly."));
   }
 
