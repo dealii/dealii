@@ -4,6 +4,10 @@ on:
   push: 
     branches: [master]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-master-docker:
     runs-on: ubuntu-latest
