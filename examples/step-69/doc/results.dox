@@ -166,7 +166,7 @@ the features we care about.
 This can be fixed, but it would exceed what a *tutorial* is about.
 Nevertheless, it is worth showing what one can achieve by adding a
 second-order scheme. For example, here is a video computed with <a
-href=https://conservation-laws.43-1.org/>the following research code</a>
+href=https://conservation-laws.org/>the following research code</a>
 that shows (with a different color scheme) a 2d simulation that corresponds
 to the cases shown above:
 
