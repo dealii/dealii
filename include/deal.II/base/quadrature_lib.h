@@ -83,7 +83,12 @@ public:
 
 /**
  * The midpoint rule for numerical quadrature. This one-point formula is exact
- * for linear polynomials.
+ * for linear integrands.
+ *
+ * @note This class only works for cells that are tensor product (hypercube) cells,
+ *   that is, are either ReferenceCells::Line, ReferenceCells::Quadrilateral,
+ *   or ReferenceCells::Hexahedron. For other cell shapes, this class is not
+ *   appropriate. Use ReferenceCell::get_midpoint_quadrature() instead.
  */
 template <int dim>
 class QMidpoint : public Quadrature<dim>

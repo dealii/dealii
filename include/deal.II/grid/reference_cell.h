@@ -204,10 +204,23 @@ public:
   get_gauss_type_quadrature(const unsigned n_points_1D) const;
 
   /**
-   * Return a quadrature rule with the support points of the given reference
-   * cell. For 1d line segments, this corresponds to the quadrature points
-   * of the trapezoidal rule, which by taking tensor products easily
-   * generalizes also to other hypercube elements (see also QTrapezoid).
+   * Return a quadrature object that has a single quadrature point at the
+   * barycenter of the cell with quadrature weight equal to the volume of the
+   * reference cell. This quadrature formula is exact for integrals of constant
+   * and linear integrands.
+   *
+   * The object returned by this function generalizes what the QMidpoint class
+   * represents to other reference cells.
+   */
+  template <int dim>
+  Quadrature<dim>
+  get_midpoint_quadrature() const;
+
+  /**
+   * Return a quadrature rule whose quadrature points are the vertices of the
+   * given reference cell. For 1d line segments, this corresponds to the
+   * quadrature points of the trapezoidal rule, which by taking tensor products
+   * easily generalizes also to other hypercube elements (see also QTrapezoid).
    * For all reference cell shapes, the quadrature points are ordered
    * in the same order as the vertices of the reference cell.
    *
@@ -922,6 +935,16 @@ ReferenceCell::get_dimension() const
 
   Assert(false, ExcNotImplemented());
   return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int dim>
+Quadrature<dim>
+ReferenceCell::get_midpoint_quadrature() const
+{
+  return Quadrature<dim>(std::vector<Point<dim>>({barycenter<dim>()}),
+                         std::vector<double>({volume()}));
 }
 
 
