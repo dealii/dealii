@@ -21,7 +21,7 @@ research computations you might want to consider exploring a corresponding
 implementation of a second-order accurate scheme</a> that uses <i>convex
 limiting</i> techniques, and strong stability-preserving (SSP) time
 integration, see @cite GuermondEtAl2018
-(<a href="https://conservation-laws.43-1.org/">website</a>).
+(<a href="https://conservation-laws.org/">website</a>).
 
 @dealiiTutorialDOI{10.5281/zenodo.3698223,https://zenodo.org/badge/DOI/10.5281/zenodo.3698223.svg}
 
