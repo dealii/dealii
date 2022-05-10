@@ -46,6 +46,16 @@ namespace NonMatching
   {
     namespace MeshClassifierImplementation
     {
+      DeclExceptionMsg(
+        ReclassifyNotCalled,
+        "The Triangulation has not been classified. You need to call the "
+        "reclassify()-function before using this function.");
+
+      DeclExceptionMsg(
+        ExcTriangulationMismatch,
+        "The incoming cell does not belong to the triangulation passed to "
+        "the constructor.");
+
       /**
        * Return LocationToLevelSet::inside/outside if all values in incoming
        * vector are negative/positive, otherwise return
@@ -419,6 +429,11 @@ namespace NonMatching
   MeshClassifier<dim>::location_to_level_set(
     const typename Triangulation<dim>::cell_iterator &cell) const
   {
+    Assert(cell_locations.size() == triangulation->n_active_cells(),
+           internal::MeshClassifierImplementation::ReclassifyNotCalled());
+    Assert(&cell->get_triangulation() == triangulation,
+           internal::MeshClassifierImplementation::ExcTriangulationMismatch());
+
     return cell_locations.at(cell->active_cell_index());
   }
 
@@ -431,6 +446,10 @@ namespace NonMatching
     const unsigned int                                face_index) const
   {
     AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
+    Assert(face_locations.size() == triangulation->n_raw_faces(),
+           internal::MeshClassifierImplementation::ReclassifyNotCalled());
+    Assert(&cell->get_triangulation() == triangulation,
+           internal::MeshClassifierImplementation::ExcTriangulationMismatch());
 
     return face_locations.at(cell->face(face_index)->index());
   }
