@@ -105,7 +105,7 @@ public:
 
   /**
    * Standardized data struct to pipe additional data to the solver.
-   * Here, it doesn't store anything but just exists for consistency
+   * Here, it does not store anything but just exists for consistency
    * with the other solver classes.
    */
   struct AdditionalData
@@ -251,14 +251,14 @@ protected:
  * which is based on a different formula to compute $\beta_k$ in the process
  * of constructing a new search direction that is A-orthogonal against the
  * previous one. Rather than using the Fletcher--Reeves update formula with
- * $\beta_k = \frac{\mathbf{r}^T_{k+1} \mathbf{z}^T_{k+1}}{\mathbf{r}^T_{k}
- * \mathbf{z}^T_{k}}$ for computing the new search direction (here
+ * $\beta_k = \frac{\mathbf{r}^T_{k+1} \mathbf{z}_{k+1}}{\mathbf{r}^T_{k}
+ * \mathbf{z}_{k}}$ for computing the new search direction (here
  * $\mathbf{r}_{k+1}$ is the residual in step $k+1$ and $\mathbf{z}_{k+1} =
  * P^{-1} \mathbf{r}_{k+1}$) as in the classical conjugate gradient algorithm,
  * this class selects the Polak-Ribiere formula $\beta_k =
- * \frac{\mathbf{r}^T_{k+1} \left(\mathbf{z}^T_{k+1} -
- * \mathbf{z}^T_{k}\right)}{\mathbf{r}^T_{k} \mathbf{z}^T_{k}}$. The
- * additional term $\mathbf{r}^T_{k+1} \mathbf{z}^T_{k}$ is zero for linear
+ * \frac{\mathbf{r}^T_{k+1} \left(\mathbf{z}_{k+1} -
+ * \mathbf{z}_{k}\right)}{\mathbf{r}^T_{k} \mathbf{z}_{k}}$. The
+ * additional term $\mathbf{r}^T_{k+1} \mathbf{z}_{k}$ is zero for linear
  * symmetric-positive definite preconditioners due to the construction of the
  * search directions, so the behavior of SolverFlexibleCG is equivalent for
  * those kinds of situations and merely increases costs by requiring an
@@ -282,7 +282,7 @@ public:
 
   /**
    * Standardized data struct to pipe additional data to the solver.
-   * Here, it doesn't store anything but just exists for consistency
+   * Here, it does not store anything but just exists for consistency
    * with the other solver classes.
    */
   struct AdditionalData
