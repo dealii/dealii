@@ -381,7 +381,7 @@ namespace Utilities
       if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
           1)
         {
-          return ConsensusAlgorithms::nbx<char, char>(
+          return ConsensusAlgorithms::nbx<std::vector<char>, std::vector<char>>(
             destinations, {}, {}, {}, mpi_comm);
         }
 
@@ -477,7 +477,7 @@ namespace Utilities
       if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
           1)
         {
-          return ConsensusAlgorithms::nbx<char, char>(
+          return ConsensusAlgorithms::nbx<std::vector<char>, std::vector<char>>(
                    destinations, {}, {}, {}, mpi_comm)
             .size();
         }
@@ -1098,8 +1098,9 @@ namespace Utilities
       // partition (i.e. in the dictionary). This process returns the actual
       // owner of the index.
       ConsensusAlgorithms::Selector<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>
+        std::vector<
+          std::pair<types::global_dof_index, types::global_dof_index>>,
+        std::vector<unsigned int>>
         consensus_algorithm(process, comm);
       consensus_algorithm.run();
 

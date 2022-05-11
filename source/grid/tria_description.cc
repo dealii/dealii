@@ -143,12 +143,12 @@ namespace TriangulationDescription
           };
 
 
-          dealii::Utilities::MPI::ConsensusAlgorithms::selector<char, char>(
-            relevant_processes,
-            create_request,
-            answer_request,
-            process_answer,
-            comm);
+          dealii::Utilities::MPI::ConsensusAlgorithms::
+            selector<std::vector<char>, std::vector<char>>(relevant_processes,
+                                                           create_request,
+                                                           answer_request,
+                                                           process_answer,
+                                                           comm);
         }
 
         /**

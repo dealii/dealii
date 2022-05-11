@@ -567,8 +567,9 @@ namespace internal
                 false);
 
             Utilities::MPI::ConsensusAlgorithms::Selector<
-              std::pair<types::global_cell_index, types::global_cell_index>,
-              unsigned int>
+              std::vector<
+                std::pair<types::global_cell_index, types::global_cell_index>>,
+              std::vector<unsigned int>>
               consensus_algorithm(process, communicator);
             consensus_algorithm.run();
           }
@@ -593,8 +594,9 @@ namespace internal
                 true);
 
       Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::pair<types::global_cell_index, types::global_cell_index>,
-        unsigned int>
+        std::vector<
+          std::pair<types::global_cell_index, types::global_cell_index>>,
+        std::vector<unsigned int>>
         consensus_algorithm(process, communicator);
       consensus_algorithm.run();
 
@@ -3086,8 +3088,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::reinit(
                 false);
 
       Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::pair<types::global_cell_index, types::global_cell_index>,
-        unsigned int>
+        std::vector<
+          std::pair<types::global_cell_index, types::global_cell_index>>,
+        std::vector<unsigned int>>
         consensus_algorithm(process, communicator);
       consensus_algorithm.run();
 

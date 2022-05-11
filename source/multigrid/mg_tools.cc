@@ -1823,8 +1823,9 @@ namespace MGTools
                   false);
 
         Utilities::MPI::ConsensusAlgorithms::Selector<
-          std::pair<types::global_cell_index, types::global_cell_index>,
-          unsigned int>
+          std::vector<
+            std::pair<types::global_cell_index, types::global_cell_index>>,
+          std::vector<unsigned int>>
           consensus_algorithm;
         consensus_algorithm.run(process, communicator);
 

@@ -77,8 +77,9 @@ namespace Utilities
          */
         class DictionaryPayLoad
           : public ConsensusAlgorithms::Process<
-              std::pair<types::global_dof_index, types::global_dof_index>,
-              unsigned int>
+              std::vector<
+                std::pair<types::global_dof_index, types::global_dof_index>>,
+              std::vector<unsigned int>>
         {
         public:
           /**
@@ -282,8 +283,9 @@ namespace Utilities
          */
         class ConsensusAlgorithmsPayload
           : public ConsensusAlgorithms::Process<
-              std::pair<types::global_dof_index, types::global_dof_index>,
-              unsigned int>
+              std::vector<
+                std::pair<types::global_dof_index, types::global_dof_index>>,
+              std::vector<unsigned int>>
         {
         public:
           /**
