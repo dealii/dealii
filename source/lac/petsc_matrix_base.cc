@@ -294,7 +294,7 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // MatInfo logs quantities as PetscLogDouble. So we need to cast it to match
-    // out interface.
+    // our interface.
     return static_cast<std::uint64_t>(mat_info.nz_used);
   }
 
