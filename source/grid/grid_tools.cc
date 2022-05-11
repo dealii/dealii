@@ -744,8 +744,6 @@ namespace GridTools
                              const double                  tol)
   {
     AssertIndexRange(2, vertices.size());
-    // create a vector of vertex indices. initialize it to the identity, later
-    // on change that if necessary.
     std::vector<unsigned int> new_vertex_numbers(vertices.size());
     std::iota(new_vertex_numbers.begin(), new_vertex_numbers.end(), 0);
 
@@ -765,14 +763,12 @@ namespace GridTools
     // number of points that need to be compared against each-other in a
     // single set for typical geometries.
     const BoundingBox<spacedim> bbox(vertices);
-    const auto &                min = bbox.get_boundary_points().first;
-    const auto &                max = bbox.get_boundary_points().second;
 
     unsigned int longest_coordinate_direction = 0;
-    double       longest_coordinate_length    = max[0] - min[0];
+    double       longest_coordinate_length    = bbox.side_length(0);
     for (unsigned int d = 1; d < spacedim; ++d)
       {
-        const double coordinate_length = max[d] - min[d];
+        const double coordinate_length = bbox.side_length(d);
         if (longest_coordinate_length < coordinate_length)
           {
             longest_coordinate_length    = coordinate_length;
