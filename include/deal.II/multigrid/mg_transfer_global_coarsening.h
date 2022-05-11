@@ -28,6 +28,7 @@
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <deal.II/multigrid/mg_base.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -612,6 +613,38 @@ private:
    */
   std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
     external_partitioners;
+};
+
+
+
+/**
+ * This class works with LinearAlgebra::distributed::BlockVector and
+ * performs exactly the same transfer operations for each block as
+ * MGTransferGlobalCoarsening.
+ */
+template <int dim, typename VectorType>
+class MGTransferBlockGlobalCoarsening
+  : public MGTransferBlockMatrixFreeBase<
+      dim,
+      typename VectorType::value_type,
+      MGTransferGlobalCoarsening<dim, VectorType>>
+{
+public:
+  /**
+   * Constructor.
+   */
+  MGTransferBlockGlobalCoarsening(
+    const MGTransferGlobalCoarsening<dim, VectorType> &transfer_operator);
+
+protected:
+  const MGTransferGlobalCoarsening<dim, VectorType> &
+  get_matrix_free_transfer(const unsigned int b) const override;
+
+private:
+  /**
+   * Non-block version of transfer operation.
+   */
+  const MGTransferGlobalCoarsening<dim, VectorType> &transfer_operator;
 };
 
 

@@ -33,7 +33,7 @@
 
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer_internal.h>
-#include <deal.II/multigrid/mg_transfer_matrix_free.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.templates.h>
 
 #include <algorithm>
 
@@ -707,8 +707,10 @@ MGTransferMatrixFree<dim, Number>::memory_consumption() const
 template <int dim, typename Number>
 MGTransferBlockMatrixFree<dim, Number>::MGTransferBlockMatrixFree(
   const MGConstrainedDoFs &mg_c)
+  : MGTransferBlockMatrixFreeBase<dim,
+                                  Number,
+                                  MGTransferMatrixFree<dim, Number>>(true)
 {
-  this->same_for_all = true;
   this->matrix_free_transfer_vector.emplace_back(mg_c);
 }
 
@@ -717,8 +719,10 @@ MGTransferBlockMatrixFree<dim, Number>::MGTransferBlockMatrixFree(
 template <int dim, typename Number>
 MGTransferBlockMatrixFree<dim, Number>::MGTransferBlockMatrixFree(
   const std::vector<MGConstrainedDoFs> &mg_c)
+  : MGTransferBlockMatrixFreeBase<dim,
+                                  Number,
+                                  MGTransferMatrixFree<dim, Number>>(false)
 {
-  this->same_for_all = false;
   for (const auto &constrained_block_dofs : mg_c)
     this->matrix_free_transfer_vector.emplace_back(constrained_block_dofs);
 }
@@ -795,82 +799,20 @@ MGTransferBlockMatrixFree<dim, Number>::memory_consumption() const
 
 
 template <int dim, typename Number>
+const MGTransferMatrixFree<dim, Number> &
+MGTransferBlockMatrixFree<dim, Number>::get_matrix_free_transfer(
+  const unsigned int b) const
+{
+  return matrix_free_transfer_vector[b];
+}
+
+
+
+template <int dim, typename Number>
 void
 MGTransferBlockMatrixFree<dim, Number>::clear()
 {
   this->matrix_free_transfer_vector.clear();
-}
-
-
-
-template <int dim, typename Number, typename TransferType>
-void
-MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::prolongate(
-  const unsigned int                                     to_level,
-  LinearAlgebra::distributed::BlockVector<Number> &      dst,
-  const LinearAlgebra::distributed::BlockVector<Number> &src) const
-{
-  const unsigned int n_blocks = src.n_blocks();
-  AssertDimension(dst.n_blocks(), n_blocks);
-
-  if (!same_for_all)
-    AssertDimension(matrix_free_transfer_vector.size(), n_blocks);
-
-  for (unsigned int b = 0; b < n_blocks; ++b)
-    {
-      const unsigned int data_block = same_for_all ? 0 : b;
-      matrix_free_transfer_vector[data_block].prolongate(to_level,
-                                                         dst.block(b),
-                                                         src.block(b));
-    }
-}
-
-
-
-template <int dim, typename Number, typename TransferType>
-void
-MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::prolongate_and_add(
-  const unsigned int                                     to_level,
-  LinearAlgebra::distributed::BlockVector<Number> &      dst,
-  const LinearAlgebra::distributed::BlockVector<Number> &src) const
-{
-  const unsigned int n_blocks = src.n_blocks();
-  AssertDimension(dst.n_blocks(), n_blocks);
-
-  if (!same_for_all)
-    AssertDimension(matrix_free_transfer_vector.size(), n_blocks);
-
-  for (unsigned int b = 0; b < n_blocks; ++b)
-    {
-      const unsigned int data_block = same_for_all ? 0 : b;
-      matrix_free_transfer_vector[data_block].prolongate_and_add(to_level,
-                                                                 dst.block(b),
-                                                                 src.block(b));
-    }
-}
-
-
-
-template <int dim, typename Number, typename TransferType>
-void
-MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::restrict_and_add(
-  const unsigned int                                     from_level,
-  LinearAlgebra::distributed::BlockVector<Number> &      dst,
-  const LinearAlgebra::distributed::BlockVector<Number> &src) const
-{
-  const unsigned int n_blocks = src.n_blocks();
-  AssertDimension(dst.n_blocks(), n_blocks);
-
-  if (!same_for_all)
-    AssertDimension(matrix_free_transfer_vector.size(), n_blocks);
-
-  for (unsigned int b = 0; b < n_blocks; ++b)
-    {
-      const unsigned int data_block = same_for_all ? 0 : b;
-      matrix_free_transfer_vector[data_block].restrict_and_add(from_level,
-                                                               dst.block(b),
-                                                               src.block(b));
-    }
 }
 
 

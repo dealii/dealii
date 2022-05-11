@@ -45,6 +45,7 @@
 
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer_global_coarsening.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -3162,6 +3163,32 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   return size;
 }
+
+
+
+template <int dim, typename VectorType>
+MGTransferBlockGlobalCoarsening<dim, VectorType>::
+  MGTransferBlockGlobalCoarsening(
+    const MGTransferGlobalCoarsening<dim, VectorType> &transfer_operator)
+  : MGTransferBlockMatrixFreeBase<dim,
+                                  typename VectorType::value_type,
+                                  MGTransferGlobalCoarsening<dim, VectorType>>(
+      true)
+  , transfer_operator(transfer_operator)
+{}
+
+
+
+template <int dim, typename VectorType>
+const MGTransferGlobalCoarsening<dim, VectorType> &
+MGTransferBlockGlobalCoarsening<dim, VectorType>::get_matrix_free_transfer(
+  const unsigned int b) const
+{
+  (void)b;
+  AssertDimension(b, 0);
+  return transfer_operator;
+}
+
 
 DEAL_II_NAMESPACE_CLOSE
 
