@@ -4265,13 +4265,14 @@ namespace internal
                                             (n_q_points_1d < 1) ? 1 :
                                                                   n_q_points_1d,
                                             Number>::
-            template evaluate_or_integrate_in_face<false>(evaluation_flag,
-                                                          shape_info,
-                                                          temp,
-                                                          fe_eval,
-                                                          scratch_data,
-                                                          subface_index,
-                                                          face_no);
+            template evaluate_or_integrate_in_face<false>(
+              evaluation_flag,
+              shape_info,
+              temp,
+              fe_eval,
+              scratch_data,
+              subface_index,
+              fe_eval.get_face_no());
         }
       else if (fe_degree > -1 &&
                subface_index >= GeometryInfo<dim>::max_children_per_cell &&
@@ -4518,7 +4519,7 @@ namespace internal
                                                          fe_eval,
                                                          scratch_data,
                                                          subface_index,
-                                                         face_no);
+                                                         fe_eval.get_face_no());
         }
       else if (fe_degree > -1 &&
                fe_eval.get_subface_index() >=
