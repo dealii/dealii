@@ -1,0 +1,55 @@
+
+DEAL::CG solver without interleaving support
+DEAL:cg::Starting value 49.0000
+DEAL:cg::Convergence step 51 value 0.429721
+DEAL::Norm of the solution: 11776.3
+DEAL::CG solver with interleaving support
+DEAL:cg::Starting value 49.0000
+DEAL:cg::Convergence step 51 value 0.429721
+DEAL::Norm of the solution: 11776.3
+DEAL::Number of calls to special vmult: 51
+DEAL::CG solver with matrix with interleaving support but no preconditioner
+DEAL:cg::Starting value 49.0000
+DEAL:cg::Convergence step 51 value 0.429721
+DEAL::Norm of the solution: 11776.3
+DEAL::CG solver with interleaving support and preconditioner working on subrange
+DEAL:cg::Starting value 49.0000
+DEAL:cg::Convergence step 51 value 0.429721
+DEAL::Norm of the solution: 11776.3
+DEAL::Number of calls to special vmult: 51
+DEAL::CG solver without interleaving support
+DEAL:cg::Starting value 189.571
+DEAL:cg::Convergence step 61 value 1.71195
+DEAL::Norm of the solution: 684335.
+DEAL::CG solver with interleaving support
+DEAL:cg::Starting value 189.571
+DEAL:cg::Convergence step 61 value 1.71195
+DEAL::Norm of the solution: 684335.
+DEAL::Number of calls to special vmult: 61
+DEAL::CG solver with matrix with interleaving support but no preconditioner
+DEAL:cg::Starting value 189.571
+DEAL:cg::Convergence step 61 value 1.71195
+DEAL::Norm of the solution: 684335.
+DEAL::CG solver with interleaving support and preconditioner working on subrange
+DEAL:cg::Starting value 189.571
+DEAL:cg::Convergence step 61 value 1.71195
+DEAL::Norm of the solution: 684335.
+DEAL::Number of calls to special vmult: 61
+DEAL::CG solver without interleaving support
+DEAL:cg::Starting value 125.000
+DEAL:cg::Convergence step 39 value 1.10898
+DEAL::Norm of the solution: 196549.
+DEAL::CG solver with interleaving support
+DEAL:cg::Starting value 125.000
+DEAL:cg::Convergence step 39 value 1.10898
+DEAL::Norm of the solution: 196549.
+DEAL::Number of calls to special vmult: 39
+DEAL::CG solver with matrix with interleaving support but no preconditioner
+DEAL:cg::Starting value 125.000
+DEAL:cg::Convergence step 39 value 1.10898
+DEAL::Norm of the solution: 196549.
+DEAL::CG solver with interleaving support and preconditioner working on subrange
+DEAL:cg::Starting value 125.000
+DEAL:cg::Convergence step 39 value 1.10898
+DEAL::Norm of the solution: 196549.
+DEAL::Number of calls to special vmult: 39
