@@ -1743,6 +1743,15 @@ public:
    * of the respective finite element class for a description of what the
    * prolongation matrices represent in this case.
    *
+   * @note Cells set the values of DoFs independently and might overwrite
+   * previously set values in the global vector, for example when calling the
+   * same function earlier from a different cell. By setting @p perform_check,
+   * you can enable a check that the previous value and the one to be set here
+   * are at least roughly the same. In practice, they might be slightly
+   * different because they are computed in a way that theoretically ensures
+   * that they are the same, but in practice they are only equal up to
+   * round-off.
+   *
    * @note Unlike the get_dof_values() function, this function is only
    * available on cells, rather than on lines, quads, and hexes, since
    * interpolation is presently only provided for cells by the finite element
@@ -1754,7 +1763,8 @@ public:
     const Vector<number> &local_values,
     OutputVector &        values,
     const unsigned int    fe_index =
-      DoFHandler<dimension_, space_dimension_>::invalid_fe_index) const;
+      DoFHandler<dimension_, space_dimension_>::invalid_fe_index,
+    const bool perform_check = false) const;
 
   /**
    * Distribute a local (cell based) vector to a global one by mapping the

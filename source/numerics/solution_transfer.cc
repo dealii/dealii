@@ -192,7 +192,8 @@ SolutionTransfer<dim, VectorType, spacedim>::refine_interpolate(
               in, (*pointerstruct->second.indices_ptr)[i]);
           cell->set_dof_values_by_interpolation(local_values,
                                                 out,
-                                                this_fe_index);
+                                                this_fe_index,
+                                                true);
         }
     }
 }
@@ -520,7 +521,8 @@ SolutionTransfer<dim, VectorType, spacedim>::interpolate(
 
                   cell->set_dof_values_by_interpolation(tmp,
                                                         all_out[j],
-                                                        old_fe_index);
+                                                        old_fe_index,
+                                                        true);
                 }
             }
           else if (valuesptr)

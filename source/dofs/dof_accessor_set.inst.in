@@ -20,7 +20,8 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS; lda : BOOL)
     template void DoFCellAccessor<deal_II_dimension, deal_II_dimension, lda>::
       set_dof_values_by_interpolation(const Vector<VEC::value_type> &,
                                       VEC &,
-                                      const unsigned int fe_index) const;
+                                      const unsigned int fe_index,
+                                      const bool) const;
 
 #if deal_II_dimension != 3
 
@@ -28,15 +29,18 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS; lda : BOOL)
     DoFCellAccessor<deal_II_dimension, deal_II_dimension + 1, lda>::
       set_dof_values_by_interpolation(const Vector<VEC::value_type> &,
                                       VEC &,
-                                      const unsigned int fe_index) const;
+                                      const unsigned int fe_index,
+                                      const bool) const;
 
 #endif
 
 #if deal_II_dimension == 3
 
     template void DoFCellAccessor<1, 3, lda>::set_dof_values_by_interpolation(
-      const Vector<VEC::value_type> &, VEC &, const unsigned int fe_index)
-      const;
+      const Vector<VEC::value_type> &,
+      VEC &,
+      const unsigned int fe_index,
+      const bool) const;
 
 #endif
   }
