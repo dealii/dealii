@@ -117,8 +117,8 @@ namespace Utilities
        *   considered as a request message by the receiving rank.
        * - receive message: The answer to a send/request message.
        *
-       * @tparam T1 The type of the elements of the vector to sent.
-       * @tparam T2 The type of the elements of the vector to received.
+       * @tparam RequestType The type of the elements of the vector to sent.
+       * @tparam AnswerType The type of the elements of the vector to received.
        *
        * @note Since the payloads of the messages are optional, users have
        *    to deal with buffers themselves. The ConsensusAlgorithm classes
@@ -126,7 +126,7 @@ namespace Utilities
        *    to be sent can be inserted to or read from, and (2) communicate
        *    these vectors blindly.
        */
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       class Process
       {
       public:
@@ -155,8 +155,8 @@ namespace Utilities
          * @note The buffer is empty. Before using it, you have to set its size.
          */
         virtual void
-        create_request(const unsigned int other_rank,
-                       std::vector<T1> &  send_buffer);
+        create_request(const unsigned int        other_rank,
+                       std::vector<RequestType> &send_buffer);
 
         /**
          * Prepare the buffer where the payload of the answer of the request to
@@ -171,9 +171,9 @@ namespace Utilities
          *       its size.
          */
         virtual void
-        answer_request(const unsigned int     other_rank,
-                       const std::vector<T1> &buffer_recv,
-                       std::vector<T2> &      request_buffer);
+        answer_request(const unsigned int              other_rank,
+                       const std::vector<RequestType> &buffer_recv,
+                       std::vector<AnswerType> &       request_buffer);
 
         /**
          * Process the payload of the answer of the request to the process with
@@ -183,8 +183,8 @@ namespace Utilities
          * @param[in] recv_buffer data to be sent part of the request (optional)
          */
         virtual void
-        read_answer(const unsigned int     other_rank,
-                    const std::vector<T2> &recv_buffer);
+        read_answer(const unsigned int             other_rank,
+                    const std::vector<AnswerType> &recv_buffer);
       };
 
 
@@ -199,10 +199,10 @@ namespace Utilities
        * to actually compute such communication patterns and perform the
        * communication.
        *
-       * @tparam T1 The type of the elements of the vector to be sent.
-       * @tparam T2 The type of the elements of the vector to be received.
+       * @tparam RequestType The type of the elements of the vector to be sent.
+       * @tparam AnswerType The type of the elements of the vector to be received.
        */
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       class Interface
       {
       public:
@@ -224,7 +224,8 @@ namespace Utilities
          *   function that takes an argument.
          */
         DEAL_II_DEPRECATED
-        Interface(Process<T1, T2> &process, const MPI_Comm &comm);
+        Interface(Process<RequestType, AnswerType> &process,
+                  const MPI_Comm &                  comm);
 
         /**
          * Destructor. Made `virtual` to ensure that one can work with
@@ -254,7 +255,7 @@ namespace Utilities
          * that takes a number of `std::function` arguments.
          */
         std::vector<unsigned int>
-        run(Process<T1, T2> &process, const MPI_Comm &comm);
+        run(Process<RequestType, AnswerType> &process, const MPI_Comm &comm);
 
         /**
          * Run the consensus algorithm and return a vector of process ranks
@@ -281,14 +282,15 @@ namespace Utilities
          */
         virtual std::vector<unsigned int>
         run(const std::vector<unsigned int> &targets,
-            const std::function<std::vector<T1>(const unsigned int)>
-              &create_request,
-            const std::function<std::vector<T2>(const unsigned int,
-                                                const std::vector<T1> &)>
-              &                                                 answer_request,
+            const std::function<std::vector<RequestType>(const unsigned int)>
+              &                                   create_request,
+            const std::function<std::vector<AnswerType>(
+              const unsigned int,
+              const std::vector<RequestType> &)> &answer_request,
             const std::function<void(const unsigned int,
-                                     const std::vector<T2> &)> &process_answer,
-            const MPI_Comm &                                    comm) = 0;
+                                     const std::vector<AnswerType> &)>
+              &             process_answer,
+            const MPI_Comm &comm) = 0;
 
       private:
         /**
@@ -299,7 +301,7 @@ namespace Utilities
          * otherwise
          */
         DEAL_II_DEPRECATED
-        Process<T1, T2> *process;
+        Process<RequestType, AnswerType> *process;
 
         /**
          * MPI communicator.
@@ -322,11 +324,11 @@ namespace Utilities
        * @note This class closely follows @cite hoefler2010scalable, but our
        *   implementation also deals with payloads.
        *
-       * @tparam T1 The type of the elements of the vector to be sent.
-       * @tparam T2 The type of the elements of the vector to be received.
+       * @tparam RequestType The type of the elements of the vector to be sent.
+       * @tparam AnswerType The type of the elements of the vector to be received.
        */
-      template <typename T1, typename T2>
-      class NBX : public Interface<T1, T2>
+      template <typename RequestType, typename AnswerType>
+      class NBX : public Interface<RequestType, AnswerType>
       {
       public:
         /**
@@ -347,7 +349,7 @@ namespace Utilities
          *   function that takes an argument.
          */
         DEAL_II_DEPRECATED
-        NBX(Process<T1, T2> &process, const MPI_Comm &comm);
+        NBX(Process<RequestType, AnswerType> &process, const MPI_Comm &comm);
 
         /**
          * Destructor.
@@ -355,28 +357,29 @@ namespace Utilities
         virtual ~NBX() = default;
 
         // Import the declarations from the base class.
-        using Interface<T1, T2>::run;
+        using Interface<RequestType, AnswerType>::run;
 
         /**
          * @copydoc Interface::run()
          */
         virtual std::vector<unsigned int>
         run(const std::vector<unsigned int> &targets,
-            const std::function<std::vector<T1>(const unsigned int)>
-              &create_request,
-            const std::function<std::vector<T2>(const unsigned int,
-                                                const std::vector<T1> &)>
-              &                                                 answer_request,
+            const std::function<std::vector<RequestType>(const unsigned int)>
+              &                                   create_request,
+            const std::function<std::vector<AnswerType>(
+              const unsigned int,
+              const std::vector<RequestType> &)> &answer_request,
             const std::function<void(const unsigned int,
-                                     const std::vector<T2> &)> &process_answer,
-            const MPI_Comm &                                    comm) override;
+                                     const std::vector<AnswerType> &)>
+              &             process_answer,
+            const MPI_Comm &comm) override;
 
       private:
 #ifdef DEAL_II_WITH_MPI
         /**
          * Buffers for sending requests.
          */
-        std::vector<std::vector<T1>> send_buffers;
+        std::vector<std::vector<RequestType>> send_buffers;
 
         /**
          * Requests for sending requests.
@@ -390,7 +393,7 @@ namespace Utilities
          * resized and consequently its elements (the pointers) are moved
          * around.
          */
-        std::vector<std::unique_ptr<std::vector<T2>>> request_buffers;
+        std::vector<std::unique_ptr<std::vector<AnswerType>>> request_buffers;
 
         /**
          * Requests for sending answers to requests.
@@ -418,7 +421,8 @@ namespace Utilities
          */
         bool
         all_locally_originated_receives_are_completed(
-          const std::function<void(const unsigned int, const std::vector<T2> &)>
+          const std::function<void(const unsigned int,
+                                   const std::vector<AnswerType> &)>
             &             process_answer,
           const MPI_Comm &comm);
 
@@ -444,10 +448,10 @@ namespace Utilities
          */
         void
         maybe_answer_one_request(
-          const std::function<std::vector<T2>(const unsigned int,
-                                              const std::vector<T1> &)>
-            &             answer_request,
-          const MPI_Comm &comm);
+          const std::function<std::vector<AnswerType>(
+            const unsigned int,
+            const std::vector<RequestType> &)> &answer_request,
+          const MPI_Comm &                      comm);
 
         /**
          * Start to send all requests via ISend and post IRecvs for the incoming
@@ -456,7 +460,7 @@ namespace Utilities
         void
         start_communication(
           const std::vector<unsigned int> &targets,
-          const std::function<std::vector<T1>(const unsigned int)>
+          const std::function<std::vector<RequestType>(const unsigned int)>
             &             create_request,
           const MPI_Comm &comm);
 
@@ -480,18 +484,19 @@ namespace Utilities
        * @note This class closely follows @cite hoefler2010scalable, but our
        *   implementation also deals with payloads.
        *
-       * @tparam T1 The type of the elements of the vector to be sent.
-       * @tparam T2 The type of the elements of the vector to be received.
+       * @tparam RequestType The type of the elements of the vector to be sent.
+       * @tparam AnswerType The type of the elements of the vector to be received.
        */
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       nbx(const std::vector<unsigned int> &targets,
-          const std::function<std::vector<T1>(const unsigned int)>
-            &create_request,
-          const std::function<std::vector<T2>(const unsigned int,
-                                              const std::vector<T1> &)>
-            &answer_request,
-          const std::function<void(const unsigned int, const std::vector<T2> &)>
+          const std::function<std::vector<RequestType>(const unsigned int)>
+            &                                   create_request,
+          const std::function<std::vector<AnswerType>(
+            const unsigned int,
+            const std::vector<RequestType> &)> &answer_request,
+          const std::function<void(const unsigned int,
+                                   const std::vector<AnswerType> &)>
             &             process_answer,
           const MPI_Comm &comm);
 
@@ -518,11 +523,11 @@ namespace Utilities
        *   in the ConsensusAlgorithms::NBX class (a sister class to the
        *   current one).
        *
-       * @tparam T1 The type of the elements of the vector to be sent.
-       * @tparam T2 The type of the elements of the vector to be received.
+       * @tparam RequestType The type of the elements of the vector to be sent.
+       * @tparam AnswerType The type of the elements of the vector to be received.
        */
-      template <typename T1, typename T2>
-      class PEX : public Interface<T1, T2>
+      template <typename RequestType, typename AnswerType>
+      class PEX : public Interface<RequestType, AnswerType>
       {
       public:
         /**
@@ -544,7 +549,7 @@ namespace Utilities
          *   function that takes an argument.
          */
         DEAL_II_DEPRECATED
-        PEX(Process<T1, T2> &process, const MPI_Comm &comm);
+        PEX(Process<RequestType, AnswerType> &process, const MPI_Comm &comm);
 
         /**
          * Destructor.
@@ -552,33 +557,34 @@ namespace Utilities
         virtual ~PEX() = default;
 
         // Import the declarations from the base class.
-        using Interface<T1, T2>::run;
+        using Interface<RequestType, AnswerType>::run;
 
         /**
          * @copydoc Interface::run()
          */
         virtual std::vector<unsigned int>
         run(const std::vector<unsigned int> &targets,
-            const std::function<std::vector<T1>(const unsigned int)>
-              &create_request,
-            const std::function<std::vector<T2>(const unsigned int,
-                                                const std::vector<T1> &)>
-              &                                                 answer_request,
+            const std::function<std::vector<RequestType>(const unsigned int)>
+              &                                   create_request,
+            const std::function<std::vector<AnswerType>(
+              const unsigned int,
+              const std::vector<RequestType> &)> &answer_request,
             const std::function<void(const unsigned int,
-                                     const std::vector<T2> &)> &process_answer,
-            const MPI_Comm &                                    comm) override;
+                                     const std::vector<AnswerType> &)>
+              &             process_answer,
+            const MPI_Comm &comm) override;
 
       private:
 #ifdef DEAL_II_WITH_MPI
         /**
          * Buffers for sending requests.
          */
-        std::vector<std::vector<T1>> send_buffers;
+        std::vector<std::vector<RequestType>> send_buffers;
 
         /**
          * Buffers for receiving answers to requests.
          */
-        std::vector<std::vector<T2>> recv_buffers;
+        std::vector<std::vector<AnswerType>> recv_buffers;
 
         /**
          * MPI request objects for sending request messages.
@@ -588,7 +594,7 @@ namespace Utilities
         /**
          * Buffers for sending answers to requests.
          */
-        std::vector<std::vector<T2>> requests_buffers;
+        std::vector<std::vector<AnswerType>> requests_buffers;
 
         /**
          * Requests for sending answers to requests.
@@ -607,7 +613,7 @@ namespace Utilities
         unsigned int
         start_communication(
           const std::vector<unsigned int> &targets,
-          const std::function<std::vector<T1>(const unsigned int)>
+          const std::function<std::vector<RequestType>(const unsigned int)>
             &             create_request,
           const MPI_Comm &comm);
 
@@ -616,12 +622,11 @@ namespace Utilities
          * process the request and send an answer.
          */
         void
-        answer_one_request(
-          const unsigned int index,
-          const std::function<std::vector<T2>(const unsigned int,
-                                              const std::vector<T1> &)>
-            &             answer_request,
-          const MPI_Comm &comm);
+        answer_one_request(const unsigned int                    index,
+                           const std::function<std::vector<AnswerType>(
+                             const unsigned int,
+                             const std::vector<RequestType> &)> &answer_request,
+                           const MPI_Comm &                      comm);
 
         /**
          * Receive and process all of the incoming responses to the
@@ -630,7 +635,8 @@ namespace Utilities
         void
         process_incoming_answers(
           const unsigned int n_targets,
-          const std::function<void(const unsigned int, const std::vector<T2> &)>
+          const std::function<void(const unsigned int,
+                                   const std::vector<AnswerType> &)>
             &             process_answer,
           const MPI_Comm &comm);
 
@@ -667,18 +673,19 @@ namespace Utilities
        *   in the ConsensusAlgorithms::NBX class (a sister class to the
        *   current one).
        *
-       * @tparam T1 The type of the elements of the vector to be sent.
-       * @tparam T2 The type of the elements of the vector to be received.
+       * @tparam RequestType The type of the elements of the vector to be sent.
+       * @tparam AnswerType The type of the elements of the vector to be received.
        */
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       pex(const std::vector<unsigned int> &targets,
-          const std::function<std::vector<T1>(const unsigned int)>
-            &create_request,
-          const std::function<std::vector<T2>(const unsigned int,
-                                              const std::vector<T1> &)>
-            &answer_request,
-          const std::function<void(const unsigned int, const std::vector<T2> &)>
+          const std::function<std::vector<RequestType>(const unsigned int)>
+            &                                   create_request,
+          const std::function<std::vector<AnswerType>(
+            const unsigned int,
+            const std::vector<RequestType> &)> &answer_request,
+          const std::function<void(const unsigned int,
+                                   const std::vector<AnswerType> &)>
             &             process_answer,
           const MPI_Comm &comm);
 
@@ -687,8 +694,8 @@ namespace Utilities
        * A serial fall back for the above classes to allow programming
        * independently of whether MPI is used or not.
        */
-      template <typename T1, typename T2>
-      class Serial : public Interface<T1, T2>
+      template <typename RequestType, typename AnswerType>
+      class Serial : public Interface<RequestType, AnswerType>
       {
       public:
         /**
@@ -709,24 +716,25 @@ namespace Utilities
          *   function that takes an argument.
          */
         DEAL_II_DEPRECATED
-        Serial(Process<T1, T2> &process, const MPI_Comm &comm);
+        Serial(Process<RequestType, AnswerType> &process, const MPI_Comm &comm);
 
         // Import the declarations from the base class.
-        using Interface<T1, T2>::run;
+        using Interface<RequestType, AnswerType>::run;
 
         /**
          * @copydoc Interface::run()
          */
         virtual std::vector<unsigned int>
         run(const std::vector<unsigned int> &targets,
-            const std::function<std::vector<T1>(const unsigned int)>
-              &create_request,
-            const std::function<std::vector<T2>(const unsigned int,
-                                                const std::vector<T1> &)>
-              &                                                 answer_request,
+            const std::function<std::vector<RequestType>(const unsigned int)>
+              &                                   create_request,
+            const std::function<std::vector<AnswerType>(
+              const unsigned int,
+              const std::vector<RequestType> &)> &answer_request,
             const std::function<void(const unsigned int,
-                                     const std::vector<T2> &)> &process_answer,
-            const MPI_Comm &                                    comm) override;
+                                     const std::vector<AnswerType> &)>
+              &             process_answer,
+            const MPI_Comm &comm) override;
       };
 
 
@@ -738,18 +746,19 @@ namespace Utilities
        * where the communicator provided has only one rank (or when
        * MPI is simply not used at all).
        *
-       * @tparam T1 The type of the elements of the vector to be sent.
-       * @tparam T2 The type of the elements of the vector to be received.
+       * @tparam RequestType The type of the elements of the vector to be sent.
+       * @tparam AnswerType The type of the elements of the vector to be received.
        */
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       pex(const std::vector<unsigned int> &targets,
-          const std::function<std::vector<T1>(const unsigned int)>
-            &create_request,
-          const std::function<std::vector<T2>(const unsigned int,
-                                              const std::vector<T1> &)>
-            &answer_request,
-          const std::function<void(const unsigned int, const std::vector<T2> &)>
+          const std::function<std::vector<RequestType>(const unsigned int)>
+            &                                   create_request,
+          const std::function<std::vector<AnswerType>(
+            const unsigned int,
+            const std::vector<RequestType> &)> &answer_request,
+          const std::function<void(const unsigned int,
+                                   const std::vector<AnswerType> &)>
             &             process_answer,
           const MPI_Comm &comm);
 
@@ -764,11 +773,11 @@ namespace Utilities
        * goal is to always use the most efficient algorithm for however many
        * processes participate in the communication.
        *
-       * @tparam T1 The type of the elements of the vector to be sent.
-       * @tparam T2 The type of the elements of the vector to be received.
+       * @tparam RequestType The type of the elements of the vector to be sent.
+       * @tparam AnswerType The type of the elements of the vector to be received.
        */
-      template <typename T1, typename T2>
-      class Selector : public Interface<T1, T2>
+      template <typename RequestType, typename AnswerType>
+      class Selector : public Interface<RequestType, AnswerType>
       {
       public:
         /**
@@ -789,7 +798,8 @@ namespace Utilities
          *   function that takes an argument.
          */
         DEAL_II_DEPRECATED
-        Selector(Process<T1, T2> &process, const MPI_Comm &comm);
+        Selector(Process<RequestType, AnswerType> &process,
+                 const MPI_Comm &                  comm);
 
         /**
          * Destructor.
@@ -797,7 +807,7 @@ namespace Utilities
         virtual ~Selector() = default;
 
         // Import the declarations from the base class.
-        using Interface<T1, T2>::run;
+        using Interface<RequestType, AnswerType>::run;
 
         /**
          * @copydoc Interface::run()
@@ -806,18 +816,19 @@ namespace Utilities
          */
         virtual std::vector<unsigned int>
         run(const std::vector<unsigned int> &targets,
-            const std::function<std::vector<T1>(const unsigned int)>
-              &create_request,
-            const std::function<std::vector<T2>(const unsigned int,
-                                                const std::vector<T1> &)>
-              &                                                 answer_request,
+            const std::function<std::vector<RequestType>(const unsigned int)>
+              &                                   create_request,
+            const std::function<std::vector<AnswerType>(
+              const unsigned int,
+              const std::vector<RequestType> &)> &answer_request,
             const std::function<void(const unsigned int,
-                                     const std::vector<T2> &)> &process_answer,
-            const MPI_Comm &                                    comm) override;
+                                     const std::vector<AnswerType> &)>
+              &             process_answer,
+            const MPI_Comm &comm) override;
 
       private:
         // Pointer to the actual ConsensusAlgorithms::Interface implementation.
-        std::shared_ptr<Interface<T1, T2>> consensus_algo;
+        std::shared_ptr<Interface<RequestType, AnswerType>> consensus_algo;
       };
 
 
@@ -833,21 +844,21 @@ namespace Utilities
        * goal is to always use the most efficient algorithm for however many
        * processes participate in the communication.
        *
-       * @tparam T1 The type of the elements of the vector to be sent.
-       * @tparam T2 The type of the elements of the vector to be received.
+       * @tparam RequestType The type of the elements of the vector to be sent.
+       * @tparam AnswerType The type of the elements of the vector to be received.
        */
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      selector(
-        const std::vector<unsigned int> &targets,
-        const std::function<std::vector<T1>(const unsigned int)>
-          &create_request,
-        const std::function<std::vector<T2>(const unsigned int,
-                                            const std::vector<T1> &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const std::vector<T2> &)>
-          &             process_answer,
-        const MPI_Comm &comm);
+      selector(const std::vector<unsigned int> &targets,
+               const std::function<std::vector<RequestType>(const unsigned int)>
+                 &                                   create_request,
+               const std::function<std::vector<AnswerType>(
+                 const unsigned int,
+                 const std::vector<RequestType> &)> &answer_request,
+               const std::function<void(const unsigned int,
+                                        const std::vector<AnswerType> &)>
+                 &             process_answer,
+               const MPI_Comm &comm);
 
 
 
@@ -857,8 +868,8 @@ namespace Utilities
        * The advantage of this class is that users do not have to write their
        * own implementation but can register lambda functions directly.
        */
-      template <typename T1, typename T2>
-      class AnonymousProcess : public Process<T1, T2>
+      template <typename RequestType, typename AnswerType>
+      class AnonymousProcess : public Process<RequestType, AnswerType>
       {
       public:
         /**
@@ -873,13 +884,15 @@ namespace Utilities
         AnonymousProcess(
           const std::function<std::vector<unsigned int>()>
             &function_compute_targets,
-          const std::function<void(const unsigned int, std::vector<T1> &)>
+          const std::function<void(const unsigned int,
+                                   std::vector<RequestType> &)>
             &function_create_request = {},
           const std::function<void(const unsigned int,
-                                   const std::vector<T1> &,
-                                   std::vector<T2> &)>
+                                   const std::vector<RequestType> &,
+                                   std::vector<AnswerType> &)>
             &function_answer_request = {},
-          const std::function<void(const unsigned int, const std::vector<T2> &)>
+          const std::function<void(const unsigned int,
+                                   const std::vector<AnswerType> &)>
             &function_read_answer = {});
 
         /**
@@ -892,33 +905,34 @@ namespace Utilities
          * @copydoc Process::create_request()
          */
         void
-        create_request(const unsigned int other_rank,
-                       std::vector<T1> &  send_buffer) override;
+        create_request(const unsigned int        other_rank,
+                       std::vector<RequestType> &send_buffer) override;
 
         /**
          * @copydoc Process::answer_request()
          */
         void
-        answer_request(const unsigned int     other_rank,
-                       const std::vector<T1> &buffer_recv,
-                       std::vector<T2> &      request_buffer) override;
+        answer_request(const unsigned int              other_rank,
+                       const std::vector<RequestType> &buffer_recv,
+                       std::vector<AnswerType> &       request_buffer) override;
 
         /**
          * @copydoc Process::read_answer()
          */
         void
-        read_answer(const unsigned int     other_rank,
-                    const std::vector<T2> &recv_buffer) override;
+        read_answer(const unsigned int             other_rank,
+                    const std::vector<AnswerType> &recv_buffer) override;
 
       private:
         const std::function<std::vector<unsigned int>()>
           function_compute_targets;
-        const std::function<void(const int, std::vector<T1> &)>
+        const std::function<void(const int, std::vector<RequestType> &)>
           function_create_request;
-        const std::function<
-          void(const unsigned int, const std::vector<T1> &, std::vector<T2> &)>
+        const std::function<void(const unsigned int,
+                                 const std::vector<RequestType> &,
+                                 std::vector<AnswerType> &)>
           function_answer_request;
-        const std::function<void(const int, const std::vector<T2> &)>
+        const std::function<void(const int, const std::vector<AnswerType> &)>
           function_read_answer;
       };
 
@@ -926,89 +940,95 @@ namespace Utilities
 #ifndef DOXYGEN
       // Implementation of the functions in this namespace.
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       nbx(const std::vector<unsigned int> &targets,
-          const std::function<std::vector<T1>(const unsigned int)>
-            &create_request,
-          const std::function<std::vector<T2>(const unsigned int,
-                                              const std::vector<T1> &)>
-            &answer_request,
-          const std::function<void(const unsigned int, const std::vector<T2> &)>
+          const std::function<std::vector<RequestType>(const unsigned int)>
+            &                                   create_request,
+          const std::function<std::vector<AnswerType>(
+            const unsigned int,
+            const std::vector<RequestType> &)> &answer_request,
+          const std::function<void(const unsigned int,
+                                   const std::vector<AnswerType> &)>
             &             process_answer,
           const MPI_Comm &comm)
       {
-        return NBX<T1, T2>().run(
+        return NBX<RequestType, AnswerType>().run(
           targets, create_request, answer_request, process_answer, comm);
       }
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       pex(const std::vector<unsigned int> &targets,
-          const std::function<std::vector<T1>(const unsigned int)>
-            &create_request,
-          const std::function<std::vector<T2>(const unsigned int,
-                                              const std::vector<T1> &)>
-            &answer_request,
-          const std::function<void(const unsigned int, const std::vector<T2> &)>
+          const std::function<std::vector<RequestType>(const unsigned int)>
+            &                                   create_request,
+          const std::function<std::vector<AnswerType>(
+            const unsigned int,
+            const std::vector<RequestType> &)> &answer_request,
+          const std::function<void(const unsigned int,
+                                   const std::vector<AnswerType> &)>
             &             process_answer,
           const MPI_Comm &comm)
       {
-        return PEX<T1, T2>().run(
+        return PEX<RequestType, AnswerType>().run(
           targets, create_request, answer_request, process_answer, comm);
       }
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       serial(const std::vector<unsigned int> &targets,
-             const std::function<std::vector<T1>(const unsigned int)>
-               &create_request,
-             const std::function<std::vector<T2>(const unsigned int,
-                                                 const std::vector<T1> &)>
-               &                                                 answer_request,
+             const std::function<std::vector<RequestType>(const unsigned int)>
+               &                                   create_request,
+             const std::function<std::vector<AnswerType>(
+               const unsigned int,
+               const std::vector<RequestType> &)> &answer_request,
              const std::function<void(const unsigned int,
-                                      const std::vector<T2> &)> &process_answer,
-             const MPI_Comm &                                    comm)
+                                      const std::vector<AnswerType> &)>
+               &             process_answer,
+             const MPI_Comm &comm)
       {
-        return Serial<T1, T2>().run(
+        return Serial<RequestType, AnswerType>().run(
           targets, create_request, answer_request, process_answer, comm);
       }
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      selector(
-        const std::vector<unsigned int> &targets,
-        const std::function<std::vector<T1>(const unsigned int)>
-          &create_request,
-        const std::function<std::vector<T2>(const unsigned int,
-                                            const std::vector<T1> &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const std::vector<T2> &)>
-          &             process_answer,
-        const MPI_Comm &comm)
+      selector(const std::vector<unsigned int> &targets,
+               const std::function<std::vector<RequestType>(const unsigned int)>
+                 &                                   create_request,
+               const std::function<std::vector<AnswerType>(
+                 const unsigned int,
+                 const std::vector<RequestType> &)> &answer_request,
+               const std::function<void(const unsigned int,
+                                        const std::vector<AnswerType> &)>
+                 &             process_answer,
+               const MPI_Comm &comm)
       {
-        return Selector<T1, T2>().run(
+        return Selector<RequestType, AnswerType>().run(
           targets, create_request, answer_request, process_answer, comm);
       }
 
 
 
-      template <typename T1, typename T2>
-      AnonymousProcess<T1, T2>::AnonymousProcess(
+      template <typename RequestType, typename AnswerType>
+      AnonymousProcess<RequestType, AnswerType>::AnonymousProcess(
         const std::function<std::vector<unsigned int>()>
           &function_compute_targets,
-        const std::function<void(const unsigned int, std::vector<T1> &)>
-          &                                           function_create_request,
         const std::function<void(const unsigned int,
-                                 const std::vector<T1> &,
-                                 std::vector<T2> &)> &function_answer_request,
-        const std::function<void(const unsigned int, const std::vector<T2> &)>
+                                 std::vector<RequestType> &)>
+          &function_create_request,
+        const std::function<void(const unsigned int,
+                                 const std::vector<RequestType> &,
+                                 std::vector<AnswerType> &)>
+          &function_answer_request,
+        const std::function<void(const unsigned int,
+                                 const std::vector<AnswerType> &)>
           &function_read_answer)
         : function_compute_targets(function_compute_targets)
         , function_create_request(function_create_request)
@@ -1018,19 +1038,20 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      AnonymousProcess<T1, T2>::compute_targets()
+      AnonymousProcess<RequestType, AnswerType>::compute_targets()
       {
         return function_compute_targets();
       }
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      AnonymousProcess<T1, T2>::create_request(const unsigned int other_rank,
-                                               std::vector<T1> &  send_buffer)
+      AnonymousProcess<RequestType, AnswerType>::create_request(
+        const unsigned int        other_rank,
+        std::vector<RequestType> &send_buffer)
       {
         if (function_create_request)
           function_create_request(other_rank, send_buffer);
@@ -1038,12 +1059,12 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      AnonymousProcess<T1, T2>::answer_request(
-        const unsigned int     other_rank,
-        const std::vector<T1> &buffer_recv,
-        std::vector<T2> &      request_buffer)
+      AnonymousProcess<RequestType, AnswerType>::answer_request(
+        const unsigned int              other_rank,
+        const std::vector<RequestType> &buffer_recv,
+        std::vector<AnswerType> &       request_buffer)
       {
         if (function_answer_request)
           function_answer_request(other_rank, buffer_recv, request_buffer);
@@ -1051,10 +1072,11 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      AnonymousProcess<T1, T2>::read_answer(const unsigned int     other_rank,
-                                            const std::vector<T2> &recv_buffer)
+      AnonymousProcess<RequestType, AnswerType>::read_answer(
+        const unsigned int             other_rank,
+        const std::vector<AnswerType> &recv_buffer)
       {
         if (function_read_answer)
           function_read_answer(other_rank, recv_buffer);

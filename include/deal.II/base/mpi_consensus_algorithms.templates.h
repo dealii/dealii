@@ -72,55 +72,61 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      Process<T1, T2>::answer_request(const unsigned int,
-                                      const std::vector<T1> &,
-                                      std::vector<T2> &)
+      Process<RequestType, AnswerType>::answer_request(
+        const unsigned int,
+        const std::vector<RequestType> &,
+        std::vector<AnswerType> &)
       {
         // nothing to do
       }
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      Process<T1, T2>::create_request(const unsigned int, std::vector<T1> &)
+      Process<RequestType, AnswerType>::create_request(
+        const unsigned int,
+        std::vector<RequestType> &)
       {
         // nothing to do
       }
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      Process<T1, T2>::read_answer(const unsigned int, const std::vector<T2> &)
+      Process<RequestType, AnswerType>::read_answer(
+        const unsigned int,
+        const std::vector<AnswerType> &)
       {
         // nothing to do
       }
 
 
 
-      template <typename T1, typename T2>
-      Interface<T1, T2>::Interface(Process<T1, T2> &process,
-                                   const MPI_Comm & comm)
+      template <typename RequestType, typename AnswerType>
+      Interface<RequestType, AnswerType>::Interface(
+        Process<RequestType, AnswerType> &process,
+        const MPI_Comm &                  comm)
         : process(&process)
         , comm(comm)
       {}
 
 
 
-      template <typename T1, typename T2>
-      Interface<T1, T2>::Interface()
+      template <typename RequestType, typename AnswerType>
+      Interface<RequestType, AnswerType>::Interface()
         : process(nullptr)
         , comm(MPI_COMM_NULL)
       {}
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      Interface<T1, T2>::run()
+      Interface<RequestType, AnswerType>::run()
       {
         Assert(process != nullptr,
                ExcMessage("This function can only be called if the "
@@ -132,9 +138,11 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      Interface<T1, T2>::run(Process<T1, T2> &process, const MPI_Comm &comm)
+      Interface<RequestType, AnswerType>::run(
+        Process<RequestType, AnswerType> &process,
+        const MPI_Comm &                  comm)
       {
         // Unpack the 'process' object and call the function that takes
         // function objects for all operations.
@@ -142,19 +150,20 @@ namespace Utilities
           process.compute_targets(),
           /* create_request: */
           [&process](const unsigned int target) {
-            std::vector<T1> request;
+            std::vector<RequestType> request;
             process.create_request(target, request);
             return request;
           },
           /* answer_request: */
-          [&process](const unsigned int     source,
-                     const std::vector<T1> &request) {
-            std::vector<T2> answer;
+          [&process](const unsigned int              source,
+                     const std::vector<RequestType> &request) {
+            std::vector<AnswerType> answer;
             process.answer_request(source, request, answer);
             return answer;
           },
           /* process_answer: */
-          [&process](const unsigned int target, const std::vector<T2> &answer) {
+          [&process](const unsigned int             target,
+                     const std::vector<AnswerType> &answer) {
             process.read_answer(target, answer);
           },
           comm);
@@ -162,23 +171,26 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
-      NBX<T1, T2>::NBX(Process<T1, T2> &process, const MPI_Comm &comm)
-        : Interface<T1, T2>(process, comm)
+      template <typename RequestType, typename AnswerType>
+      NBX<RequestType, AnswerType>::NBX(
+        Process<RequestType, AnswerType> &process,
+        const MPI_Comm &                  comm)
+        : Interface<RequestType, AnswerType>(process, comm)
       {}
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      NBX<T1, T2>::run(
+      NBX<RequestType, AnswerType>::run(
         const std::vector<unsigned int> &targets,
-        const std::function<std::vector<T1>(const unsigned int)>
-          &create_request,
-        const std::function<std::vector<T2>(const unsigned int,
-                                            const std::vector<T1> &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const std::vector<T2> &)>
+        const std::function<std::vector<RequestType>(const unsigned int)>
+          &                                   create_request,
+        const std::function<std::vector<AnswerType>(
+          const unsigned int,
+          const std::vector<RequestType> &)> &answer_request,
+        const std::function<void(const unsigned int,
+                                 const std::vector<AnswerType> &)>
           &             process_answer,
         const MPI_Comm &comm)
       {
@@ -231,11 +243,11 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      NBX<T1, T2>::start_communication(
+      NBX<RequestType, AnswerType>::start_communication(
         const std::vector<unsigned int> &targets,
-        const std::function<std::vector<T1>(const unsigned int)>
+        const std::function<std::vector<RequestType>(const unsigned int)>
           &             create_request,
         const MPI_Comm &comm)
       {
@@ -258,12 +270,12 @@ namespace Utilities
               AssertIndexRange(rank, Utilities::MPI::n_mpi_processes(comm));
 
               auto &send_buffer = send_buffers[index];
-              send_buffer =
-                (create_request ? create_request(rank) : std::vector<T1>());
+              send_buffer       = (create_request ? create_request(rank) :
+                                                    std::vector<RequestType>());
 
               // Post a request to send data
               auto ierr = MPI_Isend(send_buffer.data(),
-                                    send_buffer.size() * sizeof(T1),
+                                    send_buffer.size() * sizeof(RequestType),
                                     MPI_BYTE,
                                     rank,
                                     tag_request,
@@ -285,12 +297,14 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       bool
-      NBX<T1, T2>::all_locally_originated_receives_are_completed(
-        const std::function<void(const unsigned int, const std::vector<T2> &)>
-          &             process_answer,
-        const MPI_Comm &comm)
+      NBX<RequestType, AnswerType>::
+        all_locally_originated_receives_are_completed(
+          const std::function<void(const unsigned int,
+                                   const std::vector<AnswerType> &)>
+            &             process_answer,
+          const MPI_Comm &comm)
       {
 #ifdef DEAL_II_WITH_MPI
         // We know that all requests have come in when we have pending
@@ -333,20 +347,23 @@ namespace Utilities
                     MPI_Get_count(&status, MPI_BYTE, &message_size);
                   AssertThrowMPI(ierr);
                 }
-                Assert(message_size % sizeof(T2) == 0, ExcInternalError());
-                std::vector<T2> recv_buffer(message_size / sizeof(T2));
+                Assert(message_size % sizeof(AnswerType) == 0,
+                       ExcInternalError());
+                std::vector<AnswerType> recv_buffer(message_size /
+                                                    sizeof(AnswerType));
 
                 {
                   const int tag_deliver = Utilities::MPI::internal::Tags::
                     consensus_algorithm_nbx_process_deliver;
 
-                  const int ierr = MPI_Recv(recv_buffer.data(),
-                                            recv_buffer.size() * sizeof(T2),
-                                            MPI_BYTE,
-                                            target,
-                                            tag_deliver,
-                                            comm,
-                                            MPI_STATUS_IGNORE);
+                  const int ierr =
+                    MPI_Recv(recv_buffer.data(),
+                             recv_buffer.size() * sizeof(AnswerType),
+                             MPI_BYTE,
+                             target,
+                             tag_deliver,
+                             comm,
+                             MPI_STATUS_IGNORE);
                   AssertThrowMPI(ierr);
                 }
 
@@ -379,13 +396,13 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      NBX<T1, T2>::maybe_answer_one_request(
-        const std::function<std::vector<T2>(const unsigned int,
-                                            const std::vector<T1> &)>
-          &             answer_request,
-        const MPI_Comm &comm)
+      NBX<RequestType, AnswerType>::maybe_answer_one_request(
+        const std::function<std::vector<AnswerType>(
+          const unsigned int,
+          const std::vector<RequestType> &)> &answer_request,
+        const MPI_Comm &                      comm)
       {
 #ifdef DEAL_II_WITH_MPI
 
@@ -424,8 +441,10 @@ namespace Utilities
             AssertThrowMPI(ierr);
 
             // allocate memory for incoming message
-            Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
-            std::vector<T1> buffer_recv(number_amount / sizeof(T1));
+            Assert(number_amount % sizeof(RequestType) == 0,
+                   ExcInternalError());
+            std::vector<RequestType> buffer_recv(number_amount /
+                                                 sizeof(RequestType));
             ierr = MPI_Recv(buffer_recv.data(),
                             number_amount,
                             MPI_BYTE,
@@ -437,7 +456,8 @@ namespace Utilities
 
             // Allocate memory for an answer message to the current request,
             // and ask the 'process' object to produce an answer:
-            request_buffers.emplace_back(std::make_unique<std::vector<T2>>());
+            request_buffers.emplace_back(
+              std::make_unique<std::vector<AnswerType>>());
             auto &request_buffer = *request_buffers.back();
             if (answer_request)
               request_buffer = answer_request(other_rank, buffer_recv);
@@ -445,7 +465,7 @@ namespace Utilities
             // Then initiate sending the answer back to the requester.
             request_requests.emplace_back(std::make_unique<MPI_Request>());
             ierr = MPI_Isend(request_buffer.data(),
-                             request_buffer.size() * sizeof(T2),
+                             request_buffer.size() * sizeof(AnswerType),
                              MPI_BYTE,
                              other_rank,
                              tag_deliver,
@@ -461,9 +481,9 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      NBX<T1, T2>::signal_finish(const MPI_Comm &comm)
+      NBX<RequestType, AnswerType>::signal_finish(const MPI_Comm &comm)
       {
 #ifdef DEAL_II_WITH_MPI
         const auto ierr = MPI_Ibarrier(comm, &barrier_request);
@@ -475,9 +495,10 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       bool
-      NBX<T1, T2>::all_remotely_originated_receives_are_completed()
+      NBX<RequestType,
+          AnswerType>::all_remotely_originated_receives_are_completed()
       {
 #ifdef DEAL_II_WITH_MPI
         int        all_ranks_reached_barrier;
@@ -493,9 +514,10 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      NBX<T1, T2>::clean_up_and_end_communication(const MPI_Comm &comm)
+      NBX<RequestType, AnswerType>::clean_up_and_end_communication(
+        const MPI_Comm &comm)
       {
         (void)comm;
 #ifdef DEAL_II_WITH_MPI
@@ -530,23 +552,26 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
-      PEX<T1, T2>::PEX(Process<T1, T2> &process, const MPI_Comm &comm)
-        : Interface<T1, T2>(process, comm)
+      template <typename RequestType, typename AnswerType>
+      PEX<RequestType, AnswerType>::PEX(
+        Process<RequestType, AnswerType> &process,
+        const MPI_Comm &                  comm)
+        : Interface<RequestType, AnswerType>(process, comm)
       {}
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      PEX<T1, T2>::run(
+      PEX<RequestType, AnswerType>::run(
         const std::vector<unsigned int> &targets,
-        const std::function<std::vector<T1>(const unsigned int)>
-          &create_request,
-        const std::function<std::vector<T2>(const unsigned int,
-                                            const std::vector<T1> &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const std::vector<T2> &)>
+        const std::function<std::vector<RequestType>(const unsigned int)>
+          &                                   create_request,
+        const std::function<std::vector<AnswerType>(
+          const unsigned int,
+          const std::vector<RequestType> &)> &answer_request,
+        const std::function<void(const unsigned int,
+                                 const std::vector<AnswerType> &)>
           &             process_answer,
         const MPI_Comm &comm)
       {
@@ -580,11 +605,11 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       unsigned int
-      PEX<T1, T2>::start_communication(
+      PEX<RequestType, AnswerType>::start_communication(
         const std::vector<unsigned int> &targets,
-        const std::function<std::vector<T1>(const unsigned int)>
+        const std::function<std::vector<RequestType>(const unsigned int)>
           &             create_request,
         const MPI_Comm &comm)
       {
@@ -616,12 +641,12 @@ namespace Utilities
 
             // pack data which should be sent
             auto &send_buffer = send_buffers[i];
-            send_buffer =
-              (create_request ? create_request(rank) : std::vector<T1>());
+            send_buffer       = (create_request ? create_request(rank) :
+                                                  std::vector<RequestType>());
 
             // start to send data
             auto ierr = MPI_Isend(send_buffer.data(),
-                                  send_buffer.size() * sizeof(T1),
+                                  send_buffer.size() * sizeof(RequestType),
                                   MPI_BYTE,
                                   rank,
                                   tag_request,
@@ -641,14 +666,14 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      PEX<T1, T2>::answer_one_request(
-        const unsigned int index,
-        const std::function<std::vector<T2>(const unsigned int,
-                                            const std::vector<T1> &)>
-          &             answer_request,
-        const MPI_Comm &comm)
+      PEX<RequestType, AnswerType>::answer_one_request(
+        const unsigned int                    index,
+        const std::function<std::vector<AnswerType>(
+          const unsigned int,
+          const std::vector<RequestType> &)> &answer_request,
+        const MPI_Comm &                      comm)
       {
 #ifdef DEAL_II_WITH_MPI
         const int tag_request = Utilities::MPI::internal::Tags::
@@ -673,15 +698,15 @@ namespace Utilities
                  "received. This algorithm does not expect this to happen."));
         requesting_processes.insert(other_rank);
 
-        std::vector<T1> buffer_recv;
+        std::vector<RequestType> buffer_recv;
 
         // Actually get the incoming message:
         int number_amount;
         ierr = MPI_Get_count(&status, MPI_BYTE, &number_amount);
         AssertThrowMPI(ierr);
-        Assert(number_amount % sizeof(T1) == 0, ExcInternalError());
+        Assert(number_amount % sizeof(RequestType) == 0, ExcInternalError());
 
-        buffer_recv.resize(number_amount / sizeof(T1));
+        buffer_recv.resize(number_amount / sizeof(RequestType));
         ierr = MPI_Recv(buffer_recv.data(),
                         number_amount,
                         MPI_BYTE,
@@ -696,10 +721,10 @@ namespace Utilities
         auto &request_buffer = requests_buffers[index];
         request_buffer =
           (answer_request ? answer_request(other_rank, buffer_recv) :
-                            std::vector<T2>());
+                            std::vector<AnswerType>());
 
         ierr = MPI_Isend(request_buffer.data(),
-                         request_buffer.size() * sizeof(T2),
+                         request_buffer.size() * sizeof(AnswerType),
                          MPI_BYTE,
                          other_rank,
                          tag_deliver,
@@ -715,11 +740,12 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      PEX<T1, T2>::process_incoming_answers(
+      PEX<RequestType, AnswerType>::process_incoming_answers(
         const unsigned int n_targets,
-        const std::function<void(const unsigned int, const std::vector<T2> &)>
+        const std::function<void(const unsigned int,
+                                 const std::vector<AnswerType> &)>
           &             process_answer,
         const MPI_Comm &comm)
       {
@@ -747,15 +773,16 @@ namespace Utilities
               const int ierr = MPI_Get_count(&status, MPI_BYTE, &message_size);
               AssertThrowMPI(ierr);
             }
-            Assert(message_size % sizeof(T2) == 0, ExcInternalError());
-            std::vector<T2> recv_buffer(message_size / sizeof(T2));
+            Assert(message_size % sizeof(AnswerType) == 0, ExcInternalError());
+            std::vector<AnswerType> recv_buffer(message_size /
+                                                sizeof(AnswerType));
 
             // Now actually receive the answer. Because the MPI_Probe
             // above blocks until we have a message, we know that the
             // following MPI_Recv call will immediately succeed.
             {
               const int ierr = MPI_Recv(recv_buffer.data(),
-                                        recv_buffer.size() * sizeof(T2),
+                                        recv_buffer.size() * sizeof(AnswerType),
                                         MPI_BYTE,
                                         other_rank,
                                         tag_deliver,
@@ -776,9 +803,9 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       void
-      PEX<T1, T2>::clean_up_and_end_communication()
+      PEX<RequestType, AnswerType>::clean_up_and_end_communication()
       {
 #ifdef DEAL_II_WITH_MPI
         // Finalize all MPI_Request objects for both the
@@ -804,23 +831,26 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
-      Serial<T1, T2>::Serial(Process<T1, T2> &process, const MPI_Comm &comm)
-        : Interface<T1, T2>(process, comm)
+      template <typename RequestType, typename AnswerType>
+      Serial<RequestType, AnswerType>::Serial(
+        Process<RequestType, AnswerType> &process,
+        const MPI_Comm &                  comm)
+        : Interface<RequestType, AnswerType>(process, comm)
       {}
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      Serial<T1, T2>::run(
+      Serial<RequestType, AnswerType>::run(
         const std::vector<unsigned int> &targets,
-        const std::function<std::vector<T1>(const unsigned int)>
-          &create_request,
-        const std::function<std::vector<T2>(const unsigned int,
-                                            const std::vector<T1> &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const std::vector<T2> &)>
+        const std::function<std::vector<RequestType>(const unsigned int)>
+          &                                   create_request,
+        const std::function<std::vector<AnswerType>(
+          const unsigned int,
+          const std::vector<RequestType> &)> &answer_request,
+        const std::function<void(const unsigned int,
+                                 const std::vector<AnswerType> &)>
           &             process_answer,
         const MPI_Comm &comm)
       {
@@ -844,10 +874,11 @@ namespace Utilities
             // Since the caller indicates that there is a target, and since we
             // know that it is the current process, let the process send
             // something to itself.
-            const std::vector<T1> request =
-              (create_request ? create_request(0) : std::vector<T1>());
-            const std::vector<T2> answer =
-              (answer_request ? answer_request(0, request) : std::vector<T2>());
+            const std::vector<RequestType> request =
+              (create_request ? create_request(0) : std::vector<RequestType>());
+            const std::vector<AnswerType> answer =
+              (answer_request ? answer_request(0, request) :
+                                std::vector<AnswerType>());
 
             if (process_answer)
               process_answer(0, answer);
@@ -858,23 +889,26 @@ namespace Utilities
 
 
 
-      template <typename T1, typename T2>
-      Selector<T1, T2>::Selector(Process<T1, T2> &process, const MPI_Comm &comm)
-        : Interface<T1, T2>(process, comm)
+      template <typename RequestType, typename AnswerType>
+      Selector<RequestType, AnswerType>::Selector(
+        Process<RequestType, AnswerType> &process,
+        const MPI_Comm &                  comm)
+        : Interface<RequestType, AnswerType>(process, comm)
       {}
 
 
 
-      template <typename T1, typename T2>
+      template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      Selector<T1, T2>::run(
+      Selector<RequestType, AnswerType>::run(
         const std::vector<unsigned int> &targets,
-        const std::function<std::vector<T1>(const unsigned int)>
-          &create_request,
-        const std::function<std::vector<T2>(const unsigned int,
-                                            const std::vector<T1> &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const std::vector<T2> &)>
+        const std::function<std::vector<RequestType>(const unsigned int)>
+          &                                   create_request,
+        const std::function<std::vector<AnswerType>(
+          const unsigned int,
+          const std::vector<RequestType> &)> &answer_request,
+        const std::function<void(const unsigned int,
+                                 const std::vector<AnswerType> &)>
           &             process_answer,
         const MPI_Comm &comm)
       {
@@ -893,13 +927,13 @@ namespace Utilities
 #  else
         if (n_procs > 99)
 #  endif
-          consensus_algo.reset(new NBX<T1, T2>());
+          consensus_algo.reset(new NBX<RequestType, AnswerType>());
         else
 #endif
           if (n_procs > 1)
-          consensus_algo.reset(new PEX<T1, T2>());
+          consensus_algo.reset(new PEX<RequestType, AnswerType>());
         else
-          consensus_algo.reset(new Serial<T1, T2>());
+          consensus_algo.reset(new Serial<RequestType, AnswerType>());
 
         return consensus_algo->run(
           targets, create_request, answer_request, process_answer, comm);
