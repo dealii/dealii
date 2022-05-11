@@ -33,6 +33,8 @@
 #include "muParserError.h"
 
 
+namespace dealii
+{
 namespace mu
 {
 	//-----------------------------------------------------------------------------------------------
@@ -193,6 +195,7 @@ namespace mu
 
 		static constexpr T CONST_E = (T)2.718281828459045235360287;
 	};
+}
 }
 
 #endif

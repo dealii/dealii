@@ -49,6 +49,8 @@
 	\brief This file contains the parser token definition.
 */
 
+namespace dealii
+{
 namespace mu
 {
 	template <std::size_t NbParams> struct TplCallType;
@@ -516,6 +518,7 @@ namespace mu
 		}
 	};
 } // namespace mu
+}
 
 #if defined(_MSC_VER)
 	#pragma warning(pop)

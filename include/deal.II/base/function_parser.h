@@ -29,11 +29,6 @@
 #include <memory>
 #include <vector>
 
-namespace mu
-{
-  class Parser;
-}
-
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declaration
@@ -41,6 +36,22 @@ DEAL_II_NAMESPACE_OPEN
 template <typename>
 class Vector;
 #endif
+
+namespace internal
+{
+  /**
+   * deal.II uses muParser as a purely internal dependency. To this end, we do
+   * not include any muParser headers in this file (and the bundled version of
+   * the dependency does not install its headers or compile a separate muparser
+   * library). Hence, to interface with muParser, we use the PIMPL idiom here to
+   * wrap a pointer to mu::Parser objects.
+   */
+  class muParserBase
+  {
+  public:
+    virtual ~muParserBase() = default;
+  };
+} // namespace internal
 
 /**
  * This class implements a function object that gets its value by parsing a
@@ -260,11 +271,6 @@ public:
   FunctionParser(FunctionParser &&) = delete;
 
   /**
-   * Destructor.
-   */
-  virtual ~FunctionParser() override;
-
-  /**
    * Copy operator. Objects of this type can not be copied, and
    * consequently this operator is deleted.
    */
@@ -397,11 +403,11 @@ private:
   mutable Threads::ThreadLocalStorage<std::vector<double>> vars;
 
   /**
-   * The muParser objects for each thread (and one for each component). We are
-   * storing a unique_ptr so that we don't need to include the definition of
-   * mu::Parser in this header.
+   * The muParser objects (hidden with the PIMPL idiom) for each thread (and one
+   * for each component).
    */
-  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser>>>
+  mutable Threads::ThreadLocalStorage<
+    std::vector<std::unique_ptr<internal::muParserBase>>>
     fp;
 
   /**

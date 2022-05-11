@@ -38,6 +38,8 @@
 */
 
 
+namespace dealii
+{
 namespace mu
 {
 
@@ -138,6 +140,7 @@ namespace mu
 	};
 
 } // namespace mu
+}
 
 #endif
 
