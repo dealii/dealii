@@ -2943,15 +2943,11 @@ namespace TrilinosWrappers
         // TODO: fix this (do not run compress here, but fail)
         if (last_action == Insert)
           {
-#      ifdef DEBUG
-            int ierr;
-            ierr =
-#      endif
-              matrix->GlobalAssemble(*column_space_map,
-                                     matrix->RowMap(),
-                                     false);
+            const int ierr = matrix->GlobalAssemble(*column_space_map,
+                                                    matrix->RowMap(),
+                                                    false);
 
-            Assert(ierr == 0, ExcTrilinosError(ierr));
+            AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           }
 
         last_action = Add;
