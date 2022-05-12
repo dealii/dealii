@@ -511,7 +511,6 @@ namespace internal
       Number beta;
       double residual_norm;
       Number previous_alpha;
-      Number previous_beta;
 
       IterationWorkerBase(const MatrixType &        A,
                           const PreconditionerType &preconditioner,
@@ -535,7 +534,6 @@ namespace internal
         , beta(Number())
         , residual_norm(0.0)
         , previous_alpha(Number())
-        , previous_beta(Number())
       {}
 
       void
@@ -604,8 +602,6 @@ namespace internal
 
         const Number previous_r_dot_preconditioner_dot_r =
           r_dot_preconditioner_dot_r;
-        this->previous_alpha = alpha;
-        this->previous_beta  = beta;
 
         if (std::is_same<PreconditionerType, PreconditionIdentity>::value ==
             false)
@@ -639,7 +635,9 @@ namespace internal
 
         const Number p_dot_A_dot_p = p * v;
         Assert(std::abs(p_dot_A_dot_p) != 0., ExcDivideByZero());
-        alpha = r_dot_preconditioner_dot_r / p_dot_A_dot_p;
+
+        this->previous_alpha = alpha;
+        alpha                = r_dot_preconditioner_dot_r / p_dot_A_dot_p;
 
         x.add(alpha, p);
         residual_norm = std::sqrt(std::abs(r.add_and_dot(-alpha, v, r)));
@@ -717,6 +715,9 @@ namespace internal
     {
       using Number = typename VectorType::value_type;
 
+      Number next_r_dot_preconditioner_dot_r;
+      Number previous_beta;
+
       IterationWorker(const MatrixType &        A,
                       const PreconditionerType &preconditioner,
                       const bool                flexible,
@@ -728,6 +729,8 @@ namespace internal
             flexible,
             memory,
             x)
+        , next_r_dot_preconditioner_dot_r(0.)
+        , previous_beta(0.)
       {}
 
       // This is the main iteration function, that will use some of the
@@ -735,6 +738,13 @@ namespace internal
       void
       do_iteration(const unsigned int iteration_index)
       {
+        if (iteration_index > 1)
+          {
+            previous_beta = this->beta;
+            this->beta    = next_r_dot_preconditioner_dot_r /
+                         this->r_dot_preconditioner_dot_r;
+          }
+
         std::array<VectorizedArray<Number>, 7> vectorized_sums = {};
 
         this->A.vmult(
@@ -759,24 +769,23 @@ namespace internal
                             this->r.get_mpi_communicator(),
                             dealii::ArrayView<Number>(scalar_sums.data(), 7));
 
-        this->previous_alpha = this->alpha;
-        this->previous_beta  = this->beta;
+        this->r_dot_preconditioner_dot_r = scalar_sums[6];
 
         const Number p_dot_A_dot_p = scalar_sums[0];
         Assert(std::abs(p_dot_A_dot_p) != 0., ExcDivideByZero());
 
-        const Number previous_r_dot_preconditioner_dot_r = scalar_sums[6];
-        this->alpha = previous_r_dot_preconditioner_dot_r / p_dot_A_dot_p;
-        this->residual_norm = std::sqrt(
+        this->previous_alpha = this->alpha;
+        this->alpha          = this->r_dot_preconditioner_dot_r / p_dot_A_dot_p;
+
+        // Round-off errors near zero might yield negative values, so take
+        // the absolute value in the next two formulas
+        this->residual_norm = std::sqrt(std::abs(
           scalar_sums[3] +
-          this->alpha * (-2. * scalar_sums[2] + this->alpha * scalar_sums[1]));
+          this->alpha * (-2. * scalar_sums[2] + this->alpha * scalar_sums[1])));
 
-        this->r_dot_preconditioner_dot_r =
-          previous_r_dot_preconditioner_dot_r +
-          this->alpha * (-2. * scalar_sums[4] + this->alpha * scalar_sums[5]);
-
-        this->beta = this->r_dot_preconditioner_dot_r /
-                     previous_r_dot_preconditioner_dot_r;
+        next_r_dot_preconditioner_dot_r = std::abs(
+          this->r_dot_preconditioner_dot_r +
+          this->alpha * (-2. * scalar_sums[4] + this->alpha * scalar_sums[5]));
       }
 
       // Function that we use if the PreconditionerType implements an apply()
@@ -943,16 +952,21 @@ namespace internal
       typename std::enable_if<has_apply<PreconditionerType>, U>::type
       finalize_after_convergence(const unsigned int iteration_index)
       {
-        if (iteration_index % 2 == 1)
+        if (iteration_index % 2 == 1 || iteration_index == 2)
           this->x.add(this->alpha, this->p);
         else
           {
             using Number                 = typename VectorType::value_type;
             const unsigned int end_range = this->x.locally_owned_size();
 
-            Number *     x = this->x.begin();
-            Number *     r = this->r.begin();
-            Number *     p = this->p.begin();
+            Number *x = this->x.begin();
+            Number *r = this->r.begin();
+            Number *p = this->p.begin();
+
+            // Note that we use 'beta' here rather than 'previous_beta' in the
+            // formula above, which is because the shift in beta ->
+            // previous_beta has not been applied at this stage, allowing us
+            // to recover the previous search direction
             const Number alpha_plus_previous_alpha_over_beta =
               this->alpha + this->previous_alpha / this->previous_beta;
             const Number previous_alpha_over_beta =
@@ -1147,7 +1161,7 @@ namespace internal
       typename std::enable_if<!has_apply<PreconditionerType>, U>::type
       finalize_after_convergence(const unsigned int iteration_index)
       {
-        if (iteration_index % 2 == 1)
+        if (iteration_index % 2 == 1 || iteration_index == 2)
           this->x.add(this->alpha, this->p);
         else
           {

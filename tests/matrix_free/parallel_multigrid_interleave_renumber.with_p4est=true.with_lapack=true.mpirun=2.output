@@ -2,24 +2,24 @@
 DEAL::Testing FE_Q<2>(1)
 DEAL::Number of degrees of freedom: 81
 DEAL:cg::Starting value 7.00000
-DEAL:cg::Convergence step 3 value 1.44113e-07
+DEAL:cg::Convergence step 3 value 2.50859e-07
 DEAL::Number of calls to special vmult for Operator of size 4: 13
-DEAL::Number of calls to special vmult for Operator of size 9: 28
+DEAL::Number of calls to special vmult for Operator of size 9: 29
 DEAL::Number of calls to special vmult for Operator of size 25: 33
 DEAL::Number of calls to special vmult for Operator of size 81: 42
 DEAL::Testing FE_Q<2>(1)
 DEAL::Number of degrees of freedom: 289
 DEAL:cg::Starting value 15.0000
-DEAL:cg::Convergence step 3 value 1.49408e-06
-DEAL::Number of calls to special vmult for Operator of size 4: 13
-DEAL::Number of calls to special vmult for Operator of size 9: 28
-DEAL::Number of calls to special vmult for Operator of size 25: 33
-DEAL::Number of calls to special vmult for Operator of size 81: 42
-DEAL::Number of calls to special vmult for Operator of size 289: 42
+DEAL:cg::Convergence step 4 value 2.05438e-08
+DEAL::Number of calls to special vmult for Operator of size 4: 17
+DEAL::Number of calls to special vmult for Operator of size 9: 38
+DEAL::Number of calls to special vmult for Operator of size 25: 42
+DEAL::Number of calls to special vmult for Operator of size 81: 51
+DEAL::Number of calls to special vmult for Operator of size 289: 51
 DEAL::Testing FE_Q<2>(3)
 DEAL::Number of degrees of freedom: 625
 DEAL:cg::Starting value 23.0000
-DEAL:cg::Convergence step 4 value 6.60805e-08
+DEAL:cg::Convergence step 4 value 2.11999e-07
 DEAL::Number of calls to special vmult for Operator of size 16: 19
 DEAL::Number of calls to special vmult for Operator of size 49: 48
 DEAL::Number of calls to special vmult for Operator of size 169: 51
@@ -27,7 +27,7 @@ DEAL::Number of calls to special vmult for Operator of size 625: 51
 DEAL::Testing FE_Q<2>(3)
 DEAL::Number of degrees of freedom: 2401
 DEAL:cg::Starting value 47.0000
-DEAL:cg::Convergence step 4 value 2.29801e-07
+DEAL:cg::Convergence step 4 value 4.14038e-07
 DEAL::Number of calls to special vmult for Operator of size 16: 19
 DEAL::Number of calls to special vmult for Operator of size 49: 48
 DEAL::Number of calls to special vmult for Operator of size 169: 51
@@ -36,14 +36,14 @@ DEAL::Number of calls to special vmult for Operator of size 2401: 51
 DEAL::Testing FE_Q<3>(1)
 DEAL::Number of degrees of freedom: 125
 DEAL:cg::Starting value 5.19615
-DEAL:cg::Convergence step 3 value 5.16655e-09
+DEAL:cg::Convergence step 3 value 4.30693e-08
 DEAL::Number of calls to special vmult for Operator of size 8: 13
 DEAL::Number of calls to special vmult for Operator of size 27: 28
 DEAL::Number of calls to special vmult for Operator of size 125: 34
 DEAL::Testing FE_Q<3>(1)
 DEAL::Number of degrees of freedom: 729
 DEAL:cg::Starting value 18.5203
-DEAL:cg::Convergence step 3 value 1.00122e-06
+DEAL:cg::Convergence step 3 value 3.62205e-07
 DEAL::Number of calls to special vmult for Operator of size 8: 13
 DEAL::Number of calls to special vmult for Operator of size 27: 28
 DEAL::Number of calls to special vmult for Operator of size 125: 34
@@ -51,14 +51,14 @@ DEAL::Number of calls to special vmult for Operator of size 729: 42
 DEAL::Testing FE_Q<3>(2)
 DEAL::Number of degrees of freedom: 729
 DEAL:cg::Starting value 18.5203
-DEAL:cg::Convergence step 4 value 5.65178e-09
+DEAL:cg::Convergence step 4 value 1.13788e-08
 DEAL::Number of calls to special vmult for Operator of size 27: 17
 DEAL::Number of calls to special vmult for Operator of size 125: 43
 DEAL::Number of calls to special vmult for Operator of size 729: 51
 DEAL::Testing FE_Q<3>(2)
 DEAL::Number of degrees of freedom: 4913
 DEAL:cg::Starting value 58.0948
-DEAL:cg::Convergence step 4 value 6.26463e-08
+DEAL:cg::Convergence step 4 value 9.17189e-08
 DEAL::Number of calls to special vmult for Operator of size 27: 17
 DEAL::Number of calls to special vmult for Operator of size 125: 43
 DEAL::Number of calls to special vmult for Operator of size 729: 51

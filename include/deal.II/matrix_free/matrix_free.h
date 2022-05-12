@@ -1031,7 +1031,7 @@ public:
    *
    * @param dof_handler_index_pre_post Since MatrixFree can be initialized
    * with a vector of DoFHandler objects, each of them will in general have
-   * vector sizes and thus different ranges returned to
+   * different vector sizes and thus different ranges returned to
    * `operation_before_loop` and `operation_after_loop`. Use this variable to
    * specify which one of the DoFHandler objects the index range should be
    * associated to. Defaults to the `dof_handler_index` 0.
@@ -4621,6 +4621,28 @@ namespace internal
 
 
 
+  // Apply a unit matrix operation to constrained DoFs: Default cases where we
+  // cannot detect a LinearAlgebra::distributed::Vector, we do not do
+  // anything, else we apply the constraints as a unit operation
+  template <typename VectorStruct1, typename VectorStruct2>
+  inline void
+  apply_operation_to_constrained_dofs(const std::vector<unsigned int> &,
+                                      const VectorStruct1 &,
+                                      VectorStruct2 &)
+  {}
+
+  template <typename Number>
+  inline void
+  apply_operation_to_constrained_dofs(
+    const std::vector<unsigned int> &                 constrained_dofs,
+    const LinearAlgebra::distributed::Vector<Number> &src,
+    LinearAlgebra::distributed::Vector<Number> &      dst)
+  {
+    for (const unsigned int i : constrained_dofs)
+      dst.local_element(i) = src.local_element(i);
+  }
+
+
   namespace MatrixFreeFunctions
   {
     // struct to select between a const interface and a non-const interface
@@ -4861,6 +4883,17 @@ namespace internal
     {
       if (operation_after_loop)
         {
+          // Run unit matrix operation on constrained dofs if we are at the
+          // last range
+          const std::vector<unsigned int> &partition_row_index =
+            matrix_free.get_task_info().partition_row_index;
+          if (range_index ==
+              partition_row_index[partition_row_index.size() - 2] - 1)
+            apply_operation_to_constrained_dofs(
+              matrix_free.get_constrained_dofs(dof_handler_index_pre_post),
+              src,
+              dst);
+
           const internal::MatrixFreeFunctions::DoFInfo &dof_info =
             matrix_free.get_dof_info(dof_handler_index_pre_post);
           if (range_index == numbers::invalid_unsigned_int)
