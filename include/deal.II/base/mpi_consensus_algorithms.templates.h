@@ -262,7 +262,7 @@ namespace Utilities
 
               auto &send_buffer = send_buffers[index];
               send_buffer =
-                (create_request ? Utilities::pack(create_request(rank)) :
+                (create_request ? Utilities::pack(create_request(rank), false) :
                                   std::vector<char>());
 
               // Post a request to send data
@@ -356,7 +356,8 @@ namespace Utilities
 
                 if (process_answer)
                   process_answer(target,
-                                 Utilities::unpack<AnswerType>(recv_buffer));
+                                 Utilities::unpack<AnswerType>(recv_buffer,
+                                                               false));
 
                 // Finally, remove this rank from the list of outstanding
                 // targets:
@@ -443,9 +444,11 @@ namespace Utilities
             request_buffers.emplace_back(std::make_unique<std::vector<char>>());
             auto &request_buffer = *request_buffers.back();
             if (answer_request)
-              request_buffer = Utilities::pack(
-                answer_request(other_rank,
-                               Utilities::unpack<RequestType>(buffer_recv)));
+              request_buffer =
+                Utilities::pack(answer_request(other_rank,
+                                               Utilities::unpack<RequestType>(
+                                                 buffer_recv, false)),
+                                false);
 
             // Then initiate sending the answer back to the requester.
             request_requests.emplace_back(std::make_unique<MPI_Request>());
@@ -623,7 +626,7 @@ namespace Utilities
             // pack data which should be sent
             auto &send_buffer = send_buffers[i];
             if (create_request)
-              send_buffer = Utilities::pack(create_request(rank));
+              send_buffer = Utilities::pack(create_request(rank), false);
 
             // start to send data
             auto ierr = MPI_Isend(send_buffer.data(),
@@ -698,8 +701,10 @@ namespace Utilities
         auto &request_buffer = requests_buffers[index];
         request_buffer =
           (answer_request ?
-             Utilities::pack(answer_request(
-               other_rank, Utilities::unpack<RequestType>(buffer_recv))) :
+             Utilities::pack(answer_request(other_rank,
+                                            Utilities::unpack<RequestType>(
+                                              buffer_recv, false)),
+                             false) :
              std::vector<char>());
 
         ierr = MPI_Isend(request_buffer.data(),
@@ -769,7 +774,7 @@ namespace Utilities
 
             if (process_answer)
               process_answer(other_rank,
-                             Utilities::unpack<AnswerType>(recv_buffer));
+                             Utilities::unpack<AnswerType>(recv_buffer, false));
           }
 #else
         (void)n_targets;
