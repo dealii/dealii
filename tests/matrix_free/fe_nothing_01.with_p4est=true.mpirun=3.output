@@ -1,0 +1,41 @@
+
+DEAL:0:2d::Testing reinit for FE_Nothing + FE_Q<2>(1)
+DEAL:0:2d::# local dofs: 0
+DEAL:0:2d::Testing reinit for FE_Nothing + FE_Q<2>(2)
+DEAL:0:2d::# local dofs: 0
+DEAL:0:2d::Testing reinit for FE_Nothing + FE_Q<2>(3)
+DEAL:0:2d::# local dofs: 0
+DEAL:0:2d::Testing reinit for FE_Nothing + FE_Q<2>(4)
+DEAL:0:2d::# local dofs: 0
+DEAL:0:3d::Testing reinit for FE_Nothing + FE_Q<3>(1)
+DEAL:0:3d::# local dofs: 0
+DEAL:0:3d::Testing reinit for FE_Nothing + FE_Q<3>(2)
+DEAL:0:3d::# local dofs: 0
+
+DEAL:1:2d::Testing reinit for FE_Nothing + FE_Q<2>(1)
+DEAL:1:2d::# local dofs: 0
+DEAL:1:2d::Testing reinit for FE_Nothing + FE_Q<2>(2)
+DEAL:1:2d::# local dofs: 0
+DEAL:1:2d::Testing reinit for FE_Nothing + FE_Q<2>(3)
+DEAL:1:2d::# local dofs: 0
+DEAL:1:2d::Testing reinit for FE_Nothing + FE_Q<2>(4)
+DEAL:1:2d::# local dofs: 0
+DEAL:1:3d::Testing reinit for FE_Nothing + FE_Q<3>(1)
+DEAL:1:3d::# local dofs: 8
+DEAL:1:3d::Testing reinit for FE_Nothing + FE_Q<3>(2)
+DEAL:1:3d::# local dofs: 27
+
+
+DEAL:2:2d::Testing reinit for FE_Nothing + FE_Q<2>(1)
+DEAL:2:2d::# local dofs: 6
+DEAL:2:2d::Testing reinit for FE_Nothing + FE_Q<2>(2)
+DEAL:2:2d::# local dofs: 15
+DEAL:2:2d::Testing reinit for FE_Nothing + FE_Q<2>(3)
+DEAL:2:2d::# local dofs: 28
+DEAL:2:2d::Testing reinit for FE_Nothing + FE_Q<2>(4)
+DEAL:2:2d::# local dofs: 45
+DEAL:2:3d::Testing reinit for FE_Nothing + FE_Q<3>(1)
+DEAL:2:3d::# local dofs: 10
+DEAL:2:3d::Testing reinit for FE_Nothing + FE_Q<3>(2)
+DEAL:2:3d::# local dofs: 48
+
