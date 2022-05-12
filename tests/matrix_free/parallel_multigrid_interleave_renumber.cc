@@ -194,8 +194,6 @@ public:
                    src,
                    operation_before_loop,
                    operation_after_loop);
-    for (unsigned int i : data.get_constrained_dofs())
-      dst.local_element(i) = src.local_element(i);
   }
 
   void
