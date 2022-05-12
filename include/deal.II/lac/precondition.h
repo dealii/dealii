@@ -2500,60 +2500,39 @@ namespace internal
         solution.swap(solution_old);
     }
 
-    // Detector class to find out whether we have a vmult function that takes
-    // two additional std::function objects, which we use to run the operation
-    // on slices of the vector during the matrix-vector product
+    // a helper type-trait that leverage SFINAE to figure out if MatrixType has
+    // ... MatrixType::vmult(VectorType &, const VectorType&,
+    // std::function<...>, std::function<...>) const
+    template <typename MatrixType, typename VectorType>
+    using vmult_functions_t = decltype(std::declval<MatrixType const>().vmult(
+      std::declval<VectorType &>(),
+      std::declval<const VectorType &>(),
+      std::declval<
+        const std::function<void(const unsigned int, const unsigned int)> &>(),
+      std::declval<const std::function<void(const unsigned int,
+                                            const unsigned int)> &>()));
+
     template <typename MatrixType,
               typename VectorType,
               typename PreconditionerType>
-    struct supports_vmult_with_std_functions
-    {
-    private:
-      // this will work always
-      static bool
-      detect(...);
-
-      // this detector will work only if we have
-      // "... MatrixType::vmult(VectorType, const VectorType,
-      // const std::function<...>&, const std::function<...>&) const"
-      template <typename MatrixType2>
-      static decltype(std::declval<MatrixType2 const>().vmult(
-        std::declval<VectorType &>(),
-        std::declval<const VectorType &>(),
-        std::declval<const std::function<void(const unsigned int,
-                                              const unsigned int)> &>(),
-        std::declval<const std::function<void(const unsigned int,
-                                              const unsigned int)> &>()))
-      detect(const MatrixType2 &);
-
-    public:
-      // finally here we check if our detector has void return type and
-      // fulfills additional requirements on the vector type and
-      // preconditioner. This will happen if the compiler can use the second
-      // detector, otherwise SFINAE let's it work with the more general first
-      // one that is bool
-      static const bool value =
-        !std::is_same<decltype(detect(std::declval<MatrixType>())),
-                      bool>::value &&
-        std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value &&
-        std::is_same<
-          VectorType,
-          LinearAlgebra::distributed::Vector<typename VectorType::value_type,
-                                             MemorySpace::Host>>::value;
-    };
+    constexpr bool has_vmult_with_std_functions =
+      is_supported_operation<vmult_functions_t, MatrixType, VectorType>
+        &&  std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value
+          &&std::is_same<
+            VectorType,
+            LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                               MemorySpace::Host>>::value;
 
     // We need to have a separate declaration for static const members
-    template <typename T, typename U, typename V>
-    const bool supports_vmult_with_std_functions<T, U, V>::value;
 
-    template <typename MatrixType,
-              typename VectorType,
-              typename PreconditionerType,
-              typename std::enable_if<
-                !supports_vmult_with_std_functions<MatrixType,
-                                                   VectorType,
-                                                   PreconditionerType>::value,
-                int>::type * = nullptr>
+    template <
+      typename MatrixType,
+      typename VectorType,
+      typename PreconditionerType,
+      typename std::enable_if<!has_vmult_with_std_functions<MatrixType,
+                                                            VectorType,
+                                                            PreconditionerType>,
+                              int>::type * = nullptr>
     inline void
     vmult_and_update(const MatrixType &        matrix,
                      const PreconditionerType &preconditioner,
@@ -2579,14 +2558,14 @@ namespace internal
                      solution);
     }
 
-    template <typename MatrixType,
-              typename VectorType,
-              typename PreconditionerType,
-              typename std::enable_if<
-                supports_vmult_with_std_functions<MatrixType,
-                                                  VectorType,
-                                                  PreconditionerType>::value,
-                int>::type * = nullptr>
+    template <
+      typename MatrixType,
+      typename VectorType,
+      typename PreconditionerType,
+      typename std::enable_if<has_vmult_with_std_functions<MatrixType,
+                                                           VectorType,
+                                                           PreconditionerType>,
+                              int>::type * = nullptr>
     inline void
     vmult_and_update(const MatrixType &        matrix,
                      const PreconditionerType &preconditioner,
