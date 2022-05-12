@@ -621,10 +621,12 @@ namespace internal
                   for (unsigned int j = 0; j < n_comp; ++j)
                     dof_indices_contiguous
                       [dof_access_cell][i * vectorization_length + j] =
-                        this->dof_indices[row_starts[(i * vectorization_length +
-                                                      j) *
-                                                     n_components]
-                                            .first];
+                        this->dof_indices.size() == 0 ?
+                          0 :
+                          this->dof_indices
+                            [row_starts[(i * vectorization_length + j) *
+                                        n_components]
+                               .first];
                 }
 
               if (indices_are_interleaved_and_contiguous)
