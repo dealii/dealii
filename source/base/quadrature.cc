@@ -53,8 +53,9 @@ Quadrature<dim>::initialize(const std::vector<Point<dim>> &p,
                             const std::vector<double> &    w)
 {
   AssertDimension(w.size(), p.size());
-  quadrature_points = p;
-  weights           = w;
+  quadrature_points      = p;
+  weights                = w;
+  is_tensor_product_flag = dim == 1;
 }
 
 
