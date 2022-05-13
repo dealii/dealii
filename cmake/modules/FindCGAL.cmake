@@ -32,7 +32,7 @@ IF(DEAL_II_HAVE_CXX17)
   # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
   LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
   SET(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON)
-  FIND_PACKAGE(CGAL)
+  FIND_PACKAGE(CGAL QUIET)
   # Check version manually. Older binary distros don't do this properly.
   IF(CGAL_MAJOR_VERSION LESS 5)
     SET(CGAL_FOUND FALSE)
