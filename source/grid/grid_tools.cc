@@ -16,6 +16,7 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
+#include <deal.II/base/mpi_consensus_algorithms.templates.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
 
@@ -57,6 +58,7 @@
 #include <deal.II/numerics/vector_tools_integrate_difference.h>
 
 #include <deal.II/physics/transformations.h>
+
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random/mersenne_twister.hpp>
@@ -5985,6 +5987,9 @@ namespace GridTools
           "The marked_vertices vector has to be either empty or its size has "
           "to equal the number of vertices of the triangulation."));
 
+      using RequestType = std::vector<std::pair<unsigned int, Point<spacedim>>>;
+      using AnswerType  = std::vector<unsigned int>;
+
       // In the case that a marked_vertices vector has been given and none
       // of its entries is true, we know that this process does not own
       // any of the incoming points (and it will not send any data) so
@@ -5997,36 +6002,31 @@ namespace GridTools
       const auto create_request = [&](const unsigned int other_rank) {
         const auto other_rank_index = translate(other_rank);
 
-        std::vector<std::pair<unsigned int, Point<spacedim>>> temp;
-        temp.reserve(potential_owners_ptrs[other_rank_index + 1] -
-                     potential_owners_ptrs[other_rank_index]);
+        RequestType request;
+        request.reserve(potential_owners_ptrs[other_rank_index + 1] -
+                        potential_owners_ptrs[other_rank_index]);
 
         for (unsigned int i = potential_owners_ptrs[other_rank_index];
              i < potential_owners_ptrs[other_rank_index + 1];
              ++i)
-          temp.emplace_back(potential_owners_indices[i],
-                            points[potential_owners_indices[i]]);
+          request.emplace_back(potential_owners_indices[i],
+                               points[potential_owners_indices[i]]);
 
-        return Utilities::pack(temp, false);
+        return request;
       };
 
       const auto answer_request =
-        [&](const unsigned int &     other_rank,
-            const std::vector<char> &request) -> std::vector<char> {
-        const auto recv_buffer_unpacked = Utilities::unpack<
-          std::vector<std::pair<unsigned int, Point<spacedim>>>>(request,
-                                                                 false);
-
-        std::vector<unsigned int> request_buffer_temp(
-          recv_buffer_unpacked.size(), 0);
+        [&](const unsigned int &other_rank,
+            const RequestType & request) -> AnswerType {
+        AnswerType answer(request.size(), 0);
 
         if (has_relevant_vertices)
           {
             cell_hint = cache.get_triangulation().begin_active();
 
-            for (unsigned int i = 0; i < recv_buffer_unpacked.size(); ++i)
+            for (unsigned int i = 0; i < request.size(); ++i)
               {
-                const auto &index_and_point = recv_buffer_unpacked[i];
+                const auto &index_and_point = request[i];
 
                 const auto cells_and_reference_positions =
                   find_all_locally_owned_active_cells_around_point(
@@ -6051,27 +6051,24 @@ namespace GridTools
                       numbers::invalid_unsigned_int);
                   }
 
-                request_buffer_temp[i] = cells_and_reference_positions.size();
+                answer[i] = cells_and_reference_positions.size();
               }
           }
 
         if (perform_handshake)
-          return Utilities::pack(request_buffer_temp, false);
+          return answer;
         else
           return {};
       };
 
-      const auto process_answer = [&](const unsigned int       other_rank,
-                                      const std::vector<char> &answer) {
+      const auto process_answer = [&](const unsigned int other_rank,
+                                      const AnswerType & answer) {
         if (perform_handshake)
           {
-            const auto recv_buffer_unpacked =
-              Utilities::unpack<std::vector<unsigned int>>(answer, false);
-
             const auto other_rank_index = translate(other_rank);
 
-            for (unsigned int i = 0; i < recv_buffer_unpacked.size(); ++i)
-              for (unsigned int j = 0; j < recv_buffer_unpacked[i]; ++j)
+            for (unsigned int i = 0; i < answer.size(); ++i)
+              for (unsigned int j = 0; j < answer[i]; ++j)
                 recv_components.emplace_back(
                   other_rank,
                   potential_owners_indices
@@ -6080,8 +6077,7 @@ namespace GridTools
           }
       };
 
-      Utilities::MPI::ConsensusAlgorithms::selector<std::vector<char>,
-                                                    std::vector<char>>(
+      Utilities::MPI::ConsensusAlgorithms::selector<RequestType, AnswerType>(
         potential_owners_ranks,
         create_request,
         answer_request,

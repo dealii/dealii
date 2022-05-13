@@ -16,6 +16,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
+#include <deal.II/base/mpi_consensus_algorithms.templates.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/tria.h>
@@ -123,32 +124,19 @@ namespace TriangulationDescription
             const auto other_rank_index =
               std::distance(relevant_processes.begin(), ptr);
 
-            return dealii::Utilities::pack(description_temp[other_rank_index],
-                                           false);
+            return description_temp[other_rank_index];
           };
 
-          const auto answer_request = [&](const unsigned int,
-                                          const std::vector<char> &request) {
-            this->merge(
-              dealii::Utilities::unpack<DescriptionTemp<dim, spacedim>>(request,
-                                                                        false),
-              vertices_have_unique_ids);
-            return std::vector<char>();
-          };
+          const auto answer_request =
+            [&](const unsigned int,
+                const DescriptionTemp<dim, spacedim> &request) {
+              this->merge(request, vertices_have_unique_ids);
+              return char{};
+            };
 
-          const auto process_answer = [](const unsigned int,
-                                         const std::vector<char> &answer) {
-            (void)answer;
-            Assert(answer.size() == 0, ExcInternalError());
-          };
-
-
-          dealii::Utilities::MPI::ConsensusAlgorithms::
-            selector<std::vector<char>, std::vector<char>>(relevant_processes,
-                                                           create_request,
-                                                           answer_request,
-                                                           process_answer,
-                                                           comm);
+          dealii::Utilities::MPI::ConsensusAlgorithms::selector<
+            DescriptionTemp<dim, spacedim>,
+            char>(relevant_processes, create_request, answer_request, {}, comm);
         }
 
         /**
