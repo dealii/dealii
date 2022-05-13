@@ -65,12 +65,6 @@ INSTALL(FILES ${_macros}
 ########################################################################
 
 #
-# Do not force --as-needed for executables on user side:
-#
-
-STRIP_FLAG(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
-
-#
 # Strip -Wno-deprecated-declarations from DEAL_II_CXX_FLAGS so that
 # deprecation warnings are actually shown for user code:
 #
