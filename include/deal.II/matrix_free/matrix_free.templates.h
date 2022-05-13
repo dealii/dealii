@@ -2170,13 +2170,14 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
               }
           };
 
-          Utilities::MPI::ConsensusAlgorithms::
-            Selector<dealii::types::global_dof_index, unsigned int>()
-              .run(targets,
-                   create_request,
-                   answer_request,
-                   process_answer,
-                   communicator_sm);
+          Utilities::MPI::ConsensusAlgorithms::Selector<
+            std::vector<dealii::types::global_dof_index>,
+            std::vector<unsigned int>>()
+            .run(targets,
+                 create_request,
+                 answer_request,
+                 process_answer,
+                 communicator_sm);
 
           return cells;
         }();

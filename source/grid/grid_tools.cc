@@ -6080,7 +6080,8 @@ namespace GridTools
           }
       };
 
-      Utilities::MPI::ConsensusAlgorithms::selector<char, char>(
+      Utilities::MPI::ConsensusAlgorithms::selector<std::vector<char>,
+                                                    std::vector<char>>(
         potential_owners_ranks,
         create_request,
         answer_request,

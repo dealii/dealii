@@ -15,6 +15,9 @@
 
 #include <deal.II/base/mpi_consensus_algorithms.templates.h>
 
+#include <boost/serialization/utility.hpp>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Utilities
@@ -23,68 +26,78 @@ namespace Utilities
   {
     namespace ConsensusAlgorithms
     {
-      template class Process<unsigned int, unsigned int>;
+      template class Process<std::vector<unsigned int>,
+                             std::vector<unsigned int>>;
 
-      template class Interface<unsigned int, unsigned int>;
+      template class Interface<std::vector<unsigned int>,
+                               std::vector<unsigned int>>;
 
-      template class NBX<unsigned int, unsigned int>;
+      template class NBX<std::vector<unsigned int>, std::vector<unsigned int>>;
 
-      template class PEX<unsigned int, unsigned int>;
+      template class PEX<std::vector<unsigned int>, std::vector<unsigned int>>;
 
-      template class Serial<unsigned int, unsigned int>;
+      template class Serial<std::vector<unsigned int>,
+                            std::vector<unsigned int>>;
 
-      template class Selector<unsigned int, unsigned int>;
+      template class Selector<std::vector<unsigned int>,
+                              std::vector<unsigned int>>;
 
 
-      template class Process<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>;
+      template class Process<std::vector<std::pair<types::global_dof_index,
+                                                   types::global_dof_index>>,
+                             std::vector<unsigned int>>;
 
-      template class Interface<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>;
+      template class Interface<std::vector<std::pair<types::global_dof_index,
+                                                     types::global_dof_index>>,
+                               std::vector<unsigned int>>;
 
-      template class Selector<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>;
+      template class Selector<std::vector<std::pair<types::global_dof_index,
+                                                    types::global_dof_index>>,
+                              std::vector<unsigned int>>;
 
-      template class NBX<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>;
+      template class NBX<std::vector<std::pair<types::global_dof_index,
+                                               types::global_dof_index>>,
+                         std::vector<unsigned int>>;
 
-      template class Serial<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>;
+      template class Serial<std::vector<std::pair<types::global_dof_index,
+                                                  types::global_dof_index>>,
+                            std::vector<unsigned int>>;
 
-      template class PEX<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>;
+      template class PEX<std::vector<std::pair<types::global_dof_index,
+                                               types::global_dof_index>>,
+                         std::vector<unsigned int>>;
 
 #ifdef DEAL_II_WITH_64BIT_INDICES
-      template class Process<types::global_dof_index, unsigned int>;
+      template class Process<std::vector<types::global_dof_index>,
+                             std::vector<unsigned int>>;
 
-      template class Interface<types::global_dof_index, unsigned int>;
+      template class Interface<std::vector<types::global_dof_index>,
+                               std::vector<unsigned int>>;
 
-      template class NBX<types::global_dof_index, unsigned int>;
+      template class NBX<std::vector<types::global_dof_index>,
+                         std::vector<unsigned int>>;
 
-      template class Serial<types::global_dof_index, unsigned int>;
+      template class Serial<std::vector<types::global_dof_index>,
+                            std::vector<unsigned int>>;
 
-      template class PEX<types::global_dof_index, unsigned int>;
+      template class PEX<std::vector<types::global_dof_index>,
+                         std::vector<unsigned int>>;
 
-      template class Selector<types::global_dof_index, unsigned int>;
+      template class Selector<std::vector<types::global_dof_index>,
+                              std::vector<unsigned int>>;
 #endif
 
-      template class Process<char, char>;
+      template class Process<std::vector<char>, std::vector<char>>;
 
-      template class Interface<char, char>;
+      template class Interface<std::vector<char>, std::vector<char>>;
 
-      template class NBX<char, char>;
+      template class NBX<std::vector<char>, std::vector<char>>;
 
-      template class PEX<char, char>;
+      template class PEX<std::vector<char>, std::vector<char>>;
 
-      template class Serial<char, char>;
+      template class Serial<std::vector<char>, std::vector<char>>;
 
-      template class Selector<char, char>;
+      template class Selector<std::vector<char>, std::vector<char>>;
 
     } // namespace ConsensusAlgorithms
   }   // end of namespace MPI

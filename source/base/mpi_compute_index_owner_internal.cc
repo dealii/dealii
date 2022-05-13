@@ -408,8 +408,9 @@ namespace Utilities
                                      actually_owning_rank_list);
 
               ConsensusAlgorithms::Selector<
-                std::pair<types::global_dof_index, types::global_dof_index>,
-                unsigned int>
+                std::vector<
+                  std::pair<types::global_dof_index, types::global_dof_index>>,
+                std::vector<unsigned int>>
                 consensus_algo(temp, comm);
               consensus_algo.run();
             }
