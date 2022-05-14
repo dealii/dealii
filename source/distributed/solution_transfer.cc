@@ -244,8 +244,9 @@ namespace parallel
             &dof_handler->get_triangulation())));
       Assert(tria != nullptr, ExcInternalError());
 
-      for (const auto vec : all_out)
-        *vec = 0.0;
+      if (average_values)
+        for (const auto vec : all_out)
+          *vec = 0.0;
 
       VectorType valence;
 
@@ -268,12 +269,12 @@ namespace parallel
           // finalize valence: compress and invert
           valence.compress(::dealii::VectorOperation::add);
           for (const auto i : valence.locally_owned_elements())
-            valence[i] = valence[i] == 0.0 ? 0.0 : (1.0 / valence[i]);
+            valence[i] = (valence[i] == 0.0 ? 0.0 : (1.0 / valence[i]));
           valence.compress(::dealii::VectorOperation::insert);
 
           for (const auto vec : all_out)
             {
-              // comress and weight with valence
+              // compress and weight with valence
               vec->compress(::dealii::VectorOperation::add);
               vec->scale(valence);
             }
