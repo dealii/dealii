@@ -291,6 +291,10 @@ namespace CGALWrappers
     Assert(CGAL::is_closed(surface_mesh_2),
            ExcMessage(
              "The input surface_mesh_2 must be a closed surface mesh."));
+    Assert(CGAL::is_triangle_mesh(surface_mesh_1),
+           ExcMessage("The first CGAL mesh must be triangulated."));
+    Assert(CGAL::is_triangle_mesh(surface_mesh_2),
+           ExcMessage("The second CGAL mesh must be triangulated."));
 
     bool res      = false;
     auto surf_1   = surface_mesh_1;

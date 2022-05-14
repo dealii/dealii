@@ -64,6 +64,23 @@ namespace
                             "CGAL encountered a orientation problem that it "
                             "was not able to solve."));
   }
+
+
+
+  template <typename dealiiFace, typename CGAL_Mesh>
+  void
+  map_vertices(
+    const dealiiFace &                                        cell,
+    std::map<unsigned int, typename CGAL_Mesh::Vertex_index> &deal2cgal,
+    CGAL_Mesh &                                               mesh)
+  {
+    for (const auto i : cell->vertex_indices())
+      {
+        deal2cgal[cell->vertex_index(i)] = mesh.add_vertex(
+          CGALWrappers::dealii_point_to_cgal_point<typename CGAL_Mesh::Point>(
+            cell->vertex(i)));
+      }
+  }
 } // namespace
 
 
@@ -80,10 +97,6 @@ namespace CGALWrappers
     CGAL::Surface_mesh<CGALPointType> &                         mesh)
   {
     Assert(dim > 1, ExcImpossibleInDim(dim));
-    Assert(
-      mesh.is_empty(),
-      ExcMessage(
-        "The CGAL::Surface_mesh object must be empty upon calling this function."));
     using Mesh           = CGAL::Surface_mesh<CGALPointType>;
     const auto &vertices = mapping.get_vertices(cell);
     std::map<unsigned int, typename Mesh::Vertex_index> deal2cgal;
@@ -114,9 +127,56 @@ namespace CGALWrappers
                     (f % 2 == 0));
   }
 
-  // explicit instantiations
-#    include "surface_mesh.inst"
 
+
+  template <typename CGALPointType, int dim, int spacedim>
+  void
+  dealii_tria_to_cgal_surface_mesh(
+    const dealii::Triangulation<dim, spacedim> &tria,
+    CGAL::Surface_mesh<CGALPointType> &         mesh)
+  {
+    Assert(tria.n_cells() > 0,
+           ExcMessage(
+             "Triangulation cannot be empty upon calling this function."));
+    Assert(mesh.is_empty(),
+           ExcMessage(
+             "The surface mesh must be empty upon calling this function."));
+
+    Assert(dim > 1, ExcImpossibleInDim(dim));
+    using Mesh         = CGAL::Surface_mesh<CGALPointType>;
+    using Vertex_index = typename Mesh::Vertex_index;
+
+    std::map<unsigned int, Vertex_index> deal2cgal;
+    if constexpr (dim == 2)
+      {
+        for (const auto &cell : tria.active_cell_iterators())
+          {
+            map_vertices(cell, deal2cgal, mesh);
+            add_facet(cell, deal2cgal, mesh);
+          }
+      }
+    else if constexpr (dim == 3 && spacedim == 3)
+      {
+        for (const auto &cell : tria.active_cell_iterators())
+          {
+            for (const auto &f : cell->face_indices())
+
+              if (cell->face(f)->at_boundary())
+                {
+                  map_vertices(cell->face(f), deal2cgal, mesh);
+                  add_facet(cell->face(f),
+                            deal2cgal,
+                            mesh,
+                            (f % 2 == 0 || cell->n_vertices() != 8));
+                }
+          }
+      }
+    else
+      {
+        Assert(false, ExcImpossibleInDimSpacedim(dim, spacedim));
+      }
+  } // explicit instantiations
+#    include "surface_mesh.inst"
 
 } // namespace CGALWrappers
 #  endif
