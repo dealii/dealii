@@ -28,6 +28,17 @@
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 
+#ifdef DEAL_II_WITH_CGAL
+// All functions needed by the CGAL mesh generation utilities
+#  include <CGAL/Labeled_mesh_domain_3.h>
+#  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
+#  include <CGAL/Mesh_criteria_3.h>
+#  include <CGAL/Mesh_triangulation_3.h>
+#  include <CGAL/make_mesh_3.h>
+#  include <deal.II/cgal/triangulation.h>
+#  include <deal.II/cgal/utilities.h>
+#endif
+
 #include <array>
 #include <map>
 
@@ -1747,6 +1758,78 @@ namespace GridGenerator
     Triangulation<dim, spacedim> &tria,
     const std::string &           grid_generator_function_name,
     const std::string &           grid_generator_function_arguments);
+
+#ifdef DEAL_II_WITH_CGAL
+  /**
+   * Generate a Triangulation from the zero level set of an implicit function,
+   * using the CGAL library.
+   *
+   * This function is only implemented for `dim` equal to two or three, and
+   * requires that deal.II is configured using `DEAL_II_WITH_CGAL`. When
+   * `dim` is equal to three, the @p implicit_function is supposed to be
+   * negative in the interior of the domain, and positive outside, and the
+   * triangulation that is generated covers the volume bounded by the zero level
+   * set of the implicit function and the boundary of a ball of radius,
+   * @p outer_ball_radius where the @p implicit_function is negative.
+   *
+   * When `dim` is equal to two, the generated surface triangulation is the zero
+   * level set of the @p implicit_function, with or without boundary, depending
+   * on whether the zero level set intersects the boundary of the outer ball.
+   *
+   * The orientation is such that the surface triangulation has normals pointing
+   * towards the region where @p implicit_function is positive.
+   *
+   * The optional variable arguments @p cgal_args can be used to pass additional
+   * arguments to the CGAL::Mesh_criteria_3 class (see
+   * https://doc.cgal.org/latest/Mesh_3/index.html) for more information.
+   *
+   * The arguments allow fine control on the size, quality, and distribution of
+   * the cells of the final triangulation. CGAL uses named parameters for these
+   * arguments, i.e., they must be specified with the syntax
+   * `CGAL::parameters::parameter_name=parameter_value`. Accepted parameters
+   * are:
+   *
+   * - CGAL::parameters::facet_angl,
+   * - CGAL::parameters::facet_size,
+   * - CGAL::parameters::facet_distance,
+   * - CGAL::parameters::cell_radius_edge_ratio,
+   * - CGAL::parameters::cell_size;
+   *
+   * An example usage of this function is given by
+   *
+   * @code
+   * Triangulation<3>  tria;
+   * FunctionParser<3> implicit_function("(1-sqrt(x^2+y^2))^2+z^2-.25");
+   * GridGenerator::implicit_function(
+   *     tria,
+   *     implicit_function,
+   *     Point<3>(1, 0, 0),
+   *     10.0,
+   *     CGAL::parameters::cell_size = 0.2);
+   * @endcode
+   *
+   * The above snippet of code generates the following image:
+   *
+   * @image html grid_generator_implicit_function_3d.png
+   *
+   *
+   * @param[out] tria The output triangulation
+   * @param[in] implicit_function The implicit function
+   * @param[in] interior_point A point in the interior of the domain, for which
+   * @p implicit_function is negative
+   * @param[in] outer_ball_radius The radius of the ball that will contain the
+   * generated Triangulation object
+   * @param[in] cgal_args Additional parameters to pass to the CGAL::make_mesh_3
+   * function and to the CGAL::make_surface_mesh functions
+   */
+  template <int dim, typename... Args>
+  void
+  implicit_function(Triangulation<dim, 3> &tria,
+                    const Function<3> &    implicit_function,
+                    const Point<3> &       interior_point    = Point<3>(),
+                    const double &         outer_ball_radius = 1.0,
+                    Args... cgal_args);
+#endif
   ///@}
 
   /**
@@ -2655,6 +2738,68 @@ namespace GridGenerator
                         const unsigned int,
                         const double,
                         const bool);
+
+#  ifdef DEAL_II_WITH_CGAL
+  template <int dim, typename... Args>
+  void
+  implicit_function(Triangulation<dim, 3> &tria,
+                    const Function<3> &    implicit_function,
+                    const Point<3> &       interior_point,
+                    const double &         outer_ball_radius,
+                    Args... cgal_args)
+  {
+    Assert(implicit_function.n_components == 1,
+           ExcMessage(
+             "The implicit function must have exactly one component."));
+    Assert(implicit_function.value(interior_point) < 0,
+           ExcMessage(
+             "The implicit function must be negative at the interior point."));
+    Assert(outer_ball_radius > 0,
+           ExcMessage("The outer ball radius must be positive."));
+    Assert(tria.n_active_cells() == 0,
+           ExcMessage("The triangulation must be empty."));
+
+    using K           = CGAL::Exact_predicates_inexact_constructions_kernel;
+    using NumberType  = K::FT;
+    using Point_3     = K::Point_3;
+    using Sphere_3    = K::Sphere_3;
+    using Mesh_domain = CGAL::Labeled_mesh_domain_3<K>;
+
+    if constexpr (dim == 3)
+      {
+        using Tr =
+          CGAL::Mesh_triangulation_3<Mesh_domain,
+                                     CGAL::Default,
+                                     CGALWrappers::ConcurrencyTag>::type;
+        using C3t3 = CGAL::Mesh_complex_3_in_triangulation_3<Tr, int, int>;
+        using Mesh_criteria = CGAL::Mesh_criteria_3<Tr>;
+
+
+        auto cgal_implicit_function = [&](const Point_3 &p) {
+          return NumberType(
+            implicit_function.value(Point<3>(p.x(), p.y(), p.z())));
+        };
+
+        Mesh_domain domain = Mesh_domain::create_implicit_mesh_domain(
+          cgal_implicit_function,
+          K::Sphere_3(
+            Point_3(interior_point[0], interior_point[1], interior_point[2]),
+            outer_ball_radius * outer_ball_radius));
+
+        Mesh_criteria criteria(cgal_args...);
+        auto cgal_triangulation = CGAL::make_mesh_3<C3t3>(domain, criteria);
+        CGALWrappers::cgal_triangulation_to_dealii_triangulation(
+          cgal_triangulation, tria);
+      }
+    else if constexpr (dim == 2)
+      {}
+    else
+      {
+        Assert(false, ExcImpossibleInDim(dim));
+      }
+  }
+#  endif
+
 #endif
 } // namespace GridGenerator
 
