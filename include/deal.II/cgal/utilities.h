@@ -20,10 +20,23 @@
 
 #ifdef DEAL_II_WITH_CGAL
 #  include <CGAL/Cartesian.h>
+#  include <CGAL/Complex_2_in_triangulation_3.h>
 #  include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#  include <CGAL/Exact_predicates_exact_constructions_kernel_with_sqrt.h>
 #  include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#  include <CGAL/Kernel_traits.h>
+#  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
+#  include <CGAL/Mesh_criteria_3.h>
+#  include <CGAL/Mesh_triangulation_3.h>
+#  include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
+#  include <CGAL/Polyhedral_mesh_domain_with_features_3.h>
 #  include <CGAL/Simple_cartesian.h>
+#  include <CGAL/Surface_mesh.h>
+#  include <CGAL/Triangulation_3.h>
+#  include <CGAL/make_mesh_3.h>
+#  include <CGAL/make_surface_mesh.h>
+
+#  include <type_traits>
+
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -41,6 +54,12 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace CGALWrappers
 {
+#  ifdef CGAL_CONCURRENT_MESH_3
+  using ConcurrencyTag = CGAL::Parallel_tag;
+#  else
+  using ConcurrencyTag = CGAL::Sequential_tag;
+#  endif
+
   /**
    * Convert from deal.II Point to any compatible CGAL point.
    *
@@ -64,6 +83,26 @@ namespace CGALWrappers
   template <int dim, typename CGALPointType>
   inline dealii::Point<dim>
   cgal_point_to_dealii_point(const CGALPointType &p);
+
+  /**
+   * Given a closed CGAL::Surface_mesh, this function fills the
+   * region bounded by the surface with tets, keeping them as coarse as
+   * possible.
+   *
+   * The number of the generated tetrahedrons depends on the refinement level of
+   * surface mesh. This function does not attempt to construct a fine
+   * triangulation, nor to smooth the final result. If you need finer control on
+   * the resulting triangulation, you should consider using directly
+   * CGAL::make_mesh_3().
+   *
+   * @param [in] surface_mesh The (closed) surface mesh bounding the volume that has to be filled.
+   * @param [out] triangulation The output triangulation filled with tetrahedra.
+   */
+  template <typename C3t3>
+  void
+  cgal_surface_mesh_to_cgal_coarse_triangulation(
+    CGAL::Surface_mesh<typename C3t3::Point::Point> &surface_mesh,
+    C3t3 &                                           triangulation);
 } // namespace CGALWrappers
 
 #  ifndef DOXYGEN
@@ -105,6 +144,37 @@ namespace CGALWrappers
                                 cdim > 2 ? CGAL::to_double(p.z()) : 0);
     else
       Assert(false, dealii::ExcNotImplemented());
+  }
+
+
+
+  template <typename C3t3>
+  void
+  cgal_surface_mesh_to_cgal_coarse_triangulation(
+    CGAL::Surface_mesh<typename C3t3::Point::Point> &surface_mesh,
+    C3t3 &                                           triangulation)
+  {
+    using CGALPointType = typename C3t3::Point::Point;
+    Assert(CGAL::is_closed(surface_mesh),
+           ExcMessage("The surface mesh must be closed."));
+
+    using K           = typename CGAL::Kernel_traits<CGALPointType>::Kernel;
+    using Mesh_domain = CGAL::Polyhedral_mesh_domain_with_features_3<
+      K,
+      CGAL::Surface_mesh<CGALPointType>>;
+    using Tr = typename CGAL::
+      Mesh_triangulation_3<Mesh_domain, CGAL::Default, ConcurrencyTag>::type;
+    using Mesh_criteria = CGAL::Mesh_criteria_3<Tr>;
+
+    CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh);
+    Mesh_domain domain(surface_mesh);
+    domain.detect_features();
+    Mesh_criteria criteria;
+    // Mesh generation
+    triangulation = CGAL::make_mesh_3<C3t3>(domain,
+                                            criteria,
+                                            CGAL::parameters::no_perturb(),
+                                            CGAL::parameters::no_exude());
   }
 } // namespace CGALWrappers
 #  endif
