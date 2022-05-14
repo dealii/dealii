@@ -19,6 +19,7 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
+#include <deal.II/base/mpi_consensus_algorithms.templates.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
@@ -26,6 +27,8 @@
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_memory.h>
+
+#include <boost/serialization/utility.hpp>
 
 #include <iostream>
 #include <numeric>
@@ -381,7 +384,7 @@ namespace Utilities
       if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
           1)
         {
-          return ConsensusAlgorithms::nbx<std::vector<char>, std::vector<char>>(
+          return ConsensusAlgorithms::nbx<char, char>(
             destinations, {}, {}, {}, mpi_comm);
         }
 
@@ -477,7 +480,7 @@ namespace Utilities
       if (Utilities::MPI::min((my_destinations_are_unique ? 1 : 0), mpi_comm) ==
           1)
         {
-          return ConsensusAlgorithms::nbx<std::vector<char>, std::vector<char>>(
+          return ConsensusAlgorithms::nbx<char, char>(
                    destinations, {}, {}, {}, mpi_comm)
             .size();
         }
