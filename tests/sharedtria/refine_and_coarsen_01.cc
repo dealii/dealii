@@ -22,6 +22,10 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 
+#include <deal.II/lac/vector.h>
+
+#include <vector>
+
 #include "../tests.h"
 
 
