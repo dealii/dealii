@@ -1493,15 +1493,21 @@ namespace TrilinosWrappers
        * Specifies the constant modes (near null space) of the matrix. This
        * parameter tells AMG whether we work on a scalar equation (where the
        * near null space only consists of ones, and default value is OK) or on
-       * a vector-valued equation. For vector-valued equation problem with
-       * <tt>n_component</tt>, the provided @p constant_modes should fulfill
-       * the following requirements:
+       * a vector-valued equation. For vector-valued problem with
+       * <tt>n_components</tt> components, the provided @p constant_modes
+       * should fulfill the following requirements:
        * <ul>
-       * <li>  <tt>constant_modes.size() == n_component</tt> </li>
-       * <li>  <tt>constant_modes[*].size() == n_dof_local</tt> or
-       *       <tt>constant_modes[*].size() == n_dof_global</tt> </li>
-       * <li>  <tt>constant_modes[ic][id] == id</tt><em>th</em> DoF is
-       *       corresponding to component <tt>ic</tt>
+       * <li>  <tt>constant_modes.size() == n_components</tt> </li>
+       * <li>  <tt>constant_modes[*].size()</tt> needs to be equal to either
+       *       the total number of degrees of freedom associated with the linear
+       *       system (<tt>constant_modes[*].size() == n_dofs</tt>), or the
+       *       number of locally owned degrees of freedom
+       *       (<tt>constant_modes[*].size() == n_locally_owned_dofs</tt>). In
+       *       parallel computations, the latter is the more appropriate choice
+       *       since one does not want to store vectors of global size on
+       *       individual processes. </li>
+       * <li>  <tt>constant_modes[ic][id] == true</tt> if DoF <tt>id</tt> is a
+       *       degree of freedom that is part of vector component <tt>ic</tt>.
        * </li>
        * </ul>
        */
