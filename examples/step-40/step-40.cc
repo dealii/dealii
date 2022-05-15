@@ -537,19 +537,18 @@ namespace Step40
 
   // @sect4{LaplaceProblem::output_results}
 
-  // Compared to the corresponding function in step-6, the one here is a tad
-  // more complicated. There are two reasons: the first one is that we do not
-  // just want to output the solution but also for each cell which processor
-  // owns it (i.e. which "subdomain" it is in). Secondly, as discussed at
-  // length in step-17 and step-18, generating graphical data can be a
-  // bottleneck in parallelizing. In step-18, we have moved this step out of
-  // the actual computation but shifted it into a separate program that later
-  // combined the output from various processors into a single file. But this
-  // doesn't scale for several reasons: First, creating a single file per
-  // processor will overwhelm the filesystem with a large number of processors.
-  // Second, the step of combining all output files later can become the longest
-  // running part of the program, or it may produce a file that's so large that
-  // it can't be visualized easily any more.
+  // Compared to the corresponding function in step-6, the one here is
+  // a tad more complicated. There are two reasons: the first one is
+  // that we do not just want to output the solution but also for each
+  // cell which processor owns it (i.e. which "subdomain" it is
+  // in). Secondly, as discussed at length in step-17 and step-18,
+  // generating graphical data can be a bottleneck in
+  // parallelizing. In those two programs, we simply generate one
+  // output file per process. That worked because the
+  // parallel::shared::Triangulation cannot be used with large numbers
+  // of MPI processes anyway.  But this doesn't scale: Creating a
+  // single file per processor will overwhelm the filesystem with a
+  // large number of processors.
   //
   // We here follow a more sophisticated approach that uses
   // high-performance, parallel IO routines using MPI I/O to write to
