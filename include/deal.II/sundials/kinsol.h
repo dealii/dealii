@@ -694,7 +694,7 @@ namespace SUNDIALS
      */
     void *kinsol_mem;
 
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     /**
      * A context object associated with the KINSOL solver.
      */

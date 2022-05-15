@@ -126,7 +126,7 @@ namespace SUNDIALS
     template <typename VectorType>
     N_Vector
     create_nvector(NVectorContent<VectorType> *content
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                    ,
                    SUNContext nvector_context
 #  endif
@@ -139,7 +139,7 @@ namespace SUNDIALS
     template <typename VectorType>
     N_Vector
     create_empty_nvector(
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
       SUNContext nvector_context
 #  endif
     );
@@ -366,14 +366,14 @@ namespace SUNDIALS
     template <typename VectorType>
     NVectorView<VectorType>
     make_nvector_view(VectorType &vector
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                       ,
                       SUNContext nvector_context
 #  endif
     )
     {
       return NVectorView<VectorType>(vector
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                      ,
                                      nvector_context
 #  endif
@@ -410,7 +410,7 @@ namespace SUNDIALS
 
     template <typename VectorType>
     NVectorView<VectorType>::NVectorView(VectorType &vector
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                          ,
                                          SUNContext nvector_context
 #  endif
@@ -419,7 +419,7 @@ namespace SUNDIALS
           create_nvector(
             new NVectorContent<typename std::remove_const<VectorType>::type>(
               &vector)
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
               ,
             nvector_context
 #  endif
@@ -451,7 +451,7 @@ namespace SUNDIALS
     template <typename VectorType>
     N_Vector
     create_nvector(NVectorContent<VectorType> *content
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                    ,
                    SUNContext nvector_context
 #  endif
@@ -983,7 +983,7 @@ namespace SUNDIALS
     template <typename VectorType>
     N_Vector
     create_empty_nvector(
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
       SUNContext nvector_context
 #  endif
     )
