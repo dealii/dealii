@@ -1510,6 +1510,8 @@ namespace TrilinosWrappers
        *       degree of freedom that is part of vector component <tt>ic</tt>.
        * </li>
        * </ul>
+       * We obtain the <tt>constant_modes</tt> fulfilling the above requirements
+       * with the function DoFTools::extract_constant_modes.
        */
       std::vector<std::vector<bool>> constant_modes;
 
