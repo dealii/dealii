@@ -1370,7 +1370,7 @@ namespace TrilinosWrappers
       AdditionalData(const bool         elliptic              = true,
                      const bool         higher_order_elements = false,
                      const unsigned int n_cycles              = 1,
-                     const bool         w_cyle                = false,
+                     const bool         w_cycle               = false,
                      const double       aggregation_threshold = 1e-4,
                      const std::vector<std::vector<bool>> &constant_modes =
                        std::vector<std::vector<bool>>(0),
@@ -1727,7 +1727,7 @@ namespace TrilinosWrappers
        */
       AdditionalData(const bool         elliptic              = true,
                      const unsigned int n_cycles              = 1,
-                     const bool         w_cyle                = false,
+                     const bool         w_cycle               = false,
                      const double       aggregation_threshold = 1e-4,
                      const std::vector<std::vector<bool>> &constant_modes =
                        std::vector<std::vector<bool>>(0),
