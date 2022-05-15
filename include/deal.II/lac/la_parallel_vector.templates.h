@@ -171,10 +171,9 @@ namespace LinearAlgebra
 
               const std::size_t align_by = 64;
 
-              std::size_t s =
-                ((new_alloc_size * sizeof(Number) + align_by - 1) /
-                 sizeof(Number)) *
-                sizeof(Number);
+              std::size_t s = ((new_alloc_size * sizeof(Number) + align_by) /
+                               sizeof(Number)) *
+                              sizeof(Number);
 
               ierr = MPI_Win_allocate_shared(
                 s, sizeof(Number), info, comm_shared, &data_this, &mpi_window);
