@@ -27,6 +27,7 @@
 #  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
 #  include <CGAL/Mesh_criteria_3.h>
 #  include <CGAL/Mesh_triangulation_3.h>
+#  include <CGAL/Polygon_mesh_processing/corefinement.h>
 #  include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
 #  include <CGAL/Polyhedral_mesh_domain_with_features_3.h>
 #  include <CGAL/Simple_cartesian.h>
@@ -61,7 +62,50 @@ namespace CGALWrappers
 #  endif
 
   /**
-   * Convert from deal.II Point to any compatible CGAL point.
+   * An enum type given to functions that compute boolean operations between
+   * geometrical objects, defined by triangulated surface grids.
+   *
+   * As an example, we show all supported boolean operations applied to a hedra
+   * (the union of two pyramids) and a cube.
+   *
+   * @image html hedra_cube.png
+   */
+  enum class BooleanOperation
+  {
+    /**
+     * Given two triangulated surfaces, refine the first surface until its
+     * intersection with the second surface is captured exactly by the
+     * refinement
+     *
+     * @image html corefinement.png
+     */
+    compute_corefinement = 1 << 0,
+
+    /**
+     * Given two triangulated surfaces, compute the boolean difference of the
+     * first surface minus the second surface
+     *
+     * @image html boolean_difference.png
+     */
+    compute_difference = 1 << 1,
+
+    /**
+     * Given two triangulated surfaces, compute their intersection
+     *
+     * @image html boolean_intersection.png
+     */
+    compute_intersection = 1 << 2,
+
+    /**
+     * Given two triangulated surfaces, compute their union
+     *
+     * @image html boolean_union.png
+     */
+    compute_union = 1 << 3,
+  };
+
+  /**
+   * Convert from a deal.II Point to any compatible CGAL point.
    *
    * @tparam CGALPointType Any of the CGAL point types
    * @tparam dim Dimension of the point
@@ -103,6 +147,57 @@ namespace CGALWrappers
   cgal_surface_mesh_to_cgal_coarse_triangulation(
     CGAL::Surface_mesh<typename C3t3::Point::Point> &surface_mesh,
     C3t3 &                                           triangulation);
+
+  /**
+   * Given two triangulated surface meshes that bound two volumes, execute a
+   * boolean operation on them, and store the result in a third surface mesh.
+   *
+   * Quoting from CGAL documentation
+   * (https://doc.cgal.org/latest/Polygon_mesh_processing/index.html#title14):
+   *
+   * > Given a closed triangulated surface mesh, each connected component splits
+   * > the 3D space into two subspaces. The vertex sequence of each face of a
+   * > component is seen either clockwise or counterclockwise from these two
+   * > subspaces. The subspace that sees the sequence clockwise (resp.
+   * > counterclockwise) is on the negative (resp. positive) side of the
+   * > component.
+   *
+   * > Given a closed triangulated surface mesh `surface` with no
+   * > self-intersections, we say that `surface` bounds a volume if each
+   * > subspace lies exclusively on the positive (or negative) side of all the
+   * > incident connected components of `surface`. The volume bounded by
+   * > `surface` is the union of all subspaces that are on negative sides of
+   * > their incident connected components of `surface`.
+   *
+   * > There is no restriction on the topology of the input volumes. However,
+   * > there are some requirements on the input to guarantee that the operation
+   * > is possible. First, the input meshes must not self-intersect. Second, the
+   * > operation is possible only if the output can be bounded by a manifold
+   * > triangulated surface mesh. In particular this means that the output
+   * > volume has no part with zero thickness. Mathematically speaking, the
+   * > intersection with an infinitesimally small ball centered in the output
+   * > volume is a topological ball. At the surface level this means that no
+   * > non-manifold vertex or edge is allowed in the output. For example, it is
+   * > not possible to compute the union of two cubes that are disjoint but
+   * > sharing an edge.
+   *
+   * See BooleanOperation for a list of available operations, with the
+   * corresponding examples.
+   *
+   * @param[in] surface_mesh_1 The first surface mesh.
+   * @param[in] surface_mesh_2 The second surface mesh.
+   * @param[in] boolean_operation See BooleanOperation for the list of the
+   * allowed operations.
+   * @param[out] output_surface_mesh The surface mesh with the result of the
+   * boolean operation.
+   */
+  template <typename CGALPointType>
+  void
+  compute_boolean_operation(
+    const CGAL::Surface_mesh<CGALPointType> &surface_mesh_1,
+    const CGAL::Surface_mesh<CGALPointType> &surface_mesh_2,
+    const BooleanOperation &                 boolean_operation,
+    CGAL::Surface_mesh<CGALPointType> &      output_surface_mesh);
 } // namespace CGALWrappers
 
 #  ifndef DOXYGEN
@@ -175,6 +270,61 @@ namespace CGALWrappers
                                             criteria,
                                             CGAL::parameters::no_perturb(),
                                             CGAL::parameters::no_exude());
+  }
+
+
+
+  template <typename CGALPointType>
+  void
+  compute_boolean_operation(
+    const CGAL::Surface_mesh<CGALPointType> &surface_mesh_1,
+    const CGAL::Surface_mesh<CGALPointType> &surface_mesh_2,
+    const BooleanOperation &                 boolean_operation,
+    CGAL::Surface_mesh<CGALPointType> &      output_surface_mesh)
+  {
+    Assert(output_surface_mesh.is_empty(),
+           ExcMessage(
+             "output_surface_mesh must be empty upon calling this function"));
+    Assert(CGAL::is_closed(surface_mesh_1),
+           ExcMessage(
+             "The input surface_mesh_1 must be a closed surface mesh."));
+    Assert(CGAL::is_closed(surface_mesh_2),
+           ExcMessage(
+             "The input surface_mesh_2 must be a closed surface mesh."));
+
+    bool res      = false;
+    auto surf_1   = surface_mesh_1;
+    auto surf_2   = surface_mesh_2;
+    namespace PMP = CGAL::Polygon_mesh_processing;
+    switch (boolean_operation)
+      {
+        case BooleanOperation::compute_union:
+          res = PMP::corefine_and_compute_union(surf_1,
+                                                surf_2,
+                                                output_surface_mesh);
+          break;
+        case BooleanOperation::compute_intersection:
+          res = PMP::corefine_and_compute_intersection(surf_1,
+                                                       surf_2,
+                                                       output_surface_mesh);
+          break;
+        case BooleanOperation::compute_difference:
+          res = PMP::corefine_and_compute_difference(surf_1,
+                                                     surf_2,
+                                                     output_surface_mesh);
+          break;
+        case BooleanOperation::compute_corefinement:
+          PMP::corefine(surf_1,
+                        surf_2); // both surfaces are corefined
+          output_surface_mesh = std::move(surf_1);
+          res                 = true;
+          break;
+        default:
+          output_surface_mesh.clear();
+          break;
+      }
+    Assert(res,
+           ExcMessage("The boolean operation was not successfully computed."));
   }
 } // namespace CGALWrappers
 #  endif
