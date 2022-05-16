@@ -1,0 +1,5 @@
+Improved: The thread-local storage in FunctionParser has been reworked to avoid
+extra locking and unlocking calls. This makes evaluations of simple expressions
+about three times faster.
+<br>
+(David Wells, 2022/05/16)
