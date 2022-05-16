@@ -107,6 +107,40 @@ namespace CGALWrappers
     Triangulation<dim, spacedim> &dealii_triangulation);
 
   /**
+   * Specialization of the above function for
+   * CGAL::Mesh_complex_3_in_triangulation_3 types.
+   *
+   * CGAL::Mesh_complex_3_in_triangulation_3 is the class that implements the
+   * concept of a MeshComplexWithFeatures_3InTriangulation_3 in CGAL.
+   *
+   * https://doc.cgal.org/latest/Mesh_3/classMeshComplexWithFeatures__3InTriangulation__3.html
+   *
+   * This function translates the information contained in the input mesh
+   * complex (i.e., a collection of cells, surface patches, and curves
+   * embedded in a three dimensional simplicial complex) to a deal.II
+   * Triangulation object.
+   *
+   * This function ignores the information about the corners contained in the
+   * grids, but honors the information about curves, surface patches, and domain
+   * indices, which are all translated to manifold ids in the output
+   * Triangulation object.
+   *
+   * @param[in] cgal_triangulation An input Mesh_complex_3_in_triangulation_3
+   * object
+   * @param[out] dealii_triangulation The output deal.II Triangulation object
+   */
+  template <typename CGALTriangulationType,
+            typename CornerIndexType,
+            typename CurveIndexType>
+  void
+  cgal_triangulation_to_dealii_triangulation(
+    const CGAL::Mesh_complex_3_in_triangulation_3<CGALTriangulationType,
+                                                  CornerIndexType,
+                                                  CurveIndexType>
+      &               cgal_triangulation,
+    Triangulation<3> &dealii_triangulation);
+
+  /**
    * Construct a deal.II surface triangulation starting from a
    * CGAL::Surface_mesh or a CGAL::Polyhedron_3.
    *
@@ -160,6 +194,102 @@ namespace CGALWrappers
            ExcMessage(
              "The Triangulation is no longer valid after inserting the points. "
              "Bailing out."));
+  }
+
+
+
+  template <typename CGALTriangulationType,
+            typename CornerIndexType,
+            typename CurveIndexType>
+  void
+  cgal_triangulation_to_dealii_triangulation(
+    const CGAL::Mesh_complex_3_in_triangulation_3<CGALTriangulationType,
+                                                  CornerIndexType,
+                                                  CurveIndexType>
+      &               cgal_triangulation,
+    Triangulation<3> &dealii_triangulation)
+  {
+    using C3T3 = CGAL::Mesh_complex_3_in_triangulation_3<CGALTriangulationType,
+                                                         CornerIndexType,
+                                                         CurveIndexType>;
+
+    // Extract all vertices first
+    std::vector<Point<3>> dealii_vertices;
+    std::map<typename C3T3::Vertex_handle, unsigned int>
+      cgal_to_dealii_vertex_map;
+
+    std::size_t inum = 0;
+    for (auto vit = cgal_triangulation.triangulation().finite_vertices_begin();
+         vit != cgal_triangulation.triangulation().finite_vertices_end();
+         ++vit)
+      {
+        if (vit->in_dimension() <= -1)
+          continue;
+        cgal_to_dealii_vertex_map[vit] = inum++;
+        dealii_vertices.emplace_back(
+          CGALWrappers::cgal_point_to_dealii_point<3>(vit->point()));
+      }
+
+    // Now build cell connectivity
+    std::vector<CellData<3>> cells;
+    for (auto cgal_cell = cgal_triangulation.cells_in_complex_begin();
+         cgal_cell != cgal_triangulation.cells_in_complex_end();
+         ++cgal_cell)
+      {
+        CellData<3> cell(4);
+        for (unsigned int i = 0; i < 4; ++i)
+          cell.vertices[i] = cgal_to_dealii_vertex_map[cgal_cell->vertex(i)];
+        cell.manifold_id = cgal_triangulation.subdomain_index(cgal_cell);
+        cells.push_back(cell);
+      }
+
+    // Do the same with surface patches, if possible
+    SubCellData subcell_data;
+    if constexpr (std::is_integral<typename C3T3::Surface_patch_index>::value)
+      {
+        for (auto face = cgal_triangulation.facets_in_complex_begin();
+             face != cgal_triangulation.facets_in_complex_end();
+             ++face)
+          {
+            const auto &[cgal_cell, cgal_vertex_face_index] = *face;
+            CellData<2> dealii_face(3);
+            // A face is identified by a cell and by the index within the cell
+            // of the opposite vertex. Loop over vertices, and retain only those
+            // that belong to this face.
+            unsigned int j = 0;
+            for (unsigned int i = 0; i < 4; ++i)
+              if (i != cgal_vertex_face_index)
+                dealii_face.vertices[j++] =
+                  cgal_to_dealii_vertex_map[cgal_cell->vertex(i)];
+            dealii_face.manifold_id =
+              cgal_triangulation.surface_patch_index(cgal_cell,
+                                                     cgal_vertex_face_index);
+            subcell_data.boundary_quads.emplace_back(dealii_face);
+          }
+      }
+    // and curves
+    if constexpr (std::is_integral<typename C3T3::Curve_index>::value)
+      {
+        for (auto edge = cgal_triangulation.edges_in_complex_begin();
+             edge != cgal_triangulation.edges_in_complex_end();
+             ++edge)
+          {
+            const auto &[cgal_cell, v1, v2] = *edge;
+            CellData<1> dealii_edge(2);
+            dealii_edge.vertices[0] =
+              cgal_to_dealii_vertex_map[cgal_cell->vertex(v1)];
+            dealii_edge.vertices[1] =
+              cgal_to_dealii_vertex_map[cgal_cell->vertex(v2)];
+            dealii_edge.manifold_id =
+              cgal_triangulation.curve_index(cgal_cell->vertex(v1),
+                                             cgal_cell->vertex(v2));
+            subcell_data.boundary_lines.emplace_back(dealii_edge);
+          }
+      }
+
+    dealii_triangulation.create_triangulation(dealii_vertices,
+                                              cells,
+                                              subcell_data);
   }
 
 
@@ -223,16 +353,17 @@ namespace CGALWrappers
           // This is a degenerate Triangulation_2, made of edges
           for (const auto &e : cgal_triangulation.finite_edges())
             {
-              // An edge is idendified by a face and a vertex index in the face
+              // An edge is idendified by a face and a vertex index in the
+              // face
               const auto &  f = e.first;
               const auto &  i = e.second;
               CellData<dim> cell(ReferenceCells::Line.n_vertices());
               unsigned int  id = 0;
               // Since an edge is identified by a face (a triangle) and the
-              // index of the opposite vertex to the edge, we can use this logic
-              // to infer the indices of the vertices of the edge: loop over all
-              // vertices, and keep only those that are not the opposite vertex
-              // of the edge.
+              // index of the opposite vertex to the edge, we can use this
+              // logic to infer the indices of the vertices of the edge: loop
+              // over all vertices, and keep only those that are not the
+              // opposite vertex of the edge.
               for (unsigned int j = 0;
                    j < ReferenceCells::Triangle.n_vertices();
                    ++j)
@@ -262,17 +393,17 @@ namespace CGALWrappers
           // This is a degenerate Triangulation_3, made of triangles
           for (const auto &facet : cgal_triangulation.finite_facets())
             {
-              // A facet is idenfied by a cell and the opposite vertex index in
-              // the face
+              // A facet is idenfied by a cell and the opposite vertex index
+              // in the face
               const auto &  c = facet.first;
               const auto &  i = facet.second;
               CellData<dim> cell(ReferenceCells::Triangle.n_vertices());
               unsigned int  id = 0;
               // Since a face is identified by a cell (a tetrahedron) and the
-              // index of the opposite vertex to the face, we can use this logic
-              // to infer the indices of the vertices of the face: loop over all
-              // vertices, and keep only those that are not the opposite vertex
-              // of the face.
+              // index of the opposite vertex to the face, we can use this
+              // logic to infer the indices of the vertices of the face: loop
+              // over all vertices, and keep only those that are not the
+              // opposite vertex of the face.
               for (unsigned int j = 0;
                    j < ReferenceCells::Tetrahedron.n_vertices();
                    ++j)
