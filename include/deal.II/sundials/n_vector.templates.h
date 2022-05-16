@@ -363,22 +363,21 @@ namespace SUNDIALS
 
 
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     template <typename VectorType>
     NVectorView<VectorType>
-    make_nvector_view(VectorType &vector
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                      ,
-                      SUNContext nvector_context
-#  endif
-    )
+    make_nvector_view(VectorType &vector, SUNContext nvector_context)
     {
-      return NVectorView<VectorType>(vector
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                                     ,
-                                     nvector_context
-#  endif
-      );
+      return NVectorView<VectorType>(vector, nvector_context);
     }
+#  else
+    template <typename VectorType>
+    NVectorView<VectorType>
+    make_nvector_view(VectorType &vector)
+    {
+      return NVectorView<VectorType>(vector);
+    }
+#  endif
 
 
 
