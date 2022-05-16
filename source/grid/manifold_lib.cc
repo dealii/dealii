@@ -1673,7 +1673,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
   const Triangulation<dim, spacedim> &triangulation)
 {
   this->triangulation = &triangulation;
-  // in case the triangulation is cleared, remove the pointers by a signal
+  // In case the triangulation is cleared, remove the pointers by a signal:
   clear_signal.disconnect();
   clear_signal = triangulation.signals.clear.connect([&]() -> void {
     this->triangulation = nullptr;
@@ -1683,8 +1683,16 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
   coarse_cell_is_flat.resize(triangulation.n_cells(level_coarse), false);
   quadratic_approximation.clear();
 
+  // In case of dim == spacedim we perform a quadratic approximation in
+  // InverseQuadraticApproximation(), thus initialize the unit_points
+  // vector with one subdivision to get 3^dim unit_points.
+  //
+  // In the co-dimension one case (meaning  dim < spacedim) we have to fall
+  // back to a simple GridTools::affine_cell_approximation<dim>() which
+  // requires 2^dim points, instead. Thus, initialize the QIteraded
+  // quadrature with no subdivisions.
   std::vector<Point<dim>> unit_points =
-    QIterated<dim>(QTrapez<1>(), 2).get_points();
+    QIterated<dim>(QTrapez<1>(), (dim == spacedim ? 2 : 1)).get_points();
   std::vector<Point<spacedim>> real_points(unit_points.size());
 
   for (const auto &cell : triangulation.active_cell_iterators())
