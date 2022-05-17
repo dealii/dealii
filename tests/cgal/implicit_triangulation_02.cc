@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Create a Triangulation<3,3> from an implicit function
+// Create a Triangulation<2,3> from an implicit function
 
 #include <deal.II/base/config.h>
 
@@ -32,18 +32,20 @@ main()
 {
   initlog();
   // Build a deal.II triangulation
-  Triangulation<3>  tria;
-  FunctionParser<3> implicit_function("(1-sqrt(x^2+y^2))^2+z^2-.25");
-  CGALWrappers::AdditionalData<3> data;
-  data.cell_size = 0.4;
+  Triangulation<2, 3> tria;
+  FunctionParser<3>   implicit_function("(1-sqrt(x^2+y^2))^2+z^2-.25");
+  CGALWrappers::AdditionalData<2> data;
+  data.angular_bound  = 30.;
+  data.radius_bound   = .1;
+  data.distance_bound = .1;
   GridGenerator::implicit_function(
-    tria, implicit_function, data, Point<3>(1, 0, 0), 10.0);
+    tria, implicit_function, data, Point<3>(1, 0, 0), 10.);
   {
     GridOut       go;
-    std::ofstream of("tria.vtk");
+    std::ofstream of("tria_ancora.vtk");
     go.write_vtk(tria, of);
   }
-  // remove(/"tria.vtk");
+  remove("tria.vtk");
   //  If we got here, everything was ok, including writing the grid.
   deallog << "OK" << std::endl;
 }
