@@ -236,7 +236,7 @@ namespace CGALWrappers
          cgal_cell != cgal_triangulation.cells_in_complex_end();
          ++cgal_cell)
       {
-        CellData<3> cell(4);
+        CellData<3> cell(ReferenceCells::Tetrahedron.n_vertices());
         for (unsigned int i = 0; i < 4; ++i)
           cell.vertices[i] = cgal_to_dealii_vertex_map[cgal_cell->vertex(i)];
         cell.manifold_id = cgal_triangulation.subdomain_index(cgal_cell);
@@ -252,7 +252,7 @@ namespace CGALWrappers
              ++face)
           {
             const auto &[cgal_cell, cgal_vertex_face_index] = *face;
-            CellData<2> dealii_face(3);
+            CellData<2> dealii_face(ReferenceCells::Triangle.n_vertices());
             // A face is identified by a cell and by the index within the cell
             // of the opposite vertex. Loop over vertices, and retain only those
             // that belong to this face.
@@ -275,7 +275,7 @@ namespace CGALWrappers
              ++edge)
           {
             const auto &[cgal_cell, v1, v2] = *edge;
-            CellData<1> dealii_edge(2);
+            CellData<1> dealii_edge(ReferenceCells::Line.n_vertices());
             dealii_edge.vertices[0] =
               cgal_to_dealii_vertex_map[cgal_cell->vertex(v1)];
             dealii_edge.vertices[1] =
