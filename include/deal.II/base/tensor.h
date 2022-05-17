@@ -505,7 +505,7 @@ public:
   static_assert(rank_ >= 1,
                 "Tensors must have a rank greater than or equal to one.");
   static_assert(dim >= 0,
-                "Tensors must have a dimension greater than or equal to one.");
+                "Tensors must have a dimension greater than or equal to zero.");
   /**
    * Provide a way to get the dimension of an object without explicit
    * knowledge of it's data type. Implementation is this way instead of
