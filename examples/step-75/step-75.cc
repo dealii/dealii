@@ -669,8 +669,7 @@ namespace Step75
           dof_handler.get_triangulation());
     else
       coarse_grid_triangulations.emplace_back(
-        const_cast<Triangulation<dim> *>(&(dof_handler.get_triangulation())),
-        [](auto &) {});
+        &(dof_handler.get_triangulation()), [](auto *) {});
 
     // Determine the total number of levels for the multigrid operation and
     // allocate sufficient memory for all levels.
