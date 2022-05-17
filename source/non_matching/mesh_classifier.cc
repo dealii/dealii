@@ -47,7 +47,7 @@ namespace NonMatching
     namespace MeshClassifierImplementation
     {
       DeclExceptionMsg(
-        ReclassifyNotCalled,
+        ExcReclassifyNotCalled,
         "The Triangulation has not been classified. You need to call the "
         "reclassify()-function before using this function.");
 
@@ -430,7 +430,7 @@ namespace NonMatching
     const typename Triangulation<dim>::cell_iterator &cell) const
   {
     Assert(cell_locations.size() == triangulation->n_active_cells(),
-           internal::MeshClassifierImplementation::ReclassifyNotCalled());
+           internal::MeshClassifierImplementation::ExcReclassifyNotCalled());
     Assert(&cell->get_triangulation() == triangulation,
            internal::MeshClassifierImplementation::ExcTriangulationMismatch());
 
@@ -447,7 +447,7 @@ namespace NonMatching
   {
     AssertIndexRange(face_index, GeometryInfo<dim>::faces_per_cell);
     Assert(face_locations.size() == triangulation->n_raw_faces(),
-           internal::MeshClassifierImplementation::ReclassifyNotCalled());
+           internal::MeshClassifierImplementation::ExcReclassifyNotCalled());
     Assert(&cell->get_triangulation() == triangulation,
            internal::MeshClassifierImplementation::ExcTriangulationMismatch());
 
