@@ -13,8 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Read a Surface_mesh from an .off file, then create a coarse mesh filled with
-// tets
+// Check that different `cell_size` parameter gives different number of cells.
 
 #include <deal.II/base/config.h>
 
@@ -26,9 +25,6 @@
 #include <deal.II/cgal/utilities.h>
 
 #include "../tests.h"
-
-// Create a Surface_mesh from an .off file, then fill it with tets and print
-// vertices.
 
 using K         = CGAL::Exact_predicates_inexact_constructions_kernel;
 using CGALPoint = CGAL::Point_3<K>;
@@ -43,29 +39,29 @@ using C3t3          = CGAL::Mesh_complex_3_in_triangulation_3<Tr,
                                                      Mesh_domain::Corner_index,
                                                      Mesh_domain::Curve_index>;
 
-
 void
 test()
 {
-  const std::vector<std::string> fnames{"input_grids/cube.off",
-                                        "input_grids/tetrahedron.off"};
-  CGAL::Surface_mesh<CGALPoint>  sm;
-  C3t3                           tria;
+  CGAL::Surface_mesh<CGALPoint> sm;
+  C3t3                          tria;
+  std::ifstream                 input("input_grids/cube.off");
+  input >> sm;
+  cgal_surface_mesh_to_cgal_triangulation(sm,
+                                          tria,
+                                          CGAL::parameters::cell_size = 0.1);
+  const unsigned int n_intial_facets = tria.number_of_facets_in_complex();
+  tria.clear();
+  cgal_surface_mesh_to_cgal_triangulation(sm,
+                                          tria,
+                                          CGAL::parameters::cell_size = 0.5);
 
-  for (const auto &name : fnames)
-    {
-      std::ifstream input(name);
-      input >> sm;
-      cgal_surface_mesh_to_cgal_triangulation(sm, tria);
-      {
-        std::ofstream off_file_medit("coarse.mesh");
-        tria.output_to_medit(off_file_medit, false);
-      }
-      cat_file("coarse.mesh");
-      sm.clear(); // reset surface
-      tria.clear();
-      deallog << std::endl << std::endl;
-    }
+  Assert(
+    n_intial_facets > tria.number_of_facets_in_complex(),
+    ExcMessage(
+      "The number of facets in the finer mesh must be greater than the number of facets in the coarse mesh."));
+  deallog << std::boolalpha
+          << (n_intial_facets > tria.number_of_facets_in_complex())
+          << std::endl;
 }
 
 int

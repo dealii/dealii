@@ -53,8 +53,8 @@ main()
   }
 
   C3t3 cgal_triangulation;
-  cgal_surface_mesh_to_cgal_coarse_triangulation(cgal_surface_mesh,
-                                                 cgal_triangulation);
+  cgal_surface_mesh_to_cgal_triangulation(cgal_surface_mesh,
+                                          cgal_triangulation);
 
   Triangulation<3> tria;
   cgal_triangulation_to_dealii_triangulation(cgal_triangulation, tria);
