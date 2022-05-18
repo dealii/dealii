@@ -55,7 +55,7 @@ namespace
           Assert(false, ExcInternalError());
           break;
       }
-    if (clockwise_ordering == false)
+    if (clockwise_ordering == true)
       std::reverse(indices.begin(), indices.end());
 
     [[maybe_unused]] const auto new_face = mesh.add_face(indices);
