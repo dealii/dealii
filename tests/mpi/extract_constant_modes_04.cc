@@ -15,11 +15,8 @@
 
 
 
-// test DoFTools::extract_constant_modes with FE_Nothing
-
-#include <deal.II/base/tensor.h>
-
-#include <deal.II/distributed/tria.h>
+// test DoFTools::extract_constant_modes for multi-physical problems like in
+// step-46
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -30,9 +27,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
-#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -45,50 +40,95 @@
 
 template <int dim>
 void
-test(unsigned int fe_nothing_index)
+test(const unsigned int fe_degree)
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
+  Triangulation<dim> triangulation;
 
-  std::vector<unsigned int> sub(2);
-  sub[0] = 2 * Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-  sub[1] = 1;
-  GridGenerator::subdivided_hyper_rectangle(
-    static_cast<Triangulation<dim> &>(tr), sub, Point<2>(0, 0), Point<2>(1, 1));
+  GridGenerator::hyper_cube(triangulation, 0, 1);
+  triangulation.refine_global(1);
 
-  DoFHandler<dim> dofh(tr);
+  DoFHandler<dim> dof_handler(triangulation);
 
-  {
-    // set cells to use FE_Q x FE_Nothing and FE_Nothing x FE_Q alternately
-    unsigned int last_index = 1;
-    for (const auto &cell :
-         dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
-      cell->set_active_fe_index(last_index = 1 - last_index);
-  }
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    {
+      if (cell->center()[0] < 0.5)
+        {
+          cell->set_active_fe_index(0);
+        }
+      else if (cell->center()[0] > 0.5)
+        {
+          cell->set_active_fe_index(1);
+        }
+      else
+        {
+          Assert(false, ExcNotImplemented());
+        }
+    }
 
-  if (fe_nothing_index == 1)
-    dofh.distribute_dofs(
-      hp::FECollection<dim>(FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(1), 1));
-  else
-    dofh.distribute_dofs(
-      hp::FECollection<dim>(FESystem<dim>(FE_Nothing<dim>(1), 1, FE_Q<dim>(1), 1));
+  FESystem<dim>         left_fe(FE_Q<dim>(fe_degree), 1, FE_Nothing<dim>(), 1);
+  FESystem<dim>         right_fe(FE_Nothing<dim>(), 1, FE_Q<dim>(fe_degree), 1);
+  hp::FECollection<dim> fe_collection;
+  fe_collection.push_back(left_fe);
+  fe_collection.push_back(right_fe);
 
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    deallog << "Total dofs=" << dofh.n_dofs() << std::endl;
+  dof_handler.distribute_dofs(fe_collection);
+  deallog << "FE degree=" << fe_degree << std::endl;
+  deallog << "Total dofs=" << dof_handler.n_dofs() << std::endl;
+
+
 
   // extract constant modes and print
-
-  if (myid == 0)
+  for (unsigned int component = 0; component < fe_collection.n_components();
+       ++component)
     {
-      std::vector<bool> mask(1, true);
+      const FEValuesExtractors::Scalar component_extractor(component);
+      const ComponentMask              component_mask(
+        fe_collection.component_mask(component_extractor));
 
-      std::vector<std::vector<bool>> constant_modes;
-      DoFTools::extract_constant_modes(dofh, mask, constant_modes);
+      std::vector<std::vector<bool>> constant_modes(
+        fe_collection.n_components(),
+        std::vector<bool>(dof_handler.n_locally_owned_dofs(), false));
+
+      DoFTools::extract_constant_modes(dof_handler,
+                                       component_mask,
+                                       constant_modes);
 
       for (unsigned int i = 0; i < constant_modes.size(); ++i)
         {
           for (unsigned int j = 0; j < constant_modes[i].size(); ++j)
-            deallog << (constant_modes[i][j] ? '1' : '0') << ' ';
+            {
+              deallog << (constant_modes[i][j] ? '1' : '0') << ' ';
+            }
+          deallog << std::endl;
+        }
+    }
+
+
+
+  // renumber dofs and do the same again
+  DoFRenumbering::component_wise(dof_handler);
+  for (unsigned int component = 0; component < fe_collection.n_components();
+       ++component)
+    {
+      const FEValuesExtractors::Scalar component_extractor(component);
+      const ComponentMask              component_mask(
+        fe_collection.component_mask(component_extractor));
+
+      std::vector<std::vector<bool>> constant_modes(
+        fe_collection.n_components(),
+        std::vector<bool>(dof_handler.n_locally_owned_dofs(), false));
+
+
+      DoFTools::extract_constant_modes(dof_handler,
+                                       component_mask,
+                                       constant_modes);
+
+      for (unsigned int i = 0; i < constant_modes.size(); ++i)
+        {
+          for (unsigned int j = 0; j < constant_modes[i].size(); ++j)
+            {
+              deallog << (constant_modes[i][j] ? '1' : '0') << ' ';
+            }
           deallog << std::endl;
         }
     }
@@ -98,33 +138,20 @@ test(unsigned int fe_nothing_index)
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  initlog();
 
-  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  test<1>(1);
+  test<1>(2);
+  test<1>(3);
+  test<1>(4);
 
-  deallog.push(Utilities::int_to_string(myid));
+  test<2>(1);
+  test<2>(2);
+  test<2>(3);
+  test<2>(4);
 
-
-  if (myid == 0)
-    {
-      initlog();
-
-      deallog.push("FE_Nothing second");
-      test<2>(1);
-      deallog.pop();
-
-      deallog.push("FE_Nothing first");
-      test<2>(0);
-      deallog.pop();
-    }
-  else
-    {
-      deallog.push("FE_Nothing second");
-      test<2>(1);
-      deallog.pop();
-
-      deallog.push("FE_Nothing first");
-      test<2>(0);
-      deallog.pop();
-    }
+  test<3>(1);
+  test<3>(2);
+  test<3>(3);
+  test<3>(4);
 }
