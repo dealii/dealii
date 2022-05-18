@@ -1506,13 +1506,20 @@ namespace internal
   namespace MatrixFreeFunctions
   {
     template struct ConstraintValues<double>;
-    template struct ConstraintValues<float>;
+
+    template unsigned short
+    ConstraintValues<double>::insert_entries(
+      const std::vector<std::pair<types::global_dof_index, float>> &);
+    template unsigned short
+    ConstraintValues<double>::insert_entries(
+      const std::vector<std::pair<types::global_dof_index, double>> &);
+
 
     template void
     DoFInfo::read_dof_indices<double>(
       const std::vector<types::global_dof_index> &,
       const std::vector<types::global_dof_index> &,
-      const bool cell_has_hanging_node_constraints,
+      const bool,
       const dealii::AffineConstraints<double> &,
       const unsigned int,
       ConstraintValues<double> &,
@@ -1522,7 +1529,7 @@ namespace internal
     DoFInfo::read_dof_indices<float>(
       const std::vector<types::global_dof_index> &,
       const std::vector<types::global_dof_index> &,
-      const bool cell_has_hanging_node_constraints,
+      const bool,
       const dealii::AffineConstraints<float> &,
       const unsigned int,
       ConstraintValues<double> &,
@@ -1530,25 +1537,25 @@ namespace internal
 
     template bool
     DoFInfo::process_hanging_node_constraints<1>(
-      const HangingNodes<1> &                           hanging_nodes,
-      const std::vector<std::vector<unsigned int>> &    lexicographic_mapping,
-      const unsigned int                                cell_number,
-      const TriaIterator<DoFCellAccessor<1, 1, false>> &cell,
-      std::vector<types::global_dof_index> &            dof_indices);
+      const HangingNodes<1> &,
+      const std::vector<std::vector<unsigned int>> &,
+      const unsigned int,
+      const TriaIterator<DoFCellAccessor<1, 1, false>> &,
+      std::vector<types::global_dof_index> &);
     template bool
     DoFInfo::process_hanging_node_constraints<2>(
-      const HangingNodes<2> &                           hanging_nodes,
-      const std::vector<std::vector<unsigned int>> &    lexicographic_mapping,
-      const unsigned int                                cell_number,
-      const TriaIterator<DoFCellAccessor<2, 2, false>> &cell,
-      std::vector<types::global_dof_index> &            dof_indices);
+      const HangingNodes<2> &,
+      const std::vector<std::vector<unsigned int>> &,
+      const unsigned int,
+      const TriaIterator<DoFCellAccessor<2, 2, false>> &,
+      std::vector<types::global_dof_index> &);
     template bool
     DoFInfo::process_hanging_node_constraints<3>(
-      const HangingNodes<3> &                           hanging_nodes,
-      const std::vector<std::vector<unsigned int>> &    lexicographic_mapping,
-      const unsigned int                                cell_number,
-      const TriaIterator<DoFCellAccessor<3, 3, false>> &cell,
-      std::vector<types::global_dof_index> &            dof_indices);
+      const HangingNodes<3> &,
+      const std::vector<std::vector<unsigned int>> &,
+      const unsigned int,
+      const TriaIterator<DoFCellAccessor<3, 3, false>> &,
+      std::vector<types::global_dof_index> &);
 
     template void
     DoFInfo::compute_face_index_compression<1>(
