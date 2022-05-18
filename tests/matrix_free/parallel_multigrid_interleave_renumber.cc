@@ -63,9 +63,11 @@ public:
 
   ~LaplaceOperator()
   {
+    // round number of calls to make test more robust
     if (n_calls_vmult > 0)
-      deallog << "Number of calls to special vmult for Operator of size " << m()
-              << ": " << n_calls_vmult << std::endl;
+      deallog
+        << "Approx. number of calls to special vmult for Operator of size "
+        << m() << ": " << (n_calls_vmult + 5) / 10 * 10 << std::endl;
   }
 
   void
@@ -437,8 +439,8 @@ do_test(DoFHandler<dim> &dof)
        ++level)
     {
       smoother_data[level].smoothing_range     = 15.;
-      smoother_data[level].degree              = 5;
-      smoother_data[level].eig_cg_n_iterations = 15;
+      smoother_data[level].degree              = 4;
+      smoother_data[level].eig_cg_n_iterations = 10;
       auto preconditioner                      = std::make_shared<
         DiagonalMatrix<LinearAlgebra::distributed::Vector<number>>>();
       preconditioner->reinit(mg_matrices[level].get_matrix_diagonal_inverse());
@@ -461,7 +463,11 @@ do_test(DoFHandler<dim> &dof)
   {
     // avoid output from inner (coarse-level) solver
     deallog.depth_file(2);
-    ReductionControl control(30, 1e-20, 1e-7);
+
+    // Require a fixed number of iterations rather than a tolerance, in order
+    // to make output more stable
+    IterationNumberControl control(6, 1e-15);
+
     SolverCG<LinearAlgebra::distributed::Vector<double>> solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
@@ -473,7 +479,7 @@ template <int dim, typename number>
 void
 test(const unsigned int fe_degree)
 {
-  for (unsigned int i = 5; i < 7; ++i)
+  for (unsigned int i = 6; i < 8; ++i)
     {
       parallel::distributed::Triangulation<dim> tria(
         MPI_COMM_WORLD,
