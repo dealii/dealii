@@ -396,19 +396,48 @@ public:
   //@}
 
 private:
-#ifdef DEAL_II_WITH_MUPARSER
   /**
-   * Place for the variables for each thread
+   * Class containing the mutable state required by muParser.
+   *
+   * @note For performance reasons it is best to put all mutable state in a
+   * single object so that, for each function call, we only need to get
+   * thread-local data exactly once.
    */
-  mutable Threads::ThreadLocalStorage<std::vector<double>> vars;
+  struct ParserData
+  {
+    /**
+     * Default constructor. Threads::ThreadLocalStorage requires that objects be
+     * either default- or copy-constructible: make sure we satisfy the first
+     * case by declaring it here.
+     */
+    ParserData() = default;
+
+    /**
+     * std::is_copy_constructible gives the wrong answer for containers with
+     * non-copy constructible types (e.g., std::vector<std::unique_ptr<int>>) -
+     * for more information, see the documentation of
+     * Threads::ThreadLocalStorage. Hence, to avoid compilation failures, just
+     * delete the copy constructor completely.
+     */
+    ParserData(const ParserData &) = delete;
+
+    /**
+     * Scratch array used to set independent variables (i.e., x, y, and t)
+     * before each muParser call.
+     */
+    std::vector<double> vars;
+
+    /**
+     * The actual muParser parser objects (hidden with PIMPL).
+     */
+    std::vector<std::unique_ptr<internal::muParserBase>> parsers;
+  };
 
   /**
    * The muParser objects (hidden with the PIMPL idiom) for each thread (and one
    * for each component).
    */
-  mutable Threads::ThreadLocalStorage<
-    std::vector<std::unique_ptr<internal::muParserBase>>>
-    fp;
+  mutable Threads::ThreadLocalStorage<ParserData> parser_data;
 
   /**
    * An array to keep track of all the constants, required to initialize fp in
@@ -430,7 +459,6 @@ private:
    */
   void
   init_muparser() const;
-#endif
 
   /**
    * An array of function expressions (one per component), required to
