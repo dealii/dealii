@@ -41,6 +41,7 @@ namespace SUNDIALS
 {
   namespace internal
   {
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     /**
      * Create a NVectorView of the given @p vector.
      *
@@ -56,22 +57,48 @@ namespace SUNDIALS
      * @tparam VectorType Type of the viewed vector. This parameter can be
      *   deduced automatically and will respect a potential const-qualifier.
      * @param vector The vector to view.
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
      * @param nvector_context A SUNDIALS context object to be used for the
      *   operations we want to do on this vector.
-#  endif
      * @return A NVectorView of the @p vector.
      *
      * @related NVectorView
+     *
+     * @note Versions of this function prior to SUNDIALS 6.0 did not take a
+     * SUNContext argument.
      */
     template <typename VectorType>
     NVectorView<VectorType>
-    make_nvector_view(VectorType &vector
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-                      ,
-                      SUNContext nvector_context
+    make_nvector_view(VectorType &vector, SUNContext nvector_context);
+#  else
+    /**
+     * Create a NVectorView of the given @p vector.
+     *
+     * This call is intended to be used as
+     *
+     * @code
+     *   auto view = make_nvector_view(vector);
+     * @endcode
+     *
+     * The resulting object `view` must be kept around as long as any other
+     * object will use the internally viewed N_Vector.
+     *
+     * @tparam VectorType Type of the viewed vector. This parameter can be
+     *   deduced automatically and will respect a potential const-qualifier.
+     * @param vector The vector to view.
+     * @param nvector_context A SUNDIALS context object to be used for the
+     *   operations we want to do on this vector.
+     * @return A NVectorView of the @p vector.
+     *
+     * @related NVectorView
+     *
+     * @note This version of make_nvector_view() is only for versions of
+     * SUNDIALS prior to 6.0 which did not need a SUNContext object to set up a
+     * vector.
+     */
+    template <typename VectorType>
+    NVectorView<VectorType>
+    make_nvector_view(VectorType &vector);
 #  endif
-    );
 
     /**
      * Retrieve the underlying vector attached to N_Vector @p v. This call will
@@ -135,15 +162,23 @@ namespace SUNDIALS
        */
       NVectorView() = default;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
       /**
        * Constructor. Create view of @p vector.
+       *
+       * @note Versions of this function prior to SUNDIALS 6.0 did not take a
+       * SUNContext argument.
        */
-      NVectorView(VectorType &vector
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-                  ,
-                  SUNContext nvector_context
+      NVectorView(VectorType &vector, SUNContext nvector_context);
+#  else
+      /**
+       * Constructor. Create view of @p vector.
+       *
+       * @note This constructor is only for versions of SUNDIALS prior to 6.0
+       * which do not need a SUNContext object to set up a vector.
+       */
+      NVectorView(VectorType &vector);
 #  endif
-      );
 
       /**
        * Move assignment.

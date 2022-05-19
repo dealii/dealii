@@ -389,7 +389,7 @@ namespace SUNDIALS
         ARKStepFree(&arkode_mem);
 #  endif
 
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
         const int status = SUNContext_Free(&arkode_ctx);
         (void)status;
         AssertARKode(status);
@@ -452,7 +452,7 @@ namespace SUNDIALS
       }
 
     auto solution_nvector = internal::make_nvector_view(solution
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                                         ,
                                                         arkode_ctx
 #  endif
@@ -524,7 +524,7 @@ namespace SUNDIALS
     // just a view on the memory in solution, all write operations on yy by
     // ARKODE will automatically be mirrored to solution
     auto initial_condition_nvector = internal::make_nvector_view(solution
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                                                  ,
                                                                  arkode_ctx
 #    endif
@@ -541,7 +541,7 @@ namespace SUNDIALS
     if (get_local_tolerances)
       {
         const auto abs_tols = internal::make_nvector_view(get_local_tolerances()
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                                             ,
                                                           arkode_ctx
 #    endif
@@ -630,7 +630,7 @@ namespace SUNDIALS
       {
         ARKStepFree(&arkode_mem);
 
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
         const int status = SUNContext_Free(&arkode_ctx);
         (void)status;
         AssertARKode(status);
@@ -643,7 +643,7 @@ namespace SUNDIALS
     // just a view on the memory in solution, all write operations on yy by
     // ARKODE will automatically be mirrored to solution
     auto initial_condition_nvector = internal::make_nvector_view(solution
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                                                  ,
                                                                  arkode_ctx
 #    endif
@@ -674,7 +674,7 @@ namespace SUNDIALS
     if (get_local_tolerances)
       {
         const auto abs_tols = internal::make_nvector_view(get_local_tolerances()
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                                             ,
                                                           arkode_ctx
 #    endif
@@ -734,7 +734,7 @@ namespace SUNDIALS
             linear_solver =
               std::make_unique<internal::LinearSolverWrapper<VectorType>>(
                 solve_linearized_system
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                 ,
                 arkode_ctx
 #    endif
@@ -746,7 +746,7 @@ namespace SUNDIALS
             // use default solver from SUNDIALS
             // TODO give user options
             auto y_template = internal::make_nvector_view(solution
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                                           ,
                                                           arkode_ctx
 #    endif
@@ -793,7 +793,7 @@ namespace SUNDIALS
     else
       {
         auto y_template = internal::make_nvector_view(solution
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                                       ,
                                                       arkode_ctx
 #    endif
@@ -836,7 +836,7 @@ namespace SUNDIALS
             mass_solver =
               std::make_unique<internal::LinearSolverWrapper<VectorType>>(
                 solve_mass
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                 ,
                 arkode_ctx
 #    endif
@@ -846,7 +846,7 @@ namespace SUNDIALS
         else
           {
             auto y_template = internal::make_nvector_view(solution
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                                           ,
                                                           arkode_ctx
 #    endif
