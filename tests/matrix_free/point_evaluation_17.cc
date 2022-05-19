@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// Copyright (C) 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Check FEPointEvaluation::reinit with precomputed mapping
-// information for a vector valued FE and MappingCartesian.
+// Check precomputed mapping information against mapping
+// information on the fly for a vector valued FE and MappingCartesian.
 // This is a modified version of point_evaluation_13.cc.
 
 #include <deal.II/base/function_lib.h>
@@ -88,11 +88,13 @@ test()
   NonMatching::MappingInfo<dim, dim> mapping_info(mapping,
                                                   update_values |
                                                     update_gradients);
-  // First evaluator to use precomputed mapping
+  // The first evaluator will use the precomputed mapping
   FEPointEvaluation<dim, dim> evaluator1(mapping_info, fe);
 
-  // Second evaluator to use precomputed mapping
-  FEPointEvaluation<dim, dim> evaluator2(mapping_info, fe);
+  // The second evaluator will compute the mapping on the fly
+  FEPointEvaluation<dim, dim> evaluator2(mapping,
+                                         fe,
+                                         update_values | update_gradients);
 
   VectorTools::interpolate(mapping, dof_handler, MyFunction<dim>(), vector);
 
@@ -108,9 +110,10 @@ test()
                            solution_values.end());
 
       mapping_info.reinit(cell, unit_points);
-
       evaluator1.evaluate(solution_values,
                           EvaluationFlags::values | EvaluationFlags::gradients);
+
+      evaluator2.reinit(cell, unit_points);
       evaluator2.evaluate(solution_values,
                           EvaluationFlags::values | EvaluationFlags::gradients);
 
