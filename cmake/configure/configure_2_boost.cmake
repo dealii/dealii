@@ -68,7 +68,12 @@ MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
 
   RESET_CMAKE_REQUIRED()
 
-  IF( NOT DEAL_II_HAS_AUTO_PTR )
+  # Fix some problems by defining some additional preprocessor
+  # symbols. Ultimately these are added into DEAL_II_DEFINITIONS and
+  # DEAL_II_USER_DEFINITIONS. They are separate here so that they show up in
+  # detailed.log under DEAL_II_WITH_BOOST as, logically, they are part of our
+  # boost configuration.
+  IF(NOT DEAL_II_HAS_AUTO_PTR)
     LIST(APPEND BOOST_DEFINITIONS "BOOST_NO_AUTO_PTR")
     LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_NO_AUTO_PTR")
   ENDIF()
