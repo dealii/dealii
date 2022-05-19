@@ -61,8 +61,8 @@ test()
       process(local_owned, local_relevant, comm, owning_ranks_of_ghosts, true);
 
     Utilities::MPI::ConsensusAlgorithms::Selector<
-      std::pair<types::global_dof_index, types::global_dof_index>,
-      unsigned int>
+      std::vector<std::pair<types::global_dof_index, types::global_dof_index>>,
+      std::vector<unsigned int>>
       consensus_algorithm(process, comm);
     consensus_algorithm.run();
 
