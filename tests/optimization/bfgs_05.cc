@@ -222,8 +222,8 @@ test()
   x.add(-1, location);
   deallog << "Linf error in solution: " << x.linfty_norm() << std::endl;
 
-  deallog << "function calls: "
-          << (tot_fun_calls - 1) /*one evaluation above*/ << std::endl;
+  // deallog << "function calls: "
+  //         << (tot_fun_calls - 1) /*one evaluation above*/ << std::endl;
 }
 
 int
