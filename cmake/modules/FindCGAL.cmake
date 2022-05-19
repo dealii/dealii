@@ -17,7 +17,7 @@
 # Try to find the CGAL libraries
 #
 # This module exports
-#   
+#
 #   CGAL_INCLUDE_DIRS
 #
 
@@ -28,7 +28,12 @@ IF(NOT "${CGAL_DIR}" STREQUAL "")
   SET(CGAL_DIR ${CGAL_DIR})
 ENDIF()
 
-IF(DEAL_II_HAVE_CXX17)
+#
+# CGAL requires C++17 and an externally configured Boost, otherwise the
+# call to FIND_PACKAGE(CGAL) will fail. Guard the call to FIND_PACKAGE to
+# fail cracefully:
+#
+IF(DEAL_II_HAVE_CXX17 AND NOT FEATURE_BOOST_BUNDLED_CONFIGURED)
   # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
   LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
   SET(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON)
