@@ -29,16 +29,12 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
-#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/hp/fe_collection.h>
-
-#include <fstream>
-#include <iostream>
 
 #include "../tests.h"
 
@@ -48,6 +44,8 @@ template <int dim>
 void
 test(const unsigned int fe_degree)
 {
+  Assert(dim > 1, ExcMessage("This test must run with dim>1"));
+
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
@@ -95,36 +93,56 @@ test(const unsigned int fe_degree)
       deallog << "Total dofs=" << dof_handler.n_dofs() << std::endl;
     }
 
+  // Define set of constant modes
+  std::vector<std::vector<bool>> constant_modes(
+    fe_collection.n_components(),
+    std::vector<bool>(dof_handler.n_locally_owned_dofs(), false));
 
-
-  // extract constant modes and print
   if (myid == 0)
     {
+      // Extract constant modes automatically
+      // DoFTools::extract_constant_modes(dof_handler,
+      //                                  ComponentMask(),
+      //                                  constant_modes);
+
+      // Extract constant modes manually
       for (unsigned int component = 0; component < fe_collection.n_components();
            ++component)
         {
+          AssertDimension(constant_modes[component].size(),
+                          dof_handler.n_locally_owned_dofs());
+
           const FEValuesExtractors::Scalar component_extractor(component);
           const ComponentMask              component_mask(
             fe_collection.component_mask(component_extractor));
 
-          std::vector<std::vector<bool>> constant_modes(
-            fe_collection.n_components(),
-            std::vector<bool>(dof_handler.n_locally_owned_dofs(), false));
+          const IndexSet component_index_set =
+            DoFTools::extract_dofs(dof_handler, component_mask);
 
-          DoFTools::extract_constant_modes(dof_handler,
-                                           component_mask,
-                                           constant_modes);
-
-
-
-          for (unsigned int i = 0; i < constant_modes.size(); ++i)
+          for (unsigned int i = 0;
+               i < dof_handler.locally_owned_dofs().n_elements();
+               ++i)
             {
-              for (unsigned int j = 0; j < constant_modes[i].size(); ++j)
+              if (component_index_set.is_element(
+                    dof_handler.locally_owned_dofs().nth_index_in_set(i)))
                 {
-                  deallog << (constant_modes[i][j] ? '1' : '0') << ' ';
+                  constant_modes[component][i] = true;
                 }
-              deallog << std::endl;
+              else
+                {
+                  constant_modes[component][i] = false;
+                }
             }
+        }
+
+      // Print constant modes
+      for (unsigned int i = 0; i < constant_modes.size(); ++i)
+        {
+          for (unsigned int j = 0; j < constant_modes[i].size(); ++j)
+            {
+              deallog << (constant_modes[i][j] ? '1' : '0') << ' ';
+            }
+          deallog << std::endl;
         }
     }
 }
@@ -134,26 +152,41 @@ int
 main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-
   deallog.push(Utilities::int_to_string(myid));
-
 
   if (myid == 0)
     {
       initlog();
 
+      deallog.push("2d");
       test<2>(1);
       test<2>(2);
       test<2>(3);
       test<2>(4);
+      deallog.pop();
+
+      deallog.push("3d");
+      test<3>(1);
+      test<3>(2);
+      test<3>(3);
+      test<3>(4);
+      deallog.pop();
     }
   else
     {
+      deallog.push("2d");
       test<2>(1);
       test<2>(2);
       test<2>(3);
       test<2>(4);
+      deallog.pop();
+
+      deallog.push("3d");
+      test<3>(1);
+      test<3>(2);
+      test<3>(3);
+      test<3>(4);
+      deallog.pop();
     }
 }

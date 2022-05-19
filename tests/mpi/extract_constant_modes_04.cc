@@ -72,86 +72,58 @@ test(const unsigned int fe_degree)
   fe_collection.push_back(right_fe);
 
   dof_handler.distribute_dofs(fe_collection);
+  DoFRenumbering::component_wise(dof_handler);
   deallog << "FE degree=" << fe_degree << std::endl;
   deallog << "Total dofs=" << dof_handler.n_dofs() << std::endl;
 
 
+  // Define set of constant modes
+  std::vector<std::vector<bool>> constant_modes(
+    fe_collection.n_components(),
+    std::vector<bool>(dof_handler.n_locally_owned_dofs(), false));
 
-  // extract constant modes and print
-  for (unsigned int component = 0; component < fe_collection.n_components();
-       ++component)
+
+  // extract constant modes automatically
+  DoFTools::extract_constant_modes(dof_handler,
+                                   ComponentMask(),
+                                   constant_modes);
+
+
+  // Print constant modes
+  for (unsigned int i = 0; i < constant_modes.size(); ++i)
     {
-      const FEValuesExtractors::Scalar component_extractor(component);
-      const ComponentMask              component_mask(
-        fe_collection.component_mask(component_extractor));
-
-      std::vector<std::vector<bool>> constant_modes(
-        fe_collection.n_components(),
-        std::vector<bool>(dof_handler.n_locally_owned_dofs(), false));
-
-      DoFTools::extract_constant_modes(dof_handler,
-                                       component_mask,
-                                       constant_modes);
-
-      for (unsigned int i = 0; i < constant_modes.size(); ++i)
+      for (unsigned int j = 0; j < constant_modes[i].size(); ++j)
         {
-          for (unsigned int j = 0; j < constant_modes[i].size(); ++j)
-            {
-              deallog << (constant_modes[i][j] ? '1' : '0') << ' ';
-            }
-          deallog << std::endl;
+          deallog << (constant_modes[i][j] ? '1' : '0') << ' ';
         }
-    }
-
-
-
-  // renumber dofs and do the same again
-  DoFRenumbering::component_wise(dof_handler);
-  for (unsigned int component = 0; component < fe_collection.n_components();
-       ++component)
-    {
-      const FEValuesExtractors::Scalar component_extractor(component);
-      const ComponentMask              component_mask(
-        fe_collection.component_mask(component_extractor));
-
-      std::vector<std::vector<bool>> constant_modes(
-        fe_collection.n_components(),
-        std::vector<bool>(dof_handler.n_locally_owned_dofs(), false));
-
-
-      DoFTools::extract_constant_modes(dof_handler,
-                                       component_mask,
-                                       constant_modes);
-
-      for (unsigned int i = 0; i < constant_modes.size(); ++i)
-        {
-          for (unsigned int j = 0; j < constant_modes[i].size(); ++j)
-            {
-              deallog << (constant_modes[i][j] ? '1' : '0') << ' ';
-            }
-          deallog << std::endl;
-        }
+      deallog << std::endl;
     }
 }
 
 
 int
-main(int argc, char *argv[])
+main()
 {
   initlog();
 
+  deallog.push("1d");
   test<1>(1);
   test<1>(2);
   test<1>(3);
   test<1>(4);
+  deallog.pop();
 
+  deallog.push("2d");
   test<2>(1);
   test<2>(2);
   test<2>(3);
   test<2>(4);
+  deallog.pop();
 
+  deallog.push("3d");
   test<3>(1);
   test<3>(2);
   test<3>(3);
   test<3>(4);
+  deallog.pop();
 }
