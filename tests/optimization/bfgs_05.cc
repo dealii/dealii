@@ -210,7 +210,13 @@ test()
   SolverBFGS<VectorType>                          solver(solver_control, data);
   solver.connect_line_search_slot(line_min);
   solver.connect_preconditioner_slot(preconditioner);
-  solver.solve(func, x);
+
+  // We will check whether the number of function calls is within a specified
+  // range.
+  check_solver_within_range(solver.solve(func, x),
+                            (tot_fun_calls - 1) /*one evaluation above*/,
+                            130,
+                            140);
 
   Assert(tot_fun_calls == line_search_iterations + 1, ExcInternalError());
 
@@ -221,9 +227,6 @@ test()
 
   x.add(-1, location);
   deallog << "Linf error in solution: " << x.linfty_norm() << std::endl;
-
-  // deallog << "function calls: "
-  //         << (tot_fun_calls - 1) /*one evaluation above*/ << std::endl;
 }
 
 int
