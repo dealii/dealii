@@ -1909,8 +1909,7 @@ namespace MatrixFreeOperators
           1. / inverse_diagonal_vector.local_element(i);
       }
 
-    inverse_diagonal_vector.update_ghost_values();
-    diagonal_vector.update_ghost_values();
+    // We never need ghost values so don't update them
   }
 
 
@@ -2206,8 +2205,7 @@ namespace MatrixFreeOperators
       else
         inverse_diagonal_vector.local_element(i) = 1.;
 
-    inverse_diagonal_vector.update_ghost_values();
-    diagonal_vector.update_ghost_values();
+    // We never need ghost values so don't update them
   }
 
 
