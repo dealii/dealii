@@ -70,4 +70,9 @@ main()
   deallog.push("tetrahedral_elements_dim3_spacedim3: ");
   check_file<3, 3>(std::string(SOURCE_DIR "/grid_in_msh/tet.msh"));
   deallog.pop();
+
+  // Make sure things work when half of the tets are twisted too:
+  deallog.push("tetrahedral_elements_dim3_spacedim3_twisted: ");
+  check_file<3, 3>(std::string(SOURCE_DIR "/grid_in_msh/tet_half_twisted.msh"));
+  deallog.pop();
 }
