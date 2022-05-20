@@ -61,7 +61,8 @@ public:
     , data(matrix_free)
   {}
 
-  ~HelmholtzOperator()
+  void
+  print_n_calls_special()
   {
     if (n_calls_vmult > 0)
       deallog << "Number of calls to special vmult: " << n_calls_vmult
@@ -217,7 +218,7 @@ test(const unsigned int fe_degree)
   VectorType                                  rhs, sol;
   mf_data.initialize_dof_vector(rhs);
   mf_data.initialize_dof_vector(sol);
-  rhs = 1.;
+  rhs = 1. / std::sqrt(rhs.size());
   DiagonalMatrix<VectorType> preconditioner;
   mf_data.initialize_dof_vector(preconditioner.get_vector());
   mf.vmult(preconditioner.get_vector(), rhs);
@@ -247,6 +248,7 @@ test(const unsigned int fe_degree)
     SolverCG<VectorType>           solver(control);
     solver.solve(matrix, sol, rhs, preconditioner);
     deallog << "Norm of the solution: " << sol.l2_norm() << std::endl;
+    matrix.print_n_calls_special();
   }
 
   // Step 3: solve with CG solver for a matrix that does support but a
@@ -261,6 +263,7 @@ test(const unsigned int fe_degree)
     SolverCG<VectorType>           solver(control);
     solver.solve(matrix, sol, rhs, simple_diagonal);
     deallog << "Norm of the solution: " << sol.l2_norm() << std::endl;
+    matrix.print_n_calls_special();
   }
 
   // Step 4: solve with CG solver for a matrix that does support the
@@ -276,6 +279,7 @@ test(const unsigned int fe_degree)
     SolverCG<VectorType>   solver(control);
     solver.solve(matrix, sol, rhs, diagonal_subrange);
     deallog << "Norm of the solution: " << sol.l2_norm() << std::endl;
+    matrix.print_n_calls_special();
   }
 }
 
@@ -287,6 +291,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   mpi_initlog();
+  deallog << std::setprecision(8);
 
   test<2, double>(3);
   test<3, double>(4);

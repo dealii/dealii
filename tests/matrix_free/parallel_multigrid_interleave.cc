@@ -60,7 +60,8 @@ public:
     : n_calls_vmult(0)
   {}
 
-  ~LaplaceOperator()
+  void
+  print_n_calls_special()
   {
     // round number of calls to make test more robust
     if (n_calls_vmult > 0)
@@ -430,6 +431,14 @@ do_test(const DoFHandler<dim> &dof)
     SolverCG<LinearAlgebra::distributed::Vector<double>> solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
+
+  // Print statistics
+  for (unsigned int level = 0;
+       level < dof.get_triangulation().n_global_levels();
+       ++level)
+    mg_matrices[level].print_n_calls_special();
+
+  fine_matrix.print_n_calls_special();
 }
 
 
