@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cstdlib> // for std::getenv
+#include <mutex>
 #include <thread>
 
 #ifdef DEAL_II_WITH_TBB
@@ -144,13 +145,13 @@ MultithreadInfo::memory_consumption()
 void
 MultithreadInfo::initialize_multithreading()
 {
-  static bool done = false;
-  if (done)
-    return;
-
-  MultithreadInfo::set_thread_limit(numbers::invalid_unsigned_int);
-  done = true;
+  static std::once_flag is_initialized;
+  std::call_once(is_initialized, []() {
+    MultithreadInfo::set_thread_limit(numbers::invalid_unsigned_int);
+  });
 }
+
+
 
 #ifdef DEAL_II_WITH_TASKFLOW
 tf::Executor &
