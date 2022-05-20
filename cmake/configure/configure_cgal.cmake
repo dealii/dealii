@@ -17,4 +17,41 @@
 # Configuration for the CGAL library:
 #
 
+IF(NOT FEATURE_BOOST_PROCESSED)
+  MESSAGE(FATAL_ERROR "\n"
+    "Internal build system error: The configuration of "
+    "DEAL_II_WITH_CGAL depends on "
+    "DEAL_II_WITH_BOOST, but CONFIGURE_FEATURE(CGAL) "
+    "was called before CONFIGURE_FEATURE(BOOST).\n\n"
+    )
+ENDIF()
+
+
+MACRO(FEATURE_CGAL_FIND_EXTERNAL var)
+  FIND_PACKAGE(CGAL)
+
+  IF(CGAL_FOUND)
+    SET(${var} TRUE)
+  ENDIF()
+
+  #
+  # CGAL requires an full, externally installed Boost library. We can thus
+  # not configure our internal boost and try to use CGAL at the same time.
+  #
+  IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
+    MESSAGE(STATUS
+      "Could not find a sufficient CGAL installation: "
+      "CGAL links against external Boost but deal.II was configured "
+      "with bundled Boost."
+      )
+    SET(CGAL_ADDITIONAL_ERROR_STRING
+      ${CGAL_ADDITIONAL_ERROR_STRING}
+      "Could not find a sufficient CGAL installation:\n"
+      "CGAL links against external Boost but deal.II was configured "
+      "with bundled Boost.\n\n"
+      )
+    SET(${var} FALSE)
+  ENDIF()
+ENDMACRO()
+
 CONFIGURE_FEATURE(CGAL)
