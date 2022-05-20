@@ -258,7 +258,7 @@ test(const unsigned int fe_degree)
             << "no preconditioner" << std::endl;
     sol = 0;
     HelmholtzOperator<dim, number> matrix(mf_data);
-    MyDiagonalMatrix               simple_diagonal(preconditioner.get_vector());
+    MyDiagonalMatrix<number>       simple_diagonal(preconditioner.get_vector());
     SolverControl                  control(200, 1e-2 * rhs.l2_norm());
     SolverCG<VectorType>           solver(control);
     solver.solve(matrix, sol, rhs, simple_diagonal);
@@ -274,9 +274,10 @@ test(const unsigned int fe_degree)
             << "preconditioner working on subrange" << std::endl;
     sol = 0;
     HelmholtzOperator<dim, number> matrix(mf_data);
-    DiagonalMatrixSubrange diagonal_subrange(preconditioner.get_vector());
-    SolverControl          control(200, 1e-2 * rhs.l2_norm());
-    SolverCG<VectorType>   solver(control);
+    DiagonalMatrixSubrange<number> diagonal_subrange(
+      preconditioner.get_vector());
+    SolverControl        control(200, 1e-2 * rhs.l2_norm());
+    SolverCG<VectorType> solver(control);
     solver.solve(matrix, sol, rhs, diagonal_subrange);
     deallog << "Norm of the solution: " << sol.l2_norm() << std::endl;
     matrix.print_n_calls_special();
