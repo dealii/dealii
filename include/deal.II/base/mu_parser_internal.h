@@ -35,6 +35,56 @@ namespace internal
 {
   namespace FunctionParser
   {
+    /**
+     * deal.II uses muParser as a purely internal dependency. To this end, we do
+     * not include any muParser headers in our own headers (and the bundled
+     * version of the dependency does not install its headers or compile a
+     * separate muparser library). Hence, to interface with muParser, we use the
+     * PIMPL idiom here to wrap a pointer to mu::Parser objects.
+     */
+    class muParserBase
+    {
+    public:
+      virtual ~muParserBase() = default;
+    };
+
+    /**
+     * Class containing the mutable state required by muParser.
+     *
+     * @note For performance reasons it is best to put all mutable state in a
+     * single object so that, for each function call, we only need to get
+     * thread-local data exactly once.
+     */
+    struct ParserData
+    {
+      /**
+       * Default constructor. Threads::ThreadLocalStorage requires that objects
+       * be either default- or copy-constructible: make sure we satisfy the
+       * first case by declaring it here.
+       */
+      ParserData() = default;
+
+      /**
+       * std::is_copy_constructible gives the wrong answer for containers with
+       * non-copy constructible types (e.g., std::vector<std::unique_ptr<int>>)
+       * - for more information, see the documentation of
+       * Threads::ThreadLocalStorage. Hence, to avoid compilation failures, just
+       * delete the copy constructor completely.
+       */
+      ParserData(const ParserData &) = delete;
+
+      /**
+       * Scratch array used to set independent variables (i.e., x, y, and t)
+       * before each muParser call.
+       */
+      std::vector<double> vars;
+
+      /**
+       * The actual muParser parser objects (hidden with PIMPL).
+       */
+      std::vector<std::unique_ptr<muParserBase>> parsers;
+    };
+
     int
     mu_round(double val);
 
