@@ -37,7 +37,7 @@ template <int rank, int dim, typename Number>
 const std::vector<std::string> &
 TensorFunctionParser<rank, dim, Number>::get_expressions() const
 {
-  return expressions;
+  return this->expressions;
 }
 
 
@@ -46,8 +46,6 @@ template <int rank, int dim, typename Number>
 TensorFunctionParser<rank, dim, Number>::TensorFunctionParser(
   const double initial_time)
   : TensorFunction<rank, dim, Number>(initial_time)
-  , initialized(false)
-  , n_vars(0)
   , n_components(Utilities::pow(dim, rank))
 {}
 
@@ -58,8 +56,6 @@ TensorFunctionParser<rank, dim, Number>::TensorFunctionParser(
   const std::string &constants,
   const std::string &variable_names)
   : TensorFunction<rank, dim, Number>()
-  , initialized(false)
-  , n_vars(0)
   , n_components(Utilities::pow(dim, rank))
 {
   auto constants_map = Patterns::Tools::Convert<ConstMap>::to_value(
@@ -93,7 +89,7 @@ TensorFunctionParser<rank, dim, Number>::initialize(
   this->constants   = constants;
   this->var_names   = Utilities::split_string_list(variables, ',');
   this->expressions = expressions;
-  AssertThrow(((time_dependent) ? dim + 1 : dim) == var_names.size(),
+  AssertThrow(((time_dependent) ? dim + 1 : dim) == this->var_names.size(),
               ExcMessage("Wrong number of variables"));
 
   // We check that the number of
@@ -118,9 +114,9 @@ TensorFunctionParser<rank, dim, Number>::initialize(
   // none of this is the case, then
   // an exception is thrown.
   if (time_dependent)
-    n_vars = dim + 1;
+    this->n_vars = dim + 1;
   else
-    n_vars = dim;
+    this->n_vars = dim;
 
   // create a parser object for the current thread we can then query
   // in value() and vector_value(). this is not strictly necessary
@@ -130,7 +126,7 @@ TensorFunctionParser<rank, dim, Number>::initialize(
   init_muparser();
 
   // finally set the initialization bit
-  initialized = true;
+  this->initialized = true;
 }
 
 
@@ -178,7 +174,7 @@ TensorFunctionParser<rank, dim, Number>::init_muparser() const
 
   // initialize the objects for the current thread
   data.parsers.reserve(this->n_components);
-  data.vars.resize(var_names.size());
+  data.vars.resize(this->var_names.size());
   for (unsigned int component = 0; component < this->n_components; ++component)
     {
       data.parsers.emplace_back(
@@ -188,11 +184,11 @@ TensorFunctionParser<rank, dim, Number>::init_muparser() const
         dynamic_cast<internal::TensorFunctionParserImplementation::Parser &>(
           *data.parsers.back());
 
-      for (const auto &constant : constants)
+      for (const auto &constant : this->constants)
         parser.DefineConst(constant.first, constant.second);
 
-      for (unsigned int iv = 0; iv < var_names.size(); ++iv)
-        parser.DefineVar(var_names[iv], &data.vars[iv]);
+      for (unsigned int iv = 0; iv < this->var_names.size(); ++iv)
+        parser.DefineVar(this->var_names[iv], &data.vars[iv]);
 
       // define some compatibility functions:
       parser.DefineFun("if", internal::FunctionParser::mu_if, true);
@@ -221,7 +217,7 @@ TensorFunctionParser<rank, dim, Number>::init_muparser() const
           // (the fparser library) but also makes no real sense.
           // consequently, in the expressions we set, remove any space
           // we may find after function names
-          std::string transformed_expression = expressions[component];
+          std::string transformed_expression = this->expressions[component];
 
           for (const auto &current_function_name :
                internal::FunctionParser::get_function_names())
@@ -291,7 +287,7 @@ template <int rank, int dim, typename Number>
 Tensor<rank, dim, Number>
 TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &p) const
 {
-  Assert(initialized == true, ExcNotInitialized());
+  Assert(this->initialized == true, ExcNotInitialized());
 
   // initialize the parser if that hasn't happened yet on the current thread
   internal::FunctionParser::ParserData &data = this->parser_data.get();
@@ -300,7 +296,7 @@ TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &p) const
 
   for (unsigned int i = 0; i < dim; ++i)
     data.vars[i] = p(i);
-  if (dim != n_vars)
+  if (dim != this->n_vars)
     data.vars[dim] = this->get_time();
 
   std::array<Number, Tensor<rank, dim, Number>::n_independent_components>

@@ -36,7 +36,7 @@ template <int dim>
 const std::vector<std::string> &
 FunctionParser<dim>::get_expressions() const
 {
-  return expressions;
+  return this->expressions;
 }
 
 
@@ -46,8 +46,6 @@ FunctionParser<dim>::FunctionParser(const unsigned int n_components,
                                     const double       initial_time,
                                     const double       h)
   : AutoDerivativeFunction<dim>(h, n_components, initial_time)
-  , initialized(false)
-  , n_vars(0)
 {}
 
 
@@ -59,8 +57,6 @@ FunctionParser<dim>::FunctionParser(const std::string &expression,
   : AutoDerivativeFunction<dim>(
       h,
       Utilities::split_string_list(expression, ';').size())
-  , initialized(false)
-  , n_vars(0)
 {
   auto constants_map = Patterns::Tools::Convert<ConstMap>::to_value(
     constants,
@@ -92,7 +88,7 @@ FunctionParser<dim>::initialize(const std::string &             variables,
   this->constants   = constants;
   this->var_names   = Utilities::split_string_list(variables, ',');
   this->expressions = expressions;
-  AssertThrow(((time_dependent) ? dim + 1 : dim) == var_names.size(),
+  AssertThrow(((time_dependent) ? dim + 1 : dim) == this->var_names.size(),
               ExcMessage("Wrong number of variables"));
 
   // We check that the number of components of this function matches the
@@ -107,9 +103,9 @@ FunctionParser<dim>::initialize(const std::string &             variables,
   // to the dimension. Once we parsed the variables string, if none of this is
   // the case, then an exception is thrown.
   if (time_dependent)
-    n_vars = dim + 1;
+    this->n_vars = dim + 1;
   else
-    n_vars = dim;
+    this->n_vars = dim;
 
   // create a parser object for the current thread we can then query in
   // value() and vector_value(). this is not strictly necessary because a user
@@ -118,7 +114,7 @@ FunctionParser<dim>::initialize(const std::string &             variables,
   init_muparser();
 
   // finally set the initialization bit
-  initialized = true;
+  this->initialized = true;
 }
 
 namespace internal
@@ -163,7 +159,7 @@ FunctionParser<dim>::init_muparser() const
 
   // initialize the objects for the current thread
   data.parsers.reserve(this->n_components);
-  data.vars.resize(var_names.size());
+  data.vars.resize(this->var_names.size());
   for (unsigned int component = 0; component < this->n_components; ++component)
     {
       data.parsers.emplace_back(
@@ -172,11 +168,11 @@ FunctionParser<dim>::init_muparser() const
         dynamic_cast<internal::FunctionParserImplementation::Parser &>(
           *data.parsers.back());
 
-      for (const auto &constant : constants)
+      for (const auto &constant : this->constants)
         parser.DefineConst(constant.first, constant.second);
 
-      for (unsigned int iv = 0; iv < var_names.size(); ++iv)
-        parser.DefineVar(var_names[iv], &data.vars[iv]);
+      for (unsigned int iv = 0; iv < this->var_names.size(); ++iv)
+        parser.DefineVar(this->var_names[iv], &data.vars[iv]);
 
       // define some compatibility functions:
       parser.DefineFun("if", internal::FunctionParser::mu_if, true);
@@ -206,7 +202,7 @@ FunctionParser<dim>::init_muparser() const
           // (the fparser library) but also makes no real sense.
           // consequently, in the expressions we set, remove any space
           // we may find after function names
-          std::string transformed_expression = expressions[component];
+          std::string transformed_expression = this->expressions[component];
 
           for (const auto &current_function_name :
                internal::FunctionParser::get_function_names())
@@ -276,7 +272,7 @@ double
 FunctionParser<dim>::value(const Point<dim> & p,
                            const unsigned int component) const
 {
-  Assert(initialized == true, ExcNotInitialized());
+  Assert(this->initialized == true, ExcNotInitialized());
   AssertIndexRange(component, this->n_components);
 
   // initialize the parser if that hasn't happened yet on the current thread
@@ -286,7 +282,7 @@ FunctionParser<dim>::value(const Point<dim> & p,
 
   for (unsigned int i = 0; i < dim; ++i)
     data.vars[i] = p(i);
-  if (dim != n_vars)
+  if (dim != this->n_vars)
     data.vars[dim] = this->get_time();
 
   try
@@ -321,7 +317,7 @@ void
 FunctionParser<dim>::vector_value(const Point<dim> &p,
                                   Vector<double> &  values) const
 {
-  Assert(initialized == true, ExcNotInitialized());
+  Assert(this->initialized == true, ExcNotInitialized());
   Assert(values.size() == this->n_components,
          ExcDimensionMismatch(values.size(), this->n_components));
 
@@ -333,7 +329,7 @@ FunctionParser<dim>::vector_value(const Point<dim> &p,
 
   for (unsigned int i = 0; i < dim; ++i)
     data.vars[i] = p(i);
-  if (dim != n_vars)
+  if (dim != this->n_vars)
     data.vars[dim] = this->get_time();
 
   for (unsigned int component = 0; component < this->n_components; ++component)

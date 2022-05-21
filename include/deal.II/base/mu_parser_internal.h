@@ -92,12 +92,50 @@ namespace internal
     class ParserImplementation
     {
     public:
+      ParserImplementation()
+        : initialized(false)
+        , n_vars(0)
+      {}
+
       /**
        * The muParser objects (hidden with the PIMPL idiom) for each thread (and
        * one for each component).
        */
       mutable Threads::ThreadLocalStorage<internal::FunctionParser::ParserData>
         parser_data;
+
+      /**
+       * An array to keep track of all the constants, required to initialize fp
+       * in each thread.
+       */
+      std::map<std::string, double> constants;
+
+      /**
+       * An array for the variable names, required to initialize fp in each
+       * thread.
+       */
+      std::vector<std::string> var_names;
+
+      /**
+       * An array of function expressions (one per component), required to
+       * initialize tfp in each thread.
+       */
+      std::vector<std::string> expressions;
+
+      /**
+       * State of usability. This variable is checked every time the function is
+       * called for evaluation. It's set to true in the initialize() methods.
+       */
+      bool initialized;
+
+      /**
+       * Number of variables. If this is also a function of time, then the
+       * number of variables is dim+1, otherwise it is dim. In the case that
+       * this is a time dependent function, the time is supposed to be the last
+       * variable. If #n_vars is not identical to the number of the variables
+       * parsed by the initialize() method, then an exception is thrown.
+       */
+      unsigned int n_vars;
     };
 
     int
