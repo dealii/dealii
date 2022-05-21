@@ -26,10 +26,6 @@
 #include <cmath>
 #include <map>
 
-#ifdef DEAL_II_WITH_MUPARSER
-#  include <muParser.h>
-#endif
-
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -123,146 +119,10 @@ TensorFunctionParser<rank, dim, Number>::initialize(
   // because a user may never call these functions on the current
   // thread, but it gets us error messages about wrong formulas right
   // away
-  init_muparser();
+  this->init_muparser();
 
   // finally set the initialization bit
   this->initialized = true;
-}
-
-
-
-namespace internal
-{
-  namespace TensorFunctionParserImplementation
-  {
-    namespace
-    {
-      /**
-       * PIMPL for mu::Parser.
-       */
-      class Parser : public internal::FunctionParser::muParserBase
-      {
-      public:
-        operator mu::Parser &()
-        {
-          return parser;
-        }
-
-        operator const mu::Parser &() const
-        {
-          return parser;
-        }
-
-      protected:
-        mu::Parser parser;
-      };
-    } // namespace
-  }   // namespace TensorFunctionParserImplementation
-} // namespace internal
-
-
-
-template <int rank, int dim, typename Number>
-void
-TensorFunctionParser<rank, dim, Number>::init_muparser() const
-{
-  // check that we have not already initialized the parser on the
-  // current thread, i.e., that the current function is only called
-  // once per thread
-  internal::FunctionParser::ParserData &data = this->parser_data.get();
-  Assert(data.parsers.size() == 0 && data.vars.size() == 0, ExcInternalError());
-
-  // initialize the objects for the current thread
-  data.parsers.reserve(this->n_components);
-  data.vars.resize(this->var_names.size());
-  for (unsigned int component = 0; component < this->n_components; ++component)
-    {
-      data.parsers.emplace_back(
-        std::make_unique<
-          internal::TensorFunctionParserImplementation::Parser>());
-      mu::Parser &parser =
-        dynamic_cast<internal::TensorFunctionParserImplementation::Parser &>(
-          *data.parsers.back());
-
-      for (const auto &constant : this->constants)
-        parser.DefineConst(constant.first, constant.second);
-
-      for (unsigned int iv = 0; iv < this->var_names.size(); ++iv)
-        parser.DefineVar(this->var_names[iv], &data.vars[iv]);
-
-      // define some compatibility functions:
-      parser.DefineFun("if", internal::FunctionParser::mu_if, true);
-      parser.DefineOprt("|", internal::FunctionParser::mu_or, 1);
-      parser.DefineOprt("&", internal::FunctionParser::mu_and, 2);
-      parser.DefineFun("int", internal::FunctionParser::mu_int, true);
-      parser.DefineFun("ceil", internal::FunctionParser::mu_ceil, true);
-      parser.DefineFun("cot", internal::FunctionParser::mu_cot, true);
-      parser.DefineFun("csc", internal::FunctionParser::mu_csc, true);
-      parser.DefineFun("floor", internal::FunctionParser::mu_floor, true);
-      parser.DefineFun("sec", internal::FunctionParser::mu_sec, true);
-      parser.DefineFun("log", internal::FunctionParser::mu_log, true);
-      parser.DefineFun("pow", internal::FunctionParser::mu_pow, true);
-      parser.DefineFun("erfc", internal::FunctionParser::mu_erfc, true);
-      parser.DefineFun("rand_seed",
-                       internal::FunctionParser::mu_rand_seed,
-                       true);
-      parser.DefineFun("rand", internal::FunctionParser::mu_rand, true);
-
-      try
-        {
-          // muparser expects that functions have no
-          // space between the name of the function and the opening
-          // parenthesis. this is awkward because it is not backward
-          // compatible to the library we used to use before muparser
-          // (the fparser library) but also makes no real sense.
-          // consequently, in the expressions we set, remove any space
-          // we may find after function names
-          std::string transformed_expression = this->expressions[component];
-
-          for (const auto &current_function_name :
-               internal::FunctionParser::get_function_names())
-            {
-              const unsigned int function_name_length =
-                current_function_name.size();
-
-              std::string::size_type pos = 0;
-              while (true)
-                {
-                  // try to find any occurrences of the function name
-                  pos = transformed_expression.find(current_function_name, pos);
-                  if (pos == std::string::npos)
-                    break;
-
-                  // replace whitespace until there no longer is any
-                  while ((pos + function_name_length <
-                          transformed_expression.size()) &&
-                         ((transformed_expression[pos + function_name_length] ==
-                           ' ') ||
-                          (transformed_expression[pos + function_name_length] ==
-                           '\t')))
-                    transformed_expression.erase(
-                      transformed_expression.begin() + pos +
-                      function_name_length);
-
-                  // move the current search position by the size of the
-                  // actual function name
-                  pos += function_name_length;
-                }
-            }
-
-          // now use the transformed expression
-          parser.SetExpr(transformed_expression);
-        }
-      catch (mu::ParserError &e)
-        {
-          std::cerr << "Message:  <" << e.GetMsg() << ">\n";
-          std::cerr << "Formula:  <" << e.GetExpr() << ">\n";
-          std::cerr << "Token:    <" << e.GetToken() << ">\n";
-          std::cerr << "Position: <" << e.GetPos() << ">\n";
-          std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
-          AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg()));
-        }
-    }
 }
 
 
@@ -287,46 +147,10 @@ template <int rank, int dim, typename Number>
 Tensor<rank, dim, Number>
 TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &p) const
 {
-  Assert(this->initialized == true, ExcNotInitialized());
-
-  // initialize the parser if that hasn't happened yet on the current thread
-  internal::FunctionParser::ParserData &data = this->parser_data.get();
-  if (data.vars.size() == 0)
-    init_muparser();
-
-  for (unsigned int i = 0; i < dim; ++i)
-    data.vars[i] = p(i);
-  if (dim != this->n_vars)
-    data.vars[dim] = this->get_time();
-
   std::array<Number, Tensor<rank, dim, Number>::n_independent_components>
-    values;
-
-  try
-    {
-      for (unsigned int component = 0; component < values.size(); ++component)
-        {
-          Assert(dynamic_cast<
-                   internal::TensorFunctionParserImplementation::Parser *>(
-                   data.parsers[component].get()),
-                 ExcInternalError());
-          mu::Parser &parser = static_cast< // NOLINT
-            internal::TensorFunctionParserImplementation::Parser &>(
-            *data.parsers[component]);
-          values[component] = parser.Eval();
-        } // for
-    }     // try
-  catch (mu::ParserError &e)
-    {
-      std::cerr << "Message:  <" << e.GetMsg() << ">\n";
-      std::cerr << "Formula:  <" << e.GetExpr() << ">\n";
-      std::cerr << "Token:    <" << e.GetToken() << ">\n";
-      std::cerr << "Position: <" << e.GetPos() << ">\n";
-      std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
-      AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg()));
-
-      return Tensor<rank, dim, Number>();
-    } // catch
+       values;
+  auto values_view = make_array_view(values.begin(), values.end());
+  this->do_all_values(p, this->get_time(), values_view);
 
   return Tensor<rank, dim, Number>(
     make_array_view(values.begin(), values.end()));

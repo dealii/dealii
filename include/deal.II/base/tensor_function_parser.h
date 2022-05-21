@@ -261,17 +261,7 @@ public:
                  << ").");
 
   //@}
-
 private:
-  /**
-   * Initialize tfp and vars on the current thread. This function may only be
-   * called once per thread. A thread can test whether the function has
-   * already been called by testing whether 'tfp.get().size()==0' (not
-   * initialized) or >0 (already initialized).
-   */
-  void
-  init_muparser() const;
-
   /**
    * Number of components is equal dim<sup>rank</sup>.
    */

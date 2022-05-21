@@ -21,18 +21,15 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/thread_local_storage.h>
 
 #include <memory>
 #include <string>
 #include <vector>
 
-
 DEAL_II_NAMESPACE_OPEN
-
-
-
-#ifdef DEAL_II_WITH_MUPARSER
 
 namespace internal
 {
@@ -94,6 +91,19 @@ namespace internal
      */
     std::vector<std::string>
     get_function_names();
+
+    /**
+     * @addtogroup Exceptions
+     * @{
+     */
+    DeclException2(ExcParseError,
+                   int,
+                   std::string,
+                   << "Parsing Error at Column " << arg1
+                   << ". The parser said: " << arg2);
+
+    //@}
+
     /**
      * deal.II uses muParser as a purely internal dependency. To this end, we do
      * not include any muParser headers in our own headers (and the bundled
@@ -160,6 +170,19 @@ namespace internal
       mutable Threads::ThreadLocalStorage<internal::FunctionParser::ParserData>
         parser_data;
 
+      void
+      init_muparser() const;
+
+      Number
+      do_value(const Point<dim> &p,
+               const double      time,
+               unsigned int      component) const;
+
+      void
+      do_all_values(const Point<dim> & p,
+                    const double       time,
+                    ArrayView<Number> &values) const;
+
       /**
        * An array to keep track of all the constants, required to initialize fp
        * in each thread.
@@ -193,14 +216,8 @@ namespace internal
        */
       unsigned int n_vars;
     };
-
-
   } // namespace FunctionParser
-
 } // namespace internal
-#endif
-
-
 
 DEAL_II_NAMESPACE_CLOSE
 

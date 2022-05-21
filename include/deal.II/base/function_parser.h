@@ -345,16 +345,6 @@ public:
   value(const Point<dim> &p, const unsigned int component = 0) const override;
 
   /**
-   * Return all components of a vector-valued function at the given point @p
-   * p.
-   *
-   * <code>values</code> shall have the right size beforehand, i.e.
-   * #n_components.
-   */
-  virtual void
-  vector_value(const Point<dim> &p, Vector<double> &values) const override;
-
-  /**
    * Return an array of function expressions (one per component), used to
    * initialize this function.
    */
@@ -379,16 +369,6 @@ public:
                  << ").");
 
   //@}
-
-private:
-  /**
-   * Initialize fp and vars on the current thread. This function may only be
-   * called once per thread. A thread can test whether the function has
-   * already been called by testing whether 'fp.get().size()==0' (not
-   * initialized) or >0 (already initialized).
-   */
-  void
-  init_muparser() const;
 };
 
 
