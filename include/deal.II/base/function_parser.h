@@ -21,13 +21,11 @@
 
 #include <deal.II/base/auto_derivative_function.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/mu_parser_internal.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/thread_local_storage.h>
-#include <deal.II/base/mu_parser_internal.h>
 
 #include <map>
-#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -216,7 +214,9 @@ class Vector;
  * @ingroup functions
  */
 template <int dim>
-class FunctionParser : public AutoDerivativeFunction<dim>
+class FunctionParser
+  : public AutoDerivativeFunction<dim>,
+    protected internal::FunctionParser::ParserImplementation<dim, double>
 {
 public:
   /**
@@ -381,13 +381,6 @@ public:
   //@}
 
 private:
-  /**
-   * The muParser objects (hidden with the PIMPL idiom) for each thread (and one
-   * for each component).
-   */
-  mutable Threads::ThreadLocalStorage<internal::FunctionParser::ParserData>
-    parser_data;
-
   /**
    * An array to keep track of all the constants, required to initialize fp in
    * each thread.

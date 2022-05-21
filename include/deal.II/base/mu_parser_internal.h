@@ -21,6 +21,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/thread_local_storage.h>
+
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -83,6 +86,18 @@ namespace internal
        * The actual muParser parser objects (hidden with PIMPL).
        */
       std::vector<std::unique_ptr<muParserBase>> parsers;
+    };
+
+    template <int dim, typename Number>
+    class ParserImplementation
+    {
+    public:
+      /**
+       * The muParser objects (hidden with the PIMPL idiom) for each thread (and
+       * one for each component).
+       */
+      mutable Threads::ThreadLocalStorage<internal::FunctionParser::ParserData>
+        parser_data;
     };
 
     int

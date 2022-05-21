@@ -173,7 +173,7 @@ TensorFunctionParser<rank, dim, Number>::init_muparser() const
   // check that we have not already initialized the parser on the
   // current thread, i.e., that the current function is only called
   // once per thread
-  internal::FunctionParser::ParserData &data = parser_data.get();
+  internal::FunctionParser::ParserData &data = this->parser_data.get();
   Assert(data.parsers.size() == 0 && data.vars.size() == 0, ExcInternalError());
 
   // initialize the objects for the current thread
@@ -294,7 +294,7 @@ TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &p) const
   Assert(initialized == true, ExcNotInitialized());
 
   // initialize the parser if that hasn't happened yet on the current thread
-  internal::FunctionParser::ParserData &data = parser_data.get();
+  internal::FunctionParser::ParserData &data = this->parser_data.get();
   if (data.vars.size() == 0)
     init_muparser();
 
