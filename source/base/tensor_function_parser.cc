@@ -70,7 +70,6 @@ TensorFunctionParser<rank, dim, Number>::TensorFunctionParser(
 }
 
 
-#ifdef DEAL_II_WITH_MUPARSER
 
 template <int rank, int dim, typename Number>
 void
@@ -172,55 +171,6 @@ TensorFunctionParser<rank, dim, Number>::value_list(
       values[i] = value(p[i]);
     }
 }
-
-#else
-
-
-template <int rank, int dim, typename Number>
-void
-TensorFunctionParser<rank, dim, Number>::initialize(
-  const std::string &,
-  const std::vector<std::string> &,
-  const std::map<std::string, double> &,
-  const bool)
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-}
-
-template <int rank, int dim, typename Number>
-void
-TensorFunctionParser<rank, dim, Number>::initialize(
-  const std::string &,
-  const std::string &,
-  const std::map<std::string, double> &,
-  const bool)
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-}
-
-
-
-template <int rank, int dim, typename Number>
-Tensor<rank, dim, Number>
-TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &) const
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-  return Tensor<rank, dim, Number>();
-}
-
-
-
-template <int rank, int dim, typename Number>
-void
-TensorFunctionParser<rank, dim, Number>::value_list(
-  const std::vector<Point<dim>> &,
-  std::vector<Tensor<rank, dim, Number>> &) const
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-}
-
-
-#endif
 
 // explicit instantiations
 #include "tensor_function_parser.inst"

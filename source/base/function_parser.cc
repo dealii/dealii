@@ -70,7 +70,6 @@ FunctionParser<dim>::FunctionParser(const std::string &expression,
 }
 
 
-#ifdef DEAL_II_WITH_MUPARSER
 
 template <int dim>
 void
@@ -137,50 +136,6 @@ FunctionParser<dim>::value(const Point<dim> & p,
 {
   return this->do_value(p, this->get_time(), component);
 }
-
-#else
-
-
-template <int dim>
-void
-FunctionParser<dim>::initialize(const std::string &,
-                                const std::vector<std::string> &,
-                                const std::map<std::string, double> &,
-                                const bool)
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-}
-
-template <int dim>
-void
-FunctionParser<dim>::initialize(const std::string &,
-                                const std::string &,
-                                const std::map<std::string, double> &,
-                                const bool)
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-}
-
-
-
-template <int dim>
-double
-FunctionParser<dim>::value(const Point<dim> &, unsigned int) const
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-  return 0.;
-}
-
-
-template <int dim>
-void
-FunctionParser<dim>::vector_value(const Point<dim> &, Vector<double> &) const
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-}
-
-
-#endif
 
 // Explicit Instantiations.
 
