@@ -46,12 +46,10 @@ namespace VectorTools
     const std::set<types::boundary_id> &                       boundary_ids)
   {
     const FiniteElement<dim> &fe = dof_handler.get_fe();
-    Assert(fe.n_components() == rhs_function.n_components,
-           ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+    AssertDimension(fe.n_components(), rhs_function.n_components);
+    AssertDimension(rhs_vector.size(), dof_handler.n_dofs());
 
-    rhs_vector = 0;
+    rhs_vector = typename VectorType::value_type(0.0);
 
     UpdateFlags update_flags =
       UpdateFlags(update_values | update_quadrature_points | update_JxW_values);
@@ -64,15 +62,11 @@ namespace VectorTools
     std::vector<types::global_dof_index> dofs(dofs_per_cell);
     Vector<double>                       cell_vector(dofs_per_cell);
 
-    typename DoFHandler<dim, spacedim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-
     if (n_components == 1)
       {
         std::vector<double> rhs_values(n_q_points);
 
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof_handler.active_cell_iterators())
           for (unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
@@ -103,7 +97,7 @@ namespace VectorTools
         std::vector<Vector<double>> rhs_values(n_q_points,
                                                Vector<double>(n_components));
 
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof_handler.active_cell_iterators())
           for (unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
@@ -193,12 +187,10 @@ namespace VectorTools
     const std::set<types::boundary_id> &                       boundary_ids)
   {
     const hp::FECollection<dim> &fe = dof_handler.get_fe_collection();
-    Assert(fe.n_components() == rhs_function.n_components,
-           ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+    AssertDimension(fe.n_components(), rhs_function.n_components);
+    AssertDimension(rhs_vector.size(), dof_handler.n_dofs());
 
-    rhs_vector = 0;
+    rhs_vector = typename VectorType::value_type(0.0);
 
     UpdateFlags update_flags =
       UpdateFlags(update_values | update_quadrature_points | update_JxW_values);
@@ -209,15 +201,11 @@ namespace VectorTools
     std::vector<types::global_dof_index> dofs(fe.max_dofs_per_cell());
     Vector<double>                       cell_vector(fe.max_dofs_per_cell());
 
-    typename DoFHandler<dim, spacedim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-
     if (n_components == 1)
       {
         std::vector<double> rhs_values;
 
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof_handler.active_cell_iterators())
           for (unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
@@ -255,7 +243,7 @@ namespace VectorTools
       {
         std::vector<Vector<double>> rhs_values;
 
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof_handler.active_cell_iterators())
           for (unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
@@ -353,11 +341,9 @@ namespace VectorTools
     using Number = typename VectorType::value_type;
 
     const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
-    Assert(fe.n_components() == rhs_function.n_components,
-           ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    rhs_vector = typename VectorType::value_type(0.);
+    AssertDimension(fe.n_components(), rhs_function.n_components);
+    AssertDimension(rhs_vector.size(), dof_handler.n_dofs());
+    rhs_vector = typename VectorType::value_type(0.0);
 
     UpdateFlags update_flags =
       UpdateFlags(update_values | update_quadrature_points | update_JxW_values);
@@ -370,15 +356,11 @@ namespace VectorTools
     std::vector<types::global_dof_index> dofs(dofs_per_cell);
     Vector<Number>                       cell_vector(dofs_per_cell);
 
-    typename DoFHandler<dim, spacedim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-
     if (n_components == 1)
       {
         std::vector<Number> rhs_values(n_q_points);
 
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof_handler.active_cell_iterators())
           if (cell->is_locally_owned())
             {
               fe_values.reinit(cell);
@@ -406,7 +388,7 @@ namespace VectorTools
         std::vector<Vector<Number>> rhs_values(n_q_points,
                                                Vector<Number>(n_components));
 
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof_handler.active_cell_iterators())
           if (cell->is_locally_owned())
             {
               fe_values.reinit(cell);
@@ -496,11 +478,9 @@ namespace VectorTools
     using Number = typename VectorType::value_type;
 
     const hp::FECollection<dim, spacedim> &fe = dof_handler.get_fe_collection();
-    Assert(fe.n_components() == rhs_function.n_components,
-           ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    rhs_vector = 0;
+    AssertDimension(fe.n_components(), rhs_function.n_components);
+    AssertDimension(rhs_vector.size(), dof_handler.n_dofs());
+    rhs_vector = typename VectorType::value_type(0.0);
 
     UpdateFlags update_flags =
       UpdateFlags(update_values | update_quadrature_points | update_JxW_values);
@@ -514,15 +494,11 @@ namespace VectorTools
     std::vector<types::global_dof_index> dofs(fe.max_dofs_per_cell());
     Vector<Number>                       cell_vector(fe.max_dofs_per_cell());
 
-    typename DoFHandler<dim, spacedim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-
     if (n_components == 1)
       {
         std::vector<Number> rhs_values;
 
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof_handler.active_cell_iterators())
           if (cell->is_locally_owned())
             {
               x_fe_values.reinit(cell);
@@ -558,7 +534,7 @@ namespace VectorTools
       {
         std::vector<Vector<Number>> rhs_values;
 
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof_handler.active_cell_iterators())
           if (cell->is_locally_owned())
             {
               x_fe_values.reinit(cell);
