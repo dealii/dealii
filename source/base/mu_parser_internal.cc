@@ -222,6 +222,11 @@ namespace internal
     };
 #endif
 
+    template <int dim, typename Number>
+    ParserImplementation<dim, Number>::ParserImplementation()
+      : initialized(false)
+      , n_vars(0)
+    {}
 
 
 

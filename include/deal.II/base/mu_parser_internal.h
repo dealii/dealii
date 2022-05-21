@@ -158,10 +158,9 @@ namespace internal
     class ParserImplementation
     {
     public:
-      ParserImplementation()
-        : initialized(false)
-        , n_vars(0)
-      {}
+      ParserImplementation();
+
+      virtual ~ParserImplementation() = default;
 
       /**
        * Initialize the internal state of the object. This is the same as the
@@ -174,18 +173,42 @@ namespace internal
                  const std::map<std::string, double> &constants,
                  const bool                           time_dependent = false);
 
+      /**
+       * Set up the internal muParser objects to parse and evaluate mathematical
+       * expressions.
+       */
       void
       init_muparser() const;
 
+      /**
+       * Compute the value of a single component.
+       */
       Number
       do_value(const Point<dim> &p,
                const double      time,
                unsigned int      component) const;
 
+      /**
+       * Compute the values of all components.
+       */
       void
       do_all_values(const Point<dim> & p,
                     const double       time,
                     ArrayView<Number> &values) const;
+
+      /**
+       * An array of function expressions (one per component), required to
+       * initialize tfp in each thread.
+       */
+      std::vector<std::string> expressions;
+
+    private:
+      /**
+       * The muParser objects (hidden with the PIMPL idiom) for each thread (and
+       * one for each component).
+       */
+      mutable Threads::ThreadLocalStorage<internal::FunctionParser::ParserData>
+        parser_data;
 
       /**
        * An array to keep track of all the constants, required to initialize fp
@@ -198,12 +221,6 @@ namespace internal
        * thread.
        */
       std::vector<std::string> var_names;
-
-      /**
-       * An array of function expressions (one per component), required to
-       * initialize tfp in each thread.
-       */
-      std::vector<std::string> expressions;
 
       /**
        * State of usability. This variable is checked every time the function is
