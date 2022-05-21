@@ -155,47 +155,50 @@ namespace internal
       return uniform_distribution(rng);
     }
 
-    std::vector<std::string> function_names = {
-      // functions predefined by muparser
-      "sin",
-      "cos",
-      "tan",
-      "asin",
-      "acos",
-      "atan",
-      "sinh",
-      "cosh",
-      "tanh",
-      "asinh",
-      "acosh",
-      "atanh",
-      "atan2",
-      "log2",
-      "log10",
-      "log",
-      "ln",
-      "exp",
-      "sqrt",
-      "sign",
-      "rint",
-      "abs",
-      "min",
-      "max",
-      "sum",
-      "avg",
-      // functions we define ourselves above
-      "if",
-      "int",
-      "ceil",
-      "cot",
-      "csc",
-      "floor",
-      "sec",
-      "pow",
-      "erf",
-      "erfc",
-      "rand",
-      "rand_seed"};
+    std::vector<std::string>
+    get_function_names()
+    {
+      return {// functions predefined by muparser
+              "sin",
+              "cos",
+              "tan",
+              "asin",
+              "acos",
+              "atan",
+              "sinh",
+              "cosh",
+              "tanh",
+              "asinh",
+              "acosh",
+              "atanh",
+              "atan2",
+              "log2",
+              "log10",
+              "log",
+              "ln",
+              "exp",
+              "sqrt",
+              "sign",
+              "rint",
+              "abs",
+              "min",
+              "max",
+              "sum",
+              "avg",
+              // functions we define ourselves above
+              "if",
+              "int",
+              "ceil",
+              "cot",
+              "csc",
+              "floor",
+              "sec",
+              "pow",
+              "erf",
+              "erfc",
+              "rand",
+              "rand_seed"};
+    }
 
   } // namespace FunctionParser
 

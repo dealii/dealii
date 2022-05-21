@@ -136,7 +136,11 @@ namespace internal
     double
     mu_rand();
 
-    extern std::vector<std::string> function_names;
+    /**
+     * Get the array of all function names.
+     */
+    std::vector<std::string>
+    get_function_names();
 
   } // namespace FunctionParser
 

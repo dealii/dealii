@@ -209,7 +209,7 @@ FunctionParser<dim>::init_muparser() const
           std::string transformed_expression = expressions[component];
 
           for (const auto &current_function_name :
-               internal::FunctionParser::function_names)
+               internal::FunctionParser::get_function_names())
             {
               const unsigned int function_name_length =
                 current_function_name.size();
