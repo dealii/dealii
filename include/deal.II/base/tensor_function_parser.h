@@ -196,11 +196,11 @@ public:
    * method in this case is dim+1. The value of this parameter defaults to
    * false, i.e. do not consider time.
    */
-  void
+  virtual void
   initialize(const std::string &             vars,
              const std::vector<std::string> &expressions,
              const ConstMap &                constants,
-             const bool                      time_dependent = false);
+             const bool                      time_dependent = false) override;
 
   /**
    * Initialize the function. Same as above, but accepts a string rather than

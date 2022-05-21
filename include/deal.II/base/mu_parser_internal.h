@@ -164,11 +164,15 @@ namespace internal
       {}
 
       /**
-       * The muParser objects (hidden with the PIMPL idiom) for each thread (and
-       * one for each component).
+       * Initialize the internal state of the object. This is the same as the
+       * inheriting class method - see FunctionParser::initialize() for more
+       * information.
        */
-      mutable Threads::ThreadLocalStorage<internal::FunctionParser::ParserData>
-        parser_data;
+      virtual void
+      initialize(const std::string &                  vars,
+                 const std::vector<std::string> &     expressions,
+                 const std::map<std::string, double> &constants,
+                 const bool                           time_dependent = false);
 
       void
       init_muparser() const;

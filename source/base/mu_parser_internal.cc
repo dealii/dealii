@@ -15,6 +15,7 @@
 
 #include <deal.II/base/mu_parser_internal.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/utilities.h>
 
 #include <cmath>
 #include <ctime>
@@ -220,6 +221,44 @@ namespace internal
       mu::Parser parser;
     };
 #endif
+
+
+
+
+    template <int dim, typename Number>
+    void
+    ParserImplementation<dim, Number>::initialize(
+      const std::string &                  variables,
+      const std::vector<std::string> &     expressions,
+      const std::map<std::string, double> &constants,
+      const bool                           time_dependent)
+    {
+      this->parser_data.clear(); // this will reset all thread-local objects
+
+      this->constants   = constants;
+      this->var_names   = Utilities::split_string_list(variables, ',');
+      this->expressions = expressions;
+      AssertThrow(((time_dependent) ? dim + 1 : dim) == this->var_names.size(),
+                  ExcMessage("Wrong number of variables"));
+
+      // Now we define how many variables we expect to read in. We distinguish
+      // between two cases: Time dependent problems, and not time dependent
+      // problems. In the first case the number of variables is given by the
+      // dimension plus one. In the other case, the number of variables is equal
+      // to the dimension. Once we parsed the variables string, if none of this
+      // is the case, then an exception is thrown.
+      if (time_dependent)
+        this->n_vars = dim + 1;
+      else
+        this->n_vars = dim;
+
+      // create a parser object for the current thread we can then query in
+      // value() and vector_value(). this is not strictly necessary because a
+      // user may never call these functions on the current thread, but it gets
+      // us error messages about wrong formulas right away
+      this->init_muparser();
+      this->initialized = true;
+    }
 
 
 

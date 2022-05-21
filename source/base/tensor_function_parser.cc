@@ -20,10 +20,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_function.h>
 #include <deal.II/base/tensor_function_parser.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
-#include <cmath>
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN
@@ -79,49 +77,10 @@ TensorFunctionParser<rank, dim, Number>::initialize(
   const std::map<std::string, double> &constants,
   const bool                           time_dependent)
 {
-  this->parser_data.clear(); // this will reset all thread-local objects
-
-  this->constants   = constants;
-  this->var_names   = Utilities::split_string_list(variables, ',');
-  this->expressions = expressions;
-  AssertThrow(((time_dependent) ? dim + 1 : dim) == this->var_names.size(),
-              ExcMessage("Wrong number of variables"));
-
-  // We check that the number of
-  // components of this function
-  // matches the number of components
-  // passed in as a vector of
-  // strings.
   AssertThrow(this->n_components == expressions.size(),
               ExcInvalidExpressionSize(this->n_components, expressions.size()));
-
-  // Now we define how many variables
-  // we expect to read in.  We
-  // distinguish between two cases:
-  // Time dependent problems, and not
-  // time dependent problems. In the
-  // first case the number of
-  // variables is given by the
-  // dimension plus one. In the other
-  // case, the number of variables is
-  // equal to the dimension. Once we
-  // parsed the variables string, if
-  // none of this is the case, then
-  // an exception is thrown.
-  if (time_dependent)
-    this->n_vars = dim + 1;
-  else
-    this->n_vars = dim;
-
-  // create a parser object for the current thread we can then query
-  // in value() and vector_value(). this is not strictly necessary
-  // because a user may never call these functions on the current
-  // thread, but it gets us error messages about wrong formulas right
-  // away
-  this->init_muparser();
-
-  // finally set the initialization bit
-  this->initialized = true;
+  internal::FunctionParser::ParserImplementation<dim, Number>::initialize(
+    variables, expressions, constants, time_dependent);
 }
 
 
