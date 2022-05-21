@@ -372,10 +372,10 @@ namespace CGALWrappers
     Assert(CGAL::is_triangle_mesh(surface_mesh_2),
            ExcMessage("The second CGAL mesh must be triangulated."));
 
-    bool res      = false;
-    auto surf_1   = surface_mesh_1;
-    auto surf_2   = surface_mesh_2;
-    namespace PMP = CGAL::Polygon_mesh_processing;
+    [[maybe_unused]] bool res    = false;
+    auto                  surf_1 = surface_mesh_1;
+    auto                  surf_2 = surface_mesh_2;
+    namespace PMP                = CGAL::Polygon_mesh_processing;
     switch (boolean_operation)
       {
         case BooleanOperation::compute_union:

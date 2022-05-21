@@ -966,6 +966,388 @@ namespace NonMatching
           }
       }
   }
+
+
+
+#ifdef DEAL_II_WITH_CGAL
+  template <int dim0, int dim1, int spacedim>
+  std::vector<std::tuple<typename Triangulation<dim0, spacedim>::cell_iterator,
+                         typename Triangulation<dim1, spacedim>::cell_iterator,
+                         Quadrature<spacedim>>>
+  compute_intersection(const GridTools::Cache<dim0, spacedim> &space_cache,
+                       const GridTools::Cache<dim1, spacedim> &immersed_cache,
+                       const unsigned int                      degree,
+                       const double                            tol)
+  {
+    AssertThrow(
+      dim1 <= dim0,
+      ExcMessage(
+        "Intrinsic dimension of the immersed object must be smaller than dim0."));
+    AssertThrow(degree > 0, ExcMessage("Invalid quadrature degree."));
+    AssertThrow(dim0 == 3 && dim1 == 3 && spacedim == 3,
+                ExcNotImplemented("Not implemented for non-3D objects."));
+    const auto bool_op = CGALWrappers::BooleanOperation::compute_intersection;
+    std::vector<
+      std::tuple<typename Triangulation<dim0, spacedim>::cell_iterator,
+                 typename Triangulation<dim1, spacedim>::cell_iterator,
+                 Quadrature<spacedim>>>
+      cells_with_quadratures;
+
+    const auto &space_tree =
+      space_cache.get_locally_owned_cell_bounding_boxes_rtree();
+
+    // The immersed tree *must* contain all cells, also the non-locally owned
+    // ones.
+    const auto &immersed_tree = immersed_cache.get_cell_bounding_boxes_rtree();
+
+    // references to triangulations' info (cp cstrs marked as delete)
+    const auto &mapping0 = space_cache.get_mapping();
+    const auto &mapping1 = immersed_cache.get_mapping();
+    namespace bgi        = boost::geometry::index;
+    // Whenever the BB space_cell intersects the BB of an embedded cell,
+    // store the space_cell in the set of intersected_cells
+    for (const auto &[immersed_box, immersed_cell] : immersed_tree)
+      {
+        for (const auto &[space_box, space_cell] :
+             space_tree | bgi::adaptors::queried(bgi::intersects(immersed_box)))
+          {
+            const auto test_intersection = CGALWrappers::
+              compute_quadrature_on_boolean_operation<dim0, dim1, spacedim>(
+                space_cell, immersed_cell, degree, bool_op, mapping0, mapping1);
+
+            const auto & weights = test_intersection.get_weights();
+            const double area =
+              std::accumulate(weights.begin(), weights.end(), 0.0);
+            if (area > tol) // non-trivial intersection
+              {
+                cells_with_quadratures.push_back(std::make_tuple(
+                  space_cell, immersed_cell, test_intersection));
+              }
+          }
+      }
+    return cells_with_quadratures;
+  }
+
+
+
+  template <int dim0,
+            int dim1,
+            int spacedim,
+            typename Sparsity,
+            typename number>
+  void
+  create_coupling_sparsity_pattern_with_exact_intersections(
+    const std::vector<
+      std::tuple<typename dealii::Triangulation<dim0, spacedim>::cell_iterator,
+                 typename dealii::Triangulation<dim1, spacedim>::cell_iterator,
+                 dealii::Quadrature<spacedim>>> &intersections_info,
+    const DoFHandler<dim0, spacedim> &           space_dh,
+    const DoFHandler<dim1, spacedim> &           immersed_dh,
+    Sparsity &                                   sparsity,
+    const AffineConstraints<number> &            constraints,
+    const ComponentMask &                        space_comps,
+    const ComponentMask &                        immersed_comps,
+    const AffineConstraints<number> &            immersed_constraints)
+  {
+    AssertDimension(sparsity.n_rows(), space_dh.n_dofs());
+    AssertDimension(sparsity.n_cols(), immersed_dh.n_dofs());
+    Assert(dim1 <= dim0,
+           ExcMessage("This function can only work if dim1 <= dim0"));
+    AssertThrow(dim0 == 3 && dim1 == 3 && spacedim == 3,
+                ExcNotImplemented("Not implemented for non-3D objects."));
+    Assert((dynamic_cast<
+              const parallel::distributed::Triangulation<dim1, spacedim> *>(
+              &immersed_dh.get_triangulation()) == nullptr),
+           ExcNotImplemented());
+
+
+
+    const auto &       space_fe                 = space_dh.get_fe();
+    const auto &       immersed_fe              = immersed_dh.get_fe();
+    const unsigned int n_dofs_per_space_cell    = space_fe.n_dofs_per_cell();
+    const unsigned int n_dofs_per_immersed_cell = immersed_fe.n_dofs_per_cell();
+    const unsigned int n_space_fe_components    = space_fe.n_components();
+    const unsigned int n_immersed_fe_components = immersed_fe.n_components();
+    std::vector<types::global_dof_index> space_dofs(n_dofs_per_space_cell);
+    std::vector<types::global_dof_index> immersed_dofs(
+      n_dofs_per_immersed_cell);
+
+
+    const ComponentMask space_c =
+      (space_comps.size() == 0 ? ComponentMask(n_space_fe_components, true) :
+                                 space_comps);
+
+
+    const ComponentMask immersed_c =
+      (immersed_comps.size() == 0 ?
+         ComponentMask(n_immersed_fe_components, true) :
+         immersed_comps);
+
+    AssertDimension(space_c.size(), n_space_fe_components);
+    AssertDimension(immersed_c.size(), n_immersed_fe_components);
+
+
+    // Global 2 Local indices
+    std::vector<unsigned int> space_gtl(n_space_fe_components);
+    std::vector<unsigned int> immersed_gtl(n_immersed_fe_components);
+    for (unsigned int i = 0, j = 0; i < n_space_fe_components; ++i)
+      {
+        if (space_c[i])
+          space_gtl[i] = j++;
+      }
+
+
+    for (unsigned int i = 0, j = 0; i < n_immersed_fe_components; ++i)
+      {
+        if (immersed_c[i])
+          immersed_gtl[i] = j++;
+      }
+
+
+
+    Table<2, bool> dof_mask(n_dofs_per_space_cell, n_dofs_per_immersed_cell);
+    dof_mask.fill(false); // start off by assuming they don't couple
+
+    for (unsigned int i = 0; i < n_dofs_per_space_cell; ++i)
+      {
+        const auto comp_i = space_fe.system_to_component_index(i).first;
+        if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
+          {
+            for (unsigned int j = 0; j < n_dofs_per_immersed_cell; ++j)
+              {
+                const auto comp_j =
+                  immersed_fe.system_to_component_index(j).first;
+                if (immersed_gtl[comp_j] == space_gtl[comp_i])
+                  {
+                    dof_mask(i, j) = true;
+                  }
+              }
+          }
+      }
+
+    const bool dof_mask_is_active =
+      dof_mask.n_rows() == n_dofs_per_space_cell &&
+      dof_mask.n_cols() == n_dofs_per_immersed_cell;
+
+    // Whenever the BB space_cell intersects the BB of an embedded cell, those
+    // DoFs have to be recorded
+
+    for (const auto &it : intersections_info)
+      {
+        const auto &space_cell    = std::get<0>(it);
+        const auto &immersed_cell = std::get<1>(it);
+        typename DoFHandler<dim0, spacedim>::cell_iterator space_cell_dh(
+          *space_cell, &space_dh);
+        typename DoFHandler<dim1, spacedim>::cell_iterator immersed_cell_dh(
+          *immersed_cell, &immersed_dh);
+
+        space_cell_dh->get_dof_indices(space_dofs);
+        immersed_cell_dh->get_dof_indices(immersed_dofs);
+
+        if (dof_mask_is_active)
+          {
+            for (unsigned int i = 0; i < n_dofs_per_space_cell; ++i)
+              {
+                const unsigned int comp_i =
+                  space_dh.get_fe().system_to_component_index(i).first;
+                if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
+                  {
+                    for (unsigned int j = 0; j < n_dofs_per_immersed_cell; ++j)
+                      {
+                        const unsigned int comp_j =
+                          immersed_dh.get_fe()
+                            .system_to_component_index(j)
+                            .first;
+                        if (space_gtl[comp_i] == immersed_gtl[comp_j])
+                          {
+                            // local_cell_matrix(i, j) +=
+                            constraints.add_entries_local_to_global(
+                              {space_dofs[i]},
+                              immersed_constraints,
+                              {immersed_dofs[j]},
+                              sparsity,
+                              true);
+                          }
+                      }
+                  }
+              }
+          }
+        else
+          {
+            constraints.add_entries_local_to_global(space_dofs,
+                                                    immersed_constraints,
+                                                    immersed_dofs,
+                                                    sparsity,
+                                                    true,
+                                                    dof_mask);
+          }
+      }
+  }
+
+
+
+  template <int dim0, int dim1, int spacedim, typename Matrix>
+  void
+  create_coupling_mass_matrix_with_exact_intersections(
+    const DoFHandler<dim0, spacedim> &space_dh,
+    const DoFHandler<dim1, spacedim> &immersed_dh,
+    const std::vector<
+      std::tuple<typename Triangulation<dim0, spacedim>::cell_iterator,
+                 typename Triangulation<dim1, spacedim>::cell_iterator,
+                 Quadrature<spacedim>>> &                 cells_and_quads,
+    Matrix &                                              matrix,
+    const AffineConstraints<typename Matrix::value_type> &space_constraints,
+    const ComponentMask &                                 space_comps,
+    const ComponentMask &                                 immersed_comps,
+    const Mapping<dim0, spacedim> &                       space_mapping,
+    const Mapping<dim1, spacedim> &                       immersed_mapping,
+    const AffineConstraints<typename Matrix::value_type> &immersed_constraints)
+  {
+    AssertDimension(matrix.m(), space_dh.n_dofs());
+    AssertDimension(matrix.n(), immersed_dh.n_dofs());
+    Assert(dim1 <= dim0,
+           ExcMessage("This function can only work if dim1<=dim0"));
+    AssertThrow(dim0 == 3 && dim1 == 3 && spacedim == 3,
+                ExcNotImplemented("Not implemented for non-3D objects."));
+    Assert((dynamic_cast<
+              const parallel::distributed::Triangulation<dim1, spacedim> *>(
+              &immersed_dh.get_triangulation()) == nullptr),
+           ExcMessage("The immersed triangulation can only be a "
+                      "parallel::shared::triangulation"));
+
+    const auto &space_fe    = space_dh.get_fe();
+    const auto &immersed_fe = immersed_dh.get_fe();
+
+    const unsigned int n_dofs_per_space_cell    = space_fe.n_dofs_per_cell();
+    const unsigned int n_dofs_per_immersed_cell = immersed_fe.n_dofs_per_cell();
+
+    const unsigned int n_space_fe_components    = space_fe.n_components();
+    const unsigned int n_immersed_fe_components = immersed_fe.n_components();
+
+    FullMatrix<typename Matrix::value_type> local_cell_matrix(
+      n_dofs_per_space_cell, n_dofs_per_immersed_cell);
+    // DoF indices
+    std::vector<types::global_dof_index> local_space_dof_indices(
+      n_dofs_per_space_cell);
+    std::vector<types::global_dof_index> local_immersed_dof_indices(
+      n_dofs_per_immersed_cell);
+
+    const ComponentMask space_c =
+      (space_comps.size() == 0 ? ComponentMask(n_space_fe_components, true) :
+                                 space_comps);
+    const ComponentMask immersed_c =
+      (immersed_comps.size() == 0 ?
+         ComponentMask(n_immersed_fe_components, true) :
+         immersed_comps);
+
+    AssertDimension(space_c.size(), n_space_fe_components);
+    AssertDimension(immersed_c.size(), n_immersed_fe_components);
+
+    std::vector<unsigned int> space_gtl(n_space_fe_components,
+                                        numbers::invalid_unsigned_int);
+    std::vector<unsigned int> immersed_gtl(n_immersed_fe_components,
+                                           numbers::invalid_unsigned_int);
+    for (unsigned int i = 0, j = 0; i < n_space_fe_components; ++i)
+      {
+        if (space_c[i])
+          space_gtl[i] = j++;
+      }
+
+    for (unsigned int i = 0, j = 0; i < n_immersed_fe_components; ++i)
+      {
+        if (immersed_c[i])
+          immersed_gtl[i] = j++;
+      }
+
+    Table<2, bool> dof_mask(n_dofs_per_space_cell, n_dofs_per_immersed_cell);
+    dof_mask.fill(false); // start off by assuming they don't couple
+
+    for (unsigned int i = 0; i < n_dofs_per_space_cell; ++i)
+      {
+        const auto comp_i = space_fe.system_to_component_index(i).first;
+        if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
+          {
+            for (unsigned int j = 0; j < n_dofs_per_immersed_cell; ++j)
+              {
+                const auto comp_j =
+                  immersed_fe.system_to_component_index(j).first;
+                if (immersed_gtl[comp_j] == space_gtl[comp_i])
+                  {
+                    dof_mask(i, j) = true;
+                  }
+              }
+          }
+      }
+
+    // Loop over vector of tuples, and gather everything together
+    for (const auto &infos : cells_and_quads)
+      {
+        const auto &[first_cell, second_cell, quad_formula] = infos;
+
+        local_cell_matrix = typename Matrix::value_type();
+
+        const unsigned int       n_quad_pts = quad_formula.size();
+        const auto &             real_qpts  = quad_formula.get_points();
+        std::vector<Point<dim0>> ref_pts_space(n_quad_pts);
+        std::vector<Point<dim1>> ref_pts_immersed(n_quad_pts);
+
+        space_mapping.transform_points_real_to_unit_cell(first_cell,
+                                                         real_qpts,
+                                                         ref_pts_space);
+        immersed_mapping.transform_points_real_to_unit_cell(second_cell,
+                                                            real_qpts,
+                                                            ref_pts_immersed);
+        const auto &JxW = quad_formula.get_weights();
+        for (unsigned int q = 0; q < n_quad_pts; ++q)
+          {
+            for (unsigned int i = 0; i < n_dofs_per_space_cell; ++i)
+              {
+                const unsigned int comp_i =
+                  space_dh.get_fe().system_to_component_index(i).first;
+                if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
+                  {
+                    for (unsigned int j = 0; j < n_dofs_per_immersed_cell; ++j)
+                      {
+                        const unsigned int comp_j =
+                          immersed_dh.get_fe()
+                            .system_to_component_index(j)
+                            .first;
+                        if (space_gtl[comp_i] == immersed_gtl[comp_j])
+                          {
+                            local_cell_matrix(i, j) +=
+                              space_fe.shape_value(i, ref_pts_space[q]) *
+                              immersed_fe.shape_value(j, ref_pts_immersed[q]) *
+                              JxW[q];
+                          }
+                      }
+                  }
+              }
+          }
+        typename DoFHandler<dim0, spacedim>::cell_iterator space_cell_dh(
+          *first_cell, &space_dh);
+        typename DoFHandler<dim1, spacedim>::cell_iterator immersed_cell_dh(
+          *second_cell, &immersed_dh);
+        space_cell_dh->get_dof_indices(local_space_dof_indices);
+        immersed_cell_dh->get_dof_indices(local_immersed_dof_indices);
+
+        space_constraints.distribute_local_to_global(local_cell_matrix,
+                                                     local_space_dof_indices,
+                                                     immersed_constraints,
+                                                     local_immersed_dof_indices,
+                                                     matrix);
+      }
+    matrix.compress(VectorOperation::add);
+  }
+
+
+  template std::vector<std::tuple<typename Triangulation<3, 3>::cell_iterator,
+                                  typename Triangulation<3, 3>::cell_iterator,
+                                  Quadrature<3>>>
+  compute_intersection(const GridTools::Cache<3, 3> &space_cache,
+                       const GridTools::Cache<3, 3> &immersed_cache,
+                       const unsigned int            degree,
+                       const double                  tol);
+#endif
 #ifndef DOXYGEN
 #  include "coupling.inst"
 #endif

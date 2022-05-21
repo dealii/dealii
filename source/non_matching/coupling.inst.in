@@ -43,6 +43,21 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const Mapping<dim1, spacedim> &         immersed_mapping,
       const AffineConstraints<S> &            immersed_constraints);
 
+#  ifdef DEAL_II_WITH_CGAL
+    template void create_coupling_sparsity_pattern_with_exact_intersections(
+      const std::vector<
+        std::tuple<typename Triangulation<dim0, spacedim>::cell_iterator,
+                   typename Triangulation<dim1, spacedim>::cell_iterator,
+                   Quadrature<spacedim>>> &intersections_info,
+      const DoFHandler<dim0, spacedim> &   space_dh,
+      const DoFHandler<dim1, spacedim> &   immersed_dh,
+      Sparsity &                           sparsity,
+      const AffineConstraints<S> &         constraints,
+      const ComponentMask &                space_comps,
+      const ComponentMask &                immersed_comps,
+      const AffineConstraints<S> &         immersed_constraints);
+#  endif
+
     template void create_coupling_sparsity_pattern(
       const double &                          epsilon,
       const GridTools::Cache<dim0, spacedim> &cache0,
@@ -99,5 +114,22 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS;
       const AffineConstraints<typename Matrix::value_type> &constraints0,
       const ComponentMask &                                 comps0,
       const ComponentMask &                                 comps1);
+
+#  ifdef DEAL_II_WITH_CGAL
+    template void create_coupling_mass_matrix_with_exact_intersections(
+      const DoFHandler<dim0, spacedim> &,
+      const DoFHandler<dim1, spacedim> &,
+      const std::vector<
+        std::tuple<typename Triangulation<dim0, spacedim>::cell_iterator,
+                   typename Triangulation<dim1, spacedim>::cell_iterator,
+                   Quadrature<spacedim>>> &,
+      Matrix &matrix,
+      const AffineConstraints<Matrix::value_type> &,
+      const ComponentMask &,
+      const ComponentMask &,
+      const Mapping<dim0, spacedim> &,
+      const Mapping<dim1, spacedim> &,
+      const AffineConstraints<Matrix::value_type> &);
+#  endif
 #endif
   }
