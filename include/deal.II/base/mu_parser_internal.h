@@ -38,6 +38,62 @@ namespace internal
 {
   namespace FunctionParser
   {
+    int
+    mu_round(double val);
+
+    double
+    mu_if(double condition, double thenvalue, double elsevalue);
+
+    double
+    mu_or(double left, double right);
+
+    double
+    mu_and(double left, double right);
+
+    double
+    mu_int(double value);
+
+    double
+    mu_ceil(double value);
+
+    double
+    mu_floor(double value);
+
+    double
+    mu_cot(double value);
+
+    double
+    mu_csc(double value);
+
+    double
+    mu_sec(double value);
+
+    double
+    mu_log(double value);
+
+    double
+    mu_pow(double a, double b);
+
+    double
+    mu_erf(double value);
+
+    double
+    mu_erfc(double value);
+
+    // returns a random value in the range [0,1] initializing the generator
+    // with the given seed
+    double
+    mu_rand_seed(double seed);
+
+    // returns a random value in the range [0,1]
+    double
+    mu_rand();
+
+    /**
+     * Get the array of all function names.
+     */
+    std::vector<std::string>
+    get_function_names();
     /**
      * deal.II uses muParser as a purely internal dependency. To this end, we do
      * not include any muParser headers in our own headers (and the bundled
@@ -138,62 +194,6 @@ namespace internal
       unsigned int n_vars;
     };
 
-    int
-    mu_round(double val);
-
-    double
-    mu_if(double condition, double thenvalue, double elsevalue);
-
-    double
-    mu_or(double left, double right);
-
-    double
-    mu_and(double left, double right);
-
-    double
-    mu_int(double value);
-
-    double
-    mu_ceil(double value);
-
-    double
-    mu_floor(double value);
-
-    double
-    mu_cot(double value);
-
-    double
-    mu_csc(double value);
-
-    double
-    mu_sec(double value);
-
-    double
-    mu_log(double value);
-
-    double
-    mu_pow(double a, double b);
-
-    double
-    mu_erf(double value);
-
-    double
-    mu_erfc(double value);
-
-    // returns a random value in the range [0,1] initializing the generator
-    // with the given seed
-    double
-    mu_rand_seed(double seed);
-
-    // returns a random value in the range [0,1]
-    double
-    mu_rand();
-
-    /**
-     * Get the array of all function names.
-     */
-    std::vector<std::string>
-    get_function_names();
 
   } // namespace FunctionParser
 
