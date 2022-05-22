@@ -98,8 +98,18 @@ MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 
 #ifdef DEAL_II_WITH_TBB
 #  ifdef DEAL_II_TBB_WITH_ONEAPI
-  tbb::global_control(tbb::global_control::max_allowed_parallelism,
-                      n_max_threads);
+  // tbb::global_control is a class that affects the specified behavior of
+  // tbb during its lifetime. Thus, in order to set a global thread limit
+  // for tbb we have to maintain the object throughout the execution of the
+  // program. We do this by maintaining a static std::unique_ptr.
+  //
+  // A std::unique_ptr is a good choice here because tbb::global_control
+  // does not provide a mechanism to override its setting - we can only
+  // delete the old and replace it with a new one.
+  static std::unique_ptr<tbb::global_control> tbb_global_control;
+  tbb_global_control = std::make_unique<tbb::global_control>(
+    tbb::global_control::max_allowed_parallelism, n_max_threads);
+
 #  else
   // Initialize the scheduler and destroy the old one before doing so
   static tbb::task_scheduler_init dummy(tbb::task_scheduler_init::deferred);
