@@ -1,21 +1,53 @@
 
 DEAL::dim=2 spacedim=2:
-DEAL::measure:  0.500000
-DEAL::diameter: 1.41421
-DEAL::barycenter: 0.333333 0.333333
-DEAL::diameter_min: 1.41421
-DEAL::diameter_max: 1.41421
+DEAL::measure: 0.500000
+DEAL::measure (via quadrature): 0.500000
+DEAL::diameter 1.41421
+DEAL::barycenter 0.333333 0.333333
+DEAL::diameter_min 1.41421
+DEAL::diameter_max 1.41421
 DEAL::
-DEAL::dim=3 spacedim=3:
-DEAL::measure:  0.166667
-DEAL::diameter: 1.41421
-DEAL::barycenter: 0.250000 0.250000 0.250000
-DEAL::diameter_min: 1.41421
-DEAL::diameter_max: 1.41421
-DEAL::
-DEAL::dim=3 spacedim=3:
-DEAL::measure:  0.500000
-DEAL::diameter: 1.73205
-DEAL::diameter_min: 1.73205
-DEAL::diameter_max: 1.73205
-DEAL::
+DEAL:basic tetrahedron::dim=3 spacedim=3:
+DEAL:basic tetrahedron::measure: 0.166667
+DEAL:basic tetrahedron::measure (via quadrature): 0.166667
+DEAL:basic tetrahedron::diameter 1.41421
+DEAL:basic tetrahedron::barycenter 0.250000 0.250000 0.250000
+DEAL:basic tetrahedron::diameter_min 1.41421
+DEAL:basic tetrahedron::diameter_max 1.41421
+DEAL:basic tetrahedron::
+DEAL:basic wedge::dim=3 spacedim=3:
+DEAL:basic wedge::measure: 0.500000
+DEAL:basic wedge::measure (via quadrature): 0.500000
+DEAL:basic wedge::diameter 1.73205
+DEAL:basic wedge::diameter_min 1.73205
+DEAL:basic wedge::diameter_max 1.73205
+DEAL:basic wedge::
+DEAL:basic pyramid::dim=3 spacedim=3:
+DEAL:basic pyramid::measure: 0.333333
+DEAL:basic pyramid::measure (via quadrature): 0.333333
+DEAL:basic pyramid::diameter 1.41421
+DEAL:basic pyramid::diameter_min 1.41421
+DEAL:basic pyramid::diameter_max 1.41421
+DEAL:basic pyramid::
+DEAL:general tetrahedron::dim=3 spacedim=3:
+DEAL:general tetrahedron::measure: 0.0312500
+DEAL:general tetrahedron::measure (via quadrature): 0.0312500
+DEAL:general tetrahedron::diameter 1.01980
+DEAL:general tetrahedron::barycenter 0.187500 0.437500 0.200000
+DEAL:general tetrahedron::diameter_min 1.01980
+DEAL:general tetrahedron::diameter_max 1.01980
+DEAL:general tetrahedron::
+DEAL:general wedge::dim=3 spacedim=3:
+DEAL:general wedge::measure: 1.13283
+DEAL:general wedge::measure (via quadrature): 1.13283
+DEAL:general wedge::diameter 2.58650
+DEAL:general wedge::diameter_min 2.58650
+DEAL:general wedge::diameter_max 2.58650
+DEAL:general wedge::
+DEAL:general pyramid::dim=3 spacedim=3:
+DEAL:general pyramid::measure: 2.02375
+DEAL:general pyramid::measure (via quadrature): 2.02375
+DEAL:general pyramid::diameter 3.90512
+DEAL:general pyramid::diameter_min 3.90512
+DEAL:general pyramid::diameter_max 3.90512
+DEAL:general pyramid::
