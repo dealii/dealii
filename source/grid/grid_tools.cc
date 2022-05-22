@@ -871,16 +871,8 @@ namespace GridTools
     const std::vector<Point<spacedim>> &all_vertices,
     std::vector<CellData<dim>> &        cells)
   {
-    // This function only works for quads and hexes,
-    // and triangles. From the examples we tested,
-    // tetrahedron meshes loaded from Gmsh don't have
-    // negative measures, so we skip them for now.
-
-    // Since we use std::abs() in GridTools::cell_measure() to
-    // compute the measures of tetrahdra, the measures
-    // are always positive. But if the orientation is wrong,
-    // we may get negative determinants of the Jacobians in
-    // MappingFE, which will triger the assert there.
+    // This function is presently only implemented for hypercube and simplex
+    // volumetric (codimension 0) elements.
 
     if (dim == 1)
       return 0;
@@ -919,15 +911,11 @@ namespace GridTools
                        .is_simplex())
               {
                 ++n_negative_cells;
-                if (dim == 2)
-                  {
-                    // Triangular mesh, swap any two vertices
-                    std::swap(cell.vertices[1], cell.vertices[2]);
-                  }
-                else
-                  {
-                    AssertThrow(false, ExcNotImplemented());
-                  }
+                // By basic rules for computing determinants we can just swap
+                // two vertices to fix a negative volume. Arbitrarily pick the
+                // last two.
+                std::swap(cell.vertices[n_vertices - 2],
+                          cell.vertices[n_vertices - 1]);
               }
             else
               {

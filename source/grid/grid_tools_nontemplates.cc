@@ -128,7 +128,7 @@ namespace GridTools
         const auto &c = all_vertices[vertex_indices[2]];
         const auto &d = all_vertices[vertex_indices[3]];
 
-        return (1.0 / 6.0) * std::abs((a - d) * cross_product_3d(b - d, c - d));
+        return (1.0 / 6.0) * (d - a) * cross_product_3d(b - a, c - a);
       }
     else if (vertex_indices.size() == 5) // pyramid
       {
