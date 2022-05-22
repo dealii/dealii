@@ -1,0 +1,6 @@
+New: The Utilities::pack() and Utilities::unpack() functions are now
+optimized for the rather common case where the argument is of type
+`std::vector<T>` where `T` is a type that can be copied bit by bit
+(using `memcpy()`).
+<br>
+(Wolfgang Bangerth, 2022/05/05)
