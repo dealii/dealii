@@ -127,15 +127,15 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    BlockVector<Number>::reinit(const std::vector<size_type> &n,
+    BlockVector<Number>::reinit(const std::vector<size_type> &block_sizes,
                                 const bool omit_zeroing_entries)
     {
-      this->block_indices.reinit(n);
+      this->block_indices.reinit(block_sizes);
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
 
       for (size_type i = 0; i < this->n_blocks(); ++i)
-        this->components[i].reinit(n[i], omit_zeroing_entries);
+        this->components[i].reinit(block_sizes[i], omit_zeroing_entries);
     }
 
 

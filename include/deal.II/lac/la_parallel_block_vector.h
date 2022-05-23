@@ -276,7 +276,7 @@ namespace LinearAlgebra
        * be routed to the wrong block.
        */
       void
-      reinit(const std::vector<size_type> &N,
+      reinit(const std::vector<size_type> &block_sizes,
              const bool                    omit_zeroing_entries = false);
 
       /**
