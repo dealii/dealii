@@ -1,0 +1,7 @@
+New: PreconditionChebyshev can now also estimate eigenvalues with the power
+method, rather than the Lanczos algorithm underlying the SolverCG
+estimation. This is useful for matrices that are slightly non-symmetric such
+that the eigenvalue estimate of SolverCG breaks down, but not too much so that
+the Chebyshev iteration is still a useful iteration.
+<br>
+(Martin Kronbichler, 2022/05/23)
