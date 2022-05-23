@@ -312,6 +312,12 @@ namespace SUNDIALS
     , kinsol_mem(nullptr)
   {
     set_functions_to_trigger_an_assert();
+
+    #if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    const int status = SUNContext_Create(&mpi_communicator, &kinsol_ctx);
+    (void)status;
+    AssertKINSOL(status);
+    #endif
   }
 
 
@@ -325,12 +331,11 @@ namespace SUNDIALS
     if (kinsol_mem)
       {
         KINFree(&kinsol_mem);
-
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-        status = SUNContext_Free(&kinsol_ctx);
-        AssertKINSOL(status);
-#  endif
       }
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    status = SUNContext_Free(&kinsol_ctx);
+    AssertKINSOL(status);
+#  endif
 
 #  ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
