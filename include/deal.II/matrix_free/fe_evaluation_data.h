@@ -736,13 +736,13 @@ protected:
 
   /**
    * A pointer to the inverse transpose Jacobian information of the present
-   * cell. Only set to a useful value if on a non-Cartesian cell. If the cell is
-   * Cartesian/affine then the Jacobian is stored at index 1. For faces on
-   * hypercube elements, the derivatives are reorder s.t the derivative
-   * orthogonal to the face is stored last, i.e for dim = 3 and face_no = 0 or
-   * 1, the derivatives are ordered as [dy, dz, dx], face_no = 2 or 3: [dz, dx,
-   * dy], and face_no = 5 or 6: [dx, dy, dz]. If the Jacobian also is stored,
-   * the components are instead reordered in the same way.
+   * cell. Only the first inverse transpose Jacobian (q_point = 0) is set for
+   * Cartesian/affine cells, and the actual Jacobian is stored at index 1
+   * instead. For faces on hypercube elements, the derivatives are reorder s.t.
+   * the derivative orthogonal to the face is stored last, i.e for dim = 3 and
+   * face_no = 0 or 1, the derivatives are ordered as [dy, dz, dx], face_no = 2
+   * or 3: [dz, dx, dy], and face_no = 5 or 6: [dx, dy, dz]. If the Jacobian
+   * also is stored, the components are instead reordered in the same way.
    * Filled from MappingInfoStorage.jacobians in
    * include/deal.II/matrix_free/mapping_info.templates.h
    */
