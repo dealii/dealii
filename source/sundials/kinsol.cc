@@ -313,11 +313,11 @@ namespace SUNDIALS
   {
     set_functions_to_trigger_an_assert();
 
-    #if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     const int status = SUNContext_Create(&mpi_communicator, &kinsol_ctx);
     (void)status;
     AssertKINSOL(status);
-    #endif
+#  endif
   }
 
 
@@ -355,7 +355,7 @@ namespace SUNDIALS
 
     if (get_solution_scaling)
       u_scale = internal::make_nvector_view(get_solution_scaling()
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                               ,
                                             kinsol_ctx
 #  endif
@@ -365,7 +365,7 @@ namespace SUNDIALS
         reinit_vector(u_scale_temp);
         u_scale_temp = 1.0;
         u_scale      = internal::make_nvector_view(u_scale_temp
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                               ,
                                               kinsol_ctx
 #  endif
@@ -374,7 +374,7 @@ namespace SUNDIALS
 
     if (get_function_scaling)
       f_scale = internal::make_nvector_view(get_function_scaling()
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                               ,
                                             kinsol_ctx
 #  endif
@@ -384,7 +384,7 @@ namespace SUNDIALS
         reinit_vector(f_scale_temp);
         f_scale_temp = 1.0;
         f_scale      = internal::make_nvector_view(f_scale_temp
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                               ,
                                               kinsol_ctx
 #  endif
@@ -406,7 +406,7 @@ namespace SUNDIALS
       }
 
     auto solution = internal::make_nvector_view(initial_guess_and_solution
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                                 ,
                                                 kinsol_ctx
 #  endif
@@ -419,7 +419,7 @@ namespace SUNDIALS
       {
         KINFree(&kinsol_mem);
 
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
         status = SUNContext_Free(&kinsol_ctx);
         AssertKINSOL(status);
 #  endif
