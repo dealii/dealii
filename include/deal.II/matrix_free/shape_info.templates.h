@@ -81,6 +81,7 @@ namespace internal
     }
 
 
+
     template <int dim>
     void
     get_element_type_specific_information(
@@ -131,15 +132,13 @@ namespace internal
       else
         Assert(false, ExcNotImplemented());
 
-      // Finally store the renumbering into the member variable of this
-      // class
+      // Finally store the renumbering into the respective field
       if (fe_in.n_components() == 1)
         lexicographic_numbering = scalar_lexicographic;
       else
         {
-          // have more than one component, get the inverse
-          // permutation, invert it, sort the components one after one,
-          // and invert back
+          // have more than one component, get the inverse permutation, invert
+          // it, sort the components one by one, and invert back
           std::vector<unsigned int> scalar_inv =
             Utilities::invert_permutation(scalar_lexicographic);
           std::vector<unsigned int> lexicographic(
@@ -170,6 +169,8 @@ namespace internal
               }
         }
     }
+
+
 
     template <int dim_to, int dim, int spacedim>
     std::unique_ptr<FiniteElement<dim_to, dim_to>>
@@ -739,15 +740,13 @@ namespace internal
           quadrature_data_on_face[0].resize(quad.size() * 3);
           quadrature_data_on_face[1].resize(quad.size() * 3);
 
-          dealii::FE_DGQArbitraryNodes<1> fe_quad(quad);
+          const std::vector<Polynomials::Polynomial<double>> poly_coll =
+            Polynomials::generate_complete_Lagrange_basis(quad.get_points());
 
           for (unsigned int i = 0; i < quad.size(); ++i)
             {
-              Point<1> q_point;
-              q_point[0]                    = 0;
-              quadrature_data_on_face[0][i] = fe_quad.shape_value(i, q_point);
-              q_point[0]                    = 1;
-              quadrature_data_on_face[1][i] = fe_quad.shape_value(i, q_point);
+              quadrature_data_on_face[0][i] = poly_coll[i].value(0.0);
+              quadrature_data_on_face[1][i] = poly_coll[i].value(1.0);
             }
         }
 
@@ -762,81 +761,51 @@ namespace internal
           auto &subface_interpolation_matrix_scalar_1 =
             univariate_shape_data.subface_interpolation_matrices_scalar[1];
 
-          const auto fe_1d = create_fe<1>(fe);
-          const auto fe_2d = create_fe<2>(fe);
+          const unsigned int nn = fe_degree + 1;
+          subface_interpolation_matrix_0.resize(nn * nn);
+          subface_interpolation_matrix_1.resize(nn * nn);
+          subface_interpolation_matrix_scalar_0.resize(nn * nn);
+          subface_interpolation_matrix_scalar_1.resize(nn * nn);
 
-          FullMatrix<double> interpolation_matrix_0(fe_2d->n_dofs_per_face(0),
-                                                    fe_2d->n_dofs_per_face(0));
-          FullMatrix<double> interpolation_matrix_1(fe_2d->n_dofs_per_face(0),
-                                                    fe_2d->n_dofs_per_face(0));
+          std::vector<Point<1>> fe_q_points = QGaussLobatto<1>(nn).get_points();
+          const std::vector<Polynomials::Polynomial<double>> poly =
+            Polynomials::generate_complete_Lagrange_basis(fe_q_points);
 
-          fe_2d->get_subface_interpolation_matrix(*fe_2d,
-                                                  0,
-                                                  interpolation_matrix_0,
-                                                  0);
-
-          fe_2d->get_subface_interpolation_matrix(*fe_2d,
-                                                  1,
-                                                  interpolation_matrix_1,
-                                                  0);
-
-          ElementType               element_type;
-          std::vector<unsigned int> scalar_lexicographic;
-          std::vector<unsigned int> lexicographic_numbering;
-
-          get_element_type_specific_information(*fe_1d,
-                                                *fe_1d,
-                                                0,
-                                                element_type,
-                                                scalar_lexicographic,
-                                                lexicographic_numbering);
-
-          subface_interpolation_matrix_0.resize(fe_1d->n_dofs_per_cell() *
-                                                fe_1d->n_dofs_per_cell());
-          subface_interpolation_matrix_1.resize(fe_1d->n_dofs_per_cell() *
-                                                fe_1d->n_dofs_per_cell());
-
-          subface_interpolation_matrix_scalar_0.resize(
-            fe_1d->n_dofs_per_cell() * fe_1d->n_dofs_per_cell());
-          subface_interpolation_matrix_scalar_1.resize(
-            fe_1d->n_dofs_per_cell() * fe_1d->n_dofs_per_cell());
-
-          for (unsigned int i = 0, c = 0; i < fe_1d->n_dofs_per_cell(); ++i)
-            for (unsigned int j = 0; j < fe_1d->n_dofs_per_cell(); ++j, ++c)
+          for (unsigned int i = 0, c = 0; i < nn; ++i)
+            for (unsigned int j = 0; j < nn; ++j, ++c)
               {
-                subface_interpolation_matrix_0[c] =
-                  interpolation_matrix_0(scalar_lexicographic[i],
-                                         scalar_lexicographic[j]);
-                subface_interpolation_matrix_1[c] =
-                  interpolation_matrix_1(scalar_lexicographic[i],
-                                         scalar_lexicographic[j]);
-
                 subface_interpolation_matrix_scalar_0[c] =
-                  interpolation_matrix_0(scalar_lexicographic[i],
-                                         scalar_lexicographic[j]);
+                  poly[j].value(0.5 * fe_q_points[i][0]);
+                subface_interpolation_matrix_0[c] =
+                  subface_interpolation_matrix_scalar_0[c];
                 subface_interpolation_matrix_scalar_1[c] =
-                  interpolation_matrix_1(scalar_lexicographic[i],
-                                         scalar_lexicographic[j]);
+                  poly[j].value(0.5 + 0.5 * fe_q_points[i][0]);
+                subface_interpolation_matrix_1[c] =
+                  subface_interpolation_matrix_scalar_1[c];
               }
         }
 
       // get gradient and Hessian transformation matrix for the polynomial
       // space associated with the quadrature rule (collocation space). We
       // need to avoid the case with more than a few hundreds of quadrature
-      // points when the Lagrange polynomials constructed in
-      // FE_DGQArbitraryNodes underflow.
+      // points when the Lagrange polynomials might underflow. Note that 200
+      // is not an exact value, as different quadrature formulas behave
+      // slightly differently, but 200 has been observed to be low enough for
+      // all common quadrature formula types. For QGauss, the actual limit is
+      // 517 points, for example.
       if (n_q_points_1d < 200)
         {
           shape_gradients_collocation.resize(n_q_points_1d * n_q_points_1d);
           shape_hessians_collocation.resize(n_q_points_1d * n_q_points_1d);
-          FE_DGQArbitraryNodes<1> fe_coll(quad.get_points());
+          const std::vector<Polynomials::Polynomial<double>> poly_coll =
+            Polynomials::generate_complete_Lagrange_basis(quad.get_points());
+          std::array<double, 3> values;
           for (unsigned int i = 0; i < n_q_points_1d; ++i)
             for (unsigned int q = 0; q < n_q_points_1d; ++q)
               {
-                shape_gradients_collocation[i * n_q_points_1d + q] =
-                  fe_coll.shape_grad(i, quad.get_points()[q])[0];
-                shape_hessians_collocation[i * n_q_points_1d + q] =
-                  fe_coll.shape_grad_grad(i, quad.get_points()[q])[0][0];
+                poly_coll[i].value(quad.get_points()[q][0], 2, values.data());
+                shape_gradients_collocation[i * n_q_points_1d + q] = values[1];
+                shape_hessians_collocation[i * n_q_points_1d + q]  = values[2];
               }
 
           // compute the inverse shape functions in three steps: we first
@@ -859,7 +828,7 @@ namespace internal
           for (unsigned int i = 0; i < n_q_points_1d; ++i)
             for (unsigned int j = 0; j < n_q_points_1d; ++j)
               transform_to_gauss(i, j) =
-                fe_coll.shape_value(j, quad_gauss.point(i));
+                poly_coll[j].value(quad_gauss.point(i)[0]);
 
           // step 2: computation for the projection (in reference coordinates)
           // from higher to lower polynomial degree
@@ -872,15 +841,17 @@ namespace internal
           // polynomials where most of the interpolation matrices are unit
           // matrices when applying the inverse mass matrix, so we do not need
           // to compute much.
-          QGauss<1>               quad_project(n_dofs_1d);
-          FE_DGQArbitraryNodes<1> fe_project(quad_project.get_points());
+          QGauss<1> quad_project(n_dofs_1d);
+          const std::vector<Polynomials::Polynomial<double>> poly_project =
+            Polynomials::generate_complete_Lagrange_basis(
+              quad_project.get_points());
 
           FullMatrix<double> project_gauss(n_dofs_1d, n_q_points_1d);
 
           for (unsigned int i = 0; i < n_dofs_1d; ++i)
             for (unsigned int q = 0; q < n_q_points_1d; ++q)
               project_gauss(i, q) =
-                fe_project.shape_value(i, quad_gauss.get_points()[q]) *
+                poly_project[i].value(quad_gauss.get_points()[q][0]) *
                 (quad_gauss.weight(q) / quad_project.weight(i));
           FullMatrix<double> project_to_dof_space(n_dofs_1d, n_q_points_1d);
           project_gauss.mmult(project_to_dof_space, transform_to_gauss);
@@ -899,11 +870,8 @@ namespace internal
             {
               for (unsigned int i = 0; i < n_dofs_1d; ++i)
                 for (unsigned int j = 0; j < n_dofs_1d; ++j)
-                  transform_from_gauss(i, j) = fe_project.shape_value(
-                    j,
-                    Point<1>(
-                      fe.get_unit_support_points()[scalar_lexicographic[i]]
-                                                  [0]));
+                  transform_from_gauss(i, j) = poly_project[j].value(
+                    fe.get_unit_support_points()[scalar_lexicographic[i]][0]);
               FullMatrix<double> result(n_dofs_1d, n_q_points_1d);
               transform_from_gauss.mmult(result, project_to_dof_space);
 
@@ -1178,8 +1146,9 @@ namespace internal
       shape_hessians_eo =
         convert_to_eo(shape_hessians, fe_degree + 1, n_q_points_1d);
 
-      // FE_DGQArbitraryNodes underflow (see also above where
-      // shape_gradients_collocation and shape_hessians_collocation is set up).
+      // Avoid underflow of Lagrange polynomials on typical quadrature
+      // formulas (see also above where shape_gradients_collocation and
+      // shape_hessians_collocation is set up).
       if (n_q_points_1d < 200)
         {
           shape_gradients_collocation_eo =
