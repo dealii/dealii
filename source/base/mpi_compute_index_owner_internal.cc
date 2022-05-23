@@ -47,14 +47,11 @@ namespace Utilities
           this->use_vector = use_vector;
           this->size       = size;
 
-          data.clear();
+          data = {};
           data_map.clear();
 
-          if (use_vector)
-            {
-              data = {};
-              data.resize(size, invalid_index_value);
-            }
+          // do not initialize the vector but only upon first request in
+          // `fill`
         }
 
 
@@ -70,8 +67,27 @@ namespace Utilities
 
           if (use_vector)
             {
-              AssertDimension(data.size(), size);
-              std::fill(data.begin() + start, data.begin() + end, value);
+              if (data.empty() && end > start)
+                {
+                  // in debug mode, we want to track whether we set all
+                  // indices, so we first fill an invalid index and only later
+                  // the actual ones, whereas we simply assign the given rank
+                  // to the complete vector the first time we pass around in
+                  // this function in release mode to avoid touching data
+                  // unnecessarily (and overwrite the smaller pieces), as the
+                  // locally owned part comes first
+#ifdef DEBUG
+                  data.resize(size, invalid_index_value);
+                  std::fill(data.begin() + start, data.begin() + end, value);
+#else
+                  data.resize(size, value);
+#endif
+                }
+              else
+                {
+                  AssertDimension(data.size(), size);
+                  std::fill(data.begin() + start, data.begin() + end, value);
+                }
             }
           else
             {
@@ -131,6 +147,9 @@ namespace Utilities
 
           if (use_vector)
             {
+              if (data.empty())
+                return false;
+
               AssertDimension(data.size(), size);
               return data[index] != invalid_index_value;
             }
