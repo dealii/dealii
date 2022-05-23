@@ -34,10 +34,6 @@
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/vector_memory.h>
 
-#  if DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
-#    include <deal.II/sundials/sundials_backport.h>
-#  endif
-
 DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
@@ -1000,11 +996,9 @@ namespace SUNDIALS
       v->ops->nvcloneempty  = &NVectorOperations::clone_empty;
       v->ops->nvdestroy     = &NVectorOperations::destroy<VectorType>;
       //  v->ops->nvspace           = undef;
-#  if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
       v->ops->nvgetcommunicator =
         &NVectorOperations::get_communicator_as_void_ptr<VectorType>;
       v->ops->nvgetlength = &NVectorOperations::get_global_length<VectorType>;
-#  endif
 
       /* standard vector operations */
       v->ops->nvlinearsum = &NVectorOperations::linear_sum<VectorType>;

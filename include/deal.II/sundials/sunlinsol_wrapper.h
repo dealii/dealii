@@ -19,25 +19,24 @@
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_SUNDIALS
-#  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
 
-#    include <sundials/sundials_linearsolver.h>
+#  include <sundials/sundials_linearsolver.h>
 
-#    include <functional>
-#    include <memory>
+#  include <functional>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
 {
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
   // forward declarations
   namespace internal
   {
     template <typename VectorType>
     struct LinearSolverContent;
   }
-#    endif
+#  endif
 
   /**
    * A linear operator that wraps SUNDIALS functionality.
@@ -167,10 +166,10 @@ namespace SUNDIALS
     {
     public:
       explicit LinearSolverWrapper(LinearSolveFunction<VectorType> lsolve
-#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                    ,
                                    SUNContext &linsol_ctx
-#    endif
+#  endif
       );
 
       ~LinearSolverWrapper();
@@ -189,6 +188,5 @@ namespace SUNDIALS
 
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif
 #endif
 #endif

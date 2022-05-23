@@ -24,9 +24,9 @@ MACRO(FEATURE_SUNDIALS_FIND_EXTERNAL var)
     SET(${var} TRUE)
 
     #
-    # We require at least sundials 3.0.0
+    # We require at least sundials 5.4.0
     #
-    SET(_version_required 3.0.0)
+    SET(_version_required 5.4.0)
     IF(SUNDIALS_VERSION VERSION_LESS ${_version_required})
       MESSAGE(STATUS "Could not find a sufficient Sundials installation: "
         "deal.II requires at least version ${_version_required}, "

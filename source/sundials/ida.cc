@@ -36,17 +36,6 @@
 
 #  include <deal.II/sundials/n_vector.h>
 
-#  include <sundials/sundials_config.h>
-#  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
-#    ifdef DEAL_II_SUNDIALS_WITH_IDAS
-#      include <idas/idas_impl.h>
-#    else
-#      include <ida/ida_impl.h>
-#    endif
-#  endif
-#  if DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
-#    include <deal.II/sundials/sunlinsol_newempty.h>
-#  endif
 #  include <iomanip>
 #  include <iostream>
 
@@ -77,68 +66,6 @@ namespace SUNDIALS
 
 
 
-#  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
-    template <typename VectorType>
-    int
-    t_dae_lsetup(IDAMem   IDA_mem,
-                 N_Vector yy,
-                 N_Vector yp,
-                 N_Vector resp,
-                 N_Vector tmp1,
-                 N_Vector tmp2,
-                 N_Vector tmp3)
-    {
-      (void)tmp1;
-      (void)tmp2;
-      (void)tmp3;
-      (void)resp;
-      IDA<VectorType> &solver =
-        *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
-
-      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
-      auto *src_yp = internal::unwrap_nvector_const<VectorType>(yp);
-
-      int err = solver.setup_jacobian(IDA_mem->ida_tn,
-                                      *src_yy,
-                                      *src_yp,
-                                      IDA_mem->ida_cj);
-
-      return err;
-    }
-
-
-
-    template <typename VectorType>
-    int
-    solve_with_jacobian_callback(IDAMem   IDA_mem,
-                                 N_Vector b,
-                                 N_Vector weight,
-                                 N_Vector yy,
-                                 N_Vector yp,
-                                 N_Vector resp)
-    {
-      (void)weight;
-      (void)yy;
-      (void)yp;
-      (void)resp;
-      IDA<VectorType> &solver =
-        *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
-      GrowingVectorMemory<VectorType> mem;
-
-      typename VectorMemory<VectorType>::Pointer dst(mem);
-      solver.reinit_vector(*dst);
-
-      auto *src = internal::unwrap_nvector<VectorType>(b);
-
-      int err = solver.solve_jacobian_system(*src, *dst);
-      *src    = *dst;
-
-      return err;
-    }
-
-
-
-#  else
     template <typename VectorType>
     int
     setup_jacobian_callback(realtype tt,
@@ -188,7 +115,6 @@ namespace SUNDIALS
 
       return err;
     }
-#  endif
   } // namespace
 
 
@@ -315,7 +241,7 @@ namespace SUNDIALS
     status = SUNContext_Create(&mpi_communicator, &ida_ctx);
     AssertIDA(status);
 
-    ida_mem            = IDACreate(ida_ctx);
+    ida_mem = IDACreate(ida_ctx);
 #  endif
 
     auto yy = internal::make_nvector_view(solution
@@ -391,16 +317,6 @@ namespace SUNDIALS
     AssertIDA(status);
 
     // Initialize solver
-#  if DEAL_II_SUNDIALS_VERSION_LT(4, 0, 0)
-    auto IDA_mem = static_cast<IDAMem>(ida_mem);
-
-    IDA_mem->ida_lsetup = t_dae_lsetup<VectorType>;
-
-    if (solve_jacobian_system)
-      IDA_mem->ida_lsolve = solve_with_jacobian_callback<VectorType>;
-    else
-      AssertThrow(false, ExcFunctionNotProvided("solve_jacobian_system"));
-#  else
     SUNMatrix       J  = nullptr;
     SUNLinearSolver LS = nullptr;
 
@@ -408,11 +324,11 @@ namespace SUNDIALS
     // called do not actually receive the IDAMEM object, just the LS
     // object, so we have to store a pointer to the current
     // object in the LS object
-#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     LS = SUNLinSolNewEmpty();
-#    else
-    LS = SUNLinSolNewEmpty(ida_ctx);
-#    endif
+#  else
+    LS      = SUNLinSolNewEmpty(ida_ctx);
+#  endif
 
     LS->content = this;
 
@@ -459,11 +375,11 @@ namespace SUNDIALS
     // if we don't set it, it won't call the functions that set up
     // the matrix object (i.e., the argument to the 'IDASetJacFn'
     // function below).
-#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-    J          = SUNMatNewEmpty();
-#    else
-    J  = SUNMatNewEmpty(ida_ctx);
-#    endif
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+    J = SUNMatNewEmpty();
+#  else
+    J       = SUNMatNewEmpty(ida_ctx);
+#  endif
     J->content = this;
 
     J->ops->getid = [](SUNMatrix /*ignored*/) -> SUNMatrix_ID {
@@ -495,7 +411,6 @@ namespace SUNDIALS
     // calling IDASetLinearSolver
     status = IDASetJacFn(ida_mem, &setup_jacobian_callback<VectorType>);
     AssertIDA(status);
-#  endif
     status = IDASetMaxOrd(ida_mem, data.maximum_order);
     AssertIDA(status);
 
