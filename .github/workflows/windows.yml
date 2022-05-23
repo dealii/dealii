@@ -34,7 +34,7 @@ jobs:
         cd build
         cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -DDEAL_II_WITH_ZLIB=off -DDEAL_II_CXX_FLAGS="-WX /D FE_EVAL_FACTORY_DEGREE_MAX=2" -T host=x64 -A x64 ..
     - name: archive logs
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: windows-serial-detailed.log
         path: build/detailed.log
@@ -49,19 +49,19 @@ jobs:
       run: |
         cmake --build build  --target test -- -m
     - name: archive library
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: dealii-windows.zip
         path: c:/project/dealii-windows.zip
     - name: archive error 1
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       if: always()
       continue-on-error: true
       with:
         name: windows-serial-CMakeOutput.log
         path: build/CMakeFiles/CMakeOutput.log
     - name: archive error 2
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       if: always()
       continue-on-error: true
       with:

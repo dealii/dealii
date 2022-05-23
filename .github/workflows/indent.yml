@@ -38,7 +38,7 @@ jobs:
         ! [ -s doxygen.log ] || exit 1
         tar -czf doxygen_documentation.tar.gz doc/doxygen
     - name: archive documentation
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: doxygen_documentation.tar.gz
         path: build/doxygen_documentation.tar.gz
