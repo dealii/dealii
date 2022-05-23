@@ -83,7 +83,7 @@ checks() {
   # first user names:
   git log --since "2019-01-01" --format="%aN" --no-merges | sort -u | while read name ; do
       words=($name)
-      if [ "${#words[@]}" -lt "2" ]; then
+      if [ "${#words[@]}" -lt "2" -a "$name" != "dependabot[bot]" ]; then
 	  echo "invalid author '$name' without firstname and lastname"
 	  echo ""
 	  echo "hint: for possible solutions, consult the webpage:"
