@@ -13,15 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-// This function tests the correctness of the matrix-free implementation
-// of the FE_RaviartThomasNodal element by evaluating values + gradients
-// as well as the divergence and comparing the result with FEVaules which
-// is considered the reference. The mesh is a hypercube mesh with no
-// hanging nodes and no other constraints.
+// This test it the same as matrix_vector_rt_face_01.cc however with
+// non-Cartesian (but still affine) cells.
 
 #include "../tests.h"
 
-#include "matrix_vector_rt_common.h"
+#include "matrix_vector_rt_face_common.h"
 
 
 template <int dim, int fe_degree>
@@ -29,13 +26,16 @@ void
 test()
 {
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube(tria);
-  tria.refine_global(2);
+  const unsigned int n_subdivisions = 2;
+  Point<dim>         corners[dim];
+  corners[0] = (dim == 2) ? Point<dim>(1, 0) : Point<dim>(1, 0, 0);
+  corners[1] = (dim == 2) ? Point<dim>(0.5, 0.5) : Point<dim>(0.5, 1, 0.25);
+  if (dim == 3)
+    corners[2] = Point<dim>(0.5, 0, 1);
+  GridGenerator::subdivided_parallelepiped(tria, n_subdivisions, corners);
 
   FE_RaviartThomasNodal<dim> fe(fe_degree - 1);
-
-  DoFHandler<dim> dof(tria);
-
+  DoFHandler<dim>            dof(tria);
   dof.distribute_dofs(fe);
 
   AffineConstraints<double> constraints;
@@ -46,7 +46,6 @@ test()
           << std::endl;
   deallog << "Number of degrees of freedom: " << dof.n_dofs() << std::endl
           << std::endl;
-  do_test<dim, fe_degree, double>(dof, constraints, TestType::values);
-  do_test<dim, fe_degree, double>(dof, constraints, TestType::gradients);
+  do_test<dim, fe_degree, double>(dof, constraints, TestType::values_gradients);
   do_test<dim, fe_degree, double>(dof, constraints, TestType::divergence);
 }

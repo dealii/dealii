@@ -122,6 +122,38 @@ namespace internal
   struct EvaluatorTensorProduct
   {};
 
+  /**
+   * Evaluator framework for anisotropic polynomial spaces that valuates the
+   * given shape data in general dimensions using the tensor product form.
+   *
+   * @tparam variant Variant of evaluation used for creating template
+   *                 specializations
+   * @tparam dim Dimension of the function
+   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
+   *                to the number of 1d shape functions in the usual tensor
+   *                contraction setting
+   * @tparam n_columns Number of columns in the transformation matrix, which
+   *                   corresponds to the number of 1d shape functions in the
+   *                   usual tensor contraction setting
+   * @tparam Number Abstract number type for input and output arrays
+   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
+   *                 same type as the input/output arrays); must implement
+   *                 operator* with Number to be valid
+   * @tparam normal_dir Indicates the direction of the continuous component for the
+   *                    Raviart-Thomas space in terms of the normal onto the
+   * face, e.g 0 if the  is in x-direction, 1 if in y-direction, and 2 if in
+   * z-direction.
+   */
+  template <EvaluatorVariant variant,
+            int              dim,
+            int              n_rows,
+            int              n_columns,
+            typename Number,
+            int normal_dir,
+            typename Number2 = Number>
+  struct EvaluatorTensorProductAnisotropic
+  {};
+
 
 
   /**
@@ -198,30 +230,21 @@ namespace internal
       (void)dummy2;
     }
 
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              int  normal_dir = 0>
+    template <int direction, bool contract_over_rows, bool add>
     void
     values(const Number in[], Number out[]) const
     {
       apply<direction, contract_over_rows, add>(shape_values, in, out);
     }
 
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              int  normal_dir = 0>
+    template <int direction, bool contract_over_rows, bool add>
     void
     gradients(const Number in[], Number out[]) const
     {
       apply<direction, contract_over_rows, add>(shape_gradients, in, out);
     }
 
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              int  normal_dir = 0>
+    template <int direction, bool contract_over_rows, bool add>
     void
     hessians(const Number in[], Number out[]) const
     {
@@ -2364,13 +2387,15 @@ namespace internal
             int n_rows,
             int n_columns,
             typename Number,
+            int normal_dir,
             typename Number2>
-  struct EvaluatorTensorProduct<evaluate_raviart_thomas,
-                                dim,
-                                n_rows,
-                                n_columns,
-                                Number,
-                                Number2>
+  struct EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
+                                           dim,
+                                           n_rows,
+                                           n_columns,
+                                           Number,
+                                           normal_dir,
+                                           Number2>
   {
     static constexpr unsigned int n_rows_of_product =
       numbers::invalid_unsigned_int;
@@ -2381,7 +2406,7 @@ namespace internal
      * Empty constructor. Does nothing. Be careful when using 'values' and
      * related methods because they need to be filled with the other pointer
      */
-    EvaluatorTensorProduct()
+    EvaluatorTensorProductAnisotropic()
       : shape_values(nullptr)
       , shape_gradients(nullptr)
       , shape_hessians(nullptr)
@@ -2390,11 +2415,12 @@ namespace internal
     /**
      * Constructor, taking the data from ShapeInfo
      */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
-                           const unsigned int            dummy1 = 0,
-                           const unsigned int            dummy2 = 0)
+    EvaluatorTensorProductAnisotropic(
+      const AlignedVector<Number2> &shape_values,
+      const AlignedVector<Number2> &shape_gradients,
+      const AlignedVector<Number2> &shape_hessians,
+      const unsigned int            dummy1 = 0,
+      const unsigned int            dummy2 = 0)
       : shape_values(shape_values.begin())
       , shape_gradients(shape_gradients.begin())
       , shape_hessians(shape_hessians.begin())
@@ -2417,31 +2443,25 @@ namespace internal
       (void)dummy2;
     }
 
-    template <int direction, bool contract_over_rows, bool add, int normal_dir>
+    template <int direction, bool contract_over_rows, bool add>
     void
     values(const Number in[], Number out[]) const
     {
-      apply<direction, contract_over_rows, add, normal_dir>(shape_values,
-                                                            in,
-                                                            out);
+      apply<direction, contract_over_rows, add>(shape_values, in, out);
     }
 
-    template <int direction, bool contract_over_rows, bool add, int normal_dir>
+    template <int direction, bool contract_over_rows, bool add>
     void
     gradients(const Number in[], Number out[]) const
     {
-      apply<direction, contract_over_rows, add, normal_dir>(shape_gradients,
-                                                            in,
-                                                            out);
+      apply<direction, contract_over_rows, add>(shape_gradients, in, out);
     }
 
-    template <int direction, bool contract_over_rows, bool add, int normal_dir>
+    template <int direction, bool contract_over_rows, bool add>
     void
     hessians(const Number in[], Number out[]) const
     {
-      apply<direction, contract_over_rows, add, normal_dir>(shape_hessians,
-                                                            in,
-                                                            out);
+      apply<direction, contract_over_rows, add>(shape_hessians, in, out);
     }
 
     /**
@@ -2475,7 +2495,6 @@ namespace internal
     template <int  direction,
               bool contract_over_rows,
               bool add,
-              int  normal_dir,
               bool one_line = false>
     static void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
@@ -2486,8 +2505,7 @@ namespace internal
               bool contract_onto_face,
               bool add,
               int  max_derivative,
-              bool lex_faces = false,
-              int  normal_direction>
+              bool lex_faces = false>
     void
     apply_face(const Number *DEAL_II_RESTRICT in,
                Number *DEAL_II_RESTRICT       out) const;
@@ -2501,22 +2519,20 @@ namespace internal
             int n_rows,
             int n_columns,
             typename Number,
+            int normal_dir,
             typename Number2>
-  template <int  direction,
-            bool contract_over_rows,
-            bool add,
-            int  normal_dir,
-            bool one_line>
+  template <int direction, bool contract_over_rows, bool add, bool one_line>
   inline void
-  EvaluatorTensorProduct<evaluate_raviart_thomas,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::apply(const Number2 *DEAL_II_RESTRICT
-                                                       shape_data,
-                                         const Number *in,
-                                         Number *      out)
+  EvaluatorTensorProductAnisotropic<
+    evaluate_raviart_thomas,
+    dim,
+    n_rows,
+    n_columns,
+    Number,
+    normal_dir,
+    Number2>::apply(const Number2 *DEAL_II_RESTRICT shape_data,
+                    const Number *                  in,
+                    Number *                        out)
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
@@ -2596,22 +2612,23 @@ namespace internal
             int n_rows,
             int n_columns,
             typename Number,
+            int normal_dir,
             typename Number2>
   template <int  face_direction,
             bool contract_onto_face,
             bool add,
             int  max_derivative,
-            bool lex_faces,
-            int  normal_direction>
+            bool lex_faces>
   inline void
-  EvaluatorTensorProduct<evaluate_raviart_thomas,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::apply_face(const Number *DEAL_II_RESTRICT in,
-                                              Number *DEAL_II_RESTRICT
-                                                out) const
+  EvaluatorTensorProductAnisotropic<
+    evaluate_raviart_thomas,
+    dim,
+    n_rows,
+    n_columns,
+    Number,
+    normal_dir,
+    Number2>::apply_face(const Number *DEAL_II_RESTRICT in,
+                         Number *DEAL_II_RESTRICT       out) const
   {
     Assert(dim > 1 && (lex_faces || dim < 4),
            ExcMessage("Only dim=2,3 supported"));
@@ -2625,34 +2642,33 @@ namespace internal
 
     // Determine the number of blocks depending on the face and normaldirection,
     // as well as dimension.
-    constexpr int n_blocks1 = (face_direction == normal_direction) ?
-                                (n_rows - 1) :
-                              ((face_direction == 0 && normal_direction == 2) ||
-                               (face_direction == 1 && normal_direction == 2) ||
-                               (face_direction == 2 && normal_direction == 1)) ?
-                                n_rows :
-                                (n_rows + 1);
-    constexpr int n_blocks2 =
-      (dim == 2) ? 1 :
-                   ((face_direction == normal_direction) ?
-                      (n_rows - 1) :
-                      (((face_direction == 0 && normal_direction == 1) ||
-                        (face_direction == 1 && normal_direction == 0) ||
-                        (face_direction == 2 && normal_direction == 0)) ?
-                         n_rows :
-                         (n_rows + 1)));
+    constexpr int n_blocks1 = (face_direction == normal_dir) ? (n_rows - 1) :
+                              ((face_direction == 0 && normal_dir == 2) ||
+                               (face_direction == 1 && normal_dir == 2) ||
+                               (face_direction == 2 && normal_dir == 1)) ?
+                                                               n_rows :
+                                                               (n_rows + 1);
+    constexpr int n_blocks2 = (dim == 2) ?
+                                1 :
+                                ((face_direction == normal_dir) ?
+                                   (n_rows - 1) :
+                                   (((face_direction == 0 && normal_dir == 1) ||
+                                     (face_direction == 1 && normal_dir == 0) ||
+                                     (face_direction == 2 && normal_dir == 0)) ?
+                                      n_rows :
+                                      (n_rows + 1)));
 
     AssertIndexRange(face_direction, dim);
 
     constexpr int stride =
-      (face_direction == normal_direction) ?
+      (face_direction == normal_dir) ?
         Utilities::pow(n_rows - 1, face_direction) :
         ((face_direction == 0) ?
            1 :
            ((face_direction == 2) ?
               n_rows * (n_rows + 1) :
-              ((face_direction == 1 && normal_direction == 0) ? (n_rows + 1) :
-                                                                n_rows)));
+              ((face_direction == 1 && normal_dir == 0) ? (n_rows + 1) :
+                                                          n_rows)));
     constexpr int out_stride = n_blocks1 * n_blocks2;
 
     const Number *DEAL_II_RESTRICT shape_values = this->shape_values;
@@ -2739,21 +2755,21 @@ namespace internal
                   // product. Need to take that into account.
                   if (dim == 3)
                     {
-                      if (normal_direction == 0)
+                      if (normal_dir == 0)
                         {
                           if (contract_onto_face)
                             out += n_rows - 1;
                           else
                             in += n_rows - 1;
                         }
-                      if (normal_direction == 1)
+                      if (normal_dir == 1)
                         {
                           if (contract_onto_face)
                             out += n_rows - 2;
                           else
                             in += n_rows - 2;
                         }
-                      if (normal_direction == 2)
+                      if (normal_dir == 2)
                         {
                           if (contract_onto_face)
                             out += n_rows;
@@ -2777,17 +2793,17 @@ namespace internal
             // adjust for local coordinate system zx
             if (contract_onto_face)
               {
-                if (normal_direction == 0)
+                if (normal_dir == 0)
                   {
                     in += (n_rows + 1) * (n_rows - 1);
                     out -= n_rows * (n_rows + 1) - 1;
                   }
-                if (normal_direction == 1)
+                if (normal_dir == 1)
                   {
                     in += (n_rows - 1) * (n_rows - 1);
                     out -= (n_rows - 1) * (n_rows - 1) - 1;
                   }
-                if (normal_direction == 2)
+                if (normal_dir == 2)
                   {
                     in += (n_rows - 1) * (n_rows);
                     out -= (n_rows) * (n_rows + 1) - 1;
@@ -2795,17 +2811,17 @@ namespace internal
               }
             else
               {
-                if (normal_direction == 0)
+                if (normal_dir == 0)
                   {
                     out += (n_rows + 1) * (n_rows - 1);
                     in -= n_rows * (n_rows + 1) - 1;
                   }
-                if (normal_direction == 1)
+                if (normal_dir == 1)
                   {
                     out += (n_rows - 1) * (n_rows - 1);
                     in -= (n_rows - 1) * (n_rows - 1) - 1;
                   }
-                if (normal_direction == 2)
+                if (normal_dir == 2)
                   {
                     out += (n_rows - 1) * (n_rows);
                     in -= (n_rows) * (n_rows + 1) - 1;
