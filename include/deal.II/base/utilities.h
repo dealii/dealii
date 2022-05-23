@@ -20,6 +20,7 @@
 
 #include <deal.II/base/exceptions.h>
 
+#include <cstddef>
 #include <functional>
 #include <string>
 #include <tuple>
@@ -1214,6 +1215,116 @@ namespace Utilities
 
   // --------------------- non-inline functions
 
+  namespace internal
+  {
+    /**
+     * A structure that is used to identify whether a template
+     * argument is a std::vector<T> where T is a type that
+     * satisfies std::is_trivially_copyable<T>::value == true.
+     */
+    template <typename T>
+    struct IsVectorOfTriviallyCopyable
+    {
+      static constexpr bool value = false;
+    };
+
+
+
+    template <typename T>
+    struct IsVectorOfTriviallyCopyable<std::vector<T>>
+    {
+      static constexpr bool value = std::is_trivially_copyable<T>::value;
+    };
+
+
+
+    /**
+     * A function that is used to append the contents of a
+     * std::vector<T> (where T is a type that
+     * satisfies std::is_trivially_copyable<T>::value == true)
+     * bit for bit to a character array.
+     *
+     * If the type is not such a vector of T, then the function
+     * throws an exception.
+     */
+    template <typename T>
+    inline void
+    append_vector_of_trivially_copyable_to_buffer(const T &,
+                                                  std::vector<char> &)
+    {
+      // We shouldn't get here:
+      Assert(false, ExcInternalError());
+    }
+
+
+    template <typename T,
+              typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+    inline void
+    append_vector_of_trivially_copyable_to_buffer(
+      const std::vector<T> &object,
+      std::vector<char> &   dest_buffer)
+    {
+      const auto current_position                          = dest_buffer.size();
+      const typename std::vector<T>::size_type vector_size = object.size();
+
+      // Resize the buffer so that it can store the size of 'object'
+      // as well as all of its elements.
+      dest_buffer.resize(dest_buffer.size() + sizeof(vector_size) +
+                         object.size() * sizeof(T));
+
+      // Then copy first the size and then the elements:
+      memcpy(&dest_buffer[current_position], &vector_size, sizeof(vector_size));
+      if (object.size() > 0)
+        memcpy(&dest_buffer[current_position] + sizeof(vector_size),
+               object.data(),
+               object.size() * sizeof(T));
+    }
+
+
+
+    template <typename T>
+    inline void
+    create_vector_of_trivially_copyable_from_buffer(
+      const std::vector<char>::const_iterator &,
+      const std::vector<char>::const_iterator &,
+      T &)
+    {
+      // We shouldn't get here:
+      Assert(false, ExcInternalError());
+    }
+
+
+
+    template <typename T,
+              typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+    inline void
+    create_vector_of_trivially_copyable_from_buffer(
+      const std::vector<char>::const_iterator &cbegin,
+      const std::vector<char>::const_iterator &cend,
+      std::vector<T> &                         object)
+    {
+      // First get the size of the vector, and resize the output object
+      typename std::vector<T>::size_type vector_size;
+      memcpy(&vector_size, &*cbegin, sizeof(vector_size));
+      object.resize(vector_size);
+
+      Assert(static_cast<std::ptrdiff_t>(cend - cbegin) ==
+               static_cast<std::ptrdiff_t>(sizeof(vector_size) +
+                                           vector_size * sizeof(T)),
+             ExcMessage("The given buffer has the wrong size."));
+      (void)cend;
+
+      // Then copy the elements:
+      if (object.size() > 0)
+        memcpy(object.data(),
+               &*cbegin + sizeof(vector_size),
+               vector_size * sizeof(T));
+    }
+
+  } // namespace internal
+
+
+
   template <typename T>
   size_t
   pack(const T &          object,
@@ -1221,6 +1332,7 @@ namespace Utilities
        const bool         allow_compression)
   {
     std::size_t size = 0;
+
 
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1238,6 +1350,25 @@ namespace Utilities
         std::memcpy(dest_buffer.data() + previous_size, &object, sizeof(T));
 
         size = sizeof(T);
+      }
+    // Next try if we have a vector of trivially copyable objects.
+    // If that is the case, we can shortcut the whole BOOST serialization
+    // machinery and just copy the content of the vector bit for bit
+    // into the output buffer, assuming that we are not asked to compress
+    // the data.
+    else if (internal::IsVectorOfTriviallyCopyable<T>::value &&
+             (allow_compression == false))
+      {
+        const std::size_t previous_size = dest_buffer.size();
+
+        // When we have DEAL_II_HAVE_CXX17 set by default, we can just
+        // inline the code of the following function here and make the 'if'
+        // above a 'if constexpr'. Without the 'constexpr', we need to keep
+        // the general template of the function that throws an exception.
+        internal::append_vector_of_trivially_copyable_to_buffer(object,
+                                                                dest_buffer);
+
+        size = dest_buffer.size() - previous_size;
       }
     else
       {
@@ -1276,14 +1407,13 @@ namespace Utilities
   }
 
 
+
   template <typename T>
   T
   unpack(const std::vector<char>::const_iterator &cbegin,
          const std::vector<char>::const_iterator &cend,
          const bool                               allow_compression)
   {
-    T object;
-
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
@@ -1293,9 +1423,31 @@ namespace Utilities
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
 #endif
       {
+        T object;
+
         (void)allow_compression;
         Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
         std::memcpy(&object, &*cbegin, sizeof(T));
+
+        return object;
+      }
+    // Next try if we have a vector of trivially copyable objects.
+    // If that is the case, we can shortcut the whole BOOST serialization
+    // machinery and just copy the content of the buffer bit for bit
+    // into an appropriately sized output vector, assuming that we
+    // are not asked to compress the data.
+    else if (internal::IsVectorOfTriviallyCopyable<T>::value &&
+             (allow_compression == false))
+      {
+        // When we have DEAL_II_HAVE_CXX17 set by default, we can just
+        // inline the code of the following function here and make the 'if'
+        // above a 'if constexpr'. Without the 'constexpr', we need to keep
+        // the general template of the function that throws an exception.
+        T object;
+        internal::create_vector_of_trivially_copyable_from_buffer(cbegin,
+                                                                  cend,
+                                                                  object);
+        return object;
       }
     else
       {
@@ -1310,10 +1462,13 @@ namespace Utilities
         fisb.push(boost::iostreams::array_source(&*cbegin, cend - cbegin));
 
         boost::archive::binary_iarchive bia(fisb);
+
+        T object;
         bia >> object;
+        return object;
       }
 
-    return object;
+    return {};
   }
 
 

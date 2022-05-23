@@ -393,14 +393,14 @@ namespace Utilities
       std::vector<double>   work;    // ^^
       types::blas_int       info;
       // call lapack_templates.h wrapper:
-      internal::UtilitiesImplementation::call_stev('N',
-                                                   n,
-                                                   diagonal.data(),
-                                                   subdiagonal.data(),
-                                                   Z.data(),
-                                                   ldz,
-                                                   work.data(),
-                                                   &info);
+      dealii::internal::UtilitiesImplementation::call_stev('N',
+                                                           n,
+                                                           diagonal.data(),
+                                                           subdiagonal.data(),
+                                                           Z.data(),
+                                                           ldz,
+                                                           work.data(),
+                                                           &info);
 
       Assert(info == 0, LAPACKSupport::ExcErrorCode("dstev", info));
 
