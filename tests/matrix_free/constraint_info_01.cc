@@ -99,8 +99,13 @@ main()
       deallog << "(" << i.first << "," << i.second << ") ";
     deallog << std::endl;
 
-    for (const auto i : dof_info.row_starts)
-      deallog << "(" << i.first << "," << i.second << ") ";
+    // make sure to filter out contributions that only get filled up to make
+    // all SIMD lanes populated
+    for (unsigned int i = 0; i < dof_info.row_starts.size(); ++i)
+      if (i == 0 ||
+          (dof_info.row_starts[i].first > dof_info.row_starts[i - 1].first))
+        deallog << "(" << dof_info.row_starts[i].first << ","
+                << dof_info.row_starts[i].second << ") ";
     deallog << std::endl;
 
     deallog << std::endl;

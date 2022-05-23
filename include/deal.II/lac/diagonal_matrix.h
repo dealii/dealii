@@ -446,7 +446,8 @@ DiagonalMatrix<VectorType>::apply_to_subrange(
   const value_type * src_pointer_to_current_range,
   value_type *       dst_pointer_to_current_range) const
 {
-  AssertIndexRange(begin_range, diagonal.locally_owned_elements().n_elements());
+  AssertIndexRange(begin_range,
+                   diagonal.locally_owned_elements().n_elements() + 1);
   AssertIndexRange(end_range,
                    diagonal.locally_owned_elements().n_elements() + 1);
 
