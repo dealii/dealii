@@ -1150,6 +1150,42 @@ namespace Utilities
 
 #ifndef DOXYGEN
     // explicit instantiations
+
+    // booleans aren't in MPI_SCALARS
+    template bool
+    reduce(const bool &,
+           const MPI_Comm &,
+           const std::function<bool(const bool &, const bool &)> &,
+           const unsigned int);
+
+    template std::vector<bool>
+    reduce(const std::vector<bool> &,
+           const MPI_Comm &,
+           const std::function<std::vector<bool>(const std::vector<bool> &,
+                                                 const std::vector<bool> &)> &,
+           const unsigned int);
+
+    template bool
+    all_reduce(const bool &,
+               const MPI_Comm &,
+               const std::function<bool(const bool &, const bool &)> &);
+
+    template std::vector<bool>
+    all_reduce(
+      const std::vector<bool> &,
+      const MPI_Comm &,
+      const std::function<std::vector<bool>(const std::vector<bool> &,
+                                            const std::vector<bool> &)> &);
+
+    // We need an explicit instantiation of this for the same reason as the
+    // other types described in mpi.inst.in
+    template void
+    internal::all_reduce<bool>(const MPI_Op &,
+                               const ArrayView<const bool> &,
+                               const MPI_Comm &,
+                               const ArrayView<bool> &);
+
+
     template bool
     logical_or<bool>(const bool &, const MPI_Comm &);
 
