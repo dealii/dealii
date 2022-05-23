@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/aligned_vector.h>
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/utilities.h>
 
@@ -2961,12 +2962,14 @@ namespace internal
       }
 
     AssertIndexRange(n_shapes, 200);
-    std::array<Number2, 2 * dim * 200> shapes;
+    dealii::ndarray<Number2, 200, 2, dim> shapes;
 
     // Evaluate 1D polynomials and their derivatives
+    std::array<Number2, dim> point;
     for (unsigned int d = 0; d < dim; ++d)
-      for (int i = 0; i < n_shapes; ++i)
-        poly[i].value(p[d], 1, shapes.data() + 2 * (d * n_shapes + i));
+      point[d] = p[d];
+    for (int i = 0; i < n_shapes; ++i)
+      poly[i].values_of_array(point, 1, &shapes[i][0]);
 
     // Go through the tensor product of shape functions and interpolate
     // with optimal algorithm
@@ -2984,22 +2987,22 @@ namespace internal
             if (renumber.empty())
               for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
                 {
-                  value += shapes[2 * i0] * values[i];
-                  deriv += shapes[2 * i0 + 1] * values[i];
+                  value += shapes[i0][0][0] * values[i];
+                  deriv += shapes[i0][1][0] * values[i];
                 }
             else
               for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
                 {
-                  value += shapes[2 * i0] * values[renumber[i]];
-                  deriv += shapes[2 * i0 + 1] * values[renumber[i]];
+                  value += shapes[i0][0][0] * values[renumber[i]];
+                  deriv += shapes[i0][1][0] * values[renumber[i]];
                 }
 
             // Interpolation + derivative in y direction
             if (dim > 1)
               {
-                value_y += value * shapes[2 * n_shapes + 2 * i1];
-                deriv_x += deriv * shapes[2 * n_shapes + 2 * i1];
-                deriv_y += value * shapes[2 * n_shapes + 2 * i1 + 1];
+                value_y += value * shapes[i1][0][1];
+                deriv_x += deriv * shapes[i1][0][1];
+                deriv_y += value * shapes[i1][1][1];
               }
             else
               {
@@ -3010,10 +3013,10 @@ namespace internal
         if (dim == 3)
           {
             // Interpolation + derivative in z direction
-            result.first += value_y * shapes[4 * n_shapes + 2 * i2];
-            result.second[0] += deriv_x * shapes[4 * n_shapes + 2 * i2];
-            result.second[1] += deriv_y * shapes[4 * n_shapes + 2 * i2];
-            result.second[2] += value_y * shapes[4 * n_shapes + 2 * i2 + 1];
+            result.first += value_y * shapes[i2][0][2];
+            result.second[0] += deriv_x * shapes[i2][0][2];
+            result.second[1] += deriv_y * shapes[i2][0][2];
+            result.second[2] += value_y * shapes[i2][1][2];
           }
         else if (dim == 2)
           {
@@ -3050,12 +3053,14 @@ namespace internal
            ExcDimensionMismatch(renumber.size(), values.size()));
 
     AssertIndexRange(n_shapes, 200);
-    std::array<Number2, 3 * dim * 200> shapes;
+    dealii::ndarray<Number2, 200, 3, dim> shapes;
 
     // Evaluate 1D polynomials and their derivatives
+    std::array<Number2, dim> point;
     for (unsigned int d = 0; d < dim; ++d)
-      for (int i = 0; i < n_shapes; ++i)
-        poly[i].value(p[d], 2, shapes.data() + 3 * (d * n_shapes + i));
+      point[d] = p[d];
+    for (int i = 0; i < n_shapes; ++i)
+      poly[i].values_of_array(point, 2, &shapes[i][0]);
 
     // Go through the tensor product of shape functions and interpolate
     // with optimal algorithm
@@ -3074,16 +3079,16 @@ namespace internal
             if (renumber.empty())
               for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
                 {
-                  value += shapes[3 * i0] * values[i];
-                  deriv_1 += shapes[3 * i0 + 1] * values[i];
-                  deriv_2 += shapes[3 * i0 + 2] * values[i];
+                  value += shapes[i0][0][0] * values[i];
+                  deriv_1 += shapes[i0][1][0] * values[i];
+                  deriv_2 += shapes[i0][2][0] * values[i];
                 }
             else
               for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
                 {
-                  value += shapes[3 * i0] * values[renumber[i]];
-                  deriv_1 += shapes[3 * i0 + 1] * values[renumber[i]];
-                  deriv_2 += shapes[3 * i0 + 2] * values[renumber[i]];
+                  value += shapes[i0][0][0] * values[renumber[i]];
+                  deriv_1 += shapes[i0][1][0] * values[renumber[i]];
+                  deriv_2 += shapes[i0][2][0] * values[renumber[i]];
                 }
 
             // Interpolation + derivative in y direction
@@ -3091,13 +3096,13 @@ namespace internal
               {
                 if (dim > 2)
                   {
-                    value_y += value * shapes[3 * n_shapes + 3 * i1];
-                    deriv_x += deriv_1 * shapes[3 * n_shapes + 3 * i1];
-                    deriv_y += value * shapes[3 * n_shapes + 3 * i1 + 1];
+                    value_y += value * shapes[i1][0][1];
+                    deriv_x += deriv_1 * shapes[i1][0][1];
+                    deriv_y += value * shapes[i1][1][1];
                   }
-                deriv_xx += deriv_2 * shapes[3 * n_shapes + 3 * i1];
-                deriv_xy += deriv_1 * shapes[3 * n_shapes + 3 * i1 + 1];
-                deriv_yy += value * shapes[3 * n_shapes + 3 * i1 + 2];
+                deriv_xx += deriv_2 * shapes[i1][0][1];
+                deriv_xy += deriv_1 * shapes[i1][1][1];
+                deriv_yy += value * shapes[i1][2][1];
               }
             else
               {
@@ -3107,12 +3112,12 @@ namespace internal
         if (dim == 3)
           {
             // Interpolation + derivative in z direction
-            result[0][0] += deriv_xx * shapes[6 * n_shapes + 3 * i2];
-            result[0][1] += deriv_xy * shapes[6 * n_shapes + 3 * i2];
-            result[0][2] += deriv_x * shapes[6 * n_shapes + 3 * i2 + 1];
-            result[1][1] += deriv_yy * shapes[6 * n_shapes + 3 * i2];
-            result[1][2] += deriv_y * shapes[6 * n_shapes + 3 * i2 + 1];
-            result[2][2] += value_y * shapes[6 * n_shapes + 3 * i2 + 2];
+            result[0][0] += deriv_xx * shapes[i2][0][2];
+            result[0][1] += deriv_xy * shapes[i2][0][2];
+            result[0][2] += deriv_x * shapes[i2][1][2];
+            result[1][1] += deriv_yy * shapes[i2][0][2];
+            result[1][2] += deriv_y * shapes[i2][1][2];
+            result[2][2] += value_y * shapes[i2][2][2];
           }
         else if (dim == 2)
           {
@@ -3149,42 +3154,43 @@ namespace internal
            ExcDimensionMismatch(renumber.size(), values.size()));
 
     AssertIndexRange(n_shapes, 200);
-    std::array<Number, 2 * dim * 200> shapes;
+    dealii::ndarray<Number, 200, 2, dim> shapes;
 
     // Evaluate 1D polynomials and their derivatives
+    std::array<Number, dim> point;
     for (unsigned int d = 0; d < dim; ++d)
-      for (int i = 0; i < n_shapes; ++i)
-        poly[i].value(p[d], 1, shapes.data() + 2 * (d * n_shapes + i));
+      point[d] = p[d];
+    for (int i = 0; i < n_shapes; ++i)
+      poly[i].values_of_array(point, 1, &shapes[i][0]);
 
     // Implement the transpose of the function above
     for (int i2 = 0, i = 0; i2 < (dim > 2 ? n_shapes : 1); ++i2)
       {
         const Number2 test_value_z =
-          dim > 2 ? (value * shapes[4 * n_shapes + 2 * i2] +
-                     gradient[2] * shapes[4 * n_shapes + 2 * i2 + 1]) :
-                    value;
+          dim > 2 ?
+            (value * shapes[i2][0][2] + gradient[2] * shapes[i2][1][2]) :
+            value;
         const Number2 test_grad_x =
-          dim > 2 ? gradient[0] * shapes[4 * n_shapes + 2 * i2] : gradient[0];
-        const Number2 test_grad_y =
-          dim > 2 ? gradient[1] * shapes[4 * n_shapes + 2 * i2] :
-                    (dim > 1 ? gradient[1] : Number2());
+          dim > 2 ? gradient[0] * shapes[i2][0][2] : gradient[0];
+        const Number2 test_grad_y = dim > 2 ?
+                                      gradient[1] * shapes[i2][0][2] :
+                                      (dim > 1 ? gradient[1] : Number2());
         for (int i1 = 0; i1 < (dim > 1 ? n_shapes : 1); ++i1)
           {
-            const Number2 test_value_y =
-              dim > 1 ? (test_value_z * shapes[2 * n_shapes + 2 * i1] +
-                         test_grad_y * shapes[2 * n_shapes + 2 * i1 + 1]) :
-                        test_value_z;
+            const Number2 test_value_y = dim > 1 ?
+                                           (test_value_z * shapes[i1][0][1] +
+                                            test_grad_y * shapes[i1][1][1]) :
+                                           test_value_z;
             const Number2 test_grad_xy =
-              dim > 1 ? test_grad_x * shapes[2 * n_shapes + 2 * i1] :
-                        test_grad_x;
+              dim > 1 ? test_grad_x * shapes[i1][0][1] : test_grad_x;
             if (renumber.empty())
               for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-                values[i] += shapes[2 * i0] * test_value_y +
-                             shapes[2 * i0 + 1] * test_grad_xy;
+                values[i] += shapes[i0][0][0] * test_value_y +
+                             shapes[i0][1][0] * test_grad_xy;
             else
               for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-                values[renumber[i]] += shapes[2 * i0] * test_value_y +
-                                       shapes[2 * i0 + 1] * test_grad_xy;
+                values[renumber[i]] += shapes[i0][0][0] * test_value_y +
+                                       shapes[i0][1][0] * test_grad_xy;
           }
       }
   }
