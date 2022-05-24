@@ -626,19 +626,24 @@ namespace SUNDIALS
                             const VectorType &solution)
   {
     last_end_time = current_time;
+    int status;
+    (void)status;
+
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    if (arkode_ctx)
+      {
+        status = SUNContext_Free(&arkode_ctx);
+        AssertARKode(status);
+      }
+    status = SUNContext_Create(&mpi_communicator, &arkode_ctx);
+    AssertARKode(status);
+#    endif
+
     if (arkode_mem)
       {
         ARKStepFree(&arkode_mem);
-
-#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-        const int status = SUNContext_Free(&arkode_ctx);
-        (void)status;
-        AssertARKode(status);
-#    endif
+        // Initialization is version-dependent: do that in a moment
       }
-
-    int status;
-    (void)status;
 
     // just a view on the memory in solution, all write operations on yy by
     // ARKODE will automatically be mirrored to solution
@@ -652,23 +657,16 @@ namespace SUNDIALS
     Assert(explicit_function || implicit_function,
            ExcFunctionNotProvided("explicit_function || implicit_function"));
 
-#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     arkode_mem = ARKStepCreate(
       explicit_function ? &explicit_function_callback<VectorType> : nullptr,
       implicit_function ? &implicit_function_callback<VectorType> : nullptr,
       current_time,
-      initial_condition_nvector);
-#    else
-    status = SUNContext_Create(&mpi_communicator, &arkode_ctx);
-    AssertARKode(status);
-
-    arkode_mem = ARKStepCreate(
-      explicit_function ? &explicit_function_callback<VectorType> : nullptr,
-      implicit_function ? &implicit_function_callback<VectorType> : nullptr,
-      current_time,
-      initial_condition_nvector,
-      arkode_ctx);
+      initial_condition_nvector
+#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+      ,
+      arkode_ctx
 #    endif
+    );
     Assert(arkode_mem != nullptr, ExcInternalError());
 
     if (get_local_tolerances)
