@@ -4765,8 +4765,12 @@ namespace internal
                orientation[v][i];
     };
 
+    const unsigned int cell_index =
+      dof_access_index == MatrixFreeFunctions::DoFInfo::dof_access_cell ?
+        fe_eval.get_cell_ids()[0] :
+        cell * n_lanes;
     const unsigned int *dof_indices =
-      &dof_info.dof_indices_contiguous[dof_access_index][cell * n_lanes];
+      &dof_info.dof_indices_contiguous[dof_access_index][cell_index];
 
     for (unsigned int comp = 0; comp < n_components; ++comp)
       {
