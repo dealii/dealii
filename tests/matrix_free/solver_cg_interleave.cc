@@ -160,7 +160,8 @@ struct DiagonalMatrixSubrange
                     const Number *     src_pointer_to_current_range,
                     Number *           dst_pointer_to_current_range) const
   {
-    AssertIndexRange(begin_range, vec.locally_owned_elements().n_elements());
+    AssertIndexRange(begin_range,
+                     vec.locally_owned_elements().n_elements() + 1);
     AssertIndexRange(end_range, vec.locally_owned_elements().n_elements() + 1);
 
     const Number *     diagonal_entry = vec.begin() + begin_range;
