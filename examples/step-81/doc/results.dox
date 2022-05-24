@@ -44,12 +44,12 @@ Following are the output images:
       <p> Solution with no interface, Dirichlet boundary conditions and PML strength 0.</p>
       </td>
       <td></td>
-	<td align="center">
+        <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_noabs_PML0.png" alt="Visualization of the solution of step-81 with no interface, no absorbing boundary conditions and PML strength 0" height="210">
-	<p> Solution with no interface, absorbing boundary conditions and PML strength 0.</p>
-    	</td>
-	<td></td>
-    	<td align="center">
+        <p> Solution with no interface, absorbing boundary conditions and PML strength 0.</p>
+            </td>
+        <td></td>
+            <td align="center">
       <img src="https://www.dealii.org/images/steps/developer/step-81-nointerface_abs_PML4.png" alt="Visualization of the solution of step-81 with no interface, absorbing boundary conditions and PML strength 4" height="210">
       <p> Solution with no interface, absorbing boundary conditions and PML strength 4.</p>
     </td>
@@ -82,19 +82,19 @@ of $E_x$.
 
 <table width="80%" align="center">
   <tr>
-	<td align="center">
+        <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_noabs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
         <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
-    	</td>
-    	<td></td>
-	<td align="center">
+            </td>
+            <td></td>
+        <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_abs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
-	<p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
         </td>
         <td></td>
         <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-imagEx_abs_PML4.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
-	<p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
         </td>
   </tr>
 </table>
@@ -102,19 +102,19 @@ of $E_x$.
 
 <table width="80%" align="center">
   <tr>
-	<td align="center">
+        <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_noabs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
-	<p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
-    	</td>
-    	<td></td>
-	<td align="center">
+        <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
+            </td>
+            <td></td>
+        <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_abs_PML0.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
-	<p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
         </td>
         <td></td>
         <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-realEx_abs_PML4.png" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
-	<p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
     </td>
   </tr>
 </table>
@@ -130,19 +130,19 @@ the standing wave will dissipate more within the PML ring.
 Here are some animations to demonstrate the effect of the PML
 <table width="80%" align="center">
   <tr>
-	<td align="center">
+        <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-dirichlet_Ex.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
         <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
-    	</td>
-    	<td></td>
-	<td align="center">
+            </td>
+            <td></td>
+        <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-absorbing_Ex.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
-	<p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
         </td>
         <td></td>
         <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-perfectly_matched_layer_Ex.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
-	<p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
         </td>
   </tr>
 </table>
@@ -150,19 +150,19 @@ Here are some animations to demonstrate the effect of the PML
 
 <table width="80%" align="center">
   <tr>
-	<td align="center">
+        <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-dirichlet_Ey.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
         <p> Solution with an interface, Dirichlet boundary conditions and PML strength 0.</p>
-    	</td>
-    	<td></td>
-	<td align="center">
+            </td>
+            <td></td>
+        <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-absorbing_Ey.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 0" height="210">
-	<p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 0.</p>
         </td>
         <td></td>
         <td align="center">
         <img src="https://www.dealii.org/images/steps/developer/step-81-perfectly_matched_layer_Ey.gif" alt="Visualization of the solution of step-81 with an interface, absorbing boundary conditions and PML strength 4" height="210">
-	<p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
+        <p> Solution with an interface, absorbing boundary conditions and PML strength 4.</p>
         </td>
   </tr>
 </table>

@@ -382,19 +382,21 @@ this causes the solution image to be distorted. In order to reduce the resonance
 and distortion in our solutions, we are implementing a Perfectly Matched Layer
 (PML) in the scattering configuration.
 
-The concept of a PML was pioneered by Bérenger and it is is an indispensable tool
-for truncating unbounded domains for wave equations and often used in the
-numerical approximation of scattering problems. It is essentially a thin layer with
-modified material parameters placed near the boundary such that all outgoing
-electromagnetic waves decay exponentially with no “artificial” reflection due to
-truncation of the domain.
+The concept of a PML was pioneered by Bérenger @cite Berenger1994
+and it is is an indispensable tool for truncating unbounded domains for
+wave equations and often used in the numerical approximation of scattering
+problems. It is essentially a thin layer with modified material parameters
+placed near the boundary such that all outgoing electromagnetic waves decay
+exponentially with no “artificial” reflection due to truncation of the
+domain.
 
-Our PML is essentially a concentric circle with modified material coefficients
-($\varepsilon_r, \mu_r, \sigma$). It is located in a small region near the boundary
-$\partial\Omega$ and the transformation of the material coordinates is chosen to
-be a function of the radial distance $\rho$ from the origin $e_r$. The normal field
-$\nu$ of $\Sigma$ is orthogonal to the radial direction $e_r$, which makes
-$\mathbf{J}_a \equiv 0$ and $\mathbf{M}_a \equiv 0$ within the PML.
+Our PML is a concentric circle with modified material coefficients
+($\varepsilon_r, \mu_r, \sigma$). It is located in a small region near the
+boundary $\partial\Omega$ and the transformation of the material
+coordinates is chosen to be a function of the radial distance $\rho$ from
+the origin $e_r$. The normal field $\nu$ of $\Sigma$ is orthogonal to the
+radial direction $e_r$, which makes $\mathbf{J}_a \equiv 0$ and
+$\mathbf{M}_a \equiv 0$ within the PML.
 
 @htmlonly
 <p align="center">

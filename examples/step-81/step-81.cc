@@ -22,7 +22,8 @@
 // The set of include files is quite standard. The most notable include is
 // the fe/fe_nedelec_sz.h file which allows us to use the FE_NedelecSZ elements.
 // This is an implementation of the $H^{curl}$ conforming Nédélec Elements
-// that resolves the sign conflict issues that arise from parametrization.
+// that resolves the sign conflict issues that arise from parametrization
+// (for details we refer to the documentation of the FE_NedelecSZ element).
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/parameter_acceptor.h>
@@ -257,7 +258,8 @@ namespace Step81
   class PerfectlyMatchedLayer : public ParameterAcceptor
   {
   public:
-    static_assert(dim == 2, "dim == 2"); /* only works in 2D */
+    static_assert(dim == 2,
+                  "The perfectly matched layer is only implemented in 2D.");
 
     Parameters<dim> parameters;
 
@@ -266,10 +268,6 @@ namespace Step81
     using rank2_type = Tensor<2, dim, std::complex<double>>;
 
     PerfectlyMatchedLayer();
-
-    double inner_radius;
-    double outer_radius;
-    double strength;
 
     std::complex<double> d(const Point<dim> point);
 
@@ -285,6 +283,11 @@ namespace Step81
     rank2_type b_matrix(const Point<dim> point);
 
     rank2_type c_matrix(const Point<dim> point);
+
+  private:
+    double inner_radius;
+    double outer_radius;
+    double strength;
   };
 
 
@@ -309,11 +312,18 @@ namespace Step81
   typename std::complex<double>
   PerfectlyMatchedLayer<dim>::d(const Point<dim> point)
   {
-    const auto   radius = point.norm();
-    const double s =
-      strength * ((radius - inner_radius) * (radius - inner_radius)) /
-      ((outer_radius - inner_radius) * (outer_radius - inner_radius));
-    return 1.0 + 1.0i * s;
+    const auto radius = point.norm();
+    if (radius > inner_radius)
+      {
+        const double s =
+          strength * ((radius - inner_radius) * (radius - inner_radius)) /
+          ((outer_radius - inner_radius) * (outer_radius - inner_radius));
+        return 1.0 + 1.0i * s;
+      }
+    else
+      {
+        return 1.0;
+      }
   }
 
 
@@ -321,13 +331,21 @@ namespace Step81
   typename std::complex<double>
   PerfectlyMatchedLayer<dim>::d_bar(const Point<dim> point)
   {
-    const auto   radius = point.norm();
-    const double s_bar =
-      strength / 3. *
-      ((radius - inner_radius) * (radius - inner_radius) *
-       (radius - inner_radius)) /
-      (radius * (outer_radius - inner_radius) * (outer_radius - inner_radius));
-    return 1.0 + 1.0i * s_bar;
+    const auto radius = point.norm();
+    if (radius > inner_radius)
+      {
+        const double s_bar =
+          strength / 3. *
+          ((radius - inner_radius) * (radius - inner_radius) *
+           (radius - inner_radius)) /
+          (radius * (outer_radius - inner_radius) *
+           (outer_radius - inner_radius));
+        return 1.0 + 1.0i * s_bar;
+      }
+    else
+      {
+        return 1.0;
+      }
   }
 
 
@@ -639,24 +657,19 @@ namespace Step81
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
             const Point<dim> &position = quadrature_points[q_point];
-            const auto        radius   = position.norm();
-            const auto inner_radius    = perfectly_matched_layer.inner_radius;
 
             auto       mu_inv  = parameters.mu_inv(position, id);
             auto       epsilon = parameters.epsilon(position, id);
             const auto J_a     = parameters.J_a(position, id);
 
-            if (radius >= inner_radius)
-              {
-                auto A = perfectly_matched_layer.a_matrix(position);
-                auto B = perfectly_matched_layer.b_matrix(position);
-                auto d = perfectly_matched_layer.d(position);
+            const auto A = perfectly_matched_layer.a_matrix(position);
+            const auto B = perfectly_matched_layer.b_matrix(position);
+            const auto d = perfectly_matched_layer.d(position);
 
-                mu_inv  = mu_inv / d;
-                epsilon = invert(A) * epsilon * invert(B);
-              };
+            mu_inv  = mu_inv / d;
+            epsilon = invert(A) * epsilon * invert(B);
 
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            for (const auto i : fe_values.dof_indices())
               {
                 const auto phi_i = real_part.value(i, q_point) -
                                    1.0i * imag_part.value(i, q_point);
@@ -667,7 +680,7 @@ namespace Step81
                   (1.0i * scalar_product(J_a, phi_i)) * fe_values.JxW(q_point);
                 cell_rhs(i) += rhs_value.real();
 
-                for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                for (const auto j : fe_values.dof_indices())
                   {
                     const auto phi_j = real_part.value(j, q_point) +
                                        1.0i * imag_part.value(j, q_point);
@@ -708,34 +721,30 @@ namespace Step81
                          ++q_point)
                       {
                         const auto &position = quadrature_points[q_point];
-                        const auto  radius   = position.norm();
-                        const auto  inner_radius =
-                          perfectly_matched_layer.inner_radius;
 
                         auto mu_inv  = parameters.mu_inv(position, id);
                         auto epsilon = parameters.epsilon(position, id);
 
-                        if (radius >= inner_radius)
-                          {
-                            auto A = perfectly_matched_layer.a_matrix(position);
-                            auto B = perfectly_matched_layer.b_matrix(position);
-                            auto d = perfectly_matched_layer.d(position);
+                        const auto A =
+                          perfectly_matched_layer.a_matrix(position);
+                        const auto B =
+                          perfectly_matched_layer.b_matrix(position);
+                        const auto d = perfectly_matched_layer.d(position);
 
-                            mu_inv  = mu_inv / d;
-                            epsilon = invert(A) * epsilon * invert(B);
-                          };
+                        mu_inv  = mu_inv / d;
+                        epsilon = invert(A) * epsilon * invert(B);
 
                         const auto normal =
                           fe_face_values.normal_vector(q_point);
 
-                        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                        for (const auto i : fe_face_values.dof_indices())
                           {
                             const auto phi_i =
                               real_part.value(i, q_point) -
                               1.0i * imag_part.value(i, q_point);
                             const auto phi_i_T = tangential_part(phi_i, normal);
 
-                            for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                            for (const auto j : fe_face_values.dof_indices())
                               {
                                 const auto phi_j =
                                   real_part.value(j, q_point) +
@@ -775,28 +784,22 @@ namespace Step81
                      ++q_point)
                   {
                     const auto &position = quadrature_points[q_point];
-                    const auto  radius   = position.norm();
-                    const auto  inner_radius =
-                      perfectly_matched_layer.inner_radius;
 
                     auto sigma = parameters.sigma(position, id1, id2);
 
-                    if (radius >= inner_radius)
-                      {
-                        auto B = perfectly_matched_layer.b_matrix(position);
-                        auto C = perfectly_matched_layer.c_matrix(position);
-                        sigma  = invert(C) * sigma * invert(B);
-                      };
+                    const auto B = perfectly_matched_layer.b_matrix(position);
+                    const auto C = perfectly_matched_layer.c_matrix(position);
+                    sigma        = invert(C) * sigma * invert(B);
 
                     const auto normal = fe_face_values.normal_vector(q_point);
 
-                    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                    for (const auto i : fe_face_values.dof_indices())
                       {
                         const auto phi_i = real_part.value(i, q_point) -
                                            1.0i * imag_part.value(i, q_point);
                         const auto phi_i_T = tangential_part(phi_i, normal);
 
-                        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                        for (const auto j : fe_face_values.dof_indices())
                           {
                             const auto phi_j =
                               real_part.value(j, q_point) +
