@@ -1233,16 +1233,16 @@ namespace Utilities
     template <typename T>
     struct IsVectorOfTriviallyCopyable<std::vector<T>>
     {
-      static constexpr bool value = std::is_trivially_copyable<T>::value;
+      static constexpr bool value =
+        std::is_trivially_copyable<T>::value && !std::is_same<T, bool>::value;
     };
 
 
 
     /**
-     * A function that is used to append the contents of a
-     * std::vector<T> (where T is a type that
-     * satisfies std::is_trivially_copyable<T>::value == true)
-     * bit for bit to a character array.
+     * A function that is used to append the contents of a std::vector<T>
+     * (where T is a type that satisfies std::is_trivially_copyable<T>::value
+     * == true but not T==bool) bit for bit to a character array.
      *
      * If the type is not such a vector of T, then the function
      * throws an exception.
@@ -1258,7 +1258,8 @@ namespace Utilities
 
 
     template <typename T,
-              typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+                                          std::is_trivially_copyable<T>::value>>
     inline void
     append_vector_of_trivially_copyable_to_buffer(
       const std::vector<T> &object,
@@ -1296,7 +1297,8 @@ namespace Utilities
 
 
     template <typename T,
-              typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+                                          std::is_trivially_copyable<T>::value>>
     inline void
     create_vector_of_trivially_copyable_from_buffer(
       const std::vector<char>::const_iterator &cbegin,
