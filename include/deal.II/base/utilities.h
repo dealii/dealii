@@ -1265,20 +1265,24 @@ namespace Utilities
       const std::vector<T> &object,
       std::vector<char> &   dest_buffer)
     {
-      const auto current_position                          = dest_buffer.size();
       const typename std::vector<T>::size_type vector_size = object.size();
 
-      // Resize the buffer so that it can store the size of 'object'
-      // as well as all of its elements.
-      dest_buffer.resize(dest_buffer.size() + sizeof(vector_size) +
-                         object.size() * sizeof(T));
+      // Reserve for the buffer so that it can store the size of 'object' as
+      // well as all of its elements.
+      dest_buffer.reserve(dest_buffer.size() + sizeof(vector_size) +
+                          object.size() * sizeof(T));
 
-      // Then copy first the size and then the elements:
-      memcpy(&dest_buffer[current_position], &vector_size, sizeof(vector_size));
+      // Copy the size into the vector
+      dest_buffer.insert(dest_buffer.end(),
+                         reinterpret_cast<const char *>(&vector_size),
+                         reinterpret_cast<const char *>(&vector_size + 1));
+
+      // Insert the elements at the end of the vector:
       if (object.size() > 0)
-        memcpy(&dest_buffer[current_position] + sizeof(vector_size),
-               object.data(),
-               object.size() * sizeof(T));
+        dest_buffer.insert(dest_buffer.end(),
+                           reinterpret_cast<const char *>(object.data()),
+                           reinterpret_cast<const char *>(object.data() +
+                                                          object.size()));
     }
 
 
