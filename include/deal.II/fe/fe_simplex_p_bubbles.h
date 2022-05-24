@@ -25,7 +25,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * @brief Enriched version of FE_P that can be used with nodal quadrature.
+ * @brief Enriched version of FE_SimplexP that can be used with nodal
+ * quadrature.
  *
  * Many explicit time integration schemes require solving a mass matrix at
  * each time step. There are various ways around this requirement - for
@@ -40,18 +41,18 @@ DEAL_II_NAMESPACE_OPEN
  * cannot be used with nodal quadrature since some of the quadrature weights
  * end up being either zero or negative, resulting in either an unsolvable or
  * unstable approximation to the mass matrix. For example: the shape functions
- * of FE_P<2>(2) with support points at vertices have mean values of zero so
- * that element cannot be used with mass lumping.
+ * of FE_SimplexP<2>(2) with support points at vertices have mean values of
+ * zero so that element cannot be used with mass lumping.
 
- * This element avoids this issue by replacing the shape functions of FE_P
- * with an augmented space amendable to the construction of nodal quadrature
- * rules. For example, on the triangle a single basis function is added
- * corresponding to interpolation at the centroid (and all other basis
+ * This element avoids this issue by replacing the shape functions of
+ * FE_SimplexP with an augmented space amenable to the construction of nodal
+ * quadrature rules. For example, on the triangle a single basis function is
+ * added corresponding to interpolation at the centroid (and all other basis
  * functions are updated to preserve the partition of unity property). This
  * results in shape functions with positive means (i.e., a valid nodal
- * quadrature formula). Similarly, in 3D, the polynomial space of FE_P<3>(2)
- * is enriched with five additional degrees of freedom (where four have
- * support points at face centroids and one has a support point at the
+ * quadrature formula). Similarly, in 3D, the polynomial space of
+ * FE_SimplexP<3>(2) is enriched with five additional degrees of freedom (where
+ * four have support points at face centroids and one has a support point at the
  * centroid) to enable construction of valid nodal quadrature rule.
  *
  * Since this FE space includes bubbles (i.e., extra functions which are

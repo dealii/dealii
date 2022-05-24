@@ -134,7 +134,7 @@ namespace Step12
   //
   // The following objects are the scratch and copy objects we use in the call
   // to MeshWorker::mesh_loop(). The new object is the FEInterfaceValues object,
-  // that works similar to FEValues or FEFacesValues, except that it acts on
+  // that works similar to FEValues or FEFaceValues, except that it acts on
   // an interface between two cells and allows us to assemble the interface
   // terms in our weak form.
 
