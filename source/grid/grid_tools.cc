@@ -16,7 +16,6 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
-#include <deal.II/base/mpi_consensus_algorithms.templates.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
 

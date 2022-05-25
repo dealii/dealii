@@ -17,7 +17,6 @@
 
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
-#include <deal.II/base/mpi_consensus_algorithms.templates.h>
 #include <deal.II/base/mpi_remote_point_evaluation.h>
 
 #include <deal.II/dofs/dof_handler.h>

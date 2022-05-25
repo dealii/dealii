@@ -20,7 +20,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/mpi_consensus_algorithms.h>
-#include <deal.II/base/mpi_consensus_algorithms.templates.h>
 
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria.h>

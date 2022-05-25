@@ -16,7 +16,6 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
-#include <deal.II/base/mpi_consensus_algorithms.templates.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/dofs/dof_accessor.h>

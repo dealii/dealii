@@ -22,11 +22,7 @@
 
 #include <deal.II/matrix_free/vector_data_exchange.h>
 
-#ifdef DEAL_II_WITH_64BIT_INDICES
-#  include <deal.II/base/mpi_consensus_algorithms.templates.h>
-
-#  include <boost/serialization/utility.hpp>
-#endif
+#include <boost/serialization/utility.hpp>
 
 #include <map>
 #include <vector>

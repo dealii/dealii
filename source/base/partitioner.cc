@@ -17,6 +17,9 @@
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/partitioner.templates.h>
 
+#include <boost/serialization/utility.hpp>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Utilities
