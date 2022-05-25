@@ -3789,35 +3789,6 @@ namespace internal
           GridTools::exchange_cell_data_to_ghosts<
             std::vector<types::global_dof_index>,
             DoFHandler<dim, spacedim>>(dof_handler, pack, unpack, filter);
-
-          // have a barrier so that sends between two calls to this
-          // function are not mixed up.
-          //
-          // this is necessary because above we just see if there are
-          // messages and then receive them, without discriminating
-          // where they come from and whether they were sent in phase
-          // 1 or 2 (the function is called twice in a row). the need
-          // for a global communication step like this barrier could
-          // be avoided by receiving messages specifically from those
-          // processors from which we expect messages, and by using
-          // different tags for phase 1 and 2, but the cost of a
-          // barrier is negligible compared to everything else we do
-          // here
-          if (const auto *triangulation =
-                dynamic_cast<const dealii::parallel::
-                               DistributedTriangulationBase<dim, spacedim> *>(
-                  &dof_handler.get_triangulation()))
-            {
-              const int ierr = MPI_Barrier(triangulation->get_communicator());
-              AssertThrowMPI(ierr);
-            }
-          else
-            {
-              Assert(false,
-                     ExcMessage(
-                       "The function communicate_dof_indices_on_marked_cells() "
-                       "only works with parallel distributed triangulations."));
-            }
 #  endif
         }
 
@@ -4212,22 +4183,6 @@ namespace internal
           // managed to get every DoF, remove the user_flag, otherwise we
           // will request them again in the step below.
           communicate_mg_ghost_cells(*triangulation, *dof_handler);
-
-          // have a barrier so that sends from above and below this
-          // place are not mixed up.
-          //
-          // this is necessary because above we just see if there are
-          // messages and then receive them, without discriminating
-          // where they come from and whether they were sent in phase
-          // 1 or 2 in communicate_mg_ghost_cells() on another
-          // processor. the need for a global communication step like
-          // this barrier could be avoided by receiving messages
-          // specifically from those processors from which we expect
-          // messages, and by using different tags for phase 1 and 2,
-          // but the cost of a barrier is negligible compared to
-          // everything else we do here
-          const int ierr = MPI_Barrier(triangulation->get_communicator());
-          AssertThrowMPI(ierr);
 
           // Phase 2, only request the cells that were not completed
           // in Phase 1.
