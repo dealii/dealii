@@ -44,7 +44,7 @@
 // @endcode
 //
 // Using this logic, the following lines will then import either the
-// PETSc or Trilinos wrappers into the namespace `LA` (for "linear
+// PETSc or Trilinos wrappers into the namespace `LA` (for linear
 // algebra). In the former case, we are also defining the macro
 // `USE_PETSC_LA` so that we can detect if we are using PETSc (see
 // solve() for an example where this is necessary).
