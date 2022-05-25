@@ -1150,40 +1150,23 @@ namespace FETools
         return cells_for_this_destination;
       };
 
-      const auto answer_request =
+      const auto process_request =
         [&received_cells](const unsigned int           other_rank,
-                          const std::vector<CellData> &request) -> int {
-        // We got a message from 'other_rank', so let us decode the
-        // message in the same way as we have assembled it above.
-        // Note that the cells just received do not contain
-        // information where they came from, and we have to add that
-        // ourselves for later use.
-        for (CellData cell_data : request)
-          {
-            cell_data.receiver = other_rank;
-            received_cells.emplace_back(std::move(cell_data));
-          }
+                          const std::vector<CellData> &request) {
+          // We got a message from 'other_rank', so let us decode the
+          // message in the same way as we have assembled it above.
+          // Note that the cells just received do not contain
+          // information where they came from, and we have to add that
+          // ourselves for later use.
+          for (CellData cell_data : request)
+            {
+              cell_data.receiver = other_rank;
+              received_cells.emplace_back(std::move(cell_data));
+            }
+        };
 
-        // Nothing left to do here, we don't actually need to provide an
-        // answer:
-        return 0;
-      };
-
-      const auto read_answer = [](const unsigned int /*other_rank*/,
-                                  const int &answer) {
-        // We don't put anything into the answers, so nothing should
-        // have been coming out at this end either that differs from
-        // the default-sent zero integer:
-        (void)answer;
-        Assert(answer == 0, ExcInternalError());
-      };
-
-      Utilities::MPI::ConsensusAlgorithms::selector<std::vector<CellData>, int>(
-        destinations,
-        create_request,
-        answer_request,
-        read_answer,
-        communicator);
+      Utilities::MPI::ConsensusAlgorithms::selector<std::vector<CellData>>(
+        destinations, create_request, process_request, communicator);
     }
 
 

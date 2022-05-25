@@ -126,16 +126,17 @@ namespace TriangulationDescription
             return description_temp[other_rank_index];
           };
 
-          const auto answer_request =
+          const auto process_request =
             [&](const unsigned int,
                 const DescriptionTemp<dim, spacedim> &request) {
               this->merge(request, vertices_have_unique_ids);
-              return char{};
             };
 
           dealii::Utilities::MPI::ConsensusAlgorithms::selector<
-            DescriptionTemp<dim, spacedim>,
-            char>(relevant_processes, create_request, answer_request, {}, comm);
+            DescriptionTemp<dim, spacedim>>(relevant_processes,
+                                            create_request,
+                                            process_request,
+                                            comm);
         }
 
         /**
