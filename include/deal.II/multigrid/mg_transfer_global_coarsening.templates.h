@@ -36,8 +36,6 @@
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/tria_description.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/matrix_free/evaluation_kernels.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>

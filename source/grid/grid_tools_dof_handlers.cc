@@ -33,7 +33,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/mapping_collection.h>
 
 #include <deal.II/lac/full_matrix.h>

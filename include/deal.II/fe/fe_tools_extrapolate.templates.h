@@ -1761,10 +1761,10 @@ namespace FETools
     if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                        *>(&dof2.get_triangulation()) != nullptr)
       {
-        Assert(dof1.get_fe()[0].reference_cell() ==
+        Assert(dof1.get_fe(0).reference_cell() ==
                  ReferenceCells::get_hypercube<dim>(),
                ExcNotImplemented());
-        Assert(dof2.get_fe()[0].reference_cell() ==
+        Assert(dof2.get_fe(0).reference_cell() ==
                  ReferenceCells::get_hypercube<dim>(),
                ExcNotImplemented());
 

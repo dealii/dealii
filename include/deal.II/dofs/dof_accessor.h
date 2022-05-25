@@ -24,8 +24,6 @@
 
 #include <deal.II/grid/tria_accessor.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS

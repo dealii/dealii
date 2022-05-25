@@ -202,17 +202,6 @@ private:
     std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> &my_patches);
 };
 
-namespace Legacy
-{
-  /**
-   * @deprecated Use dealii::DataOutRotation without the DoFHandlerType
-   * template instead.
-   */
-  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-  using DataOutRotation DEAL_II_DEPRECATED =
-    dealii::DataOutRotation<dim, DoFHandlerType::space_dimension>;
-} // namespace Legacy
-
 
 DEAL_II_NAMESPACE_CLOSE
 

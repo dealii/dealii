@@ -198,8 +198,8 @@ check(const unsigned int orientation, bool reverse)
     GridTools::collect_periodic_faces(
       dof_handler, 42, 43, dim - 1, periodicity_vector);
 
-    DoFTools::make_periodicity_constraints<DoFHandler<dim>>(periodicity_vector,
-                                                            constraints);
+    DoFTools::make_periodicity_constraints<dim, dim>(periodicity_vector,
+                                                     constraints);
   }
   constraints.close();
 

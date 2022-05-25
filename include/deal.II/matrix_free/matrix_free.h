@@ -32,7 +32,6 @@
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
 
@@ -624,22 +623,6 @@ public:
          const AdditionalData &additional_data = AdditionalData());
 
   /**
-   * Initializes the data structures. Same as above, but  using DoFHandlerType.
-   *
-   * @deprecated Use the overload taking a DoFHandler object instead.
-   */
-  template <typename QuadratureType,
-            typename number2,
-            typename DoFHandlerType,
-            typename MappingType>
-  DEAL_II_DEPRECATED void
-  reinit(const MappingType &                                    mapping,
-         const std::vector<const DoFHandlerType *> &            dof_handler,
-         const std::vector<const AffineConstraints<number2> *> &constraint,
-         const std::vector<QuadratureType> &                    quad,
-         const AdditionalData &additional_data = AdditionalData());
-
-  /**
    * Initializes the data structures. Same as above, but  using a $Q_1$
    * mapping.
    *
@@ -648,18 +631,6 @@ public:
   template <typename QuadratureType, typename number2>
   DEAL_II_DEPRECATED void
   reinit(const std::vector<const DoFHandler<dim> *> &           dof_handler,
-         const std::vector<const AffineConstraints<number2> *> &constraint,
-         const std::vector<QuadratureType> &                    quad,
-         const AdditionalData &additional_data = AdditionalData());
-
-  /**
-   * Initializes the data structures. Same as above, but  using DoFHandlerType.
-   *
-   * @deprecated Use the overload taking a DoFHandler object instead.
-   */
-  template <typename QuadratureType, typename number2, typename DoFHandlerType>
-  DEAL_II_DEPRECATED void
-  reinit(const std::vector<const DoFHandlerType *> &            dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const std::vector<QuadratureType> &                    quad,
          const AdditionalData &additional_data = AdditionalData());
@@ -680,22 +651,6 @@ public:
          const AdditionalData &additional_data = AdditionalData());
 
   /**
-   * Initializes the data structures. Same as above, but  using DoFHandlerType.
-   *
-   * @deprecated Use the overload taking a DoFHandler object instead.
-   */
-  template <typename QuadratureType,
-            typename number2,
-            typename DoFHandlerType,
-            typename MappingType>
-  DEAL_II_DEPRECATED void
-  reinit(const MappingType &                                    mapping,
-         const std::vector<const DoFHandlerType *> &            dof_handler,
-         const std::vector<const AffineConstraints<number2> *> &constraint,
-         const QuadratureType &                                 quad,
-         const AdditionalData &additional_data = AdditionalData());
-
-  /**
    * Initializes the data structures. Same as above, but  using a $Q_1$
    * mapping.
    *
@@ -704,18 +659,6 @@ public:
   template <typename QuadratureType, typename number2>
   DEAL_II_DEPRECATED void
   reinit(const std::vector<const DoFHandler<dim> *> &           dof_handler,
-         const std::vector<const AffineConstraints<number2> *> &constraint,
-         const QuadratureType &                                 quad,
-         const AdditionalData &additional_data = AdditionalData());
-
-  /**
-   * Initializes the data structures. Same as above, but  using DoFHandlerType.
-   *
-   * @deprecated Use the overload taking a DoFHandler object instead.
-   */
-  template <typename QuadratureType, typename number2, typename DoFHandlerType>
-  DEAL_II_DEPRECATED void
-  reinit(const std::vector<const DoFHandlerType *> &            dof_handler,
          const std::vector<const AffineConstraints<number2> *> &constraint,
          const QuadratureType &                                 quad,
          const AdditionalData &additional_data = AdditionalData());
@@ -1725,20 +1668,6 @@ public:
    * `std::vector` argument in the reinit() function.
    */
   const DoFHandler<dim> &
-  get_dof_handler(const unsigned int dof_handler_index = 0) const;
-
-  /**
-   * Return the DoFHandler with the index as given to the respective
-   * `std::vector` argument in the reinit() function. Note that if you want to
-   * call this function with a template parameter different than the default
-   * one, you will need to use the `template` before the function call, i.e.,
-   * you will have something like `matrix_free.template
-   * get_dof_handler<hp::DoFHandler<dim>>()`.
-   *
-   * @deprecated Use the non-templated equivalent of this function.
-   */
-  template <typename DoFHandlerType>
-  DEAL_II_DEPRECATED const DoFHandlerType &
   get_dof_handler(const unsigned int dof_handler_index = 0) const;
 
   /**
@@ -3120,32 +3049,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-template <typename QuadratureType,
-          typename number2,
-          typename DoFHandlerType,
-          typename MappingType>
-void
-MatrixFree<dim, Number, VectorizedArrayType>::reinit(
-  const MappingType &                                    mapping,
-  const std::vector<const DoFHandlerType *> &            dof_handler,
-  const std::vector<const AffineConstraints<number2> *> &constraint,
-  const std::vector<QuadratureType> &                    quad,
-  const AdditionalData &                                 additional_data)
-{
-  static_assert(dim == DoFHandlerType::dimension,
-                "Dimension dim not equal to DoFHandlerType::dimension.");
-
-  std::vector<const DoFHandler<dim> *> dof_handlers;
-
-  for (const auto dh : dof_handler)
-    dof_handlers.push_back(dh);
-
-  this->reinit(mapping, dof_handlers, constraint, quad, additional_data);
-}
-
-
-
-template <int dim, typename Number, typename VectorizedArrayType>
 template <typename QuadratureType, typename number2>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::reinit(
@@ -3168,28 +3071,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
                   locally_owned_set,
                   quad_hp,
                   additional_data);
-}
-
-
-
-template <int dim, typename Number, typename VectorizedArrayType>
-template <typename QuadratureType, typename number2, typename DoFHandlerType>
-void
-MatrixFree<dim, Number, VectorizedArrayType>::reinit(
-  const std::vector<const DoFHandlerType *> &            dof_handler,
-  const std::vector<const AffineConstraints<number2> *> &constraint,
-  const std::vector<QuadratureType> &                    quad,
-  const AdditionalData &                                 additional_data)
-{
-  static_assert(dim == DoFHandlerType::dimension,
-                "Dimension dim not equal to DoFHandlerType::dimension.");
-
-  std::vector<const DoFHandler<dim> *> dof_handlers;
-
-  for (const auto dh : dof_handler)
-    dof_handlers.push_back(dh);
-
-  this->reinit(dof_handlers, constraint, quad, additional_data);
 }
 
 
@@ -3245,54 +3126,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::reinit(
                   locally_owned_set,
                   quad_hp,
                   additional_data);
-}
-
-
-
-template <int dim, typename Number, typename VectorizedArrayType>
-template <typename QuadratureType,
-          typename number2,
-          typename DoFHandlerType,
-          typename MappingType>
-void
-MatrixFree<dim, Number, VectorizedArrayType>::reinit(
-  const MappingType &                                    mapping,
-  const std::vector<const DoFHandlerType *> &            dof_handler,
-  const std::vector<const AffineConstraints<number2> *> &constraint,
-  const QuadratureType &                                 quad,
-  const AdditionalData &                                 additional_data)
-{
-  static_assert(dim == DoFHandlerType::dimension,
-                "Dimension dim not equal to DoFHandlerType::dimension.");
-
-  std::vector<const DoFHandler<dim> *> dof_handlers;
-
-  for (const auto dh : dof_handler)
-    dof_handlers.push_back(dh);
-
-  this->reinit(mapping, dof_handlers, constraint, quad, additional_data);
-}
-
-
-
-template <int dim, typename Number, typename VectorizedArrayType>
-template <typename QuadratureType, typename number2, typename DoFHandlerType>
-void
-MatrixFree<dim, Number, VectorizedArrayType>::reinit(
-  const std::vector<const DoFHandlerType *> &            dof_handler,
-  const std::vector<const AffineConstraints<number2> *> &constraint,
-  const QuadratureType &                                 quad,
-  const AdditionalData &                                 additional_data)
-{
-  static_assert(dim == DoFHandlerType::dimension,
-                "Dimension dim not equal to DoFHandlerType::dimension.");
-
-  std::vector<const DoFHandler<dim> *> dof_handlers;
-
-  for (const auto dh : dof_handler)
-    dof_handlers.push_back(dh);
-
-  this->reinit(dof_handlers, constraint, quad, additional_data);
 }
 
 

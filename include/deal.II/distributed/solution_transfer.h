@@ -366,26 +366,6 @@ namespace parallel
   } // namespace distributed
 } // namespace parallel
 
-namespace Legacy
-{
-  namespace parallel
-  {
-    namespace distributed
-    {
-      /**
-       * @deprecated Use dealii::parallel::distributed::SolutionTransfer
-       * without the DoFHandlerType template instead.
-       */
-      template <int dim,
-                typename VectorType,
-                typename DoFHandlerType = DoFHandler<dim>>
-      using SolutionTransfer DEAL_II_DEPRECATED =
-        dealii::parallel::distributed::
-          SolutionTransfer<dim, VectorType, DoFHandlerType::space_dimension>;
-    } // namespace distributed
-  }   // namespace parallel
-} // namespace Legacy
-
 
 DEAL_II_NAMESPACE_CLOSE
 
