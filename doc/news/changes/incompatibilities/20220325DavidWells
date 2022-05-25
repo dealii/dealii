@@ -1,0 +1,4 @@
+Changed: All GridIn functions now remove unused vertices and will attempt to fix
+pyramids and wedges with negative volumes.
+<br>
+(David Wells, 2022/05/25)

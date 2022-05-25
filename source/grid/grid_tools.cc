@@ -885,15 +885,16 @@ namespace GridTools
     for (auto &cell : cells)
       {
         const ArrayView<const unsigned int> vertices(cell.vertices);
-        if (GridTools::cell_measure(all_vertices, vertices) < 0)
+        // Some pathologically twisted cells can have exactly zero measure but
+        // we can still fix them
+        if (GridTools::cell_measure(all_vertices, vertices) <= 0)
           {
+            ++n_negative_cells;
             const auto reference_cell =
               ReferenceCell::n_vertices_to_type(dim, vertices.size());
 
             if (reference_cell.is_hyper_cube())
               {
-                ++n_negative_cells;
-
                 if (dim == 2)
                   {
                     // flip the cell across the y = x line in 2D
@@ -910,7 +911,6 @@ namespace GridTools
               }
             else if (reference_cell.is_simplex())
               {
-                ++n_negative_cells;
                 // By basic rules for computing determinants we can just swap
                 // two vertices to fix a negative volume. Arbitrarily pick the
                 // last two.
