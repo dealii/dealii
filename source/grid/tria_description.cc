@@ -16,7 +16,6 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
-#include <deal.II/base/mpi_consensus_algorithms.templates.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/tria.h>

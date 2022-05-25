@@ -20,6 +20,9 @@
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_vector.h>
 
+#include <boost/serialization/utility.hpp>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Utilities
