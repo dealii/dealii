@@ -1,0 +1,7 @@
+Changed: For ParameterHandler::OutputStyle::JSON or 
+ParameterHandler::OutputStyle::ShortJSON, the function 
+ParameterHandler::print_parameters() demangles now the 
+parameters before printing the output. Users do not 
+need to demangle the output themselves anymore.
+<br>
+(Magdalena Schreter, Peter Munch, 2022/05/25)

@@ -15,7 +15,7 @@ DEAL::Generate and read input.json
 {
     "Test":
     {
-        "A_20point":
+        "A point":
         {
             "value": "0, 0, 0",
             "default_value": "0, 0, 0",

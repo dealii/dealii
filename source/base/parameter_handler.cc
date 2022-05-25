@@ -334,6 +334,36 @@ namespace
   }
 
   /**
+   * Demangle all parameters recursively and attach them to @p tree_out.
+   * @p parameter_node indicates, whether a given node @p tree_in
+   * is a parameter node (as opposed to being a subsection or alias
+   * node).
+   */
+  void
+  recursively_demangle(const boost::property_tree::ptree &tree_in,
+                       boost::property_tree::ptree &      tree_out,
+                       const bool parameter_node = false)
+  {
+    for (const auto &p : tree_in)
+      {
+        if (parameter_node)
+          {
+            tree_out.put_child(p.first, p.second);
+          }
+        else
+          {
+            boost::property_tree::ptree temp;
+
+            if (const auto val = p.second.get_value_optional<std::string>())
+              temp.put_value<std::string>(*val);
+
+            recursively_demangle(p.second, temp, is_parameter_node(p.second));
+            tree_out.put_child(demangle(p.first), temp);
+          }
+      }
+  }
+
+  /**
    * Assert validity of of given output @p style.
    */
   void
@@ -1308,7 +1338,9 @@ ParameterHandler::print_parameters(std::ostream &    out,
 
   if ((style & JSON) != 0)
     {
-      write_json(out, current_entries);
+      boost::property_tree::ptree current_entries_damangled;
+      recursively_demangle(current_entries, current_entries_damangled);
+      write_json(out, current_entries_damangled);
       return out;
     }
 
