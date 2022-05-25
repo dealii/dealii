@@ -842,7 +842,8 @@ namespace Utilities
        * own implementation but can register lambda functions directly.
        */
       template <typename RequestType, typename AnswerType>
-      class AnonymousProcess : public Process<RequestType, AnswerType>
+      class DEAL_II_DEPRECATED AnonymousProcess
+        : public Process<RequestType, AnswerType>
       {
       public:
         /**
