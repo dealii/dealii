@@ -12,6 +12,11 @@ DEAL::face center = 7.00000 3.50000   face boundary id = 3
 DEAL::face center = 3.50000 7.00000   face boundary id = 0
 DEAL::Number of vertices: 8
 DEAL::Number of cells: 5
+DEAL::cell 0 type = Quad volume = 10.0000
+DEAL::cell 1 type = Quad volume = 10.0000
+DEAL::cell 2 type = Quad volume = 10.0000
+DEAL::cell 3 type = Quad volume = 10.0000
+DEAL::cell 4 type = Quad volume = 9.00000
 # vtk DataFile Version 3.0
 Triangulation generated with deal.II
 ASCII
@@ -63,6 +68,11 @@ DEAL::face center = 7.00000 3.50000 7.00000   face boundary id = 0
 DEAL::face center = 3.50000 7.00000 3.50000   face boundary id = 0
 DEAL::Number of vertices: 8
 DEAL::Number of cells: 5
+DEAL::cell 0 type = Quad volume = 14.1421
+DEAL::cell 1 type = Quad volume = 14.1421
+DEAL::cell 2 type = Quad volume = 14.1421
+DEAL::cell 3 type = Quad volume = 14.1421
+DEAL::cell 4 type = Quad volume = 12.7279
 # vtk DataFile Version 3.0
 Triangulation generated with deal.II
 ASCII
@@ -121,6 +131,10 @@ DEAL::face center = 5.50000 2.00000 4.00000   face boundary id = 0
 DEAL::face center = 8.00000 1.33333 3.66667   face boundary id = 0
 DEAL::Number of vertices: 13
 DEAL::Number of cells: 4
+DEAL::cell 0 type = Hex volume = 27.0000
+DEAL::cell 1 type = Pyramid volume = 6.00000
+DEAL::cell 2 type = Tet volume = 2.00000
+DEAL::cell 3 type = Wedge volume = -15.0000
 # vtk DataFile Version 3.0
 Triangulation generated with deal.II
 ASCII
@@ -183,6 +197,10 @@ DEAL::face center = 5.50000 2.00000 4.00000   face boundary id = 0
 DEAL::face center = 8.00000 1.33333 3.66667   face boundary id = 0
 DEAL::Number of vertices: 29
 DEAL::Number of cells: 4
+DEAL::cell 0 type = Hex volume = 27.0000
+DEAL::cell 1 type = Pyramid volume = 6.00000
+DEAL::cell 2 type = Tet volume = 2.00000
+DEAL::cell 3 type = Wedge volume = -15.0000
 # vtk DataFile Version 3.0
 Triangulation generated with deal.II
 ASCII
@@ -267,6 +285,10 @@ DEAL::face center = 5.50000 2.00000 4.00000   face boundary id = 3
 DEAL::face center = 8.00000 1.33333 3.66667   face boundary id = 6
 DEAL::Number of vertices: 13
 DEAL::Number of cells: 4
+DEAL::cell 0 type = Hex volume = 27.0000
+DEAL::cell 1 type = Pyramid volume = 6.00000
+DEAL::cell 2 type = Tet volume = 2.00000
+DEAL::cell 3 type = Wedge volume = -15.0000
 # vtk DataFile Version 3.0
 Triangulation generated with deal.II
 ASCII
@@ -349,6 +371,10 @@ DEAL::face center = 5.50000 2.00000 4.00000   face manifold id = 3
 DEAL::face center = 8.00000 1.33333 3.66667   face manifold id = 6
 DEAL::Number of vertices: 13
 DEAL::Number of cells: 4
+DEAL::cell 0 type = Hex volume = 27.0000
+DEAL::cell 1 type = Pyramid volume = 6.00000
+DEAL::cell 2 type = Tet volume = 2.00000
+DEAL::cell 3 type = Wedge volume = -15.0000
 # vtk DataFile Version 3.0
 Triangulation generated with deal.II
 ASCII

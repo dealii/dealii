@@ -45,7 +45,7 @@ read_and_print(const std::string &filename,
       deallog << std::endl;
     }
 
-  for (const auto face : tria.active_face_iterators())
+  for (const auto &face : tria.active_face_iterators())
     {
       if (face->at_boundary())
         {
@@ -60,6 +60,11 @@ read_and_print(const std::string &filename,
 
   deallog << "Number of vertices: " << tria.get_vertices().size() << std::endl;
   deallog << "Number of cells: " << tria.n_cells() << std::endl;
+
+  for (const auto &cell : tria.active_cell_iterators())
+    deallog << "cell " << cell->index()
+            << " type = " << cell->reference_cell().to_string()
+            << " volume = " << cell->measure() << std::endl;
 
   GridOut go;
   go.write_vtk(tria, deallog.get_file_stream());
