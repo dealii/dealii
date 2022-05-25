@@ -1474,7 +1474,7 @@ namespace Utilities
         return object;
       }
 
-    return {};
+    return T();
   }
 
 
