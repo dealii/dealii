@@ -872,8 +872,8 @@ namespace GridTools
     const std::vector<Point<spacedim>> &all_vertices,
     std::vector<CellData<dim>> &        cells)
   {
-    // This function is presently only implemented for hypercube and simplex
-    // volumetric (codimension 0) elements.
+    // This function is presently only implemented for volumetric (codimension
+    // 0) elements.
 
     if (dim == 1)
       return 0;
@@ -887,10 +887,10 @@ namespace GridTools
         const ArrayView<const unsigned int> vertices(cell.vertices);
         if (GridTools::cell_measure(all_vertices, vertices) < 0)
           {
-            const unsigned int n_vertices = vertices.size();
+            const auto reference_cell =
+              ReferenceCell::n_vertices_to_type(dim, vertices.size());
 
-            if (ReferenceCell::n_vertices_to_type(dim, n_vertices)
-                  .is_hyper_cube())
+            if (reference_cell.is_hyper_cube())
               {
                 ++n_negative_cells;
 
@@ -908,16 +908,27 @@ namespace GridTools
                     std::swap(cell.vertices[5], cell.vertices[7]);
                   }
               }
-
-            else if (ReferenceCell::n_vertices_to_type(dim, n_vertices)
-                       .is_simplex())
+            else if (reference_cell.is_simplex())
               {
                 ++n_negative_cells;
                 // By basic rules for computing determinants we can just swap
                 // two vertices to fix a negative volume. Arbitrarily pick the
                 // last two.
-                std::swap(cell.vertices[n_vertices - 2],
-                          cell.vertices[n_vertices - 1]);
+                std::swap(cell.vertices[cell.vertices.size() - 2],
+                          cell.vertices[cell.vertices.size() - 1]);
+              }
+            else if (reference_cell == ReferenceCells::Wedge)
+              {
+                // swap the two triangular faces
+                std::swap(cell.vertices[0], cell.vertices[3]);
+                std::swap(cell.vertices[1], cell.vertices[4]);
+                std::swap(cell.vertices[2], cell.vertices[5]);
+              }
+            else if (reference_cell == ReferenceCells::Pyramid)
+              {
+                // Try swapping two vertices in the base - perhaps things were
+                // read in the UCD (counter-clockwise) order instead of lexical
+                std::swap(cell.vertices[2], cell.vertices[3]);
               }
             else
               {
