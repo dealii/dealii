@@ -3286,69 +3286,6 @@ namespace GridTools
   compute_vertices_with_ghost_neighbors(
     const Triangulation<dim, spacedim> &tria);
 
-  /**
-   * A structure that allows the transfer of cell data of type @p T from one processor
-   * to another. It corresponds to a packed buffer that stores a vector of
-   * CellId and a vector of type @p T.
-   *
-   * This class facilitates the transfer by providing the save/load functions
-   * that are able to pack up the vector of CellId's and the associated
-   * data of type @p T into a stream.
-   *
-   * Type @p T is assumed to be serializable by <code>boost::serialization</code> (for
-   * example <code>unsigned int</code> or <code>std::vector@<double@></code>).
-   */
-  template <int dim, typename T>
-  struct CellDataTransferBuffer
-  {
-    /**
-     * A vector to store IDs of cells to be transferred.
-     */
-    std::vector<CellId> cell_ids;
-
-    /**
-     * A vector of cell data to be transferred.
-     */
-    std::vector<T> data;
-
-    /**
-     * Write the data of this object to a stream for the purpose of
-     * serialization using the [BOOST serialization
-     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html)
-     *
-     * @pre The user is responsible to keep the size of @p data
-     * equal to the size as @p cell_ids .
-     */
-    template <class Archive>
-    void
-    save(Archive &ar, const unsigned int version) const;
-
-    /**
-     * Read the data of this object from a stream for the purpose of
-     * serialization using the [BOOST serialization
-     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
-     * Throw away the previous content.
-     */
-    template <class Archive>
-    void
-    load(Archive &ar, const unsigned int version);
-
-#ifdef DOXYGEN
-    /**
-     * Read or write the data of this object to or from a stream for the
-     * purpose of serialization using the [BOOST serialization
-     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
-     */
-    template <class Archive>
-    void
-    serialize(Archive &archive, const unsigned int version);
-#else
-    // This macro defines the serialize() method that is compatible with
-    // the templated save() and load() method that have been implemented.
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
-#endif
-  };
-
 
 
   /**
@@ -4274,48 +4211,6 @@ namespace GridTools
     return projected_point;
   }
 
-
-
-  template <int dim, typename T>
-  template <class Archive>
-  void
-  CellDataTransferBuffer<dim, T>::save(Archive &ar,
-                                       const unsigned int /*version*/) const
-  {
-    Assert(cell_ids.size() == data.size(),
-           ExcDimensionMismatch(cell_ids.size(), data.size()));
-    // archive the cellids in an efficient binary format
-    const std::size_t n_cells = cell_ids.size();
-    ar &              n_cells;
-    for (const auto &id : cell_ids)
-      {
-        CellId::binary_type binary_cell_id = id.template to_binary<dim>();
-        ar &                binary_cell_id;
-      }
-
-    ar &data;
-  }
-
-
-
-  template <int dim, typename T>
-  template <class Archive>
-  void
-  CellDataTransferBuffer<dim, T>::load(Archive &ar,
-                                       const unsigned int /*version*/)
-  {
-    std::size_t n_cells;
-    ar &        n_cells;
-    cell_ids.clear();
-    cell_ids.reserve(n_cells);
-    for (unsigned int c = 0; c < n_cells; ++c)
-      {
-        CellId::binary_type value;
-        ar &                value;
-        cell_ids.emplace_back(value);
-      }
-    ar &data;
-  }
 
 
   namespace internal
