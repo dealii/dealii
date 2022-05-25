@@ -435,41 +435,30 @@ namespace parallel
 
     // 3) give global indices to locally-owned cells and mark all other cells as
     //    invalid
+    std::pair<types::global_cell_index, types::global_cell_index> my_range;
+    my_range.first = cell_index;
+
     for (const auto &cell : this->active_cell_iterators())
       if (cell->is_locally_owned())
         cell->set_global_active_cell_index(cell_index++);
       else
         cell->set_global_active_cell_index(numbers::invalid_dof_index);
 
+    my_range.second = cell_index;
+
     // 4) determine the global indices of ghost cells
+    std::vector<types::global_dof_index> is_ghost_vector;
     GridTools::exchange_cell_data_to_ghosts<types::global_cell_index>(
       *this,
       [](const auto &cell) { return cell->global_active_cell_index(); },
-      [](const auto &cell, const auto &id) {
+      [&is_ghost_vector](const auto &cell, const auto &id) {
         cell->set_global_active_cell_index(id);
+        is_ghost_vector.push_back(id);
       });
 
     // 5) set up new partitioner
-    std::vector<types::global_dof_index> is_local_vector;
-    std::vector<types::global_dof_index> is_ghost_vector;
-
-    for (const auto &cell : this->active_cell_iterators())
-      if (!cell->is_artificial())
-        {
-          const auto index = cell->global_active_cell_index();
-
-          if (index == numbers::invalid_dof_index)
-            continue;
-
-          if (cell->is_locally_owned())
-            is_local_vector.push_back(index);
-          else
-            is_ghost_vector.push_back(index);
-        }
-
-    std::sort(is_local_vector.begin(), is_local_vector.end());
     IndexSet is_local(this->n_global_active_cells());
-    is_local.add_indices(is_local_vector.begin(), is_local_vector.end());
+    is_local.add_range(my_range.first, my_range.second);
 
     std::sort(is_ghost_vector.begin(), is_ghost_vector.end());
     IndexSet is_ghost(this->n_global_active_cells());
@@ -483,57 +472,59 @@ namespace parallel
     if (this->is_multilevel_hierarchy_constructed() == true)
       {
         // 1) determine number of locally-owned cells on levels
-        std::vector<types::global_cell_index> n_locally_owned_cells(
+        std::vector<types::global_cell_index> n_cells_level(
           this->n_global_levels(), 0);
 
         for (auto cell : this->cell_iterators())
           if (cell->level_subdomain_id() == this->locally_owned_subdomain())
-            n_locally_owned_cells[cell->level()]++;
+            n_cells_level[cell->level()]++;
 
         // 2) determine the offset of each process
         std::vector<types::global_cell_index> cell_index(
           this->n_global_levels(), 0);
 
-        int ierr = MPI_Exscan(n_locally_owned_cells.data(),
-                              cell_index.data(),
-                              this->n_global_levels(),
-                              Utilities::MPI::mpi_type_id_for_type<decltype(
-                                *n_locally_owned_cells.data())>,
-                              MPI_SUM,
-                              this->mpi_communicator);
-        AssertThrowMPI(ierr);
-
-        // 3) determine global number of "active" cells on each level
-        std::vector<types::global_cell_index> n_cells_level(
-          this->n_global_levels(), 0);
-
-        for (unsigned int l = 0; l < this->n_global_levels(); ++l)
-          n_cells_level[l] = n_locally_owned_cells[l] + cell_index[l];
-
-        ierr = MPI_Bcast(
+        int ierr = MPI_Exscan(
           n_cells_level.data(),
+          cell_index.data(),
           this->n_global_levels(),
           Utilities::MPI::mpi_type_id_for_type<decltype(*n_cells_level.data())>,
-          this->n_subdomains - 1,
+          MPI_SUM,
           this->mpi_communicator);
         AssertThrowMPI(ierr);
 
+        // 3) determine global number of "active" cells on each level
+        Utilities::MPI::sum(n_cells_level,
+                            this->mpi_communicator,
+                            n_cells_level);
+
         // 4) give global indices to locally-owned cells on level and mark
         //    all other cells as invalid
+        std::vector<
+          std::pair<types::global_cell_index, types::global_cell_index>>
+          my_ranges(this->n_global_levels());
+        for (unsigned int l = 0; l < this->n_global_levels(); ++l)
+          my_ranges[l].first = cell_index[l];
+
         for (auto cell : this->cell_iterators())
           if (cell->level_subdomain_id() == this->locally_owned_subdomain())
             cell->set_global_level_cell_index(cell_index[cell->level()]++);
           else
             cell->set_global_level_cell_index(numbers::invalid_dof_index);
 
+        for (unsigned int l = 0; l < this->n_global_levels(); ++l)
+          my_ranges[l].second = cell_index[l];
+
         // 5) update the numbers of ghost level cells
+        std::vector<std::vector<types::global_dof_index>> is_ghost_vectors(
+          this->n_global_levels());
         GridTools::exchange_cell_data_to_level_ghosts<
           types::global_cell_index,
           dealii::Triangulation<dim, spacedim>>(
           *this,
           [](const auto &cell) { return cell->global_level_cell_index(); },
-          [](const auto &cell, const auto &id) {
-            return cell->set_global_level_cell_index(id);
+          [&is_ghost_vectors](const auto &cell, const auto &id) {
+            cell->set_global_level_cell_index(id);
+            is_ghost_vectors[cell->level()].push_back(id);
           });
 
         number_cache.level_cell_index_partitioners.resize(
@@ -542,35 +533,13 @@ namespace parallel
         // 6) set up cell partitioners for each level
         for (unsigned int l = 0; l < this->n_global_levels(); ++l)
           {
-            std::vector<types::global_dof_index> is_local_vector;
-            std::vector<types::global_dof_index> is_ghost_vector;
-
-            for (const auto &cell : this->cell_iterators_on_level(l))
-              if (cell->level_subdomain_id() !=
-                  dealii::numbers::artificial_subdomain_id)
-                {
-                  const auto index = cell->global_level_cell_index();
-
-                  if (index == numbers::invalid_dof_index)
-                    continue;
-
-                  if (cell->level_subdomain_id() ==
-                      this->locally_owned_subdomain())
-                    is_local_vector.push_back(index);
-                  else
-                    is_ghost_vector.push_back(index);
-                  ;
-                }
-
             IndexSet is_local(n_cells_level[l]);
-            std::sort(is_local_vector.begin(), is_local_vector.end());
-            is_local.add_indices(is_local_vector.begin(),
-                                 is_local_vector.end());
+            is_local.add_range(my_ranges[l].first, my_ranges[l].second);
 
             IndexSet is_ghost(n_cells_level[l]);
-            std::sort(is_ghost_vector.begin(), is_ghost_vector.end());
-            is_ghost.add_indices(is_ghost_vector.begin(),
-                                 is_ghost_vector.end());
+            std::sort(is_ghost_vectors[l].begin(), is_ghost_vectors[l].end());
+            is_ghost.add_indices(is_ghost_vectors[l].begin(),
+                                 is_ghost_vectors[l].end());
 
             number_cache.level_cell_index_partitioners[l] =
               std::make_shared<const Utilities::MPI::Partitioner>(
