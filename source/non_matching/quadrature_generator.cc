@@ -1278,6 +1278,10 @@ namespace NonMatching
         ExcCellNotSet,
         "The set_active_cell function has to be called before calling this function.");
 
+      DeclExceptionMsg(
+        ExcReferenceCellNotHypercube,
+        "The reference cell of the incoming cell must be a hypercube.");
+
 
       /**
        * This class evaluates a function defined by a solution vector and a
@@ -1891,6 +1895,10 @@ namespace NonMatching
   DiscreteQuadratureGenerator<dim>::generate(
     const typename Triangulation<dim>::active_cell_iterator &cell)
   {
+    Assert(cell->reference_cell().is_hyper_cube(),
+           internal::DiscreteQuadratureGeneratorImplementation::
+             ExcReferenceCellNotHypercube());
+
     reference_space_level_set->set_active_cell(cell);
     const BoundingBox<dim> unit_box = create_unit_bounding_box<dim>();
     QuadratureGenerator<dim>::generate(*reference_space_level_set, unit_box);
@@ -1921,6 +1929,10 @@ namespace NonMatching
     const typename Triangulation<dim>::active_cell_iterator &cell,
     const unsigned int                                       face_index)
   {
+    Assert(cell->reference_cell().is_hyper_cube(),
+           internal::DiscreteQuadratureGeneratorImplementation::
+             ExcReferenceCellNotHypercube());
+
     reference_space_level_set->set_active_cell(cell);
     const BoundingBox<dim> unit_box = create_unit_bounding_box<dim>();
     FaceQuadratureGenerator<dim>::generate(*reference_space_level_set,
