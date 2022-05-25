@@ -1218,8 +1218,8 @@ namespace Utilities
   namespace internal
   {
     /**
-     * A structure that is used to identify whether a template
-     * argument is a std::vector<T> where T is a type that
+     * A structure that is used to identify whether a template argument is a
+     * std::vector<T> or std::vector<std::vector<T>> where T is a type that
      * satisfies std::is_trivially_copyable<T>::value == true.
      */
     template <typename T>
@@ -1232,6 +1232,15 @@ namespace Utilities
 
     template <typename T>
     struct IsVectorOfTriviallyCopyable<std::vector<T>>
+    {
+      static constexpr bool value =
+        std::is_trivially_copyable<T>::value && !std::is_same<T, bool>::value;
+    };
+
+
+
+    template <typename T>
+    struct IsVectorOfTriviallyCopyable<std::vector<std::vector<T>>>
     {
       static constexpr bool value =
         std::is_trivially_copyable<T>::value && !std::is_same<T, bool>::value;
@@ -1257,6 +1266,7 @@ namespace Utilities
     }
 
 
+
     template <typename T,
               typename = std::enable_if_t<!std::is_same<T, bool>::value &&
                                           std::is_trivially_copyable<T>::value>>
@@ -1270,7 +1280,7 @@ namespace Utilities
       // Reserve for the buffer so that it can store the size of 'object' as
       // well as all of its elements.
       dest_buffer.reserve(dest_buffer.size() + sizeof(vector_size) +
-                          object.size() * sizeof(T));
+                          vector_size * sizeof(T));
 
       // Copy the size into the vector
       dest_buffer.insert(dest_buffer.end(),
@@ -1278,11 +1288,58 @@ namespace Utilities
                          reinterpret_cast<const char *>(&vector_size + 1));
 
       // Insert the elements at the end of the vector:
-      if (object.size() > 0)
+      if (vector_size > 0)
         dest_buffer.insert(dest_buffer.end(),
                            reinterpret_cast<const char *>(object.data()),
                            reinterpret_cast<const char *>(object.data() +
-                                                          object.size()));
+                                                          vector_size));
+    }
+
+
+
+    template <typename T,
+              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+                                          std::is_trivially_copyable<T>::value>>
+    inline void
+    append_vector_of_trivially_copyable_to_buffer(
+      const std::vector<std::vector<T>> &object,
+      std::vector<char> &                dest_buffer)
+    {
+      using size_type             = typename std::vector<T>::size_type;
+      const size_type vector_size = object.size();
+
+      typename std::vector<T>::size_type aggregated_size = 0;
+      std::vector<size_type>             sizes;
+      sizes.reserve(vector_size);
+      for (const auto &a : object)
+        {
+          aggregated_size += a.size();
+          sizes.push_back(a.size());
+        }
+
+      // Reserve for the buffer so that it can store the size of 'object' as
+      // well as all of its elements.
+      dest_buffer.reserve(dest_buffer.size() +
+                          sizeof(vector_size) * (1 + vector_size) +
+                          aggregated_size * sizeof(T));
+
+      // Copy the size into the vector
+      dest_buffer.insert(dest_buffer.end(),
+                         reinterpret_cast<const char *>(&vector_size),
+                         reinterpret_cast<const char *>(&vector_size + 1));
+
+      // Copy the sizes of the individual chunks into the vector
+      if (vector_size > 0)
+        dest_buffer.insert(dest_buffer.end(),
+                           reinterpret_cast<const char *>(sizes.data()),
+                           reinterpret_cast<const char *>(sizes.data() +
+                                                          vector_size));
+
+      // Insert the elements at the end of the vector:
+      for (const auto &a : object)
+        dest_buffer.insert(dest_buffer.end(),
+                           reinterpret_cast<const char *>(a.data()),
+                           reinterpret_cast<const char *>(a.data() + a.size()));
     }
 
 
@@ -1312,7 +1369,6 @@ namespace Utilities
       // First get the size of the vector, and resize the output object
       typename std::vector<T>::size_type vector_size;
       memcpy(&vector_size, &*cbegin, sizeof(vector_size));
-      object.resize(vector_size);
 
       Assert(static_cast<std::ptrdiff_t>(cend - cbegin) ==
                static_cast<std::ptrdiff_t>(sizeof(vector_size) +
@@ -1321,10 +1377,61 @@ namespace Utilities
       (void)cend;
 
       // Then copy the elements:
-      if (object.size() > 0)
-        memcpy(object.data(),
-               &*cbegin + sizeof(vector_size),
-               vector_size * sizeof(T));
+      object.clear();
+      if (vector_size > 0)
+        object.insert(object.end(),
+                      reinterpret_cast<const T *>(&*cbegin +
+                                                  sizeof(vector_size)),
+                      reinterpret_cast<const T *>(&*cend));
+    }
+
+
+
+    template <typename T,
+              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+                                          std::is_trivially_copyable<T>::value>>
+    inline void
+    create_vector_of_trivially_copyable_from_buffer(
+      const std::vector<char>::const_iterator &cbegin,
+      const std::vector<char>::const_iterator &cend,
+      std::vector<std::vector<T>> &            object)
+    {
+      // First get the size of the vector, and resize the output object
+      using size_type = typename std::vector<T>::size_type;
+      std::vector<char>::const_iterator iterator = cbegin;
+      size_type                         vector_size;
+      memcpy(&vector_size, &*iterator, sizeof(vector_size));
+      object.clear();
+      object.resize(vector_size);
+      std::vector<size_type> sizes(vector_size);
+      if (vector_size > 0)
+        memcpy(sizes.data(),
+               &*iterator + sizeof(vector_size),
+               vector_size * sizeof(size_type));
+
+      iterator += sizeof(vector_size) * (1 + vector_size);
+      size_type aggregated_size = 0;
+      for (const auto a : sizes)
+        aggregated_size += a;
+
+      Assert(static_cast<std::ptrdiff_t>(cend - iterator) ==
+               static_cast<std::ptrdiff_t>(aggregated_size * sizeof(T)),
+             ExcMessage("The given buffer has the wrong size."));
+      (void)cend;
+
+      // Then copy the elements:
+      for (unsigned int i = 0; i < vector_size; ++i)
+        if (sizes[i] > 0)
+          {
+            object[i].insert(object[i].end(),
+                             reinterpret_cast<const T *>(&*iterator),
+                             reinterpret_cast<const T *>(&*iterator +
+                                                         sizeof(T) * sizes[i]));
+            iterator += sizeof(T) * sizes[i];
+          }
+
+      Assert(iterator == cend,
+             ExcMessage("The given buffer has the wrong size."));
     }
 
   } // namespace internal
