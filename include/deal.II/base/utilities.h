@@ -1456,13 +1456,20 @@ namespace Utilities
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
 #endif
       {
+        // Determine the size. There are places where we would like to use a
+        // truly empty type, for which we use std::tuple<> (i.e., a tuple
+        // of zero elements). For this class, the compiler reports a nonzero
+        // sizeof(...) because that is the minimum possible for objects --
+        // objects need to have distinct addresses, so they need to have a size
+        // of at least one. But we can special case this situation.
+        size = (std::is_same<T, std::tuple<>>::value ? 0 : sizeof(T));
+
         (void)allow_compression;
         const std::size_t previous_size = dest_buffer.size();
-        dest_buffer.resize(previous_size + sizeof(T));
+        dest_buffer.resize(previous_size + size);
 
-        std::memcpy(dest_buffer.data() + previous_size, &object, sizeof(T));
-
-        size = sizeof(T);
+        if (size > 0)
+          std::memcpy(dest_buffer.data() + previous_size, &object, size);
       }
     // Next try if we have a vector of trivially copyable objects.
     // If that is the case, we can shortcut the whole BOOST serialization
@@ -1536,11 +1543,22 @@ namespace Utilities
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
 #endif
       {
+        // Determine the size. There are places where we would like to use a
+        // truly empty type, for which we use std::tuple<> (i.e., a tuple
+        // of zero elements). For this class, the compiler reports a nonzero
+        // sizeof(...) because that is the minimum possible for objects --
+        // objects need to have distinct addresses, so they need to have a size
+        // of at least one. But we can special case this situation.
+        const std::size_t size =
+          (std::is_same<T, std::tuple<>>::value ? 0 : sizeof(T));
+
         T object;
 
         (void)allow_compression;
-        Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
-        std::memcpy(&object, &*cbegin, sizeof(T));
+        Assert(std::distance(cbegin, cend) == size, ExcInternalError());
+
+        if (size > 0)
+          std::memcpy(&object, &*cbegin, size);
 
         return object;
       }
