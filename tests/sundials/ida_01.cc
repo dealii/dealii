@@ -67,7 +67,6 @@ public:
     , A(2, 2)
     , Jinv(2, 2)
     , kappa(_kappa)
-    , out("output")
   {
     using VectorType = Vector<double>;
 
@@ -117,8 +116,8 @@ public:
                                    const VectorType & sol,
                                    const VectorType & sol_dot,
                                    const unsigned int step_number) -> int {
-      out << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol_dot[0] << ' '
-          << sol_dot[1] << std::endl;
+      deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol_dot[0] << ' '
+              << sol_dot[1] << std::endl;
       return 0;
     };
   }
@@ -139,8 +138,6 @@ private:
   FullMatrix<double> A;
   FullMatrix<double> Jinv;
   double             kappa;
-
-  std::ofstream out;
 };
 
 
@@ -149,6 +146,8 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, numbers::invalid_unsigned_int);
+  initlog();
+  deallog << std::setprecision(10);
 
   SUNDIALS::IDA<Vector<double>>::AdditionalData data;
   ParameterHandler                              prm;
