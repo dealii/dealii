@@ -28,7 +28,6 @@
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/evaluation_flags.h>
 #include <deal.II/matrix_free/fe_evaluation_data.h>
-#include <deal.II/matrix_free/hanging_nodes_internal.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
