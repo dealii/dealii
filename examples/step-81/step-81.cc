@@ -462,7 +462,7 @@ namespace Step81
     , dof_handler(triangulation)
   {
     ParameterAcceptor::parse_parameters_call_back.connect(
-      std::bind(&Maxwell<dim>::parse_parameters_callback, this));
+      [&]() { parse_parameters_callback(); });
 
     scaling = 20;
     add_parameter("scaling", scaling, "scale of the hypercube geometry");
