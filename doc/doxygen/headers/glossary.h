@@ -1705,9 +1705,19 @@
  *
  *
  * <dt class="glossary">@anchor GlossReferenceCell <b>Reference cell</b></dt>
- * <dd>The hypercube [0,1]<sup>dim</sup>, on which all parametric finite
- * element shape functions are defined. Many properties of the reference
- * cell are described by the GeometryInfo class.
+ * <dd>The finite element method is typically described by providing shape
+ * functions on a "reference cell" whose shape, along with the shape functions,
+ * is then mapped to the actual cells of the mesh. These reference cells are
+ * typically triangles or quadrilaterals for two-dimensional meshes;
+ * tetrahedra, hexahedra, wedges, or pyramids for three-dimensional meshes;
+ * and simple line segments in the one-dimensional case.
+ *
+ * Rather than hard-coding properties of the reference cell in all places
+ * where one wants to know about, say, the number of vertices of a cell,
+ * deal.II uses a single, central place to describe the properties of
+ * reference cells: The ReferenceCell class. In loops over the cells of a
+ * mesh, one typically asks for properties of these cells using the
+ * call `cell->reference_cell()`.
  * </dd>
  *
  *
