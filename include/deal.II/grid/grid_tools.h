@@ -3297,9 +3297,12 @@ namespace GridTools
    *
    * Type @p T is assumed to be serializable by <code>boost::serialization</code> (for
    * example <code>unsigned int</code> or <code>std::vector@<double@></code>).
+   *
+   * @deprecated The implementation in deal.II has been rewritten, making this class
+   * obsolete for use within deal.II. Use your own data structures instead.
    */
   template <int dim, typename T>
-  struct CellDataTransferBuffer
+  struct DEAL_II_DEPRECATED CellDataTransferBuffer
   {
     /**
      * A vector to store IDs of cells to be transferred.
