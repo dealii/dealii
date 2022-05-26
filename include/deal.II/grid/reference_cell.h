@@ -68,10 +68,19 @@ namespace internal
 
 
 /**
- * A type that describes the kinds of reference cells that can be used.
- * This includes quadrilaterals and hexahedra (i.e., "hypercubes"),
- * triangles and tetrahedra (simplices), and the pyramids and wedges
- * necessary when using mixed 3d meshes.
+ * A type that describes the kinds of reference cells that can be
+ * used.  This includes quadrilaterals and hexahedra (i.e.,
+ * "hypercubes"), triangles and tetrahedra (simplices), and the
+ * pyramids and wedges necessary when using mixed 3d meshes. This
+ * class then describes geometric, topological, and other kinds of
+ * information about these kinds of reference cells. This includes how
+ * many vertices or faces a certain kind of reference cell has
+ * (topological information), where these vertices lie, what the
+ * cell's volume or center of mass is (geometric information), and how
+ * to output these cells in various output formats or what appropriate
+ * quadrature rules are. The documentation of this class is separated
+ * into a number of sections to group the many member functions into
+ * different categories such as those mentioned above.
  *
  * Objects of this type should not be created in user code, and as a
  * consequence the class does not have a user-accessible constructor
@@ -487,10 +496,11 @@ public:
   volume() const;
 
   /**
-   * Return the barycenter of the reference cell that corresponds
-   * to the current object. The function is not called `center()` because
-   * one can define the center of an object in a number of different ways
-   * whereas the barycenter of a reference cell $K$ is unambiguously defined as
+   * Return the barycenter (i.e., the center of mass) of the reference
+   * cell that corresponds to the current object. The function is not
+   * called `center()` because one can define the center of an object
+   * in a number of different ways whereas the barycenter of a
+   * reference cell $K$ is unambiguously defined as
    * @f[
    *   \mathbf x_K = \frac{1}{V} \int_K \mathbf x \; dx
    * @f]

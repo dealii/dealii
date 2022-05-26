@@ -1438,8 +1438,12 @@ struct GeometryInfo<0>
  * This class provides dimension independent information to all topological
  * structures that make up the unit, or
  * @ref GlossReferenceCell "reference cell".
- * This class has been
+ * That said, this class only describes information about hypercube reference
+ * cells (i.e., lines, quadrilaterals, or hexahedra), which historically
+ * were the only kinds of cells supported by deal.II. This is no longer the
+ * case today, and consequently this class has been
  * superseded by the ReferenceCell class -- see there for more information.
+ * The rest of this class's documentation is therefore partly historical.
  *
  *
  * It is the one central point in the library where information about the
