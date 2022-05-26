@@ -671,21 +671,23 @@ namespace Step81
 
             for (const auto i : fe_values.dof_indices())
               {
+                constexpr std::complex<double> imag{0., 1.};
+
                 const auto phi_i = real_part.value(i, q_point) -
-                                   1.0i * imag_part.value(i, q_point);
+                                   imag * imag_part.value(i, q_point);
                 const auto curl_phi_i = real_part.curl(i, q_point) -
-                                        1.0i * imag_part.curl(i, q_point);
+                                        imag * imag_part.curl(i, q_point);
 
                 const auto rhs_value =
-                  (1.0i * scalar_product(J_a, phi_i)) * fe_values.JxW(q_point);
+                  (imag * scalar_product(J_a, phi_i)) * fe_values.JxW(q_point);
                 cell_rhs(i) += rhs_value.real();
 
                 for (const auto j : fe_values.dof_indices())
                   {
                     const auto phi_j = real_part.value(j, q_point) +
-                                       1.0i * imag_part.value(j, q_point);
+                                       imag * imag_part.value(j, q_point);
                     const auto curl_phi_j = real_part.curl(j, q_point) +
-                                            1.0i * imag_part.curl(j, q_point);
+                                            imag * imag_part.curl(j, q_point);
 
                     const auto temp =
                       (scalar_product(mu_inv * curl_phi_j, curl_phi_i) -
@@ -739,16 +741,18 @@ namespace Step81
 
                         for (const auto i : fe_face_values.dof_indices())
                           {
+                            constexpr std::complex<double> imag{0., 1.};
+
                             const auto phi_i =
                               real_part.value(i, q_point) -
-                              1.0i * imag_part.value(i, q_point);
+                              imag * imag_part.value(i, q_point);
                             const auto phi_i_T = tangential_part(phi_i, normal);
 
                             for (const auto j : fe_face_values.dof_indices())
                               {
                                 const auto phi_j =
                                   real_part.value(j, q_point) +
-                                  1.0i * imag_part.value(j, q_point);
+                                  imag * imag_part.value(j, q_point);
                                 const auto phi_j_T =
                                   tangential_part(phi_j, normal) *
                                   fe_face_values.JxW(q_point);
@@ -757,7 +761,7 @@ namespace Step81
                                 const auto sqrt_prod = prod;
 
                                 const auto temp =
-                                  -1.0i * scalar_product((sqrt_prod * phi_j_T),
+                                  -imag * scalar_product((sqrt_prod * phi_j_T),
                                                          phi_i_T);
                                 cell_matrix(i, j) += temp.real();
                               } /* j */
@@ -795,19 +799,21 @@ namespace Step81
 
                     for (const auto i : fe_face_values.dof_indices())
                       {
+                        constexpr std::complex<double> imag{0., 1.};
+
                         const auto phi_i = real_part.value(i, q_point) -
-                                           1.0i * imag_part.value(i, q_point);
+                                           imag * imag_part.value(i, q_point);
                         const auto phi_i_T = tangential_part(phi_i, normal);
 
                         for (const auto j : fe_face_values.dof_indices())
                           {
                             const auto phi_j =
                               real_part.value(j, q_point) +
-                              1.0i * imag_part.value(j, q_point);
+                              imag * imag_part.value(j, q_point);
                             const auto phi_j_T = tangential_part(phi_j, normal);
 
                             const auto temp =
-                              -1.0i *
+                              -imag *
                               scalar_product((sigma * phi_j_T), phi_i_T) *
                               fe_face_values.JxW(q_point);
                             cell_matrix(i, j) += temp.real();
