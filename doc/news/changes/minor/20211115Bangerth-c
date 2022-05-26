@@ -1,5 +1,5 @@
-New: In the same spirit as provided by the C++20 [range
-adaptors](https://en.cppreference.com/w/cpp/ranges) feature, it is now
+New: In the same spirit as provided by the C++20
+[range adaptors](https://en.cppreference.com/w/cpp/ranges) feature, it is now
 possible to "filter" ranges over the active cells of Triangulation
 and DoFHandler objects.
 <br>
@@ -20,8 +20,6 @@ by:
 @code
   DoFHandler<dim> dof_handler;
   ...
-  const auto filtered_iterators_range =
-    filter_iterators();
   for (const auto &cell :
           dof_handler.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
     {
