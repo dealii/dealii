@@ -731,13 +731,14 @@ namespace Utilities
        */
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      pex(const std::vector<unsigned int> &                     targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const std::function<AnswerType(const unsigned int,
-                                         const RequestType &)> &answer_request,
-          const std::function<void(const unsigned int, const AnswerType &)>
-            &             process_answer,
-          const MPI_Comm &comm);
+      serial(
+        const std::vector<unsigned int> &                     targets,
+        const std::function<RequestType(const unsigned int)> &create_request,
+        const std::function<AnswerType(const unsigned int, const RequestType &)>
+          &answer_request,
+        const std::function<void(const unsigned int, const AnswerType &)>
+          &             process_answer,
+        const MPI_Comm &comm);
 
 
 
