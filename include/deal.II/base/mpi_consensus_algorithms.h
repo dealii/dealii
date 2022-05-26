@@ -476,8 +476,27 @@ namespace Utilities
        * @note This class closely follows @cite hoefler2010scalable, but our
        *   implementation also deals with payloads.
        *
-       * @tparam RequestType The type of the elements of the vector to be sent.
-       * @tparam AnswerType The type of the elements of the vector to be received.
+       * @param[in] targets A vector that contains the ranks of processes
+       *   to which requests should be sent and from which answers need
+       *   to be received.
+       * @param[in] create_request A function object that takes the rank
+       *   of a target process as argument and returns the message that
+       *   forms the request to this target.
+       * @param[in] answer_request A function that takes as arguments the
+       *   rank of the process that has sent a request to us, along with
+       *   the message of the request, and returns the message that forms
+       *   the answer that should be sent back to the requesting process.
+       * @param[in] process_answer A function object that takes as argument
+       *   the rank of a process from which we have received an answer
+       *   to a previously sent request, along with the message that
+       *   forms this answer. This function is used to describe what
+       *   the caller of the consensus algorithm wants to do with the
+       *   received answer.
+       * @param[in] comm The MPI communicator on which the whole algorithm
+       *   is to be performed.
+       *
+       * @tparam RequestType The type of the object to be sent.
+       * @tparam AnswerType The type of the object to be received.
        */
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
@@ -658,8 +677,27 @@ namespace Utilities
        *   in the ConsensusAlgorithms::NBX class (a sister class to the
        *   current one).
        *
-       * @tparam RequestType The type of the elements of the vector to be sent.
-       * @tparam AnswerType The type of the elements of the vector to be received.
+       * @param[in] targets A vector that contains the ranks of processes
+       *   to which requests should be sent and from which answers need
+       *   to be received.
+       * @param[in] create_request A function object that takes the rank
+       *   of a target process as argument and returns the message that
+       *   forms the request to this target.
+       * @param[in] answer_request A function that takes as arguments the
+       *   rank of the process that has sent a request to us, along with
+       *   the message of the request, and returns the message that forms
+       *   the answer that should be sent back to the requesting process.
+       * @param[in] process_answer A function object that takes as argument
+       *   the rank of a process from which we have received an answer
+       *   to a previously sent request, along with the message that
+       *   forms this answer. This function is used to describe what
+       *   the caller of the consensus algorithm wants to do with the
+       *   received answer.
+       * @param[in] comm The MPI communicator on which the whole algorithm
+       *   is to be performed.
+       *
+       * @tparam RequestType The type of the object to be sent.
+       * @tparam AnswerType The type of the object to be received.
        */
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
@@ -726,8 +764,27 @@ namespace Utilities
        * where the communicator provided has only one rank (or when
        * MPI is simply not used at all).
        *
-       * @tparam RequestType The type of the elements of the vector to be sent.
-       * @tparam AnswerType The type of the elements of the vector to be received.
+       * @param[in] targets A vector that contains the ranks of processes
+       *   to which requests should be sent and from which answers need
+       *   to be received.
+       * @param[in] create_request A function object that takes the rank
+       *   of a target process as argument and returns the message that
+       *   forms the request to this target.
+       * @param[in] answer_request A function that takes as arguments the
+       *   rank of the process that has sent a request to us, along with
+       *   the message of the request, and returns the message that forms
+       *   the answer that should be sent back to the requesting process.
+       * @param[in] process_answer A function object that takes as argument
+       *   the rank of a process from which we have received an answer
+       *   to a previously sent request, along with the message that
+       *   forms this answer. This function is used to describe what
+       *   the caller of the consensus algorithm wants to do with the
+       *   received answer.
+       * @param[in] comm The MPI communicator on which the whole algorithm
+       *   is to be performed.
+       *
+       * @tparam RequestType The type of the object to be sent.
+       * @tparam AnswerType The type of the object to be received.
        */
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
@@ -820,8 +877,27 @@ namespace Utilities
        * goal is to always use the most efficient algorithm for however many
        * processes participate in the communication.
        *
-       * @tparam RequestType The type of the elements of the vector to be sent.
-       * @tparam AnswerType The type of the elements of the vector to be received.
+       * @param[in] targets A vector that contains the ranks of processes
+       *   to which requests should be sent and from which answers need
+       *   to be received.
+       * @param[in] create_request A function object that takes the rank
+       *   of a target process as argument and returns the message that
+       *   forms the request to this target.
+       * @param[in] answer_request A function that takes as arguments the
+       *   rank of the process that has sent a request to us, along with
+       *   the message of the request, and returns the message that forms
+       *   the answer that should be sent back to the requesting process.
+       * @param[in] process_answer A function object that takes as argument
+       *   the rank of a process from which we have received an answer
+       *   to a previously sent request, along with the message that
+       *   forms this answer. This function is used to describe what
+       *   the caller of the consensus algorithm wants to do with the
+       *   received answer.
+       * @param[in] comm The MPI communicator on which the whole algorithm
+       *   is to be performed.
+       *
+       * @tparam RequestType The type of the object to be sent.
+       * @tparam AnswerType The type of the object to be received.
        */
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
