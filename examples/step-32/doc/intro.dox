@@ -739,11 +739,11 @@ the fact that we don't store all objects completely locally. There
 will be a few points where we have to limit loops over all cells to
 those that are locally owned, or where we need to distinguish between
 vectors that store only locally owned elements and those that store
-everything that is locally relevant (see @ref GlossLocallyRelevantDof
-"this glossary entry"), but by and large the amount of heavy lifting
-necessary to make the program run in %parallel is well hidden in the
-libraries upon which this program builds. In any case, we will comment
-on these locations as we get to them in the program code.
+everything that is locally relevant (see
+@ref GlossLocallyRelevantDof "this glossary entry"), but by and large the
+amount of heavy lifting necessary to make the program run in %parallel is
+well hidden in the libraries upon which this program builds. In any case,
+we will comment on these locations as we get to them in the program code.
 
 
 <h3> Parallelization within individual nodes of a cluster </h3>

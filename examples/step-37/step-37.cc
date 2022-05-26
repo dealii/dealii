@@ -472,13 +472,14 @@ namespace Step37
   // appearing on locally owned cells (plus those referenced via hanging node
   // constraints) are necessary. However, in deal.II we often set all the
   // degrees of freedom on ghosted elements as ghosted vector entries, called
-  // the @ref GlossLocallyRelevantDof "locally relevant DoFs described in the
-  // glossary". In that case, the MPI-local index of a ghosted vector entry
-  // can in general be different in the two possible ghost sets, despite
-  // referring to the same global index. To avoid problems, FEEvaluation
-  // checks that the partitioning of the vector used for the matrix-vector
-  // product does indeed match with the partitioning of the indices in
-  // MatrixFree by a check called
+  // the
+  // @ref GlossLocallyRelevantDof "locally relevant DoFs described in the glossary".
+  // In that case, the MPI-local index of a ghosted vector entry can in
+  // general be different in the two possible ghost sets, despite referring
+  // to the same global index. To avoid problems, FEEvaluation checks that
+  // the partitioning of the vector used for the matrix-vector product does
+  // indeed match with the partitioning of the indices in MatrixFree by a
+  // check called
   // LinearAlgebra::distributed::Vector::partitioners_are_compatible. To
   // facilitate things, the MatrixFreeOperators::Base class includes a
   // mechanism to fit the ghost set to the correct layout. This happens in the
