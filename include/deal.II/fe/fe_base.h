@@ -980,9 +980,9 @@ internal::GenericDoFsPerObject::generate(const FiniteElementData<dim> &fe)
 
   internal::GenericDoFsPerObject result;
 
-  result.dofs_per_object_exclusive.resize(dim + 1);
-  result.dofs_per_object_inclusive.resize(dim + 1);
-  result.object_index.resize(dim + 1);
+  result.dofs_per_object_exclusive.resize(4);
+  result.dofs_per_object_inclusive.resize(4);
+  result.object_index.resize(4);
 
   unsigned int counter = 0;
 
@@ -1023,24 +1023,32 @@ internal::GenericDoFsPerObject::generate(const FiniteElementData<dim> &fe)
       }
 
   {
-    result.dofs_per_object_exclusive[dim].emplace_back(
-      fe.template n_dofs_per_object<dim>());
+    const auto c = fe.template n_dofs_per_object<dim>();
+
+    result.dofs_per_object_exclusive[dim].emplace_back(c);
     result.dofs_per_object_inclusive[dim].emplace_back(fe.n_dofs_per_cell());
     result.object_index[dim].emplace_back(counter);
+
+    counter += c;
   }
 
-  result.first_object_index_on_face.resize(dim);
+  for (unsigned int d = dim + 1; d <= 3; ++d)
+    {
+      result.dofs_per_object_exclusive[d].emplace_back(0);
+      result.dofs_per_object_inclusive[d].emplace_back(0);
+      result.object_index[d].emplace_back(counter);
+    }
+
+  result.first_object_index_on_face.resize(3);
   for (unsigned int face_no : reference_cell.face_indices())
     {
       result.first_object_index_on_face[0].emplace_back(0);
 
-      if (dim >= 2)
-        result.first_object_index_on_face[1].emplace_back(
-          fe.get_first_face_line_index(face_no));
+      result.first_object_index_on_face[1].emplace_back(
+        fe.get_first_face_line_index(face_no));
 
-      if (dim == 3)
-        result.first_object_index_on_face[2].emplace_back(
-          fe.get_first_face_quad_index(face_no));
+      result.first_object_index_on_face[2].emplace_back(
+        fe.get_first_face_quad_index(face_no));
     }
 
   return result;
