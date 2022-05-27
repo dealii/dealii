@@ -3297,9 +3297,12 @@ namespace GridTools
    *
    * Type @p T is assumed to be serializable by <code>boost::serialization</code> (for
    * example <code>unsigned int</code> or <code>std::vector@<double@></code>).
+   *
+   * @deprecated The implementation in deal.II has been rewritten, making this class
+   * obsolete for use within deal.II. Use your own data structures instead.
    */
   template <int dim, typename T>
-  struct CellDataTransferBuffer
+  struct DEAL_II_DEPRECATED CellDataTransferBuffer
   {
     /**
      * A vector to store IDs of cells to be transferred.
@@ -3321,7 +3324,23 @@ namespace GridTools
      */
     template <class Archive>
     void
-    save(Archive &ar, const unsigned int version) const;
+    save(Archive &ar, const unsigned int) const
+    {
+      // Implement the code inline as some compilers do otherwise complain
+      // about the use of a deprecated interface.
+      Assert(cell_ids.size() == data.size(),
+             ExcDimensionMismatch(cell_ids.size(), data.size()));
+      // archive the cellids in an efficient binary format
+      const std::size_t n_cells = cell_ids.size();
+      ar &              n_cells;
+      for (const auto &id : cell_ids)
+        {
+          CellId::binary_type binary_cell_id = id.template to_binary<dim>();
+          ar &                binary_cell_id;
+        }
+
+      ar &data;
+    }
 
     /**
      * Read the data of this object from a stream for the purpose of
@@ -3331,7 +3350,23 @@ namespace GridTools
      */
     template <class Archive>
     void
-    load(Archive &ar, const unsigned int version);
+    load(Archive &ar, const unsigned int)
+    {
+      // Implement the code inline as some compilers do otherwise complain
+      // about the use of a deprecated interface.
+      std::size_t n_cells;
+      ar &        n_cells;
+      cell_ids.clear();
+      cell_ids.reserve(n_cells);
+      for (unsigned int c = 0; c < n_cells; ++c)
+        {
+          CellId::binary_type value;
+          ar &                value;
+          cell_ids.emplace_back(value);
+        }
+      ar &data;
+    }
+
 
 #ifdef DOXYGEN
     /**
@@ -4274,48 +4309,6 @@ namespace GridTools
     return projected_point;
   }
 
-
-
-  template <int dim, typename T>
-  template <class Archive>
-  void
-  CellDataTransferBuffer<dim, T>::save(Archive &ar,
-                                       const unsigned int /*version*/) const
-  {
-    Assert(cell_ids.size() == data.size(),
-           ExcDimensionMismatch(cell_ids.size(), data.size()));
-    // archive the cellids in an efficient binary format
-    const std::size_t n_cells = cell_ids.size();
-    ar &              n_cells;
-    for (const auto &id : cell_ids)
-      {
-        CellId::binary_type binary_cell_id = id.template to_binary<dim>();
-        ar &                binary_cell_id;
-      }
-
-    ar &data;
-  }
-
-
-
-  template <int dim, typename T>
-  template <class Archive>
-  void
-  CellDataTransferBuffer<dim, T>::load(Archive &ar,
-                                       const unsigned int /*version*/)
-  {
-    std::size_t n_cells;
-    ar &        n_cells;
-    cell_ids.clear();
-    cell_ids.reserve(n_cells);
-    for (unsigned int c = 0; c < n_cells; ++c)
-      {
-        CellId::binary_type value;
-        ar &                value;
-        cell_ids.emplace_back(value);
-      }
-    ar &data;
-  }
 
 
   namespace internal
