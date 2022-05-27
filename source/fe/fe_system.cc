@@ -1534,13 +1534,6 @@ template <int dim, int spacedim>
 void
 FESystem<dim, spacedim>::build_interface_constraints()
 {
-  // TODO: the implementation makes the assumption that all faces have the
-  // same number of dofs
-  if (this->n_unique_faces() != 1)
-    return;
-
-  const unsigned int face_no = 0;
-
   // check whether all base elements implement their interface constraint
   // matrices. if this is not the case, then leave the interface costraints of
   // this composed element empty as well; however, the rest of the element is
@@ -1548,6 +1541,11 @@ FESystem<dim, spacedim>::build_interface_constraints()
   for (unsigned int base = 0; base < this->n_base_elements(); ++base)
     if (base_element(base).constraints_are_implemented() == false)
       return;
+
+  // TODO: the implementation makes the assumption that all faces have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
 
   this->interface_constraints.TableBase<2, double>::reinit(
     this->interface_constraints_size());
