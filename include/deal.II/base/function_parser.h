@@ -21,12 +21,11 @@
 
 #include <deal.II/base/auto_derivative_function.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/mu_parser_internal.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/thread_local_storage.h>
 
 #include <map>
-#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -36,22 +35,6 @@ DEAL_II_NAMESPACE_OPEN
 template <typename>
 class Vector;
 #endif
-
-namespace internal
-{
-  /**
-   * deal.II uses muParser as a purely internal dependency. To this end, we do
-   * not include any muParser headers in this file (and the bundled version of
-   * the dependency does not install its headers or compile a separate muparser
-   * library). Hence, to interface with muParser, we use the PIMPL idiom here to
-   * wrap a pointer to mu::Parser objects.
-   */
-  class muParserBase
-  {
-  public:
-    virtual ~muParserBase() = default;
-  };
-} // namespace internal
 
 /**
  * This class implements a function object that gets its value by parsing a
@@ -231,7 +214,9 @@ namespace internal
  * @ingroup functions
  */
 template <int dim>
-class FunctionParser : public AutoDerivativeFunction<dim>
+class FunctionParser
+  : public AutoDerivativeFunction<dim>,
+    protected internal::FunctionParser::ParserImplementation<dim, double>
 {
 public:
   /**
@@ -323,11 +308,11 @@ public:
    * this case is dim+1. The value of this parameter defaults to false, i.e.,
    * do not consider time.
    */
-  void
+  virtual void
   initialize(const std::string &             vars,
              const std::vector<std::string> &expressions,
              const ConstMap &                constants,
-             const bool                      time_dependent = false);
+             const bool                      time_dependent = false) override;
 
   /**
    * Initialize the function. Same as above, but accepts a string rather than
@@ -360,16 +345,6 @@ public:
   value(const Point<dim> &p, const unsigned int component = 0) const override;
 
   /**
-   * Return all components of a vector-valued function at the given point @p
-   * p.
-   *
-   * <code>values</code> shall have the right size beforehand, i.e.
-   * #n_components.
-   */
-  virtual void
-  vector_value(const Point<dim> &p, Vector<double> &values) const override;
-
-  /**
    * Return an array of function expressions (one per component), used to
    * initialize this function.
    */
@@ -394,92 +369,6 @@ public:
                  << ").");
 
   //@}
-
-private:
-  /**
-   * Class containing the mutable state required by muParser.
-   *
-   * @note For performance reasons it is best to put all mutable state in a
-   * single object so that, for each function call, we only need to get
-   * thread-local data exactly once.
-   */
-  struct ParserData
-  {
-    /**
-     * Default constructor. Threads::ThreadLocalStorage requires that objects be
-     * either default- or copy-constructible: make sure we satisfy the first
-     * case by declaring it here.
-     */
-    ParserData() = default;
-
-    /**
-     * std::is_copy_constructible gives the wrong answer for containers with
-     * non-copy constructible types (e.g., std::vector<std::unique_ptr<int>>) -
-     * for more information, see the documentation of
-     * Threads::ThreadLocalStorage. Hence, to avoid compilation failures, just
-     * delete the copy constructor completely.
-     */
-    ParserData(const ParserData &) = delete;
-
-    /**
-     * Scratch array used to set independent variables (i.e., x, y, and t)
-     * before each muParser call.
-     */
-    std::vector<double> vars;
-
-    /**
-     * The actual muParser parser objects (hidden with PIMPL).
-     */
-    std::vector<std::unique_ptr<internal::muParserBase>> parsers;
-  };
-
-  /**
-   * The muParser objects (hidden with the PIMPL idiom) for each thread (and one
-   * for each component).
-   */
-  mutable Threads::ThreadLocalStorage<ParserData> parser_data;
-
-  /**
-   * An array to keep track of all the constants, required to initialize fp in
-   * each thread.
-   */
-  std::map<std::string, double> constants;
-
-  /**
-   * An array for the variable names, required to initialize fp in each
-   * thread.
-   */
-  std::vector<std::string> var_names;
-
-  /**
-   * Initialize fp and vars on the current thread. This function may only be
-   * called once per thread. A thread can test whether the function has
-   * already been called by testing whether 'fp.get().size()==0' (not
-   * initialized) or >0 (already initialized).
-   */
-  void
-  init_muparser() const;
-
-  /**
-   * An array of function expressions (one per component), required to
-   * initialize fp in each thread.
-   */
-  std::vector<std::string> expressions;
-
-  /**
-   * State of usability. This variable is checked every time the function is
-   * called for evaluation. It's set to true in the initialize() methods.
-   */
-  bool initialized;
-
-  /**
-   * Number of variables. If this is also a function of time, then the number
-   * of variables is dim+1, otherwise it is dim. In the case that this is a
-   * time dependent function, the time is supposed to be the last variable. If
-   * #n_vars is not identical to the number of the variables parsed by the
-   * initialize() method, then an exception is thrown.
-   */
-  unsigned int n_vars;
 };
 
 

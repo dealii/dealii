@@ -147,6 +147,7 @@ SET(_inst
   symbolic_function.inst.in
   tensor_function.inst.in
   tensor_function_parser.inst.in
+  mu_parser_internal.inst.in
   time_stepping.inst.in
   )
 

@@ -17,17 +17,11 @@
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/mu_parser_internal.h>
 #include <deal.II/base/patterns.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/vector.h>
 
-#include <cmath>
 #include <map>
-
-#ifdef DEAL_II_WITH_MUPARSER
-#  include <muParser.h>
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -36,7 +30,7 @@ template <int dim>
 const std::vector<std::string> &
 FunctionParser<dim>::get_expressions() const
 {
-  return expressions;
+  return this->expressions;
 }
 
 
@@ -46,8 +40,6 @@ FunctionParser<dim>::FunctionParser(const unsigned int n_components,
                                     const double       initial_time,
                                     const double       h)
   : AutoDerivativeFunction<dim>(h, n_components, initial_time)
-  , initialized(false)
-  , n_vars(0)
 {}
 
 
@@ -59,8 +51,6 @@ FunctionParser<dim>::FunctionParser(const std::string &expression,
   : AutoDerivativeFunction<dim>(
       h,
       Utilities::split_string_list(expression, ';').size())
-  , initialized(false)
-  , n_vars(0)
 {
   auto constants_map = Patterns::Tools::Convert<ConstMap>::to_value(
     constants,
@@ -78,7 +68,6 @@ FunctionParser<dim>::FunctionParser(const std::string &expression,
 }
 
 
-#ifdef DEAL_II_WITH_MUPARSER
 
 template <int dim>
 void
@@ -87,171 +76,10 @@ FunctionParser<dim>::initialize(const std::string &             variables,
                                 const std::map<std::string, double> &constants,
                                 const bool time_dependent)
 {
-  this->parser_data.clear(); // this will reset all thread-local objects
-
-  this->constants   = constants;
-  this->var_names   = Utilities::split_string_list(variables, ',');
-  this->expressions = expressions;
-  AssertThrow(((time_dependent) ? dim + 1 : dim) == var_names.size(),
-              ExcMessage("Wrong number of variables"));
-
-  // We check that the number of components of this function matches the
-  // number of components passed in as a vector of strings.
   AssertThrow(this->n_components == expressions.size(),
               ExcInvalidExpressionSize(this->n_components, expressions.size()));
-
-  // Now we define how many variables we expect to read in.  We distinguish
-  // between two cases: Time dependent problems, and not time dependent
-  // problems. In the first case the number of variables is given by the
-  // dimension plus one. In the other case, the number of variables is equal
-  // to the dimension. Once we parsed the variables string, if none of this is
-  // the case, then an exception is thrown.
-  if (time_dependent)
-    n_vars = dim + 1;
-  else
-    n_vars = dim;
-
-  // create a parser object for the current thread we can then query in
-  // value() and vector_value(). this is not strictly necessary because a user
-  // may never call these functions on the current thread, but it gets us
-  // error messages about wrong formulas right away
-  init_muparser();
-
-  // finally set the initialization bit
-  initialized = true;
-}
-
-namespace internal
-{
-  namespace FunctionParserImplementation
-  {
-    namespace
-    {
-      /**
-       * PIMPL for mu::Parser.
-       */
-      class Parser : public internal::muParserBase
-      {
-      public:
-        operator mu::Parser &()
-        {
-          return parser;
-        }
-
-        operator const mu::Parser &() const
-        {
-          return parser;
-        }
-
-      protected:
-        mu::Parser parser;
-      };
-    } // namespace
-  }   // namespace FunctionParserImplementation
-} // namespace internal
-
-
-template <int dim>
-void
-FunctionParser<dim>::init_muparser() const
-{
-  // check that we have not already initialized the parser on the
-  // current thread, i.e., that the current function is only called
-  // once per thread
-  ParserData &data = parser_data.get();
-  Assert(data.parsers.size() == 0 && data.vars.size() == 0, ExcInternalError());
-
-  // initialize the objects for the current thread
-  data.parsers.reserve(this->n_components);
-  data.vars.resize(var_names.size());
-  for (unsigned int component = 0; component < this->n_components; ++component)
-    {
-      data.parsers.emplace_back(
-        new internal::FunctionParserImplementation::Parser());
-      mu::Parser &parser =
-        dynamic_cast<internal::FunctionParserImplementation::Parser &>(
-          *data.parsers.back());
-
-      for (const auto &constant : constants)
-        parser.DefineConst(constant.first, constant.second);
-
-      for (unsigned int iv = 0; iv < var_names.size(); ++iv)
-        parser.DefineVar(var_names[iv], &data.vars[iv]);
-
-      // define some compatibility functions:
-      parser.DefineFun("if", internal::FunctionParser::mu_if, true);
-      parser.DefineOprt("|", internal::FunctionParser::mu_or, 1);
-      parser.DefineOprt("&", internal::FunctionParser::mu_and, 2);
-      parser.DefineFun("int", internal::FunctionParser::mu_int, true);
-      parser.DefineFun("ceil", internal::FunctionParser::mu_ceil, true);
-      parser.DefineFun("cot", internal::FunctionParser::mu_cot, true);
-      parser.DefineFun("csc", internal::FunctionParser::mu_csc, true);
-      parser.DefineFun("floor", internal::FunctionParser::mu_floor, true);
-      parser.DefineFun("sec", internal::FunctionParser::mu_sec, true);
-      parser.DefineFun("log", internal::FunctionParser::mu_log, true);
-      parser.DefineFun("pow", internal::FunctionParser::mu_pow, true);
-      parser.DefineFun("erf", internal::FunctionParser::mu_erf, true);
-      parser.DefineFun("erfc", internal::FunctionParser::mu_erfc, true);
-      parser.DefineFun("rand_seed",
-                       internal::FunctionParser::mu_rand_seed,
-                       true);
-      parser.DefineFun("rand", internal::FunctionParser::mu_rand, true);
-
-      try
-        {
-          // muparser expects that functions have no
-          // space between the name of the function and the opening
-          // parenthesis. this is awkward because it is not backward
-          // compatible to the library we used to use before muparser
-          // (the fparser library) but also makes no real sense.
-          // consequently, in the expressions we set, remove any space
-          // we may find after function names
-          std::string transformed_expression = expressions[component];
-
-          for (const auto &current_function_name :
-               internal::FunctionParser::function_names)
-            {
-              const unsigned int function_name_length =
-                current_function_name.size();
-
-              std::string::size_type pos = 0;
-              while (true)
-                {
-                  // try to find any occurrences of the function name
-                  pos = transformed_expression.find(current_function_name, pos);
-                  if (pos == std::string::npos)
-                    break;
-
-                  // replace whitespace until there no longer is any
-                  while ((pos + function_name_length <
-                          transformed_expression.size()) &&
-                         ((transformed_expression[pos + function_name_length] ==
-                           ' ') ||
-                          (transformed_expression[pos + function_name_length] ==
-                           '\t')))
-                    transformed_expression.erase(
-                      transformed_expression.begin() + pos +
-                      function_name_length);
-
-                  // move the current search position by the size of the
-                  // actual function name
-                  pos += function_name_length;
-                }
-            }
-
-          // now use the transformed expression
-          parser.SetExpr(transformed_expression);
-        }
-      catch (mu::ParserError &e)
-        {
-          std::cerr << "Message:  <" << e.GetMsg() << ">\n";
-          std::cerr << "Formula:  <" << e.GetExpr() << ">\n";
-          std::cerr << "Token:    <" << e.GetToken() << ">\n";
-          std::cerr << "Position: <" << e.GetPos() << ">\n";
-          std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
-          AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg()));
-        }
-    }
+  internal::FunctionParser::ParserImplementation<dim, double>::initialize(
+    variables, expressions, constants, time_dependent);
 }
 
 
@@ -276,123 +104,8 @@ double
 FunctionParser<dim>::value(const Point<dim> & p,
                            const unsigned int component) const
 {
-  Assert(initialized == true, ExcNotInitialized());
-  AssertIndexRange(component, this->n_components);
-
-  // initialize the parser if that hasn't happened yet on the current thread
-  ParserData &data = parser_data.get();
-  if (data.vars.size() == 0)
-    init_muparser();
-
-  for (unsigned int i = 0; i < dim; ++i)
-    data.vars[i] = p(i);
-  if (dim != n_vars)
-    data.vars[dim] = this->get_time();
-
-  try
-    {
-      Assert(dynamic_cast<internal::FunctionParserImplementation::Parser *>(
-               data.parsers[component].get()),
-             ExcInternalError());
-      // using dynamic_cast in the next line is about 6% slower than
-      // static_cast, so use the assertion above for debugging and disable
-      // clang-tidy:
-      mu::Parser &parser =
-        static_cast<internal::FunctionParserImplementation::Parser &>( // NOLINT
-          *data.parsers[component]);
-      return parser.Eval();
-    }
-  catch (mu::ParserError &e)
-    {
-      std::cerr << "Message:  <" << e.GetMsg() << ">\n";
-      std::cerr << "Formula:  <" << e.GetExpr() << ">\n";
-      std::cerr << "Token:    <" << e.GetToken() << ">\n";
-      std::cerr << "Position: <" << e.GetPos() << ">\n";
-      std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
-      AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg()));
-      return 0.0;
-    }
+  return this->do_value(p, this->get_time(), component);
 }
-
-
-
-template <int dim>
-void
-FunctionParser<dim>::vector_value(const Point<dim> &p,
-                                  Vector<double> &  values) const
-{
-  Assert(initialized == true, ExcNotInitialized());
-  Assert(values.size() == this->n_components,
-         ExcDimensionMismatch(values.size(), this->n_components));
-
-
-  // initialize the parser if that hasn't happened yet on the current thread
-  ParserData &data = parser_data.get();
-  if (data.vars.size() == 0)
-    init_muparser();
-
-  for (unsigned int i = 0; i < dim; ++i)
-    data.vars[i] = p(i);
-  if (dim != n_vars)
-    data.vars[dim] = this->get_time();
-
-  for (unsigned int component = 0; component < this->n_components; ++component)
-    {
-      // Same comment in value() applies here too:
-      Assert(dynamic_cast<internal::FunctionParserImplementation::Parser *>(
-               data.parsers[component].get()),
-             ExcInternalError());
-      mu::Parser &parser =
-        static_cast<internal::FunctionParserImplementation::Parser &>( // NOLINT
-          *data.parsers[component]);
-
-      values(component) = parser.Eval();
-    }
-}
-
-#else
-
-
-template <int dim>
-void
-FunctionParser<dim>::initialize(const std::string &,
-                                const std::vector<std::string> &,
-                                const std::map<std::string, double> &,
-                                const bool)
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-}
-
-template <int dim>
-void
-FunctionParser<dim>::initialize(const std::string &,
-                                const std::string &,
-                                const std::map<std::string, double> &,
-                                const bool)
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-}
-
-
-
-template <int dim>
-double
-FunctionParser<dim>::value(const Point<dim> &, unsigned int) const
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-  return 0.;
-}
-
-
-template <int dim>
-void
-FunctionParser<dim>::vector_value(const Point<dim> &, Vector<double> &) const
-{
-  AssertThrow(false, ExcNeedsFunctionparser());
-}
-
-
-#endif
 
 // Explicit Instantiations.
 
