@@ -495,7 +495,8 @@ namespace GridTools
    * vertices so that all lines are consistently oriented.
    *
    * The expectations on orientation and a discussion of this function are
-   * available in the @ref reordering "reordering module".
+   * available in the
+   * @ref reordering "reordering module".
    *
    * @param cells The array of CellData objects that describe the mesh's topology.
    */

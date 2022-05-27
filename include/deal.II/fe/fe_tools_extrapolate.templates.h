@@ -91,7 +91,7 @@ namespace FETools
 
     private:
       /**
-       *  A shortcut for the type of the OutVector.
+       * A shortcut for the type of the OutVector.
        */
       using value_type = typename OutVector::value_type;
 

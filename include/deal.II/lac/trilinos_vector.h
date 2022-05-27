@@ -394,7 +394,6 @@ namespace TrilinosWrappers
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
-     *         2008, 2009, 2017
      */
     class Vector : public Subscriptor
     {

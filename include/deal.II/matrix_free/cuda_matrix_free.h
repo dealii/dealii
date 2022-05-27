@@ -164,8 +164,8 @@ namespace CUDAWrappers
       bool use_coloring;
 
       /**
-       *  Overlap MPI communications with computation. This requires CUDA-aware
-       *  MPI and use_coloring must be false.
+       * Overlap MPI communications with computation. This requires CUDA-aware
+       * MPI and use_coloring must be false.
        */
       bool overlap_communication_computation;
     };

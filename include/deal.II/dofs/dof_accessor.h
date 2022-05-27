@@ -140,7 +140,8 @@ namespace internal
  * A class that gives access to the degrees of freedom stored in a DoFHandler
  * object. Accessors are used to access the data that pertains to edges,
  * faces, and cells of a triangulation. The concept is explained in more
- * detail in connection to @ref Iterators.
+ * detail in connection to
+ * @ref Iterators.
  *
  * This class follows mainly the route laid out by the accessor library
  * declared in the triangulation library (TriaAccessor). It enables the user

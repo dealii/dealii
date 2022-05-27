@@ -375,7 +375,7 @@ namespace GridGenerator
    *
    * In 3D, triangulation will be extruded in the z-direction by the total
    * height of @p L using @p n_slices slices (minimum is 2).
-
+   *
    * If the @p colorize flag is <code>true</code>, the boundary_ids of the
    * boundary faces are assigned such that the lower one in the x-direction is
    * 0, and the upper one is 1 (see
@@ -385,7 +385,7 @@ namespace GridGenerator
    *
    * @p tria is the triangulation to be created. It needs to be empty upon
    * calling this function.
-*/
+   */
   template <int dim>
   void
   plate_with_a_hole(Triangulation<dim> &     tria,
@@ -1050,7 +1050,8 @@ namespace GridGenerator
    * opening to match their index. All other boundary faces will be assigned
    * boundary ID 3.
    *
-   * @ref GlossManifoldIndicator "Manifold IDs" will be set on the mantles of each truncated cone in
+   * @ref GlossManifoldIndicator "Manifold IDs"
+   * will be set on the mantles of each truncated cone in
    * the same way. Each cone will have a special manifold object assigned, which
    * is based on the CylindricalManifold class. Further, all cells adjacent to
    * the mantle are given the manifold ID 3. If desired, you can assign an
@@ -1202,8 +1203,8 @@ namespace GridGenerator
    * If the @p colorize flag is <code>true</code>, the @p boundary_ids of the
    * surfaces are assigned such that the left boundary is 0 and the others are
    * assigned counterclockwise in ascending order (see
-   * @ref GlossColorization "the glossary entry on colorization"). The @p
-   * colorize option only works in two dimensions.
+   * @ref GlossColorization "the glossary entry on colorization").
+   * The @p colorize option only works in two dimensions.
    *
    * This function will create the classical L-shape in 2d
    * and it will look like the following in 3d:
@@ -1762,7 +1763,8 @@ namespace GridGenerator
    * This function is most often used to compose meshes for more complicated
    * geometries if the geometry can be composed of simpler parts for which
    * functions exist to generate
-   * @ref GlossCoarseMesh "coarse meshes". For example, the channel mesh
+   * @ref GlossCoarseMesh "coarse meshes".
+   * For example, the channel mesh
    * used in step-35 could in principle be created using a mesh created by the
    * GridGenerator::hyper_cube_with_cylindrical_hole function and several
    * rectangles, and merging them using the current function. The rectangles
@@ -1796,7 +1798,8 @@ namespace GridGenerator
    * the input meshes.
    *
    * @note The two input triangulations must be
-   * @ref GlossCoarseMesh "coarse meshes", i.e., they can not have any
+   * @ref GlossCoarseMesh "coarse meshes",
+   * i.e., they can not have any
    * refined cells.
    *
    * @note The function copies the material ids of the cells of the two input
@@ -1906,7 +1909,8 @@ namespace GridGenerator
    * @note This function is intended to create an adaptively refined
    * triangulation that contains the <i>most refined cells</i> from two input
    * triangulations that were derived from the <i>same</i>
-   * @ref GlossCoarseMesh "coarse mesh" by
+   * @ref GlossCoarseMesh "coarse mesh"
+   * by
    * adaptive refinement. This is an operation sometimes needed when one
    * solves for two variables of a coupled problem on separately refined
    * meshes on the same domain (for example because these variables have
@@ -2122,8 +2126,10 @@ namespace GridGenerator
    * triangulation later on.
    *
    * All information about cell
-   * @ref GlossManifoldIndicator "manifold indicators" and
-   * @ref GlossMaterialId "material indicators" are copied from
+   * @ref GlossManifoldIndicator "manifold indicators"
+   * and
+   * @ref GlossMaterialId "material indicators"
+   * are copied from
    * one triangulation to the other. The same is true for the manifold
    * indicators and, if an object is at the boundary, the boundary
    * indicators of faces and edges of the triangulation.

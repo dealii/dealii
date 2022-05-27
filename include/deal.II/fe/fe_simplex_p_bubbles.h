@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  * unstable approximation to the mass matrix. For example: the shape functions
  * of FE_SimplexP<2>(2) with support points at vertices have mean values of
  * zero so that element cannot be used with mass lumping.
-
+ *
  * This element avoids this issue by replacing the shape functions of
  * FE_SimplexP with an augmented space amenable to the construction of nodal
  * quadrature rules. For example, on the triangle a single basis function is

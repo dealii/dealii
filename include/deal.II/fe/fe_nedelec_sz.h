@@ -85,7 +85,9 @@ public:
    * the 3D version of FE_NedelecSZ has 12 degrees of freedom for `order = 0`
    * and 54 for `degree = 1`. It is important to have enough quadrature points
    * in order to perform the quadrature with sufficient accuracy.
-   * For example [QGauss<dim>(order + 2)](@ref QGauss) can be used for the
+   * For example
+   * [QGauss<dim>(order + 2)](@ref QGauss)
+   * can be used for the
    * quadrature formula, where `order` is the order of FE_NedelecSZ.
    */
   FE_NedelecSZ(const unsigned int order);

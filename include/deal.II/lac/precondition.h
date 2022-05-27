@@ -1481,7 +1481,7 @@ public:
  * setting AdditionalData::eig_cg_n_iterations to zero, and provide the
  * variable AdditionalData::max_eigenvalue instead. The minimal eigenvalue is
  * implicitly specified via `max_eigenvalue/smoothing_range`.
-
+ *
  * <h4>Using the PreconditionChebyshev as a solver</h4>
  *
  * If the range <tt>[max_eigenvalue/smoothing_range, max_eigenvalue]</tt>
@@ -1637,7 +1637,7 @@ public:
                      EigenvalueAlgorithm::lanczos);
 
     /**
-     *  Copy assignment operator.
+     * Copy assignment operator.
      */
     AdditionalData &
     operator=(const AdditionalData &other_data);

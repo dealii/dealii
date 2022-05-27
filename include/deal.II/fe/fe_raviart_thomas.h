@@ -47,13 +47,15 @@ DEAL_II_NAMESPACE_OPEN
  * field must be continuous across the line (or surface) even though
  * the tangential component may not be. As a consequence, the
  * Raviart-Thomas element is constructed in such a way that (i) it is
- * @ref vector_valued "vector-valued", (ii) the shape functions are
+ * @ref vector_valued "vector-valued",
+ * (ii) the shape functions are
  * discontinuous, but (iii) the normal component of the vector field
  * represented by each shape function is continuous across the faces
  * of cells.
  *
  * Other properties of the Raviart-Thomas element are that (i) it is
- * @ref GlossPrimitive "not a primitive element"; (ii) the shape functions
+ * @ref GlossPrimitive "not a primitive element"
+ * ; (ii) the shape functions
  * are defined so that certain integrals over the faces are either zero
  * or one, rather than the common case of certain point values being
  * either zero or one. (There is, however, the FE_RaviartThomasNodal
@@ -219,8 +221,8 @@ private:
    * <code>adjust_quad_dof_index_for_face_orientation_table</code> declared in
    * fe.cc. We need to fill it with the correct values in case of non-standard,
    * flipped (rotated by +180 degrees) or rotated (rotated by +90 degrees)
-   *faces. These are given in the form three flags (face_orientation, face_flip,
-   * face_rotation), see the documentation in GeometryInfo<dim> and
+   * faces. These are given in the form three flags (face_orientation,
+   * face_flip, face_rotation), see the documentation in GeometryInfo<dim> and
    * this @ref GlossFaceOrientation "glossary entry on face orientation".
    *
    * <h3>Example: Raviart-Thomas Elements of order 2 (tensor polynomial

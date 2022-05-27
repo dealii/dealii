@@ -774,7 +774,8 @@ protected:
  * component, and consequently is not shown in boldface. Then assume
  * that we want this $u_h(x)$ to be used as a boundary condition for a 2d
  * problem at the line $y=0$. Let's say that this line corresponds to
- * @ref GlossBoundaryIndicator "boundary indicator" 123.
+ * @ref GlossBoundaryIndicator "boundary indicator"
+ * 123.
  * If we say that the 2d problem is associated with
  * @code
  *   DoFHandler<2> dof_handler_2d;

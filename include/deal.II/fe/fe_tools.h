@@ -907,8 +907,10 @@ namespace FETools
    * <li> Tensor product construction (<code>do_tensor_product=true</code>):
    * The tensor product construction, in the simplest case, builds a
    * vector-valued element from scalar elements (see
-   * @ref vector_valued "this documentation module" and
-   * @ref GlossComponent "this glossary entry" for more information).
+   * @ref vector_valued "this documentation module"
+   * and
+   * @ref GlossComponent "this glossary entry"
+   * for more information).
    * To give an example, consider creating a vector-valued element with
    * two vector components, where the first should have linear shape
    * functions and the second quadratic shape functions. In 1d, the

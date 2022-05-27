@@ -401,7 +401,7 @@ private:
   double start_time;
 
   /**
-   *The end of the time interval.
+   * The end of the time interval.
    */
   double end_time;
 
