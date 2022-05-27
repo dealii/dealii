@@ -1536,7 +1536,9 @@ FESystem<dim, spacedim>::build_interface_constraints()
 {
   // TODO: the implementation makes the assumption that all faces have the
   // same number of dofs
-  AssertDimension(this->n_unique_faces(), 1);
+  if (this->n_unique_faces() != 1)
+    return;
+
   const unsigned int face_no = 0;
 
   // check whether all base elements implement their interface constraint
@@ -1809,7 +1811,7 @@ FESystem<dim, spacedim>::initialize(
 
     for (unsigned int face_no = 0; face_no < this->n_unique_faces(); ++face_no)
       {
-        this->face_system_to_component_table[0].resize(
+        this->face_system_to_component_table[face_no].resize(
           this->n_dofs_per_face(face_no));
 
         FETools::Compositing::build_face_tables(
