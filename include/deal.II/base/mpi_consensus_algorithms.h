@@ -95,8 +95,36 @@ namespace Utilities
      * variables that are active at the point of declaration of the lambda
      * function, such as variables local to the surrounding function.
      *
-     * This namespace provides several implementations of consensus algorithms,
-     * such as the nbx(), pex(), serial(), and selector() functions.
+     *
+     * <h3>Available implementations</h3>
+     *
+     * There are many ways to implement the general functionality required
+     * for these "consensus algorithms". This namespace provides several
+     * implementations of consensus algorithms, specifically the
+     * NBX and PEX algorithms, along with a serial one for the case where
+     * one wants to run such an algorithm on a single process. The key
+     * entry points to these algorithms are the
+     * nbx(), pex(), serial(), and selector() functions that take a
+     * communicator, a list of targets, and a number of functions
+     * as argument. The selector() function redirects to the other
+     * implementations based on the number of processes that participate
+     * in an MPI universe, since some implementations are better or worse
+     * suited for large or small parallel computations.
+     *
+     * This namespace also implements specializations of each of the
+     * functions for the specific case where a calling process is not
+     * actually interested in receiving and processing answers -- that
+     * is, the goal is simply to *send* messages to a number of targets,
+     * but no answer is required; all we want to know is that by the end of
+     * the call, all targets have been sent their respective data. This,
+     * strictly speaking, does not fall under the umbrella of "consensus
+     * algorithms", but is really just a "some-to-some" communication.
+     * (This operation is also provided by the Utilities::MPI::some_to_some()
+     * function, though with a different interface.) For this special
+     * case, the functions in this namespace only need to receive
+     * an MPI communicator, a list of targets, and function objects that
+     * encode and decode the messages to be sent, but no functions for
+     * encoding a reply, or processing a reply.
      *
      * @ingroup MPI
      */
@@ -508,6 +536,39 @@ namespace Utilities
             &             process_answer,
           const MPI_Comm &comm);
 
+      /**
+       * This function provides a specialization of the one above for
+       * the case where a sending process does not require an answer.
+       * Strictly speaking, the name "request" is then incorrect, as it
+       * is simply one process sending a message to another, but we keep
+       * the name for symmetry with the function above that processes both
+       * requests and answers.
+       *
+       * Since the function does not deal with answers, the algorithm
+       * implemented is really just a "some-to-some algorithm", as
+       * also provided by the Utilities::MPI::some_to_some() function.
+       *
+       * @param[in] targets A vector that contains the ranks of processes
+       *   to which requests should be sent and from which answers need
+       *   to be received.
+       * @param[in] create_request A function object that takes the rank
+       *   of a target process as argument and returns the message that
+       *   forms the request to this target.
+       * @param[in] process_request A function that takes as arguments the
+       *   rank of the process that has sent a request to us, along with
+       *   the message of the request, and processes that message.
+       * @param[in] comm The MPI communicator on which the whole algorithm
+       *   is to be performed.
+       *
+       * @tparam RequestType The type of the object to be sent.
+       */
+      template <typename RequestType>
+      std::vector<unsigned int>
+      nbx(const std::vector<unsigned int> &                     targets,
+          const std::function<RequestType(const unsigned int)> &create_request,
+          const std::function<void(const unsigned int, const RequestType &)>
+            &             process_request,
+          const MPI_Comm &comm);
 
       /**
        * This class implements a concrete algorithm for the
@@ -709,6 +770,40 @@ namespace Utilities
             &             process_answer,
           const MPI_Comm &comm);
 
+      /**
+       * This function provides a specialization of the one above for
+       * the case where a sending process does not require an answer.
+       * Strictly speaking, the name "request" is then incorrect, as it
+       * is simply one process sending a message to another, but we keep
+       * the name for symmetry with the function above that processes both
+       * requests and answers.
+       *
+       * Since the function does not deal with answers, the algorithm
+       * implemented is really just a "some-to-some algorithm", as
+       * also provided by the Utilities::MPI::some_to_some() function.
+       *
+       * @param[in] targets A vector that contains the ranks of processes
+       *   to which requests should be sent and from which answers need
+       *   to be received.
+       * @param[in] create_request A function object that takes the rank
+       *   of a target process as argument and returns the message that
+       *   forms the request to this target.
+       * @param[in] process_request A function that takes as arguments the
+       *   rank of the process that has sent a request to us, along with
+       *   the message of the request, and processes that message.
+       * @param[in] comm The MPI communicator on which the whole algorithm
+       *   is to be performed.
+       *
+       * @tparam RequestType The type of the object to be sent.
+       */
+      template <typename RequestType>
+      std::vector<unsigned int>
+      pex(const std::vector<unsigned int> &                     targets,
+          const std::function<RequestType(const unsigned int)> &create_request,
+          const std::function<void(const unsigned int, const RequestType &)>
+            &             process_request,
+          const MPI_Comm &comm);
+
 
       /**
        * A serial fall back for the above classes to allow programming
@@ -795,6 +890,41 @@ namespace Utilities
           &answer_request,
         const std::function<void(const unsigned int, const AnswerType &)>
           &             process_answer,
+        const MPI_Comm &comm);
+
+      /**
+       * This function provides a specialization of the one above for
+       * the case where a sending process does not require an answer.
+       * Strictly speaking, the name "request" is then incorrect, as it
+       * is simply one process sending a message to another, but we keep
+       * the name for symmetry with the function above that processes both
+       * requests and answers.
+       *
+       * Since the function does not deal with answers, the algorithm
+       * implemented is really just a "some-to-some algorithm", as
+       * also provided by the Utilities::MPI::some_to_some() function.
+       *
+       * @param[in] targets A vector that contains the ranks of processes
+       *   to which requests should be sent and from which answers need
+       *   to be received.
+       * @param[in] create_request A function object that takes the rank
+       *   of a target process as argument and returns the message that
+       *   forms the request to this target.
+       * @param[in] process_request A function that takes as arguments the
+       *   rank of the process that has sent a request to us, along with
+       *   the message of the request, and processes that message.
+       * @param[in] comm The MPI communicator on which the whole algorithm
+       *   is to be performed.
+       *
+       * @tparam RequestType The type of the object to be sent.
+       */
+      template <typename RequestType>
+      std::vector<unsigned int>
+      serial(
+        const std::vector<unsigned int> &                     targets,
+        const std::function<RequestType(const unsigned int)> &create_request,
+        const std::function<void(const unsigned int, const RequestType &)>
+          &             process_request,
         const MPI_Comm &comm);
 
 
@@ -910,6 +1040,40 @@ namespace Utilities
           &             process_answer,
         const MPI_Comm &comm);
 
+      /**
+       * This function provides a specialization of the one above for
+       * the case where a sending process does not require an answer.
+       * Strictly speaking, the name "request" is then incorrect, as it
+       * is simply one process sending a message to another, but we keep
+       * the name for symmetry with the function above that processes both
+       * requests and answers.
+       *
+       * Since the function does not deal with answers, the algorithm
+       * implemented is really just a "some-to-some algorithm", as
+       * also provided by the Utilities::MPI::some_to_some() function.
+       *
+       * @param[in] targets A vector that contains the ranks of processes
+       *   to which requests should be sent and from which answers need
+       *   to be received.
+       * @param[in] create_request A function object that takes the rank
+       *   of a target process as argument and returns the message that
+       *   forms the request to this target.
+       * @param[in] process_request A function that takes as arguments the
+       *   rank of the process that has sent a request to us, along with
+       *   the message of the request, and processes that message.
+       * @param[in] comm The MPI communicator on which the whole algorithm
+       *   is to be performed.
+       *
+       * @tparam RequestType The type of the object to be sent.
+       */
+      template <typename RequestType>
+      std::vector<unsigned int>
+      selector(
+        const std::vector<unsigned int> &                     targets,
+        const std::function<RequestType(const unsigned int)> &create_request,
+        const std::function<void(const unsigned int, const RequestType &)>
+          &             process_request,
+        const MPI_Comm &comm);
 
 
       /**
@@ -1003,6 +1167,44 @@ namespace Utilities
 
 
 
+      template <typename RequestType>
+      std::vector<unsigned int>
+      nbx(const std::vector<unsigned int> &                     targets,
+          const std::function<RequestType(const unsigned int)> &create_request,
+          const std::function<void(const unsigned int, const RequestType &)>
+            &             process_request,
+          const MPI_Comm &comm)
+      {
+        // TODO: For the moment, simply implement this special case by
+        // forwarding to the other function with rewritten function
+        // objects and using a plain 'char' as answer type. This way,
+        // we have the interface in place and can provide a more
+        // efficient implementation later on.
+        return nbx<RequestType, char>(
+          targets,
+          create_request,
+          // answer_request:
+          [&process_request](const unsigned int source_rank,
+                             const RequestType &request) -> char {
+            process_request(source_rank, request);
+            // Return something. What it is is arbitrary here, except that
+            // we will want to check what it is below in the process_answer().
+            // We choose the smallest possible data type for the replies (a
+            // 'char'), but we can make ourselves feel more important by
+            // putting a whole "        " into one char (sensible editor
+            // settings assumed).
+            return '\t';
+          },
+          // process_answer:
+          [](const unsigned int /*target_rank */, const char &answer) {
+            (void)answer;
+            Assert(answer == '\t', ExcInternalError());
+          },
+          comm);
+      }
+
+
+
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       pex(const std::vector<unsigned int> &                     targets,
@@ -1015,6 +1217,44 @@ namespace Utilities
       {
         return PEX<RequestType, AnswerType>().run(
           targets, create_request, answer_request, process_answer, comm);
+      }
+
+
+
+      template <typename RequestType>
+      std::vector<unsigned int>
+      pex(const std::vector<unsigned int> &                     targets,
+          const std::function<RequestType(const unsigned int)> &create_request,
+          const std::function<void(const unsigned int, const RequestType &)>
+            &             process_request,
+          const MPI_Comm &comm)
+      {
+        // TODO: For the moment, simply implement this special case by
+        // forwarding to the other function with rewritten function
+        // objects and using a plain 'char' as answer type. This way,
+        // we have the interface in place and can provide a more
+        // efficient implementation later on.
+        return pex<RequestType, char>(
+          targets,
+          create_request,
+          // answer_request:
+          [&process_request](const unsigned int source_rank,
+                             const RequestType &request) -> char {
+            process_request(source_rank, request);
+            // Return something. What it is is arbitrary here, except that
+            // we will want to check what it is below in the process_answer().
+            // We choose the smallest possible data type for the replies (a
+            // 'char'), but we can make ourselves feel more important by
+            // putting a whole "        " into one char (sensible editor
+            // settings assumed).
+            return '\t';
+          },
+          // process_answer:
+          [](const unsigned int /*target_rank */, const char &answer) {
+            (void)answer;
+            Assert(answer == '\t', ExcInternalError());
+          },
+          comm);
       }
 
 
@@ -1036,6 +1276,45 @@ namespace Utilities
 
 
 
+      template <typename RequestType>
+      std::vector<unsigned int>
+      serial(
+        const std::vector<unsigned int> &                     targets,
+        const std::function<RequestType(const unsigned int)> &create_request,
+        const std::function<void(const unsigned int, const RequestType &)>
+          &             process_request,
+        const MPI_Comm &comm)
+      {
+        // TODO: For the moment, simply implement this special case by
+        // forwarding to the other function with rewritten function
+        // objects and using a plain 'char' as answer type. This way,
+        // we have the interface in place and can provide a more
+        // efficient implementation later on.
+        return serial<RequestType, char>(
+          targets,
+          create_request,
+          // answer_request:
+          [&process_request](const unsigned int source_rank,
+                             const RequestType &request) -> char {
+            process_request(source_rank, request);
+            // Return something. What it is is arbitrary here, except that
+            // we will want to check what it is below in the process_answer().
+            // We choose the smallest possible data type for the replies (a
+            // 'char'), but we can make ourselves feel more important by
+            // putting a whole "        " into one char (sensible editor
+            // settings assumed).
+            return '\t';
+          },
+          // process_answer:
+          [](const unsigned int /*target_rank */, const char &answer) {
+            (void)answer;
+            Assert(answer == '\t', ExcInternalError());
+          },
+          comm);
+      }
+
+
+
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       selector(
@@ -1049,6 +1328,45 @@ namespace Utilities
       {
         return Selector<RequestType, AnswerType>().run(
           targets, create_request, answer_request, process_answer, comm);
+      }
+
+
+
+      template <typename RequestType>
+      std::vector<unsigned int>
+      selector(
+        const std::vector<unsigned int> &                     targets,
+        const std::function<RequestType(const unsigned int)> &create_request,
+        const std::function<void(const unsigned int, const RequestType &)>
+          &             process_request,
+        const MPI_Comm &comm)
+      {
+        // TODO: For the moment, simply implement this special case by
+        // forwarding to the other function with rewritten function
+        // objects and using a plain 'char' as answer type. This way,
+        // we have the interface in place and can provide a more
+        // efficient implementation later on.
+        return selector<RequestType, char>(
+          targets,
+          create_request,
+          // answer_request:
+          [&process_request](const unsigned int source_rank,
+                             const RequestType &request) -> char {
+            process_request(source_rank, request);
+            // Return something. What it is is arbitrary here, except that
+            // we will want to check what it is below in the process_answer().
+            // We choose the smallest possible data type for the replies (a
+            // 'char'), but we can make ourselves feel more important by
+            // putting a whole "        " into one char (sensible editor
+            // settings assumed).
+            return '\t';
+          },
+          // process_answer:
+          [](const unsigned int /*target_rank */, const char &answer) {
+            (void)answer;
+            Assert(answer == '\t', ExcInternalError());
+          },
+          comm);
       }
 
 
