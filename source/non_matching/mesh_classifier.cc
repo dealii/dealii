@@ -321,6 +321,7 @@ namespace NonMatching
           dof_handler,
           level_set))
   {
+#ifdef DEAL_II_WITH_LAPACK
     const hp::FECollection<dim> &fe_collection =
       dof_handler.get_fe_collection();
     for (unsigned int i = 0; i < fe_collection.size(); i++)
@@ -333,6 +334,9 @@ namespace NonMatching
                  "The elements in the FECollection of the incoming DoFHandler "
                  "must have face support points."));
       }
+#else
+    AssertThrow(false, ExcNeedsLAPACK());
+#endif
   }
 
 
