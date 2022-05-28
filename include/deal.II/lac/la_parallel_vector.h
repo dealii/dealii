@@ -1934,8 +1934,15 @@ namespace internal
       // Used for (Trilinos/PETSc)Wrappers::SparseMatrix
       template <
         typename MatrixType,
+#if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
         typename std::enable_if<has_get_mpi_communicator<MatrixType> &&
                                   has_locally_owned_domain_indices<MatrixType>,
+#else
+        // workaround for Intel 18
+        typename std::enable_if<
+          is_supported_operation<get_mpi_communicator_t, MatrixType> &&
+            is_supported_operation<locally_owned_domain_indices_t, MatrixType>,
+#endif
                                 MatrixType>::type * = nullptr>
       static void
       reinit_domain_vector(MatrixType &                                mat,
@@ -1948,7 +1955,13 @@ namespace internal
 
       // Used for MatrixFree and DiagonalMatrix
       template <typename MatrixType,
+#if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
                 typename std::enable_if<has_initialize_dof_vector<MatrixType>,
+#else
+                // workaround for Intel 18
+                typename std::enable_if<
+                  is_supported_operation<initialize_dof_vector_t, MatrixType>,
+#endif
                                         MatrixType>::type * = nullptr>
       static void
       reinit_domain_vector(MatrixType &                                mat,
@@ -1963,8 +1976,15 @@ namespace internal
       // Used for (Trilinos/PETSc)Wrappers::SparseMatrix
       template <
         typename MatrixType,
+#if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
         typename std::enable_if<has_get_mpi_communicator<MatrixType> &&
                                   has_locally_owned_range_indices<MatrixType>,
+#else
+        // workaround for Intel 18
+        typename std::enable_if<
+          is_supported_operation<get_mpi_communicator_t, MatrixType> &&
+            is_supported_operation<locally_owned_range_indices_t, MatrixType>,
+#endif
                                 MatrixType>::type * = nullptr>
       static void
       reinit_range_vector(MatrixType &                                mat,
@@ -1977,7 +1997,13 @@ namespace internal
 
       // Used for MatrixFree and DiagonalMatrix
       template <typename MatrixType,
+#if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
                 typename std::enable_if<has_initialize_dof_vector<MatrixType>,
+#else
+                // workaround for Intel 18
+                typename std::enable_if<
+                  is_supported_operation<initialize_dof_vector_t, MatrixType>,
+#endif
                                         MatrixType>::type * = nullptr>
       static void
       reinit_range_vector(MatrixType &                                mat,
