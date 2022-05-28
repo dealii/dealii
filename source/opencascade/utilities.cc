@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/opencascade/utilities.h>
 
 #ifdef DEAL_II_WITH_OPENCASCADE
@@ -27,7 +29,6 @@
 #  include <STEPControl_Controller.hxx>
 #  include <STEPControl_Reader.hxx>
 #  include <STEPControl_Writer.hxx>
-#  include <Standard_Version.hxx>
 #  include <TopExp_Explorer.hxx>
 #  include <TopoDS.hxx>
 #  include <TopoDS_Edge.hxx>
@@ -37,10 +38,10 @@
 #  include <cstdio>
 #  include <iostream>
 #  include <set>
-#  if (OCC_VERSION_MAJOR < 7)
-#    include <Handle_Standard_Transient.hxx>
-#  else
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
 #    include <Standard_Transient.hxx>
+#  else
+#    include <Handle_Standard_Transient.hxx>
 #  endif
 
 #  include <BRepAdaptor_Curve.hxx>
@@ -328,12 +329,12 @@ namespace OpenCASCADE
 
     StlAPI_Writer writer;
 
-#  if ((OCC_VERSION_MAJOR * 100 + OCC_VERSION_MINOR * 10) >= 690)
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(6, 9, 0)
     // opencascade versions 6.9.0 onwards return an error status
     const auto error = writer.Write(shape_to_be_written, filename.c_str());
 
     // which is a custom type between 6.9.0 and 7.1.0
-#    if ((OCC_VERSION_MAJOR * 100 + OCC_VERSION_MINOR * 10) < 720)
+#    if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 2, 0)
     AssertThrow(error == StlAPI_StatusOK,
                 ExcMessage("Error writing STL from shape."));
 #    else
