@@ -702,7 +702,7 @@ namespace DataOutBase
   {
     /**
      * Default constructor. Sets up the dimension labels with the default values
-     of <tt>"x"</tt>, <tt>"y"</tt>, and <tt>"z"</tt>.
+     * of <tt>"x"</tt>, <tt>"y"</tt>, and <tt>"z"</tt>.
      */
     GnuplotFlags();
 
@@ -1536,7 +1536,8 @@ namespace DataOutBase
     unsigned int node_dim;
 
     /**
-     * The number of cells stored in @ref filtered_cells.
+     * The number of cells stored in
+     * @ref filtered_cells.
      */
     unsigned int num_cells;
 

@@ -435,8 +435,9 @@ namespace internal
  * avoids the memory allocation and other expensive start-up cost of
  * FEValues. Currently, the functionality is specialized for mappings derived
  * from MappingQ and MappingCartesian and for finite elements with tensor
- * product structure
- * that work with the @ref matrixfree module. In those cases, the cost implied
+ * product structure that work with the
+ * @ref matrixfree
+ * module. In those cases, the cost implied
  * by this class is similar (or sometimes even somewhat lower) than using
  * `FEValues::reinit(cell)` followed by `FEValues::get_function_gradients`.
  */

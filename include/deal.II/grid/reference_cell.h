@@ -92,7 +92,8 @@ namespace internal
  * objects, and comparing against those special objects.
  *
  * The purposes and intents of this class are described in the
- * @ref GlossReferenceCell "reference cell" glossary entry.
+ * @ref GlossReferenceCell "reference cell"
+ * glossary entry.
  *
  * @ingroup grid geomprimitives aniso
  */

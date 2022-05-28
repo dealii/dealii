@@ -47,7 +47,7 @@ namespace FEInterfaceViews
   public:
     /**
      * The constructor.
-     **/
+     */
     Base(const FEInterfaceValues<dim, spacedim> &fe_interface);
 
   protected:

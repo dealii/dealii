@@ -118,7 +118,7 @@ namespace internal
  * small to be seen individually) or because you only want to see a certain
  * region of the domain (for example only in the fluid part of the domain in
  * step-46), or for some other reason.
-
+ *
  * For this, internally build_patches() does not generate the sequence of cells
  * to be converted into patches itself, but relies on the two private
  * std::function objects first_cell_function() and next_cell_function(). By

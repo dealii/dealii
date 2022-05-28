@@ -38,7 +38,7 @@ namespace Physics
      * Holzapfel (2007) and Wriggers (2008). The citation for these references,
      * as well as other notation used here, can be found in the description for
      * the Physics::Elasticity namespace.
-
+     *
      * @note These hold specifically for the codimension 0 case,
      * where the metric tensor is the identity tensor.
      */

@@ -756,7 +756,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * Create a vectorized array of given type and broadcast the scalar value
  * to all array elements.
  *
- *  @relatesalso VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
@@ -1111,7 +1111,8 @@ public:
     _mm512_storeu_pd(ptr, data);
   }
 
-  /** @copydoc VectorizedArray<Number>::streaming_store()
+  /**
+   * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 64 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -1668,7 +1669,8 @@ public:
     _mm512_storeu_ps(ptr, data);
   }
 
-  /** @copydoc VectorizedArray<Number>::streaming_store()
+  /**
+   * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 64 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -2321,7 +2323,8 @@ public:
     _mm256_storeu_pd(ptr, data);
   }
 
-  /** @copydoc VectorizedArray<Number>::streaming_store()
+  /**
+   * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 32 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -2837,7 +2840,8 @@ public:
     _mm256_storeu_ps(ptr, data);
   }
 
-  /** @copydoc VectorizedArray<Number>::streaming_store()
+  /**
+   * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 32 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -3383,7 +3387,8 @@ public:
     _mm_storeu_pd(ptr, data);
   }
 
-  /** @copydoc VectorizedArray<Number>::streaming_store()
+  /**
+   * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 16 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -3830,7 +3835,8 @@ public:
     _mm_storeu_ps(ptr, data);
   }
 
-  /** @copydoc VectorizedArray<Number>::streaming_store()
+  /**
+   * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 16 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -4299,7 +4305,8 @@ public:
     vec_vsx_st(data, 0, ptr);
   }
 
-  /** @copydoc VectorizedArray<Number>::streaming_store()
+  /**
+   * @copydoc VectorizedArray<Number>::streaming_store()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4308,7 +4315,8 @@ public:
     store(ptr);
   }
 
-  /** @copydoc VectorizedArray<Number>::gather()
+  /**
+   * @copydoc VectorizedArray<Number>::gather()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4318,7 +4326,8 @@ public:
       *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
   }
 
-  /** @copydoc VectorizedArray<Number>::scatter
+  /**
+   * @copydoc VectorizedArray<Number>::scatter
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4543,7 +4552,8 @@ public:
     vec_vsx_st(data, 0, ptr);
   }
 
-  /** @copydoc VectorizedArray<Number>::streaming_store()
+  /**
+   * @copydoc VectorizedArray<Number>::streaming_store()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4552,7 +4562,8 @@ public:
     store(ptr);
   }
 
-  /** @copydoc VectorizedArray<Number>::gather()
+  /**
+   * @copydoc VectorizedArray<Number>::gather()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4562,7 +4573,8 @@ public:
       *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
   }
 
-  /** @copydoc VectorizedArray<Number>::scatter
+  /**
+   * @copydoc VectorizedArray<Number>::scatter
    */
   DEAL_II_ALWAYS_INLINE
   void

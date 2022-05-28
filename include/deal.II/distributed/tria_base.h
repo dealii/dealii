@@ -66,7 +66,8 @@ namespace parallel
    * @ref GlossMPICommunicator "MPI communicators"
    * or that they have
    * @ref GlossLocallyOwnedCell "locally owned",
-   * @ref GlossGhostCell "ghost", and possibly
+   * @ref GlossGhostCell "ghost",
+   * and possibly
    * @ref GlossArtificialCell "artificial cells".
    * This class provides
    * a number of member functions that allows querying some information
@@ -685,7 +686,8 @@ namespace parallel
      * Save additional cell-attached data into the given file. The first
      * arguments are used to determine the offsets where to write buffers to.
      *
-     * Called by @ref save.
+     * Called by
+     * @ref save.
      */
     void
     save_attached_data(const unsigned int global_first_cell,
@@ -697,7 +699,8 @@ namespace parallel
      * The first arguments are used to determine the offsets where to read
      * buffers from.
      *
-     * Called by @ref load.
+     * Called by
+     * @ref load.
      */
     void
     load_attached_data(const unsigned int global_first_cell,

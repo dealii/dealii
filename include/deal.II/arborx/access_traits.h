@@ -245,10 +245,10 @@ namespace ArborXWrappers
 
 
   /**
-   *  This class defines a predicate used by ArborXWrappers::BVH to determine
-   *  for given spheres which of the bounding boxes used to build the
-   *  ArborXWrappers::BVH intersect with them.
-   *  @note The class is not supposed to be used in a polymorphic context.
+   * This class defines a predicate used by ArborXWrappers::BVH to determine
+   * for given spheres which of the bounding boxes used to build the
+   * ArborXWrappers::BVH intersect with them.
+   * @note The class is not supposed to be used in a polymorphic context.
    */
   class SphereIntersectPredicate : private SpherePredicate
   {

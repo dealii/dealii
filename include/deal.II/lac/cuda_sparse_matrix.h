@@ -315,7 +315,7 @@ namespace CUDAWrappers
     //@}
 
     /**
-     *@name Access to underlying CUDA data
+     * @name Access to underlying CUDA data
      */
     //@{
     /**
