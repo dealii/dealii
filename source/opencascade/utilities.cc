@@ -45,10 +45,14 @@
 #  endif
 
 #  include <BRepAdaptor_Curve.hxx>
-#  include <BRepAdaptor_HCompCurve.hxx>
-#  include <BRepAdaptor_HCurve.hxx>
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+#    include <BRepAlgoAPI_Section.hxx>
+#  else
+#    include <BRepAdaptor_HCompCurve.hxx>
+#    include <BRepAdaptor_HCurve.hxx>
+#    include <BRepAlgo_Section.hxx>
+#  endif
 #  include <BRepAdaptor_Surface.hxx>
-#  include <BRepAlgo_Section.hxx>
 #  include <BRepBndLib.hxx>
 #  include <BRepBuilderAPI_MakeEdge.hxx>
 #  include <BRepBuilderAPI_Sewing.hxx>
@@ -427,8 +431,12 @@ namespace OpenCASCADE
                   const double /*tolerance*/)
   {
     Handle(Geom_Plane) plane = new Geom_Plane(c_x, c_y, c_z, c);
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+    BRepAlgoAPI_Section section(in_shape, plane);
+#  else
     BRepAlgo_Section section(in_shape, plane);
-    TopoDS_Shape     edges = section.Shape();
+#  endif
+    TopoDS_Shape edges = section.Shape();
     return edges;
   }
 
