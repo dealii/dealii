@@ -14,6 +14,8 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/opencascade/manifold_lib.h>
 
 #ifdef DEAL_II_WITH_OPENCASCADE
@@ -28,9 +30,8 @@
 #  include <GCPnts_AbscissaPoint.hxx>
 #  include <ShapeAnalysis_Curve.hxx>
 #  include <ShapeAnalysis_Surface.hxx>
-#  include <Standard_Version.hxx>
 #  include <TopoDS.hxx>
-#  if (OCC_VERSION_MAJOR < 7)
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
 #    include <Handle_Adaptor3d_HCurve.hxx>
 #  endif
 
