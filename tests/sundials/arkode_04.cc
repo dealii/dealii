@@ -76,6 +76,7 @@ main(int argc, char **argv)
   double u0 = 3.9, v0 = 1.1, w0 = 2.8, a = 1.2, b = 2.5, eps = 1e-5;
   // Explicit jacobian.
   FullMatrix<double> J(3, 3);
+  J(2, 2) = -1.0 / eps;
 
   ode.implicit_function =
     [&](double, const VectorType &y, VectorType &ydot) -> int {
@@ -94,26 +95,21 @@ main(int argc, char **argv)
     return 0;
   };
 
-  ode.solve_jacobian_system = [&](const double t,
-                                  const double gamma,
-                                  const VectorType &,
-                                  const VectorType &,
-                                  const VectorType &src,
-                                  VectorType &      dst) -> int {
-    J       = 0;
-    J(0, 0) = 1;
-    J(1, 1) = 1;
-    J(2, 2) = 1 + gamma / eps;
-    J.gauss_jordan();
+  ode.jacobian_times_vector = [&](const VectorType &src,
+                                  VectorType &      dst,
+                                  double            t,
+                                  const VectorType & /*y*/,
+                                  const VectorType & /*fy*/) -> int {
     J.vmult(dst, src);
+
     return 0;
   };
 
   ode.output_step = [&](const double       t,
                         const VectorType & sol,
                         const unsigned int step_number) -> int {
-    deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol[2]
-            << std::endl;
+    deallog << std::setprecision(16) << t << ' ' << sol[0] << ' ' << sol[1]
+            << ' ' << sol[2] << std::endl;
     return 0;
   };
 
