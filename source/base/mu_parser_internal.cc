@@ -410,6 +410,9 @@ namespace internal
         } // catch
 
 #else
+      (void)p;
+      (void)time;
+      (void)component;
       AssertThrow(false, ExcNeedsFunctionparser());
 #endif
       return std::numeric_limits<double>::signaling_NaN();
@@ -461,6 +464,9 @@ namespace internal
           AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg()));
         } // catch
 #else
+      (void)p;
+      (void)time;
+      (void)values;
       AssertThrow(false, ExcNeedsFunctionparser());
 #endif
     }
