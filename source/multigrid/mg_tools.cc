@@ -115,17 +115,10 @@ namespace MGTools
     // Function starts here by
     // resetting the counters.
     std::fill(row_lengths.begin(), row_lengths.end(), 0);
-    // We need the user flags, so we
-    // save them for later restoration
-    std::vector<bool> old_flags;
-    // We need a non-constant
-    // triangulation for the user
-    // flags. Since we restore them in
-    // the end, this cast is safe.
-    Triangulation<dim, spacedim> &user_flags_triangulation =
-      const_cast<Triangulation<dim, spacedim> &>(dofs.get_triangulation());
-    user_flags_triangulation.save_user_flags(old_flags);
-    user_flags_triangulation.clear_user_flags();
+
+    std::vector<bool> face_touched(dim == 2 ?
+                                     dofs.get_triangulation().n_raw_lines() :
+                                     dofs.get_triangulation().n_raw_quads());
 
     std::vector<types::global_dof_index> cell_indices;
     std::vector<types::global_dof_index> neighbor_indices;
@@ -262,9 +255,10 @@ namespace MGTools
 
             // Do this only once per
             // face.
-            if (face->user_flag_set())
+            if (face_touched[face->index()])
               continue;
-            face->set_user_flag();
+            face_touched[face->index()] = true;
+
             // At this point, we assume
             // that each cell added its
             // dofs minus the face to
@@ -289,7 +283,6 @@ namespace MGTools
                 fe.n_dofs_per_face(face_no);
           }
       }
-    user_flags_triangulation.load_user_flags(old_flags);
   }
 
 
@@ -308,17 +301,10 @@ namespace MGTools
     // Function starts here by
     // resetting the counters.
     std::fill(row_lengths.begin(), row_lengths.end(), 0);
-    // We need the user flags, so we
-    // save them for later restoration
-    std::vector<bool> old_flags;
-    // We need a non-constant
-    // triangulation for the user
-    // flags. Since we restore them in
-    // the end, this cast is safe.
-    Triangulation<dim, spacedim> &user_flags_triangulation =
-      const_cast<Triangulation<dim, spacedim> &>(dofs.get_triangulation());
-    user_flags_triangulation.save_user_flags(old_flags);
-    user_flags_triangulation.clear_user_flags();
+
+    std::vector<bool> face_touched(dim == 2 ?
+                                     dofs.get_triangulation().n_raw_lines() :
+                                     dofs.get_triangulation().n_raw_quads());
 
     std::vector<types::global_dof_index> cell_indices;
     std::vector<types::global_dof_index> neighbor_indices;
@@ -530,12 +516,11 @@ namespace MGTools
                       row_lengths[cell_indices[local_dof]] += dof_increment;
                     }
 
-            // Do this only once per
-            // face and not on the
-            // hanging faces.
-            if (face->user_flag_set())
+            // Do this only once per face and not on the hanging faces.
+            if (face_touched[face->index()])
               continue;
-            face->set_user_flag();
+            face_touched[face->index()] = true;
+
             // At this point, we assume
             // that each cell added its
             // dofs minus the face to
@@ -582,7 +567,6 @@ namespace MGTools
                       fe.base_element(base).n_dofs_per_face(face_no);
           }
       }
-    user_flags_triangulation.load_user_flags(old_flags);
   }
 
 
@@ -642,9 +626,7 @@ namespace MGTools
     const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
-    typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
-                                                      endc = dof.end(level);
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.cell_iterators_on_level(level))
       {
         if (!cell->is_locally_owned_on_level())
           continue;
@@ -723,9 +705,7 @@ namespace MGTools
     const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
-    typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
-                                                      endc = dof.end(level);
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.cell_iterators_on_level(level))
       {
         if (!cell->is_locally_owned_on_level())
           continue;
@@ -801,9 +781,6 @@ namespace MGTools
     Table<2, bool>                       support_on_face(total_dofs,
                                    GeometryInfo<dim>::faces_per_cell);
 
-    typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
-                                                      endc = dof.end(level);
-
     const Table<2, DoFTools::Coupling>
       int_dof_mask =
         DoFTools::dof_couplings_from_component_couplings(fe, int_mask),
@@ -814,20 +791,11 @@ namespace MGTools
       for (auto f : GeometryInfo<dim>::face_indices())
         support_on_face(i, f) = fe.has_support_on_face(i, f);
 
-    // Clear user flags because we will
-    // need them. But first we save
-    // them and make sure that we
-    // restore them later such that at
-    // the end of this function the
-    // Triangulation will be in the
-    // same state as it was at the
-    // beginning of this function.
-    std::vector<bool> user_flags;
-    dof.get_triangulation().save_user_flags(user_flags);
-    const_cast<Triangulation<dim, spacedim> &>(dof.get_triangulation())
-      .clear_user_flags();
+    std::vector<bool> face_touched(dim == 2 ?
+                                     dof.get_triangulation().n_raw_lines() :
+                                     dof.get_triangulation().n_raw_quads());
 
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.cell_iterators_on_level(level))
       {
         if (!cell->is_locally_owned_on_level())
           continue;
@@ -844,7 +812,7 @@ namespace MGTools
           {
             typename DoFHandler<dim, spacedim>::face_iterator cell_face =
               cell->face(face);
-            if (cell_face->user_flag_set())
+            if (face_touched[cell_face->index()])
               continue;
 
             if (cell->at_boundary(face) && !cell->has_periodic_neighbor(face))
@@ -944,14 +912,10 @@ namespace MGTools
                           }
                       }
                   }
-                neighbor->face(neighbor_face)->set_user_flag();
+                face_touched[neighbor->face(neighbor_face)->index()] = true;
               }
           }
       }
-
-    // finally restore the user flags
-    const_cast<Triangulation<dim, spacedim> &>(dof.get_triangulation())
-      .load_user_flags(user_flags);
   }
 
 
@@ -992,9 +956,6 @@ namespace MGTools
     Table<2, bool>                       support_on_face(dofs_per_cell,
                                    GeometryInfo<dim>::faces_per_cell);
 
-    typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
-                                                      endc = dof.end(level);
-
     const Table<2, DoFTools::Coupling> flux_dof_mask =
       DoFTools::dof_couplings_from_component_couplings(fe, flux_mask);
 
@@ -1002,7 +963,7 @@ namespace MGTools
       for (auto f : GeometryInfo<dim>::face_indices())
         support_on_face(i, f) = fe.has_support_on_face(i, f);
 
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.cell_iterators_on_level(level))
       {
         if (!cell->is_locally_owned_on_level())
           continue;
@@ -1065,9 +1026,7 @@ namespace MGTools
 
     const unsigned int dofs_per_cell = dof.get_fe().n_dofs_per_cell();
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
-    typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(level),
-                                                      endc = dof.end(level);
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.cell_iterators_on_level(level))
       if (cell->is_locally_owned_on_level())
         {
           cell->get_mg_dof_indices(dofs_on_this_cell);
@@ -1494,10 +1453,7 @@ namespace MGTools
 
     std::vector<bool> cell_dofs(dofs_per_cell, false);
 
-    typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
-                                            endc = mg_dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : mg_dof_handler.cell_iterators())
       {
         // Do not look at artificial level cells (in a serial computation we
         // need to ignore the level_subdomain_id() because it is never set).
@@ -1573,10 +1529,7 @@ namespace MGTools
     // the first locally owned cell we find will have
     // the lowest level in the particular subdomain.
     unsigned int min_level = tria.n_global_levels();
-    typename Triangulation<dim, spacedim>::active_cell_iterator
-      cell = tria.begin_active(),
-      endc = tria.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : tria.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           min_level = cell->level();
