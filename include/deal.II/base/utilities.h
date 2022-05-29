@@ -559,7 +559,7 @@ namespace Utilities
   invert_permutation(const std::vector<Integer> &permutation);
 
   /**
-   * Given an arbitrary object of type T, use boost::serialization utilities
+   * Given an arbitrary object of type `T`, use boost::serialization utilities
    * to pack the object into a vector of characters and append it to the
    * given buffer. The number of elements that have been added to the buffer
    * will be returned. The object can be unpacked using the Utilities::unpack
@@ -572,6 +572,31 @@ namespace Utilities
    * If many consecutive calls with the same buffer are considered, it is
    * recommended for reasons of performance to ensure that its capacity is
    * sufficient.
+   *
+   * This function considers a number of special cases for which packing (and
+   * unpacking) can be simplified. These are:
+   * - If the object of type `T` is relatively small (less than 256 bytes) and
+   *   if `T` satisfies `std::is_trivially_copyable`, then it is copied bit
+   *   by bit into the output buffer.
+   * - If no compression is requested, and if the object is a vector of objects
+   *   whose type `T` satisfies `std::is_trivially_copyable`, then packing
+   *   implies copying the length of the vector into the destination buffer
+   *   followed by a bit-by-bit copy of the contents of the vector. A
+   *   similar process is used for vectors of vectors of objects whose type
+   *   `T` satisfies `std::is_trivially_copyable`.
+   * - Finally, if the type `T` of the object to be packed is std::tuple<>
+   *   (i.e., a tuple without any elements as indicated by the empty argument
+   *   list) and if no compression is requested, then this
+   *   type is considered an "empty" type and it is packed
+   *   into a zero byte buffer. Using empty types is occasionally useful when
+   *   sending messages to other processes if the important part about the
+   *   message is that it is *sent*, not what it *contains* -- in other words,
+   *   it puts the receiver on notice of something, without having to provide
+   *   any details. In such cases, it is helpful if the message body can be
+   *   empty -- that is, have length zero -- and using std::tuple<> facilitates
+   *   this by providing a type which the present function packs into an
+   *   empty output buffer, given that many deal.II functions send objects
+   *   only after calling pack() to serialize them.
    */
   template <typename T>
   size_t
@@ -581,7 +606,7 @@ namespace Utilities
 
   /**
    * Creates and returns a buffer solely for the given object, using the
-   * above mentioned pack function.
+   * above mentioned pack function (including all of its special cases).
    *
    * If the library has been compiled with ZLIB enabled, then the output buffer
    * can be compressed. This can be triggered with the parameter
@@ -593,11 +618,12 @@ namespace Utilities
 
   /**
    * Given a vector of characters, obtained through a call to the function
-   * Utilities::pack, restore its content in an object of type T.
+   * Utilities::pack, restore its content in an object of type `T`.
    *
    * This function uses boost::serialization utilities to unpack the object
    * from a vector of characters, and it is the inverse of the function
-   * Utilities::pack().
+   * Utilities::pack(). It considers the same set of special cases as
+   * documented with the pack() function.
    *
    * The @p allow_compression parameter denotes if the buffer to
    * read from could have been previously compressed with ZLIB, and
