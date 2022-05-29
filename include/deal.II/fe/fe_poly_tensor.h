@@ -252,8 +252,8 @@ protected:
    * The constructor of this class fills this table with 'false' values, i.e.,
    * no sign change at all. Derived finite element classes have to
    * fill this Table with the correct values, see the documentation in
-   * GeometryInfo<dim> and
-   * this @ref GlossFaceOrientation "glossary entry on face orientation".
+   * GeometryInfo<dim> and this
+   * @ref GlossFaceOrientation "glossary entry on face orientation".
    *
    * The table must be filled in finite element classes derived
    * from FE_PolyTensor in a meaningful way since the permutation
