@@ -8007,7 +8007,7 @@ DataOutInterface<dim, spacedim>::write_xdmf_file(
   // Only rank 0 process writes the XDMF file
   if (myrank == 0)
     {
-      std::ofstream xdmf_file(filename.c_str());
+      std::ofstream xdmf_file(filename);
 
       xdmf_file << "<?xml version=\"1.0\" ?>\n";
       xdmf_file << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
