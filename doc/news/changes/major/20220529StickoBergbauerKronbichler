@@ -1,0 +1,33 @@
+New: Several classes have been added to the NonMatching namespace for using cut
+finite element methods (CutFEM):
+<ul>
+  <li>
+    MeshClassifier identifies how active cells and faces are located relative
+    to the zero contour of a level set function, by associating one of the
+    values of the enum LocationToLevelSet: {inside, outside, intersected}, with
+    each cell/face.
+  </li>
+  <li>
+    QuadratureGenerator creates immersed quadrature rules over the 3 regions of
+    a BoundingBox defined by the sign of a level set function.
+    FaceQuadratureGenerator creates the same type of quadratures but over a
+    face of a BoundingBox. DiscreteQuadratureGenerator and
+    DiscreteFaceQuadratureGenerator create the same type of quadratures over a
+    cell/face when the level set function lies in a finite element space.
+  </li>
+  <li>
+    FEImmersedSurfaceValues is a FEValues-like class for evaluating real space
+    values based on an ImmersedSurfaceQuadrature, i.e., for integrating over
+    the zero contour in a cell.
+  </li>
+  <li>
+    NonMatching::FEValues simplifies assembling by creating dealii::FEValues
+    and FEImmersedSurfaceValues objects initialized with the 3 different
+    immersed quadratures of a cell. Analogously, NonMatching::FEInterfaceValues
+    creates dealii::FEInterfaceValues objects initialized with immersed
+    quadrature rules over a face.
+  </li>
+</ul>
+
+<br>
+(Simon Sticko, Maximilian Bergbauer, Martin Kronbichler, 2022/05/29)
