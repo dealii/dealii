@@ -44,6 +44,7 @@ namespace Utilities
 
         void
         FlexibleIndexStorage::reinit(const bool        use_vector,
+                                     const bool        index_range_contiguous,
                                      const std::size_t size)
         {
           this->use_vector = use_vector;
@@ -52,8 +53,10 @@ namespace Utilities
           data = {};
           data_map.clear();
 
-          // do not initialize the vector but only upon first request in
-          // `fill`
+          // in case we have contiguous indices, only fill the vector upon
+          // first request in `fill`
+          if (!index_range_contiguous)
+            data.resize(size, invalid_index_value);
         }
 
 
@@ -263,6 +266,8 @@ namespace Utilities
 
           actually_owning_ranks.reinit((owned_indices_size_actual *
                                         sparsity_factor) > owned_indices.size(),
+                                       owned_indices_size_actual ==
+                                         owned_indices.size(),
                                        locally_owned_size);
 
           // 2) collect relevant processes and process local dict entries
