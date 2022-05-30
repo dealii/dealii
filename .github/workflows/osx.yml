@@ -17,7 +17,7 @@ jobs:
     runs-on: [macos-latest]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: info
       run: |
         g++ -v
@@ -56,7 +56,7 @@ jobs:
     runs-on: [macos-latest]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: setup
       run: |
         brew install openmpi

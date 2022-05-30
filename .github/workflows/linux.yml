@@ -17,7 +17,7 @@ jobs:
     runs-on: [ubuntu-20.04]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
@@ -57,7 +57,7 @@ jobs:
     runs-on: [ubuntu-20.04]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: modules
       run: |
         sudo apt-get install -y software-properties-common
@@ -127,7 +127,7 @@ jobs:
     runs-on: [ubuntu-18.04]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: modules
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
@@ -179,7 +179,7 @@ jobs:
     runs-on: [ubuntu-18.04]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: setup apt repo
       run: |
         # oneapi-ci/scripts/setup_apt_repo_linux.sh
