@@ -4361,7 +4361,7 @@ namespace GridTools
             ExcMessage(
               "The functions GridTools::exchange_cell_data_to_ghosts() and "
               "GridTools::exchange_cell_data_to_level_ghosts() can only "
-              "operate on a single layer ghost cells. However, you have "
+              "operate on a single layer of ghost cells. However, you have "
               "given a Triangulation object of type "
               "parallel::shared::Triangulation without artificial cells "
               "resulting in arbitrary numbers of ghost layers."));
