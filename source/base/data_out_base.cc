@@ -8007,8 +8007,7 @@ DataOutInterface<dim, spacedim>::write_xdmf_file(
   // Only rank 0 process writes the XDMF file
   if (myrank == 0)
     {
-      std::ofstream                          xdmf_file(filename.c_str());
-      std::vector<XDMFEntry>::const_iterator it;
+      std::ofstream xdmf_file(filename.c_str());
 
       xdmf_file << "<?xml version=\"1.0\" ?>\n";
       xdmf_file << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
@@ -8021,9 +8020,16 @@ DataOutInterface<dim, spacedim>::write_xdmf_file(
       const auto &patches = get_patches();
       Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
 
-      for (it = entries.begin(); it != entries.end(); ++it)
+      // We currently don't support writing mixed meshes:
+#ifdef DEBUG
+      for (const auto &patch : patches)
+        Assert(patch.reference_cell == patches[0].reference_cell,
+               ExcNotImplemented());
+#endif
+
+      for (const auto &entry : entries)
         {
-          xdmf_file << it->get_xdmf_content(3, patches[0].reference_cell);
+          xdmf_file << entry.get_xdmf_content(3, patches[0].reference_cell);
         }
 
       xdmf_file << "    </Grid>\n";
