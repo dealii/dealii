@@ -597,6 +597,20 @@ namespace Utilities
    *   this by providing a type which the present function packs into an
    *   empty output buffer, given that many deal.II functions send objects
    *   only after calling pack() to serialize them.
+   *
+   * In several of the special cases above, the `std::is_trivially_copyable`
+   * property is important, see
+   * https://en.cppreference.com/w/cpp/types/is_trivially_copyable .
+   * For a type `T` to satisfy this property essentially means that an object
+   * `t2` of this type can be initialized by copying another object `t1`
+   * bit-by-bit into the memory space of `t2`. In particular, this is the case
+   * for built-in types such as `int`, `double`, or `char`, as well as
+   * structures and classes that only consist of such types and that have
+   * neither user-defined constructors nor `virtual` functions. In practice,
+   * and together with the fact that vectors and vector-of-vectors of these
+   * types are also special-cased, this covers many of the most common kinds of
+   * messages one sends around with MPI or one wants to serialize (the two
+   * most common use cases for this function).
    */
   template <typename T>
   size_t
