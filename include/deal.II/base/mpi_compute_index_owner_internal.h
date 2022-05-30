@@ -45,7 +45,9 @@ namespace Utilities
           FlexibleIndexStorage(const bool use_vector = true);
 
           void
-          reinit(const bool use_vector, const std::size_t size);
+          reinit(const bool        use_vector,
+                 const bool        index_range_contiguous,
+                 const std::size_t size);
 
           void
           fill(const std::size_t start,
