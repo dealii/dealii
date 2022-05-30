@@ -223,7 +223,8 @@ private:
    * flipped (rotated by +180 degrees) or rotated (rotated by +90 degrees)
    * faces. These are given in the form three flags (face_orientation,
    * face_flip, face_rotation), see the documentation in GeometryInfo<dim> and
-   * this @ref GlossFaceOrientation "glossary entry on face orientation".
+   * this
+   * @ref GlossFaceOrientation "glossary entry on face orientation".
    *
    * <h3>Example: Raviart-Thomas Elements of order 2 (tensor polynomial
    * degree 3)</h3>

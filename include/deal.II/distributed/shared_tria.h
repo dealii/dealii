@@ -500,7 +500,8 @@ namespace internal
        *
        * This class has effect only if artificial cells are allowed. Without
        * artificial cells, the current subdomain IDs already correspond to the
-       * true subdomain IDs. See the @ref GlossArtificialCell "glossary"
+       * true subdomain IDs. See the
+       * @ref GlossArtificialCell "glossary"
        * for more information about artificial cells.
        */
       template <int dim, int spacedim = dim>
