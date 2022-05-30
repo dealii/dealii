@@ -1177,29 +1177,27 @@ namespace Utilities
       {
         // TODO: For the moment, simply implement this special case by
         // forwarding to the other function with rewritten function
-        // objects and using a plain 'char' as answer type. This way,
+        // objects and using an empty type as answer type. This way,
         // we have the interface in place and can provide a more
         // efficient implementation later on.
-        return nbx<RequestType, char>(
+        using EmptyType = std::tuple<>;
+
+        return nbx<RequestType, EmptyType>(
           targets,
           create_request,
           // answer_request:
           [&process_request](const unsigned int source_rank,
-                             const RequestType &request) -> char {
+                             const RequestType &request) -> EmptyType {
             process_request(source_rank, request);
             // Return something. What it is is arbitrary here, except that
-            // we will want to check what it is below in the process_answer().
-            // We choose the smallest possible data type for the replies (a
-            // 'char'), but we can make ourselves feel more important by
-            // putting a whole "        " into one char (sensible editor
-            // settings assumed).
-            return '\t';
+            // we want it to be as small an object as possible. Using
+            // std::tuple<> is interpreted as an empty object that is packed
+            // down to a zero-length char array.
+            return {};
           },
           // process_answer:
-          [](const unsigned int /*target_rank */, const char &answer) {
-            (void)answer;
-            Assert(answer == '\t', ExcInternalError());
-          },
+          [](const unsigned int /*target_rank */,
+             const EmptyType & /*answer*/) {},
           comm);
       }
 
@@ -1231,29 +1229,27 @@ namespace Utilities
       {
         // TODO: For the moment, simply implement this special case by
         // forwarding to the other function with rewritten function
-        // objects and using a plain 'char' as answer type. This way,
+        // objects and using an empty type as answer type. This way,
         // we have the interface in place and can provide a more
         // efficient implementation later on.
-        return pex<RequestType, char>(
+        using EmptyType = std::tuple<>;
+
+        return pex<RequestType, EmptyType>(
           targets,
           create_request,
           // answer_request:
           [&process_request](const unsigned int source_rank,
-                             const RequestType &request) -> char {
+                             const RequestType &request) -> EmptyType {
             process_request(source_rank, request);
             // Return something. What it is is arbitrary here, except that
-            // we will want to check what it is below in the process_answer().
-            // We choose the smallest possible data type for the replies (a
-            // 'char'), but we can make ourselves feel more important by
-            // putting a whole "        " into one char (sensible editor
-            // settings assumed).
-            return '\t';
+            // we want it to be as small an object as possible. Using
+            // std::tuple<> is interpreted as an empty object that is packed
+            // down to a zero-length char array.
+            return {};
           },
           // process_answer:
-          [](const unsigned int /*target_rank */, const char &answer) {
-            (void)answer;
-            Assert(answer == '\t', ExcInternalError());
-          },
+          [](const unsigned int /*target_rank */,
+             const EmptyType & /*answer*/) {},
           comm);
       }
 
@@ -1287,29 +1283,27 @@ namespace Utilities
       {
         // TODO: For the moment, simply implement this special case by
         // forwarding to the other function with rewritten function
-        // objects and using a plain 'char' as answer type. This way,
+        // objects and using an empty type as answer type. This way,
         // we have the interface in place and can provide a more
         // efficient implementation later on.
-        return serial<RequestType, char>(
+        using EmptyType = std::tuple<>;
+
+        return serial<RequestType, EmptyType>(
           targets,
           create_request,
           // answer_request:
           [&process_request](const unsigned int source_rank,
-                             const RequestType &request) -> char {
+                             const RequestType &request) -> EmptyType {
             process_request(source_rank, request);
             // Return something. What it is is arbitrary here, except that
-            // we will want to check what it is below in the process_answer().
-            // We choose the smallest possible data type for the replies (a
-            // 'char'), but we can make ourselves feel more important by
-            // putting a whole "        " into one char (sensible editor
-            // settings assumed).
-            return '\t';
+            // we want it to be as small an object as possible. Using
+            // std::tuple<> is interpreted as an empty object that is packed
+            // down to a zero-length char array.
+            return {};
           },
           // process_answer:
-          [](const unsigned int /*target_rank */, const char &answer) {
-            (void)answer;
-            Assert(answer == '\t', ExcInternalError());
-          },
+          [](const unsigned int /*target_rank */,
+             const EmptyType & /*answer*/) {},
           comm);
       }
 
@@ -1343,29 +1337,27 @@ namespace Utilities
       {
         // TODO: For the moment, simply implement this special case by
         // forwarding to the other function with rewritten function
-        // objects and using a plain 'char' as answer type. This way,
+        // objects and using an empty type as answer type. This way,
         // we have the interface in place and can provide a more
         // efficient implementation later on.
-        return selector<RequestType, char>(
+        using EmptyType = std::tuple<>;
+
+        return selector<RequestType, EmptyType>(
           targets,
           create_request,
           // answer_request:
           [&process_request](const unsigned int source_rank,
-                             const RequestType &request) -> char {
+                             const RequestType &request) -> EmptyType {
             process_request(source_rank, request);
             // Return something. What it is is arbitrary here, except that
-            // we will want to check what it is below in the process_answer().
-            // We choose the smallest possible data type for the replies (a
-            // 'char'), but we can make ourselves feel more important by
-            // putting a whole "        " into one char (sensible editor
-            // settings assumed).
-            return '\t';
+            // we want it to be as small an object as possible. Using
+            // std::tuple<> is interpreted as an empty object that is packed
+            // down to a zero-length char array.
+            return {};
           },
           // process_answer:
-          [](const unsigned int /*target_rank */, const char &answer) {
-            (void)answer;
-            Assert(answer == '\t', ExcInternalError());
-          },
+          [](const unsigned int /*target_rank */,
+             const EmptyType & /*answer*/) {},
           comm);
       }
 
