@@ -1,0 +1,35 @@
+
+DEAL::FESystem<2>[FESystem<2>[FE_SimplexDGP<2>(2)^2]-FE_SimplexDGP<2>(1)]: degree=2 tensor_degree=2
+DEAL::  Now running with FESystem<2>[FESystem<2>[FE_SimplexDGP<2>(2)^2]-FE_SimplexDGP<2>(1)]
+DEAL::	Number of active cells: 32
+DEAL::	Number of degrees of freedom: 480 (384+96)
+DEAL:: At 1th mesh
+DEAL:: L2 error:     0.117546     L2_Conv_rate: 0.00000
+DEAL:: H1 error:     2.20951      H1_Conv_rate: 0.00000
+DEAL:: Hdiv error1:  0.430647     Hdiv_Conv_rate1: 0.00000
+DEAL:: L2 pressure:  4.15183      rate: 0.00000
+DEAL::
+DEAL::	Number of active cells: 128
+DEAL::	Number of degrees of freedom: 1920 (1536+384)
+DEAL:: At 2th mesh
+DEAL:: L2 error:     0.0138896    L2_Conv_rate: 8.46286
+DEAL:: H1 error:     0.577807     H1_Conv_rate: 3.82396
+DEAL:: Hdiv error1:  0.108836     Hdiv_Conv_rate1: 3.95685
+DEAL:: L2 pressure:  1.41599      rate: 2.93210
+DEAL::
+DEAL::	Number of active cells: 512
+DEAL::	Number of degrees of freedom: 7680 (6144+1536)
+DEAL:: At 3th mesh
+DEAL:: L2 error:     0.00130976   L2_Conv_rate: 10.6047
+DEAL:: H1 error:     0.137071     H1_Conv_rate: 4.21539
+DEAL:: Hdiv error1:  0.0288825    Hdiv_Conv_rate1: 3.76823
+DEAL:: L2 pressure:  0.380977     rate: 3.71674
+DEAL::
+DEAL::	Number of active cells: 2048
+DEAL::	Number of degrees of freedom: 30720 (24576+6144)
+DEAL:: At 4th mesh
+DEAL:: L2 error:     0.000134320  L2_Conv_rate: 9.75105
+DEAL:: H1 error:     0.0329769    H1_Conv_rate: 4.15658
+DEAL:: Hdiv error1:  0.00739000   Hdiv_Conv_rate1: 3.90832
+DEAL:: L2 pressure:  0.0977908    rate: 3.89584
+DEAL::
