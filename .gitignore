@@ -39,6 +39,7 @@ examples/step-*/*gnuplot
 examples/step-*/*json
 examples/step-*/*png
 examples/step-*/*pvd
+examples/step-*/*pvtu
 examples/step-*/*svg
 examples/step-*/*tex
 examples/step-*/*visit
