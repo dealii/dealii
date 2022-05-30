@@ -31,8 +31,10 @@
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/fe/fe_dg_vector.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_interface_values.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -361,7 +363,7 @@ namespace StokesTests
   class StokesProblem
   {
   public:
-    StokesProblem(FiniteElement<dim> &fe, const unsigned int pressure_degree);
+    StokesProblem(FiniteElement<dim> &fe, const unsigned int velocity_degree);
     void
     run();
 
@@ -375,7 +377,7 @@ namespace StokesTests
     void
     compute_errors(unsigned int k);
 
-    const unsigned int pressure_degree;
+    const unsigned int velocity_degree;
 
     Triangulation<dim>  triangulation;
     FiniteElement<dim> &fe;
@@ -400,8 +402,8 @@ namespace StokesTests
 
   template <int dim>
   StokesProblem<dim>::StokesProblem(FiniteElement<dim> &fe,
-                                    const unsigned int  pressure_degree)
-    : pressure_degree(pressure_degree)
+                                    const unsigned int  velocity_degree)
+    : velocity_degree(velocity_degree)
     , triangulation(Triangulation<dim>::maximum_smoothing)
     , fe(fe)
     , dof_handler(triangulation)
@@ -456,11 +458,14 @@ namespace StokesTests
     {
       constraints.reinit();
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-      VectorTools::interpolate_boundary_values(dof_handler,
-                                               0,
-                                               Solution<dim>(),
-                                               constraints,
-                                               fe.component_mask(velocities));
+      ComponentMask velocity_mask(dim + 1, false);
+      if (fe.is_primitive())
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+            velocity_mask.set(d, true);
+          }
+      VectorTools::interpolate_boundary_values(
+        dof_handler, 0, Solution<dim>(), constraints, velocity_mask);
       constraints.close();
     }
 
@@ -696,7 +701,7 @@ namespace StokesTests
       copy(c, constraints, system_matrix, system_rhs);
     };
 
-    const unsigned int n_gauss_points = pressure_degree + 2;
+    const unsigned int n_gauss_points = velocity_degree + 2;
     const UpdateFlags  cell_flags     = update_values | update_gradients |
                                    update_quadrature_points | update_JxW_values;
     const UpdateFlags face_flags = update_values | update_gradients |
@@ -760,7 +765,7 @@ namespace StokesTests
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(pressure_degree + 3),
+                                      QGauss<dim>(velocity_degree + 3),
                                       VectorTools::L2_norm,
                                       &velocity_mask);
 
@@ -770,7 +775,7 @@ namespace StokesTests
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(pressure_degree + 3),
+                                      QGauss<dim>(velocity_degree + 3),
                                       VectorTools::H1_norm,
                                       &velocity_mask);
 
@@ -780,7 +785,7 @@ namespace StokesTests
                                       solution,
                                       Functions::ZeroFunction<dim>(dim + 1),
                                       difference_per_cell,
-                                      QGauss<dim>(pressure_degree + 3),
+                                      QGauss<dim>(velocity_degree + 3),
                                       VectorTools::Hdiv_seminorm,
                                       &velocity_mask);
 
@@ -789,14 +794,14 @@ namespace StokesTests
     static double last_Pressure_L2_error = 0;
 
     const double mean_pressure = VectorTools::compute_mean_value(
-      dof_handler, QGauss<dim>(pressure_degree + 3), solution, dim);
+      dof_handler, QGauss<dim>(velocity_degree + 3), solution, dim);
     solution.block(1).add(-mean_pressure);
 
     VectorTools::integrate_difference(dof_handler,
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(pressure_degree + 3),
+                                      QGauss<dim>(velocity_degree + 3),
                                       VectorTools::L2_norm,
                                       &pressure_mask);
     const double Pressure_L2_error =
@@ -843,7 +848,7 @@ namespace StokesTests
 
     deallog << "  Now running with " << fe.get_name() << std::endl;
 
-    for (unsigned int refinement_cycle = 0; refinement_cycle < 5;
+    for (unsigned int refinement_cycle = 0; refinement_cycle < 4;
          ++refinement_cycle)
       {
         if (refinement_cycle > 0)
@@ -864,6 +869,18 @@ namespace StokesTests
 
 
 
+template <int dim>
+void
+test_stokes(FiniteElement<dim> &fe, const unsigned int velocity_degree)
+{
+  deallog << fe.get_name() << ": degree=" << fe.degree
+          << " tensor_degree=" << fe.tensor_degree() << std::endl;
+  StokesTests::StokesProblem<dim> flow_problem(fe, velocity_degree);
+  flow_problem.run();
+}
+
+
+
 int
 main()
 {
@@ -879,14 +896,29 @@ main()
       const int                           degree = 2;
 
       Assert(degree >= 1, ExcMessage("invalid degree!"));
-      fe = std::make_unique<FESystem<dim>>(
-        FESystem<dim>(FE_DGQ<dim>(degree), dim), 1, FE_DGQ<dim>(degree - 1), 1);
+      {
+        fe = std::make_unique<FESystem<dim>>(FESystem<dim>(FE_DGQ<dim>(degree),
+                                                           dim),
+                                             1,
+                                             FE_DGQ<dim>(degree - 1),
+                                             1);
 
-      deallog << fe->get_name() << ": degree=" << fe->degree
-              << " tensor_degree=" << fe->tensor_degree() << std::endl;
-      StokesProblem<dim> flow_problem(*fe.get(), degree);
-
-      flow_problem.run();
+        test_stokes(*fe, degree);
+      }
+      {
+        fe = std::make_unique<FESystem<dim>>(FE_RaviartThomas<dim>(degree),
+                                             1,
+                                             FE_DGQ<dim>(degree),
+                                             1);
+        test_stokes(*fe, degree);
+      }
+      {
+        fe = std::make_unique<FESystem<dim>>(FE_DGNedelec<dim>(degree),
+                                             1,
+                                             FE_DGQ<dim>(degree - 1),
+                                             1);
+        test_stokes(*fe, degree);
+      }
     }
   catch (std::exception &exc)
     {
