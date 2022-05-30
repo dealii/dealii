@@ -2533,16 +2533,12 @@ namespace internal
           const std::vector<dealii::types::global_dof_index> &new_numbers,
           const IndexSet &           indices_we_care_about,
           DoFHandler<dim, spacedim> &dof_handler,
-          const unsigned int         level,
-          const bool                 check_validity)
+          const unsigned int         level)
         {
-          (void)check_validity;
           Assert(level < dof_handler.get_triangulation().n_levels(),
                  ExcInternalError());
 
-          for (typename std::vector<
-                 typename DoFHandler<dim, spacedim>::MGVertexDoFs>::iterator i =
-                 dof_handler.mg_vertex_dofs.begin();
+          for (auto i = dof_handler.mg_vertex_dofs.begin();
                i != dof_handler.mg_vertex_dofs.end();
                ++i)
             // if the present vertex lives on the current level
@@ -2559,10 +2555,9 @@ namespace internal
 
                   if (idx != numbers::invalid_dof_index)
                     {
-                      Assert(check_validity == false ||
-                               (indices_we_care_about.size() > 0 ?
-                                  indices_we_care_about.is_element(idx) :
-                                  (idx < new_numbers.size())),
+                      Assert(indices_we_care_about.size() > 0 ?
+                               indices_we_care_about.is_element(idx) :
+                               (idx < new_numbers.size()),
                              ExcInternalError());
                       i->set_index(level,
                                    d,
@@ -2823,8 +2818,7 @@ namespace internal
             renumber_vertex_mg_dofs(new_numbers,
                                     indices_we_care_about,
                                     dof_handler,
-                                    level,
-                                    check_validity);
+                                    level);
           });
           tasks += Threads::new_task([&]() {
             renumber_face_mg_dofs(new_numbers,
@@ -3617,15 +3611,12 @@ namespace internal
       {
         template <int dim, int spacedim>
         void
-        communicate_mg_ghost_cells(
-          const typename dealii::parallel::
-            DistributedTriangulationBase<dim, spacedim> &tria,
-          DoFHandler<dim, spacedim> &                    dof_handler)
+        communicate_mg_ghost_cells(DoFHandler<dim, spacedim> &dof_handler)
         {
-          (void)tria;
           const auto pack = [&](const auto &cell) {
             // why would somebody request a cell that is not ours?
-            Assert(cell->level_subdomain_id() == tria.locally_owned_subdomain(),
+            Assert(cell->level_subdomain_id() ==
+                     dof_handler.get_triangulation().locally_owned_subdomain(),
                    ExcInternalError());
 
             std::vector<dealii::types::global_dof_index> data(
@@ -3686,9 +3677,7 @@ namespace internal
 
         template <int spacedim>
         void
-        communicate_mg_ghost_cells(const typename dealii::parallel::
-                                     distributed::Triangulation<1, spacedim> &,
-                                   DoFHandler<1, spacedim> &)
+        communicate_mg_ghost_cells(DoFHandler<1, spacedim> &)
         {
           Assert(false, ExcNotImplemented());
         }
@@ -4173,20 +4162,18 @@ namespace internal
           // mark all ghost cells for transfer
           {
             for (const auto &cell : dof_handler->cell_iterators())
-              if (cell->level_subdomain_id() !=
-                    dealii::numbers::artificial_subdomain_id &&
-                  !cell->is_locally_owned_on_level())
+              if (cell->is_ghost_on_level())
                 cell->set_user_flag();
           }
 
           // Phase 1. Request all marked cells from corresponding owners. If we
           // managed to get every DoF, remove the user_flag, otherwise we
           // will request them again in the step below.
-          communicate_mg_ghost_cells(*triangulation, *dof_handler);
+          communicate_mg_ghost_cells(*dof_handler);
 
           // Phase 2, only request the cells that were not completed
           // in Phase 1.
-          communicate_mg_ghost_cells(*triangulation, *dof_handler);
+          communicate_mg_ghost_cells(*dof_handler);
 
 #  ifdef DEBUG
           // make sure we have removed all flags:
@@ -4256,229 +4243,119 @@ namespace internal
 
 
         // We start by checking whether only the numbering within the MPI
-        // ranks changed. In that case, we can apply the renumbering with some
-        // local renumbering only (this is similar to the renumber_mg_dofs()
-        // function below)
-        const bool locally_owned_set_changes =
+        // ranks changed, in which case we do not need to find a new index
+        // set.
+        const IndexSet &owned_dofs = dof_handler->locally_owned_dofs();
+        const bool      locally_owned_set_changes =
           std::any_of(new_numbers.cbegin(),
                       new_numbers.cend(),
-                      [this](const types::global_dof_index i) {
-                        return dof_handler->locally_owned_dofs().is_element(
-                                 i) == false;
+                      [&owned_dofs](const types::global_dof_index i) {
+                        return owned_dofs.is_element(i) == false;
                       });
 
-        if (Utilities::MPI::sum(static_cast<unsigned int>(
-                                  locally_owned_set_changes),
-                                triangulation->get_communicator()) == 0)
+        IndexSet my_locally_owned_new_dof_indices = owned_dofs;
+        if (locally_owned_set_changes && owned_dofs.n_elements() > 0)
           {
-            // Since only the order within the local subdomains has changed,
-            // all we need to do is to propagate the knowledge about the
-            // numbers from the locally owned dofs (given by the new_numbers
-            // array) to all ghosted dofs on neighboring processors. We can do
-            // this by ghost layer exchange routines as in parallel vectors:
-            // We create an IndexSet for the relevant dofs and then export
-            // into an array of those values via Utilities::MPI::Partitioner.
-            IndexSet relevant_dofs;
-            DoFTools::extract_locally_relevant_dofs(*dof_handler,
-                                                    relevant_dofs);
-            std::vector<types::global_dof_index> ghosted_new_numbers(
-              relevant_dofs.n_elements());
-            {
-              Utilities::MPI::Partitioner partitioner(
-                dof_handler->locally_owned_dofs(),
-                relevant_dofs,
-                triangulation->get_communicator());
+            std::vector<dealii::types::global_dof_index> new_numbers_sorted =
+              new_numbers;
+            std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
 
-              // choose some number that makes it unlikely to get conflicts
-              // with other ongoing non-blocking communication (there
-              // shouldn't be any at this place in most programs).
-              const unsigned int                   communication_channel = 19;
-              std::vector<types::global_dof_index> temp_array(
-                partitioner.n_import_indices());
-              std::vector<MPI_Request> requests;
-              partitioner.export_to_ghosted_array_start(
-                communication_channel,
-                make_array_view(new_numbers),
-                make_array_view(temp_array),
-                ArrayView<types::global_dof_index>(
-                  ghosted_new_numbers.data() + new_numbers.size(),
-                  partitioner.n_ghost_indices()),
-                requests);
-              partitioner.export_to_ghosted_array_finish(
-                ArrayView<types::global_dof_index>(
-                  ghosted_new_numbers.data() + new_numbers.size(),
-                  partitioner.n_ghost_indices()),
-                requests);
+            my_locally_owned_new_dof_indices = IndexSet(dof_handler->n_dofs());
+            my_locally_owned_new_dof_indices.add_indices(
+              new_numbers_sorted.begin(), new_numbers_sorted.end());
+            my_locally_owned_new_dof_indices.compress();
 
-              // we need to fill the indices of the locally owned part into
-              // the new numbers array, which is not provided by the parallel
-              // partitioner. their right position is somewhere in the middle
-              // of the array, so we first copy the ghosted part from smaller
-              // ranks to the front, then insert the data in the middle.
-              unsigned int n_ghosts_on_smaller_ranks = 0;
-              for (std::pair<unsigned int, unsigned int> t :
-                   partitioner.ghost_targets())
-                {
-                  if (t.first > partitioner.this_mpi_process())
-                    break;
-                  n_ghosts_on_smaller_ranks += t.second;
-                }
-              if (n_ghosts_on_smaller_ranks > 0)
-                {
-                  Assert(ghosted_new_numbers.data() != nullptr,
-                         ExcInternalError());
-                  std::memmove(ghosted_new_numbers.data(),
-                               ghosted_new_numbers.data() + new_numbers.size(),
-                               sizeof(types::global_dof_index) *
-                                 n_ghosts_on_smaller_ranks);
-                }
-              if (new_numbers.size() > 0)
-                {
-                  Assert(new_numbers.data() != nullptr, ExcInternalError());
-                  std::memcpy(ghosted_new_numbers.data() +
-                                n_ghosts_on_smaller_ranks,
-                              new_numbers.data(),
-                              sizeof(types::global_dof_index) *
-                                new_numbers.size());
-                }
-            }
-
-            // In case we do not carry any relevant dof (but only some remote
-            // processor), we do not need to call the renumbering. We call the
-            // version without validity check because vertex dofs will be
-            // set already in the artificial region.
-            if (relevant_dofs.n_elements() > 0)
-              Implementation::renumber_dofs(ghosted_new_numbers,
-                                            relevant_dofs,
-                                            *dof_handler,
-                                            /*check_validity=*/false);
-
-            NumberCache number_cache;
-            number_cache.locally_owned_dofs = dof_handler->locally_owned_dofs();
-            number_cache.n_global_dofs      = dof_handler->n_dofs();
-            number_cache.n_locally_owned_dofs =
-              number_cache.locally_owned_dofs.n_elements();
-            return number_cache;
+            Assert(my_locally_owned_new_dof_indices.n_elements() ==
+                     new_numbers.size(),
+                   ExcInternalError());
           }
-        else
-          {
-            // Now back to the more complicated case
-            //
-            // First figure out the new set of locally owned DoF indices.
-            // If we own no DoFs, we still need to go through this function,
-            // but we can skip this calculation.
-            //
-            // The IndexSet::add_indices() function is substantially more
-            // efficient if the set of indices is already sorted because
-            // it can then insert ranges instead of individual elements.
-            // consequently, pre-sort the array of new indices
-            IndexSet my_locally_owned_new_dof_indices(dof_handler->n_dofs());
-            if (dof_handler->n_locally_owned_dofs() > 0)
+
+        // delete all knowledge of DoF indices that are not locally
+        // owned. we do so by getting DoF indices on cells, checking
+        // whether they are locally owned, if not, setting them to
+        // an invalid value, and then setting them again on the current
+        // cell
+        //
+        // DoFs we (i) know about, and (ii) don't own locally must be
+        // located either on ghost cells, or on the interface between a
+        // locally owned cell and a ghost cell. In any case, it is
+        // sufficient to kill them only from the ghost side cell, so loop
+        // only over ghost cells
+        {
+          std::vector<dealii::types::global_dof_index> local_dof_indices;
+
+          for (auto cell : dof_handler->active_cell_iterators())
+            if (cell->is_ghost())
               {
-                std::vector<dealii::types::global_dof_index>
-                  new_numbers_sorted = new_numbers;
-                std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
+                local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+                cell->get_dof_indices(local_dof_indices);
 
-                my_locally_owned_new_dof_indices.add_indices(
-                  new_numbers_sorted.begin(), new_numbers_sorted.end());
-                my_locally_owned_new_dof_indices.compress();
+                // delete a DoF index if it has not already been deleted
+                // (e.g., by visiting a neighboring cell, if it is on the
+                // boundary), and if we don't own it
+                for (types::global_dof_index &index : local_dof_indices)
+                  if ((index != numbers::invalid_dof_index) &&
+                      (!owned_dofs.is_element(index)))
+                    index = numbers::invalid_dof_index;
 
-                Assert(my_locally_owned_new_dof_indices.n_elements() ==
-                         new_numbers.size(),
-                       ExcInternalError());
+                cell->set_dof_indices(local_dof_indices);
               }
-
-            // delete all knowledge of DoF indices that are not locally
-            // owned. we do so by getting DoF indices on cells, checking
-            // whether they are locally owned, if not, setting them to
-            // an invalid value, and then setting them again on the current
-            // cell
-            //
-            // DoFs we (i) know about, and (ii) don't own locally must be
-            // located either on ghost cells, or on the interface between a
-            // locally owned cell and a ghost cell. In any case, it is
-            // sufficient to kill them only from the ghost side cell, so loop
-            // only over ghost cells
-            {
-              std::vector<dealii::types::global_dof_index> local_dof_indices;
-
-              for (auto cell : dof_handler->active_cell_iterators())
-                if (cell->is_ghost())
-                  {
-                    local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-                    cell->get_dof_indices(local_dof_indices);
-
-                    for (unsigned int i = 0;
-                         i < cell->get_fe().n_dofs_per_cell();
-                         ++i)
-                      // delete a DoF index if it has not already been deleted
-                      // (e.g., by visiting a neighboring cell, if it is on the
-                      // boundary), and if we don't own it
-                      if ((local_dof_indices[i] !=
-                           numbers::invalid_dof_index) &&
-                          (!dof_handler->locally_owned_dofs().is_element(
-                            local_dof_indices[i])))
-                        local_dof_indices[i] = numbers::invalid_dof_index;
-
-                    cell->set_dof_indices(local_dof_indices);
-                  }
-            }
+        }
 
 
-            // renumber. Skip when there is nothing to do because we own no DoF.
-            if (dof_handler->locally_owned_dofs().n_elements() > 0)
-              Implementation::renumber_dofs(new_numbers,
-                                            dof_handler->locally_owned_dofs(),
-                                            *dof_handler,
-                                            /*check_validity=*/false,
-                                            /*update_cache=*/false);
+        // renumber. Skip when there is nothing to do because we own no DoF.
+        if (owned_dofs.n_elements() > 0)
+          Implementation::renumber_dofs(new_numbers,
+                                        owned_dofs,
+                                        *dof_handler,
+                                        /*check_validity=*/false,
+                                        /*update_cache=*/false);
 
-            // Communicate newly assigned DoF indices to other processors
-            // and get the same information for our own ghost cells.
-            //
-            // This is the same as phase 5+6 in the distribute_dofs() algorithm,
-            // taking into account that we have to unify a few DoFs in between
-            // then communication phases if we do hp-numbering
-            {
-              std::vector<bool> user_flags;
-              triangulation->save_user_flags(user_flags);
-              triangulation->clear_user_flags();
+        // Communicate newly assigned DoF indices to other processors
+        // and get the same information for our own ghost cells.
+        //
+        // This is the same as phase 5+6 in the distribute_dofs() algorithm,
+        // taking into account that we have to unify a few DoFs in between
+        // then communication phases if we do hp-numbering
+        {
+          std::vector<bool> user_flags;
+          triangulation->save_user_flags(user_flags);
+          triangulation->clear_user_flags();
 
-              // mark all own cells for transfer
-              for (const auto &cell : dof_handler->active_cell_iterators())
-                if (cell->is_ghost())
-                  cell->set_user_flag();
+          // mark all own cells for transfer
+          for (const auto &cell : dof_handler->active_cell_iterators())
+            if (cell->is_ghost())
+              cell->set_user_flag();
 
 
-              // Send and receive cells. After this, only the local cells
-              // are marked, that received new data. This has to be
-              // communicated in a second communication step.
-              //
-              // as explained in the 'distributed' paper, this has to be
-              // done twice
-              communicate_dof_indices_on_marked_cells(*dof_handler);
+          // Send and receive cells. After this, only the local cells
+          // are marked, that received new data. This has to be
+          // communicated in a second communication step.
+          //
+          // as explained in the 'distributed' paper, this has to be
+          // done twice
+          communicate_dof_indices_on_marked_cells(*dof_handler);
 
-              // if the DoFHandler has hp-capabilities then we may have
-              // received valid indices of degrees of freedom that are
-              // dominated by a FE object adjacent to a ghost interface.
-              // thus, we overwrite the remaining invalid indices with the
-              // valid ones in this step.
-              Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
-                *dof_handler);
+          // if the DoFHandler has hp-capabilities then we may have
+          // received valid indices of degrees of freedom that are
+          // dominated by a FE object adjacent to a ghost interface.
+          // thus, we overwrite the remaining invalid indices with the
+          // valid ones in this step.
+          Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
+            *dof_handler);
 
-              communicate_dof_indices_on_marked_cells(*dof_handler);
+          communicate_dof_indices_on_marked_cells(*dof_handler);
 
-              triangulation->load_user_flags(user_flags);
-              update_all_active_cell_dof_indices_caches(*this->dof_handler);
-            }
+          triangulation->load_user_flags(user_flags);
+          update_all_active_cell_dof_indices_caches(*this->dof_handler);
+        }
 
-            NumberCache number_cache;
-            number_cache.locally_owned_dofs = my_locally_owned_new_dof_indices;
-            number_cache.n_global_dofs      = dof_handler->n_dofs();
-            number_cache.n_locally_owned_dofs =
-              number_cache.locally_owned_dofs.n_elements();
-            return number_cache;
-          }
+        NumberCache number_cache;
+        number_cache.locally_owned_dofs = my_locally_owned_new_dof_indices;
+        number_cache.n_global_dofs      = dof_handler->n_dofs();
+        number_cache.n_locally_owned_dofs =
+          number_cache.locally_owned_dofs.n_elements();
+        return number_cache;
 #endif
       }
 
@@ -4490,110 +4367,105 @@ namespace internal
         const unsigned int                          level,
         const std::vector<types::global_dof_index> &new_numbers) const
       {
-        // we only implement the case where the multigrid numbers are
-        // renumbered within the processor's partition, rather than the most
-        // general case
-        const IndexSet index_set = dof_handler->locally_owned_mg_dofs(level);
+#ifndef DEAL_II_WITH_MPI
 
-#ifdef DEAL_II_WITH_MPI
+        (void)level;
+        (void)new_numbers;
 
-        const dealii::parallel::TriangulationBase<dim, spacedim> *tr =
-          (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
-                          *>(&this->dof_handler->get_triangulation()));
-        Assert(tr != nullptr, ExcInternalError());
+        Assert(false, ExcNotImplemented());
+        return NumberCache();
+#else
 
-        const unsigned int my_rank =
-          Utilities::MPI::this_mpi_process(tr->get_communicator());
+        dealii::parallel::DistributedTriangulationBase<dim, spacedim>
+          *triangulation =
+            (dynamic_cast<
+              dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
+              const_cast<dealii::Triangulation<dim, spacedim> *>(
+                &dof_handler->get_triangulation())));
+        Assert(triangulation != nullptr, ExcInternalError());
 
-#  ifdef DEBUG
-        for (types::global_dof_index i : new_numbers)
+        // This code is very close to the respective code in renumber_dofs,
+        // with the difference that we work on different entities with
+        // different objects.
+        const IndexSet &owned_dofs = dof_handler->locally_owned_mg_dofs(level);
+        AssertDimension(new_numbers.size(), owned_dofs.n_elements());
+
+        const bool locally_owned_set_changes =
+          std::any_of(new_numbers.cbegin(),
+                      new_numbers.cend(),
+                      [&owned_dofs](const types::global_dof_index i) {
+                        return owned_dofs.is_element(i) == false;
+                      });
+
+        IndexSet my_locally_owned_new_dof_indices = owned_dofs;
+        if (locally_owned_set_changes && owned_dofs.n_elements() > 0)
           {
-            Assert(index_set.is_element(i),
-                   ExcNotImplemented(
-                     "Renumberings that change the locally owned mg dofs "
-                     "partitioning are currently not implemented for "
-                     "the multigrid levels"));
+            std::vector<dealii::types::global_dof_index> new_numbers_sorted =
+              new_numbers;
+            std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
+
+            my_locally_owned_new_dof_indices =
+              IndexSet(dof_handler->n_dofs(level));
+            my_locally_owned_new_dof_indices.add_indices(
+              new_numbers_sorted.begin(), new_numbers_sorted.end());
+            my_locally_owned_new_dof_indices.compress();
+
+            Assert(my_locally_owned_new_dof_indices.n_elements() ==
+                     new_numbers.size(),
+                   ExcInternalError());
           }
-#  endif
 
-        // we need to access all locally relevant degrees of freedom. we
-        // use Utilities::MPI::Partitioner for handling the data exchange
-        // of the new numbers, which is simply the extraction of ghost data
-        IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(*dof_handler,
-                                                      level,
-                                                      relevant_dofs);
-        std::vector<types::global_dof_index> ghosted_new_numbers(
-          relevant_dofs.n_elements());
+        // delete all knowledge of DoF indices that are not locally
+        // owned
         {
-          Utilities::MPI::Partitioner          partitioner(index_set,
-                                                  relevant_dofs,
-                                                  tr->get_communicator());
-          std::vector<types::global_dof_index> temp_array(
-            partitioner.n_import_indices());
-          const unsigned int       communication_channel = 17;
-          std::vector<MPI_Request> requests;
-          partitioner.export_to_ghosted_array_start(
-            communication_channel,
-            make_array_view(new_numbers),
-            make_array_view(temp_array),
-            ArrayView<types::global_dof_index>(ghosted_new_numbers.data() +
-                                                 new_numbers.size(),
-                                               partitioner.n_ghost_indices()),
-            requests);
-          partitioner.export_to_ghosted_array_finish(
-            ArrayView<types::global_dof_index>(ghosted_new_numbers.data() +
-                                                 new_numbers.size(),
-                                               partitioner.n_ghost_indices()),
-            requests);
+          std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-          // we need to fill the indices of the locally owned part into the
-          // new numbers array. their right position is somewhere in the
-          // middle of the array, so we first copy the ghosted part from
-          // smaller ranks to the front, then insert the data in the middle.
-          unsigned int n_ghosts_on_smaller_ranks = 0;
-          for (std::pair<unsigned int, unsigned int> t :
-               partitioner.ghost_targets())
-            {
-              if (t.first > my_rank)
-                break;
-              n_ghosts_on_smaller_ranks += t.second;
-            }
-          if (n_ghosts_on_smaller_ranks > 0)
-            {
-              Assert(ghosted_new_numbers.data() != nullptr, ExcInternalError());
-              std::memmove(ghosted_new_numbers.data(),
-                           ghosted_new_numbers.data() + new_numbers.size(),
-                           sizeof(types::global_dof_index) *
-                             n_ghosts_on_smaller_ranks);
-            }
-          if (new_numbers.size() > 0)
-            {
-              Assert(new_numbers.data() != nullptr, ExcInternalError());
-              std::memcpy(ghosted_new_numbers.data() +
-                            n_ghosts_on_smaller_ranks,
-                          new_numbers.data(),
-                          sizeof(types::global_dof_index) * new_numbers.size());
-            }
+          for (auto cell : dof_handler->cell_iterators_on_level(level))
+            if (cell->is_ghost_on_level())
+              {
+                local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+                cell->get_mg_dof_indices(local_dof_indices);
+
+                for (types::global_dof_index &index : local_dof_indices)
+                  if ((index != numbers::invalid_dof_index) &&
+                      (!owned_dofs.is_element(index)))
+                    index = numbers::invalid_dof_index;
+
+                cell->set_mg_dof_indices(local_dof_indices);
+              }
         }
 
-        // in case we do not own any of the given level (but only some remote
-        // processor), we do not need to call the renumbering
-        if (level < this->dof_handler->get_triangulation().n_levels() &&
-            relevant_dofs.n_elements() > 0)
+
+        // renumber. Skip when there is nothing to do because we own no DoF.
+        if (level < triangulation->n_levels() && owned_dofs.n_elements() > 0)
           Implementation::renumber_mg_dofs(
-            ghosted_new_numbers, relevant_dofs, *dof_handler, level, true);
-#else
-        (void)new_numbers;
-        Assert(false, ExcNotImplemented());
-#endif
+            new_numbers, owned_dofs, *dof_handler, level, false);
+
+        // communicate newly assigned DoF indices with other processors
+        {
+          std::vector<bool> user_flags;
+          triangulation->save_user_flags(user_flags);
+          triangulation->clear_user_flags();
+
+          // mark only cells on the chosen level
+          for (const auto &cell : dof_handler->cell_iterators_on_level(level))
+            if (cell->is_ghost_on_level())
+              cell->set_user_flag();
+
+          communicate_mg_ghost_cells(*dof_handler);
+
+          communicate_mg_ghost_cells(*dof_handler);
+
+          triangulation->load_user_flags(user_flags);
+        }
 
         NumberCache number_cache;
-        number_cache.locally_owned_dofs = index_set;
+        number_cache.locally_owned_dofs = my_locally_owned_new_dof_indices;
         number_cache.n_global_dofs      = dof_handler->n_dofs(level);
         number_cache.n_locally_owned_dofs =
           number_cache.locally_owned_dofs.n_elements();
         return number_cache;
+#endif
       }
     } // namespace Policy
   }   // namespace DoFHandlerImplementation
