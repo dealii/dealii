@@ -160,13 +160,14 @@ protected:
 };
 
 
-template <int dim, int fe_degree, typename Number>
+template <int dim, int, typename Number>
 void
 do_test(const DoFHandler<dim> &          dof,
         const AffineConstraints<double> &constraints,
         const TestType                   test_type)
 {
   deallog << "Testing " << enum_to_string(test_type) << std::endl;
+  const unsigned int fe_degree = dof.get_fe().degree - 1;
 
   //   constraints.distribute(solution);
   MatrixFree<dim, Number> mf_data;
@@ -192,7 +193,7 @@ do_test(const DoFHandler<dim> &          dof,
     }
 
   // MatrixFree solution
-  MatrixFreeTest<dim, fe_degree, fe_degree + 2, Number> mf(mf_data, test_type);
+  MatrixFreeTest<dim, -1, 0, Number> mf(mf_data, test_type);
   mf.test_functions(solution, initial_condition);
 
 
@@ -212,6 +213,9 @@ do_test(const DoFHandler<dim> &          dof,
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
   FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
 
+  std::vector<Tensor<1, dim>> phi_val(dofs_per_cell);
+  std::vector<Tensor<2, dim>> phi_grad(dofs_per_cell);
+  std::vector<double>         phi_div(dofs_per_cell);
 
   const FEValuesExtractors::Vector velocities(0);
 
@@ -222,29 +226,27 @@ do_test(const DoFHandler<dim> &          dof,
       local_matrix = 0;
 
       for (const auto q : fe_val.quadrature_point_indices())
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          {
-            const Tensor<1, dim> phi_i = fe_val[velocities].value(i, q) * 10.;
-            const Tensor<2, dim> grad_phi_i = fe_val[velocities].gradient(i, q);
-            const Number div_phi_i = fe_val[velocities].divergence(i, q);
-
+        {
+          const double JxW = fe_val.JxW(q);
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            {
+              phi_val[i]  = fe_val[velocities].value(i, q);
+              phi_grad[i] = fe_val[velocities].gradient(i, q);
+              phi_div[i]  = fe_val[velocities].divergence(i, q);
+            }
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             for (unsigned int j = 0; j < dofs_per_cell; ++j)
               {
-                const Tensor<1, dim> phi_j = fe_val[velocities].value(j, q);
-                const Tensor<2, dim> grad_phi_j =
-                  fe_val[velocities].gradient(j, q);
-                const Number div_phi_j = fe_val[velocities].divergence(j, q);
-
                 if (test_type < TestType::gradients)
-                  local_matrix(i, j) += phi_j * phi_i * fe_val.JxW(q);
+                  local_matrix(i, j) += 10. * (phi_val[j] * phi_val[i]) * JxW;
                 if (test_type == TestType::gradients ||
                     test_type == TestType::values_gradients)
                   local_matrix(i, j) +=
-                    scalar_product(grad_phi_i, grad_phi_j) * fe_val.JxW(q);
+                    scalar_product(phi_grad[i], phi_grad[j]) * JxW;
                 else if (test_type == TestType::divergence)
-                  local_matrix(i, j) += div_phi_i * div_phi_j * fe_val.JxW(q);
+                  local_matrix(i, j) += phi_div[i] * phi_div[j] * JxW;
               }
-          }
+        }
       cell->get_dof_indices(local_dof_indices);
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int j = 0; j < dofs_per_cell; ++j)
