@@ -32,6 +32,10 @@
 
 #include <deal.II/lac/affine_constraints.h>
 
+#ifdef DEAL_II_WITH_CGAL
+#  include <deal.II/cgal/utilities.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -349,6 +353,122 @@ namespace NonMatching
       AffineConstraints<typename Matrix::value_type>(),
     const ComponentMask &comps0 = ComponentMask(),
     const ComponentMask &comps1 = ComponentMask());
+
+#ifdef DEAL_II_WITH_CGAL
+  /**
+   * Given two cached, arbitrarily overlapped grids, the following function
+   * computes Quadrature rules on the intersection of the embedding grid with
+   * the embedded one, of degree `degree`. The return type is a vector of tuples
+   * `v`, where `v[i][0]` is an iterator to a cell of the embedding grid,
+   * `v[i][1]` is an iterator to a cell of the embedded grid,
+   * `v[i][2]` is a Quadrature formula to integrate over the intersection of the
+   * two.
+   *
+   * The last parameter `tol` defaults to 1e-6, and can be used to discard small
+   * intersections.
+   *
+   * @note This function calls compute_quadrature_on_intersection().
+   *
+   * @param [in] space_cache First cached triangulation.
+   * @param [in] immersed_cache Second cached triangulation.
+   * @param [in] degree The degree of accuracy of each quadrature formula.
+   * @param [in] tol Tolerance used to discard small intersections.
+   * @return std::vector<std::tuple<typename Triangulation<dim0, spacedim>::cell_iterator,
+   * typename Triangulation<dim1, spacedim>::cell_iterator,
+   * Quadrature<spacedim>>>.
+   */
+  template <int dim0, int dim1, int spacedim>
+  std::vector<std::tuple<typename Triangulation<dim0, spacedim>::cell_iterator,
+                         typename Triangulation<dim1, spacedim>::cell_iterator,
+                         Quadrature<spacedim>>>
+  compute_intersection(const GridTools::Cache<dim0, spacedim> &space_cache,
+                       const GridTools::Cache<dim1, spacedim> &immersed_cache,
+                       const unsigned int                      degree,
+                       const double                            tol = 1e-6);
+
+  /**
+   * Create a coupling sparsity pattern for non-matching, overlapping
+   * grids in an "exact" way. Here exact refers to that fact, differently
+   * with respect to what is done in create_coupling_sparsity_pattern(), the
+   * sparsity pattern is filled by looking at the intersection of the cells, as
+   * it means that DoFs there are coupled.
+   *
+   * Those intersections are encoded inside @p intersection_info, which needs
+   * to be computed right before calling this function.
+   *
+   * @param [in] intersections_info A vector of tuples where the i-th entry
+   * contains two `active_cell_iterator`s to the intersected cells.
+   * @param [in] space_dh `DoFHandler` object for the space grid.
+   * @param [in] immersed_dh `DoFHandler` object for the embedded grid.
+   * @param [out] sparsity The sparsity pattern to be filled.
+   * @param [in] constraints `AffineConstraints` for the space grid.
+   * @param [in] space_comps Mask for the space components of the finite
+   * element.
+   * @param [in] immersed_comps Mask for the embedded components of the finite
+   * element.
+   * @param [in] immersed_constraints `AffineConstraints` for the embedded grid.
+   */
+  template <int dim0,
+            int dim1,
+            int spacedim,
+            typename Sparsity,
+            typename number = double>
+  void
+  create_coupling_sparsity_pattern_with_exact_intersections(
+    const std::vector<
+      std::tuple<typename dealii::Triangulation<dim0, spacedim>::cell_iterator,
+                 typename dealii::Triangulation<dim1, spacedim>::cell_iterator,
+                 dealii::Quadrature<spacedim>>> &intersections_info,
+    const DoFHandler<dim0, spacedim> &           space_dh,
+    const DoFHandler<dim1, spacedim> &           immersed_dh,
+    Sparsity &                                   sparsity,
+    const AffineConstraints<number> &            constraints,
+    const ComponentMask &                        space_comps,
+    const ComponentMask &                        immersed_comps,
+    const AffineConstraints<number> &            immersed_constraints);
+
+  /**
+   * Create the coupling mass matrix for non-matching, overlapping grids
+   * in an "exact" way, i.e. by computing the local contributions
+   *  \f[
+   *  M_{ij} \dealcoloneq \int_{B} v_i(x) w_j(x) dx,
+   *                      \quad i \in [0,n), j \in [0,m),
+   *  \f]
+   *   as products of cellwise smooth
+   *  functions on the intersection of cells between the two grids. This
+   *   information
+   *  is encoded in @p intersections_info, a vector whose each element is a tuple containing the
+   *  two intersected cells and a Quadrature formula on their intersection.
+   *
+   * @param [in] space_dh `DoFHandler` object for the space grid.
+   * @param [in] immersed_dh `DoFHandler` object for the embedded grid.
+   * @param [in] intersections_info std::vector<std::tuple> with Quadratures and cell_iterators to the intersected cells.
+   * @param [in] matrix A reference to the mass matrix that must be filled.
+   * @param [in] constraints `AffineConstraints` for the space grid.
+   * @param [in] space_comps Mask for the space components of the finite element.
+   * @param [in] immersed_comps Mask for the embedded components of the finite element.
+   * @param [in] mapping0 Mapping object describing the space grid.
+   * @param [in] mapping1 Mapping object describing the embedded grid.
+   * @param [in] immersed_constraints `AffineConstraints` for the embedded grid.
+   */
+  template <int dim0, int dim1, int spacedim, typename Matrix>
+  void
+  create_coupling_mass_matrix_with_exact_intersections(
+    const dealii::DoFHandler<dim0, spacedim> &space_dh,
+    const dealii::DoFHandler<dim1, spacedim> &immersed_dh,
+    const std::vector<
+      std::tuple<typename dealii::Triangulation<dim0, spacedim>::cell_iterator,
+                 typename dealii::Triangulation<dim1, spacedim>::cell_iterator,
+                 dealii::Quadrature<spacedim>>> &intersections_info,
+    Matrix &                                     matrix,
+    const dealii::AffineConstraints<typename Matrix::value_type> &constraints,
+    const dealii::ComponentMask &                                 space_comps,
+    const dealii::ComponentMask &          immersed_comps,
+    const dealii::Mapping<dim0, spacedim> &mapping0,
+    const dealii::Mapping<dim1, spacedim> &mapping1,
+    const dealii::AffineConstraints<typename Matrix::value_type>
+      &immersed_constraints);
+#endif
 } // namespace NonMatching
 DEAL_II_NAMESPACE_CLOSE
 

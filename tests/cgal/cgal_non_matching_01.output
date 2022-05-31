@@ -1,0 +1,193 @@
+
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 3
+DEAL::intersection between : 56 and 3 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 0
+DEAL::intersection between : 56 and 0 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 1
+DEAL::intersection between : 56 and 1 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 7
+DEAL::intersection between : 56 and 7 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 4
+DEAL::intersection between : 56 and 4 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 5
+DEAL::intersection between : 56 and 5 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 32
+DEAL::intersection between : 56 and 32 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 33
+DEAL::intersection between : 56 and 33 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 34
+DEAL::intersection between : 56 and 34 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 35
+DEAL::intersection between : 56 and 35 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 36
+DEAL::intersection between : 56 and 36 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 37
+DEAL::intersection between : 56 and 37 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 38
+DEAL::intersection between : 56 and 38 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 39
+DEAL::intersection between : 56 and 39 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 6
+DEAL::intersection between : 56 and 6 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 2
+DEAL::intersection between : 56 and 2 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 53
+DEAL::intersection between : 56 and 53 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 52
+DEAL::intersection between : 56 and 52 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 48
+DEAL::intersection between : 56 and 48 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 17
+DEAL::intersection between : 56 and 17 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 21
+DEAL::intersection between : 56 and 21 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 20
+DEAL::intersection between : 56 and 20 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 22
+DEAL::intersection between : 56 and 22 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 51
+DEAL::intersection between : 56 and 51 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 18
+DEAL::intersection between : 56 and 18 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 54
+DEAL::intersection between : 56 and 54 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 50
+DEAL::intersection between : 56 and 50 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 19
+DEAL::intersection between : 56 and 19 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 16
+DEAL::intersection between : 56 and 16 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 23
+DEAL::intersection between : 56 and 23 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 55
+DEAL::intersection between : 56 and 55 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 49
+DEAL::intersection between : 56 and 49 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 46
+DEAL::intersection between : 56 and 46 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 15
+DEAL::intersection between : 56 and 15 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 44
+DEAL::intersection between : 56 and 44 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 12
+DEAL::intersection between : 56 and 12 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 9
+DEAL::intersection between : 56 and 9 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 8
+DEAL::intersection between : 56 and 8 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 14
+DEAL::intersection between : 56 and 14 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 11
+DEAL::intersection between : 56 and 11 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 13
+DEAL::intersection between : 56 and 13 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 47
+DEAL::intersection between : 56 and 47 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 40
+DEAL::intersection between : 56 and 40 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 45
+DEAL::intersection between : 56 and 45 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 41
+DEAL::intersection between : 56 and 41 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 42
+DEAL::intersection between : 56 and 42 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 10
+DEAL::intersection between : 56 and 10 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 43
+DEAL::intersection between : 56 and 43 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 29
+DEAL::intersection between : 56 and 29 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 28
+DEAL::intersection between : 56 and 28 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 24
+DEAL::intersection between : 56 and 24 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 57
+DEAL::intersection between : 56 and 57 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 63
+DEAL::intersection between : 56 and 63 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 56
+DEAL::intersection between : 56 and 56 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 27
+DEAL::intersection between : 56 and 27 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 59
+DEAL::intersection between : 56 and 59 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 25
+DEAL::intersection between : 56 and 25 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 60
+DEAL::intersection between : 56 and 60 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 61
+DEAL::intersection between : 56 and 61 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 30
+DEAL::intersection between : 56 and 30 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 31
+DEAL::intersection between : 56 and 31 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 62
+DEAL::intersection between : 56 and 62 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 58
+DEAL::intersection between : 56 and 58 has measure: 0.000244141
+DEAL::Idx Cell0: 56
+DEAL::Idx Cell1: 26
+DEAL::intersection between : 56 and 26 has measure: 0.000244141
