@@ -701,7 +701,7 @@ namespace StokesTests
       copy(c, constraints, system_matrix, system_rhs);
     };
 
-    const unsigned int n_gauss_points = velocity_degree + 2;
+    const unsigned int n_gauss_points = velocity_degree + 1;
     const UpdateFlags  cell_flags     = update_values | update_gradients |
                                    update_quadrature_points | update_JxW_values;
     const UpdateFlags face_flags = update_values | update_gradients |
@@ -765,7 +765,7 @@ namespace StokesTests
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(velocity_degree + 3),
+                                      QGauss<dim>(velocity_degree + 1),
                                       VectorTools::L2_norm,
                                       &velocity_mask);
 
@@ -775,7 +775,7 @@ namespace StokesTests
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(velocity_degree + 3),
+                                      QGauss<dim>(velocity_degree + 1),
                                       VectorTools::H1_norm,
                                       &velocity_mask);
 
@@ -785,7 +785,7 @@ namespace StokesTests
                                       solution,
                                       Functions::ZeroFunction<dim>(dim + 1),
                                       difference_per_cell,
-                                      QGauss<dim>(velocity_degree + 3),
+                                      QGauss<dim>(velocity_degree + 1),
                                       VectorTools::Hdiv_seminorm,
                                       &velocity_mask);
 
@@ -794,14 +794,14 @@ namespace StokesTests
     static double last_Pressure_L2_error = 0;
 
     const double mean_pressure = VectorTools::compute_mean_value(
-      dof_handler, QGauss<dim>(velocity_degree + 3), solution, dim);
+      dof_handler, QGauss<dim>(velocity_degree + 1), solution, dim);
     solution.block(1).add(-mean_pressure);
 
     VectorTools::integrate_difference(dof_handler,
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(velocity_degree + 3),
+                                      QGauss<dim>(velocity_degree + 1),
                                       VectorTools::L2_norm,
                                       &pressure_mask);
     const double Pressure_L2_error =

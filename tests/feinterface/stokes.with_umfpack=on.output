@@ -4,100 +4,100 @@ DEAL::  Now running with FESystem<2>[FESystem<2>[FE_DGQ<2>(2)^2]-FE_DGQ<2>(1)]
 DEAL::	Number of active cells: 4
 DEAL::	Number of degrees of freedom: 88 (72+16)
 DEAL:: At 1th mesh
-DEAL:: L2 error:     0.194224     L2_Conv_rate: 0.00000
-DEAL:: H1 error:     3.65712      H1_Conv_rate: 0.00000
-DEAL:: Hdiv error1:  2.93726      Hdiv_Conv_rate1: 0.00000
-DEAL:: L2 pressure:  0.306514     rate: 0.00000
+DEAL:: L2 error:     0.144243     L2_Conv_rate: 0.00000
+DEAL:: H1 error:     3.45892      H1_Conv_rate: 0.00000
+DEAL:: Hdiv error1:  2.97187      Hdiv_Conv_rate1: 0.00000
+DEAL:: L2 pressure:  0.284103     rate: 0.00000
 DEAL::
 DEAL::	Number of active cells: 16
 DEAL::	Number of degrees of freedom: 352 (288+64)
 DEAL:: At 2th mesh
-DEAL:: L2 error:     0.0397041    L2_Conv_rate: 4.89179
-DEAL:: H1 error:     1.27499      H1_Conv_rate: 2.86835
-DEAL:: Hdiv error1:  0.624393     Hdiv_Conv_rate1: 4.70418
-DEAL:: L2 pressure:  0.116859     rate: 2.62293
+DEAL:: L2 error:     0.0296616    L2_Conv_rate: 4.86296
+DEAL:: H1 error:     1.27528      H1_Conv_rate: 2.71229
+DEAL:: Hdiv error1:  0.624927     Hdiv_Conv_rate1: 4.75554
+DEAL:: L2 pressure:  0.120591     rate: 2.35591
 DEAL::
 DEAL::	Number of active cells: 64
 DEAL::	Number of degrees of freedom: 1408 (1152+256)
 DEAL:: At 3th mesh
-DEAL:: L2 error:     0.00512759   L2_Conv_rate: 7.74323
-DEAL:: H1 error:     0.322333     H1_Conv_rate: 3.95551
-DEAL:: Hdiv error1:  0.159620     Hdiv_Conv_rate1: 3.91175
-DEAL:: L2 pressure:  0.0134970    rate: 8.65819
+DEAL:: L2 error:     0.00386472   L2_Conv_rate: 7.67497
+DEAL:: H1 error:     0.322324     H1_Conv_rate: 3.95651
+DEAL:: Hdiv error1:  0.159630     Hdiv_Conv_rate1: 3.91485
+DEAL:: L2 pressure:  0.0136012    rate: 8.86624
 DEAL::
 DEAL::	Number of active cells: 256
 DEAL::	Number of degrees of freedom: 5632 (4608+1024)
 DEAL:: At 4th mesh
-DEAL:: L2 error:     0.000650495  L2_Conv_rate: 7.88259
-DEAL:: H1 error:     0.0806845    H1_Conv_rate: 3.99499
-DEAL:: Hdiv error1:  0.0400590    Hdiv_Conv_rate1: 3.98461
-DEAL:: L2 pressure:  0.00186869   rate: 7.22268
+DEAL:: L2 error:     0.000494086  L2_Conv_rate: 7.82196
+DEAL:: H1 error:     0.0806835    H1_Conv_rate: 3.99492
+DEAL:: Hdiv error1:  0.0400592    Hdiv_Conv_rate1: 3.98485
+DEAL:: L2 pressure:  0.00187156   rate: 7.26731
 DEAL::
 DEAL::FESystem<2>[FE_RaviartThomas<2>(2)-FE_DGQ<2>(2)]: degree=3 tensor_degree=3
 DEAL::  Now running with FESystem<2>[FE_RaviartThomas<2>(2)-FE_DGQ<2>(2)]
 DEAL::	Number of active cells: 4
 DEAL::	Number of degrees of freedom: 120 (84+36)
 DEAL:: At 1th mesh
-DEAL:: L2 error:     0.0667908    L2_Conv_rate: 0.00000
-DEAL:: H1 error:     1.51725      H1_Conv_rate: 0.00000
-DEAL:: Hdiv error1:  0.0426109    Hdiv_Conv_rate1: 0.00000
-DEAL:: L2 pressure:  0.224212     rate: 0.00000
+DEAL:: L2 error:     0.0868012    L2_Conv_rate: 0.00000
+DEAL:: H1 error:     0.637375     H1_Conv_rate: 0.00000
+DEAL:: Hdiv error1:  0.00179984   Hdiv_Conv_rate1: 0.00000
+DEAL:: L2 pressure:  0.0510136    rate: 0.00000
 DEAL::
 DEAL::	Number of active cells: 16
 DEAL::	Number of degrees of freedom: 456 (312+144)
 DEAL:: At 2th mesh
-DEAL:: L2 error:     0.0373114    L2_Conv_rate: 1.79009
-DEAL:: H1 error:     1.09666      H1_Conv_rate: 1.38351
-DEAL:: Hdiv error1:  0.0135657    Hdiv_Conv_rate1: 3.14108
-DEAL:: L2 pressure:  0.142760     rate: 1.57056
+DEAL:: L2 error:     0.0297496    L2_Conv_rate: 2.91773
+DEAL:: H1 error:     1.09523      H1_Conv_rate: 0.581955
+DEAL:: Hdiv error1:  0.0125562    Hdiv_Conv_rate1: 0.143343
+DEAL:: L2 pressure:  0.146096     rate: 0.349177
 DEAL::
 DEAL::	Number of active cells: 64
 DEAL::	Number of degrees of freedom: 1776 (1200+576)
 DEAL:: At 3th mesh
-DEAL:: L2 error:     0.00484734   L2_Conv_rate: 7.69729
-DEAL:: H1 error:     0.277441     H1_Conv_rate: 3.95279
-DEAL:: Hdiv error1:  0.00144909   Hdiv_Conv_rate1: 9.36153
-DEAL:: L2 pressure:  0.0153276    rate: 9.31391
+DEAL:: L2 error:     0.00387890   L2_Conv_rate: 7.66959
+DEAL:: H1 error:     0.277330     H1_Conv_rate: 3.94919
+DEAL:: Hdiv error1:  0.00142669   Hdiv_Conv_rate1: 8.80092
+DEAL:: L2 pressure:  0.0154399    rate: 9.46224
 DEAL::
 DEAL::	Number of active cells: 256
 DEAL::	Number of degrees of freedom: 7008 (4704+2304)
 DEAL:: At 4th mesh
-DEAL:: L2 error:     0.000614073  L2_Conv_rate: 7.89375
-DEAL:: H1 error:     0.0695257    H1_Conv_rate: 3.99048
-DEAL:: Hdiv error1:  0.000133620  Hdiv_Conv_rate1: 10.8449
-DEAL:: L2 pressure:  0.00183079   rate: 8.37210
+DEAL:: L2 error:     0.000493039  L2_Conv_rate: 7.86733
+DEAL:: H1 error:     0.0695185    H1_Conv_rate: 3.98930
+DEAL:: Hdiv error1:  0.000133125  Hdiv_Conv_rate1: 10.7169
+DEAL:: L2 pressure:  0.00183436   rate: 8.41707
 DEAL::
 DEAL::FESystem<2>[FE_DGVector_Nedelec<2>(2)-FE_DGQ<2>(1)]: degree=3 tensor_degree=3
 DEAL::  Now running with FESystem<2>[FE_DGVector_Nedelec<2>(2)-FE_DGQ<2>(1)]
 DEAL::	Number of active cells: 4
 DEAL::	Number of degrees of freedom: 112 (96+16)
 DEAL:: At 1th mesh
-DEAL:: L2 error:     0.212092     L2_Conv_rate: 0.00000
-DEAL:: H1 error:     3.62491      H1_Conv_rate: 0.00000
-DEAL:: Hdiv error1:  2.76583      Hdiv_Conv_rate1: 0.00000
-DEAL:: L2 pressure:  0.369906     rate: 0.00000
+DEAL:: L2 error:     0.171800     L2_Conv_rate: 0.00000
+DEAL:: H1 error:     3.41033      H1_Conv_rate: 0.00000
+DEAL:: Hdiv error1:  2.79451      Hdiv_Conv_rate1: 0.00000
+DEAL:: L2 pressure:  0.353516     rate: 0.00000
 DEAL::
 DEAL::	Number of active cells: 16
 DEAL::	Number of degrees of freedom: 448 (384+64)
 DEAL:: At 2th mesh
-DEAL:: L2 error:     0.0219579    L2_Conv_rate: 9.65905
-DEAL:: H1 error:     0.652822     H1_Conv_rate: 5.55267
-DEAL:: Hdiv error1:  0.611920     Hdiv_Conv_rate1: 4.51992
-DEAL:: L2 pressure:  0.0243642    rate: 15.1823
+DEAL:: L2 error:     0.0179032    L2_Conv_rate: 9.59603
+DEAL:: H1 error:     0.636036     H1_Conv_rate: 5.36185
+DEAL:: Hdiv error1:  0.607128     Hdiv_Conv_rate1: 4.60284
+DEAL:: L2 pressure:  0.0237024    rate: 14.9148
 DEAL::
 DEAL::	Number of active cells: 64
 DEAL::	Number of degrees of freedom: 1792 (1536+256)
 DEAL:: At 3th mesh
-DEAL:: L2 error:     0.00284740   L2_Conv_rate: 7.71156
-DEAL:: H1 error:     0.161348     H1_Conv_rate: 4.04605
-DEAL:: Hdiv error1:  0.158529     Hdiv_Conv_rate1: 3.85998
-DEAL:: L2 pressure:  0.00423708   rate: 5.75024
+DEAL:: L2 error:     0.00230885   L2_Conv_rate: 7.75417
+DEAL:: H1 error:     0.160155     H1_Conv_rate: 3.97138
+DEAL:: Hdiv error1:  0.158193     Hdiv_Conv_rate1: 3.83789
+DEAL:: L2 pressure:  0.00423376   rate: 5.59842
 DEAL::
 DEAL::	Number of active cells: 256
 DEAL::	Number of degrees of freedom: 7168 (6144+1024)
 DEAL:: At 4th mesh
-DEAL:: L2 error:     0.000358041  L2_Conv_rate: 7.95271
-DEAL:: H1 error:     0.0402012    H1_Conv_rate: 4.01351
-DEAL:: Hdiv error1:  0.0399893    Hdiv_Conv_rate1: 3.96429
-DEAL:: L2 pressure:  0.00101821   rate: 4.16129
+DEAL:: L2 error:     0.000289287  L2_Conv_rate: 7.98116
+DEAL:: H1 error:     0.0401242    H1_Conv_rate: 3.99148
+DEAL:: Hdiv error1:  0.0399675    Hdiv_Conv_rate1: 3.95804
+DEAL:: L2 pressure:  0.00101826   rate: 4.15783
 DEAL::
