@@ -7719,7 +7719,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
       std::stringstream ss;
       DataOutBase::write_vtu_header(ss, vtk_flags);
       header_size = ss.str().size();
-      // Write the header on rank 0 at the starting of a file, i.e., offset 0.
+      // Write the header on rank 0 at the start of a file, i.e., offset 0.
       ierr = Utilities::MPI::LargeCount::MPI_File_write_at_c(
         fh, 0, ss.str().c_str(), header_size, MPI_CHAR, MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
@@ -7746,7 +7746,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
                                   vtk_flags,
                                   ss);
 
-    // using prefix sum to find specific offset to write at.
+    // Use prefix sum to find specific offset to write at.
     const std::uint64_t size_on_proc = ss.str().size();
     std::uint64_t prefix_sum = 0;
     ierr =
@@ -7774,7 +7774,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
         DataOutBase::write_vtu_footer(ss);
         const unsigned int footer_size = ss.str().size();
 
-        // Writing Footer.
+        // Writing footer:
         ierr =
           Utilities::MPI::LargeCount::MPI_File_write_at_c(fh,
                                                           footer_offset,
