@@ -2626,16 +2626,14 @@ inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_cell_batch(
   const unsigned int cell_batch_index) const
 {
+  Assert(!dof_info.empty(), ExcNotInitialized());
   AssertIndexRange(cell_batch_index, task_info.cell_partition_data.back());
-  unsigned int n_lanes = VectorizedArrayType::size();
-  while (n_lanes > 1 &&
-         cell_level_index[cell_batch_index * VectorizedArrayType::size() +
-                          n_lanes - 1] ==
-           cell_level_index[cell_batch_index * VectorizedArrayType::size() +
-                            n_lanes - 2])
-    --n_lanes;
-  AssertIndexRange(n_lanes - 1, VectorizedArrayType::size());
-  return n_lanes;
+  const std::vector<unsigned char> &n_lanes_filled =
+    dof_info[0].n_vectorization_lanes_filled
+      [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell];
+  AssertIndexRange(cell_batch_index, n_lanes_filled.size());
+
+  return n_lanes_filled[cell_batch_index];
 }
 
 
@@ -2646,13 +2644,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_active_entries_per_face_batch(
   const unsigned int face_batch_index) const
 {
   AssertIndexRange(face_batch_index, face_info.faces.size());
-  unsigned int n_lanes = VectorizedArrayType::size();
-  while (n_lanes > 1 &&
-         face_info.faces[face_batch_index].cells_interior[n_lanes - 1] ==
-           numbers::invalid_unsigned_int)
-    --n_lanes;
-  AssertIndexRange(n_lanes - 1, VectorizedArrayType::size());
-  return n_lanes;
+  Assert(!dof_info.empty(), ExcNotInitialized());
+  const std::vector<unsigned char> &n_lanes_filled =
+    dof_info[0].n_vectorization_lanes_filled
+      [internal::MatrixFreeFunctions::DoFInfo::dof_access_face_interior];
+  AssertIndexRange(face_batch_index, n_lanes_filled.size());
+  return n_lanes_filled[face_batch_index];
 }
 
 
