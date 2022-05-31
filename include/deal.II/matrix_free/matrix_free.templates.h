@@ -252,7 +252,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
 {
   AssertIndexRange(dof_handler_index, dof_handlers.size());
   AssertIndexRange(cell_batch_index, task_info.cell_partition_data.back());
-  AssertIndexRange(lane_index, n_components_filled(cell_batch_index));
+  AssertIndexRange(lane_index,
+                   n_active_entries_per_cell_batch(cell_batch_index));
 
   std::pair<unsigned int, unsigned int> index =
     cell_level_index[cell_batch_index * VectorizedArrayType::size() +
@@ -273,7 +274,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_level_and_index(
   const unsigned int lane_index) const
 {
   AssertIndexRange(cell_batch_index, task_info.cell_partition_data.back());
-  AssertIndexRange(lane_index, n_components_filled(cell_batch_index));
+  AssertIndexRange(lane_index,
+                   n_active_entries_per_cell_batch(cell_batch_index));
 
   std::pair<int, int> level_index_pair =
     cell_level_index[cell_batch_index * VectorizedArrayType::size() +
@@ -329,7 +331,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
 {
   AssertIndexRange(dof_handler_index, dof_handlers.size());
   AssertIndexRange(cell_batch_index, task_info.cell_partition_data.back());
-  AssertIndexRange(lane_index, n_components_filled(cell_batch_index));
+  AssertIndexRange(lane_index,
+                   n_active_entries_per_cell_batch(cell_batch_index));
 
   std::pair<unsigned int, unsigned int> index =
     cell_level_index[cell_batch_index * VectorizedArrayType::size() +
@@ -2056,7 +2059,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           for (unsigned int cell = 0;
                cell < n_cell_batches() + n_ghost_cell_batches();
                ++cell)
-            for (unsigned int v = 0; v < this->n_components_filled(cell); ++v)
+            for (unsigned int v = 0;
+                 v < this->n_active_entries_per_cell_batch(cell);
+                 ++v)
               {
                 const unsigned int index = cell * n_lanes + v;
 

@@ -163,7 +163,8 @@ test()
   for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)
     {
       const unsigned int m_id = mf_data.get_cell_iterator(i, 0)->material_id();
-      for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
+      for (unsigned int c = 0; c < mf_data.n_active_entries_per_cell_batch(i);
+           ++c)
         {
           const unsigned int c_id =
             mf_data.get_cell_iterator(i, c)->material_id();
@@ -178,7 +179,9 @@ test()
         {
           const unsigned int m_id =
             level_data->get_cell_iterator(i, 0)->material_id();
-          for (unsigned int c = 0; c < level_data->n_components_filled(i); ++c)
+          for (unsigned int c = 0;
+               c < level_data->n_active_entries_per_cell_batch(i);
+               ++c)
             {
               const unsigned int c_id =
                 level_data->get_cell_iterator(i, c)->material_id();

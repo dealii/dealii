@@ -123,7 +123,8 @@ MatrixFreeTest<dim, fe_degree, Number>::operator()(
 
       // compare values with the ones the FEValues
       // gives us. Those are seen as reference
-      for (unsigned int j = 0; j < data.n_components_filled(cell); ++j)
+      for (unsigned int j = 0; j < data.n_active_entries_per_cell_batch(cell);
+           ++j)
         {
           // FE 0, Quad 0
           // generate random numbers at quadrature

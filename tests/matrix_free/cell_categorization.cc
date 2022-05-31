@@ -92,7 +92,8 @@ test()
   deallog << "Number of cell batches: " << mf_data.n_cell_batches()
           << std::endl;
   for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)
-    for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
+    for (unsigned int c = 0; c < mf_data.n_active_entries_per_cell_batch(i);
+         ++c)
       deallog << mf_data.get_cell_iterator(i, c)->id() << " with "
               << mf_data.get_cell_category(i) << std::endl;
   deallog << std::endl;
@@ -102,7 +103,8 @@ test()
   deallog << "Number of cell batches: " << mf_data.n_cell_batches()
           << std::endl;
   for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)
-    for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
+    for (unsigned int c = 0; c < mf_data.n_active_entries_per_cell_batch(i);
+         ++c)
       deallog << mf_data.get_cell_iterator(i, c)->id() << " with "
               << mf_data.get_cell_category(i) << std::endl;
   deallog << std::endl;
@@ -118,7 +120,8 @@ test()
   deallog << "Number of cell batches: " << mf_data.n_cell_batches()
           << std::endl;
   for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)
-    for (unsigned int c = 0; c < mf_data.n_components_filled(i); ++c)
+    for (unsigned int c = 0; c < mf_data.n_active_entries_per_cell_batch(i);
+         ++c)
       deallog << mf_data.get_cell_iterator(i, c)->id() << " with "
               << mf_data.get_cell_category(i) << std::endl;
   deallog << std::endl;

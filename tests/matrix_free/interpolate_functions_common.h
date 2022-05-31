@@ -89,7 +89,8 @@ public:
         fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients |
                          EvaluationFlags::hessians);
 
-        for (unsigned int j = 0; j < data.n_components_filled(cell); ++j)
+        for (unsigned int j = 0; j < data.n_active_entries_per_cell_batch(cell);
+             ++j)
           for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)
             {
               ++cell_times;
