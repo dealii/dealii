@@ -517,11 +517,24 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
           dof_info[i].dofs_per_cell.push_back(
             dof_handler[i]->get_fe(0).n_dofs_per_cell());
 
+          const unsigned int n_regular_cells = cell_level_index.size();
           // if indices are not initialized, the cell_level_index might not be
           // divisible by the vectorization length. But it must be for
           // mapping_info...
           while (cell_level_index.size() % VectorizedArrayType::size() != 0)
             cell_level_index.push_back(cell_level_index.back());
+
+          // adjust lengths for vectorization
+          dof_info[i]
+            .n_vectorization_lanes_filled
+              [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+            .resize(cell_level_index.size() / VectorizedArrayType::size(),
+                    VectorizedArrayType::size());
+          if (n_regular_cells < cell_level_index.size())
+            dof_info[i].n_vectorization_lanes_filled
+              [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+              [n_regular_cells / VectorizedArrayType::size()] =
+              n_regular_cells % VectorizedArrayType::size();
         }
     }
 
