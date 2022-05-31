@@ -66,41 +66,9 @@ public:
   {}
 
   ComplexNumber
-  value(const Position &, const unsigned int) const
+  value(const Position &x, const unsigned int) const
   {
-    return ComplexNumber(0, 0);
-  }
-
-  void
-  vector_value(const Position &, dealii::Vector<ComplexNumber> &value) const
-  {
-    value.reinit(3);
-    for (unsigned int i = 0; i < 3; i++)
-      {
-        value[i] = {0, 0};
-      }
-  }
-
-  dealii::Tensor<1, 3, ComplexNumber>
-  curl(const Position &) const
-  {
-    dealii::Tensor<1, 3, ComplexNumber> ret;
-    for (unsigned int i = 0; i < 3; i++)
-      {
-        ret[i] = {0, 0};
-      }
-    return ret;
-  }
-
-  dealii::Tensor<1, 3, ComplexNumber>
-  val(const Position &) const
-  {
-    dealii::Tensor<1, 3, ComplexNumber> ret;
-    for (unsigned int i = 0; i < 3; i++)
-      {
-        ret[i] = {0, 0};
-      }
-    return ret;
+    return x(0) + x(1) - ComplexNumber(0.2, 0.7) * x(2);
   }
 };
 
@@ -128,10 +96,17 @@ main()
   local_constraints.close();
 
   dealii::QGauss<3>             quadrature(2);
-  dealii::Vector<ComplexNumber> interpolated_exact_solution(
-    dof_handler.n_dofs());
+  dealii::Vector<ComplexNumber> projected_solution(dof_handler.n_dofs());
+  dealii::Vector<ComplexNumber> interpolated_solution(dof_handler.n_dofs());
   VectorTools::project(
-    dof_handler, local_constraints, quadrature, f, interpolated_exact_solution);
+    dof_handler, local_constraints, quadrature, f, projected_solution);
 
+  VectorTools::interpolate(dof_handler, f, interpolated_solution);
+
+  projected_solution -= interpolated_solution;
+
+  deallog << "Relative difference between project and interpolate: "
+          << projected_solution.l2_norm() / interpolated_solution.l2_norm()
+          << std::endl;
   deallog << "OK" << std::endl;
 }
