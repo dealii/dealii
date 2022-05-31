@@ -7786,6 +7786,11 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
       }
   }
 
+  // Make sure we sync to disk. This ensures that the change in file
+  // size caused by the write_at() for the footer is visible for all
+  // ranks. Otherwise, the footer is sometimes lost.
+  ierr = MPI_File_sync(fh);
+  AssertThrowMPI(ierr);
 
   ierr = MPI_File_close(&fh);
   AssertThrowMPI(ierr);
