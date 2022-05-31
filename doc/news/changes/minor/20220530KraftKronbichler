@@ -1,0 +1,3 @@
+Fixed: VectorTools::project can now be instantiated for complex numbers, bypassing undefined operations when compiling the parallel code path with MatrixFree evaluators.
+<br>
+(Pascal Kraft, Martin Kronbichler, 2022/05/30)
