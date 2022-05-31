@@ -3675,15 +3675,6 @@ namespace internal
 
 
 
-        template <int spacedim>
-        void
-        communicate_mg_ghost_cells(DoFHandler<1, spacedim> &)
-        {
-          Assert(false, ExcNotImplemented());
-        }
-
-
-
         /**
          * A function that communicates the DoF indices from that subset of
          * locally owned cells that have their user indices set to the
