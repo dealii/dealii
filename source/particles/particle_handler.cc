@@ -2394,6 +2394,8 @@ namespace Particles
             auto particle = loaded_particles_on_cell.begin();
             for (unsigned int i = 0; i < cache->particles.size();)
               {
+                bool found_new_cell = false;
+
                 for (unsigned int child_index = 0;
                      child_index < GeometryInfo<dim>::max_children_per_cell;
                      ++child_index)
@@ -2407,8 +2409,10 @@ namespace Particles
                         const Point<dim> p_unit =
                           mapping->transform_real_to_unit_cell(
                             child, particle->get_location());
-                        if (GeometryInfo<dim>::is_inside_unit_cell(p_unit))
+                        if (GeometryInfo<dim>::is_inside_unit_cell(p_unit,
+                                                                   1e-12))
                           {
+                            found_new_cell = true;
                             particle->set_reference_location(p_unit);
 
                             // if the particle is not in child 0, we stored the
@@ -2432,6 +2436,21 @@ namespace Particles
                       }
                     catch (typename Mapping<dim>::ExcTransformationFailed &)
                       {}
+                  }
+
+                if (found_new_cell == false)
+                  {
+                    // If we get here, we did not find the particle in any
+                    // child. This case may happen for particles that are at the
+                    // boundary for strongly curved cells. We apply a tolerance
+                    // in the call to GeometryInfo<dim>::is_inside_unit_cell to
+                    // account for this, but if that is not enough, we still
+                    // need to prevent an endless loop here. Delete the particle
+                    // and move on.
+                    signals.particle_lost(particle,
+                                          particle->get_surrounding_cell());
+                    cache->particles[i] = cache->particles.back();
+                    cache->particles.resize(cache->particles.size() - 1);
                   }
               }
             // clean up in case child 0 has no particle left
