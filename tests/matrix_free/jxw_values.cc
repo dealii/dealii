@@ -82,7 +82,9 @@ test()
   for (unsigned int cell = 0; cell < mf_data.n_cell_batches(); ++cell)
     {
       fe_eval.reinit(cell);
-      for (unsigned int v = 0; v < mf_data.n_components_filled(cell); ++v)
+      for (unsigned int v = 0;
+           v < mf_data.n_active_entries_per_cell_batch(cell);
+           ++v)
         {
           fe_values.reinit(mf_data.get_cell_iterator(cell, v));
           for (unsigned int q = 0; q < quad.size(); ++q)

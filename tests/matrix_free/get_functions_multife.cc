@@ -93,7 +93,8 @@ public:
 
         // compare values with the ones the FEValues
         // gives us. Those are seen as reference
-        for (unsigned int j = 0; j < data.n_components_filled(cell); ++j)
+        for (unsigned int j = 0; j < data.n_active_entries_per_cell_batch(cell);
+             ++j)
           {
             // FE 0
             fe_val0.reinit(data.get_cell_iterator(cell, j, 0));

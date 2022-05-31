@@ -46,7 +46,7 @@ compare_indices(const MatrixFree<dim, number> *mf_data)
   for (unsigned int batch_no = 0; batch_no < n_batches; ++batch_no)
     {
       const unsigned int n_lanes_filled =
-        mf_data->n_components_filled(batch_no);
+        mf_data->n_active_entries_per_cell_batch(batch_no);
       for (unsigned int lane = 0; lane < n_lanes_filled; ++lane)
         {
           const auto cell = mf_data->get_cell_iterator(batch_no, lane);

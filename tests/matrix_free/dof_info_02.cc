@@ -172,7 +172,9 @@ test(const bool adaptive_ref = true)
 
       // output cell blocks:
       for (unsigned int cell = 0; cell < n_cells; ++cell)
-        for (unsigned int c = 0; c < mf_data->n_components_filled(cell); ++c)
+        for (unsigned int c = 0;
+             c < mf_data->n_active_entries_per_cell_batch(cell);
+             ++c)
           {
             const auto dof_cell = mf_data->get_cell_iterator(cell, c);
             f << dof_cell->center() << " \"" << cell << "\"\n";

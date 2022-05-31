@@ -94,7 +94,9 @@ test()
   for (unsigned int cell = 0; cell < n_cells; ++cell)
     {
       fe_eval.reinit(cell);
-      for (unsigned int j = 0; j < mf_data.n_components_filled(cell); ++j)
+      for (unsigned int j = 0;
+           j < mf_data.n_active_entries_per_cell_batch(cell);
+           ++j)
         {
           fe_values.reinit(mf_data.get_cell_iterator(cell, j));
           for (unsigned int q = 0; q < fe_eval.n_q_points; ++q)

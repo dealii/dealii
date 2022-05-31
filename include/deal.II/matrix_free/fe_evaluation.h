@@ -1606,7 +1606,8 @@ protected:
  * incomplete batch of cells are set to zero, whereas
  * @p distribute_local_to_global or @p set_dof_values simply ignores the
  * content in the empty lanes. The number of actually filled SIMD lanes can by
- * queried by MatrixFree::n_components_filled().
+ * queried by MatrixFree::n_active_entries_per_cell_batch() or
+ * MatrixFree::n_active_entries_per_face_batch().
  *
  * Obviously, the computations performed on the artificial lanes (without real
  * data) should never be mixed with valid results. The contract in using this
@@ -1615,11 +1616,11 @@ protected:
  * put together in vectorization. For example, results on an element should
  * not be added to results on other elements except through the global vector
  * access methods or by access that is masked by
- * MatrixFree::n_components_filled(). No guarantee can be made that results on
- * artificial lanes will always be zero that can safely be added to other
- * results: The data on JxW or Jacobians is copied from the last valid lane in
- * order to avoid division by zero that could trigger floating point
- * exceptions or trouble in other situations.
+ * MatrixFree::n_active_entries_per_cell_batch(). No guarantee can be made
+ * that results on artificial lanes will always be zero that can safely be
+ * added to other results: The data on JxW or Jacobians is copied from the
+ * last valid lane in order to avoid division by zero that could trigger
+ * floating point exceptions or trouble in other situations.
  *
  * <h3>Description of evaluation routines</h3>
  *
