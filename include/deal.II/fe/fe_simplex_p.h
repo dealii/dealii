@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note Only implemented for 2D and 3D.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim, int spacedim = dim>
 class FE_SimplexPoly : public dealii::FE_Poly<dim, spacedim>
@@ -120,7 +120,7 @@ protected:
  * the finite element space of continuous, piecewise polynomials of
  * degree $k$.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim, int spacedim = dim>
 class FE_SimplexP : public FE_SimplexPoly<dim, spacedim>
@@ -175,7 +175,7 @@ public:
  * element space of discontinuous, piecewise polynomials of degree
  * $k$.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim, int spacedim = dim>
 class FE_SimplexDGP : public FE_SimplexPoly<dim, spacedim>

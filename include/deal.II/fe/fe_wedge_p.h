@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note Only implemented for 3D.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim, int spacedim = dim>
 class FE_WedgePoly : public dealii::FE_Poly<dim, spacedim>
@@ -60,7 +60,7 @@ public:
  *   (degree=2) are implemented. See also the documentation of
  *   ScalarLagrangePolynomialWedge.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim, int spacedim = dim>
 class FE_WedgeP : public FE_WedgePoly<dim, spacedim>
@@ -123,7 +123,7 @@ public:
  *   (degree=2) are implemented. See also the documentation of
  *   ScalarLagrangePolynomialWedge.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim, int spacedim = dim>
 class FE_WedgeDGP : public FE_WedgePoly<dim, spacedim>
