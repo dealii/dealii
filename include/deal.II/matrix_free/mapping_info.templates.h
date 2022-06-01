@@ -1054,17 +1054,17 @@ namespace internal
         for (unsigned int cell = 0; cell < jacobians_on_stencil.size(); ++cell)
           {
             // check in the map for the index of this cell
-            auto inserted = compressed_jacobians.insert(
-              std::make_pair(jacobians_on_stencil[cell], cell));
-            bool add_this_cell = inserted.second;
-            if (inserted.second == false)
+            const auto position =
+              compressed_jacobians.find(jacobians_on_stencil[cell]);
+            bool add_this_cell = position == compressed_jacobians.end();
+            if (!add_this_cell)
               {
                 // check if the found duplicate really is a translation and
                 // the similarity identified by the map is not by accident
                 double        max_distance = 0;
                 const double *ptr_origin =
                   plain_quadrature_points.data() +
-                  inserted.first->second * dim * n_mapping_points;
+                  position->second * dim * n_mapping_points;
                 const double *ptr_mine = plain_quadrature_points.data() +
                                          cell * dim * n_mapping_points;
                 for (unsigned int d = 0; d < dim; ++d)
@@ -1084,16 +1084,20 @@ namespace internal
                 if (max_distance > 1e-10 * jacobian_size)
                   add_this_cell = true;
               }
+            else
+              compressed_jacobians.insert(
+                std::make_pair(jacobians_on_stencil[cell], cell));
+
             if (add_this_cell)
               cell_data_index[cell] = n_data_buckets++;
             else
               {
-                cell_data_index[cell] = cell_data_index[inserted.first->second];
+                cell_data_index[cell] = cell_data_index[position->second];
                 // make sure that the cell type is the same as in the original
-                // field, despite possible small differences due to roundoff
+                // field, despite possibly small differences due to roundoff
                 // and the tolerances we use
                 preliminary_cell_type[cell] =
-                  preliminary_cell_type[inserted.first->second];
+                  preliminary_cell_type[position->second];
               }
           }
         return cell_data_index;
