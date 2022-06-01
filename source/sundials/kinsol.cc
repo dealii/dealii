@@ -170,55 +170,6 @@ namespace SUNDIALS
 
 
 
-#  if DEAL_II_SUNDIALS_VERSION_LT(4, 1, 0)
-    template <typename VectorType>
-    int
-    setup_jacobian_callback(KINMem kinsol_mem)
-    {
-      KINSOL<VectorType> &solver =
-        *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
-
-      auto *src_ycur =
-        internal::unwrap_nvector_const<VectorType>(kinsol_mem->kin_uu);
-      auto *src_fcur =
-        internal::unwrap_nvector_const<VectorType>(kinsol_mem->kin_fval);
-
-      int err = solver.setup_jacobian(*src_ycur, *src_fcur);
-      return err;
-    }
-
-
-
-    template <typename VectorType>
-    int
-    solve_with_jacobian_callback(KINMem    kinsol_mem,
-                                 N_Vector  x,
-                                 N_Vector  b,
-                                 realtype *sJpnorm,
-                                 realtype *sFdotJp)
-    {
-      KINSOL<VectorType> &solver =
-        *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
-
-      auto *src_ycur =
-        internal::unwrap_nvector_const<VectorType>(kinsol_mem->kin_uu);
-      auto *src_fcur =
-        internal::unwrap_nvector_const<VectorType>(kinsol_mem->kin_fval);
-      auto *src = internal::unwrap_nvector_const<VectorType>(b);
-      auto *dst = internal::unwrap_nvector<VectorType>(x);
-
-      int err = solver.solve_jacobian_system(*src_ycur, *src_fcur, *src, *dst);
-
-      *sJpnorm = N_VWL2Norm(b, kinsol_mem->kin_fscale);
-      N_VProd(b, kinsol_mem->kin_fscale, b);
-      N_VProd(b, kinsol_mem->kin_fscale, b);
-      *sFdotJp = N_VDotProd(kinsol_mem->kin_fval, b);
-
-      return err;
-    }
-
-#  else // SUNDIALS 5.0 or later
-
     template <typename VectorType>
     int
     setup_jacobian_callback(N_Vector u,
@@ -297,7 +248,6 @@ namespace SUNDIALS
           return err;
         }
     }
-#  endif
   } // namespace
 
 
@@ -479,38 +429,16 @@ namespace SUNDIALS
         solve_with_jacobian) // user assigned a function object to the solver
                              // slot
       {
-/* interface up to and including 4.0 */
-#  if DEAL_II_SUNDIALS_VERSION_LT(4, 1, 0)
-        auto KIN_mem = static_cast<KINMem>(kinsol_mem);
-        // Old version only works with solve_jacobian_system
-        Assert(solve_jacobian_system,
-               ExcFunctionNotProvided("solve_jacobian_system"))
-          KIN_mem->kin_lsolve = solve_with_jacobian_callback<VectorType>;
-        if (setup_jacobian) // user assigned a function object to the Jacobian
-          // set-up slot
-          KIN_mem->kin_lsetup = setup_jacobian_callback<VectorType>;
-
-/* interface up to and including 4.1 */
-#  elif DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
-
-        // deal.II does not currently have support for KINSOL in
-        // SUNDIALS 4.1. One could write this and update this section,
-        // but it does not seem worthwhile spending the time to
-        // interface with an old version of SUNDIAL given that the
-        // code below supports modern SUNDIAL versions just fine.
-        Assert(false, ExcNotImplemented());
-
-#  else /* interface starting with SUNDIALS 5.0 */
         // Set the operations we care for in the sun_linear_solver object
         // and attach it to the KINSOL object. The functions that will get
         // called do not actually receive the KINSOL object, just the LS
         // object, so we have to store a pointer to the current
         // object in the LS object
-#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-        LS          = SUNLinSolNewEmpty();
-#    else
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+        LS = SUNLinSolNewEmpty();
+#  else
         LS = SUNLinSolNewEmpty(kinsol_ctx);
-#    endif
+#  endif
         LS->content = this;
 
         LS->ops->gettype =
@@ -540,11 +468,11 @@ namespace SUNDIALS
         // if we don't set it, it won't call the functions that set up
         // the matrix object (i.e., the argument to the 'KINSetJacFn'
         // function below).
-#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-        J          = SUNMatNewEmpty();
-#    else
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+        J = SUNMatNewEmpty();
+#  else
         J  = SUNMatNewEmpty(kinsol_ctx);
-#    endif
+#  endif
         J->content = this;
 
         J->ops->getid = [](SUNMatrix /*ignored*/) -> SUNMatrix_ID {
@@ -578,7 +506,6 @@ namespace SUNDIALS
           };
         status = KINSetJacFn(kinsol_mem, &setup_jacobian_callback<VectorType>);
         AssertKINSOL(status);
-#  endif
       }
 
     // call to KINSol

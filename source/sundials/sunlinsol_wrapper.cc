@@ -18,28 +18,23 @@
 #include <deal.II/sundials/sunlinsol_wrapper.h>
 
 #ifdef DEAL_II_WITH_SUNDIALS
-#  if DEAL_II_SUNDIALS_VERSION_GTE(4, 0, 0)
 
-#    include <deal.II/base/exceptions.h>
+#  include <deal.II/base/exceptions.h>
 
-#    include <deal.II/lac/block_vector.h>
-#    include <deal.II/lac/la_parallel_block_vector.h>
-#    include <deal.II/lac/la_parallel_vector.h>
-#    include <deal.II/lac/vector.h>
-#    ifdef DEAL_II_WITH_TRILINOS
-#      include <deal.II/lac/trilinos_parallel_block_vector.h>
-#      include <deal.II/lac/trilinos_vector.h>
-#    endif
-#    ifdef DEAL_II_WITH_PETSC
-#      include <deal.II/lac/petsc_block_vector.h>
-#      include <deal.II/lac/petsc_vector.h>
-#    endif
+#  include <deal.II/lac/block_vector.h>
+#  include <deal.II/lac/la_parallel_block_vector.h>
+#  include <deal.II/lac/la_parallel_vector.h>
+#  include <deal.II/lac/vector.h>
+#  ifdef DEAL_II_WITH_TRILINOS
+#    include <deal.II/lac/trilinos_parallel_block_vector.h>
+#    include <deal.II/lac/trilinos_vector.h>
+#  endif
+#  ifdef DEAL_II_WITH_PETSC
+#    include <deal.II/lac/petsc_block_vector.h>
+#    include <deal.II/lac/petsc_vector.h>
+#  endif
 
-#    include <deal.II/sundials/n_vector.h>
-
-#    if DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
-#      include <deal.II/sundials/sunlinsol_newempty.h>
-#    endif
+#  include <deal.II/sundials/n_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -53,8 +48,8 @@ namespace SUNDIALS
                  << " functions returned a negative error code: " << arg1
                  << ". Please consult SUNDIALS manual.");
 
-#    define AssertSundialsSolver(code) \
-      Assert(code >= 0, ExcSundialsSolverError(code))
+#  define AssertSundialsSolver(code) \
+    Assert(code >= 0, ExcSundialsSolverError(code))
 
   namespace internal
   {
@@ -177,18 +172,18 @@ namespace SUNDIALS
   template <typename VectorType>
   internal::LinearSolverWrapper<VectorType>::LinearSolverWrapper(
     LinearSolveFunction<VectorType> lsolve
-#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     ,
     SUNContext &linsol_ctx
-#    endif
+#  endif
     )
     : content(std::make_unique<LinearSolverContent<VectorType>>())
   {
-#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     sun_linear_solver = SUNLinSolNewEmpty();
-#    else
+#  else
     sun_linear_solver = SUNLinSolNewEmpty(linsol_ctx);
-#    endif
+#  endif
 
     sun_linear_solver->ops->gettype    = arkode_linsol_get_type;
     sun_linear_solver->ops->solve      = arkode_linsol_solve<VectorType>;
@@ -240,13 +235,13 @@ namespace SUNDIALS
   SundialsOperator<VectorType>::vmult(VectorType &      dst,
                                       const VectorType &src) const
   {
-#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     auto sun_dst = internal::make_nvector_view(dst);
     auto sun_src = internal::make_nvector_view(src);
     int  status  = a_times_fn(A_data, sun_src, sun_dst);
     (void)status;
     AssertSundialsSolver(status);
-#    else
+#  else
     // We don't currently know how to implement this: the
     // internal::make_nvector_view() function called above requires a
     // SUNContext object, but we don't actually have access to such an
@@ -254,7 +249,7 @@ namespace SUNDIALS
     (void)dst;
     (void)src;
     Assert(false, ExcNotImplemented());
-#    endif
+#  endif
   }
 
 
@@ -283,7 +278,7 @@ namespace SUNDIALS
         return;
       }
 
-#    if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     auto sun_dst = internal::make_nvector_view(dst);
     auto sun_src = internal::make_nvector_view(src);
     // for custom preconditioners no distinction between left and right
@@ -292,7 +287,7 @@ namespace SUNDIALS
       p_solve_fn(P_data, sun_src, sun_dst, tol, 0 /*precondition_type*/);
     (void)status;
     AssertSundialsSolver(status);
-#    else
+#  else
     // We don't currently know how to implement this: the
     // internal::make_nvector_view() function called above requires a
     // SUNContext object, but we don't actually have access to such an
@@ -300,7 +295,7 @@ namespace SUNDIALS
     (void)dst;
     (void)src;
     Assert(false, ExcNotImplemented());
-#    endif
+#  endif
   }
 
   template struct SundialsOperator<Vector<double>>;
@@ -323,8 +318,8 @@ namespace SUNDIALS
   template class internal::LinearSolverWrapper<
     LinearAlgebra::distributed::BlockVector<double>>;
 
-#    ifdef DEAL_II_WITH_MPI
-#      ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_TRILINOS
   template struct SundialsOperator<TrilinosWrappers::MPI::Vector>;
   template struct SundialsOperator<TrilinosWrappers::MPI::BlockVector>;
 
@@ -334,10 +329,10 @@ namespace SUNDIALS
   template class internal::LinearSolverWrapper<TrilinosWrappers::MPI::Vector>;
   template class internal::LinearSolverWrapper<
     TrilinosWrappers::MPI::BlockVector>;
-#      endif // DEAL_II_WITH_TRILINOS
+#    endif // DEAL_II_WITH_TRILINOS
 
-#      ifdef DEAL_II_WITH_PETSC
-#        ifndef PETSC_USE_COMPLEX
+#    ifdef DEAL_II_WITH_PETSC
+#      ifndef PETSC_USE_COMPLEX
 
   template struct SundialsOperator<PETScWrappers::MPI::Vector>;
   template struct SundialsOperator<PETScWrappers::MPI::BlockVector>;
@@ -347,12 +342,11 @@ namespace SUNDIALS
 
   template class internal::LinearSolverWrapper<PETScWrappers::MPI::Vector>;
   template class internal::LinearSolverWrapper<PETScWrappers::MPI::BlockVector>;
-#        endif // PETSC_USE_COMPLEX
-#      endif   // DEAL_II_WITH_PETSC
+#      endif // PETSC_USE_COMPLEX
+#    endif   // DEAL_II_WITH_PETSC
 
-#    endif // DEAL_II_WITH_MPI
+#  endif // DEAL_II_WITH_MPI
 } // namespace SUNDIALS
 DEAL_II_NAMESPACE_CLOSE
 
-#  endif
 #endif
