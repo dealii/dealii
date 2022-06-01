@@ -64,12 +64,12 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      MPI_Type_contiguous_c(MPI_Count     count,
-                            MPI_Datatype  oldtype,
-                            MPI_Datatype *newtype)
+      Type_contiguous_c(MPI_Count     count,
+                        MPI_Datatype  oldtype,
+                        MPI_Datatype *newtype)
       {
 #  if MPI_VERSION >= 4
-        return ::MPI_Type_contiguous_c(count, oldtype, newtype);
+        return MPI_Type_contiguous_c(count, oldtype, newtype);
 #  else
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_Type_contiguous(count, oldtype, newtype);
@@ -151,22 +151,22 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      MPI_Send_c(const void * buf,
-                 MPI_Count    count,
-                 MPI_Datatype datatype,
-                 int          dest,
-                 int          tag,
-                 MPI_Comm     comm)
+      Send_c(const void * buf,
+             MPI_Count    count,
+             MPI_Datatype datatype,
+             int          dest,
+             int          tag,
+             MPI_Comm     comm)
       {
 #  if MPI_VERSION >= 4
-        return ::MPI_Send_c(buf, count, datatype, dest, tag, comm);
+        return MPI_Send_c(buf, count, datatype, dest, tag, comm);
 #  else
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_Send(buf, count, datatype, dest, tag, comm);
 
         MPI_Datatype bigtype;
         int          ierr;
-        ierr = MPI_Type_contiguous_c(count, datatype, &bigtype);
+        ierr = Type_contiguous_c(count, datatype, &bigtype);
         if (ierr != MPI_SUCCESS)
           return ierr;
         ierr = MPI_Type_commit(&bigtype);
@@ -190,23 +190,23 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      MPI_Recv_c(void *       buf,
-                 MPI_Count    count,
-                 MPI_Datatype datatype,
-                 int          source,
-                 int          tag,
-                 MPI_Comm     comm,
-                 MPI_Status * status)
+      Recv_c(void *       buf,
+             MPI_Count    count,
+             MPI_Datatype datatype,
+             int          source,
+             int          tag,
+             MPI_Comm     comm,
+             MPI_Status * status)
       {
 #  if MPI_VERSION >= 4
-        return ::MPI_Recv_c(buf, count, datatype, source, tag, comm, status);
+        return MPI_Recv_c(buf, count, datatype, source, tag, comm, status);
 #  else
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_Recv(buf, count, datatype, source, tag, comm, status);
 
         MPI_Datatype bigtype;
         int          ierr;
-        ierr = MPI_Type_contiguous_c(count, datatype, &bigtype);
+        ierr = Type_contiguous_c(count, datatype, &bigtype);
         if (ierr != MPI_SUCCESS)
           return ierr;
 
@@ -232,21 +232,21 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      MPI_Bcast_c(void *       buf,
-                  MPI_Count    count,
-                  MPI_Datatype datatype,
-                  unsigned int root_mpi_rank,
-                  MPI_Comm     comm)
+      Bcast_c(void *       buf,
+              MPI_Count    count,
+              MPI_Datatype datatype,
+              unsigned int root_mpi_rank,
+              MPI_Comm     comm)
       {
 #  if MPI_VERSION >= 4
-        return ::MPI_Bcast_c(buf, count, datatype, root_mpi_rank, comm);
+        return MPI_Bcast_c(buf, count, datatype, root_mpi_rank, comm);
 #  else
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_Bcast(buf, count, datatype, root_mpi_rank, comm);
 
         MPI_Datatype bigtype;
         int          ierr;
-        ierr = MPI_Type_contiguous_c(count, datatype, &bigtype);
+        ierr = Type_contiguous_c(count, datatype, &bigtype);
         if (ierr != MPI_SUCCESS)
           return ierr;
         ierr = MPI_Type_commit(&bigtype);
@@ -270,19 +270,19 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      MPI_File_write_at_c(MPI_File     fh,
-                          MPI_Offset   offset,
-                          const void * buf,
-                          MPI_Count    count,
-                          MPI_Datatype datatype,
-                          MPI_Status * status)
+      File_write_at_c(MPI_File     fh,
+                      MPI_Offset   offset,
+                      const void * buf,
+                      MPI_Count    count,
+                      MPI_Datatype datatype,
+                      MPI_Status * status)
       {
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_File_write_at(fh, offset, buf, count, datatype, status);
 
         MPI_Datatype bigtype;
         int          ierr;
-        ierr = MPI_Type_contiguous_c(count, datatype, &bigtype);
+        ierr = Type_contiguous_c(count, datatype, &bigtype);
         if (ierr != MPI_SUCCESS)
           return ierr;
         ierr = MPI_Type_commit(&bigtype);
@@ -306,12 +306,12 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      MPI_File_write_at_all_c(MPI_File     fh,
-                              MPI_Offset   offset,
-                              const void * buf,
-                              MPI_Count    count,
-                              MPI_Datatype datatype,
-                              MPI_Status * status)
+      File_write_at_all_c(MPI_File     fh,
+                          MPI_Offset   offset,
+                          const void * buf,
+                          MPI_Count    count,
+                          MPI_Datatype datatype,
+                          MPI_Status * status)
       {
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_File_write_at_all(
@@ -319,7 +319,7 @@ namespace Utilities
 
         MPI_Datatype bigtype;
         int          ierr;
-        ierr = MPI_Type_contiguous_c(count, datatype, &bigtype);
+        ierr = Type_contiguous_c(count, datatype, &bigtype);
         if (ierr != MPI_SUCCESS)
           return ierr;
         ierr = MPI_Type_commit(&bigtype);
@@ -342,18 +342,18 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      MPI_File_write_ordered_c(MPI_File     fh,
-                               const void * buf,
-                               MPI_Count    count,
-                               MPI_Datatype datatype,
-                               MPI_Status * status)
+      File_write_ordered_c(MPI_File     fh,
+                           const void * buf,
+                           MPI_Count    count,
+                           MPI_Datatype datatype,
+                           MPI_Status * status)
       {
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_File_write_ordered(fh, buf, count, datatype, status);
 
         MPI_Datatype bigtype;
         int          ierr;
-        ierr = MPI_Type_contiguous_c(count, datatype, &bigtype);
+        ierr = Type_contiguous_c(count, datatype, &bigtype);
         if (ierr != MPI_SUCCESS)
           return ierr;
         ierr = MPI_Type_commit(&bigtype);
@@ -377,19 +377,19 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      MPI_File_read_at_c(MPI_File     fh,
-                         MPI_Offset   offset,
-                         void *       buf,
-                         MPI_Count    count,
-                         MPI_Datatype datatype,
-                         MPI_Status * status)
+      File_read_at_c(MPI_File     fh,
+                     MPI_Offset   offset,
+                     void *       buf,
+                     MPI_Count    count,
+                     MPI_Datatype datatype,
+                     MPI_Status * status)
       {
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_File_read_at(fh, offset, buf, count, datatype, status);
 
         MPI_Datatype bigtype;
         int          ierr;
-        ierr = MPI_Type_contiguous_c(count, datatype, &bigtype);
+        ierr = Type_contiguous_c(count, datatype, &bigtype);
         if (ierr != MPI_SUCCESS)
           return ierr;
         ierr = MPI_Type_commit(&bigtype);
@@ -413,19 +413,19 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      MPI_File_read_at_all_c(MPI_File     fh,
-                             MPI_Offset   offset,
-                             void *       buf,
-                             MPI_Count    count,
-                             MPI_Datatype datatype,
-                             MPI_Status * status)
+      File_read_at_all_c(MPI_File     fh,
+                         MPI_Offset   offset,
+                         void *       buf,
+                         MPI_Count    count,
+                         MPI_Datatype datatype,
+                         MPI_Status * status)
       {
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_File_read_at_all(fh, offset, buf, count, datatype, status);
 
         MPI_Datatype bigtype;
         int          ierr;
-        ierr = MPI_Type_contiguous_c(count, datatype, &bigtype);
+        ierr = Type_contiguous_c(count, datatype, &bigtype);
         if (ierr != MPI_SUCCESS)
           return ierr;
         ierr = MPI_Type_commit(&bigtype);

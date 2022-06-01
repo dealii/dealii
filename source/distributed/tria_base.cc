@@ -1443,7 +1443,7 @@ namespace parallel
       // this task.
       if (myrank == 0)
         {
-          ierr = Utilities::MPI::LargeCount::MPI_File_write_at_c(
+          ierr = Utilities::MPI::LargeCount::File_write_at_c(
             fh,
             0,
             sizes_fixed_cumulative.data(),
@@ -1464,12 +1464,12 @@ namespace parallel
         static_cast<MPI_Offset>(global_first_cell) * bytes_per_cell;
 
       ierr =
-        Utilities::MPI::LargeCount::MPI_File_write_at_c(fh,
-                                                        my_global_file_position,
-                                                        src_data_fixed.data(),
-                                                        src_data_fixed.size(),
-                                                        MPI_BYTE,
-                                                        MPI_STATUS_IGNORE);
+        Utilities::MPI::LargeCount::File_write_at_c(fh,
+                                                    my_global_file_position,
+                                                    src_data_fixed.data(),
+                                                    src_data_fixed.size(),
+                                                    MPI_BYTE,
+                                                    MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
 
       ierr = MPI_File_close(&fh);
@@ -1519,7 +1519,7 @@ namespace parallel
                           std::numeric_limits<int>::max()),
                       ExcNotImplemented());
 
-          ierr = Utilities::MPI::LargeCount::MPI_File_write_at_c(
+          ierr = Utilities::MPI::LargeCount::File_write_at_c(
             fh,
             my_global_file_position,
             src_sizes_variable.data(),
@@ -1547,13 +1547,13 @@ namespace parallel
           prefix_sum;
 
         // Write data consecutively into file.
-        ierr = Utilities::MPI::LargeCount::MPI_File_write_at_c(
-          fh,
-          my_global_file_position,
-          src_data_variable.data(),
-          src_data_variable.size(),
-          MPI_BYTE,
-          MPI_STATUS_IGNORE);
+        ierr =
+          Utilities::MPI::LargeCount::File_write_at_c(fh,
+                                                      my_global_file_position,
+                                                      src_data_variable.data(),
+                                                      src_data_variable.size(),
+                                                      MPI_BYTE,
+                                                      MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
 
@@ -1615,7 +1615,7 @@ namespace parallel
       // location in the file.
       sizes_fixed_cumulative.resize(1 + n_attached_deserialize_fixed +
                                     (variable_size_data_stored ? 1 : 0));
-      ierr = Utilities::MPI::LargeCount::MPI_File_read_at_c(
+      ierr = Utilities::MPI::LargeCount::File_read_at_c(
         fh,
         0,
         sizes_fixed_cumulative.data(),
@@ -1639,13 +1639,12 @@ namespace parallel
         size_header +
         static_cast<MPI_Offset>(global_first_cell) * bytes_per_cell;
 
-      ierr =
-        Utilities::MPI::LargeCount::MPI_File_read_at_c(fh,
-                                                       my_global_file_position,
-                                                       dest_data_fixed.data(),
-                                                       dest_data_fixed.size(),
-                                                       MPI_BYTE,
-                                                       MPI_STATUS_IGNORE);
+      ierr = Utilities::MPI::LargeCount::File_read_at_c(fh,
+                                                        my_global_file_position,
+                                                        dest_data_fixed.data(),
+                                                        dest_data_fixed.size(),
+                                                        MPI_BYTE,
+                                                        MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
 
 
@@ -1679,7 +1678,7 @@ namespace parallel
         const MPI_Offset my_global_file_position_sizes =
           static_cast<MPI_Offset>(global_first_cell) * sizeof(unsigned int);
 
-        ierr = Utilities::MPI::LargeCount::MPI_File_read_at_c(
+        ierr = Utilities::MPI::LargeCount::File_read_at_c(
           fh,
           my_global_file_position_sizes,
           dest_sizes_variable.data(),
@@ -1711,13 +1710,13 @@ namespace parallel
 
         dest_data_variable.resize(size_on_proc);
 
-        ierr = Utilities::MPI::LargeCount::MPI_File_read_at_c(
-          fh,
-          my_global_file_position,
-          dest_data_variable.data(),
-          dest_data_variable.size(),
-          MPI_BYTE,
-          MPI_STATUS_IGNORE);
+        ierr =
+          Utilities::MPI::LargeCount::File_read_at_c(fh,
+                                                     my_global_file_position,
+                                                     dest_data_variable.data(),
+                                                     dest_data_variable.size(),
+                                                     MPI_BYTE,
+                                                     MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);

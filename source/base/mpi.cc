@@ -255,7 +255,7 @@ namespace Utilities
     create_mpi_data_type_n_bytes(const std::size_t n_bytes)
     {
       MPI_Datatype result;
-      int ierr = LargeCount::MPI_Type_contiguous_c(n_bytes, MPI_BYTE, &result);
+      int ierr = LargeCount::Type_contiguous_c(n_bytes, MPI_BYTE, &result);
       AssertThrowMPI(ierr);
       ierr = MPI_Type_commit(&result);
       AssertThrowMPI(ierr);

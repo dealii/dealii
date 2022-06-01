@@ -7733,7 +7733,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
       DataOutBase::write_vtu_header(ss, vtk_flags);
       header_size = ss.str().size();
       // Write the header on rank 0 at the start of a file, i.e., offset 0.
-      ierr = Utilities::MPI::LargeCount::MPI_File_write_at_c(
+      ierr = Utilities::MPI::LargeCount::File_write_at_c(
         fh, 0, ss.str().c_str(), header_size, MPI_CHAR, MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
     }
@@ -7769,13 +7769,12 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
     // Locate specific offset for each processor.
     const MPI_Offset offset = static_cast<MPI_Offset>(header_size) + prefix_sum;
 
-    ierr =
-      Utilities::MPI::LargeCount::MPI_File_write_at_all_c(fh,
-                                                          offset,
-                                                          ss.str().c_str(),
-                                                          ss.str().size(),
-                                                          MPI_CHAR,
-                                                          MPI_STATUS_IGNORE);
+    ierr = Utilities::MPI::LargeCount::File_write_at_all_c(fh,
+                                                           offset,
+                                                           ss.str().c_str(),
+                                                           ss.str().size(),
+                                                           MPI_CHAR,
+                                                           MPI_STATUS_IGNORE);
     AssertThrowMPI(ierr);
 
     if (myrank == n_ranks - 1)
@@ -7788,13 +7787,12 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
         const unsigned int footer_size = ss.str().size();
 
         // Writing footer:
-        ierr =
-          Utilities::MPI::LargeCount::MPI_File_write_at_c(fh,
-                                                          footer_offset,
-                                                          ss.str().c_str(),
-                                                          footer_size,
-                                                          MPI_CHAR,
-                                                          MPI_STATUS_IGNORE);
+        ierr = Utilities::MPI::LargeCount::File_write_at_c(fh,
+                                                           footer_offset,
+                                                           ss.str().c_str(),
+                                                           footer_size,
+                                                           MPI_CHAR,
+                                                           MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
       }
   }
