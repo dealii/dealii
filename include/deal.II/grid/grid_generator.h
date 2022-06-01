@@ -129,7 +129,7 @@ namespace GridGenerator
   simplex(Triangulation<dim, dim> &      tria,
           const std::vector<Point<dim>> &vertices);
 
-  /*
+  /**
    * Create a (coarse) grid with a single cell of the shape of the provided
    * reference cell. This is a generalization of the hyper_cube() and simplex()
    * functions above.
