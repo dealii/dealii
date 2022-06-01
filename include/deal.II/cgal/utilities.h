@@ -139,23 +139,54 @@ namespace CGALWrappers
 
   /**
    * Given a closed CGAL::Surface_mesh, this function fills the
-   * region bounded by the surface with tets, keeping them as coarse as
-   * possible.
+   * region bounded by the surface with tets.
    *
-   * The number of the generated tetrahedrons depends on the refinement level of
-   * surface mesh. This function does not attempt to construct a fine
-   * triangulation, nor to smooth the final result. If you need finer control on
-   * the resulting triangulation, you should consider using directly
-   * CGAL::make_mesh_3().
+   * The optional variable arguments @p cgal_args can be used to pass additional
+   * arguments to the CGAL::Mesh_criteria_3 class (see
+   * https://doc.cgal.org/latest/Mesh_3/index.html) for more information.
+   *
+   * The arguments allow for fine control on the size, quality, and distribution
+   * of the cells of the final triangulation. CGAL uses named parameters for
+   * these arguments in dimension three, i.e., they must be specified with the
+   * syntax `CGAL::parameters::parameter_name=parameter_value`, irrespective of
+   * their order. Accepted parameters are:
+   *
+   * - CGAL::parameters::edge_size: a scalar field (resp. a constant) providing
+   * a space varying (resp. a uniform) upper bound for the lengths of curve
+   * edges. This parameter has to be set to a positive value when 1-dimensional
+   * features protection is used.
+   * - CGAL::parameters::facet_angle: a lower bound for the angles (in degrees)
+   * of the surface mesh facets.
+   * - CGAL::parameters::facet_size: a scalar field (resp. a constant)
+   * describing a space varying (resp. a uniform) upper-bound or for the radii
+   * of the surface Delaunay balls.
+   * - CGAL::parameters::facet_distance: a scalar field (resp. a constant)
+   * describing a space varying (resp. a uniform) upper bound for the distance
+   * between the facet circumcenter and the center of its surface Delaunay ball.
+   * - CGAL::parameters::facet_topology: the set of topological constraints
+   * which have to be verified by each surface facet. The default value is
+   * CGAL::FACET_VERTICES_ON_SURFACE. See CGAL::Mesh_facet_topology manual page
+   * to get all possible values.
+   * - CGAL::parameters::cell_radius_edge_ratio: an upper bound for the
+   * radius-edge ratio of the mesh tetrahedra.
+   * - CGAL::parameters::cell_size: a scalar field (resp. a constant) describing
+   * a space varying (resp. a uniform) upper-bound for the circumradii of the
+   * mesh tetrahedra.
+   *
+   * If no parameters are specified, all the values will be set to `ignored` by
+   * CGAL.
+   *
    *
    * @param [in] surface_mesh The (closed) surface mesh bounding the volume that has to be filled.
    * @param [out] triangulation The output triangulation filled with tetrahedra.
+   * @param [in] cgal_args Additional parameters to pass to the CGAL::make_mesh_3 function.
    */
-  template <typename C3t3>
+  template <typename C3t3, typename... Args>
   void
-  cgal_surface_mesh_to_cgal_coarse_triangulation(
+  cgal_surface_mesh_to_cgal_triangulation(
     CGAL::Surface_mesh<typename C3t3::Point::Point> &surface_mesh,
-    C3t3 &                                           triangulation);
+    C3t3 &                                           triangulation,
+    Args... cgal_args);
 
   /**
    * Given two triangulated surface meshes that bound two volumes, execute a
@@ -321,11 +352,12 @@ namespace CGALWrappers
 
 
 
-  template <typename C3t3>
+  template <typename C3t3, typename... Args>
   void
-  cgal_surface_mesh_to_cgal_coarse_triangulation(
+  cgal_surface_mesh_to_cgal_triangulation(
     CGAL::Surface_mesh<typename C3t3::Point::Point> &surface_mesh,
-    C3t3 &                                           triangulation)
+    C3t3 &                                           triangulation,
+    Args... cgal_args)
   {
     using CGALPointType = typename C3t3::Point::Point;
     Assert(CGAL::is_closed(surface_mesh),
@@ -342,7 +374,7 @@ namespace CGALWrappers
     CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh);
     Mesh_domain domain(surface_mesh);
     domain.detect_features();
-    Mesh_criteria criteria;
+    Mesh_criteria criteria(cgal_args...);
     // Mesh generation
     triangulation = CGAL::make_mesh_3<C3t3>(domain,
                                             criteria,
