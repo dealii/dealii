@@ -117,15 +117,29 @@ namespace
   {
     if (data.size() != 0)
       {
+        const std::size_t uncompressed_size = (data.size() * sizeof(T));
+
+        // While zlib's compress2 uses unsigned long (which is 64bits
+        // on Linux), the vtu compression header stores the block size
+        // as an uint32_t (see below). While we could implement
+        // writing several smaller blocks, we haven't done that. Let's
+        // trigger an error for the user instead:
+        AssertThrow(uncompressed_size <= std::numeric_limits<uint32_t>::max(),
+                    ExcNotImplemented());
+
         // allocate a buffer for compressing data and do so
-        auto compressed_data_length = compressBound(data.size() * sizeof(T));
+        auto compressed_data_length = compressBound(uncompressed_size);
+        AssertThrow(compressed_data_length <=
+                      std::numeric_limits<uint32_t>::max(),
+                    ExcNotImplemented());
+
         std::vector<unsigned char> compressed_data(compressed_data_length);
 
         int err =
           compress2(&compressed_data[0],
                     &compressed_data_length,
                     reinterpret_cast<const Bytef *>(data.data()),
-                    data.size() * sizeof(T),
+                    uncompressed_size,
                     get_zlib_compression_level(flags.compression_level));
         (void)err;
         Assert(err == Z_OK, ExcInternalError());
@@ -135,10 +149,9 @@ namespace
 
         // now encode the compression header
         const uint32_t compression_header[4] = {
-          1,                                              /* number of blocks */
-          static_cast<uint32_t>(data.size() * sizeof(T)), /* size of block */
-          static_cast<uint32_t>(data.size() *
-                                sizeof(T)), /* size of last block */
+          1,                                        /* number of blocks */
+          static_cast<uint32_t>(uncompressed_size), /* size of block */
+          static_cast<uint32_t>(uncompressed_size), /* size of last block */
           static_cast<uint32_t>(
             compressed_data_length)}; /* list of compressed sizes of blocks */
 
