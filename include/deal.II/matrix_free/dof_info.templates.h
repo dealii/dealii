@@ -74,7 +74,6 @@ namespace internal
               next_constraint.first[j] = constraint_entries[j].second;
             }
         }
-      next_constraint.second = constraints.size();
 
       // check whether or not constraint is already in pool. the initial
       // implementation computed a hash value based on the truncated array (to
@@ -83,13 +82,16 @@ namespace internal
       // equal. this was quite lengthy and now we use a std::map with a
       // user-defined comparator to compare floating point arrays to a
       // tolerance 1e-13.
-      const auto it = constraints.insert(next_constraint);
-
       types::global_dof_index insert_position = numbers::invalid_dof_index;
-      if (it.second == false)
-        insert_position = it.first->second;
+      const auto position = constraints.find(next_constraint.first);
+      if (position != constraints.end())
+        insert_position = position->second;
       else
-        insert_position = next_constraint.second;
+        {
+          next_constraint.second = constraints.size();
+          constraints.insert(next_constraint);
+          insert_position = next_constraint.second;
+        }
 
       // we want to store the result as a short variable, so we have to make
       // sure that the result does not exceed the limits when casting.
