@@ -376,6 +376,17 @@ namespace internal
     inline void
     HangingNodes<3>::setup_line_to_cell(const Triangulation<3> &triangulation)
     {
+      // Check if we there are no hanging nodes on the current MPI process,
+      // which we do by checking if the second finest level holds no active
+      // non-artificial cell
+      if (triangulation.n_levels() <= 1 ||
+          std::none_of(triangulation.begin_active(triangulation.n_levels() - 2),
+                       triangulation.end_active(triangulation.n_levels() - 2),
+                       [](const CellAccessor<3, 3> &cell) {
+                         return !cell.is_artificial();
+                       }))
+        return;
+
       const unsigned int n_raw_lines = triangulation.n_raw_lines();
       this->line_to_cells.resize(n_raw_lines);
 
