@@ -51,7 +51,7 @@
 #include <set>
 #include <sstream>
 
-// we use uint32_t and uint8_t below, which are declared here:
+// we use std::uint32_t and std::uint8_t below, which are declared here:
 #include <cstdint>
 #include <vector>
 
@@ -121,16 +121,17 @@ namespace
 
         // While zlib's compress2 uses unsigned long (which is 64bits
         // on Linux), the vtu compression header stores the block size
-        // as an uint32_t (see below). While we could implement
+        // as an std::uint32_t (see below). While we could implement
         // writing several smaller blocks, we haven't done that. Let's
         // trigger an error for the user instead:
-        AssertThrow(uncompressed_size <= std::numeric_limits<uint32_t>::max(),
+        AssertThrow(uncompressed_size <=
+                      std::numeric_limits<std::uint32_t>::max(),
                     ExcNotImplemented());
 
         // allocate a buffer for compressing data and do so
         auto compressed_data_length = compressBound(uncompressed_size);
         AssertThrow(compressed_data_length <=
-                      std::numeric_limits<uint32_t>::max(),
+                      std::numeric_limits<std::uint32_t>::max(),
                     ExcNotImplemented());
 
         std::vector<unsigned char> compressed_data(compressed_data_length);
@@ -148,18 +149,20 @@ namespace
         compressed_data.resize(compressed_data_length);
 
         // now encode the compression header
-        const uint32_t compression_header[4] = {
-          1,                                        /* number of blocks */
-          static_cast<uint32_t>(uncompressed_size), /* size of block */
-          static_cast<uint32_t>(uncompressed_size), /* size of last block */
-          static_cast<uint32_t>(
+        const std::uint32_t compression_header[4] = {
+          1,                                             /* number of blocks */
+          static_cast<std::uint32_t>(uncompressed_size), /* size of block */
+          static_cast<std::uint32_t>(
+            uncompressed_size), /* size of last block */
+          static_cast<std::uint32_t>(
             compressed_data_length)}; /* list of compressed sizes of blocks */
 
         const auto header_start =
           reinterpret_cast<const unsigned char *>(&compression_header[0]);
 
         output_stream << Utilities::encode_base64(
-                           {header_start, header_start + 4 * sizeof(uint32_t)})
+                           {header_start,
+                            header_start + 4 * sizeof(std::uint32_t)})
                       << Utilities::encode_base64(compressed_data);
       }
   }
@@ -5999,10 +6002,10 @@ namespace DataOutBase
     std::vector<int32_t> offsets;
     offsets.reserve(n_cells);
 
-    // uint8_t might be an alias to unsigned char which is then not printed
+    // std::uint8_t might be an alias to unsigned char which is then not printed
     // as ascii integers
 #ifdef DEAL_II_WITH_ZLIB
-    std::vector<uint8_t> cell_types;
+    std::vector<std::uint8_t> cell_types;
 #else
     std::vector<unsigned int> cell_types;
 #endif

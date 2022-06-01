@@ -834,7 +834,8 @@ namespace HDF5
      * This function returns the local causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
-     * The return type is `uint32_t` and corresponds to the value returned by
+     * The return type is `std::uint32_t` and corresponds to the value returned
+     * by
      * [H5Pget_mpio_no_collective_cause](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
      *
      * The return value can be
@@ -850,7 +851,7 @@ namespace HDF5
      * H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET | Collective I/O was not performed because the dataset was neither contiguous nor chunked.
      * H5D_MPIO_FILTERS                           | Collective I/O was not performed because filters needed to be applied.
      */
-    uint32_t
+    std::uint32_t
     get_local_no_collective_cause_as_hdf5_type();
 
     /**
@@ -878,8 +879,8 @@ namespace HDF5
      * This function returns the global causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
-     * The return type is `uint32_t` and corresponds to the value returned by
-     * H5Pget_mpio_no_collective_cause.
+     * The return type is `std::uint32_t` and corresponds to the value returned
+     * by H5Pget_mpio_no_collective_cause.
      *
      * The return value can be
      * Value                                      | Meaning
@@ -894,7 +895,7 @@ namespace HDF5
      * H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET | Collective I/O was not performed because the dataset was neither contiguous nor chunked.
      * H5D_MPIO_FILTERS                           | Collective I/O was not performed because filters needed to be applied.
      */
-    uint32_t
+    std::uint32_t
     get_global_no_collective_cause_as_hdf5_type();
 
     /**
@@ -960,14 +961,14 @@ namespace HDF5
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
      */
-    uint32_t local_no_collective_cause;
+    std::uint32_t local_no_collective_cause;
 
     /**
      * Global causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
      */
-    uint32_t global_no_collective_cause;
+    std::uint32_t global_no_collective_cause;
   };
 
   /**
@@ -1254,8 +1255,8 @@ namespace HDF5
     inline void
     release_plist(hid_t &                    plist,
                   H5D_mpio_actual_io_mode_t &io_mode,
-                  uint32_t &                 local_no_collective_cause,
-                  uint32_t &                 global_no_collective_cause,
+                  std::uint32_t &            local_no_collective_cause,
+                  std::uint32_t &            global_no_collective_cause,
                   const bool                 mpi,
                   const bool                 query_io_mode);
 
@@ -1263,7 +1264,7 @@ namespace HDF5
      * Convert a HDF5 no_collective_cause code to a human readable string.
      */
     inline std::string
-    no_collective_cause_to_string(const uint32_t no_collective_cause);
+    no_collective_cause_to_string(const std::uint32_t no_collective_cause);
   } // namespace internal
 
 
@@ -1500,8 +1501,8 @@ namespace HDF5
     inline void
     release_plist(hid_t &                    plist,
                   H5D_mpio_actual_io_mode_t &io_mode,
-                  uint32_t &                 local_no_collective_cause,
-                  uint32_t &                 global_no_collective_cause,
+                  std::uint32_t &            local_no_collective_cause,
+                  std::uint32_t &            global_no_collective_cause,
                   const bool                 mpi,
                   const bool                 query_io_mode)
     {
@@ -1537,7 +1538,7 @@ namespace HDF5
 
 
     inline std::string
-    no_collective_cause_to_string(const uint32_t no_collective_cause)
+    no_collective_cause_to_string(const std::uint32_t no_collective_cause)
     {
       std::string message;
 

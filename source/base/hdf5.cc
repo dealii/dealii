@@ -267,7 +267,7 @@ namespace HDF5
 
 
 
-  uint32_t
+  std::uint32_t
   DataSet::get_local_no_collective_cause_as_hdf5_type()
   {
     Assert(
@@ -291,7 +291,7 @@ namespace HDF5
 
 
 
-  uint32_t
+  std::uint32_t
   DataSet::get_global_no_collective_cause_as_hdf5_type()
   {
     Assert(

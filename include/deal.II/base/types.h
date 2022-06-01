@@ -45,7 +45,7 @@ namespace types
   /**
    * The type used for global indices of vertices.
    */
-  using global_vertex_index = uint64_t;
+  using global_vertex_index = std::uint64_t;
 
   /**
    * An identifier that denotes the MPI type associated with
@@ -71,7 +71,7 @@ namespace types
    * page for guidance on when this type should or should not be used.
    */
 #ifdef DEAL_II_WITH_64BIT_INDICES
-  using global_dof_index = uint64_t;
+  using global_dof_index = std::uint64_t;
 #else
   using global_dof_index  = unsigned int;
 #endif
@@ -100,7 +100,7 @@ namespace types
    * The data type always corresponds to an unsigned integer type.
    */
 #ifdef DEAL_II_WITH_64BIT_INDICES
-  using global_cell_index = uint64_t;
+  using global_cell_index = std::uint64_t;
 #else
   using global_cell_index = unsigned int;
 #endif

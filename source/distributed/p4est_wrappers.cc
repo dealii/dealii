@@ -349,7 +349,7 @@ namespace internal
 
     void (&functions<2>::quadrant_set_morton)(types<2>::quadrant *quadrant,
                                               int                 level,
-                                              uint64_t            id) =
+                                              std::uint64_t       id) =
       p4est_quadrant_set_morton;
 
     int (&functions<2>::quadrant_is_equal)(const types<2>::quadrant *q1,
@@ -564,7 +564,7 @@ namespace internal
 
     void (&functions<3>::quadrant_set_morton)(types<3>::quadrant *quadrant,
                                               int                 level,
-                                              uint64_t            id) =
+                                              std::uint64_t       id) =
       p8est_quadrant_set_morton;
 
     int (&functions<3>::quadrant_is_equal)(const types<3>::quadrant *q1,
