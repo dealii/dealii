@@ -814,8 +814,6 @@ public:
  * For 1D, the quadrature rule degenerates to a
  * `dealii::QGauss<1>(n_points_1D)`.
  *
- * @ingroup simplex
- *
  * @note The quadrature rules implemented by this class come from a variety of
  * sources, but all of them have positive quadrature weights.
  *
@@ -823,6 +821,8 @@ public:
  * respect to the vertices - i.e., the locations of the mapped quadrature points
  * depends on the numbering of the cell vertices. If you need rules that are
  * independent of the vertex numbering then use QWitherdenVincentSimplex.
+ *
+ * @relates simplex
  */
 template <int dim>
 class QGaussSimplex : public QSimplex<dim>
@@ -863,7 +863,7 @@ public:
  * @note Some rules (2D 2 odd and 3D 2 even) do not yet exist and instead a
  * higher-order rule is used in their place.
  *
- * @ingroup simplex
+ * @relates simplex
  */
 template <int dim>
 class QWitherdenVincentSimplex : public QSimplex<dim>
