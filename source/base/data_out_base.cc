@@ -7799,6 +7799,13 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
       }
   }
 
+  // Make sure we sync to disk. As written in the standard,
+  // MPI_File_close() actually already implies a sync but there seems
+  // to be a bug on at least one configuration (running with multiple
+  // nodes using OpenMPI 4.1) that requires it. Without this call, the
+  // footer is sometimes missing.
+  ierr = MPI_File_sync(fh);
+  AssertThrowMPI(ierr);
 
   ierr = MPI_File_close(&fh);
   AssertThrowMPI(ierr);
