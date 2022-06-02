@@ -199,7 +199,7 @@ namespace internal
   {
     /**
      * Convert an FE index that might contain the right value but also
-     * invalid_fe_index to a right value if needed/possible.
+     * numbers::invalid_fe_index to a right value if needed/possible.
      */
     template <int structdim, int dim, int spacedim, bool level_dof_access>
     unsigned int
@@ -212,7 +212,7 @@ namespace internal
           // No hp enabled, and the argument is at its default value -> we
           // can translate to the default active fe index
           Assert(
-            (fe_index == DoFHandler<dim, spacedim>::invalid_fe_index) ||
+            (fe_index == numbers::invalid_fe_index) ||
               (fe_index == DoFHandler<dim, spacedim>::default_fe_index),
             ExcMessage(
               "It is not possible to specify a FE index if no hp support is used!"));
@@ -226,15 +226,14 @@ namespace internal
           // we are on a cell (rather than a face/edge/vertex), then we know
           // that there is only one active fe index on this cell and we can
           // use that:
-          if ((dim == structdim) &&
-              (fe_index == DoFHandler<dim, spacedim>::invalid_fe_index))
+          if ((dim == structdim) && (fe_index == numbers::invalid_fe_index))
             {
               AssertDimension(cell.n_active_fe_indices(), 1);
 
               return cell.nth_active_fe_index(0);
             }
 
-          Assert((fe_index != DoFHandler<dim, spacedim>::invalid_fe_index),
+          Assert((fe_index != numbers::invalid_fe_index),
                  ExcMessage(
                    "You need to specify a FE index if hp support is used!"));
 
@@ -1610,7 +1609,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::vertex_dof_index(
 {
   const unsigned int fe_index =
     (((this->dof_handler->hp_capability_enabled == false) &&
-      (fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index)) ?
+      (fe_index_ == numbers::invalid_fe_index)) ?
        // No hp enabled, and the argument is at its default value -> we
        // can translate to the default active fe index
        DoFHandler<dim, spacedim>::default_fe_index :
@@ -1619,8 +1618,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::vertex_dof_index(
        // we are on a cell (rather than a face/edge/vertex), then we know
        // that there is only one active fe index on this cell and we can
        // use that:
-       ((dim == structdim) &&
-            (fe_index_ == DoFHandler<dim, spacedim>::invalid_fe_index) ?
+       ((dim == structdim) && (fe_index_ == numbers::invalid_fe_index) ?
           this->nth_active_fe_index(0) :
           fe_index_));
 
@@ -2213,6 +2211,8 @@ namespace internal
         Assert(static_cast<unsigned int>(accessor.level()) <
                  accessor.dof_handler->hp_cell_future_fe_indices.size(),
                ExcMessage("DoFHandler not initialized"));
+        Assert(i != numbers::invalid_fe_index,
+               ExcMessage("Invalid finite element index."));
 
         accessor.dof_handler
           ->hp_cell_active_fe_indices[accessor.level()]
@@ -2277,6 +2277,8 @@ namespace internal
         Assert(static_cast<unsigned int>(accessor.level()) <
                  accessor.dof_handler->hp_cell_future_fe_indices.size(),
                ExcMessage("DoFHandler not initialized"));
+        Assert(i != numbers::invalid_fe_index,
+               ExcMessage("Invalid finite element index."));
 
         accessor.dof_handler
           ->hp_cell_future_fe_indices[accessor.level()]
@@ -2308,7 +2310,7 @@ namespace internal
         return accessor.dof_handler
                  ->hp_cell_future_fe_indices[accessor.level()]
                                             [accessor.present_index] !=
-               DoFHandler<dim, spacedim>::invalid_active_fe_index;
+               numbers::invalid_fe_index;
       }
 
 
@@ -2336,7 +2338,7 @@ namespace internal
         accessor.dof_handler
           ->hp_cell_future_fe_indices[accessor.level()]
                                      [accessor.present_index] =
-          DoFHandler<dim, spacedim>::invalid_active_fe_index;
+          numbers::invalid_fe_index;
       }
     };
   } // namespace DoFCellAccessorImplementation

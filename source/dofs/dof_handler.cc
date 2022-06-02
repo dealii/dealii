@@ -46,10 +46,6 @@ template <int dim, int spacedim>
 const unsigned int DoFHandler<dim, spacedim>::default_fe_index;
 
 
-template <int dim, int spacedim>
-const types::fe_index DoFHandler<dim, spacedim>::invalid_active_fe_index;
-
-
 namespace internal
 {
   template <int dim, int spacedim>
@@ -2638,7 +2634,7 @@ std::vector<unsigned int>
 DoFHandler<dim, spacedim>::get_active_fe_indices() const
 {
   std::vector<unsigned int> active_fe_indices(
-    this->get_triangulation().n_active_cells(), invalid_active_fe_index);
+    this->get_triangulation().n_active_cells(), numbers::invalid_fe_index);
 
   // we could try to extract the values directly, since they are
   // stored as protected data of this object, but for simplicity we
@@ -2678,7 +2674,8 @@ DoFHandler<dim, spacedim>::set_future_fe_indices(
   // tests which we would have to duplicate ourselves otherwise
   for (const auto &cell : this->active_cell_iterators())
     if (cell->is_locally_owned() &&
-        future_fe_indices[cell->active_cell_index()] != invalid_active_fe_index)
+        future_fe_indices[cell->active_cell_index()] !=
+          numbers::invalid_fe_index)
       cell->set_future_fe_index(future_fe_indices[cell->active_cell_index()]);
 }
 
@@ -2689,7 +2686,7 @@ std::vector<unsigned int>
 DoFHandler<dim, spacedim>::get_future_fe_indices() const
 {
   std::vector<unsigned int> future_fe_indices(
-    this->get_triangulation().n_active_cells(), invalid_active_fe_index);
+    this->get_triangulation().n_active_cells(), numbers::invalid_fe_index);
 
   // we could try to extract the values directly, since they are
   // stored as protected data of this object, but for simplicity we
@@ -2820,7 +2817,7 @@ DoFHandler<dim, spacedim>::create_active_fe_table()
           this->hp_cell_active_fe_indices[level].resize(
             this->tria->n_raw_cells(level), 0);
           this->hp_cell_future_fe_indices[level].resize(
-            this->tria->n_raw_cells(level), invalid_active_fe_index);
+            this->tria->n_raw_cells(level), numbers::invalid_fe_index);
         }
       else
         {
@@ -2879,7 +2876,7 @@ DoFHandler<dim, spacedim>::update_active_fe_table()
       // We have used future FE indices to update all active FE indices
       // before refinement happened, thus we are safe to clear them now.
       this->hp_cell_future_fe_indices[i].assign(this->tria->n_raw_cells(i),
-                                                invalid_active_fe_index);
+                                                numbers::invalid_fe_index);
     }
 }
 

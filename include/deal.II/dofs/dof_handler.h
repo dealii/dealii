@@ -519,8 +519,11 @@ public:
 
   /**
    * Invalid index of the finite element to be used on a given cell.
+   *
+   * @deprecated Use numbers::invalid_fe_index instead.
    */
-  static const unsigned int invalid_fe_index = numbers::invalid_unsigned_int;
+  static const unsigned int invalid_fe_index DEAL_II_DEPRECATED =
+    numbers::invalid_fe_index;
 
   /**
    * The type in which we store the active FE index.
@@ -537,9 +540,11 @@ public:
   /**
    * Invalid active FE index which will be used as a default value to determine
    * whether a future FE index has been set or not.
+   *
+   * @deprecated Use numbers::invalid_fe_index instead.
    */
-  static const types::fe_index invalid_active_fe_index =
-    static_cast<types::fe_index>(-1);
+  static const types::fe_index invalid_active_fe_index DEAL_II_DEPRECATED =
+    numbers::invalid_fe_index;
 
   /**
    * Standard constructor, not initializing any data. After constructing an
@@ -583,7 +588,8 @@ public:
 
   /**
    * Go through the triangulation and return a vector of active FE indices of
-   * all locally relevant cells.
+   * all locally relevant cells. Artificial cells will have the value
+   * numbers::invalid_fe_index assigned.
    */
   std::vector<unsigned int>
   get_active_fe_indices() const;
@@ -602,7 +608,7 @@ public:
   /**
    * Go through the triangulation and set the future FE indices of all
    * locally owned cells to the values given in @p future_fe_indices.
-   * Cells corresponding to invalid_active_fe_index will be skipped.
+   * Cells corresponding to numbers::invalid_fe_index will be skipped.
    */
   void
   set_future_fe_indices(const std::vector<unsigned int> &future_fe_indices);
@@ -610,7 +616,7 @@ public:
   /**
    * Go through the triangulation and return a vector of future FE indices of
    * all locally owned cells. If no future FE index has been set on a cell,
-   * its value will be invalid_active_fe_index.
+   * its value will be numbers::invalid_fe_index.
    */
   std::vector<unsigned int>
   get_future_fe_indices() const;

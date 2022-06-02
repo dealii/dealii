@@ -72,6 +72,11 @@ namespace hp
            ExcMessage("All elements inside a collection need to have the "
                       "same number of vector components!"));
 
+    Assert(this->size() <= std::numeric_limits<types::fe_index>::max() &&
+             this->size() != numbers::invalid_fe_index,
+           ExcMessage(
+             "You reached the maximum possible number of finite elements."));
+
     Collection<FiniteElement<dim, spacedim>>::push_back(new_fe.clone());
   }
 
