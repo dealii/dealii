@@ -571,7 +571,7 @@ namespace CGALWrappers
         using Mesh_criteria = CGAL::Mesh_criteria_3<Tr>;
         using C3t3          = CGAL::Mesh_complex_3_in_triangulation_3<Tr>;
         C3t3 tria;
-        cgal_surface_mesh_to_cgal_coarse_triangulation(out_surface, tria);
+        cgal_surface_mesh_to_cgal_triangulation(out_surface, tria);
         return compute_quadrature(tria, degree);
       }
   }

@@ -59,7 +59,7 @@ test()
     {
       std::ifstream input(name);
       input >> sm;
-      cgal_surface_mesh_to_cgal_coarse_triangulation(sm, tria);
+      cgal_surface_mesh_to_cgal_triangulation(sm, tria);
       auto b = compute_quadrature(tria, degree);
       deallog << "Volume of poly with Quadrature: " << std::setprecision(12)
               << std::accumulate(b.get_weights().begin(),
