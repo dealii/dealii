@@ -174,8 +174,8 @@ namespace Step81
                   mu_inv_2,
                   "inverse of relative permeability of material 2");
 
-    sigma_tensor[0][0] = 0.001 + 0.2i;
-    sigma_tensor[1][1] = 0.001 + 0.2i;
+    sigma_tensor[0][0] = std::complex<double>(0.001, 0.2);
+    sigma_tensor[1][1] = std::complex<double>(0.001, 0.2);
     add_parameter("sigma",
                   sigma_tensor,
                   "surface conductivity between material 1 and material 2");
@@ -318,7 +318,7 @@ namespace Step81
         const double s =
           strength * ((radius - inner_radius) * (radius - inner_radius)) /
           ((outer_radius - inner_radius) * (outer_radius - inner_radius));
-        return 1.0 + 1.0i * s;
+        return {1.0, s};
       }
     else
       {
@@ -340,7 +340,7 @@ namespace Step81
            (radius - inner_radius)) /
           (radius * (outer_radius - inner_radius) *
            (outer_radius - inner_radius));
-        return 1.0 + 1.0i * s_bar;
+        return {1.0, s_bar};
       }
     else
       {
