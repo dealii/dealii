@@ -30,7 +30,6 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/matrix_free/face_info.h>
-#include <deal.II/matrix_free/hanging_nodes_internal.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/task_info.h>
 #include <deal.II/matrix_free/vector_data_exchange.h>
@@ -59,6 +58,12 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
+    /**
+     * Type of the 8-bit representation of the refinement configuration that
+     * is in hanging_nodes_internal.h.
+     */
+    using compressed_constraint_kind = std::uint8_t;
+
     /**
      * A struct that takes entries describing a constraint and puts them into
      * a sorted list where duplicates are filtered out

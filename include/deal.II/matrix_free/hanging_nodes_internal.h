@@ -71,7 +71,7 @@ namespace internal
 
 
     /**
-     * Type of the 9-bit representation of the refinement configuration.
+     * Type of the 8-bit representation of the refinement configuration.
      */
     using compressed_constraint_kind = std::uint8_t;
 

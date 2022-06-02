@@ -28,6 +28,13 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
+    // ensure that the type defined in both dof_info.h and
+    // hanging_nodes_internal.h is consistent
+    static_assert(std::is_same<compressed_constraint_kind, std::uint8_t>::value,
+                  "Unexpected type for compressed hanging node indicators!");
+
+
+
     DoFInfo::DoFInfo()
     {
       clear();
