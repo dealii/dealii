@@ -318,7 +318,7 @@ namespace Step81
         const double s =
           strength * ((radius - inner_radius) * (radius - inner_radius)) /
           ((outer_radius - inner_radius) * (outer_radius - inner_radius));
-        return std::complex<double>(1.0, s);
+        return {1.0, s};
       }
     else
       {
@@ -340,7 +340,7 @@ namespace Step81
            (radius - inner_radius)) /
           (radius * (outer_radius - inner_radius) *
            (outer_radius - inner_radius));
-        return std::complex<double>(1.0, s_bar);
+        return {1.0, s_bar};
       }
     else
       {
