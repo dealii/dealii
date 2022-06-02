@@ -354,8 +354,9 @@ namespace Utilities
                 /* targets = */
                 [&buffers]() {
                   std::vector<unsigned int> targets;
+                  targets.reserve(buffers.size());
                   for (const auto &rank_pair : buffers)
-                    targets.push_back(rank_pair.first);
+                    targets.emplace_back(rank_pair.first);
 
                   return targets;
                 }(),
