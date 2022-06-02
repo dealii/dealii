@@ -21,6 +21,8 @@
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+
 #include <deal.II/matrix_free/task_info.h>
 
 

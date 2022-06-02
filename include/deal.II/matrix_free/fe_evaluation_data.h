@@ -22,7 +22,9 @@
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/geometry_info.h>
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/std_cxx20/iota_view.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor.h>

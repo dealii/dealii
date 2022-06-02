@@ -19,11 +19,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/geometry_info.h>
 #include <deal.II/base/ndarray.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/vectorization.h>
-
-#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/evaluation_flags.h>

@@ -38,6 +38,8 @@
 
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/face_setup_internal.h>
 #include <deal.II/matrix_free/hanging_nodes_internal.h>

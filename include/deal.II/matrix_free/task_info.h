@@ -28,11 +28,14 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/vectorization.h>
 
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-
 
 DEAL_II_NAMESPACE_OPEN
 
+
+// forward declaration
+#ifndef DOXYGEN
+class DynamicSparsityPattern;
+#endif
 
 
 namespace internal
