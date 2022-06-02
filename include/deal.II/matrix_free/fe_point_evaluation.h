@@ -33,6 +33,8 @@
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
+#include <deal.II/non_matching/mapping_info.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
@@ -364,48 +366,6 @@ namespace internal
     template <int dim, int spacedim>
     std::vector<Polynomials::Polynomial<double>>
     get_polynomial_space(const FiniteElement<dim, spacedim> &fe);
-
-    /**
-     * Compute the mapping related data for the given @p mapping,
-     * @p cell and @p unit_points that is required by the FEPointEvaluation
-     * class.
-     */
-    template <int dim, int spacedim>
-    void
-    compute_mapping_data_for_generic_points(
-      const Mapping<dim> &                                        mapping,
-      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-      const ArrayView<const Point<dim>> &                         unit_points,
-      const UpdateFlags                                           update_flags,
-      internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-        &mapping_data)
-    {
-      UpdateFlags update_flags_mapping = update_default;
-      // translate update flags
-      if (update_flags & update_jacobians)
-        update_flags_mapping |= update_jacobians;
-      if (update_flags & update_gradients ||
-          update_flags & update_inverse_jacobians)
-        update_flags_mapping |= update_inverse_jacobians;
-      if (update_flags & update_quadrature_points)
-        update_flags_mapping |= update_quadrature_points;
-
-      if (const MappingQ<dim, spacedim> *mapping_q =
-            dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
-        {
-          mapping_q->fill_mapping_data_for_generic_points(cell,
-                                                          unit_points,
-                                                          update_flags_mapping,
-                                                          mapping_data);
-        }
-      else if (const MappingCartesian<dim, spacedim> *mapping_cartesian =
-                 dynamic_cast<const MappingCartesian<dim, spacedim> *>(
-                   &mapping))
-        {
-          mapping_cartesian->fill_mapping_data_for_generic_points(
-            cell, unit_points, update_flags_mapping, mapping_data);
-        }
-    }
   } // namespace FEPointEvaluation
 } // namespace internal
 
@@ -477,6 +437,26 @@ public:
                     const unsigned int        first_selected_component = 0);
 
   /**
+   * Constructor to make the present class able to re-use the geometry
+   * data also used by other `FEPointEvaluation` objects.
+   *
+   * @param mapping_info The MappingInfo class describes the geometry-related
+   * data for evaluating finite-element solutions. This object enables to
+   * construct such an object on the outside, possibly re-using it between
+   * several objects or between several calls to the same cell and unit points.
+   *
+   * @param fe The FiniteElement object that is used for the evaluation, which
+   * is typically the same on all cells to be evaluated.
+   *
+   * @param first_selected_component For multi-component FiniteElement
+   * objects, this parameter allows to select a range of `n_components`
+   * components starting from this parameter.
+   */
+  FEPointEvaluation(NonMatching::MappingInfo<dim, spacedim> &mapping_info,
+                    const FiniteElement<dim> &               fe,
+                    const unsigned int first_selected_component = 0);
+
+  /**
    * Set up the mapping information for the given cell, e.g., by computing the
    * Jacobian of the mapping for the given points if gradients of the functions
    * are requested.
@@ -490,42 +470,6 @@ public:
   void
   reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
          const ArrayView<const Point<dim>> &unit_points);
-
-  /**
-   * Set up the mapping information for the given cell. This function is
-   * an alternative to the function with the same name above and uses
-   * a precomputed @p mapping_data object. This function can be used
-   * to avoid duplicated evaluation of the mapping if multiple
-   * FEPointEvaluation objects for the different components of the same FESystem
-   * are used. You can get the mapping data from an initialized
-   * FEPointEvaluation object by calling the function get_mapping_data().
-   *
-   * @param[in] cell An iterator to the current cell
-   *
-   * @param[in] unit_points List of points in the reference locations of the
-   * current cell where the FiniteElement object should be
-   * evaluated/integrated in the evaluate() and integrate() functions.
-   *
-   * @param[in] mapping_data A mapping data object that is precomputed
-   * for the given cell and positions.
-   */
-  void
-  reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-         const ArrayView<const Point<dim>> &unit_points,
-         const dealii::internal::FEValuesImplementation::
-           MappingRelatedData<dim, spacedim> &mapping_data);
-
-  /**
-   * Returns the mapping data that was computed during the last call to
-   * the reinit() function. This can be useful if multiple FEPointEvaluation
-   * objects are used for multiple components of a FESystem. The mapping data
-   * can be retrieved from the first FEPointEvaluation object and subsequently
-   * passed to the other objects, avoiding the need to recompute the mapping
-   * data.
-   */
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                     spacedim> &
-  get_mapping_data() const;
 
   /**
    * This function interpolates the finite element solution, represented by
@@ -658,6 +602,17 @@ public:
 
 private:
   /**
+   * Common setup function for both constructors. Does the setup for both fast
+   * and slow path.
+   *
+   * @param first_selected_component For multi-component FiniteElement
+   * objects, this parameter allows to select a range of `n_components`
+   * components starting from this parameter.
+   */
+  void
+  setup(const unsigned int first_selected_component);
+
+  /**
    * Pointer to the Mapping object passed to the constructor.
    */
   SmartPointer<const Mapping<dim, spacedim>> mapping;
@@ -740,12 +695,7 @@ private:
   /**
    * The desired update flags for the evaluation.
    */
-  UpdateFlags update_flags;
-
-  /**
-   * The update flags specific for the mapping in the fast evaluation path.
-   */
-  UpdateFlags update_flags_mapping;
+  const UpdateFlags update_flags;
 
   /**
    * The FEValues object underlying the slow evaluation path.
@@ -753,16 +703,26 @@ private:
   std::shared_ptr<FEValues<dim, spacedim>> fe_values;
 
   /**
-   * Array to store temporary data computed by the mapping for the fast
-   * evaluation path.
+   * Pointer to mapping info on the fly computed during reinit.
    */
-  internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-    mapping_data;
+  std::unique_ptr<NonMatching::MappingInfo<dim, spacedim>>
+    mapping_info_on_the_fly;
+
+  /**
+   * Pointer to currently used mapping info (either on the fly or external
+   * precomputed).
+   */
+  SmartPointer<NonMatching::MappingInfo<dim, spacedim>> mapping_info;
 
   /**
    * The reference points specified at reinit().
    */
   std::vector<Point<dim>> unit_points;
+
+  /**
+   * Bool indicating if fast path is chosen.
+   */
+  bool fast_path;
 };
 
 // ----------------------- template and inline function ----------------------
@@ -777,73 +737,97 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
   : mapping(&mapping)
   , fe(&fe)
   , update_flags(update_flags)
-  , update_flags_mapping(update_default)
+  , mapping_info_on_the_fly(
+      std::make_unique<NonMatching::MappingInfo<dim, spacedim>>(mapping,
+                                                                update_flags))
+  , mapping_info(mapping_info_on_the_fly.get())
+{
+  setup(first_selected_component);
+}
+
+
+
+template <int n_components, int dim, int spacedim, typename Number>
+FEPointEvaluation<n_components, dim, spacedim, Number>::FEPointEvaluation(
+  NonMatching::MappingInfo<dim, spacedim> &mapping_info,
+  const FiniteElement<dim> &               fe,
+  const unsigned int                       first_selected_component)
+  : mapping(&mapping_info.get_mapping())
+  , fe(&fe)
+  , update_flags(mapping_info.get_update_flags())
+  , mapping_info(&mapping_info)
+{
+  setup(first_selected_component);
+}
+
+
+
+template <int n_components, int dim, int spacedim, typename Number>
+void
+FEPointEvaluation<n_components, dim, spacedim, Number>::setup(
+  const unsigned int first_selected_component)
 {
   AssertIndexRange(first_selected_component + n_components,
-                   fe.n_components() + 1);
+                   fe->n_components() + 1);
 
   bool         same_base_element   = true;
   unsigned int base_element_number = 0;
   component_in_base_element        = 0;
   unsigned int component           = 0;
-  for (; base_element_number < fe.n_base_elements(); ++base_element_number)
-    if (component + fe.element_multiplicity(base_element_number) >
+  for (; base_element_number < fe->n_base_elements(); ++base_element_number)
+    if (component + fe->element_multiplicity(base_element_number) >
         first_selected_component)
       {
         if (first_selected_component + n_components >
-            component + fe.element_multiplicity(base_element_number))
+            component + fe->element_multiplicity(base_element_number))
           same_base_element = false;
         component_in_base_element = first_selected_component - component;
         break;
       }
     else
-      component += fe.element_multiplicity(base_element_number);
+      component += fe->element_multiplicity(base_element_number);
 
-  if (internal::FEPointEvaluation::is_fast_path_supported(mapping) &&
+  if (internal::FEPointEvaluation::is_fast_path_supported(*mapping) &&
       internal::FEPointEvaluation::is_fast_path_supported(
-        fe, base_element_number) &&
+        *fe, base_element_number) &&
       same_base_element)
     {
       internal::MatrixFreeFunctions::ShapeInfo<double> shape_info;
 
-      shape_info.reinit(QMidpoint<1>(), fe, base_element_number);
+      shape_info.reinit(QMidpoint<1>(), *fe, base_element_number);
       renumber           = shape_info.lexicographic_numbering;
       dofs_per_component = shape_info.dofs_per_component_on_cell;
       poly               = internal::FEPointEvaluation::get_polynomial_space(
-        fe.base_element(base_element_number));
+        fe->base_element(base_element_number));
 
       polynomials_are_hat_functions =
         (poly.size() == 2 && poly[0].value(0.) == 1. &&
          poly[0].value(1.) == 0. && poly[1].value(0.) == 0. &&
          poly[1].value(1.) == 1.);
+
+      fast_path = true;
     }
   else
     {
-      nonzero_shape_function_component.resize(fe.n_dofs_per_cell());
+      nonzero_shape_function_component.resize(fe->n_dofs_per_cell());
       for (unsigned int d = 0; d < n_components; ++d)
         {
           const unsigned int component = first_selected_component + d;
-          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
+          for (unsigned int i = 0; i < fe->n_dofs_per_cell(); ++i)
             {
-              const bool is_primitive = fe.is_primitive() || fe.is_primitive(i);
+              const bool is_primitive =
+                fe->is_primitive() || fe->is_primitive(i);
               if (is_primitive)
                 nonzero_shape_function_component[i][d] =
-                  (component == fe.system_to_component_index(i).first);
+                  (component == fe->system_to_component_index(i).first);
               else
                 nonzero_shape_function_component[i][d] =
-                  (fe.get_nonzero_components(i)[component] == true);
+                  (fe->get_nonzero_components(i)[component] == true);
             }
         }
-    }
 
-  // translate update flags
-  if (update_flags & update_jacobians)
-    update_flags_mapping |= update_jacobians;
-  if (update_flags & update_gradients ||
-      update_flags & update_inverse_jacobians)
-    update_flags_mapping |= update_inverse_jacobians;
-  if (update_flags & update_quadrature_points)
-    update_flags_mapping |= update_quadrature_points;
+      fast_path = false;
+    }
 }
 
 
@@ -854,72 +838,24 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const ArrayView<const Point<dim>> &                         unit_points)
 {
-  // If using the fast path, we need to precompute the mapping data.
-  if (!poly.empty())
-    internal::FEPointEvaluation::compute_mapping_data_for_generic_points(
-      *mapping, cell, unit_points, update_flags_mapping, mapping_data);
+  // reinit is only allowed for mapping computation on the fly
+  AssertThrow(mapping_info_on_the_fly.get() != nullptr, ExcNotImplemented());
 
-  // then call the other version of this function with the precomputed data
-  reinit(cell, unit_points, mapping_data);
-}
+  mapping_info->reinit(cell, unit_points);
 
-
-
-template <int n_components, int dim, int spacedim, typename Number>
-void
-FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const ArrayView<const Point<dim>> &                         unit_points,
-  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                     spacedim>
-    &precomputed_mapping_data)
-{
-  this->unit_points.resize(unit_points.size());
-  std::copy(unit_points.begin(), unit_points.end(), this->unit_points.begin());
-
-  if (!poly.empty())
-    {
-      // Check the mapping data for consistency.
-      if ((update_flags_mapping & update_jacobians) != 0u)
-        Assert(precomputed_mapping_data.jacobians.size() == unit_points.size(),
-               ExcDimensionMismatch(precomputed_mapping_data.jacobians.size(),
-                                    unit_points.size()));
-      if ((update_flags_mapping & update_inverse_jacobians) != 0u)
-        Assert(precomputed_mapping_data.inverse_jacobians.size() ==
-                 unit_points.size(),
-               ExcDimensionMismatch(
-                 precomputed_mapping_data.inverse_jacobians.size(),
-                 unit_points.size()));
-
-      if ((update_flags_mapping & update_quadrature_points) != 0u)
-        Assert(precomputed_mapping_data.inverse_jacobians.size() ==
-                 unit_points.size(),
-               ExcDimensionMismatch(
-                 precomputed_mapping_data.quadrature_points.size(),
-                 unit_points.size()));
-
-      mapping_data = precomputed_mapping_data;
-    }
-  else
+  if (!fast_path)
     {
       fe_values = std::make_shared<FEValues<dim, spacedim>>(
         *mapping,
         *fe,
         Quadrature<dim>(
           std::vector<Point<dim>>(unit_points.begin(), unit_points.end())),
-        update_flags | update_flags_mapping);
+        update_flags);
       fe_values->reinit(cell);
-      mapping_data.initialize(unit_points.size(), update_flags_mapping);
-      if (update_flags_mapping & update_jacobians)
-        for (unsigned int q = 0; q < unit_points.size(); ++q)
-          mapping_data.jacobians[q] = fe_values->jacobian(q);
-      if (update_flags_mapping & update_inverse_jacobians)
-        for (unsigned int q = 0; q < unit_points.size(); ++q)
-          mapping_data.inverse_jacobians[q] = fe_values->inverse_jacobian(q);
-      if (update_flags_mapping & update_quadrature_points)
-        for (unsigned int q = 0; q < unit_points.size(); ++q)
-          mapping_data.quadrature_points[q] = fe_values->quadrature_point(q);
     }
+
+  this->unit_points =
+    std::vector<Point<dim>>(unit_points.begin(), unit_points.end());
 
   if (update_flags & update_values)
     values.resize(unit_points.size(), numbers::signaling_nan<value_type>());
@@ -931,28 +867,30 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::reinit(
 
 
 template <int n_components, int dim, int spacedim, typename Number>
-const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
-                                                                   spacedim> &
-FEPointEvaluation<n_components, dim, spacedim, Number>::get_mapping_data() const
-{
-  return mapping_data;
-}
-
-
-
-template <int n_components, int dim, int spacedim, typename Number>
 void
 FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
   const ArrayView<const Number> &         solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flag)
 {
+  const bool precomputed_mapping = mapping_info_on_the_fly.get() == nullptr;
+  if (precomputed_mapping)
+    {
+      unit_points = mapping_info->get_unit_points();
+
+      if (update_flags & update_values)
+        values.resize(unit_points.size(), numbers::signaling_nan<value_type>());
+      if (update_flags & update_gradients)
+        gradients.resize(unit_points.size(),
+                         numbers::signaling_nan<gradient_type>());
+    }
+
   if (unit_points.empty())
     return;
 
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
   if (((evaluation_flag & EvaluationFlags::values) ||
        (evaluation_flag & EvaluationFlags::gradients)) &&
-      !poly.empty())
+      fast_path)
     {
       // fast path with tensor product evaluation
       if (solution_renumbered.size() != dofs_per_component)
@@ -1003,20 +941,21 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
                      ExcNotInitialized());
               for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
                 {
-                  Assert(update_flags_mapping & update_inverse_jacobians,
-                         ExcNotInitialized());
                   internal::FEPointEvaluation::EvaluatorTypeTraits<
                     dim,
                     n_components,
                     Number>::set_gradient(val_and_grad.second,
                                           j,
                                           unit_gradients[i + j]);
-                  gradients[i + j] = static_cast<
-                    typename internal::FEPointEvaluation::
-                      EvaluatorTypeTraits<dim, n_components, double>::
-                        gradient_type>(apply_transformation(
-                    mapping_data.inverse_jacobians[i + j].transpose(),
-                    unit_gradients[i + j]));
+                  gradients[i + j] =
+                    static_cast<typename internal::FEPointEvaluation::
+                                  EvaluatorTypeTraits<dim,
+                                                      n_components,
+                                                      double>::gradient_type>(
+                      apply_transformation(mapping_info->get_mapping_data()
+                                             .inverse_jacobians[i + j]
+                                             .transpose(),
+                                           unit_gradients[i + j]));
                 }
             }
         }
@@ -1085,6 +1024,18 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
   const ArrayView<Number> &               solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
+  const bool precomputed_mapping = mapping_info_on_the_fly.get() == nullptr;
+  if (precomputed_mapping)
+    {
+      unit_points = mapping_info->get_unit_points();
+
+      if (update_flags & update_values)
+        values.resize(unit_points.size(), numbers::signaling_nan<value_type>());
+      if (update_flags & update_gradients)
+        gradients.resize(unit_points.size(),
+                         numbers::signaling_nan<gradient_type>());
+    }
+
   if (unit_points.size() == 0) // no evaluation points provided
     {
       std::fill(solution_values.begin(), solution_values.end(), 0.0);
@@ -1094,7 +1045,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
   AssertDimension(solution_values.size(), fe->dofs_per_cell);
   if (((integration_flags & EvaluationFlags::values) ||
        (integration_flags & EvaluationFlags::gradients)) &&
-      !poly.empty())
+      fast_path)
     {
       // fast path with tensor product integration
 
@@ -1140,14 +1091,12 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
           if (integration_flags & EvaluationFlags::gradients)
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               {
-                Assert(update_flags_mapping & update_inverse_jacobians,
-                       ExcNotInitialized());
                 gradients[i + j] =
                   static_cast<typename internal::FEPointEvaluation::
                                 EvaluatorTypeTraits<dim, n_components, double>::
-                                  gradient_type>(
-                    apply_transformation(mapping_data.inverse_jacobians[i + j],
-                                         gradients[i + j]));
+                                  gradient_type>(apply_transformation(
+                    mapping_info->get_mapping_data().inverse_jacobians[i + j],
+                    gradients[i + j]));
                 internal::FEPointEvaluation::
                   EvaluatorTypeTraits<dim, n_components, Number>::get_gradient(
                     gradient, j, gradients[i + j]);
@@ -1270,7 +1219,7 @@ inline const typename FEPointEvaluation<n_components, dim, spacedim, Number>::
   FEPointEvaluation<n_components, dim, spacedim, Number>::get_unit_gradient(
     const unsigned int point_index) const
 {
-  Assert(!poly.empty(),
+  Assert(fast_path,
          ExcMessage("Unit gradients are currently only implemented for tensor "
                     "product finite elements combined with MappingQ "
                     "mappings"));
@@ -1309,9 +1258,9 @@ inline DerivativeForm<1, dim, spacedim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::jacobian(
   const unsigned int point_index) const
 {
-  Assert(update_flags_mapping & update_jacobians, ExcNotInitialized());
-  AssertIndexRange(point_index, mapping_data.jacobians.size());
-  return mapping_data.jacobians[point_index];
+  AssertIndexRange(point_index,
+                   mapping_info->get_mapping_data().jacobians.size());
+  return mapping_info->get_mapping_data().jacobians[point_index];
 }
 
 
@@ -1321,11 +1270,9 @@ inline DerivativeForm<1, spacedim, dim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::inverse_jacobian(
   const unsigned int point_index) const
 {
-  Assert(update_flags_mapping & update_inverse_jacobians ||
-           update_flags_mapping & update_gradients,
-         ExcNotInitialized());
-  AssertIndexRange(point_index, mapping_data.inverse_jacobians.size());
-  return mapping_data.inverse_jacobians[point_index];
+  AssertIndexRange(point_index,
+                   mapping_info->get_mapping_data().inverse_jacobians.size());
+  return mapping_info->get_mapping_data().inverse_jacobians[point_index];
 }
 
 
@@ -1335,9 +1282,9 @@ inline Point<spacedim>
 FEPointEvaluation<n_components, dim, spacedim, Number>::real_point(
   const unsigned int point_index) const
 {
-  Assert(update_flags_mapping & update_quadrature_points, ExcNotInitialized());
-  AssertIndexRange(point_index, mapping_data.quadrature_points.size());
-  return mapping_data.quadrature_points[point_index];
+  AssertIndexRange(point_index,
+                   mapping_info->get_mapping_data().quadrature_points.size());
+  return mapping_info->get_mapping_data().quadrature_points[point_index];
 }
 
 
