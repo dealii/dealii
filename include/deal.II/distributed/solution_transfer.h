@@ -228,12 +228,17 @@ namespace parallel
       /**
        * Constructor.
        *
-       * @param[in] dof The DoFHandler on which all operations will happen.
-       *   At the time when this constructor is called, the DoFHandler still
-       *   points to the Triangulation before the refinement in question
+       * @param[in] dof_handler The DoFHandler on which all operations will
+       * happen. At the time when this constructor is called, the DoFHandler
+       * still points to the Triangulation before the refinement in question
        *   happens.
+       * @param[in] average_values Average the contribututions to the same
+       *   DoF coming from different cells. Note: averaging requires an
+       * additional communication step, since the valence of the DoF has to be
+       * determined.
        */
-      SolutionTransfer(const DoFHandler<dim, spacedim> &dof);
+      SolutionTransfer(const DoFHandler<dim, spacedim> &dof_handler,
+                       const bool                       average_values = false);
 
       /**
        * Destructor.
@@ -320,6 +325,11 @@ namespace parallel
         dof_handler;
 
       /**
+       * Flag indicating if averaging should be performed.
+       */
+      const bool average_values;
+
+      /**
        * A vector that stores pointers to all the vectors we are supposed to
        * copy over from the old to the new mesh.
        */
@@ -352,7 +362,8 @@ namespace parallel
         const typename Triangulation<dim, spacedim>::CellStatus     status,
         const boost::iterator_range<std::vector<char>::const_iterator>
           &                        data_range,
-        std::vector<VectorType *> &all_out);
+        std::vector<VectorType *> &all_out,
+        VectorType &               valence);
 
 
       /**

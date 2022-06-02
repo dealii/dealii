@@ -1768,6 +1768,23 @@ public:
     const bool perform_check = false) const;
 
   /**
+   * Similar to set_dof_values_by_interpolation() with the difference that
+   * values are added into the vector.
+   *
+   * @note In parallel::distributed::SolutionTransfer, this function is used
+   *   to accumulate the contributions of all cells to a DoF; with a
+   *   subsequent multiplication with the inverse of the valence, finally,
+   *   the average value is obtained.
+   */
+  template <class OutputVector, typename number>
+  void
+  distribute_local_to_global_by_interpolation(
+    const Vector<number> &local_values,
+    OutputVector &        values,
+    const unsigned int    fe_index =
+      DoFHandler<dimension_, space_dimension_>::invalid_fe_index) const;
+
+  /**
    * Distribute a local (cell based) vector to a global one by mapping the
    * local numbering of the degrees of freedom to the global one and entering
    * the local values into the global vector. In other words, this function

@@ -1,0 +1,5 @@
+New: We added the possibility to average the contributions to a DoF from 
+different cells in parallel::distributed::SolutionTransfer. For this purpose,
+set the corresponding flag in the constructor. 
+<br>
+(Peter Munch, Magdalena Schreter, 2022/05/14)
