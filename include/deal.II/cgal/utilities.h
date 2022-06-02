@@ -437,6 +437,7 @@ namespace CGALWrappers
           output_surface_mesh.clear();
           break;
       }
+    (void)res;
     Assert(res,
            ExcMessage("The boolean operation was not successfully computed."));
   }
