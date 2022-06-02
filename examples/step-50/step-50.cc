@@ -1247,8 +1247,6 @@ struct CopyData
     , value(0.)
   {}
 
-  CopyData(const CopyData &) = default;
-
   struct FaceData
   {
     unsigned int cell_indices[2];
