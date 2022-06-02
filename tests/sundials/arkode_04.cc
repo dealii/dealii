@@ -31,17 +31,17 @@
  * ODE solvers. This problem has 3 dependent variables u, v and w, that depend
  * on the independent variable t via the IVP system
  *
- * du/dt = a − (w + 1)u + v u^2
- * dv/dt = w u − v u^2
- * dw/dt = (b − w)/eps -w u
+ * du/dt = a - (w + 1)u + v u^2
+ * dv/dt = w u - v u^2
+ * dw/dt = (b - w)/eps - w u
  *
- * We integrate over the interval 0 ≤ t ≤ 10, with the initial conditions
+ * We integrate over the interval 0 <= t <= 10, with the initial conditions
  *
  * u(0) = 3.9, v(0) = 1.1, w(0) = 2.8,
  *
  * and parameters
  *
- * a = 1.2, b = 2.5, and eps = 10−5
+ * a = 1.2, b = 2.5, and eps = 10^-5
  *
  * The implicit part only contains the stiff part of the problem (the part with
  * eps in right hand side of the third equation).
