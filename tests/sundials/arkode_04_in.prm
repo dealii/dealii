@@ -2,14 +2,16 @@ set Final time                        = 10.
 set Initial time                      = 0.
 set Time interval between each output = 0.1
 subsection Error control
-  set Absolute error tolerance = 0.000001
-  set Relative error tolerance = 0.000010
+  # This test is somewhat easier since we have a way to evaluate the Jacobian
+  set Absolute error tolerance = 4e-9
+  set Relative error tolerance = 4e-9
 end
 subsection Running parameters
   set Implicit function is linear            = true
   set Implicit function is time independent  = true
-  set Initial step size                      = 0.010000
-  set Maximum number of nonlinear iterations = 10
+  set Initial step size                      = 5e-7
+  set Maximum number of nonlinear iterations = 50
   set Maximum order of ARK                   = 5
-  set Minimum step size                      = 0.000001
+  set Minimum step size                      = 1e-8
+  set Anderson-acceleration subspace         = 5
 end
