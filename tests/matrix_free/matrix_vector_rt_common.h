@@ -267,7 +267,6 @@ do_test(const DoFHandler<dim> &          dof,
   ref -= solution;
 
   const double diff_norm = ref.linfty_norm() / solution.linfty_norm();
-  deallog << "Norm of solution: " << solution.l2_norm() << std::endl;
   deallog << "Norm of difference: " << diff_norm << std::endl << std::endl;
 }
 

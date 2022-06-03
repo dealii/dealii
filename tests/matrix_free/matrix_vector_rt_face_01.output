@@ -4,34 +4,28 @@ DEAL:2d::Number of cells: 4
 DEAL:2d::Number of degrees of freedom: 40
 DEAL:2d::
 DEAL:2d::Testing Values and Gradients 
-DEAL:2d::Norm of solution: 349.420
-DEAL:2d::Norm of difference: 5.51354e-15
+DEAL:2d::Norm of difference: 7.46625e-15
 DEAL:2d::
 DEAL:2d::Testing Divergence 
-DEAL:2d::Norm of solution: 278.856
-DEAL:2d::Norm of difference: 3.16427e-15
+DEAL:2d::Norm of difference: 2.58308e-15
 DEAL:2d::
 DEAL:2d::Using FE_RaviartThomasNodal<2>(2)
 DEAL:2d::Number of cells: 4
 DEAL:2d::Number of degrees of freedom: 84
 DEAL:2d::
 DEAL:2d::Testing Values and Gradients 
-DEAL:2d::Norm of solution: 1079.93
-DEAL:2d::Norm of difference: 7.57657e-15
+DEAL:2d::Norm of difference: 7.18468e-15
 DEAL:2d::
 DEAL:2d::Testing Divergence 
-DEAL:2d::Norm of solution: 742.108
-DEAL:2d::Norm of difference: 5.41246e-15
+DEAL:2d::Norm of difference: 8.17176e-15
 DEAL:2d::
 DEAL:3d::Using FE_RaviartThomasNodal<3>(1)
 DEAL:3d::Number of cells: 8
 DEAL:3d::Number of degrees of freedom: 240
 DEAL:3d::
 DEAL:3d::Testing Values and Gradients 
-DEAL:3d::Norm of solution: 713.187
-DEAL:3d::Norm of difference: 1.34671e-14
+DEAL:3d::Norm of difference: 1.38066e-14
 DEAL:3d::
 DEAL:3d::Testing Divergence 
-DEAL:3d::Norm of solution: 606.610
-DEAL:3d::Norm of difference: 4.86336e-15
+DEAL:3d::Norm of difference: 4.05280e-15
 DEAL:3d::

@@ -4,62 +4,50 @@ DEAL:2d::Number of cells: 16
 DEAL:2d::Number of degrees of freedom: 144
 DEAL:2d::
 DEAL:2d::Testing Values 
-DEAL:2d::Norm of solution: 16.5132
-DEAL:2d::Norm of difference: 3.63536e-15
+DEAL:2d::Norm of difference: 2.61453e-15
 DEAL:2d::
 DEAL:2d::Testing Gradients 
-DEAL:2d::Norm of solution: 132.862
-DEAL:2d::Norm of difference: 1.55640e-14
+DEAL:2d::Norm of difference: 6.23772e-15
 DEAL:2d::
 DEAL:2d::Testing Divergence 
-DEAL:2d::Norm of solution: 119.010
-DEAL:2d::Norm of difference: 5.11308e-15
+DEAL:2d::Norm of difference: 3.80204e-15
 DEAL:2d::
 DEAL:2d::Using FE_RaviartThomasNodal<2>(2)
 DEAL:2d::Number of cells: 16
 DEAL:2d::Number of degrees of freedom: 312
 DEAL:2d::
 DEAL:2d::Testing Values 
-DEAL:2d::Norm of solution: 14.0918
-DEAL:2d::Norm of difference: 1.43100e-14
+DEAL:2d::Norm of difference: 7.43226e-15
 DEAL:2d::
 DEAL:2d::Testing Gradients 
-DEAL:2d::Norm of solution: 325.637
-DEAL:2d::Norm of difference: 1.18579e-14
+DEAL:2d::Norm of difference: 1.08102e-14
 DEAL:2d::
 DEAL:2d::Testing Divergence 
-DEAL:2d::Norm of solution: 265.508
-DEAL:2d::Norm of difference: 7.83102e-15
+DEAL:2d::Norm of difference: 2.64297e-15
 DEAL:2d::
 DEAL:3d::Using FE_RaviartThomasNodal<3>(1)
 DEAL:3d::Number of cells: 64
 DEAL:3d::Number of degrees of freedom: 1728
 DEAL:3d::
 DEAL:3d::Testing Values 
-DEAL:3d::Norm of solution: 104.458
-DEAL:3d::Norm of difference: 4.66178e-15
+DEAL:3d::Norm of difference: 4.39080e-15
 DEAL:3d::
 DEAL:3d::Testing Gradients 
-DEAL:3d::Norm of solution: 739.015
-DEAL:3d::Norm of difference: 3.41121e-14
+DEAL:3d::Norm of difference: 1.34515e-14
 DEAL:3d::
 DEAL:3d::Testing Divergence 
-DEAL:3d::Norm of solution: 715.240
-DEAL:3d::Norm of difference: 5.75164e-15
+DEAL:3d::Norm of difference: 5.97286e-15
 DEAL:3d::
 DEAL:3d::Using FE_RaviartThomasNodal<3>(2)
 DEAL:3d::Number of cells: 64
 DEAL:3d::Number of degrees of freedom: 5616
 DEAL:3d::
 DEAL:3d::Testing Values 
-DEAL:3d::Norm of solution: 90.0432
-DEAL:3d::Norm of difference: 8.73551e-15
+DEAL:3d::Norm of difference: 6.20876e-15
 DEAL:3d::
 DEAL:3d::Testing Gradients 
-DEAL:3d::Norm of solution: 2248.46
-DEAL:3d::Norm of difference: 1.49298e-14
+DEAL:3d::Norm of difference: 1.81453e-14
 DEAL:3d::
 DEAL:3d::Testing Divergence 
-DEAL:3d::Norm of solution: 1814.05
-DEAL:3d::Norm of difference: 7.35099e-15
+DEAL:3d::Norm of difference: 6.56897e-15
 DEAL:3d::
