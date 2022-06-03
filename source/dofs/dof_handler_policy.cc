@@ -1763,12 +1763,12 @@ namespace internal
                 ((subdomain_id == numbers::invalid_subdomain_id) ||
                  (cell->subdomain_id() == subdomain_id)))
               {
-                // need to create a dummy int reference to feed the
-                // process_dof_indices function for the case we do want want
-                // to retrieve any index
+                // feed the process_dof_indices function with an empty type
+                // `std::tuple<>`, as we do not want to retrieve any DoF
+                // indices here and rather modify the stored ones
                 DoFAccessorImplementation::Implementation::process_dof_indices(
                   *cell,
-                  0,
+                  std::make_tuple(),
                   cell->active_fe_index(),
                   DoFAccessorImplementation::Implementation::
                     DoFIndexProcessor<dim, spacedim, false>(),
@@ -1868,7 +1868,7 @@ namespace internal
               {
                 DoFAccessorImplementation::Implementation::process_dof_indices(
                   *cell,
-                  0,
+                  std::make_tuple(),
                   0,
                   DoFAccessorImplementation::Implementation::
                     MGDoFIndexProcessor<dim, spacedim>(level),
@@ -4276,7 +4276,7 @@ namespace internal
             {
               DoFAccessorImplementation::Implementation::process_dof_indices(
                 *cell,
-                0,
+                std::make_tuple(),
                 cell->active_fe_index(),
                 DoFAccessorImplementation::Implementation::
                   DoFIndexProcessor<dim, spacedim, false>(),
@@ -4411,7 +4411,7 @@ namespace internal
             {
               DoFAccessorImplementation::Implementation::process_dof_indices(
                 *cell,
-                0,
+                std::make_tuple(),
                 0,
                 DoFAccessorImplementation::Implementation::
                   MGDoFIndexProcessor<dim, spacedim>(cell->level()),

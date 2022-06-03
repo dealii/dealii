@@ -493,7 +493,7 @@ namespace internal
 
 
       // The next few internal helper functions are needed to support various
-      // DoFIndicesType kinds, e.g. actual vectors of DoFIndices or dummy
+      // DoFIndicesType kinds, e.g. actual vectors of DoFIndices or empty
       // types that we use when we only want to work on the internally stored
       // DoFs and never extract any number.
       static unsigned int
@@ -503,7 +503,7 @@ namespace internal
       }
 
       static unsigned int
-      get_array_length(const int &)
+      get_array_length(const std::tuple<> &)
       {
         return 0;
       }
@@ -524,10 +524,10 @@ namespace internal
         return array[index];
       }
 
-      static unsigned int
-      get_array_entry(const int &, const unsigned int)
+      static types::global_dof_index
+      get_array_entry(const std::tuple<> &, const unsigned int)
       {
-        return 0;
+        return numbers::invalid_dof_index;
       }
 
 
@@ -1021,9 +1021,12 @@ namespace internal
 
         const auto &fe = accessor.get_fe(fe_index);
 
-        // we want to pass in rvalue 'int' types as `DoFIndicesType`, but we
-        // need non-const references for std::vector<> types, so get in a
-        // const reference here and immediately cast it away
+        // we want to pass in rvalue 'std::tuple<>' types as `DoFIndicesType`,
+        // but we need non-const references for std::vector<> types, so get in
+        // a const reference here and immediately cast the constness away -
+        // note that we prevent the use of the dereferenced invalid type, as
+        // we only return an rvalue `types::global_dof_index` into the lambda
+        // function DoFOperation that operates on it
         DoFIndicesType &dof_indices =
           const_cast<DoFIndicesType &>(const_dof_indices);
 
