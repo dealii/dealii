@@ -142,10 +142,8 @@ private:
 
 
 int
-main(int argc, char **argv)
+main()
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
   initlog();
   deallog << std::setprecision(10);
 
