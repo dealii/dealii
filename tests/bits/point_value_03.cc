@@ -26,6 +26,7 @@
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -44,7 +45,7 @@
 #include "../tests.h"
 
 
-using VectorType = LinearAlgebraPETSc::MPI::Vector;
+using VectorType = LinearAlgebra::distributed::Vector<double>;
 
 template <int dim>
 class MySquareFunction : public Function<dim, VectorType::value_type>
@@ -129,15 +130,15 @@ check()
 
   static const MySquareFunction<dim> function;
 
-
-  IndexSet locally_owned_dofs;
-
   VectorType v;
 
-  locally_owned_dofs = dof.locally_owned_dofs();
+  const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof);
 
-  v.reinit(locally_owned_dofs, MPI_COMM_WORLD);
+  v.reinit(locally_owned_dofs, locally_relevant_dofs, MPI_COMM_WORLD);
   VectorTools::interpolate(dof, function, v);
+  v.update_ghost_values();
 
   // v = 1.;
 
@@ -158,32 +159,28 @@ check()
     }
   Vector<VectorType::value_type> value(1);
   const auto &                   mapping = get_default_linear_mapping(tria);
-  GridTools::Cache<dim, dim>     cache(tria, mapping);
-  typename Triangulation<dim, dim>::active_cell_iterator cell_hint{};
-  std::vector<bool>                                      marked_vertices = {};
-  const double                                           tolerance = 1.e-10;
   for (unsigned int i = 0; i < 3; ++i)
     {
       {
         bool point_in_locally_owned_cell = false;
         value(0)                         = 0;
         {
-          auto cell_and_ref_point = GridTools::find_active_cell_around_point(
-            cache, p[i], cell_hint, marked_vertices, tolerance);
+          auto cell_and_ref_point =
+            GridTools::find_active_cell_around_point(mapping, dof, p[i]);
           if (cell_and_ref_point.first.state() == IteratorState::valid)
             {
-              cell_hint = cell_and_ref_point.first;
               point_in_locally_owned_cell =
                 cell_and_ref_point.first->is_locally_owned();
             }
         }
         if (point_in_locally_owned_cell)
           {
-            VectorTools::point_value(dof, v, p[i], value);
+            VectorTools::point_value(mapping, dof, v, p[i], value);
           }
       }
       value(0) = Utilities::MPI::sum(value(0), MPI_COMM_WORLD);
       deallog << -value(0) << std::endl;
+      std::cout << value(0) << std::endl;
 
       Assert(std::abs(value(0) - function.value(p[i])) < 2e-4,
              ExcInternalError());
