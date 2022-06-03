@@ -792,10 +792,31 @@ namespace internal
                       data.first[my_q].jacobians[0].push_back(inv_jac);
 
                       if (update_flags & update_jacobian_grads)
-                        data.first[my_q].jacobian_gradients[0].push_back(
-                          process_jacobian_gradient(inv_jac,
-                                                    inv_jac,
-                                                    jacobian_grad));
+                        {
+                          data.first[my_q].jacobian_gradients[0].push_back(
+                            process_jacobian_gradient(inv_jac,
+                                                      inv_jac,
+                                                      jacobian_grad));
+                          Tensor<1,
+                                 dim *(dim + 1) / 2,
+                                 Tensor<1, dim, VectorizedArrayType>>
+                            jac_grad_sym;
+                          // the diagonal part of Jacobian gradient comes
+                          // first
+                          for (unsigned int d = 0; d < dim; ++d)
+                            for (unsigned int f = 0; f < dim; ++f)
+                              jac_grad_sym[d][f] = jacobian_grad[f][d][d];
+
+                          // then the upper-diagonal part
+                          for (unsigned int d = 0, count = dim; d < dim; ++d)
+                            for (unsigned int e = d + 1; e < dim; ++e, ++count)
+                              for (unsigned int f = 0; f < dim; ++f)
+                                jac_grad_sym[count][f] = jacobian_grad[f][d][e];
+
+                          data.first[my_q]
+                            .jacobian_gradients_non_inverse[0]
+                            .push_back(jac_grad_sym);
+                        }
                     }
                 }
 
@@ -939,6 +960,12 @@ namespace internal
                       data_cells_local.jacobian_gradients[i].end(),
                       data_cells.jacobian_gradients[i].begin() + data_shift[0]);
             data_cells_local.jacobian_gradients[i].clear();
+            std::copy(
+              data_cells_local.jacobian_gradients_non_inverse[i].begin(),
+              data_cells_local.jacobian_gradients_non_inverse[i].end(),
+              data_cells.jacobian_gradients_non_inverse[i].begin() +
+                data_shift[0]);
+            data_cells_local.jacobian_gradients_non_inverse[i].clear();
             std::copy(data_cells_local.normals_times_jacobians[i].begin(),
                       data_cells_local.normals_times_jacobians[i].end(),
                       data_cells.normals_times_jacobians[i].begin() +
@@ -1259,6 +1286,28 @@ namespace internal
                                   inv_jac_grad[d][e],
                                   vv,
                                   my_data.jacobian_gradients[0][idx][d][e]);
+
+                            // Also store the non-inverse jacobian gradient.
+                            // the diagonal part of Jacobian gradient comes
+                            // first
+                            for (unsigned int d = 0; d < dim; ++d)
+                              for (unsigned int f = 0; f < dim; ++f)
+                                store_vectorized_array(
+                                  jac_grad[f][d][d],
+                                  vv,
+                                  my_data.jacobian_gradients_non_inverse[0][idx]
+                                                                        [d][f]);
+
+                            // then the upper-diagonal part
+                            for (unsigned int d = 0, count = dim; d < dim; ++d)
+                              for (unsigned int e = d + 1; e < dim;
+                                   ++e, ++count)
+                                for (unsigned int f = 0; f < dim; ++f)
+                                  store_vectorized_array(
+                                    jac_grad[f][d][e],
+                                    vv,
+                                    my_data.jacobian_gradients_non_inverse
+                                      [0][idx][count][f]);
                           }
                       }
                   }
@@ -1364,8 +1413,12 @@ namespace internal
           cell_data[my_q].jacobians[0].resize_fast(
             cell_data[my_q].JxW_values.size());
           if (update_flags_cells & update_jacobian_grads)
-            cell_data[my_q].jacobian_gradients[0].resize_fast(
-              cell_data[my_q].JxW_values.size());
+            {
+              cell_data[my_q].jacobian_gradients[0].resize_fast(
+                cell_data[my_q].JxW_values.size());
+              cell_data[my_q].jacobian_gradients_non_inverse[0].resize_fast(
+                cell_data[my_q].JxW_values.size());
+            }
           if (update_flags_cells & update_quadrature_points)
             {
               cell_data[my_q].quadrature_point_offsets.resize(cell_type.size());
@@ -2148,6 +2201,29 @@ namespace internal
                               my_data.jacobian_gradients[is_exterior]
                                                         [offset + q][d][e]);
                         }
+
+                      // Also store the non-inverse jacobian gradient.
+                      // the diagonal part of Jacobian gradient comes first.
+                      // jac_grad already has its derivatives reordered,
+                      // so no need to compensate for this here
+                      for (unsigned int d = 0; d < dim; ++d)
+                        for (unsigned int f = 0; f < dim; ++f)
+                          store_vectorized_array(
+                            jac_grad[f][d][d],
+                            vv,
+                            my_data.jacobian_gradients_non_inverse[is_exterior]
+                                                                  [offset + q]
+                                                                  [d][f]);
+
+                      // then the upper-diagonal part
+                      for (unsigned int d = 0, count = dim; d < dim; ++d)
+                        for (unsigned int e = d + 1; e < dim; ++e, ++count)
+                          for (unsigned int f = 0; f < dim; ++f)
+                            store_vectorized_array(
+                              jac_grad[f][d][e],
+                              vv,
+                              my_data.jacobian_gradients_non_inverse
+                                [is_exterior][offset + q][count][f]);
                     }
                 };
 
@@ -2436,6 +2512,10 @@ namespace internal
                 face_data[my_q].JxW_values.size());
               face_data[my_q].jacobian_gradients[1].resize_fast(
                 face_data[my_q].JxW_values.size());
+              face_data[my_q].jacobian_gradients_non_inverse[0].resize_fast(
+                face_data[my_q].JxW_values.size());
+              face_data[my_q].jacobian_gradients_non_inverse[1].resize_fast(
+                face_data[my_q].JxW_values.size());
             }
           face_data[my_q].normals_times_jacobians[0].resize_fast(
             face_data[my_q].JxW_values.size());
@@ -2674,7 +2754,10 @@ namespace internal
           my_data.JxW_values.resize_fast(max_size);
           my_data.jacobians[0].resize_fast(max_size);
           if (update_flags_cells & update_jacobian_grads)
-            my_data.jacobian_gradients[0].resize_fast(max_size);
+            {
+              my_data.jacobian_gradients[0].resize_fast(max_size);
+              my_data.jacobian_gradients_non_inverse[0].resize_fast(max_size);
+            }
 
           if (update_flags_cells & update_quadrature_points)
             {
@@ -2804,6 +2887,8 @@ namespace internal
             {
               my_data.jacobian_gradients[0].resize_fast(max_size);
               my_data.jacobian_gradients[1].resize_fast(max_size);
+              my_data.jacobian_gradients_non_inverse[0].resize_fast(max_size);
+              my_data.jacobian_gradients_non_inverse[1].resize_fast(max_size);
             }
           my_data.normals_times_jacobians[0].resize_fast(max_size);
           my_data.normals_times_jacobians[1].resize_fast(max_size);
@@ -2963,8 +3048,14 @@ namespace internal
             face_data_by_cells[my_q].normals_times_jacobians[1].resize_fast(
               storage_length * GeometryInfo<dim>::faces_per_cell);
           if (update_flags & update_jacobian_grads)
-            face_data_by_cells[my_q].jacobian_gradients[0].resize_fast(
-              storage_length * GeometryInfo<dim>::faces_per_cell);
+            {
+              face_data_by_cells[my_q].jacobian_gradients[0].resize_fast(
+                storage_length * GeometryInfo<dim>::faces_per_cell);
+              face_data_by_cells[my_q]
+                .jacobian_gradients_non_inverse[0]
+                .resize_fast(storage_length *
+                             GeometryInfo<dim>::faces_per_cell);
+            }
 
           if (update_flags & update_quadrature_points)
             face_data_by_cells[my_q].quadrature_points.resize_fast(

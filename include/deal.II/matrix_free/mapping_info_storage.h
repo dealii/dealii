@@ -260,6 +260,27 @@ namespace internal
         jacobian_gradients;
 
       /**
+       * The storage of the gradients of the Jacobian transformation. Because of
+       * symmetry, only the upper diagonal and diagonal part are needed. The
+       * first index runs through the derivatives, starting with the diagonal
+       * and then continuing row-wise, i.e., $\partial^2/\partial x_1 \partial
+       * x_2$ first, then
+       * $\partial^2/\partial x_1 \partial x_3$, and so on. The second index
+       * is the spatial coordinate.
+       *
+       * Indexed by @p data_index_offsets.
+       *
+       * Contains two fields for access from both sides for interior faces,
+       * but the default case (cell integrals or boundary integrals) only
+       * fills the zeroth component and ignores the first one.
+       */
+      std::array<
+        AlignedVector<
+          Tensor<1, spacedim *(spacedim + 1) / 2, Tensor<1, spacedim, Number>>>,
+        2>
+        jacobian_gradients_non_inverse;
+
+      /**
        * Stores the Jacobian transformations times the normal vector (this
        * represents a shortcut that is accessed often and can thus get higher
        * performance).

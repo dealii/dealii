@@ -3022,6 +3022,10 @@ inline FEEvaluationBase<dim,
         this->mapped_geometry->get_data_storage().JxW_values.begin();
       this->jacobian_gradients =
         this->mapped_geometry->get_data_storage().jacobian_gradients[0].begin();
+      this->jacobian_gradients_non_inverse =
+        this->mapped_geometry->get_data_storage()
+          .jacobian_gradients_non_inverse[0]
+          .begin();
       this->quadrature_points =
         this->mapped_geometry->get_data_storage().quadrature_points.begin();
     }
@@ -3086,6 +3090,10 @@ operator=(const FEEvaluationBase<dim,
         this->mapped_geometry->get_data_storage().JxW_values.begin();
       this->jacobian_gradients =
         this->mapped_geometry->get_data_storage().jacobian_gradients[0].begin();
+      this->jacobian_gradients_non_inverse =
+        this->mapped_geometry->get_data_storage()
+          .jacobian_gradients_non_inverse[0]
+          .begin();
       this->quadrature_points =
         this->mapped_geometry->get_data_storage().quadrature_points.begin();
     }
@@ -5865,9 +5873,97 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       else
         {
           // General cell
-          // Here we need the jacobian gradient and not the inverse which is
-          // stored in this->jacobian_gradients
-          AssertThrow(false, ExcNotImplemented());
+
+          // This assert could be removed if we make sure that this is updated
+          // even though update_hessians or update_jacobian_grads is not passed,
+          // i.e make the necessary changes in
+          // MatrixFreeFunctions::MappingInfoStorage::compute_update_flags
+          Assert(this->jacobian_gradients_non_inverse != nullptr,
+                 internal::ExcMatrixFreeAccessToUninitializedMappingField(
+                   "update_hessians"));
+
+          const auto &jac_grad = this->jacobian_gradients_non_inverse[q_point];
+          const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
+            this->jacobian[q_point];
+          const Tensor<2, dim, VectorizedArrayType> &t_jac = invert(inv_t_jac);
+
+          // Derivatives are reordered for faces. Need to take this into account
+          const VectorizedArrayType inv_det =
+            (is_face && dim == 2 && this->get_face_no() < 2) ?
+              -determinant(inv_t_jac) :
+              determinant(inv_t_jac);
+
+          VectorizedArrayType tmp;
+          // J * grad_quad * J^-1 * det(J^-1)
+          for (unsigned int comp = 0; comp < n_components; ++comp)
+            for (unsigned int d = 0; d < dim; ++d)
+              {
+                tmp = 0;
+                for (unsigned int f = 0; f < dim; ++f)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    tmp += t_jac[f][comp] * inv_t_jac[d][e] *
+                           this->gradients_quad[(f * dim + e) * nqp + q_point];
+
+                grad_out[comp][d] = tmp * inv_det;
+              }
+
+          // Contribution from values
+          { // Diagonal part of jac_grad
+
+            // Add jac_grad * J^{-1} * values * det(J^{-1})
+            // -(J^{-T} * jac_grad * J^{-1} * J * values * det(J^{-1}))
+            for (unsigned int i = 0; i < dim; ++i)
+              for (unsigned int j = 0; j < dim; ++j)
+                {
+                  tmp = jac_grad[0][i] * inv_t_jac[j][0] *
+                        this->values_quad[q_point];
+                  for (unsigned int f = 1; f < dim; ++f)
+                    tmp += jac_grad[f][i] * inv_t_jac[j][f] *
+                           this->values_quad[f * nqp + q_point];
+
+                  grad_out[i][j] += tmp * inv_det;
+                }
+
+            for (unsigned int i = 0; i < dim; ++i)
+              for (unsigned int j = 0; j < dim; ++j)
+                {
+                  tmp = 0;
+                  for (unsigned int f = 0; f < dim; ++f)
+                    for (unsigned int n = 0; n < dim; ++n)
+                      for (unsigned int m = 0; m < dim; ++m)
+                        tmp += inv_t_jac[m][f] * jac_grad[f][m] *
+                               inv_t_jac[j][f] * t_jac[n][i] *
+                               this->values_quad[n * nqp + q_point];
+                  grad_out[i][j] -= tmp * inv_det;
+                }
+          }
+
+          { // Off-diagonal part of jac_grad
+
+            // Add jac_grad * J^{-1} * values * det(J^{-1})
+            // -(J^{-T} * jac_grad * J^{-1} * J * values * det(J^{-1}))
+            for (unsigned int i = 0; i < dim; ++i)
+              for (unsigned int j = 0; j < dim; ++j)
+                {
+                  tmp = 0;
+                  for (unsigned int r = 0, f = dim; r < dim; ++r)
+                    for (unsigned int k = r + 1; k < dim; ++k, ++f)
+                      {
+                        tmp += jac_grad[f][i] *
+                               (inv_t_jac[j][k] *
+                                  this->values_quad[r * nqp + q_point] +
+                                inv_t_jac[j][r] *
+                                  this->values_quad[k * nqp + q_point]);
+                        for (unsigned int n = 0; n < dim; ++n)
+                          for (unsigned int m = 0; m < dim; ++m)
+                            tmp -= jac_grad[f][m] * t_jac[n][i] *
+                                   this->values_quad[n * nqp + q_point] *
+                                   (inv_t_jac[m][k] * inv_t_jac[j][r] +
+                                    inv_t_jac[m][r] * inv_t_jac[j][k]);
+                      }
+                  grad_out[i][j] += tmp * inv_det;
+                }
+          }
         }
       return grad_out;
     }
@@ -5914,25 +6010,28 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
             divergence +=
               this->gradients_quad[(dim * d + d) * nqp + q_point] * inv_det;
         }
-      else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
+      else
         {
-          // Affine cell
+          // General cell
           // Derivatives are reordered for faces. Need to take this into account
           const VectorizedArrayType inv_det =
             (is_face && dim == 2 && this->get_face_no() < 2) ?
-              -determinant(this->jacobian[0]) :
-              determinant(this->jacobian[0]);
+              -determinant(
+                this->jacobian[this->cell_type >
+                                   internal::MatrixFreeFunctions::affine ?
+                                 q_point :
+                                 0]) :
+              determinant(
+                this->jacobian[this->cell_type >
+                                   internal::MatrixFreeFunctions::affine ?
+                                 q_point :
+                                 0]);
 
           // div * det(J^-1)
           divergence = this->gradients_quad[q_point] * inv_det;
           for (unsigned int d = 1; d < dim; ++d)
             divergence +=
               this->gradients_quad[(dim * d + d) * nqp + q_point] * inv_det;
-        }
-      else
-        {
-          // General cell
-          Assert(false, ExcNotImplemented());
         }
     }
   else
@@ -6193,15 +6292,107 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                 VectorizedArrayType tmp = 0;
                 for (unsigned int f = 0; f < dim; ++f)
                   for (unsigned int e = 0; e < dim; ++e)
-                    tmp += jac[f][comp] * inv_t_jac[e][d] * grad_in[f][e] * fac;
+                    tmp += jac[f][comp] * inv_t_jac[e][d] * grad_in[f][e];
 
-                this->gradients_quad[(comp * dim + d) * nqp + q_point] = tmp;
+                this->gradients_quad[(comp * dim + d) * nqp + q_point] =
+                  tmp * fac;
               }
         }
       else
         {
           // General cell
-          AssertThrow(false, ExcNotImplemented());
+
+          const auto &jac_grad = this->jacobian_gradients_non_inverse[q_point];
+          const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
+            this->jacobian[q_point];
+          const Tensor<2, dim, VectorizedArrayType> &t_jac = invert(inv_t_jac);
+
+          // Derivatives are reordered for faces. Need to take this into account
+          // and 1/inv_det != J_value for faces
+          const VectorizedArrayType fac =
+            (!is_face) ?
+              this->quadrature_weights[q_point] :
+              this->J_value[q_point] * ((dim == 2 && this->get_face_no() < 2) ?
+                                          -determinant(inv_t_jac) :
+                                          determinant(inv_t_jac));
+
+          VectorizedArrayType tmp;
+          // J_{j,i} * J^{-1}_{k,m} * grad_in_{j,m} * factor
+          for (unsigned int comp = 0; comp < n_components; ++comp)
+            for (unsigned int d = 0; d < dim; ++d)
+              {
+                tmp = 0;
+                for (unsigned int f = 0; f < dim; ++f)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    tmp += t_jac[comp][f] * inv_t_jac[e][d] * grad_in[f][e];
+
+                this->gradients_quad[(comp * dim + d) * nqp + q_point] =
+                  tmp * fac;
+              }
+
+          // Contribution from values
+          { // Diagonal part of jac_grad
+
+            // Add jac_grad * J^{-1} * values * factor
+            // -(J^{-T} * jac_grad * J^{-1} * J * values * factor)
+            for (unsigned int f = 0; f < dim; ++f)
+              {
+                tmp = 0;
+                for (unsigned int i = 0; i < dim; ++i)
+                  for (unsigned int j = 0; j < dim; ++j)
+                    {
+                      tmp += inv_t_jac[j][f] * jac_grad[f][i] * grad_in[i][j];
+                      for (unsigned int m = 0; m < dim; ++m)
+                        for (unsigned int k = 0; k < dim; ++k)
+                          tmp -= inv_t_jac[m][k] * jac_grad[k][m] *
+                                 inv_t_jac[j][k] * t_jac[f][i] * grad_in[i][j];
+                    }
+                this->values_from_gradients_quad[f * nqp + q_point] = tmp * fac;
+              }
+          }
+
+          { // Off-diagonal part of jac_grad
+
+            // Add jac_grad * J^{-1} * values * factor
+            for (unsigned int r = 0, f = dim; r < dim; ++r)
+              for (unsigned int k = r + 1; k < dim; ++k, ++f)
+                {
+                  tmp = jac_grad[f][0] * inv_t_jac[0][k] * grad_in[0][0];
+                  for (unsigned int j = 1; j < dim; ++j)
+                    tmp += jac_grad[f][0] * inv_t_jac[j][k] * grad_in[0][j];
+                  for (unsigned int i = 1; i < dim; ++i)
+                    for (unsigned int j = 0; j < dim; ++j)
+                      tmp += jac_grad[f][i] * inv_t_jac[j][k] * grad_in[i][j];
+                  this->values_from_gradients_quad[r * nqp + q_point] +=
+                    tmp * fac;
+
+                  tmp = jac_grad[f][0] * inv_t_jac[0][r] * grad_in[0][0];
+                  for (unsigned int j = 1; j < dim; ++j)
+                    tmp += jac_grad[f][0] * inv_t_jac[j][r] * grad_in[0][j];
+                  for (unsigned int i = 1; i < dim; ++i)
+                    for (unsigned int j = 0; j < dim; ++j)
+                      tmp += jac_grad[f][i] * inv_t_jac[j][r] * grad_in[i][j];
+                  this->values_from_gradients_quad[k * nqp + q_point] +=
+                    tmp * fac;
+                }
+
+            // -(J^{-T} * jac_grad * J^{-1} * J * values * factor)
+            for (unsigned int n = 0; n < dim; ++n)
+              {
+                tmp = 0;
+                for (unsigned int r = 0, f = dim; r < dim; ++r)
+                  for (unsigned int k = r + 1; k < dim; ++k, ++f)
+                    for (unsigned int i = 0; i < dim; ++i)
+                      for (unsigned int j = 0; j < dim; ++j)
+                        for (unsigned int m = 0; m < dim; ++m)
+                          tmp += jac_grad[f][m] * t_jac[n][i] * grad_in[i][j] *
+                                 (inv_t_jac[m][k] * inv_t_jac[j][r] +
+                                  inv_t_jac[m][r] * inv_t_jac[j][k]);
+
+                this->values_from_gradients_quad[n * nqp + q_point] -=
+                  tmp * fac;
+              }
+          }
         }
     }
   else
@@ -6259,37 +6450,41 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
-      if (this->cell_type <= internal::MatrixFreeFunctions::affine)
+      // General cell
+
+      // Derivatives are reordered for faces. Need to take this into account
+      // and 1/inv_det != J_value for faces
+      const VectorizedArrayType fac =
+        (!is_face) ?
+          this->quadrature_weights[q_point] * div_in :
+          (this->cell_type > internal::MatrixFreeFunctions::affine ?
+             this->J_value[q_point] :
+             this->J_value[0] * this->quadrature_weights[q_point]) *
+            div_in *
+            ((dim == 2 && this->get_face_no() < 2) ?
+               -determinant(
+                 this->jacobian[this->cell_type >
+                                    internal::MatrixFreeFunctions::affine ?
+                                  q_point :
+                                  0]) :
+               determinant(
+                 this->jacobian[this->cell_type >
+                                    internal::MatrixFreeFunctions::affine ?
+                                  q_point :
+                                  0]));
+
+      for (unsigned int d = 0; d < dim; ++d)
         {
-          // Affine cell
-
-          // Derivatives are reordered for faces. Need to take this into account
-          // and 1/inv_det != J_value for faces
-          const VectorizedArrayType fac =
-            ((!is_face) ?
-               1 :
-               this->J_value[0] * ((dim == 2 && this->get_face_no() < 2) ?
-                                     -determinant(this->jacobian[0]) :
-                                     determinant(this->jacobian[0]))) *
-            this->quadrature_weights[q_point] * div_in;
-
-          for (unsigned int d = 0; d < dim; ++d)
+          this->gradients_quad[(dim * d + d) * nqp + q_point] = fac;
+          for (unsigned int e = d + 1; e < dim; ++e)
             {
-              this->gradients_quad[(dim * d + d) * nqp + q_point] = fac;
-              for (unsigned int e = d + 1; e < dim; ++e)
-                {
-                  this->gradients_quad[(dim * d + e) * nqp + q_point] =
-                    VectorizedArrayType();
-                  this->gradients_quad[(dim * e + d) * nqp + q_point] =
-                    VectorizedArrayType();
-                }
+              this->gradients_quad[(dim * d + e) * nqp + q_point] =
+                VectorizedArrayType();
+              this->gradients_quad[(dim * e + d) * nqp + q_point] =
+                VectorizedArrayType();
             }
         }
-      else
-        {
-          // General cell
-          AssertThrow(false, ExcNotImplemented());
-        }
+      this->divergence_is_requested = true;
     }
   else
     {
@@ -7194,6 +7389,8 @@ FEEvaluation<dim,
   this->J_value  = &this->mapping_data->JxW_values[offsets];
   this->jacobian_gradients =
     this->mapping_data->jacobian_gradients[0].data() + offsets;
+  this->jacobian_gradients_non_inverse =
+    this->mapping_data->jacobian_gradients_non_inverse[0].data() + offsets;
 
   unsigned int i = 0;
   for (; i < this->matrix_free->n_active_entries_per_cell_batch(this->cell);
@@ -7266,7 +7463,9 @@ FEEvaluation<dim,
   auto &this_jacobian_data           = mapping_storage.jacobians[0];
   auto &this_J_value_data            = mapping_storage.JxW_values;
   auto &this_jacobian_gradients_data = mapping_storage.jacobian_gradients[0];
-  auto &this_quadrature_points_data  = mapping_storage.quadrature_points;
+  auto &this_jacobian_gradients_non_inverse_data =
+    mapping_storage.jacobian_gradients_non_inverse[0];
+  auto &this_quadrature_points_data = mapping_storage.quadrature_points;
 
   if (this->cell_type <= internal::MatrixFreeFunctions::GeometryType::affine)
     {
@@ -7278,6 +7477,9 @@ FEEvaluation<dim,
 
       if (this->mapping_data->jacobian_gradients[0].size() > 0)
         this_jacobian_gradients_data.resize_fast(1);
+
+      if (this->mapping_data->jacobian_gradients_non_inverse[0].size() > 0)
+        this_jacobian_gradients_non_inverse_data.resize_fast(1);
 
       if (this->mapping_data->quadrature_points.size() > 0)
         this_quadrature_points_data.resize_fast(1);
@@ -7293,6 +7495,10 @@ FEEvaluation<dim,
       if (this->mapping_data->jacobian_gradients[0].size() > 0)
         this_jacobian_gradients_data.resize_fast(this->n_quadrature_points);
 
+      if (this->mapping_data->jacobian_gradients_non_inverse[0].size() > 0)
+        this_jacobian_gradients_non_inverse_data.resize_fast(
+          this->n_quadrature_points);
+
       if (this->mapping_data->quadrature_points.size() > 0)
         this_quadrature_points_data.resize_fast(this->n_quadrature_points);
     }
@@ -7301,7 +7507,9 @@ FEEvaluation<dim,
   this->jacobian           = this_jacobian_data.data();
   this->J_value            = this_J_value_data.data();
   this->jacobian_gradients = this_jacobian_gradients_data.data();
-  this->quadrature_points  = this_quadrature_points_data.data();
+  this->jacobian_gradients_non_inverse =
+    this_jacobian_gradients_non_inverse_data.data();
+  this->quadrature_points = this_quadrature_points_data.data();
 
   // fill internal data storage lane by lane
   for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
@@ -7340,6 +7548,14 @@ FEEvaluation<dim,
                 this_jacobian_gradients_data[q][i][j][v] =
                   this->mapping_data
                     ->jacobian_gradients[0][offsets + q][i][j][lane];
+
+          if (this->mapping_data->jacobian_gradients_non_inverse[0].size() > 0)
+            for (unsigned int i = 0; i < dim * (dim + 1) / 2; ++i)
+              for (unsigned int j = 0; j < dim; ++j)
+                this_jacobian_gradients_non_inverse_data[q][i][j][v] =
+                  this->mapping_data
+                    ->jacobian_gradients_non_inverse[0][offsets + q][i][j]
+                                                    [lane];
 
           if (this->mapping_data->quadrature_points.size() > 0)
             for (unsigned int i = 0; i < dim; ++i)
@@ -7381,6 +7597,15 @@ FEEvaluation<dim,
                     this_jacobian_gradients_data[q][i][j][v] =
                       this->mapping_data
                         ->jacobian_gradients[0][offsets + q_src][i][j][lane];
+
+              if (this->mapping_data->jacobian_gradients_non_inverse[0].size() >
+                  0)
+                for (unsigned int i = 0; i < dim * (dim + 1) / 2; ++i)
+                  for (unsigned int j = 0; j < dim; ++j)
+                    this_jacobian_gradients_non_inverse_data[q][i][j][v] =
+                      this->mapping_data
+                        ->jacobian_gradients_non_inverse[0][offsets + q_src][i]
+                                                        [j][lane];
 
               if (this->mapping_data->quadrature_points.size() > 0)
                 {
@@ -7611,6 +7836,12 @@ FEEvaluation<dim,
   EvaluationFlags::EvaluationFlags evaluation_flag_actual = evaluation_flag;
   if (hessians_on_general_cells)
     evaluation_flag_actual |= EvaluationFlags::gradients;
+
+  if (this->data->element_type ==
+        internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas &&
+      evaluation_flag & EvaluationFlags::gradients &&
+      (this->cell_type > internal::MatrixFreeFunctions::affine))
+    evaluation_flag_actual |= EvaluationFlags::values;
 
   if (fe_degree > -1)
     {
@@ -7901,6 +8132,26 @@ FEEvaluation<dim,
         }
     }
 
+  if (this->data->element_type ==
+        internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas &&
+      integration_flag & EvaluationFlags::gradients &&
+      this->cell_type > internal::MatrixFreeFunctions::affine &&
+      this->divergence_is_requested == false)
+    {
+      unsigned int size = n_components * n_q_points;
+      if ((integration_flag & EvaluationFlags::values) != 0u)
+        {
+          for (unsigned int i = 0; i < size; ++i)
+            this->values_quad[i] += this->values_from_gradients_quad[i];
+        }
+      else
+        {
+          for (unsigned int i = 0; i < size; ++i)
+            this->values_quad[i] = this->values_from_gradients_quad[i];
+          integration_flag_actual |= EvaluationFlags::values;
+        }
+    }
+
   if (fe_degree > -1)
     {
       SelectEvaluator<dim, fe_degree, n_q_points_1d, VectorizedArrayType>::
@@ -8138,6 +8389,11 @@ FEFaceEvaluation<dim,
   this->jacobian_gradients =
     this->mapping_data->jacobian_gradients[!this->is_interior_face()].data() +
     offsets;
+  this->jacobian_gradients_non_inverse =
+    this->mapping_data
+      ->jacobian_gradients_non_inverse[!this->is_interior_face()]
+      .data() +
+    offsets;
 
   if (this->mapping_data->quadrature_point_offsets.empty() == false)
     {
@@ -8294,6 +8550,11 @@ FEFaceEvaluation<dim,
   this->jacobian_gradients =
     this->mapping_data->jacobian_gradients[!this->is_interior_face()].data() +
     offsets;
+  this->jacobian_gradients_non_inverse =
+    this->mapping_data
+      ->jacobian_gradients_non_inverse[!this->is_interior_face()]
+      .data() +
+    offsets;
 
   if (this->matrix_free->get_mapping_info()
         .face_data_by_cells[this->quad_no]
@@ -8427,6 +8688,12 @@ FEFaceEvaluation<dim,
   EvaluationFlags::EvaluationFlags evaluation_flag_actual = evaluation_flag;
   if (hessians_on_general_cells)
     evaluation_flag_actual |= EvaluationFlags::gradients;
+
+  if (this->data->element_type ==
+        internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas &&
+      evaluation_flag & EvaluationFlags::gradients &&
+      (this->cell_type > internal::MatrixFreeFunctions::affine))
+    evaluation_flag_actual |= EvaluationFlags::values;
 
   if (fe_degree > -1)
     internal::FEFaceEvaluationImplEvaluateSelector<dim, VectorizedArrayType>::
@@ -8562,6 +8829,26 @@ FEFaceEvaluation<dim,
           for (unsigned int i = 0; i < size; ++i)
             this->gradients_quad[i] = this->gradients_from_hessians_quad[i];
           integration_flag_actual |= EvaluationFlags::gradients;
+        }
+    }
+
+  if (this->data->element_type ==
+        internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas &&
+      integration_flag & EvaluationFlags::gradients &&
+      this->cell_type > internal::MatrixFreeFunctions::affine &&
+      this->divergence_is_requested == false)
+    {
+      unsigned int size = n_components * n_q_points;
+      if ((integration_flag & EvaluationFlags::values) != 0u)
+        {
+          for (unsigned int i = 0; i < size; ++i)
+            this->values_quad[i] += this->values_from_gradients_quad[i];
+        }
+      else
+        {
+          for (unsigned int i = 0; i < size; ++i)
+            this->values_quad[i] = this->values_from_gradients_quad[i];
+          integration_flag_actual |= EvaluationFlags::values;
         }
     }
 

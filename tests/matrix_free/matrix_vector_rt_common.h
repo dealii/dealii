@@ -173,10 +173,11 @@ do_test(const DoFHandler<dim> &          dof,
   MatrixFree<dim, Number> mf_data;
   {
     const QGaussLobatto<1>                           quad(fe_degree + 2);
+    const MappingQ<dim>                              mapping(fe_degree + 2);
     typename MatrixFree<dim, Number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, Number>::AdditionalData::none;
     data.mapping_update_flags  = update_gradients | update_hessians;
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(mapping, dof, constraints, quad, data);
   }
 
   // create vector with random entries
@@ -191,23 +192,27 @@ do_test(const DoFHandler<dim> &          dof,
         continue;
       initial_condition[i] = random_value<Number>();
     }
+  constraints.distribute(initial_condition);
 
   // MatrixFree solution
   MatrixFreeTest<dim, -1, 0, Number> mf(mf_data, test_type);
   mf.test_functions(solution, initial_condition);
 
 
+  // Evaluation with FEValues
   SparsityPattern        sp;
   SparseMatrix<double>   system_matrix;
   DynamicSparsityPattern dsp(dof.n_dofs(), dof.n_dofs());
-  DoFTools::make_sparsity_pattern(dof, dsp);
+  DoFTools::make_sparsity_pattern(dof, dsp, constraints, false);
   sp.copy_from(dsp);
   system_matrix.reinit(sp);
 
-  FEValues<dim> fe_val(dof.get_fe(),
+  const MappingQ<dim> mapping(fe_degree + 2);
+  FEValues<dim>       fe_val(mapping,
+                       dof.get_fe(),
                        Quadrature<dim>(mf_data.get_quadrature(0)),
-                       update_values | update_gradients | update_JxW_values);
-
+                       update_values | update_gradients | update_piola |
+                         update_JxW_values);
 
   const unsigned int dofs_per_cell = fe_val.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
@@ -248,21 +253,21 @@ do_test(const DoFHandler<dim> &          dof,
               }
         }
       cell->get_dof_indices(local_dof_indices);
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        for (unsigned int j = 0; j < dofs_per_cell; ++j)
-          system_matrix.add(local_dof_indices[i],
-                            local_dof_indices[j],
-                            local_matrix(i, j));
+      constraints.distribute_local_to_global(local_matrix,
+                                             local_dof_indices,
+                                             system_matrix);
     }
 
   Vector<Number> ref(solution.size());
 
   // Compute reference
   system_matrix.vmult(ref, initial_condition);
+  constraints.set_zero(ref);
 
   ref -= solution;
 
   const double diff_norm = ref.linfty_norm() / solution.linfty_norm();
+  deallog << "Norm of solution: " << solution.l2_norm() << std::endl;
   deallog << "Norm of difference: " << diff_norm << std::endl << std::endl;
 }
 
