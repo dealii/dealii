@@ -24,11 +24,6 @@
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/vectorization.h>
 
-#include <deal.II/dofs/dof_handler.h>
-
-#include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/task_info.h>
@@ -41,6 +36,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN
+
+// forward declarations
+
 namespace internal
 {
   namespace MatrixFreeFunctions
@@ -52,6 +50,18 @@ namespace internal
     struct FPArrayComparator;
   } // namespace MatrixFreeFunctions
 } // namespace internal
+
+template <typename>
+class AffineConstraints;
+
+class DynamicSparsityPattern;
+
+template <typename>
+class TriaIterator;
+
+template <int, int, bool>
+class DoFCellAccessor;
+
 #endif
 
 namespace internal
