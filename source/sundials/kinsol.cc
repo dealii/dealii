@@ -294,13 +294,21 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
+  KINSOL<VectorType>::KINSOL(const AdditionalData &data)
+    : KINSOL(data, MPI_COMM_SELF)
+  {}
+
+
+
+  template <typename VectorType>
   KINSOL<VectorType>::KINSOL(const AdditionalData &data,
                              const MPI_Comm &      mpi_comm)
     : data(data)
-    , mpi_communicator(is_serial_vector<VectorType>::value ?
-                         MPI_COMM_SELF :
-                         Utilities::MPI::duplicate_communicator(mpi_comm))
+    , mpi_communicator(mpi_comm)
     , kinsol_mem(nullptr)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    , kinsol_ctx(nullptr)
+#  endif
     , solution(nullptr)
     , u_scale(nullptr)
     , f_scale(nullptr)
@@ -308,7 +316,15 @@ namespace SUNDIALS
     set_functions_to_trigger_an_assert();
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    const int status = SUNContext_Create(&mpi_communicator, &kinsol_ctx);
+    // SUNDIALS will always duplicate communicators if we provide them. This
+    // can cause problems if SUNDIALS is configured with MPI and we pass along
+    // MPI_COMM_SELF in a serial application as MPI won't be
+    // initialized. Hence, work around that by just not providing a
+    // communicator in that case.
+    const int status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
+                                                            &mpi_communicator,
+                        &kinsol_ctx);
     (void)status;
     AssertKINSOL(status);
 #  endif
@@ -319,21 +335,11 @@ namespace SUNDIALS
   template <typename VectorType>
   KINSOL<VectorType>::~KINSOL()
   {
-    int status = 0;
-    (void)status;
-
-    if (kinsol_mem)
-      {
-        KINFree(&kinsol_mem);
-      }
+    KINFree(&kinsol_mem);
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    status = SUNContext_Free(&kinsol_ctx);
+    const int status = SUNContext_Free(&kinsol_ctx);
+    (void)status;
     AssertKINSOL(status);
-#  endif
-
-#  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
-      Utilities::MPI::free_communicator(mpi_communicator);
 #  endif
   }
 
@@ -361,20 +367,20 @@ namespace SUNDIALS
     int status = 0;
     (void)status;
 
-    if (kinsol_mem)
-      {
-        KINFree(&kinsol_mem);
-
+    KINFree(&kinsol_mem);
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-        status = SUNContext_Free(&kinsol_ctx);
-        AssertKINSOL(status);
+    status = SUNContext_Free(&kinsol_ctx);
+    AssertKINSOL(status);
 #  endif
-      }
 
 #  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     kinsol_mem = KINCreate();
 #  else
-    status = SUNContext_Create(&mpi_communicator, &kinsol_ctx);
+    // Same comment applies as in class constructor:
+    status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
+                                                            &mpi_communicator,
+                        &kinsol_ctx);
     AssertKINSOL(status);
 
     kinsol_mem = KINCreate(kinsol_ctx);

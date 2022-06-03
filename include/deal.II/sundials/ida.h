@@ -590,13 +590,22 @@ namespace SUNDIALS
      * choose how these are made consistent, using the same three options that
      * you used for the initial conditions in `reset_type`.
      *
-     * The MPI communicator is simply ignored in the serial case.
-     *
      * @param data IDA configuration data
-     * @param mpi_comm MPI communicator
+     *
+     * @note With SUNDIALS 6 and later this constructor sets up logging
+     * objects to only work on the present processor (i.e., results are only
+     * communicated over MPI_COMM_SELF).
      */
-    IDA(const AdditionalData &data     = AdditionalData(),
-        const MPI_Comm &      mpi_comm = MPI_COMM_WORLD);
+    IDA(const AdditionalData &data = AdditionalData());
+
+    /**
+     * Constructor.
+     *
+     * @param data IDA configuration data. Same as the other constructor.
+     * @param mpi_comm MPI Communicator over which logging operations are
+     * computed. Only used in SUNDIALS 6 and newer.
+     */
+    IDA(const AdditionalData &data, const MPI_Comm &mpi_comm);
 
     /**
      * Destructor.
@@ -885,9 +894,8 @@ namespace SUNDIALS
 #  endif
 
     /**
-     * MPI communicator. SUNDIALS solver runs happily in
-     * parallel. Note that if the library is compiled without MPI
-     * support, MPI_Comm is aliased as int.
+     * MPI communicator. Only used for SUNDIALS' logging routines - the actual
+     * solve routines will use the communicator provided by the vector class.
      */
     MPI_Comm mpi_communicator;
 

@@ -373,15 +373,24 @@ namespace SUNDIALS
     };
 
     /**
-     * Constructor. It is possible to fine tune the SUNDIALS KINSOL solver by
-     * passing an AdditionalData() object that sets all of the solver
-     * parameters.
+     * Constructor, with class parameters set by the AdditionalData object.
      *
      * @param data KINSOL configuration data
-     * @param mpi_comm MPI communicator
+     *
+     * @note With SUNDIALS 6 and later this constructor sets up logging
+     * objects to only work on the present processor (i.e., results are only
+     * communicated over MPI_COMM_SELF).
      */
-    KINSOL(const AdditionalData &data     = AdditionalData(),
-           const MPI_Comm &      mpi_comm = MPI_COMM_WORLD);
+    KINSOL(const AdditionalData &data = AdditionalData());
+
+    /**
+     * Constructor.
+     *
+     * @param data KINSOL configuration data
+     * @param mpi_comm MPI Communicator over which logging operations are
+     * computed. Only used in SUNDIALS 6 and newer.
+     */
+    KINSOL(const AdditionalData &data, const MPI_Comm &mpi_comm);
 
     /**
      * Destructor.
@@ -691,6 +700,13 @@ namespace SUNDIALS
      */
     void *kinsol_mem;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /**
+     * A context object associated with the KINSOL solver.
+     */
+    SUNContext kinsol_ctx;
+#  endif
+
     /**
      * KINSOL solution vector.
      */
@@ -705,13 +721,6 @@ namespace SUNDIALS
      * KINSOL f scale.
      */
     N_Vector f_scale;
-
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    /**
-     * A context object associated with the KINSOL solver.
-     */
-    SUNContext kinsol_ctx;
-#  endif
 
     /**
      * Memory pool of vectors.
