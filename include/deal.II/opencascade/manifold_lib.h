@@ -28,7 +28,9 @@
 // opencascade needs "HAVE_CONFIG_H" to be exported...
 #  define HAVE_CONFIG_H
 #  include <Adaptor3d_Curve.hxx>
-#  include <Adaptor3d_HCurve.hxx>
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+#    include <Adaptor3d_HCurve.hxx>
+#  endif
 #  include <BRepAdaptor_Curve.hxx>
 #  undef HAVE_CONFIG_H
 
@@ -325,7 +327,11 @@ namespace OpenCASCADE
      * A Curve adaptor. This is the one which is used in the computations, and
      * it points to the right one above.
      */
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+    Handle_Adaptor3d_Curve curve;
+#  else
     Handle_Adaptor3d_HCurve curve;
+#  endif
 
     /**
      * Relative tolerance used in all internal computations.
