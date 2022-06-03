@@ -69,10 +69,8 @@ namespace SUNDIALS
    *  - setup_jacobian;
    *  - solve_jacobian_system/solve_with_jacobian;
    *
-   * The function `solve_jacobian_system` should be implemented for SUNDIALS
-   * < 4.0.0. For later versions, you should use
-   * `solve_with_jacobian` to leverage better non-linear
-   * algorithms.
+   * The function solve_jacobian_system() is deprecated. You should use
+   * solve_with_jacobian() to leverage better non-linear algorithms.
    *
    * Optionally, also the following functions could be provided. By default
    * they do nothing, or are not required. If you call the constructor in a way
@@ -659,9 +657,8 @@ namespace SUNDIALS
      * Compute Jacobian. This function is called by IDA any time a Jacobian
      * update is required. The user should compute the Jacobian (or update all
      * the variables that allow the application of the Jacobian). This function
-     * is called by IDA once, before any call to solve_jacobian_system() (for
-     * SUNDIALS < 4.0.0) or solve_with_jacobian() (for
-     * SUNDIALS >= 4.0.0).
+     * is called by IDA once, before any call to solve_jacobian_system() or
+     * solve_with_jacobian().
      *
      * The Jacobian $J$ should be a (possibly inexact) computation of
      * \f[
@@ -723,9 +720,8 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      *
-     * @warning Starting with SUNDIALS 4.1, SUNDIALS provides the possibility of
-     * specifying the tolerance for the resolution. A part from the tolerance
-     * only `rhs` is provided and `dst` needs to be returned.
+     * @deprecated Use solve_with_jacobian() instead which also uses a numerical
+     * tolerance.
      */
     DEAL_II_DEPRECATED
     std::function<int(const VectorType &rhs, VectorType &dst)>

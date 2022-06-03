@@ -23,7 +23,7 @@
 #include "../tests.h"
 
 
-// Test implicit-explicit time stepper. Only solve_jacobian_system.
+// Test implicit-explicit time stepper. Only jacobian_times_vector.
 // Brusselator benchmark
 
 /**

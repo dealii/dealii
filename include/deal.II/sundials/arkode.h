@@ -198,10 +198,9 @@ namespace SUNDIALS
    * $f_I(t, y)$ depends linearly on $y$, and if the Newton-based nonlinear
    * solver is chosen, then the system will be solved using only a single
    * Newton iteration. Notice that in order for the Newton solver to be used,
-   * at least the jacobian_times_vector() function (or solve_jacobian_system()
-   * for SUNDIALS version > 4.0.0) should be supplied. If this function is not
-   * supplied, then only the fixed-point iteration will be supported, and the
-   *`implicit_function_is_linear` setting is ignored.
+   * then jacobian_times_vector() should be supplied. If it is not supplied then
+   * only the fixed-point iteration will be supported, and the
+   * `implicit_function_is_linear` setting is ignored.
    *
    * The optimal solver (Newton vs fixed-point) is highly problem-dependent.
    * Since fixed-point solvers do not require the solution of any linear
@@ -234,27 +233,22 @@ namespace SUNDIALS
    *  - explicit_function()
    *
    * If the mass matrix is different from the identity, the user should supply
-   *  - mass_times_vector() (or solve_mass_system() for SUNDIALS version
-   *    < 4.0.0) and, optionally,
-   *  - mass_times_setup() (or setup_mass() for SUNDIALS version < 4.0.0)
+   *  - mass_times_vector() and, optionally,
+   *  - mass_times_setup()
    *
    * If the use of a Newton method is desired, then the user should also supply
-   *  - jacobian_times_vector (or solve_jacobian_system() for SUNDIALS version
-   *    < 4.0.0)
-   *  - optional: jacobian_times_setup() (or setup_jacobian() for SUNDIALS
-   *    version < 4.0.0)
+   * jacobian_times_vector(). jacobian_times_setup() is optional.
    *
    * @note Although SUNDIALS can provide a difference quotient approximation
    *   of the Jacobian, this is currently not supported through this wrapper.
    *
-   * Only for SUNDIALS version > 4.0.0: A SUNDIALS default solver (SPGMR) is
-   * used to solve the linear systems. To use a custom linear solver for the
-   * mass matrix and/or Jacobian, set:
+   * A SUNDIALS default solver (SPGMR) is used to solve the linear systems. To
+   * use a custom linear solver for the mass matrix and/or Jacobian, set:
    *  - solve_mass() and/or
-   *  - solve_jacobian()
+   *  - solve_linearized_system()
    *
-   * Only for SUNDIALS version > 4.0.0: To use a custom preconditioner with
-   * either a default or custom linear solver, set:
+   * To use a custom preconditioner with either a default or custom linear
+   * solver, set:
    * - jacobian_preconditioner_solve() and/or mass_preconditioner_solve()
    * and, optionally,
    * - jacobian_preconditioner_setup() and/or mass_preconditioner_setup()
