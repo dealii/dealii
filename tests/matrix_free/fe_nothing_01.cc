@@ -19,6 +19,7 @@
 // dofs
 
 #include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
