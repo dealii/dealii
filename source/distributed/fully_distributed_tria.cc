@@ -16,6 +16,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi_large_count.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/repartitioning_policy_tools.h>
@@ -539,35 +540,41 @@ namespace parallel
         dealii::Utilities::pack(construction_data, buffer, false);
 
         // Write offsets to file.
-        unsigned int buffer_size = buffer.size();
+        const std::uint64_t buffer_size = buffer.size();
 
-        unsigned int offset = 0;
+        std::uint64_t offset = 0;
 
-        ierr = MPI_Exscan(&buffer_size,
-                          &offset,
-                          1,
-                          MPI_UNSIGNED,
-                          MPI_SUM,
-                          this->mpi_communicator);
+        ierr = MPI_Exscan(
+          &buffer_size,
+          &offset,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<decltype(buffer_size)>,
+          MPI_SUM,
+          this->mpi_communicator);
         AssertThrowMPI(ierr);
 
         // Write offsets to file.
-        ierr = MPI_File_write_at(fh,
-                                 myrank * sizeof(unsigned int),
-                                 &buffer_size,
-                                 1,
-                                 MPI_UNSIGNED,
-                                 MPI_STATUS_IGNORE);
+        ierr = MPI_File_write_at(
+          fh,
+          myrank * sizeof(std::uint64_t),
+          &buffer_size,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<decltype(buffer_size)>,
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
+        // global position in file
+        const std::uint64_t global_position =
+          mpisize * sizeof(std::uint64_t) + offset;
+
         // Write buffers to file.
-        ierr = MPI_File_write_at(fh,
-                                 mpisize * sizeof(unsigned int) +
-                                   offset, // global position in file
-                                 buffer.data(),
-                                 buffer.size(), // local buffer
-                                 MPI_CHAR,
-                                 MPI_STATUS_IGNORE);
+        ierr = dealii::Utilities::MPI::LargeCount::File_write_at_c(
+          fh,
+          global_position,
+          buffer.data(),
+          buffer.size(), // local buffer
+          MPI_CHAR,
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);
@@ -651,35 +658,41 @@ namespace parallel
         AssertThrowMPI(ierr);
 
         // Read offsets from file.
-        unsigned int buffer_size;
+        std::uint64_t buffer_size;
 
-        ierr = MPI_File_read_at(fh,
-                                myrank * sizeof(unsigned int),
-                                &buffer_size,
-                                1,
-                                MPI_UNSIGNED,
-                                MPI_STATUS_IGNORE);
+        ierr = MPI_File_read_at(
+          fh,
+          myrank * sizeof(std::uint64_t),
+          &buffer_size,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<decltype(buffer_size)>,
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
-        unsigned int offset = 0;
+        std::uint64_t offset = 0;
 
-        ierr = MPI_Exscan(&buffer_size,
-                          &offset,
-                          1,
-                          MPI_UNSIGNED,
-                          MPI_SUM,
-                          this->mpi_communicator);
+        ierr = MPI_Exscan(
+          &buffer_size,
+          &offset,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<decltype(buffer_size)>,
+          MPI_SUM,
+          this->mpi_communicator);
         AssertThrowMPI(ierr);
+
+        // global position in file
+        const std::uint64_t global_position =
+          mpisize * sizeof(std::uint64_t) + offset;
 
         // Read buffers from file.
         std::vector<char> buffer(buffer_size);
-        ierr = MPI_File_read_at(fh,
-                                mpisize * sizeof(unsigned int) +
-                                  offset, // global position in file
-                                buffer.data(),
-                                buffer.size(), // local buffer
-                                MPI_CHAR,
-                                MPI_STATUS_IGNORE);
+        ierr = dealii::Utilities::MPI::LargeCount::File_read_at_c(
+          fh,
+          global_position,
+          buffer.data(),
+          buffer.size(), // local buffer
+          MPI_CHAR,
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);
