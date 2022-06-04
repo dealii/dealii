@@ -718,15 +718,15 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim>
+  template <int dim, typename number, typename number2 = number>
   void
   project_boundary_values_div_conforming(
-    const DoFHandler<dim, dim> & dof_handler,
-    const unsigned int           first_vector_component,
-    const Function<dim, double> &boundary_function,
-    const types::boundary_id     boundary_component,
-    AffineConstraints<double> &  constraints,
-    const Mapping<dim> &         mapping);
+    const DoFHandler<dim, dim> &  dof_handler,
+    const unsigned int            first_vector_component,
+    const Function<dim, number2> &boundary_function,
+    const types::boundary_id      boundary_component,
+    AffineConstraints<number> &   constraints,
+    const Mapping<dim> &          mapping);
 
   /**
    * Same as above for the hp-namespace.
@@ -736,14 +736,14 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim>
+  template <int dim, typename number, typename number2 = number>
   void
   project_boundary_values_div_conforming(
     const DoFHandler<dim, dim> &           dof_handler,
     const unsigned int                     first_vector_component,
-    const Function<dim, double> &          boundary_function,
+    const Function<dim, number2> &         boundary_function,
     const types::boundary_id               boundary_component,
-    AffineConstraints<double> &            constraints,
+    AffineConstraints<number> &            constraints,
     const hp::MappingCollection<dim, dim> &mapping_collection =
       hp::StaticMappingQ1<dim>::mapping_collection);
 
