@@ -691,6 +691,21 @@ namespace SUNDIALS
      */
     void *kinsol_mem;
 
+    /**
+     * KINSOL solution vector.
+     */
+    N_Vector solution;
+
+    /**
+     * KINSOL solution scale.
+     */
+    N_Vector u_scale;
+
+    /**
+     * KINSOL f scale.
+     */
+    N_Vector f_scale;
+
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     /**
      * A context object associated with the KINSOL solver.

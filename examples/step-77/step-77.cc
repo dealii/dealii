@@ -29,6 +29,7 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
 
@@ -640,11 +641,19 @@ namespace Step77
 } // namespace Step77
 
 
-int main()
+int main(int argc, char **argv)
 {
   try
     {
       using namespace Step77;
+#ifdef DEAL_II_WITH_MPI
+      dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc,
+                                                                  argv,
+                                                                  1);
+#else
+      (void)argc;
+      (void)argv;
+#endif
 
       MinimalSurfaceProblem<2> laplace_problem_2d;
       laplace_problem_2d.run();
