@@ -3536,7 +3536,7 @@ namespace internal
   };
 
 
-  template <int dim, int fe_degree, typename Number, bool lex_faces = false>
+  template <int dim, int fe_degree, typename Number>
   struct FEFaceNormalEvaluationImpl
   {
     template <bool do_evaluate, bool add_into_output>
@@ -3637,20 +3637,17 @@ namespace internal
                 evalf.template apply_face<face_direction,
                                           do_evaluate,
                                           add_into_output,
-                                          2,
-                                          lex_faces>(input, output);
+                                          2>(input, output);
               else if (flag & EvaluationFlags::gradients)
                 evalf.template apply_face<face_direction,
                                           do_evaluate,
                                           add_into_output,
-                                          1,
-                                          lex_faces>(input, output);
+                                          1>(input, output);
               else
                 evalf.template apply_face<face_direction,
                                           do_evaluate,
                                           add_into_output,
-                                          0,
-                                          lex_faces>(input, output);
+                                          0>(input, output);
               input += in_stride;
               output += out_stride;
             }
@@ -3841,8 +3838,7 @@ namespace internal
       evalf0.template apply_face<face_direction,
                                  do_evaluate,
                                  add_into_output,
-                                 max_derivative,
-                                 lex_faces>(input, output);
+                                 max_derivative>(input, output);
       // stride to next component
       input += (face_direction == 0) ? in_stride_after_normal : in_stride;
       output += (face_direction == 0) ? out_stride_after_normal : out_stride;
@@ -3850,8 +3846,7 @@ namespace internal
       evalf1.template apply_face<face_direction,
                                  do_evaluate,
                                  add_into_output,
-                                 max_derivative,
-                                 lex_faces>(input, output);
+                                 max_derivative>(input, output);
 
       if (dim == 3)
         {
@@ -3863,8 +3858,7 @@ namespace internal
           evalf2.template apply_face<face_direction,
                                      do_evaluate,
                                      add_into_output,
-                                     max_derivative,
-                                     lex_faces>(input, output);
+                                     max_derivative>(input, output);
         }
     }
   };
