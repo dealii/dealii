@@ -20,7 +20,7 @@
 
 #include <deal.II/fe/block_mask.h>
 #include <deal.II/fe/component_mask.h>
-#include <deal.II/fe/fe_base.h>
+#include <deal.II/fe/fe_data.h>
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/mapping.h>
