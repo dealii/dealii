@@ -2149,16 +2149,16 @@ namespace VectorTools
   {
     // This function computes the projection of the boundary function on the
     // boundary in 2d.
-    template <typename cell_iterator>
+    template <typename cell_iterator, typename number, typename number2>
     void
     compute_face_projection_div_conforming(
       const cell_iterator &                       cell,
       const unsigned int                          face,
       const FEFaceValues<2> &                     fe_values,
       const unsigned int                          first_vector_component,
-      const Function<2> &                         boundary_function,
+      const Function<2, number2> &                boundary_function,
       const std::vector<DerivativeForm<1, 2, 2>> &jacobians,
-      AffineConstraints<double> &                 constraints)
+      AffineConstraints<number> &                 constraints)
     {
       // Compute the integral over the product of the normal components of
       // the boundary function times the normal components of the shape
@@ -2171,9 +2171,9 @@ namespace VectorTools
                                                                       1,
                                                                       0,
                                                                       0};
-      std::vector<Vector<double>> values(fe_values.n_quadrature_points,
-                                         Vector<double>(2));
-      Vector<double>              dof_values(fe.n_dofs_per_face(face));
+      std::vector<Vector<number2>> values(fe_values.n_quadrature_points,
+                                          Vector<number2>(2));
+      Vector<number2>              dof_values(fe.n_dofs_per_face(face));
 
       // Get the values of the boundary function at the quadrature points.
       {
@@ -2186,7 +2186,7 @@ namespace VectorTools
       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
            ++q_point)
         {
-          double tmp = 0.0;
+          number2 tmp = 0.0;
 
           for (unsigned int d = 0; d < 2; ++d)
             tmp += normals[q_point][d] * values[q_point](d);
@@ -2235,32 +2235,35 @@ namespace VectorTools
     }
 
     // dummy implementation of above function for all other dimensions
-    template <int dim, typename cell_iterator>
+    template <int dim,
+              typename cell_iterator,
+              typename number,
+              typename number2>
     void
     compute_face_projection_div_conforming(
       const cell_iterator &,
       const unsigned int,
       const FEFaceValues<dim> &,
       const unsigned int,
-      const Function<dim> &,
+      const Function<dim, number2> &,
       const std::vector<DerivativeForm<1, dim, dim>> &,
-      AffineConstraints<double> &)
+      AffineConstraints<number> &)
     {
       Assert(false, ExcNotImplemented());
     }
 
     // This function computes the projection of the boundary function on the
     // boundary in 3d.
-    template <typename cell_iterator>
+    template <typename cell_iterator, typename number, typename number2>
     void
     compute_face_projection_div_conforming(
       const cell_iterator &                       cell,
       const unsigned int                          face,
       const FEFaceValues<3> &                     fe_values,
       const unsigned int                          first_vector_component,
-      const Function<3> &                         boundary_function,
+      const Function<3, number2> &                boundary_function,
       const std::vector<DerivativeForm<1, 3, 3>> &jacobians,
-      std::vector<double> &                       dof_values,
+      std::vector<number> &                       dof_values,
       std::vector<types::global_dof_index> &      projected_dofs)
     {
       // Compute the intergral over the product of the normal components of
@@ -2272,9 +2275,9 @@ namespace VectorTools
       const unsigned int
         face_coordinate_directions[GeometryInfo<3>::faces_per_cell][2] = {
           {1, 2}, {1, 2}, {2, 0}, {2, 0}, {0, 1}, {0, 1}};
-      std::vector<Vector<double>> values(fe_values.n_quadrature_points,
-                                         Vector<double>(3));
-      Vector<double>              dof_values_local(fe.n_dofs_per_face(face));
+      std::vector<Vector<number2>> values(fe_values.n_quadrature_points,
+                                          Vector<number2>(3));
+      Vector<number2>              dof_values_local(fe.n_dofs_per_face(face));
 
       {
         const std::vector<Point<3>> &quadrature_points =
@@ -2286,7 +2289,7 @@ namespace VectorTools
       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
            ++q_point)
         {
-          double tmp = 0.0;
+          number2 tmp = 0.0;
 
           for (unsigned int d = 0; d < 3; ++d)
             tmp += normals[q_point][d] * values[q_point](d);
@@ -2342,16 +2345,19 @@ namespace VectorTools
     // dummy implementation of above
     // function for all other
     // dimensions
-    template <int dim, typename cell_iterator>
+    template <int dim,
+              typename cell_iterator,
+              typename number,
+              typename number2>
     void
     compute_face_projection_div_conforming(
       const cell_iterator &,
       const unsigned int,
       const FEFaceValues<dim> &,
       const unsigned int,
-      const Function<dim> &,
+      const Function<dim, number2> &,
       const std::vector<DerivativeForm<1, dim, dim>> &,
-      std::vector<double> &,
+      std::vector<number> &,
       std::vector<types::global_dof_index> &)
     {
       Assert(false, ExcNotImplemented());
@@ -2359,15 +2365,15 @@ namespace VectorTools
   } // namespace internals
 
 
-  template <int dim>
+  template <int dim, typename number, typename number2>
   void
   project_boundary_values_div_conforming(
-    const DoFHandler<dim> &    dof_handler,
-    const unsigned int         first_vector_component,
-    const Function<dim> &      boundary_function,
-    const types::boundary_id   boundary_component,
-    AffineConstraints<double> &constraints,
-    const Mapping<dim> &       mapping)
+    const DoFHandler<dim> &       dof_handler,
+    const unsigned int            first_vector_component,
+    const Function<dim, number2> &boundary_function,
+    const types::boundary_id      boundary_component,
+    AffineConstraints<number> &   constraints,
+    const Mapping<dim> &          mapping)
   {
     const unsigned int spacedim = dim;
     // Interpolate the normal components
@@ -2430,7 +2436,9 @@ namespace VectorTools
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(&fe) !=
-                              nullptr,
+                                nullptr ||
+                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
+                                &fe) != nullptr,
                             typename FiniteElement<
                               dim>::ExcInterpolationNotImplemented());
                         }
@@ -2485,7 +2493,9 @@ namespace VectorTools
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(&fe) !=
-                              nullptr,
+                                nullptr ||
+                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
+                                &fe) != nullptr,
                             typename FiniteElement<
                               dim>::ExcInterpolationNotImplemented());
                         }
@@ -2529,14 +2539,14 @@ namespace VectorTools
   }
 
 
-  template <int dim>
+  template <int dim, typename number, typename number2>
   void
   project_boundary_values_div_conforming(
     const DoFHandler<dim> &                dof_handler,
     const unsigned int                     first_vector_component,
-    const Function<dim> &                  boundary_function,
+    const Function<dim, number2> &         boundary_function,
     const types::boundary_id               boundary_component,
-    AffineConstraints<double> &            constraints,
+    AffineConstraints<number> &            constraints,
     const hp::MappingCollection<dim, dim> &mapping_collection)
   {
     const unsigned int           spacedim = dim;
@@ -2618,7 +2628,7 @@ namespace VectorTools
         case 3:
           {
             const unsigned int                   n_dofs = dof_handler.n_dofs();
-            std::vector<double>                  dof_values(n_dofs);
+            std::vector<number2>                 dof_values(n_dofs);
             std::vector<types::global_dof_index> projected_dofs(n_dofs);
 
             for (unsigned int dof = 0; dof < n_dofs; ++dof)

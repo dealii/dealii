@@ -268,21 +268,37 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         AffineConstraints<std::complex<double>> &,
         const hp::MappingCollection<deal_II_dimension> &);
 #    endif
+#  endif
+#endif
+    \}
+  }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     number : REAL_SCALARS;
+     number2 : REAL_SCALARS)
+  {
+    namespace VectorTools
+    \{
+#if deal_II_dimension == deal_II_space_dimension
+
+#  if deal_II_dimension != 1
+
       template void
       project_boundary_values_div_conforming<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
         const unsigned int,
-        const Function<deal_II_dimension> &,
+        const Function<deal_II_dimension, number2> &,
         const types::boundary_id,
-        AffineConstraints<double> &,
+        AffineConstraints<number> &,
         const Mapping<deal_II_dimension> &);
+
       template void
       project_boundary_values_div_conforming<deal_II_dimension>(
         const DoFHandler<deal_II_dimension> &,
         const unsigned int,
-        const Function<deal_II_dimension> &,
+        const Function<deal_II_dimension, number2> &,
         const types::boundary_id,
-        AffineConstraints<double> &,
+        AffineConstraints<number> &,
         const hp::MappingCollection<deal_II_dimension> &);
 #  endif
 #endif
