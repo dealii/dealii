@@ -3672,7 +3672,6 @@ namespace internal
         }
     }
 
-  private:
     template <typename EvalType>
     static EvalType
     create_evaluator_tensor_product(
