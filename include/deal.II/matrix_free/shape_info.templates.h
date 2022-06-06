@@ -944,7 +944,7 @@ namespace internal
         {
           face_to_cell_index_nodal.reinit(GeometryInfo<dim>::faces_per_cell,
                                           dofs_per_component_on_face);
-          for (auto f : GeometryInfo<dim>::face_indices())
+          for (const auto f : GeometryInfo<dim>::face_indices())
             {
               const unsigned int direction = f / 2;
               const unsigned int stride =
@@ -990,7 +990,7 @@ namespace internal
         {
           face_to_cell_index_hermite.reinit(GeometryInfo<dim>::faces_per_cell,
                                             2 * dofs_per_component_on_face);
-          for (auto f : GeometryInfo<dim>::face_indices())
+          for (const auto f : GeometryInfo<dim>::face_indices())
             {
               const unsigned int direction = f / 2;
               const unsigned int stride =

@@ -476,7 +476,7 @@ namespace internal
                   (dim > 2 ? n_rows : 1);
 
     AssertIndexRange(face_direction, dim);
-    constexpr int stride     = Utilities::pow(n_rows, face_direction);
+    constexpr int in_stride  = Utilities::pow(n_rows, face_direction);
     constexpr int out_stride = Utilities::pow(n_rows, dim - 1);
     const Number *DEAL_II_RESTRICT shape_values = this->shape_values;
 
@@ -494,11 +494,12 @@ namespace internal
                   res2 = shape_values[2 * n_rows] * in[0];
                 for (int ind = 1; ind < n_rows; ++ind)
                   {
-                    res0 += shape_values[ind] * in[stride * ind];
+                    res0 += shape_values[ind] * in[in_stride * ind];
                     if (max_derivative > 0)
-                      res1 += shape_values[ind + n_rows] * in[stride * ind];
+                      res1 += shape_values[ind + n_rows] * in[in_stride * ind];
                     if (max_derivative > 1)
-                      res2 += shape_values[ind + 2 * n_rows] * in[stride * ind];
+                      res2 +=
+                        shape_values[ind + 2 * n_rows] * in[in_stride * ind];
                   }
                 if (add)
                   {
@@ -522,14 +523,14 @@ namespace internal
                 for (int col = 0; col < n_rows; ++col)
                   {
                     if (add)
-                      out[col * stride] += shape_values[col] * in[0];
+                      out[col * in_stride] += shape_values[col] * in[0];
                     else
-                      out[col * stride] = shape_values[col] * in[0];
+                      out[col * in_stride] = shape_values[col] * in[0];
                     if (max_derivative > 0)
-                      out[col * stride] +=
+                      out[col * in_stride] +=
                         shape_values[col + n_rows] * in[out_stride];
                     if (max_derivative > 1)
-                      out[col * stride] +=
+                      out[col * in_stride] +=
                         shape_values[col + 2 * n_rows] * in[2 * out_stride];
                   }
               }
@@ -916,7 +917,7 @@ namespace internal
     const int n_blocks2 = dim > 2 ? n_rows : 1;
 
     AssertIndexRange(face_direction, dim);
-    const int stride =
+    const int in_stride =
       face_direction > 0 ? Utilities::fixed_power<face_direction>(n_rows) : 1;
     const int out_stride =
       dim > 1 ? Utilities::fixed_power<dim - 1>(n_rows) : 1;
@@ -935,11 +936,12 @@ namespace internal
                   res2 = shape_values[2 * n_rows] * in[0];
                 for (unsigned int ind = 1; ind < n_rows; ++ind)
                   {
-                    res0 += shape_values[ind] * in[stride * ind];
+                    res0 += shape_values[ind] * in[in_stride * ind];
                     if (max_derivative > 0)
-                      res1 += shape_values[ind + n_rows] * in[stride * ind];
+                      res1 += shape_values[ind + n_rows] * in[in_stride * ind];
                     if (max_derivative > 1)
-                      res2 += shape_values[ind + 2 * n_rows] * in[stride * ind];
+                      res2 +=
+                        shape_values[ind + 2 * n_rows] * in[in_stride * ind];
                   }
                 if (add)
                   {
@@ -963,14 +965,14 @@ namespace internal
                 for (unsigned int col = 0; col < n_rows; ++col)
                   {
                     if (add)
-                      out[col * stride] += shape_values[col] * in[0];
+                      out[col * in_stride] += shape_values[col] * in[0];
                     else
-                      out[col * stride] = shape_values[col] * in[0];
+                      out[col * in_stride] = shape_values[col] * in[0];
                     if (max_derivative > 0)
-                      out[col * stride] +=
+                      out[col * in_stride] +=
                         shape_values[col + n_rows] * in[out_stride];
                     if (max_derivative > 1)
-                      out[col * stride] +=
+                      out[col * in_stride] +=
                         shape_values[col + 2 * n_rows] * in[2 * out_stride];
                   }
               }
@@ -2661,7 +2663,7 @@ namespace internal
 
     AssertIndexRange(face_direction, dim);
 
-    constexpr int stride =
+    constexpr int in_stride =
       (face_direction == normal_dir) ?
         Utilities::pow(n_rows - 1, face_direction) :
         ((face_direction == 0) ?
@@ -2691,12 +2693,13 @@ namespace internal
 
                 for (int ind = 1; ind < n_rows; ++ind)
                   {
-                    res0 += shape_values[ind] * in[stride * ind];
+                    res0 += shape_values[ind] * in[in_stride * ind];
                     if (max_derivative > 0)
-                      res1 += shape_values[ind + n_rows] * in[stride * ind];
+                      res1 += shape_values[ind + n_rows] * in[in_stride * ind];
 
                     if (max_derivative > 1)
-                      res2 += shape_values[ind + 2 * n_rows] * in[stride * ind];
+                      res2 +=
+                        shape_values[ind + 2 * n_rows] * in[in_stride * ind];
                   }
                 if (add)
                   {
@@ -2724,16 +2727,16 @@ namespace internal
                 for (int col = 0; col < n_rows; ++col)
                   {
                     if (add)
-                      out[col * stride] += shape_values[col] * in[0];
+                      out[col * in_stride] += shape_values[col] * in[0];
                     else
-                      out[col * stride] = shape_values[col] * in[0];
+                      out[col * in_stride] = shape_values[col] * in[0];
 
                     if (max_derivative > 0)
-                      out[col * stride] +=
+                      out[col * in_stride] +=
                         shape_values[col + n_rows] * in[out_stride];
 
                     if (max_derivative > 1)
-                      out[col * stride] +=
+                      out[col * in_stride] +=
                         shape_values[col + 2 * n_rows] * in[2 * out_stride];
                   }
               }
