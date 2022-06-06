@@ -46,14 +46,13 @@ test()
   C3t3                          tria;
   std::ifstream                 input("input_grids/cube.off");
   input >> sm;
-  cgal_surface_mesh_to_cgal_triangulation(sm,
-                                          tria,
-                                          CGAL::parameters::cell_size = 0.1);
+  AdditionalData<3> data;
+  data.cell_size = .1;
+  cgal_surface_mesh_to_cgal_triangulation(sm, tria, data);
   const unsigned int n_intial_facets = tria.number_of_facets_in_complex();
   tria.clear();
-  cgal_surface_mesh_to_cgal_triangulation(sm,
-                                          tria,
-                                          CGAL::parameters::cell_size = 0.5);
+  data.cell_size = .5;
+  cgal_surface_mesh_to_cgal_triangulation(sm, tria, data);
 
   Assert(
     n_intial_facets > tria.number_of_facets_in_complex(),
