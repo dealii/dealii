@@ -44,7 +44,7 @@ test()
 {
   CGAL::Surface_mesh<CGALPoint> sm;
   C3t3                          tria;
-  std::ifstream                 input("input_grids/cube.off");
+  std::ifstream                 input(SOURCE_DIR "/input_grids/cube.off");
   input >> sm;
   cgal_surface_mesh_to_cgal_triangulation(sm,
                                           tria,

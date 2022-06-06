@@ -32,8 +32,8 @@ using namespace CGALWrappers;
 void
 test()
 {
-  const std::vector<std::string> fnames{"input_grids/cube.off",
-                                        "input_grids/hedra.off"};
+  const std::vector<std::string> fnames{SOURCE_DIR "/input_grids/cube.off",
+                                        SOURCE_DIR "/input_grids/hedra.off"};
   CGAL::Surface_mesh<CGALPoint>  sm0, sm1, outsm;
   std::ifstream                  input0(fnames[0]);
   std::ifstream                  input1(fnames[1]);
