@@ -251,16 +251,37 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
+  ARKode<VectorType>::ARKode(const AdditionalData &data)
+    : ARKode(data, MPI_COMM_SELF)
+  {}
+
+
+  template <typename VectorType>
   ARKode<VectorType>::ARKode(const AdditionalData &data,
                              const MPI_Comm &      mpi_comm)
     : data(data)
     , arkode_mem(nullptr)
-    , mpi_communicator(is_serial_vector<VectorType>::value ?
-                         MPI_COMM_SELF :
-                         Utilities::MPI::duplicate_communicator(mpi_comm))
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    , arkode_ctx(nullptr)
+#  endif
+    , mpi_communicator(mpi_comm)
     , last_end_time(data.initial_time)
   {
     set_functions_to_trigger_an_assert();
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    // SUNDIALS will always duplicate communicators if we provide them. This
+    // can cause problems if SUNDIALS is configured with MPI and we pass along
+    // MPI_COMM_SELF in a serial application as MPI won't be
+    // initialized. Hence, work around that by just not providing a
+    // communicator in that case.
+    const int status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
+                                                            &mpi_communicator,
+                        &arkode_ctx);
+    (void)status;
+    AssertARKode(status);
+#  endif
   }
 
 
@@ -268,20 +289,12 @@ namespace SUNDIALS
   template <typename VectorType>
   ARKode<VectorType>::~ARKode()
   {
-    if (arkode_mem)
-      {
-        ARKStepFree(&arkode_mem);
+    ARKStepFree(&arkode_mem);
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-        const int status = SUNContext_Free(&arkode_ctx);
-        (void)status;
-        AssertARKode(status);
-#  endif
-      }
-
-#  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
-      Utilities::MPI::free_communicator(mpi_communicator);
+    const int status = SUNContext_Free(&arkode_ctx);
+    (void)status;
+    AssertARKode(status);
 #  endif
   }
 
@@ -388,12 +401,13 @@ namespace SUNDIALS
     (void)status;
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    if (arkode_ctx)
-      {
-        status = SUNContext_Free(&arkode_ctx);
-        AssertARKode(status);
-      }
-    status = SUNContext_Create(&mpi_communicator, &arkode_ctx);
+    status = SUNContext_Free(&arkode_ctx);
+    AssertARKode(status);
+    // Same comment applies as in class constructor:
+    status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
+                                                            &mpi_communicator,
+                        &arkode_ctx);
     AssertARKode(status);
 #  endif
 

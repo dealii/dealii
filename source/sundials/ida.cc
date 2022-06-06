@@ -121,13 +121,34 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
+  IDA<VectorType>::IDA(const AdditionalData &data)
+    : IDA(data, MPI_COMM_SELF)
+  {}
+
+
+
+  template <typename VectorType>
   IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm &mpi_comm)
     : data(data)
     , ida_mem(nullptr)
-    , mpi_communicator(is_serial_vector<VectorType>::value ?
-                         MPI_COMM_SELF :
-                         Utilities::MPI::duplicate_communicator(mpi_comm))
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    , ida_ctx(nullptr)
+#  endif
+    , mpi_communicator(mpi_comm)
   {
+    // SUNDIALS will always duplicate communicators if we provide them. This
+    // can cause problems if SUNDIALS is configured with MPI and we pass along
+    // MPI_COMM_SELF in a serial application as MPI won't be
+    // initialized. Hence, work around that by just not providing a
+    // communicator in that case.
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    const int status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
+                                                            &mpi_communicator,
+                        &ida_ctx);
+    (void)status;
+    AssertIDA(status);
+#  endif
     set_functions_to_trigger_an_assert();
   }
 
@@ -136,20 +157,11 @@ namespace SUNDIALS
   template <typename VectorType>
   IDA<VectorType>::~IDA()
   {
-    if (ida_mem)
-      {
-        IDAFree(&ida_mem);
-
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-        const int status = SUNContext_Free(&ida_ctx);
-        (void)status;
-        AssertIDA(status);
-#  endif
-      }
-
-#  ifdef DEAL_II_WITH_MPI
-    if (is_serial_vector<VectorType>::value == false)
-      Utilities::MPI::free_communicator(mpi_communicator);
+    IDAFree(&ida_mem);
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    const int status = SUNContext_Free(&ida_ctx);
+    (void)status;
+    AssertIDA(status);
 #  endif
   }
 
@@ -221,27 +233,30 @@ namespace SUNDIALS
   {
     bool first_step = (current_time == data.initial_time);
 
-    if (ida_mem)
-      {
-        IDAFree(&ida_mem);
-
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-        const int status = SUNContext_Free(&ida_ctx);
-        (void)status;
-        AssertIDA(status);
-#  endif
-      }
-
     int status;
     (void)status;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    status = SUNContext_Free(&ida_ctx);
+    AssertIDA(status);
+
+    // Same comment applies as in class constructor:
+    status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
+                                                            &mpi_communicator,
+                        &ida_ctx);
+    AssertIDA(status);
+#  endif
+
+    if (ida_mem)
+      {
+        IDAFree(&ida_mem);
+        // Initialization is version-dependent: do that in a moment
+      }
 
 #  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     ida_mem = IDACreate();
 #  else
-    status = SUNContext_Create(&mpi_communicator, &ida_ctx);
-    AssertIDA(status);
-
     ida_mem = IDACreate(ida_ctx);
 #  endif
 

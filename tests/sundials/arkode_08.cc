@@ -47,12 +47,9 @@
  * with SUNDIALS nomenclature.
  */
 int
-main(int argc, char **argv)
+main()
 {
   initlog();
-
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
 
   using VectorType = Vector<double>;
 

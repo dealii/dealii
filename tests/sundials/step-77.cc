@@ -454,17 +454,10 @@ namespace Step77
 
 
 int
-main(int argc, char **argv)
+main()
 {
   initlog();
   using namespace Step77;
-  // SUNDIALS will duplicate communicators even if we are running in serial
-#ifdef DEAL_II_WITH_MPI
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-#else
-  (void)argc;
-  (void)argv;
-#endif
 
   MinimalSurfaceProblem<2> laplace_problem_2d;
   laplace_problem_2d.run();
