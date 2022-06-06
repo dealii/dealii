@@ -335,18 +335,18 @@ namespace
 
   /**
    * Demangle all parameters recursively and attach them to @p tree_out.
-   * @p parameter_node indicates, whether a given node @p tree_in
-   * is a parameter node (as opposed to being a subsection or alias
-   * node).
+   * @p is_parameter_or_alias_node indicates, whether a given node
+   * @p tree_in is a parameter node or an alias node (as opposed to being
+   * a subsection).
    */
   void
   recursively_demangle(const boost::property_tree::ptree &tree_in,
                        boost::property_tree::ptree &      tree_out,
-                       const bool parameter_node = false)
+                       const bool is_parameter_or_alias_node = false)
   {
     for (const auto &p : tree_in)
       {
-        if (parameter_node)
+        if (is_parameter_or_alias_node)
           {
             tree_out.put_child(p.first, p.second);
           }
@@ -357,7 +357,10 @@ namespace
             if (const auto val = p.second.get_value_optional<std::string>())
               temp.put_value<std::string>(*val);
 
-            recursively_demangle(p.second, temp, is_parameter_node(p.second));
+            recursively_demangle(p.second,
+                                 temp,
+                                 is_parameter_node(p.second) ||
+                                   is_alias_node(p.second));
             tree_out.put_child(demangle(p.first), temp);
           }
       }

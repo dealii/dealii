@@ -16,6 +16,11 @@
         "pattern": "1",
         "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]"
     },
+    "int2_alias":
+    {
+        "alias": "int2",
+        "deprecation_status": "false"
+    },
     "Testing%testing":
     {
         "double+double":
@@ -62,6 +67,11 @@
                 "documentation": "doc 4",
                 "pattern": "3",
                 "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
+            },
+            "double 2 alias":
+            {
+                "alias": "double 2",
+                "deprecation_status": "false"
             }
         }
     }
@@ -70,6 +80,11 @@
 {
     "int1": "1",
     "int2": "2",
+    "int2_alias":
+    {
+        "alias": "int2",
+        "deprecation_status": "false"
+    },
     "Testing%testing":
     {
         "double+double": "6.1415926",
@@ -81,7 +96,12 @@
         "double 1": "1.234",
         "ss2":
         {
-            "double 2": "4.321"
+            "double 2": "4.321",
+            "double 2 alias":
+            {
+                "alias": "double 2",
+                "deprecation_status": "false"
+            }
         }
     }
 }
