@@ -283,8 +283,9 @@ namespace VectorTools
                       // dofs on this face
                       face_dofs.resize(fe.n_dofs_per_face(face_no));
                       face->get_dof_indices(face_dofs, cell->active_fe_index());
-                      const std::vector<Point<spacedim>> &dof_locations =
+                      std::vector<Point<spacedim>> dof_locations =
                         fe_values.get_quadrature_points();
+                      dof_locations.resize(fe.n_dofs_per_face(face_no));
 
                       if (fe_is_system)
                         {
