@@ -60,9 +60,24 @@ namespace SUNDIALS
     template <typename VectorType>
     struct LinearSolverContent
     {
+      LinearSolverContent()
+        : a_times_fn(nullptr)
+        , preconditioner_setup(nullptr)
+        , preconditioner_solve(nullptr)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+        , linsol_ctx(nullptr)
+#  endif
+        , P_data(nullptr)
+        , A_data(nullptr)
+      {}
+
       ATimesFn a_times_fn;
       PSetupFn preconditioner_setup;
       PSolveFn preconditioner_solve;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+      SUNContext linsol_ctx;
+#  endif
 
       LinearSolveFunction<VectorType> lsolve;
 
@@ -109,10 +124,21 @@ namespace SUNDIALS
       auto *src_b = unwrap_nvector_const<VectorType>(b);
       auto *dst_x = unwrap_nvector<VectorType>(x);
 
-      SundialsOperator<VectorType> op(content->A_data, content->a_times_fn);
+      SundialsOperator<VectorType> op(content->A_data,
+                                      content->a_times_fn
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                      ,
+                                      content->linsol_ctx
+#  endif
+      );
 
       SundialsPreconditioner<VectorType> preconditioner(
-        content->P_data, content->preconditioner_solve, tol);
+        content->P_data,
+        content->preconditioner_solve,
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+        content->linsol_ctx,
+#  endif
+        tol);
 
       return content->lsolve(op, preconditioner, *dst_x, *src_b, tol);
     }
@@ -173,17 +199,17 @@ namespace SUNDIALS
   template <typename VectorType>
   internal::LinearSolverWrapper<VectorType>::LinearSolverWrapper(
     LinearSolveFunction<VectorType> lsolve
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     ,
-    SUNContext &linsol_ctx
+    SUNContext linsol_ctx
 #  endif
     )
     : content(std::make_unique<LinearSolverContent<VectorType>>())
   {
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-    sun_linear_solver = SUNLinSolNewEmpty();
-#  else
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     sun_linear_solver = SUNLinSolNewEmpty(linsol_ctx);
+#  else
+    sun_linear_solver = SUNLinSolNewEmpty();
 #  endif
 
     sun_linear_solver->ops->gettype    = arkode_linsol_get_type;
@@ -194,7 +220,10 @@ namespace SUNDIALS
     sun_linear_solver->ops->setpreconditioner =
       arkode_linsol_set_preconditioner<VectorType>;
 
-    content->lsolve            = lsolve;
+    content->lsolve = lsolve;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    content->linsol_ctx = linsol_ctx;
+#  endif
     sun_linear_solver->content = content.get();
   }
 
@@ -219,8 +248,22 @@ namespace SUNDIALS
 
 
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   template <typename VectorType>
-  SundialsOperator<VectorType>::SundialsOperator(void *   A_data,
+  SundialsOperator<VectorType>::SundialsOperator(void *     A_data,
+                                                 ATimesFn   a_times_fn,
+                                                 SUNContext linsol_ctx)
+    : A_data(A_data)
+    , a_times_fn(a_times_fn)
+    , linsol_ctx(linsol_ctx)
+
+  {
+    Assert(a_times_fn != nullptr, ExcInternalError());
+    Assert(linsol_ctx != nullptr, ExcInternalError());
+  }
+#  else
+  template <typename VectorType>
+  SundialsOperator<VectorType>::SundialsOperator(void *A_data,
                                                  ATimesFn a_times_fn)
     : A_data(A_data)
     , a_times_fn(a_times_fn)
@@ -228,6 +271,7 @@ namespace SUNDIALS
   {
     Assert(a_times_fn != nullptr, ExcInternalError());
   }
+#  endif
 
 
 
@@ -236,34 +280,48 @@ namespace SUNDIALS
   SundialsOperator<VectorType>::vmult(VectorType &      dst,
                                       const VectorType &src) const
   {
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-    auto sun_dst = internal::make_nvector_view(dst);
-    auto sun_src = internal::make_nvector_view(src);
-    int  status  = a_times_fn(A_data, sun_src, sun_dst);
+    auto sun_dst = internal::make_nvector_view(dst
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                               ,
+                                               linsol_ctx
+#  endif
+    );
+    auto sun_src = internal::make_nvector_view(src
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                               ,
+                                               linsol_ctx
+#  endif
+    );
+    int status = a_times_fn(A_data, sun_src, sun_dst);
     (void)status;
     AssertSundialsSolver(status);
-#  else
-    // We don't currently know how to implement this: the
-    // internal::make_nvector_view() function called above requires a
-    // SUNContext object, but we don't actually have access to such an
-    // object here...
-    (void)dst;
-    (void)src;
-    Assert(false, ExcNotImplemented());
-#  endif
   }
 
 
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   template <typename VectorType>
   SundialsPreconditioner<VectorType>::SundialsPreconditioner(
-    void *   P_data,
+    void *     P_data,
+    PSolveFn   p_solve_fn,
+    SUNContext linsol_ctx,
+    double     tol)
+    : P_data(P_data)
+    , p_solve_fn(p_solve_fn)
+    , linsol_ctx(linsol_ctx)
+    , tol(tol)
+  {}
+#  else
+  template <typename VectorType>
+  SundialsPreconditioner<VectorType>::SundialsPreconditioner(
+    void *P_data,
     PSolveFn p_solve_fn,
-    double   tol)
+    double tol)
     : P_data(P_data)
     , p_solve_fn(p_solve_fn)
     , tol(tol)
   {}
+#  endif
 
 
 
@@ -279,24 +337,24 @@ namespace SUNDIALS
         return;
       }
 
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-    auto sun_dst = internal::make_nvector_view(dst);
-    auto sun_src = internal::make_nvector_view(src);
+    auto sun_dst = internal::make_nvector_view(dst
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                               ,
+                                               linsol_ctx
+#  endif
+    );
+    auto sun_src = internal::make_nvector_view(src
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                               ,
+                                               linsol_ctx
+#  endif
+    );
     // for custom preconditioners no distinction between left and right
     // preconditioning is made
     int status =
       p_solve_fn(P_data, sun_src, sun_dst, tol, 0 /*precondition_type*/);
     (void)status;
     AssertSundialsSolver(status);
-#  else
-    // We don't currently know how to implement this: the
-    // internal::make_nvector_view() function called above requires a
-    // SUNContext object, but we don't actually have access to such an
-    // object here...
-    (void)dst;
-    (void)src;
-    Assert(false, ExcNotImplemented());
-#  endif
   }
 
   template struct SundialsOperator<Vector<double>>;
