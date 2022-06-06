@@ -16,7 +16,8 @@
 
 
 // check ParameterHandler::print_parameters (..., JSON). have a few
-// names that contain all sorts of weird (for JSON) characters
+// names that contain all sorts of weird (for JSON) characters and
+// aliased parameters.
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -31,6 +32,7 @@ main()
   ParameterHandler prm;
   prm.declare_entry("int1", "1", Patterns::Integer(), "doc 1");
   prm.declare_entry("int2", "2", Patterns::Integer(), "doc 2");
+  prm.declare_alias("int2", "int2_alias");
   prm.enter_subsection("ss1");
   {
     prm.declare_entry("double 1", "1.234", Patterns::Double(), "doc 3");
@@ -38,6 +40,7 @@ main()
     prm.enter_subsection("ss2");
     {
       prm.declare_entry("double 2", "4.321", Patterns::Double(), "doc 4");
+      prm.declare_alias("double 2", "double 2 alias");
     }
     prm.leave_subsection();
   }
