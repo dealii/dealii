@@ -52,6 +52,7 @@ DeclException2(ExcNonMatchingElementsSetDofValuesByInterpolation,
 
 namespace internal
 {
+#ifdef DEBUG
   /**
    * In the set_dof_values(), we need to invoke abs() also on unsigned data
    * types, which is ill-formed on newer C++ standards. To avoid this, we use
@@ -120,6 +121,7 @@ namespace internal
   {
     // serial vector: nothing to do
   }
+#endif
 
   /**
    * Helper function that sets the values on a cell, but also checks if the
