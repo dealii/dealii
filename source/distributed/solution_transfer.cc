@@ -267,9 +267,12 @@ namespace parallel
       if (average_values)
         {
           // finalize valence: compress and invert
+          using Number = typename VectorType::value_type;
           valence.compress(::dealii::VectorOperation::add);
           for (const auto i : valence.locally_owned_elements())
-            valence[i] = (valence[i] == 0.0 ? 0.0 : (1.0 / valence[i]));
+            valence[i] = (static_cast<Number>(valence[i]) == Number() ?
+                            Number() :
+                            (Number(1.0) / static_cast<Number>(valence[i])));
           valence.compress(::dealii::VectorOperation::insert);
 
           for (const auto vec : all_out)
