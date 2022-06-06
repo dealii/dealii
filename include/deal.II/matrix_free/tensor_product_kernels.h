@@ -352,6 +352,7 @@ namespace internal
     apply_face(const Number *DEAL_II_RESTRICT in,
                Number *DEAL_II_RESTRICT       out) const;
 
+  private:
     const Number2 *shape_values;
     const Number2 *shape_gradients;
     const Number2 *shape_hessians;
@@ -1101,6 +1102,7 @@ namespace internal
     void
     hessians(const Number in[], Number out[]) const;
 
+  private:
     const Number2 *shape_values;
     const Number2 *shape_gradients;
     const Number2 *shape_hessians;
@@ -1782,6 +1784,7 @@ namespace internal
           const Number *                  in,
           Number *                        out);
 
+  private:
     const Number2 *shape_values;
     const Number2 *shape_gradients;
     const Number2 *shape_hessians;
@@ -2160,6 +2163,7 @@ namespace internal
           const Number *                  in,
           Number *                        out);
 
+  private:
     const Number2 *shape_values;
     const Number2 *shape_gradients;
     const Number2 *shape_hessians;
@@ -2513,6 +2517,7 @@ namespace internal
     apply_face(const Number *DEAL_II_RESTRICT in,
                Number *DEAL_II_RESTRICT       out) const;
 
+  private:
     const Number2 *shape_values;
     const Number2 *shape_gradients;
     const Number2 *shape_hessians;
