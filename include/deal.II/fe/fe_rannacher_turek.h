@@ -21,7 +21,7 @@
 
 #include <deal.II/base/polynomials_rannacher_turek.h>
 
-#include <deal.II/fe/fe_base.h>
+#include <deal.II/fe/fe_data.h>
 #include <deal.II/fe/fe_poly.h>
 
 #include <string>
