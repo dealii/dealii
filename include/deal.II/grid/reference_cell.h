@@ -1369,21 +1369,10 @@ ReferenceCell::standard_line_to_face_and_line_index(
 {
   AssertIndexRange(line, n_lines());
 
-  if (*this == ReferenceCells::Vertex)
+  // start with most common cases
+  if (*this == ReferenceCells::Hexahedron)
     {
-      Assert(false, ExcNotImplemented());
-    }
-  else if (*this == ReferenceCells::Line)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-  else if (*this == ReferenceCells::Triangle)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-  else if (*this == ReferenceCells::Quadrilateral)
-    {
-      Assert(false, ExcNotImplemented());
+      return GeometryInfo<3>::standard_hex_line_to_quad_line_index(line);
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
@@ -1419,9 +1408,21 @@ ReferenceCell::standard_line_to_face_and_line_index(
 
       return table[line];
     }
-  else if (*this == ReferenceCells::Hexahedron)
+  else if (*this == ReferenceCells::Vertex)
     {
-      return GeometryInfo<3>::standard_hex_line_to_quad_line_index(line);
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Line)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      Assert(false, ExcNotImplemented());
     }
 
   Assert(false, ExcNotImplemented());
@@ -1606,25 +1607,24 @@ ReferenceCell::standard_to_real_face_vertex(
   AssertIndexRange(face, n_faces());
   AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
 
-  if (*this == ReferenceCells::Vertex)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-  else if (*this == ReferenceCells::Line)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-  else if (*this == ReferenceCells::Triangle)
+  if (*this == ReferenceCells::Quadrilateral ||
+      *this == ReferenceCells::Triangle)
     {
       static const ndarray<unsigned int, 2, 2> table = {{{{1, 0}}, {{0, 1}}}};
 
       return table[face_orientation][vertex];
     }
-  else if (*this == ReferenceCells::Quadrilateral)
+  else if (*this == ReferenceCells::Hexahedron)
     {
-      return GeometryInfo<2>::standard_to_real_line_vertex(vertex,
-                                                           face_orientation !=
-                                                             0u);
+      static const ndarray<unsigned int, 8, 4> table = {{{{0, 2, 1, 3}},
+                                                         {{0, 1, 2, 3}},
+                                                         {{2, 3, 0, 1}},
+                                                         {{2, 0, 3, 1}},
+                                                         {{3, 1, 2, 0}},
+                                                         {{3, 2, 1, 0}},
+                                                         {{1, 0, 3, 2}},
+                                                         {{1, 3, 0, 2}}}};
+      return table[face_orientation][vertex];
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
@@ -1681,13 +1681,13 @@ ReferenceCell::standard_to_real_face_vertex(
           return table[face_orientation][vertex];
         }
     }
-  else if (*this == ReferenceCells::Hexahedron)
+  else if (*this == ReferenceCells::Vertex)
     {
-      return GeometryInfo<3>::standard_to_real_face_vertex(
-        vertex,
-        Utilities::get_bit(face_orientation, 0),
-        Utilities::get_bit(face_orientation, 2),
-        Utilities::get_bit(face_orientation, 1));
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Line)
+    {
+      Assert(false, ExcNotImplemented());
     }
 
   Assert(false, ExcNotImplemented());
@@ -1705,21 +1705,18 @@ ReferenceCell::standard_to_real_face_line(
   AssertIndexRange(face, n_faces());
   AssertIndexRange(line, face_reference_cell(face).n_lines());
 
-  if (*this == ReferenceCells::Vertex)
+  // start with the most common cases
+  if (*this == ReferenceCells::Hexahedron)
     {
-      Assert(false, ExcNotImplemented());
-    }
-  else if (*this == ReferenceCells::Line)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-  else if (*this == ReferenceCells::Triangle)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-  else if (*this == ReferenceCells::Quadrilateral)
-    {
-      Assert(false, ExcNotImplemented());
+      static const ndarray<unsigned int, 8, 4> table = {{{{2, 3, 0, 1}},
+                                                         {{0, 1, 2, 3}},
+                                                         {{0, 1, 3, 2}},
+                                                         {{3, 2, 0, 1}},
+                                                         {{3, 2, 1, 0}},
+                                                         {{1, 0, 3, 2}},
+                                                         {{1, 0, 2, 3}},
+                                                         {{2, 3, 1, 0}}}};
+      return table[face_orientation][line];
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
@@ -1776,13 +1773,21 @@ ReferenceCell::standard_to_real_face_line(
           return table[face_orientation][line];
         }
     }
-  else if (*this == ReferenceCells::Hexahedron)
+  else if (*this == ReferenceCells::Vertex)
     {
-      return GeometryInfo<3>::standard_to_real_face_line(
-        line,
-        Utilities::get_bit(face_orientation, 0),
-        Utilities::get_bit(face_orientation, 2),
-        Utilities::get_bit(face_orientation, 1));
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Line)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Triangle)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else if (*this == ReferenceCells::Quadrilateral)
+    {
+      Assert(false, ExcNotImplemented());
     }
 
   Assert(false, ExcNotImplemented());
