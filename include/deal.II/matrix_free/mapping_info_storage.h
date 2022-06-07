@@ -309,7 +309,8 @@ namespace internal
       compute_update_flags(
         const UpdateFlags                                     update_flags,
         const std::vector<dealii::hp::QCollection<spacedim>> &quads =
-          std::vector<dealii::hp::QCollection<spacedim>>());
+          std::vector<dealii::hp::QCollection<spacedim>>(),
+        const bool piola_transform = false);
 
       /**
        * Prints a detailed summary of memory consumption in the different
