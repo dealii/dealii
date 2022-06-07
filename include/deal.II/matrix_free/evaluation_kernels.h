@@ -3696,6 +3696,15 @@ namespace internal
       const unsigned int                            face_no,
       const MatrixFreeFunctions::ShapeInfo<Number> &shape_info)
     {
+      if (dim == 1)
+        {
+          // This should never happen since the FE_RaviartThomasNodal is not
+          // defined for dim = 1. It prevents compiler warnings of infinite
+          // recursion.
+          Assert(false, ExcInternalError());
+          return;
+        }
+
       bool increase_max_der = false;
       if ((flag & EvaluationFlags::hessians && max_derivative < 2) ||
           (flag & EvaluationFlags::gradients && max_derivative < 1))
