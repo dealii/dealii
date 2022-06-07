@@ -114,17 +114,30 @@ namespace CGALWrappers
     else
       // in 3d, we build a surface mesh containing all the faces of the 3d cell.
       // Simplices, Tetrahedrons, and Pyramids have their faces numbered in the
-      // same way as CGAL does (all faces are numbered clockwise). Hexahedrons,
-      // instead, have their faces numbered lexicographically, and one cannot
+      // same way as CGAL does (all faces of a bounding polyhedron are numbered
+      // counter-clockwise, so that their normal points outwards). Hexahedrons
+      // in deal.II have their faces numbered lexicographically, and one cannot
       // deduce the direction of the normals by just looking at the vertices.
+      //
       // In order for CGAL to be able to produce the right orientation, we need
-      // to revers the order of the vertices for faces with even index.
+      // to reverse the order of the vertices for faces with even index.
+      // However, in order to allow for all kinds of meshes in 3d, including
+      // Moebius-loops, a deal.II face might even be rotated looking from one
+      // cell, whereas it is according to the standard when looking at it from
+      // the neighboring cell sharing that particular face. Therefore, when
+      // building a cgal face we must also take into account the fact that a
+      // face may have a non-standard orientation.
       for (const auto &f : cell->face_indices())
-        add_facet(cell->face(f),
-                  deal2cgal,
-                  mesh,
-                  cell->reference_cell() != ReferenceCells::Hexahedron ||
-                    (f % 2 == 0));
+        {
+          // Check for standard orientation of faces
+          bool face_is_clockwise_oriented =
+            cell->reference_cell() != ReferenceCells::Hexahedron ||
+            (f % 2 == 0);
+          // Make sure that we revert the orientation if required
+          if (cell->face_orientation(f) == false)
+            face_is_clockwise_oriented = !face_is_clockwise_oriented;
+          add_facet(cell->face(f), deal2cgal, mesh, face_is_clockwise_oriented);
+        }
   }
 
 
