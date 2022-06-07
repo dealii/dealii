@@ -68,7 +68,8 @@ namespace internal
       const UpdateFlags update_flags_cells,
       const UpdateFlags update_flags_boundary_faces,
       const UpdateFlags update_flags_inner_faces,
-      const UpdateFlags update_flags_faces_by_cells)
+      const UpdateFlags update_flags_faces_by_cells,
+      const bool        piola_transform)
     {
       clear();
       this->mapping_collection = mapping;
@@ -85,15 +86,18 @@ namespace internal
       // the mapping that are independent of the FE
       this->update_flags_cells =
         MappingInfoStorage<dim, dim, VectorizedArrayType>::compute_update_flags(
-          update_flags_cells, quad);
+          update_flags_cells, quad, piola_transform);
 
       this->update_flags_boundary_faces =
         ((update_flags_inner_faces | update_flags_boundary_faces) &
              update_quadrature_points ?
            update_quadrature_points :
            update_default) |
-        (((update_flags_inner_faces | update_flags_boundary_faces) &
-          (update_jacobian_grads | update_hessians)) != 0u ?
+        ((((update_flags_inner_faces | update_flags_boundary_faces) &
+           (update_jacobian_grads | update_hessians)) != 0u ||
+          (piola_transform &&
+           ((update_flags_inner_faces | update_flags_boundary_faces) &
+            update_gradients) != 0u)) ?
            update_jacobian_grads :
            update_default) |
         update_normal_vectors | update_JxW_values | update_jacobians;
