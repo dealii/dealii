@@ -47,7 +47,10 @@ main()
     std::ifstream input_sm(SOURCE_DIR "/input_grids/tripod.off");
     input_sm >> sm;
     cgal_surface_mesh_to_dealii_triangulation(sm, tria);
-    go.write_msh(tria, deallog.get_file_stream());
+    go.write_msh(tria, "temp.msh");
+    remove("temp.msh");
+    // If we got here, everything is fine.
+    deallog << "OK" << std::endl;
   }
   tria.clear();
 
@@ -58,6 +61,9 @@ main()
     std::ifstream input_p(SOURCE_DIR "/input_grids/tripod.off");
     input_p >> P;
     cgal_surface_mesh_to_dealii_triangulation(P, tria);
-    go.write_msh(tria, deallog.get_file_stream());
+    go.write_msh(tria, "temp.msh");
+    remove("temp.msh");
+    // If we got here, everything is fine.
+    deallog << "OK" << std::endl;
   }
 }

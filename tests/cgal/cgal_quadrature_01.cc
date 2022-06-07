@@ -48,10 +48,12 @@ using C3t3          = CGAL::Mesh_complex_3_in_triangulation_3<Tr,
 void
 test()
 {
-  const std::vector<std::string> fnames{"input_grids/cube.off",
-                                        "input_grids/tetrahedron.off",
-                                        "input_grids/hedra.off",
-                                        "input_grids/octahedron.off"};
+  const std::vector<std::string> fnames{SOURCE_DIR "/input_grids/cube.off",
+                                        SOURCE_DIR
+                                        "/input_grids/tetrahedron.off",
+                                        SOURCE_DIR "/input_grids/hedra.off",
+                                        SOURCE_DIR
+                                        "/input_grids/octahedron.off"};
   CGAL::Surface_mesh<CGALPoint>  sm;
   C3t3                           tria;
   constexpr int                  degree = 3;

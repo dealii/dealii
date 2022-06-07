@@ -44,7 +44,7 @@ test()
 {
   CGAL::Surface_mesh<CGALPoint> sm;
   C3t3                          tria;
-  std::ifstream                 input("input_grids/cube.off");
+  std::ifstream                 input(SOURCE_DIR "/input_grids/cube.off");
   input >> sm;
   AdditionalData<3> data;
   data.cell_size = .1;
