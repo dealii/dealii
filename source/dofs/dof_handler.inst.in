@@ -46,26 +46,3 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
     \}
 #endif
   }
-
-
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS;
-     deal_II_component : DIMENSIONS)
-  {
-#if deal_II_component <= deal_II_dimension && \
-  deal_II_dimension <= deal_II_space_dimension
-    template types::global_dof_index
-    DoFHandler<deal_II_dimension, deal_II_space_dimension>::get_dof_index<
-      deal_II_component>(const unsigned int obj_level,
-                         const unsigned int obj_index,
-                         const unsigned int fe_index,
-                         const unsigned int local_index) const;
-
-    template void
-    DoFHandler<deal_II_dimension, deal_II_space_dimension>::set_dof_index<
-      deal_II_component>(const unsigned int            obj_level,
-                         const unsigned int            obj_index,
-                         const unsigned int            fe_index,
-                         const unsigned int            local_index,
-                         const types::global_dof_index global_index) const;
-#endif
-  }

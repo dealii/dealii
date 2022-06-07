@@ -1758,22 +1758,21 @@ namespace internal
           // distribute dofs on all cells excluding artificial ones
           types::global_dof_index next_free_dof = 0;
 
-          std::vector<types::global_dof_index> dof_indices;
-
           for (auto cell : dof_handler.active_cell_iterators())
             if (!cell->is_artificial() &&
                 ((subdomain_id == numbers::invalid_subdomain_id) ||
                  (cell->subdomain_id() == subdomain_id)))
               {
-                dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-
+                // feed the process_dof_indices function with an empty type
+                // `std::tuple<>`, as we do not want to retrieve any DoF
+                // indices here and rather modify the stored ones
                 DoFAccessorImplementation::Implementation::process_dof_indices(
                   *cell,
-                  dof_indices,
+                  std::make_tuple(),
                   cell->active_fe_index(),
                   DoFAccessorImplementation::Implementation::
                     DoFIndexProcessor<dim, spacedim, false>(),
-                  [&next_free_dof](auto &stored_index, auto &) {
+                  [&next_free_dof](auto &stored_index, auto) {
                     if (stored_index == numbers::invalid_dof_index)
                       {
                         stored_index = next_free_dof;
@@ -1863,35 +1862,34 @@ namespace internal
 
           types::global_dof_index next_free_dof = 0;
 
-          std::vector<types::global_dof_index> dof_indices;
-
           for (auto cell : dof_handler.cell_iterators_on_level(level))
             if ((level_subdomain_id == numbers::invalid_subdomain_id) ||
                 (cell->level_subdomain_id() == level_subdomain_id))
               {
-                dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-
-                cell->get_mg_dof_indices(dof_indices);
-
-                for (auto &dof_index : dof_indices)
-                  if (dof_index == numbers::invalid_dof_index)
-                    {
-                      dof_index = next_free_dof;
-
-                      Assert(
-                        next_free_dof !=
-                          std::numeric_limits<types::global_dof_index>::max(),
-                        ExcMessage(
-                          "You have reached the maximal number of degrees of "
-                          "freedom that can be stored in the chosen data type. "
-                          "In practice, this can only happen if you are using "
-                          "32-bit data types. You will have to re-compile "
-                          "deal.II with the `DEAL_II_WITH_64BIT_INDICES' "
-                          "flag set to `ON'."));
-                      ++next_free_dof;
-                    }
-
-                cell->set_mg_dof_indices(dof_indices);
+                DoFAccessorImplementation::Implementation::process_dof_indices(
+                  *cell,
+                  std::make_tuple(),
+                  0,
+                  DoFAccessorImplementation::Implementation::
+                    MGDoFIndexProcessor<dim, spacedim>(level),
+                  [&next_free_dof](auto &stored_index, auto) {
+                    if (stored_index == numbers::invalid_dof_index)
+                      {
+                        stored_index = next_free_dof;
+                        Assert(
+                          next_free_dof !=
+                            std::numeric_limits<types::global_dof_index>::max(),
+                          ExcMessage(
+                            "You have reached the maximal number of degrees of "
+                            "freedom that can be stored in the chosen data "
+                            "type. In practice, this can only happen if you "
+                            "are using 32-bit data types. You will have to "
+                            "re-compile deal.II with the "
+                            "`DEAL_II_WITH_64BIT_INDICES' flag set to `ON'."));
+                        ++next_free_dof;
+                      }
+                  },
+                  true);
               }
 
           return next_free_dof;
@@ -2549,9 +2547,9 @@ namespace internal
                    ++d)
                 {
                   const dealii::types::global_dof_index idx =
-                    i->get_index(level,
-                                 d,
-                                 dof_handler.get_fe().n_dofs_per_vertex());
+                    i->access_index(level,
+                                    d,
+                                    dof_handler.get_fe().n_dofs_per_vertex());
 
                   if (idx != numbers::invalid_dof_index)
                     {
@@ -2559,13 +2557,12 @@ namespace internal
                                indices_we_care_about.is_element(idx) :
                                (idx < new_numbers.size()),
                              ExcInternalError());
-                      i->set_index(level,
-                                   d,
-                                   dof_handler.get_fe().n_dofs_per_vertex(),
-                                   (indices_we_care_about.size() == 0) ?
-                                     (new_numbers[idx]) :
-                                     (new_numbers[indices_we_care_about
-                                                    .index_within_set(idx)]));
+                      i->access_index(
+                        level, d, dof_handler.get_fe().n_dofs_per_vertex()) =
+                        (indices_we_care_about.size() == 0) ?
+                          new_numbers[idx] :
+                          new_numbers[indices_we_care_about.index_within_set(
+                            idx)];
                     }
                 }
         }
@@ -3634,21 +3631,27 @@ namespace internal
                      dealii::numbers::artificial_subdomain_id,
                    ExcInternalError());
 
-            std::vector<dealii::types::global_dof_index> dof_indices(
-              cell->get_fe().n_dofs_per_cell());
-            cell->get_mg_dof_indices(dof_indices);
-
             bool complete = true;
-            for (unsigned int i = 0; i < dof_indices.size(); ++i)
-              if (dofs[i] != numbers::invalid_dof_index)
-                {
-                  Assert((dof_indices[i] == (numbers::invalid_dof_index)) ||
-                           (dof_indices[i] == dofs[i]),
-                         ExcInternalError());
-                  dof_indices[i] = dofs[i];
-                }
-              else
-                complete = false;
+            DoFAccessorImplementation::Implementation::process_dof_indices(
+              *cell,
+              dofs,
+              0,
+              DoFAccessorImplementation::Implementation::
+                MGDoFIndexProcessor<dim, spacedim>(cell->level()),
+              [&complete](auto &stored_index, auto received_index) {
+                if (received_index != numbers::invalid_dof_index)
+                  {
+#  if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
+                    Assert((stored_index == (numbers::invalid_dof_index)) ||
+                             (stored_index == received_index),
+                           ExcInternalError());
+#  endif
+                    stored_index = received_index;
+                  }
+                else
+                  complete = false;
+              },
+              true);
 
             if (!complete)
               const_cast<
@@ -3658,10 +3661,6 @@ namespace internal
               const_cast<
                 typename DoFHandler<dim, spacedim>::level_cell_iterator &>(cell)
                 ->clear_user_flag();
-
-            const_cast<
-              typename DoFHandler<dim, spacedim>::level_cell_iterator &>(cell)
-              ->set_mg_dof_indices(dof_indices);
           };
 
           const auto filter = [](const auto &cell) {
@@ -3735,7 +3734,7 @@ namespace internal
               cell->active_fe_index(),
               DoFAccessorImplementation::Implementation::
                 DoFIndexProcessor<dim, spacedim, false>(),
-              [&complete](auto &stored_index, auto &received_index) {
+              [&complete](auto &stored_index, auto received_index) {
                 if (received_index != numbers::invalid_dof_index)
                   {
 #    if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
@@ -4272,26 +4271,25 @@ namespace internal
         // locally owned cell and a ghost cell. In any case, it is
         // sufficient to kill them only from the ghost side cell, so loop
         // only over ghost cells
-        {
-          std::vector<dealii::types::global_dof_index> local_dof_indices;
-
-          for (auto cell : dof_handler->active_cell_iterators())
-            if (cell->is_ghost())
-              {
-                local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-                cell->get_dof_indices(local_dof_indices);
-
-                // delete a DoF index if it has not already been deleted
-                // (e.g., by visiting a neighboring cell, if it is on the
-                // boundary), and if we don't own it
-                for (types::global_dof_index &index : local_dof_indices)
-                  if ((index != numbers::invalid_dof_index) &&
-                      (!owned_dofs.is_element(index)))
-                    index = numbers::invalid_dof_index;
-
-                cell->set_dof_indices(local_dof_indices);
-              }
-        }
+        for (auto cell : dof_handler->active_cell_iterators())
+          if (cell->is_ghost())
+            {
+              DoFAccessorImplementation::Implementation::process_dof_indices(
+                *cell,
+                std::make_tuple(),
+                cell->active_fe_index(),
+                DoFAccessorImplementation::Implementation::
+                  DoFIndexProcessor<dim, spacedim, false>(),
+                [&owned_dofs](auto &stored_index, auto) {
+                  // delete a DoF index if it has not already been
+                  // deleted (e.g., by visiting a neighboring cell, if
+                  // it is on the boundary), and if we don't own it
+                  if (stored_index != numbers::invalid_dof_index &&
+                      (!owned_dofs.is_element(stored_index)))
+                    stored_index = numbers::invalid_dof_index;
+                },
+                false);
+            }
 
 
         // renumber. Skip when there is nothing to do because we own no DoF.
@@ -4408,24 +4406,22 @@ namespace internal
 
         // delete all knowledge of DoF indices that are not locally
         // owned
-        {
-          std::vector<dealii::types::global_dof_index> local_dof_indices;
-
-          for (auto cell : dof_handler->cell_iterators_on_level(level))
-            if (cell->is_ghost_on_level())
-              {
-                local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-                cell->get_mg_dof_indices(local_dof_indices);
-
-                for (types::global_dof_index &index : local_dof_indices)
-                  if ((index != numbers::invalid_dof_index) &&
-                      (!owned_dofs.is_element(index)))
-                    index = numbers::invalid_dof_index;
-
-                cell->set_mg_dof_indices(local_dof_indices);
-              }
-        }
-
+        for (auto cell : dof_handler->cell_iterators_on_level(level))
+          if (cell->is_ghost_on_level())
+            {
+              DoFAccessorImplementation::Implementation::process_dof_indices(
+                *cell,
+                std::make_tuple(),
+                0,
+                DoFAccessorImplementation::Implementation::
+                  MGDoFIndexProcessor<dim, spacedim>(cell->level()),
+                [&owned_dofs](auto &stored_index, auto) {
+                  if ((stored_index != numbers::invalid_dof_index) &&
+                      (!owned_dofs.is_element(stored_index)))
+                    stored_index = numbers::invalid_dof_index;
+                },
+                true);
+            }
 
         // renumber. Skip when there is nothing to do because we own no DoF.
         if (level < triangulation->n_levels() && owned_dofs.n_elements() > 0)

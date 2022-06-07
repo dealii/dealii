@@ -1391,20 +1391,10 @@ private:
      * Return the index of the <code>dof_number</code>th degree of freedom for
      * the given level stored for the current vertex.
      */
-    types::global_dof_index
-    get_index(const unsigned int level,
-              const unsigned int dof_number,
-              const unsigned int dofs_per_vertex) const;
-
-    /**
-     * Set the index of the <code>dof_number</code>th degree of freedom for
-     * the given level stored for the current vertex to <code>index</code>.
-     */
-    void
-    set_index(const unsigned int            level,
-              const unsigned int            dof_number,
-              const unsigned int            dofs_per_vertex,
-              const types::global_dof_index index);
+    types::global_dof_index &
+    access_index(const unsigned int level,
+                 const unsigned int dof_number,
+                 const unsigned int dofs_per_vertex);
 
   private:
     /**
@@ -1629,27 +1619,6 @@ private:
    */
   void
   clear_mg_space();
-
-  /**
-   * Return dof index of specified object.
-   */
-  template <int structdim>
-  types::global_dof_index
-  get_dof_index(const unsigned int obj_level,
-                const unsigned int obj_index,
-                const unsigned int fe_index,
-                const unsigned int local_index) const;
-
-  /**
-   * Return dof index of specified object.
-   */
-  template <int structdim>
-  void
-  set_dof_index(const unsigned int            obj_level,
-                const unsigned int            obj_index,
-                const unsigned int            fe_index,
-                const unsigned int            local_index,
-                const types::global_dof_index global_index) const;
 
   /**
    * Set up DoFHandler policy.
@@ -2156,30 +2125,15 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 
 
 template <int dim, int spacedim>
-inline types::global_dof_index
-DoFHandler<dim, spacedim>::MGVertexDoFs::get_index(
+inline types::global_dof_index &
+DoFHandler<dim, spacedim>::MGVertexDoFs::access_index(
   const unsigned int level,
   const unsigned int dof_number,
-  const unsigned int dofs_per_vertex) const
+  const unsigned int dofs_per_vertex)
 {
   Assert((level >= coarsest_level) && (level <= finest_level),
          ExcInvalidLevel(level));
   return indices[dofs_per_vertex * (level - coarsest_level) + dof_number];
-}
-
-
-
-template <int dim, int spacedim>
-inline void
-DoFHandler<dim, spacedim>::MGVertexDoFs::set_index(
-  const unsigned int            level,
-  const unsigned int            dof_number,
-  const unsigned int            dofs_per_vertex,
-  const types::global_dof_index index)
-{
-  Assert((level >= coarsest_level) && (level <= finest_level),
-         ExcInvalidLevel(level));
-  indices[dofs_per_vertex * (level - coarsest_level) + dof_number] = index;
 }
 
 
