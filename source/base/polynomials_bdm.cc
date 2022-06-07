@@ -122,7 +122,15 @@ PolynomialsBDM<dim>::evaluate(
   std::vector<std::vector<double>> monovali(dim, std::vector<double>(4));
   std::vector<std::vector<double>> monovalk(dim, std::vector<double>(4));
 
-  if (dim == 2)
+  if (dim == 1)
+    {
+      // Despite the fact that we are instantiating this class for 1, 2 and
+      // 3 space dimensions we only support dimension 2 and 3.
+      Assert(false,
+             dealii::ExcMessage("PolynomialsBDF::evaluate is only "
+                                "available for dim == 2, or dim == 3"));
+    }
+  else if (dim == 2)
     {
       for (unsigned int d = 0; d < dim; ++d)
         monomials[0].value(unit_point(d), monovali[d]);
@@ -164,7 +172,7 @@ PolynomialsBDM<dim>::evaluate(
           grad_grads[start + 1][1][1][1] = -monovali[1][2];
         }
     }
-  else // dim == 3
+  else if (dim == 3)
     {
       // The number of curls in each component. Note that the table in
       // BrezziFortin91 has a typo, but the text has the right basis
@@ -182,6 +190,7 @@ PolynomialsBDM<dim>::evaluate(
               monomials[this->degree() - 1 - i].value(unit_point(d),
                                                       monovalk[d]);
             }
+
           if (values.size() != 0)
             {
               // x p'(y) q(z)
@@ -205,6 +214,7 @@ PolynomialsBDM<dim>::evaluate(
               values[start + 2][0] = -monovali[0][0] * monovalk[1][0];
               values[start + 2][1] = 0.;
             }
+
           if (grads.size() != 0)
             {
               grads[start][0][0] = monovali[1][1] * monovalk[2][0];
@@ -243,6 +253,7 @@ PolynomialsBDM<dim>::evaluate(
               grads[start + 2][1][0] = 0.;
               grads[start + 2][1][1] = 0.;
             }
+
           if (grad_grads.size() != 0)
             {
               grad_grads[start][0][0][0] = 0.;
