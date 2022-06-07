@@ -346,6 +346,16 @@ namespace SUNDIALS
                       solution,
                       time.get_step_number());
       }
+    else
+      {
+        // If we don't do a full reset then we still need to fix the end time.
+        // In SUNDIALS 6 and later, SUNDIALS will not do timesteps if the
+        // current time is past the set end point (i.e., ARKStepEvolve will
+        // return ARK_TSTOP_RETURN).
+        const int status = ARKStepSetStopTime(arkode_mem, time.get_end_time());
+        (void)status;
+        AssertARKode(status);
+      }
 
     auto solution_nvector = internal::make_nvector_view(solution
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)

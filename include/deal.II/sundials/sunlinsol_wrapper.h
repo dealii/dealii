@@ -51,6 +51,16 @@ namespace SUNDIALS
     void
     vmult(VectorType &dst, const VectorType &src) const;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /**
+     * Constructor.
+     *
+     * @param A_data Data required by @p a_times_fn
+     * @param a_times_fn A function pointer to the function that computes A*v
+     * @param linsol_ctx The context object used to set up the linear solver and all vectors
+     */
+    SundialsOperator(void *A_data, ATimesFn a_times_fn, SUNContext linsol_ctx);
+#  else
     /**
      * Constructor.
      *
@@ -58,6 +68,7 @@ namespace SUNDIALS
      * @param a_times_fn A function pointer to the function that computes A*v
      */
     SundialsOperator(void *A_data, ATimesFn a_times_fn);
+#  endif
 
   private:
     /**
@@ -70,6 +81,13 @@ namespace SUNDIALS
      * product.
      */
     ATimesFn a_times_fn;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /**
+     * Context object used for SUNDIALS logging.
+     */
+    SUNContext linsol_ctx;
+#  endif
   };
 
 
@@ -92,6 +110,25 @@ namespace SUNDIALS
     void
     vmult(VectorType &dst, const VectorType &src) const;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /**
+     * Constructor.
+     *
+     * @param P_data Data required by @p p_solve_fn
+     * @param p_solve_fn A function pointer to the function that computes A*v
+     * @param linsol_ctx The context object used to set up the linear solver and all vectors
+     * @param tol Tolerance, that an iterative solver should use to judge
+     *   convergence
+     *
+     * @note This function is only available with SUNDIALS 6.0.0 and later.
+     * 6.0.0. If you are using an earlier version of SUNDIALS then you need to
+     * use the other constructor.
+     */
+    SundialsPreconditioner(void *     P_data,
+                           PSolveFn   p_solve_fn,
+                           SUNContext linsol_ctx,
+                           double     tol);
+#  else
     /**
      * Constructor.
      *
@@ -99,8 +136,13 @@ namespace SUNDIALS
      * @param p_solve_fn A function pointer to the function that computes A*v
      * @param tol Tolerance, that an iterative solver should use to judge
      *   convergence
+     *
+     * @note This function is only available with versions of SUNDIALS prior to
+     * 6.0.0. If you are using SUNDIALS 6 or later then you need to use the
+     * other constructor.
      */
     SundialsPreconditioner(void *P_data, PSolveFn p_solve_fn, double tol);
+#  endif
 
   private:
     /**
@@ -113,6 +155,13 @@ namespace SUNDIALS
      * application.
      */
     PSolveFn p_solve_fn;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /**
+     * Context object used for SUNDIALS logging.
+     */
+    SUNContext linsol_ctx;
+#  endif
 
     /**
      * Potential tolerance to use in the internal solve of the preconditioner
@@ -169,7 +218,7 @@ namespace SUNDIALS
       explicit LinearSolverWrapper(LinearSolveFunction<VectorType> lsolve
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                    ,
-                                   SUNContext &linsol_ctx
+                                   SUNContext linsol_ctx
 #  endif
       );
 
