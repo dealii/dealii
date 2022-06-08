@@ -145,6 +145,72 @@ namespace GridGenerator
 
 #  endif
   }
+
+
+
+  void
+  surface_mesh_to_volumetric_mesh(const Triangulation<2, 3> &surface_tria,
+                                  Triangulation<3> &         vol_tria,
+                                  const CGALWrappers::AdditionalData<3> &data)
+  {
+#  ifdef DEAL_II_WITH_CGAL
+    Assert(
+      surface_tria.n_cells() > 0,
+      ExcMessage(
+        "The input triangulation cannot be empty when calling this function."));
+    Assert(
+      vol_tria.n_cells() == 0,
+      ExcMessage(
+        "The output triangulation must be empty when calling this function."));
+    using K       = CGAL::Exact_predicates_inexact_constructions_kernel;
+    using Point_3 = K::Point_3;
+
+    using Mesh_domain =
+      CGAL::Polyhedral_mesh_domain_with_features_3<K,
+                                                   CGAL::Surface_mesh<Point_3>>;
+    using Tr            = CGAL::Mesh_triangulation_3<Mesh_domain,
+                                          CGAL::Default,
+                                          CGALWrappers::ConcurrencyTag>::type;
+    using Mesh_criteria = CGAL::Mesh_criteria_3<Tr>;
+    using C3t3 =
+      CGAL::Mesh_complex_3_in_triangulation_3<Tr,
+                                              Mesh_domain::Corner_index,
+                                              Mesh_domain::Curve_index>;
+
+    CGAL::Surface_mesh<Point_3> mesh;
+    // This function "fills" the missing arrow of the following diagram.
+    //  Tria<2,3>                           Tria<3>
+    //      |                                 ^
+    //      |                                 |
+    //      |                                 |
+    //      |                                 |
+    //      V                                 |
+    // CGAL::Surface_mesh -----------> CGAL::C3t3
+    CGALWrappers::dealii_tria_to_cgal_surface_mesh(surface_tria, mesh);
+    CGAL::Polygon_mesh_processing::triangulate_faces(mesh);
+    CGAL::Polygon_mesh_processing::stitch_borders(mesh);
+    Mesh_domain domain(mesh);
+    domain.detect_features();
+    Mesh_criteria criteria(CGAL::parameters::facet_size  = data.facet_size,
+                           CGAL::parameters::facet_angle = data.facet_angle,
+                           CGAL::parameters::facet_distance =
+                             data.facet_distance,
+                           CGAL::parameters::cell_radius_edge_ratio =
+                             data.cell_radius_edge_ratio,
+                           CGAL::parameters::cell_size = data.cell_size);
+    const auto cgal_triangulation = CGAL::make_mesh_3<C3t3>(domain, criteria);
+    CGALWrappers::cgal_triangulation_to_dealii_triangulation(cgal_triangulation,
+                                                             vol_tria);
+
+#  else
+
+    (void)surface_tria;
+    (void)vol_tria;
+    (void)data;
+    AssertThrow(false, ExcMessage("This function needs CGAL to be installed."));
+
+#  endif
+  }
 } // namespace GridGenerator
 
 // explicit instantiations
