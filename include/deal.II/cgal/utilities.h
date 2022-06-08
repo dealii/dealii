@@ -210,30 +210,6 @@ namespace CGALWrappers
 
 
   /**
-   * Convert from a deal.II Point to any compatible CGAL point.
-   *
-   * @tparam CGALPointType Any of the CGAL point types
-   * @tparam dim Dimension of the point
-   * @param [in] p An input deal.II Point<dim>
-   * @return CGALPointType A CGAL point
-   */
-  template <typename CGALPointType, int dim>
-  inline CGALPointType
-  dealii_point_to_cgal_point(const dealii::Point<dim> &p);
-
-  /**
-   * Convert from various CGAL point types to deal.II Point.
-   *
-   * @tparam dim Dimension of the point
-   * @tparam CGALPointType Any of the CGAL point types
-   * @param p An input CGAL point type
-   * @return dealii::Point<dim> The corresponding deal.II point.
-   */
-  template <int dim, typename CGALPointType>
-  inline dealii::Point<dim>
-  cgal_point_to_dealii_point(const CGALPointType &p);
-
-  /**
    * Given a closed CGAL::Surface_mesh, this function fills the
    * region bounded by the surface with tets.
    *
@@ -375,45 +351,6 @@ namespace CGALWrappers
 // Template implementations
 namespace CGALWrappers
 {
-  template <typename CGALPointType, int dim>
-  inline CGALPointType
-  dealii_point_to_cgal_point(const dealii::Point<dim> &p)
-  {
-    constexpr int cdim = CGALPointType::Ambient_dimension::value;
-    static_assert(dim <= cdim, "Only dim <= cdim supported");
-    if constexpr (cdim == 1)
-      return CGALPointType(p[0]);
-    else if constexpr (cdim == 2)
-      return CGALPointType(p[0], dim > 1 ? p[1] : 0);
-    else if constexpr (cdim == 3)
-      return CGALPointType(p[0], dim > 1 ? p[1] : 0, dim > 2 ? p[2] : 0);
-    else
-      Assert(false, dealii::ExcNotImplemented());
-    return CGALPointType();
-  }
-
-
-
-  template <int dim, typename CGALPointType>
-  inline dealii::Point<dim>
-  cgal_point_to_dealii_point(const CGALPointType &p)
-  {
-    constexpr int cdim = CGALPointType::Ambient_dimension::value;
-    if constexpr (dim == 1)
-      return dealii::Point<dim>(CGAL::to_double(p.x()));
-    else if constexpr (dim == 2)
-      return dealii::Point<dim>(CGAL::to_double(p.x()),
-                                cdim > 1 ? CGAL::to_double(p.y()) : 0);
-    else if constexpr (dim == 3)
-      return dealii::Point<dim>(CGAL::to_double(p.x()),
-                                cdim > 1 ? CGAL::to_double(p.y()) : 0,
-                                cdim > 2 ? CGAL::to_double(p.z()) : 0);
-    else
-      Assert(false, dealii::ExcNotImplemented());
-  }
-
-
-
   template <typename C3t3>
   void
   cgal_surface_mesh_to_cgal_triangulation(

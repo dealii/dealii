@@ -23,11 +23,11 @@
 
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/cgal/utilities.h>
 
 #ifdef DEAL_II_WITH_CGAL
 #  include <CGAL/Polygon_mesh_processing/stitch_borders.h>
 #  include <CGAL/Surface_mesh.h>
+#  include <deal.II/cgal/point_conversion.h>
 
 
 DEAL_II_NAMESPACE_OPEN
