@@ -18,17 +18,32 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CGAL
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 
-#  include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria.h>
+
+#include <deal.II/cgal/utilities.h>
+
+#ifdef DEAL_II_WITH_CGAL
 
 #  include <boost/hana.hpp>
 
+#  include <CGAL/Complex_2_in_triangulation_3.h>
+#  include <CGAL/IO/facets_in_complex_2_to_triangle_mesh.h>
+#  include <CGAL/Implicit_surface_3.h>
+#  include <CGAL/Labeled_mesh_domain_3.h>
+#  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
+#  include <CGAL/Mesh_criteria_3.h>
+#  include <CGAL/Mesh_triangulation_3.h>
 #  include <CGAL/Polyhedron_3.h>
 #  include <CGAL/Surface_mesh.h>
+#  include <CGAL/Surface_mesh_default_triangulation_3.h>
 #  include <CGAL/Triangulation_2.h>
 #  include <CGAL/Triangulation_3.h>
-#  include <deal.II/cgal/utilities.h>
+#  include <CGAL/make_mesh_3.h>
+#  include <CGAL/make_surface_mesh.h>
+#  include <deal.II/cgal/surface_mesh.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -256,8 +271,8 @@ namespace CGALWrappers
             // A face is identified by a cell and by the index within the cell
             // of the opposite vertex. Loop over vertices, and retain only those
             // that belong to this face.
-            unsigned int j = 0;
-            for (unsigned int i = 0; i < 4; ++i)
+            int j = 0;
+            for (int i = 0; i < 4; ++i)
               if (i != cgal_vertex_face_index)
                 dealii_face.vertices[j++] =
                   cgal_to_dealii_vertex_map[cgal_cell->vertex(i)];
@@ -545,8 +560,8 @@ namespace CGALWrappers
       }
     triangulation.create_triangulation(vertices, cells, subcell_data);
   }
-#  endif
 } // namespace CGALWrappers
+#  endif // doxygen
 
 DEAL_II_NAMESPACE_CLOSE
 
