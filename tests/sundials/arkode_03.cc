@@ -20,6 +20,8 @@
 
 #include <deal.II/sundials/arkode.h>
 
+#include <arkode/arkode_arkstep.h>
+
 #include "../tests.h"
 
 
@@ -97,6 +99,19 @@ main()
     if (step_number % 10 == 0)
       deallog << t << ' ' << std::setprecision(10) << sol[0] << ' ' << sol[1]
               << ' ' << sol[2] << std::endl;
+    return 0;
+  };
+
+  // This test, for reasons I don't fully understand, generates some output
+  // which varies between environments much more than the other ARKODE
+  // tests. Work around it by setting a fairly stringent maximum time step.
+  ode.custom_setup = [&](void *arkode_mem) -> int {
+    int ierr = ARKStepSetMinStep(arkode_mem, 1e-8);
+    AssertThrow(ierr == 0, ExcInternalError());
+    ierr = ARKStepSetMaxStep(arkode_mem, 1e-4);
+    AssertThrow(ierr == 0, ExcInternalError());
+    ierr = ARKStepSetMaxNumSteps(arkode_mem, 5000);
+    AssertThrow(ierr == 0, ExcInternalError());
     return 0;
   };
 
