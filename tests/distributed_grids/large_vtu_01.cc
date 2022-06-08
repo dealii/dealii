@@ -69,9 +69,11 @@ run()
   unsigned int n_cycles_global = (run_big) ? 4 : 1;
   triangulation.refine_global(n_cycles_global);
 
-  deallog << "n_global_active_cells: " << triangulation.n_global_active_cells()
-          << " n_global_levels: " << triangulation.n_global_levels()
-          << std::endl;
+  if (dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    deallog << "n_global_active_cells: "
+            << triangulation.n_global_active_cells()
+            << " n_global_levels: " << triangulation.n_global_levels()
+            << std::endl;
 
   const unsigned int n_vectors = 1;
 
@@ -116,8 +118,9 @@ run()
           if (line[0] == '<')
             deallog << line << '\n';
         }
+
+      deallog << "OK" << std::endl;
     }
-  deallog << "OK" << std::endl;
 }
 
 
