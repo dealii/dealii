@@ -233,6 +233,10 @@
 
 /* cmake/configure/configure_2_boost.cmake */
 #cmakedefine DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
+#ifdef defined(DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS) && \
+  !defined(BOOST_ALLOW_DEPRECATED_HEADERS)
+#  define BOOST_ALLOW_DEPRECATED_HEADERS
+#endif
 
 /* cmake/configure/configure_2_trilinos.cmake */
 #cmakedefine DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
