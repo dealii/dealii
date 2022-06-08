@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-// Performs the following: deal.II Triangulations -> CGAL::Surface_mesh(es) ->
-// Perform boolean operation -> deal.II tria.
+// Remesh the union of two deal.II hyper_spheres in order to avoid bad
+// triangles.
 
 #include <deal.II/base/config.h>
 
@@ -27,7 +27,6 @@
 
 #include <deal.II/cgal/surface_mesh.h>
 #include <deal.II/cgal/triangulation.h>
-#include <deal.II/cgal/utilities.h>
 #include <string.h>
 
 #include "../tests.h"
@@ -48,8 +47,8 @@ test()
   GridOut                 go;
   CGALMesh                surface_mesh0, surface_mesh1, out_mesh;
 
-  GridGenerator::hyper_ball(tria0, {0., 0., 0.}, 0.5);
-  GridGenerator::hyper_ball(tria1, {0.2, 0.2, 0.2}, 0.5);
+  GridGenerator::hyper_ball(tria0, {0., 0., 0.}, 0.4);
+  GridGenerator::hyper_ball(tria1, {0.3, 0.3, 0.3}, 0.4);
   tria0.refine_global(3);
   tria1.refine_global(3);
 
@@ -66,50 +65,21 @@ test()
 
   compute_boolean_operation(surface_mesh0,
                             surface_mesh1,
-                            BooleanOperation::compute_intersection,
+                            BooleanOperation::compute_union,
                             out_mesh);
-  // Now back to deal.II
+  AdditionalData<3> data;
+  data.edge_size      = .02;
+  data.facet_angle    = 25;
+  data.facet_size     = 0.05;
+  data.facet_distance = 0.05;
+
+  remesh_surface<CGALPoint>(out_mesh, data);
+
+  //  Now back to deal.II
   cgal_surface_mesh_to_dealii_triangulation(out_mesh, tria_out);
-  std::ofstream out_name_spheres("boolean_intersection_hyper_spheres.vtk");
+  std::ofstream out_name_spheres("remeshed_union_spheres.vtk");
   go.write_vtk(tria_out, out_name_spheres);
   deallog << "OK" << std::endl;
-  remove("boolean_intersection_hyper_spheres.vtk");
-
-  // Clear everything
-  tria0.clear();
-  tria1.clear();
-  tria_out.clear();
-  surface_mesh0.clear();
-  surface_mesh1.clear();
-  out_mesh.clear();
-
-  GridGenerator::hyper_cube(tria0);
-  GridGenerator::hyper_cube(tria1, 0.5, 1.5);
-  tria0.refine_global(3);
-  tria1.refine_global(3);
-  GridTools::rotate(numbers::PI_4, 2, tria1);
-
-  // Move to CGAL surfaces
-  dealii_tria_to_cgal_surface_mesh(tria0, surface_mesh0);
-  dealii_tria_to_cgal_surface_mesh(tria1, surface_mesh1);
-
-  // close the surfaces
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh0);
-  CGAL::Polygon_mesh_processing::stitch_borders(surface_mesh1);
-
-  CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh0);
-  CGAL::Polygon_mesh_processing::triangulate_faces(surface_mesh1);
-
-  compute_boolean_operation(surface_mesh0,
-                            surface_mesh1,
-                            BooleanOperation::compute_intersection,
-                            out_mesh);
-  // Now back to deal.II
-  cgal_surface_mesh_to_dealii_triangulation(out_mesh, tria_out);
-  std::ofstream out_name_cubes("boolean_intersection_cubes.vtk");
-  go.write_vtk(tria_out, out_name_cubes);
-  deallog << "OK" << std::endl;
-  remove("boolean_intersection_cubes.vtk");
 }
 
 int
