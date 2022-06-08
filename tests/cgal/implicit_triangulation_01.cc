@@ -17,7 +17,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/function_parser.h>
+#include <deal.II/base/function.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
@@ -27,13 +27,24 @@
 
 using namespace CGAL::parameters;
 
+class ImplicitFunction : public Function<3>
+{
+public:
+  virtual double
+  value(const Point<3> &p, const unsigned int component = 0) const override
+  {
+    return std::pow(1 - std::sqrt(p[0] * p[0] + p[1] * p[1]), 2) + p[2] * p[2] -
+           .25;
+  }
+};
+
 int
 main()
 {
   initlog();
   // Build a deal.II triangulation
-  Triangulation<3>  tria;
-  FunctionParser<3> implicit_function("(1-sqrt(x^2+y^2))^2+z^2-.25");
+  Triangulation<3>                tria;
+  ImplicitFunction                implicit_function;
   CGALWrappers::AdditionalData<3> data;
   data.cell_size = 0.4;
   GridGenerator::implicit_function(
