@@ -231,8 +231,11 @@
 /* cmake/modules/FindSYMENGINE.cmake */
 #cmakedefine DEAL_II_SYMENGINE_WITH_LLVM
 
-/* cmake/configure/configure_2_boost.cmake */
+/* cmake/configure/configure_20_boost.cmake */
 #cmakedefine DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
+
+/* cmake/configure/configure_50_cgal.cmake */
+#cmakedefine DEAL_II_CGAL_HAS_DEPRECATED_BOOST_INCLUDES
 
 /* cmake/configure/configure_2_trilinos.cmake */
 #cmakedefine DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
@@ -244,6 +247,12 @@
 #cmakedefine DEAL_II_TRILINOS_WITH_TPETRA
 #cmakedefine DEAL_II_TRILINOS_WITH_ZOLTAN
 
+#if defined(DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS) || \
+  defined(DEAL_II_CGAL_HAS_DEPRECATED_BOOST_INCLUDES)
+#  ifndef BOOST_ALLOW_DEPRECATED_HEADERS
+#    define BOOST_ALLOW_DEPRECATED_HEADERS
+#  endif
+#endif
 
 /***********************************************************************
  * Various macros for version number query and comparison:
