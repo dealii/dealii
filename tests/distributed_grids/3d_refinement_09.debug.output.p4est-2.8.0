@@ -1,0 +1,33 @@
+
+DEAL:3d::The maximal level of p4est refinements is 30
+DEAL:3d::cells: 1 level:1
+DEAL:3d::cells: 8 level:2
+DEAL:3d::cells: 15 level:3
+DEAL:3d::cells: 22 level:4
+DEAL:3d::cells: 29 level:5
+DEAL:3d::cells: 36 level:6
+DEAL:3d::cells: 43 level:7
+DEAL:3d::cells: 50 level:8
+DEAL:3d::cells: 57 level:9
+DEAL:3d::cells: 64 level:10
+DEAL:3d::cells: 71 level:11
+DEAL:3d::cells: 78 level:12
+DEAL:3d::cells: 85 level:13
+DEAL:3d::cells: 92 level:14
+DEAL:3d::cells: 99 level:15
+DEAL:3d::cells: 106 level:16
+DEAL:3d::cells: 113 level:17
+DEAL:3d::cells: 120 level:18
+DEAL:3d::cells: 127 level:19
+DEAL:3d::cells: 134 level:20
+DEAL:3d::cells: 141 level:21
+DEAL:3d::cells: 148 level:22
+DEAL:3d::cells: 155 level:23
+DEAL:3d::cells: 162 level:24
+DEAL:3d::cells: 169 level:25
+DEAL:3d::cells: 176 level:26
+DEAL:3d::cells: 183 level:27
+DEAL:3d::cells: 190 level:28
+DEAL:3d::cells: 197 level:29
+DEAL:3d::cells: 204 level:30
+DEAL:3d::ExcMessage( "Fatal Error: maximum refinement level of p4est reached.")
