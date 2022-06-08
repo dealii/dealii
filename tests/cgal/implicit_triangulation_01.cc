@@ -19,9 +19,10 @@
 
 #include <deal.II/base/function_parser.h>
 
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
+
+#include <deal.II/cgal/triangulation.h>
 
 #include "../tests.h"
 
@@ -36,7 +37,7 @@ main()
   FunctionParser<3> implicit_function("(1-sqrt(x^2+y^2))^2+z^2-.25");
   CGALWrappers::AdditionalData<3> data;
   data.cell_size = 0.4;
-  GridGenerator::implicit_function(
+  CGALWrappers::implicit_function(
     tria, implicit_function, data, Point<3>(1, 0, 0), 10.0);
   {
     GridOut       go;

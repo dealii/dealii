@@ -19,9 +19,10 @@
 
 #include <deal.II/base/function_parser.h>
 
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
+
+#include <deal.II/cgal/triangulation.h>
 
 #include "../tests.h"
 
@@ -38,7 +39,7 @@ main()
   data.angular_bound  = 30.;
   data.radius_bound   = .1;
   data.distance_bound = .1;
-  GridGenerator::implicit_function(
+  CGALWrappers::implicit_function(
     tria, implicit_function, data, Point<3>(1, 0, 0), 10.);
   {
     GridOut       go;

@@ -28,23 +28,6 @@
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 
-#ifdef DEAL_II_WITH_CGAL
-// All functions needed by the CGAL mesh generation utilities
-#  include <CGAL/Complex_2_in_triangulation_3.h>
-#  include <CGAL/IO/facets_in_complex_2_to_triangle_mesh.h>
-#  include <CGAL/Implicit_surface_3.h>
-#  include <CGAL/Labeled_mesh_domain_3.h>
-#  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
-#  include <CGAL/Mesh_criteria_3.h>
-#  include <CGAL/Mesh_triangulation_3.h>
-#  include <CGAL/Surface_mesh.h>
-#  include <CGAL/Surface_mesh_default_triangulation_3.h>
-#  include <CGAL/make_mesh_3.h>
-#  include <CGAL/make_surface_mesh.h>
-#  include <deal.II/cgal/triangulation.h>
-#  include <deal.II/cgal/utilities.h>
-#endif
-
 #include <array>
 #include <map>
 
@@ -1764,66 +1747,6 @@ namespace GridGenerator
     Triangulation<dim, spacedim> &tria,
     const std::string &           grid_generator_function_name,
     const std::string &           grid_generator_function_arguments);
-
-#ifdef DEAL_II_WITH_CGAL
-  /**
-   * Generate a Triangulation from the zero level set of an implicit function,
-   * using the CGAL library.
-   *
-   * This function is only implemented for `dim` equal to two or three, and
-   * requires that deal.II is configured using `DEAL_II_WITH_CGAL`. When `dim`
-   * is equal to three, the @p implicit_function is supposed to be negative in
-   * the interior of the domain, positive outside, and to be entirely enclosed
-   * in a ball of radius @p outer_ball_radius centered at the point
-   * @p interior_point. The triangulation that is generated covers the volume
-   * bounded by the zero level set of the implicit function  where the
-   * @p implicit_function is negative.
-   *
-   * When `dim` is equal to two, the generated surface triangulation is the zero
-   * level set of the @p implicit_function, oriented such that the surface
-   * triangulation has normals pointing towards the region where
-   * @p implicit_function is positive.
-   *
-   * The struct @p data can be used to pass additional
-   * arguments to the CGAL::Mesh_criteria_3 class (see
-   * https://doc.cgal.org/latest/Mesh_3/index.html for more information.)
-   *
-   * An example usage of this function is given by
-   *
-   * @code
-   * Triangulation<dim, 3>  tria;
-   * FunctionParser<3> my_function("(1-sqrt(x^2+y^2))^2+z^2-.25");
-   * GridGenerator::implicit_function( tria, my_function,
-   *      Point<3>(.5, 0, 0), 1.0, cell_size = 0.2);
-   * @endcode
-   *
-   * The above snippet of code generates the following grid for `dim` equal to
-   * two and three respectively
-   *
-   * @image html grid_generator_implicit_function_2d.png
-   *
-   * @image html grid_generator_implicit_function_3d.png
-   *
-   * @ingroup simplex
-   *
-   * @param[out] tria The output triangulation
-   * @param[in] implicit_function The implicit function
-   * @param[in] data Additional parameters to pass to the CGAL::make_mesh_3
-   * function and to the CGAL::make_surface_mesh functions
-   * @param[in] interior_point A point in the interior of the domain, for which
-   * @p implicit_function is negative
-   * @param[in] outer_ball_radius The radius of the ball that will contain the
-   * generated Triangulation object
-   */
-  template <int dim>
-  void
-  implicit_function(Triangulation<dim, 3> &                  tria,
-                    const Function<3> &                      implicit_function,
-                    const CGALWrappers::AdditionalData<dim> &data =
-                      CGALWrappers::AdditionalData<dim>{},
-                    const Point<3> &interior_point    = Point<3>(),
-                    const double &  outer_ball_radius = 1.0);
-#endif
   ///@}
 
   /**
@@ -2732,112 +2655,6 @@ namespace GridGenerator
                         const unsigned int,
                         const double,
                         const bool);
-
-#  ifdef DEAL_II_WITH_CGAL
-  template <int dim>
-  void
-  implicit_function(Triangulation<dim, 3> &tria,
-                    const Function<3> &    dealii_implicit_function,
-                    const CGALWrappers::AdditionalData<dim> &data,
-                    const Point<3> &                         interior_point,
-                    const double &                           outer_ball_radius)
-  {
-    Assert(dealii_implicit_function.n_components == 1,
-           ExcMessage(
-             "The implicit function must have exactly one component."));
-    Assert(dealii_implicit_function.value(interior_point) < 0,
-           ExcMessage(
-             "The implicit function must be negative at the interior point."));
-    Assert(outer_ball_radius > 0,
-           ExcMessage("The outer ball radius must be positive."));
-    Assert(tria.n_active_cells() == 0,
-           ExcMessage("The triangulation must be empty."));
-
-    if constexpr (dim == 3)
-      {
-        using K          = CGAL::Exact_predicates_inexact_constructions_kernel;
-        using NumberType = K::FT;
-        using Point_3    = K::Point_3;
-        using Sphere_3   = K::Sphere_3;
-
-        using Mesh_domain = CGAL::Labeled_mesh_domain_3<K>;
-        using Tr =
-          CGAL::Mesh_triangulation_3<Mesh_domain,
-                                     CGAL::Default,
-                                     CGALWrappers::ConcurrencyTag>::type;
-        using C3t3 = CGAL::Mesh_complex_3_in_triangulation_3<Tr, int, int>;
-        using Mesh_criteria = CGAL::Mesh_criteria_3<Tr>;
-
-
-        auto cgal_implicit_function = [&](const Point_3 &p) {
-          return NumberType(
-            dealii_implicit_function.value(Point<3>(p.x(), p.y(), p.z())));
-        };
-
-        Mesh_domain domain = Mesh_domain::create_implicit_mesh_domain(
-          cgal_implicit_function,
-          K::Sphere_3(
-            Point_3(interior_point[0], interior_point[1], interior_point[2]),
-            outer_ball_radius * outer_ball_radius));
-
-        Mesh_criteria criteria(CGAL::parameters::facet_size  = data.facet_size,
-                               CGAL::parameters::facet_angle = data.facet_angle,
-                               CGAL::parameters::facet_distance =
-                                 data.facet_distance,
-                               CGAL::parameters::cell_radius_edge_ratio =
-                                 data.cell_radius_edge_ratio,
-                               CGAL::parameters::cell_size = data.cell_size);
-
-        auto cgal_triangulation = CGAL::make_mesh_3<C3t3>(domain, criteria);
-        CGALWrappers::cgal_triangulation_to_dealii_triangulation(
-          cgal_triangulation, tria);
-      }
-    else if constexpr (dim == 2)
-      {
-        // default triangulation for Surface_mesher
-        using Tr       = CGAL::Surface_mesh_default_triangulation_3;
-        using C2t3     = CGAL::Complex_2_in_triangulation_3<Tr>;
-        using GT       = Tr::Geom_traits;
-        using Sphere_3 = GT::Sphere_3;
-        using Point_3  = GT::Point_3;
-        using FT       = GT::FT;
-        typedef FT (*Function)(Point_3);
-        using Surface_3    = CGAL::Implicit_surface_3<GT, Function>;
-        using Surface_mesh = CGAL::Surface_mesh<Point_3>;
-
-
-        auto cgal_implicit_function = [&](const Point_3 &p) {
-          return FT(
-            dealii_implicit_function.value(Point<3>(p.x(), p.y(), p.z())));
-        };
-
-        Surface_3 surface(cgal_implicit_function,
-                          Sphere_3(Point_3(interior_point[0],
-                                           interior_point[1],
-                                           interior_point[2]),
-                                   outer_ball_radius * outer_ball_radius));
-
-        Tr           tr;
-        C2t3         c2t3(tr);
-        Surface_mesh mesh;
-
-        CGAL::Surface_mesh_default_criteria_3<Tr> criteria(data.angular_bound,
-                                                           data.radius_bound,
-                                                           data.distance_bound);
-        CGAL::make_surface_mesh(c2t3,
-                                surface,
-                                criteria,
-                                CGAL::Non_manifold_tag());
-        CGAL::facets_in_complex_2_to_triangle_mesh(c2t3, mesh);
-        CGALWrappers::cgal_surface_mesh_to_dealii_triangulation(mesh, tria);
-      }
-    else
-      {
-        Assert(false, ExcImpossibleInDim(dim));
-      }
-  }
-#  endif
-
 #endif
 } // namespace GridGenerator
 
