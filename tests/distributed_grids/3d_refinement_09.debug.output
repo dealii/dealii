@@ -1,4 +1,5 @@
 
+DEAL:3d::The maximal level of p4est refinements is 19
 DEAL:3d::cells: 1 level:1
 DEAL:3d::cells: 8 level:2
 DEAL:3d::cells: 15 level:3

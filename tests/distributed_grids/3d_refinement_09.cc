@@ -19,6 +19,7 @@
 
 #include <deal.II/base/tensor.h>
 
+#include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -37,10 +38,17 @@ template <int dim>
 void
 test(std::ostream & /*out*/)
 {
+  const unsigned int max_level = internal::p4est::functions<dim>::max_level;
+
+  deallog << "The maximal level of p4est refinements is " << max_level
+          << std::endl;
+
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridGenerator::hyper_cube(tr);
-  for (unsigned int i = 0; i < 19; ++i)
+  // The first refinement level is "1". So in order to refine past the
+  // limit we have to attempt to refine max_level times:
+  for (unsigned int i = 0; i < max_level; ++i)
     {
       deallog << "cells: " << tr.n_active_cells() << " level:" << tr.n_levels()
               << std::endl;
@@ -49,9 +57,8 @@ test(std::ostream & /*out*/)
       it = tr.begin_active();
       while (it->level() < static_cast<int>(i))
         ++it;
-
-
       it->set_refine_flag();
+
       try
         {
           tr.execute_coarsening_and_refinement();
