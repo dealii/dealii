@@ -14561,9 +14561,40 @@ Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
       for (const auto &cell : cell_iterators_on_level(l))
         {
           const unsigned int my_index = cell->index() * max_vertices_per_cell;
-          for (const unsigned int i : cell->vertex_indices())
-            cache[my_index + i] = internal::TriaAccessorImplementation::
-              Implementation::vertex_index(*cell, i);
+
+          // to reduce the cost of this function when passing down into quads,
+          // then lines, then vertices, we use a more low-level access method
+          // for hexahedral cells, where we can streamline most of the logic
+          const ReferenceCell ref_cell = cell->reference_cell();
+          if (ref_cell == ReferenceCells::Hexahedron)
+            for (unsigned int face = 4; face < 6; ++face)
+              {
+                const auto                face_iter = cell->face(face);
+                const std::array<bool, 2> line_orientations{
+                  {face_iter->line_orientation(0),
+                   face_iter->line_orientation(1)}};
+                std::array<unsigned int, 4> raw_vertex_indices{
+                  {face_iter->line(0)->vertex_index(1 - line_orientations[0]),
+                   face_iter->line(1)->vertex_index(1 - line_orientations[1]),
+                   face_iter->line(0)->vertex_index(line_orientations[0]),
+                   face_iter->line(1)->vertex_index(line_orientations[1])}};
+
+                const unsigned char orientate =
+                  levels[l]->face_orientations[cell->index() * 6 + face];
+                std::array<unsigned int, 4> vertex_order{
+                  {ref_cell.standard_to_real_face_vertex(0, face, orientate),
+                   ref_cell.standard_to_real_face_vertex(1, face, orientate),
+                   ref_cell.standard_to_real_face_vertex(2, face, orientate),
+                   ref_cell.standard_to_real_face_vertex(3, face, orientate)}};
+
+                const unsigned int index = my_index + 4 * (face - 4);
+                for (unsigned int i = 0; i < 4; ++i)
+                  cache[index + i] = raw_vertex_indices[vertex_order[i]];
+              }
+          else
+            for (const unsigned int i : cell->vertex_indices())
+              cache[my_index + i] = internal::TriaAccessorImplementation::
+                Implementation::vertex_index(*cell, i);
         }
     }
 }
