@@ -94,7 +94,7 @@ check_solve(SolverType &              solver,
       case 5:
         check_solver_within_range((void)true,
                                   solver_control.last_step(),
-                                  127,
+                                  125,
                                   138);
         break;
       case 6:

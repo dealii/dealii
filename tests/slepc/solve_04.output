@@ -18,7 +18,7 @@ DEAL::Solver stopped within 119 - 128 iterations
 DEAL::Eigenvalues: 3.98974, 3.95906, 3.90828, 3.83792
 DEAL::
 DEAL::Solver type: N6dealii13SLEPcWrappers25SolverGeneralizedDavidsonE
-DEAL::Solver stopped within 127 - 138 iterations
+DEAL::Solver stopped within 125 - 138 iterations
 DEAL::Eigenvalues: 3.98974, 3.95906, 3.90828, 3.83792
 DEAL::
 DEAL::Solver type: N6dealii13SLEPcWrappers20SolverJacobiDavidsonE
