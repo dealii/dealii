@@ -1047,16 +1047,28 @@ namespace internal
         // correct (face/cell-local) ordering.
         if ((structdim == 2 || structdim == 3) && fe.n_dofs_per_line() > 0)
           for (const auto line : accessor.line_indices())
-            dof_operation.process_dofs(
-              *accessor.line(line),
-              [&](const auto d) {
-                return fe.adjust_line_dof_index_for_line_orientation(
-                  d, accessor.line_orientation(line));
-              },
-              index,
-              dof_indices,
-              fe_index,
-              dof_processor);
+            {
+              const bool line_orientation = accessor.line_orientation(line);
+              if (line_orientation)
+                dof_operation.process_dofs(
+                  *accessor.line(line),
+                  [](const auto d) { return d; },
+                  index,
+                  dof_indices,
+                  fe_index,
+                  dof_processor);
+              else
+                dof_operation.process_dofs(
+                  *accessor.line(line),
+                  [&fe, &line_orientation](const auto d) {
+                    return fe.adjust_line_dof_index_for_line_orientation(
+                      d, line_orientation);
+                  },
+                  index,
+                  dof_indices,
+                  fe_index,
+                  dof_processor);
+            }
 
         // 3) copy dof numbers from the FACE. for faces with the wrong
         // orientation, we have already made sure that we're ok by picking the
@@ -1068,20 +1080,33 @@ namespace internal
         // or face_orientation is non-standard
         if (structdim == 3 && fe.max_dofs_per_quad() > 0)
           for (const auto quad : accessor.face_indices())
-            dof_operation.process_dofs(
-              *accessor.quad(quad),
-              [&](const auto d) {
-                return fe.adjust_quad_dof_index_for_face_orientation(
-                  d,
-                  quad,
-                  accessor.face_orientation(quad),
-                  accessor.face_flip(quad),
-                  accessor.face_rotation(quad));
-              },
-              index,
-              dof_indices,
-              fe_index,
-              dof_processor);
+            {
+              const unsigned int raw_orientation = TriaAccessorImplementation::
+                Implementation::face_orientation_raw(accessor, quad);
+              if (raw_orientation == 1)
+                dof_operation.process_dofs(
+                  *accessor.quad(quad),
+                  [](const auto d) { return d; },
+                  index,
+                  dof_indices,
+                  fe_index,
+                  dof_processor);
+              else
+                dof_operation.process_dofs(
+                  *accessor.quad(quad),
+                  [&](const auto d) {
+                    return fe.adjust_quad_dof_index_for_face_orientation(
+                      d,
+                      quad,
+                      accessor.face_orientation(quad),
+                      accessor.face_flip(quad),
+                      accessor.face_rotation(quad));
+                  },
+                  index,
+                  dof_indices,
+                  fe_index,
+                  dof_processor);
+            }
 
         // 4) INNER dofs
         if (fe.template n_dofs_per_object<structdim>() > 0)
