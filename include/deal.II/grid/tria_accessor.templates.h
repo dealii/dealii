@@ -3728,9 +3728,10 @@ CellAccessor<dim, spacedim>::is_locally_owned() const
   // subdomain, so the first condition checks whether we have a serial
   // triangulation, in which case all cells are locally owned. The second
   // condition compares the subdomain id in the parallel case.
-  return (this->tria->locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id ||
-          this->subdomain_id() == this->tria->locally_owned_subdomain());
+  const types::subdomain_id locally_owned_subdomain =
+    this->tria->locally_owned_subdomain();
+  return (locally_owned_subdomain == numbers::invalid_subdomain_id ||
+          this->subdomain_id() == locally_owned_subdomain);
 
 #endif
 }
@@ -3748,9 +3749,10 @@ CellAccessor<dim, spacedim>::is_locally_owned_on_level() const
   // subdomain, so the first condition checks whether we have a serial
   // triangulation, in which case all cells are locally owned. The second
   // condition compares the subdomain id in the parallel case.
-  return (this->tria->locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id ||
-          this->level_subdomain_id() == this->tria->locally_owned_subdomain());
+  const types::subdomain_id locally_owned_subdomain =
+    this->tria->locally_owned_subdomain();
+  return (locally_owned_subdomain == numbers::invalid_subdomain_id ||
+          this->level_subdomain_id() == locally_owned_subdomain);
 
 #endif
 }
@@ -3774,10 +3776,12 @@ CellAccessor<dim, spacedim>::is_ghost() const
   // serial triangulation are locally owned and none is ghosted. The second
   // and third conditions check whether the cell's subdomain is not the
   // locally owned one and not artificial.
-  return (this->tria->locally_owned_subdomain() !=
-            numbers::invalid_subdomain_id &&
-          this->subdomain_id() != this->tria->locally_owned_subdomain() &&
-          this->subdomain_id() != numbers::artificial_subdomain_id);
+  const types::subdomain_id locally_owned_subdomain =
+    this->tria->locally_owned_subdomain();
+  const types::subdomain_id subdomain_id = this->subdomain_id();
+  return (locally_owned_subdomain != numbers::invalid_subdomain_id &&
+          subdomain_id != locally_owned_subdomain &&
+          subdomain_id != numbers::artificial_subdomain_id);
 
 #endif
 }
@@ -3788,17 +3792,19 @@ inline bool
 CellAccessor<dim, spacedim>::is_ghost_on_level() const
 {
 #ifndef DEAL_II_WITH_MPI
-  return true;
+  return false;
 #else
 
   // Serial triangulations report invalid_subdomain_id as their locally owned
   // subdomain, so the first condition checks whether we have a serial
   // triangulation, in which case all cells are locally owned. The second
   // condition compares the subdomain id in the parallel case.
-  return (
-    this->tria->locally_owned_subdomain() == numbers::invalid_subdomain_id ||
-    (this->level_subdomain_id() != this->tria->locally_owned_subdomain() &&
-     this->level_subdomain_id() != numbers::artificial_subdomain_id));
+  const types::subdomain_id locally_owned_subdomain =
+    this->tria->locally_owned_subdomain();
+  const types::subdomain_id subdomain_id = this->level_subdomain_id();
+  return (locally_owned_subdomain != numbers::invalid_subdomain_id &&
+          subdomain_id != locally_owned_subdomain &&
+          subdomain_id != numbers::artificial_subdomain_id);
 
 #endif
 }
@@ -3834,7 +3840,9 @@ CellAccessor<dim, spacedim>::is_artificial_on_level() const
 #ifndef DEAL_II_WITH_MPI
   return false;
 #else
-  return (is_locally_owned_on_level() || is_ghost_on_level()) == false;
+  return (this->tria->locally_owned_subdomain() !=
+            numbers::invalid_subdomain_id &&
+          this->level_subdomain_id() == numbers::artificial_subdomain_id);
 #endif
 }
 
@@ -3849,6 +3857,17 @@ CellAccessor<dim, spacedim>::subdomain_id() const
          ExcMessage("subdomain_id() can only be called on active cells!"));
   return this->tria->levels[this->present_level]
     ->subdomain_ids[this->present_index];
+}
+
+
+
+template <int dim, int spacedim>
+inline types::subdomain_id
+CellAccessor<dim, spacedim>::level_subdomain_id() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  return this->tria->levels[this->present_level]
+    ->level_subdomain_ids[this->present_index];
 }
 
 
