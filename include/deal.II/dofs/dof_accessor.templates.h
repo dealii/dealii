@@ -1033,9 +1033,10 @@ namespace internal
         unsigned int index = 0;
 
         // 1) VERTEX dofs
-        for (const auto vertex : accessor.vertex_indices())
-          dof_operation.process_vertex_dofs(
-            accessor, vertex, index, dof_indices, fe_index, dof_processor);
+        if (fe.n_dofs_per_vertex() > 0)
+          for (const auto vertex : accessor.vertex_indices())
+            dof_operation.process_vertex_dofs(
+              accessor, vertex, index, dof_indices, fe_index, dof_processor);
 
         // 2) copy dof numbers from the LINE. for lines with the wrong
         // orientation (which might occur in 3d), we have already made sure that
@@ -1044,7 +1045,7 @@ namespace internal
         // orientation, we look at it in flipped orientation and we will have to
         // adjust the shape function indices that we see to correspond to the
         // correct (face/cell-local) ordering.
-        if (structdim == 2 || structdim == 3)
+        if ((structdim == 2 || structdim == 3) && fe.n_dofs_per_line() > 0)
           for (const auto line : accessor.line_indices())
             dof_operation.process_dofs(
               *accessor.line(line),
@@ -1065,7 +1066,7 @@ namespace internal
         // adjust the shape function indices that we see to correspond to the
         // correct (cell-local) ordering. The same applies, if the face_rotation
         // or face_orientation is non-standard
-        if (structdim == 3)
+        if (structdim == 3 && fe.max_dofs_per_quad() > 0)
           for (const auto quad : accessor.face_indices())
             dof_operation.process_dofs(
               *accessor.quad(quad),
@@ -1083,13 +1084,14 @@ namespace internal
               dof_processor);
 
         // 4) INNER dofs
-        dof_operation.process_dofs(
-          accessor,
-          [&](const auto d) { return d; },
-          index,
-          dof_indices,
-          fe_index,
-          dof_processor);
+        if (fe.template n_dofs_per_object<structdim>() > 0)
+          dof_operation.process_dofs(
+            accessor,
+            [&](const auto d) { return d; },
+            index,
+            dof_indices,
+            fe_index,
+            dof_processor);
 
         AssertDimension(n_dof_indices(accessor, fe_index, count_level_dofs),
                         index);
