@@ -2228,17 +2228,6 @@ CellAccessor<dim, spacedim>::set_subdomain_id(
 
 
 template <int dim, int spacedim>
-types::subdomain_id
-CellAccessor<dim, spacedim>::level_subdomain_id() const
-{
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]
-    ->level_subdomain_ids[this->present_index];
-}
-
-
-
-template <int dim, int spacedim>
 void
 CellAccessor<dim, spacedim>::set_level_subdomain_id(
   const types::subdomain_id new_level_subdomain_id) const
