@@ -20,6 +20,8 @@
 
 #include <deal.II/sundials/arkode.h>
 
+#include <arkode/arkode_arkstep.h>
+
 #include "../tests.h"
 
 
@@ -76,7 +78,7 @@ main()
     [&](double, const VectorType &y, VectorType &ydot) -> int {
     ydot[0] = 0;
     ydot[1] = 0;
-    ydot[2] = (b - y[2]) / eps;
+    ydot[2] = -y[2] / eps;
     return 0;
   };
 
@@ -85,7 +87,7 @@ main()
     [&](double, const VectorType &y, VectorType &ydot) -> int {
     ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
     ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
-    ydot[2] = -y[2] * y[0];
+    ydot[2] = b / eps - y[2] * y[0];
     return 0;
   };
 
@@ -97,6 +99,19 @@ main()
     if (step_number % 10 == 0)
       deallog << t << ' ' << std::setprecision(10) << sol[0] << ' ' << sol[1]
               << ' ' << sol[2] << std::endl;
+    return 0;
+  };
+
+  // This test, for reasons I don't fully understand, generates some output
+  // which varies between environments much more than the other ARKODE
+  // tests. Work around it by setting a fairly stringent maximum time step.
+  ode.custom_setup = [&](void *arkode_mem) -> int {
+    int ierr = ARKStepSetMinStep(arkode_mem, 1e-8);
+    AssertThrow(ierr == 0, ExcInternalError());
+    ierr = ARKStepSetMaxStep(arkode_mem, 1e-4);
+    AssertThrow(ierr == 0, ExcInternalError());
+    ierr = ARKStepSetMaxNumSteps(arkode_mem, 5000);
+    AssertThrow(ierr == 0, ExcInternalError());
     return 0;
   };
 

@@ -4,16 +4,16 @@ set Time interval between each output = 0.1
 subsection Error control
   # making this tolerance any lower prevents convergence in 5.4:
   # this is fixed in 6.2
-  set Absolute error tolerance = 1e-8
-  set Relative error tolerance = 1e-8
+  set Absolute error tolerance = 5e-9
+  set Relative error tolerance = 5e-9
 end
 subsection Running parameters
   set Implicit function is linear            = true
   set Implicit function is time independent  = true
   set Initial step size                      = 1e-6
-  set Maximum number of nonlinear iterations = 30
+  set Maximum number of nonlinear iterations = 50
   set Maximum order of ARK                   = 5
   set Minimum step size                      = 1e-7
   # A larger subspace, combined with looser tolerances, are required by 5.4
-  set Anderson-acceleration subspace         = 5
+  set Anderson-acceleration subspace         = 10
 end
