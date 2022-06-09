@@ -7,14 +7,8 @@ DEAL:0::<?xml version="1.0" ?>
 <Piece NumberOfPoints="81415168" NumberOfCells="75866112" >
 OK
 
-DEAL:1::n_global_active_cells: 4096 n_global_levels: 5
-DEAL:1::OK
 
-DEAL:2::n_global_active_cells: 4096 n_global_levels: 5
-DEAL:2::OK
 
-DEAL:3::n_global_active_cells: 4096 n_global_levels: 5
-DEAL:3::OK
 
 
 
