@@ -373,9 +373,10 @@ namespace internal
     inline unsigned int
     TriaObjects::n_objects() const
     {
-      // assume that each cell has the same number of faces
-      const unsigned int faces_per_cell = 2 * this->structdim;
-      return cells.size() / faces_per_cell;
+      // ensure that sizes are consistent, and then return one that
+      // corresponds to the number of objects
+      AssertDimension(cells.size(), manifold_id.size() * 2 * this->structdim);
+      return manifold_id.size();
     }
 
 

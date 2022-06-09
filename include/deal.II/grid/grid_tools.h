@@ -4669,9 +4669,7 @@ namespace GridTools
       cell_filter,
       [&](const auto &process) {
         for (const auto &cell : mesh.cell_iterators())
-          if (cell->level_subdomain_id() !=
-                dealii::numbers::artificial_subdomain_id &&
-              !cell->is_locally_owned_on_level())
+          if (cell->is_ghost_on_level())
             process(cell, cell->level_subdomain_id());
       },
       [](const auto &tria) { return tria.level_ghost_owners(); });
