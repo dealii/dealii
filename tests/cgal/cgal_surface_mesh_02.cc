@@ -27,8 +27,8 @@
 
 #include "../tests.h"
 
-// Create a Surface_mesh from an .off file, then fill it with tets and print
-// vertices.
+// Create a Surface_mesh from an .off file, then fill it with tets and
+// check that we succeeded.
 
 using K         = CGAL::Exact_predicates_inexact_constructions_kernel;
 using CGALPoint = CGAL::Point_3<K>;
@@ -58,14 +58,10 @@ test()
       std::ifstream input(name);
       input >> sm;
       cgal_surface_mesh_to_cgal_triangulation(sm, tria);
-      {
-        std::ofstream off_file_medit("coarse.mesh");
-        tria.output_to_medit(off_file_medit, false);
-      }
-      cat_file("coarse.mesh");
+      Assert(tria.is_valid(), ExcMessage("Result is not valid."));
       sm.clear(); // reset surface
       tria.clear();
-      deallog << std::endl << std::endl;
+      deallog << "OK" << std::endl;
     }
 }
 
