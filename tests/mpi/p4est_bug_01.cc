@@ -15,7 +15,7 @@
 
 
 
-// quarter_hyper_ball is currently broken with p4est:
+// quarter_hyper_ball is broken with p4est versions prior to 2.8.0:
 
 /**
 Abort: Assertion 'edge_trees == (p4est_topidx_t) ta->elem_count + distinct'
@@ -64,5 +64,5 @@ main(int argc, char *argv[])
   MPILogInitAll                    all;
 
   test<2>(); // works
-  test<3>(); // crashes in the GridGenerator call
+  test<3>(); // used to crash in the GridGenerator call, works with p4est 2.8.0
 }
