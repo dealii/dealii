@@ -20,11 +20,36 @@
 
 #ifdef DEAL_II_WITH_CGAL
 
-#  include <CGAL/boost/graph/Named_function_parameters.h>
+#  include <CGAL/Mesh_facet_topology.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 namespace CGALWrappers
 {
+  enum class FacetTopology
+  {
+    /**
+     * Each vertex of the facet have to be on the surface, on a curve, or on a
+     * corner.
+     */
+    facet_vertices_on_surface = CGAL::FACET_VERTICES_ON_SURFACE,
+    /**
+     * The three vertices of a facet belonging to a surface patch s have to be
+     * on the same surface patch s, on a curve or on a corner.
+     */
+    facet_vertices_on_same_surface_patch =
+      CGAL::FACET_VERTICES_ON_SAME_SURFACE_PATCH,
+    /**
+     * The three vertices of a facet belonging to a surface patch s have to be
+     * on the same surface patch s, or on a curve incident to the surface patch
+     * s or on a corner incident to the surface patch s.
+     */
+    facet_vertices_on_same_surface_patch_with_adjacency_check =
+      CGAL::FACET_VERTICES_ON_SAME_SURFACE_PATCH_WITH_ADJACENCY_CHECK,
+
+
+  };
+
   /**
    * Struct that must be used to pass additional
    * arguments to the CGAL::Mesh_criteria_3 class (see
@@ -50,7 +75,7 @@ namespace CGALWrappers
    * between the facet circumcenter and the center of its surface Delaunay ball.
    * - `CGAL::parameters::facet_topology`: the set of topological constraints
    * which have to be verified by each surface facet. The default value is
-   * `CGAL::FACET_VERTICES_ON_SURFACE`. See CGAL::Mesh_facet_topology manual
+   * `CGAL::FACET_VERTICES_ON_SURFACE`. See the enum @p FacetToplogy CGAL::Mesh_facet_topology manual
    * page to get all possible values.
    * - `CGAL::parameters::cell_radius_edge_ratio`: an upper bound for the
    * radius-edge ratio of the mesh tetrahedra.
@@ -63,26 +88,46 @@ namespace CGALWrappers
   template <int dim>
   struct AdditionalData
   {
+    // a constant providing a uniform upper bound for the lengths ofcurve edges.
+    // This parameter has to be set to a positive value when1-dimensional
+    // features protection is used.
+    double edge_size;
+    //   lower bound for the angles (in degrees) of the surface mesh facets.
     double facet_angle;
+    // constant describing a uniform upper bound for the radii of the surface
+    // Delaunay balls.
     double facet_size;
+    //  a constant describing a uniform upper bound for the distance between the
+    //  facet circumcenter and the center of its surface Delaunay ball.
     double facet_distance;
+    // set of topological constraints which have to be verified by each surface
+    // facet.
+    FacetTopology facet_topology;
+    // upper bound for the radius-edge ratio of the mesh tetrahedra.
     double cell_radius_edge_ratio;
+    // a constant describing a uniform upper bound for the circumradii of the
+    // mesh tetrahedra.
     double cell_size;
 
     AdditionalData(
-      double facet_a            = CGAL::parameters::is_default_parameter(true),
-      double facet_s            = CGAL::parameters::is_default_parameter(true),
-      double facet_d            = CGAL::parameters::is_default_parameter(true),
-      double cell_radius_edge_r = CGAL::parameters::is_default_parameter(true),
-      double cell_s             = CGAL::parameters::is_default_parameter(true))
+      double        edge_s  = std::numeric_limits<double>::max(),
+      double        facet_a = 0.,
+      double        facet_s = 0.,
+      double        facet_d = 0.,
+      FacetTopology facet_t =
+        dealii::CGALWrappers::FacetTopology::facet_vertices_on_surface,
+      double cell_radius_edge_r = 0.,
+      double cell_s             = 0.)
     {
       AssertThrow(
         dim == 3,
         ExcMessage(
           "These struct can be instantiated with 3D Triangulations only."));
+      edge_size              = edge_s;
       facet_angle            = facet_a;
       facet_size             = facet_s;
       facet_distance         = facet_d;
+      facet_topology         = facet_t;
       cell_radius_edge_ratio = cell_radius_edge_r;
       cell_size              = cell_s;
     }
@@ -106,7 +151,15 @@ namespace CGALWrappers
   template <>
   struct AdditionalData<2>
   {
-    double angular_bound, radius_bound, distance_bound;
+    // lower bound in degrees for the angles of mesh facets.
+    double angular_bound;
+    // upper bound on the radii of surface Delaunay balls. A surface Delaunay
+    // ball is a ball circumscribing a mesh facet and centered on the surface.
+    double radius_bound;
+    // upper bound for the distance between the circumcenter of a mesh facet and
+    // the center of a surface Delaunay ball of this facet.
+    double distance_bound;
+
     AdditionalData(double angular_b  = 0.,
                    double radius_b   = 0.,
                    double distance_b = 0.)
