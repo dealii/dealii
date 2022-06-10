@@ -1032,7 +1032,8 @@ namespace internal
 
         unsigned int index = 0;
 
-        // 1) VERTEX dofs
+        // 1) VERTEX dofs, only step into the functions if we actually have
+        // DoFs on them
         if (fe.n_dofs_per_vertex() > 0)
           for (const auto vertex : accessor.vertex_indices())
             dof_operation.process_vertex_dofs(
@@ -1108,8 +1109,13 @@ namespace internal
                   dof_processor);
             }
 
-        // 4) INNER dofs
-        if (fe.template n_dofs_per_object<structdim>() > 0)
+        // 4) INNER dofs - here we need to make sure that the shortcut to not
+        // run the function does not miss the faces of wedge and pyramid
+        // elements where n_dofs_per_object might not return the largest
+        // possible value
+        if (((dim == 3 && structdim == 2) ?
+               fe.max_dofs_per_quad() :
+               fe.template n_dofs_per_object<structdim>()) > 0)
           dof_operation.process_dofs(
             accessor,
             [&](const auto d) { return d; },
