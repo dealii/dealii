@@ -25,7 +25,6 @@
 
 #include "../tests.h"
 
-using namespace CGAL::parameters;
 
 class ImplicitFunction : public Function<3>
 {
@@ -53,7 +52,7 @@ main()
     tria, implicit_function, data, Point<3>(1, 0, 0), 10.);
   {
     GridOut       go;
-    std::ofstream of("tria_ancora.vtk");
+    std::ofstream of("tria.vtk");
     go.write_vtk(tria, of);
   }
   remove("tria.vtk");

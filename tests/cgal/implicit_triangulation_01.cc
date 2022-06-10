@@ -25,7 +25,6 @@
 
 #include "../tests.h"
 
-using namespace CGAL::parameters;
 
 class ImplicitFunction : public Function<3>
 {
@@ -54,7 +53,7 @@ main()
     std::ofstream of("tria.vtk");
     go.write_vtk(tria, of);
   }
-  // remove(/"tria.vtk");
+  remove("tria.vtk");
   //  If we got here, everything was ok, including writing the grid.
   deallog << "OK" << std::endl;
 }
