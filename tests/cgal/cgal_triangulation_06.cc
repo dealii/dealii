@@ -41,6 +41,7 @@ using Tr = typename CGAL::
   Mesh_triangulation_3<Mesh_domain, CGAL::Default, ConcurrencyTag>::type;
 using Mesh_criteria = CGAL::Mesh_criteria_3<Tr>;
 using C3t3          = CGAL::Mesh_complex_3_in_triangulation_3<Tr>;
+
 int
 main()
 {
@@ -59,10 +60,5 @@ main()
   Triangulation<3> tria;
   cgal_triangulation_to_dealii_triangulation(cgal_triangulation, tria);
 
-  {
-    GridOut       go;
-    std::ofstream out_tria("tria.vtk");
-    go.write_vtk(tria, out_tria);
-  }
-  cat_file("tria.vtk");
+  deallog << "OK" << std::endl;
 }

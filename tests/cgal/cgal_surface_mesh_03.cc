@@ -52,10 +52,7 @@ test()
       compute_boolean_operation(sm0, sm1, bool_op, outsm);
       Assert((outsm.is_valid() && sm0.is_valid() && sm1.is_valid()),
              ExcMessage("Result is not valid."));
-      // Uncomment the following to have print the meshes
-      deallog << outsm << std::endl;
-      // Clear surface
-      outsm.clear();
+      outsm.clear(); // reset surface
     }
 }
 
