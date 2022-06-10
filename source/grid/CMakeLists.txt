@@ -15,6 +15,23 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
+#
+# Work around an issue where gcc emits a note that the warning
+# -Wmisleading-indentation will be disabled due to a humongous line of over
+# 100k characters produced by one of the CGAL headers. Unfortunately,
+# guarding the include by DEAL_II_DISABLE_EXTRA_DIAGNOSTICS is not enough
+# due to a longstanding bug in gcc. Thus, simply wet
+# -Wno-misleading-indentation on the command line for the grid_generator.cc
+# compilation unit.
+#
+IF(DEAL_II_WITH_CGAL)
+  ENABLE_IF_SUPPORTED(_flag "-Wno-misleading-indentation")
+  SET_PROPERTY(SOURCE "grid_generator.cc"
+    APPEND_STRING PROPERTY COMPILE_FLAGS " ${_flag}"
+    )
+ENDIF()
+
+
 SET(_unity_include_src
   cell_id.cc
   grid_refinement.cc
