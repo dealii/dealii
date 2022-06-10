@@ -1452,20 +1452,6 @@ private:
     mg_number_cache;
 
   /**
-   * Cached indices of the degrees of freedom of all active cell. Identification
-   * of the appropriate position of a cell in the vectors is done via
-   * cell_dof_cache_ptr (CRS scheme).
-   */
-  mutable std::vector<std::vector<types::global_dof_index>>
-    cell_dof_cache_indices;
-
-  /**
-   * Pointer to the first cached degree of freedom of an active cell
-   * (identified by level and level index) within cell_dof_cache_indices.
-   */
-  mutable std::vector<std::vector<offset_type>> cell_dof_cache_ptr;
-
-  /**
    * Indices of degree of freedom of each d+1 geometric object (3D: vertex,
    * line, quad, hex) for all relevant active finite elements. Identification
    * of the appropriate position is done via object_dof_ptr (CRS scheme).
@@ -1931,9 +1917,6 @@ DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
       ar &this->object_dof_indices;
       ar &this->object_dof_ptr;
 
-      ar &this->cell_dof_cache_indices;
-      ar &this->cell_dof_cache_ptr;
-
       ar &this->hp_cell_active_fe_indices;
       ar &this->hp_cell_future_fe_indices;
 
@@ -1961,9 +1944,6 @@ DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
       ar &this->object_dof_indices;
       ar &this->object_dof_ptr;
 
-      ar &this->cell_dof_cache_indices;
-      ar &this->cell_dof_cache_ptr;
-
       // write out the number of triangulation cells and later check during
       // loading that this number is indeed correct; same with something that
       // identifies the FE and the policy
@@ -1986,9 +1966,6 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
     {
       ar &this->object_dof_indices;
       ar &this->object_dof_ptr;
-
-      ar &this->cell_dof_cache_indices;
-      ar &this->cell_dof_cache_ptr;
 
       ar &this->hp_cell_active_fe_indices;
       ar &this->hp_cell_future_fe_indices;
@@ -2031,9 +2008,6 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 
       ar &this->object_dof_indices;
       ar &this->object_dof_ptr;
-
-      ar &this->cell_dof_cache_indices;
-      ar &this->cell_dof_cache_ptr;
 
       // these are the checks that correspond to the last block in the save()
       // function

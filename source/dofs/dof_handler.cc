@@ -274,14 +274,6 @@ namespace internal
         dof_handler.object_dof_ptr.clear();
         dof_handler.object_dof_ptr.resize(dof_handler.tria->n_levels());
         dof_handler.object_dof_ptr.shrink_to_fit();
-
-        dof_handler.cell_dof_cache_indices.clear();
-        dof_handler.cell_dof_cache_indices.resize(dof_handler.tria->n_levels());
-        dof_handler.cell_dof_cache_indices.shrink_to_fit();
-
-        dof_handler.cell_dof_cache_ptr.clear();
-        dof_handler.cell_dof_cache_ptr.resize(dof_handler.tria->n_levels());
-        dof_handler.cell_dof_cache_ptr.shrink_to_fit();
       }
 
       /**
@@ -294,7 +286,6 @@ namespace internal
       {
         for (unsigned int i = 0; i < dof_handler.tria->n_levels(); ++i)
           {
-            // 1) object_dof_indices
             dof_handler.object_dof_ptr[i][dim].assign(
               dof_handler.tria->n_raw_cells(i) + 1, 0);
 
@@ -310,24 +301,6 @@ namespace internal
 
             dof_handler.object_dof_indices[i][dim].resize(
               dof_handler.object_dof_ptr[i][dim].back(),
-              numbers::invalid_dof_index);
-
-            // 2) cell_dof_cache_indices
-            dof_handler.cell_dof_cache_ptr[i].assign(
-              dof_handler.tria->n_raw_cells(i) + 1, 0);
-
-            for (const auto &cell :
-                 dof_handler.tria->cell_iterators_on_level(i))
-              if (cell->is_active() && !cell->is_artificial())
-                dof_handler.cell_dof_cache_ptr[i][cell->index() + 1] =
-                  dof_handler.get_fe().n_dofs_per_cell();
-
-            for (unsigned int j = 0; j < dof_handler.tria->n_raw_cells(i); ++j)
-              dof_handler.cell_dof_cache_ptr[i][j + 1] +=
-                dof_handler.cell_dof_cache_ptr[i][j];
-
-            dof_handler.cell_dof_cache_indices[i].resize(
-              dof_handler.cell_dof_cache_ptr[i].back(),
               numbers::invalid_dof_index);
           }
       }
@@ -868,15 +841,8 @@ namespace internal
                   dof_handler.tria->n_raw_cells(level),
                   static_cast<typename DoFHandler<dim, spacedim>::offset_type>(
                     -1));
-              dof_handler.cell_dof_cache_ptr[level] =
-                std::vector<typename DoFHandler<dim, spacedim>::offset_type>(
-                  dof_handler.tria->n_raw_cells(level),
-                  static_cast<typename DoFHandler<dim, spacedim>::offset_type>(
-                    -1));
 
               types::global_dof_index next_free_dof = 0;
-              types::global_dof_index cache_size    = 0;
-
               for (auto cell :
                    dof_handler.active_cell_iterators_on_level(level))
                 if (cell->is_active() && !cell->is_artificial())
@@ -885,18 +851,11 @@ namespace internal
                       next_free_dof;
                     next_free_dof +=
                       cell->get_fe().template n_dofs_per_object<dim>();
-
-                    dof_handler.cell_dof_cache_ptr[level][cell->index()] =
-                      cache_size;
-                    cache_size += cell->get_fe().n_dofs_per_cell();
                   }
 
               dof_handler.object_dof_indices[level][dim] =
                 std::vector<types::global_dof_index>(
                   next_free_dof, numbers::invalid_dof_index);
-              dof_handler.cell_dof_cache_indices[level] =
-                std::vector<types::global_dof_index>(
-                  cache_size, numbers::invalid_dof_index);
             }
         }
 
@@ -2131,9 +2090,7 @@ DoFHandler<dim, spacedim>::memory_consumption() const
                     MemoryConsumption::memory_consumption(this->fe_collection) +
                     MemoryConsumption::memory_consumption(this->number_cache);
 
-  mem += MemoryConsumption::memory_consumption(cell_dof_cache_indices) +
-         MemoryConsumption::memory_consumption(cell_dof_cache_ptr) +
-         MemoryConsumption::memory_consumption(object_dof_indices) +
+  mem += MemoryConsumption::memory_consumption(object_dof_indices) +
          MemoryConsumption::memory_consumption(object_dof_ptr) +
          MemoryConsumption::memory_consumption(hp_object_fe_indices) +
          MemoryConsumption::memory_consumption(hp_object_fe_ptr) +
@@ -2391,10 +2348,6 @@ template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::clear_space()
 {
-  cell_dof_cache_indices.clear();
-
-  cell_dof_cache_ptr.clear();
-
   object_dof_indices.clear();
 
   object_dof_ptr.clear();

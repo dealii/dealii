@@ -40,14 +40,11 @@
 
 template <int dim, int spacedim>
 void
-test_real_to_unit_cell(const Mapping<dim, spacedim> &mapping)
+test_real_to_unit_cell(const Mapping<dim, spacedim> &mapping,
+                       Triangulation<dim, spacedim> &triangulation)
 {
-  // define a boundary that fits the vertices of the hyper cube we're
-  // going to create below
+  // define a boundary that fits the vertices of the hyper cube mesh
   SphericalManifold<dim, spacedim> boundary;
-
-  Triangulation<dim, spacedim> triangulation;
-  GridGenerator::hyper_cube(triangulation, -1, 1);
 
   // set the boundary indicator for one face of the single cell
   triangulation.set_manifold(1, boundary);
@@ -112,15 +109,16 @@ template <int dim, int spacedim>
 void
 test()
 {
-  deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
-  deallog << "MappingQ(1): ";
-  test_real_to_unit_cell(MappingQ<dim, spacedim>(1));
-  deallog << "MappingQ(4): ";
-  test_real_to_unit_cell(MappingQ<dim, spacedim>(4));
-
-  deallog << "MappingFEField(FESystem(FE_Q(4))): ";
   Triangulation<dim, spacedim> triangulation;
   GridGenerator::hyper_cube(triangulation, -1, 1);
+
+  deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
+  deallog << "MappingQ(1): ";
+  test_real_to_unit_cell(MappingQ<dim, spacedim>(1), triangulation);
+  deallog << "MappingQ(4): ";
+  test_real_to_unit_cell(MappingQ<dim, spacedim>(4), triangulation);
+
+  deallog << "MappingFEField(FESystem(FE_Q(4))): ";
 
   FESystem<dim, spacedim>   fe(FE_Q<dim, spacedim>(4), spacedim);
   DoFHandler<dim, spacedim> dof_handler(triangulation);
@@ -129,7 +127,7 @@ test()
   Vector<double>      location_vector(dof_handler.n_dofs());
   VectorTools::get_position_vector(dof_handler, location_vector, mask);
   MappingFEField<dim, spacedim> mapping(dof_handler, location_vector, mask);
-  test_real_to_unit_cell(mapping);
+  test_real_to_unit_cell(mapping, triangulation);
 }
 
 
