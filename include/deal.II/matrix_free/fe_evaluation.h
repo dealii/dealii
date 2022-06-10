@@ -8189,8 +8189,9 @@ FEFaceEvaluation<dim,
     return;
   Assert(this->matrix_free != nullptr, ExcNotInitialized());
 
-  this->cell_type = this->matrix_free->get_mapping_info().cell_type[cell_index];
-  this->cell      = cell_index;
+  this->cell_type = this->matrix_free->get_mapping_info()
+                      .faces_by_cells_type[cell_index][face_number];
+  this->cell          = cell_index;
   this->subface_index = GeometryInfo<dim>::max_children_per_cell;
   this->dof_access_index =
     internal::MatrixFreeFunctions::DoFInfo::dof_access_cell;
