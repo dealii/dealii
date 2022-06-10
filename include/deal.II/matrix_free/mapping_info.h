@@ -67,7 +67,7 @@ namespace internal
       initialize(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const FaceInfo<VectorizedArrayType::size()> &             faces,
+        const FaceInfo<VectorizedArrayType::size()> &             face_info,
         const std::vector<unsigned int> &active_fe_index,
         const std::shared_ptr<dealii::hp::MappingCollection<dim>> &mapping,
         const std::vector<dealii::hp::QCollection<dim>> &          quad,
@@ -86,7 +86,7 @@ namespace internal
       update_mapping(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const FaceInfo<VectorizedArrayType::size()> &             faces,
+        const FaceInfo<VectorizedArrayType::size()> &             face_info,
         const std::vector<unsigned int> &active_fe_index,
         const std::shared_ptr<dealii::hp::MappingCollection<dim>> &mapping);
 
@@ -158,6 +158,15 @@ namespace internal
       std::vector<GeometryType> face_type;
 
       /**
+       * Store whether the face geometry for the face_data_by_cells data
+       * structure is represented as Cartesian (cell type 0), with constant
+       * transform data (Jacobians) (cell type 1), or a general type (cell
+       * type 3). Note that both the interior and exterior agree on the type
+       * of the data structure, using the more general of the two.
+       */
+      std::vector<std::array<GeometryType, 2 * dim>> faces_by_cells_type;
+
+      /**
        * The data cache for the cells.
        */
       std::vector<MappingInfoStorage<dim, dim, VectorizedArrayType>> cell_data;
@@ -209,15 +218,14 @@ namespace internal
        * given as a tuple of the level and index within the level as used in
        * the main initialization of the class
        *
-       * @param faces The description of the connectivity from faces to cells
-       * as filled in the MatrixFree class
+       * @param face_info The description of the connectivity from faces to
+       * cells as filled in the MatrixFree class
        */
       void
       compute_mapping_q(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
-          &faces);
+        const FaceInfo<VectorizedArrayType::size()> &             face_info);
 
       /**
        * Computes the information in the given cells, called within
@@ -251,6 +259,7 @@ namespace internal
       initialize_faces_by_cells(
         const dealii::Triangulation<dim> &                        tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+        const FaceInfo<VectorizedArrayType::size()> &             face_info,
         const dealii::hp::MappingCollection<dim> &                mapping);
     };
 
