@@ -33,12 +33,14 @@ namespace CGALWrappers
      * corner.
      */
     facet_vertices_on_surface = CGAL::FACET_VERTICES_ON_SURFACE,
+
     /**
      * The three vertices of a facet belonging to a surface patch s have to be
      * on the same surface patch s, on a curve or on a corner.
      */
     facet_vertices_on_same_surface_patch =
       CGAL::FACET_VERTICES_ON_SAME_SURFACE_PATCH,
+
     /**
      * The three vertices of a facet belonging to a surface patch s have to be
      * on the same surface patch s, or on a curve incident to the surface patch
@@ -46,8 +48,6 @@ namespace CGALWrappers
      */
     facet_vertices_on_same_surface_patch_with_adjacency_check =
       CGAL::FACET_VERTICES_ON_SAME_SURFACE_PATCH_WITH_ADJACENCY_CHECK,
-
-
   };
 
   /**
@@ -88,27 +88,46 @@ namespace CGALWrappers
   template <int dim>
   struct AdditionalData
   {
-    // a constant providing a uniform upper bound for the lengths ofcurve edges.
-    // This parameter has to be set to a positive value when1-dimensional
-    // features protection is used.
+    /**
+     * Uniform upper bound for the lengths of curve edges.
+     * This parameter has to be set to a positive value when1-dimensional
+     * features protection is used.
+     */
     double edge_size;
-    //   lower bound for the angles (in degrees) of the surface mesh facets.
+
+    /**
+     * Lower bound for the angles (in degrees) of the surface mesh facets.
+     */
     double facet_angle;
-    // constant describing a uniform upper bound for the radii of the surface
-    // Delaunay balls.
+
+    /**
+     * Uniform upper bound for the radii of the surface Delaunay balls.
+     */
     double facet_size;
-    //  a constant describing a uniform upper bound for the distance between the
-    //  facet circumcenter and the center of its surface Delaunay ball.
+    /**
+     * Uniform upper bound for the distance between the facet circumcenter and
+     * the center of its surface Delaunay ball.
+     */
     double facet_distance;
-    // set of topological constraints which have to be verified by each surface
-    // facet.
+
+    /**
+     * Set of topological constraints which have to be verified by each surface
+     * facet.
+     */
     FacetTopology facet_topology;
-    // upper bound for the radius-edge ratio of the mesh tetrahedra.
+
+    /**
+     * upper bound for the radius-edge ratio of the mesh tetrahedra.
+     */
     double cell_radius_edge_ratio;
-    // a constant describing a uniform upper bound for the circumradii of the
-    // mesh tetrahedra.
+    /**
+     * Uniform upper bound for the circumradii of the mesh tetrahedra.
+     */
     double cell_size;
 
+    /**
+     * Constructor.
+     */
     AdditionalData(
       double        edge_s  = std::numeric_limits<double>::max(),
       double        facet_a = 0.,
@@ -133,8 +152,6 @@ namespace CGALWrappers
     }
   };
 
-
-
   /**
    * Specialization of the above struct when the object to be constructed is a
    * 2D triangulation embedded in the 3D space, i.e. a Triangulation<2,3>.
@@ -151,15 +168,26 @@ namespace CGALWrappers
   template <>
   struct AdditionalData<2>
   {
-    // lower bound in degrees for the angles of mesh facets.
+    /**
+     * Lower bound in degrees for the angles of mesh facets.
+     */
     double angular_bound;
-    // upper bound on the radii of surface Delaunay balls. A surface Delaunay
-    // ball is a ball circumscribing a mesh facet and centered on the surface.
+
+    /**
+     * Upper bound on the radii of surface Delaunay balls. A surface Delaunay
+     * ball is a ball circumscribing a mesh facet and centered on the surface.
+     */
     double radius_bound;
-    // upper bound for the distance between the circumcenter of a mesh facet and
-    // the center of a surface Delaunay ball of this facet.
+
+    /**
+     * Upper bound for the distance between the circumcenter of a mesh facet
+     * and the center of a surface Delaunay ball of this facet.
+     */
     double distance_bound;
 
+    /**
+     * Constructor.
+     */
     AdditionalData(double angular_b  = 0.,
                    double radius_b   = 0.,
                    double distance_b = 0.)
@@ -178,6 +206,9 @@ DEAL_II_NAMESPACE_CLOSE
 DEAL_II_NAMESPACE_OPEN
 namespace CGALWrappers
 {
+  /**
+   * Empty structure for the case where CGAL is not available.
+   */
   template <int dim>
   struct AdditionalData
   {};
