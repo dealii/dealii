@@ -1220,13 +1220,10 @@ namespace internal
 
         // cache the constrained indices for use in matrix-vector products and
         // the like
-        const types::global_dof_index
-          start_index = dof_info[no].vector_partitioner->local_range().first,
-          end_index   = dof_info[no].vector_partitioner->local_range().second;
-        for (types::global_dof_index i = start_index; i < end_index; ++i)
-          if (constraint[no]->is_constrained(i) == true)
+        for (const auto &line : constraint[no]->get_lines())
+          if (dof_info[no].vector_partitioner->in_local_range(line.index))
             dof_info[no].constrained_dofs.push_back(
-              static_cast<unsigned int>(i - start_index));
+              dof_info[no].vector_partitioner->global_to_local(line.index));
       }
 
     // extract all the global indices associated with the computation, and form
@@ -1268,32 +1265,40 @@ namespace internal
 
         for (unsigned int no = 0; no < n_dof_handlers; ++no)
           {
+            const DoFHandler<dim> &dofh = *dof_handler[no];
+            bool                   cell_has_hanging_node_constraints = false;
+
             // read indices from active cells
             if (mg_level == numbers::invalid_unsigned_int)
               {
-                const DoFHandler<dim> *dofh = &*dof_handler[no];
                 typename DoFHandler<dim>::active_cell_iterator cell_it(
                   &tria,
                   cell_level_index[counter].first,
                   cell_level_index[counter].second,
-                  dofh);
+                  &dofh);
                 const unsigned int fe_index =
-                  dofh->get_fe_collection().size() > 1 ?
+                  dofh.get_fe_collection().size() > 1 ?
                     cell_it->active_fe_index() :
                     0;
-                if (dofh->get_fe_collection().size() > 1)
+                const unsigned int dofs_per_cell =
+                  dof_info[no].dofs_per_cell[fe_index];
+                if (dofh.get_fe_collection().size() > 1)
                   dof_info[no].cell_active_fe_index[counter] = fe_index;
-                local_dof_indices_resolved.resize(
-                  dof_info[no].dofs_per_cell[fe_index]);
+                else if (cell_categorization_enabled)
+                  {
+                    AssertIndexRange(cell_it->active_cell_index(),
+                                     cell_vectorization_category.size());
+                    dof_info[no].cell_active_fe_index[counter] =
+                      cell_vectorization_category[cell_it->active_cell_index()];
+                  }
+
+                local_dof_indices_resolved.resize(dofs_per_cell);
                 cell_it->get_dof_indices(local_dof_indices_resolved);
 
-                local_dof_indices.resize(local_dof_indices_resolved.size());
-                for (unsigned int i = 0; i < local_dof_indices_resolved.size();
-                     ++i)
+                local_dof_indices.resize(dofs_per_cell);
+                for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   local_dof_indices[i] =
                     local_dof_indices_resolved[lexicographic[no][fe_index][i]];
-
-                bool cell_has_hanging_node_constraints = false;
 
                 if (dim > 1 && use_fast_hanging_node_algorithm)
                   {
@@ -1307,53 +1312,21 @@ namespace internal
                         cell_it,
                         local_dof_indices_resolved);
                   }
-
-                dof_info[no].read_dof_indices(
-                  cell_has_hanging_node_constraints ?
-                    local_dof_indices_resolved :
-                    local_dof_indices,
-                  local_dof_indices,
-                  cell_has_hanging_node_constraints,
-                  *constraint[no],
-                  counter,
-                  constraint_values,
-                  cell_at_subdomain_boundary);
-                if (dofh->get_fe_collection().size() == 1 &&
-                    cell_categorization_enabled)
-                  {
-                    AssertIndexRange(cell_it->active_cell_index(),
-                                     cell_vectorization_category.size());
-                    dof_info[no].cell_active_fe_index[counter] =
-                      cell_vectorization_category[cell_it->active_cell_index()];
-                  }
               }
             // we are requested to use a multigrid level
             else
               {
-                const DoFHandler<dim> *dofh = dof_handler[no];
                 AssertIndexRange(mg_level, tria.n_levels());
                 typename DoFHandler<dim>::cell_iterator cell_it(
                   &tria,
                   cell_level_index[counter].first,
                   cell_level_index[counter].second,
-                  dofh);
-                local_dof_indices_resolved.resize(
-                  dof_info[no].dofs_per_cell[0]);
+                  &dofh);
+                const unsigned int dofs_per_cell =
+                  dof_info[no].dofs_per_cell[0];
+                local_dof_indices_resolved.resize(dofs_per_cell);
                 cell_it->get_mg_dof_indices(local_dof_indices_resolved);
 
-                local_dof_indices.resize(local_dof_indices_resolved.size());
-                for (unsigned int i = 0; i < local_dof_indices_resolved.size();
-                     ++i)
-                  local_dof_indices[i] =
-                    local_dof_indices_resolved[lexicographic[no][0][i]];
-
-                dof_info[no].read_dof_indices(local_dof_indices,
-                                              local_dof_indices,
-                                              false,
-                                              *constraint[no],
-                                              counter,
-                                              constraint_values,
-                                              cell_at_subdomain_boundary);
                 if (cell_categorization_enabled)
                   {
                     AssertIndexRange(cell_it->index(),
@@ -1362,7 +1335,22 @@ namespace internal
                       cell_vectorization_category[cell_level_index[counter]
                                                     .second];
                   }
+
+                local_dof_indices.resize(dofs_per_cell);
+                for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                  local_dof_indices[i] =
+                    local_dof_indices_resolved[lexicographic[no][0][i]];
               }
+
+            dof_info[no].read_dof_indices(cell_has_hanging_node_constraints ?
+                                            local_dof_indices_resolved :
+                                            local_dof_indices,
+                                          local_dof_indices,
+                                          cell_has_hanging_node_constraints,
+                                          *constraint[no],
+                                          counter,
+                                          constraint_values,
+                                          cell_at_subdomain_boundary);
           }
 
         // if we found dofs on some FE component that belong to other
