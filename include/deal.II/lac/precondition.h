@@ -640,9 +640,9 @@ namespace internal
       void
       step(VectorType &, const VectorType &) const
       {
-        Assert(false,
-               ExcMessage(
-                 "Matrix A does not provide a Jacobi_step() function!"));
+        AssertThrow(false,
+                    ExcMessage(
+                      "Matrix A does not provide a Jacobi_step() function!"));
       }
 
       template <typename VectorType>
@@ -696,8 +696,9 @@ namespace internal
       void
       step(VectorType &, const VectorType &) const
       {
-        Assert(false,
-               ExcMessage("Matrix A does not provide a SOR_step() function!"));
+        AssertThrow(false,
+                    ExcMessage(
+                      "Matrix A does not provide a SOR_step() function!"));
       }
 
       template <typename VectorType,
@@ -715,8 +716,9 @@ namespace internal
       void
       Tstep(VectorType &, const VectorType &) const
       {
-        Assert(false,
-               ExcMessage("Matrix A does not provide a TSOR_step() function!"));
+        AssertThrow(false,
+                    ExcMessage(
+                      "Matrix A does not provide a TSOR_step() function!"));
       }
 
     private:
@@ -797,8 +799,9 @@ namespace internal
       void
       step(VectorType &, const VectorType &) const
       {
-        Assert(false,
-               ExcMessage("Matrix A does not provide a SSOR_step() function!"));
+        AssertThrow(false,
+                    ExcMessage(
+                      "Matrix A does not provide a SSOR_step() function!"));
       }
 
       template <typename VectorType>
@@ -985,8 +988,8 @@ namespace internal
     void
     Tvmult(const MatrixType &, VectorType &, const VectorType &)
     {
-      Assert(false,
-             ExcMessage("Matrix A does not provide a Tvmult() function!"));
+      AssertThrow(false,
+                  ExcMessage("Matrix A does not provide a Tvmult() function!"));
     }
 
     template <typename MatrixType,
