@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
+
 #ifdef DEAL_II_WITH_CGAL
 
 #  include <CGAL/Mesh_facet_topology.h>
