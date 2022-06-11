@@ -1807,6 +1807,26 @@ namespace GridGenerator
                       CGALWrappers::AdditionalData<dim>{},
                     const Point<3> &interior_point    = Point<3>(),
                     const double &  outer_ball_radius = 1.0);
+
+  /**
+   * Create a deal.II Triangulation<3> out of a deal.II Triangulation<2,3>
+   * by filling it with tetrahedra.
+   *
+   * The last optional argument @p data can be used to pass additional
+   * arguments to the CGAL::Mesh_criteria_3 class (see
+   * https://doc.cgal.org/latest/Mesh_3/index.html for more information).
+   *
+   *
+   * @param [in] surface_tria The input deal.II Triangulation<2,3>.
+   * @param [out] vol_tria The output deal.II Triangulation<3>.
+   * @param[in] data Additional parameters to pass to the CGAL::make_mesh_3
+   * function.
+   */
+  void
+  surface_mesh_to_volumetric_mesh(const Triangulation<2, 3> &surface_tria,
+                                  Triangulation<3> &         vol_tria,
+                                  const CGALWrappers::AdditionalData<3> &data =
+                                    CGALWrappers::AdditionalData<3>{});
   ///@}
 
   /**
