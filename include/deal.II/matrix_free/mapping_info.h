@@ -164,7 +164,8 @@ namespace internal
        * type 3). Note that both the interior and exterior agree on the type
        * of the data structure, using the more general of the two.
        */
-      std::vector<std::array<GeometryType, 2 * dim>> faces_by_cells_type;
+      std::vector<std::array<GeometryType, GeometryInfo<dim>::faces_per_cell>>
+        faces_by_cells_type;
 
       /**
        * The data cache for the cells.
