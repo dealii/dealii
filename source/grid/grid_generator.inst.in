@@ -228,14 +228,6 @@ for (deal_II_dimension : DIMENSIONS)
       hyper_ball_balanced<deal_II_dimension>(Triangulation<deal_II_dimension> &,
                                              const Point<deal_II_dimension> &,
                                              const double);
-
-      template void
-      implicit_function<deal_II_dimension>(
-        Triangulation<deal_II_dimension, 3> &,
-        const Function<3> &,
-        const CGALWrappers::AdditionalData<deal_II_dimension> &,
-        const Point<3> &,
-        const double &);
 #endif
     \}
   }
