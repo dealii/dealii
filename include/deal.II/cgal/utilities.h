@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
+
 #include <deal.II/cgal/additional_data.h>
 
 #ifdef DEAL_II_WITH_CGAL
