@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check SparseMatrix::add(other, factor)
+// check SparseMatrix::add(factor, other)
 
 #include <deal.II/lac/petsc_sparse_matrix.h>
 
@@ -50,14 +50,14 @@ test()
     deallog << m(k, k) << ' ';
   deallog << std::endl;
 
-  m.add(m2, 1.0);
+  m.add(1.0, m2);
 
   deallog << "after: " << m(0, 1) << std::endl;
   for (unsigned int k = 0; k < s; ++k)
     deallog << m(k, k) << ' ';
   deallog << std::endl;
 
-  m.add(m2, -1.0);
+  m.add(-1.0, m2);
 
   deallog << "back to original: " << m(0, 1) << std::endl;
   for (unsigned int k = 0; k < s; ++k)
