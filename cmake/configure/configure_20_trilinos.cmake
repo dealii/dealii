@@ -220,8 +220,12 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
       LIST(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
 
-
       LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+
+      # For the case of Trilinos being compiled with openmp support the
+      # following Tpetra test needs -fopenmp to succeed. Make sure that we
+      # supply the correct compiler and linker flags:
+      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
 
       CHECK_CXX_SOURCE_COMPILES(
         "
