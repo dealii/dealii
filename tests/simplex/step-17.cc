@@ -311,12 +311,13 @@ namespace Step17
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
 
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(mapping,
-                                             dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(dim),
-                                             boundary_values);
+    std::map<types::global_dof_index, PetscScalar> boundary_values;
+    VectorTools::interpolate_boundary_values(
+      mapping,
+      dof_handler,
+      0,
+      Functions::ZeroFunction<dim, PetscScalar>(dim),
+      boundary_values);
     MatrixTools::apply_boundary_values(
       boundary_values, system_matrix, solution, system_rhs, false);
   }

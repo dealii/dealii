@@ -288,7 +288,7 @@ namespace Step40
                                            system_rhs,
                                            preconditioner),
                               solver_control.last_step(),
-                              5,
+                              1,
                               9);
 
     constraints.distribute(completely_distributed_solution);
@@ -340,12 +340,7 @@ namespace Step40
   void
   LaplaceProblem<dim>::run()
   {
-    deallog << "Running with "
-#ifdef USE_PETSC_LA
-            << "PETSc"
-#else
-            << "Trilinos"
-#endif
+    deallog << "Running "
             << " on " << Utilities::MPI::n_mpi_processes(mpi_communicator)
             << " MPI rank(s)..." << std::endl;
 
