@@ -152,6 +152,19 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.3") )
     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
   ENDIF()
+
+  #
+  # Clang-14.0.5 complaines loudly about not being able to vectorize some
+  # of our loops that we have annotated with DEAL_II_OPENMP_SIMD:
+  #
+  #     warning: loop not vectorized: the optimizer was unable to perform
+  #     the requested transformation; the transformation might be disabled
+  #     or specified as part of an unsupported transformation ordering
+  #     [-Wpass-failed=transform-warning]
+  #
+  # Let us simply disable the warning for now.
+  #
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-pass-failed")
 ENDIF()
 
 
