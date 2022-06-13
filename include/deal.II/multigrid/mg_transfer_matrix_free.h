@@ -313,7 +313,7 @@ private:
 
 /**
  * Base class of MGTransferBlockMatrixFree. While MGTransferBlockMatrixFree
- * constains all the setup routines of the transfer operators for the blocks,
+ * contains all the setup routines of the transfer operators for the blocks,
  * this class simply applies them, e.g., for restricting and prolongating.
  */
 template <int dim, typename Number, typename TransferType>

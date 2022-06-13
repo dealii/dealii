@@ -704,7 +704,7 @@ namespace MatrixFreeTools
       {
         // if we have a block vector with components with the same DoFHandler,
         // we need to figure out which component and which DoF within the
-        // comonent are we currently considering
+        // component are we currently considering
         const unsigned int n_fe_components =
           phi.get_dof_info().start_components.back();
         const unsigned int comp =
@@ -768,7 +768,7 @@ namespace MatrixFreeTools
                    phi.get_current_cell_index());
              ++v)
           // if we have a block vector with components with the same
-          // DoFHandler, we need to loop over all components manully and
+          // DoFHandler, we need to loop over all components manually and
           // need to apply the correct shift
           for (unsigned int j = 0; j < c_pools[v].row.size() - 1; ++j)
             for (unsigned int comp = 0;

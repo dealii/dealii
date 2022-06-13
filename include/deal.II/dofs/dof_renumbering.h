@@ -1257,7 +1257,7 @@ namespace DoFRenumbering
    * distributes DoFs: i.e., for a given support point, the global dof indices
    * for component i should be less than the global dof indices for component i
    * + 1. Due to various technical complications (like DoF unification in
-   * hp-mode) this assumption needs to be satified for this function to work in
+   * hp-mode) this assumption needs to be satisfied for this function to work in
    * all relevant cases.
    */
   template <int dim, int spacedim>

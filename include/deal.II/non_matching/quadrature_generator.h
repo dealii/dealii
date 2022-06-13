@@ -83,8 +83,8 @@ namespace NonMatching
      *
      * $|\frac{\partial \psi}{\partial x_i}| > 0$.
      *
-     * In practice, it might happend the bound we have for the expression in
-     * the left-hand side is only floating-point close to zero.
+     * In practice, the bound we have for the expression in the left-hand side
+     * may be near but not equal to zero due to roundoff errors.
      *
      * This constant is a safety margin, $C$, that states that the implicit
      * function theorem can be used when
@@ -1348,7 +1348,7 @@ namespace NonMatching
        *
        * $|\partial_k \psi_j| > L_{jk}$.
        *
-       * and then returns a coordindate direction, $i$, and a lower bound $L$,
+       * and then returns a coordinate direction, $i$, and a lower bound $L$,
        * such that
        *
        * @f[

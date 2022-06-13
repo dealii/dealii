@@ -194,7 +194,7 @@ namespace CGALWrappers
 
   /**
    * Given a CGAL Triangulation describing a polyhedral region, create
-   * a Quadrature rule to integrate over the polygon by looping trough all the
+   * a Quadrature rule to integrate over the polygon by looping through all the
    * vertices and exploiting QGaussSimplex.
    *
    * @param[in] tria The CGAL triangulation object describing the polyhedral

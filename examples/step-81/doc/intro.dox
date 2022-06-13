@@ -114,7 +114,7 @@ atomic thickness it is an example of a so-called 2D material: Compared to
 the other spatial dimensions (where graphene samples can reach up to
 several centimeters) the atomistic thickness of graphene typically ranges
 around 2.5 ångstrom ($2.5\times10^{-10}\text{m}$). We will thus model
-graphene as a lower-dimensional interface $\Sigma$ imbedded into the
+graphene as a lower-dimensional interface $\Sigma$ embedded into the
 computational domain $\Omega\subset\mathbb{R}^d$. More precisely, $\Sigma$
 is a two-dimensional sheet in three spatial dimensions, or a
 one-dimensional line in two spatial dimensions. The special electronic
