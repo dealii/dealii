@@ -39,16 +39,21 @@
 #  include <CGAL/Mesh_triangulation_3.h>
 #  include <CGAL/Polygon_mesh_processing/corefinement.h>
 #  include <CGAL/Polygon_mesh_processing/measure.h>
+#  include <CGAL/Polygon_mesh_processing/remesh.h>
 #  include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
 #  include <CGAL/Polyhedral_mesh_domain_with_features_3.h>
 #  include <CGAL/Simple_cartesian.h>
 #  include <CGAL/Surface_mesh.h>
 #  include <CGAL/Triangulation_3.h>
+#  include <CGAL/boost/graph/copy_face_graph.h>
+#  include <CGAL/boost/graph/selection.h>
 #  include <CGAL/convex_hull_3.h>
 #  include <CGAL/make_mesh_3.h>
 #  include <CGAL/make_surface_mesh.h>
 #  include <deal.II/cgal/surface_mesh.h>
+//#  include <CGAL/tetrahedral_remeshing.h> REQUIRES CGAL_VERSION>=5.1.5
 
+#  include <fstream>
 #  include <type_traits>
 
 
@@ -255,6 +260,39 @@ namespace CGALWrappers
     const unsigned int                                                   degree,
     const Mapping<dim0, spacedim> &mapping0,
     const Mapping<dim1, spacedim> &mapping1);
+
+  /**
+   * Remesh a CGAL::Surface_mesh.
+   *
+   * If the domain has 1-dimensional exposed features, the criteria includes a
+   * sizing field to guide the sampling of 1-dimensional features with
+   * protecting balls centers.
+   * - CGAL::parameters::edge_size.
+   *
+   * This utility should be exploited to improve the quality of a mesh coming
+   * from boolean operations. As an example, consider two CGAL::Surface_mesh
+   * objects describing two hyper_spheres that intersect non-trivially. After
+   * computing their corefinement and union with compute_boolean_operation(),
+   * the resulting mesh is the following:
+   *
+   * @image html boolean_union_hyper_spheres.png
+   *
+   * Clearly, elements (triangles) like the ones arising along the intersection
+   * of the two spheres should be avoided as they're quite degenerate and would
+   * decrease the accuracy of the results. A call to the present function will
+   * try to remesh the surface, according to the given named parameters, to
+   * improve its quality. In the present case, the result is the following:
+   *
+   * @image html boolean_union_hyper_spheres_remeshed.png
+   *
+   * @param surface_mesh The input CGAL::Surface_mesh.
+   * @param [in] data AdditionalData object to pass to the CGAL::make_mesh_3 function. See the documentation
+   * of that struct for a description of those parameters.
+   */
+  template <typename CGALPointType>
+  void
+  remesh_surface(CGAL::Surface_mesh<CGALPointType> &surface_mesh,
+                 const AdditionalData<3> &          data = AdditionalData<3>{});
 } // namespace CGALWrappers
 
 #  ifndef DOXYGEN
@@ -527,6 +565,82 @@ namespace CGALWrappers
                         dummy);
     tr.insert(dummy.points().begin(), dummy.points().end());
     return compute_quadrature(tr, degree);
+  }
+
+
+
+  template <typename CGALPointType>
+  void
+  remesh_surface(CGAL::Surface_mesh<CGALPointType> &cgal_mesh,
+                 const AdditionalData<3> &          data)
+  {
+    using K           = CGAL::Exact_predicates_inexact_constructions_kernel;
+    using Mesh_domain = CGAL::Polyhedral_mesh_domain_with_features_3<K>;
+    // Polyhedron type
+    using Polyhedron = CGAL::Mesh_polyhedron_3<K>::type;
+    // Triangulation
+    using Tr = CGAL::Mesh_triangulation_3<Mesh_domain>::type;
+    using C3t3 =
+      CGAL::Mesh_complex_3_in_triangulation_3<Tr,
+                                              Mesh_domain::Corner_index,
+                                              Mesh_domain::Curve_index>;
+    // Criteria
+    using Mesh_criteria = CGAL::Mesh_criteria_3<Tr>;
+
+    Polyhedron poly;
+    CGAL::copy_face_graph(cgal_mesh, poly);
+    // Create a vector with only one element: the pointer to the
+    // polyhedron.
+    std::vector<Polyhedron *> poly_ptrs_vector(1, &poly);
+    // Create a polyhedral domain, with only one polyhedron,
+    // and no "bounding polyhedron", so the volumetric part of the
+    // domain will be empty.
+    Mesh_domain domain(poly_ptrs_vector.begin(), poly_ptrs_vector.end());
+    // Get sharp features
+    domain.detect_features(); // includes detection of borders
+
+    // Mesh criteria
+    const double default_value_edge_size = std::numeric_limits<double>::max();
+    if (data.edge_size > 0 &&
+        std::abs(data.edge_size - default_value_edge_size) > 1e-12)
+      {
+        Mesh_criteria criteria(CGAL::parameters::edge_size   = data.edge_size,
+                               CGAL::parameters::facet_size  = data.facet_size,
+                               CGAL::parameters::facet_angle = data.facet_angle,
+                               CGAL::parameters::facet_distance =
+                                 data.facet_distance,
+                               CGAL::parameters::cell_radius_edge_ratio =
+                                 data.cell_radius_edge_ratio,
+                               CGAL::parameters::cell_size = data.cell_size);
+        // Mesh generation
+        C3t3 c3t3 = CGAL::make_mesh_3<C3t3>(domain,
+                                            criteria,
+                                            CGAL::parameters::no_perturb(),
+                                            CGAL::parameters::no_exude());
+        cgal_mesh.clear();
+        CGAL::facets_in_complex_3_to_triangle_mesh(c3t3, cgal_mesh);
+      }
+    else if (std::abs(data.edge_size - default_value_edge_size) <= 1e-12)
+      {
+        Mesh_criteria criteria(CGAL::parameters::facet_size  = data.facet_size,
+                               CGAL::parameters::facet_angle = data.facet_angle,
+                               CGAL::parameters::facet_distance =
+                                 data.facet_distance,
+                               CGAL::parameters::cell_radius_edge_ratio =
+                                 data.cell_radius_edge_ratio,
+                               CGAL::parameters::cell_size = data.cell_size);
+        // Mesh generation
+        C3t3 c3t3 = CGAL::make_mesh_3<C3t3>(domain,
+                                            criteria,
+                                            CGAL::parameters::no_perturb(),
+                                            CGAL::parameters::no_exude());
+        cgal_mesh.clear();
+        CGAL::facets_in_complex_3_to_triangle_mesh(c3t3, cgal_mesh);
+      }
+    else
+      {
+        Assert(false, ExcInternalError());
+      }
   }
 } // namespace CGALWrappers
 #  endif
