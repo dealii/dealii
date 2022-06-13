@@ -3047,7 +3047,7 @@ namespace internal
             dof_handler.get_fe_collection().max_dofs_per_cell());
 
           // loop over all cells and record which subdomain a DoF belongs to.
-          // interface goes to proccessor with smaller subdomain id
+          // interface goes to processor with smaller subdomain id
           for (const auto &cell : dof_handler.cell_iterators_on_level(level))
             {
               // get the owner of the cell; note that we have made sure above

@@ -623,7 +623,7 @@ namespace
 
   private:
     /**
-     * Simple struct to keep relavant data. Can be accessed though p4est's user
+     * Simple struct to keep relevant data. Can be accessed though p4est's user
      * pointer.
      */
     class QuadrantData

@@ -47,7 +47,7 @@ namespace internal
 
 
   /**
-   * Helper enum to spefify the type of vectorization for
+   * Helper enum to specify the type of vectorization for
    * FEEvaluationImplHangingNodesRunnerTypes::scalar.
    */
   enum class VectorizationTypes

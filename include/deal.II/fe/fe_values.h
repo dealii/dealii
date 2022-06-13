@@ -946,7 +946,7 @@ namespace FEValuesViews
     Vector(const Vector<dim, spacedim> &) = delete;
 
     /**
-     * Move constuctor.
+     * Move constructor.
      */
     // NOLINTNEXTLINE OSX does not compile with noexcept
     Vector(Vector<dim, spacedim> &&) = default;

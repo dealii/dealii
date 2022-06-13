@@ -226,7 +226,7 @@ The rationale behind creating first `parameters.prm` file (the first time the
 program is run) and then a `output/parameters_22.prm` (every time you
 run the program with an existing input file), is because you may want
 to leave most parameters to their
-default values, and only modify a handful of them, while still beeing able to
+default values, and only modify a handful of them, while still being able to
 reproduce the results and inspect what parameters were used for a specific
 simulation. It is generally good scientific practice to store the
 parameter file you used for a simulation along with the simulation

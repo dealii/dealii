@@ -191,7 +191,7 @@ reduces the number of CG iterations by a few steps.
 
 
 <h3>Possibilities for extensions</h3>
-A couple of possible extensions are available concerning minor updates fo the
+A couple of possible extensions are available concerning minor updates to the
 present code as well as a deeper numerical investigation of the Gelfand problem.
 
 <h4>More sophisticated Newton iteration</h4>

@@ -1260,7 +1260,7 @@ namespace Step82
 
             const bool at_boundary = face->at_boundary();
 
-            // Recall that by convention, the average of a function accross a
+            // Recall that by convention, the average of a function across a
             // boundary face $e$ reduces to the trace of the function on the
             // only element adjacent to $e$, namely there is no factor
             // $\frac{1}{2}$. We distinguish between the two cases (the current

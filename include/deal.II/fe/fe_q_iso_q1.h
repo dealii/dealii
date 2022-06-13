@@ -109,7 +109,7 @@ DEAL_II_NAMESPACE_OPEN
  * contrast with FE_Q(p) where QGauss<dim>(p+1) is the default choice. In
  * particular, care must be taken to not use a quadrature formula that
  * evaluates the basis functions (and their derivatives) on sub-element
- * boundaries as the gradients of piecewiese functions on internal boundaries
+ * boundaries as the gradients of piecewise functions on internal boundaries
  * are set to zero. No checks are performed internally to ensure that this is
  * not the case - it is the user's responsibility to avoid these situations.
  *

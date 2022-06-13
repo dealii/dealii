@@ -531,7 +531,7 @@ namespace Utilities
      * process messages of sizes larger than 2 GB with MPI_Byte as the
      * underlying data type. This helper is required for MPI versions before 4.0
      * because routines like `MPI_Send`
-     * use a signed interger for the @p count variable. Instead, you can use this
+     * use a signed integer for the @p count variable. Instead, you can use this
      * data type with the appropriate size set to the size of your message and
      * by passing
      * 1 as the @p count.

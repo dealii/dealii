@@ -1016,9 +1016,9 @@ namespace internal
       }
   }
 
-  // Helper function that applies the 1d evaluation kernals.
+  // Helper function that applies the 1d evaluation kernels.
   // std::integral_constant<bool, false> is the interpolation path, and
-  // std::integral_constant<bool, true> bellow is the integration path.
+  // std::integral_constant<bool, true> below is the integration path.
   template <int dim, int fe_degree, int n_q_points_1d, typename Number>
   template <int normal_dir>
   inline void

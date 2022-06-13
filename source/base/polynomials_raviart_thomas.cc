@@ -115,7 +115,7 @@ PolynomialsRaviartThomas<dim>::evaluate(
 
   // In the following, we will access the scratch arrays declared as 'mutable'
   // in the class. In order to do so from this function, we have to make sure
-  // that we guard this access by a mutex so that the invokation of this 'const'
+  // that we guard this access by a mutex so that the invocation of this 'const'
   // function is thread-safe.
   std::lock_guard<std::mutex> lock(scratch_arrays_mutex);
 

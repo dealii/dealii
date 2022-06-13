@@ -6735,7 +6735,7 @@ namespace internal
         // might have to renumber/rename children...)
 
         // we need a loop in cases c) and d), as the anisotropic
-        // children migt have a lower index than the mother quad
+        // children might have a lower index than the mother quad
         for (unsigned int loop = 0; loop < 2; ++loop)
           {
             // usually, only active objects can be refined

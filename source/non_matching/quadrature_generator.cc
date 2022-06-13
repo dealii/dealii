@@ -471,7 +471,7 @@ namespace NonMatching
         const AdditionalQGeneratorData &additional_data,
         QPartitioning<dim> &            q_partitioning)
       {
-        // Make this int to avoid a warning signed/unsigned comparision.
+        // Make this int to avoid a warning signed/unsigned comparison.
         const int n_roots = roots.size();
 
         // The number of intervals are roots.size() + 1
@@ -1007,7 +1007,7 @@ namespace NonMatching
         if (height_direction_data)
           return height_direction_data->direction;
 
-        // We have to choose some direction, we might aswell take 0.
+        // We have to choose some direction, we might as well take 0.
         return 0;
       }
 

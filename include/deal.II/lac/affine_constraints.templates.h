@@ -3265,7 +3265,7 @@ namespace internal
       else
         col_val = 0;
 
-      // account for indirect contributions by constraints in row, going trough
+      // account for indirect contributions by constraints in row, going through
       // the direct and indirect references in the given column.
       for (size_type q = 0; q < global_rows.size(i); ++q)
         {

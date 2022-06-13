@@ -495,9 +495,10 @@ public:
   /**
    * Similar function to MGTransferMatrixFree::build() with the difference that
    * the information for the prolongation for each level has already been built.
-   * So this function only tries to optimize the data structues of the two-level
-   * transfer operators, e.g., by enabling inplace vector operations, by
-   * checking if @p external_partitioners and the internal ones are compatible.
+   * So this function only tries to optimize the data structures of the
+   * two-level transfer operators, e.g., by enabling inplace vector operations,
+   * by checking if @p external_partitioners and the internal ones are
+   * compatible.
    */
   void
   build(const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
