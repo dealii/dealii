@@ -28,7 +28,5 @@
  * detected during configuration of deal.II. Refer to the README file
  * for more details about this.
  *
- * @author Martin Kronbichler, Wolfgang Bangerth, 2008
- *
  * @ingroup LAC
  */

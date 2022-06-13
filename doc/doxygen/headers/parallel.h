@@ -32,7 +32,6 @@
  * @ref distributed).
  *
  * @ingroup threads
- * @author Wolfgang Bangerth, 2008, 2009
  */
 namespace parallel
 {
