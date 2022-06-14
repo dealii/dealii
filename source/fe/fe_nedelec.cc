@@ -4121,7 +4121,63 @@ FE_Nedelec<dim>::memory_consumption() const
   return 0;
 }
 
+template <int dim>
+std::vector<unsigned int>
+FE_Nedelec<dim>::get_embedding_dofs(const unsigned int sub_degree) const
+{
+  Assert((sub_degree > 0) && (sub_degree <= this->degree),
+         ExcIndexRange(sub_degree, 1, this->degree));
 
+  switch (dim)
+    {
+      case 2:
+        {
+          // The Nedelec cell has only Face (Line) and Cell DoFs...
+          const unsigned int n_face_dofs_sub =
+            GeometryInfo<dim>::lines_per_cell * sub_degree;
+          const unsigned int n_cell_dofs_sub =
+            2 * (sub_degree - 1) * sub_degree;
+
+          std::vector<unsigned int> embedding_dofs(n_face_dofs_sub +
+                                                   n_cell_dofs_sub);
+
+          unsigned int i = 0;
+
+          // Identify the Face/Line DoFs
+          while (i < n_face_dofs_sub)
+            {
+              const unsigned int face_index = i / sub_degree;
+              embedding_dofs[i] = i % sub_degree + face_index * this->degree;
+              ++i;
+            }
+
+          // Identify the Cell DoFs
+          if (sub_degree >= 2)
+            {
+              const unsigned int n_face_dofs =
+                GeometryInfo<dim>::lines_per_cell * this->degree;
+
+              // For the first component
+              for (unsigned ku = 0; ku < sub_degree; ++ku)
+                for (unsigned kv = 2; kv <= sub_degree; ++kv)
+                  embedding_dofs[i++] =
+                    n_face_dofs + ku * (this->degree - 1) + (kv - 2);
+
+              // For the second component
+              for (unsigned ku = 2; ku <= sub_degree; ++ku)
+                for (unsigned kv = 0; kv < sub_degree; ++kv)
+                  embedding_dofs[i++] = n_face_dofs +
+                                        this->degree * (this->degree - 1) +
+                                        (ku - 2) * (this->degree) + kv;
+            }
+          Assert(i == (n_face_dofs_sub + n_cell_dofs_sub), ExcInternalError());
+          return embedding_dofs;
+        }
+      default:
+        Assert(false, ExcNotImplemented());
+        return std::vector<unsigned int>();
+    }
+}
 //----------------------------------------------------------------------//
 
 
