@@ -231,10 +231,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         {
           using LO       = int;
           using GO       = unsigned int;
-          using Node     = Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::Serial>;
-          using map_type = Tpetra::Map<LO, GO, Node>;
-          Teuchos::RCP<const map_type>         dummy_map = Teuchos::rcp(new map_type());
-          Tpetra::Vector<double, LO, GO, Node> dummy_vector(dummy_map);
+          using map_type = Tpetra::Map<LO, GO>;
+          Teuchos::RCP<const map_type>   dummy_map = Teuchos::rcp(new map_type());
+          Tpetra::Vector<double, LO, GO> dummy_vector(dummy_map);
           (void)dummy_vector;
           return 0;
         }
