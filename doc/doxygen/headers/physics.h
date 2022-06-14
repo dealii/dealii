@@ -50,8 +50,6 @@ namespace Physics
    * some further general insights on this topic.
    *
    * @ingroup physics
-   *
-   * @author Jean-Paul Pelteret, 2017
    */
   namespace Notation
   {
@@ -85,8 +83,6 @@ namespace Physics
   * Piola stress in elasticity).
   *
   * @ingroup physics
-  *
-  * @author Jean-Paul Pelteret, Andrew McBride, 2016
   */
   namespace Transformations
   {
@@ -185,8 +181,6 @@ namespace Physics
    * @f]
    * The fourth-order symmetric tensor returned by identity_tensor() is
    * $\mathcal{S}$.
-   *
-   * @author Jean-Paul Pelteret, Andrew McBride, 2016
    *
    * @ingroup physics
    */

@@ -26,7 +26,5 @@
  * PETSc installation was detected during configuration of
  * deal.II. Refer to the README file for more details about this.
  *
- * @author Toby D. Young, 2011
- *
  * @ingroup LAC PETScWrappers
  */
