@@ -161,5 +161,6 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
+  deallog << std::setprecision(10);
   test<3>();
 }
