@@ -301,43 +301,34 @@ private:
 
 /**
  * The Raviart-Thomas elements with node functionals defined as point values
- * in Gauss points.
+ * in Gauss-Lobatto points.
  *
  * <h3>Description of node values</h3>
  *
  * For this Raviart-Thomas element, the node values are not cell and face
- * moments with respect to certain polynomials, but the values in quadrature
+ * moments with respect to certain polynomials, but the values at quadrature
  * points. Following the general scheme for numbering degrees of freedom, the
  * node values on faces (edges in 2D, quads in 3D) are first, face by face,
  * according to the natural ordering of the faces of a cell. The interior
  * degrees of freedom are last.
  *
  * For an RT-element of degree <i>k</i>, we choose <i>(k+1)<sup>d-1</sup></i>
- * Gauss points on each face. These points are ordered lexicographically with
- * respect to the orientation of the face. This way, the normal component
- * which is in <i>Q<sub>k</sub></i>, is uniquely determined. Furthermore,
- * since this Gauss-formula is exact for polynomials of degree <i>2k+1</i>,
- * these node values correspond to the exact integration of the moments of the
- * RT-space.
+ * Gauss-Lobatto points on each face, as defined by QGaussLobatto. For degree
+ * $k=0$, the midpoint is chosen. These points are ordered lexicographically
+ * with respect to the orientation of the face. This way, the normal component
+ * which is in <i>Q<sub>k</sub></i>, is uniquely determined.
  *
  * These face polynomials are extended into the interior by the means of a
  * QGaussLobatto formula for the normal direction. In other words, the
  * polynomials are the tensor product of Lagrange polynomials on the points of
- * a QGaussLobatto formula in the normal direction with Lagrange polynomials
- * on the points of a QGauss quadrature formula.
+ * a QGaussLobatto formula with $(k+2)$ points in the normal direction with
+ * Lagrange polynomials on the points of a QGaussLobatto quadrature formula
+ * with $(k+1)$ points.
  *
  * @note The degree stored in the member variable
  * FiniteElementData<dim>::degree is higher by one than the constructor
  * argument!
  */
-
-namespace internal
-{
-  template <int dim>
-  std::vector<unsigned int>
-  get_lexicographic_numbering_rt_nodal(const unsigned int degree);
-} // namespace internal
-
 template <int dim>
 class FE_RaviartThomasNodal : public FE_PolyTensor<dim>
 {
@@ -429,6 +420,17 @@ private:
   mutable Threads::Mutex mutex;
 };
 
+
+namespace internal
+{
+  /**
+   * Compute the lexicographic to hierarchic numbering underlying the
+   * FE_RaviartThomasNodal class.
+   */
+  template <int dim>
+  std::vector<unsigned int>
+  get_lexicographic_numbering_rt_nodal(const unsigned int degree);
+} // namespace internal
 
 /*@}*/
 
