@@ -341,8 +341,9 @@ namespace
     points.resize(n_polynomials(degree));
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int i = 0; i < n_sub; ++i)
-        points[lexicographic_to_hierarchic[i + d * n_sub]] =
-          quad.point(renumber_aniso[d][i]);
+        for (unsigned int c = 0; c < dim; ++c)
+          points[lexicographic_to_hierarchic[i + d * n_sub]][(c + d) % dim] =
+            quad.point(renumber_aniso[d][i])[c];
     return points;
   }
 
@@ -426,6 +427,8 @@ namespace internal
     return lexicographic_numbering;
   }
 } // namespace internal
+
+
 
 // --------------------- actual implementation of element --------------------
 
