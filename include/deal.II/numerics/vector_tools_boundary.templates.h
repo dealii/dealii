@@ -2599,7 +2599,9 @@ namespace VectorTools
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
-                              &cell->get_fe()) != nullptr,
+                              &cell->get_fe()) != nullptr ||
+                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
+                                &cell->get_fe()) != nullptr,
                             typename FiniteElement<
                               dim>::ExcInterpolationNotImplemented());
                         }
@@ -2651,7 +2653,9 @@ namespace VectorTools
                         {
                           AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
-                              &cell->get_fe()) != nullptr,
+                              &cell->get_fe()) != nullptr ||
+                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
+                                &cell->get_fe()) != nullptr,
                             typename FiniteElement<
                               dim>::ExcInterpolationNotImplemented());
                         }
