@@ -519,7 +519,7 @@ protected:
   const std::unique_ptr<const TensorPolynomialsBase<dim>> poly_space;
 
   /**
-   * The inverse of the matrix <i>a<sub>ij</sub></i> of node values
+   * The inverse of the matrix <i>a<sub>ij</sub></i> of node functionals
    * <i>N<sub>i</sub></i> applied to polynomial <i>p<sub>j</sub></i>. This
    * matrix is used to convert polynomials in the "raw" basis provided in
    * #poly_space to the basis dual to the node functionals on the reference
@@ -527,7 +527,9 @@ protected:
    *
    * This object is not filled by FE_PolyTensor, but is a chance for a derived
    * class to allow for reorganization of the basis functions. If it is left
-   * empty, the basis in #poly_space is used.
+   * empty, the basis in #poly_space is used, i.e., it is assumed that
+   * #poly_space already satisfies the Kronecker delta property with
+   * regard to the node functionals.
    */
   FullMatrix<double> inverse_node_matrix;
 
