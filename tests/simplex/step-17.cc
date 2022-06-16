@@ -119,7 +119,7 @@ namespace Step17
     FESystem<dim>      fe;
     DoFHandler<dim>    dof_handler;
 
-    AffineConstraints<double> hanging_node_constraints;
+    AffineConstraints<PetscScalar> hanging_node_constraints;
 
     PETScWrappers::MPI::SparseMatrix system_matrix;
 
@@ -233,8 +233,8 @@ namespace Step17
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>     cell_rhs(dofs_per_cell);
+    FullMatrix<PetscScalar> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<PetscScalar>     cell_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -341,7 +341,7 @@ namespace Step17
       upper);
 
 
-    Vector<double> localized_solution(solution);
+    Vector<PetscScalar> localized_solution(solution);
     hanging_node_constraints.distribute(localized_solution);
     solution = localized_solution;
 
@@ -352,7 +352,7 @@ namespace Step17
   void
   ElasticProblem<dim>::output_results() const
   {
-    const Vector<double> localized_solution(solution);
+    const Vector<PetscScalar> localized_solution(solution);
 
     if (this_mpi_process == 0)
       {

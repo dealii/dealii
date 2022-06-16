@@ -639,14 +639,13 @@ namespace Step18
 #endif
 
 
-    FEValuesExtractors::Scalar                     z_component(dim - 1);
-    std::map<types::global_dof_index, PetscScalar> boundary_values;
-    VectorTools::interpolate_boundary_values(
-      mapping,
-      dof_handler,
-      0,
-      Functions::ZeroFunction<dim, PetscScalar>(dim),
-      boundary_values);
+    FEValuesExtractors::Scalar                z_component(dim - 1);
+    std::map<types::global_dof_index, double> boundary_values;
+    VectorTools::interpolate_boundary_values(mapping,
+                                             dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(dim),
+                                             boundary_values);
     VectorTools::interpolate_boundary_values(
       mapping,
       dof_handler,
