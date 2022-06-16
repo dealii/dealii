@@ -324,7 +324,7 @@ namespace Particles
      * and has no meaning any more. ParticleAccessors always use the
      * property pool of the owning particle handler.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     set_property_pool(PropertyPool<dim, spacedim> &property_pool);
 
@@ -349,7 +349,7 @@ namespace Particles
      * @deprecated Deprecated version of the function with the same
      * name above.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     const typename Triangulation<dim, spacedim>::cell_iterator &
     get_surrounding_cell(
       const Triangulation<dim, spacedim> &triangulation) const;

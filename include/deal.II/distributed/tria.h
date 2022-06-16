@@ -639,7 +639,7 @@ namespace parallel
        *
        * @deprecated The autopartition parameter has been removed.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       virtual void
       load(const std::string &filename, const bool autopartition) override;
 
@@ -906,7 +906,7 @@ namespace parallel
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       virtual void
       load(const std::string &filename, const bool autopartition) override;
 
@@ -1062,7 +1062,7 @@ namespace parallel
        * Dummy replacement to allow for better error messages when compiling
        * this class.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       virtual void
       load(const std::string & /*filename*/,
            const bool /*autopartition*/) override

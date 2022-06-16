@@ -2256,7 +2256,7 @@ public:
        * Connects an additional base weight function if signal was previously
        * empty.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       boost::signals2::connection
       connect(
         const slot_type &                 slot,
@@ -2279,7 +2279,7 @@ public:
        * Returns the number of connected functions <em>without</em> the base
        * weight.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       std::size_t
       num_slots() const
       {
@@ -2290,7 +2290,7 @@ public:
       /**
        * Checks if there are any connected functions to the signal.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       bool
       empty() const
       {
@@ -2309,7 +2309,7 @@ public:
        * function.
        */
       template <typename S>
-      DEAL_II_DEPRECATED_EARLY void
+      DEAL_II_DEPRECATED void
       disconnect(const S &connection)
       {
         new_signal.disconnect(connection);
@@ -2325,7 +2325,7 @@ public:
       /**
        * Triggers the signal.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       unsigned int
       operator()(const cell_iterator &iterator, const CellStatus status)
       {

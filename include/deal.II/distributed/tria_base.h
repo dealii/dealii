@@ -506,7 +506,7 @@ namespace parallel
      *
      * @deprecated The autopartition parameter has been removed.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     virtual void
     load(const std::string &filename, const bool autopartition) = 0;
 
