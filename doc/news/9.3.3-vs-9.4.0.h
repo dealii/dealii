@@ -37,10 +37,10 @@ inconvenience this causes.
 <ol>
 
  <li>
-  Changed: For ParameterHandler::OutputStyle::JSON or 
-  ParameterHandler::OutputStyle::ShortJSON, the function 
-  ParameterHandler::print_parameters() demangles now the 
-  parameters before printing the output. Users do not 
+  Changed: For ParameterHandler::OutputStyle::JSON or
+  ParameterHandler::OutputStyle::ShortJSON, the function
+  ParameterHandler::print_parameters() demangles now the
+  parameters before printing the output. Users do not
   need to demangle the output themselves anymore.
   <br>
   (Magdalena Schreter, Peter Munch, 2022/05/25)
@@ -74,7 +74,7 @@ inconvenience this causes.
   before calling MatrixFree::reinit() if AffineConstraints
   objects are passed that are not empty. One can check
   if an AffineConstraints object is closed with the
-  new function AffineConstraints::is_closed(). 
+  new function AffineConstraints::is_closed().
   <br>
   (Peter Munch, 2022/03/08)
  </li>
@@ -314,7 +314,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Removed: The deprecated overloads of 
+  Removed: The deprecated overloads of
   FETools::lexicographic_to_hierarchic_numbering() and
   FETools::hierarchic_to_lexicographic_numbering() have been removed.
   <br>
@@ -391,7 +391,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Removed: The deprecated member field 
+  Removed: The deprecated member field
   MatrixFree::AdditionalData::level_mg_handler.
   <br>
   (Peter Munch, 2021/05/25)
@@ -406,9 +406,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  Removed: The deprecated member functions 
-  DoFHandler::locally_owned_dofs_per_processor(), 
-  DoFHandler::n_locally_owned_dofs_per_processor(), and 
+  Removed: The deprecated member functions
+  DoFHandler::locally_owned_dofs_per_processor(),
+  DoFHandler::n_locally_owned_dofs_per_processor(), and
   DoFHandler::n_locally_owned_mg_dofs_per_processor() have been removed.
   <br>
   (Daniel Arndt, 2021/05/24)
@@ -499,7 +499,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Added support for the CGAL library (www.cgal.org). The following features 
+  New: Added support for the CGAL library (www.cgal.org). The following features
   are supported:
   <ul>
     <li>Conversion from deal.II to CGAL point types and viceversa</li>
@@ -547,7 +547,7 @@ inconvenience this causes.
  <li>
   New: Added an interface to p4est_search.h (>=v2.2) to find the MPI
   rank of cells owning remote points without communication. This
-  works in the special (but not uncommon) case that no nontrivial 
+  works in the special (but not uncommon) case that no nontrivial
   manifold is attached to the triangulation, i.e., the triangulation
   has only FlatManifold attached to it.
   <br>
@@ -584,7 +584,7 @@ inconvenience this causes.
 
  <li>
   Improved: DataOut_DoFData and the derived classes create internally
-  a copy of vectors attached via add_data_vector() and are now 
+  a copy of vectors attached via add_data_vector() and are now
   responsible for updating ghost values so that users do not
   need to call update_ghost_values() and potentially zero_out_ghost_values().
   <br>
@@ -593,7 +593,7 @@ inconvenience this causes.
 
  <li>
   New: The new postprocessing class DataOutResample is similar to
-  DataOut but allows to interpolate the result onto a second 
+  DataOut but allows to interpolate the result onto a second
   triangulation.
   <br>
   (Peter Munch, Martin Kronbichler, Magdalena Schreter, 2021/06/08)
@@ -658,9 +658,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: We added the possibility to average the contributions to a DoF from 
+  New: We added the possibility to average the contributions to a DoF from
   different cells in parallel::distributed::SolutionTransfer. For this purpose,
-  set the corresponding flag in the constructor. 
+  set the corresponding flag in the constructor.
   <br>
   (Peter Munch, Magdalena Schreter, 2022/05/14)
  </li>
@@ -762,8 +762,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: FEInterfaceValues now has functions get_*_function_values() to evaluate solution 
-  values across cell faces, such as the jump in (or average of) values, 
+  New: FEInterfaceValues now has functions get_*_function_values() to evaluate solution
+  values across cell faces, such as the jump in (or average of) values,
   gradients, and Hessians.
   <br>
   (Jiaqi Zhang, 2022/04/11)
@@ -861,7 +861,7 @@ inconvenience this causes.
   Improved: The asserts in parallel::distributed::SolutionTransfer have
   been improved. Before this change, an assert has been only called
   in the parallel case for distributed vectors for cells neighboring
-  interprocess boundaries. Now, we check for all DoFs that the 
+  interprocess boundaries. Now, we check for all DoFs that the
   contributions from all cells have the same values. This condition
   might be not given if the solution has high gradients at hanging
   nodes.
@@ -878,9 +878,9 @@ inconvenience this causes.
  <li>
   Fixed: The function parallel::distributed::copy_triangulation() used to
   copy the reference to the attached SolutionTransfer instance, which resulted
-  in calling the same SolutionTransfer instance multiple times if the 
+  in calling the same SolutionTransfer instance multiple times if the
   triangulation and the new triangulation are refined/coarsened independently.
-  This has been fixed. 
+  This has been fixed.
   <br>
   (Ivo Dravins, Peter Munch, 2022/02/22)
  </li>
@@ -901,8 +901,8 @@ inconvenience this causes.
 
  <li>
   New: AffineConstraints::add_entries_local_to_global() now supports also the case
-  where columns don't use the same constraints as rows. 
-  <br> 
+  where columns don't use the same constraints as rows.
+  <br>
   (Luca Heltai, 2022/02/18)
  </li>
 
@@ -957,8 +957,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: To be consistent with the FEValues classes, one can now 
-  loop over all DoF and quadrature-point indices in a 
+  Improved: To be consistent with the FEValues classes, one can now
+  loop over all DoF and quadrature-point indices in a
   range-based loop with the help of the new functions dof_indices() and
   quadrature_point_indices().
   <br>
@@ -973,8 +973,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: In MatrixFreeTools::compute_diagonal a template argument VectorType 
-  has been introduced to be applicable for arbitrary vector types. 
+  Improved: In MatrixFreeTools::compute_diagonal a template argument VectorType
+  has been introduced to be applicable for arbitrary vector types.
   <br>
   (Magdalena Schreter, Peter Munch, 2022/02/02)
  </li>
@@ -986,8 +986,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: FE_Nedelec<2> now includes the function get_embedding_dofs(), 
-  which permits direct identification of DoF indices between two 
+  New: FE_Nedelec<2> now includes the function get_embedding_dofs(),
+  which permits direct identification of DoF indices between two
   realizations of the FE_Nedelec cell.
   <br>
   (Jake Harmon, 2022/01/25)
@@ -1063,8 +1063,8 @@ inconvenience this causes.
   Improved: The class PreconditionRelaxation has been refactored.
   Similarly to PreconditionChebyshev, it can be now used
   stand-alone and users can attach their own preconditioners.
-  Furthermore, users can specify multiple iteration steps, 
-  which is particularly useful if PreconditionRelaxation is 
+  Furthermore, users can specify multiple iteration steps,
+  which is particularly useful if PreconditionRelaxation is
   used as smoother in a multigrid algorithm.
   <br>
   (Peter Munch, 2022/01/01)
@@ -1072,7 +1072,7 @@ inconvenience this causes.
 
  <li>
   New: More "getter" functions have been added to MeshWorker::ScratchData,
-  facilitating the construction of other FEValues-type objects with some of 
+  facilitating the construction of other FEValues-type objects with some of
   the same objects as those used in a ScratchData instance.
   <br>
   (Jean-Paul Pelteret, 2021/12/31)
@@ -1443,10 +1443,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: FEInterfaceViews now has functions get_*_function_values() and 
-  get_*_function_values_from_local_dof_values() to evaluate solution 
-  values across cell faces, such as the jump in (or average of) values, 
-  gradients, and Hessians. With these functions, FEInterfaceValues 
+  New: FEInterfaceViews now has functions get_*_function_values() and
+  get_*_function_values_from_local_dof_values() to evaluate solution
+  values across cell faces, such as the jump in (or average of) values,
+  gradients, and Hessians. With these functions, FEInterfaceValues
   can now be used with automatic differentiation.
   <br>
   (Jiaqi Zhang, 2021/08/11)
@@ -1476,7 +1476,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: Use tolerances consistently in RemotePointEvaluation, 
+  Fixed: Use tolerances consistently in RemotePointEvaluation,
   VectorTools::point_values(), and GridTools::distributed_compute_point_locations().
   <br>
   (Peter Munch, Magdalena Schreter, 2021/07/31)
@@ -1503,7 +1503,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The new function TableBase::clear() allows to 
+  New: The new function TableBase::clear() allows to
   empty a Table object.
   <br>
   (Jiaqi Zhang, 2021/07/21)
@@ -1553,7 +1553,7 @@ inconvenience this causes.
  <li>
   New: The new function Triangulation::n_global_coarse_cells() allows to
   query the global number of coarse cells. This function is particularly useful
-  for parallel::fullydistributed::Triangulation, since in this case the coarse 
+  for parallel::fullydistributed::Triangulation, since in this case the coarse
   cells might differ on each process.
   <br>
   (Peter Munch, 2021/06/26)
@@ -1561,14 +1561,14 @@ inconvenience this causes.
 
  <li>
   New: The new unified function MGTwoLevelTransfer::reinit() selects automatically
-  if MGTwoLevelTransfer::reinit_geometric_transfer() or 
+  if MGTwoLevelTransfer::reinit_geometric_transfer() or
   MGTwoLevelTransfer::reinit_polynomial_transfer() is needed.
   <br>
   (Peter Munch, 2021/06/23)
  </li>
 
  <li>
-  New: The new function CellAccessor::is_ghost_on_level() allows to 
+  New: The new function CellAccessor::is_ghost_on_level() allows to
   check if a cell is a ghost cell on a multigrid level.
   <br>
   (Peter Munch, 2021/06/23)
@@ -1616,7 +1616,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The new function Utilities::MPI::reduce() allows to reduce 
+  New: The new function Utilities::MPI::reduce() allows to reduce
   arbitrary types with a user-specified binary operation.
   <br>
   (Peter Munch, 2021/05/27)
@@ -1638,8 +1638,8 @@ inconvenience this causes.
 
  <li>
   New: The class MGTransferMatrixFree::build() now also
-  accepts an optional function for initializing the internal level vectors. 
-  This is useful if one uses the transfer operators in the context of 
+  accepts an optional function for initializing the internal level vectors.
+  This is useful if one uses the transfer operators in the context of
   smoothers that are built around MatrixFree objects.
   <br>
   (Peter Munch, 2021/03/09)
