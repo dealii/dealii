@@ -1,5 +1,0 @@
-New: The class SolverFlexibleCG implements a flexible variant of the conjugate
-gradient method that runs the so-called Polak-Ribiere update formula instead
-of the default Fletcher-Reeves formula of SolverCG.
-<br>
-(Martin Kronbichler, 2022/05/06)

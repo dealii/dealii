@@ -1,6 +1,0 @@
-Improved: DataOut_DoFData and the derived classes create internally
-a copy of vectors attached via add_data_vector() and are now 
-responsible for updating ghost values so that users do not
-need to call update_ghost_values() and potentially zero_out_ghost_values().
-<br>
-(Peter Munch, Magdalena Schreter, 2021/05/27)

@@ -1,7 +1,0 @@
-Changed: The function MatrixFreeTools::compute_diagonal()
-does not initialize the output vector anymore. Users
-need to call MatrixFree:initialize_dof_vector() themselves.
-This change is required to be able to also support block
-vectors.
-<br>
-(Magdalena Schreter, Peter Munch, 2022/02/01)

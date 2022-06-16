@@ -1,6 +1,0 @@
-Fixed: The FEInterfaceValues class is now made compatible with filtered
-iterators. Specifically, it is now possible to call FEInterfaceValues::reinit()
-with the active `cell` being a filtered iterator and the type returned by
-`cell->neighbor()` being some other non-filtered iterator type.
-<br>
-(Simon Sticko, Jean-Paul Pelteret, 2022/01/05)

@@ -1,5 +1,0 @@
-New: There is now a template variable Utilities::MPI::is_mpi_type that
-can be used to query whether a data type is a natively supported MPI
-type.
-<br>
-(Wolfgang Bangerth, 2022/03/01)

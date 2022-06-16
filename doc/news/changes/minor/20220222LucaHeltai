@@ -1,3 +1,0 @@
-Fixed: ParsedConvergenceTable::difference() was not working. This is now fixed.
-<br>
-(Luca Heltai, 2022/02/22)

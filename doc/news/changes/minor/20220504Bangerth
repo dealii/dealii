@@ -1,5 +1,0 @@
-New: There are now functions ReferenceCell::volume() and
-ReferenceCells::barycenter() that compute what their names suggest for
-the various kinds of reference cells deal.II supports.
-<br>
-(Wolfgang Bangerth, 2022/05/04)

@@ -1,9 +1,0 @@
-Improved: The asserts in parallel::distributed::SolutionTransfer have
-been improved. Before this change, an assert has been only called
-in the parallel case for distributed vectors for cells neighboring
-interprocess boundaries. Now, we check for all DoFs that the 
-contributions from all cells have the same values. This condition
-might be not given if the solution has high gradients at hanging
-nodes.
-<br>
-(Peter Munch, Magdalena Schreter, 2022/02/25)

@@ -1,5 +1,0 @@
-New: There is a new function DoFRenumbering::matrix_free_data_locality() that
-re-orders the indices of the unknowns in a DoFHandler to give optimal data
-locality of pre- and post-operations in matrix-free loops.
-<br>
-(Martin Kronbichler, Peter Munch, Alexander Roschlaub, Dmytro Sashko, 2022/04/21)

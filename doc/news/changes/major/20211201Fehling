@@ -1,5 +1,0 @@
-New: Geometry GridGenerator::pipe_junction() creates an intersection of
-arbitrary truncated cones in 3D. It can be used to generate T-pipes,
-Y-pipes, corner pieces and other fittings.
-<br>
-(Marc Fehling, Maximilian Bergbauer, Peter Munch, Martin Kronbichler, 2021/12/01)

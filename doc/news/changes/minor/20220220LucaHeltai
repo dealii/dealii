@@ -1,3 +1,0 @@
-Fixed: GridOut::write_msh() with gmsh api now works also with non standard combinations of boundary and manifold ids.
-<br>
-(Luca Heltai, 2022/02/20)

@@ -1,4 +1,0 @@
-Fixed: ParticleHandler::insert_particles() runs into a deadlock in parallel
-when a processor is not inserting any particles. This is now fixed.
-<br>
-(Sebastian Fuchs, 2021/08/31)
