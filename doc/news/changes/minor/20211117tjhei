@@ -1,3 +1,0 @@
-New: Utilities::MPI::create_mpi_data_type_n_bytes() helps with large MPI communication and IO.
-<br>
-(Timo Heister, 2021/11/17)

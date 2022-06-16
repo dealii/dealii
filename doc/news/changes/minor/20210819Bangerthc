@@ -1,5 +1,0 @@
-New: There is now an overload for
-Particles::ParticleAccessor::set_properties() that takes a Tensor
-as argument. It is used in step-19.
-<br>
-(Wolfgang Bangerth, 2021/08/19)

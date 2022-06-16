@@ -1,7 +1,0 @@
-New: The template variable Utilities::MPI::mpi_type_id_for_type
-provides information about the `MPI_Datatype` that corresponds to a
-given type. This information is necessary in all MPI calls where one
-needs to provide an `MPI_Datatype` to identify the kinds of objects
-stored in a send or receive buffer.
-<br>
-(Wolfgang Bangerth, 2022/02/27)

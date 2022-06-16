@@ -1,3 +1,0 @@
-Fixed: Renumbering of the support points of `FE_RaviartThomasNodal`, which previously had x and z coordinates switched for the second component with `dim=3`.
-<br>
-(Niklas Wik, 2022/04/04)

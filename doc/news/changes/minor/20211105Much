@@ -1,5 +1,0 @@
-New: The new class Functions::SignedDistance::Ellipsoid computes
-a signed distance function for ellipsoids. It is implemented for 1D and
-2D ellipsoids (ellipses).
-<br>
-(Nils Much, 2021/11/05)

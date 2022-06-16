@@ -1,5 +1,0 @@
-Fixed: NonMatching::create_coupling_sparsity_pattern() and
-NonMatching::create_coupling_mass_matrix() were not working properly with
-hanging node constraints.
-<br>
-(Luca Heltai, 2022/02/18)

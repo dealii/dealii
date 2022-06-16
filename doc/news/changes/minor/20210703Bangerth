@@ -1,7 +1,0 @@
-Fixed: step-34 had a minor memory leak whereby the function
-`get_singular_quadrature()` allocated some memory the
-first time it was called, and then never released it. This is now
-fixed. Separately, this function was not thread-safe, and now it is.
-<br>
-(Wolfgang Bangerth, 2021/07/03)
-

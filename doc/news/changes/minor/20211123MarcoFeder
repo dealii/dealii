@@ -1,3 +1,0 @@
-Fixed: The step-22 tutorial now uses FEValuesExtractors also for the right-hand side
-<br>
-(Marco Feder, 2021/11/23)

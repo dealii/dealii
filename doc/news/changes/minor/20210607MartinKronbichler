@@ -1,5 +1,0 @@
-Fixed: MappingQCache::get_vertices() would previously always return the actual
-vertices, ignoring a possible displacement that is possible with this
-class. This is now fixed.
-<br>
-(Martin Kronbichler, 2021/06/07)

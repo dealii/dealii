@@ -1,5 +1,0 @@
-Deprecated: The autopartition parameter has been removed from
-parallel::DistributedTriangulationBase::load() and all inheriting
-classes.
-<br>
-(Marc Fehling, 2021/07/24)

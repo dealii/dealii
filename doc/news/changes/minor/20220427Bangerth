@@ -1,4 +1,0 @@
-New: The class DataPostprocessors::BoundaryIds can be used to
-visualize the boundary indicators used in a mesh.
-<br>
-(Wolfgang Bangerth, 2022/04/27)

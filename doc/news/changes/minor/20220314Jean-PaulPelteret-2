@@ -1,5 +1,0 @@
-Improved: MeshWorker::CopyData gains a new template argument for the scalar
-type, which allows the collected local matrix or vector contributions to be
-stored as types other than `double`.
-<br>
-(Jean-Paul Pelteret, 2022/03/14)

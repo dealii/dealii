@@ -1,6 +1,0 @@
-Improved: PreconditionChebyshev can now run the vector updates on a part of
-the vector for better data locality. The prerequisite is an associated
-`MatrixType` class to provide a `vmult` class with two `std::function` objects
-to specify the operation before and after the matrix-vector product.
-<br>
-(Martin Kronbichler, 2021/10/12)

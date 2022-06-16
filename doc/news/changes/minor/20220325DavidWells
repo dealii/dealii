@@ -1,4 +1,0 @@
-Fixed: deal.II, compiled with the bundled copy of muParser, can now be
-safely linked alongside other projects which use a separate copy of muParser.
-<br>
-(David Wells, 2022/03/25)

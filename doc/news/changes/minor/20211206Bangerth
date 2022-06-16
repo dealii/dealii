@@ -1,3 +1,0 @@
-New: GridOut::write_msh() now also works for triangular and tetrahedral meshes.
-<br>
-(Wolfgang Bangerth, 2021/12/06)

@@ -1,5 +1,0 @@
-Changed: The minimum CMake version required to configure and build deal.II
-has been raised to 3.3.0.
-<br>
-(Matthias Maier, 2022/02/06)
-

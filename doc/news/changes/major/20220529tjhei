@@ -1,4 +1,0 @@
-New: The namespace Utilities::MPI::LargeCount provides functionality
-to do MPI operations with more than 2^31 number of objects.
-<br>
-(Timo Heister, Sean Ingimarson, Penfei Jia, Jiaqi Zhang, 2022/05/29)

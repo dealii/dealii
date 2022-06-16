@@ -1,5 +1,0 @@
-New: FE_Nedelec<2> now includes the function get_embedding_dofs(), 
-which permits direct identification of DoF indices between two 
-realizations of the FE_Nedelec cell.
-<br>
-(Jake Harmon, 2022/01/25)

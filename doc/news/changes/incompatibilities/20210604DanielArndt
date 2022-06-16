@@ -1,4 +1,0 @@
-Removed: The deprecated specializations of VectorTools::integrate_difference()
-and VectorTools::project_boundary_values_curl_conforming() have been removed.
-<br>
-(Daniel Arndt, 2021/06/04)

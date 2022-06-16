@@ -1,4 +1,0 @@
-New: The SD::BatchOptimizer::copy_from() function can be used to duplicate the
-data from one batch optimizer instance to another.
-<br>
-(Jean-Paul Pelteret, 2021/11/27)
