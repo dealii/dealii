@@ -19,7 +19,7 @@ Principal developers:
 - Timo Heister, Clemson University, SC, USA
 - Luca Heltai, SISSA, Trieste, Italy
 - Guido Kanschat, Heidelberg University, Germany
-- Martin Kronbichler, University of Augsburg, Sweden
+- Martin Kronbichler, University of Augsburg, Germany
 - Matthias Maier, Texas A&M University, College Station, TX, USA
 - Peter Munch, Helmholtz-Zentrum Hereon and University of Augsburg, Germany
 - Jean-Paul Pelteret, Independent Researcher, Germany
