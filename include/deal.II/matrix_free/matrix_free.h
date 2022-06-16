@@ -2857,7 +2857,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
   if (dof_info[0].cell_active_fe_index.empty())
     return std::make_pair(0U, 0U);
 
-  std::pair<unsigned int, unsigned int> result;
+  std::pair<unsigned int, unsigned int> result = std::make_pair(0U, 0U);
   for (unsigned int v = 0;
        v < VectorizedArrayType::size() &&
        face_info.faces[face_batch_index].cells_interior[v] !=
@@ -2866,7 +2866,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
     result.first = std::max(
       result.first,
       dof_info[0].cell_active_fe_index[face_info.faces[face_batch_index]
-                                         .cells_interior[v]]);
+                                         .cells_interior[v] /
+                                       VectorizedArrayType::size()]);
   if (face_info.faces[face_batch_index].cells_exterior[0] !=
       numbers::invalid_unsigned_int)
     for (unsigned int v = 0;
@@ -2875,9 +2876,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_category(
            numbers::invalid_unsigned_int;
          ++v)
       result.second = std::max(
-        result.first,
+        result.second,
         dof_info[0].cell_active_fe_index[face_info.faces[face_batch_index]
-                                           .cells_exterior[v]]);
+                                           .cells_exterior[v] /
+                                         VectorizedArrayType::size()]);
   else
     result.second = numbers::invalid_unsigned_int;
   return result;
