@@ -796,7 +796,7 @@ make_array_view(ArrayView<Number, MemorySpaceType> &array_view)
  * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
-DEAL_II_DEPRECATED_EARLY inline ArrayView<const Number>
+DEAL_II_DEPRECATED inline ArrayView<const Number>
 make_array_view(const Tensor<rank, dim, Number> &tensor)
 {
   return make_array_view(tensor.begin_raw(), tensor.end_raw());
@@ -826,7 +826,7 @@ make_array_view(const Tensor<rank, dim, Number> &tensor)
  * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
-DEAL_II_DEPRECATED_EARLY inline ArrayView<Number>
+DEAL_II_DEPRECATED inline ArrayView<Number>
 make_array_view(Tensor<rank, dim, Number> &tensor)
 {
   return make_array_view(tensor.begin_raw(), tensor.end_raw());
@@ -856,7 +856,7 @@ make_array_view(Tensor<rank, dim, Number> &tensor)
  * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
-DEAL_II_DEPRECATED_EARLY inline ArrayView<const Number>
+DEAL_II_DEPRECATED inline ArrayView<const Number>
 make_array_view(const SymmetricTensor<rank, dim, Number> &tensor)
 {
   return make_array_view(tensor.begin_raw(), tensor.end_raw());
@@ -887,7 +887,7 @@ make_array_view(const SymmetricTensor<rank, dim, Number> &tensor)
  * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
-DEAL_II_DEPRECATED_EARLY inline ArrayView<Number>
+DEAL_II_DEPRECATED inline ArrayView<Number>
 make_array_view(SymmetricTensor<rank, dim, Number> &tensor)
 {
   return make_array_view(tensor.begin_raw(), tensor.end_raw());

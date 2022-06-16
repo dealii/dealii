@@ -469,7 +469,7 @@ namespace Utilities
      * @deprecated Use MPI_Comm_create_group directly
      */
 #ifdef DEAL_II_WITH_MPI
-    DEAL_II_DEPRECATED_EARLY int
+    DEAL_II_DEPRECATED int
     create_group(const MPI_Comm & comm,
                  const MPI_Group &group,
                  const int        tag,

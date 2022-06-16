@@ -826,7 +826,7 @@ namespace Particles
      * prepare_for_serialization() instead. See there for further information
      * about the purpose of this function.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     register_store_callback_function();
 
@@ -840,7 +840,7 @@ namespace Particles
      * deserialize() instead. See there for further information about the
      * purpose of this function.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     void
     register_load_callback_function(const bool serialization);
 

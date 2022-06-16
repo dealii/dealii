@@ -637,7 +637,7 @@ namespace GridTools
    * @deprecated Use the alternative with the unit vector instead.
    */
   template <int dim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   rotate(const double           angle,
          const unsigned int     axis,
          Triangulation<dim, 3> &triangulation);
