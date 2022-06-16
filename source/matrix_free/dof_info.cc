@@ -994,16 +994,19 @@ namespace internal
           const std::function<void(
             const std::function<void(
               const unsigned int, const unsigned int, const bool)> &)> &loop) {
-          bool all_nodal_and_tensorial = true;
-          for (unsigned int c = 0; c < n_base_elements; ++c)
-            {
-              const auto &si =
-                shape_info(global_base_element_offset + c, 0).data.front();
-              if (!si.nodal_at_cell_boundaries ||
-                  (si.element_type ==
-                   MatrixFreeFunctions::ElementType::tensor_none))
-                all_nodal_and_tensorial = false;
-            }
+          bool all_nodal_and_tensorial = shape_info.size(1) == 1;
+
+          if (all_nodal_and_tensorial)
+            for (unsigned int c = 0; c < n_base_elements; ++c)
+              {
+                const auto &si =
+                  shape_info(global_base_element_offset + c, 0).data.front();
+                if (!si.nodal_at_cell_boundaries ||
+                    (si.element_type ==
+                     MatrixFreeFunctions::ElementType::tensor_none))
+                  all_nodal_and_tensorial = false;
+              }
+
           if (all_nodal_and_tensorial == false)
             vector_partitioner_values = vector_partitioner;
           else
@@ -1082,11 +1085,13 @@ namespace internal
           const std::function<void(
             const std::function<void(
               const unsigned int, const unsigned int, const bool)> &)> &loop) {
-          bool all_hermite = true;
-          for (unsigned int c = 0; c < n_base_elements; ++c)
-            if (shape_info(global_base_element_offset + c, 0).element_type !=
-                MatrixFreeFunctions::tensor_symmetric_hermite)
-              all_hermite = false;
+          bool all_hermite = shape_info.size(1) == 1;
+
+          if (all_hermite)
+            for (unsigned int c = 0; c < n_base_elements; ++c)
+              if (shape_info(global_base_element_offset + c, 0).element_type !=
+                  MatrixFreeFunctions::tensor_symmetric_hermite)
+                all_hermite = false;
           if (all_hermite == false ||
               vector_partitoner_values.get() == vector_partitioner.get())
             vector_partitioner_gradients = vector_partitioner;
