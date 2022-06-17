@@ -1,0 +1,26 @@
+
+DEAL:Double:Evaluation::f: x*y
+DEAL:Double:Evaluation::G: (x + y)*T_00 (x + y)*T_01 (x + y)*T_10 (x + y)*T_11
+DEAL:Double:Evaluation::H: S_00/(x - y) S_01/(x - y) S_01/(x - y) S_11/(x - y)
+DEAL:Double:Evaluation::f(x,y): 20.00000000
+DEAL:Double:Evaluation::G(x,y,T): 48.00000000 48.00000000 60.00000000 84.00000000
+DEAL:Double:Evaluation::H(x,y,S): 0.6250000000 0.7500000000 0.7500000000 0.7500000000
+DEAL:Double:Evaluation::
+DEAL:Double:Extraction::f(x,y): 20.00000000
+DEAL:Double:Extraction::G(x,y,T): 48.00000000 48.00000000 60.00000000 84.00000000
+DEAL:Double:Extraction::H(x,y,S): 0.6250000000 0.7500000000 0.7500000000 0.7500000000
+DEAL:Double:Extraction::
+DEAL:Double:Invalid evaluation::Going to try evaluation without substitution...
+DEAL:Double:Invalid evaluation::f(x,y): 0.000000000
+DEAL:Double:Invalid evaluation::
+DEAL:Double:Invalid evaluation::Caught invalid evaluation before substitution: Tensor
+DEAL:Double:Invalid evaluation::Caught invalid evaluation before substitution: SymmetricTensor
+DEAL:Double:Invalid evaluation::Going to try substitution without optimization...
+DEAL:Double:Invalid evaluation::Caught invalid substitution before optimization.
+DEAL:Double:Invalid evaluation::Going to try evaluation without optimization...
+DEAL:Double:Invalid evaluation::f(x,y): 0.000000000
+DEAL:Double:Invalid evaluation::
+DEAL:Double:Invalid evaluation::Caught invalid evaluation before optimization: Tensor
+DEAL:Double:Invalid evaluation::Caught invalid evaluation before optimization: SymmetricTensor
+DEAL:Double::OK
+DEAL::OK
