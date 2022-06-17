@@ -234,12 +234,8 @@ do_test(const DoFHandler<dim> &          dof,
     const QGaussLobatto<1>                           quad(n_q_points);
     typename MatrixFree<dim, Number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, Number>::AdditionalData::none;
-    data.mapping_update_flags =
-      (update_gradients | update_JxW_values | update_hessians);
-    data.mapping_update_flags_inner_faces =
-      (update_gradients | update_JxW_values | update_hessians);
-    data.mapping_update_flags_boundary_faces =
-      (update_gradients | update_JxW_values | update_hessians);
+    data.mapping_update_flags  = update_piola;
+    data.mapping_update_flags_inner_faces = update_contravariant_transformation;
     mf_data.reinit(mapping, dof, constraints, quad, data);
   }
 

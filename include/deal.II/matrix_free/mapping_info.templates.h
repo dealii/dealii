@@ -97,7 +97,7 @@ namespace internal
            (update_jacobian_grads | update_hessians)) != 0u ||
           (piola_transform &&
            ((update_flags_inner_faces | update_flags_boundary_faces) &
-            update_gradients) != 0u)) ?
+            (update_gradients | update_contravariant_transformation)) != 0u)) ?
            update_jacobian_grads :
            update_default) |
         update_normal_vectors | update_JxW_values | update_jacobians;

@@ -137,7 +137,9 @@ namespace internal
       // inverse Jacobians, which is what we need)
       if ((update_flags & update_hessians) != 0u ||
           (update_flags & update_jacobian_grads) != 0u ||
-          (piola_transform && (update_flags & update_gradients) != 0u))
+          (piola_transform &&
+           ((update_flags &
+             (update_gradients | update_contravariant_transformation)) != 0u)))
         new_flags |= update_jacobian_grads;
 
       if ((update_flags & update_quadrature_points) != 0u)
