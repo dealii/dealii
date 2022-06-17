@@ -498,13 +498,18 @@ public:
     /**
      * This data structure allows to assign a fraction of cells to different
      * categories when building the information for vectorization. It is used
-     * implicitly when working with hp-adaptivity but can also be useful in
-     * other contexts, such as in local time stepping where one would like to
-     * control which elements together form a batch of cells.
+     * implicitly when working with hp-adaptivity (with each active index
+     * being a category) but can also be useful in other contexts where one
+     * would like to control which cells together can form a batch of cells.
+     * Such an example is "local time stepping", where cells of different
+     * caterogries progress with different time-step sizes and, as a
+     * consequence, can only processed together with cells with the same
+     * cateogry.
      *
      * This array is accessed by the number given by cell->active_cell_index()
-     * when working on the active cells with @p mg_level set to numbers::invalid_unsigned_int and
-     * by cell->index() for the level cells.
+     * when working on the active cells (with
+     * @p mg_level set to numbers::invalid_unsigned_int) and by cell->index()
+     * for the level cells.
      *
      * @note This field is empty upon construction of AdditionalData. It is
      * the responsibility of the user to resize this field to
