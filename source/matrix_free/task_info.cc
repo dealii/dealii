@@ -1060,8 +1060,16 @@ namespace internal
            ++cell)
         {
           if (!cell_vectorization_categories.empty())
-            AssertDimension(cell_vectorization_categories[cell],
-                            cell_vectorization_categories[n_active_cells]);
+            Assert(
+              cell_vectorization_categories[cell] ==
+                cell_vectorization_categories[n_active_cells],
+              ExcMessage(
+                "Currently, all ghost cells need to have the same category, "
+                "but got " +
+                std::to_string(cell_vectorization_categories[cell]) + " and " +
+                std::to_string(cell_vectorization_categories[n_active_cells]) +
+                ". Please check MatrixFree::AdditionalData::cell_vectorization_category "
+                "or the active FE index of the ghost cells in the hp case!"));
           renumbering[cell] = cell;
         }
       if ((n_ghost_cells % n_lanes) != 0u)
