@@ -84,19 +84,18 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
 
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
-  const unsigned int n_dofs = this->n_dofs_per_cell();
-
   this->mapping_kind = {mapping_nedelec};
   // First, initialize the
   // generalized support points and
   // quadrature weights, since they
   // are required for interpolation.
   initialize_support_points(order);
-  this->inverse_node_matrix.reinit(n_dofs, n_dofs);
-  this->inverse_node_matrix.fill(FullMatrix<double>(IdentityMatrix(n_dofs)));
-  // From now on, the shape functions
-  // will be the correct ones, not
-  // the raw shape functions anymore.
+
+  // We already use the correct basis, so no basis transformation is required
+  // from the polynomial space we have described above to the one that is dual
+  // to the node functionals. As documented in the base class, this is
+  // expressed by setting the inverse node matrix to the empty matrix.
+  this->inverse_node_matrix.clear();
 
   // do not initialize embedding and restriction here. these matrices are
   // initialized on demand in get_restriction_matrix and
