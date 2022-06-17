@@ -1482,25 +1482,40 @@ namespace internal
         std::vector<unsigned int> parent_relation(
           task_info.n_active_cells + task_info.n_ghost_cells,
           numbers::invalid_unsigned_int);
-        std::map<std::pair<int, int>, std::vector<unsigned int>> cell_parents;
+
+        constexpr unsigned int max_children_per_cell =
+          GeometryInfo<dim>::max_children_per_cell;
+        const unsigned int n_levels =
+          mg_level == numbers::invalid_unsigned_int ?
+            dof_handler[0]->get_triangulation().n_levels() - 1 :
+            mg_level;
+        std::vector<std::vector<
+          std::pair<unsigned int,
+                    std::array<unsigned int, max_children_per_cell>>>>
+          cell_parents(n_levels);
+        for (unsigned int level = 0; level < n_levels; ++level)
+          cell_parents[level].resize(
+            dof_handler[0]->get_triangulation().n_raw_cells(level));
+
         for (unsigned int c = 0; c < cell_level_index_end_local; ++c)
           if (cell_level_index[c].first > 0)
             {
               typename Triangulation<dim>::cell_iterator cell(
                 &tria, cell_level_index[c].first, cell_level_index[c].second);
               Assert(cell->level() > 0, ExcInternalError());
-              cell_parents[std::make_pair(cell->parent()->level(),
-                                          cell->parent()->index())]
-                .push_back(c);
+              const auto parent = cell->parent();
+              auto &     entry = cell_parents[parent->level()][parent->index()];
+              entry.second[entry.first++] = c;
             }
         unsigned int position = 0;
-        for (const auto &it : cell_parents)
-          if (it.second.size() == GeometryInfo<dim>::max_children_per_cell)
-            {
-              for (auto i : it.second)
-                parent_relation[i] = position;
-              ++position;
-            }
+        for (const auto &cells_on_level : cell_parents)
+          for (const auto &it : cells_on_level)
+            if (it.first == GeometryInfo<dim>::max_children_per_cell)
+              {
+                for (auto i : it.second)
+                  parent_relation[i] = position;
+                ++position;
+              }
         task_info.create_blocks_serial(subdomain_boundary_cells,
                                        max_dofs_per_cell,
                                        hp_functionality_enabled,
