@@ -34,27 +34,28 @@ namespace
     const auto reference_cell_type = face->reference_cell();
     std::vector<typename CGAL_Mesh::Vertex_index> indices;
 
-    switch (reference_cell_type)
+    if (reference_cell_type == ReferenceCells::Line)
       {
-        case ReferenceCells::Line:
-          mesh.add_edge(deal2cgal.at(face->vertex_index(0)),
-                        deal2cgal.at(face->vertex_index(1)));
-          break;
-        case ReferenceCells::Triangle:
-          indices = {deal2cgal.at(face->vertex_index(0)),
-                     deal2cgal.at(face->vertex_index(1)),
-                     deal2cgal.at(face->vertex_index(2))};
-          break;
-        case ReferenceCells::Quadrilateral:
-          indices = {deal2cgal.at(face->vertex_index(0)),
-                     deal2cgal.at(face->vertex_index(1)),
-                     deal2cgal.at(face->vertex_index(3)),
-                     deal2cgal.at(face->vertex_index(2))};
-          break;
-        default:
-          Assert(false, ExcInternalError());
-          break;
+        mesh.add_edge(deal2cgal.at(face->vertex_index(0)),
+                      deal2cgal.at(face->vertex_index(1)));
       }
+    else if (reference_cell_type == ReferenceCells::Triangle)
+      {
+        indices = {deal2cgal.at(face->vertex_index(0)),
+                   deal2cgal.at(face->vertex_index(1)),
+                   deal2cgal.at(face->vertex_index(2))};
+      }
+
+    else if (reference_cell_type == ReferenceCells::Quadrilateral)
+      {
+        indices = {deal2cgal.at(face->vertex_index(0)),
+                   deal2cgal.at(face->vertex_index(1)),
+                   deal2cgal.at(face->vertex_index(3)),
+                   deal2cgal.at(face->vertex_index(2))};
+      }
+    else
+      Assert(false, ExcInternalError());
+
     if (clockwise_ordering == true)
       std::reverse(indices.begin(), indices.end());
 
