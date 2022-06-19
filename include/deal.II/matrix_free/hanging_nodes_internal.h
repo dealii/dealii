@@ -258,9 +258,8 @@ namespace internal
     /**
      * This class creates the mask used in the treatment of hanging nodes in
      * CUDAWrappers::MatrixFree.
-     * The implementation of this class is explained in Section 3 of
-     * @cite ljungkvist2017matrix and in Section 3.4 of
-     * @cite kronbichler2019multigrid.
+     * The implementation of this class is explained in detail in
+     * @cite munch2022hn.
      */
     template <int dim>
     class HangingNodes
