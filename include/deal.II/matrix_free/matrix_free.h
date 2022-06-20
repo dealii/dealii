@@ -1892,8 +1892,14 @@ public:
   /**
    * Return the category the current batch range of cells was assigned to.
    * Categories run between the given values in the field
-   * AdditionalData::cell_vectorization_category for non-hp-DoFHandler types
+   * AdditionalData::cell_vectorization_category for the non-hp case
    * and return the active FE index in the hp-adaptive case.
+   *
+   * @note Following the behaviour of get_cell_category(), we return the
+   * maximum category of any cell batch. In the hp case, it is
+   * guaranteed that all cells and as a consequence all cell batches in a range
+   * have the same category. Otherwise, there may be different categories in
+   * different cell batches.
    */
   unsigned int
   get_cell_range_category(
@@ -1910,8 +1916,13 @@ public:
   /**
    * Return the category the current batch of cells was assigned to. Categories
    * run between the given values in the field
-   * AdditionalData::cell_vectorization_category for non-hp-DoFHandler types
+   * AdditionalData::cell_vectorization_category for the non-hp case
    * and return the active FE index in the hp-adaptive case.
+   *
+   * @note In the non-hp case, a category of a cell batch is given
+   * as the maximum category of any of its cell. In the hp case or the case that
+   * MatrixFree::AdditionalData::cell_vectorization_categories_strict was
+   * enabled, it is guaranteed that all cells have the same category.
    */
   unsigned int
   get_cell_category(const unsigned int cell_batch_index) const;
@@ -2805,14 +2816,10 @@ inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::get_cell_range_category(
   const std::pair<unsigned int, unsigned int> range) const
 {
-  const auto result = get_cell_category(range.first);
+  auto result = get_cell_category(range.first);
 
-#  ifdef DEBUG
   for (unsigned int i = range.first; i < range.second; ++i)
-    Assert(result == get_cell_category(i),
-           ExcMessage(
-             "The cell batches of the range have different categories!"));
-#  endif
+    result = std::max(result, get_cell_category(i));
 
   return result;
 }
@@ -2824,14 +2831,13 @@ inline std::pair<unsigned int, unsigned int>
 MatrixFree<dim, Number, VectorizedArrayType>::get_face_range_category(
   const std::pair<unsigned int, unsigned int> range) const
 {
-  const auto result = get_face_category(range.first);
+  auto result = get_face_category(range.first);
 
-#  ifdef DEBUG
   for (unsigned int i = range.first; i < range.second; ++i)
-    Assert(result == get_face_category(i),
-           ExcMessage(
-             "The face batches of the range have different categories!"));
-#  endif
+    {
+      result.first  = std::max(result.first, get_face_category(i).first);
+      result.second = std::max(result.second, get_face_category(i).second);
+    }
 
   return result;
 }
