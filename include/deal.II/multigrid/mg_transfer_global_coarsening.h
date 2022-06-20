@@ -155,6 +155,8 @@ namespace MGTransferGlobalCoarseningTools
 
 /**
  * Class for transfer between two multigrid levels for p- or global coarsening.
+ *
+ * The implementation of this class is explained in detail in @cite munch2022gc.
  */
 template <int dim, typename VectorType>
 class MGTwoLevelTransfer
@@ -203,6 +205,8 @@ public:
 /**
  * Class for transfer between two multigrid levels for p- or global coarsening.
  * Specialization for LinearAlgebra::distributed::Vector.
+ *
+ * The implementation of this class is explained in detail in @cite munch2022gc.
  */
 template <int dim, typename Number>
 class MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
@@ -470,6 +474,8 @@ private:
  * FE_Q and FE_DGQ and simplex elements FE_SimplexP and FE_SimplexDGP as well as
  * for systems involving multiple components of one of these elements. Other
  * elements are currently not implemented.
+ *
+ * The implementation of this class is explained in detail in @cite munch2022gc.
  */
 template <int dim, typename VectorType>
 class MGTransferGlobalCoarsening : public dealii::MGTransferBase<VectorType>
