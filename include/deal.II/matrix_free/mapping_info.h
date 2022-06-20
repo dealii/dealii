@@ -33,7 +33,6 @@
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/matrix_free/face_info.h>
-#include <deal.II/matrix_free/helper_functions.h>
 #include <deal.II/matrix_free/mapping_info_storage.h>
 
 #include <memory>
