@@ -75,7 +75,7 @@ namespace internal
         const UpdateFlags update_flags_boundary_faces,
         const UpdateFlags update_flags_inner_faces,
         const UpdateFlags update_flags_faces_by_cells,
-        const bool        piola_transform = false);
+        const bool        piola_transform);
 
       /**
        * Update the information in the given cells and faces that is the
