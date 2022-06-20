@@ -1146,7 +1146,14 @@ public:
     const __m256 index_val =
       _mm256_loadu_ps(reinterpret_cast<const float *>(offsets));
     const __m256i index = *reinterpret_cast<const __m256i *>(&index_val);
-    data                = _mm512_i32gather_pd(index, base_ptr, 8);
+
+    // work around a warning with gcc-12 about an uninitialized initial state
+    // for gather by starting with a zero guess, even though all lanes will be
+    // overwritten
+    __m512d  zero = {};
+    __mmask8 mask = 0xFF;
+
+    data = _mm512_mask_i32gather_pd(zero, mask, index, base_ptr, 8);
   }
 
   /**
@@ -1704,7 +1711,14 @@ public:
     const __m512 index_val =
       _mm512_loadu_ps(reinterpret_cast<const float *>(offsets));
     const __m512i index = *reinterpret_cast<const __m512i *>(&index_val);
-    data                = _mm512_i32gather_ps(index, base_ptr, 4);
+
+    // work around a warning with gcc-12 about an uninitialized initial state
+    // for gather by starting with a zero guess, even though all lanes will be
+    // overwritten
+    __m512    zero = {};
+    __mmask16 mask = 0xFFFF;
+
+    data = _mm512_mask_i32gather_ps(zero, mask, index, base_ptr, 4);
   }
 
   /**
@@ -2359,7 +2373,14 @@ public:
     const __m128 index_val =
       _mm_loadu_ps(reinterpret_cast<const float *>(offsets));
     const __m128i index = *reinterpret_cast<const __m128i *>(&index_val);
-    data                = _mm256_i32gather_pd(base_ptr, index, 8);
+
+    // work around a warning with gcc-12 about an uninitialized initial state
+    // for gather by starting with a zero guess, even though all lanes will be
+    // overwritten
+    __m256d zero = _mm256_setzero_pd();
+    __m256d mask = _mm256_cmp_pd(zero, zero, _CMP_EQ_OQ);
+
+    data = _mm256_mask_i32gather_pd(zero, base_ptr, index, mask, 8);
 #    else
     for (unsigned int i = 0; i < 4; ++i)
       *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
@@ -2876,7 +2897,14 @@ public:
     const __m256 index_val =
       _mm256_loadu_ps(reinterpret_cast<const float *>(offsets));
     const __m256i index = *reinterpret_cast<const __m256i *>(&index_val);
-    data                = _mm256_i32gather_ps(base_ptr, index, 4);
+
+    // work around a warning with gcc-12 about an uninitialized initial state
+    // for gather by starting with a zero guess, even though all lanes will be
+    // overwritten
+    __m256 zero = _mm256_setzero_ps();
+    __m256 mask = _mm256_cmp_ps(zero, zero, _CMP_EQ_OQ);
+
+    data = _mm256_mask_i32gather_ps(zero, base_ptr, index, mask, 4);
 #    else
     for (unsigned int i = 0; i < 8; ++i)
       *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
