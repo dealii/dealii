@@ -88,8 +88,6 @@ namespace internal
       copy_indices.resize(n_levels);
       copy_indices_global_mine.resize(n_levels);
       copy_indices_level_mine.resize(n_levels);
-      IndexSet globally_relevant;
-      DoFTools::extract_locally_relevant_dofs(dof_handler, globally_relevant);
       const IndexSet &owned_dofs = dof_handler.locally_owned_dofs();
 
       const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
@@ -98,7 +96,7 @@ namespace internal
 
       for (unsigned int level = 0; level < n_levels; ++level)
         {
-          std::vector<bool> dof_touched(globally_relevant.n_elements(), false);
+          std::vector<bool> dof_touched(owned_dofs.n_elements(), false);
           const IndexSet &  owned_level_dofs =
             dof_handler.locally_owned_mg_dofs(level);
 
@@ -143,8 +141,10 @@ namespace internal
                   // and the level one. This check involves locally owned
                   // indices which often consist only of a single range, so
                   // they are cheap to look up.
+                  const types::global_dof_index global_index_in_set =
+                    owned_dofs.index_within_set(global_dof_indices[i]);
                   bool global_mine =
-                    owned_dofs.is_element(global_dof_indices[i]);
+                    global_index_in_set != numbers::invalid_dof_index;
                   bool level_mine =
                     owned_level_dofs.is_element(level_dof_indices[i]);
 
@@ -153,39 +153,24 @@ namespace internal
                       // we own both the active dof index and the level one ->
                       // set them into the vector, indexed by the local index
                       // range of the active dof
-                      unrolled_copy_indices[owned_dofs.index_within_set(
-                        global_dof_indices[i])] = level_dof_indices[i];
+                      unrolled_copy_indices[global_index_in_set] =
+                        level_dof_indices[i];
+                    }
+                  else if (global_mine &&
+                           dof_touched[global_index_in_set] == false)
+                    {
+                      copy_indices_global_mine[level].emplace_back(
+                        global_dof_indices[i], level_dof_indices[i]);
+
+                      // send this to the owner of the level_dof:
+                      send_data_temp.emplace_back(level,
+                                                  global_dof_indices[i],
+                                                  level_dof_indices[i]);
+                      dof_touched[global_index_in_set] = true;
                     }
                   else
                     {
-                      // Get the relevant dofs index - this might be more
-                      // expensive to look up than the active indices, so we
-                      // only do it for the local-remote case within this loop.
-                      const types::global_dof_index relevant_idx =
-                        globally_relevant.index_within_set(
-                          global_dof_indices[i]);
-
-                      // Work on this dof if we haven't already (on this or a
-                      // coarser level)
-                      if (dof_touched[relevant_idx] == false)
-                        {
-                          if (global_mine)
-                            {
-                              copy_indices_global_mine[level].emplace_back(
-                                global_dof_indices[i], level_dof_indices[i]);
-
-                              // send this to the owner of the level_dof:
-                              send_data_temp.emplace_back(level,
-                                                          global_dof_indices[i],
-                                                          level_dof_indices[i]);
-                            }
-                          else
-                            {
-                              // somebody will send those to me
-                            }
-
-                          dof_touched[relevant_idx] = true;
-                        }
+                      // somebody will send those to me
                     }
                 }
             }
