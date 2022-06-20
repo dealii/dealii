@@ -20,10 +20,27 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/partitioner.h>
+#include <deal.II/base/array_view.h>
+#include <deal.II/base/mpi.h>
+
+#include <deal.II/lac/vector_operation.h>
 
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifndef DOXYGEN
+
+// forward declaration
+namespace Utilities
+{
+  namespace MPI
+  {
+    class Partitioner;
+  }
+} // namespace Utilities
+
+#endif
+
 
 namespace internal
 {

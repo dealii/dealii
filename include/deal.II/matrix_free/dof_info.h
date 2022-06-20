@@ -21,12 +21,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/partitioner.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/matrix_free/face_info.h>
 #include <deal.II/matrix_free/shape_info.h>
-#include <deal.II/matrix_free/task_info.h>
 #include <deal.II/matrix_free/vector_data_exchange.h>
 
 #include <array>
@@ -48,6 +46,8 @@ namespace internal
 
     template <typename, typename>
     struct FPArrayComparator;
+
+    struct TaskInfo;
   } // namespace MatrixFreeFunctions
 } // namespace internal
 
@@ -61,6 +61,14 @@ class TriaIterator;
 
 template <int, int, bool>
 class DoFCellAccessor;
+
+namespace Utilities
+{
+  namespace MPI
+  {
+    class Partitioner;
+  }
+} // namespace Utilities
 
 #endif
 

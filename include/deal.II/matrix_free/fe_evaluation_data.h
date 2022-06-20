@@ -33,7 +33,6 @@
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/mapping_info_storage.h>
 #include <deal.II/matrix_free/shape_info.h>
-#include <deal.II/matrix_free/type_traits.h>
 
 
 DEAL_II_NAMESPACE_OPEN
