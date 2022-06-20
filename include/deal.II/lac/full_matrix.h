@@ -49,14 +49,24 @@ class LAPACKFullMatrix;
 
 
 /**
- * Implementation of a classical rectangular scheme of numbers. The data type
- * of the entries is provided in the template argument <tt>number</tt>.  The
- * interface is quite fat and in fact has grown every time a new feature was
- * needed. So, a lot of functions are provided.
+ * This class implements a rectangular, dense ("full") matrix, that is,
+ * a matrix where we store every element whether it is zero or
+ * nonzero.  This is in contrast to the SparseMatrix and related
+ * classes, which store a "sparse" representation in which memory is
+ * only allocated for those elements for which it is known that they
+ * are (or, more precisely, could be) nonzero.
  *
- * Internal calculations are usually done with the accuracy of the vector
- * argument to functions. If there is no argument with a number type, the
- * matrix number type is used.
+ * The data type of the entries of the matrix is provided by the
+ * template argument <tt>number</tt>.
+ *
+ * This class provides a number of operations that involve both the
+ * current matrix and either another matrix or one or more
+ * vectors. Each of these other objects may store their elements in a
+ * different data type than the current object does (again, as
+ * indicated by the corresponding template arguments of the other
+ * objects). In these cases, internal calculations are usually done
+ * with the accuracy of the vector argument, or with the more accurate
+ * of the data types.
  *
  * @note Instantiations for this template are provided for <tt>@<float@>,
  * @<double@>, @<std::complex@<float@>@>,
