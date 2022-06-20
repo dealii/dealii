@@ -22,6 +22,10 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/container/small_vector.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #include <algorithm>
 #include <vector>
 
@@ -990,7 +994,52 @@ private:
    */
   void
   do_compress() const;
+
+  /**
+   * Expensive part of is_element() that does a binary search in case we did
+   * not find the index in the largest range. Kept separate to avoid pulling
+   * in a binary search in the header and make it easy for the compiler to
+   * inline the fast path.
+   */
+  bool
+  is_element_binary_search(const size_type local_index) const;
+
+  /**
+   * Expensive part of nth_index_in_set() that does the binary search in case
+   * we did not find the index in the largest range. Kept separate to avoid
+   * using a binary search in the header and make it easy for the compiler to
+   * inline the fast path.
+   */
+  size_type
+  nth_index_in_set_binary_search(const size_type local_index) const;
+
+  /**
+   * Expensive part of index_within_set() that does the binary search in case
+   * we did not find the index in the largest range. Kept separate to avoid
+   * using a binary search in the header and make it easy for the compiler to
+   * inline the fast path.
+   */
+  size_type
+  index_within_set_binary_search(const size_type global_index) const;
+
+  /**
+   * Expensive part of add_index() and add_range(). Defined in separate
+   * function to avoid using a binary search in the header and make it easy
+   * for the compiler to inline the fast path.
+   */
+  void
+  add_range_lower_bound(const Range &range);
+
+  /**
+   * Expensive part of add_indices().
+   */
+  void
+  add_ranges_internal(
+    boost::container::small_vector<std::pair<size_type, size_type>, 200>
+      &        tmp_ranges,
+    const bool ranges_are_sorted);
 };
+
 
 
 /**
@@ -1529,56 +1578,6 @@ IndexSet::begin() const
 
 
 inline IndexSet::ElementIterator
-IndexSet::at(const size_type global_index) const
-{
-  compress();
-  AssertIndexRange(global_index, size());
-
-  if (ranges.empty())
-    return end();
-
-  std::vector<Range>::const_iterator main_range =
-    ranges.begin() + largest_range;
-
-  Range r(global_index, global_index + 1);
-  // This optimization makes the bounds for lower_bound smaller by checking
-  // the largest range first.
-  std::vector<Range>::const_iterator range_begin, range_end;
-  if (global_index < main_range->begin)
-    {
-      range_begin = ranges.begin();
-      range_end   = main_range;
-    }
-  else
-    {
-      range_begin = main_range;
-      range_end   = ranges.end();
-    }
-
-  // This will give us the first range p=[a,b[ with b>=global_index using
-  // a binary search
-  const std::vector<Range>::const_iterator p =
-    Utilities::lower_bound(range_begin, range_end, r, Range::end_compare);
-
-  // We couldn't find a range, which means we have no range that contains
-  // global_index and also no range behind it, meaning we need to return end().
-  if (p == ranges.end())
-    return end();
-
-  // Finally, we can have two cases: Either global_index is not in [a,b[,
-  // which means we need to return an iterator to a because global_index, ...,
-  // a-1 is not in the IndexSet (if branch). Alternatively, global_index is in
-  // [a,b[ and we will return an iterator pointing directly at global_index
-  // (else branch).
-  if (global_index < p->begin)
-    return {this, static_cast<size_type>(p - ranges.begin()), p->begin};
-  else
-    return {this, static_cast<size_type>(p - ranges.begin()), global_index};
-}
-
-
-
-inline IndexSet::ElementIterator
 IndexSet::end() const
 {
   compress();
@@ -1662,10 +1661,7 @@ IndexSet::add_index(const size_type index)
   else if (index == ranges.back().end)
     ranges.back().end++;
   else
-    ranges.insert(Utilities::lower_bound(ranges.begin(),
-                                         ranges.end(),
-                                         new_range),
-                  new_range);
+    add_range_lower_bound(new_range);
   is_compressed = false;
 }
 
@@ -1689,11 +1685,11 @@ IndexSet::add_range(const size_type begin, const size_type end)
       // ranges. Then we can skip the binary search
       if (ranges.size() == 0 || begin > ranges.back().end)
         ranges.push_back(new_range);
+      else if (begin == ranges.back().end)
+        ranges.back().end = end;
       else
-        ranges.insert(Utilities::lower_bound(ranges.begin(),
-                                             ranges.end(),
-                                             new_range),
-                      new_range);
+        add_range_lower_bound(new_range);
+
       is_compressed = false;
     }
 }
@@ -1712,8 +1708,9 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
   // calling add_range many times (as add_range() going into the middle of an
   // already existing range must shift entries around), we first collect a
   // vector of ranges.
-  std::vector<std::pair<size_type, size_type>> tmp_ranges;
-  bool                                         ranges_are_sorted = true;
+  boost::container::small_vector<std::pair<size_type, size_type>, 200>
+       tmp_ranges;
+  bool ranges_are_sorted = true;
   for (ForwardIterator p = begin; p != end;)
     {
       const size_type begin_index = *p;
@@ -1737,28 +1734,7 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
         ranges_are_sorted = false;
     }
 
-  if (!ranges_are_sorted)
-    std::sort(tmp_ranges.begin(), tmp_ranges.end());
-
-  // if we have many ranges, we first construct a temporary index set (where
-  // we add ranges in a consecutive way, so fast), otherwise, we work with
-  // add_range(). the number 9 is chosen heuristically given the fact that
-  // there are typically up to 8 independent ranges when adding the degrees of
-  // freedom on a 3D cell or 9 when adding degrees of freedom of faces. if
-  // doing cell-by-cell additions, we want to avoid repeated calls to
-  // IndexSet::compress() which gets called upon merging two index sets, so we
-  // want to be in the other branch then.
-  if (tmp_ranges.size() > 9)
-    {
-      IndexSet tmp_set(size());
-      tmp_set.ranges.reserve(tmp_ranges.size());
-      for (const auto &i : tmp_ranges)
-        tmp_set.add_range(i.first, i.second);
-      this->add_indices(tmp_set);
-    }
-  else
-    for (const auto &i : tmp_ranges)
-      add_range(i.first, i.second);
+  add_ranges_internal(tmp_ranges, ranges_are_sorted);
 }
 
 
@@ -1775,40 +1751,13 @@ IndexSet::is_element(const size_type index) const
       if (index >= ranges[largest_range].begin &&
           index < ranges[largest_range].end)
         return true;
-
-      // get the element after which we would have to insert a range that
-      // consists of all elements from this element to the end of the index
-      // range plus one. after this call we know that if p!=end() then
-      // p->begin<=index unless there is no such range at all
-      //
-      // if the searched for element is an element of this range, then we're
-      // done. otherwise, the element can't be in one of the following ranges
-      // because otherwise p would be a different iterator
-      //
-      // since we already know the position relative to the largest range (we
-      // called compress!), we can perform the binary search on ranges with
-      // lower/higher number compared to the largest range
-      std::vector<Range>::const_iterator p = std::upper_bound(
-        ranges.begin() +
-          (index < ranges[largest_range].begin ? 0 : largest_range + 1),
-        index < ranges[largest_range].begin ? ranges.begin() + largest_range :
-                                              ranges.end(),
-        Range(index, size() + 1));
-
-      if (p == ranges.begin())
-        return ((index >= p->begin) && (index < p->end));
-
-      Assert((p == ranges.end()) || (p->begin > index), ExcInternalError());
-
-      // now move to that previous range
-      --p;
-      Assert(p->begin <= index, ExcInternalError());
-
-      return (p->end > index);
+      else if (ranges.size() > 1)
+        return is_element_binary_search(index);
+      else
+        return false;
     }
-
-  // didn't find this index, so it's not in the set
-  return false;
+  else
+    return false;
 }
 
 
@@ -1887,34 +1836,12 @@ IndexSet::nth_index_in_set(const size_type n) const
 
   // first check whether the index is in the largest range
   Assert(largest_range < ranges.size(), ExcInternalError());
-  std::vector<Range>::const_iterator main_range =
-    ranges.begin() + largest_range;
+  const auto main_range = ranges.begin() + largest_range;
   if (n >= main_range->nth_index_in_set &&
       n < main_range->nth_index_in_set + (main_range->end - main_range->begin))
     return main_range->begin + (n - main_range->nth_index_in_set);
-
-  // find out which chunk the local index n belongs to by using a binary
-  // search. the comparator is based on the end of the ranges. Use the
-  // position relative to main_range to subdivide the ranges
-  Range r(n, n + 1);
-  r.nth_index_in_set = n;
-  std::vector<Range>::const_iterator range_begin, range_end;
-  if (n < main_range->nth_index_in_set)
-    {
-      range_begin = ranges.begin();
-      range_end   = main_range;
-    }
   else
-    {
-      range_begin = main_range + 1;
-      range_end   = ranges.end();
-    }
-
-  const std::vector<Range>::const_iterator p =
-    Utilities::lower_bound(range_begin, range_end, r, Range::nth_index_compare);
-
-  Assert(p != ranges.end(), ExcInternalError());
-  return p->begin + (n - p->nth_index_in_set);
+    return nth_index_in_set_binary_search(n);
 }
 
 
@@ -1934,35 +1861,13 @@ IndexSet::index_within_set(const size_type n) const
   // check whether the index is in the largest range. use the result to
   // perform a one-sided binary search afterward
   Assert(largest_range < ranges.size(), ExcInternalError());
-  std::vector<Range>::const_iterator main_range =
-    ranges.begin() + largest_range;
-  if (n >= main_range->begin && n < main_range->end)
-    return (n - main_range->begin) + main_range->nth_index_in_set;
-
-  Range                              r(n, n);
-  std::vector<Range>::const_iterator range_begin, range_end;
-  if (n < main_range->begin)
-    {
-      range_begin = ranges.begin();
-      range_end   = main_range;
-    }
+  if (n >= ranges[largest_range].begin && n < ranges[largest_range].end)
+    return (n - ranges[largest_range].begin) +
+           ranges[largest_range].nth_index_in_set;
+  else if (ranges.size() > 1)
+    return index_within_set_binary_search(n);
   else
-    {
-      range_begin = main_range + 1;
-      range_end   = ranges.end();
-    }
-
-  std::vector<Range>::const_iterator p =
-    Utilities::lower_bound(range_begin, range_end, r, Range::end_compare);
-
-  // if n is not in this set
-  if (p == range_end || p->end == n || p->begin > n)
     return numbers::invalid_dof_index;
-
-  Assert(p != ranges.end(), ExcInternalError());
-  Assert(p->begin <= n, ExcInternalError());
-  Assert(n < p->end, ExcInternalError());
-  return (n - p->begin) + p->nth_index_in_set;
 }
 
 
