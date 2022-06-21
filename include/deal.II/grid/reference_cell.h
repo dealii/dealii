@@ -1311,6 +1311,9 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
   const unsigned int vertex) const
 {
   AssertIndexRange(vertex, n_vertices());
+  // Work around a GCC warning at higher optimization levels by making all of
+  // these tables the same size
+  constexpr unsigned int X = numbers::invalid_unsigned_int;
 
   if (*this == ReferenceCells::Vertex)
     {
@@ -1322,8 +1325,8 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
     }
   else if (*this == ReferenceCells::Triangle)
     {
-      static const ndarray<unsigned int, 3, 2> table = {
-        {{{0, 0}}, {{0, 1}}, {{1, 1}}}};
+      static const ndarray<unsigned int, 6, 2> table = {
+        {{{0, 0}}, {{0, 1}}, {{1, 1}}, {{X, X}}, {{X, X}}, {{X, X}}}};
 
       return table[vertex];
     }
@@ -1333,15 +1336,15 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
-      static const ndarray<unsigned int, 4, 2> table = {
-        {{{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 2}}}};
+      static const ndarray<unsigned int, 6, 2> table = {
+        {{{0, 0}}, {{0, 1}}, {{0, 2}}, {{1, 2}}, {{X, X}}, {{X, X}}}};
 
       return table[vertex];
     }
   else if (*this == ReferenceCells::Pyramid)
     {
-      static const ndarray<unsigned int, 5, 2> table = {
-        {{{0, 0}}, {{0, 1}}, {{0, 2}}, {{0, 3}}, {{1, 2}}}};
+      static const ndarray<unsigned int, 6, 2> table = {
+        {{{0, 0}}, {{0, 1}}, {{0, 2}}, {{0, 3}}, {{1, 2}}, {{X, X}}}};
 
       return table[vertex];
     }
