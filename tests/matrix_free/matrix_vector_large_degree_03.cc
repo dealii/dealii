@@ -71,7 +71,7 @@ test()
       typename MatrixFree<dim, double>::AdditionalData data;
       data.tasks_parallel_scheme =
         MatrixFree<dim, double>::AdditionalData::none;
-      mf_data.reinit(dof, constraints, quad, data);
+      mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
     }
 
     MatrixFreeTest<dim, fe_degree, double, Vector<double>, fe_degree + 1> mf(
@@ -84,7 +84,8 @@ test()
   MatrixFree<dim, double> mf_data;
 
   {
-    mf_data.reinit(dof, constraints, QGauss<1>(fe_degree + 2), data);
+    mf_data.reinit(
+      MappingQ1<dim>{}, dof, constraints, QGauss<1>(fe_degree + 2), data);
     MatrixFreeTest<dim, fe_degree, double, Vector<double>, fe_degree + 2> mf(
       mf_data);
     mf.vmult(out, in);
@@ -96,7 +97,7 @@ test()
   // unfortunately we cannot use for loops due to the template, so duplicate
   // some code here
   {
-    mf_data.reinit(dof, constraints, QGauss<1>(100), data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, QGauss<1>(100), data);
     MatrixFreeTest<dim, fe_degree, double, Vector<double>, 100> mf(mf_data);
     mf.vmult(out, in);
     out -= ref;
@@ -104,7 +105,7 @@ test()
             << " quadrature points: " << out.l2_norm() << std::endl;
   }
   {
-    mf_data.reinit(dof, constraints, QGauss<1>(200), data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, QGauss<1>(200), data);
     MatrixFreeTest<dim, fe_degree, double, Vector<double>, 200> mf(mf_data);
     mf.vmult(out, in);
     out -= ref;
@@ -112,7 +113,7 @@ test()
             << " quadrature points: " << out.l2_norm() << std::endl;
   }
   {
-    mf_data.reinit(dof, constraints, QGauss<1>(500), data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, QGauss<1>(500), data);
     MatrixFreeTest<dim, fe_degree, double, Vector<double>, 500> mf(mf_data);
     mf.vmult(out, in);
     out -= ref;
@@ -120,7 +121,7 @@ test()
             << " quadrature points: " << out.l2_norm() << std::endl;
   }
   {
-    mf_data.reinit(dof, constraints, QGauss<1>(1000), data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, QGauss<1>(1000), data);
     MatrixFreeTest<dim, fe_degree, double, Vector<double>, 1000> mf(mf_data);
     mf.vmult(out, in);
     out -= ref;

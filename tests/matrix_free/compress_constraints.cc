@@ -83,7 +83,7 @@ test()
 
   const QGauss<1> quad(2);
   MatrixFree<dim> mf;
-  mf.reinit(dof, constraints, quad);
+  mf.reinit(MappingQ1<dim>{}, dof, constraints, quad);
 
   deallog << "Number of hanging nodes: " << constraints.n_constraints()
           << std::endl;

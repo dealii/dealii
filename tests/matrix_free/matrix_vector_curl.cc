@@ -255,7 +255,8 @@ test()
   // setup matrix-free structure
   {
     QGauss<1> quad(fe_degree + 1);
-    mf_data.reinit(dof_handler_sca,
+    mf_data.reinit(MappingQ1<dim>{},
+                   dof_handler_sca,
                    constraints,
                    quad,
                    typename MatrixFree<dim>::AdditionalData(

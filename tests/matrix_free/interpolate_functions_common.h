@@ -342,7 +342,7 @@ do_test(const DoFHandler<dim> &          dof,
       update_gradients | update_hessians | update_quadrature_points;
     data.mapping_update_flags_inner_faces =
       update_gradients | update_hessians | update_quadrature_points;
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   MatrixFreeTest<dim, fe_degree, fe_degree + 1, number> mf(mf_data);

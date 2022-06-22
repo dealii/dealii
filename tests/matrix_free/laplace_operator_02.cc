@@ -156,7 +156,7 @@ test()
     data.tasks_block_size      = 7;
     data.mapping_update_flags =
       update_quadrature_points | update_gradients | update_JxW_values;
-    mf_data->reinit(dof, constraints, quad, data);
+    mf_data->reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   std::shared_ptr<Table<2, VectorizedArray<number>>> coefficient;

@@ -69,7 +69,8 @@ main(int argc, char **argv)
   DoFTools::make_hanging_node_constraints(dof_handler, constraint);
   constraint.close();
 
-  matrix_free.reinit(dof_handler, constraint, QGauss<1>(4), data);
+  matrix_free.reinit(
+    MappingQ1<dim>{}, dof_handler, constraint, QGauss<1>(4), data);
 
   LinearAlgebra::distributed::Vector<double> src;
   matrix_free.initialize_dof_vector(src);

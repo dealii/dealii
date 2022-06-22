@@ -312,7 +312,7 @@ test(const unsigned int n_refine)
     (update_gradients | update_JxW_values);
 
   MatrixFree<dim, double> mf_data;
-  mf_data.reinit(dof, constraints, quad, data);
+  mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
 
   mf_data.initialize_dof_vector(in);
   mf_data.initialize_dof_vector(out);

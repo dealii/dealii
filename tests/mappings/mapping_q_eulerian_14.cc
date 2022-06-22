@@ -283,7 +283,8 @@ test(const unsigned int n_ref = 0)
       euler_fine, dof_handler, constraints, quadrature_formula, data);
 
     MatrixFree<dim, NumberType> matrix_free;
-    matrix_free.reinit(dof_handler, constraints, quadrature_formula, data);
+    matrix_free.reinit(
+      MappingQ1<dim>{}, dof_handler, constraints, quadrature_formula, data);
 
 
     // test fine-level mapping:

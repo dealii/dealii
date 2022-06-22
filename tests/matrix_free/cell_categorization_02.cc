@@ -112,7 +112,7 @@ test()
         cell->material_id();
     }
 
-  mf_data.reinit(dof, constraints, QGauss<1>(2), data);
+  mf_data.reinit(MappingQ1<dim>{}, dof, constraints, QGauss<1>(2), data);
 
   const unsigned int max_level = tria.n_global_levels() - 1;
   std::vector<typename MatrixFree<dim, float>::AdditionalData>
@@ -154,7 +154,8 @@ test()
 
       mg_mf_data[level] = std::make_shared<MatrixFree<dim, float>>();
 
-      mg_mf_data[level]->reinit(dof,
+      mg_mf_data[level]->reinit(MappingQ1<dim>{},
+                                dof,
                                 level_constraints,
                                 QGauss<1>(2),
                                 mg_additional_data[level]);

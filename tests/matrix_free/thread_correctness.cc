@@ -86,7 +86,8 @@ sub_test()
       MatrixFree<dim, number> mf_data, mf_data_color, mf_data_partition;
       {
         const QGauss<1> quad(fe_degree + 1);
-        mf_data.reinit(dof,
+        mf_data.reinit(MappingQ1<dim>{},
+                       dof,
                        constraints,
                        quad,
                        typename MatrixFree<dim, number>::AdditionalData(
@@ -96,12 +97,14 @@ sub_test()
         // some irregularity to the blocks (stress the
         // non-overlapping computation harder)
         mf_data_color.reinit(
+          MappingQ1<dim>{},
           dof,
           constraints,
           quad,
           typename MatrixFree<dim, number>::AdditionalData(
             MatrixFree<dim, number>::AdditionalData::partition_color, 3));
         mf_data_partition.reinit(
+          MappingQ1<dim>{},
           dof,
           constraints,
           quad,

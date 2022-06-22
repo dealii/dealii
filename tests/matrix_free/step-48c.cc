@@ -275,10 +275,8 @@ namespace Step48
     additional_data.tasks_parallel_scheme =
       MatrixFree<dim>::AdditionalData::partition_partition;
 
-    matrix_free_data.reinit(dof_handler,
-                            constraints,
-                            quadrature,
-                            additional_data);
+    matrix_free_data.reinit(
+      MappingQ1<dim>{}, dof_handler, constraints, quadrature, additional_data);
 
     matrix_free_data.initialize_dof_vector(solution);
     old_solution.reinit(solution);

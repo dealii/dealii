@@ -120,7 +120,7 @@ test(const FiniteElement<dim> &fe, const unsigned int n_iterations)
     const QGauss<1>                                  quad(fe_degree + 1);
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_block_size = 8 / VectorizedArray<number>::size();
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   MatrixFreeTest<dim, fe_degree, number> mf(mf_data);
