@@ -27,36 +27,6 @@ namespace LinearAlgebra
   namespace CUDAWrappers
   {
     /**
-     * Provide atomicAdd for floats.
-     *
-     * @deprecated Use atomicAdd(address, val) directly.
-     * @ingroup CUDAWrappers
-     */
-    DEAL_II_DEPRECATED
-    inline __device__ float
-    atomicAdd_wrapper(float *address, float val)
-    {
-      return atomicAdd(address, val);
-    }
-
-
-
-    /**
-     * Provide atomicAdd for doubles.
-     *
-     * @deprecated Use atomicAdd(address, val) directly.
-     * @ingroup CUDAWrappers
-     */
-    DEAL_II_DEPRECATED
-    inline __device__ double
-    atomicAdd_wrapper(double *address, double val)
-    {
-      return atomicAdd(address, val);
-    }
-
-
-
-    /**
      * Provide atomicMax for floats.
      *
      * @ingroup CUDAWrappers
