@@ -1,0 +1,4 @@
+Removed: The deprecated constructors for SparseVanka and SparseBlockVanka
+have been removed.
+<br>
+(Daniel Arndt, 2022/06/22)
