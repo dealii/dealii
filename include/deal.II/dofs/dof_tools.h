@@ -1626,8 +1626,7 @@ namespace DoFTools
    * DoFHandler objects built on parallel::distributed::Triangulation this set
    * is the union of DoFHandler::locally_owned_dofs() and the DoF indices on
    * all ghost cells. In essence, it is the DoF indices on all cells that are
-   * not artificial (see
-   * @ref GlossArtificialCell "the glossary").
+   * not artificial (see @ref GlossArtificialCell "the glossary").
    *
    * @deprecated Use the previous function instead.
    */
@@ -1638,12 +1637,12 @@ namespace DoFTools
 
   /**
    * Extract the set of locally owned DoF indices for each component within the
-   * mask that are owned by the current  processor. For components disabled by
+   * mask that are owned by the current processor. For components disabled by
    * the mask, an empty IndexSet is returned. For a scalar DoFHandler built on a
    * sequential triangulation, the return vector contains a single complete
    * IndexSet with all DoF indices. If the mask contains all components (which
    * also corresponds to the default value), then the union of the returned
-   * index sets equlas what DoFHandler::locally_owned_dofs() returns.
+   * index sets equals what DoFHandler::locally_owned_dofs() returns.
    */
   template <int dim, int spacedim>
   std::vector<IndexSet>
