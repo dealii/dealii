@@ -759,7 +759,13 @@ namespace Threads
   DEAL_II_DEPRECATED inline Thread<RT>
   new_thread(const std::function<RT()> &function)
   {
+    // Here and below we need to disable deprecation warnings for calling the
+    // constructor in this function - as this function itself is deprecated
+    // these warnings are not helpful. This problem only appears in some
+    // configurations (e.g., Debian 11 with GCC-10).
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
     return Thread<RT>(function);
+    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
   }
 
 
@@ -835,8 +841,11 @@ namespace Threads
   new_thread(FunctionObjectType function_object)
     -> Thread<decltype(function_object())>
   {
+    // See the comment in the first new_thread() implementation
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
     using return_type = decltype(function_object());
     return Thread<return_type>(std::function<return_type()>(function_object));
+    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
   }
 
 
@@ -853,9 +862,12 @@ namespace Threads
   DEAL_II_DEPRECATED inline Thread<RT>
   new_thread(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
   {
+    // See the comment in the first new_thread() implementation
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
     auto dummy = std::make_tuple(internal::maybe_make_ref<Args>::act(args)...);
     return new_thread(
       [dummy, fun_ptr]() -> RT { return std_cxx17::apply(fun_ptr, dummy); });
+    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
   }
 
 
@@ -891,9 +903,12 @@ namespace Threads
              typename identity<const C>::type &c,
              typename identity<Args>::type... args)
   {
+    // See the comment in the first new_thread() implementation
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
     // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_thread(std::function<RT()>(std::bind(
       fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
+    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
   }
 
   // ------------------------ ThreadGroup -------------------------------------
