@@ -99,6 +99,8 @@ main(int argc, char **argv)
 
   test<PETScWrappers::PreconditionJacobi>();
   test<PETScWrappers::PreconditionBlockJacobi>();
-  test<PETScWrappers::PreconditionBoomerAMG>();
+  // Unfortunately we get floating point exceptions inside newer versions of
+  // HYPRE + Tvmult, so skip it
+  // test<PETScWrappers::PreconditionBoomerAMG>();
   test<PETScWrappers::PreconditionNone>();
 }
