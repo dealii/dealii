@@ -176,7 +176,7 @@ do_test(const DoFHandler<dim> &          dof,
     const MappingQ<dim>                              mapping(fe_degree + 2);
     typename MatrixFree<dim, Number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, Number>::AdditionalData::none;
-    data.mapping_update_flags  = update_gradients | update_hessians;
+    data.mapping_update_flags  = update_gradients;
     mf_data.reinit(mapping, dof, constraints, quad, data);
   }
 

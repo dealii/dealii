@@ -809,6 +809,23 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
             }
         }
 
+      // Will the piola transform be used? If so we need to update
+      // the jacobian gradients in case of update_gradients on general cells.
+      bool piola_transform = false;
+      for (unsigned int no = 0, c = 0; no < dof_handler.size(); ++no)
+        for (unsigned int b = 0;
+             b < dof_handler[no]->get_fe(0).n_base_elements();
+             ++b, ++c)
+          for (unsigned int fe_no = 0;
+               fe_no < dof_handler[no]->get_fe_collection().size();
+               ++fe_no)
+            for (unsigned int nq = 0; nq < quad.size(); ++nq)
+              for (unsigned int q_no = 0; q_no < quad[nq].size(); ++q_no)
+                if (shape_info(c, nq, fe_no, q_no).element_type ==
+                    internal::MatrixFreeFunctions::ElementType::
+                      tensor_raviart_thomas)
+                  piola_transform = true;
+
       mapping_info.initialize(
         dof_handler[0]->get_triangulation(),
         cell_level_index,
@@ -821,7 +838,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         additional_data.mapping_update_flags,
         additional_data.mapping_update_flags_boundary_faces,
         additional_data.mapping_update_flags_inner_faces,
-        additional_data.mapping_update_flags_faces_by_cells);
+        additional_data.mapping_update_flags_faces_by_cells,
+        piola_transform);
 
       mapping_is_initialized = true;
     }
