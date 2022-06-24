@@ -739,8 +739,11 @@ namespace internal
                   dof_handler_fine.get_fe(buffer[i]).n_dofs_per_cell();
                 ++i;
                 for (unsigned int j = 0; j < dofs_per_cell; ++j, ++i)
-                  if (!is_extended_locally_owned.is_element(buffer[i]))
-                    ghost_indices.push_back(buffer[i]);
+                  {
+                    AssertIndexRange(i, buffer.size());
+                    if (!is_extended_locally_owned.is_element(buffer[i]))
+                      ghost_indices.push_back(buffer[i]);
+                  }
               }
 
             const unsigned int rank = status.MPI_SOURCE;
