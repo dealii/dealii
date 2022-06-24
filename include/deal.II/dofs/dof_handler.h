@@ -574,63 +574,6 @@ public:
   operator=(const DoFHandler &) = delete;
 
   /**
-   * Assign a Triangulation and a FiniteElement to the DoFHandler and compute
-   * the distribution of degrees of freedom over the mesh.
-   *
-   * @deprecated Use reinit() and distribute_dofs() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  initialize(const Triangulation<dim, spacedim> &tria,
-             const FiniteElement<dim, spacedim> &fe);
-
-  /**
-   * Same as above but taking an hp::FECollection object.
-   *
-   * @deprecated Use reinit() and distribute_dofs() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  initialize(const Triangulation<dim, spacedim> &   tria,
-             const hp::FECollection<dim, spacedim> &fe);
-
-  /**
-   * Assign a FiniteElement @p fe to this object.
-   *
-   * @note This function makes a copy of the finite element given as
-   * argument, and stores it as a member variable. Consequently, it is
-   * possible to write code such as
-   * @code
-   *   dof_handler.set_fe(FE_Q<dim>(2));
-   * @endcode
-   * You can then access the finite element later on by calling
-   * DoFHandler::get_fe(). However, it is often more convenient to
-   * keep a named finite element object as a member variable in your
-   * main class and refer to it directly whenever you need to access
-   * properties of the finite element (such as
-   * FiniteElementData::dofs_per_cell). This is what all tutorial programs do.
-   *
-   * @warning This function only sets a FiniteElement. Degrees of freedom have
-   * either not been distributed yet, or are distributed using a previously set
-   * element. In both cases, accessing degrees of freedom will lead to invalid
-   * results. To restore consistency, call distribute_dofs().
-   *
-   * @deprecated Use distribute_dofs() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  set_fe(const FiniteElement<dim, spacedim> &fe);
-
-  /**
-   * Same as above but taking an hp::FECollection object.
-   *
-   * @deprecated Use distribute_dofs() instead.
-   */
-  DEAL_II_DEPRECATED
-  void
-  set_fe(const hp::FECollection<dim, spacedim> &fe);
-
-  /**
    * Go through the triangulation and set the active FE indices of all
    * active cells to the values given in @p active_fe_indices.
    */
