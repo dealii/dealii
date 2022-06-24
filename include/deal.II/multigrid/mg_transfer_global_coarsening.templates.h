@@ -650,6 +650,11 @@ namespace internal
           }
       }
 
+      this->is_extended_locally_owned =
+        mg_level_fine == numbers::invalid_unsigned_int ?
+          dof_handler_fine.locally_owned_dofs() :
+          dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
+
       std::vector<types::global_dof_index> ghost_indices;
 
       // process local cells
@@ -672,9 +677,9 @@ namespace internal
             else
               cell_->get_mg_dof_indices(indices);
 
-            ghost_indices.insert(ghost_indices.end(),
-                                 indices.begin(),
-                                 indices.end());
+            for (const auto i : indices)
+              if (!is_extended_locally_owned.is_element(i))
+                ghost_indices.push_back(i);
           }
       }
 
@@ -726,13 +731,18 @@ namespace internal
               MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr_3);
 
-            for (unsigned int i = 0; i < buffer.size();
-                 i += dof_handler_fine.get_fe(buffer[i]).n_dofs_per_cell() + 1)
-              ghost_indices.insert(
-                ghost_indices.end(),
-                buffer.begin() + i + 1,
-                buffer.begin() + i + 1 +
-                  dof_handler_fine.get_fe(buffer[i]).n_dofs_per_cell());
+            for (unsigned int i = 0; i < buffer.size();)
+              {
+                const unsigned int dofs_per_cell =
+                  dof_handler_fine.get_fe(buffer[i]).n_dofs_per_cell();
+                ++i;
+                for (unsigned int j = 0; j < dofs_per_cell; ++j, ++i)
+                  {
+                    AssertIndexRange(i, buffer.size());
+                    if (!is_extended_locally_owned.is_element(buffer[i]))
+                      ghost_indices.push_back(buffer[i]);
+                  }
+              }
 
             const unsigned int rank = status.MPI_SOURCE;
 
@@ -762,11 +772,6 @@ namespace internal
       ghost_indices.erase(std::unique(ghost_indices.begin(),
                                       ghost_indices.end()),
                           ghost_indices.end());
-
-      this->is_extended_locally_owned =
-        mg_level_fine == numbers::invalid_unsigned_int ?
-          dof_handler_fine.locally_owned_dofs() :
-          dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
 
       this->is_extended_ghosts =
         IndexSet(mg_level_fine == numbers::invalid_unsigned_int ?
