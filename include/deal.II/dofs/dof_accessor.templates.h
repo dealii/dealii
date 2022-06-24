@@ -1032,10 +1032,12 @@ namespace internal
 
         unsigned int index = 0;
 
-        // 1) VERTEX dofs
-        for (const auto vertex : accessor.vertex_indices())
-          dof_operation.process_vertex_dofs(
-            accessor, vertex, index, dof_indices, fe_index, dof_processor);
+        // 1) VERTEX dofs, only step into the functions if we actually have
+        // DoFs on them
+        if (fe.n_dofs_per_vertex() > 0)
+          for (const auto vertex : accessor.vertex_indices())
+            dof_operation.process_vertex_dofs(
+              accessor, vertex, index, dof_indices, fe_index, dof_processor);
 
         // 2) copy dof numbers from the LINE. for lines with the wrong
         // orientation (which might occur in 3d), we have already made sure that
@@ -1044,18 +1046,30 @@ namespace internal
         // orientation, we look at it in flipped orientation and we will have to
         // adjust the shape function indices that we see to correspond to the
         // correct (face/cell-local) ordering.
-        if (structdim == 2 || structdim == 3)
+        if ((structdim == 2 || structdim == 3) && fe.n_dofs_per_line() > 0)
           for (const auto line : accessor.line_indices())
-            dof_operation.process_dofs(
-              *accessor.line(line),
-              [&](const auto d) {
-                return fe.adjust_line_dof_index_for_line_orientation(
-                  d, accessor.line_orientation(line));
-              },
-              index,
-              dof_indices,
-              fe_index,
-              dof_processor);
+            {
+              const bool line_orientation = accessor.line_orientation(line);
+              if (line_orientation)
+                dof_operation.process_dofs(
+                  *accessor.line(line),
+                  [](const auto d) { return d; },
+                  index,
+                  dof_indices,
+                  fe_index,
+                  dof_processor);
+              else
+                dof_operation.process_dofs(
+                  *accessor.line(line),
+                  [&fe, &line_orientation](const auto d) {
+                    return fe.adjust_line_dof_index_for_line_orientation(
+                      d, line_orientation);
+                  },
+                  index,
+                  dof_indices,
+                  fe_index,
+                  dof_processor);
+            }
 
         // 3) copy dof numbers from the FACE. for faces with the wrong
         // orientation, we have already made sure that we're ok by picking the
@@ -1065,31 +1079,50 @@ namespace internal
         // adjust the shape function indices that we see to correspond to the
         // correct (cell-local) ordering. The same applies, if the face_rotation
         // or face_orientation is non-standard
-        if (structdim == 3)
+        if (structdim == 3 && fe.max_dofs_per_quad() > 0)
           for (const auto quad : accessor.face_indices())
-            dof_operation.process_dofs(
-              *accessor.quad(quad),
-              [&](const auto d) {
-                return fe.adjust_quad_dof_index_for_face_orientation(
-                  d,
-                  quad,
-                  accessor.face_orientation(quad),
-                  accessor.face_flip(quad),
-                  accessor.face_rotation(quad));
-              },
-              index,
-              dof_indices,
-              fe_index,
-              dof_processor);
+            {
+              const unsigned int raw_orientation = TriaAccessorImplementation::
+                Implementation::face_orientation_raw(accessor, quad);
+              if (raw_orientation == 1)
+                dof_operation.process_dofs(
+                  *accessor.quad(quad),
+                  [](const auto d) { return d; },
+                  index,
+                  dof_indices,
+                  fe_index,
+                  dof_processor);
+              else
+                dof_operation.process_dofs(
+                  *accessor.quad(quad),
+                  [&](const auto d) {
+                    return fe.adjust_quad_dof_index_for_face_orientation(
+                      d,
+                      quad,
+                      accessor.face_orientation(quad),
+                      accessor.face_flip(quad),
+                      accessor.face_rotation(quad));
+                  },
+                  index,
+                  dof_indices,
+                  fe_index,
+                  dof_processor);
+            }
 
-        // 4) INNER dofs
-        dof_operation.process_dofs(
-          accessor,
-          [&](const auto d) { return d; },
-          index,
-          dof_indices,
-          fe_index,
-          dof_processor);
+        // 4) INNER dofs - here we need to make sure that the shortcut to not
+        // run the function does not miss the faces of wedge and pyramid
+        // elements where n_dofs_per_object might not return the largest
+        // possible value
+        if (((dim == 3 && structdim == 2) ?
+               fe.max_dofs_per_quad() :
+               fe.template n_dofs_per_object<structdim>()) > 0)
+          dof_operation.process_dofs(
+            accessor,
+            [&](const auto d) { return d; },
+            index,
+            dof_indices,
+            fe_index,
+            dof_processor);
 
         AssertDimension(n_dof_indices(accessor, fe_index, count_level_dofs),
                         index);
