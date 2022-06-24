@@ -1,0 +1,4 @@
+Removed: The deprecated member functions of QProjector not using a ReferenceCell
+object have been removed.
+<br>
+(Daniel Arndt, 2022/06/24)
