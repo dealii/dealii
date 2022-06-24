@@ -71,10 +71,15 @@ DEAL_II_NAMESPACE_OPEN
 namespace Utilities
 {
   IndexSet
-  create_evenly_distributed_partitioning(const unsigned int my_partition_id,
-                                         const unsigned int n_partitions,
-                                         const IndexSet::size_type total_size)
+  create_evenly_distributed_partitioning(
+    const unsigned int            my_partition_id,
+    const unsigned int            n_partitions,
+    const types::global_dof_index total_size)
   {
+    static_assert(
+      std::is_same<types::global_dof_index, IndexSet::size_type>::value,
+      "IndexSet::size_type must match types::global_dof_index for "
+      "using this function");
     const unsigned int remain = total_size % n_partitions;
 
     const IndexSet::size_type min_size = total_size / n_partitions;
@@ -214,9 +219,14 @@ namespace Utilities
 
 
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm &          comm,
-                                  const IndexSet::size_type locally_owned_size)
+    create_ascending_partitioning(
+      const MPI_Comm &              comm,
+      const types::global_dof_index locally_owned_size)
     {
+      static_assert(
+        std::is_same<types::global_dof_index, IndexSet::size_type>::value,
+        "IndexSet::size_type must match types::global_dof_index for "
+        "using this function");
       const unsigned int                     n_proc = n_mpi_processes(comm);
       const std::vector<IndexSet::size_type> sizes =
         all_gather(comm, locally_owned_size);
@@ -238,8 +248,9 @@ namespace Utilities
 
 
     IndexSet
-    create_evenly_distributed_partitioning(const MPI_Comm &          comm,
-                                           const IndexSet::size_type total_size)
+    create_evenly_distributed_partitioning(
+      const MPI_Comm &              comm,
+      const types::global_dof_index total_size)
     {
       const unsigned int this_proc = this_mpi_process(comm);
       const unsigned int n_proc    = n_mpi_processes(comm);
@@ -663,15 +674,17 @@ namespace Utilities
 
 
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm & /*comm*/,
-                                  const IndexSet::size_type locally_owned_size)
+    create_ascending_partitioning(
+      const MPI_Comm & /*comm*/,
+      const types::global_dof_index locally_owned_size)
     {
       return std::vector<IndexSet>(1, complete_index_set(locally_owned_size));
     }
 
     IndexSet
-    create_evenly_distributed_partitioning(const MPI_Comm & /*comm*/,
-                                           const IndexSet::size_type total_size)
+    create_evenly_distributed_partitioning(
+      const MPI_Comm & /*comm*/,
+      const types::global_dof_index total_size)
     {
       return complete_index_set(total_size);
     }

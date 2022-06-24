@@ -19,10 +19,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
-#include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/utilities.h>
 
 #include <boost/signals2.hpp>
 
@@ -116,9 +116,10 @@ namespace Utilities
    * return the @p my_partition_id 's IndexSet.
    */
   IndexSet
-  create_evenly_distributed_partitioning(const unsigned int my_partition_id,
-                                         const unsigned int n_partitions,
-                                         const IndexSet::size_type total_size);
+  create_evenly_distributed_partitioning(
+    const unsigned int            my_partition_id,
+    const unsigned int            n_partitions,
+    const types::global_dof_index total_size);
 
   /**
    * A namespace for utility functions that abstract certain operations using
@@ -485,8 +486,9 @@ namespace Utilities
      * starts at the index one larger than the last one stored on process p.
      */
     std::vector<IndexSet>
-    create_ascending_partitioning(const MPI_Comm &          comm,
-                                  const IndexSet::size_type locally_owned_size);
+    create_ascending_partitioning(
+      const MPI_Comm &              comm,
+      const types::global_dof_index locally_owned_size);
 
     /**
      * Given the total number of elements @p total_size, create an evenly
@@ -497,8 +499,8 @@ namespace Utilities
      */
     IndexSet
     create_evenly_distributed_partitioning(
-      const MPI_Comm &          comm,
-      const IndexSet::size_type total_size);
+      const MPI_Comm &              comm,
+      const types::global_dof_index total_size);
 
 #ifdef DEAL_II_WITH_MPI
     /**
