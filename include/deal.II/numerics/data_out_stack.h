@@ -38,25 +38,6 @@ class DoFHandler;
 #endif
 
 /**
- * @deprecated Use DataOutStack<dim, spacedim> instead.
- */
-template <int dim, int spacedim = dim, typename DoFHandlerType = void>
-class DataOutStack;
-
-#ifndef DOXYGEN
-// prevent doxygen from complaining about potential recursive class relations
-template <int dim, int spacedim, typename DoFHandlerType>
-class DataOutStack : public DataOutStack<dim, spacedim, void>
-{
-public:
-  DEAL_II_DEPRECATED
-  DataOutStack()
-    : DataOutStack<dim, spacedim, void>()
-  {}
-};
-#endif // DOXYGEN
-
-/**
  * This class is used to stack the output from several computations into one
  * output file by stacking the data sets in another coordinate direction
  * orthogonal to the space directions. The most common use is to stack the
@@ -130,9 +111,8 @@ public:
  *
  * @ingroup output
  */
-template <int dim, int spacedim>
-class DataOutStack<dim, spacedim, void>
-  : public DataOutInterface<dim + 1, spacedim + 1>
+template <int dim, int spacedim = dim>
+class DataOutStack : public DataOutInterface<dim + 1, spacedim + 1>
 {
   static_assert(dim < 3,
                 "Because this class stacks data into the (dim+1)st "
@@ -343,8 +323,7 @@ private:
    * DoF handler to be used for the data corresponding to the present
    * parameter value.
    */
-  SmartPointer<const DoFHandler<dim, spacedim>,
-               DataOutStack<dim, spacedim, void>>
+  SmartPointer<const DoFHandler<dim, spacedim>, DataOutStack<dim, spacedim>>
     dof_handler;
 
   /**
@@ -391,9 +370,9 @@ private:
    * data in the form of Patch structures (declared in the base class
    * DataOutBase) to the actual output function.
    */
-  virtual const std::vector<dealii::DataOutBase::Patch<
-    DataOutStack<dim, spacedim, void>::patch_dim,
-    DataOutStack<dim, spacedim, void>::patch_spacedim>> &
+  virtual const std::vector<
+    dealii::DataOutBase::Patch<DataOutStack<dim, spacedim>::patch_dim,
+                               DataOutStack<dim, spacedim>::patch_spacedim>> &
   get_patches() const override;
 
 

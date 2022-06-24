@@ -22,8 +22,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_iterator.templates.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

@@ -27,8 +27,6 @@
 
 #include <deal.II/fe/component_mask.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/lac/affine_constraints.h>
 
 #include <map>
@@ -1061,7 +1059,6 @@ namespace DoFTools
     const number periodicity_factor = 1.);
 
 
-
   /**
    * Insert the (algebraic) constraints due to periodic boundary conditions
    * into an AffineConstraints object @p constraints.
@@ -1087,24 +1084,6 @@ namespace DoFTools
     const std::vector<GridTools::PeriodicFacePair<
       typename DoFHandler<dim, spacedim>::cell_iterator>> &periodic_faces,
     AffineConstraints<number> &                            constraints,
-    const ComponentMask &            component_mask = ComponentMask(),
-    const std::vector<unsigned int> &first_vector_components =
-      std::vector<unsigned int>(),
-    const number periodicity_factor = 1.);
-
-  /**
-   * The same as above.
-   *
-   * @deprecated Use the function that takes dim and spacedim as template
-   *   argument.
-   */
-  template <typename DoFHandlerType, typename number>
-  DEAL_II_DEPRECATED void
-  make_periodicity_constraints(
-    const std::vector<
-      GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
-      &                              periodic_faces,
-    AffineConstraints<number> &      constraints,
     const ComponentMask &            component_mask = ComponentMask(),
     const std::vector<unsigned int> &first_vector_components =
       std::vector<unsigned int>(),
@@ -1891,17 +1870,6 @@ namespace DoFTools
       &patch);
 
   /**
-   * The same as above.
-   *
-   * @deprecated Use the function that takes dim and spacedim as template
-   *   argument.
-   */
-  template <typename DoFHandlerType>
-  DEAL_II_DEPRECATED std::vector<types::global_dof_index>
-                     get_dofs_on_patch(
-                       const std::vector<typename DoFHandlerType::active_cell_iterator> &patch);
-
-  /**
    * Creates a sparsity pattern, which lists
    * the degrees of freedom associated to each cell on the given
    * level. This pattern can be used in RelaxationBlock classes as
@@ -2204,17 +2172,6 @@ namespace DoFTools
   count_dofs_on_patch(
     const std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>
       &patch);
-
-  /**
-   * The same as above.
-   *
-   * @deprecated Use the function that takes dim and spacedim as template
-   *   argument.
-   */
-  template <typename DoFHandlerType>
-  DEAL_II_DEPRECATED unsigned int
-  count_dofs_on_patch(
-    const std::vector<typename DoFHandlerType::active_cell_iterator> &patch);
 
   /**
    * @}
@@ -2682,50 +2639,6 @@ namespace DoFTools
     point_to_index_map.clear();
     for (types::global_dof_index i = 0; i < dof_handler.n_dofs(); ++i)
       point_to_index_map[support_points[i]] = i;
-  }
-
-
-
-  template <typename DoFHandlerType, typename number>
-  inline void
-  make_periodicity_constraints(
-    const std::vector<
-      GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
-      &                              periodic_faces,
-    AffineConstraints<number> &      constraints,
-    const ComponentMask &            component_mask,
-    const std::vector<unsigned int> &first_vector_components,
-    const number                     periodicity_factor)
-  {
-    make_periodicity_constraints<DoFHandlerType::dimension,
-                                 DoFHandlerType::space_dimension>(
-      periodic_faces,
-      constraints,
-      component_mask,
-      first_vector_components,
-      periodicity_factor);
-  }
-
-
-
-  template <typename DoFHandlerType>
-  inline std::vector<types::global_dof_index>
-  get_dofs_on_patch(
-    const std::vector<typename DoFHandlerType::active_cell_iterator> &patch)
-  {
-    return get_dofs_on_patch<DoFHandlerType::dimension,
-                             DoFHandlerType::space_dimension>(patch);
-  }
-
-
-
-  template <typename DoFHandlerType>
-  inline unsigned int
-  count_dofs_on_patch(
-    const std::vector<typename DoFHandlerType::active_cell_iterator> &patch)
-  {
-    return count_dofs_on_patch<DoFHandlerType::dimension,
-                               DoFHandlerType::space_dimension>(patch);
   }
 } // namespace DoFTools
 

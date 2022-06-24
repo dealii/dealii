@@ -229,23 +229,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-template <typename DoFHandlerType>
-const DoFHandlerType &
-MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
-  const unsigned int dof_handler_index) const
-{
-  AssertIndexRange(dof_handler_index, n_components());
-
-  auto dh =
-    dynamic_cast<const DoFHandlerType *>(&*dof_handlers[dof_handler_index]);
-  Assert(dh != nullptr, ExcNotInitialized());
-
-  return *dh;
-}
-
-
-
-template <int dim, typename Number, typename VectorizedArrayType>
 typename DoFHandler<dim>::cell_iterator
 MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
   const unsigned int cell_batch_index,

@@ -929,18 +929,6 @@ public:
     const Point<patch_spacedim> &shift = Point<patch_spacedim>());
 
   /**
-   * @deprecated Use merge_patches() without the DoFHandlerType2 template
-   * instead.
-   */
-  template <typename DoFHandlerType2>
-  DEAL_II_DEPRECATED void
-  merge_patches(const DataOut_DoFData<DoFHandlerType2::dimension,
-                                      patch_dim,
-                                      DoFHandlerType2::space_dimension,
-                                      patch_spacedim> &source,
-                const Point<patch_spacedim> &shift = Point<patch_spacedim>());
-
-  /**
    * Release the pointers to the data vectors and the DoF handler. You have to
    * set all data entries again using the add_data_vector() function. The
    * pointer to the dof handler is cleared as well, along with all other data.
@@ -1237,40 +1225,6 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::merge_patches(
       if (patches[i].neighbors[n] != Patch::no_neighbor)
         patches[i].neighbors[n] += old_n_patches;
 }
-
-
-
-template <int dim, int patch_dim, int spacedim, int patch_spacedim>
-template <typename DoFHandlerType2>
-void
-DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::merge_patches(
-  const DataOut_DoFData<DoFHandlerType2::dimension,
-                        patch_dim,
-                        DoFHandlerType2::space_dimension,
-                        patch_spacedim> &source,
-  const Point<patch_spacedim> &          shift)
-{
-  this->merge_patches<DoFHandlerType2::dimension,
-                      DoFHandlerType2::space_dimension>(source, shift);
-}
-
-
-
-namespace Legacy
-{
-  /**
-   * @deprecated Use dealii::DataOut_DoFData without the DoFHandlerType
-   * template instead.
-   */
-  template <typename DoFHandlerType,
-            int patch_dim,
-            int patch_space_dim = patch_dim>
-  using DataOut_DoFData DEAL_II_DEPRECATED =
-    dealii::DataOut_DoFData<DoFHandlerType::dimension,
-                            patch_dim,
-                            DoFHandlerType::space_dimension,
-                            patch_space_dim>;
-} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

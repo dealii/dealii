@@ -162,8 +162,8 @@ test(const unsigned numRefinementLevels = 2)
                                       /*direction*/ d,
                                       periodicity_vectorDof);
 
-  DoFTools::make_periodicity_constraints<DoFHandler<dim>>(periodicity_vectorDof,
-                                                          constraints);
+  DoFTools::make_periodicity_constraints<dim, dim>(periodicity_vectorDof,
+                                                   constraints);
 
   const bool consistent =
     constraints.is_consistent_in_parallel(locally_owned_dofs,

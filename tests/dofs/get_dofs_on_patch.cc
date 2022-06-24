@@ -91,7 +91,7 @@ test()
        ++cell)
     {
       const std::vector<types::global_dof_index> m =
-        DoFTools::get_dofs_on_patch<DoFHandler<dim>>(
+        DoFTools::get_dofs_on_patch<dim, dim>(
           GridTools::get_patch_around_cell<DoFHandler<dim>>(cell));
       deallog << cell << ": ";
       for (unsigned int i = 0; i < m.size(); ++i)
