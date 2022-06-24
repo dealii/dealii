@@ -612,8 +612,9 @@ namespace internal
       line_index(const TriaAccessor<2, dim, spacedim> &accessor,
                  const unsigned int                    i)
       {
-        return accessor.objects().get_bounding_object_indices(
-          accessor.present_index)[i];
+        constexpr unsigned int max_faces_per_cell = 4;
+        return accessor.objects()
+          .cells[accessor.present_index * max_faces_per_cell + i];
       }
 
 
@@ -651,8 +652,9 @@ namespace internal
       inline static unsigned int
       quad_index(const TriaAccessor<3, 3, 3> &accessor, const unsigned int i)
       {
+        constexpr unsigned int max_faces_per_cell = 6;
         return accessor.tria->levels[accessor.present_level]
-          ->cells.get_bounding_object_indices(accessor.present_index)[i];
+          ->cells.cells[accessor.present_index * max_faces_per_cell + i];
       }
 
 
@@ -1010,8 +1012,9 @@ namespace internal
       vertex_index(const TriaAccessor<1, dim, spacedim> &accessor,
                    const unsigned int                    corner)
       {
-        return accessor.objects().get_bounding_object_indices(
-          accessor.present_index)[corner];
+        constexpr unsigned int max_faces_per_cell = 2;
+        return accessor.objects()
+          .cells[accessor.present_index * max_faces_per_cell + corner];
       }
 
 
