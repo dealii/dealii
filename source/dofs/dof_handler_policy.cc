@@ -446,14 +446,6 @@ namespace internal
           std::map<types::global_dof_index, types::global_dof_index>
             dof_identities;
 
-          // we will mark lines that we have already treated, so first save and
-          // clear the user flags on lines and later restore them
-          std::vector<bool> user_flags;
-          dof_handler.get_triangulation().save_user_flags_line(user_flags);
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
-            .clear_user_flags_line();
-
           // An implementation of the algorithm described in the hp-paper,
           // including the modification mentioned later in the "complications in
           // 3-d" subsections
@@ -476,12 +468,14 @@ namespace internal
           dealii::Table<2, std::unique_ptr<DoFIdentities>> line_dof_identities(
             dof_handler.fe_collection.size(), dof_handler.fe_collection.size());
 
+          std::vector<bool> line_touched(
+            dof_handler.get_triangulation().n_raw_lines());
           for (const auto &cell : dof_handler.active_cell_iterators())
             for (const auto l : cell->line_indices())
-              if (cell->line(l)->user_flag_set() == false)
+              if (!line_touched[cell->line(l)->index()])
                 {
-                  const auto line = cell->line(l);
-                  line->set_user_flag();
+                  const auto line             = cell->line(l);
+                  line_touched[line->index()] = true;
 
                   unsigned int unique_sets_of_dofs =
                     line->n_active_fe_indices();
@@ -774,11 +768,6 @@ namespace internal
                     }
                 }
 
-          // finally restore the user flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
-            .load_user_flags_line(user_flags);
-
           return dof_identities;
         }
 
@@ -819,16 +808,6 @@ namespace internal
           std::map<types::global_dof_index, types::global_dof_index>
             dof_identities;
 
-
-          // we will mark quads that we have already treated, so first
-          // save and clear the user flags on quads and later restore
-          // them
-          std::vector<bool> user_flags;
-          dof_handler.get_triangulation().save_user_flags_quad(user_flags);
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
-            .clear_user_flags_quad();
-
           // An implementation of the algorithm described in the hp-
           // paper, including the modification mentioned later in the
           // "complications in 3-d" subsections
@@ -845,13 +824,15 @@ namespace internal
             dof_handler.fe_collection.size(),
             2 /*triangle (0) or quadrilateral (1)*/);
 
+          std::vector<bool> quad_touched(
+            dof_handler.get_triangulation().n_raw_quads());
           for (const auto &cell : dof_handler.active_cell_iterators())
             for (const auto q : cell->face_indices())
-              if ((cell->quad(q)->user_flag_set() == false) &&
+              if (!quad_touched[cell->quad(q)->index()] &&
                   (cell->quad(q)->n_active_fe_indices() == 2))
                 {
-                  const auto quad = cell->quad(q);
-                  quad->set_user_flag();
+                  const auto quad             = cell->quad(q);
+                  quad_touched[quad->index()] = true;
 
                   const std::set<unsigned int> fe_indices =
                     quad->get_active_fe_indices();
@@ -937,11 +918,6 @@ namespace internal
                           }
                     }
                 }
-
-          // finally restore the user flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
-            .load_user_flags_quad(user_flags);
 
           return dof_identities;
         }
@@ -1129,7 +1105,8 @@ namespace internal
             vertex_dof_identities(dof_handler.get_fe_collection().size(),
                                   dof_handler.get_fe_collection().size());
 
-          // mark all vertices on ghost cells
+          // mark all vertices on ghost cells to identify those cells that we
+          // have already treated
           std::vector<bool> include_vertex(
             dof_handler.get_triangulation().n_vertices(), false);
           if (dynamic_cast<const dealii::parallel::
@@ -1290,19 +1267,13 @@ namespace internal
             dof_handler.hp_capability_enabled == true,
             (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
-          // we will mark lines that we have already treated, so first save and
-          // clear the user flags on lines and later restore them
-          std::vector<bool> user_flags;
-          dof_handler.get_triangulation().save_user_flags_line(user_flags);
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
-            .clear_user_flags_line();
-
           // mark all lines on ghost cells
+          std::vector<bool> line_marked(
+            dof_handler.get_triangulation().n_raw_lines());
           for (const auto &cell : dof_handler.active_cell_iterators())
             if (cell->is_ghost())
               for (const auto l : cell->line_indices())
-                cell->line(l)->set_user_flag();
+                line_marked[cell->line(l)->index()] = true;
 
           // An implementation of the algorithm described in the hp-paper,
           // including the modification mentioned later in the "complications in
@@ -1329,10 +1300,10 @@ namespace internal
           for (const auto &cell : dof_handler.active_cell_iterators())
             for (const auto l : cell->line_indices())
               if ((cell->is_locally_owned()) &&
-                  (cell->line(l)->user_flag_set() == true))
+                  line_marked[cell->line(l)->index()])
                 {
-                  const auto line = cell->line(l);
-                  line->clear_user_flag();
+                  const auto line            = cell->line(l);
+                  line_marked[line->index()] = false;
 
                   unsigned int unique_sets_of_dofs =
                     line->n_active_fe_indices();
@@ -1531,11 +1502,6 @@ namespace internal
                         }
                     }
                 }
-
-          // finally restore the user flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
-            .load_user_flags_line(user_flags);
         }
 
 
@@ -1571,20 +1537,13 @@ namespace internal
 
           const int dim = 3;
 
-          // we will mark quads that we have already treated, so first
-          // save and clear the user flags on quads and later restore
-          // them
-          std::vector<bool> user_flags;
-          dof_handler.get_triangulation().save_user_flags_quad(user_flags);
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
-            .clear_user_flags_quad();
-
           // mark all quads on ghost cells
+          std::vector<bool> quad_marked(
+            dof_handler.get_triangulation().n_raw_quads());
           for (const auto &cell : dof_handler.active_cell_iterators())
             if (cell->is_ghost())
               for (const auto q : cell->face_indices())
-                cell->quad(q)->set_user_flag();
+                quad_marked[cell->quad(q)->index()] = true;
 
           // An implementation of the algorithm described in the hp-
           // paper, including the modification mentioned later in the
@@ -1605,11 +1564,11 @@ namespace internal
           for (const auto &cell : dof_handler.active_cell_iterators())
             for (const auto q : cell->face_indices())
               if ((cell->is_locally_owned()) &&
-                  (cell->quad(q)->user_flag_set() == true) &&
+                  quad_marked[cell->quad(q)->index()] &&
                   (cell->quad(q)->n_active_fe_indices() == 2))
                 {
-                  const auto quad = cell->quad(q);
-                  quad->clear_user_flag();
+                  const auto quad            = cell->quad(q);
+                  quad_marked[quad->index()] = false;
 
                   const std::set<unsigned int> fe_indices =
                     quad->get_active_fe_indices();
@@ -1685,11 +1644,6 @@ namespace internal
                           }
                     }
                 }
-
-          // finally restore the user flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(
-            dof_handler.get_triangulation())
-            .load_user_flags_quad(user_flags);
         }
 
 
@@ -2190,23 +2144,15 @@ namespace internal
 
           // deal with DoFs on lines
           {
-            // save user flags on lines so we can use them to mark lines
-            // we've already treated
-            std::vector<bool> saved_line_user_flags;
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
-              .save_user_flags_line(saved_line_user_flags);
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
-              .clear_user_flags_line();
-
+            std::vector<bool> line_touched(
+              dof_handler.get_triangulation().n_raw_lines());
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto l : cell->line_indices())
-                  if (cell->line(l)->user_flag_set() == false)
+                  if (!line_touched[cell->line(l)->index()])
                     {
-                      const auto line = cell->line(l);
-                      line->set_user_flag();
+                      const auto line             = cell->line(l);
+                      line_touched[line->index()] = true;
 
                       const unsigned int n_active_fe_indices =
                         line->n_active_fe_indices();
@@ -2265,12 +2211,6 @@ namespace internal
                             }
                         }
                     }
-
-            // at the end, restore the user
-            // flags for the lines
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
-              .load_user_flags_line(saved_line_user_flags);
           }
         }
 
@@ -2299,23 +2239,15 @@ namespace internal
 
           // deal with DoFs on lines
           {
-            // save user flags on lines so we can use them to mark lines
-            // we've already treated
-            std::vector<bool> saved_line_user_flags;
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
-              .save_user_flags_line(saved_line_user_flags);
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
-              .clear_user_flags_line();
-
+            std::vector<bool> line_touched(
+              dof_handler.get_triangulation().n_raw_lines());
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto l : cell->line_indices())
-                  if (cell->line(l)->user_flag_set() == false)
+                  if (!line_touched[cell->line(l)->index()])
                     {
-                      const auto line = cell->line(l);
-                      line->set_user_flag();
+                      const auto line             = cell->line(l);
+                      line_touched[line->index()] = true;
 
                       const unsigned int n_active_fe_indices =
                         line->n_active_fe_indices();
@@ -2369,31 +2301,19 @@ namespace internal
                             }
                         }
                     }
-
-            // at the end, restore the user
-            // flags for the lines
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
-              .load_user_flags_line(saved_line_user_flags);
           }
 
           // then deal with dofs on quads
           {
-            std::vector<bool> saved_quad_user_flags;
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
-              .save_user_flags_quad(saved_quad_user_flags);
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
-              .clear_user_flags_quad();
-
+            std::vector<bool> quad_touched(
+              dof_handler.get_triangulation().n_raw_quads());
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto q : cell->face_indices())
-                  if (cell->quad(q)->user_flag_set() == false)
+                  if (!quad_touched[cell->quad(q)->index()])
                     {
-                      const auto quad = cell->quad(q);
-                      quad->set_user_flag();
+                      const auto quad             = cell->quad(q);
+                      quad_touched[quad->index()] = true;
 
                       const unsigned int n_active_fe_indices =
                         quad->n_active_fe_indices();
@@ -2452,11 +2372,6 @@ namespace internal
                             }
                         }
                     }
-
-            // at the end, restore the user flags for the quads
-            const_cast<dealii::Triangulation<dim, spacedim> &>(
-              dof_handler.get_triangulation())
-              .load_user_flags_quad(saved_quad_user_flags);
           }
         }
 
@@ -2637,28 +2552,23 @@ namespace internal
         {
           if (dof_handler.get_fe().n_dofs_per_line() > 0)
             {
-              // save user flags as they will be modified
-              std::vector<bool> user_flags;
-              dof_handler.get_triangulation().save_user_flags(user_flags);
-              const_cast<dealii::Triangulation<2, spacedim> &>(
-                dof_handler.get_triangulation())
-                .clear_user_flags();
-
-              // flag all lines adjacent to cells of the current
+              // mark all lines adjacent to cells of the current
               // level, as those lines logically belong to the same
               // level as the cell, at least for for isotropic
               // refinement
+              std::vector<bool> line_marked(
+                dof_handler.get_triangulation().n_raw_lines());
               for (const auto &cell :
                    dof_handler.cell_iterators_on_level(level))
                 if (cell->level_subdomain_id() !=
                     numbers::artificial_subdomain_id)
                   for (const unsigned int line : cell->face_indices())
-                    cell->face(line)->set_user_flag();
+                    line_marked[cell->face(line)->index()] = true;
 
               for (const auto &cell :
                    dof_handler.cell_iterators_on_level(level))
                 for (const auto l : cell->line_indices())
-                  if (cell->line(l)->user_flag_set())
+                  if (line_marked[cell->line(l)->index()])
                     {
                       for (unsigned int d = 0;
                            d < dof_handler.get_fe().n_dofs_per_line();
@@ -2679,12 +2589,8 @@ namespace internal
                                  new_numbers[indices_we_care_about
                                                .index_within_set(idx)]));
                         }
-                      cell->line(l)->clear_user_flag();
+                      line_marked[cell->line(l)->index()] = false;
                     }
-              // finally, restore user flags
-              const_cast<dealii::Triangulation<2, spacedim> &>(
-                dof_handler.get_triangulation())
-                .load_user_flags(user_flags);
             }
         }
 
@@ -2702,27 +2608,22 @@ namespace internal
           if (dof_handler.get_fe().n_dofs_per_line() > 0 ||
               dof_handler.get_fe().max_dofs_per_quad() > 0)
             {
-              // save user flags as they will be modified
-              std::vector<bool> user_flags;
-              dof_handler.get_triangulation().save_user_flags(user_flags);
-              const_cast<dealii::Triangulation<3, spacedim> &>(
-                dof_handler.get_triangulation())
-                .clear_user_flags();
-
               // flag all lines adjacent to cells of the current
               // level, as those lines logically belong to the same
               // level as the cell, at least for isotropic refinement
+              std::vector<bool> line_marked(
+                dof_handler.get_triangulation().n_raw_lines());
               for (const auto &cell :
                    dof_handler.cell_iterators_on_level(level))
                 if (cell->level_subdomain_id() !=
                     numbers::artificial_subdomain_id)
                   for (const auto line : cell->line_indices())
-                    cell->line(line)->set_user_flag();
+                    line_marked[cell->line(line)->index()] = true;
 
               for (const auto &cell :
                    dof_handler.cell_iterators_on_level(level))
                 for (const auto l : cell->line_indices())
-                  if (cell->line(l)->user_flag_set())
+                  if (line_marked[cell->line(l)->index()])
                     {
                       for (unsigned int d = 0;
                            d < dof_handler.get_fe().n_dofs_per_line();
@@ -2743,22 +2644,24 @@ namespace internal
                                  new_numbers[indices_we_care_about
                                                .index_within_set(idx)]));
                         }
-                      cell->line(l)->clear_user_flag();
+                      line_marked[cell->line(l)->index()] = false;
                     }
 
               // flag all quads adjacent to cells of the current level, as
               // those quads logically belong to the same level as the cell,
               // at least for isotropic refinement
+              std::vector<bool> quad_marked(
+                dof_handler.get_triangulation().n_raw_quads());
               for (const auto &cell :
                    dof_handler.cell_iterators_on_level(level))
                 if (cell->level_subdomain_id() !=
                     numbers::artificial_subdomain_id)
                   for (const auto quad : cell->face_indices())
-                    cell->quad(quad)->set_user_flag();
+                    quad_marked[cell->quad(quad)->index()] = true;
 
               for (const auto &cell : dof_handler.cell_iterators())
                 for (const auto l : cell->face_indices())
-                  if (cell->quad(l)->user_flag_set())
+                  if (quad_marked[cell->quad(l)->index()])
                     {
                       for (unsigned int d = 0;
                            d < dof_handler.get_fe().n_dofs_per_quad(l);
@@ -2779,13 +2682,8 @@ namespace internal
                                  new_numbers[indices_we_care_about
                                                .index_within_set(idx)]));
                         }
-                      cell->quad(l)->clear_user_flag();
+                      quad_marked[cell->quad(l)->index()] = false;
                     }
-
-              // finally, restore user flags
-              const_cast<dealii::Triangulation<3, spacedim> &>(
-                dof_handler.get_triangulation())
-                .load_user_flags(user_flags);
             }
         }
 
@@ -2873,13 +2771,6 @@ namespace internal
       std::vector<NumberCache>
       Sequential<dim, spacedim>::distribute_mg_dofs() const
       {
-        std::vector<bool> user_flags;
-        dof_handler->get_triangulation().save_user_flags(user_flags);
-
-        const_cast<dealii::Triangulation<dim, spacedim> &>(
-          dof_handler->get_triangulation())
-          .clear_user_flags();
-
         std::vector<NumberCache> number_caches;
         number_caches.reserve(dof_handler->get_triangulation().n_levels());
         for (unsigned int level = 0;
@@ -2894,10 +2785,6 @@ namespace internal
             // then add a complete, sequential index set
             number_caches.emplace_back(n_level_dofs);
           }
-
-        const_cast<dealii::Triangulation<dim, spacedim> &>(
-          dof_handler->get_triangulation())
-          .load_user_flags(user_flags);
 
         return number_caches;
       }
@@ -3608,13 +3495,12 @@ namespace internal
       {
         template <int dim, int spacedim>
         void
-        communicate_mg_ghost_cells(DoFHandler<dim, spacedim> &dof_handler)
+        communicate_mg_ghost_cells(DoFHandler<dim, spacedim> &     dof_handler,
+                                   std::vector<std::vector<bool>> &cell_marked)
         {
-          const auto pack = [&](const auto &cell) {
+          const auto pack = [](const auto &cell) {
             // why would somebody request a cell that is not ours?
-            Assert(cell->level_subdomain_id() ==
-                     dof_handler.get_triangulation().locally_owned_subdomain(),
-                   ExcInternalError());
+            Assert(cell->is_locally_owned_on_level(), ExcInternalError());
 
             std::vector<dealii::types::global_dof_index> data(
               cell->get_fe().n_dofs_per_cell());
@@ -3623,7 +3509,8 @@ namespace internal
             return data;
           };
 
-          const auto unpack = [](const auto &cell, const auto &dofs) {
+          const auto unpack = [&cell_marked](const auto &cell,
+                                             const auto &dofs) {
             Assert(cell->get_fe().n_dofs_per_cell() == dofs.size(),
                    ExcInternalError());
 
@@ -3654,17 +3541,17 @@ namespace internal
               true);
 
             if (!complete)
-              const_cast<
-                typename DoFHandler<dim, spacedim>::level_cell_iterator &>(cell)
-                ->set_user_flag();
+              {
+                // We should have the cell already marked
+                Assert(cell_marked[cell->level()][cell->index()],
+                       ExcInternalError());
+              }
             else
-              const_cast<
-                typename DoFHandler<dim, spacedim>::level_cell_iterator &>(cell)
-                ->clear_user_flag();
+              cell_marked[cell->level()][cell->index()] = false;
           };
 
-          const auto filter = [](const auto &cell) {
-            return cell->user_flag_set();
+          const auto filter = [&cell_marked](const auto &cell) {
+            return cell_marked[cell->level()][cell->index()];
           };
 
           GridTools::exchange_cell_data_to_level_ghosts<
@@ -3695,7 +3582,8 @@ namespace internal
         template <int dim, int spacedim>
         void
         communicate_dof_indices_on_marked_cells(
-          const DoFHandler<dim, spacedim> &dof_handler)
+          const DoFHandler<dim, spacedim> &dof_handler,
+          std::vector<bool> &              cell_marked)
         {
 #  ifndef DEAL_II_WITH_MPI
           (void)dof_handler;
@@ -3718,7 +3606,8 @@ namespace internal
             return data;
           };
 
-          const auto unpack = [](const auto &cell, const auto &dofs) {
+          const auto unpack = [&cell_marked](const auto &cell,
+                                             const auto &dofs) {
             Assert(cell->get_fe().n_dofs_per_cell() == dofs.size(),
                    ExcInternalError());
 
@@ -3750,19 +3639,17 @@ namespace internal
               false);
 
             if (!complete)
-              const_cast<
-                typename DoFHandler<dim, spacedim>::active_cell_iterator &>(
-                cell)
-                ->set_user_flag();
+              {
+                // We should have the cell already marked
+                Assert(cell_marked[cell->active_cell_index()],
+                       ExcInternalError());
+              }
             else
-              const_cast<
-                typename DoFHandler<dim, spacedim>::active_cell_iterator &>(
-                cell)
-                ->clear_user_flag();
+              cell_marked[cell->active_cell_index()] = false;
           };
 
-          const auto filter = [](const auto &cell) {
-            return cell->user_flag_set();
+          const auto filter = [&cell_marked](const auto &cell) {
+            return cell_marked[cell->active_cell_index()];
           };
 
           GridTools::exchange_cell_data_to_ghosts<
@@ -3918,16 +3805,13 @@ namespace internal
         //                    cells somewhere else, send our own DoF indices
         //                    to the appropriate set of other processors
         {
-          std::vector<bool> user_flags;
-          triangulation->save_user_flags(user_flags);
-          triangulation->clear_user_flags();
-
           // mark all cells that either have to send data (locally
           // owned cells that are adjacent to ghost neighbors in some
           // way) or receive data (all ghost cells) via the user flags
+          std::vector<bool> cell_marked(triangulation->n_active_cells());
           for (const auto &cell : dof_handler->active_cell_iterators())
             if (cell->is_ghost())
-              cell->set_user_flag();
+              cell_marked[cell->active_cell_index()] = true;
 
           // Send and receive cells. After this, only the local cells
           // are marked, that received new data. This has to be
@@ -3935,7 +3819,7 @@ namespace internal
           //
           // as explained in the 'distributed' paper, this has to be
           // done twice
-          communicate_dof_indices_on_marked_cells(*dof_handler);
+          communicate_dof_indices_on_marked_cells(*dof_handler, cell_marked);
 
           // If the DoFHandler has hp-capabilities enabled, then we may have
           // received valid indices of degrees of freedom that are dominated
@@ -3948,16 +3832,15 @@ namespace internal
           //                    DoF indices set. however, some ghost cells
           //                    may still have invalid ones. thus, exchange
           //                    one more time.
-          communicate_dof_indices_on_marked_cells(*dof_handler);
+          communicate_dof_indices_on_marked_cells(*dof_handler, cell_marked);
 
           // at this point, we must have taken care of the data transfer
           // on all cells we had previously marked. verify this
 #  ifdef DEBUG
           for (const auto &cell : dof_handler->active_cell_iterators())
-            Assert(cell->user_flag_set() == false, ExcInternalError());
+            Assert(cell_marked[cell->active_cell_index()] == false,
+                   ExcInternalError());
 #  endif
-
-          triangulation->load_user_flags(user_flags);
         }
 
         update_all_active_cell_dof_indices_caches(*this->dof_handler);
@@ -4145,38 +4028,28 @@ namespace internal
         // these cells from the corresponding owners. As this information
         // can be incomplete,
         {
-          std::vector<bool> user_flags;
-          triangulation->save_user_flags(user_flags);
-          triangulation->clear_user_flags();
-
-          // mark all ghost cells for transfer
-          {
-            for (const auto &cell : dof_handler->cell_iterators())
-              if (cell->is_ghost_on_level())
-                cell->set_user_flag();
-          }
+          std::vector<std::vector<bool>> cell_marked(triangulation->n_levels());
+          for (unsigned int l = 0; l < triangulation->n_levels(); ++l)
+            cell_marked[l].resize(triangulation->n_raw_cells(l));
+          for (const auto &cell : dof_handler->cell_iterators())
+            if (cell->is_ghost_on_level())
+              cell_marked[cell->level()][cell->index()] = true;
 
           // Phase 1. Request all marked cells from corresponding owners. If we
           // managed to get every DoF, remove the user_flag, otherwise we
           // will request them again in the step below.
-          communicate_mg_ghost_cells(*dof_handler);
+          communicate_mg_ghost_cells(*dof_handler, cell_marked);
 
           // Phase 2, only request the cells that were not completed
           // in Phase 1.
-          communicate_mg_ghost_cells(*dof_handler);
+          communicate_mg_ghost_cells(*dof_handler, cell_marked);
 
 #  ifdef DEBUG
-          // make sure we have removed all flags:
-          {
-            for (const auto &cell : dof_handler->cell_iterators())
-              if (cell->level_subdomain_id() !=
-                    dealii::numbers::artificial_subdomain_id &&
-                  !cell->is_locally_owned_on_level())
-                Assert(cell->user_flag_set() == false, ExcInternalError());
-          }
+          // make sure we have finished all cells:
+          for (const auto &cell : dof_handler->cell_iterators())
+            Assert(cell_marked[cell->level()][cell->index()] == false,
+                   ExcInternalError());
 #  endif
-
-          triangulation->load_user_flags(user_flags);
         }
 
 
@@ -4307,15 +4180,11 @@ namespace internal
         // taking into account that we have to unify a few DoFs in between
         // then communication phases if we do hp-numbering
         {
-          std::vector<bool> user_flags;
-          triangulation->save_user_flags(user_flags);
-          triangulation->clear_user_flags();
-
-          // mark all own cells for transfer
+          // mark all ghost cells for transfer
+          std::vector<bool> cell_marked(triangulation->n_active_cells());
           for (const auto &cell : dof_handler->active_cell_iterators())
             if (cell->is_ghost())
-              cell->set_user_flag();
-
+              cell_marked[cell->active_cell_index()] = true;
 
           // Send and receive cells. After this, only the local cells
           // are marked, that received new data. This has to be
@@ -4323,7 +4192,7 @@ namespace internal
           //
           // as explained in the 'distributed' paper, this has to be
           // done twice
-          communicate_dof_indices_on_marked_cells(*dof_handler);
+          communicate_dof_indices_on_marked_cells(*dof_handler, cell_marked);
 
           // if the DoFHandler has hp-capabilities then we may have
           // received valid indices of degrees of freedom that are
@@ -4333,9 +4202,8 @@ namespace internal
           Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
             *dof_handler);
 
-          communicate_dof_indices_on_marked_cells(*dof_handler);
+          communicate_dof_indices_on_marked_cells(*dof_handler, cell_marked);
 
-          triangulation->load_user_flags(user_flags);
           update_all_active_cell_dof_indices_caches(*this->dof_handler);
         }
 
@@ -4430,20 +4298,16 @@ namespace internal
 
         // communicate newly assigned DoF indices with other processors
         {
-          std::vector<bool> user_flags;
-          triangulation->save_user_flags(user_flags);
-          triangulation->clear_user_flags();
-
-          // mark only cells on the chosen level
+          std::vector<std::vector<bool>> cell_marked(triangulation->n_levels());
+          for (unsigned int l = 0; l < triangulation->n_levels(); ++l)
+            cell_marked[l].resize(triangulation->n_raw_cells(l));
           for (const auto &cell : dof_handler->cell_iterators_on_level(level))
             if (cell->is_ghost_on_level())
-              cell->set_user_flag();
+              cell_marked[cell->level()][cell->index()] = true;
 
-          communicate_mg_ghost_cells(*dof_handler);
+          communicate_mg_ghost_cells(*dof_handler, cell_marked);
 
-          communicate_mg_ghost_cells(*dof_handler);
-
-          triangulation->load_user_flags(user_flags);
+          communicate_mg_ghost_cells(*dof_handler, cell_marked);
         }
 
         NumberCache number_cache;

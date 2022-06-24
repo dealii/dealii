@@ -385,12 +385,13 @@ namespace TriangulationDescription
        */
       template <int dim, int spacedim>
       void
-      set_user_flag_and_of_its_parents(
-        const TriaIterator<CellAccessor<dim, spacedim>> &cell)
+      mark_cell_and_its_parents(
+        const TriaIterator<CellAccessor<dim, spacedim>> &cell,
+        std::vector<std::vector<bool>> &                 cell_marked)
       {
-        cell->set_user_flag();
+        cell_marked[cell->level()][cell->index()] = true;
         if (cell->level() != 0)
-          set_user_flag_and_of_its_parents(cell->parent());
+          mark_cell_and_its_parents(cell->parent(), cell_marked);
       }
 
       /**
@@ -466,16 +467,12 @@ namespace TriangulationDescription
                   }
               };
 
-          // 1) collect locally relevant cells (set user_flag)
-          std::vector<bool> old_user_flags;
-          tria.save_user_flags(old_user_flags);
+          // 1) loop over levels (from fine to coarse) and mark on each level
+          //    the locally relevant cells
+          std::vector<std::vector<bool>> cell_marked(tria.n_levels());
+          for (unsigned int l = 0; l < tria.n_levels(); ++l)
+            cell_marked[l].resize(tria.n_raw_cells(l));
 
-          // 1a) clear user_flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
-            .clear_user_flags();
-
-          // 1b) loop over levels (from fine to coarse) and mark on each level
-          //     the locally relevant cells
           for (int level = tria.get_triangulation().n_global_levels() - 1;
                level >= 0;
                --level)
@@ -509,7 +506,7 @@ namespace TriangulationDescription
               // mark all locally relevant cells
               for (const auto &cell : tria.cell_iterators_on_level(level))
                 if (is_locally_relevant_on_level(cell))
-                  set_user_flag_and_of_its_parents(cell);
+                  mark_cell_and_its_parents(cell, cell_marked);
             }
 
           // 2) set_up coarse-grid triangulation
@@ -520,7 +517,7 @@ namespace TriangulationDescription
             // a) loop over all cells
             for (const auto &cell : tria.cell_iterators_on_level(0))
               {
-                if (!cell->user_flag_set())
+                if (!cell_marked[cell->level()][cell->index()])
                   continue;
 
                 // extract cell definition (with old numbering of vertices)
@@ -597,7 +594,7 @@ namespace TriangulationDescription
               for (const auto &cell : tria.cell_iterators_on_level(level))
                 {
                   // check if cell is locally relevant
-                  if (!(cell->user_flag_set()))
+                  if (!cell_marked[cell->level()][cell->index()])
                     continue;
 
                   CellData<dim> cell_info;
@@ -657,9 +654,6 @@ namespace TriangulationDescription
                   level_cell_infos.emplace_back(cell_info);
                 }
             }
-
-          const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
-            .load_user_flags(old_user_flags);
 
           return construction_data;
         }

@@ -921,43 +921,14 @@ namespace internal
           // *have* to be different, and so we need to prepare for this
           // as well.
           //
-          // The way we do things is that we loop over all active
-          // cells (these are the only ones that have DoFs
-          // anyway) and all their faces. We note in the
-          // user flags whether we have previously visited a face and
-          // if so skip it (consequently, we have to save and later
-          // restore the face flags)
+          // The way we do things is that we loop over all active cells (these
+          // are the only ones that have DoFs anyway) and all their faces. We
+          // note in the vector face_touched whether we have previously
+          // visited a face and if so skip it
           {
-            std::vector<bool> saved_face_user_flags;
-            switch (dim)
-              {
-                case 2:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .save_user_flags_line(saved_face_user_flags);
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .clear_user_flags_line();
-
-                    break;
-                  }
-
-                case 3:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .save_user_flags_quad(saved_face_user_flags);
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .clear_user_flags_quad();
-
-                    break;
-                  }
-
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
+            std::vector<bool> face_touched(dim == 2 ?
+                                             dof_handler.tria->n_raw_lines() :
+                                             dof_handler.tria->n_raw_quads());
 
             const unsigned int d = dim - 1;
             const unsigned int l = 0;
@@ -977,7 +948,7 @@ namespace internal
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto face : cell->face_indices())
-                  if (cell->face(face)->user_flag_set() == false)
+                  if (!face_touched[cell->face(face)->index()])
                     {
                       unsigned int fe_slots_needed = 0;
 
@@ -1009,7 +980,7 @@ namespace internal
                         }
 
                       // mark this face as visited
-                      cell->face(face)->set_user_flag();
+                      face_touched[cell->face(face)->index()] = true;
 
                       dof_handler
                         .hp_object_fe_ptr[d][cell->face(face)->index() + 1] =
@@ -1033,34 +1004,12 @@ namespace internal
             // With the memory now allocated, loop over the
             // dof_handler cells again and prime the _offset values as
             // well as the fe_index fields
-            switch (dim)
-              {
-                case 2:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .clear_user_flags_line();
-
-                    break;
-                  }
-
-                case 3:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .clear_user_flags_quad();
-
-                    break;
-                  }
-
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
+            face_touched = std::vector<bool>(face_touched.size());
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto face : cell->face_indices())
-                  if (!cell->face(face)->user_flag_set())
+                  if (!face_touched[cell->face(face)->index()])
                     {
                       // Same decision tree as before
                       if (cell->at_boundary(face) ||
@@ -1135,7 +1084,7 @@ namespace internal
                         }
 
                       // mark this face as visited
-                      cell->face(face)->set_user_flag();
+                      face_touched[cell->face(face)->index()] = true;
                     }
 
             for (unsigned int i = 1;
@@ -1143,31 +1092,6 @@ namespace internal
                  i++)
               dof_handler.object_dof_ptr[l][d][i] +=
                 dof_handler.object_dof_ptr[l][d][i - 1];
-
-            // at the end, restore the user flags for the faces
-            switch (dim)
-              {
-                case 2:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .load_user_flags_line(saved_face_user_flags);
-
-                    break;
-                  }
-
-                case 3:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .load_user_flags_quad(saved_face_user_flags);
-
-                    break;
-                  }
-
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
           }
         }
 
