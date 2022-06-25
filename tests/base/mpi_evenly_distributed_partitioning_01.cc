@@ -15,6 +15,7 @@
 
 // Test Utilities::MPI::create_evenly_distributed_partitioning()
 
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi.h>
 
 #include <vector>
