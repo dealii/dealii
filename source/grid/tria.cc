@@ -14591,6 +14591,18 @@ Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
                 for (unsigned int i = 0; i < 4; ++i)
                   cache[index + i] = raw_vertex_indices[vertex_order[i]];
               }
+          else if (ref_cell == ReferenceCells::Quadrilateral)
+            {
+              const std::array<bool, 2> line_orientations{
+                {cell->line_orientation(0), cell->line_orientation(1)}};
+              std::array<unsigned int, 4> raw_vertex_indices{
+                {cell->line(0)->vertex_index(1 - line_orientations[0]),
+                 cell->line(1)->vertex_index(1 - line_orientations[1]),
+                 cell->line(0)->vertex_index(line_orientations[0]),
+                 cell->line(1)->vertex_index(line_orientations[1])}};
+              for (unsigned int i = 0; i < 4; ++i)
+                cache[my_index + i] = raw_vertex_indices[i];
+            }
           else
             for (const unsigned int i : cell->vertex_indices())
               cache[my_index + i] = internal::TriaAccessorImplementation::
