@@ -4233,7 +4233,7 @@ namespace internal
           Quadrature<dim - 1> quadrature(boundary_points, dummy_weights);
 
           q_projector = QProjector<dim>::project_to_all_faces(
-            dealii::ReferenceCells::Quadrilateral, quadrature);
+            dealii::ReferenceCells::get_hypercube<dim>(), quadrature);
         }
 
       for (const auto &cell : tria.active_cell_iterators())
@@ -4347,7 +4347,8 @@ namespace internal
           // tensor product of points, only one copy
           QIterated<dim - 1> quadrature(quadrature1d, 1);
           q_projector = std::make_unique<Quadrature<dim>>(
-            QProjector<dim>::project_to_all_faces(quadrature));
+            QProjector<dim>::project_to_all_faces(
+              ReferenceCells::get_hypercube<dim>(), quadrature));
         }
 
       for (const auto &cell : tria.active_cell_iterators())
@@ -4770,7 +4771,8 @@ namespace internal
 
                   Quadrature<dim - 1> quadrature(boundary_points);
                   Quadrature<dim>     q_projector(
-                    QProjector<dim>::project_to_all_faces(quadrature));
+                    QProjector<dim>::project_to_all_faces(
+                      ReferenceCells::get_hypercube<dim>(), quadrature));
 
                   // next loop over all
                   // boundary faces and
