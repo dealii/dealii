@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2020 by the deal.II authors
+ * Copyright (C) 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -15,7 +15,7 @@
  */
 
 /*
- * Authors: TODO, 2020
+ * Authors: Jean-Paul Pelteret, 2022
  */
 
 
@@ -31,7 +31,8 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/quadrature_point_data.h>
-#include <deal.II/base/std_cxx11/shared_ptr.h>
+
+#include <deal.II/differentiation/ad.h>
 
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -40,7 +41,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 
 #include <deal.II/fe/fe_dgp_monomial.h>
 #include <deal.II/fe/fe_q.h>
@@ -61,12 +61,6 @@
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
-
-#include <deal.II/base/config.h>
-// #if DEAL_II_VERSION_MAJOR >= 9 && (defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_WITH_TRILINOS))
-#include <deal.II/differentiation/ad.h>
-#define ENABLE_AD_FORMULATION
-// #endif
 
 // These must be included below the AD headers so that
 // their math functions are available for use in the
@@ -1133,8 +1127,8 @@ namespace Cook_Membrane
     dof_handler_ref.distribute_dofs(fe);
     DoFRenumbering::Cuthill_McKee(dof_handler_ref);
     DoFRenumbering::component_wise(dof_handler_ref, block_component);
-    DoFTools::count_dofs_per_block(dof_handler_ref, dofs_per_block,
-                                   block_component);
+    dofs_per_block = DoFTools::count_dofs_per_fe_block(dof_handler_ref,
+                                                       block_component);
 
     std::cout << "Triangulation:"
               << "\n\t Number of active cells: " << triangulation.n_active_cells()
@@ -1799,8 +1793,6 @@ namespace Cook_Membrane
 
   };
 
-#ifdef ENABLE_AD_FORMULATION
-
   namespace AD = dealii::Differentiation::AD;
 
   template <int dim>
@@ -2111,8 +2103,6 @@ namespace Cook_Membrane
   };
 
 
-#endif
-
 
 // Since we use TBB for assembly, we simply setup a copy of the
 // data structures required for the process and pass them, along
@@ -2370,7 +2360,6 @@ int main (int argc, char *argv[])
           Solid<dim,NumberType> solid_3d(parameters);
           solid_3d.run();
         }
-#ifdef ENABLE_AD_FORMULATION
       else if (parameters.automatic_differentiation_order == 1)
         {
           std::cout << "Assembly method: Residual computed manually; linearisation performed using AD." << std::endl;
@@ -2444,7 +2433,6 @@ int main (int argc, char *argv[])
             AssertThrow(false, ExcMessage("The selected auto-differentiable library is not supported."));
           }
         }
-#endif
       else
         {
           AssertThrow(false,

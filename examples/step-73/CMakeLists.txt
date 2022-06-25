@@ -37,19 +37,19 @@ ENDIF()
 #
 # Are all dependencies fulfilled?
 #
-IF(NOT DEAL_II_WITH_ADOLC OR NOT (DEAL_II_WITH_TRILINOS AND DEAL_II_WITH_TRILINOS_WITH_SACADO) OR NOT DEAL_II_WITH_SYMENGINE) # keep in one line
+IF(NOT DEAL_II_WITH_ADOLC OR NOT (DEAL_II_WITH_TRILINOS AND DEAL_II_TRILINOS_WITH_SACADO) OR NOT DEAL_II_WITH_SYMENGINE) # keep in one line
   MESSAGE(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_ADOLC = ON
 or
     DEAL_II_WITH_TRILINOS = ON
-    DEAL_II_WITH_TRILINOS_WITH_SACADO = ON
+    DEAL_II_TRILINOS_WITH_SACADO = ON
 or
     DEAL_II_WITH_SYMENGINE = ON
 However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
     DEAL_II_WITH_ADOLC = ${DEAL_II_WITH_ADOLC}
     DEAL_II_WITH_TRILINOS = ${DEAL_II_WITH_TRILINOS}
-    DEAL_II_WITH_TRILINOS_WITH_SACADO = ${DEAL_II_WITH_TRILINOS_WITH_SACADO}
+    DEAL_II_TRILINOS_WITH_SACADO = ${DEAL_II_TRILINOS_WITH_SACADO}
     DEAL_II_WITH_SYMENGINE = ${DEAL_II_WITH_SYMENGINE}
 which conflict with the requirements.
 One or both of the aforementioned combinations of prerequisites are not met by your installation, but at least one is required for this tutorial step."
