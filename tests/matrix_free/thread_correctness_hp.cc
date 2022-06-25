@@ -146,7 +146,8 @@ do_test(const unsigned int parallel_option)
   MatrixFree<dim, number>                          mf_data;
   typename MatrixFree<dim, number>::AdditionalData data;
   data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
-  mf_data.reinit(dof, constraints, quadrature_collection_mf, data);
+  mf_data.reinit(
+    MappingQ1<dim>{}, dof, constraints, quadrature_collection_mf, data);
   MatrixFreeTestHP<dim, number> mf(mf_data);
 
   // test different block sizes, starting from
@@ -174,7 +175,8 @@ do_test(const unsigned int parallel_option)
           deallog << "Parallel option partition/color" << std::endl;
         }
       data.tasks_block_size = 1;
-      mf_data_par.reinit(dof, constraints, quadrature_collection_mf, data);
+      mf_data_par.reinit(
+        MappingQ1<dim>{}, dof, constraints, quadrature_collection_mf, data);
       MatrixFreeTestHP<dim, number> mf_par(mf_data_par);
 
       // fill a right hand side vector with random

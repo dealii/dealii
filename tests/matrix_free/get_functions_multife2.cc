@@ -328,7 +328,8 @@ test()
     std::vector<Quadrature<1>> quad;
     quad.push_back(QGauss<1>(1));
     quad.push_back(QGauss<1>(fe_degree + 1));
-    mf_data.reinit(dof,
+    mf_data.reinit(MappingQ1<dim>{},
+                   dof,
                    constraints,
                    quad,
                    typename MatrixFree<dim, number>::AdditionalData(

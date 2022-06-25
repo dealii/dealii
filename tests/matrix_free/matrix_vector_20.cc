@@ -180,7 +180,7 @@ test()
     data.tasks_parallel_scheme =
       MatrixFree<dim, number>::AdditionalData::partition_color;
     data.tasks_block_size = 7;
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   MatrixFreeTest<dim, fe_degree, number>          mf(mf_data);

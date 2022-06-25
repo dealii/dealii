@@ -1,0 +1,6 @@
+Removed: The deprecated functions MatrixFree::n_macro_cells(),
+MatrixFree::get_hp_cell_iterator(), MatrixFree::n_components_filled(),
+MatrixFree::get_dof_handler(), and
+MatrixFree::reinit() with default Mapping argument have been removed.
+<br>
+(Daniel Arndt, 2022/06/22)

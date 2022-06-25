@@ -58,7 +58,8 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
   add_data.mapping_update_flags_boundary_faces =
     update_values | update_JxW_values | update_quadrature_points;
   add_data.overlap_communication_computation = overlap_communication;
-  matrix_free.reinit(dof_handler,
+  matrix_free.reinit(MappingQ1<dim>{},
+                     dof_handler,
                      constraints,
                      QGauss<1>(fe.degree + 1),
                      add_data);

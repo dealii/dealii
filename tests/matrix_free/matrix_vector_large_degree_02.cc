@@ -96,7 +96,7 @@ test()
     const QGauss<1>                                  quad(fe_degree + 1);
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   MatrixFreeTest<dim, fe_degree, number, Vector<number>> mf(mf_data);

@@ -108,7 +108,7 @@ test(const bool adaptive_ref = true)
 
   {
     std::cout << "Compare active indices." << std::endl;
-    mf_data->reinit(dof, constraints, quad, additional_data);
+    mf_data->reinit(MappingQ1<dim>{}, dof, constraints, quad, additional_data);
     compare_indices(mf_data.get());
   }
 
@@ -116,7 +116,7 @@ test(const bool adaptive_ref = true)
     std::cout << "Compare level indices." << std::endl;
     const unsigned int level = tria.n_global_levels() - 1;
     additional_data.mg_level = level;
-    mf_data->reinit(dof, constraints, quad, additional_data);
+    mf_data->reinit(MappingQ1<dim>{}, dof, constraints, quad, additional_data);
     compare_indices(mf_data.get());
   }
 }

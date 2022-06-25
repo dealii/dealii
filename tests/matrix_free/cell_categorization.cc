@@ -87,7 +87,7 @@ test()
       static_cast<unsigned int>(cell->center()[1] * 10.);
 
   data.cell_vectorization_categories_strict = false;
-  mf_data.reinit(dof, constraints, QGauss<1>(2), data);
+  mf_data.reinit(MappingQ1<dim>{}, dof, constraints, QGauss<1>(2), data);
 
   deallog << "Number of cell batches: " << mf_data.n_cell_batches()
           << std::endl;
@@ -99,7 +99,7 @@ test()
   deallog << std::endl;
 
   data.cell_vectorization_categories_strict = true;
-  mf_data.reinit(dof, constraints, QGauss<1>(2), data);
+  mf_data.reinit(MappingQ1<dim>{}, dof, constraints, QGauss<1>(2), data);
   deallog << "Number of cell batches: " << mf_data.n_cell_batches()
           << std::endl;
   for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)
@@ -116,7 +116,7 @@ test()
             100000000);
 
   data.cell_vectorization_categories_strict = false;
-  mf_data.reinit(dof, constraints, QGauss<1>(2), data);
+  mf_data.reinit(MappingQ1<dim>{}, dof, constraints, QGauss<1>(2), data);
   deallog << "Number of cell batches: " << mf_data.n_cell_batches()
           << std::endl;
   for (unsigned int i = 0; i < mf_data.n_cell_batches(); ++i)

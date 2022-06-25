@@ -85,7 +85,7 @@ test()
   data.mapping_update_flags_boundary_faces =
     (update_gradients | update_JxW_values);
 
-  mf_data.reinit(dof, constraints, quad, data);
+  mf_data.reinit(MappingQ1<mydim>{}, dof, constraints, quad, data);
   mf_data.initialize_dof_vector(in);
   mf_data.initialize_dof_vector(out);
 
@@ -105,7 +105,7 @@ test()
   mf_data.renumber_dofs(renumbering);
   dof.renumber_dofs(renumbering);
 
-  mf_data.reinit(dof, constraints, quad, data);
+  mf_data.reinit(MappingQ1<mydim>{}, dof, constraints, quad, data);
   mf_data.initialize_dof_vector(in2);
   mf_data.initialize_dof_vector(out2);
   for (unsigned int i = 0; i < in.local_size(); ++i)

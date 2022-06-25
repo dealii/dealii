@@ -67,7 +67,8 @@ test(const unsigned int n_refinements)
     bool result = true;
 
     MatrixFree<dim, double> data;
-    data.reinit(dof_handler, dummy, quadrature, additional_data);
+    data.reinit(
+      MappingQ1<dim>{}, dof_handler, dummy, quadrature, additional_data);
 
     using VectorType = Vector<double>;
 

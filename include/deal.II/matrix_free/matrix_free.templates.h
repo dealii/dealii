@@ -308,30 +308,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_iterator(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-typename DoFHandler<dim>::active_cell_iterator
-MatrixFree<dim, Number, VectorizedArrayType>::get_hp_cell_iterator(
-  const unsigned int cell_batch_index,
-  const unsigned int lane_index,
-  const unsigned int dof_handler_index) const
-{
-  AssertIndexRange(dof_handler_index, dof_handlers.size());
-  AssertIndexRange(cell_batch_index, task_info.cell_partition_data.back());
-  AssertIndexRange(lane_index,
-                   n_active_entries_per_cell_batch(cell_batch_index));
-
-  std::pair<unsigned int, unsigned int> index =
-    cell_level_index[cell_batch_index * VectorizedArrayType::size() +
-                     lane_index];
-  return typename DoFHandler<dim>::cell_iterator(
-    &dof_handlers[dof_handler_index]->get_triangulation(),
-    index.first,
-    index.second,
-    &*dof_handlers[dof_handler_index]);
-}
-
-
-
-template <int dim, typename Number, typename VectorizedArrayType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::copy_from(
   const MatrixFree<dim, Number, VectorizedArrayType> &v)

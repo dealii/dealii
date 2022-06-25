@@ -78,7 +78,8 @@ test()
       deallog << "Checking " << fes[i]->get_name() << std::endl;
       dof.distribute_dofs(*fes[i]);
       MatrixFree<dim> matrix_free;
-      matrix_free.reinit(dof,
+      matrix_free.reinit(MappingQ1<dim>{},
+                         dof,
                          AffineConstraints<double>(),
                          QGauss<1>(degree + 3),
                          typename MatrixFree<dim>::AdditionalData());

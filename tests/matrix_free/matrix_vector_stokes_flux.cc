@@ -271,7 +271,8 @@ test()
   {
     QGauss<1> quad(fe_degree + 2);
     // no parallelism
-    mf_data.reinit(dof_handler,
+    mf_data.reinit(MappingQ1<dim>{},
+                   dof_handler,
                    constraints,
                    quad,
                    typename MatrixFree<dim>::AdditionalData(

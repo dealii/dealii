@@ -71,7 +71,7 @@ test()
     typename MatrixFree<dim>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim>::AdditionalData::none;
     data.mapping_update_flags  = update_JxW_values;
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   double error = 0, error2 = 0, abs = 0;
