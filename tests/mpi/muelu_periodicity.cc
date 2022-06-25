@@ -382,11 +382,11 @@ namespace Step22
       GridTools::collect_periodic_faces(
         dof_handler, 2, 3, 1, periodicity_vector, Tensor<1, dim>(), matrix);
 
-      DoFTools::make_periodicity_constraints<DoFHandler<dim>>(
-        periodicity_vector,
-        constraints,
-        fe.component_mask(velocities),
-        first_vector_components);
+      DoFTools::make_periodicity_constraints<dim, dim>(periodicity_vector,
+                                                       constraints,
+                                                       fe.component_mask(
+                                                         velocities),
+                                                       first_vector_components);
 #endif
     }
 
