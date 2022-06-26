@@ -1031,7 +1031,7 @@ namespace MatrixFreeTools
           integrator(
             matrix_free, range, dof_no, quad_no, first_selected_component);
 
-        unsigned int const dofs_per_cell = integrator.dofs_per_cell;
+        const unsigned int dofs_per_cell = integrator.dofs_per_cell;
 
         std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
         std::vector<types::global_dof_index> dof_indices_mf(dofs_per_cell);
