@@ -415,7 +415,17 @@ IndexSet::add_ranges_internal(
       tmp_set.ranges.reserve(tmp_ranges.size());
       for (const auto &i : tmp_ranges)
         tmp_set.add_range(i.first, i.second);
-      this->add_indices(tmp_set);
+
+      // Case if we have zero or just one range: Add into the other set with
+      // its indices, as that is cheaper
+      if (this->ranges.size() <= 1)
+        {
+          if (this->ranges.size() == 1)
+            tmp_set.add_range(ranges[0].begin, ranges[0].end);
+          std::swap(*this, tmp_set);
+        }
+      else
+        this->add_indices(tmp_set);
     }
   else
     for (const auto &i : tmp_ranges)
