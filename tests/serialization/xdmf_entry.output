@@ -1,6 +1,4 @@
 
-DEAL::0 0 1 11 solution.h5 7 mesh.h5 5.00000000000000000e-01 128 16 2 3 0 0 0 0
-
 DEAL::XDMFEntry before serialization: 
 DEAL::
 DEAL::<Grid Name="mesh" GridType="Uniform">

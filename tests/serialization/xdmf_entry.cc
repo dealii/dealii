@@ -43,7 +43,6 @@ test()
     oa << entry1;
     // archive and stream closed when destructors are called
   }
-  deallog << oss.str() << std::endl;
 
   // verify correctness of the serialization
   {
