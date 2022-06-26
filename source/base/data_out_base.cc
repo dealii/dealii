@@ -7985,13 +7985,24 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   // Output the XDMF file only on the root process
   if (myrank == 0)
     {
+      const auto &patches = get_patches();
+      Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
+      // We currently don't support writing mixed meshes:
+#ifdef DEBUG
+      for (const auto &patch : patches)
+        Assert(patch.reference_cell == patches[0].reference_cell,
+               ExcNotImplemented());
+#endif
+
+
       XDMFEntry    entry(h5_mesh_filename,
                       h5_solution_filename,
                       cur_time,
                       global_node_cell_count[0],
                       global_node_cell_count[1],
                       dim,
-                      spacedim);
+                      spacedim,
+                      patches[0].reference_cell);
       unsigned int n_data_sets = data_filter.n_data_sets();
 
       // The vector names generated here must match those generated in the HDF5
