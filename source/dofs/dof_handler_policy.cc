@@ -2522,8 +2522,8 @@ namespace internal
 
         /**
          * The part of the renumber_mg_dofs() functionality that operates on
-         * faces. This part is dimension dependent and so needs to be
-         * implemented in three separate specializations of the function.
+         * faces. There only needs to happen something if we are in 2D or 3D, so
+         * we need to separate out the 1D case.
          *
          * See renumber_mg_dofs() for the meaning of the arguments.
          */
@@ -2541,72 +2541,17 @@ namespace internal
 
 
 
-        template <int spacedim>
+        template <int dim, int spacedim>
         static void
         renumber_face_mg_dofs(
           const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &         indices_we_care_about,
-          DoFHandler<2, spacedim> &dof_handler,
-          const unsigned int       level,
-          const bool               check_validity)
-        {
-          if (dof_handler.get_fe().n_dofs_per_line() > 0)
-            {
-              // mark all lines adjacent to cells of the current
-              // level, as those lines logically belong to the same
-              // level as the cell, at least for for isotropic
-              // refinement
-              std::vector<bool> line_marked(
-                dof_handler.get_triangulation().n_raw_lines());
-              for (const auto &cell :
-                   dof_handler.cell_iterators_on_level(level))
-                if (cell->level_subdomain_id() !=
-                    numbers::artificial_subdomain_id)
-                  for (const unsigned int line : cell->face_indices())
-                    line_marked[cell->face(line)->index()] = true;
-
-              for (const auto &cell :
-                   dof_handler.cell_iterators_on_level(level))
-                for (const auto l : cell->line_indices())
-                  if (line_marked[cell->line(l)->index()])
-                    {
-                      for (unsigned int d = 0;
-                           d < dof_handler.get_fe().n_dofs_per_line();
-                           ++d)
-                        {
-                          const dealii::types::global_dof_index idx =
-                            cell->line(l)->mg_dof_index(level, d);
-                          if (check_validity)
-                            Assert(idx != numbers::invalid_dof_index,
-                                   ExcInternalError());
-
-                          if (idx != numbers::invalid_dof_index)
-                            cell->line(l)->set_mg_dof_index(
-                              level,
-                              d,
-                              ((indices_we_care_about.size() == 0) ?
-                                 new_numbers[idx] :
-                                 new_numbers[indices_we_care_about
-                                               .index_within_set(idx)]));
-                        }
-                      line_marked[cell->line(l)->index()] = false;
-                    }
-            }
-        }
-
-
-
-        template <int spacedim>
-        static void
-        renumber_face_mg_dofs(
-          const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &         indices_we_care_about,
-          DoFHandler<3, spacedim> &dof_handler,
-          const unsigned int       level,
-          const bool               check_validity)
+          const IndexSet &           indices_we_care_about,
+          DoFHandler<dim, spacedim> &dof_handler,
+          const unsigned int         level,
+          const bool                 check_validity)
         {
           if (dof_handler.get_fe().n_dofs_per_line() > 0 ||
-              dof_handler.get_fe().max_dofs_per_quad() > 0)
+              (dim > 2 && dof_handler.get_fe().max_dofs_per_quad() > 0))
             {
               // visit all lines/quads adjacent to cells of the current level
               // exactly once, as those lines/quads logically belong to the same
@@ -2614,7 +2559,7 @@ namespace internal
               std::vector<bool> line_touched(
                 dof_handler.get_triangulation().n_raw_lines());
               std::vector<bool> quad_touched(
-                dof_handler.get_triangulation().n_raw_quads());
+                dim > 2 ? dof_handler.get_triangulation().n_raw_quads() : 0);
               for (const auto &cell :
                    dof_handler.cell_iterators_on_level(level))
                 if (cell->level_subdomain_id() !=
@@ -2628,52 +2573,69 @@ namespace internal
                           {
                             const unsigned int dofs_per_line =
                               dof_handler.get_fe().n_dofs_per_line();
+                            dealii::types::global_dof_index *indices =
+                              &internal::DoFAccessorImplementation::
+                                Implementation::get_mg_dof_index(
+                                  dof_handler,
+                                  dof_handler.mg_levels[level],
+                                  dof_handler.mg_faces,
+                                  line->index(),
+                                  0,
+                                  0,
+                                  std::integral_constant<int, 1>());
                             for (unsigned int d = 0; d < dofs_per_line; ++d)
                               {
-                                const dealii::types::global_dof_index idx =
-                                  line->mg_dof_index(level, d);
                                 if (check_validity)
-                                  Assert(idx != numbers::invalid_dof_index,
+                                  Assert(indices[d] !=
+                                           numbers::invalid_dof_index,
                                          ExcInternalError());
 
-                                if (idx != numbers::invalid_dof_index)
-                                  line->set_mg_dof_index(
-                                    level,
-                                    d,
-                                    ((indices_we_care_about.size() == 0) ?
-                                       new_numbers[idx] :
-                                       new_numbers[indices_we_care_about
-                                                     .index_within_set(idx)]));
+                                if (indices[d] != numbers::invalid_dof_index)
+                                  indices[d] =
+                                    (indices_we_care_about.size() == 0) ?
+                                      new_numbers[indices[d]] :
+                                      new_numbers[indices_we_care_about
+                                                    .index_within_set(
+                                                      indices[d])];
                               }
                             line_touched[line->index()] = true;
                           }
                       }
 
                     // quads
-                    for (const auto quad : cell->face_indices())
-                      if (!quad_touched[cell->quad(quad)->index()])
-                        {
-                          const unsigned int dofs_per_quad =
-                            dof_handler.get_fe().n_dofs_per_quad(quad);
-                          for (unsigned int d = 0; d < dofs_per_quad; ++d)
-                            {
-                              const dealii::types::global_dof_index idx =
-                                cell->quad(quad)->mg_dof_index(level, d);
-                              if (check_validity)
-                                Assert(idx != numbers::invalid_dof_index,
-                                       ExcInternalError());
+                    if (dim > 2)
+                      for (const auto quad : cell->face_indices())
+                        if (!quad_touched[cell->quad(quad)->index()])
+                          {
+                            const unsigned int dofs_per_quad =
+                              dof_handler.get_fe().n_dofs_per_quad(quad);
+                            dealii::types::global_dof_index *indices =
+                              &internal::DoFAccessorImplementation::
+                                Implementation::get_mg_dof_index(
+                                  dof_handler,
+                                  dof_handler.mg_levels[level],
+                                  dof_handler.mg_faces,
+                                  cell->quad(quad)->index(),
+                                  0,
+                                  0,
+                                  std::integral_constant<int, 2>());
+                            for (unsigned int d = 0; d < dofs_per_quad; ++d)
+                              {
+                                if (check_validity)
+                                  Assert(indices[d] !=
+                                           numbers::invalid_dof_index,
+                                         ExcInternalError());
 
-                              if (idx != numbers::invalid_dof_index)
-                                cell->quad(quad)->set_mg_dof_index(
-                                  level,
-                                  d,
-                                  ((indices_we_care_about.size() == 0) ?
-                                     new_numbers[idx] :
-                                     new_numbers[indices_we_care_about
-                                                   .index_within_set(idx)]));
-                            }
-                          quad_touched[cell->quad(quad)->index()] = true;
-                        }
+                                if (indices[d] != numbers::invalid_dof_index)
+                                  indices[d] =
+                                    (indices_we_care_about.size() == 0) ?
+                                      new_numbers[indices[d]] :
+                                      new_numbers[indices_we_care_about
+                                                    .index_within_set(
+                                                      indices[d])];
+                              }
+                            quad_touched[cell->quad(quad)->index()] = true;
+                          }
                   }
             }
         }
