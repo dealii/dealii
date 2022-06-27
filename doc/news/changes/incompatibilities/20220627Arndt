@@ -1,0 +1,4 @@
+Removed: The deprecated header file lac/parallel_block_vector.h
+has been removed.
+<br>
+(Daniel Arndt, 2022/06/27)
