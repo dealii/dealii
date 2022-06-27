@@ -1,0 +1,4 @@
+Removed: The deprecated overload of XDMFEntry::get_xdmf_content()
+has been removed.
+<br>
+(Daniel Arndt, 2022/06/27)
