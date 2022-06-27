@@ -145,7 +145,8 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
   additional_data.mapping_update_flags =
     update_values | update_JxW_values | update_quadrature_points;
   std::shared_ptr<MatrixFree<dim, double>> data(new MatrixFree<dim, double>());
-  data->reinit(dof_handlers_mf,
+  data->reinit(MappingQ1<dim>{},
+               dof_handlers_mf,
                constraints_mf,
                quadrature_formula_1d,
                additional_data);

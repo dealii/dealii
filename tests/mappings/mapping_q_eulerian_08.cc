@@ -319,7 +319,8 @@ test(const unsigned int n_ref = 0)
                             mg_additional_data);
 
       MatrixFree<dim, LevelNumberType> mg_level;
-      mg_level.reinit(dof_handler,
+      mg_level.reinit(MappingQ1<dim>{},
+                      dof_handler,
                       level_constraints,
                       quadrature_formula,
                       mg_additional_data);
