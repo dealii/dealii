@@ -1070,7 +1070,8 @@ namespace StokesClass
 
     std::shared_ptr<MatrixFree<dim, double>> stokes_mf_storage(
       new MatrixFree<dim, double>());
-    stokes_mf_storage->reinit(stokes_dofs,
+    stokes_mf_storage->reinit(MappingQ1<dim>{},
+                              stokes_dofs,
                               stokes_constraints,
                               QGauss<1>(degree_u + 1),
                               additional_data_stokes);
