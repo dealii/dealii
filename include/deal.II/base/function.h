@@ -565,27 +565,6 @@ namespace Functions
 } // namespace Functions
 
 /**
- * Provide a function which always returns the constant values handed to the
- * constructor.
- *
- * @deprecated use Functions::ConstantFunction instead.
- */
-template <int dim, typename RangeNumberType = double>
-using ConstantFunction DEAL_II_DEPRECATED =
-  Functions::ConstantFunction<dim, RangeNumberType>;
-
-/**
- * Provide a function which always returns zero.
- *
- * @deprecated use Functions::ZeroFunction instead.
- */
-template <int dim, typename RangeNumberType = double>
-using ZeroFunction DEAL_II_DEPRECATED =
-  Functions::ZeroFunction<dim, RangeNumberType>;
-
-
-
-/**
  * This is a constant vector-valued function, in which one or more components
  * of the vector have a constant value and all other components are zero.  It
  * is especially useful as a weight function for

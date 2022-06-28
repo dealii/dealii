@@ -244,7 +244,7 @@ we can compute $\|u\| \approx \|u_h\|=\|0-u_h\|$ by calling
     Vector<float> norm_per_cell(triangulation.n_active_cells());
     VectorTools::integrate_difference(dof_handler,
                                       solution,
-                                      ZeroFunction<dim>(),
+                                      Functions::ZeroFunction<dim>(),
                                       norm_per_cell,
                                       QGauss<dim>(fe->degree + 1),
                                       VectorTools::L2_norm);

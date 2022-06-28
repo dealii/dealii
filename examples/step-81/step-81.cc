@@ -548,13 +548,13 @@ namespace Step81
     VectorTools::project_boundary_values_curl_conforming_l2(
       dof_handler,
       0, /* real part */
-      dealii::ZeroFunction<dim>(2 * dim),
+      Functions::ZeroFunction<dim>(2 * dim),
       0, /* boundary id */
       constraints);
     VectorTools::project_boundary_values_curl_conforming_l2(
       dof_handler,
       dim, /* imaginary part */
-      dealii::ZeroFunction<dim>(2 * dim),
+      Functions::ZeroFunction<dim>(2 * dim),
       0, /* boundary id */
       constraints);
 

@@ -1,0 +1,4 @@
+Removed: The deprecated classes ConstantFunction and ZeroFunction
+have been removed.
+<br>
+(Daniel Arndt, 2022/06/24)
