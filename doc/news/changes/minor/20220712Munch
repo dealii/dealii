@@ -1,0 +1,4 @@
+Improved: Refinement and coarsening flags are now
+communicated in parallel::shared::Triangulation.
+<br>
+(Peter Munch, 2022/07/12)

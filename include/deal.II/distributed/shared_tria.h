@@ -69,10 +69,9 @@ namespace parallel
      * about cells owned by other processors with the exception of a single
      * layer of ghost cells around their own part of the domain.
      *
-     * As a consequence of storing the entire mesh on each processor, active
-     * cells need to be flagged for refinement or coarsening consistently on
-     * all processors if you want to adapt them, regardless of being classified
-     * as locally owned, ghost or artificial.
+     * Active cells need to be flagged for refinement or coarsening
+     * locally owned cells. The relevant information is gathered for
+     * ghost and artificial cells internally via MPI communication.
      *
      * The class is also useful in cases where compute time and memory
      * considerations dictate that the program needs to be run in parallel,
