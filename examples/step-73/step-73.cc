@@ -23,7 +23,7 @@
 // related ones. They have been discussed in detail in previous tutorial
 // programs, so you need only refer to past tutorials for details.
 #include <deal.II/base/function.h>
-#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/symmetric_tensor.h>
@@ -75,7 +75,7 @@
 // We then stick everything that relates to this tutorial program into a
 // namespace of its own, and import all the deal.II function and class names
 // into it:
-namespace Cook_Membrane
+namespace Step73
 {
   using namespace dealii;
 
@@ -83,372 +83,152 @@ namespace Cook_Membrane
 //
 // There are several parameters that can be set in the code so we set up a
 // ParameterHandler object to read in the choices at run-time.
-  namespace Parameters
-  {
-// @sect4{Assembly method}
 
-// Here we specify whether automatic differentiation is to be used to assemble
-// the linear system, and if so then what order of differentiation is to be
-// employed.
-    struct AssemblyMethod
+    struct Parameters : ParameterAcceptor
     {
-      unsigned int automatic_differentiation_order;
-      std::string automatic_differentiation_library;
+      Parameters();
 
-      static void
-      declare_parameters(ParameterHandler &prm);
+      // Assembly method
+      unsigned int automatic_differentiation_order = 0;
+      std::string automatic_differentiation_library = "None";
 
-      void
-      parse_parameters(ParameterHandler &prm);
+      // Finite Element system
+      unsigned int poly_degree = 2;
+      unsigned int quad_order = poly_degree + 1;
+
+      // Geometry
+      unsigned int elements_per_edge = 32;
+      double       scale = 1e-3;
+
+      // Materials
+      double nu = 0.3;
+      double mu = 0.4225e6;
+
+       // Linear solver
+      std::string type_lin = "CG";
+      double      tol_lin = 1e-6;
+      std::string preconditioner_type = "ssor";
+      double      preconditioner_relaxation = 0.65;
+
+      // Nonlinear solver
+      unsigned int max_iterations_NR = 10;
+      double       tol_f = 1.0e-9;
+      double       tol_u = 1.0e-6;
+
+       // Time
+      double delta_t = 0.1;
+      double end_time = 1.0;
+
+      bool initialized = false;
     };
 
 
-    void AssemblyMethod::declare_parameters(ParameterHandler &prm)
+    Parameters::Parameters()
+      : ParameterAcceptor()
     {
-      prm.enter_subsection("Assembly method");
+      auto &prm = ParameterAcceptor::prm;
+
+      enter_subsection("Assembly method");
       {
-        prm.declare_entry("Automatic differentiation order", "0",
-                          Patterns::Integer(0,2),
+        add_parameter("Automatic differentiation order", automatic_differentiation_order,
                           "The automatic differentiation order to be used in the assembly of the linear system.\n"
-                          "# Order = 0: Both the residual and linearisation are computed manually.\n"
-                          "# Order = 1: The residual is computed manually but the linearisation is performed using AD.\n"
-                          "# Order = 2: Both the residual and linearisation are computed using AD.");
+                          "- Order = 0: Both the residual and linearisation are computed manually.\n"
+                          "- Order = 1: The residual is computed manually but the linearisation is performed using AD.\n"
+                          "- Order = 2: Both the residual and linearisation are computed using AD.",
+                         prm, Patterns::Integer(0,2));
 
-        prm.declare_entry("Automatic differentiation library", "None",
-                          Patterns::Selection("None|ADOL-C|Sacado"),
-                          "The automatic differentiation library to be used in the assembly of the linear system.");
+        add_parameter("Automatic differentiation library", automatic_differentiation_library,
+                          "The automatic differentiation library to be used in the assembly of the linear system.",
+                          prm,Patterns::Selection("None|ADOL-C|Sacado"));
       }
-      prm.leave_subsection();
-    }
+      leave_subsection ();
+      
+       enter_subsection("Finite element system");
+       {
+       add_parameter("Polynomial degree", poly_degree,
+                          "Displacement system polynomial order",
+                          prm,Patterns::Integer(0));
 
-    void AssemblyMethod::parse_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Assembly method");
+       add_parameter("Quadrature order", quad_order,
+                          "Gauss quadrature order",
+                          prm,Patterns::Integer(0));
+      }
+      leave_subsection ();
+
+      enter_subsection("Geometry");
       {
-        automatic_differentiation_order = prm.get_integer("Automatic differentiation order");
-        automatic_differentiation_library = prm.get("Automatic differentiation library");
+       add_parameter("Elements per edge", elements_per_edge,
+                          "Number of elements per long edge of the beam",
+                          prm,Patterns::Integer(0));
+
+       add_parameter("Grid scale", scale,
+                          "Global grid scaling factor",
+                          prm,Patterns::Double(0.0));
       }
-      prm.leave_subsection();
-    }
+      leave_subsection ();
 
-// @sect4{Finite Element system}
-
-// Here we specify the polynomial order used to approximate the solution.
-// The quadrature order should be adjusted accordingly.
-    struct FESystem
-    {
-      unsigned int poly_degree;
-      unsigned int quad_order;
-
-      static void
-      declare_parameters(ParameterHandler &prm);
-
-      void
-      parse_parameters(ParameterHandler &prm);
-    };
-
-
-    void FESystem::declare_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Finite element system");
+      enter_subsection("Linear solver");
       {
-        prm.declare_entry("Polynomial degree", "2",
-                          Patterns::Integer(0),
-                          "Displacement system polynomial order");
+       add_parameter("Solver type", type_lin,
+                          "Type of solver used to solve the linear system",
+                          prm,Patterns::Selection("CG|Direct"));
 
-        prm.declare_entry("Quadrature order", "3",
-                          Patterns::Integer(0),
-                          "Gauss quadrature order");
+       add_parameter("Residual", tol_lin,
+                          "Linear solver residual (scaled by residual norm)",
+                          prm,Patterns::Double(0.0));
+
+       add_parameter("Preconditioner type",preconditioner_type,
+                          "Type of preconditioner",
+                          prm,Patterns::Selection("jacobi|ssor"));
+
+       add_parameter("Preconditioner relaxation", preconditioner_relaxation,
+                          "Preconditioner relaxation value",
+                          prm,Patterns::Double(0.0));
       }
-      prm.leave_subsection();
-    }
-
-    void FESystem::parse_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Finite element system");
+      leave_subsection ();
+       
+      enter_subsection("Material properties");
       {
-        poly_degree = prm.get_integer("Polynomial degree");
-        quad_order = prm.get_integer("Quadrature order");
+       add_parameter("Poisson's ratio", nu,
+                          "Poisson's ratio",
+                          prm,Patterns::Double(-1.0,0.5));
+
+       add_parameter("Shear modulus", mu,
+                          "Shear modulus",
+                          prm,Patterns::Double());
       }
-      prm.leave_subsection();
-    }
+      leave_subsection ();
 
-// @sect4{Geometry}
-
-// Make adjustments to the problem geometry and its discretisation.
-    struct Geometry
-    {
-      unsigned int elements_per_edge;
-      double       scale;
-
-      static void
-      declare_parameters(ParameterHandler &prm);
-
-      void
-      parse_parameters(ParameterHandler &prm);
-    };
-
-    void Geometry::declare_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Geometry");
+      enter_subsection("Nonlinear solver");
       {
-        prm.declare_entry("Elements per edge", "32",
-                          Patterns::Integer(0),
-                          "Number of elements per long edge of the beam");
+       add_parameter("Max iterations Newton-Raphson", max_iterations_NR,
+                          "Number of Newton-Raphson iterations allowed",
+                          prm,Patterns::Integer(0));
 
-        prm.declare_entry("Grid scale", "1e-3",
-                          Patterns::Double(0.0),
-                          "Global grid scaling factor");
+       add_parameter("Tolerance force", tol_f,
+                          "Force residual tolerance",
+                          prm,Patterns::Double(0.0));
+
+       add_parameter("Tolerance displacement", tol_u,
+                          "Displacement error tolerance",
+                         prm, Patterns::Double(0.0));
       }
-      prm.leave_subsection();
-    }
+      leave_subsection ();
 
-    void Geometry::parse_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Geometry");
+      enter_subsection("Time");
       {
-        elements_per_edge = prm.get_integer("Elements per edge");
-        scale = prm.get_double("Grid scale");
+       add_parameter("End time", end_time,
+                          "End time",
+                          prm,Patterns::Double());
+
+       add_parameter("Time step size", delta_t,
+                          "Time step size",
+                          prm,Patterns::Double());
       }
-      prm.leave_subsection();
+      leave_subsection ();
+
+      parse_parameters_call_back.connect([&]() { initialized = true; });
     }
-
-// @sect4{Materials}
-
-// We also need the shear modulus $ \mu $ and Poisson ration $ \nu $ for the
-// neo-Hookean material.
-    struct Materials
-    {
-      double nu;
-      double mu;
-
-      static void
-      declare_parameters(ParameterHandler &prm);
-
-      void
-      parse_parameters(ParameterHandler &prm);
-    };
-
-    void Materials::declare_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Material properties");
-      {
-        prm.declare_entry("Poisson's ratio", "0.3",
-                          Patterns::Double(-1.0,0.5),
-                          "Poisson's ratio");
-
-        prm.declare_entry("Shear modulus", "0.4225e6",
-                          Patterns::Double(),
-                          "Shear modulus");
-      }
-      prm.leave_subsection();
-    }
-
-    void Materials::parse_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Material properties");
-      {
-        nu = prm.get_double("Poisson's ratio");
-        mu = prm.get_double("Shear modulus");
-      }
-      prm.leave_subsection();
-    }
-
-// @sect4{Linear solver}
-
-// Next, we choose both solver and preconditioner settings.  The use of an
-// effective preconditioner is critical to ensure convergence when a large
-// nonlinear motion occurs within a Newton increment.
-    struct LinearSolver
-    {
-      std::string type_lin;
-      double      tol_lin;
-      std::string preconditioner_type;
-      double      preconditioner_relaxation;
-
-      static void
-      declare_parameters(ParameterHandler &prm);
-
-      void
-      parse_parameters(ParameterHandler &prm);
-    };
-
-    void LinearSolver::declare_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Linear solver");
-      {
-        prm.declare_entry("Solver type", "CG",
-                          Patterns::Selection("CG|Direct"),
-                          "Type of solver used to solve the linear system");
-
-        prm.declare_entry("Residual", "1e-6",
-                          Patterns::Double(0.0),
-                          "Linear solver residual (scaled by residual norm)");
-
-        prm.declare_entry("Preconditioner type", "ssor",
-                          Patterns::Selection("jacobi|ssor"),
-                          "Type of preconditioner");
-
-        prm.declare_entry("Preconditioner relaxation", "0.65",
-                          Patterns::Double(0.0),
-                          "Preconditioner relaxation value");
-      }
-      prm.leave_subsection();
-    }
-
-    void LinearSolver::parse_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Linear solver");
-      {
-        type_lin = prm.get("Solver type");
-        tol_lin = prm.get_double("Residual");
-        preconditioner_type = prm.get("Preconditioner type");
-        preconditioner_relaxation = prm.get_double("Preconditioner relaxation");
-      }
-      prm.leave_subsection();
-    }
-
-// @sect4{Nonlinear solver}
-
-// A Newton-Raphson scheme is used to solve the nonlinear system of governing
-// equations.  We now define the tolerances and the maximum number of
-// iterations for the Newton-Raphson nonlinear solver.
-    struct NonlinearSolver
-    {
-      unsigned int max_iterations_NR;
-      double       tol_f;
-      double       tol_u;
-
-      static void
-      declare_parameters(ParameterHandler &prm);
-
-      void
-      parse_parameters(ParameterHandler &prm);
-    };
-
-    void NonlinearSolver::declare_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Nonlinear solver");
-      {
-        prm.declare_entry("Max iterations Newton-Raphson", "10",
-                          Patterns::Integer(0),
-                          "Number of Newton-Raphson iterations allowed");
-
-        prm.declare_entry("Tolerance force", "1.0e-9",
-                          Patterns::Double(0.0),
-                          "Force residual tolerance");
-
-        prm.declare_entry("Tolerance displacement", "1.0e-6",
-                          Patterns::Double(0.0),
-                          "Displacement error tolerance");
-      }
-      prm.leave_subsection();
-    }
-
-    void NonlinearSolver::parse_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Nonlinear solver");
-      {
-        max_iterations_NR = prm.get_integer("Max iterations Newton-Raphson");
-        tol_f = prm.get_double("Tolerance force");
-        tol_u = prm.get_double("Tolerance displacement");
-      }
-      prm.leave_subsection();
-    }
-
-// @sect4{Time}
-
-// Set the timestep size $ \varDelta t $ and the simulation end-time.
-    struct Time
-    {
-      double delta_t;
-      double end_time;
-
-      static void
-      declare_parameters(ParameterHandler &prm);
-
-      void
-      parse_parameters(ParameterHandler &prm);
-    };
-
-    void Time::declare_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Time");
-      {
-        prm.declare_entry("End time", "1",
-                          Patterns::Double(),
-                          "End time");
-
-        prm.declare_entry("Time step size", "0.1",
-                          Patterns::Double(),
-                          "Time step size");
-      }
-      prm.leave_subsection();
-    }
-
-    void Time::parse_parameters(ParameterHandler &prm)
-    {
-      prm.enter_subsection("Time");
-      {
-        end_time = prm.get_double("End time");
-        delta_t = prm.get_double("Time step size");
-      }
-      prm.leave_subsection();
-    }
-
-// @sect4{All parameters}
-
-// Finally we consolidate all of the above structures into a single container
-// that holds all of our run-time selections.
-    struct AllParameters :
-      public AssemblyMethod,
-      public FESystem,
-      public Geometry,
-      public Materials,
-      public LinearSolver,
-      public NonlinearSolver,
-      public Time
-
-    {
-      AllParameters(const std::string &input_file);
-
-      static void
-      declare_parameters(ParameterHandler &prm);
-
-      void
-      parse_parameters(ParameterHandler &prm);
-    };
-
-    AllParameters::AllParameters(const std::string &input_file)
-    {
-      ParameterHandler prm;
-      declare_parameters(prm);
-      prm.parse_input(input_file);
-      parse_parameters(prm);
-    }
-
-    void AllParameters::declare_parameters(ParameterHandler &prm)
-    {
-      AssemblyMethod::declare_parameters(prm);
-      FESystem::declare_parameters(prm);
-      Geometry::declare_parameters(prm);
-      Materials::declare_parameters(prm);
-      LinearSolver::declare_parameters(prm);
-      NonlinearSolver::declare_parameters(prm);
-      Time::declare_parameters(prm);
-    }
-
-    void AllParameters::parse_parameters(ParameterHandler &prm)
-    {
-      AssemblyMethod::parse_parameters(prm);
-      FESystem::parse_parameters(prm);
-      Geometry::parse_parameters(prm);
-      Materials::parse_parameters(prm);
-      LinearSolver::parse_parameters(prm);
-      NonlinearSolver::parse_parameters(prm);
-      Time::parse_parameters(prm);
-    }
-  }
 
 
 // @sect3{Time class}
@@ -711,7 +491,7 @@ namespace Cook_Membrane
     // initialize all tensors correctly: The second one updates the stored
     // values and stresses based on the current deformation measure
     // $\textrm{Grad}\mathbf{u}_{\textrm{n}}$.
-    void setup_lqp (const Parameters::AllParameters &parameters)
+    void setup_lqp (const Parameters &parameters)
     {
       material.reset(new Material_Compressible_Neo_Hook_One_Field<dim,NumberType>(parameters.mu,
                      parameters.nu));
@@ -770,7 +550,7 @@ namespace Cook_Membrane
   class Solid
   {
   public:
-    Solid(const Parameters::AllParameters &parameters);
+    Solid(const Parameters &parameters);
 
     virtual
     ~Solid();
@@ -831,7 +611,7 @@ namespace Cook_Membrane
 
     // Finally, some member variables that describe the current state: A
     // collection of the parameters used to describe the problem setup...
-    const Parameters::AllParameters &parameters;
+    const Parameters &parameters;
 
     // ...the volume of the reference and current configurations...
     double                           vol_reference;
@@ -949,7 +729,7 @@ namespace Cook_Membrane
 
 // We initialise the Solid class using data extracted from the parameter file.
   template <int dim,typename NumberType>
-  Solid<dim,NumberType>::Solid(const Parameters::AllParameters &parameters)
+  Solid<dim,NumberType>::Solid(const Parameters &parameters)
     :
     parameters(parameters),
     vol_reference (0.0),
@@ -1615,7 +1395,7 @@ namespace Cook_Membrane
       // Aliases for data referenced from the Solid class
       const unsigned int &n_q_points_f = data.solid->n_q_points_f;
       const unsigned int &dofs_per_cell = data.solid->dofs_per_cell;
-      const Parameters::AllParameters &parameters = data.solid->parameters;
+      const Parameters &parameters = data.solid->parameters;
       const Time &time = data.solid->time;
       const FESystem<dim> &fe = data.solid->fe;
       const unsigned int &u_dof = data.solid->u_dof;
@@ -2341,13 +2121,21 @@ namespace Cook_Membrane
 int main (int argc, char *argv[])
 {
   using namespace dealii;
-  using namespace Cook_Membrane;
+  using namespace Step73;
 
   const unsigned int dim = 2;
   try
     {
       deallog.depth_console(0);
-      Parameters::AllParameters parameters("parameters.prm");
+      const Parameters parameters;
+
+      std::string parameter_file;
+      if (argc > 1)
+        parameter_file = argv[1];
+      else
+        parameter_file = "parameters.prm";
+      ParameterAcceptor::initialize(parameter_file, "used_parameters.prm");
+
       if (parameters.automatic_differentiation_order == 0)
         {
           std::cout << "Assembly method: Residual and linearisation are computed manually." << std::endl;
