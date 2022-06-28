@@ -378,7 +378,8 @@ namespace internal
       }
 
       /**
-       * Determine range of dofs of object in global data structure.
+       * Determine start index and number of dofs of object in global data
+       * structure.
        *
        * The template argument `structdim` indicates the
        * dimensionality of the object on which we seek to know the DoF
@@ -401,11 +402,10 @@ namespace internal
           {
             const unsigned int ptr_0 =
               dof_handler.object_dof_ptr[obj_level][structdim][obj_index];
-            const unsigned int ptr_1 =
-              ptr_0 +
+            const unsigned int length =
               dof_handler.get_fe(fe_index).template n_dofs_per_object<dim>(0);
 
-            return {ptr_0, ptr_1};
+            return {ptr_0, length};
           }
 
         // 2) hp is not used -> fe_index == 0
@@ -416,10 +416,11 @@ namespace internal
 
             const unsigned int ptr_0 =
               dof_handler.object_dof_ptr[obj_level][structdim][obj_index];
-            const unsigned int ptr_1 =
-              dof_handler.object_dof_ptr[obj_level][structdim][obj_index + 1];
+            const unsigned int length =
+              dof_handler.object_dof_ptr[obj_level][structdim][obj_index + 1] -
+              ptr_0;
 
-            return {ptr_0, ptr_1};
+            return {ptr_0, length};
           }
 
         // 3) hp is used
@@ -463,7 +464,7 @@ namespace internal
                            [dof_handler.hp_object_fe_ptr[structdim][obj_index] +
                             fe_index_local + 1];
 
-        return {ptr_0, ptr_1};
+        return {ptr_0, ptr_1 - ptr_0};
       }
 
       template <int dim, int spacedim, int structdim, bool level_dof_access>
@@ -492,46 +493,6 @@ namespace internal
 
 
 
-      // The next few internal helper functions are needed to support various
-      // DoFIndicesType kinds, e.g. actual vectors of DoFIndices or empty
-      // types that we use when we only want to work on the internally stored
-      // DoFs and never extract any number.
-      static unsigned int
-      get_array_length(const std::vector<types::global_dof_index> &array)
-      {
-        return array.size();
-      }
-
-      static unsigned int
-      get_array_length(const std::tuple<> &)
-      {
-        return 0;
-      }
-
-      static types::global_dof_index &
-      get_array_entry(std::vector<types::global_dof_index> &array,
-                      const unsigned int                    index)
-      {
-        AssertIndexRange(index, array.size());
-        return array[index];
-      }
-
-      static types::global_dof_index
-      get_array_entry(const std::vector<types::global_dof_index> &array,
-                      const unsigned int                          index)
-      {
-        AssertIndexRange(index, array.size());
-        return array[index];
-      }
-
-      static types::global_dof_index
-      get_array_entry(const std::tuple<> &, const unsigned int)
-      {
-        return numbers::invalid_dof_index;
-      }
-
-
-
       /**
        * Process all dofs of an object.
        *
@@ -543,34 +504,33 @@ namespace internal
       template <int dim,
                 int spacedim,
                 int structdim,
-                typename DoFIndicesType,
                 typename DoFProcessor,
                 typename DoFMapping>
-      static void
+      static DEAL_II_ALWAYS_INLINE void
       process_object(const DoFHandler<dim, spacedim> &             dof_handler,
                      const unsigned int                            obj_level,
                      const unsigned int                            obj_index,
                      const unsigned int                            fe_index,
                      const DoFMapping &                            mapping,
                      const std::integral_constant<int, structdim> &dd,
-                     DoFIndicesType &    local_indices,
-                     unsigned int &      index,
-                     const DoFProcessor &process)
+                     types::global_dof_index *&dof_indices_ptr,
+                     const DoFProcessor &      process)
       {
         Assert(structdim == dim || obj_level == 0, ExcNotImplemented());
 
         // determine range of dofs in global data structure
         const auto range =
           process_object_range(dof_handler, obj_level, obj_index, fe_index, dd);
+        types::global_dof_index *DEAL_II_RESTRICT stored_indices =
+          &dof_handler.object_dof_indices[structdim < dim ? 0 : obj_level]
+                                         [structdim][range.first];
 
         // process dofs
-        for (unsigned int i = 0, k = range.first; k < range.second;
-             ++i, ++k, ++index)
-          process(dof_handler.object_dof_indices
-                    [structdim < dim ? 0 : obj_level][structdim]
-                    [range.first +
-                     ((structdim == 0 || structdim == dim) ? i : mapping(i))],
-                  get_array_entry(local_indices, index));
+        for (unsigned int i = 0; i < range.second; ++i, ++dof_indices_ptr)
+          process(
+            stored_indices[(structdim == 0 || structdim == dim) ? i :
+                                                                  mapping(i)],
+            dof_indices_ptr);
       }
 
 
@@ -960,34 +920,62 @@ namespace internal
 
             unsigned int index = 0;
 
-            const auto diff = [](const auto &p) { return p.second - p.first; };
-
             // 1) VERTEX dofs
             for (const auto vertex : accessor.vertex_indices())
-              index +=
-                diff(process_object_range(accessor.get_dof_handler(),
-                                          0,
-                                          accessor.vertex_index(vertex),
-                                          fe_index,
-                                          std::integral_constant<int, 0>()));
+              index += process_object_range(accessor.get_dof_handler(),
+                                            0,
+                                            accessor.vertex_index(vertex),
+                                            fe_index,
+                                            std::integral_constant<int, 0>())
+                         .second;
 
             // 2) LINE dofs
             if (structdim == 2 || structdim == 3)
               for (const auto line : accessor.line_indices())
                 index +=
-                  diff(process_object_range(*accessor.line(line), fe_index));
+                  process_object_range(*accessor.line(line), fe_index).second;
 
             // 3) FACE dofs
             if (structdim == 3)
               for (const auto face : accessor.face_indices())
                 index +=
-                  diff(process_object_range(*accessor.quad(face), fe_index));
+                  process_object_range(*accessor.quad(face), fe_index).second;
 
             // 4) INNER dofs
-            index += diff(process_object_range(accessor, fe_index));
+            index += process_object_range(accessor, fe_index).second;
 
             return index;
           }
+      }
+
+
+
+      // The next few internal helper functions are needed to support various
+      // DoFIndicesType kinds, e.g. actual vectors of DoFIndices or empty
+      // types that we use when we only want to work on the internally stored
+      // DoFs and never extract any number.
+      static unsigned int
+      get_array_length(const std::vector<types::global_dof_index> &array)
+      {
+        return array.size();
+      }
+
+      static unsigned int
+      get_array_length(const std::tuple<> &)
+      {
+        return 0;
+      }
+
+      static types::global_dof_index *
+      get_array_ptr(const std::vector<types::global_dof_index> &array)
+      {
+        return const_cast<types::global_dof_index *>(array.data());
+      }
+
+      static types::global_dof_index *
+      get_array_ptr(const std::tuple<> &)
+      {
+        return nullptr;
       }
 
 
@@ -1024,20 +1012,19 @@ namespace internal
         // we want to pass in rvalue 'std::tuple<>' types as `DoFIndicesType`,
         // but we need non-const references for std::vector<> types, so get in
         // a const reference here and immediately cast the constness away -
-        // note that we prevent the use of the dereferenced invalid type, as
-        // we only return an rvalue `types::global_dof_index` into the lambda
-        // function DoFOperation that operates on it
-        DoFIndicesType &dof_indices =
-          const_cast<DoFIndicesType &>(const_dof_indices);
-
-        unsigned int index = 0;
+        // note that any use of the dereferenced invalid type will result in a
+        // segfault
+        types::global_dof_index *dof_indices_ptr =
+          get_array_ptr(const_dof_indices);
+        types::global_dof_index *end_dof_indices =
+          dof_indices_ptr + get_array_length(const_dof_indices);
 
         // 1) VERTEX dofs, only step into the functions if we actually have
         // DoFs on them
         if (fe.n_dofs_per_vertex() > 0)
           for (const auto vertex : accessor.vertex_indices())
             dof_operation.process_vertex_dofs(
-              accessor, vertex, index, dof_indices, fe_index, dof_processor);
+              accessor, vertex, dof_indices_ptr, fe_index, dof_processor);
 
         // 2) copy dof numbers from the LINE. for lines with the wrong
         // orientation (which might occur in 3d), we have already made sure that
@@ -1054,8 +1041,7 @@ namespace internal
                 dof_operation.process_dofs(
                   *accessor.line(line),
                   [](const auto d) { return d; },
-                  index,
-                  dof_indices,
+                  dof_indices_ptr,
                   fe_index,
                   dof_processor);
               else
@@ -1065,8 +1051,7 @@ namespace internal
                     return fe.adjust_line_dof_index_for_line_orientation(
                       d, line_orientation);
                   },
-                  index,
-                  dof_indices,
+                  dof_indices_ptr,
                   fe_index,
                   dof_processor);
             }
@@ -1088,8 +1073,7 @@ namespace internal
                 dof_operation.process_dofs(
                   *accessor.quad(quad),
                   [](const auto d) { return d; },
-                  index,
-                  dof_indices,
+                  dof_indices_ptr,
                   fe_index,
                   dof_processor);
               else
@@ -1103,8 +1087,7 @@ namespace internal
                       accessor.face_flip(quad),
                       accessor.face_rotation(quad));
                   },
-                  index,
-                  dof_indices,
+                  dof_indices_ptr,
                   fe_index,
                   dof_processor);
             }
@@ -1119,13 +1102,12 @@ namespace internal
           dof_operation.process_dofs(
             accessor,
             [&](const auto d) { return d; },
-            index,
-            dof_indices,
+            dof_indices_ptr,
             fe_index,
             dof_processor);
 
         AssertDimension(n_dof_indices(accessor, fe_index, count_level_dofs),
-                        index);
+                        dof_indices_ptr - get_array_ptr(const_dof_indices));
 
         // PM: This is a part that should not be reached since it indicates that
         // an object (and/or its subobjects) is not active. However,
@@ -1134,8 +1116,8 @@ namespace internal
         // get_dof_indices() also for artificial faces to determine if a face
         // is artificial.
         types::global_dof_index invalid_index = numbers::invalid_dof_index;
-        for (; index < get_array_length(dof_indices); ++index)
-          dof_processor(invalid_index, get_array_entry(dof_indices, index));
+        for (; dof_indices_ptr < end_dof_indices; ++dof_indices_ptr)
+          dof_processor(invalid_index, dof_indices_ptr);
       }
 
 
@@ -1150,16 +1132,15 @@ namespace internal
         /**
          * Return vertex DoF indices.
          */
-        template <int structdim, typename DoFIndicesType, typename DoFProcessor>
+        template <int structdim, typename DoFProcessor>
         DEAL_II_ALWAYS_INLINE void
         process_vertex_dofs(
           const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
-            &                 accessor,
-          const unsigned int  vertex,
-          unsigned int &      index,
-          DoFIndicesType &    dof_indices,
-          const unsigned int  fe_index_,
-          const DoFProcessor &dof_processor) const
+            &                       accessor,
+          const unsigned int        vertex,
+          types::global_dof_index *&dof_indices_ptr,
+          const unsigned int        fe_index_,
+          const DoFProcessor &      dof_processor) const
         {
           const auto fe_index =
             internal::DoFAccessorImplementation::get_fe_index_or_default(
@@ -1175,27 +1156,22 @@ namespace internal
               return d;
             },
             std::integral_constant<int, 0>(),
-            dof_indices,
-            index,
+            dof_indices_ptr,
             dof_processor);
         }
 
         /**
          * Return DoF indices for lines, quads, and inner degrees of freedom.
          */
-        template <int structdim,
-                  typename DoFMapping,
-                  typename DoFIndicesType,
-                  typename DoFProcessor>
+        template <int structdim, typename DoFMapping, typename DoFProcessor>
         DEAL_II_ALWAYS_INLINE void
         process_dofs(
           const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
-            &                 accessor,
-          const DoFMapping &  mapping,
-          unsigned int &      index,
-          DoFIndicesType &    dof_indices,
-          const unsigned int  fe_index_,
-          const DoFProcessor &dof_processor) const
+            &                       accessor,
+          const DoFMapping &        mapping,
+          types::global_dof_index *&dof_indices_ptr,
+          const unsigned int        fe_index_,
+          const DoFProcessor &      dof_processor) const
         {
           const auto fe_index =
             internal::DoFAccessorImplementation::get_fe_index_or_default(
@@ -1207,24 +1183,19 @@ namespace internal
                          fe_index,
                          mapping,
                          std::integral_constant<int, structdim>(),
-                         dof_indices,
-                         index,
+                         dof_indices_ptr,
                          dof_processor);
         }
 
         /**
          * Fallback for DoFInvalidAccessor.
          */
-        template <int structdim,
-                  typename DoFMapping,
-                  typename DoFIndicesType,
-                  typename DoFProcessor>
+        template <int structdim, typename DoFMapping, typename DoFProcessor>
         DEAL_II_ALWAYS_INLINE void
         process_dofs(
           const dealii::DoFInvalidAccessor<structdim, dim, spacedim> &,
           const DoFMapping &,
-          unsigned int &,
-          DoFIndicesType &,
+          types::global_dof_index *&,
           const unsigned int,
           const DoFProcessor &) const
         {
@@ -1251,30 +1222,23 @@ namespace internal
         /**
          * Return vertex DoF indices.
          */
-        template <int structdim,
-                  typename DoFIndicesType,
-                  typename DoFProcessor,
-                  bool level_dof_access>
+        template <int structdim, typename DoFProcessor, bool level_dof_access>
         DEAL_II_ALWAYS_INLINE void
         process_vertex_dofs(
           const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
-            &                 accessor,
-          const unsigned int  vertex,
-          unsigned int &      index,
-          DoFIndicesType &    dof_indices,
-          const unsigned int  fe_index,
-          const DoFProcessor &dof_processor) const
+            &                       accessor,
+          const unsigned int        vertex,
+          types::global_dof_index *&dof_indices_ptr,
+          const unsigned int        fe_index,
+          const DoFProcessor &      dof_processor) const
         {
-          for (unsigned int d = 0;
-               d < accessor.get_fe(fe_index).template n_dofs_per_object<0>();
-               ++d, ++index)
-            dof_processor(
-              accessor.dof_handler
-                ->mg_vertex_dofs[accessor.vertex_index(vertex)]
-                .access_index(level,
-                              d,
-                              accessor.get_fe(fe_index).n_dofs_per_vertex()),
-              get_array_entry(dof_indices, index));
+          const unsigned int n_indices =
+            accessor.get_fe(fe_index).template n_dofs_per_object<0>();
+          types::global_dof_index *stored_indices =
+            &accessor.dof_handler->mg_vertex_dofs[accessor.vertex_index(vertex)]
+               .access_index(level, 0, n_indices);
+          for (unsigned int d = 0; d < n_indices; ++d, ++dof_indices_ptr)
+            dof_processor(stored_indices[d], dof_indices_ptr);
         }
 
         /**
@@ -1282,48 +1246,41 @@ namespace internal
          */
         template <int structdim,
                   typename DoFMapping,
-                  typename DoFIndicesType,
                   typename DoFProcessor,
                   bool level_dof_access>
         DEAL_II_ALWAYS_INLINE void
         process_dofs(
           const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
-            &                 accessor,
-          const DoFMapping &  mapping,
-          unsigned int &      index,
-          DoFIndicesType &    dof_indices,
-          const unsigned int  fe_index,
-          const DoFProcessor &dof_processor) const
+            &                       accessor,
+          const DoFMapping &        mapping,
+          types::global_dof_index *&dof_indices_ptr,
+          const unsigned int        fe_index,
+          const DoFProcessor &      dof_processor) const
         {
-          for (unsigned int d = 0;
-               d <
-               accessor.get_fe(fe_index).template n_dofs_per_object<structdim>(
-                 0);
-               ++d, ++index)
-            dof_processor(
-              get_mg_dof_index(*accessor.dof_handler,
-                               accessor.dof_handler->mg_levels[level],
-                               accessor.dof_handler->mg_faces,
-                               accessor.index(),
-                               fe_index,
-                               (structdim == dim ? d : mapping(d)),
-                               std::integral_constant<int, structdim>()),
-              get_array_entry(dof_indices, index));
+          const unsigned int n_indices =
+            accessor.get_fe(fe_index).template n_dofs_per_object<structdim>();
+          types::global_dof_index *stored_indices =
+            &get_mg_dof_index(*accessor.dof_handler,
+                              accessor.dof_handler->mg_levels[level],
+                              accessor.dof_handler->mg_faces,
+                              accessor.index(),
+                              fe_index,
+                              0,
+                              std::integral_constant<int, structdim>());
+          for (unsigned int d = 0; d < n_indices; ++d, ++dof_indices_ptr)
+            dof_processor(stored_indices[structdim < dim ? mapping(d) : d],
+                          dof_indices_ptr);
         }
 
         /**
          * Fallback for DoFInvalidAccessor.
          */
-        template <int structdim,
-                  typename DoFMapping,
-                  typename DoFIndicesType,
-                  typename DoFProcessor>
+        template <int structdim, typename DoFMapping, typename DoFProcessor>
         DEAL_II_ALWAYS_INLINE void
         process_dofs(
           const dealii::DoFInvalidAccessor<structdim, dim, spacedim> &,
           const DoFMapping &,
-          unsigned int &,
-          DoFIndicesType &,
+          types::global_dof_index *&,
           const unsigned int,
           const DoFProcessor &) const
         {
@@ -1349,7 +1306,7 @@ namespace internal
           dof_indices,
           fe_index,
           DoFIndexProcessor<dim, spacedim, level_dof_access>(),
-          [](auto stored_index, auto &dof_index) { dof_index = stored_index; },
+          [](auto stored_index, auto dof_ptr) { *dof_ptr = stored_index; },
           false);
       }
 
@@ -1379,7 +1336,7 @@ namespace internal
           dof_indices,
           fe_index,
           DoFIndexProcessor<dim, spacedim, level_dof_access>(),
-          [](auto &stored_index, auto dof_index) { stored_index = dof_index; },
+          [](auto &stored_index, auto dof_ptr) { stored_index = *dof_ptr; },
           false);
       }
 
@@ -1399,7 +1356,7 @@ namespace internal
           dof_indices,
           fe_index,
           MGDoFIndexProcessor<dim, spacedim>(level),
-          [](auto stored_index, auto &dof_index) { dof_index = stored_index; },
+          [](auto stored_index, auto dof_ptr) { *dof_ptr = stored_index; },
           true);
       }
 
@@ -1428,7 +1385,7 @@ namespace internal
           dof_indices,
           fe_index,
           MGDoFIndexProcessor<dim, spacedim>(level),
-          [](auto &stored_index, auto dof_index) { stored_index = dof_index; },
+          [](auto &stored_index, auto dof_ptr) { stored_index = *dof_ptr; },
           true);
       }
 
@@ -1749,81 +1706,6 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_fe(
   return this->dof_handler->get_fe(fe_index);
 }
 
-
-template <int structdim, int dim, int spacedim, bool level_dof_access>
-inline void
-DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_indices(
-  std::vector<types::global_dof_index> &dof_indices,
-  const unsigned int                    fe_index_) const
-{
-  Assert(this->dof_handler != nullptr, ExcInvalidObject());
-
-  const auto fe_index =
-    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
-                                                                 fe_index_);
-
-  Assert(static_cast<unsigned int>(this->level()) <
-           this->dof_handler->object_dof_indices.size(),
-         ExcMessage(
-           "The DoFHandler to which this accessor points has not "
-           "been initialized, i.e., it doesn't appear that DoF indices "
-           "have been distributed on it."));
-
-  // this function really only makes sense if either a) there are degrees of
-  // freedom defined on the present object, or b) the object is non-active
-  // objects but all degrees of freedom are located on vertices, since
-  // otherwise there are degrees of freedom on sub-objects which are not
-  // allocated for this non-active thing
-  Assert(this->fe_index_is_active(fe_index) ||
-           (this->dof_handler->get_fe(fe_index).n_dofs_per_cell() ==
-            this->n_vertices() *
-              this->dof_handler->get_fe(fe_index).n_dofs_per_vertex()),
-         ExcInternalError());
-
-  // now do the actual work
-  dealii::internal::DoFAccessorImplementation::Implementation::get_dof_indices(
-    *this, dof_indices, fe_index);
-}
-
-
-
-template <int structdim, int dim, int spacedim, bool level_dof_access>
-inline void
-DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
-  const int                             level,
-  std::vector<types::global_dof_index> &dof_indices,
-  const unsigned int                    fe_index_) const
-{
-  Assert(this->dof_handler != nullptr, ExcInvalidObject());
-  Assert(this->dof_handler->mg_vertex_dofs.size() > 0,
-         ExcMessage("Multigrid DoF indices can only be accessed after "
-                    "DoFHandler::distribute_mg_dofs() has been called!"));
-
-  const auto fe_index =
-    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
-                                                                 fe_index_);
-
-  internal::DoFAccessorImplementation::Implementation::get_mg_dof_indices(
-    *this, level, dof_indices, fe_index);
-}
-
-
-template <int structdim, int dim, int spacedim, bool level_dof_access>
-inline void
-DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
-  const int                                   level,
-  const std::vector<types::global_dof_index> &dof_indices,
-  const unsigned int                          fe_index_)
-{
-  Assert(this->dof_handler != nullptr, ExcInvalidObject());
-
-  const auto fe_index =
-    internal::DoFAccessorImplementation::get_fe_index_or_default(*this,
-                                                                 fe_index_);
-
-  internal::DoFAccessorImplementation::Implementation::set_mg_dof_indices(
-    *this, level, dof_indices, fe_index);
-}
 
 
 template <int structdim, int dim, int spacedim, bool level_dof_access>
