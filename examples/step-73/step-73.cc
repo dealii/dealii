@@ -22,6 +22,7 @@
 // We start by including all the necessary deal.II header files and some C++
 // related ones. They have been discussed in detail in previous tutorial
 // programs, so you need only refer to past tutorials for details.
+#include <deal.II/base/discrete_time.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/point.h>
@@ -229,56 +230,6 @@ namespace Step73
 
       parse_parameters_call_back.connect([&]() { initialized = true; });
     }
-
-
-// @sect3{Time class}
-
-// A simple class to store time data. Its functioning is transparent so no
-// discussion is necessary. For simplicity we assume a constant time step
-// size.
-  class Time
-  {
-  public:
-    Time (const double time_end,
-          const double delta_t)
-      :
-      timestep(0),
-      time_current(0.0),
-      time_end(time_end),
-      delta_t(delta_t)
-    {}
-
-    virtual ~Time()
-    {}
-
-    double current() const
-    {
-      return time_current;
-    }
-    double end() const
-    {
-      return time_end;
-    }
-    double get_delta_t() const
-    {
-      return delta_t;
-    }
-    unsigned int get_timestep() const
-    {
-      return timestep;
-    }
-    void increment()
-    {
-      time_current += delta_t;
-      ++timestep;
-    }
-
-  private:
-    unsigned int timestep;
-    double       time_current;
-    const double time_end;
-    const double delta_t;
-  };
 
 // @sect3{Compressible neo-Hookean material within a one-field formulation}
 
@@ -622,7 +573,7 @@ namespace Step73
 
     // Also, keep track of the current time and the time spent evaluating
     // certain functions
-    Time                             time;
+    DiscreteTime                     time;
     TimerOutput                      timer;
 
     // A storage object for quadrature point information. As opposed to
@@ -735,7 +686,7 @@ namespace Step73
     vol_reference (0.0),
     vol_current (0.0),
     triangulation(Triangulation<dim>::maximum_smoothing),
-    time(parameters.end_time, parameters.delta_t),
+    time(0.0, parameters.end_time, parameters.delta_t),
     timer(std::cout,
           TimerOutput::summary,
           TimerOutput::wall_times),
@@ -778,7 +729,6 @@ namespace Step73
     make_grid();
     system_setup();
     output_results();
-    time.increment();
 
     // We then declare the incremental solution update $\varDelta
     // \mathbf{\Xi}:= \{\varDelta \mathbf{u}\}$ and start the loop over the
@@ -786,8 +736,9 @@ namespace Step73
     //
     // At the beginning, we reset the solution update for this time step...
     BlockVector<double> solution_delta(dofs_per_block);
-    while (time.current() <= time.end())
+    while (time.get_current_time() != time.get_end_time())
       {
+        time.advance_time();
         solution_delta = 0.0;
 
         // ...solve the current time step and update total solution vector
@@ -799,7 +750,6 @@ namespace Step73
         // ...and plot the results before moving on happily to the next time
         // step:
         output_results();
-        time.increment();
       }
 
     // Lastly, we print the vertical tip displacement of the Cook cantilever
@@ -996,8 +946,8 @@ namespace Step73
   void
   Solid<dim,NumberType>::solve_nonlinear_timestep(BlockVector<double> &solution_delta)
   {
-    std::cout << std::endl << "Timestep " << time.get_timestep() << " @ "
-              << time.current() << "s" << std::endl;
+    std::cout << std::endl << "Timestep " << time.get_step_number() << " @ "
+              << time.get_current_time() << "s" << std::endl;
 
     BlockVector<double> newton_update(dofs_per_block);
 
@@ -1396,7 +1346,7 @@ namespace Step73
       const unsigned int &n_q_points_f = data.solid->n_q_points_f;
       const unsigned int &dofs_per_cell = data.solid->dofs_per_cell;
       const Parameters &parameters = data.solid->parameters;
-      const Time &time = data.solid->time;
+      const DiscreteTime &time = data.solid->time;
       const FESystem<dim> &fe = data.solid->fe;
       const unsigned int &u_dof = data.solid->u_dof;
 
@@ -1422,7 +1372,7 @@ namespace Step73
                 // Note that the contributions to the right hand side vector we
                 // compute here only exist in the displacement components of the
                 // vector.
-                const double time_ramp = (time.current() / time.end());
+                const double time_ramp = time.get_current_time() / time.get_end_time();
                 const double magnitude  = (1.0/(16.0*parameters.scale*1.0*parameters.scale))*time_ramp; // (Total force) / (RHS surface area)
                 Tensor<1,dim> dir;
                 dir[1] = 1.0;
@@ -2106,7 +2056,7 @@ namespace Step73
     data_out.build_patches(q_mapping, degree);
 
     std::ostringstream filename;
-    filename << "solution-" << time.get_timestep() << ".vtk";
+    filename << "solution-" << time.get_step_number() << ".vtk";
 
     std::ofstream output(filename.str().c_str());
     data_out.write_vtk(output);
