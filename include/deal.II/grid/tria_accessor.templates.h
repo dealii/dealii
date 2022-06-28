@@ -1050,6 +1050,202 @@ namespace internal
 
         return accessor.quad(face_index)->vertex_index(vertex_index);
       }
+
+
+
+      template <int dim, int spacedim>
+      static std::array<unsigned int, 1>
+      get_line_indices_of_cell(const TriaAccessor<1, dim, spacedim> &)
+      {
+        Assert(false, ExcInternalError());
+        return {};
+      }
+
+
+
+      template <int structdim, int dim, int spacedim>
+      static std::array<unsigned int, 4>
+      get_line_indices_of_cell(const TriaAccessor<2, dim, spacedim> &cell)
+      {
+        // For 2D cells the access cell->line_orientation() is already
+        // efficient
+        std::array<unsigned int, 4> line_indices;
+        for (unsigned int line : cell.line_indices())
+          line_indices[line] = cell.line_index(line);
+        return line_indices;
+      }
+
+      /**
+       * A helper function to provide faster access to cell->line_index() in
+       * 3D
+       */
+      template <int structdim, int dim, int spacedim>
+      static std::array<unsigned int, 12>
+      get_line_indices_of_cell(
+        const TriaAccessor<structdim, dim, spacedim> &cell)
+      {
+        std::array<unsigned int, 12> line_indices;
+
+        // For hexahedra, the classical access via quads -> lines is too
+        // inefficient. Unroll this code here to allow the compiler to inline
+        // the necessary functions.
+        const auto ref_cell = cell.reference_cell();
+        if (ref_cell == ReferenceCells::Hexahedron)
+          {
+            for (unsigned int f = 4; f < 6; ++f)
+              {
+                const unsigned char orientation =
+                  cell.get_triangulation()
+                    .levels[cell.level()]
+                    ->face_orientations[cell.index() * 6 + f];
+
+                // It might seem superfluous to spell out the four indices
+                // that get later consumed by a for loop over these four
+                // elements; however, for the compiler it is easier to inline
+                // the statement of standard_to_real_face_line() when next to
+                // each other, as opposed to be interleaved with a
+                // line_index() call.
+                const std::array<unsigned int, 4> my_indices{
+                  {ref_cell.standard_to_real_face_line(0, f, orientation),
+                   ref_cell.standard_to_real_face_line(1, f, orientation),
+                   ref_cell.standard_to_real_face_line(2, f, orientation),
+                   ref_cell.standard_to_real_face_line(3, f, orientation)}};
+                const auto quad = cell.quad(f);
+                for (unsigned int l = 0; l < 4; ++l)
+                  line_indices[4 * (f - 4) + l] =
+                    quad->line_index(my_indices[l]);
+              }
+            for (unsigned int f = 0; f < 2; ++f)
+              {
+                const unsigned char orientation =
+                  cell.get_triangulation()
+                    .levels[cell.level()]
+                    ->face_orientations[cell.index() * 6 + f];
+                const std::array<unsigned int, 2> my_indices{
+                  {ref_cell.standard_to_real_face_line(0, f, orientation),
+                   ref_cell.standard_to_real_face_line(1, f, orientation)}};
+                const auto quad      = cell.quad(f);
+                line_indices[8 + f]  = quad->line_index(my_indices[0]);
+                line_indices[10 + f] = quad->line_index(my_indices[1]);
+              }
+          }
+        else
+          // For other shapes (tetrahedra, wedges, pyramids), we do not
+          // currently implement an optimized function.
+          for (unsigned int l = 0; l < std::min(12U, cell.n_lines()); ++l)
+            line_indices[l] = cell.line_index(l);
+
+        return line_indices;
+      }
+
+
+
+      /**
+       * A helper function to provide faster access to
+       * cell->line_orientation(), 1D specialization
+       */
+      template <int dim, int spacedim>
+      static std::array<unsigned int, 1>
+      get_line_orientations_of_cell(const TriaAccessor<1, dim, spacedim> &)
+      {
+        Assert(false, ExcInternalError());
+        return {};
+      }
+
+
+
+      /**
+       * A helper function to provide faster access to
+       * cell->line_orientation(), 2D specialization
+       */
+      template <int dim, int spacedim>
+      static std::array<bool, 4>
+      get_line_orientations_of_cell(const TriaAccessor<2, dim, spacedim> &cell)
+      {
+        // For 2D cells the access cell->line_orientation() is already
+        // efficient
+        std::array<bool, 4> line_orientations;
+        for (unsigned int line : cell.line_indices())
+          line_orientations[line] = cell.line_orientation(line);
+        return line_orientations;
+      }
+
+
+
+      /**
+       * A helper function to provide faster access to
+       * cell->line_orientation(), 3D specialization
+       */
+      template <int dim, int spacedim>
+      static std::array<bool, 12>
+      get_line_orientations_of_cell(const TriaAccessor<3, dim, spacedim> &cell)
+      {
+        std::array<bool, 12> line_orientations;
+
+        // For hexahedra, the classical access via quads -> lines is too
+        // inefficient. Unroll this code here to allow the compiler to inline
+        // the necessary functions.
+        const auto ref_cell = cell.reference_cell();
+        if (ref_cell == ReferenceCells::Hexahedron)
+          {
+            for (unsigned int f = 4; f < 6; ++f)
+              {
+                const unsigned char orientation =
+                  cell.get_triangulation()
+                    .levels[cell.level()]
+                    ->face_orientations[cell.index() * 6 + f];
+
+                // It might seem superfluous to spell out the four indices and
+                // orientations that get later consumed by a for loop over
+                // these four elements; however, for the compiler it is easier
+                // to inline the statement of standard_to_real_face_line()
+                // when next to each other, as opposed to be interleaved with
+                // a line_index() call.
+                const std::array<unsigned int, 4> my_indices{
+                  {ref_cell.standard_to_real_face_line(0, f, orientation),
+                   ref_cell.standard_to_real_face_line(1, f, orientation),
+                   ref_cell.standard_to_real_face_line(2, f, orientation),
+                   ref_cell.standard_to_real_face_line(3, f, orientation)}};
+                const auto                quad = cell.quad(f);
+                const std::array<bool, 4> my_orientations{
+                  {ref_cell.standard_vs_true_line_orientation(
+                     0, orientation, quad->line_orientation(my_indices[0])),
+                   ref_cell.standard_vs_true_line_orientation(
+                     1, orientation, quad->line_orientation(my_indices[1])),
+                   ref_cell.standard_vs_true_line_orientation(
+                     2, orientation, quad->line_orientation(my_indices[2])),
+                   ref_cell.standard_vs_true_line_orientation(
+                     3, orientation, quad->line_orientation(my_indices[3]))}};
+                for (unsigned int l = 0; l < 4; ++l)
+                  line_orientations[4 * (f - 4) + l] = my_orientations[l];
+              }
+            for (unsigned int f = 0; f < 2; ++f)
+              {
+                const unsigned char orientation =
+                  cell.get_triangulation()
+                    .levels[cell.level()]
+                    ->face_orientations[cell.index() * 6 + f];
+                const std::array<unsigned int, 2> my_indices{
+                  {ref_cell.standard_to_real_face_line(0, f, orientation),
+                   ref_cell.standard_to_real_face_line(1, f, orientation)}};
+                const auto                quad = cell.quad(f);
+                const std::array<bool, 2> my_orientations{
+                  {ref_cell.standard_vs_true_line_orientation(
+                     0, orientation, quad->line_orientation(my_indices[0])),
+                   ref_cell.standard_vs_true_line_orientation(
+                     1, orientation, quad->line_orientation(my_indices[1]))}};
+                line_orientations[8 + f]  = my_orientations[0];
+                line_orientations[10 + f] = my_orientations[1];
+              }
+          }
+        else
+          // For other shapes (tetrahedra, wedges, pyramids), we do not
+          // currently implement an optimized function
+          for (unsigned int l = 0; l < std::min(12U, cell.n_lines()); ++l)
+            line_orientations[l] = cell.line_orientation(l);
+
+        return line_orientations;
+      }
     };
   } // namespace TriaAccessorImplementation
 } // namespace internal
