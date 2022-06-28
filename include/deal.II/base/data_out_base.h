@@ -3372,17 +3372,6 @@ public:
   /**
    * Get the XDMF content associated with this entry.
    * If the entry is not valid, this returns an empty string.
-   *
-   * @deprecated Use the overload taking an `unsigned int` and a
-   * `const ReferenceCell &` instead.
-   */
-  DEAL_II_DEPRECATED
-  std::string
-  get_xdmf_content(const unsigned int indent_level) const;
-
-  /**
-   * Get the XDMF content associated with this entry.
-   * If the entry is not valid, this returns an empty string.
    */
   std::string
   get_xdmf_content(const unsigned int   indent_level,
