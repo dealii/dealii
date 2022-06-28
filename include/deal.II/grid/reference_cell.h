@@ -2243,26 +2243,11 @@ ReferenceCell::standard_vs_true_line_orientation(
 {
   if (*this == ReferenceCells::Hexahedron)
     {
-      static const bool bool_table[2][2][2][2] = {
-        {{{true, false},    // lines 0/1, face_orientation=false,
-                            // face_flip=false, face_rotation=false and true
-          {false, true}},   // lines 0/1, face_orientation=false,
-                            // face_flip=true, face_rotation=false and true
-         {{true, true},     // lines 0/1, face_orientation=true,
-                            // face_flip=false, face_rotation=false and true
-          {false, false}}}, // lines 0/1, face_orientation=true,
-                            // face_flip=true, face_rotation=false and true
+      static constexpr dealii::ndarray<bool, 2, 8> bool_table{
+        {{{true, true, false, true, false, false, true, false}},
+         {{true, true, true, false, false, false, false, true}}}};
 
-        {{{true, true}, // lines 2/3 ...
-          {false, false}},
-         {{true, false}, {false, true}}}};
-
-      const bool face_orientation = Utilities::get_bit(face_orientation_raw, 0);
-      const bool face_flip        = Utilities::get_bit(face_orientation_raw, 2);
-      const bool face_rotation    = Utilities::get_bit(face_orientation_raw, 1);
-
-      return (line_orientation ==
-              bool_table[line / 2][face_orientation][face_flip][face_rotation]);
+      return (line_orientation == bool_table[line / 2][face_orientation_raw]);
     }
   else
     // TODO: This might actually be wrong for some of the other
