@@ -22,6 +22,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_piecewise.h>
+#include <deal.II/base/polynomials_raviart_thomas.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/utilities.h>
@@ -268,7 +269,8 @@ namespace internal
           const unsigned int dofs_per_face_normal = fe_in.n_dofs_per_face();
 
           lexicographic_numbering =
-            get_lexicographic_numbering_rt_nodal<dim>(fe_in.degree);
+            PolynomialsRaviartThomas<dim>::get_lexicographic_numbering(
+              fe_in.degree, fe_in.degree - 1);
 
           // To get the right shape_values of the RT element
           std::vector<unsigned int> lex_normal, lex_tangent;

@@ -22,72 +22,110 @@
 #include <iostream>
 #include <memory>
 
-// TODO[WB]: This class is not thread-safe: it uses mutable member variables
-// that contain temporary state. this is not what one would want when one uses a
-// finite element object in a number of different contexts on different threads:
-// finite element objects should be stateless
-// TODO:[GK] This can be achieved by writing a function in Polynomial space
-// which does the rotated fill performed below and writes the data into the
-// right data structures. The same function would be used by Nedelec
-// polynomials.
 
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim>
-PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas(const unsigned int k)
-  : TensorPolynomialsBase<dim>(k, n_polynomials(k))
-  , polynomial_space(create_polynomials(k))
-{}
+namespace
+{
+  // Create nodal Raviart-Thomas polynomials as the tensor product of Lagrange
+  // polynomials on Gauss-Lobatto points of the given degrees in the normal and
+  // tangential directions, respectively (we could also choose Lagrange
+  // polynomials on Gauss points but those are slightly more expensive to handle
+  // in classes).
+  std::vector<std::vector<Polynomials::Polynomial<double>>>
+  create_rt_polynomials(const unsigned int dim,
+                        const unsigned int normal_degree,
+                        const unsigned int tangential_degree)
+  {
+    std::vector<std::vector<Polynomials::Polynomial<double>>> pols(dim);
+    if (normal_degree > 0)
+      pols[0] = Polynomials::generate_complete_Lagrange_basis(
+        QGaussLobatto<1>(normal_degree + 1).get_points());
+    else
+      pols[0] = Polynomials::generate_complete_Lagrange_basis(
+        QMidpoint<1>().get_points());
+    if (tangential_degree > 0)
+      for (unsigned int d = 1; d < dim; ++d)
+        pols[d] = Polynomials::generate_complete_Lagrange_basis(
+          QGaussLobatto<1>(tangential_degree + 1).get_points());
+    else
+      for (unsigned int d = 1; d < dim; ++d)
+        pols[d] = Polynomials::generate_complete_Lagrange_basis(
+          QMidpoint<1>().get_points());
+
+    return pols;
+  }
+} // namespace
 
 
 
 template <int dim>
 PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas(
-  const PolynomialsRaviartThomas &other)
-  : TensorPolynomialsBase<dim>(other)
-  , polynomial_space(other.polynomial_space)
-// no need to copy the scratch data, or the mutex
-{}
+  const unsigned int normal_degree,
+  const unsigned int tangential_degree)
+  : TensorPolynomialsBase<dim>(std::min(normal_degree, tangential_degree),
+                               n_polynomials(normal_degree, tangential_degree))
+  , normal_degree(normal_degree)
+  , tangential_degree(tangential_degree)
+  , polynomial_space(
+      create_rt_polynomials(dim, normal_degree, tangential_degree))
+{
+  // create renumbering of the unknowns from the lexicographic order to the
+  // actual order required by the finite element class with unknowns on
+  // faces placed first
+  const unsigned int n_pols = polynomial_space.n();
+  lexicographic_to_hierarchic =
+    get_lexicographic_numbering(normal_degree, tangential_degree);
+
+  hierarchic_to_lexicographic =
+    Utilities::invert_permutation(lexicographic_to_hierarchic);
+
+  // since we only store an anisotropic polynomial for the first component,
+  // we set up a second numbering to switch out the actual coordinate
+  // direction
+  renumber_aniso[0].resize(n_pols);
+  for (unsigned int i = 0; i < n_pols; ++i)
+    renumber_aniso[0][i] = i;
+  if (dim == 2)
+    {
+      // switch x and y component (i and j loops)
+      renumber_aniso[1].resize(n_pols);
+      for (unsigned int j = 0; j < normal_degree + 1; ++j)
+        for (unsigned int i = 0; i < tangential_degree + 1; ++i)
+          renumber_aniso[1][j * (tangential_degree + 1) + i] =
+            j + i * (normal_degree + 1);
+    }
+  if (dim == 3)
+    {
+      // switch x, y, and z component (i, j, k) -> (j, k, i)
+      renumber_aniso[1].resize(n_pols);
+      for (unsigned int k = 0; k < tangential_degree + 1; ++k)
+        for (unsigned int j = 0; j < normal_degree + 1; ++j)
+          for (unsigned int i = 0; i < tangential_degree + 1; ++i)
+            renumber_aniso[1][(k * (normal_degree + 1) + j) *
+                                (tangential_degree + 1) +
+                              i] =
+              j + (normal_degree + 1) * (k + i * (tangential_degree + 1));
+
+      // switch x, y, and z component (i, j, k) -> (k, i, j)
+      renumber_aniso[2].resize(n_pols);
+      for (unsigned int k = 0; k < normal_degree + 1; ++k)
+        for (unsigned int j = 0; j < tangential_degree + 1; ++j)
+          for (unsigned int i = 0; i < tangential_degree + 1; ++i)
+            renumber_aniso[2][(k * (tangential_degree + 1) + j) *
+                                (tangential_degree + 1) +
+                              i] =
+              k + (normal_degree + 1) * (i + j * (tangential_degree + 1));
+    }
+}
 
 
 
 template <int dim>
-std::vector<std::vector<Polynomials::Polynomial<double>>>
-PolynomialsRaviartThomas<dim>::create_polynomials(const unsigned int k)
-{
-  // Create a vector of polynomial spaces where the first element
-  // has degree k+1 and the rest has degree k. This corresponds to
-  // the space of single-variable polynomials from which we will create the
-  // space for the first component of the RT element by way of tensor
-  // product.
-  //
-  // The other components of the RT space can be created by rotating
-  // this vector of single-variable polynomials.
-  //
-  std::vector<std::vector<Polynomials::Polynomial<double>>> pols(dim);
-  if (k == 0)
-    {
-      // We need to treat the case k=0 differently because there,
-      // the polynomial in x has degree 1 and so has node points
-      // equal to the end points of the interval [0,1] (i.e., it
-      // is a "Lagrange" polynomial), whereas the y- and z-polynomials
-      // only have the interval midpoint as a node (i.e., they are
-      // a "Legendre" polynomial).
-      pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(1);
-      for (unsigned int d = 1; d < dim; ++d)
-        pols[d] = Polynomials::Legendre::generate_complete_basis(0);
-    }
-  else
-    {
-      pols[0] =
-        Polynomials::LagrangeEquidistant::generate_complete_basis(k + 1);
-      for (unsigned int d = 1; d < dim; ++d)
-        pols[d] = Polynomials::LagrangeEquidistant::generate_complete_basis(k);
-    }
-
-  return pols;
-}
+PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas(const unsigned int k)
+  : PolynomialsRaviartThomas(k + 1, k)
+{}
 
 
 
@@ -113,93 +151,171 @@ PolynomialsRaviartThomas<dim>::evaluate(
            fourth_derivatives.size() == 0,
          ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
-  // In the following, we will access the scratch arrays declared as 'mutable'
-  // in the class. In order to do so from this function, we have to make sure
-  // that we guard this access by a mutex so that the invocation of this 'const'
-  // function is thread-safe.
-  std::lock_guard<std::mutex> lock(scratch_arrays_mutex);
+  std::vector<double>         p_values;
+  std::vector<Tensor<1, dim>> p_grads;
+  std::vector<Tensor<2, dim>> p_grad_grads;
+  std::vector<Tensor<3, dim>> p_third_derivatives;
+  std::vector<Tensor<4, dim>> p_fourth_derivatives;
 
   const unsigned int n_sub = polynomial_space.n();
-  scratch_values.resize((values.size() == 0) ? 0 : n_sub);
-  scratch_grads.resize((grads.size() == 0) ? 0 : n_sub);
-  scratch_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
-  scratch_third_derivatives.resize((third_derivatives.size() == 0) ? 0 : n_sub);
-  scratch_fourth_derivatives.resize((fourth_derivatives.size() == 0) ? 0 :
-                                                                       n_sub);
+  p_values.resize((values.size() == 0) ? 0 : n_sub);
+  p_grads.resize((grads.size() == 0) ? 0 : n_sub);
+  p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
+  p_third_derivatives.resize((third_derivatives.size() == 0) ? 0 : n_sub);
+  p_fourth_derivatives.resize((fourth_derivatives.size() == 0) ? 0 : n_sub);
 
   for (unsigned int d = 0; d < dim; ++d)
     {
-      // First we copy the point. The
-      // polynomial space for
-      // component d consists of
-      // polynomials of degree k+1 in
-      // x_d and degree k in the
-      // other variables. in order to
-      // simplify this, we use the
-      // same AnisotropicPolynomial
-      // space and simply rotate the
-      // coordinates through all
-      // directions.
+      // First we copy the point. The polynomial space for component d
+      // consists of polynomials of degree k in x_d and degree k+1 in the
+      // other variables. in order to simplify this, we use the same
+      // AnisotropicPolynomial space and simply rotate the coordinates
+      // through all directions.
       Point<dim> p;
       for (unsigned int c = 0; c < dim; ++c)
         p(c) = unit_point((c + d) % dim);
 
       polynomial_space.evaluate(p,
-                                scratch_values,
-                                scratch_grads,
-                                scratch_grad_grads,
-                                scratch_third_derivatives,
-                                scratch_fourth_derivatives);
+                                p_values,
+                                p_grads,
+                                p_grad_grads,
+                                p_third_derivatives,
+                                p_fourth_derivatives);
 
-      for (unsigned int i = 0; i < scratch_values.size(); ++i)
-        values[i + d * n_sub][d] = scratch_values[i];
+      for (unsigned int i = 0; i < p_values.size(); ++i)
+        values[lexicographic_to_hierarchic[i + d * n_sub]][d] =
+          p_values[renumber_aniso[d][i]];
 
-      for (unsigned int i = 0; i < scratch_grads.size(); ++i)
+      for (unsigned int i = 0; i < p_grads.size(); ++i)
         for (unsigned int d1 = 0; d1 < dim; ++d1)
-          grads[i + d * n_sub][d][(d1 + d) % dim] = scratch_grads[i][d1];
+          grads[lexicographic_to_hierarchic[i + d * n_sub]][d][(d1 + d) % dim] =
+            p_grads[renumber_aniso[d][i]][d1];
 
-      for (unsigned int i = 0; i < scratch_grad_grads.size(); ++i)
+      for (unsigned int i = 0; i < p_grad_grads.size(); ++i)
         for (unsigned int d1 = 0; d1 < dim; ++d1)
           for (unsigned int d2 = 0; d2 < dim; ++d2)
-            grad_grads[i + d * n_sub][d][(d1 + d) % dim][(d2 + d) % dim] =
-              scratch_grad_grads[i][d1][d2];
+            grad_grads[lexicographic_to_hierarchic[i + d * n_sub]][d]
+                      [(d1 + d) % dim][(d2 + d) % dim] =
+                        p_grad_grads[renumber_aniso[d][i]][d1][d2];
 
-      for (unsigned int i = 0; i < scratch_third_derivatives.size(); ++i)
+      for (unsigned int i = 0; i < p_third_derivatives.size(); ++i)
         for (unsigned int d1 = 0; d1 < dim; ++d1)
           for (unsigned int d2 = 0; d2 < dim; ++d2)
             for (unsigned int d3 = 0; d3 < dim; ++d3)
-              third_derivatives[i + d * n_sub][d][(d1 + d) % dim]
-                               [(d2 + d) % dim][(d3 + d) % dim] =
-                                 scratch_third_derivatives[i][d1][d2][d3];
+              third_derivatives[lexicographic_to_hierarchic[i + d * n_sub]][d]
+                               [(d1 + d) % dim][(d2 + d) % dim]
+                               [(d3 + d) % dim] =
+                                 p_third_derivatives[renumber_aniso[d][i]][d1]
+                                                    [d2][d3];
 
-      for (unsigned int i = 0; i < scratch_fourth_derivatives.size(); ++i)
+      for (unsigned int i = 0; i < p_fourth_derivatives.size(); ++i)
         for (unsigned int d1 = 0; d1 < dim; ++d1)
           for (unsigned int d2 = 0; d2 < dim; ++d2)
             for (unsigned int d3 = 0; d3 < dim; ++d3)
               for (unsigned int d4 = 0; d4 < dim; ++d4)
-                fourth_derivatives[i + d * n_sub][d][(d1 + d) % dim]
-                                  [(d2 + d) % dim][(d3 + d) % dim]
-                                  [(d4 + d) % dim] =
-                                    scratch_fourth_derivatives[i][d1][d2][d3]
-                                                              [d4];
+                fourth_derivatives[lexicographic_to_hierarchic[i + d * n_sub]]
+                                  [d][(d1 + d) % dim][(d2 + d) % dim]
+                                  [(d3 + d) % dim][(d4 + d) % dim] =
+                                    p_fourth_derivatives[renumber_aniso[d][i]]
+                                                        [d1][d2][d3][d4];
     }
 }
 
 
+
+template <int dim>
+std::string
+PolynomialsRaviartThomas<dim>::name() const
+{
+  return "RaviartThomas";
+}
+
+
+
 template <int dim>
 unsigned int
-PolynomialsRaviartThomas<dim>::n_polynomials(const unsigned int k)
+PolynomialsRaviartThomas<dim>::n_polynomials(const unsigned int degree)
 {
-  if (dim == 1)
-    return k + 1;
-  if (dim == 2)
-    return 2 * (k + 1) * (k + 2);
-  if (dim == 3)
-    return 3 * (k + 1) * (k + 1) * (k + 2);
-
-  Assert(false, ExcNotImplemented());
-  return 0;
+  return n_polynomials(degree + 1, degree);
 }
+
+
+
+template <int dim>
+unsigned int
+PolynomialsRaviartThomas<dim>::n_polynomials(
+  const unsigned int normal_degree,
+  const unsigned int tangential_degree)
+{
+  return dim * (normal_degree + 1) *
+         Utilities::pow(tangential_degree + 1, dim - 1);
+}
+
+
+
+template <int dim>
+std::vector<unsigned int>
+PolynomialsRaviartThomas<dim>::get_lexicographic_numbering(
+  const unsigned int normal_degree,
+  const unsigned int tangential_degree)
+{
+  const unsigned int n_dofs_face =
+    Utilities::pow(tangential_degree + 1, dim - 1);
+  std::vector<unsigned int> lexicographic_numbering;
+  // component 1
+  for (unsigned int j = 0; j < n_dofs_face; ++j)
+    {
+      lexicographic_numbering.push_back(j);
+      if (normal_degree > 1)
+        for (unsigned int i = n_dofs_face * 2 * dim;
+             i < n_dofs_face * 2 * dim + normal_degree - 1;
+             ++i)
+          lexicographic_numbering.push_back(i + j * (normal_degree - 1));
+      lexicographic_numbering.push_back(n_dofs_face + j);
+    }
+
+  // component 2
+  unsigned int layers = (dim == 3) ? tangential_degree + 1 : 1;
+  for (unsigned int k = 0; k < layers; ++k)
+    {
+      unsigned int k_add = k * (tangential_degree + 1);
+      for (unsigned int j = n_dofs_face * 2;
+           j < n_dofs_face * 2 + tangential_degree + 1;
+           ++j)
+        lexicographic_numbering.push_back(j + k_add);
+
+      if (normal_degree > 1)
+        for (unsigned int i = n_dofs_face * (2 * dim + (normal_degree - 1));
+             i < n_dofs_face * (2 * dim + (normal_degree - 1)) +
+                   (normal_degree - 1) * (tangential_degree + 1);
+             ++i)
+          {
+            lexicographic_numbering.push_back(i + k_add * tangential_degree);
+          }
+      for (unsigned int j = n_dofs_face * 3;
+           j < n_dofs_face * 3 + tangential_degree + 1;
+           ++j)
+        lexicographic_numbering.push_back(j + k_add);
+    }
+
+  // component 3
+  if (dim == 3)
+    {
+      for (unsigned int i = 4 * n_dofs_face; i < 5 * n_dofs_face; ++i)
+        lexicographic_numbering.push_back(i);
+      if (normal_degree > 1)
+        for (unsigned int i =
+               6 * n_dofs_face + n_dofs_face * 2 * (normal_degree - 1);
+             i < 6 * n_dofs_face + n_dofs_face * 3 * (normal_degree - 1);
+             ++i)
+          lexicographic_numbering.push_back(i);
+      for (unsigned int i = 5 * n_dofs_face; i < 6 * n_dofs_face; ++i)
+        lexicographic_numbering.push_back(i);
+    }
+
+  return lexicographic_numbering;
+}
+
 
 
 template <int dim>
@@ -208,6 +324,38 @@ PolynomialsRaviartThomas<dim>::clone() const
 {
   return std::make_unique<PolynomialsRaviartThomas<dim>>(*this);
 }
+
+
+
+template <int dim>
+std::vector<Point<dim>>
+PolynomialsRaviartThomas<dim>::get_polynomial_support_points() const
+{
+  Assert(dim > 0 && dim <= 3, ExcImpossibleInDim(dim));
+  const Quadrature<1> tangential(
+    tangential_degree == 0 ?
+      static_cast<Quadrature<1>>(QMidpoint<1>()) :
+      static_cast<Quadrature<1>>(QGaussLobatto<1>(tangential_degree + 1)));
+  const Quadrature<1> normal(
+    normal_degree == 0 ?
+      static_cast<Quadrature<1>>(QMidpoint<1>()) :
+      static_cast<Quadrature<1>>(QGaussLobatto<1>(normal_degree + 1)));
+  const QAnisotropic<dim> quad =
+    (dim == 1 ? QAnisotropic<dim>(normal) :
+                (dim == 2 ? QAnisotropic<dim>(normal, tangential) :
+                            QAnisotropic<dim>(normal, tangential, tangential)));
+
+  const unsigned int      n_sub = polynomial_space.n();
+  std::vector<Point<dim>> points(dim * n_sub);
+  points.resize(n_polynomials(normal_degree, tangential_degree));
+  for (unsigned int d = 0; d < dim; ++d)
+    for (unsigned int i = 0; i < n_sub; ++i)
+      for (unsigned int c = 0; c < dim; ++c)
+        points[lexicographic_to_hierarchic[i + d * n_sub]][(c + d) % dim] =
+          quad.point(renumber_aniso[d][i])[c];
+  return points;
+}
+
 
 
 template class PolynomialsRaviartThomas<1>;
