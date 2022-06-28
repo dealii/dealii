@@ -9200,6 +9200,32 @@ namespace
 
 
 std::string
+XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
+{
+  switch (dimension)
+    {
+      case 0:
+        return get_xdmf_content(indent_level,
+                                ReferenceCells::get_hypercube<0>());
+      case 1:
+        return get_xdmf_content(indent_level,
+                                ReferenceCells::get_hypercube<1>());
+      case 2:
+        return get_xdmf_content(indent_level,
+                                ReferenceCells::get_hypercube<2>());
+      case 3:
+        return get_xdmf_content(indent_level,
+                                ReferenceCells::get_hypercube<3>());
+      default:
+        Assert(false, ExcNotImplemented());
+    }
+
+  return "";
+}
+
+
+
+std::string
 XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
                             const ReferenceCell &reference_cell) const
 {
