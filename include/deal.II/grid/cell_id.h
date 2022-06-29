@@ -147,15 +147,6 @@ public:
   to_binary() const;
 
   /**
-   * Return a cell_iterator to the cell represented by this CellId.
-   *
-   * @deprecated Use Triangulation::create_cell_iterator() instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED typename Triangulation<dim, spacedim>::cell_iterator
-  to_cell(const Triangulation<dim, spacedim> &tria) const;
-
-  /**
    * Compare two CellId objects for equality.
    */
   bool
