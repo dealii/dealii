@@ -997,11 +997,15 @@ namespace internal
         const dealii::DoFAccessor<structdim, dim, spacedim, level_dof_access>
           &                   accessor,
         const DoFIndicesType &const_dof_indices,
-        const unsigned int    fe_index,
+        const unsigned int    fe_index_,
         const DoFOperation &  dof_operation,
         const DoFProcessor &  dof_processor,
         const bool            count_level_dofs)
       {
+        const unsigned int fe_index =
+          internal::DoFAccessorImplementation::get_fe_index_or_default(
+            accessor, fe_index_);
+
         // we cannot rely on the template parameter level_dof_access here, since
         // the function get_mg_dof_indices()/set_mg_dof_indices() can be called
         // even if level_dof_access==false.
@@ -1337,6 +1341,8 @@ namespace internal
         std::vector<types::global_dof_index> &dof_indices,
         const unsigned int                    fe_index)
       {
+        Assert((fe_index == DoFHandler<dim, spacedim>::default_fe_index),
+               ExcMessage("MG DoF indices cannot be queried in hp case"));
         process_dof_indices(
           accessor,
           dof_indices,
@@ -1357,6 +1363,9 @@ namespace internal
         const std::vector<types::global_dof_index> &dof_indices,
         const unsigned int                          fe_index)
       {
+        Assert((fe_index == DoFHandler<dim, spacedim>::default_fe_index),
+               ExcMessage("MG DoF indices cannot be queried in hp case"));
+
         // Note: this function is as general as `get_mg_dof_indices()`. This
         // assert is placed here since it is currently only used by the
         // function DoFCellAccessor::set_mg_dof_indices(), which is called by
