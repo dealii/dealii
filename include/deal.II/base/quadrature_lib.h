@@ -128,22 +128,6 @@ public:
 
 
 /**
- * An alias for QTrapezoid available for historic reasons. This name is
- * deprecated.
- *
- * The class was originally named QTrapez, a poorly named choice since the
- * proper name of the quadrature formula
- * is "trapezoidal rule", or sometimes also called the "trapezoid rule". The
- * misnomer resulted from the fact that its original authors' poor English
- * language skills led them to translate the name incorrectly from the German
- * "Trapezregel".
- */
-template <int dim>
-using QTrapez DEAL_II_DEPRECATED = QTrapezoid<dim>;
-
-
-
-/**
  * The Milne rule for numerical quadrature formula. The Milne rule is a closed
  * Newton-Cotes formula and is exact for polynomials of degree 5.
  *

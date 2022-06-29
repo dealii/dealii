@@ -2489,8 +2489,7 @@ namespace FETools
                     // find sub-quadrature
                     position = name.find('(');
                     const std::string subquadrature_name(name, 0, position);
-                    AssertThrow(subquadrature_name == "QTrapez" ||
-                                  subquadrature_name == "QTrapezoid",
+                    AssertThrow(subquadrature_name == "QTrapezoid",
                                 ExcNotImplemented(
                                   "Could not detect quadrature of name " +
                                   subquadrature_name));

@@ -236,7 +236,7 @@ public:
    *
    * @note The weights of the quadrature object are left unfilled and
    *   consequently the object cannot usefully be used for actually
-   *   computing integrals. This is in contrast to, for example, the QTrapez
+   *   computing integrals. This is in contrast to, for example, the QTrapezoid
    *   class that correctly sets quadrature weights.
    */
   template <int dim>

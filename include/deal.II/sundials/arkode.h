@@ -570,17 +570,6 @@ namespace SUNDIALS
     get_arkode_memory() const;
 
     /**
-     * A function object that was used to `reinit` the given vector. Setting
-     * this field does no longer have any effect and all auxiliary vectors are
-     * reinit-ed automatically based on the user-supplied vector in solve_ode().
-     *
-     * @deprecated This function is no longer used and can be safely removed in
-     *   user code.
-     */
-    DEAL_II_DEPRECATED
-    std::function<void(VectorType &)> reinit_vector;
-
-    /**
      * A function object that users may supply and that is intended to compute
      * the explicit part of the IVP right hand side. Sets $explicit_f = f_E(t,
      * y)$.
