@@ -9209,6 +9209,39 @@ XDMFEntry::XDMFEntry(const std::string & mesh_filename,
 
 
 
+namespace
+{
+  /**
+   * Deprecated XDMFEntry constructors do not fill the cell_type, so we use this
+   * little helper to convert it to the appropriate hex cell.
+   */
+  ReferenceCell
+  cell_type_hex_if_invalid(const ReferenceCell &cell_type,
+                           const unsigned int   dimension)
+  {
+    if (cell_type == ReferenceCells::Invalid)
+      {
+        switch (dimension)
+          {
+            case 0:
+              return ReferenceCells::get_hypercube<0>();
+            case 1:
+              return ReferenceCells::get_hypercube<1>();
+            case 2:
+              return ReferenceCells::get_hypercube<2>();
+            case 3:
+              return ReferenceCells::get_hypercube<3>();
+            default:
+              AssertThrow(false, ExcMessage("Invalid dimension"));
+          }
+      }
+    else
+      return cell_type;
+  }
+} // namespace
+
+
+
 XDMFEntry::XDMFEntry(const std::string &  mesh_filename,
                      const std::string &  solution_filename,
                      const double         time,
@@ -9225,29 +9258,8 @@ XDMFEntry::XDMFEntry(const std::string &  mesh_filename,
   , num_cells(cells)
   , dimension(dim)
   , space_dimension(spacedim)
-  , cell_type(cell_type_)
-{
-  if (cell_type == ReferenceCells::Invalid)
-    {
-      switch (dimension)
-        {
-          case 0:
-            cell_type = ReferenceCells::get_hypercube<0>();
-            break;
-          case 1:
-            cell_type = ReferenceCells::get_hypercube<1>();
-            break;
-          case 2:
-            cell_type = ReferenceCells::get_hypercube<2>();
-            break;
-          case 3:
-            cell_type = ReferenceCells::get_hypercube<3>();
-            break;
-          default:
-            AssertThrow(false, ExcMessage("Invalid dimension"));
-        }
-    }
-}
+  , cell_type(cell_type_hex_if_invalid(cell_type_, dim))
+{}
 
 
 
