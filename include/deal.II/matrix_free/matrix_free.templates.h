@@ -1089,8 +1089,7 @@ namespace internal
 
     if (use_fast_hanging_node_algorithm)
       {
-        const auto &reference_cells =
-          dof_handler[0]->get_triangulation().get_reference_cells();
+        const auto &reference_cells = tria.get_reference_cells();
         use_fast_hanging_node_algorithm =
           std::all_of(reference_cells.begin(),
                       reference_cells.end(),
@@ -1451,16 +1450,18 @@ namespace internal
         constexpr unsigned int max_children_per_cell =
           GeometryInfo<dim>::max_children_per_cell;
         const unsigned int n_levels =
-          mg_level == numbers::invalid_unsigned_int ?
-            dof_handler[0]->get_triangulation().n_levels() - 1 :
-            mg_level;
+          mg_level == numbers::invalid_unsigned_int ? tria.n_levels() - 1 :
+                                                      mg_level;
         std::vector<std::vector<
           std::pair<unsigned int,
                     std::array<unsigned int, max_children_per_cell>>>>
           cell_parents(n_levels);
+
+        // Set up data structures, making sure that the current process has
+        // cells on that level in the case of MG
         for (unsigned int level = 0; level < n_levels; ++level)
-          cell_parents[level].resize(
-            dof_handler[0]->get_triangulation().n_raw_cells(level));
+          if (tria.n_levels() > level)
+            cell_parents[level].resize(tria.n_raw_cells(level));
 
         for (unsigned int c = 0; c < cell_level_index_end_local; ++c)
           if (cell_level_index[c].first > 0)
