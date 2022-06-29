@@ -1190,7 +1190,8 @@ namespace StokesClass
 
     std::shared_ptr<MatrixFree<dim, double>> matrix_free_homogeneous(
       new MatrixFree<dim, double>());
-    matrix_free_homogeneous->reinit(dofs,
+    matrix_free_homogeneous->reinit(MappingQ1<dim>{},
+                                    dofs,
                                     constraints_no_dirchlet,
                                     QGauss<1>(degree_u + 1),
                                     data);
