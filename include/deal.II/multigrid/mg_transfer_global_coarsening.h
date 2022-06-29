@@ -603,6 +603,18 @@ public:
   std::size_t
   memory_consumption() const;
 
+  /**
+   * Minimum level.
+   */
+  unsigned int
+  min_level() const;
+
+  /**
+   * Maximum level.
+   */
+  unsigned int
+  max_level() const;
+
 private:
   /**
    * Function to initialize internal level vectors.
@@ -876,6 +888,24 @@ MGTransferGlobalCoarsening<dim, VectorType>::memory_consumption() const
     size += this->transfer[l].memory_consumption();
 
   return size;
+}
+
+
+
+template <int dim, typename VectorType>
+inline unsigned int
+MGTransferGlobalCoarsening<dim, VectorType>::min_level() const
+{
+  return transfer.min_level();
+}
+
+
+
+template <int dim, typename VectorType>
+inline unsigned int
+MGTransferGlobalCoarsening<dim, VectorType>::max_level() const
+{
+  return transfer.max_level();
 }
 
 #endif
