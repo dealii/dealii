@@ -12098,6 +12098,35 @@ Triangulation<dim, spacedim>::get_anisotropic_refinement_flag() const
 
 
 
+namespace internal
+{
+  namespace
+  {
+    std::vector<std::vector<bool>>
+    extract_raw_coarsen_flags(
+      const std::vector<std::unique_ptr<
+        dealii::internal::TriangulationImplementation::TriaLevel>> &levels)
+    {
+      std::vector<std::vector<bool>> coarsen_flags(levels.size());
+      for (unsigned int level = 0; level < levels.size(); ++level)
+        coarsen_flags[level] = levels[level]->coarsen_flags;
+      return coarsen_flags;
+    }
+
+    std::vector<std::vector<std::uint8_t>>
+    extract_raw_refine_flags(
+      const std::vector<std::unique_ptr<
+        dealii::internal::TriangulationImplementation::TriaLevel>> &levels)
+    {
+      std::vector<std::vector<std::uint8_t>> refine_flags(levels.size());
+      for (unsigned int level = 0; level < levels.size(); ++level)
+        refine_flags[level] = levels[level]->refine_flags;
+      return refine_flags;
+    }
+  } // namespace
+} // namespace internal
+
+
 /*-------------------- user data/flags -------------------------*/
 
 
@@ -14885,8 +14914,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
   // in particular we set flags right if
   // limit_level_difference_at_vertices is set. to do so we iterate
   // until the flags don't change any more
-  std::vector<bool> previous_coarsen_flags(n_active_cells());
-  save_coarsen_flags(previous_coarsen_flags);
+  auto previous_coarsen_flags = internal::extract_raw_coarsen_flags(levels);
 
   std::vector<int> vertex_level(vertices.size(), 0);
 
@@ -15065,11 +15093,10 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
 
       // now see if anything has changed in the last iteration of this
       // function
-      std::vector<bool> current_coarsen_flags(n_active_cells());
-      save_coarsen_flags(current_coarsen_flags);
+      auto current_coarsen_flags = internal::extract_raw_coarsen_flags(levels);
 
       continue_iterating = (current_coarsen_flags != previous_coarsen_flags);
-      previous_coarsen_flags = current_coarsen_flags;
+      previous_coarsen_flags.swap(current_coarsen_flags);
     }
   while (continue_iterating == true);
 }
@@ -15082,14 +15109,12 @@ Triangulation<1, 1>::prepare_coarsening_and_refinement()
 {
   // save the flags to determine whether something was changed in the
   // course of this function
-  std::vector<bool> flags_before;
-  save_coarsen_flags(flags_before);
+  const auto flags_before = internal::extract_raw_coarsen_flags(levels);
 
   // do nothing in 1d, except setting the coarsening flags correctly
   fix_coarsen_flags();
 
-  std::vector<bool> flags_after;
-  save_coarsen_flags(flags_after);
+  const auto flags_after = internal::extract_raw_coarsen_flags(levels);
 
   return (flags_before != flags_after);
 }
@@ -15101,14 +15126,12 @@ Triangulation<1, 2>::prepare_coarsening_and_refinement()
 {
   // save the flags to determine whether something was changed in the
   // course of this function
-  std::vector<bool> flags_before;
-  save_coarsen_flags(flags_before);
+  const auto flags_before = internal::extract_raw_coarsen_flags(levels);
 
   // do nothing in 1d, except setting the coarsening flags correctly
   fix_coarsen_flags();
 
-  std::vector<bool> flags_after;
-  save_coarsen_flags(flags_after);
+  const auto flags_after = internal::extract_raw_coarsen_flags(levels);
 
   return (flags_before != flags_after);
 }
@@ -15120,14 +15143,12 @@ Triangulation<1, 3>::prepare_coarsening_and_refinement()
 {
   // save the flags to determine whether something was changed in the
   // course of this function
-  std::vector<bool> flags_before;
-  save_coarsen_flags(flags_before);
+  const auto flags_before = internal::extract_raw_coarsen_flags(levels);
 
   // do nothing in 1d, except setting the coarsening flags correctly
   fix_coarsen_flags();
 
-  std::vector<bool> flags_after;
-  save_coarsen_flags(flags_after);
+  const auto flags_after = internal::extract_raw_coarsen_flags(levels);
 
   return (flags_before != flags_after);
 }
@@ -15325,9 +15346,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
 {
   // save the flags to determine whether something was changed in the
   // course of this function
-  std::vector<bool> flags_before[2];
-  save_coarsen_flags(flags_before[0]);
-  save_refine_flags(flags_before[1]);
+  const auto coarsen_flags_before = internal::extract_raw_coarsen_flags(levels);
+  const auto refine_flags_before  = internal::extract_raw_refine_flags(levels);
 
   // save the flags at the outset of each loop. we do so in order to
   // find out whether something was changed in the present loop, in
@@ -15345,7 +15365,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
   // transported over one level in each run of the loop, so this is
   // enough. Unfortunately, each loop is rather expensive, so we chose
   // the way presented here
-  std::vector<bool> flags_before_loop[2] = {flags_before[0], flags_before[1]};
+  auto coarsen_flags_before_loop = coarsen_flags_before;
+  auto refine_flags_before_loop  = refine_flags_before;
 
   // now for what is done in each loop: we have to fulfill several
   // tasks at the same time, namely several mesh smoothing algorithms
@@ -16303,31 +16324,29 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
       //    cell are either flagged for coarsening
       //    or none of the children is
       fix_coarsen_flags();
-      // get the refinement and coarsening
-      // flags
-      std::vector<bool> flags_after_loop[2];
-      save_coarsen_flags(flags_after_loop[0]);
-      save_refine_flags(flags_after_loop[1]);
 
-      // find out whether something was
-      // changed in this loop
+      // get the refinement and coarsening flags
+      auto coarsen_flags_after_loop =
+        internal::extract_raw_coarsen_flags(levels);
+      auto refine_flags_after_loop = internal::extract_raw_refine_flags(levels);
+
+      // find out whether something was changed in this loop
       mesh_changed_in_this_loop =
-        ((flags_before_loop[0] != flags_after_loop[0]) ||
-         (flags_before_loop[1] != flags_after_loop[1]));
+        ((coarsen_flags_before_loop != coarsen_flags_after_loop) ||
+         (refine_flags_before_loop != refine_flags_after_loop));
 
-      // set the flags for the next loop
-      // already
-      flags_before_loop[0].swap(flags_after_loop[0]);
-      flags_before_loop[1].swap(flags_after_loop[1]);
+      // set the flags for the next loop already
+      coarsen_flags_before_loop.swap(coarsen_flags_after_loop);
+      refine_flags_before_loop.swap(refine_flags_after_loop);
     }
   while (mesh_changed_in_this_loop);
 
 
   // find out whether something was really changed in this
-  // function. Note that @p{flags_before_loop} represents the state
-  // after the last loop, i.e.  the present state
-  return ((flags_before[0] != flags_before_loop[0]) ||
-          (flags_before[1] != flags_before_loop[1]));
+  // function. Note that @p{..._flags_before_loop} represents the state
+  // after the last loop, i.e., the present state
+  return ((coarsen_flags_before != coarsen_flags_before_loop) ||
+          (refine_flags_before != refine_flags_before_loop));
 }
 
 
