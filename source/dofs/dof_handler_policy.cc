@@ -1725,7 +1725,7 @@ namespace internal
                   std::make_tuple(),
                   cell->active_fe_index(),
                   DoFAccessorImplementation::Implementation::
-                    DoFIndexProcessor<dim, spacedim, false>(),
+                    DoFIndexProcessor<dim, spacedim>(),
                   [&next_free_dof](auto &stored_index, auto) {
                     if (stored_index == numbers::invalid_dof_index)
                       {
@@ -3575,7 +3575,7 @@ namespace internal
               dofs,
               cell->active_fe_index(),
               DoFAccessorImplementation::Implementation::
-                DoFIndexProcessor<dim, spacedim, false>(),
+                DoFIndexProcessor<dim, spacedim>(),
               [&complete](auto &stored_index, auto received_index) {
                 if (*received_index != numbers::invalid_dof_index)
                   {
@@ -4105,7 +4105,7 @@ namespace internal
                 std::make_tuple(),
                 cell->active_fe_index(),
                 DoFAccessorImplementation::Implementation::
-                  DoFIndexProcessor<dim, spacedim, false>(),
+                  DoFIndexProcessor<dim, spacedim>(),
                 [&owned_dofs](auto &stored_index, auto) {
                   // delete a DoF index if it has not already been
                   // deleted (e.g., by visiting a neighboring cell, if
