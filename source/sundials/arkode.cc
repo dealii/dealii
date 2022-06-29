@@ -679,10 +679,6 @@ namespace SUNDIALS
   void
   ARKode<VectorType>::set_functions_to_trigger_an_assert()
   {
-    reinit_vector = [](VectorType &) {
-      AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
-    };
-
     solver_should_restart = [](const double, VectorType &) -> bool {
       return false;
     };
