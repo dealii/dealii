@@ -1069,7 +1069,7 @@ namespace internal
       {
         // For 2D cells the access cell->line_orientation() is already
         // efficient
-        std::array<unsigned int, 4> line_indices;
+        std::array<unsigned int, 4> line_indices = {};
         for (unsigned int line : cell.line_indices())
           line_indices[line] = cell.line_index(line);
         return line_indices;
@@ -1084,7 +1084,7 @@ namespace internal
       get_line_indices_of_cell(
         const TriaAccessor<structdim, dim, spacedim> &cell)
       {
-        std::array<unsigned int, 12> line_indices;
+        std::array<unsigned int, 12> line_indices = {};
 
         // For hexahedra, the classical access via quads -> lines is too
         // inefficient. Unroll this code here to allow the compiler to inline
@@ -1164,7 +1164,7 @@ namespace internal
       {
         // For 2D cells the access cell->line_orientation() is already
         // efficient
-        std::array<bool, 4> line_orientations;
+        std::array<bool, 4> line_orientations = {};
         for (unsigned int line : cell.line_indices())
           line_orientations[line] = cell.line_orientation(line);
         return line_orientations;
@@ -1180,7 +1180,7 @@ namespace internal
       static std::array<bool, 12>
       get_line_orientations_of_cell(const TriaAccessor<3, dim, spacedim> &cell)
       {
-        std::array<bool, 12> line_orientations;
+        std::array<bool, 12> line_orientations = {};
 
         // For hexahedra, the classical access via quads -> lines is too
         // inefficient. Unroll this code here to allow the compiler to inline
