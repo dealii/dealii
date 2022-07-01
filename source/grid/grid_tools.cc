@@ -744,6 +744,9 @@ namespace GridTools
                              std::vector<unsigned int> &   considered_vertices,
                              const double                  tol)
   {
+    if (tol == 0.0)
+      return; // nothing to do per definition
+
     AssertIndexRange(2, vertices.size());
     std::vector<unsigned int> new_vertex_numbers(vertices.size());
     std::iota(new_vertex_numbers.begin(), new_vertex_numbers.end(), 0);

@@ -1864,7 +1864,7 @@ namespace GridGenerator
    * {
    *   double length = std::numeric_limits<double>::max();
    *   for (const auto &cell : tria.active_cell_iterators())
-   *     for (unsigned int n = 0; n < GeometryInfo<dim>::lines_per_cell; ++n)
+   *     for (const auto n : cell->line_indices())
    *       length = std::min(length, (cell->line(n)->vertex(0) -
    *                                  cell->line(n)->vertex(1)).norm());
    *   return length;
@@ -1875,7 +1875,7 @@ namespace GridGenerator
    * @endcode
    *
    * This will merge any vertices that are closer than any pair of vertices on
-   * the input meshes.
+   * the input meshes. If the tolerance is set to zero, vertices are not merged.
    *
    * @note The two input triangulations must be
    * @ref GlossCoarseMesh "coarse meshes",
