@@ -3342,12 +3342,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // Case 3: standard operation with one index per degree of freedom -> go on
   // here
   constexpr unsigned int n_lanes = VectorizedArrayType::size();
-  Assert(mask.count() == n_lanes,
-         ExcNotImplemented("Masking currently not implemented for "
-                           "non-contiguous DoF storage"));
 
-  const std::array<unsigned int, VectorizedArrayType::size()> &cells =
+  std::array<unsigned int, VectorizedArrayType::size()> cells =
     this->get_cell_ids();
+
+  for (unsigned int v = 0; v < n_lanes; ++v)
+    if (mask[v] == false)
+      cells[v] = numbers::invalid_unsigned_int;
 
   bool has_hn_constraints = false;
 
