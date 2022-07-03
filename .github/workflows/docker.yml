@@ -2,7 +2,9 @@ name: github-docker
 
 on: 
   push: 
-    branches: [master]
+    branches:
+      - 'docker*'
+      - 'master'
 
 permissions:
   contents: read
@@ -30,7 +32,7 @@ jobs:
           context: ./contrib/docker/
           cache-from: type=registry,ref=dealii/dependencies:focal
           cache-to: type=inline
-          push: true
+          push: false
           tags: dealii/dealii:master-focal
 
       - name: Build and push Docker image of master with root user
@@ -40,6 +42,6 @@ jobs:
           file: ./contrib/docker/Dockerfile.root
           cache-from: type=registry,ref=dealii/dealii:master-focal
           cache-to: type=inline
-          push: true
+          push: false
           tags: dealii/dealii:master-focal-root
 
