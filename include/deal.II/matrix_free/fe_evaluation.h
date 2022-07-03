@@ -5883,7 +5883,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                    "update_hessians"));
 
           const auto &jac_grad = this->jacobian_gradients_non_inverse[q_point];
-          const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
+          const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
             this->jacobian[q_point];
           const Tensor<2, dim, VectorizedArrayType> &t_jac = invert(inv_t_jac);
 
@@ -6299,7 +6299,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
           // General cell
 
           const auto &jac_grad = this->jacobian_gradients_non_inverse[q_point];
-          const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
+          const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
             this->jacobian[q_point];
           const Tensor<2, dim, VectorizedArrayType> &t_jac = invert(inv_t_jac);
 
