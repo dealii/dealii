@@ -2569,45 +2569,51 @@ namespace internal
                   {
                     // lines
                     if (dofs_per_line > 0)
-                      for (const auto l : cell->line_indices())
-                        {
-                          const auto line = cell->line(l);
-                          if (!line_touched[line->index()])
-                            {
-                              dealii::types::global_dof_index *indices =
-                                &internal::DoFAccessorImplementation::
-                                  Implementation::get_mg_dof_index(
-                                    dof_handler,
-                                    dof_handler.mg_levels[level],
-                                    dof_handler.mg_faces,
-                                    line->index(),
-                                    0,
-                                    0,
-                                    std::integral_constant<int, 1>());
-                              for (unsigned int d = 0; d < dofs_per_line; ++d)
-                                {
-                                  if (check_validity)
-                                    Assert(indices[d] !=
-                                             numbers::invalid_dof_index,
-                                           ExcInternalError());
+                      {
+                        const auto line_indices =
+                          internal::TriaAccessorImplementation::Implementation::
+                            get_line_indices_of_cell(*cell);
+                        for (const auto line : cell->line_indices())
+                          {
+                            if (!line_touched[line_indices[line]])
+                              {
+                                line_touched[line_indices[line]] = true;
+                                dealii::types::global_dof_index *indices =
+                                  &internal::DoFAccessorImplementation::
+                                    Implementation::get_mg_dof_index(
+                                      dof_handler,
+                                      dof_handler.mg_levels[level],
+                                      dof_handler.mg_faces,
+                                      line_indices[line],
+                                      0,
+                                      0,
+                                      std::integral_constant<int, 1>());
+                                for (unsigned int d = 0; d < dofs_per_line; ++d)
+                                  {
+                                    if (check_validity)
+                                      Assert(indices[d] !=
+                                               numbers::invalid_dof_index,
+                                             ExcInternalError());
 
-                                  if (indices[d] != numbers::invalid_dof_index)
-                                    indices[d] =
-                                      (indices_we_care_about.size() == 0) ?
-                                        new_numbers[indices[d]] :
-                                        new_numbers[indices_we_care_about
-                                                      .index_within_set(
-                                                        indices[d])];
-                                }
-                              line_touched[line->index()] = true;
-                            }
-                        }
+                                    if (indices[d] !=
+                                        numbers::invalid_dof_index)
+                                      indices[d] =
+                                        (indices_we_care_about.size() == 0) ?
+                                          new_numbers[indices[d]] :
+                                          new_numbers[indices_we_care_about
+                                                        .index_within_set(
+                                                          indices[d])];
+                                  }
+                              }
+                          }
+                      }
 
                     // quads
                     if (dim > 2)
                       for (const auto quad : cell->face_indices())
                         if (!quad_touched[cell->quad(quad)->index()])
                           {
+                            quad_touched[cell->quad(quad)->index()] = true;
                             const unsigned int dofs_per_quad =
                               dof_handler.get_fe().n_dofs_per_quad(quad);
                             if (dofs_per_quad > 0)
@@ -2639,7 +2645,6 @@ namespace internal
                                                           indices[d])];
                                   }
                               }
-                            quad_touched[cell->quad(quad)->index()] = true;
                           }
                   }
             }
@@ -3886,12 +3891,9 @@ namespace internal
                 triangulation->locally_owned_subdomain(), *dof_handler, level);
 
             //* 2. iterate over ghostcells and kill dofs that are not
-            // owned by us
+            // owned by us, which we mark by invalid_dof_index
             std::vector<dealii::types::global_dof_index> renumbering(
-              n_initial_local_dofs);
-            for (dealii::types::global_dof_index i = 0; i < renumbering.size();
-                 ++i)
-              renumbering[i] = i;
+              n_initial_local_dofs, enumeration_dof_index);
 
             if (level < triangulation->n_levels())
               {
@@ -3923,10 +3925,10 @@ namespace internal
                     }
               }
 
-            level_number_cache.n_locally_owned_dofs = 0;
-            for (types::global_dof_index &index : renumbering)
-              if (index != numbers::invalid_dof_index)
-                index = level_number_cache.n_locally_owned_dofs++;
+            level_number_cache.n_locally_owned_dofs =
+              std::count(renumbering.begin(),
+                         renumbering.end(),
+                         enumeration_dof_index);
 
             //* 3. communicate local dofcount and shift ids to make
             // them unique
@@ -3953,10 +3955,10 @@ namespace internal
                              triangulation->get_communicator());
             AssertThrowMPI(ierr);
 
-            // shift indices
+            // assign appropriate indices
             for (types::global_dof_index &index : renumbering)
-              if (index != numbers::invalid_dof_index)
-                index += my_shift;
+              if (index == enumeration_dof_index)
+                index = my_shift++;
 
             // now re-enumerate all dofs to this shifted and condensed
             // numbering form.  we renumber some dofs as invalid, so
@@ -3974,7 +3976,7 @@ namespace internal
             level_number_cache.locally_owned_dofs =
               IndexSet(level_number_cache.n_global_dofs);
             level_number_cache.locally_owned_dofs.add_range(
-              my_shift, my_shift + level_number_cache.n_locally_owned_dofs);
+              my_shift - level_number_cache.n_locally_owned_dofs, my_shift);
             level_number_cache.locally_owned_dofs.compress();
 
             number_caches.emplace_back(level_number_cache);
