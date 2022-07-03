@@ -3781,7 +3781,9 @@ public:
   /**
    * Return a globally unique index for a non-artificial level cell.
    *
-   * @note Similar to global_active_cell_index().
+   * @note Similar to global_active_cell_index(), with the difference
+   * that the cell-data vector has been set up with
+   * parallel::TriangulationBase::global_level_cell_index_partitioner().
    */
   types::global_cell_index
   global_level_cell_index() const;

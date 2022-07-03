@@ -204,14 +204,16 @@ namespace parallel
 
     /**
      * Return partitioner for the global indices of the cells on the active
-     * level of the triangulation.
+     * level of the triangulation, which is returned by the function
+     * CellAccessor::global_active_cell_index().
      */
     const std::weak_ptr<const Utilities::MPI::Partitioner>
     global_active_cell_index_partitioner() const;
 
     /**
      * Return partitioner for the global indices of the cells on the given @p
-     * level of the triangulation.
+     * level of the triangulation, which is returned by the function
+     * CellAccessor::global_level_cell_index().
      */
     const std::weak_ptr<const Utilities::MPI::Partitioner>
     global_level_cell_index_partitioner(const unsigned int level) const;
