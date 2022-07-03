@@ -125,14 +125,46 @@ template <int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE SymmetricTensor<4, dim, Number>
                                 invert(const SymmetricTensor<4, dim, Number> &);
 
+/**
+ * Compute and return the trace of a tensor of rank 2, i.e. the sum of its
+ * diagonal entries. The trace is the first invariant of a rank-2 tensor.
+ * \f[
+ *   \text{tr} \mathbf A = \sum_i A_{ii}
+ * \f]
+ *
+ * @relatesalso SymmetricTensor
+ */
 template <int dim2, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Number
 trace(const SymmetricTensor<2, dim2, Number> &);
 
+/**
+ * Compute the deviator of a symmetric tensor, which is defined as
+ * $\text{dev} \mathbf T = \mathbf T -
+ * \frac{1}{\text{dim}} \text{tr}\mathbf T \; \mathbf I$, where $\mathbf I$
+ * is the identity operator. This
+ * quantity equals the original tensor minus its contractive or dilative
+ * component and refers to the shear in, for example, elasticity.
+ *
+ * @relatesalso SymmetricTensor
+ */
 template <int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
 deviator(const SymmetricTensor<2, dim, Number> &);
 
+/**
+ * Compute the determinant of a rank 2 symmetric tensor. The determinant is
+ * also commonly referred to as the third invariant of rank-2 tensors.
+ *
+ * For a one-dimensional tensor, the determinant equals the only element and
+ * is therefore equivalent to the trace.
+ *
+ * For greater notational simplicity, there is also a
+ * <tt>third_invariant()</tt>
+ * function that returns the determinant of a tensor.
+ *
+ * @relatesalso SymmetricTensor
+ */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
 determinant(const SymmetricTensor<2, dim, Number> &);
@@ -1069,6 +1101,8 @@ private:
    */
   base_tensor_type data;
 
+#ifndef DOXYGEN
+
   // Make all other symmetric tensors friends.
   template <int, int, typename>
   friend class SymmetricTensor;
@@ -1105,6 +1139,7 @@ private:
 
   friend struct internal::SymmetricTensorImplementation::
     Inverse<4, dim, Number>;
+#endif
 };
 
 
@@ -2727,19 +2762,6 @@ constexpr DEAL_II_ALWAYS_INLINE
 
 
 
-/**
- * Compute the determinant of a rank 2 symmetric tensor. The determinant is
- * also commonly referred to as the third invariant of rank-2 tensors.
- *
- * For a one-dimensional tensor, the determinant equals the only element and
- * is therefore equivalent to the trace.
- *
- * For greater notational simplicity, there is also a
- * <tt>third_invariant()</tt>
- * function that returns the determinant of a tensor.
- *
- * @relatesalso SymmetricTensor
- */
 template <int dim, typename Number>
 DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE Number
 determinant(const SymmetricTensor<2, dim, Number> &t)
@@ -2789,15 +2811,6 @@ third_invariant(const SymmetricTensor<2, dim, Number> &t)
 
 
 
-/**
- * Compute and return the trace of a tensor of rank 2, i.e. the sum of its
- * diagonal entries. The trace is the first invariant of a rank-2 tensor.
- * \f[
- *   \text{tr} \mathbf A = \sum_i A_{ii}
- * \f]
- *
- * @relatesalso SymmetricTensor
- */
 template <int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Number
 trace(const SymmetricTensor<2, dim, Number> &d)
@@ -3297,16 +3310,6 @@ transpose(const SymmetricTensor<rank_, dim, Number> &t)
 
 
 
-/**
- * Compute the deviator of a symmetric tensor, which is defined as
- * $\text{dev} \mathbf T = \mathbf T -
- * \frac{1}{\text{dim}} \text{tr}\mathbf T \; \mathbf I$, where $\mathbf I$
- * is the identity operator. This
- * quantity equals the original tensor minus its contractive or dilative
- * component and refers to the shear in, for example, elasticity.
- *
- * @relatesalso SymmetricTensor
- */
 template <int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, Number>
 deviator(const SymmetricTensor<2, dim, Number> &t)
