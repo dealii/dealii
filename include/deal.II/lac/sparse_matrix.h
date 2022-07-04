@@ -14,30 +14,29 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_sparse_matrix_h
-#  define dealii_sparse_matrix_h
+#define dealii_sparse_matrix_h
 
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
 
-#  include <deal.II/base/smartpointer.h>
-#  include <deal.II/base/subscriptor.h>
+#include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/identity_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/vector_operation.h>
+#ifdef DEAL_II_WITH_MPI
+#  include <mpi.h>
+#endif
 
-#  include <deal.II/lac/exceptions.h>
-#  include <deal.II/lac/identity_matrix.h>
-#  include <deal.II/lac/sparsity_pattern.h>
-#  include <deal.II/lac/vector_operation.h>
-#  ifdef DEAL_II_WITH_MPI
-#    include <mpi.h>
-#  endif
-
-#  include <iterator>
-#  include <memory>
+#include <iterator>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 template <typename number>
 class Vector;
 template <typename number>
@@ -46,7 +45,7 @@ template <typename Matrix>
 class BlockMatrixBase;
 template <typename number>
 class SparseILU;
-#    ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
 namespace Utilities
 {
   namespace MPI
@@ -56,15 +55,15 @@ namespace Utilities
     sum(const SparseMatrix<Number> &, const MPI_Comm &, SparseMatrix<Number> &);
   }
 } // namespace Utilities
-#    endif
+#  endif
 
-#    ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   class SparseMatrix;
 }
-#    endif
 #  endif
+#endif
 
 /**
  * @addtogroup Matrix1
@@ -1022,7 +1021,7 @@ public:
   void
   copy_from(const FullMatrix<somenumber> &matrix);
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Copy the given Trilinos matrix to this one. The operation triggers an
    * assertion if the sparsity patterns of the current object does not contain
@@ -1034,7 +1033,7 @@ public:
    */
   SparseMatrix<number> &
   copy_from(const TrilinosWrappers::SparseMatrix &matrix);
-#  endif
+#endif
 
   /**
    * Add <tt>matrix</tt> scaled by <tt>factor</tt> to this matrix, i.e. the
@@ -1782,17 +1781,17 @@ private:
   template <typename, bool>
   friend class SparseMatrixIterators::Accessor;
 
-#  ifdef DEAL_II_WITH_MPI
+#ifdef DEAL_II_WITH_MPI
   // Give access to internal datastructures to perform MPI operations.
   template <typename Number>
   friend void
   Utilities::MPI::sum(const SparseMatrix<Number> &,
                       const MPI_Comm &,
                       SparseMatrix<Number> &);
-#  endif
+#endif
 };
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 /*---------------------- Inline functions -----------------------------------*/
 
 
@@ -2577,12 +2576,9 @@ SparseMatrix<number>::prepare_set()
   // nothing to do here
 }
 
-#  endif // DOXYGEN
+#endif // DOXYGEN
 
-
-/*----------------------------   sparse_matrix.h ---------------------------*/
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-/*----------------------------   sparse_matrix.h ---------------------------*/
