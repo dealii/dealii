@@ -502,7 +502,7 @@ namespace PETScWrappers
       reinit(const SparseMatrix &other);
 
       /**
-       * Create a matrix where the size() of the IndexSets determine the
+       * Create a matrix where the size of the IndexSets determine the
        * global number of rows and columns and the entries of the IndexSet
        * give the rows and columns for the calling processor. Note that only
        * ascending, 1:1 IndexSets are supported. The additional call to the
