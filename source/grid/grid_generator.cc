@@ -6544,6 +6544,10 @@ namespace GridGenerator
       GridTools::consistently_order_cells(cells);
     result.clear();
     result.create_triangulation(vertices, cells, subcell_data);
+
+    Assert(duplicated_vertex_tolerance > 0.0 ||
+             n_accumulated_vertices == result.n_vertices(),
+           ExcInternalError());
   }
 
 

@@ -439,7 +439,8 @@ namespace GridTools
    * vertices.
    *
    * Two vertices are considered equal if their difference in each coordinate
-   * direction is less than @p tol.
+   * direction is less than @p tol. This implies that nothing happens if
+   * the tolerance is set to zero.
    */
   template <int dim, int spacedim>
   void
