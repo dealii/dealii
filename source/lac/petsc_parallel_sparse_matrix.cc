@@ -439,7 +439,7 @@ namespace PETScWrappers
     {
       Assert(sparsity_pattern.n_rows() == local_rows.size(),
              ExcMessage(
-               "SparsityPattern and IndexSet have different number of rows"));
+               "SparsityPattern and IndexSet have different number of rows."));
       Assert(
         sparsity_pattern.n_cols() == local_columns.size(),
         ExcMessage(
