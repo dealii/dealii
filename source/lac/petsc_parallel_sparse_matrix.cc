@@ -477,10 +477,11 @@ namespace PETScWrappers
 
       // create the local to global mappings as arrays.
       IndexSet::size_type n_local_active_rows = local_active_rows.n_elements();
-      IndexSet::size_type n_local_active_cols = local_active_columns.n_elements();
-      std::vector<int>    idx_glob_row(n_local_active_rows);
-      std::vector<int>    idx_glob_col(n_local_active_cols);
-      unsigned int        k;
+      IndexSet::size_type n_local_active_cols =
+        local_active_columns.n_elements();
+      std::vector<int> idx_glob_row(n_local_active_rows);
+      std::vector<int> idx_glob_col(n_local_active_cols);
+      unsigned int     k;
       for (k = 0; k < n_local_active_rows; ++k)
         {
           idx_glob_row[k] = local_active_rows.nth_index_in_set(k);
