@@ -476,16 +476,16 @@ namespace PETScWrappers
       PetscErrorCode ierr;
 
       // create the local to global mappings as arrays.
-      IndexSet::size_type n_l2g_row = local_active_rows.n_elements();
-      IndexSet::size_type n_l2g_col = local_active_columns.n_elements();
-      std::vector<int>    idx_glob_row(n_l2g_row);
-      std::vector<int>    idx_glob_col(n_l2g_col);
+      IndexSet::size_type n_local_active_rows = local_active_rows.n_elements();
+      IndexSet::size_type n_local_active_cols = local_active_columns.n_elements();
+      std::vector<int>    idx_glob_row(n_local_active_rows);
+      std::vector<int>    idx_glob_col(n_local_active_cols);
       unsigned int        k;
-      for (k = 0; k < n_l2g_row; ++k)
+      for (k = 0; k < n_local_active_rows; ++k)
         {
           idx_glob_row[k] = local_active_rows.nth_index_in_set(k);
         }
-      for (k = 0; k < n_l2g_col; ++k)
+      for (k = 0; k < n_local_active_cols; ++k)
         {
           idx_glob_col[k] = local_active_columns.nth_index_in_set(k);
         }
@@ -495,7 +495,7 @@ namespace PETScWrappers
       // Create row index set
       ISLocalToGlobalMapping l2gmap_row;
       ierr = ISCreateGeneral(communicator,
-                             n_l2g_row,
+                             n_local_active_rows,
                              idx_glob_row.data(),
                              PETSC_COPY_VALUES,
                              &is_glob_row);
@@ -511,7 +511,7 @@ namespace PETScWrappers
       // Create column index set
       ISLocalToGlobalMapping l2gmap_col;
       ierr = ISCreateGeneral(communicator,
-                             n_l2g_col,
+                             n_local_active_cols,
                              idx_glob_col.data(),
                              PETSC_COPY_VALUES,
                              &is_glob_col);
@@ -553,8 +553,7 @@ namespace PETScWrappers
       // read the documentation of this
       // class.
 
-      // In the MATIS case, we use the local matrix instead
-      Mat local_matrix;
+      Mat local_matrix; // In the MATIS case, we use the local matrix instead
       ierr = MatISGetLocalMat(matrix, &local_matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
       ierr = MatSetType(local_matrix,
