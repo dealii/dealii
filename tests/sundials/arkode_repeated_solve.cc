@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2021 by the deal.II authors
+//    Copyright (C) 2021 - 2022 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -51,19 +51,17 @@ create_solver()
   ode->output_step = [&](const double       t,
                          const VectorType & sol,
                          const unsigned int step_number) -> int {
-    deallog << t << ' ' << sol[0] << ' ' << sol[1] << std::endl;
+    deallog << std::setprecision(16) << t << ' ' << sol[0] << ' ' << sol[1]
+            << std::endl;
     return 0;
   };
   return ode;
 }
 
 int
-main(int argc, char **argv)
+main()
 {
   initlog();
-
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
 
   auto ode = create_solver();
   {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,8 @@
 for (deal_II_dimension : DIMENSIONS)
   {
     template class FEValues<deal_II_dimension>;
+
+    template class FEInterfaceValues<deal_II_dimension>;
   }
 
 for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
@@ -41,12 +43,39 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
       const DoFHandler<deal_II_dimension> &,
       const VEC &,
       const typename FEValues<deal_II_dimension>::AdditionalData &);
+
+    template FEInterfaceValues<deal_II_dimension>::FEInterfaceValues(
+      const hp::FECollection<deal_II_dimension> &,
+      const Quadrature<1> &,
+      const RegionUpdateFlags,
+      const MeshClassifier<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
+      const VEC &,
+      const FEInterfaceValues<deal_II_dimension>::AdditionalData &);
+
+    template FEInterfaceValues<deal_II_dimension>::FEInterfaceValues(
+      const hp::MappingCollection<deal_II_dimension> &,
+      const hp::FECollection<deal_II_dimension> &,
+      const hp::QCollection<deal_II_dimension - 1> &,
+      const hp::QCollection<1> &,
+      const RegionUpdateFlags,
+      const MeshClassifier<deal_II_dimension> &,
+      const DoFHandler<deal_II_dimension> &,
+      const VEC &,
+      const AdditionalData &);
   }
 
-// Template reinit function
+// Template reinit functions
 for (deal_II_dimension : DIMENSIONS; lda : BOOL)
   {
     template void FEValues<deal_II_dimension>::reinit(
       const TriaIterator<
         DoFCellAccessor<deal_II_dimension, deal_II_dimension, lda>> &);
+
+    template void FEInterfaceValues<deal_II_dimension>::do_reinit(
+      const TriaIterator<
+        DoFCellAccessor<deal_II_dimension, deal_II_dimension, lda>> &,
+      const unsigned int,
+      const std::function<void(dealii::FEInterfaceValues<deal_II_dimension> &)>
+        &);
   }

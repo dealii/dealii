@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,9 @@ namespace Utilities
           FlexibleIndexStorage(const bool use_vector = true);
 
           void
-          reinit(const bool use_vector, const std::size_t size);
+          reinit(const bool        use_vector,
+                 const bool        index_range_contiguous,
+                 const std::size_t size);
 
           void
           fill(const std::size_t start,
@@ -77,8 +79,9 @@ namespace Utilities
          */
         class DictionaryPayLoad
           : public ConsensusAlgorithms::Process<
-              std::pair<types::global_dof_index, types::global_dof_index>,
-              unsigned int>
+              std::vector<
+                std::pair<types::global_dof_index, types::global_dof_index>>,
+              std::vector<unsigned int>>
         {
         public:
           /**
@@ -282,8 +285,9 @@ namespace Utilities
          */
         class ConsensusAlgorithmsPayload
           : public ConsensusAlgorithms::Process<
-              std::pair<types::global_dof_index, types::global_dof_index>,
-              unsigned int>
+              std::vector<
+                std::pair<types::global_dof_index, types::global_dof_index>>,
+              std::vector<unsigned int>>
         {
         public:
           /**
@@ -425,13 +429,13 @@ namespace Utilities
            * out the owner of the index that was requested (using the guess in
            * `owner_index`, as we typically might look up on the same rank
            * several times in a row, which avoids the binary search in
-           * Dictionary::get_owning_rank_index(). Once we know the rank of the
-           * owner, we the vector entry with the rank of the request. Here, we
-           * utilize the fact that requests are processed rank-by-rank, so we
-           * can simply look at the end of the vector if there is already some
-           * data stored or not. Finally, we build ranges, again using that
-           * the index list is sorted and we therefore only need to append at
-           * the end.
+           * Dictionary::get_owning_rank_index()). Once we know the rank of
+           * the owner, we fill the vector entry with the rank of the
+           * request. Here, we utilize the fact that requests are processed
+           * rank-by-rank, so we can simply look at the end of the vector
+           * whether there is already some data stored or not. Finally, we
+           * build ranges, again using that the index list is sorted and we
+           * therefore only need to append at the end.
            */
           void
           append_index_origin(const types::global_dof_index index,

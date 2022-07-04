@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,8 +23,6 @@
 #include <deal.II/dofs/dof_iterator_selector.h>
 
 #include <deal.II/grid/tria_accessor.h>
-
-#include <deal.II/hp/dof_handler.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
@@ -140,7 +138,8 @@ namespace internal
  * A class that gives access to the degrees of freedom stored in a DoFHandler
  * object. Accessors are used to access the data that pertains to edges,
  * faces, and cells of a triangulation. The concept is explained in more
- * detail in connection to @ref Iterators.
+ * detail in connection to
+ * @ref Iterators.
  *
  * This class follows mainly the route laid out by the accessor library
  * declared in the triangulation library (TriaAccessor). It enables the user
@@ -1743,6 +1742,15 @@ public:
    * of the respective finite element class for a description of what the
    * prolongation matrices represent in this case.
    *
+   * @note Cells set the values of DoFs independently and might overwrite
+   * previously set values in the global vector, for example when calling the
+   * same function earlier from a different cell. By setting @p perform_check,
+   * you can enable a check that the previous value and the one to be set here
+   * are at least roughly the same. In practice, they might be slightly
+   * different because they are computed in a way that theoretically ensures
+   * that they are the same, but in practice they are only equal up to
+   * round-off.
+   *
    * @note Unlike the get_dof_values() function, this function is only
    * available on cells, rather than on lines, quads, and hexes, since
    * interpolation is presently only provided for cells by the finite element
@@ -1751,6 +1759,24 @@ public:
   template <class OutputVector, typename number>
   void
   set_dof_values_by_interpolation(
+    const Vector<number> &local_values,
+    OutputVector &        values,
+    const unsigned int    fe_index =
+      DoFHandler<dimension_, space_dimension_>::invalid_fe_index,
+    const bool perform_check = false) const;
+
+  /**
+   * Similar to set_dof_values_by_interpolation() with the difference that
+   * values are added into the vector.
+   *
+   * @note In parallel::distributed::SolutionTransfer, this function is used
+   *   to accumulate the contributions of all cells to a DoF; with a
+   *   subsequent multiplication with the inverse of the valence, finally,
+   *   the average value is obtained.
+   */
+  template <class OutputVector, typename number>
+  void
+  distribute_local_to_global_by_interpolation(
     const Vector<number> &local_values,
     OutputVector &        values,
     const unsigned int    fe_index =

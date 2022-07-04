@@ -1,17 +1,18 @@
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2022 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
-//---------------------------------------------------------------
+// ---------------------------------------------------------------------
+
 
 #ifndef dealii_sundials_ida_h
 #define dealii_sundials_ida_h
@@ -37,17 +38,12 @@
 #    include <ida/ida.h>
 #  endif
 
-#  include <sundials/sundials_config.h>
-#  if DEAL_II_SUNDIALS_VERSION_LT(3, 0, 0)
-#    include <ida/ida_spbcgs.h>
-#    include <ida/ida_spgmr.h>
-#    include <ida/ida_sptfqmr.h>
-#  endif
 #  include <deal.II/sundials/sunlinsol_wrapper.h>
 
 #  include <boost/signals2.hpp>
 
 #  include <nvector/nvector_serial.h>
+#  include <sundials/sundials_config.h>
 #  include <sundials/sundials_math.h>
 #  include <sundials/sundials_types.h>
 
@@ -74,10 +70,8 @@ namespace SUNDIALS
    *  - setup_jacobian;
    *  - solve_jacobian_system/solve_with_jacobian;
    *
-   * The function `solve_jacobian_system` should be implemented for SUNDIALS
-   * < 4.0.0. For later versions, you should use
-   * `solve_with_jacobian` to leverage better non-linear
-   * algorithms.
+   * The function solve_jacobian_system() is deprecated. You should use
+   * solve_with_jacobian() to leverage better non-linear algorithms.
    *
    * Optionally, also the following functions could be provided. By default
    * they do nothing, or are not required. If you call the constructor in a way
@@ -595,13 +589,22 @@ namespace SUNDIALS
      * choose how these are made consistent, using the same three options that
      * you used for the initial conditions in `reset_type`.
      *
-     * The MPI communicator is simply ignored in the serial case.
-     *
      * @param data IDA configuration data
-     * @param mpi_comm MPI communicator
+     *
+     * @note With SUNDIALS 6 and later this constructor sets up logging
+     * objects to only work on the present processor (i.e., results are only
+     * communicated over MPI_COMM_SELF).
      */
-    IDA(const AdditionalData &data     = AdditionalData(),
-        const MPI_Comm &      mpi_comm = MPI_COMM_WORLD);
+    IDA(const AdditionalData &data = AdditionalData());
+
+    /**
+     * Constructor.
+     *
+     * @param data IDA configuration data. Same as the other constructor.
+     * @param mpi_comm MPI Communicator over which logging operations are
+     * computed. Only used in SUNDIALS 6 and newer.
+     */
+    IDA(const AdditionalData &data, const MPI_Comm &mpi_comm);
 
     /**
      * Destructor.
@@ -664,9 +667,8 @@ namespace SUNDIALS
      * Compute Jacobian. This function is called by IDA any time a Jacobian
      * update is required. The user should compute the Jacobian (or update all
      * the variables that allow the application of the Jacobian). This function
-     * is called by IDA once, before any call to solve_jacobian_system() (for
-     * SUNDIALS < 4.0.0) or solve_with_jacobian() (for
-     * SUNDIALS >= 4.0.0).
+     * is called by IDA once, before any call to solve_jacobian_system() or
+     * solve_with_jacobian().
      *
      * The Jacobian $J$ should be a (possibly inexact) computation of
      * \f[
@@ -728,9 +730,8 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an
      * assertion will be thrown.
      *
-     * @warning Starting with SUNDIALS 4.1, SUNDIALS provides the possibility of
-     * specifying the tolerance for the resolution. A part from the tolerance
-     * only `rhs` is provided and `dst` needs to be returned.
+     * @deprecated Use solve_with_jacobian() instead which also uses a numerical
+     * tolerance.
      */
     DEAL_II_DEPRECATED
     std::function<int(const VectorType &rhs, VectorType &dst)>
@@ -882,7 +883,7 @@ namespace SUNDIALS
      */
     void *ida_mem;
 
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     /**
      * A context object associated with the IDA solver.
      */
@@ -890,9 +891,8 @@ namespace SUNDIALS
 #  endif
 
     /**
-     * MPI communicator. SUNDIALS solver runs happily in
-     * parallel. Note that if the library is compiled without MPI
-     * support, MPI_Comm is aliased as int.
+     * MPI communicator. Only used for SUNDIALS' logging routines - the actual
+     * solve routines will use the communicator provided by the vector class.
      */
     MPI_Comm mpi_communicator;
 

@@ -61,29 +61,16 @@
 	MUPARSER_LOCAL is used for non-api symbols.
 */
 
-#ifndef MUPARSER_STATIC /* defined if muParser is compiled as a DLL */
 
-	#ifdef MUPARSERLIB_EXPORTS /* defined if we are building the muParser DLL (instead of using it) */
-		#define API_EXPORT_CXX MUPARSER_HELPER_DLL_EXPORT
-	#else
-		#define API_EXPORT_CXX MUPARSER_HELPER_DLL_IMPORT
-	#endif /* MUPARSER_DLL_EXPORTS */
-	#define MUPARSER_LOCAL MUPARSER_HELPER_DLL_LOCAL
-
-#else /* MUPARSER_STATIC is defined: this means muParser is a static lib. */
-
-	#define API_EXPORT_CXX
-	#define MUPARSER_LOCAL
-
-#endif /* !MUPARSER_STATIC */
-
-
-#ifdef _WIN32
-	#define API_EXPORT(TYPE) API_EXPORT_CXX TYPE __cdecl
-#else
-	#define API_EXPORT(TYPE) TYPE
-#endif
-
+// deal.II-specific patch: we 
+//  1) already set up our own flags for static linkage elsewhere 
+//  2) do not support dynamic linkage with MSVC
+// to this end, override muParser's original logic here to unconditionally make 
+// API_EXPORT(TYPE) the identity function (and other relevant macros empty).
+// Since this header is not installed this behavior change is purely internal.
+#define API_EXPORT_CXX
+#define MUPARSER_LOCAL
+#define API_EXPORT(TYPE) TYPE
 
 #endif // include guard
 

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2020 by the deal.II Authors
+## Copyright (C) 2012 - 2022 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -155,8 +155,8 @@ FOREACH(_step ${_deal_ii_steps})
     DEPENDS
       ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
       ${CMAKE_CURRENT_BINARY_DIR}/${_step}.${_FILE_EXTENSION}
-      COMMENT
-        "Building doxygen input file for tutorial program <${_step}>"
+    COMMENT
+      "Building doxygen input file for tutorial program <${_step}>"
     )
   ADD_DEPENDENCIES(tutorial tutorial_${_step})
 ENDFOREACH()

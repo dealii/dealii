@@ -45,6 +45,8 @@
 	\brief This file contains the parser test class.
 */
 
+namespace dealii
+{
 namespace mu
 {
 	/** \brief Namespace for test cases. */
@@ -286,6 +288,7 @@ namespace mu
 		};
 	} // namespace Test
 } // namespace mu
+}
 
 
 #if defined(_MSC_VER)

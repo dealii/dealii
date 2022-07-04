@@ -133,7 +133,7 @@ be the Mapping from $K$ to its reference cell $\hat{K}$. The entries in
 the right-hand side in the projection system are, therefore,
 @f[
 \int_K u_\text{hp}(x) P_k(x) dx
-= \det(J_K) \int_\hat{K} u_\text{hp}(F_K(\hat{x})) P_k(F_K(\hat{x})) d\hat{x}.
+= \det(J_K) \int_{\hat{K}} u_\text{hp}(F_K(\hat{x})) P_k(F_K(\hat{x})) d\hat{x}.
 @f]
 Recalling the shape function representation of $u_\text{hp}(x)$, we can
 write this as $\det(J_K) \, \mathbf{C} \, \mathbf{c}$, where

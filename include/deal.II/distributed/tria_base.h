@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// Copyright (C) 2008 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,7 +66,8 @@ namespace parallel
    * @ref GlossMPICommunicator "MPI communicators"
    * or that they have
    * @ref GlossLocallyOwnedCell "locally owned",
-   * @ref GlossGhostCell "ghost", and possibly
+   * @ref GlossGhostCell "ghost",
+   * and possibly
    * @ref GlossArtificialCell "artificial cells".
    * This class provides
    * a number of member functions that allows querying some information
@@ -203,14 +204,16 @@ namespace parallel
 
     /**
      * Return partitioner for the global indices of the cells on the active
-     * level of the triangulation.
+     * level of the triangulation, which is returned by the function
+     * CellAccessor::global_active_cell_index().
      */
     const std::weak_ptr<const Utilities::MPI::Partitioner>
     global_active_cell_index_partitioner() const;
 
     /**
      * Return partitioner for the global indices of the cells on the given @p
-     * level of the triangulation.
+     * level of the triangulation, which is returned by the function
+     * CellAccessor::global_level_cell_index().
      */
     const std::weak_ptr<const Utilities::MPI::Partitioner>
     global_level_cell_index_partitioner(const unsigned int level) const;
@@ -505,7 +508,7 @@ namespace parallel
      *
      * @deprecated The autopartition parameter has been removed.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     virtual void
     load(const std::string &filename, const bool autopartition) = 0;
 
@@ -685,7 +688,8 @@ namespace parallel
      * Save additional cell-attached data into the given file. The first
      * arguments are used to determine the offsets where to write buffers to.
      *
-     * Called by @ref save.
+     * Called by
+     * @ref save.
      */
     void
     save_attached_data(const unsigned int global_first_cell,
@@ -697,7 +701,8 @@ namespace parallel
      * The first arguments are used to determine the offsets where to read
      * buffers from.
      *
-     * Called by @ref load.
+     * Called by
+     * @ref load.
      */
     void
     load_attached_data(const unsigned int global_first_cell,

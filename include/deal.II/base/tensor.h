@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -184,7 +184,7 @@ public:
    *   and one should not pretend that this so. As a consequence, this function
    *   is deprecated.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   Number *
   begin_raw();
 
@@ -196,7 +196,7 @@ public:
    *   and one should not pretend that this so. As a consequence, this function
    *   is deprecated.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   const Number *
   begin_raw() const;
 
@@ -208,7 +208,7 @@ public:
    *   and one should not pretend that this so. As a consequence, this function
    *   is deprecated.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   Number *
   end_raw();
 
@@ -221,7 +221,7 @@ public:
    *   and one should not pretend that this so. As a consequence, this function
    *   is deprecated.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   const Number *
   end_raw() const;
 
@@ -505,7 +505,7 @@ public:
   static_assert(rank_ >= 1,
                 "Tensors must have a rank greater than or equal to one.");
   static_assert(dim >= 0,
-                "Tensors must have a dimension greater than or equal to one.");
+                "Tensors must have a dimension greater than or equal to zero.");
   /**
    * Provide a way to get the dimension of an object without explicit
    * knowledge of it's data type. Implementation is this way instead of
@@ -804,7 +804,7 @@ public:
    * instead.
    */
   template <typename OtherNumber>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   unroll(Vector<OtherNumber> &result) const;
 
   /**

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2020 by the deal.II authors
+// Copyright (C) 2000 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -201,17 +201,6 @@ private:
     internal::DataOutRotationImplementation::ParallelData<dim, spacedim> &data,
     std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> &my_patches);
 };
-
-namespace Legacy
-{
-  /**
-   * @deprecated Use dealii::DataOutRotation without the DoFHandlerType
-   * template instead.
-   */
-  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-  using DataOutRotation DEAL_II_DEPRECATED =
-    dealii::DataOutRotation<dim, DoFHandlerType::space_dimension>;
-} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

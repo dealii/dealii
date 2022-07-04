@@ -21,6 +21,7 @@
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
 
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_vector.h>
@@ -445,6 +446,8 @@ namespace VectorTools
       vec_result.compress(VectorOperation::insert);
     }
 
+
+
     /**
      * Return whether the boundary values try to constrain a degree of freedom
      * that is already constrained to something else
@@ -769,19 +772,23 @@ namespace VectorTools
     }
 
     /**
-     * Specialization of project() for the case dim==spacedim.
-     * Check if we can use the MatrixFree implementation or need
-     * to use the matrix based one.
+     * Specialization of project() for the case dim==spacedim and with correct
+     * number types for MatrixFree support.  Check if we actually can use the
+     * MatrixFree implementation or need to use the matrix based one
+     * nonetheless based on the number of components.
      */
-    template <typename VectorType, int dim>
-    void
+    template <typename VectorType, int dim, int spacedim>
+    std::enable_if_t<
+      !numbers::NumberTraits<typename VectorType::value_type>::is_complex &&
+        (dim == spacedim),
+      void>
     project(
-      const Mapping<dim> &                                      mapping,
-      const DoFHandler<dim> &                                   dof,
-      const AffineConstraints<typename VectorType::value_type> &constraints,
-      const Quadrature<dim> &                                   quadrature,
-      const Function<dim, typename VectorType::value_type> &    function,
-      VectorType &                                              vec_result,
+      const Mapping<dim, spacedim> &                             mapping,
+      const DoFHandler<dim, spacedim> &                          dof,
+      const AffineConstraints<typename VectorType::value_type> & constraints,
+      const Quadrature<dim> &                                    quadrature,
+      const Function<spacedim, typename VectorType::value_type> &function,
+      VectorType &                                               vec_result,
       const bool                 enforce_zero_boundary,
       const Quadrature<dim - 1> &q_boundary,
       const bool                 project_to_boundary_first)
@@ -825,6 +832,40 @@ namespace VectorTools
                      q_boundary,
                      project_to_boundary_first);
         }
+    }
+
+    /**
+     * Specialization of project() for complex numbers or `dim < spacedim`,
+     * for which we are sure that we cannot use the MatrixFree implementation.
+     */
+    template <typename VectorType, int dim, int spacedim>
+    std::enable_if_t<
+      numbers::NumberTraits<typename VectorType::value_type>::is_complex ||
+        (dim < spacedim),
+      void>
+    project(
+      const Mapping<dim, spacedim> &                             mapping,
+      const DoFHandler<dim, spacedim> &                          dof,
+      const AffineConstraints<typename VectorType::value_type> & constraints,
+      const Quadrature<dim> &                                    quadrature,
+      const Function<spacedim, typename VectorType::value_type> &function,
+      VectorType &                                               vec_result,
+      const bool                 enforce_zero_boundary,
+      const Quadrature<dim - 1> &q_boundary,
+      const bool                 project_to_boundary_first)
+    {
+      Assert((dynamic_cast<const parallel::TriangulationBase<dim> *>(
+                &(dof.get_triangulation())) == nullptr),
+             ExcNotImplemented());
+      do_project(mapping,
+                 dof,
+                 constraints,
+                 quadrature,
+                 function,
+                 vec_result,
+                 enforce_zero_boundary,
+                 q_boundary,
+                 project_to_boundary_first);
     }
   } // namespace internal
 
@@ -900,44 +941,15 @@ namespace VectorTools
           const Quadrature<dim - 1> &q_boundary,
           const bool                 project_to_boundary_first)
   {
-    if (dim == spacedim)
-      {
-        const Mapping<dim> *const mapping_ptr =
-          dynamic_cast<const Mapping<dim> *>(&mapping);
-        const DoFHandler<dim> *const dof_ptr =
-          dynamic_cast<const DoFHandler<dim> *>(&dof);
-        const Function<dim,
-                       typename VectorType::value_type> *const function_ptr =
-          dynamic_cast<const Function<dim, typename VectorType::value_type> *>(
-            &function);
-        Assert(mapping_ptr != nullptr, ExcInternalError());
-        Assert(dof_ptr != nullptr, ExcInternalError());
-        internal::project<VectorType, dim>(*mapping_ptr,
-                                           *dof_ptr,
-                                           constraints,
-                                           quadrature,
-                                           *function_ptr,
-                                           vec_result,
-                                           enforce_zero_boundary,
-                                           q_boundary,
-                                           project_to_boundary_first);
-      }
-    else
-      {
-        Assert(
-          (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-             &(dof.get_triangulation())) == nullptr),
-          ExcNotImplemented());
-        internal::do_project(mapping,
-                             dof,
-                             constraints,
-                             quadrature,
-                             function,
-                             vec_result,
-                             enforce_zero_boundary,
-                             q_boundary,
-                             project_to_boundary_first);
-      }
+    internal::project(mapping,
+                      dof,
+                      constraints,
+                      quadrature,
+                      function,
+                      vec_result,
+                      enforce_zero_boundary,
+                      q_boundary,
+                      project_to_boundary_first);
   }
 
 

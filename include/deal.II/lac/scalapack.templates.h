@@ -653,10 +653,10 @@ extern "C"
 
 
   /**
-   *  psyevx computes selected eigenvalues and, optionally, eigenvectors
-   *  of a real symmetric matrix A. Eigenvalues/vectors can be selected by
-   *  specifying a range of values or a range of indices for the desired
-   *  eigenvalues.
+   * psyevx computes selected eigenvalues and, optionally, eigenvectors
+   * of a real symmetric matrix A. Eigenvalues/vectors can be selected by
+   * specifying a range of values or a range of indices for the desired
+   * eigenvalues.
    */
   void
   pdsyevx_(const char *  jobz,
@@ -873,8 +873,8 @@ extern "C"
           const int *  DESCC);
 
   /**
-   *  psyevr computes selected eigenvalues and, optionally, eigenvectors
-   *  of a real symmetric matrix A using a parallel implementation of the MRR
+   * psyevr computes selected eigenvalues and, optionally, eigenvectors
+   * of a real symmetric matrix A using a parallel implementation of the MRR
    * algorithm. Eigenvalues/vectors can be selected by specifying a range of
    * values or a range of indices for the desired eigenvalues.
    */

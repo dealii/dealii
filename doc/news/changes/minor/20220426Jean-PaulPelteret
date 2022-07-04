@@ -1,6 +1,0 @@
-Improved: The step-44 tutorial now uses FE_DGP elements to discretize the
-pressure and dilatation fields, rather than FE_DGPMonomial. This improves
-the condition number of the linear system, necessitating fewer iterations
-to compute its iterative inverse.
-<br>
-(Jean-Paul Pelteret, 2022/04/26)

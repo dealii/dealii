@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2020 by the deal.II authors
+// Copyright (C) 2000 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -91,7 +91,7 @@ namespace FETools
 
     private:
       /**
-       *  A shortcut for the type of the OutVector.
+       * A shortcut for the type of the OutVector.
        */
       using value_type = typename OutVector::value_type;
 
@@ -1140,49 +1140,33 @@ namespace FETools
       // front which processes (and from how many processes) we have to
       // expect information from.
       const auto create_request =
-        [&cells_to_send](const types::subdomain_id other_rank) {
-          std::vector<CellData> cells_for_this_destination;
-          for (const auto &cell : cells_to_send)
-            if (cell.receiver == other_rank)
-              cells_for_this_destination.emplace_back(cell);
+        [&cells_to_send](
+          const types::subdomain_id other_rank) -> std::vector<CellData> {
+        std::vector<CellData> cells_for_this_destination;
+        for (const auto &cell : cells_to_send)
+          if (cell.receiver == other_rank)
+            cells_for_this_destination.emplace_back(cell);
 
-          return Utilities::pack(cells_for_this_destination, false);
-        };
+        return cells_for_this_destination;
+      };
 
-      const auto answer_request =
-        [&received_cells](const unsigned int       other_rank,
-                          const std::vector<char> &request) {
+      const auto process_request =
+        [&received_cells](const unsigned int           other_rank,
+                          const std::vector<CellData> &request) {
           // We got a message from 'other_rank', so let us decode the
           // message in the same way as we have assembled it above.
           // Note that the cells just received do not contain
           // information where they came from, and we have to add that
           // ourselves for later use.
-          for (CellData &cell_data :
-               Utilities::unpack<std::vector<CellData>>(request, false))
+          for (CellData cell_data : request)
             {
               cell_data.receiver = other_rank;
               received_cells.emplace_back(std::move(cell_data));
             }
-
-          // Nothing left to do here, we don't actually need to provide an
-          // answer:
-          return std::vector<char>();
         };
 
-      const auto read_answer = [](const unsigned int /*other_rank*/,
-                                  const std::vector<char> &answer) {
-        // We don't put anything into the answers, so nothing should
-        // have been coming out at this end either:
-        (void)answer;
-        Assert(answer.size() == 0, ExcInternalError());
-      };
-
-      Utilities::MPI::ConsensusAlgorithms::Selector<char, char>().run(
-        destinations,
-        create_request,
-        answer_request,
-        read_answer,
-        communicator);
+      Utilities::MPI::ConsensusAlgorithms::selector<std::vector<CellData>>(
+        destinations, create_request, process_request, communicator);
     }
 
 
@@ -1759,10 +1743,10 @@ namespace FETools
     if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                        *>(&dof2.get_triangulation()) != nullptr)
       {
-        Assert(dof1.get_fe()[0].reference_cell() ==
+        Assert(dof1.get_fe(0).reference_cell() ==
                  ReferenceCells::get_hypercube<dim>(),
                ExcNotImplemented());
-        Assert(dof2.get_fe()[0].reference_cell() ==
+        Assert(dof2.get_fe(0).reference_cell() ==
                  ReferenceCells::get_hypercube<dim>(),
                ExcNotImplemented());
 

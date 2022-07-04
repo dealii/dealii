@@ -456,5 +456,4 @@
  * it can get from a boundary description alone.
  *
  * @ingroup grid
- * @author Luca Heltai, 2013, Martin Kronbichler, 2017
  */

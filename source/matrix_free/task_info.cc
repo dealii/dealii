@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,8 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/utilities.h>
+
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/matrix_free/task_info.h>
 
@@ -1012,10 +1014,62 @@ namespace internal
           blocks                      = {0, comm_begin, comm_end, end};
         }
 
-      // Step 7: Fill in the data by batches for the locally owned cells.
+      // Step 7: sort ghost cells according to the category
+      std::vector<std::array<unsigned int, 2>> tight_category_map_ghost;
+
+      if (cell_vectorization_categories.empty() == false)
+        {
+          tight_category_map_ghost.reserve(n_ghost_cells);
+
+          std::set<unsigned int> used_categories;
+          for (unsigned int i = 0; i < n_ghost_cells; ++i)
+            used_categories.insert(
+              cell_vectorization_categories[i + n_active_cells]);
+
+          std::vector<unsigned int> used_categories_vector(
+            used_categories.size());
+          n_categories = 0;
+          for (const auto &it : used_categories)
+            used_categories_vector[n_categories++] = it;
+
+          std::vector<unsigned int> counters(n_categories, 0);
+
+          for (unsigned int i = 0; i < n_ghost_cells; ++i)
+            {
+              const unsigned int index =
+                std::lower_bound(
+                  used_categories_vector.begin(),
+                  used_categories_vector.end(),
+                  cell_vectorization_categories[i + n_active_cells]) -
+                used_categories_vector.begin();
+              AssertIndexRange(index, used_categories_vector.size());
+              tight_category_map_ghost.emplace_back(
+                std::array<unsigned int, 2>{{index, i}});
+
+              // account for padding in the hp and strict case
+              if (categories_are_hp || cell_vectorization_categories_strict)
+                counters[index]++;
+            }
+
+          // insert padding
+          for (unsigned int i = 0; i < counters.size(); ++i)
+            if (counters[i] % n_lanes != 0)
+              for (unsigned int j = counters[i] % n_lanes; j < n_lanes; ++j)
+                tight_category_map_ghost.emplace_back(
+                  std::array<unsigned int, 2>{
+                    {i, numbers::invalid_unsigned_int}});
+
+          std::sort(tight_category_map_ghost.begin(),
+                    tight_category_map_ghost.end());
+        }
+
+      // Step 8: Fill in the data by batches for the locally owned cells.
       const unsigned int n_cell_batches = batch_order.size();
       const unsigned int n_ghost_batches =
-        (n_ghost_cells + n_lanes - 1) / n_lanes;
+        ((tight_category_map_ghost.empty() ? n_ghost_cells :
+                                             tight_category_map_ghost.size()) +
+         n_lanes - 1) /
+        n_lanes;
       incompletely_filled_vectorization.resize(n_cell_batches +
                                                n_ghost_batches);
 
@@ -1052,18 +1106,37 @@ namespace internal
         }
       AssertDimension(counter, n_active_cells);
 
-      // Step 8: Treat the ghost cells
-      for (unsigned int cell = n_active_cells;
-           cell < n_active_cells + n_ghost_cells;
-           ++cell)
+      // Step 9: Treat the ghost cells
+      if (tight_category_map_ghost.empty())
         {
-          if (!cell_vectorization_categories.empty())
-            AssertDimension(cell_vectorization_categories[cell],
-                            cell_vectorization_categories[n_active_cells]);
-          renumbering[cell] = cell;
+          for (unsigned int cell = 0; cell < n_ghost_cells; ++cell)
+            renumbering[n_active_cells + cell] = n_active_cells + cell;
+
+          if ((n_ghost_cells % n_lanes) != 0u)
+            incompletely_filled_vectorization.back() = n_ghost_cells % n_lanes;
         }
-      if ((n_ghost_cells % n_lanes) != 0u)
-        incompletely_filled_vectorization.back() = n_ghost_cells % n_lanes;
+      else
+        {
+          for (unsigned int k = 0, ptr = 0; k < n_ghost_batches;
+               ++k, ptr += n_lanes)
+            {
+              unsigned int j = 0;
+
+              for (;
+                   j < n_lanes && (ptr + j < tight_category_map_ghost.size()) &&
+                   (tight_category_map_ghost[ptr + j][1] !=
+                    numbers::invalid_unsigned_int);
+                   ++j)
+                renumbering[counter++] =
+                  n_active_cells + tight_category_map_ghost[ptr + j][1];
+
+              if (j < n_lanes)
+                incompletely_filled_vectorization[n_cell_batches + k] = j;
+            }
+
+          AssertDimension(counter, n_active_cells + n_ghost_cells);
+        }
+
       cell_partition_data.push_back(n_cell_batches + n_ghost_batches);
       partition_row_index.back() = cell_partition_data.size() - 1;
 

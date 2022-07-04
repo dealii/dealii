@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// Copyright (C) 2021 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -156,8 +156,9 @@ namespace RepartitioningPolicyTools
                 false);
 
       Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::pair<types::global_cell_index, types::global_cell_index>,
-        unsigned int>
+        std::vector<
+          std::pair<types::global_cell_index, types::global_cell_index>>,
+        std::vector<unsigned int>>
         consensus_algorithm(process, communicator);
       consensus_algorithm.run();
     }
@@ -300,12 +301,12 @@ namespace RepartitioningPolicyTools
           cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
 
     // determine weight of all the cells locally owned by this process
-    uint64_t process_local_weight = 0;
+    std::uint64_t process_local_weight = 0;
     for (const auto &weight : weights)
       process_local_weight += weight;
 
     // determine partial sum of weights of this process
-    uint64_t process_local_weight_offset = 0;
+    std::uint64_t process_local_weight_offset = 0;
 
     int ierr = MPI_Exscan(
       &process_local_weight,
@@ -317,7 +318,8 @@ namespace RepartitioningPolicyTools
     AssertThrowMPI(ierr);
 
     // total weight of all processes
-    uint64_t total_weight = process_local_weight_offset + process_local_weight;
+    std::uint64_t total_weight =
+      process_local_weight_offset + process_local_weight;
 
     ierr =
       MPI_Bcast(&total_weight,
@@ -330,7 +332,7 @@ namespace RepartitioningPolicyTools
     // setup partition
     LinearAlgebra::distributed::Vector<double> partition(partitioner);
 
-    for (uint64_t i = 0, weight = process_local_weight_offset;
+    for (std::uint64_t i = 0, weight = process_local_weight_offset;
          i < partition.locally_owned_size();
          weight += weights[i], ++i)
       partition.local_element(i) =

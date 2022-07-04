@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -134,7 +134,7 @@ check()
     << "    <Grid Name=\"CellTime\" GridType=\"Collection\" CollectionType=\"Temporal\">\n";
 
   // Write out the entry
-  xdmf_file << entry.get_xdmf_content(3);
+  xdmf_file << entry.get_xdmf_content(3, ReferenceCells::get_hypercube<dim>());
 
   xdmf_file << "    </Grid>\n";
   xdmf_file << "  </Domain>\n";

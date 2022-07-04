@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2020 - 2021 by the deal.II authors
+//    Copyright (C) 2020 - 2022 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -47,7 +47,7 @@
  * with SUNDIALS nomenclature.
  */
 int
-main(int argc, char **argv)
+main()
 {
   initlog();
 

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2021 by the deal.II authors
+ * Copyright (C) 2000 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -119,7 +119,7 @@ namespace Step17
     FESystem<dim>      fe;
     DoFHandler<dim>    dof_handler;
 
-    AffineConstraints<double> hanging_node_constraints;
+    AffineConstraints<PetscScalar> hanging_node_constraints;
 
     PETScWrappers::MPI::SparseMatrix system_matrix;
 
@@ -233,8 +233,8 @@ namespace Step17
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>     cell_rhs(dofs_per_cell);
+    FullMatrix<PetscScalar> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<PetscScalar>     cell_rhs(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -311,12 +311,13 @@ namespace Step17
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
 
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(mapping,
-                                             dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim>(dim),
-                                             boundary_values);
+    std::map<types::global_dof_index, PetscScalar> boundary_values;
+    VectorTools::interpolate_boundary_values(
+      mapping,
+      dof_handler,
+      0,
+      Functions::ZeroFunction<dim, PetscScalar>(dim),
+      boundary_values);
     MatrixTools::apply_boundary_values(
       boundary_values, system_matrix, solution, system_rhs, false);
   }
@@ -340,7 +341,7 @@ namespace Step17
       upper);
 
 
-    Vector<double> localized_solution(solution);
+    Vector<PetscScalar> localized_solution(solution);
     hanging_node_constraints.distribute(localized_solution);
     solution = localized_solution;
 
@@ -351,7 +352,7 @@ namespace Step17
   void
   ElasticProblem<dim>::output_results() const
   {
-    const Vector<double> localized_solution(solution);
+    const Vector<PetscScalar> localized_solution(solution);
 
     if (this_mpi_process == 0)
       {

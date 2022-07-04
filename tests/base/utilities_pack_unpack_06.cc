@@ -22,6 +22,9 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 
+// We need this header to define the exception when we compile with zlib
+#include <boost/iostreams/filter/gzip.hpp>
+
 #include "../tests.h"
 
 

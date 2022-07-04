@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 - 2017 by the deal.II authors
+## Copyright (C) 2016 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -27,28 +27,10 @@
 
 MACRO(CHECK_COMPILER_SETUP _compiler_flags_unstr _linker_flags_unstr _var)
   #
-  # Strip -Wl,--as-needed from the list of linker flags. This works around
-  # a serious regression with ld.bfd in combination with -Wl,--as-needed
-  # when compiling a simple
-  #
-  #    int main () { return 0; }
-  #
-  # and linking against a *huge* list of (entirely unused) libraries.
-  #
-  # Ideally, one should use ld.gold [1] instead of ld.bfd - but because
-  # this is not always possible, simply disable -Wl,--as-needed.
-  #
-  # See https://github.com/dealii/dealii/issues/3686
-  #
-  # [1] https://lwn.net/Articles/274859/
-  #
-  STRING(REPLACE "-Wl,--as-needed" "" _linker_flags "${_linker_flags_unstr}")
-
-  #
   # Strip leading and trailing whitespace to make CMake 2.8.8 happy
   #
   STRING(STRIP "${_compiler_flags_unstr}" _compiler_flags)
-  STRING(STRIP "${_linker_flags}" _linker_flags)
+  STRING(STRIP "${_linker_flags_unstr}" _linker_flags)
 
   #
   # Rerun this test if flags have changed:

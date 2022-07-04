@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// Copyright (C) 2017 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -620,7 +620,10 @@ namespace Utilities
                 // p::d::SolutionTransfer. The rationale is that during
                 // interpolation on two elements sharing the face, values on
                 // this face obtained from each side might be different due to
-                // additions being done in different order.
+                // additions being done in different order. If the local
+                // value is zero, it indicates that the local process has not
+                // set the value during the cell loop and its value can be
+                // safely overridden.
                 Assert(*read_position == Number() ||
                          internal::get_abs(locally_owned_array[j] -
                                            *read_position) <=

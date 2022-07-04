@@ -1,0 +1,8 @@
+Removed: The previously deprecated class hp::DoFHandler has been
+removed, and with it all functions and classes that required the
+template parameter DoFHandlerType.
+<br>
+From now on, use the standard DoFHandler. All hp-functionality has been
+integrated to this one.
+<br>
+(Marc Fehling, Peter Munch, 2022/05/24)

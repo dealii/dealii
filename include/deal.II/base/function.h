@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -565,27 +565,6 @@ namespace Functions
 } // namespace Functions
 
 /**
- * Provide a function which always returns the constant values handed to the
- * constructor.
- *
- * @deprecated use Functions::ConstantFunction instead.
- */
-template <int dim, typename RangeNumberType = double>
-using ConstantFunction DEAL_II_DEPRECATED =
-  Functions::ConstantFunction<dim, RangeNumberType>;
-
-/**
- * Provide a function which always returns zero.
- *
- * @deprecated use Functions::ZeroFunction instead.
- */
-template <int dim, typename RangeNumberType = double>
-using ZeroFunction DEAL_II_DEPRECATED =
-  Functions::ZeroFunction<dim, RangeNumberType>;
-
-
-
-/**
  * This is a constant vector-valued function, in which one or more components
  * of the vector have a constant value and all other components are zero.  It
  * is especially useful as a weight function for
@@ -774,7 +753,8 @@ protected:
  * component, and consequently is not shown in boldface. Then assume
  * that we want this $u_h(x)$ to be used as a boundary condition for a 2d
  * problem at the line $y=0$. Let's say that this line corresponds to
- * @ref GlossBoundaryIndicator "boundary indicator" 123.
+ * @ref GlossBoundaryIndicator "boundary indicator"
+ * 123.
  * If we say that the 2d problem is associated with
  * @code
  *   DoFHandler<2> dof_handler_2d;

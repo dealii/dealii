@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -243,7 +243,8 @@ test(const unsigned int n_ref = 0)
       euler_fine, dof_handler, constraints, quadrature_formula, data);
 
     MatrixFree<dim, NumberType> matrix_free;
-    matrix_free.reinit(dof_handler, constraints, quadrature_formula, data);
+    matrix_free.reinit(
+      MappingQ1<dim>{}, dof_handler, constraints, quadrature_formula, data);
 
 
     // test fine-level mapping:
@@ -276,9 +277,8 @@ test(const unsigned int n_ref = 0)
   }
 
   // now go through all GMG levels:
-  std::set<types::boundary_id> dirichlet_boundary_ids;
-  dirichlet_boundary_ids.insert(0);
-  MGConstrainedDoFs mg_constrained_dofs;
+  const std::set<types::boundary_id> dirichlet_boundary_ids = {0};
+  MGConstrainedDoFs                  mg_constrained_dofs;
   mg_constrained_dofs.initialize(dof_handler);
   mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
                                                      dirichlet_boundary_ids);
@@ -319,7 +319,8 @@ test(const unsigned int n_ref = 0)
                             mg_additional_data);
 
       MatrixFree<dim, LevelNumberType> mg_level;
-      mg_level.reinit(dof_handler,
+      mg_level.reinit(MappingQ1<dim>{},
+                      dof_handler,
                       level_constraints,
                       quadrature_formula,
                       mg_additional_data);

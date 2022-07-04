@@ -94,6 +94,19 @@ namespace internal
 
     return result;
   }
+
+  unsigned int
+  number_unique_entries(const std::vector<unsigned int> &vector)
+  {
+    if (std::all_of(vector.begin(), vector.end(), [&](const auto &e) {
+          return e == vector.front();
+        }))
+      {
+        return 1;
+      }
+    else
+      return vector.size();
+  }
 } // namespace internal
 
 
@@ -133,6 +146,8 @@ FiniteElementData<dim>::FiniteElementData(
                       block_indices)
 {}
 
+
+
 template <int dim>
 FiniteElementData<dim>::FiniteElementData(
   const internal::GenericDoFsPerObject &data,
@@ -142,16 +157,17 @@ FiniteElementData<dim>::FiniteElementData(
   const Conformity                      conformity,
   const BlockIndices &                  block_indices)
   : reference_cell_kind(reference_cell)
-  , number_unique_quads(data.dofs_per_object_inclusive[2].size())
-  , number_unique_faces(data.dofs_per_object_inclusive[dim - 1].size())
+  , number_unique_quads(
+      internal::number_unique_entries(data.dofs_per_object_inclusive[2]))
+  , number_unique_faces(
+      internal::number_unique_entries(data.dofs_per_object_inclusive[dim - 1]))
   , dofs_per_vertex(data.dofs_per_object_exclusive[0][0])
   , dofs_per_line(data.dofs_per_object_exclusive[1][0])
-  , n_dofs_on_quad(dim > 1 ? data.dofs_per_object_exclusive[2] :
-                             std::vector<unsigned int>{0})
+  , n_dofs_on_quad(data.dofs_per_object_exclusive[2])
   , dofs_per_quad(n_dofs_on_quad[0])
   , dofs_per_quad_max(
       *max_element(n_dofs_on_quad.begin(), n_dofs_on_quad.end()))
-  , dofs_per_hex(dim > 2 ? data.dofs_per_object_exclusive[3][0] : 0)
+  , dofs_per_hex(data.dofs_per_object_exclusive[3][0])
   , first_line_index(data.object_index[1][0])
   , first_index_of_quads(data.object_index[2])
   , first_quad_index(first_index_of_quads[0])

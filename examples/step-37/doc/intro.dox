@@ -529,25 +529,26 @@ parallel vector facilities.
 The deal.II parallel vector class, LinearAlgebra::distributed::Vector, holds
 the processor-local part of the solution as well as data fields for ghosted
 DoFs, i.e. DoFs that are owned by a remote processor but accessed by cells
-that are owned by the present processor. In the @ref GlossLocallyActiveDof
-"glossary" these degrees of freedom are referred to as locally active degrees
-of freedom. The function MatrixFree::initialize_dof_vector() provides a method
-that sets this design. Note that hanging nodes can relate to additional
-ghosted degrees of freedom that must be included in the distributed vector but
-are not part of the locally active DoFs in the sense of the @ref
-GlossLocallyActiveDof "glossary". Moreover, the distributed vector holds the
-MPI metadata for DoFs that are owned locally but needed by other
+that are owned by the present processor. In the
+@ref GlossLocallyActiveDof "glossary" these degrees of freedom are referred
+to as locally active degrees of freedom. The function
+MatrixFree::initialize_dof_vector() provides a method that sets this
+design. Note that hanging nodes can relate to additional ghosted degrees of
+freedom that must be included in the distributed vector but are not part of
+the locally active DoFs in the sense of the
+@ref GlossLocallyActiveDof "glossary". Moreover, the distributed vector
+holds the MPI metadata for DoFs that are owned locally but needed by other
 processors. A benefit of the design of this vector class is the way ghosted
 entries are accessed. In the storage scheme of the vector, the data array
 extends beyond the processor-local part of the solution with further vector
-entries available for the ghosted degrees of freedom. This gives a contiguous
-index range for all locally active degrees of freedom. (Note that the index
-range depends on the exact configuration of the mesh.) Since matrix-free
-operations can be thought of doing linear algebra that is performance
-critical, and performance-critical code cannot waste time on doing MPI-global
-to MPI-local index translations, the availability of an index spaces local to
-one MPI rank is fundamental. The way things are accessed here is a direct
-array access. This is provided through
+entries available for the ghosted degrees of freedom. This gives a
+contiguous index range for all locally active degrees of freedom. (Note
+that the index range depends on the exact configuration of the mesh.) Since
+matrix-free operations can be thought of doing linear algebra that is
+performance critical, and performance-critical code cannot waste time on
+doing MPI-global to MPI-local index translations, the availability of an
+index spaces local to one MPI rank is fundamental. The way things are
+accessed here is a direct array access. This is provided through
 LinearAlgebra::distributed::Vector::local_element(), but it is actually rarely
 needed because all of this happens internally in FEEvaluation.
 

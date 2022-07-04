@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2021 by the deal.II authors
+// Copyright (C) 2000 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -122,7 +122,7 @@ public:
    * versions of deal.II, but it does not have any effect on the workings of
    * this class.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   MappingQ(const unsigned int polynomial_degree,
            const bool         use_mapping_q_on_all_cells);
 

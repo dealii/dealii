@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2019 by the deal.II authors
+// Copyright (C) 2018 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -130,6 +130,30 @@ test()
 
     GridOut grid_out;
     deallog << "Triangulation constructed from a refined Triangulation:"
+            << std::endl;
+    grid_out.write_vtk(tria_2, deallog.get_file_stream());
+  }
+
+  {
+    // Check that we can copy a simplex Triangulation
+    Triangulation<dim> tria_hypercube, tria;
+    setup_tria(tria_hypercube);
+    GridGenerator::convert_hypercube_to_simplex_mesh(tria_hypercube, tria);
+
+    std::vector<Point<dim>>    vertices;
+    std::vector<CellData<dim>> cells;
+    SubCellData                subcell_data;
+    std::tie(vertices, cells, subcell_data) =
+      GridTools::get_coarse_mesh_description(tria);
+
+    Triangulation<dim> tria_2;
+    tria_2.create_triangulation(vertices, cells, subcell_data);
+    Assert(GridTools::have_same_coarse_mesh(tria, tria_2), ExcInternalError());
+
+    GridOut grid_out;
+    deallog << "Original Triangulation:" << std::endl;
+    grid_out.write_vtk(tria, deallog.get_file_stream());
+    deallog << "Triangulation constructed from an unrefined Triangulation:"
             << std::endl;
     grid_out.write_vtk(tria_2, deallog.get_file_stream());
   }

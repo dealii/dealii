@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -840,14 +840,15 @@ bool
 FiniteElement<dim, spacedim>::constraints_are_implemented(
   const internal::SubfaceCase<dim> &subface_case) const
 {
-  // TODO: the implementation makes the assumption that all faces have the
-  // same number of dofs
-  AssertDimension(this->n_unique_faces(), 1);
-  const unsigned int face_no = 0;
-
   if (subface_case == internal::SubfaceCase<dim>::case_isotropic)
-    return (this->n_dofs_per_face(face_no) == 0) ||
-           (interface_constraints.m() != 0);
+    {
+      unsigned int n_dofs_on_faces = 0;
+
+      for (const auto face_no : this->reference_cell().face_indices())
+        n_dofs_on_faces += this->n_dofs_per_face(face_no);
+
+      return (n_dofs_on_faces == 0) || (interface_constraints.m() != 0);
+    }
   else
     return false;
 }

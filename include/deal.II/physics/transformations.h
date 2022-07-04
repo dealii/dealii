@@ -97,7 +97,7 @@ namespace Physics
        * @deprecated Use the variant with a Tensor as an axis.
        */
       template <typename Number>
-      DEAL_II_DEPRECATED_EARLY Tensor<2, 3, Number>
+      DEAL_II_DEPRECATED Tensor<2, 3, Number>
       rotation_matrix_3d(const Point<3, Number> &axis, const Number &angle);
 
       //@}

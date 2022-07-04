@@ -1,0 +1,3 @@
+Removed: The deprecated member function CellId::to_cell() has been removed.
+<br>
+(Daniel Arndt, 2022/06/28)

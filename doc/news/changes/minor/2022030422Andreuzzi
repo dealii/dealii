@@ -1,4 +1,0 @@
-Improved: The Utilities::MPI::broadcast() has been optimized for
-types that are natively supported by MPI.
-<br>
-(Francesco Andreuzzi, Wolfgang Bangerth, 2022/03/04)

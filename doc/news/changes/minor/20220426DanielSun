@@ -1,5 +1,0 @@
-Fixed: The building process now works well with MPI option on Windows system.
-If configured properly, we can explore the capability of distributed computing
-on Windows system within Deal.II framework.
-<br>
-(Daniel Sun, 2022/04/26)

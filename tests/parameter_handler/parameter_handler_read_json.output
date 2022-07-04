@@ -18,9 +18,9 @@
         "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]",
         "actions": "1"
     },
-    "Testing_25testing":
+    "Testing%testing":
     {
-        "double_2bdouble":
+        "double+double":
         {
             "value": "7.1415926",
             "default_value": "6.14159",
@@ -29,7 +29,7 @@
             "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
             "actions": "6"
         },
-        "int_2aint":
+        "int*int":
         {
             "value": "2",
             "default_value": "2",
@@ -38,7 +38,7 @@
             "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]",
             "actions": "5"
         },
-        "string_26list":
+        "string&list":
         {
             "value": "< & > ; \/",
             "default_value": "< & > ; \/",
@@ -50,7 +50,7 @@
     },
     "ss1":
     {
-        "double_201":
+        "double 1":
         {
             "value": "2.234",
             "default_value": "1.234",
@@ -61,7 +61,7 @@
         },
         "ss2":
         {
-            "double_202":
+            "double 2":
             {
                 "value": "5.321",
                 "default_value": "4.321",

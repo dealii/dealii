@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2021 by the deal.II authors
+// Copyright (C) 2001 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,6 +36,34 @@
 
 
 DEAL_II_NAMESPACE_OPEN
+
+DeclExceptionMsg(
+  ExcCellNotCartesian,
+  "You are using MappingCartesian, but the incoming cell is not Cartesian.");
+
+
+
+/**
+ * Return whether the incoming cell is of Cartesian shape. This is determined by
+ * checking if the smallest BoundingBox that encloses the cell has the same
+ * vertices as the cell itself.
+ */
+template <class CellType>
+bool
+is_cartesian(const CellType &cell)
+{
+  if (!cell->reference_cell().is_hyper_cube())
+    return false;
+
+  const double tolerance    = 1e-14 * cell->diameter();
+  const auto   bounding_box = cell->bounding_box();
+
+  for (const unsigned int v : cell->vertex_indices())
+    if (cell->vertex(v).distance(bounding_box.vertex(v)) > tolerance)
+      return false;
+
+  return true;
+}
 
 
 
@@ -455,6 +483,8 @@ MappingCartesian<dim, spacedim>::fill_fe_values(
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
+  Assert(is_cartesian(cell), ExcCellNotCartesian());
+
   // convert data object to internal data for this class. fails with
   // an exception if that is not possible
   Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
@@ -504,6 +534,8 @@ MappingCartesian<dim, spacedim>::fill_mapping_data_for_generic_points(
   if (update_flags == update_default)
     return;
 
+  Assert(is_cartesian(cell), ExcCellNotCartesian());
+
   Assert(update_flags & update_inverse_jacobians ||
            update_flags & update_jacobians ||
            update_flags & update_quadrature_points,
@@ -538,6 +570,7 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values(
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
+  Assert(is_cartesian(cell), ExcCellNotCartesian());
   AssertDimension(quadrature.size(), 1);
 
   // convert data object to internal
@@ -591,6 +624,8 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values(
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
+  Assert(is_cartesian(cell), ExcCellNotCartesian());
+
   // convert data object to internal data for this class. fails with
   // an exception if that is not possible
   Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
@@ -647,6 +682,7 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
     &output_data) const
 {
   AssertDimension(dim, spacedim);
+  Assert(is_cartesian(cell), ExcCellNotCartesian());
 
   // Convert data object to internal data for this class. Fails with an
   // exception if that is not possible.
@@ -1113,6 +1149,8 @@ MappingCartesian<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<dim> &                                          p) const
 {
+  Assert(is_cartesian(cell), ExcCellNotCartesian());
+
   Tensor<1, dim>   length;
   const Point<dim> start = cell->vertex(0);
   switch (dim)
@@ -1148,6 +1186,8 @@ MappingCartesian<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<spacedim> &                                     p) const
 {
+  Assert(is_cartesian(cell), ExcCellNotCartesian());
+
   if (dim != spacedim)
     Assert(false, ExcNotImplemented());
   const Point<dim> &start = cell->vertex(0);

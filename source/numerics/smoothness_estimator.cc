@@ -16,11 +16,12 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/signaling_nan.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_series.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/block_vector.h>

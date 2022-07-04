@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2021 by the deal.II authors
+ * Copyright (C) 2021 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -19,7 +19,7 @@
 // the hp (variable transfer) version of checkpointing_02.cc
 
 // set to true to run a test that generates a 5GB file:
-const bool big = false;
+const bool run_big = false;
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
@@ -160,7 +160,7 @@ LaplaceProblem<dim>::run(unsigned int n_cycles_global,
 
       setup_system();
 
-      const unsigned int n_vectors = (big) ? 50 : 2;
+      const unsigned int n_vectors = (run_big) ? 50 : 2;
       {
         deallog << "checkpointing..." << std::endl;
         std::vector<VectorType> vectors(n_vectors);
@@ -243,7 +243,7 @@ LaplaceProblem<dim>::run(unsigned int n_cycles_global,
 int
 main(int argc, char *argv[])
 {
-  unsigned int n_cycles_global   = (big) ? 3 : 1;
+  unsigned int n_cycles_global   = (run_big) ? 3 : 1;
   unsigned int n_cycles_adaptive = 1;
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -276,7 +276,7 @@ namespace LinearAlgebra
        * be routed to the wrong block.
        */
       void
-      reinit(const std::vector<size_type> &N,
+      reinit(const std::vector<size_type> &block_sizes,
              const bool                    omit_zeroing_entries = false);
 
       /**
@@ -361,10 +361,16 @@ namespace LinearAlgebra
       zero_out_ghost_values() const;
 
       /**
-       * Return if this Vector contains ghost elements.
+       * Return if any of the blocks in this vector contains ghost elements.
        */
       bool
       has_ghost_elements() const;
+
+      /**
+       * Change the ghost state of all blocks in this vector to @p ghosted.
+       */
+      void
+      set_ghost_state(const bool ghosted) const;
 
       /**
        * This method copies the data in the locally owned range from another

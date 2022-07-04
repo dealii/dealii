@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2021 by the deal.II authors
+// Copyright (C) 2005 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -660,6 +660,11 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-81</td>
+ *        <td> Solving the complex-valued time-harmonic Maxwell equations.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-82</td>
  *        <td> Solving the fourth-order biharmonic equation using a lifting operator approach.
  *       </td></tr>
@@ -1064,6 +1069,7 @@
  *       step-46,
  *       step-58,
  *       step-62,
+ *       step-81,
  *       step-82
  *     </td>
  *   </tr>
@@ -1313,6 +1319,12 @@
  *     <td> The nonlinear Schr&ouml;dinger equation
  *     </td>
  *     <td>step-58</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> The time-harmonic Maxwell equations
+ *     </td>
+ *     <td>step-81</td>
  *   </tr>
  *
  *   <tr valign="top">

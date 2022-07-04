@@ -1,0 +1,457 @@
+<i>
+  This program was contributed by Manaswinee Bezbaruah (Texas A&M University),
+  and Matthias Maier (Texas A&M University).
+</i>
+
+<a name="Intro"></a>
+
+<h1> Introduction </h1>
+
+A surface plasmon-polariton (SPP) is a slowly decaying electromagnetic wave
+that is confined near a metal-air (or similar) interface. SPP structures on
+novel "2D" materials such as graphene, a monoatomic layer of carbon atoms
+arranged in a hexagonal lattice, typically have wavelengths much shorter
+than the wavelength of the free-space radiation. This scale separation
+makes SPPs on 2D materials a promising ingredient in the design of novel
+optical devices.
+
+In the following, we discuss a method for observing SPPs numerically by
+solving a suitable electromagnetic model based on time-harmonic Maxwell's
+equations which incorporate jump conditions on lower-dimensional material
+interfaces: The conducting sheet is modeled as an idealized hypersurface
+with an effective electric conductivity and the weak discontinuity for the
+tangential surface appears naturally in the variational form.
+
+This tutorial presents a direct solver for the time-harmonic Maxwell
+equations for scattering configurations with lower-dimensional interfaces.
+In particular, we discuss using complex values, simple first-order absorbing
+boundary conditions, and a more sophisticated
+<a href="https://en.wikipedia.org/wiki/Perfectly_matched_layer">perfectly
+  matched layer</a> (PML) boundary condition for electromagnetic waves.
+
+
+<h3>Time-Harmonic Maxwell's Equations with interface conditions</h3>
+
+We start the discussion with a short derivation of the governing equations
+and some literature references.
+
+<h4>Derivation of time-harmonic Maxwell's equations</h4>
+
+In two ($d=2$) or three ($d=3$) spatial dimensions,
+the time evolution of an electromagnetic
+wave $(\mathbf{E},\mathbf{H})$ that consists of an electric field component
+$\mathbf{E}(t,\mathbf{x})\;:\;\mathbb{R}\times\mathbb{R}^d\to\mathbb{R}^d$
+and a magnetic field component
+$\mathbf{H}(t,\mathbf{x})\;:\;\mathbb{R}\times\mathbb{R}^d\to\mathbb{R}^d$
+is described by
+<a href="https://en.wikipedia.org/wiki/Maxwell%27s_equations">Maxwell's
+equations</a>
+@cite Schwartz1972, @cite Monk2003 :
+@f{align*}
+  \frac{\partial}{\partial t} \mathbf{H} + \nabla \times \mathbf{E} &= -\mathbf{M}_a,
+  \\
+  \nabla \cdot \mathbf{H} &= \rho_m,
+  \\
+  \frac{\partial}{\partial t} (\varepsilon\mathbf{E}) - \nabla\times(\mu^{-1}\mathbf{H}) &= - \mathbf{J}_a,
+  \\
+  \nabla\cdot(\varepsilon\mathbf{E}) &= \rho.
+@f}
+Here, $\nabla\times$ is the curl operator, $\nabla\cdot$ is the divergence
+operator, $\varepsilon$ is the
+<a href="https://en.wikipedia.org/wiki/Permittivity">electric permittivity</a>,
+$\mu$ is the
+<a href="https://en.wikipedia.org/wiki/Permeability">magnetic permeability</a>,
+$\rho$ is the electric charge density, and $\rho_m$ is a corresponding
+(hypothetical) <a href="https://en.wikipedia.org/wiki/Magnetic_monopole">magnetic
+  monopole</a> density.
+$\mathbf{J}_a$ and $\mathbf{M}_a$ are the electric and magnetic
+flux densities which are related to their respective charge densities by the
+conservation equations @cite Schwartz1972
+@f[
+\frac{\partial}{\partial t} \rho + \nabla\cdot\mathbf{J}_a = 0
+\text{ and }
+\frac{\partial}{\partial t} \rho_m + \nabla\cdot\mathbf{M}_a = 0.
+@f]
+
+We now make the important assumption that the material parameters
+$\varepsilon$ and $\mu$ are time-independent and that the fields
+$\mathbf{E}$ and $\mathbf{H}$, the fluxes $\mathbf{M}_a$ and
+$\mathbf{J}_a$, as well as the densities $\rho$ and $\rho_m$ are all
+<em>time-harmonic</em>, i.e., their time evolution is completely described by
+@f[
+  \mathbf{F}(\mathbf{x},t) = \text{Re}\{e^{-i\omega
+  t}\tilde{\mathbf{F}}(\mathbf{x})\},
+@f]
+in which $\omega$ is the temporal angular frequency and
+$\tilde{\mathbf{F}}(\mathbf{x})$ is a corresponding complex-valued vector
+field (or density). Inserting this ansatz into Maxwell's equations,
+substituting the charge conservation equations and some minor algebra then
+yields the so-called <em>time-harmonic</em> Maxwell's equations:
+@f{align*}
+  -i\omega \tilde{\mathbf{H}} + \nabla \times \tilde{\mathbf{E}} &=
+  -\tilde{\mathbf{M}}_a,
+  \\
+  \nabla \cdot \tilde{\mathbf{H}} &= \frac{1}{i\omega}\nabla \cdot
+  \tilde{\mathbf{M}}_a,
+  \\
+  i\omega\varepsilon\tilde{\mathbf{E}} +
+  \nabla\times(\mu^{-1}\tilde{\mathbf{H}}) &= \tilde{\mathbf{J}}_a,
+  \\
+  \nabla\cdot(\varepsilon\tilde{\mathbf{E}}) &=
+  \frac{1}{i\omega}\nabla\cdot\tilde{\mathbf{J}}_a.
+@f}
+
+For the sake of better readability we will now drop the tilde and simply
+write $\mathbf{E}(\mathbf{x})$, $\mathbf{H}(\mathbf{x})$, etc., when
+referring to the time-harmonic fields.
+
+
+<h4>Jump conditions on lower dimensional interfaces</h4>
+
+Graphene is a two-dimensional carbon allotrope with a <em>single</em> atom
+layer that is arranged in a honeycomb lattice @cite Geim2004. Due to its
+atomic thickness it is an example of a so-called 2D material: Compared to
+the other spatial dimensions (where graphene samples can reach up to
+several centimeters) the atomistic thickness of graphene typically ranges
+around 2.5 ångstrom ($2.5\times10^{-10}\text{m}$). We will thus model
+graphene as a lower-dimensional interface $\Sigma$ embedded into the
+computational domain $\Omega\subset\mathbb{R}^d$. More precisely, $\Sigma$
+is a two-dimensional sheet in three spatial dimensions, or a
+one-dimensional line in two spatial dimensions. The special electronic
+structure of graphene gives rise to a current density on the
+lower-dimensional interface that is modeled with an effective surface
+conductivity $\sigma^\Sigma$ obeying <a
+href="https://en.wikipedia.org/wiki/Ohm%27s_law">Ohm's Law</a>:
+@f[
+  \mathbf{J}^\Sigma=\sigma^\Sigma\,\mathbf{E}_T
+@f]
+in which $\mathbf{J}^\Sigma$ is the surface current density, $\mathbf{E}_T$
+denotes the tangential part of the electric field $\mathbf{E}$, and
+$\sigma^\Sigma$ is an appropriately chosen surface conductivity that will
+be discussed in more detail below. The surface current density gives rise
+to a jump condition on $\Sigma$ in the tangential component of the magnetic
+field. This is best seen by visualizing <a
+href="https://en.wikipedia.org/wiki/Amp%C3%A8re%27s_circuital_law">Ampère's
+law</a>:
+
+@htmlonly
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-81-cartoon.png" alt="Visualization of Ohm's law and Ampère's law leading to a jump condition over the interface" height="200">
+</p>
+@endhtmlonly
+
+and then taking the limit of the upper and lower part of the line integral
+approaching the sheet. In contrast, the tangential part of the electric
+field is continuous. By fixing a unit normal $\mathbf{\nu}$ on the hypersurface
+$\Sigma$ both jump conditions are
+@f{align*}
+\mathbf{\nu} \times \left[(\mu^{-1}\mathbf{H})^+ - (\mu^{-1}\mathbf{H})^-\right]|_{\Sigma}
+&= \sigma^{\Sigma}\left[(\mathbf{\nu}\times \mathbf{E}\times \mathbf{\nu})\right]|_{\Sigma},
+\\
+\mathbf{\nu} \times \left[\mathbf{E}^+ - \mathbf{E}^-\right]|_{\Sigma} &= 0.
+@f}
+The notation $\mathbf{F}^\pm$ indicates the limit values of the field
+when approaching the interface from above or below the interface:
+$\mathbf{F}^\pm(\mathbf{x})=\lim_{\delta\to0,\delta>0}\mathbf{F}(\mathbf{x}\pm\delta\mathbf{\nu})$.
+
+
+<h4> Rescaling </h4>
+
+We will be using a rescaled version of the Maxwell's equations described above.
+The rescaling has the following key differences:
+<ol>
+<li>Every length is rescaled by the free-space wavelength $2\pi k^{-1}
+\dealcoloneq 2\pi(\omega\sqrt{\varepsilon_0\mu_0})^{-1}$, in which $\varepsilon_0$ and $\mu_0$
+denote the vacuum dielectric permittivity and magnetic permeability, respectively.</li>
+<li>$\mathbf{E}$, $\mathbf{H}$, $\mathbf{J}_a$, $\mathbf{M}_a$ are all rescaled by
+typical electric current strength $J_0$, i.e., the strength of the
+prescribed dipole source at location $a$ in the $e_i$ direction in Cartesian
+coordinates (here, $\delta$ is the Dirac delta operator).
+@f[
+\mathbf{J}_a = J_0 \mathbf{e}_i\delta(x-a)
+@f]
+  </li>
+</ol>
+
+Accordingly, our electric permittivity and magnetic permeability are rescaled by
+$\varepsilon_0$ and $\mu_0$ as
+@f[
+\mu_r = \frac{1}{\mu_0}\mu
+\text{ and }
+\varepsilon_r = \frac{1}{\varepsilon_0}\varepsilon.
+@f]
+
+We use the free-space wave number $k_0 = \omega\sqrt{\varepsilon_0\mu_0}$ and
+the dipole strength, $J_0$ to arrive at the following rescaling of the vector
+fields and coordinates:
+@f[
+\begin{align*}
+\hat{x} = k_0x, &\qquad
+\hat{\nabla} = \frac{1}{k_0}\nabla,\\
+\hat{\mathbf{H}} = \frac{k_0}{J_0}\mu^{-1}\mathbf{H},&\qquad
+\hat{\mathbf{E}} = \frac{k_0^2}{\omega\mu_0 J_0}\mathbf{E},\\
+\hat{\mathbf{J}}_a = \frac{1}{J_0}\mathbf{J}_a,&\qquad
+\hat{\mathbf{M}}_a = \frac{k_0}{\omega\mu_0 J_0}\mathbf{M}_a.
+\end{align*}
+@f]
+
+Finally, the interface conductivity is rescaled as
+@f[
+\sigma^{\Sigma}_r = \sqrt{\frac{\mu_0}{\varepsilon_0}}\sigma^{\Sigma}.
+@f]
+
+Accordingly, our rescaled equations are
+@f{align*}
+  -i\mu_r \hat{\mathbf{H}} + \hat{\nabla} \times \hat{\mathbf{E}}
+  &= -\hat{\mathbf{M}}_a,
+  \\
+  \hat{\nabla} \cdot (\mu_r\hat{\mathbf{H}}) &= \frac{1}{i\omega}\hat{\nabla}
+  \cdot \hat{\mathbf{M}}_a,
+  \\
+  i\varepsilon_r\hat{\mathbf{E}} + \nabla\times(\mu^{-1}\mathbf{H})
+  &= \mathbf{J}_a,
+  \\
+  \nabla\cdot(\varepsilon\mathbf{E}) &= \frac{1}{i\omega}\hat{\nabla}
+  \cdot\hat{\mathbf{J}}_a.
+@f}
+
+We will omit the hat in further discussion for ease of notation.
+
+<h4> Variational Statement</h4>
+
+Let $\Omega \subset \mathbb{R}^n$, $(n = 2,3)$ be a simply connected and bounded
+domain with Lipschitz-continuous and piecewise smooth boundary, $\partial\Omega$.
+Let $\Sigma$ be an oriented, Lipschitz-continuous, piecewise smooth hypersurface.
+Fix a normal field $\nu$ on $\Sigma$ and let $n$ denote the outer normal vector
+on $\partial\Omega$.
+
+In order to arrive at the variational form, we will substitute for $\mathbf{H}$ in
+the first equation and obtain
+@f[
+\nabla \times (\mu_r^{-1}\nabla\times\mathbf{E}) - \varepsilon_r \mathbf{E}
+= i\mathbf{J}_a - \nabla\times (\mu_r^{-1}\mathbf{M}_a).
+@f]
+
+Now, consider a smooth test function $\varphi$ with complex conjugate $\bar{\varphi}$.
+Multiply both sides of the above equation by $\bar{\varphi}$ and integrate by parts
+in $\Omega\backslash\Sigma$.
+@f[
+\int_\Omega (\mu_r^{-1}\nabla\times\mathbf{E})\cdot (\nabla\times\bar{\varphi})\;\text{d}x
+- \int_\Omega \varepsilon_r\mathbf{E} \cdot \bar{\varphi}\;\text{d}x
+- \int_\Sigma [\nu \times (\mu_r^{-1}\nabla\times\mathbf{E} +
+\mu^{-1}\mathbf{M}_a)]_{\Sigma}\cdot \bar{\varphi}_T\;\text{d}o_x\\
+\qquad - \int_{\partial\Omega} (\nu \times (\mu_r^{-1}\nabla\times\mathbf{E} +
+\mu^{-1}\mathbf{M}_a)) \cdot \bar{\varphi}_T\;\text{d}o_x =
+i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
+- \int_\Omega \mu_r^{-1}\mathbf{M}_a \cdot (\nabla \times \bar{\varphi})\;\text{d}x.
+@f]
+
+We use the subscript $T$ to denote the tangential part of the given vector
+and $[\cdot]_{\Sigma}$ to denote a jump over $\Sigma$, i.e.,
+@f[
+  \mathbf{F}_T = (\mathbf{\nu}\times \mathbf{F})\times\mathbf{\nu}
+  \text{ and }
+  [\mathbf{F}]_{\Sigma}(\mathbf{x}) = \lim\limits_{s\searrow 0}(\mathbf{F}(\mathbf{x}+s\mathbf{\nu})-\mathbf{F}(\mathbf{x}-s\mathbf{\nu}))
+@f]
+for $\mathbf{x}\in \Sigma$.
+
+For the computational domain $\Omega$, we introduce the absorbing boundary condition
+at $\partial\Omega$, which is obtained by using a first-order approximation of
+the Silver-Müller radiation condition, truncated at $\partial\Omega$ @cite Monk2003.
+@f[
+\nu\times\mathbf{H}+\sqrt{\mu_r^{-1}\varepsilon_r}\mathbf{E}=0\qquad x\in\partial\Omega
+@f]
+We assume that $\mu_r^{-1}$ and $\varepsilon$ have well-defined square roots. In
+our numerical computation, we combine the above absorbing boundary condition
+with a PML.
+
+The jump condition can be expressed as a weak discontinuity as follows:
+@f[
+[\nu \times (\mu_r^{-1}\nabla\times\mathbf{E} + \mu^{-1}\mathbf{M}_a)]_{\Sigma}
+= i\sigma_r^{\Sigma}\mathbf{E}_T,\qquad \text{on }\Sigma\\
+\nu \times (\mu_r^{-1}\nabla\times\mathbf{E} + \mu^{-1}\mathbf{M}_a)
+= -i\sqrt{\mu_r^{-1}\varepsilon_r}\mathbf{E}_T,\qquad \text{on }\partial\Omega.
+@f]
+
+Combining, our weak form is as follows:
+@f[
+\int_\Omega (\mu_r^{-1}\nabla\times\mathbf{E})\cdot (\nabla\times\bar{\varphi})\;\text{d}x
+- \int_\Omega \varepsilon_r\mathbf{E} \cdot \bar{\varphi}\;\text{d}x
+- i\int_\Sigma (\sigma_r^{\Sigma}\mathbf{E}_T) \cdot \bar{\varphi}_T\;\text{d}o_x\\
+\qquad - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}\mathbf{E}_T) \cdot
+(\nabla\times\bar{\varphi}_T)\;\text{d}o_x.=
+i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
+- \int_\Omega \mu_r^{-1}\mathbf{M}_a \cdot (\nabla \times \bar{\varphi})\;\text{d}x.
+@f]
+
+Assume that $\sigma_r^{\Sigma} \in L^{\infty}(\Sigma)^{2\times 2}$ is matrix-valued
+and symmetric, and has a semidefinite real and complex part. Let $\varepsilon_r$
+be a smooth scalar function with $–\text{Im}(\varepsilon_r) = 0$, or
+$\text{Im}(\varepsilon_r)\ge c > 0$ in $\Omega$. $\mu_r^{-1}$ is a smooth scalar
+such that $\sqrt{\mu_r^{-1}\varepsilon_r}$ is real valued and strictly positive
+in $\partial\Omega$.
+
+$\mathbf{H}(\text{curl};\Omega)$ is space of vector-valued, measurable and square
+integrable functions whose weak curl admits a representation by a
+square integrable function. Define a Hilbert space
+@f[
+X(\Omega) = \{\varphi \in \mathbf{H}(\text{curl};\Omega)\;\;:\;\; \varphi_T|_{\Sigma}
+\in L^2(\Sigma)^2,\;\varphi_T|_{\partial\Omega} \in L^2(\partial\Omega)^2\}
+@f]
+equipped with the norm
+@f[
+  \|\varphi\|^2_X = \|\varphi\|^2_{L^2(\Omega)} +
+  \|\nabla\times\varphi\|^2_{L^2(\Omega)} + \|\varphi_T\|^2_{L^2(\Sigma)} +
+  \|\varphi_T\|^2_{L^2(\partial\Omega)}.
+@f]
+
+Define
+@f[
+A(\mathbf{E},\varphi) \dealcoloneq \int_\Omega (\mu_r^{-1}\nabla\times\mathbf{E})\cdot
+(\nabla\times\bar{\varphi})\;\text{d}x
+- \int_\Omega \varepsilon_r\mathbf{E} \cdot \bar{\varphi}\;\text{d}x
+- i\int_\Sigma (\sigma_r^{\Sigma}\mathbf{E}_T) \cdot \bar{\varphi}_T\;\text{d}o_x
+- i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}\mathbf{E}_T) \cdot
+(\nabla\times\bar{\varphi}_T)\;\text{d}o_x.\\
+F(\varphi) \dealcoloneq i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi}\;\text{d}x
+- \int_\Omega \mu_r^{-1}\mathbf{M}_a \cdot (\nabla \times \bar{\varphi})\;\text{d}x.
+@f]
+
+Then, our rescaled weak formulation is:
+
+@f[
+  \text{Find a unique } \mathbf{E} \in X(\Omega) \text{ such that, for all } \varphi \in X(\Omega),
+@f]
+
+@f[
+  A(\mathbf{E},\varphi) = F(\varphi).
+@f]
+
+
+<h4>Absorbing boundary conditions and the perfectly matched layer</h4>
+
+Moreover, the above equations are supplemented by the Silver-Müller radiation
+condition, if the ambient (unbounded) medium is isotropic. This amounts to the
+requirement that $\mathbf{E}$ and $\mathbf{H}$ both approach a spherical wave
+uniformly in the radial direction for points at infinity and away from the
+conducting sheet, i.e.,
+
+@f[
+\lim\limits_{|x|\to\infty} \{\mathbf{H}\times x - c^{-1}|x|\mathbf{E}\} = 0
+\text{ and }
+\lim\limits_{|x|\to\infty} \{\mathbf{E}\times x - c^{-1}|x|\mathbf{H}\} = 0
+\text{ for }
+x \not\in \Sigma.
+@f]
+
+In our case, we eliminate reflection from infinity by implementing a PML, which
+is described at length below, and avoid the explicit use of the last condition.
+
+<h3> Discretization Scheme</h3>
+
+The variational form is discretized on a non-uniform quadrilateral mesh with
+higher-order, curl-conforming Nédélec elements implemented by the FE_NedelecSZ
+class. This way the interface with a weak discontinuity is optimal, and we get optimal convergence rates.
+
+Consider the finite element subspace $X_h(\Omega) \subset X(\Omega)$. Define
+the matrices
+@f[
+A_{ij} = \int_\Omega (\mu_r^{-1}\nabla \times \varphi_j) \cdot
+          (\nabla\times\bar{\varphi}_i)\;\text{d}x
+          - \int_\Omega \varepsilon_r\varphi_j \cdot \bar{\varphi}_i\;\text{d}x
+          - i\int_\Sigma (\sigma_r^{\Sigma}\varphi_{j_T}) \cdot
+          \bar{\varphi}_{i_T}\;\text{d}o_x
+          - i\int_{\partial\Omega} (\sqrt{\mu_r^{-1}\varepsilon}\varphi_{j_T})
+          \cdot (\nabla\times \bar{\varphi}_{i_T})\;\text{d}o_x,
+@f]
+@f[
+F_i = i\int_\Omega \mathbf{J}_a \cdot \bar{\varphi_i}\;\text{d}x
+      - \int_\Omega \mu_r^{-1}\mathbf{M}_a \cdot (\nabla \times \bar{\varphi_i})
+      \;\text{d}x.
+@f]
+
+Then under the assumption of a sufficiently refined initial mesh
+the discretized variational problem is:
+
+@f[
+  \text{Find a unique } \mathbf{E}_h = \sum_j U_j\mathbf{\varphi}_j \in
+  X_h(\Omega) \text{ such that}
+@f]
+@f[
+\sum_jA_{ij}U_j = F_i\qquad\text{for all }i.
+@f]
+
+<h3>Perfectly Matched Layer</h3>
+The SPP amplitude is negatively affected by the absorbing boundary condition and
+this causes the solution image to be distorted. In order to reduce the resonance
+and distortion in our solutions, we are implementing a Perfectly Matched Layer
+(PML) in the scattering configuration.
+
+The concept of a PML was pioneered by Bérenger @cite Berenger1994
+and it is is an indispensable tool for truncating unbounded domains for
+wave equations and often used in the numerical approximation of scattering
+problems. It is essentially a thin layer with modified material parameters
+placed near the boundary such that all outgoing electromagnetic waves decay
+exponentially with no “artificial” reflection due to truncation of the
+domain.
+
+Our PML is a concentric circle with modified material coefficients
+($\varepsilon_r, \mu_r, \sigma$). It is located in a small region near the
+boundary $\partial\Omega$ and the transformation of the material
+coordinates is chosen to be a function of the radial distance $\rho$ from
+the origin $e_r$. The normal field $\nu$ of $\Sigma$ is orthogonal to the
+radial direction $e_r$, which makes $\mathbf{J}_a \equiv 0$ and
+$\mathbf{M}_a \equiv 0$ within the PML.
+
+@htmlonly
+<p align="center">
+  <img src = "https://www.dealii.org/images/steps/developer/step-81-PML.png">
+</p>
+@endhtmlonly
+
+Introduce a change of coordinates
+@f[
+x \to \bar{x} =
+\begin{cases}
+x + ie_r\int\limits_\rho^r s(\tau)\text{d}\tau,\;\;\;\;\;\;\; r\ge\rho\\
+x\;\;\;\;\;\;\;\;\;\text{otherwise}
+\end{cases}
+@f]
+
+in which $r = e_r \cdot x$ and $s(\tau)$ is an appropriately chosen, nonnegative
+scaling function.
+
+We introduce the following $2\times2$ matrices
+@f{align*}
+  A &= T_{e_xe_r}^{-1} \text{diag}\left(\frac{1}{\bar{d}^2},
+       \frac{1}{d\bar{d}}\right)T_{e_xe_r}
+       \\
+  B &= T_{e_xe_r}^{-1} \text{diag}\left(d,\bar{d}\right)T_{e_xe_r}
+       \\
+  C &= T_{e_xe_r}^{-1} \text{diag}\left(\frac{1}{\bar{d}},\frac{1}{d}\right)
+       T_{e_xe_r}
+@f}
+
+in which
+
+@f{align*}
+  d       &= 1 + is(r) \\
+  \bar{d} &= 1 + i/r \int\limits_{\rho}^{r}s(\tau)\text{d}\tau
+@f}
+
+and $T_{e_xe_r}$ is the rotation matrix which rotates $e_r$ onto $e_x$.
+Thus, after applying the rescaling, we get the following modified parameters
+@f{align*}
+  \bar{\mu}_r^{-1}        &= \frac{\mu_r^{-1}}{d},
+  \\
+  \bar{\varepsilon}_r     &= A^{-1} \varepsilon_r B^{-1}, \text{ and }
+  \\
+  \bar{\sigma}^{\Sigma}_r &= C^{-1} \sigma^{\Sigma}_r B^{-1}.
+@f}
+
+These PML transformations are implemented in our <tt>PerfectlyMatchedLayer</tt>
+class. After the PML
+is implemented, the electromagnetic wave essentially decays exponentially within
+the PML region near the boundary, therefore reducing reflection from the boundary
+of our finite domain. The decay function also depends on the strength of our PML,
+which can be adjusted to see more or less visible decaying in the PML region.

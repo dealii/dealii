@@ -45,6 +45,8 @@
 #endif
 
 
+namespace dealii
+{
 namespace mu
 {
 	/** \brief Bytecode default constructor. */
@@ -638,6 +640,7 @@ namespace mu
 		mu::console() << _T("END") << std::endl;
 	}
 } // namespace mu
+}
 
 #if defined(_MSC_VER)
 	#pragma warning(pop)

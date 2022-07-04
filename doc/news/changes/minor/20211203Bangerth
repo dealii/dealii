@@ -1,6 +1,0 @@
-New: The DataPostprocessorInputs::CommonInputs class now also
-stores the face number that is currently being worked on when
-using a DataOutFaces object. This allows accessing face-related
-data like the boundary id from a DataPostprocessor.
-<br>
-(Wolfgang Bangerth, 2021/12/03)

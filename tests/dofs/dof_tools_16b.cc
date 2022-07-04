@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2020 by the deal.II authors
+// Copyright (C) 2003 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,8 +40,7 @@ check_this(const DoFHandler<dim> &dof_handler)
     return;
 
   std::vector<types::global_dof_index> map(dof_handler.n_dofs());
-  std::set<types::boundary_id>         set;
-  set.insert(0);
+  const std::set<types::boundary_id>   set = {0};
   DoFTools::map_dof_to_boundary_indices(dof_handler, set, map);
 
   // create sparsity pattern

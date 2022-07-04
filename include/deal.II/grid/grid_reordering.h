@@ -27,7 +27,8 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * A class implementing various grid reordering algorithms. For more information
- * see the @ref reordering "reordering module".
+ * see the
+ * @ref reordering "reordering module".
  *
  * @deprecated Use GridTools::invert_all_negative_measure_cells() or
  * GridTools::consistently_order_cells() instead of the functions provided by

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -189,9 +189,8 @@ FindBug<dim>::dirichlet_conditions()
                                            component_mask);
 
 
-  std::vector<bool>            fixed_dofs(dof_handler.n_dofs());
-  std::set<types::boundary_id> boundary_ids;
-  boundary_ids.insert(0);
+  std::vector<bool>                  fixed_dofs(dof_handler.n_dofs());
+  const std::set<types::boundary_id> boundary_ids = {0};
 
   // get a list of those boundary DoFs which
   // we want to be fixed:

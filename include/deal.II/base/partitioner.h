@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2021 by the deal.II authors
+// Copyright (C) 2011 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -873,15 +873,19 @@ namespace Utilities
              ExcIndexNotPresent(global_index, my_pid));
       if (in_local_range(global_index))
         return static_cast<unsigned int>(global_index - local_range_data.first);
-      else if (is_ghost_entry(global_index))
-        return (locally_owned_size() +
-                static_cast<unsigned int>(
-                  ghost_indices_data.index_within_set(global_index)));
       else
-        // should only end up here in optimized mode, when we use this large
-        // number to trigger a segfault when using this method for array
-        // access
-        return numbers::invalid_unsigned_int;
+        {
+          // avoid checking the ghost index set via a binary search twice by
+          // querying the index within set, which returns invalid_dof_index
+          // for non-existent entries
+          const types::global_dof_index index_within_ghosts =
+            ghost_indices_data.index_within_set(global_index);
+          if (index_within_ghosts == numbers::invalid_dof_index)
+            return numbers::invalid_unsigned_int;
+          else
+            return locally_owned_size() +
+                   static_cast<unsigned int>(index_within_ghosts);
+        }
     }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// Copyright (C) 2010 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -144,6 +144,12 @@ public:
   make_no_normal_flux_constraints(const DoFHandler<dim, spacedim> &dof,
                                   const types::boundary_id         bid,
                                   const unsigned int first_vector_component);
+
+  /**
+   * Clear the user constraints on all levels.
+   */
+  void
+  clear_user_constraints();
 
   /**
    * Reset the data structures.
@@ -457,6 +463,16 @@ MGConstrainedDoFs::add_user_constraints(
     AffineConstraints<double>::MergeConflictBehavior::right_object_wins);
   user_constraints[level].close();
 }
+
+
+
+inline void
+MGConstrainedDoFs::clear_user_constraints()
+{
+  for (auto &constraint : user_constraints)
+    constraint.clear();
+}
+
 
 
 inline void

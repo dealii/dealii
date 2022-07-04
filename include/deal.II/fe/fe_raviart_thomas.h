@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// Copyright (C) 2003 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,13 +47,15 @@ DEAL_II_NAMESPACE_OPEN
  * field must be continuous across the line (or surface) even though
  * the tangential component may not be. As a consequence, the
  * Raviart-Thomas element is constructed in such a way that (i) it is
- * @ref vector_valued "vector-valued", (ii) the shape functions are
+ * @ref vector_valued "vector-valued",
+ * (ii) the shape functions are
  * discontinuous, but (iii) the normal component of the vector field
  * represented by each shape function is continuous across the faces
  * of cells.
  *
  * Other properties of the Raviart-Thomas element are that (i) it is
- * @ref GlossPrimitive "not a primitive element"; (ii) the shape functions
+ * @ref GlossPrimitive "not a primitive element"
+ * ; (ii) the shape functions
  * are defined so that certain integrals over the faces are either zero
  * or one, rather than the common case of certain point values being
  * either zero or one. (There is, however, the FE_RaviartThomasNodal
@@ -219,9 +221,10 @@ private:
    * <code>adjust_quad_dof_index_for_face_orientation_table</code> declared in
    * fe.cc. We need to fill it with the correct values in case of non-standard,
    * flipped (rotated by +180 degrees) or rotated (rotated by +90 degrees)
-   *faces. These are given in the form three flags (face_orientation, face_flip,
-   * face_rotation), see the documentation in GeometryInfo<dim> and
-   * this @ref GlossFaceOrientation "glossary entry on face orientation".
+   * faces. These are given in the form three flags (face_orientation,
+   * face_flip, face_rotation), see the documentation in GeometryInfo<dim> and
+   * this
+   * @ref GlossFaceOrientation "glossary entry on face orientation".
    *
    * <h3>Example: Raviart-Thomas Elements of order 2 (tensor polynomial
    * degree 3)</h3>
@@ -298,43 +301,34 @@ private:
 
 /**
  * The Raviart-Thomas elements with node functionals defined as point values
- * in Gauss points.
+ * in Gauss-Lobatto points.
  *
  * <h3>Description of node values</h3>
  *
  * For this Raviart-Thomas element, the node values are not cell and face
- * moments with respect to certain polynomials, but the values in quadrature
+ * moments with respect to certain polynomials, but the values at quadrature
  * points. Following the general scheme for numbering degrees of freedom, the
  * node values on faces (edges in 2D, quads in 3D) are first, face by face,
  * according to the natural ordering of the faces of a cell. The interior
  * degrees of freedom are last.
  *
  * For an RT-element of degree <i>k</i>, we choose <i>(k+1)<sup>d-1</sup></i>
- * Gauss points on each face. These points are ordered lexicographically with
- * respect to the orientation of the face. This way, the normal component
- * which is in <i>Q<sub>k</sub></i>, is uniquely determined. Furthermore,
- * since this Gauss-formula is exact for polynomials of degree <i>2k+1</i>,
- * these node values correspond to the exact integration of the moments of the
- * RT-space.
+ * Gauss-Lobatto points on each face, as defined by QGaussLobatto. For degree
+ * $k=0$, the midpoint is chosen. These points are ordered lexicographically
+ * with respect to the orientation of the face. This way, the normal component
+ * which is in <i>Q<sub>k</sub></i>, is uniquely determined.
  *
  * These face polynomials are extended into the interior by the means of a
  * QGaussLobatto formula for the normal direction. In other words, the
  * polynomials are the tensor product of Lagrange polynomials on the points of
- * a QGaussLobatto formula in the normal direction with Lagrange polynomials
- * on the points of a QGauss quadrature formula.
+ * a QGaussLobatto formula with $(k+2)$ points in the normal direction with
+ * Lagrange polynomials on the points of a QGaussLobatto quadrature formula
+ * with $(k+1)$ points.
  *
  * @note The degree stored in the member variable
  * FiniteElementData<dim>::degree is higher by one than the constructor
  * argument!
  */
-
-namespace internal
-{
-  template <int dim>
-  std::vector<unsigned int>
-  get_lexicographic_numbering_rt_nodal(const unsigned int degree);
-} // namespace internal
-
 template <int dim>
 class FE_RaviartThomasNodal : public FE_PolyTensor<dim>
 {
@@ -425,7 +419,6 @@ private:
    */
   mutable Threads::Mutex mutex;
 };
-
 
 /*@}*/
 

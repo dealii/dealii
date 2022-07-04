@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2021 by the deal.II authors
+// Copyright (C) 2011 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1128,13 +1128,18 @@ AlignedVector<T>::Deleter::MPISharedMemDeleterAction::delete_array(
   T *                     ptr)
 {
   (void)ptr;
-  Assert(aligned_vector->elements.get() == ptr, ExcInternalError());
+  // It would be nice to assert that aligned_vector->elements.get() equals ptr,
+  // but it is not guaranteed to work: clang, for example, sets elements.get()
+  // to nullptr and then calls the deleter on a previously made copy. Hence we
+  // must assume here that elements.get() (which is managed by the unique_ptr)
+  // may be nullptr at this point.
+  //
+  // used_elements_end is a member variable of AlignedVector (i.e., we control
+  // it, not unique_ptr) so it is still set to its correct value.
 
   if (is_shmem_root)
     if (std::is_trivial<T>::value == false)
-      for (T *p = aligned_vector->used_elements_end - 1;
-           p >= aligned_vector->elements.get();
-           --p)
+      for (T *p = aligned_vector->used_elements_end - 1; p >= ptr; --p)
         p->~T();
 
   int ierr;

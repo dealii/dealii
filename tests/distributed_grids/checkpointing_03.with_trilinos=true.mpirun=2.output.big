@@ -1,0 +1,115 @@
+
+DEAL:0::Cycle 1 / 1:
+DEAL:0::n_global_active_cells: 512000 n_global_levels: 4 ghost_owners.size: 1 level_ghost_owners.size: 1
+DEAL:0::checkpointing...
+DEAL:0::resume...
+DEAL:0::vec 0: 0.00000
+DEAL:0::vec 1: 1.00000
+DEAL:0::vec 2: 2.00000
+DEAL:0::vec 3: 3.00000
+DEAL:0::vec 4: 4.00000
+DEAL:0::vec 5: 5.00000
+DEAL:0::vec 6: 6.00000
+DEAL:0::vec 7: 7.00000
+DEAL:0::vec 8: 8.00000
+DEAL:0::vec 9: 9.00000
+DEAL:0::vec 10: 10.0000
+DEAL:0::vec 11: 11.0000
+DEAL:0::vec 12: 12.0000
+DEAL:0::vec 13: 13.0000
+DEAL:0::vec 14: 14.0000
+DEAL:0::vec 15: 15.0000
+DEAL:0::vec 16: 16.0000
+DEAL:0::vec 17: 17.0000
+DEAL:0::vec 18: 18.0000
+DEAL:0::vec 19: 19.0000
+DEAL:0::vec 20: 20.0000
+DEAL:0::vec 21: 21.0000
+DEAL:0::vec 22: 22.0000
+DEAL:0::vec 23: 23.0000
+DEAL:0::vec 24: 24.0000
+DEAL:0::vec 25: 25.0000
+DEAL:0::vec 26: 26.0000
+DEAL:0::vec 27: 27.0000
+DEAL:0::vec 28: 28.0000
+DEAL:0::vec 29: 29.0000
+DEAL:0::vec 30: 30.0000
+DEAL:0::vec 31: 31.0000
+DEAL:0::vec 32: 32.0000
+DEAL:0::vec 33: 33.0000
+DEAL:0::vec 34: 34.0000
+DEAL:0::vec 35: 35.0000
+DEAL:0::vec 36: 36.0000
+DEAL:0::vec 37: 37.0000
+DEAL:0::vec 38: 38.0000
+DEAL:0::vec 39: 39.0000
+DEAL:0::vec 40: 40.0000
+DEAL:0::vec 41: 41.0000
+DEAL:0::vec 42: 42.0000
+DEAL:0::vec 43: 43.0000
+DEAL:0::vec 44: 44.0000
+DEAL:0::vec 45: 45.0000
+DEAL:0::vec 46: 46.0000
+DEAL:0::vec 47: 47.0000
+DEAL:0::vec 48: 48.0000
+DEAL:0::vec 49: 49.0000
+DEAL:0::vec y: 50.0000
+DEAL:0::
+
+DEAL:1::Cycle 1 / 1:
+DEAL:1::n_global_active_cells: 512000 n_global_levels: 4 ghost_owners.size: 1 level_ghost_owners.size: 1
+DEAL:1::checkpointing...
+DEAL:1::resume...
+DEAL:1::vec 0: 0.00000
+DEAL:1::vec 1: 1.00000
+DEAL:1::vec 2: 2.00000
+DEAL:1::vec 3: 3.00000
+DEAL:1::vec 4: 4.00000
+DEAL:1::vec 5: 5.00000
+DEAL:1::vec 6: 6.00000
+DEAL:1::vec 7: 7.00000
+DEAL:1::vec 8: 8.00000
+DEAL:1::vec 9: 9.00000
+DEAL:1::vec 10: 10.0000
+DEAL:1::vec 11: 11.0000
+DEAL:1::vec 12: 12.0000
+DEAL:1::vec 13: 13.0000
+DEAL:1::vec 14: 14.0000
+DEAL:1::vec 15: 15.0000
+DEAL:1::vec 16: 16.0000
+DEAL:1::vec 17: 17.0000
+DEAL:1::vec 18: 18.0000
+DEAL:1::vec 19: 19.0000
+DEAL:1::vec 20: 20.0000
+DEAL:1::vec 21: 21.0000
+DEAL:1::vec 22: 22.0000
+DEAL:1::vec 23: 23.0000
+DEAL:1::vec 24: 24.0000
+DEAL:1::vec 25: 25.0000
+DEAL:1::vec 26: 26.0000
+DEAL:1::vec 27: 27.0000
+DEAL:1::vec 28: 28.0000
+DEAL:1::vec 29: 29.0000
+DEAL:1::vec 30: 30.0000
+DEAL:1::vec 31: 31.0000
+DEAL:1::vec 32: 32.0000
+DEAL:1::vec 33: 33.0000
+DEAL:1::vec 34: 34.0000
+DEAL:1::vec 35: 35.0000
+DEAL:1::vec 36: 36.0000
+DEAL:1::vec 37: 37.0000
+DEAL:1::vec 38: 38.0000
+DEAL:1::vec 39: 39.0000
+DEAL:1::vec 40: 40.0000
+DEAL:1::vec 41: 41.0000
+DEAL:1::vec 42: 42.0000
+DEAL:1::vec 43: 43.0000
+DEAL:1::vec 44: 44.0000
+DEAL:1::vec 45: 45.0000
+DEAL:1::vec 46: 46.0000
+DEAL:1::vec 47: 47.0000
+DEAL:1::vec 48: 48.0000
+DEAL:1::vec 49: 49.0000
+DEAL:1::vec y: 50.0000
+DEAL:1::
+

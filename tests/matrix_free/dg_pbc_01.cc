@@ -81,7 +81,7 @@ test()
     (update_gradients | update_JxW_values);
 
   MatrixFree<dim> mf_data;
-  mf_data.reinit(dof, constraints, quad, data);
+  mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
 
   LinearAlgebra::distributed::Vector<double> rhs, sol;
   mf_data.initialize_dof_vector(rhs);

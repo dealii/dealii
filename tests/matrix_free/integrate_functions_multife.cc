@@ -122,7 +122,8 @@ MatrixFreeTest<dim, fe_degree, Number>::operator()(
 
       // compare values with the ones the FEValues
       // gives us. Those are seen as reference
-      for (unsigned int j = 0; j < data.n_components_filled(cell); ++j)
+      for (unsigned int j = 0; j < data.n_active_entries_per_cell_batch(cell);
+           ++j)
         {
           // FE 0, Quad 0
           // generate random numbers at quadrature
@@ -322,7 +323,8 @@ test()
     std::vector<Quadrature<1>> quad;
     for (unsigned int no = 0; no < 2; ++no)
       quad.push_back(QGauss<1>(fe_degree + 1 + no));
-    mf_data.reinit(dof,
+    mf_data.reinit(MappingQ1<dim>{},
+                   dof,
                    constraints,
                    quad,
                    typename MatrixFree<dim, number>::AdditionalData(

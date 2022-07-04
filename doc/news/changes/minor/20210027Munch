@@ -1,4 +1,0 @@
-New: You can now perform range-based iterations on hp::FECollecion, hp::QCollection,
-and hp::MappingCollection objects.
-<br>
-(Peter Munch, 2021/10/27)

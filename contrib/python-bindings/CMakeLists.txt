@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 - 2020 by the deal.II authors
+## Copyright (C) 2016 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,7 +21,15 @@ IF(DEAL_II_COMPONENT_PYTHON_BINDINGS)
   #
   # Find Python:
   #
-  INCLUDE(FindPythonInterp)
+  # Since CMake 3.12, FindPythonInterp is deprecated.
+  if (CMAKE_VERSION VERSION_LESS 3.12)
+    INCLUDE(FindPythonInterp)
+  else()
+    FIND_PACKAGE(Python3)
+    SET(PYTHON_VERSION_MAJOR ${Python3_VERSION_MAJOR})
+    SET(PYTHON_VERSION_MINOR ${Python3_VERSION_MINOR})
+    SET(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+  endif()
   INCLUDE(FindPythonLibs)
 
   IF(FEATURE_BOOST_BUNDLED_CONFIGURED)

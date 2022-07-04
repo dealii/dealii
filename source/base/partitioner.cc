@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,9 @@
 #include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/partitioner.templates.h>
+
+#include <boost/serialization/utility.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -281,8 +284,9 @@ namespace Utilities
       // in the static partition (i.e. in the dictionary). This process
       // returns the actual owner of the index.
       ConsensusAlgorithms::Selector<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>
+        std::vector<
+          std::pair<types::global_dof_index, types::global_dof_index>>,
+        std::vector<unsigned int>>
         consensus_algorithm(process, communicator);
       consensus_algorithm.run();
 

@@ -265,7 +265,8 @@ test()
     constraints.push_back(&constraints_p);
     QGauss<1> quad(degree + 2);
     // no parallelism
-    mf_data->reinit(dofs,
+    mf_data->reinit(MappingQ1<dim>{},
+                    dofs,
                     constraints,
                     quad,
                     typename MatrixFree<dim>::AdditionalData(

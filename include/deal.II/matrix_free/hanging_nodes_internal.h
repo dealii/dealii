@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2020 by the deal.II authors
+// Copyright (C) 2018 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,10 +22,11 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
+
+#include <deal.II/hp/fe_collection.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -70,7 +71,7 @@ namespace internal
 
 
     /**
-     * Type of the 9-bit representation of the refinement configuration.
+     * Type of the 8-bit representation of the refinement configuration.
      */
     using compressed_constraint_kind = std::uint8_t;
 
@@ -257,9 +258,8 @@ namespace internal
     /**
      * This class creates the mask used in the treatment of hanging nodes in
      * CUDAWrappers::MatrixFree.
-     * The implementation of this class is explained in Section 3 of
-     * @cite ljungkvist2017matrix and in Section 3.4 of
-     * @cite kronbichler2019multigrid.
+     * The implementation of this class is explained in detail in
+     * @cite munch2022hn.
      */
     template <int dim>
     class HangingNodes
@@ -375,6 +375,17 @@ namespace internal
     inline void
     HangingNodes<3>::setup_line_to_cell(const Triangulation<3> &triangulation)
     {
+      // Check if we there are no hanging nodes on the current MPI process,
+      // which we do by checking if the second finest level holds no active
+      // non-artificial cell
+      if (triangulation.n_levels() <= 1 ||
+          std::none_of(triangulation.begin_active(triangulation.n_levels() - 2),
+                       triangulation.end_active(triangulation.n_levels() - 2),
+                       [](const CellAccessor<3, 3> &cell) {
+                         return !cell.is_artificial();
+                       }))
+        return;
+
       const unsigned int n_raw_lines = triangulation.n_raw_lines();
       this->line_to_cells.resize(n_raw_lines);
 

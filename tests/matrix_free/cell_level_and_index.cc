@@ -46,7 +46,7 @@ compare_indices(const MatrixFree<dim, number> *mf_data)
   for (unsigned int batch_no = 0; batch_no < n_batches; ++batch_no)
     {
       const unsigned int n_lanes_filled =
-        mf_data->n_components_filled(batch_no);
+        mf_data->n_active_entries_per_cell_batch(batch_no);
       for (unsigned int lane = 0; lane < n_lanes_filled; ++lane)
         {
           const auto cell = mf_data->get_cell_iterator(batch_no, lane);
@@ -108,7 +108,7 @@ test(const bool adaptive_ref = true)
 
   {
     std::cout << "Compare active indices." << std::endl;
-    mf_data->reinit(dof, constraints, quad, additional_data);
+    mf_data->reinit(MappingQ1<dim>{}, dof, constraints, quad, additional_data);
     compare_indices(mf_data.get());
   }
 
@@ -116,7 +116,7 @@ test(const bool adaptive_ref = true)
     std::cout << "Compare level indices." << std::endl;
     const unsigned int level = tria.n_global_levels() - 1;
     additional_data.mg_level = level;
-    mf_data->reinit(dof, constraints, quad, additional_data);
+    mf_data->reinit(MappingQ1<dim>{}, dof, constraints, quad, additional_data);
     compare_indices(mf_data.get());
   }
 }

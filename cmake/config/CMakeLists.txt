@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2020 by the deal.II authors
+## Copyright (C) 2012 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -63,12 +63,6 @@ INSTALL(FILES ${_macros}
 #        Configure and install the cmake project configuration:        #
 #                                                                      #
 ########################################################################
-
-#
-# Do not force --as-needed for executables on user side:
-#
-
-STRIP_FLAG(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 
 #
 # Strip -Wno-deprecated-declarations from DEAL_II_CXX_FLAGS so that

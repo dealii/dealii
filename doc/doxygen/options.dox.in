@@ -213,6 +213,10 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_MPI_VERSION_MINOR=0 \
                          DEAL_II_WITH_MUPARSER=1 \
                          DEAL_II_WITH_OPENCASCADE=1 \
+                         DEAL_II_OPENCASCADE_VERSION_MAJOR=7 \
+                         DEAL_II_OPENCASCADE_VERSION_MINOR=6 \
+                         DEAL_II_OPENCASCADE_VERSION_SUBMINOR=0 \
+                         DEAL_II_OPENCASCADE_VERSION_GTE=1 \
                          DEAL_II_WITH_P4EST=1 \
                          DEAL_II_P4EST_VERSION_MAJOR=2 \
                          DEAL_II_P4EST_VERSION_MINOR=0 \

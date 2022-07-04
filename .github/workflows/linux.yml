@@ -6,6 +6,9 @@ concurrency:
   group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{github.event_name == 'pull_request'}}
 
+permissions:
+  contents: read
+
 jobs:
   linux-release-serial:
     # simple serial release build using g++
@@ -14,7 +17,7 @@ jobs:
     runs-on: [ubuntu-20.04]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
@@ -37,7 +40,7 @@ jobs:
       run: |
         cmake -D BOOST_DIR=/home/runner/work/dealii/boost -D BOOST_INCLUDEDIR=/home/runner/work/dealii/boost -D BOOST_LIBRARYDIR=/home/runner/work/dealii/boost/stage/x64/Release/lib -D CMAKE_BUILD_TYPE=Release -D CMAKE_CXX_COMPILER=g++-10 -D DEAL_II_CXX_FLAGS='-Werror -std=c++20' -D DEAL_II_EARLY_DEPRECATIONS=ON -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON .
     - name: archive
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: linux-serial-detailed.log
         path: detailed.log
@@ -54,7 +57,7 @@ jobs:
     runs-on: [ubuntu-20.04]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: modules
       run: |
         sudo apt-get install -y software-properties-common
@@ -89,7 +92,7 @@ jobs:
               -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
               ..
     - name: archive
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: linux-simplex-detailed.log
         path: build/detailed.log
@@ -109,7 +112,7 @@ jobs:
         ctest --output-on-failure -j 2
     - name: failed test log
       if: ${{ failure() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: test-log
         path: |
@@ -124,7 +127,7 @@ jobs:
     runs-on: [ubuntu-18.04]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: modules
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
@@ -157,7 +160,7 @@ jobs:
               -D DEAL_II_COMPONENT_EXAMPLES="ON" \
               .
     - name: archive
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: linux-cuda-detailed.log
         path: detailed.log
@@ -176,7 +179,7 @@ jobs:
     runs-on: [ubuntu-18.04]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: setup apt repo
       run: |
         # oneapi-ci/scripts/setup_apt_repo_linux.sh
@@ -193,7 +196,7 @@ jobs:
                           intel-oneapi-tbb-devel | tee dependencies.txt
     - name: cache install
       id: cache-install
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: /opt/intel/oneapi
         key: install-${{ hashFiles('**/dependencies.txt') }}
@@ -227,7 +230,7 @@ jobs:
               -D TBB_DIR=${TBBROOT} \
               .
     - name: archive
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: linux-intel-detailed.log
         path: detailed.log

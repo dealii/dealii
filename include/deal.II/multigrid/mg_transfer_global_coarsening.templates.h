@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,8 +36,6 @@
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/tria_description.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/matrix_free/evaluation_kernels.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
@@ -45,6 +43,7 @@
 
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer_global_coarsening.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -566,8 +565,9 @@ namespace internal
                 false);
 
             Utilities::MPI::ConsensusAlgorithms::Selector<
-              std::pair<types::global_cell_index, types::global_cell_index>,
-              unsigned int>
+              std::vector<
+                std::pair<types::global_cell_index, types::global_cell_index>>,
+              std::vector<unsigned int>>
               consensus_algorithm(process, communicator);
             consensus_algorithm.run();
           }
@@ -592,8 +592,9 @@ namespace internal
                 true);
 
       Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::pair<types::global_cell_index, types::global_cell_index>,
-        unsigned int>
+        std::vector<
+          std::pair<types::global_cell_index, types::global_cell_index>>,
+        std::vector<unsigned int>>
         consensus_algorithm(process, communicator);
       consensus_algorithm.run();
 
@@ -649,6 +650,11 @@ namespace internal
           }
       }
 
+      this->is_extended_locally_owned =
+        mg_level_fine == numbers::invalid_unsigned_int ?
+          dof_handler_fine.locally_owned_dofs() :
+          dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
+
       std::vector<types::global_dof_index> ghost_indices;
 
       // process local cells
@@ -671,9 +677,9 @@ namespace internal
             else
               cell_->get_mg_dof_indices(indices);
 
-            ghost_indices.insert(ghost_indices.end(),
-                                 indices.begin(),
-                                 indices.end());
+            for (const auto i : indices)
+              if (!is_extended_locally_owned.is_element(i))
+                ghost_indices.push_back(i);
           }
       }
 
@@ -725,13 +731,18 @@ namespace internal
               MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr_3);
 
-            for (unsigned int i = 0; i < buffer.size();
-                 i += dof_handler_fine.get_fe(buffer[i]).n_dofs_per_cell() + 1)
-              ghost_indices.insert(
-                ghost_indices.end(),
-                buffer.begin() + i + 1,
-                buffer.begin() + i + 1 +
-                  dof_handler_fine.get_fe(buffer[i]).n_dofs_per_cell());
+            for (unsigned int i = 0; i < buffer.size();)
+              {
+                const unsigned int dofs_per_cell =
+                  dof_handler_fine.get_fe(buffer[i]).n_dofs_per_cell();
+                ++i;
+                for (unsigned int j = 0; j < dofs_per_cell; ++j, ++i)
+                  {
+                    AssertIndexRange(i, buffer.size());
+                    if (!is_extended_locally_owned.is_element(buffer[i]))
+                      ghost_indices.push_back(buffer[i]);
+                  }
+              }
 
             const unsigned int rank = status.MPI_SOURCE;
 
@@ -761,11 +772,6 @@ namespace internal
       ghost_indices.erase(std::unique(ghost_indices.begin(),
                                       ghost_indices.end()),
                           ghost_indices.end());
-
-      this->is_extended_locally_owned =
-        mg_level_fine == numbers::invalid_unsigned_int ?
-          dof_handler_fine.locally_owned_dofs() :
-          dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
 
       this->is_extended_ghosts =
         IndexSet(mg_level_fine == numbers::invalid_unsigned_int ?
@@ -3085,8 +3091,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::reinit(
                 false);
 
       Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::pair<types::global_cell_index, types::global_cell_index>,
-        unsigned int>
+        std::vector<
+          std::pair<types::global_cell_index, types::global_cell_index>>,
+        std::vector<unsigned int>>
         consensus_algorithm(process, communicator);
       consensus_algorithm.run();
 
@@ -3162,6 +3169,32 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   return size;
 }
+
+
+
+template <int dim, typename VectorType>
+MGTransferBlockGlobalCoarsening<dim, VectorType>::
+  MGTransferBlockGlobalCoarsening(
+    const MGTransferGlobalCoarsening<dim, VectorType> &transfer_operator)
+  : MGTransferBlockMatrixFreeBase<dim,
+                                  typename VectorType::value_type,
+                                  MGTransferGlobalCoarsening<dim, VectorType>>(
+      true)
+  , transfer_operator(transfer_operator)
+{}
+
+
+
+template <int dim, typename VectorType>
+const MGTransferGlobalCoarsening<dim, VectorType> &
+MGTransferBlockGlobalCoarsening<dim, VectorType>::get_matrix_free_transfer(
+  const unsigned int b) const
+{
+  (void)b;
+  AssertDimension(b, 0);
+  return transfer_operator;
+}
+
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -673,281 +673,6 @@ namespace internal
               dof_handler.mg_vertex_dofs[vertex].init(1, 0, 0);
             }
       }
-
-      template <int spacedim>
-      static types::global_dof_index
-      get_dof_index(
-        const DoFHandler<1, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<1>>
-          &mg_level,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<1>>
-          &,
-        const unsigned int obj_index,
-        const unsigned int fe_index,
-        const unsigned int local_index,
-        const std::integral_constant<int, 1>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<1, spacedim>::ExcNotImplementedWithHP()));
-
-        return mg_level->dof_object.get_dof_index(
-          static_cast<const DoFHandler<1, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index);
-      }
-
-      template <int spacedim>
-      static types::global_dof_index
-      get_dof_index(
-        const DoFHandler<2, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<2>>
-          &,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<2>>
-          &                mg_faces,
-        const unsigned int obj_index,
-        const unsigned int fe_index,
-        const unsigned int local_index,
-        const std::integral_constant<int, 1>)
-      {
-        return mg_faces->lines.get_dof_index(
-          static_cast<const DoFHandler<2, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index);
-      }
-
-      template <int spacedim>
-      static types::global_dof_index
-      get_dof_index(
-        const DoFHandler<2, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<2>>
-          &mg_level,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<2>>
-          &,
-        const unsigned int obj_index,
-        const unsigned int fe_index,
-        const unsigned int local_index,
-        const std::integral_constant<int, 2>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<2, spacedim>::ExcNotImplementedWithHP()));
-        return mg_level->dof_object.get_dof_index(
-          static_cast<const DoFHandler<2, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index);
-      }
-
-      template <int spacedim>
-      static types::global_dof_index
-      get_dof_index(
-        const DoFHandler<3, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3>>
-          &,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3>>
-          &                mg_faces,
-        const unsigned int obj_index,
-        const unsigned int fe_index,
-        const unsigned int local_index,
-        const std::integral_constant<int, 1>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
-        return mg_faces->lines.get_dof_index(
-          static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index);
-      }
-
-      template <int spacedim>
-      static types::global_dof_index
-      get_dof_index(
-        const DoFHandler<3, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3>>
-          &,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3>>
-          &                mg_faces,
-        const unsigned int obj_index,
-        const unsigned int fe_index,
-        const unsigned int local_index,
-        const std::integral_constant<int, 2>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
-        return mg_faces->quads.get_dof_index(
-          static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index);
-      }
-
-      template <int spacedim>
-      static types::global_dof_index
-      get_dof_index(
-        const DoFHandler<3, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3>>
-          &mg_level,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3>>
-          &,
-        const unsigned int obj_index,
-        const unsigned int fe_index,
-        const unsigned int local_index,
-        const std::integral_constant<int, 3>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
-        return mg_level->dof_object.get_dof_index(
-          static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index);
-      }
-
-      template <int spacedim>
-      static void
-      set_dof_index(
-        const DoFHandler<1, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<1>>
-          &mg_level,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<1>>
-          &,
-        const unsigned int            obj_index,
-        const unsigned int            fe_index,
-        const unsigned int            local_index,
-        const types::global_dof_index global_index,
-        const std::integral_constant<int, 1>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<1, spacedim>::ExcNotImplementedWithHP()));
-        mg_level->dof_object.set_dof_index(
-          static_cast<const DoFHandler<1, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index,
-          global_index);
-      }
-
-      template <int spacedim>
-      static void
-      set_dof_index(
-        const DoFHandler<2, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<2>>
-          &,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<2>>
-          &                           mg_faces,
-        const unsigned int            obj_index,
-        const unsigned int            fe_index,
-        const unsigned int            local_index,
-        const types::global_dof_index global_index,
-        const std::integral_constant<int, 1>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<2, spacedim>::ExcNotImplementedWithHP()));
-        mg_faces->lines.set_dof_index(
-          static_cast<const DoFHandler<2, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index,
-          global_index);
-      }
-
-      template <int spacedim>
-      static void
-      set_dof_index(
-        const DoFHandler<2, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<2>>
-          &mg_level,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<2>>
-          &,
-        const unsigned int            obj_index,
-        const unsigned int            fe_index,
-        const unsigned int            local_index,
-        const types::global_dof_index global_index,
-        const std::integral_constant<int, 2>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<2, spacedim>::ExcNotImplementedWithHP()));
-        mg_level->dof_object.set_dof_index(
-          static_cast<const DoFHandler<2, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index,
-          global_index);
-      }
-
-      template <int spacedim>
-      static void
-      set_dof_index(
-        const DoFHandler<3, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3>>
-          &,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3>>
-          &                           mg_faces,
-        const unsigned int            obj_index,
-        const unsigned int            fe_index,
-        const unsigned int            local_index,
-        const types::global_dof_index global_index,
-        const std::integral_constant<int, 1>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
-        mg_faces->lines.set_dof_index(
-          static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index,
-          global_index);
-      }
-
-      template <int spacedim>
-      static void
-      set_dof_index(
-        const DoFHandler<3, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3>>
-          &,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3>>
-          &                           mg_faces,
-        const unsigned int            obj_index,
-        const unsigned int            fe_index,
-        const unsigned int            local_index,
-        const types::global_dof_index global_index,
-        const std::integral_constant<int, 2>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
-        mg_faces->quads.set_dof_index(
-          static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index,
-          global_index);
-      }
-
-      template <int spacedim>
-      static void
-      set_dof_index(
-        const DoFHandler<3, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3>>
-          &mg_level,
-        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3>>
-          &,
-        const unsigned int            obj_index,
-        const unsigned int            fe_index,
-        const unsigned int            local_index,
-        const types::global_dof_index global_index,
-        const std::integral_constant<int, 3>)
-      {
-        Assert(dof_handler.hp_capability_enabled == false,
-               (typename DoFHandler<3, spacedim>::ExcNotImplementedWithHP()));
-        mg_level->dof_object.set_dof_index(
-          static_cast<const DoFHandler<3, spacedim> &>(dof_handler),
-          obj_index,
-          fe_index,
-          local_index,
-          global_index);
-      }
     };
   } // namespace DoFHandlerImplementation
 
@@ -1196,43 +921,14 @@ namespace internal
           // *have* to be different, and so we need to prepare for this
           // as well.
           //
-          // The way we do things is that we loop over all active
-          // cells (these are the only ones that have DoFs
-          // anyway) and all their faces. We note in the
-          // user flags whether we have previously visited a face and
-          // if so skip it (consequently, we have to save and later
-          // restore the face flags)
+          // The way we do things is that we loop over all active cells (these
+          // are the only ones that have DoFs anyway) and all their faces. We
+          // note in the vector face_touched whether we have previously
+          // visited a face and if so skip it
           {
-            std::vector<bool> saved_face_user_flags;
-            switch (dim)
-              {
-                case 2:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .save_user_flags_line(saved_face_user_flags);
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .clear_user_flags_line();
-
-                    break;
-                  }
-
-                case 3:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .save_user_flags_quad(saved_face_user_flags);
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .clear_user_flags_quad();
-
-                    break;
-                  }
-
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
+            std::vector<bool> face_touched(dim == 2 ?
+                                             dof_handler.tria->n_raw_lines() :
+                                             dof_handler.tria->n_raw_quads());
 
             const unsigned int d = dim - 1;
             const unsigned int l = 0;
@@ -1252,7 +948,7 @@ namespace internal
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto face : cell->face_indices())
-                  if (cell->face(face)->user_flag_set() == false)
+                  if (!face_touched[cell->face(face)->index()])
                     {
                       unsigned int fe_slots_needed = 0;
 
@@ -1284,7 +980,7 @@ namespace internal
                         }
 
                       // mark this face as visited
-                      cell->face(face)->set_user_flag();
+                      face_touched[cell->face(face)->index()] = true;
 
                       dof_handler
                         .hp_object_fe_ptr[d][cell->face(face)->index() + 1] =
@@ -1308,34 +1004,12 @@ namespace internal
             // With the memory now allocated, loop over the
             // dof_handler cells again and prime the _offset values as
             // well as the fe_index fields
-            switch (dim)
-              {
-                case 2:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .clear_user_flags_line();
-
-                    break;
-                  }
-
-                case 3:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .clear_user_flags_quad();
-
-                    break;
-                  }
-
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
+            face_touched = std::vector<bool>(face_touched.size());
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
                 for (const auto face : cell->face_indices())
-                  if (!cell->face(face)->user_flag_set())
+                  if (!face_touched[cell->face(face)->index()])
                     {
                       // Same decision tree as before
                       if (cell->at_boundary(face) ||
@@ -1410,7 +1084,7 @@ namespace internal
                         }
 
                       // mark this face as visited
-                      cell->face(face)->set_user_flag();
+                      face_touched[cell->face(face)->index()] = true;
                     }
 
             for (unsigned int i = 1;
@@ -1418,31 +1092,6 @@ namespace internal
                  i++)
               dof_handler.object_dof_ptr[l][d][i] +=
                 dof_handler.object_dof_ptr[l][d][i - 1];
-
-            // at the end, restore the user flags for the faces
-            switch (dim)
-              {
-                case 2:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .load_user_flags_line(saved_face_user_flags);
-
-                    break;
-                  }
-
-                case 3:
-                  {
-                    const_cast<dealii::Triangulation<dim, spacedim> &>(
-                      *dof_handler.tria)
-                      .load_user_flags_quad(saved_face_user_flags);
-
-                    break;
-                  }
-
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
           }
         }
 
@@ -2160,27 +1809,6 @@ DoFHandler<dim, spacedim>::~DoFHandler()
 
 template <int dim, int spacedim>
 void
-DoFHandler<dim, spacedim>::initialize(const Triangulation<dim, spacedim> &tria,
-                                      const FiniteElement<dim, spacedim> &fe)
-{
-  this->initialize(tria, hp::FECollection<dim, spacedim>(fe));
-}
-
-
-
-template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::initialize(const Triangulation<dim, spacedim> &tria,
-                                      const hp::FECollection<dim, spacedim> &fe)
-{
-  this->reinit(tria);
-  this->distribute_dofs(fe);
-}
-
-
-
-template <int dim, int spacedim>
-void
 DoFHandler<dim, spacedim>::reinit(const Triangulation<dim, spacedim> &tria)
 {
   //
@@ -2536,81 +2164,6 @@ DoFHandler<dim, spacedim>::memory_consumption() const
     }
 
   return mem;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::set_fe(const FiniteElement<dim, spacedim> &fe)
-{
-  this->set_fe(hp::FECollection<dim, spacedim>(fe));
-}
-
-
-
-template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::set_fe(const hp::FECollection<dim, spacedim> &ff)
-{
-  Assert(
-    this->tria != nullptr,
-    ExcMessage(
-      "You need to set the Triangulation in the DoFHandler using reinit() or "
-      "in the constructor before you can distribute DoFs."));
-  Assert(this->tria->n_levels() > 0,
-         ExcMessage("The Triangulation you are using is empty!"));
-  Assert(ff.size() > 0, ExcMessage("The hp::FECollection given is empty!"));
-
-  // don't create a new object if the one we have is already appropriate
-  if (this->fe_collection != ff)
-    {
-      this->fe_collection = hp::FECollection<dim, spacedim>(ff);
-
-      const bool contains_multiple_fes = (this->fe_collection.size() > 1);
-
-      // disable hp-mode if only a single finite element has been registered
-      if (hp_capability_enabled && !contains_multiple_fes)
-        {
-          hp_capability_enabled = false;
-
-          // unsubscribe connections to signals that are only relevant for
-          // hp-mode, since we only have a single element here
-          for (auto &connection : this->tria_listeners_for_transfer)
-            connection.disconnect();
-          this->tria_listeners_for_transfer.clear();
-
-          // release active and future finite element tables
-          this->hp_cell_active_fe_indices.clear();
-          this->hp_cell_active_fe_indices.shrink_to_fit();
-          this->hp_cell_future_fe_indices.clear();
-          this->hp_cell_future_fe_indices.shrink_to_fit();
-        }
-
-      // re-enabling hp-mode is not permitted since the active and future FE
-      // tables are no longer available
-      AssertThrow(
-        hp_capability_enabled || !contains_multiple_fes,
-        ExcMessage(
-          "You cannot re-enable hp-capabilities after you registered a single "
-          "finite element. Please create a new DoFHandler object instead."));
-    }
-
-  if (hp_capability_enabled)
-    {
-      // make sure every processor knows the active FE indices
-      // on both its own cells and all ghost cells
-      dealii::internal::hp::DoFHandlerImplementation::Implementation::
-        communicate_active_fe_indices(*this);
-
-      // make sure that the FE collection is large enough to
-      // cover all FE indices presently in use on the mesh
-      for (const auto &cell : this->active_cell_iterators())
-        if (!cell->is_artificial())
-          Assert(cell->active_fe_index() < this->fe_collection.size(),
-                 ExcInvalidFEIndex(cell->active_fe_index(),
-                                   this->fe_collection.size()));
-    }
 }
 
 
@@ -3065,65 +2618,6 @@ DoFHandler<dim, spacedim>::max_couplings_between_dofs() const
   Assert(this->fe_collection.size() > 0, ExcNoFESelected());
   return internal::DoFHandlerImplementation::Implementation::
     max_couplings_between_dofs(*this);
-}
-
-
-
-template <int dim, int spacedim>
-template <int structdim>
-types::global_dof_index
-DoFHandler<dim, spacedim>::get_dof_index(const unsigned int obj_level,
-                                         const unsigned int obj_index,
-                                         const unsigned int fe_index,
-                                         const unsigned int local_index) const
-{
-  if (hp_capability_enabled)
-    {
-      Assert(false, ExcNotImplemented());
-      return numbers::invalid_dof_index;
-    }
-  else
-    {
-      return internal::DoFHandlerImplementation::Implementation::get_dof_index(
-        *this,
-        this->mg_levels[obj_level],
-        this->mg_faces,
-        obj_index,
-        fe_index,
-        local_index,
-        std::integral_constant<int, structdim>());
-    }
-}
-
-
-
-template <int dim, int spacedim>
-template <int structdim>
-void
-DoFHandler<dim, spacedim>::set_dof_index(
-  const unsigned int            obj_level,
-  const unsigned int            obj_index,
-  const unsigned int            fe_index,
-  const unsigned int            local_index,
-  const types::global_dof_index global_index) const
-{
-  if (hp_capability_enabled)
-    {
-      Assert(false, ExcNotImplemented());
-      return;
-    }
-  else
-    {
-      internal::DoFHandlerImplementation::Implementation::set_dof_index(
-        *this,
-        this->mg_levels[obj_level],
-        this->mg_faces,
-        obj_index,
-        fe_index,
-        local_index,
-        global_index,
-        std::integral_constant<int, structdim>());
-    }
 }
 
 

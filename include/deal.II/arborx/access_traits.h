@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// Copyright (C) 2021 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -245,10 +245,10 @@ namespace ArborXWrappers
 
 
   /**
-   *  This class defines a predicate used by ArborXWrappers::BVH to determine
-   *  for given spheres which of the bounding boxes used to build the
-   *  ArborXWrappers::BVH intersect with them.
-   *  @note The class is not supposed to be used in a polymorphic context.
+   * This class defines a predicate used by ArborXWrappers::BVH to determine
+   * for given spheres which of the bounding boxes used to build the
+   * ArborXWrappers::BVH intersect with them.
+   * @note The class is not supposed to be used in a polymorphic context.
    */
   class SphereIntersectPredicate : private SpherePredicate
   {

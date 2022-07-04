@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2021 by the deal.II authors
+//    Copyright (C) 2017 - 2022 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -31,28 +31,25 @@
  * ODE solvers. This problem has 3 dependent variables u, v and w, that depend
  * on the independent variable t via the IVP system
  *
- * du/dt = a − (w + 1)u + v u^2
- * dv/dt = w u − v u^2
- * dw/dt = (b − w)/eps -w u
+ * du/dt = a - (w + 1)u + v u^2
+ * dv/dt = w u - v u^2
+ * dw/dt = (b - w)/eps - w u
  *
- * We integrate over the interval 0 ≤ t ≤ 10, with the initial conditions
+ * We integrate over the interval 0 <= t <= 10, with the initial conditions
  *
  * u(0) = 3.9, v(0) = 1.1, w(0) = 2.8,
  *
  * and parameters
  *
- * a = 1.2, b = 2.5, and eps = 10−5
+ * a = 1.2, b = 2.5, and eps = 10^−5
  *
  * The implicit part only contains the stiff part of the problem (the part with
  * eps in right hand side of the third equation).
  */
 int
-main(int argc, char **argv)
+main()
 {
   initlog();
-
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, numbers::invalid_unsigned_int);
 
   using VectorType = Vector<double>;
 
@@ -81,7 +78,7 @@ main(int argc, char **argv)
     [&](double, const VectorType &y, VectorType &ydot) -> int {
     ydot[0] = 0;
     ydot[1] = 0;
-    ydot[2] = (b - y[2]) / eps;
+    ydot[2] = -y[2] / eps;
     return 0;
   };
 
@@ -90,7 +87,7 @@ main(int argc, char **argv)
     [&](double, const VectorType &y, VectorType &ydot) -> int {
     ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
     ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
-    ydot[2] = -y[2] * y[0];
+    ydot[2] = b / eps - y[2] * y[0];
     return 0;
   };
 

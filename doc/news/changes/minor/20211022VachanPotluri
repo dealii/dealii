@@ -1,6 +1,0 @@
-Fixed: GridIn::read_unv() can now ignore any sections before 2411. In other
-words, the unv file can start with any number sections (before 2411) as long as
-they have a proper format (must begin and end with a "-1").
-<br>
-(Vachan Potluri, 2021/10/22)
-

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,14 +51,25 @@ template <int dim,
           typename Number              = double,
           typename VectorizedArrayType = VectorizedArray<Number>>
 void
-test(const unsigned int n_refinements = 1,
+test(const unsigned int geometry      = 0,
+     const unsigned int n_refinements = 1,
      const bool         print_vector  = true,
      const MPI_Comm     comm          = MPI_COMM_SELF)
 {
   using VectorType = LinearAlgebra::distributed::Vector<Number>;
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
-  GridGenerator::hyper_cube(tria, 0.0, 1.0, true);
+
+  if (geometry == 0)
+    GridGenerator::hyper_cube(tria, 0.0, 1.0, true);
+  else if (geometry == 1)
+    GridGenerator::hyper_shell(tria, Point<dim>(), 0.5, 1.0);
+  else if (geometry == 2)
+    GridGenerator::hyper_ball(tria);
+  else
+    Assert(false, ExcNotImplemented());
+
+  tria.reset_all_manifolds();
 
   if (false)
     {

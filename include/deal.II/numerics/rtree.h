@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,15 +27,8 @@
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/geometry/algorithms/distance.hpp>
-
-#ifdef DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
-#  define BOOST_ALLOW_DEPRECATED_HEADERS
-#endif
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
-#ifdef DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS
-#  undef BOOST_ALLOW_DEPRECATED_HEADERS
-#endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <memory>

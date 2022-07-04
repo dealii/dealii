@@ -1,0 +1,5 @@
+
+DEAL::Volume of poly with Quadrature: 8.00000000000	 Expected:8.00000000000
+DEAL::Volume of poly with Quadrature: 0.166666666667	 Expected:0.166666666667
+DEAL::Volume of poly with Quadrature: 6.38820454400	 Expected:6.38820454400
+DEAL::Volume of poly with Quadrature: 10.6666666667	 Expected:10.6666666667

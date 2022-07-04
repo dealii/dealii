@@ -90,7 +90,7 @@ test()
        cell != dof_handler.end();
        ++cell)
     deallog << cell << ": "
-            << DoFTools::count_dofs_on_patch<DoFHandler<dim>>(
+            << DoFTools::count_dofs_on_patch<dim, dim>(
                  GridTools::get_patch_around_cell<DoFHandler<dim>>(cell))
             << std::endl;
 }

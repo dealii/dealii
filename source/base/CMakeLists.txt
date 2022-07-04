@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2021 by the deal.II authors
+## Copyright (C) 2012 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -50,7 +50,6 @@ SET(_unity_include_src
   hdf5.cc
   mpi.cc
   mpi_compute_index_owner_internal.cc
-  mpi_consensus_algorithms.cc
   mpi_noncontiguous_partitioner.cc
   mpi_remote_point_evaluation.cc
   mu_parser_internal.cc
@@ -148,6 +147,7 @@ SET(_inst
   symbolic_function.inst.in
   tensor_function.inst.in
   tensor_function_parser.inst.in
+  mu_parser_internal.inst.in
   time_stepping.inst.in
   )
 

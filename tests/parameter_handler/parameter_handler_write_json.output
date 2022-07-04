@@ -16,9 +16,14 @@
         "pattern": "1",
         "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]"
     },
-    "Testing_25testing":
+    "int2_alias":
     {
-        "double_2bdouble":
+        "alias": "int2",
+        "deprecation_status": "false"
+    },
+    "Testing%testing":
+    {
+        "double+double":
         {
             "value": "6.1415926",
             "default_value": "6.1415926",
@@ -26,7 +31,7 @@
             "pattern": "6",
             "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
         },
-        "int_2aint":
+        "int*int":
         {
             "value": "2",
             "default_value": "2",
@@ -34,7 +39,7 @@
             "pattern": "5",
             "pattern_description": "[Integer range -2147483648...2147483647 (inclusive)]"
         },
-        "string_26list":
+        "string&list":
         {
             "value": "< & > ; \/",
             "default_value": "< & > ; \/",
@@ -45,7 +50,7 @@
     },
     "ss1":
     {
-        "double_201":
+        "double 1":
         {
             "value": "1.234",
             "default_value": "1.234",
@@ -55,13 +60,18 @@
         },
         "ss2":
         {
-            "double_202":
+            "double 2":
             {
                 "value": "4.321",
                 "default_value": "4.321",
                 "documentation": "doc 4",
                 "pattern": "3",
                 "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]"
+            },
+            "double 2 alias":
+            {
+                "alias": "double 2",
+                "deprecation_status": "false"
             }
         }
     }
@@ -70,18 +80,28 @@
 {
     "int1": "1",
     "int2": "2",
-    "Testing_25testing":
+    "int2_alias":
     {
-        "double_2bdouble": "6.1415926",
-        "int_2aint": "2",
-        "string_26list": "< & > ; \/"
+        "alias": "int2",
+        "deprecation_status": "false"
+    },
+    "Testing%testing":
+    {
+        "double+double": "6.1415926",
+        "int*int": "2",
+        "string&list": "< & > ; \/"
     },
     "ss1":
     {
-        "double_201": "1.234",
+        "double 1": "1.234",
         "ss2":
         {
-            "double_202": "4.321"
+            "double 2": "4.321",
+            "double 2 alias":
+            {
+                "alias": "double 2",
+                "deprecation_status": "false"
+            }
         }
     }
 }

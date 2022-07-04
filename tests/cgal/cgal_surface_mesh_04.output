@@ -1,0 +1,19 @@
+
+DEAL::dim= 2,	 spacedim= 2
+DEAL::dim = 2, spacedim = 2 name: hyper_cube
+DEAL::OK
+DEAL::dim = 2, spacedim = 2 name: hyper_ball
+DEAL::OK
+DEAL::dim = 2, spacedim = 2 name: hyper_L
+DEAL::OK
+DEAL::dim = 2, spacedim = 2 name: channel_with_cylinder
+DEAL::OK
+DEAL::dim= 3,	 spacedim= 3
+DEAL::dim = 3, spacedim = 3 name: hyper_cube
+DEAL::OK
+DEAL::dim = 3, spacedim = 3 name: hyper_ball
+DEAL::OK
+DEAL::dim = 3, spacedim = 3 name: hyper_L
+DEAL::OK
+DEAL::dim = 3, spacedim = 3 name: channel_with_cylinder
+DEAL::OK

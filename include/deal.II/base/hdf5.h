@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -834,7 +834,8 @@ namespace HDF5
      * This function returns the local causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
-     * The return type is `uint32_t` and corresponds to the value returned by
+     * The return type is `std::uint32_t` and corresponds to the value returned
+     * by
      * [H5Pget_mpio_no_collective_cause](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
      *
      * The return value can be
@@ -850,7 +851,7 @@ namespace HDF5
      * H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET | Collective I/O was not performed because the dataset was neither contiguous nor chunked.
      * H5D_MPIO_FILTERS                           | Collective I/O was not performed because filters needed to be applied.
      */
-    uint32_t
+    std::uint32_t
     get_local_no_collective_cause_as_hdf5_type();
 
     /**
@@ -878,8 +879,8 @@ namespace HDF5
      * This function returns the global causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
-     * The return type is `uint32_t` and corresponds to the value returned by
-     * H5Pget_mpio_no_collective_cause.
+     * The return type is `std::uint32_t` and corresponds to the value returned
+     * by H5Pget_mpio_no_collective_cause.
      *
      * The return value can be
      * Value                                      | Meaning
@@ -894,7 +895,7 @@ namespace HDF5
      * H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET | Collective I/O was not performed because the dataset was neither contiguous nor chunked.
      * H5D_MPIO_FILTERS                           | Collective I/O was not performed because filters needed to be applied.
      */
-    uint32_t
+    std::uint32_t
     get_global_no_collective_cause_as_hdf5_type();
 
     /**
@@ -960,14 +961,14 @@ namespace HDF5
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
      */
-    uint32_t local_no_collective_cause;
+    std::uint32_t local_no_collective_cause;
 
     /**
      * Global causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
      */
-    uint32_t global_no_collective_cause;
+    std::uint32_t global_no_collective_cause;
   };
 
   /**
@@ -1122,7 +1123,8 @@ namespace HDF5
 
   namespace internal
   {
-    /** This function returns the HDF5 datatype corresponding to the C++ type.
+    /**
+     * This function returns the HDF5 datatype corresponding to the C++ type.
      * In the case of std::complex types the HDF5 handlers are automatically
      * freed using the destructor of `std::shared_ptr`. `std::shared_ptr` is
      * used instead of `std::unique_ptr` because the destructor of
@@ -1136,7 +1138,8 @@ namespace HDF5
     std::shared_ptr<hid_t>
     get_hdf5_datatype();
 
-    /** Return the dimensions of `data`. For a std::vector this function returns
+    /**
+     * Return the dimensions of `data`. For a std::vector this function returns
      * `std::vector<hsize_t>{vector_size}`.
      *
      * Several HDF5 functions such as H5Screate_simple() require a
@@ -1148,42 +1151,48 @@ namespace HDF5
     std::vector<hsize_t>
     get_container_dimensions(const std::vector<number> &data);
 
-    /** Return the dimensions of `data`. For a Vector this function returns
+    /**
+     * Return the dimensions of `data`. For a Vector this function returns
      * `std::vector<hsize_t>{vector_size}`.
      */
     template <typename number>
     std::vector<hsize_t>
     get_container_dimensions(const Vector<number> &data);
 
-    /** Return the dimensions of `data`. For a FullMatrix the function returns
+    /**
+     * Return the dimensions of `data`. For a FullMatrix the function returns
      * `std::vector<hsize_t>{rows, columns}`.
      */
     template <typename number>
     std::vector<hsize_t>
     get_container_dimensions(const FullMatrix<number> &data);
 
-    /** This function returns the total size of the container. For a std::vector
+    /**
+     * This function returns the total size of the container. For a std::vector
      * the function returns `int(vector_size)`.
      */
     template <typename number>
     unsigned int
     get_container_size(const std::vector<number> &data);
 
-    /** This function returns the total size of the container. For a Vector the
+    /**
+     * This function returns the total size of the container. For a Vector the
      * function returns `int(vector_size)`.
      */
     template <typename number>
     unsigned int
     get_container_size(const Vector<number> &data);
 
-    /** This function returns the total size of the container. For a FullMatrix
+    /**
+     * This function returns the total size of the container. For a FullMatrix
      * the function returns `int(rows*columns)`.
      */
     template <typename number>
     unsigned int
     get_container_size(const FullMatrix<number> &data);
 
-    /** This function initializes and returns a container of type std::vector,
+    /**
+     * This function initializes and returns a container of type std::vector,
      * Vector or FullMatrix. The function does not set the values of the
      * elements of the container. The container can store data of a HDF5 dataset
      * or a HDF5 selection. The dimensions parameter holds the dimensions of the
@@ -1207,7 +1216,8 @@ namespace HDF5
       Container>::type
     initialize_container(const std::vector<hsize_t> &dimensions);
 
-    /** Same as above.
+    /**
+     * Same as above.
      */
     template <typename Container>
     typename std::enable_if<
@@ -1215,7 +1225,8 @@ namespace HDF5
       Container>::type
     initialize_container(const std::vector<hsize_t> &dimensions);
 
-    /** Same as above.
+    /**
+     * Same as above.
      */
     template <typename Container>
     typename std::enable_if<
@@ -1224,7 +1235,8 @@ namespace HDF5
       Container>::type
     initialize_container(const std::vector<hsize_t> &dimensions);
 
-    /** This helper function sets the property list of the read and write
+    /**
+     * This helper function sets the property list of the read and write
      * operations of DataSet. A property list has to be created for the MPI
      * driver. For the serial driver the default H5P_DEFAULT can be used. In
      * addition H5Pset_dxpl_mpio is used to set the MPI mode to collective.
@@ -1232,7 +1244,8 @@ namespace HDF5
     inline void
     set_plist(hid_t &plist, const bool mpi);
 
-    /** This helper function releases the property list handler of the read and
+    /**
+     * This helper function releases the property list handler of the read and
      * write operations of DataSet. For the serial version there is no need to
      * release the property list handler because H5P_DEFAULT has been used. If
      * query_io_mode is True then H5Pget_mpio_actual_io_mode and
@@ -1242,15 +1255,16 @@ namespace HDF5
     inline void
     release_plist(hid_t &                    plist,
                   H5D_mpio_actual_io_mode_t &io_mode,
-                  uint32_t &                 local_no_collective_cause,
-                  uint32_t &                 global_no_collective_cause,
+                  std::uint32_t &            local_no_collective_cause,
+                  std::uint32_t &            global_no_collective_cause,
                   const bool                 mpi,
                   const bool                 query_io_mode);
 
-    /** Convert a HDF5 no_collective_cause code to a human readable string.
+    /**
+     * Convert a HDF5 no_collective_cause code to a human readable string.
      */
     inline std::string
-    no_collective_cause_to_string(const uint32_t no_collective_cause);
+    no_collective_cause_to_string(const std::uint32_t no_collective_cause);
   } // namespace internal
 
 
@@ -1487,8 +1501,8 @@ namespace HDF5
     inline void
     release_plist(hid_t &                    plist,
                   H5D_mpio_actual_io_mode_t &io_mode,
-                  uint32_t &                 local_no_collective_cause,
-                  uint32_t &                 global_no_collective_cause,
+                  std::uint32_t &            local_no_collective_cause,
+                  std::uint32_t &            global_no_collective_cause,
                   const bool                 mpi,
                   const bool                 query_io_mode)
     {
@@ -1524,7 +1538,7 @@ namespace HDF5
 
 
     inline std::string
-    no_collective_cause_to_string(const uint32_t no_collective_cause)
+    no_collective_cause_to_string(const std::uint32_t no_collective_cause)
     {
       std::string message;
 

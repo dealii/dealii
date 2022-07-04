@@ -1,7 +1,0 @@
-Changed: For parallel::distributed::Triangulation, vertices will no longer
-be communicated automatically to p4est in debug mode. Please set the
-corresponding flag
-parallel::distributed::Triangulation::Settings::communicate_vertices_to_p4est
-while constructing your triangulation object.
-<br>
-(Marc Fehling, 2021/10/13)

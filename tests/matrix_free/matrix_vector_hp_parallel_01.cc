@@ -198,7 +198,8 @@ test()
   MatrixFree<dim, number>                          mf_data;
   typename MatrixFree<dim, number>::AdditionalData data;
   data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
-  mf_data.reinit(dof, constraints, quadrature_collection_mf, data);
+  mf_data.reinit(
+    MappingQ1<dim>{}, dof, constraints, quadrature_collection_mf, data);
   MatrixFreeTestHP<dim, number> mf(mf_data);
 
   // assemble sparse matrix with (\nabla v,

@@ -1,0 +1,91 @@
+
+DEAL:cg::Starting value 5.47723
+DEAL:cg::   CG estimated residual at iteration 0: 5.47723
+DEAL:cg:cg::Starting value 5.47723
+DEAL:cg:cg::Convergence step 3 value 1.69418
+DEAL:cg::   CG estimated residual at iteration 1: 1.69418
+DEAL:cg:cg::Starting value 1.69418
+DEAL:cg:cg::Convergence step 4 value 0.640168
+DEAL:cg::   CG estimated residual at iteration 2: 1.16797
+DEAL:cg:cg::Starting value 1.16797
+DEAL:cg:cg::Convergence step 3 value 0.340792
+DEAL:cg::   CG estimated residual at iteration 3: 0.581169
+DEAL:cg:cg::Starting value 0.581169
+DEAL:cg:cg::Convergence step 4 value 0.0744913
+DEAL:cg::   CG estimated residual at iteration 4: 0.326845
+DEAL:cg:cg::Starting value 0.326845
+DEAL:cg:cg::Convergence step 3 value 0.0750283
+DEAL:cg::   CG estimated residual at iteration 5: 0.110157
+DEAL:cg:cg::Starting value 0.110157
+DEAL:cg:cg::Convergence step 4 value 0.0248289
+DEAL:cg::   CG estimated residual at iteration 6: 0.0580666
+DEAL:cg:cg::Starting value 0.0580666
+DEAL:cg:cg::Convergence step 3 value 0.0299569
+DEAL:cg::   CG estimated residual at iteration 7: 0.0311519
+DEAL:cg:cg::Starting value 0.0311519
+DEAL:cg:cg::Convergence step 4 value 0.00678179
+DEAL:cg::   CG estimated residual at iteration 8: 0.0196211
+DEAL:cg:cg::Starting value 0.0196211
+DEAL:cg:cg::Convergence step 3 value 0.00345458
+DEAL:cg::   CG estimated residual at iteration 9: 0.00776886
+DEAL:cg:cg::Starting value 0.00776886
+DEAL:cg:cg::Convergence step 4 value 0.00116611
+DEAL:cg::   CG estimated residual at iteration 10: 0.00285322
+DEAL:cg:cg::Starting value 0.00285322
+DEAL:cg:cg::Convergence step 3 value 0.00157219
+DEAL:cg::   CG estimated residual at iteration 11: 0.00166226
+DEAL:cg:cg::Starting value 0.00166226
+DEAL:cg:cg::Convergence step 4 value 0.000451853
+DEAL:cg::   CG estimated residual at iteration 12: 0.00112345
+DEAL:cg:cg::Starting value 0.00112345
+DEAL:cg:cg::Convergence step 3 value 0.000250859
+DEAL:cg::   CG estimated residual at iteration 13: 0.000392171
+DEAL:cg:cg::Starting value 0.000392171
+DEAL:cg:cg::Convergence step 4 value 5.59076e-05
+DEAL:cg::   CG estimated residual at iteration 14: 0.000235130
+DEAL:cg:cg::Starting value 0.000235130
+DEAL:cg:cg::Convergence step 3 value 6.46587e-05
+DEAL:cg::   CG estimated residual at iteration 15: 0.000105880
+DEAL:cg:cg::Starting value 0.000105880
+DEAL:cg:cg::Convergence step 4 value 2.74842e-05
+DEAL:cg::Convergence step 16 value 4.78582e-05
+DEAL:cg::   CG estimated residual at iteration 16: 4.78582e-05
+DEAL:cg::Starting value 5.47723
+DEAL:cg::   CG estimated residual at iteration 0: 5.47723
+DEAL:cg:cg::Starting value 5.47723
+DEAL:cg:cg::Convergence step 3 value 1.69418
+DEAL:cg::   CG estimated residual at iteration 1: 1.69418
+DEAL:cg:cg::Starting value 1.69418
+DEAL:cg:cg::Convergence step 4 value 0.640168
+DEAL:cg::   CG estimated residual at iteration 2: 1.16797
+DEAL:cg:cg::Starting value 1.16797
+DEAL:cg:cg::Convergence step 3 value 0.340792
+DEAL:cg::   CG estimated residual at iteration 3: 0.399820
+DEAL:cg:cg::Starting value 0.399820
+DEAL:cg:cg::Convergence step 4 value 0.0868174
+DEAL:cg::   CG estimated residual at iteration 4: 0.200425
+DEAL:cg:cg::Starting value 0.200425
+DEAL:cg:cg::Convergence step 3 value 0.0482953
+DEAL:cg::   CG estimated residual at iteration 5: 0.0551085
+DEAL:cg:cg::Starting value 0.0551085
+DEAL:cg:cg::Convergence step 4 value 0.0149675
+DEAL:cg::   CG estimated residual at iteration 6: 0.0295425
+DEAL:cg:cg::Starting value 0.0295425
+DEAL:cg:cg::Convergence step 3 value 0.00812170
+DEAL:cg::   CG estimated residual at iteration 7: 0.00923062
+DEAL:cg:cg::Starting value 0.00923062
+DEAL:cg:cg::Convergence step 4 value 0.00218874
+DEAL:cg::   CG estimated residual at iteration 8: 0.00475654
+DEAL:cg:cg::Starting value 0.00475654
+DEAL:cg:cg::Convergence step 3 value 0.00103994
+DEAL:cg::   CG estimated residual at iteration 9: 0.00102251
+DEAL:cg:cg::Starting value 0.00102251
+DEAL:cg:cg::Convergence step 4 value 0.000231461
+DEAL:cg::   CG estimated residual at iteration 10: 0.000425978
+DEAL:cg:cg::Starting value 0.000425978
+DEAL:cg:cg::Convergence step 3 value 0.000140415
+DEAL:cg::   CG estimated residual at iteration 11: 0.000161655
+DEAL:cg:cg::Starting value 0.000161655
+DEAL:cg:cg::Convergence step 4 value 4.27639e-05
+DEAL:cg::Convergence step 12 value 7.45407e-05
+DEAL:cg::   CG estimated residual at iteration 12: 7.45407e-05

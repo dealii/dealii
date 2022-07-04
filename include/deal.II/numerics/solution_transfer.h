@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -565,19 +565,6 @@ private:
   std::vector<std::vector<Vector<typename VectorType::value_type>>>
     dof_values_on_cell;
 };
-
-namespace Legacy
-{
-  /**
-   * @deprecated Use dealii::SolutionTransfer without the DoFHandlerType
-   * template instead.
-   */
-  template <int dim,
-            typename VectorType     = Vector<double>,
-            typename DoFHandlerType = DoFHandler<dim>>
-  using SolutionTransfer DEAL_II_DEPRECATED =
-    dealii::SolutionTransfer<dim, VectorType, DoFHandlerType::space_dimension>;
-} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

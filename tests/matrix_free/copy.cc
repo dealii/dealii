@@ -83,7 +83,8 @@ sub_test()
       MatrixFree<dim, number> mf_data;
       {
         const QGauss<1> quad(fe_degree + 1);
-        mf_data.reinit(dof,
+        mf_data.reinit(MappingQ1<dim>{},
+                       dof,
                        constraints,
                        quad,
                        typename MatrixFree<dim, number>::AdditionalData(

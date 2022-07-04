@@ -1,0 +1,73 @@
+
+DEAL::dim = 1
+DEAL::Simple constructor:
+DEAL::face 0
+DEAL::inside has value
+DEAL::face 1
+DEAL::outside has value
+DEAL::Advanced constructor:
+DEAL::face 0
+DEAL::inside has value
+DEAL::face 1
+DEAL::outside has value
+DEAL::
+DEAL::dim = 2
+DEAL::Simple constructor:
+DEAL::face 0
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 1
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 2
+DEAL::inside has value
+DEAL::face 3
+DEAL::outside has value
+DEAL::Advanced constructor:
+DEAL::face 0
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 1
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 2
+DEAL::inside has value
+DEAL::face 3
+DEAL::outside has value
+DEAL::
+DEAL::dim = 3
+DEAL::Simple constructor:
+DEAL::face 0
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 1
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 2
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 3
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 4
+DEAL::inside has value
+DEAL::face 5
+DEAL::outside has value
+DEAL::Advanced constructor:
+DEAL::face 0
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 1
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 2
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 3
+DEAL::inside has value
+DEAL::outside has value
+DEAL::face 4
+DEAL::inside has value
+DEAL::face 5
+DEAL::outside has value
+DEAL::

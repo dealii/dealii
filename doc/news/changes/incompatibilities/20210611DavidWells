@@ -1,4 +1,0 @@
-Removed: The PETSc Eisenstat preconditioner wrapper, which has never worked
-correctly in parallel, has been removed.
-<br>
-(David Wells, 2021/06/11)

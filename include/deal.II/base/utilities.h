@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2021 by the deal.II authors
+// Copyright (C) 2005 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,6 +20,7 @@
 
 #include <deal.II/base/exceptions.h>
 
+#include <cstddef>
 #include <functional>
 #include <string>
 #include <tuple>
@@ -558,7 +559,7 @@ namespace Utilities
   invert_permutation(const std::vector<Integer> &permutation);
 
   /**
-   * Given an arbitrary object of type T, use boost::serialization utilities
+   * Given an arbitrary object of type `T`, use boost::serialization utilities
    * to pack the object into a vector of characters and append it to the
    * given buffer. The number of elements that have been added to the buffer
    * will be returned. The object can be unpacked using the Utilities::unpack
@@ -571,6 +572,45 @@ namespace Utilities
    * If many consecutive calls with the same buffer are considered, it is
    * recommended for reasons of performance to ensure that its capacity is
    * sufficient.
+   *
+   * This function considers a number of special cases for which packing (and
+   * unpacking) can be simplified. These are:
+   * - If the object of type `T` is relatively small (less than 256 bytes) and
+   *   if `T` satisfies `std::is_trivially_copyable`, then it is copied bit
+   *   by bit into the output buffer.
+   * - If no compression is requested, and if the object is a vector of objects
+   *   whose type `T` satisfies `std::is_trivially_copyable`, then packing
+   *   implies copying the length of the vector into the destination buffer
+   *   followed by a bit-by-bit copy of the contents of the vector. A
+   *   similar process is used for vectors of vectors of objects whose type
+   *   `T` satisfies `std::is_trivially_copyable`.
+   * - Finally, if the type `T` of the object to be packed is std::tuple<>
+   *   (i.e., a tuple without any elements as indicated by the empty argument
+   *   list) and if no compression is requested, then this
+   *   type is considered an "empty" type and it is packed
+   *   into a zero byte buffer. Using empty types is occasionally useful when
+   *   sending messages to other processes if the important part about the
+   *   message is that it is *sent*, not what it *contains* -- in other words,
+   *   it puts the receiver on notice of something, without having to provide
+   *   any details. In such cases, it is helpful if the message body can be
+   *   empty -- that is, have length zero -- and using std::tuple<> facilitates
+   *   this by providing a type which the present function packs into an
+   *   empty output buffer, given that many deal.II functions send objects
+   *   only after calling pack() to serialize them.
+   *
+   * In several of the special cases above, the `std::is_trivially_copyable`
+   * property is important, see
+   * https://en.cppreference.com/w/cpp/types/is_trivially_copyable .
+   * For a type `T` to satisfy this property essentially means that an object
+   * `t2` of this type can be initialized by copying another object `t1`
+   * bit-by-bit into the memory space of `t2`. In particular, this is the case
+   * for built-in types such as `int`, `double`, or `char`, as well as
+   * structures and classes that only consist of such types and that have
+   * neither user-defined constructors nor `virtual` functions. In practice,
+   * and together with the fact that vectors and vector-of-vectors of these
+   * types are also special-cased, this covers many of the most common kinds of
+   * messages one sends around with MPI or one wants to serialize (the two
+   * most common use cases for this function).
    */
   template <typename T>
   size_t
@@ -580,7 +620,7 @@ namespace Utilities
 
   /**
    * Creates and returns a buffer solely for the given object, using the
-   * above mentioned pack function.
+   * above mentioned pack function (including all of its special cases).
    *
    * If the library has been compiled with ZLIB enabled, then the output buffer
    * can be compressed. This can be triggered with the parameter
@@ -592,11 +632,12 @@ namespace Utilities
 
   /**
    * Given a vector of characters, obtained through a call to the function
-   * Utilities::pack, restore its content in an object of type T.
+   * Utilities::pack, restore its content in an object of type `T`.
    *
    * This function uses boost::serialization utilities to unpack the object
    * from a vector of characters, and it is the inverse of the function
-   * Utilities::pack().
+   * Utilities::pack(). It considers the same set of special cases as
+   * documented with the pack() function.
    *
    * The @p allow_compression parameter denotes if the buffer to
    * read from could have been previously compressed with ZLIB, and
@@ -1214,6 +1255,229 @@ namespace Utilities
 
   // --------------------- non-inline functions
 
+  namespace internal
+  {
+    /**
+     * A structure that is used to identify whether a template argument is a
+     * std::vector<T> or std::vector<std::vector<T>> where T is a type that
+     * satisfies std::is_trivially_copyable<T>::value == true.
+     */
+    template <typename T>
+    struct IsVectorOfTriviallyCopyable
+    {
+      static constexpr bool value = false;
+    };
+
+
+
+    template <typename T>
+    struct IsVectorOfTriviallyCopyable<std::vector<T>>
+    {
+      static constexpr bool value =
+        std::is_trivially_copyable<T>::value && !std::is_same<T, bool>::value;
+    };
+
+
+
+    template <typename T>
+    struct IsVectorOfTriviallyCopyable<std::vector<std::vector<T>>>
+    {
+      static constexpr bool value =
+        std::is_trivially_copyable<T>::value && !std::is_same<T, bool>::value;
+    };
+
+
+
+    /**
+     * A function that is used to append the contents of a std::vector<T>
+     * (where T is a type that satisfies std::is_trivially_copyable<T>::value
+     * == true but not T==bool) bit for bit to a character array.
+     *
+     * If the type is not such a vector of T, then the function
+     * throws an exception.
+     */
+    template <typename T>
+    inline void
+    append_vector_of_trivially_copyable_to_buffer(const T &,
+                                                  std::vector<char> &)
+    {
+      // We shouldn't get here:
+      Assert(false, ExcInternalError());
+    }
+
+
+
+    template <typename T,
+              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+                                          std::is_trivially_copyable<T>::value>>
+    inline void
+    append_vector_of_trivially_copyable_to_buffer(
+      const std::vector<T> &object,
+      std::vector<char> &   dest_buffer)
+    {
+      const typename std::vector<T>::size_type vector_size = object.size();
+
+      // Reserve for the buffer so that it can store the size of 'object' as
+      // well as all of its elements.
+      dest_buffer.reserve(dest_buffer.size() + sizeof(vector_size) +
+                          vector_size * sizeof(T));
+
+      // Copy the size into the vector
+      dest_buffer.insert(dest_buffer.end(),
+                         reinterpret_cast<const char *>(&vector_size),
+                         reinterpret_cast<const char *>(&vector_size + 1));
+
+      // Insert the elements at the end of the vector:
+      if (vector_size > 0)
+        dest_buffer.insert(dest_buffer.end(),
+                           reinterpret_cast<const char *>(object.data()),
+                           reinterpret_cast<const char *>(object.data() +
+                                                          vector_size));
+    }
+
+
+
+    template <typename T,
+              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+                                          std::is_trivially_copyable<T>::value>>
+    inline void
+    append_vector_of_trivially_copyable_to_buffer(
+      const std::vector<std::vector<T>> &object,
+      std::vector<char> &                dest_buffer)
+    {
+      using size_type             = typename std::vector<T>::size_type;
+      const size_type vector_size = object.size();
+
+      typename std::vector<T>::size_type aggregated_size = 0;
+      std::vector<size_type>             sizes;
+      sizes.reserve(vector_size);
+      for (const auto &a : object)
+        {
+          aggregated_size += a.size();
+          sizes.push_back(a.size());
+        }
+
+      // Reserve for the buffer so that it can store the size of 'object' as
+      // well as all of its elements.
+      dest_buffer.reserve(dest_buffer.size() +
+                          sizeof(vector_size) * (1 + vector_size) +
+                          aggregated_size * sizeof(T));
+
+      // Copy the size into the vector
+      dest_buffer.insert(dest_buffer.end(),
+                         reinterpret_cast<const char *>(&vector_size),
+                         reinterpret_cast<const char *>(&vector_size + 1));
+
+      // Copy the sizes of the individual chunks into the vector
+      if (vector_size > 0)
+        dest_buffer.insert(dest_buffer.end(),
+                           reinterpret_cast<const char *>(sizes.data()),
+                           reinterpret_cast<const char *>(sizes.data() +
+                                                          vector_size));
+
+      // Insert the elements at the end of the vector:
+      for (const auto &a : object)
+        dest_buffer.insert(dest_buffer.end(),
+                           reinterpret_cast<const char *>(a.data()),
+                           reinterpret_cast<const char *>(a.data() + a.size()));
+    }
+
+
+
+    template <typename T>
+    inline void
+    create_vector_of_trivially_copyable_from_buffer(
+      const std::vector<char>::const_iterator &,
+      const std::vector<char>::const_iterator &,
+      T &)
+    {
+      // We shouldn't get here:
+      Assert(false, ExcInternalError());
+    }
+
+
+
+    template <typename T,
+              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+                                          std::is_trivially_copyable<T>::value>>
+    inline void
+    create_vector_of_trivially_copyable_from_buffer(
+      const std::vector<char>::const_iterator &cbegin,
+      const std::vector<char>::const_iterator &cend,
+      std::vector<T> &                         object)
+    {
+      // First get the size of the vector, and resize the output object
+      typename std::vector<T>::size_type vector_size;
+      memcpy(&vector_size, &*cbegin, sizeof(vector_size));
+
+      Assert(static_cast<std::ptrdiff_t>(cend - cbegin) ==
+               static_cast<std::ptrdiff_t>(sizeof(vector_size) +
+                                           vector_size * sizeof(T)),
+             ExcMessage("The given buffer has the wrong size."));
+      (void)cend;
+
+      // Then copy the elements:
+      object.clear();
+      if (vector_size > 0)
+        object.insert(object.end(),
+                      reinterpret_cast<const T *>(&*cbegin +
+                                                  sizeof(vector_size)),
+                      reinterpret_cast<const T *>(&*cend));
+    }
+
+
+
+    template <typename T,
+              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+                                          std::is_trivially_copyable<T>::value>>
+    inline void
+    create_vector_of_trivially_copyable_from_buffer(
+      const std::vector<char>::const_iterator &cbegin,
+      const std::vector<char>::const_iterator &cend,
+      std::vector<std::vector<T>> &            object)
+    {
+      // First get the size of the vector, and resize the output object
+      using size_type = typename std::vector<T>::size_type;
+      std::vector<char>::const_iterator iterator = cbegin;
+      size_type                         vector_size;
+      memcpy(&vector_size, &*iterator, sizeof(vector_size));
+      object.clear();
+      object.resize(vector_size);
+      std::vector<size_type> sizes(vector_size);
+      if (vector_size > 0)
+        memcpy(sizes.data(),
+               &*iterator + sizeof(vector_size),
+               vector_size * sizeof(size_type));
+
+      iterator += sizeof(vector_size) * (1 + vector_size);
+      size_type aggregated_size = 0;
+      for (const auto a : sizes)
+        aggregated_size += a;
+
+      Assert(static_cast<std::ptrdiff_t>(cend - iterator) ==
+               static_cast<std::ptrdiff_t>(aggregated_size * sizeof(T)),
+             ExcMessage("The given buffer has the wrong size."));
+      (void)cend;
+
+      // Then copy the elements:
+      for (unsigned int i = 0; i < vector_size; ++i)
+        if (sizes[i] > 0)
+          {
+            object[i].insert(object[i].end(),
+                             reinterpret_cast<const T *>(&*iterator),
+                             reinterpret_cast<const T *>(&*iterator +
+                                                         sizeof(T) * sizes[i]));
+            iterator += sizeof(T) * sizes[i];
+          }
+
+      Assert(iterator == cend,
+             ExcMessage("The given buffer has the wrong size."));
+    }
+
+  } // namespace internal
+
+
+
   template <typename T>
   size_t
   pack(const T &          object,
@@ -1221,6 +1485,7 @@ namespace Utilities
        const bool         allow_compression)
   {
     std::size_t size = 0;
+
 
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1231,13 +1496,39 @@ namespace Utilities
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
 #endif
       {
+        // Determine the size. There are places where we would like to use a
+        // truly empty type, for which we use std::tuple<> (i.e., a tuple
+        // of zero elements). For this class, the compiler reports a nonzero
+        // sizeof(...) because that is the minimum possible for objects --
+        // objects need to have distinct addresses, so they need to have a size
+        // of at least one. But we can special case this situation.
+        size = (std::is_same<T, std::tuple<>>::value ? 0 : sizeof(T));
+
         (void)allow_compression;
         const std::size_t previous_size = dest_buffer.size();
-        dest_buffer.resize(previous_size + sizeof(T));
+        dest_buffer.resize(previous_size + size);
 
-        std::memcpy(dest_buffer.data() + previous_size, &object, sizeof(T));
+        if (size > 0)
+          std::memcpy(dest_buffer.data() + previous_size, &object, size);
+      }
+    // Next try if we have a vector of trivially copyable objects.
+    // If that is the case, we can shortcut the whole BOOST serialization
+    // machinery and just copy the content of the vector bit for bit
+    // into the output buffer, assuming that we are not asked to compress
+    // the data.
+    else if (internal::IsVectorOfTriviallyCopyable<T>::value &&
+             (allow_compression == false))
+      {
+        const std::size_t previous_size = dest_buffer.size();
 
-        size = sizeof(T);
+        // When we have DEAL_II_HAVE_CXX17 set by default, we can just
+        // inline the code of the following function here and make the 'if'
+        // above a 'if constexpr'. Without the 'constexpr', we need to keep
+        // the general template of the function that throws an exception.
+        internal::append_vector_of_trivially_copyable_to_buffer(object,
+                                                                dest_buffer);
+
+        size = dest_buffer.size() - previous_size;
       }
     else
       {
@@ -1276,14 +1567,13 @@ namespace Utilities
   }
 
 
+
   template <typename T>
   T
   unpack(const std::vector<char>::const_iterator &cbegin,
          const std::vector<char>::const_iterator &cend,
          const bool                               allow_compression)
   {
-    T object;
-
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
@@ -1293,9 +1583,42 @@ namespace Utilities
     if (std::is_trivially_copyable<T>() && sizeof(T) < 256)
 #endif
       {
+        // Determine the size. There are places where we would like to use a
+        // truly empty type, for which we use std::tuple<> (i.e., a tuple
+        // of zero elements). For this class, the compiler reports a nonzero
+        // sizeof(...) because that is the minimum possible for objects --
+        // objects need to have distinct addresses, so they need to have a size
+        // of at least one. But we can special case this situation.
+        const std::size_t size =
+          (std::is_same<T, std::tuple<>>::value ? 0 : sizeof(T));
+
+        T object;
+
         (void)allow_compression;
-        Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
-        std::memcpy(&object, &*cbegin, sizeof(T));
+        Assert(std::distance(cbegin, cend) == size, ExcInternalError());
+
+        if (size > 0)
+          std::memcpy(&object, &*cbegin, size);
+
+        return object;
+      }
+    // Next try if we have a vector of trivially copyable objects.
+    // If that is the case, we can shortcut the whole BOOST serialization
+    // machinery and just copy the content of the buffer bit for bit
+    // into an appropriately sized output vector, assuming that we
+    // are not asked to compress the data.
+    else if (internal::IsVectorOfTriviallyCopyable<T>::value &&
+             (allow_compression == false))
+      {
+        // When we have DEAL_II_HAVE_CXX17 set by default, we can just
+        // inline the code of the following function here and make the 'if'
+        // above a 'if constexpr'. Without the 'constexpr', we need to keep
+        // the general template of the function that throws an exception.
+        T object;
+        internal::create_vector_of_trivially_copyable_from_buffer(cbegin,
+                                                                  cend,
+                                                                  object);
+        return object;
       }
     else
       {
@@ -1310,10 +1633,13 @@ namespace Utilities
         fisb.push(boost::iostreams::array_source(&*cbegin, cend - cbegin));
 
         boost::archive::binary_iarchive bia(fisb);
+
+        T object;
         bia >> object;
+        return object;
       }
 
-    return object;
+    return T();
   }
 
 

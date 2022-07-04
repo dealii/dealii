@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2020 by the deal.II authors
+// Copyright (C) 2009 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,7 @@ namespace types
   /**
    * The type used for global indices of vertices.
    */
-  using global_vertex_index = uint64_t;
+  using global_vertex_index = std::uint64_t;
 
   /**
    * An identifier that denotes the MPI type associated with
@@ -71,7 +71,7 @@ namespace types
    * page for guidance on when this type should or should not be used.
    */
 #ifdef DEAL_II_WITH_64BIT_INDICES
-  using global_dof_index = uint64_t;
+  using global_dof_index = std::uint64_t;
 #else
   using global_dof_index  = unsigned int;
 #endif
@@ -100,7 +100,7 @@ namespace types
    * The data type always corresponds to an unsigned integer type.
    */
 #ifdef DEAL_II_WITH_64BIT_INDICES
-  using global_cell_index = uint64_t;
+  using global_cell_index = std::uint64_t;
 #else
   using global_cell_index = unsigned int;
 #endif
@@ -167,11 +167,16 @@ namespace TrilinosWrappers
 {
   namespace types
   {
+    /**
+     * Declare type of 64 bit integer used in the Epetra package of Trilinos.
+     */
+    using int64_type = long long int;
+
 #ifdef DEAL_II_WITH_64BIT_INDICES
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */
-    using int_type = long long int;
+    using int_type = int64_type;
 #else
     /**
      * Declare type of integer used in the Epetra package of Trilinos.

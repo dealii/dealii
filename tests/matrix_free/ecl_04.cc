@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -108,12 +108,17 @@ test(const unsigned int geometry, const MPI_Comm comm = MPI_COMM_SELF)
   using MF = MatrixFree<dim, Number, VectorizedArrayType>;
 
   typename MF::AdditionalData additional_data;
-  additional_data.mapping_update_flags                = update_values;
-  additional_data.mapping_update_flags_inner_faces    = update_values;
-  additional_data.mapping_update_flags_boundary_faces = update_values;
-  additional_data.mapping_update_flags_faces_by_cells = update_values;
-  additional_data.hold_all_faces_to_owned_cells       = true;
-  additional_data.communicator_sm                     = comm;
+  additional_data.mapping_update_flags = update_values | update_gradients;
+  additional_data.mapping_update_flags_inner_faces =
+    update_values | update_gradients;
+  additional_data.mapping_update_flags_boundary_faces =
+    update_values | update_gradients;
+  additional_data.mapping_update_flags_faces_by_cells =
+    update_values | update_gradients;
+  additional_data.hold_all_faces_to_owned_cells = true;
+  additional_data.communicator_sm               = comm;
+  additional_data.tasks_parallel_scheme =
+    MF::AdditionalData::TasksParallelScheme::none;
 
   MatrixFreeTools::categorize_by_boundary_ids(tria, additional_data);
 
@@ -166,6 +171,35 @@ test(const unsigned int geometry, const MPI_Comm comm = MPI_COMM_SELF)
                     {
                       Assert(std::abs(u_minus[v] - u_plus[v]) < 1e-10,
                              ExcMessage("Entries do not match!"));
+                    }
+                }
+
+              phi_m.gather_evaluate(src,
+                                    EvaluationFlags::values |
+                                      EvaluationFlags::gradients);
+              phi_p.gather_evaluate(src,
+                                    EvaluationFlags::values |
+                                      EvaluationFlags::gradients);
+
+              for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+                {
+                  const auto u_minus = phi_m.get_value(q);
+                  const auto u_plus  = phi_p.get_value(q);
+
+                  const auto grad_u_minus = phi_m.get_gradient(q);
+                  const auto grad_u_plus  = phi_p.get_gradient(q);
+
+                  for (unsigned int v = 0; v < VectorizedArray<double>::size();
+                       ++v)
+                    {
+                      Assert(std::abs(u_minus[v] - u_plus[v]) < 1e-10,
+                             ExcMessage("Entries do not match!"));
+
+                      if (false)
+                        for (int d = 0; d < dim; ++d)
+                          Assert(std::abs(grad_u_minus[d][v] -
+                                          grad_u_plus[d][v]) < 1e-6,
+                                 ExcMessage("Entries do not match!"));
                     }
                 }
             }

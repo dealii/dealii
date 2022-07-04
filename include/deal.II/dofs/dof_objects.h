@@ -74,28 +74,6 @@ namespace internal
        */
       std::vector<types::global_dof_index> dofs;
 
-    public:
-      /**
-       * Set the global index of the @p local_index-th degree of freedom
-       * located on the object with number @p obj_index to the value given by
-       * the last argument. The @p dof_handler argument is used to access the
-       * finite element that is to be used to compute the location where this
-       * data is stored.
-       *
-       * The third argument, @p fe_index, must equal zero. It is otherwise
-       * unused, but we retain the argument so that we can use the same
-       * interface for non-hp- and hp-finite element methods, in effect making
-       * it possible to share the DoFAccessor class hierarchy between hp- and
-       * non-hp-classes.
-       */
-      template <int dh_dim, int spacedim>
-      void
-      set_dof_index(const dealii::DoFHandler<dh_dim, spacedim> &dof_handler,
-                    const unsigned int                          obj_index,
-                    const unsigned int                          fe_index,
-                    const unsigned int                          local_index,
-                    const types::global_dof_index               global_index);
-
       /**
        * Return the global index of the @p local_index-th degree of freedom
        * located on the object with number @p obj_index. The @p dof_handler
@@ -109,11 +87,11 @@ namespace internal
        * non-hp-classes.
        */
       template <int dh_dim, int spacedim>
-      types::global_dof_index
-      get_dof_index(const dealii::DoFHandler<dh_dim, spacedim> &dof_handler,
-                    const unsigned int                          obj_index,
-                    const unsigned int                          fe_index,
-                    const unsigned int local_index) const;
+      types::global_dof_index &
+      access_dof_index(const dealii::DoFHandler<dh_dim, spacedim> &dof_handler,
+                       const unsigned int                          obj_index,
+                       const unsigned int                          fe_index,
+                       const unsigned int                          local_index);
 
       /**
        * Return the value 1. The meaning of this function becomes clear by
@@ -196,28 +174,24 @@ namespace internal
 
     template <int dim>
     template <int dh_dim, int spacedim>
-    inline types::global_dof_index
-    DoFObjects<dim>::get_dof_index(
+    inline types::global_dof_index &
+    DoFObjects<dim>::access_dof_index(
       const dealii::DoFHandler<dh_dim, spacedim> &dof_handler,
       const unsigned int                          obj_index,
       const unsigned int                          fe_index,
-      const unsigned int                          local_index) const
+      const unsigned int                          local_index)
     {
       (void)fe_index;
-      Assert(
-        (fe_index == dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
-        ExcMessage(
-          "Only the default FE index is allowed for non-hp-DoFHandler objects"));
-      Assert(
-        local_index < dof_handler.get_fe().template n_dofs_per_object<dim>(),
-        ExcIndexRange(local_index,
-                      0,
-                      dof_handler.get_fe().template n_dofs_per_object<dim>()));
-      Assert(obj_index *
-                   dof_handler.get_fe().template n_dofs_per_object<dim>() +
-                 local_index <
-               dofs.size(),
-             ExcInternalError());
+      Assert((fe_index ==
+              dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
+             ExcMessage("Only the default FE index is allowed for DoFHandler "
+                        "objects without hp capability"));
+      AssertIndexRange(local_index,
+                       dof_handler.get_fe().template n_dofs_per_object<dim>());
+      AssertIndexRange(
+        obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>() +
+          local_index,
+        dofs.size());
 
       return dofs[obj_index *
                     dof_handler.get_fe().template n_dofs_per_object<dim>() +

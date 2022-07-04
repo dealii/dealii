@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// Copyright (C) 2008 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1370,7 +1370,7 @@ namespace TrilinosWrappers
       AdditionalData(const bool         elliptic              = true,
                      const bool         higher_order_elements = false,
                      const unsigned int n_cycles              = 1,
-                     const bool         w_cyle                = false,
+                     const bool         w_cycle               = false,
                      const double       aggregation_threshold = 1e-4,
                      const std::vector<std::vector<bool>> &constant_modes =
                        std::vector<std::vector<bool>>(0),
@@ -1493,17 +1493,25 @@ namespace TrilinosWrappers
        * Specifies the constant modes (near null space) of the matrix. This
        * parameter tells AMG whether we work on a scalar equation (where the
        * near null space only consists of ones, and default value is OK) or on
-       * a vector-valued equation. For vector-valued equation problem with
-       * <tt>n_component</tt>, the provided @p constant_modes should fulfill
-       * the following requirements:
+       * a vector-valued equation. For vector-valued problem with
+       * <tt>n_components</tt> components, the provided @p constant_modes
+       * should fulfill the following requirements:
        * <ul>
-       * <li>  n_component.size() == <tt>n_component</tt> </li>
-       * <li>  n_component[*].size() == n_dof_local or n_component[*].size()
-       * == n_dof_global </li>
-       * <li>  n_component[<tt>ic</tt>][<tt>id</tt>] ==
-       * "<tt>id</tt><em>th</em> DoF is corresponding to component <tt>ic</tt>
+       * <li>  <tt>constant_modes.size() == n_components</tt> </li>
+       * <li>  <tt>constant_modes[*].size()</tt> needs to be equal to either
+       *       the total number of degrees of freedom associated with the linear
+       *       system (<tt>constant_modes[*].size() == n_dofs</tt>), or the
+       *       number of locally owned degrees of freedom
+       *       (<tt>constant_modes[*].size() == n_locally_owned_dofs</tt>). In
+       *       parallel computations, the latter is the more appropriate choice
+       *       since one does not want to store vectors of global size on
+       *       individual processes. </li>
+       * <li>  <tt>constant_modes[ic][id] == true</tt> if DoF <tt>id</tt> is a
+       *       degree of freedom that is part of vector component <tt>ic</tt>.
        * </li>
        * </ul>
+       * We obtain the <tt>constant_modes</tt> fulfilling the above requirements
+       * with the function DoFTools::extract_constant_modes.
        */
       std::vector<std::vector<bool>> constant_modes;
 
@@ -1727,7 +1735,7 @@ namespace TrilinosWrappers
        */
       AdditionalData(const bool         elliptic              = true,
                      const unsigned int n_cycles              = 1,
-                     const bool         w_cyle                = false,
+                     const bool         w_cycle               = false,
                      const double       aggregation_threshold = 1e-4,
                      const std::vector<std::vector<bool>> &constant_modes =
                        std::vector<std::vector<bool>>(0),

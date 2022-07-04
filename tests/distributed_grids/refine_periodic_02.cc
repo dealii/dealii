@@ -195,10 +195,10 @@ test()
           << "n_levels: " << tr.n_levels() << std::endl;
 
   for (const auto &id : marked_coarsen)
-    CellId(id).to_cell(tr)->set_coarsen_flag();
+    tr.create_cell_iterator(CellId(id))->set_coarsen_flag();
 
   for (const auto &id : marked_refine)
-    CellId(id).to_cell(tr)->set_refine_flag();
+    tr.create_cell_iterator(CellId(id))->set_refine_flag();
 
   deallog << "execute_coarsening_and_refinement()..." << std::endl;
 

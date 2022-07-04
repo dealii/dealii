@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2020 by the deal.II authors
+// Copyright (C) 2005 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,19 +20,14 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/function_parser.h>
+#include <deal.II/base/mu_parser_internal.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_function.h>
-#include <deal.II/base/thread_local_storage.h>
 
 #include <map>
-#include <memory>
 #include <vector>
-
-namespace mu
-{
-  class Parser;
-}
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -108,7 +103,9 @@ class Vector;
  * @ingroup functions
  */
 template <int rank, int dim, typename Number = double>
-class TensorFunctionParser : public TensorFunction<rank, dim, Number>
+class TensorFunctionParser
+  : public TensorFunction<rank, dim, Number>,
+    protected internal::FunctionParser::ParserImplementation<dim, Number>
 {
 public:
   /**
@@ -143,11 +140,6 @@ public:
    * consequently this constructor is deleted.
    */
   TensorFunctionParser(TensorFunctionParser &&) = delete;
-
-  /**
-   * Destructor.
-   */
-  virtual ~TensorFunctionParser() override;
 
   /**
    * Copy operator. Objects of this type can not be copied, and
@@ -204,11 +196,11 @@ public:
    * method in this case is dim+1. The value of this parameter defaults to
    * false, i.e. do not consider time.
    */
-  void
+  virtual void
   initialize(const std::string &             vars,
              const std::vector<std::string> &expressions,
              const ConstMap &                constants,
-             const bool                      time_dependent = false);
+             const bool                      time_dependent = false) override;
 
   /**
    * Initialize the function. Same as above, but accepts a string rather than
@@ -269,65 +261,7 @@ public:
                  << ").");
 
   //@}
-
 private:
-#ifdef DEAL_II_WITH_MUPARSER
-  /**
-   * Place for the variables for each thread
-   */
-  mutable Threads::ThreadLocalStorage<std::vector<double>> vars;
-
-  /**
-   * The muParser objects for each thread (and one for each component). We are
-   * storing a unique_ptr so that we don't need to include the definition of
-   * mu::Parser in this header.
-   */
-  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser>>>
-    tfp;
-
-  /**
-   * An array to keep track of all the constants, required to initialize tfp in
-   * each thread.
-   */
-  std::map<std::string, double> constants;
-
-  /**
-   * An array for the variable names, required to initialize tfp in each
-   * thread.
-   */
-  std::vector<std::string> var_names;
-
-  /**
-   * Initialize tfp and vars on the current thread. This function may only be
-   * called once per thread. A thread can test whether the function has
-   * already been called by testing whether 'tfp.get().size()==0' (not
-   * initialized) or >0 (already initialized).
-   */
-  void
-  init_muparser() const;
-#endif
-
-  /**
-   * An array of function expressions (one per component), required to
-   * initialize tfp in each thread.
-   */
-  std::vector<std::string> expressions;
-
-  /**
-   * State of usability. This variable is checked every time the function is
-   * called for evaluation. It's set to true in the initialize() methods.
-   */
-  bool initialized;
-
-  /**
-   * Number of variables. If this is also a function of time, then the number
-   * of variables is dim+1, otherwise it is dim. In the case that this is a
-   * time dependent function, the time is supposed to be the last variable. If
-   * #n_vars is not identical to the number of the variables parsed by the
-   * initialize() method, then an exception is thrown.
-   */
-  unsigned int n_vars;
-
   /**
    * Number of components is equal dim<sup>rank</sup>.
    */

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2020 by the deal.II authors
+## Copyright (C) 2012 - 2022 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -64,12 +64,6 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-pedantic")
 # Set the pic flag.
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fPIC")
-
-#
-# Check whether the -as-needed flag is available. If so set it to link
-# the deal.II library with it.
-#
-ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 
 #
 # Setup various warnings:
@@ -158,6 +152,19 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.3") )
     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
   ENDIF()
+
+  #
+  # Clang-14.0.5 complaines loudly about not being able to vectorize some
+  # of our loops that we have annotated with DEAL_II_OPENMP_SIMD:
+  #
+  #     warning: loop not vectorized: the optimizer was unable to perform
+  #     the requested transformation; the transformation might be disabled
+  #     or specified as part of an unsupported transformation ordering
+  #     [-Wpass-failed=transform-warning]
+  #
+  # Let us simply disable the warning for now.
+  #
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-pass-failed")
 ENDIF()
 
 

@@ -1,7 +1,0 @@
-Fixed: deal.II has been updated to support the new OneAPI api interface
-introduced by the Intel Threading Building Blocks Library. Note that the
-threading support of the matrix-free backend will be disabled in this case:
-For now, the MatrixFree::AdditionalData::tasks_parallel_scheme control has
-no effect and simply defaults to the serial loop.
-<br>
-(Wolfgang Bangerth, Matthias Maier, 2022/01/06)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2020 by the deal.II authors
+// Copyright (C) 2008 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -932,12 +932,12 @@ namespace TrilinosWrappers
 
 
 
-  SparsityPattern::size_type
+  std::uint64_t
   SparsityPattern::n_nonzero_elements() const
   {
-    TrilinosWrappers::types::int_type nnz = n_global_entries(*graph);
+    TrilinosWrappers::types::int64_type nnz = n_global_entries(*graph);
 
-    return static_cast<size_type>(nnz);
+    return static_cast<std::uint64_t>(nnz);
   }
 
 

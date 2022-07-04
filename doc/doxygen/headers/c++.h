@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2020 by the deal.II authors
+// Copyright (C) 2014 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,7 @@
  * Some functions such as determinant() are specified as `constexpr`: these rely
  * on the generalized constexpr support available in C++14. Some functions,
  * such as unit_symmetric_tensor(), rely on further developments of `constexpr`
- * only * available in C++17 and newer. As such, this function is declared as
+ * only available in C++17 and newer. As such, this function is declared as
  * @code
  * template <int dim, typename Number>
  * DEAL_II_CONSTEXPR inline SymmetricTensor<2, dim, Number>
@@ -110,10 +110,8 @@
  * useful C++14 features in this namespace. Presently, as the library now requires
  * C++14, usage of this namespace is deprecated.
  *
- * @note If the compiler in use actually does support C++14, then the
- *   contents of this namespace are simply imported classes and
- *   functions from namespace `std`. That is, we fall back to what the
- *   compiler provides, rather than our own implementations.
+ * This namespace contains functions imported from `namespace std`. It
+ * used to be used in the same way as the std_cxx17 namespace.
  */
 namespace std_cxx14
 {}

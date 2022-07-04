@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// Copyright (C) 2021 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,12 +88,12 @@ test(const unsigned int degree)
   dof_handler.distribute_dofs(fe);
   Vector<double> vector(dof_handler.n_dofs());
 
-  FEPointEvaluation<dim, dim> evaluator(mapping,
-                                        fe,
-                                        update_values | update_gradients);
-  FEPointEvaluation<dim, dim> evaluator2(mapping,
-                                         fe,
-                                         update_values | update_gradients);
+  NonMatching::MappingInfo<dim, dim> mapping_info(mapping,
+                                                  update_values |
+                                                    update_gradients);
+
+  FEPointEvaluation<dim, dim> evaluator(mapping_info, fe);
+  FEPointEvaluation<dim, dim> evaluator2(mapping_info, fe);
 
   VectorTools::interpolate(mapping, dof_handler, MyFunction<dim>(), vector);
 
@@ -108,11 +108,11 @@ test(const unsigned int degree)
                            solution_values.begin(),
                            solution_values.end());
 
-      evaluator.reinit(cell, unit_points);
+      mapping_info.reinit(cell, unit_points);
+
       evaluator.evaluate(solution_values,
                          EvaluationFlags::values | EvaluationFlags::gradients);
 
-      evaluator2.reinit(cell, unit_points, evaluator.get_mapping_data());
       evaluator2.evaluate(solution_values,
                           EvaluationFlags::values | EvaluationFlags::gradients);
 

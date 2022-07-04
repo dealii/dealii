@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,6 +34,7 @@
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi_large_count.h>
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
@@ -50,7 +51,7 @@
 #include <set>
 #include <sstream>
 
-// we use uint32_t and uint8_t below, which are declared here:
+// we use std::uint32_t and std::uint8_t below, which are declared here:
 #include <cstdint>
 #include <vector>
 
@@ -116,15 +117,30 @@ namespace
   {
     if (data.size() != 0)
       {
+        const std::size_t uncompressed_size = (data.size() * sizeof(T));
+
+        // While zlib's compress2 uses unsigned long (which is 64bits
+        // on Linux), the vtu compression header stores the block size
+        // as an std::uint32_t (see below). While we could implement
+        // writing several smaller blocks, we haven't done that. Let's
+        // trigger an error for the user instead:
+        AssertThrow(uncompressed_size <=
+                      std::numeric_limits<std::uint32_t>::max(),
+                    ExcNotImplemented());
+
         // allocate a buffer for compressing data and do so
-        auto compressed_data_length = compressBound(data.size() * sizeof(T));
+        auto compressed_data_length = compressBound(uncompressed_size);
+        AssertThrow(compressed_data_length <=
+                      std::numeric_limits<std::uint32_t>::max(),
+                    ExcNotImplemented());
+
         std::vector<unsigned char> compressed_data(compressed_data_length);
 
         int err =
           compress2(&compressed_data[0],
                     &compressed_data_length,
                     reinterpret_cast<const Bytef *>(data.data()),
-                    data.size() * sizeof(T),
+                    uncompressed_size,
                     get_zlib_compression_level(flags.compression_level));
         (void)err;
         Assert(err == Z_OK, ExcInternalError());
@@ -133,19 +149,20 @@ namespace
         compressed_data.resize(compressed_data_length);
 
         // now encode the compression header
-        const uint32_t compression_header[4] = {
-          1,                                              /* number of blocks */
-          static_cast<uint32_t>(data.size() * sizeof(T)), /* size of block */
-          static_cast<uint32_t>(data.size() *
-                                sizeof(T)), /* size of last block */
-          static_cast<uint32_t>(
+        const std::uint32_t compression_header[4] = {
+          1,                                             /* number of blocks */
+          static_cast<std::uint32_t>(uncompressed_size), /* size of block */
+          static_cast<std::uint32_t>(
+            uncompressed_size), /* size of last block */
+          static_cast<std::uint32_t>(
             compressed_data_length)}; /* list of compressed sizes of blocks */
 
         const auto header_start =
           reinterpret_cast<const unsigned char *>(&compression_header[0]);
 
         output_stream << Utilities::encode_base64(
-                           {header_start, header_start + 4 * sizeof(uint32_t)})
+                           {header_start,
+                            header_start + 4 * sizeof(std::uint32_t)})
                       << Utilities::encode_base64(compressed_data);
       }
   }
@@ -5985,10 +6002,10 @@ namespace DataOutBase
     std::vector<int32_t> offsets;
     offsets.reserve(n_cells);
 
-    // uint8_t might be an alias to unsigned char which is then not printed
+    // std::uint8_t might be an alias to unsigned char which is then not printed
     // as ascii integers
 #ifdef DEAL_II_WITH_ZLIB
-    std::vector<uint8_t> cell_types;
+    std::vector<std::uint8_t> cell_types;
 #else
     std::vector<unsigned int> cell_types;
 #endif
@@ -7673,6 +7690,7 @@ DataOutInterface<dim, spacedim>::write_svg(std::ostream &out) const
                          out);
 }
 
+
 template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
@@ -7688,8 +7706,8 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   write_vtu(f);
 #else
 
-  const int myrank = Utilities::MPI::this_mpi_process(comm);
-
+  const unsigned int myrank = Utilities::MPI::this_mpi_process(comm);
+  const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(comm);
   MPI_Info info;
   int ierr = MPI_Info_create(&info);
   AssertThrowMPI(ierr);
@@ -7707,7 +7725,9 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   ierr = MPI_Info_free(&info);
   AssertThrowMPI(ierr);
 
+  // Define header size so we can broadcast later.
   unsigned int header_size;
+  std::uint64_t footer_offset;
 
   // write header
   if (myrank == 0)
@@ -7715,13 +7735,14 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
       std::stringstream ss;
       DataOutBase::write_vtu_header(ss, vtk_flags);
       header_size = ss.str().size();
-      // Write the header on rank 0 and automatically move the
-      // shared file pointer to the location after header;
-      ierr = MPI_File_write_shared(
-        fh, ss.str().c_str(), header_size, MPI_CHAR, MPI_STATUS_IGNORE);
+      // Write the header on rank 0 at the start of a file, i.e., offset 0.
+      ierr = Utilities::MPI::LargeCount::File_write_at_c(
+        fh, 0, ss.str().c_str(), header_size, MPI_CHAR, MPI_STATUS_IGNORE);
       AssertThrowMPI(ierr);
     }
 
+  ierr = MPI_Bcast(&header_size, 1, MPI_UNSIGNED, 0, comm);
+  AssertThrowMPI(ierr);
 
   {
     const auto &patches = get_patches();
@@ -7741,21 +7762,52 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
                                   vtk_flags,
                                   ss);
 
-    ierr = MPI_File_write_ordered(
-      fh, ss.str().c_str(), ss.str().size(), MPI_CHAR, MPI_STATUS_IGNORE);
+    // Use prefix sum to find specific offset to write at.
+    const std::uint64_t size_on_proc = ss.str().size();
+    std::uint64_t prefix_sum = 0;
+    ierr =
+      MPI_Exscan(&size_on_proc, &prefix_sum, 1, MPI_UINT64_T, MPI_SUM, comm);
     AssertThrowMPI(ierr);
+
+    // Locate specific offset for each processor.
+    const MPI_Offset offset = static_cast<MPI_Offset>(header_size) + prefix_sum;
+
+    ierr = Utilities::MPI::LargeCount::File_write_at_all_c(fh,
+                                                           offset,
+                                                           ss.str().c_str(),
+                                                           ss.str().size(),
+                                                           MPI_CHAR,
+                                                           MPI_STATUS_IGNORE);
+    AssertThrowMPI(ierr);
+
+    if (myrank == n_ranks - 1)
+      {
+        // Locating Footer with offset on last rank.
+        footer_offset = size_on_proc + offset;
+
+        std::stringstream ss;
+        DataOutBase::write_vtu_footer(ss);
+        const unsigned int footer_size = ss.str().size();
+
+        // Writing footer:
+        ierr = Utilities::MPI::LargeCount::File_write_at_c(fh,
+                                                           footer_offset,
+                                                           ss.str().c_str(),
+                                                           footer_size,
+                                                           MPI_CHAR,
+                                                           MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+      }
   }
 
-  // write footer
-  if (myrank == 0)
-    {
-      std::stringstream ss;
-      DataOutBase::write_vtu_footer(ss);
-      unsigned int footer_size = ss.str().size();
-      ierr = MPI_File_write_shared(
-        fh, ss.str().c_str(), footer_size, MPI_CHAR, MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
-    }
+  // Make sure we sync to disk. As written in the standard,
+  // MPI_File_close() actually already implies a sync but there seems
+  // to be a bug on at least one configuration (running with multiple
+  // nodes using OpenMPI 4.1) that requires it. Without this call, the
+  // footer is sometimes missing.
+  ierr = MPI_File_sync(fh);
+  AssertThrowMPI(ierr);
+
   ierr = MPI_File_close(&fh);
   AssertThrowMPI(ierr);
 #endif
@@ -7976,8 +8028,7 @@ DataOutInterface<dim, spacedim>::write_xdmf_file(
   // Only rank 0 process writes the XDMF file
   if (myrank == 0)
     {
-      std::ofstream                          xdmf_file(filename.c_str());
-      std::vector<XDMFEntry>::const_iterator it;
+      std::ofstream xdmf_file(filename);
 
       xdmf_file << "<?xml version=\"1.0\" ?>\n";
       xdmf_file << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
@@ -7990,9 +8041,16 @@ DataOutInterface<dim, spacedim>::write_xdmf_file(
       const auto &patches = get_patches();
       Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
 
-      for (it = entries.begin(); it != entries.end(); ++it)
+      // We currently don't support writing mixed meshes:
+#ifdef DEBUG
+      for (const auto &patch : patches)
+        Assert(patch.reference_cell == patches[0].reference_cell,
+               ExcNotImplemented());
+#endif
+
+      for (const auto &entry : entries)
         {
-          xdmf_file << it->get_xdmf_content(3, patches[0].reference_cell);
+          xdmf_file << entry.get_xdmf_content(3, patches[0].reference_cell);
         }
 
       xdmf_file << "    </Grid>\n";
@@ -9138,32 +9196,6 @@ namespace
     return res;
   }
 } // namespace
-
-
-
-std::string
-XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
-{
-  switch (dimension)
-    {
-      case 0:
-        return get_xdmf_content(indent_level,
-                                ReferenceCells::get_hypercube<0>());
-      case 1:
-        return get_xdmf_content(indent_level,
-                                ReferenceCells::get_hypercube<1>());
-      case 2:
-        return get_xdmf_content(indent_level,
-                                ReferenceCells::get_hypercube<2>());
-      case 3:
-        return get_xdmf_content(indent_level,
-                                ReferenceCells::get_hypercube<3>());
-      default:
-        Assert(false, ExcNotImplemented());
-    }
-
-  return "";
-}
 
 
 

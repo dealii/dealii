@@ -50,6 +50,8 @@
 #endif
 
 
+namespace dealii
+{
 namespace mu
 {
 	/** \file
@@ -309,6 +311,7 @@ namespace mu
 	};
 
 } // namespace mu
+}
 
 #if defined(_MSC_VER)
 	#pragma warning(pop)

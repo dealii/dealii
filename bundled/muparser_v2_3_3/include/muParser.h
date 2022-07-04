@@ -40,6 +40,8 @@
 	\brief Definition of the standard floating point parser.
 */
 
+namespace dealii
+{
 namespace mu
 {
 	/** \brief Mathematical expressions parser.
@@ -66,6 +68,7 @@ namespace mu
 		static int IsVal(const char_type* a_szExpr, int* a_iPos, value_type* a_fVal);
 	};
 } // namespace mu
+}
 
 #endif
 

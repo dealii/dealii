@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2020 by the deal.II authors
+// Copyright (C) 2003 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,8 +52,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   // third further restrict to
   // boundary indicator 0
   {
-    std::set<types::boundary_id> boundary_ids;
-    boundary_ids.insert(0);
+    const std::set<types::boundary_id> boundary_ids = {0};
     DoFTools::extract_boundary_dofs(dof_handler,
                                     component_select,
                                     boundary_dofs,

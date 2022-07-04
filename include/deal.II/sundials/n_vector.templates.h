@@ -1,17 +1,18 @@
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
 //
-//    Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2022 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal.II library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE.md at
-//    the top level directory of deal.II.
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
+
 
 #ifndef dealii_sundials_n_vector_templates_h
 #define dealii_sundials_n_vector_templates_h
@@ -33,10 +34,6 @@
 #  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/vector_memory.h>
-
-#  if DEAL_II_SUNDIALS_VERSION_LT(5, 0, 0)
-#    include <deal.II/sundials/sundials_backport.h>
-#  endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -126,7 +123,7 @@ namespace SUNDIALS
     template <typename VectorType>
     N_Vector
     create_nvector(NVectorContent<VectorType> *content
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                    ,
                    SUNContext nvector_context
 #  endif
@@ -139,7 +136,7 @@ namespace SUNDIALS
     template <typename VectorType>
     N_Vector
     create_empty_nvector(
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
       SUNContext nvector_context
 #  endif
     );
@@ -363,22 +360,21 @@ namespace SUNDIALS
 
 
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     template <typename VectorType>
     NVectorView<VectorType>
-    make_nvector_view(VectorType &vector
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-                      ,
-                      SUNContext nvector_context
-#  endif
-    )
+    make_nvector_view(VectorType &vector, SUNContext nvector_context)
     {
-      return NVectorView<VectorType>(vector
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-                                     ,
-                                     nvector_context
-#  endif
-      );
+      return NVectorView<VectorType>(vector, nvector_context);
     }
+#  else
+    template <typename VectorType>
+    NVectorView<VectorType>
+    make_nvector_view(VectorType &vector)
+    {
+      return NVectorView<VectorType>(vector);
+    }
+#  endif
 
 
 
@@ -410,7 +406,7 @@ namespace SUNDIALS
 
     template <typename VectorType>
     NVectorView<VectorType>::NVectorView(VectorType &vector
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                          ,
                                          SUNContext nvector_context
 #  endif
@@ -419,7 +415,7 @@ namespace SUNDIALS
           create_nvector(
             new NVectorContent<typename std::remove_const<VectorType>::type>(
               &vector)
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
               ,
             nvector_context
 #  endif
@@ -451,7 +447,7 @@ namespace SUNDIALS
     template <typename VectorType>
     N_Vector
     create_nvector(NVectorContent<VectorType> *content
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                    ,
                    SUNContext nvector_context
 #  endif
@@ -983,7 +979,7 @@ namespace SUNDIALS
     template <typename VectorType>
     N_Vector
     create_empty_nvector(
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
       SUNContext nvector_context
 #  endif
     )
@@ -1001,11 +997,9 @@ namespace SUNDIALS
       v->ops->nvcloneempty  = &NVectorOperations::clone_empty;
       v->ops->nvdestroy     = &NVectorOperations::destroy<VectorType>;
       //  v->ops->nvspace           = undef;
-#  if DEAL_II_SUNDIALS_VERSION_GTE(5, 0, 0)
       v->ops->nvgetcommunicator =
         &NVectorOperations::get_communicator_as_void_ptr<VectorType>;
       v->ops->nvgetlength = &NVectorOperations::get_global_length<VectorType>;
-#  endif
 
       /* standard vector operations */
       v->ops->nvlinearsum = &NVectorOperations::linear_sum<VectorType>;

@@ -14,10 +14,10 @@
 // ---------------------------------------------------------------------
 
 // This function tests the correctness of the matrix-free implementation
-// of the FE_RaviartThomasNodal element by evaluating a simple fe operator
-// and comparing the result with FEVaules which is considered the
-// reference. The mesh is a hypercube mesh with no hanging nodes and no other
-// constraints
+// of the FE_RaviartThomasNodal element by evaluating values + gradients
+// as well as the divergence and comparing the result with FEVaules which
+// is considered the reference. The mesh is a hypercube mesh with no
+// hanging nodes and no other constraints.
 
 #include "../tests.h"
 
@@ -40,5 +40,13 @@ test()
 
   AffineConstraints<double> constraints;
   constraints.close();
-  do_test<dim, fe_degree, double>(dof, constraints);
+
+  deallog << "Using " << dof.get_fe().get_name() << std::endl;
+  deallog << "Number of cells: " << dof.get_triangulation().n_active_cells()
+          << std::endl;
+  deallog << "Number of degrees of freedom: " << dof.n_dofs() << std::endl
+          << std::endl;
+  do_test<dim, fe_degree, double>(dof, constraints, TestType::values);
+  do_test<dim, fe_degree, double>(dof, constraints, TestType::gradients);
+  do_test<dim, fe_degree, double>(dof, constraints, TestType::divergence);
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -261,8 +261,8 @@ namespace internal
                                   true);
 
     Utilities::MPI::ConsensusAlgorithms::Selector<
-      std::pair<types::global_dof_index, types::global_dof_index>,
-      unsigned int>(constrained_indices_process, mpi_communicator)
+      std::vector<std::pair<types::global_dof_index, types::global_dof_index>>,
+      std::vector<unsigned int>>(constrained_indices_process, mpi_communicator)
       .run();
 
     // step 2: collect all locally owned constraints
@@ -388,8 +388,10 @@ namespace internal
                                       true);
 
       Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>(locally_relevant_dofs_process, mpi_communicator)
+        std::vector<
+          std::pair<types::global_dof_index, types::global_dof_index>>,
+        std::vector<unsigned int>>(locally_relevant_dofs_process,
+                                   mpi_communicator)
         .run();
 
       const auto locally_relevant_dofs_by_ranks =
@@ -3263,7 +3265,7 @@ namespace internal
       else
         col_val = 0;
 
-      // account for indirect contributions by constraints in row, going trough
+      // account for indirect contributions by constraints in row, going through
       // the direct and indirect references in the given column.
       for (size_type q = 0; q < global_rows.size(i); ++q)
         {

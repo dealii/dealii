@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// Copyright (C) 2008 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -947,7 +947,7 @@ namespace TrilinosWrappers
      * Return the total number of nonzero elements of this matrix (summed
      * over all MPI processes).
      */
-    size_type
+    std::uint64_t
     n_nonzero_elements() const;
 
     /**
@@ -2943,15 +2943,11 @@ namespace TrilinosWrappers
         // TODO: fix this (do not run compress here, but fail)
         if (last_action == Insert)
           {
-#      ifdef DEBUG
-            int ierr;
-            ierr =
-#      endif
-              matrix->GlobalAssemble(*column_space_map,
-                                     matrix->RowMap(),
-                                     false);
+            const int ierr = matrix->GlobalAssemble(*column_space_map,
+                                                    matrix->RowMap(),
+                                                    false);
 
-            Assert(ierr == 0, ExcTrilinosError(ierr));
+            AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           }
 
         last_action = Add;
@@ -3015,14 +3011,14 @@ namespace TrilinosWrappers
 
 
 
-  inline SparseMatrix::size_type
+  inline std::uint64_t
   SparseMatrix::n_nonzero_elements() const
   {
-#      ifndef DEAL_II_WITH_64BIT_INDICES
-    return matrix->NumGlobalNonzeros();
-#      else
-    return matrix->NumGlobalNonzeros64();
-#      endif
+    // Trilinos uses 64bit functions internally for attribute access, which
+    // return `long long`. They also offer 32bit variants that return `int`,
+    // however those call the 64bit version and convert the values to 32bit.
+    // There is no necessity in using the 32bit versions at all.
+    return static_cast<std::uint64_t>(matrix->NumGlobalNonzeros64());
   }
 
 

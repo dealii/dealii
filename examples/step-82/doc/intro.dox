@@ -9,7 +9,7 @@
 
 <a name="Intro"></a>
 <h1>Introduction</h1>
-<h3>Problem statment</h3>
+<h3>Problem Statement</h3>
 
 In this example, we consider the <i>local discontinuous Galerkin</i> (LDG) method for approximating the solution to the bi-Laplacian problem,
 @f{align*}{
@@ -17,7 +17,7 @@ In this example, we consider the <i>local discontinuous Galerkin</i> (LDG) metho
 \nabla u & = \mathbf{0} \quad \mbox{on } \partial\Omega, \\
 u & = 0 \quad \mbox{on } \partial\Omega,
 @f}
-where $\Omega\subset\mathbb{R}^d$ $(d=2,3)$ is an open bounded Lipschitz domain and $f\in L^2(\Omega)$. This is the same problem we have already considered in step-47, but we will take here a different approach towards solving it: Rather than using continuous finite elements and the interior penalty method, we consider discontinuous finite elements and the local discontinous Galerkin method defined using lifting operators.
+where $\Omega\subset\mathbb{R}^d$ $(d=2,3)$ is an open bounded Lipschitz domain and $f\in L^2(\Omega)$. This is the same problem we have already considered in step-47, but we will take here a different approach towards solving it: Rather than using continuous finite elements and the interior penalty method, we consider discontinuous finite elements and the local discontinuous Galerkin method defined using lifting operators.
 
 The weak formulation of this problem reads as follows: find $u\in H_0^2(\Omega)$ such that
 @f[
@@ -243,7 +243,7 @@ where $\mathbf{n}_{K_c}$ (resp. $\mathbf{n}_{K_n}$) denotes the outward unit nor
 @f[
 G_m=\int_e\average{{\rm div}\, \psi_m}\cdot\mathbf{n}_e\jump{\varphi^c}=\frac{1}{2}\int_e{\rm div}\, \psi_m\cdot\mathbf{n}_{K_c}\varphi^c,
 @f]
-while if $\varphi=\varphi^n$, namely $\varphi$ has support on the neighbhoring cell $K_n$, then
+while if $\varphi=\varphi^n$, namely $\varphi$ has support on the neighboring cell $K_n$, then
 @f[
 G_m=\int_e\average{{\rm div}\, \psi_m}\cdot\mathbf{n}_e\jump{\varphi^n}=\frac{1}{2}\int_e{\rm div}\, \psi_m\cdot\mathbf{n}_{K_n}\varphi^n.
 @f]

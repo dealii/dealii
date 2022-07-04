@@ -1,4 +1,0 @@
-Improved: An assert has been added in the constructor of
-FEPointEvaluation to prevent accessing non-existing components.
-<br>
-(Judith Pauen, 2021/06/05)

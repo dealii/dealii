@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2021 by the deal.II authors
+ * Copyright (C) 2009 - 2022 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -44,7 +44,7 @@
 // @endcode
 //
 // Using this logic, the following lines will then import either the
-// PETSc or Trilinos wrappers into the namespace `LA` (for "linear
+// PETSc or Trilinos wrappers into the namespace `LA` (for linear
 // algebra). In the former case, we are also defining the macro
 // `USE_PETSC_LA` so that we can detect if we are using PETSc (see
 // solve() for an example where this is necessary).
@@ -537,20 +537,24 @@ namespace Step40
 
   // @sect4{LaplaceProblem::output_results}
 
-  // Compared to the corresponding function in step-6, the one here is a tad
-  // more complicated. There are two reasons: the first one is that we do not
-  // just want to output the solution but also for each cell which processor
-  // owns it (i.e. which "subdomain" it is in). Secondly, as discussed at
-  // length in step-17 and step-18, generating graphical data can be a
-  // bottleneck in parallelizing. In step-18, we have moved this step out of
-  // the actual computation but shifted it into a separate program that later
-  // combined the output from various processors into a single file. But this
-  // doesn't scale: if the number of processors is large, this may mean that
-  // the step of combining data on a single processor later becomes the
-  // longest running part of the program, or it may produce a file that's so
-  // large that it can't be visualized any more. We here follow a more
-  // sensible approach, namely creating individual files for each MPI process
-  // and leaving it to the visualization program to make sense of that.
+  // Compared to the corresponding function in step-6, the one here is
+  // a tad more complicated. There are two reasons: the first one is
+  // that we do not just want to output the solution but also for each
+  // cell which processor owns it (i.e. which "subdomain" it is
+  // in). Secondly, as discussed at length in step-17 and step-18,
+  // generating graphical data can be a bottleneck in
+  // parallelizing. In those two programs, we simply generate one
+  // output file per process. That worked because the
+  // parallel::shared::Triangulation cannot be used with large numbers
+  // of MPI processes anyway.  But this doesn't scale: Creating a
+  // single file per processor will overwhelm the filesystem with a
+  // large number of processors.
+  //
+  // We here follow a more sophisticated approach that uses
+  // high-performance, parallel IO routines using MPI I/O to write to
+  // a small, fixed number of visualization files (here 8). We also
+  // generate a .pvtu record referencing these .vtu files, which can
+  // be opened directly in visualizatin tools like ParaView and VisIt.
   //
   // To start, the top of the function looks like it usually does. In addition
   // to attaching the solution vector (the one that has entries for all locally
@@ -581,7 +585,7 @@ namespace Step40
 
     data_out.build_patches();
 
-    // The next step is to write this data to disk. We write up to 8 VTU files
+    // The final step is to write this data to disk. We write up to 8 VTU files
     // in parallel with the help of MPI-IO. Additionally a PVTU record is
     // generated, which groups the written VTU files.
     data_out.write_vtu_with_pvtu_record(
@@ -595,11 +599,7 @@ namespace Step40
   // The function that controls the overall behavior of the program is again
   // like the one in step-6. The minor difference are the use of
   // <code>pcout</code> instead of <code>std::cout</code> for output to the
-  // console (see also step-17) and that we only generate graphical output if
-  // at most 32 processors are involved. Without this limit, it would be just
-  // too easy for people carelessly running this program without reading it
-  // first to bring down the cluster interconnect and fill any file system
-  // available :-)
+  // console (see also step-17).
   //
   // A functional difference to step-6 is the use of a square domain and that
   // we start with a slightly finer mesh (5 global refinement cycles) -- there
@@ -641,11 +641,10 @@ namespace Step40
         assemble_system();
         solve();
 
-        if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 32)
-          {
-            TimerOutput::Scope t(computing_timer, "output");
-            output_results(cycle);
-          }
+        {
+          TimerOutput::Scope t(computing_timer, "output");
+          output_results(cycle);
+        }
 
         computing_timer.print_summary();
         computing_timer.reset();

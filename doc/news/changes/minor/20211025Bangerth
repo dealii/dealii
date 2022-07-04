@@ -1,4 +1,0 @@
-New: The ReferenceCell class now has input and output operators (`>>`
-and `<<`).
-<br>
-(Wolfgang Bangerth, 2021/10/25)

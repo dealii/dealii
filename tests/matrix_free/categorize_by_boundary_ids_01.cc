@@ -67,7 +67,8 @@ test(const unsigned int n_refinements)
     bool result = true;
 
     MatrixFree<dim, double> data;
-    data.reinit(dof_handler, dummy, quadrature, additional_data);
+    data.reinit(
+      MappingQ1<dim>{}, dof_handler, dummy, quadrature, additional_data);
 
     using VectorType = Vector<double>;
 
@@ -85,7 +86,8 @@ test(const unsigned int n_refinements)
               {
                 bool temp = true;
 
-                for (unsigned int v = 1; v < data.n_components_filled(cell);
+                for (unsigned int v = 1;
+                     v < data.n_active_entries_per_cell_batch(cell);
                      ++v)
                   temp &= (data.get_faces_by_cells_boundary_id(cell, face)[0] ==
                            data.get_faces_by_cells_boundary_id(cell, face)[v]);

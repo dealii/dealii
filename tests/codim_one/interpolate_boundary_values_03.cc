@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2020 by the deal.II authors
+// Copyright (C) 2005 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,9 +43,7 @@ test()
   Triangulation<dim, spacedim> tria;
   Triangulation<spacedim>      volume_mesh;
   GridGenerator::half_hyper_ball(volume_mesh);
-  std::set<types::boundary_id> boundary_ids;
-  boundary_ids.insert(0);
-
+  const std::set<types::boundary_id> boundary_ids = {0};
   GridGenerator::extract_boundary_mesh(volume_mesh, tria, boundary_ids);
 
   deallog << tria.n_active_cells() << " active cells" << std::endl;

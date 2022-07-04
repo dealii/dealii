@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2020 by the deal.II authors
+// Copyright (C) 2018 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -100,8 +100,8 @@ make_constraint_matrix(const DoFHandler<2> &dof_handler, int version)
           dof_handler, 1, 0, 0, periodicity_vectorDof);
     }
 
-  DoFTools::make_periodicity_constraints<DoFHandler<dim>>(periodicity_vectorDof,
-                                                          constraints);
+  DoFTools::make_periodicity_constraints<dim, dim>(periodicity_vectorDof,
+                                                   constraints);
 
   constraints.close();
   std::map<types::global_dof_index, Point<dim>> support_points;

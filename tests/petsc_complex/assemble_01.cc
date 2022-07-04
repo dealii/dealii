@@ -19,6 +19,7 @@
 // combinations of PETScWrappers objects is correctly instantiated and works.
 
 #include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -37,9 +38,20 @@ main(int argc, char **argv)
 
   const unsigned int n = 4;
 
-  PETScWrappers::SparseMatrix      serial_matrix(n, n, n);
-  PETScWrappers::MPI::SparseMatrix mpi_matrix(MPI_COMM_WORLD, n, n, n, n, n);
-  PETScWrappers::MPI::Vector       mpi_vector(MPI_COMM_WORLD, n, n);
+  PETScWrappers::SparseMatrix serial_matrix(n, n, n);
+
+  // PETSc requires us to set up the sparsity pattern ahead of construction
+  DynamicSparsityPattern dsp(n, n);
+  for (unsigned int i = 0; i < n; ++i)
+    for (unsigned int j = 0; j < n; ++j)
+      dsp.add(i, j);
+  IndexSet all_dofs(n);
+  all_dofs.add_range(0, n);
+
+  PETScWrappers::MPI::SparseMatrix mpi_matrix;
+  mpi_matrix.reinit(all_dofs, all_dofs, dsp, MPI_COMM_WORLD);
+
+  PETScWrappers::MPI::Vector mpi_vector(MPI_COMM_WORLD, n, n);
 
   FullMatrix<PetscScalar> cell_matrix(n, n);
   Vector<PetscScalar>     cell_rhs(n);

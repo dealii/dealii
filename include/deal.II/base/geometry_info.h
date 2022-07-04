@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1438,8 +1438,12 @@ struct GeometryInfo<0>
  * This class provides dimension independent information to all topological
  * structures that make up the unit, or
  * @ref GlossReferenceCell "reference cell".
- * This class has been
+ * That said, this class only describes information about hypercube reference
+ * cells (i.e., lines, quadrilaterals, or hexahedra), which historically
+ * were the only kinds of cells supported by deal.II. This is no longer the
+ * case today, and consequently this class has been
  * superseded by the ReferenceCell class -- see there for more information.
+ * The rest of this class's documentation is therefore partly historical.
  *
  *
  * It is the one central point in the library where information about the
@@ -3671,6 +3675,10 @@ GeometryInfo<2>::face_refinement_case(
                    RefinementCase<dim>::isotropic_refinement + 1);
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
 
+  // simple special case
+  if (cell_refinement_case == RefinementCase<dim>::cut_xy)
+    return RefinementCase<1>::cut_x;
+
   const RefinementCase<dim - 1>
     ref_cases[RefinementCase<dim>::isotropic_refinement +
               1][GeometryInfo<dim>::faces_per_cell / 2] = {
@@ -3701,6 +3709,10 @@ GeometryInfo<3>::face_refinement_case(
   AssertIndexRange(cell_refinement_case,
                    RefinementCase<dim>::isotropic_refinement + 1);
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+
+  // simple special case
+  if (cell_refinement_case == RefinementCase<dim>::cut_xyz)
+    return RefinementCase<dim - 1>::cut_xy;
 
   const RefinementCase<dim - 1>
     ref_cases[RefinementCase<dim>::isotropic_refinement + 1]
@@ -3811,6 +3823,10 @@ GeometryInfo<3>::line_refinement_case(
   AssertIndexRange(cell_refinement_case,
                    RefinementCase<dim>::isotropic_refinement + 1);
   AssertIndexRange(line_no, GeometryInfo<dim>::lines_per_cell);
+
+  // simple special case
+  if (cell_refinement_case == RefinementCase<dim>::cut_xyz)
+    return RefinementCase<1>::cut_x;
 
   // array indicating, which simple refine
   // case cuts a line in direction x, y or

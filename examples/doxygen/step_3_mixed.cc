@@ -68,7 +68,7 @@
  * quadrilaterals, we have discussed in step-3: we selected an appropriate
  * finite element, quadrature rule and mapping object, e.g., FE_Q, QGauss, and
  * MappingFE (initialized with FE_Q). For simplex meshes, we selected in
- * step-3simplex FE_SimplexP, QGaussSimplex, and MappingFE (intialized with
+ * step-3simplex FE_SimplexP, QGaussSimplex, and MappingFE (initialized with
  * FE_SimplexP).
  *
  * For mixed meshes, we need multiple finite elements, quadrature rules, and

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,7 @@
 
 
 // Compare the evaluation of a SIP Laplace operator with face- and element-
-// centric loops on a structured grid.
+// centric loops on a hypercube, hypershell, and hyperball.
 
 int
 main(int argc, char **argv)
@@ -42,5 +42,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 
   mpi_initlog();
-  test<2, 2, 3, double, VectorizedArray<double>>();
+  test<2, 2, 3, double, VectorizedArray<double>>(0);
+  test<2, 2, 3, double, VectorizedArray<double>>(1);
+  test<2, 2, 3, double, VectorizedArray<double>>(2);
 }

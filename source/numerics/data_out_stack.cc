@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 std::size_t
-DataOutStack<dim, spacedim, void>::DataVector::memory_consumption() const
+DataOutStack<dim, spacedim>::DataVector::memory_consumption() const
 {
   return (MemoryConsumption::memory_consumption(data) +
           MemoryConsumption::memory_consumption(names));
@@ -49,8 +49,8 @@ DataOutStack<dim, spacedim, void>::DataVector::memory_consumption() const
 
 template <int dim, int spacedim>
 void
-DataOutStack<dim, spacedim, void>::new_parameter_value(const double p,
-                                                       const double dp)
+DataOutStack<dim, spacedim>::new_parameter_value(const double p,
+                                                 const double dp)
 {
   parameter      = p;
   parameter_step = dp;
@@ -72,7 +72,7 @@ DataOutStack<dim, spacedim, void>::new_parameter_value(const double p,
 
 template <int dim, int spacedim>
 void
-DataOutStack<dim, spacedim, void>::attach_dof_handler(
+DataOutStack<dim, spacedim>::attach_dof_handler(
   const DoFHandler<dim, spacedim> &dof)
 {
   dof_handler = &dof;
@@ -81,9 +81,8 @@ DataOutStack<dim, spacedim, void>::attach_dof_handler(
 
 template <int dim, int spacedim>
 void
-DataOutStack<dim, spacedim, void>::declare_data_vector(
-  const std::string &name,
-  const VectorType   vector_type)
+DataOutStack<dim, spacedim>::declare_data_vector(const std::string &name,
+                                                 const VectorType   vector_type)
 {
   std::vector<std::string> names;
   names.push_back(name);
@@ -93,7 +92,7 @@ DataOutStack<dim, spacedim, void>::declare_data_vector(
 
 template <int dim, int spacedim>
 void
-DataOutStack<dim, spacedim, void>::declare_data_vector(
+DataOutStack<dim, spacedim>::declare_data_vector(
   const std::vector<std::string> &names,
   const VectorType                vector_type)
 {
@@ -136,8 +135,8 @@ DataOutStack<dim, spacedim, void>::declare_data_vector(
 template <int dim, int spacedim>
 template <typename number>
 void
-DataOutStack<dim, spacedim, void>::add_data_vector(const Vector<number> &vec,
-                                                   const std::string &   name)
+DataOutStack<dim, spacedim>::add_data_vector(const Vector<number> &vec,
+                                             const std::string &   name)
 {
   const unsigned int n_components = dof_handler->get_fe(0).n_components();
 
@@ -170,7 +169,7 @@ DataOutStack<dim, spacedim, void>::add_data_vector(const Vector<number> &vec,
 template <int dim, int spacedim>
 template <typename number>
 void
-DataOutStack<dim, spacedim, void>::add_data_vector(
+DataOutStack<dim, spacedim>::add_data_vector(
   const Vector<number> &          vec,
   const std::vector<std::string> &names)
 {
@@ -244,8 +243,7 @@ DataOutStack<dim, spacedim, void>::add_data_vector(
 
 template <int dim, int spacedim>
 void
-DataOutStack<dim, spacedim, void>::build_patches(
-  const unsigned int nnnn_subdivisions)
+DataOutStack<dim, spacedim>::build_patches(const unsigned int nnnn_subdivisions)
 {
   // this is mostly copied from the
   // DataOut class
@@ -432,7 +430,7 @@ DataOutStack<dim, spacedim, void>::build_patches(
 
 template <int dim, int spacedim>
 void
-DataOutStack<dim, spacedim, void>::finish_parameter_value()
+DataOutStack<dim, spacedim>::finish_parameter_value()
 {
   // release lock on dof handler
   dof_handler = nullptr;
@@ -451,7 +449,7 @@ DataOutStack<dim, spacedim, void>::finish_parameter_value()
 
 template <int dim, int spacedim>
 std::size_t
-DataOutStack<dim, spacedim, void>::memory_consumption() const
+DataOutStack<dim, spacedim>::memory_consumption() const
 {
   return (DataOutInterface<patch_dim, patch_spacedim>::memory_consumption() +
           MemoryConsumption::memory_consumption(parameter) +
@@ -466,10 +464,9 @@ DataOutStack<dim, spacedim, void>::memory_consumption() const
 
 template <int dim, int spacedim>
 const std::vector<
-  dealii::DataOutBase::Patch<DataOutStack<dim, spacedim, void>::patch_dim,
-                             DataOutStack<dim, spacedim, void>::patch_spacedim>>
-  &
-  DataOutStack<dim, spacedim, void>::get_patches() const
+  dealii::DataOutBase::Patch<DataOutStack<dim, spacedim>::patch_dim,
+                             DataOutStack<dim, spacedim>::patch_spacedim>> &
+DataOutStack<dim, spacedim>::get_patches() const
 {
   return patches;
 }
@@ -478,7 +475,7 @@ const std::vector<
 
 template <int dim, int spacedim>
 std::vector<std::string>
-DataOutStack<dim, spacedim, void>::get_dataset_names() const
+DataOutStack<dim, spacedim>::get_dataset_names() const
 {
   std::vector<std::string> names;
   for (typename std::vector<DataVector>::const_iterator dataset =

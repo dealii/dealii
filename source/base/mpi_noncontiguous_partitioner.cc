@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,9 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_vector.h>
+
+#include <boost/serialization/utility.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -115,8 +118,9 @@ namespace Utilities
                 true);
 
       Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::pair<types::global_dof_index, types::global_dof_index>,
-        unsigned int>
+        std::vector<
+          std::pair<types::global_dof_index, types::global_dof_index>>,
+        std::vector<unsigned int>>
         consensus_algorithm(process, communicator);
       consensus_algorithm.run();
 

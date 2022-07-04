@@ -60,8 +60,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/householder.h>
 
@@ -85,11 +83,6 @@ namespace FETools
     {
       AssertDimension(fes.size(), multiplicities.size());
 
-      unsigned int multiplied_dofs_per_vertex = 0;
-      unsigned int multiplied_dofs_per_line   = 0;
-      unsigned int multiplied_dofs_per_quad   = 0;
-      unsigned int multiplied_dofs_per_hex    = 0;
-
       unsigned int multiplied_n_components = 0;
 
       unsigned int degree = 0; // degree is the maximal degree of the components
@@ -103,23 +96,69 @@ namespace FETools
             break;
           }
 
+      dealii::internal::GenericDoFsPerObject dpo;
+
+      std::vector<dealii::internal::GenericDoFsPerObject> dpos_in(fes.size());
+
+      for (unsigned int i = 0; i < fes.size(); ++i)
+        if (multiplicities[i] > 0)
+          dpos_in[i] =
+            dealii::internal::GenericDoFsPerObject::generate(*fes[i]);
+
+      // helper function to fill a vector of GenericDoFsPerObject
+      // according to multiplicities
+      const auto fill_dpo_vector =
+        [&](const std::function<std::vector<std::vector<unsigned int>> &(
+              dealii::internal::GenericDoFsPerObject &)> &get_vector) {
+          auto &vector_dst = get_vector(dpo);
+
+          // allocate memory
+          for (unsigned int i = 0; i < fes.size(); ++i)
+            if (multiplicities[i] > 0)
+              {
+                const auto &vector_src = get_vector(dpos_in[i]);
+
+                vector_dst.resize(vector_src.size());
+
+                for (unsigned int j = 0; j < vector_src.size(); ++j)
+                  vector_dst[j].assign(vector_src[j].size(), 0);
+
+                break;
+              }
+
+          // fill vector according to multiplicities
+          for (unsigned int i = 0; i < fes.size(); ++i)
+            if (multiplicities[i] > 0)
+              {
+                const auto &vector_src = get_vector(dpos_in[i]);
+
+                for (unsigned int j = 0; j < vector_src.size(); ++j)
+                  for (unsigned int k = 0; k < vector_src[j].size(); ++k)
+                    vector_dst[j][k] += vector_src[j][k] * multiplicities[i];
+              }
+        };
+
+      // go through each field of GenericDoFsPerObject
+      fill_dpo_vector(
+        [](auto &dpo) -> std::vector<std::vector<unsigned int>> & {
+          return dpo.dofs_per_object_exclusive;
+        });
+      fill_dpo_vector(
+        [](auto &dpo) -> std::vector<std::vector<unsigned int>> & {
+          return dpo.dofs_per_object_inclusive;
+        });
+      fill_dpo_vector(
+        [](auto &dpo) -> std::vector<std::vector<unsigned int>> & {
+          return dpo.object_index;
+        });
+      fill_dpo_vector(
+        [](auto &dpo) -> std::vector<std::vector<unsigned int>> & {
+          return dpo.first_object_index_on_face;
+        });
+
       for (unsigned int i = 0; i < fes.size(); ++i)
         if (multiplicities[i] > 0)
           {
-            // TODO: the implementation makes the assumption that all faces have
-            // the same number of dofs -> don't construct DPO but
-            // PrecomputedFiniteElementData
-            AssertDimension(fes[i]->n_unique_quads(), 1);
-
-            multiplied_dofs_per_vertex +=
-              fes[i]->n_dofs_per_vertex() * multiplicities[i];
-            multiplied_dofs_per_line +=
-              fes[i]->n_dofs_per_line() * multiplicities[i];
-            multiplied_dofs_per_quad +=
-              fes[i]->n_dofs_per_quad(0) * multiplicities[i];
-            multiplied_dofs_per_hex +=
-              fes[i]->n_dofs_per_hex() * multiplicities[i];
-
             multiplied_n_components +=
               fes[i]->n_components() * multiplicities[i];
 
@@ -149,14 +188,6 @@ namespace FETools
             total_conformity = typename FiniteElementData<dim>::Conformity(
               total_conformity & fes[index]->conforming_space);
       }
-
-      std::vector<unsigned int> dpo;
-      dpo.push_back(multiplied_dofs_per_vertex);
-      dpo.push_back(multiplied_dofs_per_line);
-      if (dim > 1)
-        dpo.push_back(multiplied_dofs_per_quad);
-      if (dim > 2)
-        dpo.push_back(multiplied_dofs_per_hex);
 
       BlockIndices block_indices(0, 0);
 
@@ -2458,8 +2489,7 @@ namespace FETools
                     // find sub-quadrature
                     position = name.find('(');
                     const std::string subquadrature_name(name, 0, position);
-                    AssertThrow(subquadrature_name == "QTrapez" ||
-                                  subquadrature_name == "QTrapezoid",
+                    AssertThrow(subquadrature_name == "QTrapezoid",
                                 ExcNotImplemented(
                                   "Could not detect quadrature of name " +
                                   subquadrature_name));

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -123,32 +123,20 @@ namespace TriangulationDescription
             const auto other_rank_index =
               std::distance(relevant_processes.begin(), ptr);
 
-            return dealii::Utilities::pack(description_temp[other_rank_index],
-                                           false);
+            return description_temp[other_rank_index];
           };
 
-          const auto answer_request = [&](const unsigned int,
-                                          const std::vector<char> &request) {
-            this->merge(
-              dealii::Utilities::unpack<DescriptionTemp<dim, spacedim>>(request,
-                                                                        false),
-              vertices_have_unique_ids);
-            return std::vector<char>();
-          };
+          const auto process_request =
+            [&](const unsigned int,
+                const DescriptionTemp<dim, spacedim> &request) {
+              this->merge(request, vertices_have_unique_ids);
+            };
 
-          const auto process_answer = [](const unsigned int,
-                                         const std::vector<char> &answer) {
-            (void)answer;
-            Assert(answer.size() == 0, ExcInternalError());
-          };
-
-
-          dealii::Utilities::MPI::ConsensusAlgorithms::Selector<char, char>()
-            .run(relevant_processes,
-                 create_request,
-                 answer_request,
-                 process_answer,
-                 comm);
+          dealii::Utilities::MPI::ConsensusAlgorithms::selector<
+            DescriptionTemp<dim, spacedim>>(relevant_processes,
+                                            create_request,
+                                            process_request,
+                                            comm);
         }
 
         /**
@@ -397,12 +385,13 @@ namespace TriangulationDescription
        */
       template <int dim, int spacedim>
       void
-      set_user_flag_and_of_its_parents(
-        const TriaIterator<CellAccessor<dim, spacedim>> &cell)
+      mark_cell_and_its_parents(
+        const TriaIterator<CellAccessor<dim, spacedim>> &cell,
+        std::vector<std::vector<bool>> &                 cell_marked)
       {
-        cell->set_user_flag();
+        cell_marked[cell->level()][cell->index()] = true;
         if (cell->level() != 0)
-          set_user_flag_and_of_its_parents(cell->parent());
+          mark_cell_and_its_parents(cell->parent(), cell_marked);
       }
 
       /**
@@ -478,16 +467,12 @@ namespace TriangulationDescription
                   }
               };
 
-          // 1) collect locally relevant cells (set user_flag)
-          std::vector<bool> old_user_flags;
-          tria.save_user_flags(old_user_flags);
+          // 1) loop over levels (from fine to coarse) and mark on each level
+          //    the locally relevant cells
+          std::vector<std::vector<bool>> cell_marked(tria.n_levels());
+          for (unsigned int l = 0; l < tria.n_levels(); ++l)
+            cell_marked[l].resize(tria.n_raw_cells(l));
 
-          // 1a) clear user_flags
-          const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
-            .clear_user_flags();
-
-          // 1b) loop over levels (from fine to coarse) and mark on each level
-          //     the locally relevant cells
           for (int level = tria.get_triangulation().n_global_levels() - 1;
                level >= 0;
                --level)
@@ -521,7 +506,7 @@ namespace TriangulationDescription
               // mark all locally relevant cells
               for (const auto &cell : tria.cell_iterators_on_level(level))
                 if (is_locally_relevant_on_level(cell))
-                  set_user_flag_and_of_its_parents(cell);
+                  mark_cell_and_its_parents(cell, cell_marked);
             }
 
           // 2) set_up coarse-grid triangulation
@@ -532,7 +517,7 @@ namespace TriangulationDescription
             // a) loop over all cells
             for (const auto &cell : tria.cell_iterators_on_level(0))
               {
-                if (!cell->user_flag_set())
+                if (!cell_marked[cell->level()][cell->index()])
                   continue;
 
                 // extract cell definition (with old numbering of vertices)
@@ -609,7 +594,7 @@ namespace TriangulationDescription
               for (const auto &cell : tria.cell_iterators_on_level(level))
                 {
                   // check if cell is locally relevant
-                  if (!(cell->user_flag_set()))
+                  if (!cell_marked[cell->level()][cell->index()])
                     continue;
 
                   CellData<dim> cell_info;
@@ -669,9 +654,6 @@ namespace TriangulationDescription
                   level_cell_infos.emplace_back(cell_info);
                 }
             }
-
-          const_cast<dealii::Triangulation<dim, spacedim> &>(tria)
-            .load_user_flags(old_user_flags);
 
           return construction_data;
         }

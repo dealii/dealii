@@ -174,7 +174,7 @@ namespace Algorithms
     double start_val;
 
     /**
-     *The end of the time interval.
+     * The end of the time interval.
      */
     double final_val;
 

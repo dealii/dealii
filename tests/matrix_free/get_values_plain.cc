@@ -141,7 +141,7 @@ do_test(const DoFHandler<dim> &          dof,
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.store_plain_indices   = true;
-    mf_data.reinit(dof, constraints, quad, data);
+    mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
   MatrixFreeTest<dim, fe_degree, fe_degree + 1, number> mf(mf_data);

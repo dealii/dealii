@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -153,7 +153,8 @@ test()
 
       AffineConstraints<double> dummy;
       dummy.close();
-      data.reinit(dof_handler, dummy, quadrature, additional_data);
+      data.reinit(
+        MappingQ1<dim>{}, dof_handler, dummy, quadrature, additional_data);
 
       using VectorType = LinearAlgebra::distributed::Vector<double>;
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2020 by the deal.II authors
+// Copyright (C) 1999 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -118,7 +118,7 @@ namespace internal
  * small to be seen individually) or because you only want to see a certain
  * region of the domain (for example only in the fluid part of the domain in
  * step-46), or for some other reason.
-
+ *
  * For this, internally build_patches() does not generate the sequence of cells
  * to be converted into patches itself, but relies on the two private
  * std::function objects first_cell_function() and next_cell_function(). By
@@ -450,17 +450,6 @@ private:
     const unsigned int     n_subdivisions,
     const CurvedCellRegion curved_cell_region);
 };
-
-namespace Legacy
-{
-  /**
-   * @deprecated Use dealii::DataOut without the DoFHandlerType template
-   * instead.
-   */
-  template <int dim, typename DoFHandlerType = DoFHandler<dim>>
-  using DataOut DEAL_II_DEPRECATED =
-    dealii::DataOut<dim, DoFHandlerType::space_dimension>;
-} // namespace Legacy
 
 
 DEAL_II_NAMESPACE_CLOSE

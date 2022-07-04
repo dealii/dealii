@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2021 by the deal.II authors
+// Copyright (C) 2014 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,11 +60,14 @@ public:
     : n_calls_vmult(0)
   {}
 
-  ~LaplaceOperator()
+  void
+  print_n_calls_special()
   {
+    // round number of calls to make test more robust
     if (n_calls_vmult > 0)
-      deallog << "Number of calls to special vmult for Operator of size " << m()
-              << ": " << n_calls_vmult << std::endl;
+      deallog
+        << "Approx. number of calls to special vmult for Operator of size "
+        << m() << ": " << (n_calls_vmult + 5) / 10 * 10 << std::endl;
   }
 
   void
@@ -153,8 +156,6 @@ public:
                    src,
                    operation_before_loop,
                    operation_after_loop);
-    for (unsigned int i : data.get_constrained_dofs())
-      dst.local_element(i) = src.local_element(i);
   }
 
   void
@@ -342,11 +343,10 @@ do_test(const DoFHandler<dim> &dof)
   deallog << std::endl;
   deallog << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
-  const unsigned int           fe_degree = dof.get_fe().degree;
-  MappingQ<dim>                mapping(fe_degree + 1);
-  LaplaceOperator<dim, double> fine_matrix;
-  std::set<types::boundary_id> dirichlet_boundaries;
-  dirichlet_boundaries.insert(0);
+  const unsigned int                 fe_degree = dof.get_fe().degree;
+  MappingQ<dim>                      mapping(fe_degree + 1);
+  LaplaceOperator<dim, double>       fine_matrix;
+  const std::set<types::boundary_id> dirichlet_boundaries = {0};
   fine_matrix.initialize(mapping, dof, dirichlet_boundaries);
 
   LinearAlgebra::distributed::Vector<double> in, sol;
@@ -399,8 +399,8 @@ do_test(const DoFHandler<dim> &dof)
        ++level)
     {
       smoother_data[level].smoothing_range     = 15.;
-      smoother_data[level].degree              = 5;
-      smoother_data[level].eig_cg_n_iterations = 15;
+      smoother_data[level].degree              = 4;
+      smoother_data[level].eig_cg_n_iterations = 10;
       auto preconditioner                      = std::make_shared<
         DiagonalMatrix<LinearAlgebra::distributed::Vector<number>>>();
       preconditioner->reinit(mg_matrices[level].get_matrix_diagonal_inverse());
@@ -423,10 +423,22 @@ do_test(const DoFHandler<dim> &dof)
   {
     // avoid output from inner (coarse-level) solver
     deallog.depth_file(2);
-    ReductionControl control(30, 1e-20, 1e-7);
+
+    // Require a fixed number of iterations rather than a tolerance, in order
+    // to make output more stable
+    IterationNumberControl control(6, 1e-15);
+
     SolverCG<LinearAlgebra::distributed::Vector<double>> solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
+
+  // Print statistics
+  for (unsigned int level = 0;
+       level < dof.get_triangulation().n_global_levels();
+       ++level)
+    mg_matrices[level].print_n_calls_special();
+
+  fine_matrix.print_n_calls_special();
 }
 
 
@@ -435,7 +447,7 @@ template <int dim, typename number>
 void
 test(const unsigned int fe_degree)
 {
-  for (unsigned int i = 5; i < 7; ++i)
+  for (unsigned int i = 6; i < 8; ++i)
     {
       parallel::distributed::Triangulation<dim> tria(
         MPI_COMM_WORLD,

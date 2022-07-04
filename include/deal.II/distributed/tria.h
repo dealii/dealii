@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// Copyright (C) 2008 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -639,7 +639,7 @@ namespace parallel
        *
        * @deprecated The autopartition parameter has been removed.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       virtual void
       load(const std::string &filename, const bool autopartition) override;
 
@@ -906,7 +906,7 @@ namespace parallel
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       virtual void
       load(const std::string &filename, const bool autopartition) override;
 
@@ -1062,7 +1062,7 @@ namespace parallel
        * Dummy replacement to allow for better error messages when compiling
        * this class.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       virtual void
       load(const std::string & /*filename*/,
            const bool /*autopartition*/) override
@@ -1099,7 +1099,7 @@ namespace parallel
      * combination with the Triangulation::Signals::post_p4est_refinement
      * signal. At this stage, the p4est oracle already has been refined, but
      * the triangulation is still unchanged. After the modification, all
-     * refine and coarsen flags describe how the traingulation will actually
+     * refine and coarsen flags describe how the triangulation will actually
      * be refined.
      *
      * The use of this class is demonstrated in step-75.

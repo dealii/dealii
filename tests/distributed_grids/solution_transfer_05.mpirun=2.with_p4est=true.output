@@ -1,0 +1,19 @@
+
+Process #0
+Local range: [0, 9), global size: 11
+Vector data:
+5.000e-01 5.000e-01 5.000e-01 5.000e-01 5.000e-01 1.000e-01 5.000e-01 5.000e-01 5.000e-01 
+Process #0
+Local range: [0, 9), global size: 15
+Vector data:
+5.000e-01 5.000e-01 5.000e-01 5.000e-01 5.000e-01 3.000e-01 5.000e-01 5.000e-01 5.000e-01 
+
+Process #1
+Local range: [9, 11), global size: 11
+Vector data:
+5.000e-01 5.000e-01 
+Process #1
+Local range: [9, 15), global size: 15
+Vector data:
+5.000e-01 5.000e-01 5.000e-01 5.000e-01 5.000e-01 5.000e-01 
+

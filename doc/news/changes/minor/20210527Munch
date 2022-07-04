@@ -1,4 +1,0 @@
-New: The new function Utilities::MPI::reduce() allows to reduce 
-arbitrary types with a user-specified binary operation.
-<br>
-(Peter Munch, 2021/05/27)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,7 @@ test(const unsigned int degree)
 
   const std::vector<Point<dim>> evaluation_points =
     dim == 3 ? QGauss<dim>(2).get_points() :
-               QIterated<dim>(QTrapez<1>(), 3).get_points();
+               QIterated<dim>(QTrapezoid<1>(), 3).get_points();
 
   deallog << "Evaluate in " << dim << "d with polynomial degree " << degree
           << std::endl;

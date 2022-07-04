@@ -1,0 +1,22 @@
+
+DEAL:1D::ReferenceCell: Line
+DEAL:1D::  computed barycenter = 0.500000
+DEAL:1D::  self-reported barycenter = 0.500000
+DEAL:2D::ReferenceCell: Quad
+DEAL:2D::  computed barycenter = 0.500000 0.500000
+DEAL:2D::  self-reported barycenter = 0.500000 0.500000
+DEAL:2D::ReferenceCell: Tri
+DEAL:2D::  computed barycenter = 0.333333 0.333333
+DEAL:2D::  self-reported barycenter = 0.333333 0.333333
+DEAL:3D::ReferenceCell: Tet
+DEAL:3D::  computed barycenter = 0.250000 0.250000 0.250000
+DEAL:3D::  self-reported barycenter = 0.250000 0.250000 0.250000
+DEAL:3D::ReferenceCell: Pyramid
+DEAL:3D::  computed barycenter = 0 0 0.250000
+DEAL:3D::  self-reported barycenter = 0.00000 0.00000 0.250000
+DEAL:3D::ReferenceCell: Wedge
+DEAL:3D::  computed barycenter = 0.333333 0.333333 0.500000
+DEAL:3D::  self-reported barycenter = 0.333333 0.333333 0.500000
+DEAL:3D::ReferenceCell: Hex
+DEAL:3D::  computed barycenter = 0.500000 0.500000 0.500000
+DEAL:3D::  self-reported barycenter = 0.500000 0.500000 0.500000

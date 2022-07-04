@@ -1,5 +1,0 @@
-Addes conformity tests for several vector elements
-in 2D/3D as well as minor fixes for 2d Nedelec and
-Raviart-Thomas to make them work on non-standard meshes.
-<br>
-(Konrad Simon, 2021/05/08)

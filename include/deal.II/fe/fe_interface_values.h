@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,7 @@ namespace FEInterfaceViews
   public:
     /**
      * The constructor.
-     **/
+     */
     Base(const FEInterfaceValues<dim, spacedim> &fe_interface);
 
   protected:

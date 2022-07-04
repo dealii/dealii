@@ -2,12 +2,12 @@ set Final time                        = 2.0
 set Initial time                      = 0
 set Time interval between each output = 0.1
 subsection Error control
-  set Absolute error tolerance = 0.000001
-  set Relative error tolerance = 0.000010
+  set Absolute error tolerance = 1e-8
+  set Relative error tolerance = 1e-8
 end
 subsection Running parameters
-  set Initial step size                      = 0.010000
+  set Initial step size                      = 1e-6
   set Maximum number of nonlinear iterations = 10
   set Maximum order of ARK                   = 5
-  set Minimum step size                      = 0.000001
+  set Minimum step size                      = 1e-7
 end

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2021 by the deal.II authors
+// Copyright (C) 2021 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -471,7 +471,7 @@ namespace NonMatching
         const AdditionalQGeneratorData &additional_data,
         QPartitioning<dim> &            q_partitioning)
       {
-        // Make this int to avoid a warning signed/unsigned comparision.
+        // Make this int to avoid a warning signed/unsigned comparison.
         const int n_roots = roots.size();
 
         // The number of intervals are roots.size() + 1
@@ -1007,7 +1007,7 @@ namespace NonMatching
         if (height_direction_data)
           return height_direction_data->direction;
 
-        // We have to choose some direction, we might aswell take 0.
+        // We have to choose some direction, we might as well take 0.
         return 0;
       }
 
@@ -1277,6 +1277,10 @@ namespace NonMatching
       DeclExceptionMsg(
         ExcCellNotSet,
         "The set_active_cell function has to be called before calling this function.");
+
+      DeclExceptionMsg(
+        ExcReferenceCellNotHypercube,
+        "The reference cell of the incoming cell must be a hypercube.");
 
 
       /**
@@ -1653,8 +1657,8 @@ namespace NonMatching
     Assert(
       q_generator.get_quadratures().indefinite.size() == 0,
       ExcMessage(
-        "Generation of quadrature rules failed. This can mean that the level"
-        "set function is degenerate in some way, e.g. oscillating extremely"
+        "Generation of quadrature rules failed. This can mean that the level "
+        "set function is degenerate in some way, e.g. oscillating extremely "
         "rapidly."));
   }
 
@@ -1891,6 +1895,10 @@ namespace NonMatching
   DiscreteQuadratureGenerator<dim>::generate(
     const typename Triangulation<dim>::active_cell_iterator &cell)
   {
+    Assert(cell->reference_cell().is_hyper_cube(),
+           internal::DiscreteQuadratureGeneratorImplementation::
+             ExcReferenceCellNotHypercube());
+
     reference_space_level_set->set_active_cell(cell);
     const BoundingBox<dim> unit_box = create_unit_bounding_box<dim>();
     QuadratureGenerator<dim>::generate(*reference_space_level_set, unit_box);
@@ -1921,6 +1929,10 @@ namespace NonMatching
     const typename Triangulation<dim>::active_cell_iterator &cell,
     const unsigned int                                       face_index)
   {
+    Assert(cell->reference_cell().is_hyper_cube(),
+           internal::DiscreteQuadratureGeneratorImplementation::
+             ExcReferenceCellNotHypercube());
+
     reference_space_level_set->set_active_cell(cell);
     const BoundingBox<dim> unit_box = create_unit_bounding_box<dim>();
     FaceQuadratureGenerator<dim>::generate(*reference_space_level_set,

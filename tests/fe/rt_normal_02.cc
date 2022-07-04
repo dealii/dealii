@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2020 by the deal.II authors
+// Copyright (C) 2003 - 2021 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,7 +65,8 @@ EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
   // This quadrature rule determines the points, where the
   // continuity will be tested.
   QGauss<1>     quad(6);
-  Quadrature<2> qproject = QProjector<2>::project_to_all_faces(quad);
+  Quadrature<2> qproject =
+    QProjector<2>::project_to_all_faces(ReferenceCells::Quadrilateral, quad);
 
   FEFaceValues<2> fe_v_face(
     dof_handler->get_fe(),
@@ -107,12 +108,13 @@ EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
           if (!cell->face(f)->at_boundary())
             {
               const QProjector<2>::DataSetDescriptor offset =
-                (QProjector<2>::DataSetDescriptor::face(f,
-                                                        cell->face_orientation(
-                                                          f),
-                                                        cell->face_flip(f),
-                                                        cell->face_rotation(f),
-                                                        quad.size()));
+                (QProjector<2>::DataSetDescriptor::face(
+                  ReferenceCells::Quadrilateral,
+                  f,
+                  cell->face_orientation(f),
+                  cell->face_flip(f),
+                  cell->face_rotation(f),
+                  quad.size()));
               fe_v_face.reinit(cell, f);
 
               DoFHandler<2>::active_cell_iterator cell_n = cell->neighbor(f);
@@ -121,6 +123,7 @@ EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
 
               const QProjector<2>::DataSetDescriptor offset_n =
                 (QProjector<2>::DataSetDescriptor::face(
+                  ReferenceCells::Quadrilateral,
                   neighbor,
                   cell_n->face_orientation(neighbor),
                   cell_n->face_flip(neighbor),

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// Copyright (C) 2010 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,7 +88,6 @@ main()
   // get the interpolated solution
   // back
   Vector<double> tmp(dh.n_dofs());
-  tmp = 2;
   soltrans.interpolate(solution, tmp);
 
   deallog << "New values:" << std::endl;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -266,7 +266,7 @@ namespace parallel
        *
        * @deprecated The autopartition parameter has been removed.
        */
-      DEAL_II_DEPRECATED_EARLY
+      DEAL_II_DEPRECATED
       virtual void
       load(const std::string &filename, const bool autopartition) override;
 

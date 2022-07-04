@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -167,6 +167,35 @@ namespace Functions
 
 
     template <int dim>
+    Tensor<1, dim>
+    Ellipsoid<dim>::gradient(const Point<dim> & point,
+                             const unsigned int component) const
+    {
+      AssertIndexRange(component, this->n_components);
+      (void)component;
+
+      Tensor<1, dim> grad;
+      if (dim == 1)
+        grad = point - center;
+      else if (dim == 2)
+        {
+          const Point<dim> point_in_centered_coordinate_system =
+            Point<dim>(compute_closest_point_ellipse(point) - center);
+          grad = compute_analyical_normal_vector_on_ellipse(
+            point_in_centered_coordinate_system);
+        }
+      else
+        AssertThrow(false, ExcNotImplemented());
+
+      if (grad.norm() > 1e-12)
+        return grad / grad.norm();
+      else
+        return grad;
+    }
+
+
+
+    template <int dim>
     double
     Ellipsoid<dim>::evaluate_ellipsoid(const Point<dim> &point) const
     {
@@ -179,15 +208,10 @@ namespace Functions
 
 
     template <int dim>
-    double
-    Ellipsoid<dim>::compute_signed_distance_ellipse(
-      const Point<dim> &point) const
+    Point<dim>
+    Ellipsoid<dim>::compute_closest_point_ellipse(const Point<dim> &point) const
     {
       AssertDimension(dim, 2);
-
-      // point corresponds to center
-      if (point.distance(center) < tolerance)
-        return *std::min_element(radii.begin(), radii.end()) * -1.;
 
       /*
        * Function to compute the closest point on an ellipse (adopted from
@@ -204,8 +228,10 @@ namespace Functions
        * 4. Repeat 2.-4. until convergence.
        */
       // get equivalent point in first quadrant of centered ellipse
-      const double px = std::abs(point[0] - center[0]);
-      const double py = std::abs(point[1] - center[1]);
+      const double px      = std::abs(point[0] - center[0]);
+      const double py      = std::abs(point[1] - center[1]);
+      const double sign_px = std::copysign(1.0, point[0] - center[0]);
+      const double sign_py = std::copysign(1.0, point[1] - center[1]);
       // get semi axes radii
       const double &a = radii[0];
       const double &b = radii[1];
@@ -245,7 +271,61 @@ namespace Functions
       while (std::abs(delta_t) > tolerance && iter < max_iter);
       AssertIndexRange(iter, max_iter);
 
-      const double distance = std::hypot(x - px, y - py);
+      AssertIsFinite(x);
+      AssertIsFinite(y);
+
+      return center + Point<dim>(sign_px * x, sign_py * y);
+    }
+
+
+
+    template <int dim>
+    Tensor<1, dim, double>
+    Ellipsoid<dim>::compute_analyical_normal_vector_on_ellipse(
+      const Point<dim> &) const
+    {
+      AssertThrow(false, ExcNotImplemented());
+      return Tensor<1, dim, double>();
+    }
+
+
+
+    template <>
+    Tensor<1, 2, double>
+    Ellipsoid<2>::compute_analyical_normal_vector_on_ellipse(
+      const Point<2> &point) const
+    {
+      const auto &a = radii[0];
+      const auto &b = radii[1];
+      const auto &x = point[0];
+      const auto &y = point[1];
+      return Tensor<1, 2, double>({b * x / a, a * y / b});
+    }
+
+
+
+    template <int dim>
+    double
+    Ellipsoid<dim>::compute_signed_distance_ellipse(const Point<dim> &) const
+    {
+      AssertThrow(false, ExcNotImplemented());
+      return 0;
+    }
+
+
+
+    template <>
+    double
+    Ellipsoid<2>::compute_signed_distance_ellipse(const Point<2> &point) const
+    {
+      // point corresponds to center
+      if (point.distance(center) < tolerance)
+        return *std::min_element(radii.begin(), radii.end()) * -1.;
+
+      const Point<2> &closest_point = compute_closest_point_ellipse(point);
+
+      const double distance =
+        std::hypot(closest_point[0] - point[0], closest_point[1] - point[1]);
 
       return evaluate_ellipsoid(point) < 0.0 ? -distance : distance;
     }

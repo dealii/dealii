@@ -1,6 +1,0 @@
-Fixed: Exceptions thrown via `AssertThrow` did not have a stacktrace
-attached to them, unlike exceptions thrown with `Assert`. This is now
-fixed.
-<br>
-(Wolfgang Bangerth, Paras Kumar, 2021/08/20)
-

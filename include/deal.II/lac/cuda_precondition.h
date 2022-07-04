@@ -288,7 +288,7 @@ namespace CUDAWrappers
     {
       /**
        * Constructor. cuSPARSE allows to compute and use level information.
-       *  to the documentation this might improve performance.
+       * to the documentation this might improve performance.
        * It is suggested to try both options.
        */
       AdditionalData(bool use_level_analysis = true);

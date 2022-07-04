@@ -361,7 +361,7 @@ do.
 
 <h3>Who are Courant, Friedrichs, and Lewy?</h3>
 
-One of the reasons why the wave equation is nasty to solve numerically is that
+One of the reasons why the wave equation is not easy to solve numerically is that
 explicit time discretizations are only stable if the time step is small
 enough. In particular, it is coupled to the spatial mesh width $h$. For the
 lowest order discretization we use here, the relationship reads
