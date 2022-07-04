@@ -65,21 +65,7 @@ generate_grid(Triangulation<2> &triangulation)
 
   // tolerance 0. to ensure vertices are not merged
   GridGenerator::merge_triangulations(
-    triangulation1, triangulation2, triangulation, 0., false);
-
-  // make sure boundary ids are kept
-  std::vector<types::boundary_id> boundary_ids;
-  for (const auto &face : triangulation1.active_face_iterators())
-    if (face->at_boundary())
-      boundary_ids.emplace_back(face->boundary_id());
-  for (const auto &face : triangulation2.active_face_iterators())
-    if (face->at_boundary())
-      boundary_ids.emplace_back(face->boundary_id());
-
-  unsigned int i = 0;
-  for (const auto &face : triangulation.active_face_iterators())
-    if (face->at_boundary())
-      face->set_boundary_id(boundary_ids[i++]);
+    triangulation1, triangulation2, triangulation, 0., false, true);
 }
 
 std::vector<unsigned int>
