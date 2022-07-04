@@ -2853,15 +2853,51 @@ namespace GridTools
     bool found_cell  = false;
     bool approx_cell = false;
 
-    unsigned int        closest_vertex_index = 0;
+    unsigned int closest_vertex_index = 0;
+    // ensure closest vertex index is a marked one, otherwise cell (with vertex
+    // 0) might be found even though it is not marked. This is only relevant if
+    // searching with rtree, using find_closest_vertex already can manage not
+    // finding points
+    if (marked_vertices.size() && !used_vertices_rtree.empty())
+      {
+        const auto itr =
+          std::find(marked_vertices.begin(), marked_vertices.end(), true);
+        Assert(itr != marked_vertices.end(),
+               dealii::ExcMessage("No vertex has been marked!"));
+        closest_vertex_index = std::distance(marked_vertices.begin(), itr);
+      }
+
     Tensor<1, spacedim> vertex_to_point;
     auto                current_cell = cell_hint;
+
+    // check whether cell has at least one marked vertex
+    const auto cell_marked = [&mesh, &marked_vertices](const auto &cell) {
+      if (marked_vertices.size() == 0)
+        return true;
+
+      if (cell != mesh.active_cell_iterators().end())
+        for (unsigned int i = 0; i < cell->n_vertices(); ++i)
+          if (marked_vertices[cell->vertex_index(i)])
+            return true;
+
+      return false;
+    };
+
+    // check whether any cell in collection is marked
+    const auto any_cell_marked = [&cell_marked](const auto &cells) {
+      return std::any_of(cells.begin(),
+                         cells.end(),
+                         [&cell_marked](const auto &cell) {
+                           return cell_marked(cell);
+                         });
+    };
 
     while (found_cell == false)
       {
         // First look at the vertices of the cell cell_hint. If it's an
         // invalid cell, then query for the closest global vertex
-        if (current_cell.state() == IteratorState::valid)
+        if (current_cell.state() == IteratorState::valid &&
+            cell_marked(cell_hint))
           {
             const auto cell_vertices = mapping.get_vertices(current_cell);
             const unsigned int closest_vertex =
@@ -2891,9 +2927,14 @@ namespace GridTools
                     boost::geometry::index::satisfies(marked),
                   std::back_inserter(res));
 
-                // We should have one and only one result
-                AssertDimension(res.size(), 1);
-                closest_vertex_index = res[0].second;
+                // Searching for a point which is located outside the
+                // triangulation results in res.size() = 0
+                Assert(res.size() < 2,
+                       dealii::ExcMessage("There can not be multiple results"));
+
+                if (res.size() > 0)
+                  if (any_cell_marked(vertex_to_cells[res[0].second]))
+                    closest_vertex_index = res[0].second;
               }
             else
               {
@@ -2902,6 +2943,14 @@ namespace GridTools
               }
             vertex_to_point = p - mesh.get_vertices()[closest_vertex_index];
           }
+
+#ifdef DEBUG
+        {
+          // Double-check if found index is at marked cell
+          Assert(any_cell_marked(vertex_to_cells[closest_vertex_index]),
+                 dealii::ExcMessage("Found non-marked vertex"));
+        }
+#endif
 
         const double vertex_point_norm = vertex_to_point.norm();
         if (vertex_point_norm > 0)
