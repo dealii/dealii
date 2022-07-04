@@ -959,7 +959,18 @@ namespace PETScWrappers
 
   /**
    * A class that implements the interface to use the BDDC preconditioner from
-   * PETSc.
+   * PETSc (<a
+   * href="https://petsc.org/release/docs/manualpages/PC/PCBDDC.html">PCBDDC</a>),
+   * which is a two-level, substructuring, non-overlapping domain decomposition
+   * preconditioner. Details of the implementation can be found in "S Zampini,
+   * SISC (2016)". It mainly consists of two elements:
+   *
+   * <ul>
+   *   <li> Local solvers: Solvers for each subdomain. These are performed concurrently by each processor
+   *   <li> A coarse solver: Continuity between each subdomain is imposed in a small number of DoFs, referred to as <em>primal DoFs</em>. This solver solves such problem.
+   * </ul>
+   *
+   * The size of the primal space is determined through the @p AdditionalData parameters.
    *
    * @ingroup PETScWrappers
    */
@@ -977,28 +988,30 @@ namespace PETScWrappers
        * than what is exposed here.
        */
       AdditionalData(const bool                    use_vertices = true,
-                     const bool                    use_edges_    = false,
-                     const bool                    use_faces_    = false,
-                     const bool                    symmetric_    = false,
-                     const unsigned int            coords_cdim_  = 0,
-                     const types::global_dof_index coords_n_     = 0,
-                     const PetscReal *             coords_data_  = nullptr);
+                     const bool                    use_edges_   = false,
+                     const bool                    use_faces_   = false,
+                     const bool                    symmetric_   = false,
+                     const unsigned int            coords_cdim_ = 0,
+                     const types::global_dof_index coords_n_    = 0,
+                     const PetscReal *             coords_data_ = nullptr);
 
       /**
        * This flag sets the use of degrees of freedom in the vertices of the
-       * subdomain as primal variables.
+       * subdomains as primal variables for the creation of the coarse space.
        */
       bool use_vertices;
 
       /**
        * This flag sets the use of degrees of freedom in the edges of the
-       * subdomain as primal variables.
+       * subdomain as primal variables for the creation of the coarse space.
+       * Continuity is actually imposed at the edge average.
        */
       bool use_edges;
 
       /**
        * This flag sets the use of degrees of freedom in the faces of the
-       * subdomain as primal variables.
+       * subdomain as primal variables for the creation of the coarse space.
+       * Continuity is actually imposed at the face average.
        */
       bool use_faces;
 
@@ -1008,12 +1021,21 @@ namespace PETScWrappers
       bool symmetric;
 
       /**
-       * Support for H1 problems
+       * Set the number of coordinates that each DoF has, i.e. 2 in 2D and 3 in
+       * 3D.
        */
-      unsigned int            coords_cdim;
+      unsigned int coords_cdim;
+
+      /**
+       * Set the number of degrees of freedom that the problem has.
+       */
       types::global_dof_index coords_n;
-      const PetscReal
-        *coords_data; /* not referenced, consumed at initialize time */
+
+      /**
+       * Set the location of each DoF. This helps in improving the definition of
+       * the vertices for unstructured meshes.
+       */
+      const PetscReal *coords_data;
     };
 
     /**

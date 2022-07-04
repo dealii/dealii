@@ -473,6 +473,7 @@ namespace PETScWrappers
             std::to_string(col_owners) + ")"));
       }
 #  endif
+      PetscErrorCode ierr;
 
       // create the local to global mappings as arrays.
       IndexSet::size_type n_l2g_row = local_active_rows.n_elements();
@@ -493,39 +494,51 @@ namespace PETScWrappers
       IS is_glob_row, is_glob_col;
       // Create row index set
       ISLocalToGlobalMapping l2gmap_row;
-      ISCreateGeneral(communicator,
-                      n_l2g_row,
-                      idx_glob_row.data(),
-                      PETSC_COPY_VALUES,
-                      &is_glob_row);
-      ISLocalToGlobalMappingCreateIS(is_glob_row, &l2gmap_row);
-      ISDestroy(&is_glob_row);
-      ISLocalToGlobalMappingViewFromOptions(l2gmap_row, NULL, "-view_map");
+      ierr = ISCreateGeneral(communicator,
+                             n_l2g_row,
+                             idx_glob_row.data(),
+                             PETSC_COPY_VALUES,
+                             &is_glob_row);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      ierr = ISLocalToGlobalMappingCreateIS(is_glob_row, &l2gmap_row);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      ierr = ISDestroy(&is_glob_row);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      ierr =
+        ISLocalToGlobalMappingViewFromOptions(l2gmap_row, NULL, "-view_map");
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       // Create column index set
       ISLocalToGlobalMapping l2gmap_col;
-      ISCreateGeneral(communicator,
-                      n_l2g_col,
-                      idx_glob_col.data(),
-                      PETSC_COPY_VALUES,
-                      &is_glob_col);
-      ISLocalToGlobalMappingCreateIS(is_glob_col, &l2gmap_col);
-      ISDestroy(&is_glob_col);
-      ISLocalToGlobalMappingViewFromOptions(l2gmap_col, NULL, "-view_map");
+      ierr = ISCreateGeneral(communicator,
+                             n_l2g_col,
+                             idx_glob_col.data(),
+                             PETSC_COPY_VALUES,
+                             &is_glob_col);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      ierr = ISLocalToGlobalMappingCreateIS(is_glob_col, &l2gmap_col);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      ierr = ISDestroy(&is_glob_col);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      ierr =
+        ISLocalToGlobalMappingViewFromOptions(l2gmap_col, NULL, "-view_map");
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       // create the matrix with the IS constructor.
-      PetscErrorCode ierr = MatCreateIS(communicator,
-                                        1,
-                                        local_rows.n_elements(),
-                                        local_columns.n_elements(),
-                                        sparsity_pattern.n_rows(),
-                                        sparsity_pattern.n_cols(),
-                                        l2gmap_row,
-                                        l2gmap_col,
-                                        &matrix);
+      ierr = MatCreateIS(communicator,
+                         1,
+                         local_rows.n_elements(),
+                         local_columns.n_elements(),
+                         sparsity_pattern.n_rows(),
+                         sparsity_pattern.n_cols(),
+                         l2gmap_row,
+                         l2gmap_col,
+                         &matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
-      ISLocalToGlobalMappingDestroy(&l2gmap_row);
-      ISLocalToGlobalMappingDestroy(&l2gmap_col);
+      ierr = ISLocalToGlobalMappingDestroy(&l2gmap_row);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      ierr = ISLocalToGlobalMappingDestroy(&l2gmap_col);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       // next preset the exact given matrix
       // entries with zeros. This doesn't avoid any
@@ -542,10 +555,12 @@ namespace PETScWrappers
 
       // In the MATIS case, we use the local matrix instead
       Mat local_matrix;
-      MatISGetLocalMat(matrix, &local_matrix);
-      MatSetType(local_matrix,
-                 MATSEQAIJ); // SEQ as it is local! TODO: Allow for OpenMP
-                             // parallelization in local node.
+      ierr = MatISGetLocalMat(matrix, &local_matrix);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      ierr = MatSetType(local_matrix,
+                        MATSEQAIJ); // SEQ as it is local! TODO: Allow for
+                                    // OpenMP parallelization in local node.
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
       if (local_rows.n_elements() > 0)
         {
           // MatSEQAIJSetPreallocationCSR
@@ -621,7 +636,8 @@ namespace PETScWrappers
         close_matrix(local_matrix);
         set_keep_zero_rows(local_matrix);
       }
-      MatISRestoreLocalMat(matrix, &local_matrix);
+      ierr = MatISRestoreLocalMat(matrix, &local_matrix);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
 
 #  ifndef DOXYGEN
