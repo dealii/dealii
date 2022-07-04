@@ -635,7 +635,7 @@ namespace PETScWrappers
                 const SparsityPatternType &sparsity_pattern);
 
       /**
-       * Same as previous functions, but here we consider active dofs for MATIS.
+       * Same as previous functions, but here we consider active dofs for matrices of IS type.
        */
       template <typename SparsityPatternType>
       void
