@@ -18,7 +18,8 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 
 SET(_src
-surface_mesh.cc
+  surface_mesh.cc
+  intersections.cc
 )
 
 
