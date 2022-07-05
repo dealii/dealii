@@ -55,12 +55,21 @@ is_cartesian(const CellType &cell)
   if (!cell->reference_cell().is_hyper_cube())
     return false;
 
-  const double tolerance    = 1e-14 * cell->diameter();
-  const auto   bounding_box = cell->bounding_box();
+  const double tolerance         = 1e-14;
+  const auto   bounding_box      = cell->bounding_box();
+  const auto & bounding_vertices = bounding_box.get_boundary_points();
+  const auto   cell_measure =
+    bounding_vertices.first.distance_square(bounding_vertices.second);
 
   for (const unsigned int v : cell->vertex_indices())
-    if (cell->vertex(v).distance(bounding_box.vertex(v)) > tolerance)
-      return false;
+    {
+      const double vertex_tolerance =
+        tolerance * std::max(cell->vertex(v).norm_square(), cell_measure);
+
+      if (cell->vertex(v).distance_square(bounding_box.vertex(v)) >
+          vertex_tolerance)
+        return false;
+    }
 
   return true;
 }
