@@ -642,6 +642,23 @@ public:
   Quadrature<spacedim>
   compute_affine_transformation(
     const std::array<Point<spacedim>, dim + 1> &vertices) const;
+
+  /**
+   *
+   * Given a partition of a cell into simplices, this function creates a
+   * quadrature rule on the cell by collecting Quadrature objects on each
+   * simplex. A simplex is identified by its vertices, which are stored into an
+   * array of Points. Hence, this function can provide quadrature rules on
+   * polygons (or polyhedra), as they can be split into simplices.
+   *
+   *
+   * @param simplices A std::vector where each entry is an array of `dim+1` points, which identifies the vertices of a simplex.
+   * @return A Quadrature object on the cell.
+   */
+  template <int spacedim = dim>
+  Quadrature<spacedim>
+  mapped_quadrature(
+    const std::vector<std::array<Point<spacedim>, dim + 1>> &simplices) const;
 };
 
 /**
