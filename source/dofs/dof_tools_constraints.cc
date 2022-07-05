@@ -2298,14 +2298,6 @@ namespace DoFTools
     const std::vector<unsigned int> &            first_vector_components,
     const number                                 periodicity_factor)
   {
-    // TODO: the implementation makes the assumption that all faces have the
-    // same number of dofs
-    AssertDimension(
-      face_1->get_fe(face_1->nth_active_fe_index(0)).n_unique_faces(), 1);
-    AssertDimension(
-      face_2->get_fe(face_2->nth_active_fe_index(0)).n_unique_faces(), 1);
-    const unsigned int face_no = 0;
-
     static const int dim      = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
@@ -2339,6 +2331,12 @@ namespace DoFTools
 #ifdef DEBUG
     if (!face_1->has_children())
       {
+        // TODO: the implementation makes the assumption that all faces have the
+        // same number of dofs
+        AssertDimension(
+          face_1->get_fe(face_1->nth_active_fe_index(0)).n_unique_faces(), 1);
+        const unsigned int face_no = 0;
+
         Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
         const unsigned int n_dofs_per_face =
           face_1->get_fe(face_1->nth_active_fe_index(0))
@@ -2357,6 +2355,12 @@ namespace DoFTools
 
     if (!face_2->has_children())
       {
+        // TODO: the implementation makes the assumption that all faces have the
+        // same number of dofs
+        AssertDimension(
+          face_2->get_fe(face_2->nth_active_fe_index(0)).n_unique_faces(), 1);
+        const unsigned int face_no = 0;
+
         Assert(face_2->n_active_fe_indices() == 1, ExcInternalError());
         const unsigned int n_dofs_per_face =
           face_2->get_fe(face_2->nth_active_fe_index(0))
@@ -2458,6 +2462,11 @@ namespace DoFTools
           face_1->has_children() ?
             face_2->get_fe(face_2->nth_active_fe_index(0)) :
             face_1->get_fe(face_1->nth_active_fe_index(0));
+
+        // TODO: the implementation makes the assumption that all faces have the
+        // same number of dofs
+        AssertDimension(fe.n_unique_faces(), 1);
+        const unsigned int face_no = 0;
 
         const unsigned int n_dofs_per_face = fe.n_dofs_per_face(face_no);
 
