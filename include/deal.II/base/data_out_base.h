@@ -2344,6 +2344,30 @@ namespace DataOutBase
     std::ostream &                   out);
 
   /**
+   * Like write_deal_II_intermediate() but write all patches from all ranks
+   * using MPI I/O
+   * into a single file with name @p name. Compression using zlib is optional and controlled
+   * using @p compression.
+   *
+   * The files typically have the extension <tt>.d2_par_patches</tt>.
+   */
+  template <int dim, int spacedim>
+  void
+  write_deal_II_intermediate_in_parallel(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &                                  nonscalar_data_ranges,
+    const Deal_II_IntermediateFlags &    flags,
+    const std::string &                  filename,
+    const MPI_Comm &                     comm,
+    const VtkFlags::ZlibCompressionLevel compression);
+
+  /**
    * Write the data in @p data_filter to a single HDF5 file containing both the
    * mesh and solution values.
    */
@@ -2825,6 +2849,19 @@ public:
    */
   void
   write_deal_II_intermediate(std::ostream &out) const;
+
+  /**
+   * Obtain data through get_patches() and write it using MPI I/O in parallel
+   * to the file @p filename in the parallel
+   * deal.II intermediate format. See
+   * DataOutBase::write_deal_II_intermediate_in_parallel().
+   *
+   */
+  void
+  write_deal_II_intermediate_in_parallel(
+    const std::string &                               filename,
+    const MPI_Comm &                                  comm,
+    const DataOutBase::VtkFlags::ZlibCompressionLevel compression) const;
 
   /**
    * Create an XDMFEntry based on the data in the data_filter. This assumes

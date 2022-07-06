@@ -43,6 +43,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <fstream>
@@ -50,18 +51,20 @@
 #include <memory>
 #include <set>
 #include <sstream>
-
-// we use std::uint32_t and std::uint8_t below, which are declared here:
-#include <cstdint>
 #include <vector>
 
 #ifdef DEAL_II_WITH_ZLIB
+#  include <boost/iostreams/filter/zlib.hpp>
+
 #  include <zlib.h>
 #endif
 
 #ifdef DEAL_II_WITH_HDF5
 #  include <hdf5.h>
 #endif
+
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -7540,6 +7543,136 @@ namespace DataOutBase
   }
 
 
+  template <int dim, int spacedim>
+  void
+  write_deal_II_intermediate_in_parallel(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &                                  nonscalar_data_ranges,
+    const Deal_II_IntermediateFlags &    flags,
+    const std::string &                  filename,
+    const MPI_Comm &                     comm,
+    const VtkFlags::ZlibCompressionLevel compression)
+  {
+#ifndef DEAL_II_WITH_MPI
+
+    (void)comm;
+#else
+    // First generate my data by writing (optionally compressed) data into
+    // my_buffer:
+    std::vector<char> my_buffer;
+    {
+      boost::iostreams::filtering_ostream f;
+
+      if (compression != VtkFlags::no_compression)
+        f.push(boost::iostreams::zlib_compressor());
+
+      boost::iostreams::back_insert_device<std::vector<char>> inserter(
+        my_buffer);
+      f.push(inserter);
+
+      write_deal_II_intermediate<dim, spacedim>(
+        patches, data_names, nonscalar_data_ranges, flags, f);
+    }
+    const std::uint64_t my_size = my_buffer.size();
+
+    const unsigned int  my_rank     = Utilities::MPI::this_mpi_process(comm);
+    const std::uint64_t num_ranks   = Utilities::MPI::n_mpi_processes(comm);
+    const std::uint64_t num_patches = Utilities::MPI::sum(patches.size(), comm);
+
+    struct HeaderType
+    {
+      std::uint64_t magic;
+      std::uint64_t version;
+      std::uint64_t compression;
+      std::uint64_t dimension;
+      std::uint64_t space_dimension;
+      std::uint64_t num_ranks;
+      std::uint64_t num_patches;
+    };
+
+    const HeaderType header{0x00dea111,
+                            Deal_II_IntermediateFlags::format_version,
+                            compression,
+                            dim,
+                            spacedim,
+                            num_ranks,
+                            num_patches};
+
+    // rank 0 also collects and writes the size of the data from each rank in
+    // bytes:
+    std::vector<std::uint64_t> chunk_sizes(num_ranks);
+    int                        ierr = MPI_Gather(
+      &my_size, 1, MPI_UINT64_T, chunk_sizes.data(), 1, MPI_UINT64_T, 0, comm);
+    AssertThrowMPI(ierr);
+
+    MPI_Info info;
+    MPI_Info_create(&info);
+    AssertThrowMPI(ierr);
+    MPI_File fh;
+    ierr = MPI_File_open(
+      comm, filename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
+    AssertThrow(ierr == MPI_SUCCESS, ExcFileNotOpen(filename));
+
+    ierr = MPI_File_set_size(fh, 0); // delete the file contents
+    AssertThrowMPI(ierr);
+    // this barrier is necessary, because otherwise others might already write
+    // while one core is still setting the size to zero.
+    ierr = MPI_Barrier(comm);
+    AssertThrowMPI(ierr);
+    ierr = MPI_Info_free(&info);
+    AssertThrowMPI(ierr);
+
+    // write header
+    if (my_rank == 0)
+      {
+        ierr = Utilities::MPI::LargeCount::File_write_at_c(
+          fh, 0, &header, sizeof(header), MPI_CHAR, MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+
+        ierr = Utilities::MPI::LargeCount::File_write_at_c(fh,
+                                                           sizeof(header),
+                                                           chunk_sizes.data(),
+                                                           chunk_sizes.size(),
+                                                           MPI_UINT64_T,
+                                                           MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+      }
+
+    // wite main part
+    {
+      std::uint64_t prefix_sum = 0;
+      ierr = MPI_Exscan(&my_size, &prefix_sum, 1, MPI_UINT64_T, MPI_SUM, comm);
+      AssertThrowMPI(ierr);
+
+      // Locate specific offset for each processor.
+      const MPI_Offset offset = static_cast<MPI_Offset>(sizeof(header)) +
+                                num_ranks * sizeof(std::uint64_t) + prefix_sum;
+
+      ierr = Utilities::MPI::LargeCount::File_write_at_all_c(
+        fh, offset, my_buffer.data(), my_size, MPI_CHAR, MPI_STATUS_IGNORE);
+      AssertThrowMPI(ierr);
+    }
+
+    // Make sure we sync to disk. As written in the standard,
+    // MPI_File_close() actually already implies a sync but there seems
+    // to be a bug on at least one configuration (running with multiple
+    // nodes using OpenMPI 4.1) that requires it. Without this call, the
+    // footer is sometimes missing.
+    ierr = MPI_File_sync(fh);
+    AssertThrowMPI(ierr);
+
+    ierr = MPI_File_close(&fh);
+    AssertThrowMPI(ierr);
+#endif
+  }
+
+
 
   std::pair<unsigned int, unsigned int>
   determine_intermediate_format_dimensions(std::istream &input)
@@ -7922,6 +8055,26 @@ DataOutInterface<dim, spacedim>::write_deal_II_intermediate(
                                           deal_II_intermediate_flags,
                                           out);
 }
+
+
+
+template <int dim, int spacedim>
+void
+DataOutInterface<dim, spacedim>::write_deal_II_intermediate_in_parallel(
+  const std::string &                               filename,
+  const MPI_Comm &                                  comm,
+  const DataOutBase::VtkFlags::ZlibCompressionLevel compression) const
+{
+  DataOutBase::write_deal_II_intermediate_in_parallel(
+    get_patches(),
+    get_dataset_names(),
+    get_nonscalar_data_ranges(),
+    deal_II_intermediate_flags,
+    filename,
+    comm,
+    compression);
+}
+
 
 
 template <int dim, int spacedim>
