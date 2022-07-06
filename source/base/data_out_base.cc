@@ -8079,6 +8079,332 @@ DataOutInterface<dim, spacedim>::write_filtered_data(
 }
 
 
+namespace
+{
+#ifdef DEAL_II_WITH_HDF5
+  /**
+   * Helper function to actually perform the HDF5 output.
+   */
+  template <int dim, int spacedim>
+  void
+  do_write_hdf5(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
+                const DataOutBase::DataOutFilter &data_filter,
+                const bool                        write_mesh_file,
+                const std::string &               mesh_filename,
+                const std::string &               solution_filename,
+                const MPI_Comm &                  comm)
+  {
+    hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
+    hid_t node_dataspace, node_dataset, node_file_dataspace,
+      node_memory_dataspace;
+    hid_t cell_dataspace, cell_dataset, cell_file_dataspace,
+      cell_memory_dataspace;
+    hid_t pt_data_dataspace, pt_data_dataset, pt_data_file_dataspace,
+      pt_data_memory_dataspace;
+    herr_t              status;
+    std::uint64_t       local_node_cell_count[2];
+    hsize_t             count[2], offset[2], node_ds_dim[2], cell_ds_dim[2];
+    std::vector<double> node_data_vec;
+    std::vector<unsigned int> cell_data_vec;
+
+
+
+    local_node_cell_count[0] = data_filter.n_nodes();
+    local_node_cell_count[1] = data_filter.n_cells();
+
+    // Create file access properties
+    file_plist_id = H5Pcreate(H5P_FILE_ACCESS);
+    AssertThrow(file_plist_id != -1, ExcIO());
+    // If MPI is enabled *and* HDF5 is parallel, we can do parallel output
+#  ifdef DEAL_II_WITH_MPI
+#    ifdef H5_HAVE_PARALLEL
+    // Set the access to use the specified MPI_Comm object
+    status = H5Pset_fapl_mpio(file_plist_id, comm, MPI_INFO_NULL);
+    AssertThrow(status >= 0, ExcIO());
+#    endif
+#  endif
+
+    // Compute the global total number of nodes/cells and determine the offset
+    // of the data for this process
+
+    std::uint64_t global_node_cell_count[2]   = {0, 0};
+    std::uint64_t global_node_cell_offsets[2] = {0, 0};
+
+#  ifdef DEAL_II_WITH_MPI
+    int ierr = MPI_Allreduce(local_node_cell_count,
+                             global_node_cell_count,
+                             2,
+                             MPI_UINT64_T,
+                             MPI_SUM,
+                             comm);
+    AssertThrowMPI(ierr);
+    ierr = MPI_Exscan(local_node_cell_count,
+                      global_node_cell_offsets,
+                      2,
+                      MPI_UINT64_T,
+                      MPI_SUM,
+                      comm);
+    AssertThrowMPI(ierr);
+#  else
+    global_node_cell_count[0]   = local_node_cell_count[0];
+    global_node_cell_count[1]   = local_node_cell_count[1];
+    global_node_cell_offsets[0] = global_node_cell_offsets[1] = 0;
+#  endif
+
+    // Create the property list for a collective write
+    plist_id = H5Pcreate(H5P_DATASET_XFER);
+    AssertThrow(plist_id >= 0, ExcIO());
+#  ifdef DEAL_II_WITH_MPI
+#    ifdef H5_HAVE_PARALLEL
+    status = H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+    AssertThrow(status >= 0, ExcIO());
+#    endif
+#  endif
+
+    if (write_mesh_file)
+      {
+        // Overwrite any existing files (change this to an option?)
+        h5_mesh_file_id = H5Fcreate(mesh_filename.c_str(),
+                                    H5F_ACC_TRUNC,
+                                    H5P_DEFAULT,
+                                    file_plist_id);
+        AssertThrow(h5_mesh_file_id >= 0, ExcIO());
+
+        // Create the dataspace for the nodes and cells. HDF5 only supports 2-
+        // or 3-dimensional coordinates
+        node_ds_dim[0] = global_node_cell_count[0];
+        node_ds_dim[1] = (spacedim < 2) ? 2 : spacedim;
+        node_dataspace = H5Screate_simple(2, node_ds_dim, nullptr);
+        AssertThrow(node_dataspace >= 0, ExcIO());
+
+        cell_ds_dim[0] = global_node_cell_count[1];
+        cell_ds_dim[1] = patches[0].reference_cell.n_vertices();
+        cell_dataspace = H5Screate_simple(2, cell_ds_dim, nullptr);
+        AssertThrow(cell_dataspace >= 0, ExcIO());
+
+        // Create the dataset for the nodes and cells
+#  if H5Gcreate_vers == 1
+        node_dataset = H5Dcreate(h5_mesh_file_id,
+                                 "nodes",
+                                 H5T_NATIVE_DOUBLE,
+                                 node_dataspace,
+                                 H5P_DEFAULT);
+#  else
+        node_dataset    = H5Dcreate(h5_mesh_file_id,
+                                 "nodes",
+                                 H5T_NATIVE_DOUBLE,
+                                 node_dataspace,
+                                 H5P_DEFAULT,
+                                 H5P_DEFAULT,
+                                 H5P_DEFAULT);
+#  endif
+        AssertThrow(node_dataset >= 0, ExcIO());
+#  if H5Gcreate_vers == 1
+        cell_dataset = H5Dcreate(h5_mesh_file_id,
+                                 "cells",
+                                 H5T_NATIVE_UINT,
+                                 cell_dataspace,
+                                 H5P_DEFAULT);
+#  else
+        cell_dataset    = H5Dcreate(h5_mesh_file_id,
+                                 "cells",
+                                 H5T_NATIVE_UINT,
+                                 cell_dataspace,
+                                 H5P_DEFAULT,
+                                 H5P_DEFAULT,
+                                 H5P_DEFAULT);
+#  endif
+        AssertThrow(cell_dataset >= 0, ExcIO());
+
+        // Close the node and cell dataspaces since we're done with them
+        status = H5Sclose(node_dataspace);
+        AssertThrow(status >= 0, ExcIO());
+        status = H5Sclose(cell_dataspace);
+        AssertThrow(status >= 0, ExcIO());
+
+        // Create the data subset we'll use to read from memory. HDF5 only
+        // supports 2- or 3-dimensional coordinates
+        count[0] = local_node_cell_count[0];
+        count[1] = (spacedim < 2) ? 2 : spacedim;
+
+        offset[0] = global_node_cell_offsets[0];
+        offset[1] = 0;
+
+        node_memory_dataspace = H5Screate_simple(2, count, nullptr);
+        AssertThrow(node_memory_dataspace >= 0, ExcIO());
+
+        // Select the hyperslab in the file
+        node_file_dataspace = H5Dget_space(node_dataset);
+        AssertThrow(node_file_dataspace >= 0, ExcIO());
+        status = H5Sselect_hyperslab(
+          node_file_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
+        AssertThrow(status >= 0, ExcIO());
+
+        // And repeat for cells
+        count[0]              = local_node_cell_count[1];
+        count[1]              = patches[0].reference_cell.n_vertices();
+        offset[0]             = global_node_cell_offsets[1];
+        offset[1]             = 0;
+        cell_memory_dataspace = H5Screate_simple(2, count, nullptr);
+        AssertThrow(cell_memory_dataspace >= 0, ExcIO());
+
+        cell_file_dataspace = H5Dget_space(cell_dataset);
+        AssertThrow(cell_file_dataspace >= 0, ExcIO());
+        status = H5Sselect_hyperslab(
+          cell_file_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
+        AssertThrow(status >= 0, ExcIO());
+
+        // And finally, write the node data
+        data_filter.fill_node_data(node_data_vec);
+        status = H5Dwrite(node_dataset,
+                          H5T_NATIVE_DOUBLE,
+                          node_memory_dataspace,
+                          node_file_dataspace,
+                          plist_id,
+                          node_data_vec.data());
+        AssertThrow(status >= 0, ExcIO());
+        node_data_vec.clear();
+
+        // And the cell data
+        data_filter.fill_cell_data(global_node_cell_offsets[0], cell_data_vec);
+        status = H5Dwrite(cell_dataset,
+                          H5T_NATIVE_UINT,
+                          cell_memory_dataspace,
+                          cell_file_dataspace,
+                          plist_id,
+                          cell_data_vec.data());
+        AssertThrow(status >= 0, ExcIO());
+        cell_data_vec.clear();
+
+        // Close the file dataspaces
+        status = H5Sclose(node_file_dataspace);
+        AssertThrow(status >= 0, ExcIO());
+        status = H5Sclose(cell_file_dataspace);
+        AssertThrow(status >= 0, ExcIO());
+
+        // Close the memory dataspaces
+        status = H5Sclose(node_memory_dataspace);
+        AssertThrow(status >= 0, ExcIO());
+        status = H5Sclose(cell_memory_dataspace);
+        AssertThrow(status >= 0, ExcIO());
+
+        // Close the datasets
+        status = H5Dclose(node_dataset);
+        AssertThrow(status >= 0, ExcIO());
+        status = H5Dclose(cell_dataset);
+        AssertThrow(status >= 0, ExcIO());
+
+        // If the filenames are different, we need to close the mesh file
+        if (mesh_filename != solution_filename)
+          {
+            status = H5Fclose(h5_mesh_file_id);
+            AssertThrow(status >= 0, ExcIO());
+          }
+      }
+
+    // If the filenames are identical, continue with the same file
+    if (mesh_filename == solution_filename && write_mesh_file)
+      {
+        h5_solution_file_id = h5_mesh_file_id;
+      }
+    else
+      {
+        // Otherwise we need to open a new file
+        h5_solution_file_id = H5Fcreate(solution_filename.c_str(),
+                                        H5F_ACC_TRUNC,
+                                        H5P_DEFAULT,
+                                        file_plist_id);
+        AssertThrow(h5_solution_file_id >= 0, ExcIO());
+      }
+
+    // when writing, first write out all vector data, then handle the scalar
+    // data sets that have been left over
+    unsigned int i;
+    std::string  vector_name;
+    for (i = 0; i < data_filter.n_data_sets(); ++i)
+      {
+        // Allocate space for the point data
+        // Must be either 1D or 3D
+        const unsigned int pt_data_vector_dim = data_filter.get_data_set_dim(i);
+        vector_name = data_filter.get_data_set_name(i);
+
+        // Create the dataspace for the point data
+        node_ds_dim[0]    = global_node_cell_count[0];
+        node_ds_dim[1]    = pt_data_vector_dim;
+        pt_data_dataspace = H5Screate_simple(2, node_ds_dim, nullptr);
+        AssertThrow(pt_data_dataspace >= 0, ExcIO());
+
+#  if H5Gcreate_vers == 1
+        pt_data_dataset = H5Dcreate(h5_solution_file_id,
+                                    vector_name.c_str(),
+                                    H5T_NATIVE_DOUBLE,
+                                    pt_data_dataspace,
+                                    H5P_DEFAULT);
+#  else
+        pt_data_dataset = H5Dcreate(h5_solution_file_id,
+                                    vector_name.c_str(),
+                                    H5T_NATIVE_DOUBLE,
+                                    pt_data_dataspace,
+                                    H5P_DEFAULT,
+                                    H5P_DEFAULT,
+                                    H5P_DEFAULT);
+#  endif
+        AssertThrow(pt_data_dataset >= 0, ExcIO());
+
+        // Create the data subset we'll use to read from memory
+        count[0]                 = local_node_cell_count[0];
+        count[1]                 = pt_data_vector_dim;
+        offset[0]                = global_node_cell_offsets[0];
+        offset[1]                = 0;
+        pt_data_memory_dataspace = H5Screate_simple(2, count, nullptr);
+        AssertThrow(pt_data_memory_dataspace >= 0, ExcIO());
+
+        // Select the hyperslab in the file
+        pt_data_file_dataspace = H5Dget_space(pt_data_dataset);
+        AssertThrow(pt_data_file_dataspace >= 0, ExcIO());
+        status = H5Sselect_hyperslab(pt_data_file_dataspace,
+                                     H5S_SELECT_SET,
+                                     offset,
+                                     nullptr,
+                                     count,
+                                     nullptr);
+        AssertThrow(status >= 0, ExcIO());
+
+        // And finally, write the data
+        status = H5Dwrite(pt_data_dataset,
+                          H5T_NATIVE_DOUBLE,
+                          pt_data_memory_dataspace,
+                          pt_data_file_dataspace,
+                          plist_id,
+                          data_filter.get_data_set(i));
+        AssertThrow(status >= 0, ExcIO());
+
+        // Close the dataspaces
+        status = H5Sclose(pt_data_dataspace);
+        AssertThrow(status >= 0, ExcIO());
+        status = H5Sclose(pt_data_memory_dataspace);
+        AssertThrow(status >= 0, ExcIO());
+        status = H5Sclose(pt_data_file_dataspace);
+        AssertThrow(status >= 0, ExcIO());
+        // Close the dataset
+        status = H5Dclose(pt_data_dataset);
+        AssertThrow(status >= 0, ExcIO());
+      }
+
+    // Close the file property list
+    status = H5Pclose(file_plist_id);
+    AssertThrow(status >= 0, ExcIO());
+
+    // Close the parallel access
+    status = H5Pclose(plist_id);
+    AssertThrow(status >= 0, ExcIO());
+
+    // Close the file
+    status = H5Fclose(h5_solution_file_id);
+    AssertThrow(status >= 0, ExcIO());
+  }
+#endif
+} // namespace
 
 template <int dim, int spacedim>
 void
@@ -8268,332 +8594,54 @@ DataOutBase::write_hdf5_parallel(
   (void)comm;
   AssertThrow(false, ExcMessage("HDF5 support is disabled."));
 #else
-#  ifndef DEAL_II_WITH_MPI
-  (void)comm;
-#  endif
 
-  // verify that there are indeed patches to be written out. most of the times,
-  // people just forget to call build_patches when there are no patches, so a
-  // warning is in order. that said, the assertion is disabled if we support MPI
-  // since then it can happen that on the coarsest mesh, a processor simply has
-  // no cells it actually owns, and in that case it is legit if there are no
-  // patches
-  Assert(patches.size() > 0, ExcNoPatches());
+  const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(comm);
+  (void)n_ranks;
 
-  hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
-  hid_t node_dataspace, node_dataset, node_file_dataspace,
-    node_memory_dataspace;
-  hid_t cell_dataspace, cell_dataset, cell_file_dataspace,
-    cell_memory_dataspace;
-  hid_t pt_data_dataspace, pt_data_dataset, pt_data_file_dataspace,
-    pt_data_memory_dataspace;
-  herr_t status;
-  std::uint64_t local_node_cell_count[2];
-  hsize_t count[2], offset[2], node_ds_dim[2], cell_ds_dim[2];
-  std::vector<double> node_data_vec;
-  std::vector<unsigned int> cell_data_vec;
-
-  // If HDF5 is not parallel and we're using multiple processes, abort
+  // If HDF5 is not parallel and we're using multiple processes, abort:
 #  ifndef H5_HAVE_PARALLEL
-#    ifdef DEAL_II_WITH_MPI
-  int world_size = Utilities::MPI::n_mpi_processes(comm);
   AssertThrow(
-    world_size <= 1,
+    n_ranks <= 1,
     ExcMessage(
       "Serial HDF5 output on multiple processes is not yet supported."));
-#    endif
 #  endif
 
-  local_node_cell_count[0] = data_filter.n_nodes();
-  local_node_cell_count[1] = data_filter.n_cells();
+  // Verify that there are indeed patches to be written out. most of the times,
+  // people just forget to call build_patches when there are no patches, so a
+  // warning is in order. That said, the assertion is disabled if we run with
+  // more than one MPI rank,
+  // since then it can happen that, on coarse meshes, a processor simply has
+  // no cells it actually owns, and in that case it is legit if there are no
+  // patches.
+  Assert((patches.size() > 0) || (n_ranks > 1), ExcNoPatches());
 
-  // Create file access properties
-  file_plist_id = H5Pcreate(H5P_FILE_ACCESS);
-  AssertThrow(file_plist_id != -1, ExcIO());
-  // If MPI is enabled *and* HDF5 is parallel, we can do parallel output
-#  ifdef DEAL_II_WITH_MPI
-#    ifdef H5_HAVE_PARALLEL
-  // Set the access to use the specified MPI_Comm object
-  status = H5Pset_fapl_mpio(file_plist_id, comm, MPI_INFO_NULL);
-  AssertThrow(status >= 0, ExcIO());
-#    endif
-#  endif
+  // The HDF5 routines perform a bunch of collective calls that expect all
+  // ranks to participate. One ranks without any patches we are missing
+  // critical information, so rather than broadcasting that information, just
+  // create a new communicator that only contains ranks with cells and
+  // use that to perform the write operations:
+  const bool have_patches = (patches.size() > 0);
+  MPI_Comm split_comm;
+  {
+    const int key = Utilities::MPI::this_mpi_process(comm);
+    const int color = (have_patches ? 1 : 0);
+    const int ierr = MPI_Comm_split(comm, color, key, &split_comm);
+    AssertThrowMPI(ierr);
+  }
 
-  // Compute the global total number of nodes/cells and determine the offset of
-  // the data for this process
+  if (have_patches)
+    {
+      do_write_hdf5<dim, spacedim>(patches,
+                                   data_filter,
+                                   write_mesh_file,
+                                   mesh_filename,
+                                   solution_filename,
+                                   split_comm);
+    }
 
-  std::uint64_t global_node_cell_count[2] = {0, 0};
-  std::uint64_t global_node_cell_offsets[2] = {0, 0};
-
-#  ifdef DEAL_II_WITH_MPI
-  ierr = MPI_Allreduce(local_node_cell_count,
-                       global_node_cell_count,
-                       2,
-                       MPI_UINT64_T,
-                       MPI_SUM,
-                       comm);
+  ierr = MPI_Comm_free(&split_comm);
   AssertThrowMPI(ierr);
-  ierr = MPI_Exscan(local_node_cell_count,
-                    global_node_cell_offsets,
-                    2,
-                    MPI_UINT64_T,
-                    MPI_SUM,
-                    comm);
-  AssertThrowMPI(ierr);
-#  else
-  global_node_cell_count[0] = local_node_cell_count[0];
-  global_node_cell_count[1] = local_node_cell_count[1];
-  global_node_cell_offsets[0] = global_node_cell_offsets[1] = 0;
-#  endif
 
-  // Create the property list for a collective write
-  plist_id = H5Pcreate(H5P_DATASET_XFER);
-  AssertThrow(plist_id >= 0, ExcIO());
-#  ifdef DEAL_II_WITH_MPI
-#    ifdef H5_HAVE_PARALLEL
-  status = H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
-  AssertThrow(status >= 0, ExcIO());
-#    endif
-#  endif
-
-  if (write_mesh_file)
-    {
-      // Overwrite any existing files (change this to an option?)
-      h5_mesh_file_id = H5Fcreate(mesh_filename.c_str(),
-                                  H5F_ACC_TRUNC,
-                                  H5P_DEFAULT,
-                                  file_plist_id);
-      AssertThrow(h5_mesh_file_id >= 0, ExcIO());
-
-      // Create the dataspace for the nodes and cells. HDF5 only supports 2- or
-      // 3-dimensional coordinates
-      node_ds_dim[0] = global_node_cell_count[0];
-      node_ds_dim[1] = (spacedim < 2) ? 2 : spacedim;
-      node_dataspace = H5Screate_simple(2, node_ds_dim, nullptr);
-      AssertThrow(node_dataspace >= 0, ExcIO());
-
-      cell_ds_dim[0] = global_node_cell_count[1];
-      cell_ds_dim[1] = patches[0].reference_cell.n_vertices();
-      cell_dataspace = H5Screate_simple(2, cell_ds_dim, nullptr);
-      AssertThrow(cell_dataspace >= 0, ExcIO());
-
-      // Create the dataset for the nodes and cells
-#  if H5Gcreate_vers == 1
-      node_dataset = H5Dcreate(h5_mesh_file_id,
-                               "nodes",
-                               H5T_NATIVE_DOUBLE,
-                               node_dataspace,
-                               H5P_DEFAULT);
-#  else
-      node_dataset = H5Dcreate(h5_mesh_file_id,
-                               "nodes",
-                               H5T_NATIVE_DOUBLE,
-                               node_dataspace,
-                               H5P_DEFAULT,
-                               H5P_DEFAULT,
-                               H5P_DEFAULT);
-#  endif
-      AssertThrow(node_dataset >= 0, ExcIO());
-#  if H5Gcreate_vers == 1
-      cell_dataset = H5Dcreate(
-        h5_mesh_file_id, "cells", H5T_NATIVE_UINT, cell_dataspace, H5P_DEFAULT);
-#  else
-      cell_dataset = H5Dcreate(h5_mesh_file_id,
-                               "cells",
-                               H5T_NATIVE_UINT,
-                               cell_dataspace,
-                               H5P_DEFAULT,
-                               H5P_DEFAULT,
-                               H5P_DEFAULT);
-#  endif
-      AssertThrow(cell_dataset >= 0, ExcIO());
-
-      // Close the node and cell dataspaces since we're done with them
-      status = H5Sclose(node_dataspace);
-      AssertThrow(status >= 0, ExcIO());
-      status = H5Sclose(cell_dataspace);
-      AssertThrow(status >= 0, ExcIO());
-
-      // Create the data subset we'll use to read from memory. HDF5 only
-      // supports 2- or 3-dimensional coordinates
-      count[0] = local_node_cell_count[0];
-      count[1] = (spacedim < 2) ? 2 : spacedim;
-
-      offset[0] = global_node_cell_offsets[0];
-      offset[1] = 0;
-
-      node_memory_dataspace = H5Screate_simple(2, count, nullptr);
-      AssertThrow(node_memory_dataspace >= 0, ExcIO());
-
-      // Select the hyperslab in the file
-      node_file_dataspace = H5Dget_space(node_dataset);
-      AssertThrow(node_file_dataspace >= 0, ExcIO());
-      status = H5Sselect_hyperslab(
-        node_file_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
-      AssertThrow(status >= 0, ExcIO());
-
-      // And repeat for cells
-      count[0] = local_node_cell_count[1];
-      count[1] = patches[0].reference_cell.n_vertices();
-      offset[0] = global_node_cell_offsets[1];
-      offset[1] = 0;
-      cell_memory_dataspace = H5Screate_simple(2, count, nullptr);
-      AssertThrow(cell_memory_dataspace >= 0, ExcIO());
-
-      cell_file_dataspace = H5Dget_space(cell_dataset);
-      AssertThrow(cell_file_dataspace >= 0, ExcIO());
-      status = H5Sselect_hyperslab(
-        cell_file_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
-      AssertThrow(status >= 0, ExcIO());
-
-      // And finally, write the node data
-      data_filter.fill_node_data(node_data_vec);
-      status = H5Dwrite(node_dataset,
-                        H5T_NATIVE_DOUBLE,
-                        node_memory_dataspace,
-                        node_file_dataspace,
-                        plist_id,
-                        node_data_vec.data());
-      AssertThrow(status >= 0, ExcIO());
-      node_data_vec.clear();
-
-      // And the cell data
-      data_filter.fill_cell_data(global_node_cell_offsets[0], cell_data_vec);
-      status = H5Dwrite(cell_dataset,
-                        H5T_NATIVE_UINT,
-                        cell_memory_dataspace,
-                        cell_file_dataspace,
-                        plist_id,
-                        cell_data_vec.data());
-      AssertThrow(status >= 0, ExcIO());
-      cell_data_vec.clear();
-
-      // Close the file dataspaces
-      status = H5Sclose(node_file_dataspace);
-      AssertThrow(status >= 0, ExcIO());
-      status = H5Sclose(cell_file_dataspace);
-      AssertThrow(status >= 0, ExcIO());
-
-      // Close the memory dataspaces
-      status = H5Sclose(node_memory_dataspace);
-      AssertThrow(status >= 0, ExcIO());
-      status = H5Sclose(cell_memory_dataspace);
-      AssertThrow(status >= 0, ExcIO());
-
-      // Close the datasets
-      status = H5Dclose(node_dataset);
-      AssertThrow(status >= 0, ExcIO());
-      status = H5Dclose(cell_dataset);
-      AssertThrow(status >= 0, ExcIO());
-
-      // If the filenames are different, we need to close the mesh file
-      if (mesh_filename != solution_filename)
-        {
-          status = H5Fclose(h5_mesh_file_id);
-          AssertThrow(status >= 0, ExcIO());
-        }
-    }
-
-  // If the filenames are identical, continue with the same file
-  if (mesh_filename == solution_filename && write_mesh_file)
-    {
-      h5_solution_file_id = h5_mesh_file_id;
-    }
-  else
-    {
-      // Otherwise we need to open a new file
-      h5_solution_file_id = H5Fcreate(solution_filename.c_str(),
-                                      H5F_ACC_TRUNC,
-                                      H5P_DEFAULT,
-                                      file_plist_id);
-      AssertThrow(h5_solution_file_id >= 0, ExcIO());
-    }
-
-  // when writing, first write out all vector data, then handle the scalar data
-  // sets that have been left over
-  unsigned int i;
-  std::string vector_name;
-  for (i = 0; i < data_filter.n_data_sets(); ++i)
-    {
-      // Allocate space for the point data
-      // Must be either 1D or 3D
-      const unsigned int pt_data_vector_dim = data_filter.get_data_set_dim(i);
-      vector_name = data_filter.get_data_set_name(i);
-
-      // Create the dataspace for the point data
-      node_ds_dim[0] = global_node_cell_count[0];
-      node_ds_dim[1] = pt_data_vector_dim;
-      pt_data_dataspace = H5Screate_simple(2, node_ds_dim, nullptr);
-      AssertThrow(pt_data_dataspace >= 0, ExcIO());
-
-#  if H5Gcreate_vers == 1
-      pt_data_dataset = H5Dcreate(h5_solution_file_id,
-                                  vector_name.c_str(),
-                                  H5T_NATIVE_DOUBLE,
-                                  pt_data_dataspace,
-                                  H5P_DEFAULT);
-#  else
-      pt_data_dataset = H5Dcreate(h5_solution_file_id,
-                                  vector_name.c_str(),
-                                  H5T_NATIVE_DOUBLE,
-                                  pt_data_dataspace,
-                                  H5P_DEFAULT,
-                                  H5P_DEFAULT,
-                                  H5P_DEFAULT);
-#  endif
-      AssertThrow(pt_data_dataset >= 0, ExcIO());
-
-      // Create the data subset we'll use to read from memory
-      count[0] = local_node_cell_count[0];
-      count[1] = pt_data_vector_dim;
-      offset[0] = global_node_cell_offsets[0];
-      offset[1] = 0;
-      pt_data_memory_dataspace = H5Screate_simple(2, count, nullptr);
-      AssertThrow(pt_data_memory_dataspace >= 0, ExcIO());
-
-      // Select the hyperslab in the file
-      pt_data_file_dataspace = H5Dget_space(pt_data_dataset);
-      AssertThrow(pt_data_file_dataspace >= 0, ExcIO());
-      status = H5Sselect_hyperslab(pt_data_file_dataspace,
-                                   H5S_SELECT_SET,
-                                   offset,
-                                   nullptr,
-                                   count,
-                                   nullptr);
-      AssertThrow(status >= 0, ExcIO());
-
-      // And finally, write the data
-      status = H5Dwrite(pt_data_dataset,
-                        H5T_NATIVE_DOUBLE,
-                        pt_data_memory_dataspace,
-                        pt_data_file_dataspace,
-                        plist_id,
-                        data_filter.get_data_set(i));
-      AssertThrow(status >= 0, ExcIO());
-
-      // Close the dataspaces
-      status = H5Sclose(pt_data_dataspace);
-      AssertThrow(status >= 0, ExcIO());
-      status = H5Sclose(pt_data_memory_dataspace);
-      AssertThrow(status >= 0, ExcIO());
-      status = H5Sclose(pt_data_file_dataspace);
-      AssertThrow(status >= 0, ExcIO());
-      // Close the dataset
-      status = H5Dclose(pt_data_dataset);
-      AssertThrow(status >= 0, ExcIO());
-    }
-
-  // Close the file property list
-  status = H5Pclose(file_plist_id);
-  AssertThrow(status >= 0, ExcIO());
-
-  // Close the parallel access
-  status = H5Pclose(plist_id);
-  AssertThrow(status >= 0, ExcIO());
-
-  // Close the file
-  status = H5Fclose(h5_solution_file_id);
-  AssertThrow(status >= 0, ExcIO());
 #endif
 }
 
