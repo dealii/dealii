@@ -43,7 +43,6 @@ test()
     oa << entry1;
     // archive and stream closed when destructors are called
   }
-  deallog << oss.str() << std::endl;
 
   // verify correctness of the serialization
   {
@@ -54,13 +53,11 @@ test()
 
   deallog << "XDMFEntry before serialization: " << std::endl
           << std::endl
-          << entry1.get_xdmf_content(0, ReferenceCells::get_hypercube<dim>())
-          << std::endl;
+          << entry1.get_xdmf_content(0) << std::endl;
 
   deallog << "XDMFEntry after de-serialization: " << std::endl
           << std::endl
-          << entry2.get_xdmf_content(0, ReferenceCells::get_hypercube<dim>())
-          << std::endl;
+          << entry2.get_xdmf_content(0) << std::endl;
 }
 
 

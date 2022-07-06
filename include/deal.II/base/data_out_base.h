@@ -3322,7 +3322,31 @@ public:
    * cases where <code>solution_filename == mesh_filename</code>, and
    * <code>dim==spacedim</code>.
    */
+  XDMFEntry(const std::string &  filename,
+            const double         time,
+            const std::uint64_t  nodes,
+            const std::uint64_t  cells,
+            const unsigned int   dim,
+            const ReferenceCell &cell_type);
+
+  /**
+   * Deprecated constructor.
+   *
+   * @deprecated Use the constructor that additionally takes a ReferenceCell.
+   */
   XDMFEntry(const std::string & filename,
+            const double        time,
+            const std::uint64_t nodes,
+            const std::uint64_t cells,
+            const unsigned int  dim);
+
+  /**
+   * Deprecated constructor.
+   *
+   * @deprecated Use the constructor that additionally takes a ReferenceCell.
+   */
+  XDMFEntry(const std::string & mesh_filename,
+            const std::string & solution_filename,
             const double        time,
             const std::uint64_t nodes,
             const std::uint64_t cells,
@@ -3332,16 +3356,20 @@ public:
    * Simplified constructor that calls the complete constructor for
    * cases where <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string & mesh_filename,
-            const std::string & solution_filename,
-            const double        time,
-            const std::uint64_t nodes,
-            const std::uint64_t cells,
-            const unsigned int  dim);
+  XDMFEntry(const std::string &  mesh_filename,
+            const std::string &  solution_filename,
+            const double         time,
+            const std::uint64_t  nodes,
+            const std::uint64_t  cells,
+            const unsigned int   dim,
+            const ReferenceCell &cell_type);
 
   /**
-   * Constructor that sets all members to provided parameters.
+   * Deprecated constructor.
+   *
+   * @deprecated Use the constructor that additionally takes a ReferenceCell.
    */
+  DEAL_II_DEPRECATED
   XDMFEntry(const std::string & mesh_filename,
             const std::string & solution_filename,
             const double        time,
@@ -3349,6 +3377,18 @@ public:
             const std::uint64_t cells,
             const unsigned int  dim,
             const unsigned int  spacedim);
+
+  /**
+   * Constructor that sets all members to provided parameters.
+   */
+  XDMFEntry(const std::string &  mesh_filename,
+            const std::string &  solution_filename,
+            const double         time,
+            const std::uint64_t  nodes,
+            const std::uint64_t  cells,
+            const unsigned int   dim,
+            const unsigned int   spacedim,
+            const ReferenceCell &cell_type);
 
   /**
    * Record an attribute and associated dimensionality.
@@ -3366,13 +3406,23 @@ public:
   serialize(Archive &ar, const unsigned int /*version*/)
   {
     ar &valid &h5_sol_filename &h5_mesh_filename &entry_time &num_nodes
-      &num_cells &dimension &space_dimension &attribute_dims;
+      &num_cells &dimension &space_dimension &cell_type &attribute_dims;
   }
 
   /**
    * Get the XDMF content associated with this entry.
    * If the entry is not valid, this returns an empty string.
    */
+  std::string
+  get_xdmf_content(const unsigned int indent_level) const;
+
+  /**
+   * Get the XDMF content associated with this entry.
+   * If the entry is not valid, this returns an empty string.
+   *
+   * @deprecated Use the other function instead.
+   */
+  DEAL_II_DEPRECATED
   std::string
   get_xdmf_content(const unsigned int   indent_level,
                    const ReferenceCell &reference_cell) const;
@@ -3418,6 +3468,12 @@ private:
    * Note that dimension <= space_dimension.
    */
   unsigned int space_dimension;
+
+  /**
+   * The type of cell in deal.II language. We currently only support
+   * xdmf entries where all cells have the same type.
+   */
+  ReferenceCell cell_type;
 
   /**
    * The attributes associated with this entry and their dimension.

@@ -7985,13 +7985,24 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   // Output the XDMF file only on the root process
   if (myrank == 0)
     {
+      const auto &patches = get_patches();
+      Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
+      // We currently don't support writing mixed meshes:
+#ifdef DEBUG
+      for (const auto &patch : patches)
+        Assert(patch.reference_cell == patches[0].reference_cell,
+               ExcNotImplemented());
+#endif
+
+
       XDMFEntry    entry(h5_mesh_filename,
                       h5_solution_filename,
                       cur_time,
                       global_node_cell_count[0],
                       global_node_cell_count[1],
                       dim,
-                      spacedim);
+                      spacedim,
+                      patches[0].reference_cell);
       unsigned int n_data_sets = data_filter.n_data_sets();
 
       // The vector names generated here must match those generated in the HDF5
@@ -8037,20 +8048,9 @@ DataOutInterface<dim, spacedim>::write_xdmf_file(
       xdmf_file
         << "    <Grid Name=\"CellTime\" GridType=\"Collection\" CollectionType=\"Temporal\">\n";
 
-      // Write out all the entries indented
-      const auto &patches = get_patches();
-      Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
-
-      // We currently don't support writing mixed meshes:
-#ifdef DEBUG
-      for (const auto &patch : patches)
-        Assert(patch.reference_cell == patches[0].reference_cell,
-               ExcNotImplemented());
-#endif
-
       for (const auto &entry : entries)
         {
-          xdmf_file << entry.get_xdmf_content(3, patches[0].reference_cell);
+          xdmf_file << entry.get_xdmf_content(3);
         }
 
       xdmf_file << "    </Grid>\n";
@@ -9177,6 +9177,7 @@ XDMFEntry::XDMFEntry()
   , num_cells(numbers::invalid_unsigned_int)
   , dimension(numbers::invalid_unsigned_int)
   , space_dimension(numbers::invalid_unsigned_int)
+  , cell_type()
 {}
 
 
@@ -9186,7 +9187,16 @@ XDMFEntry::XDMFEntry(const std::string & filename,
                      const std::uint64_t nodes,
                      const std::uint64_t cells,
                      const unsigned int  dim)
-  : XDMFEntry(filename, filename, time, nodes, cells, dim, dim)
+  : XDMFEntry(filename, filename, time, nodes, cells, dim, dim, ReferenceCell())
+{}
+
+XDMFEntry::XDMFEntry(const std::string &  filename,
+                     const double         time,
+                     const std::uint64_t  nodes,
+                     const std::uint64_t  cells,
+                     const unsigned int   dim,
+                     const ReferenceCell &cell_type)
+  : XDMFEntry(filename, filename, time, nodes, cells, dim, dim, cell_type)
 {}
 
 
@@ -9197,7 +9207,33 @@ XDMFEntry::XDMFEntry(const std::string & mesh_filename,
                      const std::uint64_t nodes,
                      const std::uint64_t cells,
                      const unsigned int  dim)
-  : XDMFEntry(mesh_filename, solution_filename, time, nodes, cells, dim, dim)
+  : XDMFEntry(mesh_filename,
+              solution_filename,
+              time,
+              nodes,
+              cells,
+              dim,
+              dim,
+              ReferenceCell())
+{}
+
+
+
+XDMFEntry::XDMFEntry(const std::string &  mesh_filename,
+                     const std::string &  solution_filename,
+                     const double         time,
+                     const std::uint64_t  nodes,
+                     const std::uint64_t  cells,
+                     const unsigned int   dim,
+                     const ReferenceCell &cell_type)
+  : XDMFEntry(mesh_filename,
+              solution_filename,
+              time,
+              nodes,
+              cells,
+              dim,
+              dim,
+              cell_type)
 {}
 
 
@@ -9209,6 +9245,59 @@ XDMFEntry::XDMFEntry(const std::string & mesh_filename,
                      const std::uint64_t cells,
                      const unsigned int  dim,
                      const unsigned int  spacedim)
+  : XDMFEntry(mesh_filename,
+              solution_filename,
+              time,
+              nodes,
+              cells,
+              dim,
+              spacedim,
+              ReferenceCell())
+{}
+
+
+
+namespace
+{
+  /**
+   * Deprecated XDMFEntry constructors do not fill the cell_type, so we use this
+   * little helper to convert it to the appropriate hex cell.
+   */
+  ReferenceCell
+  cell_type_hex_if_invalid(const ReferenceCell &cell_type,
+                           const unsigned int   dimension)
+  {
+    if (cell_type == ReferenceCells::Invalid)
+      {
+        switch (dimension)
+          {
+            case 0:
+              return ReferenceCells::get_hypercube<0>();
+            case 1:
+              return ReferenceCells::get_hypercube<1>();
+            case 2:
+              return ReferenceCells::get_hypercube<2>();
+            case 3:
+              return ReferenceCells::get_hypercube<3>();
+            default:
+              AssertThrow(false, ExcMessage("Invalid dimension"));
+          }
+      }
+    else
+      return cell_type;
+  }
+} // namespace
+
+
+
+XDMFEntry::XDMFEntry(const std::string &  mesh_filename,
+                     const std::string &  solution_filename,
+                     const double         time,
+                     const std::uint64_t  nodes,
+                     const std::uint64_t  cells,
+                     const unsigned int   dim,
+                     const unsigned int   spacedim,
+                     const ReferenceCell &cell_type_)
   : valid(true)
   , h5_sol_filename(solution_filename)
   , h5_mesh_filename(mesh_filename)
@@ -9217,6 +9306,7 @@ XDMFEntry::XDMFEntry(const std::string & mesh_filename,
   , num_cells(cells)
   , dimension(dim)
   , space_dimension(spacedim)
+  , cell_type(cell_type_hex_if_invalid(cell_type_, dim))
 {}
 
 
@@ -9251,6 +9341,18 @@ std::string
 XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
                             const ReferenceCell &reference_cell) const
 {
+  // We now store the type of cell in the XDMFEntry:
+  (void)reference_cell;
+  Assert(cell_type == reference_cell,
+         ExcMessage("Incorrect ReferenceCell type passed in."));
+  return get_xdmf_content(indent_level);
+}
+
+
+
+std::string
+XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
+{
   if (!valid)
     return "";
 
@@ -9282,26 +9384,26 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
         }
       else if (dimension == 2)
         {
-          Assert(reference_cell == ReferenceCells::Quadrilateral ||
-                   reference_cell == ReferenceCells::Triangle,
+          Assert(cell_type == ReferenceCells::Quadrilateral ||
+                   cell_type == ReferenceCells::Triangle,
                  ExcNotImplemented());
 
-          if (reference_cell == ReferenceCells::Quadrilateral)
+          if (cell_type == ReferenceCells::Quadrilateral)
             {
               ss << "Quadrilateral";
             }
-          else // if (reference_cell == ReferenceCells::Triangle)
+          else // if (cell_type == ReferenceCells::Triangle)
             {
               ss << "Triangle";
             }
         }
       else if (dimension == 3)
         {
-          Assert(reference_cell == ReferenceCells::Hexahedron ||
-                   reference_cell == ReferenceCells::Tetrahedron,
+          Assert(cell_type == ReferenceCells::Hexahedron ||
+                   cell_type == ReferenceCells::Tetrahedron,
                  ExcNotImplemented());
 
-          if (reference_cell == ReferenceCells::Hexahedron)
+          if (cell_type == ReferenceCells::Hexahedron)
             {
               ss << "Hexahedron";
             }
@@ -9321,7 +9423,7 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
         ss << "\">\n";
 
       ss << indent(indent_level + 2) << "<DataItem Dimensions=\"" << num_cells
-         << " " << reference_cell.n_vertices()
+         << " " << cell_type.n_vertices()
          << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
 
       ss << indent(indent_level + 3) << h5_mesh_filename << ":/cells\n";
