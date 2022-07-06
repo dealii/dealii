@@ -1831,7 +1831,12 @@ namespace MatrixFreeOperators
                VectorType,
                VectorizedArrayType>::MassOperator()
     : Base<dim, VectorType, VectorizedArrayType>()
-  {}
+  {
+    AssertThrow(
+      IsBlockVector<VectorType>::value == false,
+      ExcNotImplemented(
+        "This class only supports the non-blocked vector variant of the Base operator because only a single FEEvaluation object is used in the apply function."));
+  }
 
 
 
