@@ -3915,13 +3915,17 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   for (unsigned int v = 0; v < n_filled_lanes; ++v)
     {
-      Assert(cells[v] != numbers::invalid_unsigned_int, ExcNotImplemented());
-      dof_indices[v] =
-        dof_indices_cont[cells[v]] +
-        this->dof_info
-            ->component_dof_indices_offset[this->active_fe_index]
-                                          [this->first_selected_component] *
-          this->dof_info->dof_indices_interleave_strides[ind][cells[v]];
+      Assert(mask[v] == false || cells[v] != numbers::invalid_unsigned_int,
+             ExcNotImplemented());
+      if (mask[v] == true)
+        dof_indices[v] =
+          dof_indices_cont[cells[v]] +
+          this->dof_info
+              ->component_dof_indices_offset[this->active_fe_index]
+                                            [this->first_selected_component] *
+            this->dof_info->dof_indices_interleave_strides[ind][cells[v]];
+      else
+        dof_indices[v] = numbers::invalid_unsigned_int;
     }
 
   for (unsigned int v = n_filled_lanes; v < VectorizedArrayType::size(); ++v)
