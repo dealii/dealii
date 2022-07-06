@@ -65,6 +65,7 @@ namespace MatrixFreeOperators
                             typename VectorType::BlockType &>::type
     subblock(VectorType &vector, unsigned int block_no)
     {
+      AssertIndexRange(block_no, vector.n_blocks());
       return vector.block(block_no);
     }
 
