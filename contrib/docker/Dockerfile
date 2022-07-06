@@ -13,7 +13,7 @@ RUN cd /usr/src \
     -DDEAL_II_WITH_MPI=ON \
     -DCMAKE_CXX_FLAGS="-std=c++17" \
     .. \  
-    && ninja install \
+    && ninja -j 2 install \
     && cd ../ && rm -rf .git build
 
 USER $USER
