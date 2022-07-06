@@ -52,11 +52,11 @@ namespace VectorTools
      * mapping here because the function we evaluate for the DoFs is zero in
      * the mapped locations as well as in the original, unmapped locations
      */
-    template <int dim, int spacedim, typename number>
+    template <int dim, int spacedim, typename Number>
     void
     interpolate_zero_boundary_values(
       const DoFHandler<dim, spacedim> &          dof_handler,
-      std::map<types::global_dof_index, number> &boundary_values)
+      std::map<types::global_dof_index, Number> &boundary_values)
     {
       // loop over all boundary faces
       // to get all dof indices of
@@ -79,11 +79,8 @@ namespace VectorTools
       // that is actually wholly on
       // the boundary, not only by
       // one line or one vertex
-      typename DoFHandler<dim, spacedim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
       std::vector<types::global_dof_index> face_dof_indices;
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->at_boundary(f))
             {
@@ -102,6 +99,8 @@ namespace VectorTools
             }
     }
 
+
+
     /**
      * Compute the boundary values to be used in the project() functions.
      */
@@ -111,16 +110,16 @@ namespace VectorTools
               class M_or_MC,
               template <int>
               class Q_or_QC,
-              typename number>
+              typename Number>
     void
     project_compute_b_v(
       const M_or_MC<dim, spacedim> &             mapping,
       const DoFHandler<dim, spacedim> &          dof,
-      const Function<spacedim, number> &         function,
+      const Function<spacedim, Number> &         function,
       const bool                                 enforce_zero_boundary,
       const Q_or_QC<dim - 1> &                   q_boundary,
       const bool                                 project_to_boundary_first,
-      std::map<types::global_dof_index, number> &boundary_values)
+      std::map<types::global_dof_index, Number> &boundary_values)
     {
       if (enforce_zero_boundary == true)
         // no need to project boundary
@@ -143,7 +142,7 @@ namespace VectorTools
           const std::vector<types::boundary_id> used_boundary_ids =
             dof.get_triangulation().get_boundary_ids();
 
-          std::map<types::boundary_id, const Function<spacedim, number> *>
+          std::map<types::boundary_id, const Function<spacedim, Number> *>
             boundary_functions;
           for (const auto used_boundary_id : used_boundary_ids)
             boundary_functions[used_boundary_id] = &function;
@@ -151,6 +150,7 @@ namespace VectorTools
             mapping, dof, boundary_functions, q_boundary, boundary_values);
         }
     }
+
 
 
     /*
@@ -180,12 +180,8 @@ namespace VectorTools
       (void)q_boundary;
 
       AssertDimension(dof.get_fe_collection().size(), 1);
-
-      Assert(dof.get_fe(0).n_components() == function.n_components,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(),
-                                  function.n_components));
-      Assert(dof.get_fe(0).n_components() == components,
-             ExcDimensionMismatch(components, dof.get_fe(0).n_components()));
+      AssertDimension(dof.get_fe(0).n_components(), function.n_components);
+      AssertDimension(dof.get_fe(0).n_components(), components);
 
       Quadrature<dim> quadrature_mf;
 
@@ -329,8 +325,10 @@ namespace VectorTools
 
 
 
-    // Helper interface for the matrix-free implementation of project().
-    // Used to determine the number of components.
+    /**
+     * Helper interface for the matrix-free implementation of project(). Used
+     * to determine the number of components.
+     */
     template <int dim, typename Number, int spacedim>
     void
     project_matrix_free_component(
@@ -422,8 +420,7 @@ namespace VectorTools
       const Quadrature<dim - 1> &q_boundary,
       const bool                 project_to_boundary_first)
     {
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      AssertDimension(vec_result.size(), dof.n_dofs());
 
       LinearAlgebra::distributed::Vector<typename VectorType::value_type>
         work_result;
@@ -437,11 +434,9 @@ namespace VectorTools
                                     q_boundary,
                                     project_to_boundary_first);
 
-      const IndexSet &          locally_owned_dofs = dof.locally_owned_dofs();
-      IndexSet::ElementIterator it                 = locally_owned_dofs.begin();
-      for (; it != locally_owned_dofs.end(); ++it)
-        ::dealii::internal::ElementAccess<VectorType>::set(work_result(*it),
-                                                           *it,
+      for (const auto i : dof.locally_owned_dofs())
+        ::dealii::internal::ElementAccess<VectorType>::set(work_result(i),
+                                                           i,
                                                            vec_result);
       vec_result.compress(VectorOperation::insert);
     }
@@ -452,11 +447,11 @@ namespace VectorTools
      * Return whether the boundary values try to constrain a degree of freedom
      * that is already constrained to something else
      */
-    template <typename number>
+    template <typename Number>
     bool
     constraints_and_b_v_are_compatible(
-      const AffineConstraints<number> &          constraints,
-      std::map<types::global_dof_index, number> &boundary_values)
+      const AffineConstraints<Number> &          constraints,
+      std::map<types::global_dof_index, Number> &boundary_values)
     {
       for (const auto &boundary_value : boundary_values)
         if (constraints.is_constrained(boundary_value.first))
@@ -495,15 +490,12 @@ namespace VectorTools
       const Q_or_QC<dim - 1> &q_boundary,
       const bool              project_to_boundary_first)
     {
-      using number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == function.n_components,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(),
-                                  function.n_components));
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      using Number = typename VectorType::value_type;
+      AssertDimension(dof.get_fe(0).n_components(), function.n_components);
+      AssertDimension(vec_result.size(), dof.n_dofs());
 
       // make up boundary values
-      std::map<types::global_dof_index, number> boundary_values;
+      std::map<types::global_dof_index, Number> boundary_values;
       project_compute_b_v(mapping,
                           dof,
                           function,
@@ -514,11 +506,11 @@ namespace VectorTools
 
       // check if constraints are compatible (see below)
       const bool constraints_are_compatible =
-        constraints_and_b_v_are_compatible<number>(constraints,
+        constraints_and_b_v_are_compatible<Number>(constraints,
                                                    boundary_values);
 
       // set up mass matrix and right hand side
-      Vector<number>  vec(dof.n_dofs());
+      Vector<Number>  vec(dof.n_dofs());
       SparsityPattern sparsity;
       {
         DynamicSparsityPattern dsp(dof.n_dofs(), dof.n_dofs());
@@ -529,8 +521,8 @@ namespace VectorTools
 
         sparsity.copy_from(dsp);
       }
-      SparseMatrix<number> mass_matrix(sparsity);
-      Vector<number>       tmp(mass_matrix.n());
+      SparseMatrix<Number> mass_matrix(sparsity);
+      Vector<Number>       tmp(mass_matrix.n());
 
       // If the constraints object does not conflict with the given boundary
       // values (i.e., it either does not contain boundary values or it contains
@@ -539,7 +531,7 @@ namespace VectorTools
       // interpolate the boundary values and then condense the matrix and vector
       if (constraints_are_compatible)
         {
-          const Function<spacedim, number> *dummy = nullptr;
+          const Function<spacedim, Number> *dummy = nullptr;
           MatrixCreator::create_mass_matrix(mapping,
                                             dof,
                                             quadrature,
@@ -566,10 +558,10 @@ namespace VectorTools
       // steps may not be sufficient, since roundoff errors may accumulate for
       // badly conditioned matrices
       ReductionControl control(5 * tmp.size(), 0., 1e-12, false, false);
-      GrowingVectorMemory<Vector<number>> memory;
-      SolverCG<Vector<number>>            cg(control, memory);
+      GrowingVectorMemory<Vector<Number>> memory;
+      SolverCG<Vector<Number>>            cg(control, memory);
 
-      PreconditionSSOR<SparseMatrix<number>> prec;
+      PreconditionSSOR<SparseMatrix<Number>> prec;
       prec.initialize(mass_matrix, 1.2);
 
       cg.solve(mass_matrix, vec, tmp, prec);
@@ -584,6 +576,8 @@ namespace VectorTools
                                                            vec_result);
     }
 
+
+
     template <int dim, typename VectorType, int spacedim>
     void
     project_parallel(
@@ -596,11 +590,10 @@ namespace VectorTools
         const unsigned int)> &                                  func,
       VectorType &                                              vec_result)
     {
-      using Number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == 1,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      using Number          = typename VectorType::value_type;
+      using LocalVectorType = LinearAlgebra::distributed::Vector<Number>;
+      AssertDimension(dof.get_fe(0).n_components(), 1);
+      AssertDimension(vec_result.size(), dof.n_dofs());
 
       // set up mass matrix and right hand side
       typename MatrixFree<dim, Number>::AdditionalData additional_data;
@@ -615,13 +608,12 @@ namespace VectorTools
                           constraints,
                           QGauss<1>(dof.get_fe().degree + 2),
                           additional_data);
-      using MatrixType = MatrixFreeOperators::
-        MassOperator<dim, -1, 0, 1, LinearAlgebra::distributed::Vector<Number>>;
+      using MatrixType =
+        MatrixFreeOperators::MassOperator<dim, -1, 0, 1, LocalVectorType>;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
       mass_matrix.compute_diagonal();
 
-      using LocalVectorType = LinearAlgebra::distributed::Vector<Number>;
       LocalVectorType vec, rhs, inhomogeneities;
       matrix_free->initialize_dof_vector(vec);
       matrix_free->initialize_dof_vector(rhs);
@@ -640,10 +632,7 @@ namespace VectorTools
         const unsigned int n_q_points    = quadrature.size();
         Vector<Number>     cell_rhs(dofs_per_cell);
         std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-        typename DoFHandler<dim, spacedim>::active_cell_iterator
-          cell = dof.begin_active(),
-          endc = dof.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : dof.active_cell_iterators())
           if (cell->is_locally_owned())
             {
               cell_rhs = 0;
@@ -672,7 +661,7 @@ namespace VectorTools
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
       ReductionControl control(5 * rhs.size(), 0., 1e-12, false, false);
-      SolverCG<LinearAlgebra::distributed::Vector<Number>>    cg(control);
+      SolverCG<LocalVectorType>                               cg(control);
       typename PreconditionJacobi<MatrixType>::AdditionalData data(0.8);
       PreconditionJacobi<MatrixType>                          preconditioner;
       preconditioner.initialize(mass_matrix, data);
@@ -707,19 +696,17 @@ namespace VectorTools
       const DoFHandler<dim, spacedim> &dof =
         matrix_free->get_dof_handler(fe_component);
 
-      using Number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == 1,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      using Number          = typename VectorType::value_type;
+      using LocalVectorType = LinearAlgebra::distributed::Vector<Number>;
+      AssertDimension(dof.get_fe(0).n_components(), 1);
+      AssertDimension(vec_result.size(), dof.n_dofs());
 
-      using MatrixType = MatrixFreeOperators::
-        MassOperator<dim, -1, 0, 1, LinearAlgebra::distributed::Vector<Number>>;
+      using MatrixType =
+        MatrixFreeOperators::MassOperator<dim, -1, 0, 1, LocalVectorType>;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free, {fe_component});
       mass_matrix.compute_diagonal();
 
-      using LocalVectorType = LinearAlgebra::distributed::Vector<Number>;
       LocalVectorType vec, rhs, inhomogeneities;
       matrix_free->initialize_dof_vector(vec, fe_component);
       matrix_free->initialize_dof_vector(rhs, fe_component);
@@ -753,7 +740,7 @@ namespace VectorTools
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
       ReductionControl control(5 * rhs.size(), 0., 1e-12, false, false);
-      SolverCG<LinearAlgebra::distributed::Vector<Number>>    cg(control);
+      SolverCG<LocalVectorType>                               cg(control);
       typename PreconditionJacobi<MatrixType>::AdditionalData data(0.8);
       PreconditionJacobi<MatrixType>                          preconditioner;
       preconditioner.initialize(mass_matrix, data);
@@ -771,11 +758,13 @@ namespace VectorTools
       vec_result.compress(VectorOperation::insert);
     }
 
+
+
     /**
      * Specialization of project() for the case dim==spacedim and with correct
-     * number types for MatrixFree support.  Check if we actually can use the
-     * MatrixFree implementation or need to use the matrix based one
-     * nonetheless based on the number of components.
+     * number types for MatrixFree support. Check if we actually can use the
+     * MatrixFree implementation or need to use the matrix based one nonetheless
+     * based on the number of components.
      */
     template <typename VectorType, int dim, int spacedim>
     std::enable_if_t<
@@ -834,6 +823,8 @@ namespace VectorTools
         }
     }
 
+
+
     /**
      * Specialization of project() for complex numbers or `dim < spacedim`,
      * for which we are sure that we cannot use the MatrixFree implementation.
@@ -867,7 +858,10 @@ namespace VectorTools
                  q_boundary,
                  project_to_boundary_first);
     }
+
   } // namespace internal
+
+
 
   template <int dim, typename VectorType, int spacedim>
   void
@@ -1006,6 +1000,7 @@ namespace VectorTools
   }
 
 
+
   template <int dim, typename VectorType, int spacedim>
   void
   project(const DoFHandler<dim, spacedim> &                         dof,
@@ -1027,6 +1022,7 @@ namespace VectorTools
             q_boundary,
             project_to_boundary_first);
   }
+
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE
