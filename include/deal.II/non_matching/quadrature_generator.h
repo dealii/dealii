@@ -906,7 +906,7 @@ namespace NonMatching
          * The roots of the functions in point_restrictions.
          * This will be the values of the height functions, $\{H_i(x_I)\}$ at
          * some lower dimensional quadrature point,
-         * $x_I \in \mathbb{R}^{dim-1}}$.
+         * $x_I \in \mathbb{R}^{dim-1}$.
          */
         std::vector<double> roots;
       };

@@ -5747,11 +5747,10 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::get_value(
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
         {
           // Cartesian cell
-          const Tensor<2, dim, dealii::VectorizedArray<Number>> jac =
-            this->jacobian[1];
-          const VectorizedArrayType inv_det =
+          const Tensor<2, dim, VectorizedArrayType> jac = this->jacobian[1];
+          const VectorizedArrayType                 inv_det =
             (dim == 2) ? this->jacobian[0][0][0] * this->jacobian[0][1][1] :
-                         this->jacobian[0][0][0] * this->jacobian[0][1][1] *
+                                         this->jacobian[0][0][0] * this->jacobian[0][1][1] *
                            this->jacobian[0][2][2];
 
           // J * u * det(J^-1)
@@ -5762,7 +5761,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::get_value(
       else
         {
           // Affine or general cell
-          const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
+          const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
             (this->cell_type > internal::MatrixFreeFunctions::affine) ?
               this->jacobian[q_point] :
               this->jacobian[0];
@@ -5838,7 +5837,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
           // Affine cell
-          const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
+          const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
             this->jacobian[0];
           const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
 
@@ -6081,8 +6080,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
         {
-          const Tensor<2, dim, dealii::VectorizedArray<Number>> jac =
-            this->jacobian[1];
+          const Tensor<2, dim, VectorizedArrayType> jac = this->jacobian[1];
           const VectorizedArrayType weight = this->quadrature_weights[q_point];
 
           for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -6092,7 +6090,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       else
         {
           // Affine or general cell
-          const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
+          const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
             (this->cell_type > internal::MatrixFreeFunctions::affine) ?
               this->jacobian[q_point] :
               this->jacobian[0];
@@ -6173,7 +6171,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
           // Affine cell
-          const Tensor<2, dim, dealii::VectorizedArray<Number>> &inv_t_jac =
+          const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
             this->jacobian[0];
           const Tensor<2, dim, VectorizedArrayType> &jac = this->jacobian[1];
 
