@@ -1,0 +1,6 @@
+New: Implement ``DataOut::write_deal_II_intermediate_in_parallel()``
+that writes a combined file from all MPI ranks using MPI I/O of the
+internal patches and a corresponding
+``DataOutReader::read_whole_parallel_file()`` to read them back in.
+<br>
+(Timo Heister, 2022/07/07)
