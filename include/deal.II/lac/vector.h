@@ -994,11 +994,19 @@ public:
 
   /**
    * This function exists for compatibility with the @p
-   * parallel vector classes (e.g., LinearAlgebra::distributed::Vector class).
-   * Always returns false since this implementation is serial.
+   * parallel vector classes (e.g., LinearAlgebra::distributed::Vector class)
+   * and always returns false since this implementation is serial.
    */
   bool
   has_ghost_elements() const;
+
+  /**
+   * This function exists for compatibility with the @p
+   * parallel vector classes (e.g., LinearAlgebra::distributed::Vector class)
+   * and does nothing since this implementation is serial.
+   */
+  void
+  zero_out_ghost_values() const;
   //@}
 
 private:
@@ -1315,12 +1323,22 @@ inline void Vector<Number>::compress(::dealii::VectorOperation::values) const
 {}
 
 
+
 template <typename Number>
 inline bool
 Vector<Number>::has_ghost_elements() const
 {
   return false;
 }
+
+
+
+template <typename Number>
+inline void
+Vector<Number>::zero_out_ghost_values() const
+{}
+
+
 
 template <typename Number>
 inline void
