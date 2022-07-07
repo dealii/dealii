@@ -9255,6 +9255,14 @@ DataOutReader<dim, spacedim>::read_whole_parallel_file(std::istream &in)
 
   ParallelIntermediateHeaderType header;
   in.read(reinterpret_cast<char *>(&header), sizeof(header));
+  AssertThrow(
+    header.magic == 0x00dea111,
+    ExcMessage(
+      "Invalid header of parallel deal.II intermediate format encountered."));
+  AssertThrow(
+    header.version == DataOutBase::Deal_II_IntermediateFlags::format_version,
+    ExcMessage(
+      "Incorrect header version of parallel deal.II intermediate format."));
 
   std::vector<std::uint64_t> chunk_sizes(header.num_ranks);
   in.read(reinterpret_cast<char *>(chunk_sizes.data()),
