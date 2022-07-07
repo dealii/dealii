@@ -2750,6 +2750,9 @@ namespace DataOutBase
     if (format_name == "deal.II intermediate")
       return deal_II_intermediate;
 
+    if (format_name == "parallel deal.II intermediate")
+      return parallel_deal_II_intermediate;
+
     if (format_name == "hdf5")
       return hdf5;
 
@@ -2766,7 +2769,7 @@ namespace DataOutBase
   std::string
   get_output_format_names()
   {
-    return "none|dx|ucd|gnuplot|povray|eps|gmv|tecplot|tecplot_binary|vtk|vtu|hdf5|svg|deal.II intermediate";
+    return "none|dx|ucd|gnuplot|povray|eps|gmv|tecplot|tecplot_binary|vtk|vtu|hdf5|svg|deal.II intermediate|parallel deal.II intermediate";
   }
 
 
@@ -2800,6 +2803,8 @@ namespace DataOutBase
           return ".vtu";
         case deal_II_intermediate:
           return ".d2";
+        case parallel_deal_II_intermediate:
+          return ".pd2";
         case hdf5:
           return ".h5";
         case svg:

@@ -1659,6 +1659,11 @@ namespace DataOutBase
     deal_II_intermediate,
 
     /**
+     * Output in parallel deal.II intermediate format.
+     */
+    parallel_deal_II_intermediate,
+
+    /**
      * Output in HDF5 format.
      */
     hdf5
