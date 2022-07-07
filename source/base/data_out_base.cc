@@ -8606,13 +8606,13 @@ DataOutBase::write_hdf5_parallel(
       "Serial HDF5 output on multiple processes is not yet supported."));
 #  endif
 
-  // Verify that there are indeed patches to be written out. most of the times,
-  // people just forget to call build_patches when there are no patches, so a
-  // warning is in order. That said, the assertion is disabled if we run with
-  // more than one MPI rank,
-  // since then it can happen that, on coarse meshes, a processor simply has
-  // no cells it actually owns, and in that case it is legit if there are no
-  // patches.
+  // Verify that there are indeed patches to be written out. most of
+  // the times, people just forget to call build_patches when there
+  // are no patches, so a warning is in order. That said, the
+  // assertion is disabled if we run with more than one MPI rank,
+  // since then it can happen that, on coarse meshes, a processor
+  // simply has no cells it actually owns, and in that case it is
+  // legit if there are no patches.
   Assert((patches.size() > 0) || (n_ranks > 1), ExcNoPatches());
 
   // The HDF5 routines perform a bunch of collective calls that expect all
