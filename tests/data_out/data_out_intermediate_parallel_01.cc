@@ -13,7 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-// Test DataOut::write_deal_II_intermediate_in_parallel()
+// Test DataOut::write_deal_II_intermediate_in_parallel() and
+// DataOutReader::read_whole_parallel_file()
 
 #include <deal.II/base/mpi.h>
 
@@ -63,19 +64,18 @@ check()
   data_out.build_patches();
 
   data_out.write_deal_II_intermediate_in_parallel(
-    "test.d2p", MPI_COMM_WORLD, DataOutBase::VtkFlags::no_compression);
+    "test.pd2", MPI_COMM_WORLD, DataOutBase::VtkFlags::no_compression);
 
   const unsigned int my_rank =
     dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   if (my_rank == 0)
     {
-      // can't checksum as the file contains "[written by deal.II
-      // 9.5.0-pre]" which would change often, so we just look at the
-      // size for now. This will of course fail once we go to
-      // 10.0. :-)
-      std::ifstream in("test.d2p", std::ifstream::ate | std::ifstream::binary);
+      // Read the data back in and dump it into the deallog:
+      std::ifstream in("test.pd2");
       Assert(in, dealii::ExcIO());
-      deallog << "size: " << in.tellg() << std::endl;
+      DataOutReader<dim, dim> reader;
+      reader.read_whole_parallel_file(in);
+      reader.write_deal_II_intermediate(deallog.get_file_stream());
     }
 
   deallog << "OK" << std::endl;

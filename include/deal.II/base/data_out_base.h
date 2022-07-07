@@ -2349,7 +2349,7 @@ namespace DataOutBase
    * into a single file with name @p name. Compression using zlib is optional and controlled
    * using @p compression.
    *
-   * The files typically have the extension <tt>.d2_par_patches</tt>.
+   * The files typically have the extension <tt>.pd2</tt>.
    */
   template <int dim, int spacedim>
   void
@@ -3221,6 +3221,14 @@ public:
    */
   void
   read(std::istream &in);
+
+  /**
+   * Read all data previously written using
+   * DataOutBase::write_deal_II_intermediate_in_parallel() from all
+   * MPI ranks into this data structure.
+   */
+  void
+  read_whole_parallel_file(std::istream &in);
 
   /**
    * This function can be used to merge the patches read by the other object
