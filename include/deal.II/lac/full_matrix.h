@@ -779,18 +779,18 @@ public:
   symmetrize();
 
   /**
-   * A=Inverse(A). A must be a square matrix.  Inversion of this matrix by
-   * Gauss-Jordan algorithm with partial pivoting.  This process is well-
-   * behaved for positive definite matrices, but be aware of round-off errors
-   * in the indefinite case.
+   * A=Inverse(A). A must be a square matrix. Inversion of this matrix by
+   * Gauss-Jordan algorithm with partial pivoting. This process is
+   * well-behaved for positive definite matrices, but be aware of round-off
+   * errors in the indefinite case.
    *
    * In case deal.II was configured with LAPACK, the functions Xgetrf and
    * Xgetri build an LU factorization and invert the matrix upon that
    * factorization, providing best performance up to matrices with a few
    * hundreds rows and columns.
    *
-   * The numerical effort to invert an <tt>n x n</tt> matrix is of the order
-   * <tt>n**3</tt>.
+   * The numerical effort to invert an $n \times n$ matrix is of the order
+   * $n^3$.
    */
   void
   gauss_jordan();
