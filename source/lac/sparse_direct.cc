@@ -666,7 +666,7 @@ SparseDirectUMFPACK::factorize(const Matrix &)
     ExcMessage(
       "To call this function you need UMFPACK, but you configured deal.II "
       "without passing the necessary switch to 'cmake'. Please consult the "
-      "installation instructions in doc/readme.html."));
+      "installation instructions at https://dealii.org/current/readme.html"));
 }
 
 
@@ -678,7 +678,7 @@ SparseDirectUMFPACK::solve(Vector<double> &, const bool) const
     ExcMessage(
       "To call this function you need UMFPACK, but you configured deal.II "
       "without passing the necessary switch to 'cmake'. Please consult the "
-      "installation instructions in doc/readme.html."));
+      "installation instructions at https://dealii.org/current/readme.html"));
 }
 
 
@@ -691,7 +691,7 @@ SparseDirectUMFPACK::solve(Vector<std::complex<double>> &, const bool) const
     ExcMessage(
       "To call this function you need UMFPACK, but you configured deal.II "
       "without passing the necessary switch to 'cmake'. Please consult the "
-      "installation instructions in doc/readme.html."));
+      "installation instructions at https://dealii.org/current/readme.html"));
 }
 
 
@@ -704,7 +704,7 @@ SparseDirectUMFPACK::solve(BlockVector<double> &, const bool) const
     ExcMessage(
       "To call this function you need UMFPACK, but you configured deal.II "
       "without passing the necessary switch to 'cmake'. Please consult the "
-      "installation instructions in doc/readme.html."));
+      "installation instructions at https://dealii.org/current/readme.html"));
 }
 
 
@@ -718,7 +718,7 @@ SparseDirectUMFPACK::solve(BlockVector<std::complex<double>> &,
     ExcMessage(
       "To call this function you need UMFPACK, but you configured deal.II "
       "without passing the necessary switch to 'cmake'. Please consult the "
-      "installation instructions in doc/readme.html."));
+      "installation instructions at https://dealii.org/current/readme.html"));
 }
 
 
@@ -732,7 +732,7 @@ SparseDirectUMFPACK::solve(const Matrix &, Vector<double> &, const bool)
     ExcMessage(
       "To call this function you need UMFPACK, but you configured deal.II "
       "without passing the necessary switch to 'cmake'. Please consult the "
-      "installation instructions in doc/readme.html."));
+      "installation instructions at https://dealii.org/current/readme.html"));
 }
 
 
@@ -748,7 +748,7 @@ SparseDirectUMFPACK::solve(const Matrix &,
     ExcMessage(
       "To call this function you need UMFPACK, but you configured deal.II "
       "without passing the necessary switch to 'cmake'. Please consult the "
-      "installation instructions in doc/readme.html."));
+      "installation instructions at https://dealii.org/current/readme.html"));
 }
 
 
@@ -762,7 +762,7 @@ SparseDirectUMFPACK::solve(const Matrix &, BlockVector<double> &, const bool)
     ExcMessage(
       "To call this function you need UMFPACK, but you configured deal.II "
       "without passing the necessary switch to 'cmake'. Please consult the "
-      "installation instructions in doc/readme.html."));
+      "installation instructions at https://dealii.org/current/readme.html"));
 }
 
 
@@ -778,7 +778,7 @@ SparseDirectUMFPACK::solve(const Matrix &,
     ExcMessage(
       "To call this function you need UMFPACK, but you configured deal.II "
       "without passing the necessary switch to 'cmake'. Please consult the "
-      "installation instructions in doc/readme.html."));
+      "installation instructions at https://dealii.org/current/readme.html"));
 }
 
 #endif
