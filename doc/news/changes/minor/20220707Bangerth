@@ -1,0 +1,6 @@
+New: There are now functions Utilities::MPI::isend() and
+Utilities::MPI::irecv() that can send and receive arbitrary objects to
+and from other processes, and that handle all of the setting up and
+tearing down of MPI objects and temporary buffers.
+<br>
+(Wolfgang Bangerth, 2022/07/07)
