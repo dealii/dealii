@@ -1835,7 +1835,9 @@ namespace MatrixFreeOperators
     AssertThrow(
       IsBlockVector<VectorType>::value == false,
       ExcNotImplemented(
-        "This class only supports the non-blocked vector variant of the Base operator because only a single FEEvaluation object is used in the apply function."));
+        "This class only supports the non-blocked vector variant of the Base "
+        "operator because only a single FEEvaluation object is used in the "
+        "apply function."));
   }
 
 
