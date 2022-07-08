@@ -7652,8 +7652,14 @@ namespace DataOutBase
     // rank 0 also collects and writes the size of the data from each rank in
     // bytes:
     std::vector<std::uint64_t> chunk_sizes(n_ranks);
-    int                        ierr = MPI_Gather(
-      &my_size, 1, MPI_UINT64_T, chunk_sizes.data(), 1, MPI_UINT64_T, 0, comm);
+    int                        ierr = MPI_Gather(&my_size,
+                          1,
+                          MPI_UINT64_T,
+                          static_cast<std::uint64_t *>(chunk_sizes.data()),
+                          1,
+                          MPI_UINT64_T,
+                          0,
+                          comm);
     AssertThrowMPI(ierr);
 
     MPI_Info info;
