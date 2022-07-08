@@ -110,7 +110,7 @@ namespace LinearAlgebra
      * local_element(). Locally owned indices are placed first, [0,
      * locally_owned_size()), and then all ghost indices follow after them
      * contiguously, [locally_owned_size(),
-     * locally_owned_size()+n_ghost_entries()).
+     * locally_owned_size()+get_partitioner()->n_ghost_indices()).
      * </ul>
      *
      * Functions related to parallel functionality:
@@ -149,7 +149,8 @@ namespace LinearAlgebra
      * has_ghost_elements(), which returns <code>true</code> exactly when
      * ghost elements have been updated and <code>false</code> otherwise,
      * irrespective of the actual number of ghost entries in the vector layout
-     * (for that information, use n_ghost_entries() instead).
+     * (for that information, use
+     * <code>get_partitioner()->n_ghost_indices()</code> instead).
      * </ul>
      *
      * This vector uses the facilities of the class dealii::Vector<Number> for
@@ -1051,7 +1052,7 @@ namespace LinearAlgebra
        * Read access to the data field specified by @p local_index. Locally
        * owned indices can be accessed with indices
        * <code>[0,locally_owned_size)</code>, and ghost indices with indices
-       * <code>[locally_owned_size,locally_owned_size+ n_ghost_entries]</code>.
+       * <code>[locally_owned_size,locally_owned_size+get_partitioner()->n_ghost_indices()]</code>.
        *
        * Performance: Direct array access (fast).
        */
