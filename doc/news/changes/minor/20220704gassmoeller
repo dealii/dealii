@@ -2,4 +2,4 @@ Fixed: MappingCartesian used to throw exceptions in debug mode when checking if
 small cells in a large domain size are actually aligned to coordinate axes.
 This is fixed now.
 <br>
-+(Rene Gassmoeller, 2022/07/04)
+(Rene Gassmoeller, 2022/07/04)
