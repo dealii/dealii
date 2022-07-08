@@ -2352,7 +2352,7 @@ namespace DataOutBase
    * Like write_deal_II_intermediate() but write all patches from all ranks
    * using MPI I/O
    * into a single file with name @p name. Compression using zlib is optional and controlled
-   * using @p compression.
+   * by the @p compression argument.
    *
    * The files typically have the extension <tt>.pd2</tt>.
    */
@@ -2860,7 +2860,6 @@ public:
    * to the file @p filename in the parallel
    * deal.II intermediate format. See
    * DataOutBase::write_deal_II_intermediate_in_parallel().
-   *
    */
   void
   write_deal_II_intermediate_in_parallel(

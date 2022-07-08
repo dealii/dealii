@@ -176,16 +176,20 @@ namespace
   /**
    * The header in binary format that the parallel intermediate files
    * start with.
+   *
+   * @note We are using std::uint64_t for all variables for simplicity below,
+   * so that we don't have to worry about packing/data member alignment
+   * by the compiler.
    */
-  struct ParallelIntermediateHeaderType
+  struct ParallelIntermediateHeader
   {
     std::uint64_t magic;
     std::uint64_t version;
     std::uint64_t compression;
     std::uint64_t dimension;
     std::uint64_t space_dimension;
-    std::uint64_t num_ranks;
-    std::uint64_t num_patches;
+    std::uint64_t n_ranks;
+    std::uint64_t n_patches;
   };
 } // namespace
 
@@ -7582,8 +7586,17 @@ namespace DataOutBase
     const VtkFlags::ZlibCompressionLevel compression)
   {
 #ifndef DEAL_II_WITH_MPI
-
+    (void)patches;
+    (void)data_names;
+    (void)nonscalar_data_ranges;
+    (void)flags;
+    (void)filename;
     (void)comm;
+    (void)compression;
+
+    AssertThrow(false,
+                ExcMessage("This functionality requires MPI to be enabled."));
+
 #else
 
     // We write a simple format based on the text format of
@@ -7617,22 +7630,22 @@ namespace DataOutBase
     }
     const std::uint64_t my_size = my_buffer.size();
 
-    const unsigned int  my_rank     = Utilities::MPI::this_mpi_process(comm);
-    const std::uint64_t num_ranks   = Utilities::MPI::n_mpi_processes(comm);
-    const std::uint64_t num_patches = Utilities::MPI::sum(patches.size(), comm);
+    const unsigned int  my_rank   = Utilities::MPI::this_mpi_process(comm);
+    const std::uint64_t n_ranks   = Utilities::MPI::n_mpi_processes(comm);
+    const std::uint64_t n_patches = Utilities::MPI::sum(patches.size(), comm);
 
-    const ParallelIntermediateHeaderType header{
+    const ParallelIntermediateHeader header{
       0x00dea111,
       Deal_II_IntermediateFlags::format_version,
       compression,
       dim,
       spacedim,
-      num_ranks,
-      num_patches};
+      n_ranks,
+      n_patches};
 
     // rank 0 also collects and writes the size of the data from each rank in
     // bytes:
-    std::vector<std::uint64_t> chunk_sizes(num_ranks);
+    std::vector<std::uint64_t> chunk_sizes(n_ranks);
     int                        ierr = MPI_Gather(
       &my_size, 1, MPI_UINT64_T, chunk_sizes.data(), 1, MPI_UINT64_T, 0, comm);
     AssertThrowMPI(ierr);
@@ -7644,14 +7657,14 @@ namespace DataOutBase
     ierr = MPI_File_open(
       comm, filename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
     AssertThrow(ierr == MPI_SUCCESS, ExcFileNotOpen(filename));
+    ierr = MPI_Info_free(&info);
+    AssertThrowMPI(ierr);
 
     ierr = MPI_File_set_size(fh, 0); // delete the file contents
     AssertThrowMPI(ierr);
     // this barrier is necessary, because otherwise others might already write
     // while one core is still setting the size to zero.
     ierr = MPI_Barrier(comm);
-    AssertThrowMPI(ierr);
-    ierr = MPI_Info_free(&info);
     AssertThrowMPI(ierr);
 
     // write header
@@ -7678,7 +7691,7 @@ namespace DataOutBase
 
       // Locate specific offset for each processor.
       const MPI_Offset offset = static_cast<MPI_Offset>(sizeof(header)) +
-                                num_ranks * sizeof(std::uint64_t) + prefix_sum;
+                                n_ranks * sizeof(std::uint64_t) + prefix_sum;
 
       ierr = Utilities::MPI::LargeCount::File_write_at_all_c(
         fh, offset, my_buffer.data(), my_size, MPI_CHAR, MPI_STATUS_IGNORE);
@@ -9258,7 +9271,7 @@ DataOutReader<dim, spacedim>::read_whole_parallel_file(std::istream &in)
 {
   AssertThrow(in.fail() == false, ExcIO());
 
-  ParallelIntermediateHeaderType header;
+  ParallelIntermediateHeader header;
   in.read(reinterpret_cast<char *>(&header), sizeof(header));
   AssertThrow(
     header.magic == 0x00dea111,
@@ -9269,11 +9282,11 @@ DataOutReader<dim, spacedim>::read_whole_parallel_file(std::istream &in)
     ExcMessage(
       "Incorrect header version of parallel deal.II intermediate format."));
 
-  std::vector<std::uint64_t> chunk_sizes(header.num_ranks);
+  std::vector<std::uint64_t> chunk_sizes(header.n_ranks);
   in.read(reinterpret_cast<char *>(chunk_sizes.data()),
-          header.num_ranks * sizeof(std::uint64_t));
+          header.n_ranks * sizeof(std::uint64_t));
 
-  for (unsigned int n = 0; n < header.num_ranks; ++n)
+  for (unsigned int n = 0; n < header.n_ranks; ++n)
     {
       // First read the compressed data into temp_buffer and then
       // decompress and put into datastream
