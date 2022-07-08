@@ -329,6 +329,8 @@ namespace Utilities
       MPI_Comm comm;
     };
 
+
+
     /**
      * This class represents a mutex to guard a critical section for a set of
      * processors in a parallel computation using MPI.
@@ -436,6 +438,138 @@ namespace Utilities
        * The request to keep track of the non-blocking barrier.
        */
       MPI_Request request;
+    };
+
+
+
+    /**
+     * An object that acts like a
+     * [std::future](https://en.cppreference.com/w/cpp/thread/future)
+     * object except that it does not encode the operation of waiting
+     * for an operation to finish that may be happening on a different
+     * thread, but for an "immediate" MPI operation such as
+     * `MPI_Isend` or `MPI_Irecv`. An object of this kind is returned,
+     * for example, by the isend() and irecv() functions in this
+     * namespace.
+     *
+     * If the operation being waited for produces a result (such as
+     * a *receive* operation, then the produced result is returned
+     * by the get() function and its type is indicated by the
+     * template argument `T`. If the operation does not produce
+     * a result (such as waiting for a send operation to complete),
+     * then `T=void` is the right choice for the template argument.
+     *
+     *
+     * <h3> Implementation </h3>
+     *
+     * Immediate MPI operations are typically associated with two
+     * additional actions. The first is that one has to be able to
+     * *wait* for them to finish. In many cases, this is done using
+     * a call to `MPI_Wait` that is given an `MPI_Request` object
+     * (in the case of send operations) or a call to `MPI_Probe`
+     * or a variant of this function (in the case of receive
+     * operations). The wait operation may be called more than
+     * once and would immediately return once the first one
+     * has succeeded.
+     *
+     * Secondly, immediate MPI operations often require clean-up
+     * actions that must be executed once the operation has
+     * finished. An example is releasing a buffer in which data
+     * has been stored (for an immediate send operation), or
+     * allocating a receive buffer, calling the MPI function that
+     * puts the received data into this buffer, calling the unpacking
+     * function for the data received, and releasing the receive buffer
+     * (for an immediate receive operation).
+     *
+     * This class models these two steps by taking two constructor
+     * arguments that correspond to these two operations. It ensures
+     * that that upon destruction of the current object, both the
+     * wait and clean-up functions are called. Because the clean-up
+     * function can only be called once, objects of the current
+     * class can not be copied, but they can be moved.
+     */
+    template <typename T>
+    class Future
+    {
+    public:
+      /**
+       * Constructor. Take both the wait and clean-up functions mentioned
+       * in the class documentation as arguments.
+       */
+      template <typename W, typename G>
+      Future(W &&wait_operation, G &&get_and_cleanup_operation);
+
+      /**
+       * Copy constructor. This operation is not possible, as explained
+       * in the class documentation, and consequently the constructor
+       * is deleted.
+       */
+      Future(const Future &) = delete;
+
+      /**
+       * Move constructor.
+       */
+      Future(Future &&) noexcept = default;
+
+      /**
+       * Destructor.
+       */
+      ~Future();
+
+      /**
+       * Copy operator. This operation is not possible, as explained
+       * in the class documentation, and consequently the operator
+       * is deleted.
+       */
+      Future &
+      operator=(const Future &) = delete;
+
+      /**
+       * Move operator.
+       */
+      Future &
+      operator=(Future &&) noexcept = default;
+
+      /**
+       * Wait for the operation to complete. This function can safely be called
+       * more than once. It will wait for the operation to complete the first
+       * time it is called; because the operation will have completed once
+       * it has been called for the first time, it will immediately return
+       * if called again at a later time.
+       */
+      void
+      wait();
+
+      /**
+       * Wait for the operation to complete and return the object the
+       * operation produces (if `T` is not equal to `void`).
+       *
+       * Like for std::future, this function can only be called once
+       * because the class does not store the object produced. (It
+       * can not store the object being produced because returning
+       * it from this function would require the ability to copy
+       * it; however, not all objects can be copied, whereas all
+       * useful objects can be moved.)
+       */
+      T
+      get();
+
+    private:
+      /**
+       * Function objects encoding the wait and clean-up operations.
+       */
+      std::function<void()> wait_function;
+      std::function<T()>    get_and_cleanup_function;
+
+      /**
+       * Whether or not wait() has already been called.
+       */
+      bool is_done;
+
+      /**
+       * Whether or not get() has already been called.
+       */
+      bool get_was_called;
     };
 
 
@@ -1305,6 +1439,58 @@ namespace Utilities
                const MPI_Comm &                              comm,
                const std::function<T(const T &, const T &)> &combiner);
 
+
+    /**
+     * A function that takes a given argument `object` and, using MPI,
+     * sends it to MPI process indicated by the given `target_rank`.
+     * This function is "immediate" (corresponding to the `MPI_Isend`
+     * function), i.e., it immediately returns rather than waiting
+     * for the send operation to succeed. Instead, it returns a
+     * Future object that can be used to wait for the send operation
+     * to complete.
+     *
+     * Unlike `MPI_Isend`, the object to be sent does not need to
+     * have a lifetime that extends until the send operation is
+     * complete. As a consequence, the first argument to this function
+     * may be a temporary variable (such as the result of another
+     * function call). That is because the object is internally
+     * packaged into a buffer whose lifetime is automatically
+     * managed. Using the buffer enables sending arbitrary objects,
+     * not just those natively supported by MPI. The only restriction
+     * on the type is that it needs to be possible to call
+     * Utilities::pack() and Utilities::unpack() on the object.
+     */
+    template <typename T>
+    Future<void>
+    isend(const T &          object,
+          MPI_Comm           communicator,
+          const unsigned int target_rank,
+          const unsigned int mpi_tag = 0);
+
+
+    /**
+     * A function that encodes an MPI "receive" function for an object
+     * whose type is represented by the template argument. The object
+     * is expected to be sent by the MPI process indicated by the given
+     * `source_rank`. This function is "immediate" (corresponding to the
+     * `MPI_Irecv` or a variant of this function),
+     * i.e., it immediately returns rather than waiting
+     * for the receive operation to succeed. Instead, it returns a
+     * Future object that can be used to wait for the send operation
+     * to complete, and then to obtain the object received via the
+     * Future::get() function.
+     *
+     * Unlike `MPI_Irecv`, the object to be received may be of any
+     * type on which one can call Utilities::pack() and Utilities::unpack(),
+     * not just those natively supported by MPI.
+     */
+    template <typename T>
+    Future<T>
+    irecv(MPI_Comm           communicator,
+          const unsigned int source_rank,
+          const unsigned int mpi_tag = 0);
+
+
     /**
      * Given a partitioned index set space, compute the owning MPI process rank
      * of each element of a second index set according to the partitioned index
@@ -1568,8 +1754,62 @@ namespace Utilities
     } // namespace internal
 
 
+    template <typename T>
+    template <typename W, typename G>
+    Future<T>::Future(W &&wait_operation, G &&get_and_cleanup_operation)
+      : wait_function(wait_operation)
+      , get_and_cleanup_function(get_and_cleanup_operation)
+      , is_done(false)
+      , get_was_called(false)
+    {}
 
-    // Since these depend on N they must live in the header file
+
+
+    template <typename T>
+    Future<T>::~Future()
+    {
+      // If there is a clean-up function, and if it has not been
+      // called yet, then do so. Note that we may not have a
+      // clean-up function (not even an empty one) if the current
+      // object has been moved from, into another object, and as
+      // a consequence the std::function objects are now empty
+      // even though they were initialized in the constructor.
+      // (A std::function object whose object is a an empty lambda
+      // function, [](){}, is not an empty std::function object.)
+      if ((get_was_called == false) && get_and_cleanup_function)
+        get();
+    }
+
+
+
+    template <typename T>
+    void
+    Future<T>::wait()
+    {
+      if (is_done == false)
+        {
+          wait_function();
+
+          is_done = true;
+        }
+    }
+
+
+    template <typename T>
+    T
+    Future<T>::get()
+    {
+      Assert(get_was_called == false,
+             ExcMessage(
+               "You can't call get() more than once on a Future object."));
+      get_was_called = true;
+
+      wait();
+      return get_and_cleanup_function();
+    }
+
+
+
     template <typename T, unsigned int N>
     void
     sum(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&sums)[N])
@@ -1992,6 +2232,144 @@ namespace Utilities
       AssertThrowMPI(ierr);
 
       return object;
+#  endif
+    }
+
+
+    template <typename T>
+    Future<void>
+    isend(const T &          object,
+          MPI_Comm           communicator,
+          const unsigned int target_rank,
+          const unsigned int mpi_tag)
+    {
+#  ifndef DEAL_II_WITH_MPI
+      Assert(false,
+             ExcMessage(
+               "This function is not useful when called without MPI."));
+      (void)object;
+      (void)communicator;
+      (void)target_rank;
+      (void)mpi_tag;
+      return Future<void>([]() {}, []() {});
+#  else
+      // Create a pointer to a send buffer into which we pack the object
+      // to be sent. The buffer will be released by the Future object once
+      // the send has been verified to have succeeded.
+      //
+      // Conceptually, we would like this send buffer to be a
+      // std::unique_ptr object whose ownership is later handed over
+      // to the cleanup function. That has the disadvantage that the
+      // cleanup object is a non-copyable lambda capture, leading to
+      // awkward semantics. Instead, we use a std::shared_ptr; we move
+      // this shared pointer into the cleanup function, which means
+      // that there is exactly one shared pointer who owns the buffer
+      // at any given time, though the latter is not an important
+      // optimization.
+      std::shared_ptr<std::vector<char>> send_buffer =
+        std::make_unique<std::vector<char>>(Utilities::pack(object, false));
+
+      // Now start the send, and store the result in a request object that
+      // we can then wait for later:
+      MPI_Request request;
+      const int   ierr =
+        MPI_Isend(send_buffer->data(),
+                  send_buffer->size(),
+                  mpi_type_id_for_type<decltype(*send_buffer->data())>,
+                  target_rank,
+                  mpi_tag,
+                  communicator,
+                  &request);
+      AssertThrowMPI(ierr);
+
+      // Then return a std::future-like object that has a wait()
+      // function one can use to wait for the communication to finish,
+      // and that has a cleanup function to be called at some point
+      // after that makes sure the send buffer gets deallocated. This
+      // cleanup function takes over ownership of the send buffer.
+      //
+      // Note that the body of the lambda function of the clean-up
+      // function could be left empty. If that were so, once the
+      // lambda function object goes out of scope, the 'send_buffer'
+      // member of the closure object goes out of scope as well and so
+      // the send_buffer is destroyed. But we may want to release the
+      // buffer itself as early as possible, and so we clear the
+      // buffer when the Future::get() function is called.
+      auto wait = [request]() mutable {
+        const int ierr = MPI_Wait(&request, MPI_STATUS_IGNORE);
+        AssertThrowMPI(ierr);
+      };
+      auto cleanup = [send_buffer = std::move(send_buffer)]() {
+        send_buffer->clear();
+      };
+      return Future<void>(wait, cleanup);
+#  endif
+    }
+
+
+
+    template <typename T>
+    Future<T>
+    irecv(MPI_Comm           communicator,
+          const unsigned int source_rank,
+          const unsigned int mpi_tag)
+    {
+#  ifndef DEAL_II_WITH_MPI
+      Assert(false,
+             ExcMessage(
+               "This function is not useful when called without MPI."));
+      (void)communicator;
+      (void)source_rank;
+      (void)mpi_tag;
+      return Future<void>([]() {}, []() { return T{}; });
+#  else
+      // Use a 'probe' operation for the 'wait' operation of the
+      // Future this function returns. It will trigger whenever we get
+      // the incoming message. Later, once we have received the message, we
+      // can query its size and allocate a receiver buffer.
+      //
+      // Since we may be waiting for multiple messages from the same
+      // incoming process (with possibly the same tag -- we can't
+      // know), we must make sure that the 'probe' operation we have
+      // here (and which we use to determine the buffer size) matches
+      // the 'recv' operation with which we actually get the data
+      // later on. This is exactly what the 'MPI_Mprobe' function and
+      // its 'I'mmediate variant is there for, coupled with the
+      // 'MPI_Mrecv' call that would put into the clean-up function
+      // below.
+      std::shared_ptr<MPI_Message> message = std::make_shared<MPI_Message>();
+      std::shared_ptr<MPI_Status>  status  = std::make_shared<MPI_Status>();
+
+      auto wait = [source_rank, mpi_tag, communicator, message, status]() {
+        const int ierr = MPI_Mprobe(
+          source_rank, mpi_tag, communicator, message.get(), status.get());
+        AssertThrowMPI(ierr);
+      };
+
+
+      // Now also define the function that actually gets the data:
+      auto get = [status, message]() {
+        int number_amount;
+        int ierr;
+        ierr = MPI_Get_count(status.get(), MPI_CHAR, &number_amount);
+        AssertThrowMPI(ierr);
+
+        std::vector<char> receive_buffer(number_amount);
+
+        // Then actually get the data, using the matching MPI_Mrecv to the above
+        // MPI_Mprobe:
+        ierr = MPI_Mrecv(receive_buffer.data(),
+                         number_amount,
+                         mpi_type_id_for_type<decltype(*receive_buffer.data())>,
+                         message.get(),
+                         status.get());
+        AssertThrowMPI(ierr);
+
+        // Return the unpacked object:
+        return Utilities::unpack<T>(receive_buffer, false);
+      };
+
+      return Future<T>(wait, get);
 #  endif
     }
 
