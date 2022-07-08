@@ -54,8 +54,6 @@
 #include <vector>
 
 #ifdef DEAL_II_WITH_ZLIB
-#  include <boost/iostreams/filter/zlib.hpp>
-
 #  include <zlib.h>
 #endif
 
@@ -63,12 +61,18 @@
 #  include <hdf5.h>
 #endif
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
+#ifdef DEAL_II_WITH_ZLIB
+#  include <boost/iostreams/filter/zlib.hpp>
+#endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
+
 
 DEAL_II_NAMESPACE_OPEN
-
 
 // we need the following exception from a global function, so can't declare it
 // in the usual way inside a class
@@ -2753,9 +2757,6 @@ namespace DataOutBase
 
     if (format_name == "deal.II intermediate")
       return deal_II_intermediate;
-
-    if (format_name == "parallel deal.II intermediate")
-      return parallel_deal_II_intermediate;
 
     if (format_name == "hdf5")
       return hdf5;
@@ -7617,7 +7618,14 @@ namespace DataOutBase
       boost::iostreams::filtering_ostream f;
 
       if (compression != VtkFlags::no_compression)
+#  ifdef DEAL_II_WITH_ZLIB
         f.push(boost::iostreams::zlib_compressor());
+#  else
+        AssertThrow(
+          false,
+          ExcMessage(
+            "Compression requires deal.II to be configured with ZLIB support."));
+#  endif
 
       boost::iostreams::back_insert_device<std::vector<char>> inserter(
         my_buffer);
@@ -9292,8 +9300,16 @@ DataOutReader<dim, spacedim>::read_whole_parallel_file(std::istream &in)
       in.read(temp_buffer.data(), chunk_sizes[n]);
 
       boost::iostreams::filtering_istreambuf f;
-      if (header.compression)
+      if (static_cast<DataOutBase::VtkFlags::ZlibCompressionLevel>(
+            header.compression) != DataOutBase::VtkFlags::no_compression)
+#ifdef DEAL_II_WITH_ZLIB
         f.push(boost::iostreams::zlib_decompressor());
+#else
+        AssertThrow(
+          false,
+          ExcMessage(
+            "Decompression requires deal.II to be configured with ZLIB support."));
+#endif
 
       boost::iostreams::basic_array_source<char> source(temp_buffer.data(),
                                                         temp_buffer.size());
