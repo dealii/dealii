@@ -3346,9 +3346,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   std::array<unsigned int, VectorizedArrayType::size()> cells =
     this->get_cell_ids();
 
-  for (unsigned int v = 0; v < n_lanes; ++v)
-    if (mask[v] == false)
-      cells[v] = numbers::invalid_unsigned_int;
+  const bool masking_is_active = mask.count() < n_lanes;
+  if (masking_is_active)
+    for (unsigned int v = 0; v < n_lanes; ++v)
+      if (mask[v] == false)
+        cells[v] = numbers::invalid_unsigned_int;
 
   bool has_hn_constraints = false;
 
@@ -3370,6 +3372,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                          internal::is_vectorizable<VectorType, Number>::value>
     vector_selector;
 
+  const bool is_neighbor_cells = !is_face && !this->is_interior_face();
+  const bool use_non_vectorized_path =
+    masking_is_active || is_neighbor_cells || has_hn_constraints;
+
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
   std::array<VectorizedArrayType *, n_components> values_dofs;
   for (unsigned int c = 0; c < n_components; ++c)
@@ -3382,7 +3388,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
           [this->cell] == internal::MatrixFreeFunctions::DoFInfo::
                             IndexStorageVariants::interleaved &&
-      (has_hn_constraints == false))
+      (use_non_vectorized_path == false))
     {
       const unsigned int *dof_indices =
         this->dof_info->dof_indices_interleaved.data() +
