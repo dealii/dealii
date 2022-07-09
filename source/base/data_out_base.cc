@@ -7649,8 +7649,10 @@ namespace DataOutBase
       n_ranks,
       n_patches};
 
-    // rank 0 also collects and writes the size of the data from each rank in
-    // bytes:
+    // Rank 0 also collects and writes the size of the data from each
+    // rank in bytes. The static_cast for the destination buffer looks
+    // useless, but without it clang-tidy will complain about a wrong
+    // MPI type.
     std::vector<std::uint64_t> chunk_sizes(n_ranks);
     int                        ierr = MPI_Gather(&my_size,
                           1,
@@ -7672,30 +7674,32 @@ namespace DataOutBase
     ierr = MPI_Info_free(&info);
     AssertThrowMPI(ierr);
 
-    ierr = MPI_File_set_size(fh, 0); // delete the file contents
+    // Delete the file contents:
+    ierr = MPI_File_set_size(fh, 0);
     AssertThrowMPI(ierr);
-    // this barrier is necessary, because otherwise others might already write
+    // This barrier is necessary, because otherwise others might already write
     // while one core is still setting the size to zero.
     ierr = MPI_Barrier(comm);
     AssertThrowMPI(ierr);
 
-    // write header
+    // Write the two parts of the header on rank 0:
     if (my_rank == 0)
       {
         ierr = Utilities::MPI::LargeCount::File_write_at_c(
           fh, 0, &header, sizeof(header), MPI_CHAR, MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
 
-        ierr = Utilities::MPI::LargeCount::File_write_at_c(fh,
-                                                           sizeof(header),
-                                                           chunk_sizes.data(),
-                                                           chunk_sizes.size(),
-                                                           MPI_UINT64_T,
-                                                           MPI_STATUS_IGNORE);
+        ierr = Utilities::MPI::LargeCount::File_write_at_c(
+          fh,
+          /* offset = */ sizeof(header),
+          chunk_sizes.data(),
+          chunk_sizes.size(),
+          MPI_UINT64_T,
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
       }
 
-    // wite main part
+    // Write the main part on each rank:
     {
       std::uint64_t prefix_sum = 0;
       ierr = MPI_Exscan(&my_size, &prefix_sum, 1, MPI_UINT64_T, MPI_SUM, comm);
