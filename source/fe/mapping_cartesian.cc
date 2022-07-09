@@ -55,19 +55,28 @@ is_cartesian(const CellType &cell)
   if (!cell->reference_cell().is_hyper_cube())
     return false;
 
-  const double tolerance         = 1e-14;
+  const double abs_tol           = 1e-15;
+  const double rel_tol           = 1e-14;
   const auto   bounding_box      = cell->bounding_box();
   const auto & bounding_vertices = bounding_box.get_boundary_points();
-  const auto   cell_measure =
+  const auto   bb_diagonal_length_squared =
     bounding_vertices.first.distance_square(bounding_vertices.second);
 
   for (const unsigned int v : cell->vertex_indices())
     {
-      const double vertex_tolerance =
-        tolerance * std::max(cell->vertex(v).norm_square(), cell_measure);
+      // Choose a tolerance that takes into account both that vertices far
+      // away from the origin have only a finite number of digits
+      // that are considered correct (an "absolute tolerance"), as well as that
+      // vertices are supposed to be close to the corresponding vertices of the
+      // bounding box (a tolerance that is "relative" to the size of the cell).
+      //
+      // We need to do it this way because when a vertex is far away from
+      // the origin, computing the difference between two vertices is subject
+      // to cancellation.
+      const double tolerance = std::max(abs_tol * cell->vertex(v).norm_square(),
+                                        rel_tol * bb_diagonal_length_squared);
 
-      if (cell->vertex(v).distance_square(bounding_box.vertex(v)) >
-          vertex_tolerance)
+      if (cell->vertex(v).distance_square(bounding_box.vertex(v)) > tolerance)
         return false;
     }
 
