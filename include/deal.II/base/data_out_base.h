@@ -2344,6 +2344,30 @@ namespace DataOutBase
     std::ostream &                   out);
 
   /**
+   * Like write_deal_II_intermediate() but write all patches from all ranks
+   * using MPI I/O
+   * into a single file with name @p name. Compression using zlib is optional and controlled
+   * by the @p compression argument.
+   *
+   * The files typically have the extension <tt>.pd2</tt>.
+   */
+  template <int dim, int spacedim>
+  void
+  write_deal_II_intermediate_in_parallel(
+    const std::vector<Patch<dim, spacedim>> &patches,
+    const std::vector<std::string> &         data_names,
+    const std::vector<
+      std::tuple<unsigned int,
+                 unsigned int,
+                 std::string,
+                 DataComponentInterpretation::DataComponentInterpretation>>
+      &                                  nonscalar_data_ranges,
+    const Deal_II_IntermediateFlags &    flags,
+    const std::string &                  filename,
+    const MPI_Comm &                     comm,
+    const VtkFlags::ZlibCompressionLevel compression);
+
+  /**
    * Write the data in @p data_filter to a single HDF5 file containing both the
    * mesh and solution values.
    */
@@ -2827,6 +2851,18 @@ public:
   write_deal_II_intermediate(std::ostream &out) const;
 
   /**
+   * Obtain data through get_patches() and write it using MPI I/O in parallel
+   * to the file @p filename in the parallel
+   * deal.II intermediate format. See
+   * DataOutBase::write_deal_II_intermediate_in_parallel().
+   */
+  void
+  write_deal_II_intermediate_in_parallel(
+    const std::string &                               filename,
+    const MPI_Comm &                                  comm,
+    const DataOutBase::VtkFlags::ZlibCompressionLevel compression) const;
+
+  /**
    * Create an XDMFEntry based on the data in the data_filter. This assumes
    * the mesh and solution data were written to a single file. See
    * write_xdmf_file() for an example of usage.
@@ -3184,6 +3220,14 @@ public:
    */
   void
   read(std::istream &in);
+
+  /**
+   * Read all data previously written using
+   * DataOutBase::write_deal_II_intermediate_in_parallel() from all
+   * MPI ranks into this data structure.
+   */
+  void
+  read_whole_parallel_file(std::istream &in);
 
   /**
    * This function can be used to merge the patches read by the other object

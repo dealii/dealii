@@ -204,6 +204,22 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         std::ostream &                   out);
 
       template void
+      write_deal_II_intermediate_in_parallel(
+        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
+          &                             patches,
+        const std::vector<std::string> &data_names,
+        const std::vector<
+          std::tuple<unsigned int,
+                     unsigned int,
+                     std::string,
+                     DataComponentInterpretation::DataComponentInterpretation>>
+          &                                  nonscalar_data_ranges,
+        const Deal_II_IntermediateFlags &    flags,
+        const std::string &                  filename,
+        const MPI_Comm &                     comm,
+        const VtkFlags::ZlibCompressionLevel compression);
+
+      template void
       write_hdf5_parallel(
         const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
           &                  patches,
