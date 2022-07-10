@@ -1611,6 +1611,10 @@ public:
    * this method can be used to query the boundary id of a given face in the
    * faces' own sorting by lanes in a VectorizedArray. Only valid for an index
    * indicating a boundary face.
+   *
+   * @note Alternatively to this function, you can use
+   * FEFaceEvaluation::boundary_id() to get the same information if a
+   * FEFaceEvaluation object has been set up already.
    */
   types::boundary_id
   get_boundary_id(const unsigned int face_batch_index) const;
