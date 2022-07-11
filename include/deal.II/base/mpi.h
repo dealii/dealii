@@ -1370,6 +1370,33 @@ namespace Utilities
     std::set<T>
     compute_set_union(const std::set<T> &set, const MPI_Comm &comm);
 
+    /**
+     * Compute exclusive or incluse prefix sum for scalar quantities.
+     */
+    template <typename T>
+    std::pair<T, T>
+    prefix_sum(const T &       value,
+               const MPI_Comm &comm,
+               const bool      exclusive = true);
+
+    /**
+     * Compute exclusive or incluse prefix sum for std::vector.
+     */
+    template <typename T>
+    std::vector<std::pair<T, T>>
+    prefix_sum(const std::vector<T> &value,
+               const MPI_Comm &      comm,
+               const bool            exclusive = true);
+
+    /**
+     * Compute exclusive or incluse prefix sum for ArrayView.
+     */
+    template <typename T>
+    void
+    prefix_sum(const ArrayView<const T> &        value,
+               const MPI_Comm &                  comm,
+               const ArrayView<std::pair<T, T>> &values,
+               const bool                        exclusive = true);
 
 
     /* --------------------------- inline functions ------------------------- */
@@ -2025,6 +2052,80 @@ namespace Utilities
                             std::sqrt(sq_sum / static_cast<Std>(size - 1)));
     }
 #  endif
+
+
+
+    template <typename T>
+    std::pair<T, T>
+    prefix_sum(const T &value, const MPI_Comm &comm, const bool exclusive)
+    {
+      std::pair<T, T> result;
+
+      prefix_sum<T>(ArrayView<const T>(&value, 1),
+                    comm,
+                    ArrayView<std::pair<T, T>>(&result, 1),
+                    exclusive);
+      return result;
+    }
+
+
+
+    template <typename T>
+    std::vector<std::pair<T, T>>
+    prefix_sum(const std::vector<T> &values,
+               const MPI_Comm &      comm,
+               const bool            exclusive)
+    {
+      const unsigned int           N = values.size();
+      std::vector<std::pair<T, T>> results(N);
+
+      prefix_sum<T>(ArrayView<const T>(values.data(), N),
+                    comm,
+                    ArrayView<std::pair<T, T>>(results.data(), N),
+                    exclusive);
+      return results;
+    }
+
+
+
+    template <typename T>
+    void
+    prefix_sum(const ArrayView<const T> &        values,
+               const MPI_Comm &                  comm,
+               const ArrayView<std::pair<T, T>> &results,
+               const bool                        exclusive)
+    {
+      AssertDimension(values.size(), results.size());
+
+      std::vector<T> temp(values.size());
+      std::vector<T> sums(values.size());
+
+      if (exclusive)
+        {
+          int ierr = MPI_Exscan(values.data(),
+                                temp.data(),
+                                values.size(),
+                                Utilities::MPI::mpi_type_id_for_type<T>,
+                                MPI_SUM,
+                                comm);
+          AssertThrowMPI(ierr);
+        }
+      else
+        {
+          int ierr = MPI_Scan(values.data(),
+                              temp.data(),
+                              values.size(),
+                              Utilities::MPI::mpi_type_id_for_type<T>,
+                              MPI_SUM,
+                              comm);
+          AssertThrowMPI(ierr);
+        }
+
+      Utilities::MPI::sum(values, comm, make_array_view(sums));
+
+      for (unsigned int i = 0; i < values.size(); ++i)
+        results[i] = {temp[i], sums[i]};
+    }
 
 #endif
   } // end of namespace MPI
