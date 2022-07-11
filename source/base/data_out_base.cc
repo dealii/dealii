@@ -114,6 +114,30 @@ namespace
   }
 
   /**
+   * Convert between the enum specified inside VtkFlags and the preprocessor
+   * constant defined by boost::iostreams::zlib.
+   */
+  int
+  get_boost_zlib_compression_level(
+    const DataOutBase::VtkFlags::ZlibCompressionLevel level)
+  {
+    switch (level)
+      {
+        case (DataOutBase::VtkFlags::no_compression):
+          return boost::iostreams::zlib::no_compression;
+        case (DataOutBase::VtkFlags::best_speed):
+          return boost::iostreams::zlib::best_speed;
+        case (DataOutBase::VtkFlags::best_compression):
+          return boost::iostreams::zlib::best_compression;
+        case (DataOutBase::VtkFlags::default_compression):
+          return boost::iostreams::zlib::default_compression;
+        default:
+          Assert(false, ExcNotImplemented());
+          return boost::iostreams::zlib::no_compression;
+      }
+  }
+
+  /**
    * Do a zlib compression followed by a base64 encoding of the given data. The
    * result is then written to the given stream.
    */
@@ -7619,7 +7643,8 @@ namespace DataOutBase
 
       if (compression != VtkFlags::no_compression)
 #  ifdef DEAL_II_WITH_ZLIB
-        f.push(boost::iostreams::zlib_compressor());
+        f.push(boost::iostreams::zlib_compressor(
+          get_boost_zlib_compression_level(compression)));
 #  else
         AssertThrow(
           false,
