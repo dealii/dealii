@@ -55,8 +55,11 @@ is_cartesian(const CellType &cell)
   if (!cell->reference_cell().is_hyper_cube())
     return false;
 
-  const double abs_tol           = 1e-15;
-  const double rel_tol           = 1e-14;
+  // The tolerances here are somewhat larger than the square of the machine
+  // epsilon, because we are going to compare the square of distances (to
+  // avoid computing square roots).
+  const double abs_tol           = 1e-30;
+  const double rel_tol           = 1e-28;
   const auto   bounding_box      = cell->bounding_box();
   const auto & bounding_vertices = bounding_box.get_boundary_points();
   const auto   bb_diagonal_length_squared =
