@@ -1,0 +1,3 @@
+Improved: The function GridGenerator::merge_triangulations() can now copy boundary ids to remaining boundary faces.
+<br>
+(Johannes Heinz, 2022/07/07)

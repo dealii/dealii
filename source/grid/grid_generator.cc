@@ -6469,7 +6469,8 @@ namespace GridGenerator
     const std::vector<const Triangulation<dim, spacedim> *> &triangulations,
     Triangulation<dim, spacedim> &                           result,
     const double duplicated_vertex_tolerance,
-    const bool   copy_manifold_ids)
+    const bool   copy_manifold_ids,
+    const bool   copy_boundary_ids)
   {
     std::vector<Point<spacedim>> vertices;
     std::vector<CellData<dim>>   cells;
@@ -6545,6 +6546,22 @@ namespace GridGenerator
     result.clear();
     result.create_triangulation(vertices, cells, subcell_data);
 
+    if (copy_boundary_ids)
+      {
+        auto result_cell = result.begin();
+        for (const auto &tria : triangulations)
+          {
+            for (const auto &cell : tria->cell_iterators())
+              {
+                for (auto const &f : cell->face_indices())
+                  if (result_cell->face(f)->at_boundary())
+                    result_cell->face(f)->set_boundary_id(
+                      cell->face(f)->boundary_id());
+                result_cell++;
+              }
+          }
+      }
+
     Assert(duplicated_vertex_tolerance > 0.0 ||
              n_accumulated_vertices == result.n_vertices(),
            ExcInternalError());
@@ -6558,7 +6575,8 @@ namespace GridGenerator
                        const Triangulation<dim, spacedim> &triangulation_2,
                        Triangulation<dim, spacedim> &      result,
                        const double duplicated_vertex_tolerance,
-                       const bool   copy_manifold_ids)
+                       const bool   copy_manifold_ids,
+                       const bool   copy_boundary_ids)
   {
     // if either Triangulation is empty then merging is just a copy.
     if (triangulation_1.n_cells() == 0)
@@ -6574,7 +6592,8 @@ namespace GridGenerator
     merge_triangulations({&triangulation_1, &triangulation_2},
                          result,
                          duplicated_vertex_tolerance,
-                         copy_manifold_ids);
+                         copy_manifold_ids,
+                         copy_boundary_ids);
   }
 
 

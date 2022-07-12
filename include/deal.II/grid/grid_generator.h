@@ -1884,10 +1884,8 @@ namespace GridGenerator
    *
    * @note The function copies the material ids of the cells of the two input
    * triangulations into the output triangulation. If @p copy_manifold_ids is
-   * set to @p true, manifold ids will be copied. Boundary indicators are never
-   * copied. In other words, if the two coarse meshes have anything but the
-   * default boundary indicators, then you will have to set boundary indicators
-   * again by hand in the output triangulation.
+   * set to @p true, manifold ids will be copied. If @p copy_boundary_ids is
+   * set to @p true, boundary_ids are copied to all remaining faces at the boundary.
    *
    * @note This function does not attach any manifolds to @p result, nor does
    * it set any manifold ids. In particular, manifolds attached to the two
@@ -1903,7 +1901,8 @@ namespace GridGenerator
                        const Triangulation<dim, spacedim> &triangulation_2,
                        Triangulation<dim, spacedim> &      result,
                        const double duplicated_vertex_tolerance = 1.0e-12,
-                       const bool   copy_manifold_ids           = false);
+                       const bool   copy_manifold_ids           = false,
+                       const bool   copy_boundary_ids           = false);
 
   /**
    * Same as above but allows to merge more than two triangulations at once.
@@ -1916,6 +1915,7 @@ namespace GridGenerator
    *   GridGenerator::merge_triangulations({&tria_1, &tria_2, &tria_3},
    *                                       merged_triangulation,
    *                                       1.0e-10,
+   *                                       false,
    *                                       false);
    * @endcode
    */
@@ -1925,7 +1925,8 @@ namespace GridGenerator
     const std::vector<const Triangulation<dim, spacedim> *> &triangulations,
     Triangulation<dim, spacedim> &                           result,
     const double duplicated_vertex_tolerance = 1.0e-12,
-    const bool   copy_manifold_ids           = false);
+    const bool   copy_manifold_ids           = false,
+    const bool   copy_boundary_ids           = false);
 
   /**
    * \brief Replicate a given triangulation in multiple coordinate axes
