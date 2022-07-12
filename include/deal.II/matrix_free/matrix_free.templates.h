@@ -271,6 +271,19 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_level_and_index(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
+unsigned int
+MatrixFree<dim, Number, VectorizedArrayType>::get_matrix_free_cell_index(
+  const typename Triangulation<dim>::cell_iterator &cell) const
+{
+  return mf_cell_indices[(this->get_mg_level() ==
+                          numbers::invalid_unsigned_int) ?
+                           cell->active_cell_index() :
+                           cell->index()];
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
 std::pair<typename DoFHandler<dim>::cell_iterator, unsigned int>
 MatrixFree<dim, Number, VectorizedArrayType>::get_face_iterator(
   const unsigned int face_batch_index,
@@ -802,6 +815,29 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
 
       mapping_is_initialized = true;
     }
+
+  // set up map: deal.II index -> MatrixFree index
+  {
+    const auto &tria     = dof_handler[0]->get_triangulation();
+    const auto  mg_level = this->get_mg_level();
+
+    mf_cell_indices.resize((mg_level == numbers::invalid_unsigned_int) ?
+                             tria.n_active_cells() :
+                             tria.n_cells(mg_level),
+                           numbers::invalid_unsigned_int);
+
+    for (unsigned int cell = 0;
+         cell < n_cell_batches() + n_ghost_cell_batches();
+         ++cell)
+      for (unsigned int v = 0; v < n_active_entries_per_cell_batch(cell); ++v)
+        {
+          const auto tria_cell = get_cell_iterator(cell, v);
+          mf_cell_indices[(mg_level == numbers::invalid_unsigned_int) ?
+                            tria_cell->active_cell_index() :
+                            tria_cell->index()] =
+            cell * VectorizedArrayType::size() + v;
+        }
+  }
 }
 
 
