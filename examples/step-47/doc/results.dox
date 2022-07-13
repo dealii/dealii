@@ -13,7 +13,7 @@ $Q_3$; and 5, 4, 3 for $Q_4$, respectively.
 
 From the literature, it is not immediately clear what
 the penalty parameter $\gamma$ should be. For example,
-@cite Brenner2009 state that it needs to be larger than one, and
+@cite Brenner2010 state that it needs to be larger than one, and
 choose $\gamma=5$. The FEniCS/Dolphin tutorial chooses it as
 $\gamma=8$, see
 https://fenicsproject.org/docs/dolfin/1.6.0/python/demo/documented/biharmonic/python/documentation.html
