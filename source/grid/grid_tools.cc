@@ -3462,31 +3462,26 @@ namespace GridTools
              std::vector<std::tuple<types::global_vertex_index,
                                     types::global_vertex_index,
                                     std::string>>>
-                         vertices_to_send;
-    active_cell_iterator cell = triangulation.begin_active(),
-                         endc = triangulation.end();
+                                   vertices_to_send;
     std::set<active_cell_iterator> missing_vert_cells;
     std::set<unsigned int>         used_vertex_index;
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         if (cell->is_locally_owned())
           {
             for (const unsigned int i : cell->vertex_indices())
               {
                 types::subdomain_id lowest_subdomain_id = cell->subdomain_id();
-                typename std::set<active_cell_iterator>::iterator
-                  adjacent_cell = vertex_to_cell[cell->vertex_index(i)].begin(),
-                  end_adj_cell  = vertex_to_cell[cell->vertex_index(i)].end();
-                for (; adjacent_cell != end_adj_cell; ++adjacent_cell)
-                  lowest_subdomain_id =
-                    std::min(lowest_subdomain_id,
-                             (*adjacent_cell)->subdomain_id());
+                for (const auto &adjacent_cell :
+                     vertex_to_cell[cell->vertex_index(i)])
+                  lowest_subdomain_id = std::min(lowest_subdomain_id,
+                                                 adjacent_cell->subdomain_id());
 
-                // See if I "own" this vertex
+                // See if this process "owns" this vertex
                 if (lowest_subdomain_id == cell->subdomain_id())
                   {
-                    // Check that the vertex we are working on a vertex that has
-                    // not be dealt with yet
+                    // Check that the vertex we are working on is a vertex that
+                    // has not been dealt with yet
                     if (used_vertex_index.find(cell->vertex_index(i)) ==
                         used_vertex_index.end())
                       {
@@ -3496,20 +3491,19 @@ namespace GridTools
 
                         // Store the information that will be sent to the
                         // adjacent cells on other subdomains
-                        adjacent_cell =
-                          vertex_to_cell[cell->vertex_index(i)].begin();
-                        for (; adjacent_cell != end_adj_cell; ++adjacent_cell)
-                          if ((*adjacent_cell)->subdomain_id() !=
+                        for (const auto &adjacent_cell :
+                             vertex_to_cell[cell->vertex_index(i)])
+                          if (adjacent_cell->subdomain_id() !=
                               cell->subdomain_id())
                             {
                               std::pair<types::subdomain_id,
                                         types::global_vertex_index>
-                                tmp((*adjacent_cell)->subdomain_id(),
+                                tmp(adjacent_cell->subdomain_id(),
                                     cell->vertex_index(i));
                               if (vertices_added.find(tmp) ==
                                   vertices_added.end())
                                 {
-                                  vertices_to_send[(*adjacent_cell)
+                                  vertices_to_send[adjacent_cell
                                                      ->subdomain_id()]
                                     .emplace_back(i,
                                                   cell->vertex_index(i),
@@ -3583,11 +3577,8 @@ namespace GridTools
                           triangulation.get_communicator());
     AssertThrowMPI(ierr);
 
-    std::map<unsigned int, types::global_vertex_index>::iterator
-      global_index_it  = local_to_global_vertex_index.begin(),
-      global_index_end = local_to_global_vertex_index.end();
-    for (; global_index_it != global_index_end; ++global_index_it)
-      global_index_it->second += shift;
+    for (auto &global_index_it : local_to_global_vertex_index)
+      global_index_it.second += shift;
 
 
     const int mpi_tag = Utilities::MPI::internal::Tags::
