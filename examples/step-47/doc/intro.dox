@@ -226,7 +226,9 @@ alternative method.
 We base this program on the $C^0$ IP method presented by Susanne
 Brenner and Li-Yeng Sung in the paper "C$^0$ Interior Penalty Method
 for Linear Fourth Order Boundary Value Problems on polygonal
-domains" @cite Brenner2005 , where the method is
+domains"
+@cite Brenner2005
+where the method is
 derived for the biharmonic equation with "clamped" boundary
 conditions.
 
