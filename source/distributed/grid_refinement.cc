@@ -42,6 +42,18 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
+  template <int dim, int spacedim>
+  unsigned int
+  n_locally_owned_active_cells(const Triangulation<dim, spacedim> &tria)
+  {
+    if (const auto parallel_tria =
+          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+            &tria))
+      return parallel_tria->n_locally_owned_active_cells();
+    else
+      return tria.n_active_cells();
+  }
+
   template <typename number>
   inline number
   max_element(const dealii::Vector<number> &criteria)
@@ -107,7 +119,7 @@ namespace
     Vector<Number> &locally_owned_indicators)
   {
     Assert(locally_owned_indicators.size() ==
-             tria.n_locally_owned_active_cells(),
+             n_locally_owned_active_cells(tria),
            ExcInternalError());
 
     unsigned int owned_index = 0;
@@ -118,7 +130,7 @@ namespace
           criteria(cell->active_cell_index());
         ++owned_index;
       }
-    Assert(owned_index == tria.n_locally_owned_active_cells(),
+    Assert(owned_index == n_locally_owned_active_cells(tria),
            ExcInternalError());
   }
 
@@ -207,8 +219,7 @@ namespace
   {
     // first extract from the vector of indicators the ones that correspond
     // to cells that we locally own
-    Vector<Number> locally_owned_indicators(
-      tria.n_locally_owned_active_cells());
+    Vector<Number> locally_owned_indicators(n_locally_owned_active_cells(tria));
     get_locally_owned_indicators(tria, criteria, locally_owned_indicators);
 
     MPI_Comm mpi_communicator = tria.get_communicator();
@@ -520,7 +531,7 @@ namespace parallel
         // first extract from the vector of indicators the ones that correspond
         // to cells that we locally own
         Vector<Number> locally_owned_indicators(
-          tria.n_locally_owned_active_cells());
+          n_locally_owned_active_cells(tria));
         get_locally_owned_indicators(tria, criteria, locally_owned_indicators);
 
         MPI_Comm mpi_communicator = tria.get_communicator();
