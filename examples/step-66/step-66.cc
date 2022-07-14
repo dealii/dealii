@@ -1036,7 +1036,7 @@ namespace Step66
                            DataOut<dim>::curved_inner_cells);
 
     DataOutBase::VtkFlags flags;
-    flags.compression_level = DataOutBase::VtkFlags::best_speed;
+    flags.compression_level = DataOutBase::CompressionLevel::best_speed;
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
       "./", "solution_" + std::to_string(dim) + "d", cycle, MPI_COMM_WORLD, 3);

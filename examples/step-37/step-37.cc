@@ -1103,8 +1103,8 @@ namespace Step37
   // optimized for speed rather than disk usage. The default setting (which
   // optimizes for disk usage) makes saving the output take about 4 times as
   // long as running the linear solver, while setting
-  // DataOutBase::VtkFlags::compression_level to
-  // DataOutBase::VtkFlags::best_speed lowers this to only one fourth the time
+  // DataOutBase::CompressionLevel to
+  // best_speed lowers this to only one fourth the time
   // of the linear solve.
   //
   // We disable the output when the mesh gets too large. A variant of this
@@ -1126,7 +1126,7 @@ namespace Step37
     data_out.build_patches(mapping);
 
     DataOutBase::VtkFlags flags;
-    flags.compression_level = DataOutBase::VtkFlags::best_speed;
+    flags.compression_level = DataOutBase::CompressionLevel::best_speed;
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", cycle, MPI_COMM_WORLD, 3);

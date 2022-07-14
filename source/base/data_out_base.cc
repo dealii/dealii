@@ -90,8 +90,8 @@ namespace
 {
 #ifdef DEAL_II_WITH_ZLIB
   /**
-   * Convert between the enum specified inside VtkFlags and the preprocessor
-   * constant defined by zlib.
+   * Convert between the CompressionLevel enum (used inside VtkFlags
+   * for example) and the preprocessor constant defined by zlib.
    */
   int
   get_zlib_compression_level(const DataOutBase::CompressionLevel level)
@@ -114,7 +114,7 @@ namespace
 
 #  ifdef DEAL_II_WITH_MPI
   /**
-   * Convert between the enum specified inside VtkFlags and the preprocessor
+   * Convert between the CompressionLevel enum and the preprocessor
    * constant defined by boost::iostreams::zlib.
    */
   int

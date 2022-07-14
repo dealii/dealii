@@ -64,7 +64,7 @@ check()
   data_out.build_patches();
 
   data_out.write_deal_II_intermediate_in_parallel(
-    "test.pd2", MPI_COMM_WORLD, DataOutBase::VtkFlags::no_compression);
+    "test.pd2", MPI_COMM_WORLD, DataOutBase::CompressionLevel::no_compression);
 
   const unsigned int my_rank =
     dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
