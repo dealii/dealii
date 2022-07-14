@@ -844,8 +844,7 @@ namespace Step9
       // disk. Here we ask ZLib, a compression library, to compress the data
       // in a way that maximizes throughput.
       DataOutBase::VtkFlags vtk_flags;
-      vtk_flags.compression_level =
-        DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
+      vtk_flags.compression_level = DataOutBase::best_speed;
       data_out.set_flags(vtk_flags);
 
       std::ofstream output("solution-" + std::to_string(cycle) + ".vtu");
