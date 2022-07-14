@@ -431,7 +431,7 @@ namespace Step24
     const std::string filename =
       "solution-" + Utilities::int_to_string(timestep_number, 3) + ".vtu";
     DataOutBase::VtkFlags vtk_flags;
-    vtk_flags.compression_level = DataOutBase::best_speed;
+    vtk_flags.compression_level = DataOutBase::CompressionLevel::best_speed;
     std::ofstream output(filename);
     data_out.write_vtu(output);
   }

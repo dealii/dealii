@@ -98,13 +98,13 @@ namespace
   {
     switch (level)
       {
-        case (DataOutBase::no_compression):
+        case (DataOutBase::CompressionLevel::no_compression):
           return Z_NO_COMPRESSION;
-        case (DataOutBase::best_speed):
+        case (DataOutBase::CompressionLevel::best_speed):
           return Z_BEST_SPEED;
-        case (DataOutBase::best_compression):
+        case (DataOutBase::CompressionLevel::best_compression):
           return Z_BEST_COMPRESSION;
-        case (DataOutBase::default_compression):
+        case (DataOutBase::CompressionLevel::default_compression):
           return Z_DEFAULT_COMPRESSION;
         default:
           Assert(false, ExcNotImplemented());
@@ -122,13 +122,13 @@ namespace
   {
     switch (level)
       {
-        case (DataOutBase::no_compression):
+        case (DataOutBase::CompressionLevel::no_compression):
           return boost::iostreams::zlib::no_compression;
-        case (DataOutBase::best_speed):
+        case (DataOutBase::CompressionLevel::best_speed):
           return boost::iostreams::zlib::best_speed;
-        case (DataOutBase::best_compression):
+        case (DataOutBase::CompressionLevel::best_compression):
           return boost::iostreams::zlib::best_compression;
-        case (DataOutBase::default_compression):
+        case (DataOutBase::CompressionLevel::default_compression):
           return boost::iostreams::zlib::default_compression;
         default:
           Assert(false, ExcNotImplemented());
@@ -7641,7 +7641,7 @@ namespace DataOutBase
     {
       boost::iostreams::filtering_ostream f;
 
-      if (compression != no_compression)
+      if (compression != CompressionLevel::no_compression)
 #  ifdef DEAL_II_WITH_ZLIB
         f.push(boost::iostreams::zlib_compressor(
           get_boost_zlib_compression_level(compression)));
@@ -7668,7 +7668,7 @@ namespace DataOutBase
     const ParallelIntermediateHeader header{
       0x00dea111,
       Deal_II_IntermediateFlags::format_version,
-      compression,
+      static_cast<std::uint64_t>(compression),
       dim,
       spacedim,
       n_ranks,
@@ -9336,7 +9336,7 @@ DataOutReader<dim, spacedim>::read_whole_parallel_file(std::istream &in)
 
       boost::iostreams::filtering_istreambuf f;
       if (static_cast<DataOutBase::CompressionLevel>(header.compression) !=
-          DataOutBase::no_compression)
+          DataOutBase::CompressionLevel::no_compression)
 #ifdef DEAL_II_WITH_ZLIB
         f.push(boost::iostreams::zlib_decompressor());
 #else

@@ -224,7 +224,7 @@ namespace DataOutBase
    * An enum for different levels of compression used in several places
    * to determine zlib compression levels.
    */
-  enum CompressionLevel
+  enum class CompressionLevel
   {
     /**
      * Do not use any compression.
@@ -1158,13 +1158,13 @@ namespace DataOutBase
       DataOutBase::CompressionLevel;
 
     DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel
-      no_compression = dealii::DataOutBase::no_compression;
+      no_compression = DataOutBase::CompressionLevel::no_compression;
     DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel
-      best_compression = dealii::DataOutBase::best_compression;
+      best_compression = DataOutBase::CompressionLevel::best_compression;
     DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel best_speed =
-      dealii::DataOutBase::best_speed;
+      DataOutBase::CompressionLevel::best_speed;
     DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel
-      default_compression = dealii::DataOutBase::default_compression;
+      default_compression = DataOutBase::CompressionLevel::default_compression;
 
     /**
      * Flag determining the compression level at which zlib, if available, is
@@ -1218,12 +1218,13 @@ namespace DataOutBase
      * Constructor. Initializes the member variables with names corresponding
      * to the argument names of this function.
      */
-    VtkFlags(
+    explicit VtkFlags(
       const double           time  = std::numeric_limits<double>::min(),
       const unsigned int     cycle = std::numeric_limits<unsigned int>::min(),
-      const bool             print_date_and_time      = true,
-      const CompressionLevel compression_level        = best_compression,
-      const bool             write_higher_order_cells = false,
+      const bool             print_date_and_time = true,
+      const CompressionLevel compression_level =
+        CompressionLevel::best_compression,
+      const bool write_higher_order_cells                      = false,
       const std::map<std::string, std::string> &physical_units = {});
   };
 
