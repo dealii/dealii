@@ -2003,6 +2003,9 @@ template <>
 bool
 CellAccessor<2>::point_inside(const Point<2> &p) const
 {
+  Assert(this->reference_cell() == ReferenceCells::Quadrilateral,
+         ExcNotImplemented());
+
   // we check whether the point is
   // inside the cell by making sure
   // that it on the inner side of
@@ -2065,6 +2068,9 @@ template <>
 bool
 CellAccessor<3>::point_inside(const Point<3> &p) const
 {
+  Assert(this->reference_cell() == ReferenceCells::Hexahedron,
+         ExcNotImplemented());
+
   // original implementation by Joerg
   // Weimar
 
@@ -2125,6 +2131,8 @@ template <int dim_, int spacedim_>
 bool
 CellAccessor<dim, spacedim>::point_inside_codim(const Point<spacedim_> &p) const
 {
+  Assert(this->reference_cell().is_hyper_cube(), ExcNotImplemented());
+
   const TriaRawIterator<CellAccessor<dim_, spacedim_>> cell_iterator(*this);
   const Point<dim_>                                    p_unit =
     StaticMappingQ1<dim_, spacedim_>::mapping.transform_real_to_unit_cell(
@@ -2155,6 +2163,8 @@ template <>
 bool
 CellAccessor<2, 3>::point_inside(const Point<3> &p) const
 {
+  Assert(this->reference_cell() == ReferenceCells::Quadrilateral,
+         ExcNotImplemented());
   return point_inside_codim<2, 3>(p);
 }
 
