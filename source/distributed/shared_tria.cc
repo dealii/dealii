@@ -351,6 +351,51 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
     {
+      // make sure that all refinement/coarsening flags are the same on all
+      // processes
+      {
+        std::vector<unsigned int> refinement_configurations(
+          this->n_active_cells() * 2, 0u);
+        for (const auto &cell : this->active_cell_iterators())
+          if (cell->is_locally_owned())
+            {
+              refinement_configurations[cell->active_cell_index() * 2 + 0] =
+                cell->refine_flag_set();
+              refinement_configurations[cell->active_cell_index() * 2 + 1] =
+                cell->coarsen_flag_set();
+            }
+
+        Utilities::MPI::max(refinement_configurations,
+                            this->get_communicator(),
+                            refinement_configurations);
+
+        for (const auto &cell : this->active_cell_iterators())
+          {
+            cell->clear_refine_flag();
+            cell->clear_coarsen_flag();
+
+            Assert(
+              (refinement_configurations[cell->active_cell_index() * 2 + 0] >
+                   0 ?
+                 1 :
+                 0) +
+                  refinement_configurations[cell->active_cell_index() * 2 +
+                                            1] <=
+                1,
+              ExcMessage(
+                "Refinement/coarsening flags of cells are not consistent in parallel!"));
+
+            if (refinement_configurations[cell->active_cell_index() * 2 + 0] >
+                0)
+              cell->set_refine_flag(RefinementCase<dim>(
+                refinement_configurations[cell->active_cell_index() * 2 + 0]));
+
+            if (refinement_configurations[cell->active_cell_index() * 2 + 1] >
+                0)
+              cell->set_coarsen_flag();
+          }
+      }
+
       dealii::Triangulation<dim, spacedim>::execute_coarsening_and_refinement();
       partition();
       this->update_number_cache();
