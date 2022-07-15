@@ -1674,66 +1674,6 @@ private:
 #endif
 };
 
-
-/**
- * A function that converts a Triangulation active cell iterator to a
- * DoFHandler active cell iterator. The triangulation @p iterator must be
- * associated with the triangulation of the @p dof_handler.
- *
- * @param iterator The input iterator to be converted.
- * @param dof_handler The DoFHandler for the output active cell iterator.
- * @return An active cell iterator for the @p dof_handler, matching the cell
- *         referenced by the input triangulation @p iterator.
- */
-template <int dim, int spacedim>
-typename DoFHandler<dim, spacedim>::active_cell_iterator
-convert_active_cell_iterator(
-  const typename Triangulation<dim, spacedim>::active_cell_iterator &iterator,
-  const DoFHandler<dim, spacedim> &dof_handler)
-{
-  Assert(
-    &iterator->get_triangulation() == &dof_handler.get_triangulation(),
-    ExcMessage(
-      "The triangulation associated with the iterator does not match that of the dof_handler."));
-
-  return typename DoFHandler<dim, spacedim>::active_cell_iterator(
-    &dof_handler.get_triangulation(),
-    iterator->level(),
-    iterator->index(),
-    &dof_handler);
-}
-
-
-/**
- * A function that converts a DoFHandler active cell iterator to an active
- * cell iterator of another DoFHandler. The degree-of-freedom handler to which
- * @p iterator is associated  must have the same triangulation as the
- * second @p dof_handler.
- *
- * @param iterator The input iterator to be converted.
- * @param dof_handler The DoFHandler for the output active cell iterator.
- * @return An active cell iterator for the @p dof_handler, matching the cell
- *         referenced by the input @p iterator for another DoFHandler.
- */
-template <int dim, int spacedim>
-typename DoFHandler<dim, spacedim>::active_cell_iterator
-convert_active_cell_iterator(
-  const typename DoFHandler<dim, spacedim>::active_cell_iterator &iterator,
-  const DoFHandler<dim, spacedim> &                               dof_handler)
-{
-  Assert(
-    &iterator->get_triangulation() == &dof_handler.get_triangulation(),
-    ExcMessage(
-      "The triangulation associated with the iterator does not match that of the dof_handler."));
-
-  return typename DoFHandler<dim, spacedim>::active_cell_iterator(
-    &dof_handler.get_triangulation(),
-    iterator->level(),
-    iterator->index(),
-    &dof_handler);
-}
-
-
 namespace internal
 {
   namespace hp

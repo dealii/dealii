@@ -16,6 +16,8 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
 
+#include <deal.II/dofs/dof_accessor.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q1.h>
 
@@ -2115,6 +2117,27 @@ CellAccessor<3>::point_inside(const Point<3> &p) const
 
 
 /*------------------- Functions: CellAccessor<dim,spacedim> -----------------*/
+
+// The return type is the same as DoFHandler<dim,spacedim>::active_cell_iterator
+template <int dim, int spacedim>
+TriaActiveIterator<DoFCellAccessor<dim, spacedim, false>>
+CellAccessor<dim, spacedim>::as_dof_handler_iterator(
+  const DoFHandler<dim, spacedim> &dof_handler) const
+{
+  Assert(is_active(),
+         ExcMessage("The current iterator points to an inactive cell. "
+                    "You cannot convert it to an iterator to an active cell."));
+  Assert(&this->get_triangulation() == &dof_handler.get_triangulation(),
+         ExcMessage("The triangulation associated with the iterator does not "
+                    "match that of the DoFHandler."));
+
+  return typename DoFHandler<dim, spacedim>::active_cell_iterator(
+    &dof_handler.get_triangulation(),
+    this->level(),
+    this->index(),
+    &dof_handler);
+}
+
 
 // For codim>0 we proceed as follows:
 // 1) project point onto manifold and
