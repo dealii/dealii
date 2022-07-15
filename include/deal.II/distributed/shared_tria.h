@@ -69,9 +69,16 @@ namespace parallel
      * about cells owned by other processors with the exception of a single
      * layer of ghost cells around their own part of the domain.
      *
-     * Active cells need to be flagged for refinement or coarsening
-     * locally owned cells. The relevant information is gathered for
-     * ghost and artificial cells internally via MPI communication.
+     * Because every MPI process has a complete copy of the entire mesh
+     * as if it were stored on only this process, it needs to know for
+     * every active cell whether it is flagged for refinement or coarsening
+     * when doing mesh refinement via
+     * Triangulation::execute_coarsening_and_refinement(). In practice,
+     * each process only needs to set this information for its own
+     * "locally owned" cells; upon calling
+     * Triangulation::execute_coarsening_and_refinement(), the
+     * relevant information is then exchanged between processes
+     * internally, via MPI communication.
      *
      * The class is also useful in cases where compute time and memory
      * considerations dictate that the program needs to be run in parallel,
