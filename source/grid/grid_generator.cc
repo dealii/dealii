@@ -6557,7 +6557,7 @@ namespace GridGenerator
                   if (result_cell->face(f)->at_boundary())
                     result_cell->face(f)->set_boundary_id(
                       cell->face(f)->boundary_id());
-                result_cell++;
+                ++result_cell;
               }
           }
       }
