@@ -176,10 +176,28 @@ know that we could do far better:
   of these in other tutorial programs. In all cases, they need to be
   accompanied by good preconditioners. For the current case, one
   could in principle use GMRES -- a method that does not require
-  any specific properties of the matrix -- but would be better
-  advised to implement an iterative scheme that exploits the one
+  any specific properties of the matrix -- as the outer solver but
+  at least at the time of writing this sentence (in 2022), the
+  SolverGMRES class can only handle real-valued linear systems.
+  This can be overcome by implementing a variation of GMRES that
+  can deal with complex-valued matrices and vectors, see for
+  example
+  @cite Fraysse2005 .
+  Even better would be to implement an iterative scheme that exploits the one
   structural feature we know is true for this problem: That the matrix
-  is complex-symmetric (albeit not Hermitian).
+  is complex-symmetric (albeit not Hermitian), for which a literature
+  search would probably find schemes as well.
+
+- A different strategy towards iterative solvers would be to break the
+  linear system into a $2\times 2$ block system of real and imaginary
+  components, like we did in step-29. This would then enable using
+  real-valued iterative solvers on the outer level (e.g., the existing
+  GMRES implementation), but one would have to come up with preconditioners
+  that exploit the block structure. There is, again, literature on the
+  topic, of which we simply point out a non-representative sample:
+  @cite Axelsson2014 ,
+  @cite Day2001 ,
+  @cite Liao2016 .
 
 
 <h4> Boundary conditions </h4>
