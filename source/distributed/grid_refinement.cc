@@ -113,10 +113,9 @@ namespace
    */
   template <int dim, int spacedim, typename Number>
   void
-  get_locally_owned_indicators(
-    const parallel::distributed::Triangulation<dim, spacedim> &tria,
-    const dealii::Vector<Number> &                             criteria,
-    Vector<Number> &locally_owned_indicators)
+  get_locally_owned_indicators(const dealii::Triangulation<dim, spacedim> &tria,
+                               const dealii::Vector<Number> &criteria,
+                               Vector<Number> &locally_owned_indicators)
   {
     Assert(locally_owned_indicators.size() ==
              n_locally_owned_active_cells(tria),
@@ -182,10 +181,10 @@ namespace
    */
   template <int dim, int spacedim, typename Number>
   void
-  mark_cells(parallel::distributed::Triangulation<dim, spacedim> &tria,
-             const dealii::Vector<Number> &                       criteria,
-             const double                                         top_threshold,
-             const double bottom_threshold)
+  mark_cells(dealii::Triangulation<dim, spacedim> &tria,
+             const dealii::Vector<Number> &        criteria,
+             const double                          top_threshold,
+             const double                          bottom_threshold)
   {
     dealii::GridRefinement::refine(tria, criteria, top_threshold);
     dealii::GridRefinement::coarsen(tria, criteria, bottom_threshold);
@@ -212,10 +211,10 @@ namespace
   template <int dim, int spacedim, typename Number>
   void
   refine_and_coarsen_fixed_fraction_via_l1_norm(
-    parallel::distributed::Triangulation<dim, spacedim> &tria,
-    const dealii::Vector<Number> &                       criteria,
-    const double                                         top_fraction_of_error,
-    const double bottom_fraction_of_error)
+    dealii::Triangulation<dim, spacedim> &tria,
+    const dealii::Vector<Number> &        criteria,
+    const double                          top_fraction_of_error,
+    const double                          bottom_fraction_of_error)
   {
     // first extract from the vector of indicators the ones that correspond
     // to cells that we locally own
@@ -503,11 +502,11 @@ namespace parallel
       template <int dim, typename Number, int spacedim>
       void
       refine_and_coarsen_fixed_number(
-        parallel::distributed::Triangulation<dim, spacedim> &tria,
-        const dealii::Vector<Number> &                       criteria,
-        const double                   top_fraction_of_cells,
-        const double                   bottom_fraction_of_cells,
-        const types::global_cell_index max_n_cells)
+        dealii::Triangulation<dim, spacedim> &tria,
+        const dealii::Vector<Number> &        criteria,
+        const double                          top_fraction_of_cells,
+        const double                          bottom_fraction_of_cells,
+        const types::global_cell_index        max_n_cells)
       {
         Assert(criteria.size() == tria.n_active_cells(),
                ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
@@ -576,11 +575,11 @@ namespace parallel
       template <int dim, typename Number, int spacedim>
       void
       refine_and_coarsen_fixed_fraction(
-        parallel::distributed::Triangulation<dim, spacedim> &tria,
-        const dealii::Vector<Number> &                       criteria,
-        const double                top_fraction_of_error,
-        const double                bottom_fraction_of_error,
-        const VectorTools::NormType norm_type)
+        dealii::Triangulation<dim, spacedim> &tria,
+        const dealii::Vector<Number> &        criteria,
+        const double                          top_fraction_of_error,
+        const double                          bottom_fraction_of_error,
+        const VectorTools::NormType           norm_type)
       {
         Assert(criteria.size() == tria.n_active_cells(),
                ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));

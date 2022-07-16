@@ -154,11 +154,11 @@ namespace parallel
       template <int dim, typename Number, int spacedim>
       void
       refine_and_coarsen_fixed_number(
-        Triangulation<dim, spacedim> & tria,
-        const dealii::Vector<Number> & criteria,
-        const double                   top_fraction_of_cells,
-        const double                   bottom_fraction_of_cells,
-        const types::global_cell_index max_n_cells =
+        dealii::Triangulation<dim, spacedim> &tria,
+        const dealii::Vector<Number> &        criteria,
+        const double                          top_fraction_of_cells,
+        const double                          bottom_fraction_of_cells,
+        const types::global_cell_index        max_n_cells =
           std::numeric_limits<types::global_cell_index>::max());
 
       /**
@@ -208,10 +208,10 @@ namespace parallel
       template <int dim, typename Number, int spacedim>
       void
       refine_and_coarsen_fixed_fraction(
-        Triangulation<dim, spacedim> &tria,
-        const dealii::Vector<Number> &criteria,
-        const double                  top_fraction_of_error,
-        const double                  bottom_fraction_of_error,
+        dealii::Triangulation<dim, spacedim> &tria,
+        const dealii::Vector<Number> &        criteria,
+        const double                          top_fraction_of_error,
+        const double                          bottom_fraction_of_error,
         const VectorTools::NormType norm_type = VectorTools::NormType::L1_norm);
     } // namespace GridRefinement
   }   // namespace distributed
