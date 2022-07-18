@@ -951,7 +951,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
                     static_cast<typename internal::FEPointEvaluation::
                                   EvaluatorTypeTraits<dim,
                                                       n_components,
-                                                      double>::gradient_type>(
+                                                      Number>::gradient_type>(
                       apply_transformation(mapping_info->get_mapping_data()
                                              .inverse_jacobians[i + j]
                                              .transpose(),
@@ -1093,7 +1093,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
               {
                 gradients[i + j] =
                   static_cast<typename internal::FEPointEvaluation::
-                                EvaluatorTypeTraits<dim, n_components, double>::
+                                EvaluatorTypeTraits<dim, n_components, Number>::
                                   gradient_type>(apply_transformation(
                     mapping_info->get_mapping_data().inverse_jacobians[i + j],
                     gradients[i + j]));
