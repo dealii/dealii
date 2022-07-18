@@ -186,39 +186,33 @@ namespace SUNDIALS
       void
       elementwise_product(N_Vector x, N_Vector y, N_Vector z);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
       void
       elementwise_div(N_Vector x, N_Vector y, N_Vector z);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
       void
       elementwise_div(N_Vector x, N_Vector y, N_Vector z);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
       void
       elementwise_inv(N_Vector x, N_Vector z);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
       void
       elementwise_inv(N_Vector x, N_Vector z);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
       void
       elementwise_abs(N_Vector x, N_Vector z);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
       void
       elementwise_abs(N_Vector x, N_Vector z);
 
@@ -234,25 +228,22 @@ namespace SUNDIALS
       realtype
       max_norm(N_Vector x);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
       realtype
       min_element(N_Vector x);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<!is_serial_vector<VectorType>::value &&
-                                    !IsBlockVector<VectorType>::value,
-                                  int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<!is_serial_vector<VectorType>::value &&
+                                   !IsBlockVector<VectorType>::value,
+                                 int> = 0>
       realtype
       min_element(N_Vector x);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<!is_serial_vector<VectorType>::value &&
-                                    IsBlockVector<VectorType>::value,
-                                  int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<!is_serial_vector<VectorType>::value &&
+                                   IsBlockVector<VectorType>::value,
+                                 int> = 0>
       realtype
       min_element(N_Vector x);
 
@@ -268,15 +259,13 @@ namespace SUNDIALS
       void
       add_constant(N_Vector x, realtype b, N_Vector z);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
       const MPI_Comm &
       get_communicator(N_Vector v);
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
       const MPI_Comm &
       get_communicator(N_Vector v);
 
@@ -284,15 +273,13 @@ namespace SUNDIALS
        * Sundials likes a void* but we want to use the above functions
        * internally with a safe type.
        */
-      template <
-        typename VectorType,
-        typename std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
+      template <typename VectorType,
+                std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
       inline void *
       get_communicator_as_void_ptr(N_Vector v);
 
       template <typename VectorType,
-                typename std::enable_if_t<!is_serial_vector<VectorType>::value,
-                                          int> = 0>
+                std::enable_if_t<!is_serial_vector<VectorType>::value, int> = 0>
       inline void *
       get_communicator_as_void_ptr(N_Vector v);
 
@@ -561,9 +548,8 @@ namespace SUNDIALS
 
 
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<is_serial_vector<VectorType>::value, int>>
+      template <typename VectorType,
+                std::enable_if_t<is_serial_vector<VectorType>::value, int>>
       void *get_communicator_as_void_ptr(N_Vector)
       {
         // required by SUNDIALS: MPI-unaware vectors should return the nullptr
@@ -573,9 +559,8 @@ namespace SUNDIALS
 
 
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<!is_serial_vector<VectorType>::value, int>>
+      template <typename VectorType,
+                std::enable_if_t<!is_serial_vector<VectorType>::value, int>>
       void *
       get_communicator_as_void_ptr(N_Vector v)
       {
@@ -739,9 +724,8 @@ namespace SUNDIALS
 
 
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<is_serial_vector<VectorType>::value, int>>
+      template <typename VectorType,
+                std::enable_if_t<is_serial_vector<VectorType>::value, int>>
       realtype
       min_element(N_Vector x)
       {
@@ -751,11 +735,10 @@ namespace SUNDIALS
 
 
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<!is_serial_vector<VectorType>::value &&
-                                    !IsBlockVector<VectorType>::value,
-                                  int>>
+      template <typename VectorType,
+                std::enable_if_t<!is_serial_vector<VectorType>::value &&
+                                   !IsBlockVector<VectorType>::value,
+                                 int>>
       realtype
       min_element(N_Vector x)
       {
@@ -778,11 +761,10 @@ namespace SUNDIALS
 
 
 
-      template <
-        typename VectorType,
-        typename std::enable_if_t<!is_serial_vector<VectorType>::value &&
-                                    IsBlockVector<VectorType>::value,
-                                  int>>
+      template <typename VectorType,
+                std::enable_if_t<!is_serial_vector<VectorType>::value &&
+                                   IsBlockVector<VectorType>::value,
+                                 int>>
       realtype
       min_element(N_Vector x)
       {
