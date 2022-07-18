@@ -202,8 +202,8 @@ namespace internal
    * indeed a serial vector.
    */
   template <class VectorType>
-  using is_serial_vector_type = decltype(
-    typename std::enable_if<is_serial_vector<VectorType>::value, int>::type());
+  using is_serial_vector_type =
+    decltype(std::enable_if_t<is_serial_vector<VectorType>::value, int>());
 
   /**
    * A variable that indicates that the type `T` is either (i) not

@@ -5594,7 +5594,7 @@ namespace internal
         const FEEvaluationData<dim, Number, false> &fe_eval,
         const Number *                              in_array,
         Number *                                    out_array,
-        typename std::enable_if<fe_degree != -1>::type * = nullptr)
+        std::enable_if_t<fe_degree != -1> * = nullptr)
     {
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
@@ -5650,7 +5650,7 @@ namespace internal
         const FEEvaluationData<dim, Number, false> &fe_eval,
         const Number *                              in_array,
         Number *                                    out_array,
-        typename std::enable_if<fe_degree == -1>::type * = nullptr)
+        std::enable_if_t<fe_degree == -1> * = nullptr)
     {
       static_assert(fe_degree == -1, "Only usable for degree -1");
       const unsigned int dofs_per_component =
@@ -5712,7 +5712,7 @@ namespace internal
         const AlignedVector<Number> &inverse_coefficients,
         const Number *               in_array,
         Number *                     out_array,
-        typename std::enable_if<fe_degree != -1>::type * = nullptr)
+        std::enable_if_t<fe_degree != -1> * = nullptr)
     {
       constexpr unsigned int dofs_per_component =
         Utilities::pow(fe_degree + 1, dim);
@@ -5775,7 +5775,7 @@ namespace internal
         const AlignedVector<Number> &,
         const Number *,
         Number *,
-        typename std::enable_if<fe_degree == -1>::type * = nullptr)
+        std::enable_if_t<fe_degree == -1> * = nullptr)
     {
       static_assert(fe_degree == -1, "Only usable for degree -1");
       Assert(false, ExcNotImplemented());

@@ -797,9 +797,8 @@ namespace TrilinosWrappers
 
 
   template <typename SparsityPatternType>
-  inline typename std::enable_if<
-    !std::is_same<SparsityPatternType,
-                  dealii::SparseMatrix<double>>::value>::type
+  inline std::enable_if_t<
+    !std::is_same<SparsityPatternType, dealii::SparseMatrix<double>>::value>
   SparseMatrix::reinit(const IndexSet &           row_parallel_partitioning,
                        const IndexSet &           col_parallel_partitioning,
                        const SparsityPatternType &sparsity_pattern,
@@ -1976,8 +1975,8 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
-  typename std::enable_if<
-    std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
+  std::enable_if_t<
+    std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
   SparseMatrix::vmult(VectorType &dst, const VectorType &src) const
   {
     Assert(&src != &dst, ExcSourceEqualsDestination());
@@ -2010,8 +2009,8 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
-  typename std::enable_if<
-    !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
+  std::enable_if_t<
+    !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
   SparseMatrix::vmult(VectorType & /*dst*/, const VectorType & /*src*/) const
   {
     AssertThrow(false, ExcNotImplemented());
@@ -2020,8 +2019,8 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
-  typename std::enable_if<
-    std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
+  std::enable_if_t<
+    std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
   SparseMatrix::Tvmult(VectorType &dst, const VectorType &src) const
   {
     Assert(&src != &dst, ExcSourceEqualsDestination());
@@ -2051,8 +2050,8 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
-  typename std::enable_if<
-    !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
+  std::enable_if_t<
+    !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
   SparseMatrix::Tvmult(VectorType & /*dst*/, const VectorType & /*src*/) const
   {
     AssertThrow(false, ExcNotImplemented());

@@ -365,9 +365,9 @@ namespace internal
       class SolverType,
       class MatrixType,
       class PreconditionerType,
-      typename std::enable_if<
+      std::enable_if_t<
         std::is_same<VectorType, typename SolverType::vector_type>::value,
-        VectorType>::type * = nullptr>
+        VectorType> * = nullptr>
     void
     solve(SolverType &              solver,
           const MatrixType &        matrix,
@@ -383,9 +383,9 @@ namespace internal
       class SolverType,
       class MatrixType,
       class PreconditionerType,
-      typename std::enable_if<
+      std::enable_if_t<
         !std::is_same<VectorType, typename SolverType::vector_type>::value,
-        VectorType>::type * = nullptr>
+        VectorType> * = nullptr>
     void
     solve(SolverType &              solver,
           const MatrixType &        matrix,

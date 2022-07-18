@@ -840,9 +840,8 @@ namespace TrilinosWrappers
      * processors in order to avoid a dead lock.
      */
     template <typename SparsityPatternType>
-    typename std::enable_if<
-      !std::is_same<SparsityPatternType,
-                    dealii::SparseMatrix<double>>::value>::type
+    std::enable_if_t<
+      !std::is_same<SparsityPatternType, dealii::SparseMatrix<double>>::value>
     reinit(const IndexSet &           row_parallel_partitioning,
            const IndexSet &           col_parallel_partitioning,
            const SparsityPatternType &sparsity_pattern,
@@ -1438,8 +1437,8 @@ namespace TrilinosWrappers
      * distributed. Otherwise, an exception will be thrown.
      */
     template <typename VectorType>
-    typename std::enable_if<std::is_same<typename VectorType::value_type,
-                                         TrilinosScalar>::value>::type
+    std::enable_if_t<
+      std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
     vmult(VectorType &dst, const VectorType &src) const;
 
     /**
@@ -1449,8 +1448,8 @@ namespace TrilinosWrappers
      * Despite looking complicated, the return type is just `void`.
      */
     template <typename VectorType>
-    typename std::enable_if<!std::is_same<typename VectorType::value_type,
-                                          TrilinosScalar>::value>::type
+    std::enable_if_t<
+      !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
     vmult(VectorType &dst, const VectorType &src) const;
 
     /**
@@ -1468,8 +1467,8 @@ namespace TrilinosWrappers
      * Despite looking complicated, the return type is just `void`.
      */
     template <typename VectorType>
-    typename std::enable_if<std::is_same<typename VectorType::value_type,
-                                         TrilinosScalar>::value>::type
+    std::enable_if_t<
+      std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
     Tvmult(VectorType &dst, const VectorType &src) const;
 
     /**
@@ -1479,8 +1478,8 @@ namespace TrilinosWrappers
      * Despite looking complicated, the return type is just `void`.
      */
     template <typename VectorType>
-    typename std::enable_if<!std::is_same<typename VectorType::value_type,
-                                          TrilinosScalar>::value>::type
+    std::enable_if_t<
+      !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
     Tvmult(VectorType &dst, const VectorType &src) const;
 
     /**
@@ -2182,11 +2181,11 @@ namespace TrilinosWrappers
          * 2. the @p Preconditioner derives from TrilinosWrappers::PreconditionBase.
          */
         template <typename Solver, typename Preconditioner>
-        typename std::enable_if<
+        std::enable_if_t<
           std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
             std::is_base_of<TrilinosWrappers::PreconditionBase,
                             Preconditioner>::value,
-          TrilinosPayload>::type
+          TrilinosPayload>
         inverse_payload(Solver &, const Preconditioner &) const;
 
         /**
@@ -2207,11 +2206,11 @@ namespace TrilinosWrappers
          * TrilinosWrappers::PreconditionBase.
          */
         template <typename Solver, typename Preconditioner>
-        typename std::enable_if<
+        std::enable_if_t<
           !(std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
             std::is_base_of<TrilinosWrappers::PreconditionBase,
                             Preconditioner>::value),
-          TrilinosPayload>::type
+          TrilinosPayload>
         inverse_payload(Solver &, const Preconditioner &) const;
 
         //@}
@@ -3210,11 +3209,11 @@ namespace TrilinosWrappers
 
 
       template <typename Solver, typename Preconditioner>
-      typename std::enable_if<
+      std::enable_if_t<
         std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
           std::is_base_of<TrilinosWrappers::PreconditionBase,
                           Preconditioner>::value,
-        TrilinosPayload>::type
+        TrilinosPayload>
       TrilinosPayload::inverse_payload(
         Solver &              solver,
         const Preconditioner &preconditioner) const
@@ -3265,11 +3264,11 @@ namespace TrilinosWrappers
       }
 
       template <typename Solver, typename Preconditioner>
-      typename std::enable_if<
+      std::enable_if_t<
         !(std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
           std::is_base_of<TrilinosWrappers::PreconditionBase,
                           Preconditioner>::value),
-        TrilinosPayload>::type
+        TrilinosPayload>
       TrilinosPayload::inverse_payload(Solver &, const Preconditioner &) const
       {
         TrilinosPayload return_op(*this);

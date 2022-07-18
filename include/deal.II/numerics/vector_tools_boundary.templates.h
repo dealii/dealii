@@ -990,7 +990,7 @@ namespace VectorTools
   namespace internals
   {
     template <int dim, typename cell_iterator, typename number>
-    typename std::enable_if<dim == 3>::type
+    std::enable_if_t<dim == 3>
     compute_edge_projection_l2(const cell_iterator &        cell,
                                const unsigned int           face,
                                const unsigned int           line,
@@ -1280,7 +1280,7 @@ namespace VectorTools
 
 
     template <int dim, typename cell_iterator, typename number>
-    typename std::enable_if<dim != 3>::type
+    std::enable_if_t<dim != 3>
     compute_edge_projection_l2(const cell_iterator &,
                                const unsigned int,
                                const unsigned int,

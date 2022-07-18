@@ -1661,11 +1661,11 @@ namespace internal
               int dim,
               typename Number,
               typename OtherNumber,
-              typename std::enable_if<
+              std::enable_if_t<
                 !std::is_integral<
                   typename ProductType<Number, OtherNumber>::type>::value &&
                   !std::is_same<Number, Differentiation::SD::Expression>::value,
-                int>::type = 0>
+                int> = 0>
     constexpr DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
     division_operator(Tensor<rank, dim, Number> (&t)[dim],
                       const OtherNumber &factor)
@@ -1681,11 +1681,11 @@ namespace internal
               int dim,
               typename Number,
               typename OtherNumber,
-              typename std::enable_if<
+              std::enable_if_t<
                 std::is_integral<
                   typename ProductType<Number, OtherNumber>::type>::value ||
                   std::is_same<Number, Differentiation::SD::Expression>::value,
-                int>::type = 0>
+                int> = 0>
     constexpr DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE void
     division_operator(Tensor<rank, dim, Number> (&t)[dim],
                       const OtherNumber &factor)
@@ -2111,10 +2111,10 @@ namespace internal
               int dim,
               typename Number,
               typename OtherNumber,
-              typename std::enable_if<
+              std::enable_if_t<
                 !std::is_integral<
                   typename ProductType<Number, OtherNumber>::type>::value,
-                int>::type = 0>
+                int> = 0>
     constexpr DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
       Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
       division_operator(const Tensor<rank, dim, Number> &t,
@@ -2133,10 +2133,10 @@ namespace internal
               int dim,
               typename Number,
               typename OtherNumber,
-              typename std::enable_if<
+              std::enable_if_t<
                 std::is_integral<
                   typename ProductType<Number, OtherNumber>::type>::value,
-                int>::type = 0>
+                int> = 0>
     constexpr DEAL_II_CUDA_HOST_DEV inline DEAL_II_ALWAYS_INLINE
       Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
       division_operator(const Tensor<rank, dim, Number> &t,
@@ -2318,7 +2318,7 @@ template <int rank_1,
           int dim,
           typename Number,
           typename OtherNumber,
-          typename = typename std::enable_if<rank_1 >= 1 && rank_2 >= 1>::type>
+          typename = std::enable_if_t<rank_1 >= 1 && rank_2 >= 1>>
 constexpr inline DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,

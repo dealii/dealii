@@ -3120,8 +3120,8 @@ namespace internal
      * Start update_ghost_value for serial vectors
      */
     template <typename VectorType,
-              typename std::enable_if<is_not_parallel_vector<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<is_not_parallel_vector<VectorType>, VectorType>
+                * = nullptr>
     void
     update_ghost_values_start(const unsigned int /*component_in_block_vector*/,
                               const VectorType & /*vec*/)
@@ -3132,11 +3132,10 @@ namespace internal
      * Start update_ghost_value for vectors that do not support
      * the split into _start() and finish() stages
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<!has_update_ghost_values_start<VectorType> &&
-                                !is_not_parallel_vector<VectorType>,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              std::enable_if_t<!has_update_ghost_values_start<VectorType> &&
+                                 !is_not_parallel_vector<VectorType>,
+                               VectorType> * = nullptr>
     void
     update_ghost_values_start(const unsigned int component_in_block_vector,
                               const VectorType & vec)
@@ -3161,11 +3160,10 @@ namespace internal
      * the split into _start() and finish() stages, but don't support
      * exchange on a subset of DoFs
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<has_update_ghost_values_start<VectorType> &&
-                                !has_exchange_on_subset<VectorType>,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              std::enable_if_t<has_update_ghost_values_start<VectorType> &&
+                                 !has_exchange_on_subset<VectorType>,
+                               VectorType> * = nullptr>
     void
     update_ghost_values_start(const unsigned int component_in_block_vector,
                               const VectorType & vec)
@@ -3191,11 +3189,10 @@ namespace internal
      * exchange on a subset of DoFs,
      * i.e. LinearAlgebra::distributed::Vector
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<has_update_ghost_values_start<VectorType> &&
-                                has_exchange_on_subset<VectorType>,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              std::enable_if_t<has_update_ghost_values_start<VectorType> &&
+                                 has_exchange_on_subset<VectorType>,
+                               VectorType> * = nullptr>
     void
     update_ghost_values_start(const unsigned int component_in_block_vector,
                               const VectorType & vec)
@@ -3251,10 +3248,9 @@ namespace internal
      * Finish update_ghost_value for vectors that do not support
      * the split into _start() and finish() stages and serial vectors
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<!has_update_ghost_values_start<VectorType>,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              std::enable_if_t<!has_update_ghost_values_start<VectorType>,
+                               VectorType> * = nullptr>
     void
     update_ghost_values_finish(const unsigned int /*component_in_block_vector*/,
                                const VectorType & /*vec*/)
@@ -3267,11 +3263,10 @@ namespace internal
      * the split into _start() and finish() stages, but don't support
      * exchange on a subset of DoFs
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<has_update_ghost_values_start<VectorType> &&
-                                !has_exchange_on_subset<VectorType>,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              std::enable_if_t<has_update_ghost_values_start<VectorType> &&
+                                 !has_exchange_on_subset<VectorType>,
+                               VectorType> * = nullptr>
     void
     update_ghost_values_finish(const unsigned int component_in_block_vector,
                                const VectorType & vec)
@@ -3288,11 +3283,10 @@ namespace internal
      * exchange on a subset of DoFs,
      * i.e. LinearAlgebra::distributed::Vector
      */
-    template <
-      typename VectorType,
-      typename std::enable_if<has_update_ghost_values_start<VectorType> &&
-                                has_exchange_on_subset<VectorType>,
-                              VectorType>::type * = nullptr>
+    template <typename VectorType,
+              std::enable_if_t<has_update_ghost_values_start<VectorType> &&
+                                 has_exchange_on_subset<VectorType>,
+                               VectorType> * = nullptr>
     void
     update_ghost_values_finish(const unsigned int component_in_block_vector,
                                const VectorType & vec)
@@ -3341,8 +3335,8 @@ namespace internal
      * Start compress for serial vectors
      */
     template <typename VectorType,
-              typename std::enable_if<is_not_parallel_vector<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<is_not_parallel_vector<VectorType>, VectorType>
+                * = nullptr>
     void
     compress_start(const unsigned int /*component_in_block_vector*/,
                    VectorType & /*vec*/)
@@ -3355,9 +3349,9 @@ namespace internal
      * the split into _start() and finish() stages
      */
     template <typename VectorType,
-              typename std::enable_if<!has_compress_start<VectorType> &&
-                                        !is_not_parallel_vector<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<!has_compress_start<VectorType> &&
+                                 !is_not_parallel_vector<VectorType>,
+                               VectorType> * = nullptr>
     void
     compress_start(const unsigned int component_in_block_vector,
                    VectorType &       vec)
@@ -3375,9 +3369,9 @@ namespace internal
      * exchange on a subset of DoFs
      */
     template <typename VectorType,
-              typename std::enable_if<has_compress_start<VectorType> &&
-                                        !has_exchange_on_subset<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<has_compress_start<VectorType> &&
+                                 !has_exchange_on_subset<VectorType>,
+                               VectorType> * = nullptr>
     void
     compress_start(const unsigned int component_in_block_vector,
                    VectorType &       vec)
@@ -3396,9 +3390,9 @@ namespace internal
      * i.e. LinearAlgebra::distributed::Vector
      */
     template <typename VectorType,
-              typename std::enable_if<has_compress_start<VectorType> &&
-                                        has_exchange_on_subset<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<has_compress_start<VectorType> &&
+                                 has_exchange_on_subset<VectorType>,
+                               VectorType> * = nullptr>
     void
     compress_start(const unsigned int component_in_block_vector,
                    VectorType &       vec)
@@ -3447,9 +3441,9 @@ namespace internal
      * Finish compress for vectors that do not support
      * the split into _start() and finish() stages and serial vectors
      */
-    template <typename VectorType,
-              typename std::enable_if<!has_compress_start<VectorType>,
-                                      VectorType>::type * = nullptr>
+    template <
+      typename VectorType,
+      std::enable_if_t<!has_compress_start<VectorType>, VectorType> * = nullptr>
     void
     compress_finish(const unsigned int /*component_in_block_vector*/,
                     VectorType & /*vec*/)
@@ -3463,9 +3457,9 @@ namespace internal
      * exchange on a subset of DoFs
      */
     template <typename VectorType,
-              typename std::enable_if<has_compress_start<VectorType> &&
-                                        !has_exchange_on_subset<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<has_compress_start<VectorType> &&
+                                 !has_exchange_on_subset<VectorType>,
+                               VectorType> * = nullptr>
     void
     compress_finish(const unsigned int component_in_block_vector,
                     VectorType &       vec)
@@ -3483,9 +3477,9 @@ namespace internal
      * i.e. LinearAlgebra::distributed::Vector
      */
     template <typename VectorType,
-              typename std::enable_if<has_compress_start<VectorType> &&
-                                        has_exchange_on_subset<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<has_compress_start<VectorType> &&
+                                 has_exchange_on_subset<VectorType>,
+                               VectorType> * = nullptr>
     void
     compress_finish(const unsigned int component_in_block_vector,
                     VectorType &       vec)
@@ -3540,8 +3534,8 @@ namespace internal
      * Reset all ghost values for serial vectors
      */
     template <typename VectorType,
-              typename std::enable_if<is_not_parallel_vector<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<is_not_parallel_vector<VectorType>, VectorType>
+                * = nullptr>
     void
     reset_ghost_values(const VectorType & /*vec*/) const
     {}
@@ -3553,9 +3547,9 @@ namespace internal
      * exchange on a subset of DoFs
      */
     template <typename VectorType,
-              typename std::enable_if<!has_exchange_on_subset<VectorType> &&
-                                        !is_not_parallel_vector<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<!has_exchange_on_subset<VectorType> &&
+                                 !is_not_parallel_vector<VectorType>,
+                               VectorType> * = nullptr>
     void
     reset_ghost_values(const VectorType &vec) const
     {
@@ -3573,8 +3567,8 @@ namespace internal
      * LinearAlgebra::distributed::Vector
      */
     template <typename VectorType,
-              typename std::enable_if<has_exchange_on_subset<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<has_exchange_on_subset<VectorType>, VectorType>
+                * = nullptr>
     void
     reset_ghost_values(const VectorType &vec) const
     {
@@ -3617,8 +3611,8 @@ namespace internal
      * i.e. LinearAlgebra::distributed::Vector
      */
     template <typename VectorType,
-              typename std::enable_if<has_exchange_on_subset<VectorType>,
-                                      VectorType>::type * = nullptr>
+              std::enable_if_t<has_exchange_on_subset<VectorType>, VectorType>
+                * = nullptr>
     void
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
@@ -3659,9 +3653,9 @@ namespace internal
      * vector type
      */
     template <typename VectorType,
-              typename std::enable_if<!has_exchange_on_subset<VectorType>,
-                                      VectorType>::type * = nullptr,
-              typename VectorType::value_type *           = nullptr>
+              std::enable_if_t<!has_exchange_on_subset<VectorType>, VectorType>
+                *                               = nullptr,
+              typename VectorType::value_type * = nullptr>
     void
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
@@ -3757,8 +3751,8 @@ namespace internal
 
   // default value for vectors that do not have communication_block_size
   template <typename VectorStruct,
-            typename std::enable_if<!has_communication_block_size<VectorStruct>,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<!has_communication_block_size<VectorStruct>,
+                             VectorStruct> * = nullptr>
   constexpr unsigned int
   get_communication_block_size(const VectorStruct &)
   {
@@ -3768,8 +3762,8 @@ namespace internal
 
 
   template <typename VectorStruct,
-            typename std::enable_if<has_communication_block_size<VectorStruct>,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<has_communication_block_size<VectorStruct>,
+                             VectorStruct> * = nullptr>
   constexpr unsigned int
   get_communication_block_size(const VectorStruct &)
   {
@@ -3791,8 +3785,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   void
   update_ghost_values_start(
     const VectorStruct &                                  vec,
@@ -3820,8 +3814,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<!IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<!IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   void
   update_ghost_values_start(
     const VectorStruct &                                  vec,
@@ -3882,8 +3876,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   void
   update_ghost_values_finish(
     const VectorStruct &                                  vec,
@@ -3907,8 +3901,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<!IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<!IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   void
   update_ghost_values_finish(
     const VectorStruct &                                  vec,
@@ -3969,8 +3963,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   inline void
   compress_start(
     VectorStruct &                                        vec,
@@ -3991,8 +3985,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<!IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<!IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   inline void
   compress_start(
     VectorStruct &                                        vec,
@@ -4053,8 +4047,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   inline void
   compress_finish(
     VectorStruct &                                        vec,
@@ -4078,8 +4072,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<!IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<!IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   inline void
   compress_finish(
     VectorStruct &                                        vec,
@@ -4144,8 +4138,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   inline void
   reset_ghost_values(
     const VectorStruct &                                  vec,
@@ -4166,8 +4160,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<!IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<!IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   inline void
   reset_ghost_values(
     const VectorStruct &                                  vec,
@@ -4227,8 +4221,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   inline void
   zero_vector_region(
     const unsigned int                                    range_index,
@@ -4246,8 +4240,8 @@ namespace internal
             typename VectorStruct,
             typename Number,
             typename VectorizedArrayType,
-            typename std::enable_if<!IsBlockVector<VectorStruct>::value,
-                                    VectorStruct>::type * = nullptr>
+            std::enable_if_t<!IsBlockVector<VectorStruct>::value, VectorStruct>
+              * = nullptr>
   inline void
   zero_vector_region(
     const unsigned int                                    range_index,

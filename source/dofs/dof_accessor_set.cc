@@ -102,18 +102,18 @@ namespace internal
   constexpr bool has_set_ghost_state =
     is_supported_operation<set_ghost_state_t, T>;
 
-  template <typename VectorType,
-            typename std::enable_if<has_set_ghost_state<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<has_set_ghost_state<VectorType>, VectorType> * = nullptr>
   void
   set_ghost_state(VectorType &vector, const bool ghosted)
   {
     vector.set_ghost_state(ghosted);
   }
 
-  template <typename VectorType,
-            typename std::enable_if<!has_set_ghost_state<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<!has_set_ghost_state<VectorType>, VectorType> * = nullptr>
   void
   set_ghost_state(VectorType &, const bool)
   {
