@@ -67,9 +67,9 @@ namespace Differentiation
      *
      * This variant is used when the @p exponent is not a Expression.
      */
-    template <typename NumberType,
-              typename = typename std::enable_if<
-                !std::is_same<NumberType, Expression>::value>::type>
+    template <
+      typename NumberType,
+      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
     Expression
     pow(const Expression &base, const NumberType &exponent)
     {
@@ -86,9 +86,9 @@ namespace Differentiation
      *
      * This variant is used when the @p base is not a Expression.
      */
-    template <typename NumberType,
-              typename = typename std::enable_if<
-                !std::is_same<NumberType, Expression>::value>::type>
+    template <
+      typename NumberType,
+      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
     Expression
     pow(const NumberType &base, const Expression &exponent)
     {
@@ -152,9 +152,9 @@ namespace Differentiation
      *
      * This variant is used when the @p base is not a Expression.
      */
-    template <typename NumberType,
-              typename = typename std::enable_if<
-                !std::is_same<NumberType, Expression>::value>::type>
+    template <
+      typename NumberType,
+      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
     Expression
     log(const Expression &x, const NumberType &base)
     {
@@ -171,9 +171,9 @@ namespace Differentiation
      *
      * This variant is used when the @p value is not a Expression.
      */
-    template <typename NumberType,
-              typename = typename std::enable_if<
-                !std::is_same<NumberType, Expression>::value>::type>
+    template <
+      typename NumberType,
+      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
     Expression
     log(const NumberType &x, const Expression &base)
     {
@@ -311,9 +311,9 @@ namespace Differentiation
      *
      * This variant is used when the numerator @p y is not a Expression.
      */
-    template <typename NumberType,
-              typename = typename std::enable_if<
-                !std::is_same<NumberType, Expression>::value>::type>
+    template <
+      typename NumberType,
+      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
     Expression
     atan2(const NumberType &y, const Expression &x)
     {
@@ -331,9 +331,9 @@ namespace Differentiation
      *
      * This variant is used when the denominator @p x is not a Expression.
      */
-    template <typename NumberType,
-              typename = typename std::enable_if<
-                !std::is_same<NumberType, Expression>::value>::type>
+    template <
+      typename NumberType,
+      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
     Expression
     atan2(const Expression &y, const NumberType &x)
     {
@@ -600,9 +600,9 @@ namespace Differentiation
      *
      * This variant is used when @p b is not a Expression.
      */
-    template <typename NumberType,
-              typename = typename std::enable_if<
-                !std::is_same<NumberType, Expression>::value>::type>
+    template <
+      typename NumberType,
+      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
     Expression
     max(const Expression &a, const NumberType &b)
     {
@@ -619,9 +619,9 @@ namespace Differentiation
      *
      * This variant is used when @p a is not a Expression.
      */
-    template <typename NumberType,
-              typename = typename std::enable_if<
-                !std::is_same<NumberType, Expression>::value>::type>
+    template <
+      typename NumberType,
+      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
     Expression
     max(const NumberType &a, const Expression &b)
     {
@@ -648,9 +648,9 @@ namespace Differentiation
      *
      * This variant is used when @p b is not a Expression.
      */
-    template <typename NumberType,
-              typename = typename std::enable_if<
-                !std::is_same<NumberType, Expression>::value>::type>
+    template <
+      typename NumberType,
+      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
     Expression
     min(const Expression &a, const NumberType &b)
     {
@@ -667,9 +667,9 @@ namespace Differentiation
      *
      * This variant is used when @p a is not a Expression.
      */
-    template <typename NumberType,
-              typename = typename std::enable_if<
-                !std::is_same<NumberType, Expression>::value>::type>
+    template <
+      typename NumberType,
+      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
     Expression
     min(const NumberType &a, const Expression &b)
     {

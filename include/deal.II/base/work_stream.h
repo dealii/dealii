@@ -1212,8 +1212,7 @@ namespace WorkStream
             typename IteratorRangeType,
             typename ScratchData,
             typename CopyData,
-            typename = typename std::enable_if<
-              has_begin_and_end<IteratorRangeType>>::type>
+            typename = std::enable_if_t<has_begin_and_end<IteratorRangeType>>>
   void
   run(IteratorRangeType  iterator_range,
       Worker             worker,
@@ -1436,8 +1435,7 @@ namespace WorkStream
             typename IteratorRangeType,
             typename ScratchData,
             typename CopyData,
-            typename = typename std::enable_if<
-              has_begin_and_end<IteratorRangeType>>::type>
+            typename = std::enable_if_t<has_begin_and_end<IteratorRangeType>>>
   void
   run(IteratorRangeType iterator_range,
       MainClass &       main_object,

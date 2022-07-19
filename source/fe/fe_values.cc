@@ -125,8 +125,7 @@ namespace internal
     template <typename Number>
     struct CheckForZero<
       Number,
-      typename std::enable_if<
-        Differentiation::AD::is_ad_number<Number>::value>::type>
+      std::enable_if_t<Differentiation::AD::is_ad_number<Number>::value>>
     {
       static bool
       value(const Number & /*value*/)

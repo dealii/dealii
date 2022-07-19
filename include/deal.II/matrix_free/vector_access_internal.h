@@ -39,9 +39,9 @@ namespace internal
   // access to generic const vectors that have operator ().
   // FIXME: this is wrong for Trilinos/Petsc MPI vectors
   // where we should first do Partitioner::local_to_global()
-  template <typename VectorType,
-            typename std::enable_if<!has_local_element<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<!has_local_element<VectorType>, VectorType> * = nullptr>
   inline typename VectorType::value_type
   vector_access(const VectorType &vec, const unsigned int entry)
   {
@@ -53,9 +53,9 @@ namespace internal
   // access to generic non-const vectors that have operator ().
   // FIXME: this is wrong for Trilinos/Petsc MPI vectors
   // where we should first do Partitioner::local_to_global()
-  template <typename VectorType,
-            typename std::enable_if<!has_local_element<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<!has_local_element<VectorType>, VectorType> * = nullptr>
   inline typename VectorType::value_type &
   vector_access(VectorType &vec, const unsigned int entry)
   {
@@ -67,9 +67,9 @@ namespace internal
   // access to distributed MPI vectors that have a local_element(uint)
   // method to access data in local index space, which is what we use in
   // DoFInfo and hence in read_dof_values etc.
-  template <typename VectorType,
-            typename std::enable_if<has_local_element<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<has_local_element<VectorType>, VectorType> * = nullptr>
   inline typename VectorType::value_type &
   vector_access(VectorType &vec, const unsigned int entry)
   {
@@ -79,9 +79,9 @@ namespace internal
 
 
   // same for const access
-  template <typename VectorType,
-            typename std::enable_if<has_local_element<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<has_local_element<VectorType>, VectorType> * = nullptr>
   inline typename VectorType::value_type
   vector_access(const VectorType &vec, const unsigned int entry)
   {
@@ -90,9 +90,9 @@ namespace internal
 
 
 
-  template <typename VectorType,
-            typename std::enable_if<has_add_local_element<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<has_add_local_element<VectorType>, VectorType> * = nullptr>
   inline void
   vector_access_add(VectorType &                           vec,
                     const unsigned int                     entry,
@@ -104,8 +104,8 @@ namespace internal
 
 
   template <typename VectorType,
-            typename std::enable_if<!has_add_local_element<VectorType>,
-                                    VectorType>::type * = nullptr>
+            std::enable_if_t<!has_add_local_element<VectorType>, VectorType> * =
+              nullptr>
   inline void
   vector_access_add(VectorType &                           vec,
                     const unsigned int                     entry,
@@ -116,9 +116,9 @@ namespace internal
 
 
 
-  template <typename VectorType,
-            typename std::enable_if<has_add_local_element<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<has_add_local_element<VectorType>, VectorType> * = nullptr>
   inline void
   vector_access_add_global(VectorType &                           vec,
                            const types::global_dof_index          entry,
@@ -130,8 +130,8 @@ namespace internal
 
 
   template <typename VectorType,
-            typename std::enable_if<!has_add_local_element<VectorType>,
-                                    VectorType>::type * = nullptr>
+            std::enable_if_t<!has_add_local_element<VectorType>, VectorType> * =
+              nullptr>
   inline void
   vector_access_add_global(VectorType &                           vec,
                            const types::global_dof_index          entry,
@@ -142,9 +142,9 @@ namespace internal
 
 
 
-  template <typename VectorType,
-            typename std::enable_if<has_set_local_element<VectorType>,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename VectorType,
+    std::enable_if_t<has_set_local_element<VectorType>, VectorType> * = nullptr>
   inline void
   vector_access_set(VectorType &                           vec,
                     const unsigned int                     entry,
@@ -156,8 +156,8 @@ namespace internal
 
 
   template <typename VectorType,
-            typename std::enable_if<!has_set_local_element<VectorType>,
-                                    VectorType>::type * = nullptr>
+            std::enable_if_t<!has_set_local_element<VectorType>, VectorType> * =
+              nullptr>
   inline void
   vector_access_set(VectorType &                           vec,
                     const unsigned int                     entry,
@@ -172,13 +172,12 @@ namespace internal
   // is really the same as stored in MatrixFree.
   // version below is when has_partitioners_are_compatible == false
   // FIXME: this is incorrect for PETSc/Trilinos MPI vectors
-  template <
-    int dim,
-    typename Number,
-    typename VectorizedArrayType,
-    typename VectorType,
-    typename std::enable_if<!has_partitioners_are_compatible<VectorType>,
-                            VectorType>::type * = nullptr>
+  template <int dim,
+            typename Number,
+            typename VectorizedArrayType,
+            typename VectorType,
+            std::enable_if_t<!has_partitioners_are_compatible<VectorType>,
+                             VectorType> * = nullptr>
   inline void
   check_vector_compatibility(
     const VectorType &                                  vec,
@@ -199,8 +198,8 @@ namespace internal
             typename Number,
             typename VectorizedArrayType,
             typename VectorType,
-            typename std::enable_if<has_partitioners_are_compatible<VectorType>,
-                                    VectorType>::type * = nullptr>
+            std::enable_if_t<has_partitioners_are_compatible<VectorType>,
+                             VectorType> * = nullptr>
   inline void
   check_vector_compatibility(
     const VectorType &                                  vec,

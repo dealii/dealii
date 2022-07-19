@@ -950,11 +950,11 @@ namespace MatrixFreeTools
      */
     template <typename MatrixType,
               typename Number,
-              typename std::enable_if<std::is_same<
+              std::enable_if_t<std::is_same<
                 typename std::remove_const<typename std::remove_reference<
                   typename MatrixType::value_type>::type>::type,
                 typename std::remove_const<typename std::remove_reference<
-                  Number>::type>::type>::value>::type * = nullptr>
+                  Number>::type>::type>::value> * = nullptr>
     const AffineConstraints<typename MatrixType::value_type> &
     create_new_affine_constraints_if_needed(
       const MatrixType &,
@@ -971,11 +971,11 @@ namespace MatrixFreeTools
      */
     template <typename MatrixType,
               typename Number,
-              typename std::enable_if<!std::is_same<
+              std::enable_if_t<!std::is_same<
                 typename std::remove_const<typename std::remove_reference<
                   typename MatrixType::value_type>::type>::type,
                 typename std::remove_const<typename std::remove_reference<
-                  Number>::type>::type>::value>::type * = nullptr>
+                  Number>::type>::type>::value> * = nullptr>
     const AffineConstraints<typename MatrixType::value_type> &
     create_new_affine_constraints_if_needed(
       const MatrixType &,

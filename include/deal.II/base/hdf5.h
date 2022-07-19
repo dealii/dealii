@@ -1210,29 +1210,29 @@ namespace HDF5
      * of the FullMatrix will be FullMatrix(dim_0,dim_2)
      */
     template <typename Container>
-    typename std::enable_if<
+    std::enable_if_t<
       std::is_same<Container,
                    std::vector<typename Container::value_type>>::value,
-      Container>::type
+      Container>
     initialize_container(const std::vector<hsize_t> &dimensions);
 
     /**
      * Same as above.
      */
     template <typename Container>
-    typename std::enable_if<
+    std::enable_if_t<
       std::is_same<Container, Vector<typename Container::value_type>>::value,
-      Container>::type
+      Container>
     initialize_container(const std::vector<hsize_t> &dimensions);
 
     /**
      * Same as above.
      */
     template <typename Container>
-    typename std::enable_if<
+    std::enable_if_t<
       std::is_same<Container,
                    FullMatrix<typename Container::value_type>>::value,
-      Container>::type
+      Container>
     initialize_container(const std::vector<hsize_t> &dimensions);
 
     /**
@@ -1418,10 +1418,10 @@ namespace HDF5
 
 
     template <typename Container>
-    typename std::enable_if<
+    std::enable_if_t<
       std::is_same<Container,
                    std::vector<typename Container::value_type>>::value,
-      Container>::type
+      Container>
     initialize_container(const std::vector<hsize_t> &dimensions)
     {
       return Container(std::accumulate(
@@ -1431,9 +1431,9 @@ namespace HDF5
 
 
     template <typename Container>
-    typename std::enable_if<
+    std::enable_if_t<
       std::is_same<Container, Vector<typename Container::value_type>>::value,
-      Container>::type
+      Container>
     initialize_container(const std::vector<hsize_t> &dimensions)
     {
       return Container(std::accumulate(
@@ -1443,10 +1443,10 @@ namespace HDF5
 
 
     template <typename Container>
-    typename std::enable_if<
+    std::enable_if_t<
       std::is_same<Container,
                    FullMatrix<typename Container::value_type>>::value,
-      Container>::type
+      Container>
     initialize_container(const std::vector<hsize_t> &dimensions)
     {
       // If the rank is higher than 2, then remove single-dimensional entries

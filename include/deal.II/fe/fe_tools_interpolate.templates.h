@@ -350,7 +350,7 @@ namespace FETools
   namespace internal
   {
     template <int dim, int spacedim, class InVector>
-    typename std::enable_if<is_serial_vector<InVector>::value>::type
+    std::enable_if_t<is_serial_vector<InVector>::value>
     back_interpolate(
       const DoFHandler<dim, spacedim> &                       dof1,
       const AffineConstraints<typename InVector::value_type> &constraints1,

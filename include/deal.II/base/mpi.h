@@ -1215,7 +1215,7 @@ namespace Utilities
      *   the @p root_process.
      */
     template <typename T>
-    typename std::enable_if<is_mpi_type<T> == false, T>::type
+    std::enable_if_t<is_mpi_type<T> == false, T>
     broadcast(const MPI_Comm &   comm,
               const T &          object_to_send,
               const unsigned int root_process = 0);
@@ -1243,7 +1243,7 @@ namespace Utilities
      *   the @p root_process.
      */
     template <typename T>
-    typename std::enable_if<is_mpi_type<T> == true, T>::type
+    std::enable_if_t<is_mpi_type<T> == true, T>
     broadcast(const MPI_Comm &   comm,
               const T &          object_to_send,
               const unsigned int root_process = 0);
@@ -1925,7 +1925,7 @@ namespace Utilities
 
 
     template <typename T>
-    typename std::enable_if<is_mpi_type<T> == false, T>::type
+    std::enable_if_t<is_mpi_type<T> == false, T>
     broadcast(const MPI_Comm &   comm,
               const T &          object_to_send,
               const unsigned int root_process)
@@ -1975,7 +1975,7 @@ namespace Utilities
 
 
     template <typename T>
-    typename std::enable_if<is_mpi_type<T> == true, T>::type
+    std::enable_if_t<is_mpi_type<T> == true, T>
     broadcast(const MPI_Comm &   comm,
               const T &          object_to_send,
               const unsigned int root_process)

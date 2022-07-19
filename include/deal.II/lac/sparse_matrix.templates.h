@@ -168,14 +168,14 @@ namespace internal
     using size_type = types::global_dof_index;
 
     template <typename T>
-    typename std::enable_if<std::is_trivial<T>::value>::type
+    std::enable_if_t<std::is_trivial<T>::value>
     zero_subrange(const size_type begin, const size_type end, T *dst)
     {
       std::memset(dst + begin, 0, (end - begin) * sizeof(T));
     }
 
     template <typename T>
-    typename std::enable_if<!std::is_trivial<T>::value>::type
+    std::enable_if_t<!std::is_trivial<T>::value>
     zero_subrange(const size_type begin, const size_type end, T *dst)
     {
       std::fill(dst + begin, dst + end, 0);

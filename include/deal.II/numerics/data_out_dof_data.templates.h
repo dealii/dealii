@@ -913,8 +913,8 @@ namespace internal
                 int spacedim,
                 typename VectorType,
                 typename Number,
-                typename std::enable_if<IsBlockVector<VectorType>::value,
-                                        VectorType>::type * = nullptr>
+                std::enable_if_t<IsBlockVector<VectorType>::value, VectorType>
+                  * = nullptr>
       void
       create_dof_vector(const DoFHandler<dim, spacedim> &dof_handler,
                         const VectorType &               src,
@@ -975,8 +975,8 @@ namespace internal
                 int spacedim,
                 typename VectorType,
                 typename Number,
-                typename std::enable_if<!IsBlockVector<VectorType>::value,
-                                        VectorType>::type * = nullptr>
+                std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
+                  * = nullptr>
       void
       create_dof_vector(const DoFHandler<dim, spacedim> &dof_handler,
                         const VectorType &               src,
@@ -1009,8 +1009,8 @@ namespace internal
        */
       template <typename VectorType,
                 typename Number,
-                typename std::enable_if<IsBlockVector<VectorType>::value,
-                                        VectorType>::type * = nullptr>
+                std::enable_if_t<IsBlockVector<VectorType>::value, VectorType>
+                  * = nullptr>
       void
       create_cell_vector(const VectorType &                               src,
                          LinearAlgebra::distributed::BlockVector<Number> &dst)
@@ -1032,8 +1032,8 @@ namespace internal
        */
       template <typename VectorType,
                 typename Number,
-                typename std::enable_if<!IsBlockVector<VectorType>::value,
-                                        VectorType>::type * = nullptr>
+                std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
+                  * = nullptr>
       void
       create_cell_vector(const VectorType &                               src,
                          LinearAlgebra::distributed::BlockVector<Number> &dst)

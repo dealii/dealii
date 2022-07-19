@@ -2006,9 +2006,9 @@ namespace internal
         ::dealii::MemorySpace::MemorySpaceData<Number,
                                                ::dealii::MemorySpace::Host>
           &data,
-        typename std::enable_if<
+        std::enable_if_t<
           std::is_same<MemorySpace2, dealii::MemorySpace::Host>::value,
-          int>::type = 0)
+          int> = 0)
       {
         if (operation == VectorOperation::insert)
           {
@@ -2037,9 +2037,9 @@ namespace internal
         ::dealii::MemorySpace::MemorySpaceData<Number,
                                                ::dealii::MemorySpace::Host>
           &data,
-        typename std::enable_if<
+        std::enable_if_t<
           std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
-          int>::type = 0)
+          int> = 0)
       {
         if (operation == VectorOperation::insert)
           {
@@ -2524,9 +2524,9 @@ namespace internal
         ::dealii::MemorySpace::MemorySpaceData<Number,
                                                ::dealii::MemorySpace::CUDA>
           &data,
-        typename std::enable_if<
+        std::enable_if_t<
           std::is_same<MemorySpace2, ::dealii::MemorySpace::CUDA>::value,
-          int>::type = 0)
+          int> = 0)
       {
         if (operation == VectorOperation::insert)
           {
@@ -2554,9 +2554,9 @@ namespace internal
         ::dealii::MemorySpace::MemorySpaceData<Number,
                                                ::dealii::MemorySpace::CUDA>
           &data,
-        typename std::enable_if<
+        std::enable_if_t<
           std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,
-          int>::type = 0)
+          int> = 0)
       {
         if (operation == VectorOperation::insert)
           {

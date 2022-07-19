@@ -523,10 +523,10 @@ namespace internal
  * @ingroup LAOperators
  */
 
-template <typename Range,
-          typename = typename std::enable_if<
-            internal::PackagedOperationImplementation::has_vector_interface<
-              Range>::type::value>::type>
+template <
+  typename Range,
+  typename = std::enable_if_t<internal::PackagedOperationImplementation::
+                                has_vector_interface<Range>::type::value>>
 PackagedOperation<Range>
 operator+(const Range &u, const Range &v)
 {
@@ -568,10 +568,10 @@ operator+(const Range &u, const Range &v)
  * @ingroup LAOperators
  */
 
-template <typename Range,
-          typename = typename std::enable_if<
-            internal::PackagedOperationImplementation::has_vector_interface<
-              Range>::type::value>::type>
+template <
+  typename Range,
+  typename = std::enable_if_t<internal::PackagedOperationImplementation::
+                                has_vector_interface<Range>::type::value>>
 PackagedOperation<Range>
 operator-(const Range &u, const Range &v)
 {
@@ -612,10 +612,10 @@ operator-(const Range &u, const Range &v)
  *
  * @ingroup LAOperators
  */
-template <typename Range,
-          typename = typename std::enable_if<
-            internal::PackagedOperationImplementation::has_vector_interface<
-              Range>::type::value>::type>
+template <
+  typename Range,
+  typename = std::enable_if_t<internal::PackagedOperationImplementation::
+                                has_vector_interface<Range>::type::value>>
 PackagedOperation<Range>
 operator*(const Range &u, typename Range::value_type number)
 {
@@ -637,10 +637,10 @@ operator*(const Range &u, typename Range::value_type number)
  *
  * @ingroup LAOperators
  */
-template <typename Range,
-          typename = typename std::enable_if<
-            internal::PackagedOperationImplementation::has_vector_interface<
-              Range>::type::value>::type>
+template <
+  typename Range,
+  typename = std::enable_if_t<internal::PackagedOperationImplementation::
+                                has_vector_interface<Range>::type::value>>
 PackagedOperation<Range>
 operator*(typename Range::value_type number, const Range &u)
 {

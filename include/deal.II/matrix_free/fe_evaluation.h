@@ -4094,20 +4094,20 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
 namespace internal
 {
-  template <typename Number,
-            typename VectorType,
-            typename std::enable_if<!IsBlockVector<VectorType>::value,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename Number,
+    typename VectorType,
+    std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType> * = nullptr>
   decltype(std::declval<VectorType>().begin())
   get_beginning(VectorType &vec)
   {
     return vec.begin();
   }
 
-  template <typename Number,
-            typename VectorType,
-            typename std::enable_if<IsBlockVector<VectorType>::value,
-                                    VectorType>::type * = nullptr>
+  template <
+    typename Number,
+    typename VectorType,
+    std::enable_if_t<IsBlockVector<VectorType>::value, VectorType> * = nullptr>
   typename VectorType::value_type *
   get_beginning(VectorType &)
   {
@@ -4115,8 +4115,8 @@ namespace internal
   }
 
   template <typename VectorType,
-            typename std::enable_if<has_shared_vector_data<VectorType>,
-                                    VectorType>::type * = nullptr>
+            std::enable_if_t<has_shared_vector_data<VectorType>, VectorType> * =
+              nullptr>
   const std::vector<ArrayView<const typename VectorType::value_type>> *
   get_shared_vector_data(VectorType &       vec,
                          const bool         is_valid_mode_for_sm,
@@ -4134,8 +4134,8 @@ namespace internal
   }
 
   template <typename VectorType,
-            typename std::enable_if<!has_shared_vector_data<VectorType>,
-                                    VectorType>::type * = nullptr>
+            std::enable_if_t<!has_shared_vector_data<VectorType>, VectorType>
+              * = nullptr>
   const std::vector<ArrayView<const typename VectorType::value_type>> *
   get_shared_vector_data(VectorType &,
                          const bool,
@@ -7911,9 +7911,9 @@ namespace internal
             typename VectorizedArrayType,
             typename VectorType,
             typename EvaluatorType,
-            typename std::enable_if<internal::has_begin<VectorType> &&
-                                      !IsBlockVector<VectorType>::value,
-                                    VectorType>::type * = nullptr>
+            std::enable_if_t<internal::has_begin<VectorType> &&
+                               !IsBlockVector<VectorType>::value,
+                             VectorType> * = nullptr>
   VectorizedArrayType *
   check_vector_access_inplace(const EvaluatorType &fe_eval, VectorType &vector)
   {
@@ -7963,9 +7963,9 @@ namespace internal
             typename VectorizedArrayType,
             typename VectorType,
             typename EvaluatorType,
-            typename std::enable_if<!internal::has_begin<VectorType> ||
-                                      IsBlockVector<VectorType>::value,
-                                    VectorType>::type * = nullptr>
+            std::enable_if_t<!internal::has_begin<VectorType> ||
+                               IsBlockVector<VectorType>::value,
+                             VectorType> * = nullptr>
   VectorizedArrayType *
   check_vector_access_inplace(const EvaluatorType &, VectorType &)
   {

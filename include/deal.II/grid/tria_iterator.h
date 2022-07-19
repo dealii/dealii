@@ -381,8 +381,7 @@ public:
    * Compare for equality.
    */
   template <typename OtherAccessor = Accessor>
-  typename std::enable_if<std::is_convertible<OtherAccessor, Accessor>::value,
-                          bool>::type
+  std::enable_if_t<std::is_convertible<OtherAccessor, Accessor>::value, bool>
   operator==(const TriaRawIterator<OtherAccessor> &) const;
 
   /**

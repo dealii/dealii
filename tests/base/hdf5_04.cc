@@ -28,9 +28,8 @@
 
 // This function initializes a container of Number type
 template <template <class...> class Container, typename Number>
-typename std::enable_if<
-  std::is_same<Container<Number>, std::vector<Number>>::value,
-  Container<Number>>::type
+std::enable_if_t<std::is_same<Container<Number>, std::vector<Number>>::value,
+                 Container<Number>>
 initialize_container(std::vector<hsize_t> dimensions)
 {
   return Container<Number>(std::accumulate(
@@ -38,8 +37,8 @@ initialize_container(std::vector<hsize_t> dimensions)
 }
 
 template <template <class...> class Container, typename Number>
-typename std::enable_if<std::is_same<Container<Number>, Vector<Number>>::value,
-                        Container<Number>>::type
+std::enable_if_t<std::is_same<Container<Number>, Vector<Number>>::value,
+                 Container<Number>>
 initialize_container(std::vector<hsize_t> dimensions)
 {
   return Container<Number>(std::accumulate(
@@ -47,9 +46,8 @@ initialize_container(std::vector<hsize_t> dimensions)
 }
 
 template <template <class...> class Container, typename Number>
-typename std::enable_if<
-  std::is_same<Container<Number>, FullMatrix<Number>>::value,
-  Container<Number>>::type
+std::enable_if_t<std::is_same<Container<Number>, FullMatrix<Number>>::value,
+                 Container<Number>>
 initialize_container(std::vector<hsize_t> dimensions)
 {
   return FullMatrix<Number>(dimensions[0], dimensions[1]);
@@ -57,26 +55,23 @@ initialize_container(std::vector<hsize_t> dimensions)
 
 // This function calculates the sum of the elements in a container
 template <template <class...> class Container, typename Number>
-typename std::enable_if<
-  std::is_same<Container<Number>, std::vector<Number>>::value,
-  Number>::type
+std::enable_if_t<std::is_same<Container<Number>, std::vector<Number>>::value,
+                 Number>
 container_sum(Container<Number> data)
 {
   return std::accumulate(data.begin(), data.end(), static_cast<Number>(0));
 }
 
 template <template <class...> class Container, typename Number>
-typename std::enable_if<std::is_same<Container<Number>, Vector<Number>>::value,
-                        Number>::type
+std::enable_if_t<std::is_same<Container<Number>, Vector<Number>>::value, Number>
 container_sum(Container<Number> data)
 {
   return std::accumulate(data.begin(), data.end(), static_cast<Number>(0));
 }
 
 template <template <class...> class Container, typename Number>
-typename std::enable_if<
-  std::is_same<Container<Number>, FullMatrix<Number>>::value,
-  Number>::type
+std::enable_if_t<std::is_same<Container<Number>, FullMatrix<Number>>::value,
+                 Number>
 container_sum(Container<Number> data)
 {
   Number sum = 0;
@@ -95,14 +90,14 @@ container_sum(Container<Number> data)
 // If Number is scalar the function returns 1
 // If Number is complex the function returns 1 + 1j
 template <typename Number>
-typename std::enable_if<!boost::is_complex<Number>::value, Number>::type
+std::enable_if_t<!boost::is_complex<Number>::value, Number>
 get_factor()
 {
   return 1;
 }
 
 template <typename Number>
-typename std::enable_if<boost::is_complex<Number>::value, Number>::type
+std::enable_if_t<boost::is_complex<Number>::value, Number>
 get_factor()
 {
   return static_cast<Number>(std::complex<float>(1, 1));
@@ -110,9 +105,8 @@ get_factor()
 
 // This function assigns data to the elements of the container
 template <template <class...> class Container, typename Number>
-typename std::enable_if<
-  std::is_same<Container<Number>, std::vector<Number>>::value,
-  void>::type
+std::enable_if_t<std::is_same<Container<Number>, std::vector<Number>>::value,
+                 void>
 assign_data(Container<Number> &data)
 {
   for (unsigned int idx = 0; idx < data.size(); ++idx)
@@ -122,8 +116,7 @@ assign_data(Container<Number> &data)
 }
 
 template <template <class...> class Container, typename Number>
-typename std::enable_if<std::is_same<Container<Number>, Vector<Number>>::value,
-                        void>::type
+std::enable_if_t<std::is_same<Container<Number>, Vector<Number>>::value, void>
 assign_data(Container<Number> &data)
 {
   for (unsigned int idx = 0; idx < data.size(); ++idx)
@@ -133,9 +126,8 @@ assign_data(Container<Number> &data)
 }
 
 template <template <class...> class Container, typename Number>
-typename std::enable_if<
-  std::is_same<Container<Number>, FullMatrix<Number>>::value,
-  void>::type
+std::enable_if_t<std::is_same<Container<Number>, FullMatrix<Number>>::value,
+                 void>
 assign_data(Container<Number> &data)
 {
   for (unsigned int row_idx = 0; row_idx < data.m(); ++row_idx)

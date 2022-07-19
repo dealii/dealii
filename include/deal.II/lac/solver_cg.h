@@ -703,14 +703,14 @@ namespace internal
       VectorType,
       MatrixType,
       PreconditionerType,
-      typename std::enable_if<has_vmult_functions<MatrixType, VectorType> &&
-                                (has_apply_to_subrange<PreconditionerType> ||
-                                 has_apply<PreconditionerType>)&&std::
-                                  is_same<VectorType,
-                                          LinearAlgebra::distributed::Vector<
-                                            typename VectorType::value_type,
-                                            MemorySpace::Host>>::value,
-                              int>::type>
+      std::enable_if_t<has_vmult_functions<MatrixType, VectorType> &&
+                         (has_apply_to_subrange<PreconditionerType> ||
+                          has_apply<PreconditionerType>)&&std::
+                           is_same<VectorType,
+                                   LinearAlgebra::distributed::Vector<
+                                     typename VectorType::value_type,
+                                     MemorySpace::Host>>::value,
+                       int>>
       : public IterationWorkerBase<VectorType, MatrixType, PreconditionerType>
     {
       using Number = typename VectorType::value_type;
@@ -791,7 +791,7 @@ namespace internal
       // Function that we use if the PreconditionerType implements an apply()
       // function
       template <typename U = void>
-      typename std::enable_if<has_apply<PreconditionerType>, U>::type
+      std::enable_if_t<has_apply<PreconditionerType>, U>
       operation_before_loop(const unsigned int iteration_index,
                             const unsigned int start_range,
                             const unsigned int end_range) const
@@ -897,7 +897,7 @@ namespace internal
       // Function that we use if the PreconditionerType implements an apply()
       // function
       template <typename U = void>
-      typename std::enable_if<has_apply<PreconditionerType>, U>::type
+      std::enable_if_t<has_apply<PreconditionerType>, U>
       operation_after_loop(
         const unsigned int                      start_range,
         const unsigned int                      end_range,
@@ -949,7 +949,7 @@ namespace internal
       // Function that we use if the PreconditionerType implements an apply()
       // function
       template <typename U = void>
-      typename std::enable_if<has_apply<PreconditionerType>, U>::type
+      std::enable_if_t<has_apply<PreconditionerType>, U>
       finalize_after_convergence(const unsigned int iteration_index)
       {
         if (iteration_index % 2 == 1 || iteration_index == 2)
@@ -986,7 +986,7 @@ namespace internal
       // apply() function, where we instead need to choose the
       // apply_to_subrange function
       template <typename U = void>
-      typename std::enable_if<!has_apply<PreconditionerType>, U>::type
+      std::enable_if_t<!has_apply<PreconditionerType>, U>
       operation_before_loop(const unsigned int iteration_index,
                             const unsigned int start_range,
                             const unsigned int end_range) const
@@ -1084,7 +1084,7 @@ namespace internal
       // apply() function and where we instead need to use the
       // apply_to_subrange function
       template <typename U = void>
-      typename std::enable_if<!has_apply<PreconditionerType>, U>::type
+      std::enable_if_t<!has_apply<PreconditionerType>, U>
       operation_after_loop(
         const unsigned int                      start_range,
         const unsigned int                      end_range,
@@ -1158,7 +1158,7 @@ namespace internal
       // apply() function, where we instead need to choose the
       // apply_to_subrange function
       template <typename U = void>
-      typename std::enable_if<!has_apply<PreconditionerType>, U>::type
+      std::enable_if_t<!has_apply<PreconditionerType>, U>
       finalize_after_convergence(const unsigned int iteration_index)
       {
         if (iteration_index % 2 == 1 || iteration_index == 2)
