@@ -154,19 +154,6 @@ for (deal_II_dimension : DIMENSIONS)
 
     // TODO: can cleanup a bit more to fit into the scheme used above
 
-    template void DoFTools::distribute_cell_to_dof_vector<deal_II_dimension,
-                                                          deal_II_dimension>(
-      const DoFHandler<deal_II_dimension> &dof_handler,
-      const Vector<float> &                cell_data,
-      Vector<double> &                     dof_data,
-      const unsigned int                   component);
-    template void DoFTools::distribute_cell_to_dof_vector<deal_II_dimension,
-                                                          deal_II_dimension>(
-      const DoFHandler<deal_II_dimension> &dof_handler,
-      const Vector<double> &               cell_data,
-      Vector<double> &                     dof_data,
-      const unsigned int                   component);
-
     template void
     DoFTools::extract_boundary_dofs<deal_II_dimension, deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &,
@@ -455,16 +442,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const BlockMask &,
         std::vector<bool> &);
-    \}
-#endif
-  }
 
-
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
-  {
-#if deal_II_dimension <= deal_II_space_dimension
-    namespace DoFTools
-    \{
       template void
       make_cell_patches<deal_II_dimension, deal_II_space_dimension>(
         SparsityPattern &,
@@ -473,6 +451,21 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         const std::vector<bool> &,
         const types::global_dof_index);
 
+      template void
+      distribute_cell_to_dof_vector<deal_II_dimension, deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension>
+          &                  dof_handler,
+        const Vector<float> &cell_data,
+        Vector<double> &     dof_data,
+        const unsigned int   component);
+
+      template void
+      distribute_cell_to_dof_vector<deal_II_dimension, deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension>
+          &                   dof_handler,
+        const Vector<double> &cell_data,
+        Vector<double> &      dof_data,
+        const unsigned int    component);
     \}
 #endif
   }
