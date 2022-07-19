@@ -698,10 +698,8 @@ namespace Step51
     PerTaskData &                                         task_data)
   {
     // Construct iterator for dof_handler_local for FEValues reinit function.
-    typename DoFHandler<dim>::active_cell_iterator loc_cell(&triangulation,
-                                                            cell->level(),
-                                                            cell->index(),
-                                                            &dof_handler_local);
+    const typename DoFHandler<dim>::active_cell_iterator loc_cell =
+      cell->as_dof_handler_iterator(dof_handler_local);
 
     const unsigned int n_q_points =
       scratch.fe_values_local.get_quadrature().size();
@@ -1128,10 +1126,8 @@ namespace Step51
     PostProcessScratchData &                              scratch,
     unsigned int &)
   {
-    typename DoFHandler<dim>::active_cell_iterator loc_cell(&triangulation,
-                                                            cell->level(),
-                                                            cell->index(),
-                                                            &dof_handler_local);
+    const typename DoFHandler<dim>::active_cell_iterator loc_cell =
+      cell->as_dof_handler_iterator(dof_handler_local);
 
     scratch.fe_values_local.reinit(loc_cell);
     scratch.fe_values.reinit(cell);
