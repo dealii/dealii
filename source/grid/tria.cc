@@ -13979,10 +13979,19 @@ template <int dim, int spacedim>
 bool
 Triangulation<dim, spacedim>::has_hanging_nodes() const
 {
-  for (unsigned int lvl = 0; lvl < n_global_levels() - 1; ++lvl)
-    if (n_active_cells(lvl) != 0)
-      return true;
-
+  if (anisotropic_refinement == false)
+    {
+      for (unsigned int lvl = 0; lvl < n_global_levels() - 1; ++lvl)
+        if (n_active_cells(lvl) != 0)
+          return true;
+    }
+  else
+    {
+      for (const auto cell : active_cell_iterators())
+        for (const auto i : cell->face_indices())
+          if (cell->face(i)->has_children())
+            return true;
+    }
   return false;
 }
 
