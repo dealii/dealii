@@ -259,13 +259,62 @@ struct is_same_as_any_of
 /*
  * A generalization of `std::enable_if` that only works if
  * <i>all</i> of the given boolean template parameters are
- * true.
+ * true. See [here](https://en.cppreference.com/w/cpp/types/enable_if)
+ * for what `std::enable_if` does.
+ *
+ * @note
+ * In contrast to `std::enable_if`, this template has no additional
+ * template type (which for `std::enable_if` is defaulted to `void`).
+ * As a consequence, this structure cannot be used for anything other
+ * than enabling or disabling a template declaration; in particular
+ * it cannot be used to set the return type of a function as one might
+ * do with something like
+ * @code
+ *   template <typename T>
+ *   typename std::enable_if<std::is_floating_point<T>::value, T>::type
+ *   abs (const T t);
+ * @endcode
+ * which declares a function template `abs()` that can only be
+ * instantiated if `T` is a floating point type; this function then
+ * returns an object of type `T` as indicated by the last argument to
+ * `std::enable_if`. The reason `enable_if_all` does not allow providing
+ * this additional type is that variadic templates (here, the list of
+ * `bool` arguments) must be the last template argument.
  */
 template <bool... Values>
 struct enable_if_all
   : std::enable_if<internal::TemplateConstraints::all_true<Values...>::value>
 {};
 
+
+
+/*
+ * A generalization of `std::enable_if_t` that only works if
+ * <i>all</i> of the given boolean template parameters are
+ * true. See [here](https://en.cppreference.com/w/cpp/types/enable_if)
+ * for what `std::enable_if_t` does.
+ *
+ * @note
+ * In contrast to `std::enable_if_t`, this template has no additional
+ * template type (which for `std::enable_if` is defaulted to `void`).
+ * As a consequence, this structure cannot be used for anything other
+ * than enabling or disabling a template declaration; in particular
+ * it cannot be used to set the return type of a function as one might
+ * do with something like
+ * @code
+ *   template <typename T>
+ *   std::enable_if_t<std::is_floating_point<T>::value, T>
+ *   abs (const T t);
+ * @endcode
+ * which declares a function template `abs()` that can only be
+ * instantiated if `T` is a floating point type; this function then
+ * returns an object of type `T` as indicated by the last argument to
+ * `std::enable_if`. The reason `enable_if_all` does not allow providing
+ * this additional type is that variadic templates (here, the list of
+ * `bool` arguments) must be the last template argument.
+ */
+template <bool... Values>
+using enable_if_all_t = typename enable_if_all<Values...>::type;
 
 
 /**
