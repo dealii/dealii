@@ -23,6 +23,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/std_cxx20/iota_view.h>
 #include <deal.II/base/symmetric_tensor.h>
@@ -1219,7 +1220,13 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
      n_quadrature_points);
 
   const unsigned int allocated_size = size_scratch_data + size_data_arrays;
+#  ifdef DEBUG
+  scratch_data_array->clear();
+  scratch_data_array->resize(allocated_size,
+                             Number(numbers::signaling_nan<ScalarNumber>()));
+#  else
   scratch_data_array->resize_fast(allocated_size);
+#  endif
   scratch_data.reinit(scratch_data_array->begin() + size_data_arrays,
                       size_scratch_data);
 
