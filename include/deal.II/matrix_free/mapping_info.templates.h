@@ -2101,11 +2101,10 @@ namespace internal
         FEEvaluationData<dim, VectorizedDouble, true> eval_ext(shape_info,
                                                                false);
 
-        // Let both evaluators use the same array as their use will not
-        // overlap
-        AlignedVector<VectorizedDouble> evaluation_data;
-        eval_int.set_data_pointers(&evaluation_data, dim);
-        eval_ext.set_data_pointers(&evaluation_data, dim);
+        AlignedVector<VectorizedDouble> evaluation_data_int,
+          evaluation_data_ext;
+        eval_int.set_data_pointers(&evaluation_data_int, dim);
+        eval_ext.set_data_pointers(&evaluation_data_ext, dim);
 
         for (unsigned int face = begin_face; face < end_face; ++face)
           for (unsigned vv = 0; vv < n_lanes; vv += n_lanes_d)
