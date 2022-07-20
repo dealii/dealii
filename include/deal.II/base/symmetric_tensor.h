@@ -37,6 +37,10 @@ class SymmetricTensor;
 /**
  * Return a unit symmetric tensor of rank 2, i.e., the
  * $\text{dim}\times\text{dim}$ identity matrix $\mathbf I$.
+ * For example, if `dim==2`, then this matrix has the form
+ * @f[
+ *   I_{2\times 2} = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}.
+ * @f]
  *
  * @relatesalso SymmetricTensor
  */
