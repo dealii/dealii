@@ -108,12 +108,14 @@ public:
    * Number>. In particular, if order == 1 and the derivative is the Jacobian of
    * $\mathbf F(\mathbf x)$, then Tensor[i] = $\nabla F_i(\mathbf x)$.
    */
-  operator Tensor<order + 1, dim, Number>() const;
+  template <typename Number2>
+  operator Tensor<order + 1, dim, Number2>() const;
 
   /**
    * Converts a DerivativeForm<1, dim, 1, Number> to Tensor<1, dim, Number>.
    */
-  operator Tensor<1, dim, Number>() const;
+  template <typename Number2>
+  operator Tensor<1, dim, Number2>() const;
 
   /**
    * Return the transpose of a rectangular DerivativeForm,
@@ -273,8 +275,9 @@ DerivativeForm<order, dim, spacedim, Number>::operator[](
 
 
 template <int order, int dim, int spacedim, typename Number>
+template <typename Number2>
 inline DerivativeForm<order, dim, spacedim, Number>::
-operator Tensor<1, dim, Number>() const
+operator Tensor<1, dim, Number2>() const
 {
   Assert((1 == spacedim) && (order == 1),
          ExcMessage("Only allowed for spacedim==1."));
@@ -285,12 +288,13 @@ operator Tensor<1, dim, Number>() const
 
 
 template <int order, int dim, int spacedim, typename Number>
+template <typename Number2>
 inline DerivativeForm<order, dim, spacedim, Number>::
-operator Tensor<order + 1, dim, Number>() const
+operator Tensor<order + 1, dim, Number2>() const
 {
   Assert((dim == spacedim), ExcMessage("Only allowed when dim==spacedim."));
 
-  Tensor<order + 1, dim, Number> t;
+  Tensor<order + 1, dim, Number2> t;
 
   if (dim == spacedim)
     for (unsigned int j = 0; j < dim; ++j)

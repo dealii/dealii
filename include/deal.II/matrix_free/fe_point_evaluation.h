@@ -947,15 +947,11 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::evaluate(
                     Number>::set_gradient(val_and_grad.second,
                                           j,
                                           unit_gradients[i + j]);
-                  gradients[i + j] =
-                    static_cast<typename internal::FEPointEvaluation::
-                                  EvaluatorTypeTraits<dim,
-                                                      n_components,
-                                                      Number>::gradient_type>(
-                      apply_transformation(mapping_info->get_mapping_data()
-                                             .inverse_jacobians[i + j]
-                                             .transpose(),
-                                           unit_gradients[i + j]));
+                  gradients[i + j] = static_cast<gradient_type>(
+                    apply_transformation(mapping_info->get_mapping_data()
+                                           .inverse_jacobians[i + j]
+                                           .transpose(),
+                                         unit_gradients[i + j]));
                 }
             }
         }
@@ -1092,9 +1088,7 @@ FEPointEvaluation<n_components, dim, spacedim, Number>::integrate(
             for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
               {
                 gradients[i + j] =
-                  static_cast<typename internal::FEPointEvaluation::
-                                EvaluatorTypeTraits<dim, n_components, Number>::
-                                  gradient_type>(apply_transformation(
+                  static_cast<gradient_type>(apply_transformation(
                     mapping_info->get_mapping_data().inverse_jacobians[i + j],
                     gradients[i + j]));
                 internal::FEPointEvaluation::
