@@ -4118,7 +4118,7 @@ namespace internal
             std::enable_if_t<has_shared_vector_data<VectorType>, VectorType> * =
               nullptr>
   const std::vector<ArrayView<const typename VectorType::value_type>> *
-  get_shared_vector_data(VectorType &       vec,
+  get_shared_vector_data(VectorType *       vec,
                          const bool         is_valid_mode_for_sm,
                          const unsigned int active_fe_index,
                          const internal::MatrixFreeFunctions::DoFInfo *dof_info)
@@ -4128,7 +4128,7 @@ namespace internal
         dof_info->dof_indices_contiguous_sm[0 /*any index (<3) should work*/]
             .size() > 0 &&
         active_fe_index == 0)
-      return &vec.shared_vector_data();
+      return &vec->shared_vector_data();
     else
       return nullptr;
   }
@@ -4137,7 +4137,7 @@ namespace internal
             std::enable_if_t<!has_shared_vector_data<VectorType>, VectorType>
               * = nullptr>
   const std::vector<ArrayView<const typename VectorType::value_type>> *
-  get_shared_vector_data(VectorType &,
+  get_shared_vector_data(VectorType *,
                          const bool,
                          const unsigned int,
                          const internal::MatrixFreeFunctions::DoFInfo *)
@@ -4189,7 +4189,7 @@ namespace internal
         const_cast<typename internal::BlockVectorSelector<
           typename std::remove_const<VectorType>::type,
           IsBlockVector<typename std::remove_const<VectorType>::type>::value>::
-                     BaseVectorType &>(*src_data.first[d]),
+                     BaseVectorType *>(src_data.first[d]),
         is_valid_mode_for_sm,
         active_fe_index,
         dof_info);
@@ -7377,8 +7377,6 @@ FEEvaluation<dim,
   Assert(this->mapped_geometry == nullptr,
          ExcMessage("FEEvaluation was initialized without a matrix-free object."
                     " Integer indexing is not possible"));
-  if (this->mapped_geometry != nullptr)
-    return;
 
   Assert(this->dof_info != nullptr, ExcNotInitialized());
   Assert(this->mapping_data != nullptr, ExcNotInitialized());
@@ -7390,10 +7388,13 @@ FEEvaluation<dim,
     this->mapping_data->data_index_offsets[cell_index];
   this->jacobian = &this->mapping_data->jacobians[0][offsets];
   this->J_value  = &this->mapping_data->JxW_values[offsets];
-  this->jacobian_gradients =
-    this->mapping_data->jacobian_gradients[0].data() + offsets;
-  this->jacobian_gradients_non_inverse =
-    this->mapping_data->jacobian_gradients_non_inverse[0].data() + offsets;
+  if (!this->mapping_data->jacobian_gradients[0].empty())
+    {
+      this->jacobian_gradients =
+        this->mapping_data->jacobian_gradients[0].data() + offsets;
+      this->jacobian_gradients_non_inverse =
+        this->mapping_data->jacobian_gradients_non_inverse[0].data() + offsets;
+    }
 
   unsigned int i = 0;
   for (; i < this->matrix_free->n_active_entries_per_cell_batch(this->cell);
@@ -8921,7 +8922,7 @@ FEFaceEvaluation<dim,
                     "and EvaluationFlags::hessians are supported."));
 
   const auto shared_vector_data = internal::get_shared_vector_data(
-    input_vector,
+    &input_vector,
     this->dof_access_index ==
       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
     this->active_fe_index,
@@ -9038,7 +9039,7 @@ FEFaceEvaluation<dim,
          ExcNotImplemented());
 
   const auto shared_vector_data = internal::get_shared_vector_data(
-    destination,
+    &destination,
     this->dof_access_index ==
       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
     this->active_fe_index,
