@@ -90,28 +90,52 @@ namespace
 {
 #ifdef DEAL_II_WITH_ZLIB
   /**
-   * Convert between the enum specified inside VtkFlags and the preprocessor
-   * constant defined by zlib.
+   * Convert between the CompressionLevel enum (used inside VtkFlags
+   * for example) and the preprocessor constant defined by zlib.
    */
   int
-  get_zlib_compression_level(
-    const DataOutBase::VtkFlags::ZlibCompressionLevel level)
+  get_zlib_compression_level(const DataOutBase::CompressionLevel level)
   {
     switch (level)
       {
-        case (DataOutBase::VtkFlags::no_compression):
+        case (DataOutBase::CompressionLevel::no_compression):
           return Z_NO_COMPRESSION;
-        case (DataOutBase::VtkFlags::best_speed):
+        case (DataOutBase::CompressionLevel::best_speed):
           return Z_BEST_SPEED;
-        case (DataOutBase::VtkFlags::best_compression):
+        case (DataOutBase::CompressionLevel::best_compression):
           return Z_BEST_COMPRESSION;
-        case (DataOutBase::VtkFlags::default_compression):
+        case (DataOutBase::CompressionLevel::default_compression):
           return Z_DEFAULT_COMPRESSION;
         default:
           Assert(false, ExcNotImplemented());
           return Z_NO_COMPRESSION;
       }
   }
+
+#  ifdef DEAL_II_WITH_MPI
+  /**
+   * Convert between the CompressionLevel enum and the preprocessor
+   * constant defined by boost::iostreams::zlib.
+   */
+  int
+  get_boost_zlib_compression_level(const DataOutBase::CompressionLevel level)
+  {
+    switch (level)
+      {
+        case (DataOutBase::CompressionLevel::no_compression):
+          return boost::iostreams::zlib::no_compression;
+        case (DataOutBase::CompressionLevel::best_speed):
+          return boost::iostreams::zlib::best_speed;
+        case (DataOutBase::CompressionLevel::best_compression):
+          return boost::iostreams::zlib::best_compression;
+        case (DataOutBase::CompressionLevel::default_compression):
+          return boost::iostreams::zlib::default_compression;
+        default:
+          Assert(false, ExcNotImplemented());
+          return boost::iostreams::zlib::no_compression;
+      }
+  }
+#  endif
 
   /**
    * Do a zlib compression followed by a base64 encoding of the given data. The
@@ -2703,11 +2727,11 @@ namespace DataOutBase
 
 
 
-  VtkFlags::VtkFlags(const double                         time,
-                     const unsigned int                   cycle,
-                     const bool                           print_date_and_time,
-                     const VtkFlags::ZlibCompressionLevel compression_level,
-                     const bool write_higher_order_cells,
+  VtkFlags::VtkFlags(const double           time,
+                     const unsigned int     cycle,
+                     const bool             print_date_and_time,
+                     const CompressionLevel compression_level,
+                     const bool             write_higher_order_cells,
                      const std::map<std::string, std::string> &physical_units)
     : time(time)
     , cycle(cycle)
@@ -7578,11 +7602,11 @@ namespace DataOutBase
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &                                  nonscalar_data_ranges,
-    const Deal_II_IntermediateFlags &    flags,
-    const std::string &                  filename,
-    const MPI_Comm &                     comm,
-    const VtkFlags::ZlibCompressionLevel compression)
+      &                              nonscalar_data_ranges,
+    const Deal_II_IntermediateFlags &flags,
+    const std::string &              filename,
+    const MPI_Comm &                 comm,
+    const CompressionLevel           compression)
   {
 #ifndef DEAL_II_WITH_MPI
     (void)patches;
@@ -7617,9 +7641,10 @@ namespace DataOutBase
     {
       boost::iostreams::filtering_ostream f;
 
-      if (compression != VtkFlags::no_compression)
+      if (compression != CompressionLevel::no_compression)
 #  ifdef DEAL_II_WITH_ZLIB
-        f.push(boost::iostreams::zlib_compressor());
+        f.push(boost::iostreams::zlib_compressor(
+          get_boost_zlib_compression_level(compression)));
 #  else
         AssertThrow(
           false,
@@ -7643,7 +7668,7 @@ namespace DataOutBase
     const ParallelIntermediateHeader header{
       0x00dea111,
       Deal_II_IntermediateFlags::format_version,
-      compression,
+      static_cast<std::uint64_t>(compression),
       dim,
       spacedim,
       n_ranks,
@@ -8116,9 +8141,9 @@ DataOutInterface<dim, spacedim>::write_deal_II_intermediate(
 template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_deal_II_intermediate_in_parallel(
-  const std::string &                               filename,
-  const MPI_Comm &                                  comm,
-  const DataOutBase::VtkFlags::ZlibCompressionLevel compression) const
+  const std::string &                 filename,
+  const MPI_Comm &                    comm,
+  const DataOutBase::CompressionLevel compression) const
 {
   DataOutBase::write_deal_II_intermediate_in_parallel(
     get_patches(),
@@ -9310,8 +9335,8 @@ DataOutReader<dim, spacedim>::read_whole_parallel_file(std::istream &in)
       in.read(temp_buffer.data(), chunk_sizes[n]);
 
       boost::iostreams::filtering_istreambuf f;
-      if (static_cast<DataOutBase::VtkFlags::ZlibCompressionLevel>(
-            header.compression) != DataOutBase::VtkFlags::no_compression)
+      if (static_cast<DataOutBase::CompressionLevel>(header.compression) !=
+          DataOutBase::CompressionLevel::no_compression)
 #ifdef DEAL_II_WITH_ZLIB
         f.push(boost::iostreams::zlib_decompressor());
 #else

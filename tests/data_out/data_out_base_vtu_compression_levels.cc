@@ -62,23 +62,25 @@ check_all(std::ostream &log)
       switch (i)
         {
           case (0):
-            flags.compression_level = DataOutBase::VtkFlags::no_compression;
+            flags.compression_level =
+              DataOutBase::CompressionLevel::no_compression;
             break;
           case (1):
-            flags.compression_level = DataOutBase::VtkFlags::best_speed;
+            flags.compression_level = DataOutBase::CompressionLevel::best_speed;
             break;
           case (2):
-            flags.compression_level = DataOutBase::VtkFlags::best_compression;
+            flags.compression_level =
+              DataOutBase::CompressionLevel::best_compression;
             break;
           case (3):
             flags.compression_level =
-              DataOutBase::VtkFlags::default_compression;
+              DataOutBase::CompressionLevel::default_compression;
             break;
           default:
             Assert(false, ExcInternalError());
         }
       log << "==============================\n"
-          << dim << spacedim << '-' << flags.compression_level << ".vtu"
+          << dim << spacedim << '-' << i << ".vtu"
           << "\n==============================\n";
       check<dim, spacedim>(flags, log);
     }

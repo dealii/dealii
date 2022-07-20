@@ -412,8 +412,7 @@ namespace Step23
     // zlib compression algorithm that is optimized for speed instead of disk
     // usage since otherwise plotting the output becomes a bottleneck:
     DataOutBase::VtkFlags vtk_flags;
-    vtk_flags.compression_level =
-      DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
+    vtk_flags.compression_level = DataOutBase::CompressionLevel::best_speed;
     data_out.set_flags(vtk_flags);
     std::ofstream output(filename);
     data_out.write_vtu(output);

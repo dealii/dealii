@@ -221,6 +221,33 @@ class XDMFEntry;
 namespace DataOutBase
 {
   /**
+   * An enum for different levels of compression used in several places
+   * to determine zlib compression levels.
+   */
+  enum class CompressionLevel
+  {
+    /**
+     * Do not use any compression.
+     */
+    no_compression,
+    /**
+     * Use the fastest available compression algorithm.
+     */
+    best_speed,
+    /**
+     * Use the algorithm which results in the smallest compressed
+     * files. This is the default flag.
+     */
+    best_compression,
+    /**
+     * Use the default compression algorithm. This is a compromise between
+     * speed and file size.
+     */
+    default_compression
+  };
+
+
+  /**
    * Data structure describing a patch of data in <tt>dim</tt> space
    * dimensions.
    *
@@ -1124,34 +1151,26 @@ namespace DataOutBase
     /**
      * A data type providing the different possible zlib compression
      * levels. These map directly to constants defined by zlib.
+     *
+     * @deprecated Use DataOutBase::CompressionLevel instead.
      */
-    enum ZlibCompressionLevel
-    {
-      /**
-       * Do not use any compression.
-       */
-      no_compression,
-      /**
-       * Use the fastest available compression algorithm.
-       */
-      best_speed,
-      /**
-       * Use the algorithm which results in the smallest compressed
-       * files. This is the default flag.
-       */
-      best_compression,
-      /**
-       * Use the default compression algorithm. This is a compromise between
-       * speed and file size.
-       */
-      default_compression
-    };
+    using ZlibCompressionLevel DEAL_II_DEPRECATED =
+      DataOutBase::CompressionLevel;
+
+    DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel
+      no_compression = DataOutBase::CompressionLevel::no_compression;
+    DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel
+      best_compression = DataOutBase::CompressionLevel::best_compression;
+    DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel best_speed =
+      DataOutBase::CompressionLevel::best_speed;
+    DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel
+      default_compression = DataOutBase::CompressionLevel::default_compression;
 
     /**
      * Flag determining the compression level at which zlib, if available, is
      * run. The default is <tt>best_compression</tt>.
      */
-    ZlibCompressionLevel compression_level;
+    DataOutBase::CompressionLevel compression_level;
 
     /**
      * Flag determining whether to write patches as linear cells
@@ -1199,12 +1218,13 @@ namespace DataOutBase
      * Constructor. Initializes the member variables with names corresponding
      * to the argument names of this function.
      */
-    VtkFlags(
-      const double       time  = std::numeric_limits<double>::min(),
-      const unsigned int cycle = std::numeric_limits<unsigned int>::min(),
-      const bool         print_date_and_time              = true,
-      const ZlibCompressionLevel compression_level        = best_compression,
-      const bool                 write_higher_order_cells = false,
+    explicit VtkFlags(
+      const double           time  = std::numeric_limits<double>::min(),
+      const unsigned int     cycle = std::numeric_limits<unsigned int>::min(),
+      const bool             print_date_and_time = true,
+      const CompressionLevel compression_level =
+        CompressionLevel::best_compression,
+      const bool write_higher_order_cells                      = false,
       const std::map<std::string, std::string> &physical_units = {});
   };
 
@@ -2361,11 +2381,11 @@ namespace DataOutBase
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &                                  nonscalar_data_ranges,
-    const Deal_II_IntermediateFlags &    flags,
-    const std::string &                  filename,
-    const MPI_Comm &                     comm,
-    const VtkFlags::ZlibCompressionLevel compression);
+      &                              nonscalar_data_ranges,
+    const Deal_II_IntermediateFlags &flags,
+    const std::string &              filename,
+    const MPI_Comm &                 comm,
+    const CompressionLevel           compression);
 
   /**
    * Write the data in @p data_filter to a single HDF5 file containing both the
@@ -2858,9 +2878,9 @@ public:
    */
   void
   write_deal_II_intermediate_in_parallel(
-    const std::string &                               filename,
-    const MPI_Comm &                                  comm,
-    const DataOutBase::VtkFlags::ZlibCompressionLevel compression) const;
+    const std::string &                 filename,
+    const MPI_Comm &                    comm,
+    const DataOutBase::CompressionLevel compression) const;
 
   /**
    * Create an XDMFEntry based on the data in the data_filter. This assumes

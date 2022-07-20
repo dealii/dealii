@@ -2773,7 +2773,7 @@ namespace Step69
       DataOutBase::VtkFlags flags(t,
                                   cycle,
                                   true,
-                                  DataOutBase::VtkFlags::best_speed);
+                                  DataOutBase::CompressionLevel::best_speed);
       data_out->set_flags(flags);
 
       data_out->write_vtu_with_pvtu_record(
