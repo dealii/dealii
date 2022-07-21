@@ -43,8 +43,10 @@ and using the 'signals' keyword. You can either #include the Qt headers (or any 
 *after* the deal.II headers or you can define the 'QT_NO_KEYWORDS' macro and use the 'Q_SIGNALS' macro."
 #endif
 
-/*!@addtogroup mg */
-/*@{*/
+/**
+ * @addtogroup mg
+ * @{
+ */
 
 namespace mg
 {
@@ -643,7 +645,7 @@ private:
   mg::Signals signals;
 };
 
-/*@}*/
+/** @} */
 
 #ifndef DOXYGEN
 /* --------------------------- inline functions --------------------- */

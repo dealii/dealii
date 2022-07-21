@@ -37,8 +37,10 @@ template <typename>
 class Vector;
 
 
-/*!@addtogroup mapping */
-/*@{*/
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * This class is an extension of the MappingQ1Eulerian class to higher order
@@ -223,7 +225,7 @@ private:
   mutable Threads::Mutex fe_values_mutex;
 };
 
-/*@}*/
+/** @} */
 
 
 /*----------------------------------------------------------------------*/

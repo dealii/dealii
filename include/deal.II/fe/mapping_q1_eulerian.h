@@ -32,8 +32,10 @@ template <typename>
 class Vector;
 
 
-/*!@addtogroup mapping */
-/*@{*/
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * This class provides a mapping that adds to the location of each cell
@@ -186,7 +188,7 @@ protected:
     shiftmap_dof_handler;
 };
 
-/*@}*/
+/** @} */
 
 /*----------------------------------------------------------------------*/
 

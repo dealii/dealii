@@ -1499,7 +1499,7 @@ namespace DoFTools
   extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
                          const ComponentMask &            component_mask,
                          std::vector<std::vector<bool>> & constant_modes);
-  //@}
+  /** @} */
 
   /**
    * @name Parallelization and domain decomposition
@@ -1817,7 +1817,7 @@ namespace DoFTools
    * and related classes to implement Schwarz preconditioners and smoothers,
    * where the subdomains consist of small numbers of cells only.
    */
-  //@{
+  /** @{ */
 
   /**
    * Return the set of degrees of freedom that live on a set of cells (i.e., a

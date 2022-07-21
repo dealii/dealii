@@ -418,7 +418,7 @@ namespace OpenCASCADE
 
 } // namespace OpenCASCADE
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

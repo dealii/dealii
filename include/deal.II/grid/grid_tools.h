@@ -131,7 +131,7 @@ namespace GridTools
   /**
    * @name Information about meshes and cells
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Return the diameter of a triangulation. The diameter is computed using
@@ -396,11 +396,11 @@ namespace GridTools
     tuple<std::vector<Point<spacedim>>, std::vector<CellData<dim>>, SubCellData>
     get_coarse_mesh_description(const Triangulation<dim, spacedim> &tria);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Functions supporting the creation of meshes
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Remove vertices that are not referenced by any of the cells. This
@@ -503,11 +503,11 @@ namespace GridTools
   void
   consistently_order_cells(std::vector<CellData<dim>> &cells);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Rotating, stretching and otherwise transforming meshes
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Transform the vertices of the given triangulation by applying the
@@ -911,11 +911,11 @@ namespace GridTools
   regularize_corner_cells(Triangulation<dim, spacedim> &tria,
                           const double limit_angle_fraction = .75);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Finding cells and vertices of a triangulation
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Given a Triangulation's @p cache and a list of @p points, call
@@ -2128,11 +2128,11 @@ namespace GridTools
   get_longest_direction(
     typename Triangulation<dim, spacedim>::active_cell_iterator cell);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Partitions and subdomains of triangulations
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Produce a sparsity pattern in which nonzero entries indicate that two
@@ -2409,11 +2409,11 @@ namespace GridTools
   std::vector<bool>
   get_locally_owned_vertices(const Triangulation<dim, spacedim> &triangulation);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Comparing different meshes
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Given two meshes (i.e. objects of type Triangulation or DoFHandler) that
@@ -2480,11 +2480,11 @@ namespace GridTools
   bool
   have_same_coarse_mesh(const MeshType &mesh_1, const MeshType &mesh_2);
 
-  /*@}*/
+  /** @} */
   /**
    * @name Dealing with distorted cells
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Given a triangulation and a list of cells whose children have become
@@ -2510,14 +2510,14 @@ namespace GridTools
 
 
 
-  /*@}*/
+  /** @} */
   /**
    * @name Extracting and creating patches of cells
    *
    * These functions extract and create patches of cells surrounding a single
    * cell, and creating triangulation out of them.
    */
-  /*@{*/
+  /** @{ */
 
 
   /**
@@ -2703,12 +2703,12 @@ namespace GridTools
   get_dof_to_support_patch_map(DoFHandler<dim, spacedim> &dof_handler);
 
 
-  /*@}*/
+  /** @} */
 
   /**
    * @name Dealing with periodic domains
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Data type that provides all information necessary to create periodicity
@@ -2945,11 +2945,11 @@ namespace GridTools
       dealii::Tensor<1, MeshType::space_dimension>(),
     const FullMatrix<double> &matrix = FullMatrix<double>());
 
-  /*@}*/
+  /** @} */
   /**
    * @name Dealing with boundary and manifold ids
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Copy boundary ids to manifold ids on faces and edges at the boundary. The
@@ -3076,7 +3076,7 @@ namespace GridTools
           return numbers::flat_manifold_id;
       },
     bool overwrite_only_flat_manifold_ids = true);
-  /*@}*/
+  /** @} */
 
   /**
    * Exchange arbitrary data of type @p DataType provided by the function
@@ -3511,7 +3511,7 @@ namespace GridTools
   /**
    * @name Exceptions
    */
-  /*@{*/
+  /** @{ */
 
   /**
    * Exception
@@ -3548,7 +3548,7 @@ namespace GridTools
                  << "The given vertex with index " << arg1
                  << " is not used in the given triangulation.");
 
-  /*@}*/
+  /** @} */
 
 } /*namespace GridTools*/
 

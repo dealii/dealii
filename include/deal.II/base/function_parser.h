@@ -368,7 +368,7 @@ public:
                  << ") is not equal to the number of expressions (" << arg2
                  << ").");
 
-  //@}
+  /** @} */
 };
 
 

@@ -46,8 +46,8 @@ namespace LinearAlgebra
 #endif
 
 
-/*!@addtogroup Solvers */
-/*@{*/
+/** @addtogroup Solvers */
+/** @{ */
 
 /**
  * This class implements the preconditioned Conjugate Gradients (CG)
@@ -383,7 +383,7 @@ public:
 };
 
 
-/*@}*/
+/** @} */
 
 /*------------------------- Implementation ----------------------------*/
 

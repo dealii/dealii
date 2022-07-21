@@ -30,8 +30,9 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-  /*! @addtogroup PETScWrappers
-   *@{
+  /**
+   * @addtogroup PETScWrappers
+   * @{
    */
 
   /**
@@ -93,7 +94,7 @@ namespace PETScWrappers
     do_reinit(const size_type m, const size_type n);
   };
 
-  /*@}*/
+  /** @} */
 } // namespace PETScWrappers
 
 

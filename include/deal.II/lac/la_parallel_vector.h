@@ -79,8 +79,9 @@ namespace LinearAlgebra
 {
   namespace distributed
   {
-    /*! @addtogroup Vectors
-     *@{
+    /**
+     * @addtogroup Vectors
+     * @{
      */
 
     /**
@@ -271,7 +272,7 @@ namespace LinearAlgebra
       /**
        * @name 1: Basic Object-handling
        */
-      //@{
+      /** @{ */
       /**
        * Empty constructor.
        */
@@ -474,12 +475,12 @@ namespace LinearAlgebra
       Vector<Number, MemorySpace> &
       operator=(const Vector<Number2, MemorySpace> &in_vector);
 
-      //@}
+      /** @} */
 
       /**
        * @name 2: Parallel data exchange
        */
-      //@{
+      /** @{ */
       /**
        * This function copies the data that has accumulated in the data buffer
        * for ghost indices to the owning processor. For the meaning of the
@@ -688,12 +689,12 @@ namespace LinearAlgebra
       import(const Vector<Number, MemorySpace2> &src,
              VectorOperation::values             operation);
 
-      //@}
+      /** @} */
 
       /**
        * @name 3: Implementation of VectorSpaceVector
        */
-      //@{
+      /** @{ */
 
       /**
        * Change the dimension to that of the vector V. The elements of V are not
@@ -889,12 +890,12 @@ namespace LinearAlgebra
        */
       virtual std::size_t
       memory_consumption() const override;
-      //@}
+      /** @} */
 
       /**
        * @name 4: Other vector operations not included in VectorSpaceVector
        */
-      //@{
+      /** @{ */
 
       /**
        * Sets all elements of the vector to the scalar @p s. If the scalar is
@@ -930,13 +931,13 @@ namespace LinearAlgebra
       void
       sadd(const Number s, const Vector<Number, MemorySpace> &V);
 
-      //@}
+      /** @} */
 
 
       /**
        * @name 5: Entry access and local data representation
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the local size of the vector, i.e., the number of indices
@@ -1153,12 +1154,12 @@ namespace LinearAlgebra
        */
       real_type
       lp_norm(const real_type p) const;
-      //@}
+      /** @} */
 
       /**
        * @name 6: Mixed stuff
        */
-      //@{
+      /** @{ */
 
       /**
        * Return a reference to the MPI communicator object in use with this
@@ -1219,7 +1220,7 @@ namespace LinearAlgebra
       const std::vector<ArrayView<const Number>> &
       shared_vector_data() const;
 
-      //@}
+      /** @} */
 
       /**
        * Attempt to perform an operation between two incompatible vector types.
@@ -1431,7 +1432,7 @@ namespace LinearAlgebra
       template <typename Number2>
       friend class BlockVector;
     };
-    /*@}*/
+    /** @} */
 
 
     /*-------------------- Inline functions ---------------------------------*/

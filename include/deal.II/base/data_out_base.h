@@ -401,7 +401,7 @@ namespace DataOutBase
       << "It is not possible to have a structural dimension of " << arg1
       << " to be larger than the space dimension of the surrounding"
       << " space " << arg2);
-    //@}
+    /** @} */
   };
 
 
@@ -553,7 +553,7 @@ namespace DataOutBase
       << "It is not possible to have a structural dimension of " << arg1
       << " to be larger than the space dimension of the surrounding"
       << " space " << arg2);
-    //@}
+    /** @} */
   };
 
 
@@ -2528,7 +2528,7 @@ namespace DataOutBase
                  << "There was an error opening Tecplot file " << arg1
                  << " for output.");
 
-  //@}
+  /** @} */
 } // namespace DataOutBase
 
 

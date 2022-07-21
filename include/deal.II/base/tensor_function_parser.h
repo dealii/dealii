@@ -260,7 +260,7 @@ public:
                  << ") is not equal to the number of expressions (" << arg2
                  << ").");
 
-  //@}
+  /** @} */
 private:
   /**
    * Number of components is equal dim<sup>rank</sup>.

@@ -414,7 +414,7 @@ namespace TrilinosWrappers
       /**
        * @name 1: Basic Object-handling
        */
-      //@{
+      /** @{ */
       /**
        * Default constructor that generates an empty (zero size) vector. The
        * function <tt>reinit()</tt> will have to give the vector the correct
@@ -910,13 +910,13 @@ namespace TrilinosWrappers
        */
       bool
       is_non_negative() const;
-      //@}
+      /** @} */
 
 
       /**
        * @name 2: Data-Access
        */
-      //@{
+      /** @{ */
 
       /**
        * Provide access to a given element, both read and write.
@@ -1040,13 +1040,13 @@ namespace TrilinosWrappers
       const_iterator
       end() const;
 
-      //@}
+      /** @} */
 
 
       /**
        * @name 3: Modification of vectors
        */
-      //@{
+      /** @{ */
 
       /**
        * A collective set operation: instead of setting individual elements of a
@@ -1189,12 +1189,12 @@ namespace TrilinosWrappers
        */
       void
       equ(const TrilinosScalar a, const Vector &V);
-      //@}
+      /** @} */
 
       /**
        * @name 4: Mixed stuff
        */
-      //@{
+      /** @{ */
 
       /**
        * Return a const reference to the underlying Trilinos Epetra_MultiVector
@@ -1258,7 +1258,7 @@ namespace TrilinosWrappers
        */
       const MPI_Comm &
       get_mpi_communicator() const;
-      //@}
+      /** @} */
 
       /**
        * Exception
@@ -2209,7 +2209,7 @@ namespace TrilinosWrappers
 
 } /* end of namespace TrilinosWrappers */
 
-/*@}*/
+/** @} */
 
 
 namespace internal

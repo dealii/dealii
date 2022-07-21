@@ -549,7 +549,7 @@ public:
   /**
    * @name 1: Construction and initialization
    */
-  //@{
+  /** @{ */
   /**
    * Default empty constructor. Does nothing.
    */
@@ -663,7 +663,7 @@ public:
   void
   clear();
 
-  //@}
+  /** @} */
 
   /**
    * This class defines the type of data access for face integrals in loop ()
@@ -742,7 +742,7 @@ public:
   /**
    * @name 2: Matrix-free loops
    */
-  //@{
+  /** @{ */
   /**
    * This method runs the loop over all cells (in parallel) and performs the
    * MPI data exchange on the source vector and destination vector.
@@ -1402,12 +1402,12 @@ public:
   get_face_active_fe_index(const std::pair<unsigned int, unsigned int> range,
                            const bool is_interior_face = true) const;
 
-  //@}
+  /** @} */
 
   /**
    * @name 3: Initialization of vectors
    */
-  //@{
+  /** @{ */
   /**
    * Initialize function for a vector with each entry associated with a cell
    * batch (cell data). For reading and writing the vector use:
@@ -1517,12 +1517,12 @@ public:
   renumber_dofs(std::vector<types::global_dof_index> &renumbering,
                 const unsigned int                    dof_handler_index = 0);
 
-  //@}
+  /** @} */
 
   /**
    * @name 4: General information
    */
-  //@{
+  /** @{ */
   /**
    * Return whether a given FiniteElement @p fe is supported by this class.
    */
@@ -1844,14 +1844,14 @@ public:
   void
   print(std::ostream &out) const;
 
-  //@}
+  /** @} */
 
   /**
    * @name 5: Access of internal data structure
    *
    * Note: Expert mode, interface not stable between releases.
    */
-  //@{
+  /** @{ */
   /**
    * Return information on task graph.
    */
@@ -1959,7 +1959,7 @@ public:
   release_scratch_data_non_threadsafe(
     const AlignedVector<Number> *memory) const;
 
-  //@}
+  /** @} */
 
 private:
   /**

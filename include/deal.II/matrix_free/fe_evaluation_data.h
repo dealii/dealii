@@ -169,7 +169,7 @@ public:
   /**
    * @name 1: Access to geometry data at quadrature points
    */
-  //@{
+  /** @{ */
 
   /**
    * Return an ArrayView to internal memory for temporary use. Note that some
@@ -223,12 +223,12 @@ public:
   Tensor<1, dim, Number>
   get_normal_vector(const unsigned int q_point) const;
 
-  //@}
+  /** @} */
 
   /**
    * @name 2: Access to internal data arrays
    */
-  //@{
+  /** @{ */
   /**
    * Return a read-only pointer to the first field of the dof values. This is
    * the data field the read_dof_values() functions write into. First come the
@@ -335,12 +335,12 @@ public:
   Number *
   begin_hessians();
 
-  //@}
+  /** @} */
 
   /**
    * @name 3: Information about the current cell this class operates on
    */
-  //@{
+  /** @{ */
 
   /**
    * Return the index offset within the geometry fields for the cell the @p
@@ -543,12 +543,12 @@ public:
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   quadrature_point_indices() const;
 
-  //@}
+  /** @} */
 
   /**
    * @name 3: Functions to access cell- and face-data vectors.
    */
-  //@{
+  /** @{ */
 
   /**
    * Provides a unified interface to access data in a vector of
@@ -626,7 +626,7 @@ public:
   set_face_data(AlignedVector<std::array<T, Number::size()>> &array,
                 const std::array<T, Number::size()> &         value) const;
 
-  //@}
+  /** @} */
 
   /**
    * This data structure is used for the initialization by the derived

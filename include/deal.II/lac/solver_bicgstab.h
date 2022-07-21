@@ -30,8 +30,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup Solvers */
-/*@{*/
+/**
+ * @addtogroup Solvers
+ * @{
+ */
 
 namespace internal
 {
@@ -286,7 +288,7 @@ private:
   iterate(const MatrixType &A, const PreconditionerType &preconditioner);
 };
 
-/*@}*/
+/** @} */
 /*-------------------------Inline functions -------------------------------*/
 
 #ifndef DOXYGEN

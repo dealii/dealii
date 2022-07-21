@@ -314,7 +314,7 @@ public:
   /**
    * @name In-place vector space operations
    */
-  //@{
+  /** @{ */
 
   /**
    * Addition with a LinearOperator @p second_op with the same @p Domain and
@@ -367,14 +367,14 @@ public:
    */
   bool is_null_operator;
 
-  //@}
+  /** @} */
 };
 
 
 /**
  * @name Vector space operations
  */
-//@{
+/** @{ */
 
 /**
  * @relatesalso LinearOperator
@@ -562,13 +562,13 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
   return number * op;
 }
 
-//@}
+/** @} */
 
 
 /**
  * @name Composition and manipulation of a LinearOperator
  */
-//@{
+/** @{ */
 
 /**
  * @relatesalso LinearOperator
@@ -840,13 +840,13 @@ inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
   return inverse_operator(op, solver);
 }
 
-//@}
+/** @} */
 
 
 /**
  * @name Creation of a LinearOperator
  */
-//@{
+/** @{ */
 
 /**
  * @relatesalso LinearOperator
@@ -1477,7 +1477,7 @@ linear_operator(const LinearOperator<Range, Domain, Payload> &operator_exemplar,
 }
 
 
-//@}
+/** @} */
 
 #ifndef DOXYGEN
 

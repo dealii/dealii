@@ -106,8 +106,8 @@ public:
    *
    * Classes derived from Subscriptor provide a facility to subscribe to this
    * object. This is mostly used by the SmartPointer class.
+   * @{
    */
-  // @{
 
   /**
    * Subscribes a user of the object by storing the pointer @p validity. The
@@ -148,7 +148,7 @@ public:
   void
   list_subscribers() const;
 
-  // @}
+  /** @} */
 
   /**
    * @addtogroup Exceptions
@@ -181,7 +181,7 @@ public:
                  << "No subscriber with identifier <" << arg2
                  << "> subscribes to this object of class " << arg1
                  << ". Consequently, it cannot be unsubscribed.");
-  //@}
+  /** @} */
 
   /**
    * Read or write the data of this object to or from a stream for the purpose

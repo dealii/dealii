@@ -42,9 +42,10 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup threads */
-/*@{*/
-
+/**
+ * @addtogroup threads
+ * @{
+ */
 
 /**
  * A namespace for the implementation of thread management in deal.II. Most of
@@ -1300,7 +1301,7 @@ namespace Threads
                      "The current object is not associated with a task that "
                      "can be joined. It may have been detached, or you "
                      "may have already joined it in the past.");
-    //@}
+    /** @} */
   private:
     /**
      * A data structure that holds a std::future into which the task deposits

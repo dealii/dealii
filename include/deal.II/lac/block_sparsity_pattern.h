@@ -38,8 +38,9 @@ class BlockSparseMatrix;
 class BlockDynamicSparsityPattern;
 #endif
 
-/*! @addtogroup Sparsity
- *@{
+/**
+ * @addtogroup Sparsity
+ * @{
  */
 
 
@@ -340,7 +341,7 @@ public:
                  int,
                  << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
                  << ',' << arg4 << "] have differing column numbers.");
-  //@}
+  /** @} */
 
 protected:
   /**
@@ -607,7 +608,7 @@ public:
   using BlockSparsityPatternBase<DynamicSparsityPattern>::reinit;
 };
 
-/*@}*/
+/** @} */
 
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -615,8 +616,9 @@ public:
 
 namespace TrilinosWrappers
 {
-  /*! @addtogroup TrilinosWrappers
-   *@{
+  /**
+   * @addtogroup TrilinosWrappers
+   * @{
    */
 
   /**
@@ -741,7 +743,7 @@ namespace TrilinosWrappers
     using BlockSparsityPatternBase<SparsityPattern>::reinit;
   };
 
-  /*@}*/
+  /** @} */
 
 } /* namespace TrilinosWrappers */
 

@@ -23,8 +23,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup Quadrature */
-/*@{*/
+/**
+ * @addtogroup Quadrature
+ * @{
+ */
 
 /**
  * The Gauss-Legendre family of quadrature rules for numerical integration.
@@ -908,7 +910,7 @@ public:
   explicit QGaussPyramid(const unsigned int n_points_1D);
 };
 
-/*@}*/
+/** @} */
 
 /* -------------- declaration of explicit specializations ------------- */
 

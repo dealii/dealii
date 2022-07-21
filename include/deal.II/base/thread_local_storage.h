@@ -31,8 +31,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup threads */
-/*@{*/
+/**
+ * @addtogroup threads
+ * @{
+ */
 
 #  ifndef DOXYGEN
 class LogStream;

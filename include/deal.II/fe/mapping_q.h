@@ -42,9 +42,10 @@ template <int, int>
 class MappingQCache;
 #endif
 
-/*!@addtogroup mapping */
-/*@{*/
-
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * This class implements the functionality for polynomial mappings $Q_p$ of
@@ -794,7 +795,7 @@ protected:
 template <int dim, int spacedim = dim>
 using MappingQGeneric = MappingQ<dim, spacedim>;
 
-/*@}*/
+/** @} */
 
 
 /*----------------------------------------------------------------------*/

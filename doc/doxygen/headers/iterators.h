@@ -383,7 +383,7 @@ levels, and accessors for objects of lower dimensionality do not have a
 @ingroup grid
 */
 
-//@}
+/** @} */
 
 
 /**

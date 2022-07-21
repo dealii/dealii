@@ -24,8 +24,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup fe */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * Discontinuous finite elements based on Legendre polynomials.
@@ -468,7 +470,7 @@ private:
   get_dpo_vector(const unsigned int degree);
 };
 
-/* @} */
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

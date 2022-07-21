@@ -44,7 +44,7 @@ namespace VectorTools
   /**
    * @name Interpolation and projection
    */
-  //@{
+  /** @{ */
 
   /**
    * Compute constraints on the solution that corresponds to the imposition

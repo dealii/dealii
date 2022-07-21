@@ -41,7 +41,7 @@ namespace VectorTools
   /**
    * @name Interpolation and projection
    */
-  //@{
+  /** @{ */
 
   /**
    * This function computes the constraints that correspond to boundary
@@ -374,7 +374,7 @@ namespace VectorTools
 #endif
          ));
 
-  //@}
+  /** @} */
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE

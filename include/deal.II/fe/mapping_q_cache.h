@@ -36,9 +36,10 @@ class DoFHandler;
 #endif
 
 
-/*!@addtogroup mapping */
-/*@{*/
-
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * This class implements a caching strategy for objects of the MappingQ family
@@ -248,7 +249,7 @@ private:
   bool uses_level_info;
 };
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -29,8 +29,10 @@ DEAL_II_NAMESPACE_OPEN
 class ParameterHandler;
 #endif
 
-/*!@addtogroup Solvers */
-/*@{*/
+/**
+ * @addtogroup Solvers
+ * @{
+ */
 
 /**
  * Control class to determine convergence of iterative solvers.
@@ -615,7 +617,7 @@ protected:
   unsigned int n_converged_iterations;
 };
 
-/*@}*/
+/** @} */
 //---------------------------------------------------------------------------
 
 #ifndef DOXYGEN

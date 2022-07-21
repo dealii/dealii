@@ -51,7 +51,7 @@ namespace TrilinosWrappers
   /**
    * @name Creation of a LinearOperator
    */
-  //@{
+  /** @{ */
 
 
   /**
@@ -149,11 +149,11 @@ namespace TrilinosWrappers
   }
 
 
-  //@}
+  /** @} */
   /**
    * @name Creation of a BlockLinearOperator
    */
-  //@{
+  /** @{ */
 
 
   /**
@@ -302,7 +302,7 @@ namespace TrilinosWrappers
     return dealii::block_diagonal_operator<m, Range, Domain, BlockPayload>(ops);
   }
 
-  //@}
+  /** @} */
 
 } // namespace TrilinosWrappers
 

@@ -37,8 +37,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*! @addtogroup Sparsity
- *@{
+/**
+ * @addtogroup Sparsity
+ * @{
  */
 
 /**

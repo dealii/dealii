@@ -576,7 +576,7 @@ public:
   /**
    * @name Constructors and initialization
    */
-  //@{
+  /** @{ */
   /**
    * Constructor; initializes the matrix to be empty, without any structure,
    * i.e.  the matrix is not usable at all. This constructor is therefore only
@@ -712,11 +712,11 @@ public:
    */
   virtual void
   clear();
-  //@}
+  /** @} */
   /**
    * @name Information on the matrix
    */
-  //@{
+  /** @{ */
   /**
    * Return whether the object is empty. It is empty if either both dimensions
    * are zero or no SparsityPattern is associated.
@@ -787,11 +787,11 @@ public:
    */
   void compress(::dealii::VectorOperation::values);
 
-  //@}
+  /** @} */
   /**
    * @name Modifying entries
    */
-  //@{
+  /** @{ */
   /**
    * Set the element (<i>i,j</i>) to <tt>value</tt>. Throws an error if the
    * entry does not exist or if <tt>value</tt> is not a finite number. Still,
@@ -1050,11 +1050,11 @@ public:
   void
   add(const number factor, const SparseMatrix<somenumber> &matrix);
 
-  //@}
+  /** @} */
   /**
    * @name Accessing elements
    */
-  //@{
+  /** @{ */
 
   /**
    * Return the value of the entry (<i>i,j</i>).  This may be an expensive
@@ -1112,11 +1112,11 @@ public:
   number &
   diag_element(const size_type i);
 
-  //@}
+  /** @} */
   /**
    * @name Multiplying matrices and vectors
    */
-  //@{
+  /** @{ */
   /**
    * Matrix-vector multiplication: let <i>dst = M*src</i> with <i>M</i> being
    * this matrix.
@@ -1314,11 +1314,11 @@ public:
          const Vector<number> &       V = Vector<number>(),
          const bool                   rebuild_sparsity_pattern = true) const;
 
-  //@}
+  /** @} */
   /**
    * @name Matrix norms
    */
-  //@{
+  /** @{ */
 
   /**
    * Return the $l_1$-norm of the matrix, that is $|M|_1=\max_{\mathrm{all\
@@ -1346,11 +1346,11 @@ public:
    */
   real_type
   frobenius_norm() const;
-  //@}
+  /** @} */
   /**
    * @name Preconditioning methods
    */
-  //@{
+  /** @{ */
 
   /**
    * Apply the Jacobi preconditioner, which multiplies every element of the
@@ -1494,11 +1494,11 @@ public:
   SSOR_step(Vector<somenumber> &      v,
             const Vector<somenumber> &b,
             const number              omega = 1.) const;
-  //@}
+  /** @} */
   /**
    * @name Iterators
    */
-  //@{
+  /** @{ */
 
   /**
    * Return an iterator pointing to the first element of the matrix.
@@ -1562,11 +1562,11 @@ public:
    */
   iterator
   end(const size_type r);
-  //@}
+  /** @} */
   /**
    * @name Input/Output
    */
-  //@{
+  /** @{ */
 
   /**
    * Print the matrix to the given stream, using the format <tt>(row,column)
@@ -1664,7 +1664,7 @@ public:
    */
   void
   block_read(std::istream &in);
-  //@}
+  /** @} */
   /**
    * @addtogroup Exceptions
    * @{
@@ -1715,7 +1715,7 @@ public:
                    "You are attempting an operation on two matrices that "
                    "are the same object, but the operation requires that the "
                    "two objects are in fact different.");
-  //@}
+  /** @} */
 
 protected:
   /**

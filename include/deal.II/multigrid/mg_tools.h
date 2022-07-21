@@ -397,7 +397,7 @@ namespace MGTools
 
 } // namespace MGTools
 
-/* @} */
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

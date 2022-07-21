@@ -25,9 +25,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup mapping */
-/*@{*/
-
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * Implementation of a $d$-linear mapping from the reference cell to a general
@@ -98,7 +99,7 @@ struct StaticMappingQ1
 };
 
 
-/*@}*/
+/** @} */
 
 
 DEAL_II_NAMESPACE_CLOSE

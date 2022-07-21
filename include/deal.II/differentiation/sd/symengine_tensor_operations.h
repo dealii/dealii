@@ -39,7 +39,7 @@ namespace Differentiation
     /**
      * @name Symbolic variable creation
      */
-    //@{
+    /** @{ */
 
     /**
      * Return a vector of Expressions representing a vectorial symbolic
@@ -184,12 +184,12 @@ namespace Differentiation
       const std::string &            symbol,
       const types::substitution_map &arguments);
 
-    //@}
+    /** @} */
 
     /**
      * @name Symbolic differentiation
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the symbolic result of computing the partial derivative of the
@@ -367,12 +367,12 @@ namespace Differentiation
     differentiate(const SymmetricTensor<rank_1, dim, Expression> &S,
                   const Tensor<rank_2, dim, Expression> &         T);
 
-    //@}
+    /** @} */
 
     /**
      * @name Symbol map creation and manipulation
      */
-    //@{
+    /** @{ */
 
     /**
      * A convenience function for adding empty entries, with the key values
@@ -495,12 +495,12 @@ namespace Differentiation
       const SymmetricTensor<rank, dim, SymbolicType> &symbol_tensor,
       const SymmetricTensor<rank, dim, ValueType> &   value_tensor);
 
-    //@}
+    /** @} */
 
     /**
      * @name Symbol substitution map creation
      */
-    //@{
+    /** @{ */
 
     /**
      * Return a substitution map that has the entry keys given by the
@@ -556,12 +556,12 @@ namespace Differentiation
       const SymmetricTensor<rank, dim, ExpressionType> &symbol_tensor,
       const SymmetricTensor<rank, dim, ValueType> &     value_tensor);
 
-    //@}
+    /** @} */
 
     /**
      * @name Symbol substitution map enlargement
      */
-    //@{
+    /** @{ */
 
     /**
      * A convenience function for adding an entry to the @p substitution_map.
@@ -636,12 +636,12 @@ namespace Differentiation
       const SymmetricTensor<rank, dim, ExpressionType> &symbol_tensor,
       const SymmetricTensor<rank, dim, ValueType> &     value_tensor);
 
-    //@}
+    /** @} */
 
     /**
      * @name Symbol substitution and evaluation
      */
-    //@{
+    /** @{ */
 
     /**
      * Perform a single substitution sweep of a set of symbols into the given
@@ -755,7 +755,7 @@ namespace Differentiation
       const SymmetricTensor<rank, dim, Expression> &expression_tensor,
       const types::substitution_map &               substitution_map);
 
-    //@}
+    /** @} */
 
   } // namespace SD
 } // namespace Differentiation

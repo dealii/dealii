@@ -1018,7 +1018,7 @@ public:
   has_support_on_face(const unsigned int shape_index,
                       const unsigned int face_index) const;
 
-  //@}
+  /** @} */
   /**
    * @name Transfer and constraint matrices
    * @{
@@ -1249,7 +1249,7 @@ public:
   virtual void
   get_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
                            FullMatrix<double> &                matrix) const;
-  //@}
+  /** @} */
 
   /**
    * @name Functions to support hp-adaptivity
@@ -1290,7 +1290,7 @@ public:
                                    const unsigned int                  subface,
                                    FullMatrix<double> &                matrix,
                                    const unsigned int face_no = 0) const;
-  //@}
+  /** @} */
 
 
   /**
@@ -1350,7 +1350,7 @@ public:
   compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
                          const unsigned int                  codim = 0) const;
 
-  //@}
+  /** @} */
 
   /**
    * Comparison operator.
@@ -1795,7 +1795,7 @@ public:
   unsigned int
   component_to_block_index(const unsigned int component) const;
 
-  //@}
+  /** @} */
 
   /**
    * @name Component and block matrices
@@ -1971,7 +1971,7 @@ public:
   virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
   get_constant_modes() const;
 
-  //@}
+  /** @} */
 
   /**
    * @name Support points and interpolation
@@ -2250,7 +2250,7 @@ public:
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double> &              nodal_values) const;
 
-  //@}
+  /** @} */
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this

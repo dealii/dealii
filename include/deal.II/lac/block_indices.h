@@ -119,7 +119,7 @@ public:
   /**
    * @name Size information
    */
-  //@{
+  /** @{ */
 
   /**
    * Number of blocks in index field.
@@ -148,7 +148,7 @@ public:
   std::string
   to_string() const;
 
-  //@}
+  /** @} */
 
   /**
    * @name Index conversion
@@ -158,7 +158,7 @@ public:
    * object. If applied to other objects, the numbers obtained from these
    * functions are meaningless.
    */
-  //@{
+  /** @{ */
 
   /**
    * Return the block and the index within that block for the global index @p
@@ -179,7 +179,7 @@ public:
    */
   size_type
   block_start(const unsigned int i) const;
-  //@}
+  /** @} */
 
   /**
    * Copy operator.

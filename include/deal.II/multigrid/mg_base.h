@@ -31,9 +31,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup mg */
-/*@{*/
-
+/**
+ * @addtogroup mg
+ * @{
+ */
 
 /**
  * Multilevel matrix base. This class sets up the interface needed by
@@ -293,7 +294,7 @@ public:
   apply(const unsigned int level, VectorType &u, const VectorType &rhs) const;
 };
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

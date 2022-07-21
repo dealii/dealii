@@ -107,7 +107,7 @@ public:
   /**
    * @name 1: Reading from and writing to vectors
    */
-  //@{
+  /** @{ */
   /**
    * For the vector @p src, read out the values on the degrees of freedom of
    * the current cell, and store them internally. Similar functionality as the
@@ -277,12 +277,12 @@ public:
     const std::bitset<VectorizedArrayType::size()> &mask =
       std::bitset<VectorizedArrayType::size()>().flip()) const;
 
-  //@}
+  /** @} */
 
   /**
    * @name 2: Access to data at quadrature points or the gather vector data
    */
-  //@{
+  /** @{ */
   /**
    * Return the value stored for the local degree of freedom with index @p
    * dof. If the object is vector-valued, a vector-valued return argument is
@@ -578,7 +578,7 @@ public:
   value_type
   integrate_value() const;
 
-  //@}
+  /** @} */
 
   /**
    * Return the underlying MatrixFree object.

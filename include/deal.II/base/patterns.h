@@ -538,7 +538,7 @@ namespace Patterns
                    int,
                    << "The values " << arg1 << " and " << arg2
                    << " do not form a valid range.");
-    //@}
+    /** @} */
   private:
     /**
      * Copy of the pattern that each element of the list has to satisfy.
@@ -685,7 +685,7 @@ namespace Patterns
                    int,
                    << "The values " << arg1 << " and " << arg2
                    << " do not form a valid range.");
-    //@}
+    /** @} */
   private:
     /**
      * Copy of the patterns that each key and each value of the map has to
@@ -960,7 +960,7 @@ namespace Patterns
       int,
       << "A comma was found at position " << arg1
       << " of your input string, but commas are not allowed here.");
-    //@}
+    /** @} */
   private:
     /**
      * List of valid strings as passed to the constructor. We don't make this
@@ -1404,7 +1404,7 @@ namespace Patterns
                    std::string,
                    << "The string \"" << arg1
                    << "\" does not match the pattern \"" << arg2 << "\"");
-    //@}
+    /** @} */
   } // namespace Tools
 } // namespace Patterns
 

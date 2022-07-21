@@ -38,8 +38,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup Quadrature */
-/*@{*/
+/**
+ * @addtogroup Quadrature
+ * @{
+ */
 
 /**
  * A class for storing at each cell represented by iterators of type @p CellIteratorType
@@ -587,7 +589,7 @@ namespace parallel
 
 #endif
 
-/*@}*/
+/** @} */
 
 #ifndef DOXYGEN
 

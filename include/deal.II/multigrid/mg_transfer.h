@@ -237,10 +237,10 @@ namespace internal
  * MGTransferBase is defined in mg_base.h
  */
 
-/*!@addtogroup mg */
-/*@{*/
-
-
+/**
+ * @addtogroup mg
+ * @{
+ */
 
 /**
  * Implementation of transfer between the global vectors and the multigrid
@@ -763,7 +763,7 @@ private:
 };
 
 
-/*@}*/
+/** @} */
 
 
 DEAL_II_NAMESPACE_CLOSE

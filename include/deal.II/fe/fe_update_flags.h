@@ -35,8 +35,8 @@ template <int, int>
 class FiniteElement;
 #endif
 
-/*!@addtogroup feaccess */
-/*@{*/
+/** @addtogroup feaccess */
+/** @{ */
 
 /**
  * The enum type given to the constructors of FEValues, FEFaceValues and
@@ -623,7 +623,7 @@ namespace internal
 } // namespace internal
 
 
-/*@}*/
+/** @} */
 
 
 

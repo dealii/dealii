@@ -54,7 +54,7 @@ namespace VectorTools
   /**
    * @name Interpolation and projection
    */
-  //@{
+  /** @{ */
 
   /**
    * Compute the projection of @p function to the finite element space. In other

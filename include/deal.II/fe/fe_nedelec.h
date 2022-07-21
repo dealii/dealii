@@ -33,8 +33,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup fe */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * @warning Several aspects of the implementation are experimental. For the
@@ -663,7 +665,7 @@ FE_Nedelec<1>::initialize_restriction();
 
 #endif // DOXYGEN
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

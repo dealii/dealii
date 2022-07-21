@@ -49,7 +49,7 @@ namespace Physics
       /**
        * @name Metric tensors
        */
-      //@{
+      /** @{ */
 
       /**
        * The second-order referential/spatial symmetric identity (metric) tensor
@@ -124,12 +124,12 @@ namespace Physics
 #endif
         ;
 
-      //@}
+      /** @} */
 
       /**
        * @name Projection operators
        */
-      //@{
+      /** @{ */
 
       /**
        * The fourth-order spatial deviatoric tensor. Also known as the
@@ -250,12 +250,12 @@ namespace Physics
       static DEAL_II_CONSTEXPR SymmetricTensor<4, dim, Number>
                                Dev_P_T(const Tensor<2, dim, Number> &F);
 
-      //@}
+      /** @} */
 
       /**
        * @name Scalar derivatives
        */
-      //@{
+      /** @{ */
       /**
        * Return the derivative of the volumetric Jacobian
        * $J = \text{det} \mathbf{F}$ with respect to the right Cauchy-Green
@@ -277,12 +277,12 @@ namespace Physics
       static DEAL_II_CONSTEXPR SymmetricTensor<2, dim, Number>
                                ddet_F_dC(const Tensor<2, dim, Number> &F);
 
-      //@}
+      /** @} */
 
       /**
        * @name Tensor derivatives
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the derivative of the inverse of the right Cauchy-Green
@@ -302,7 +302,7 @@ namespace Physics
       static DEAL_II_CONSTEXPR SymmetricTensor<4, dim, Number>
                                dC_inv_dC(const Tensor<2, dim, Number> &F);
 
-      //@}
+      /** @} */
     };
 
   } // namespace Elasticity
