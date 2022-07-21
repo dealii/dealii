@@ -881,6 +881,7 @@ namespace GridTools
       Assert(false, ExcNotImplemented());
 
     std::size_t n_negative_cells = 0;
+    std::size_t cell_no          = 0;
     for (auto &cell : cells)
       {
         const ArrayView<const unsigned int> vertices(cell.vertices);
@@ -926,8 +927,9 @@ namespace GridTools
             // If not, then the grid is seriously broken and
             // we just give up.
             AssertThrow(GridTools::cell_measure(all_vertices, vertices) > 0,
-                        ExcInternalError());
+                        ExcGridHasInvalidCell(cell_no));
           }
+        ++cell_no;
       }
     return n_negative_cells;
   }
