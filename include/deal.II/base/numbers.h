@@ -836,8 +836,8 @@ namespace numbers
   values_are_equal(const adouble &value_1, const Number &value_2)
   {
     // Use the specialized definition for two ADOL-C taped types
-    return values_are_equal(value_1,
-                            internal::NumberType<adouble>::value(value_2));
+    return values_are_equal(
+      value_1, dealii::internal::NumberType<adouble>::value(value_2));
   }
 
 
@@ -892,7 +892,7 @@ namespace numbers
   {
     // Use the specialized definition for two ADOL-C taped types
     return value_is_less_than(value_1,
-                              internal::NumberType<adouble>::value(value_2));
+                              ::internal::NumberType<adouble>::value(value_2));
   }
 
 
@@ -912,8 +912,8 @@ namespace numbers
   value_is_less_than(const Number &value_1, const adouble &value_2)
   {
     // Use the specialized definition for two ADOL-C taped types
-    return value_is_less_than(internal::NumberType<adouble>::value(value_1),
-                              value_2);
+    return value_is_less_than(
+      dealii::internal::NumberType<adouble>::value(value_1), value_2);
   }
 
 #endif
@@ -923,7 +923,7 @@ namespace numbers
   constexpr bool
   values_are_equal(const Number1 &value_1, const Number2 &value_2)
   {
-    return (value_1 == internal::NumberType<Number1>::value(value_2));
+    return (value_1 == dealii::internal::NumberType<Number1>::value(value_2));
   }
 
 
@@ -947,7 +947,7 @@ namespace numbers
   inline bool
   value_is_less_than(const Number1 &value_1, const Number2 &value_2)
   {
-    return (value_1 < internal::NumberType<Number1>::value(value_2));
+    return (value_1 < dealii::internal::NumberType<Number1>::value(value_2));
   }
 
 
