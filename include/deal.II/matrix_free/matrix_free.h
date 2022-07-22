@@ -1631,6 +1631,15 @@ public:
   get_dof_handler(const unsigned int dof_handler_index = 0) const;
 
   /**
+   * Return the AffineConstraints with the index as given to the
+   * respective `std::vector` argument in the reinit() function. Only available
+   * if the AffineConstraints objects have the same template parameter Number as
+   * MatrixFree. Throws an exception otherwise.
+   */
+  const AffineConstraints<Number> &
+  get_affine_constraints(const unsigned int dof_handler_index = 0) const;
+
+  /**
    * Return the cell iterator in deal.II speak to a given cell batch
    * (populating several lanes in a VectorizedArray) and the lane index within
    * the vectorization across cells in the renumbering of this structure.
@@ -2001,6 +2010,14 @@ private:
    * Pointers to the DoFHandlers underlying the current problem.
    */
   std::vector<SmartPointer<const DoFHandler<dim>>> dof_handlers;
+
+  /**
+   * Pointers to the AffineConstraints underlying the current problem. Only
+   * filled with an AffineConstraints object if objects of the same `Number`
+   * template parameter as the `Number` template of MatrixFree is passed to
+   * reinit(). Filled with nullptr otherwise.
+   */
+  std::vector<SmartPointer<const AffineConstraints<Number>>> affine_constraints;
 
   /**
    * Contains the information about degrees of freedom on the individual cells

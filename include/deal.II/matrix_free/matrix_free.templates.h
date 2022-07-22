@@ -229,6 +229,23 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_dof_handler(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
+const AffineConstraints<Number> &
+MatrixFree<dim, Number, VectorizedArrayType>::get_affine_constraints(
+  const unsigned int dof_handler_index) const
+{
+  AssertIndexRange(dof_handler_index, n_components());
+
+  AssertThrow(affine_constraints[dof_handler_index] != nullptr,
+              ExcMessage(
+                "AffineConstraints are only accessible if its Number type "
+                "matches with Number type of MatrixFree!"));
+
+  return *(affine_constraints[dof_handler_index]);
+}
+
+
+
+template <int dim, typename Number, typename VectorizedArrayType>
 typename DoFHandler<dim>::cell_iterator
 MatrixFree<dim, Number, VectorizedArrayType>::get_cell_iterator(
   const unsigned int cell_batch_index,
@@ -330,6 +347,29 @@ MatrixFree<dim, Number, VectorizedArrayType>::copy_from(
 
 
 
+namespace internal
+{
+  template <typename Number, typename Number2>
+  void
+  store_affine_constraints(
+    const dealii::AffineConstraints<Number2> *,
+    SmartPointer<const dealii::AffineConstraints<Number>> &stored_constraints)
+  {
+    stored_constraints = nullptr;
+  }
+
+  template <typename Number>
+  void
+  store_affine_constraints(
+    const dealii::AffineConstraints<Number> *              affine_constraints,
+    SmartPointer<const dealii::AffineConstraints<Number>> &stored_constraints)
+  {
+    stored_constraints = affine_constraints;
+  }
+} // namespace internal
+
+
+
 template <int dim, typename Number, typename VectorizedArrayType>
 template <typename number2, int q_dim>
 void
@@ -373,6 +413,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
               shape_info(c, nq, fe_no, q_no)
                 .reinit(quad[nq][q_no], dof_handler[no]->get_fe(fe_no), b);
   }
+
+  // Store pointers to AffineConstraints objects if Number type matches
+  affine_constraints.resize(constraints.size());
+  for (unsigned int no = 0; no < constraints.size(); ++no)
+    internal::store_affine_constraints(constraints[no], affine_constraints[no]);
 
   if (additional_data.initialize_indices == true)
     {
