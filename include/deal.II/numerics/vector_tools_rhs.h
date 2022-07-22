@@ -177,7 +177,7 @@ namespace VectorTools
     VectorType &                                               rhs_vector,
     const std::set<types::boundary_id> &                       boundary_ids =
       std::set<types::boundary_id>());
-  // @}
+  /** @} */
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE

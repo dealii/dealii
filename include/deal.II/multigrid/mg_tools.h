@@ -36,8 +36,10 @@ class DoFHandler;
 class MGConstrainedDoFs;
 #endif
 
-/* !@addtogroup mg */
-/* @{ */
+/**
+ * addtogroup mg
+ * @{
+ */
 
 /**
  * This is a collection of functions operating on, and manipulating the

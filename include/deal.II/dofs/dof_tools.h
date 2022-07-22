@@ -282,9 +282,7 @@ namespace DoFTools
   dof_couplings_from_component_couplings(
     const hp::FECollection<dim, spacedim> &fe,
     const Table<2, Coupling> &             component_couplings);
-  /**
-   * @}
-   */
+  /** @} */
 
   /**
    * @name Sparsity pattern generation
@@ -1808,7 +1806,8 @@ namespace DoFTools
   dof_indices_with_subdomain_association(
     const DoFHandler<dim, spacedim> &dof_handler,
     const types::subdomain_id        subdomain);
-  // @}
+  /** @} */
+
   /**
    * @name DoF indices on patches of cells
    *

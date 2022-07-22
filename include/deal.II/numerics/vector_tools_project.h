@@ -53,8 +53,8 @@ namespace VectorTools
 {
   /**
    * @name Interpolation and projection
+   * @{
    */
-  /** @{ */
 
   /**
    * Compute the projection of @p function to the finite element space. In other
@@ -296,7 +296,7 @@ namespace VectorTools
     VectorType &                                              vec_result,
     const unsigned int                                        fe_component = 0);
 
-  // @}
+  /** @} */
 
 } // namespace VectorTools
 

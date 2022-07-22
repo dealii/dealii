@@ -604,7 +604,7 @@ public:
   iterator
   end(const size_type r) const;
 
-  // @}
+  /** @} */
 
   /**
    * Compute the bandwidth of the matrix represented by this structure. The

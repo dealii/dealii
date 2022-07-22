@@ -170,8 +170,6 @@ public:
 
   /**
    * @name Copying into and out of other matrices
-   */
-  /**
    * @{
    */
 
@@ -360,8 +358,6 @@ public:
    */
   /**
    * @name Non-modifying operators
-   */
-  /**
    * @{
    */
 
@@ -530,8 +526,10 @@ public:
   memory_consumption() const;
 
   /** @} */
-  ///@name Iterator functions
-  /** @{ */
+  /**
+   * @name Iterator functions
+   * @{
+   */
 
   /**
    * Mutable iterator starting at the first entry of row <tt>r</tt>.
@@ -558,8 +556,10 @@ public:
   end(const size_type r) const;
 
   /** @} */
-  ///@name Modifying operators
-  /** @{ */
+  /**
+   * @name Modifying operators
+   * @{
+   */
 
   /**
    * Scale the entire matrix by a fixed factor.
@@ -845,8 +845,10 @@ public:
   right_invert(const FullMatrix<number2> &M);
 
   /** @} */
-  ///@name Multiplications
-  /** @{ */
+  /**
+   * @name Multiplications
+   * @{
+   */
 
   /**
    * Matrix-matrix-multiplication.
@@ -1111,7 +1113,7 @@ public:
   /** @} */
 };
 
-/**@}*/
+/** @} */
 
 #ifndef DOXYGEN
 /*-------------------------Inline functions -------------------------------*/

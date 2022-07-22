@@ -212,7 +212,7 @@ namespace VectorTools
                              const Point<spacedim, double> &  p,
                              const Point<dim, double> &       direction,
                              Vector<double> &                 rhs_vector);
-  // @}
+  /** @} */
 
   /**
    * @name Evaluation of functions and errors

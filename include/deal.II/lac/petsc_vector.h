@@ -563,7 +563,7 @@ namespace internal
   } // namespace LinearOperatorImplementation
 } /* namespace internal */
 
-/**@}*/
+/** @} */
 
 
 /**
