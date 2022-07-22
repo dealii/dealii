@@ -727,7 +727,7 @@ namespace MatrixFreeOperators
   /**
    * This class implements the operation of the action of a mass matrix.
    *
-   * Note that this class only supports the non-blocked vector variant of the
+   * @note This class only supports the non-blocked vector variant of the
    * Base operator because only a single FEEvaluation object is used in the
    * apply function.
    */
@@ -1828,7 +1828,14 @@ namespace MatrixFreeOperators
                VectorType,
                VectorizedArrayType>::MassOperator()
     : Base<dim, VectorType, VectorizedArrayType>()
-  {}
+  {
+    AssertThrow(
+      IsBlockVector<VectorType>::value == false,
+      ExcNotImplemented(
+        "This class only supports the non-blocked vector variant of the Base "
+        "operator because only a single FEEvaluation object is used in the "
+        "apply function."));
+  }
 
 
 
