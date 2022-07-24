@@ -43,8 +43,9 @@ template <typename number>
 class SparseBlockVanka;
 #endif
 
-/*! @addtogroup Preconditioners
- *@{
+/**
+ * @addtogroup Preconditioners
+ * @{
  */
 
 /**
@@ -544,7 +545,7 @@ private:
                     const BlockingStrategy      blocking_strategy);
 };
 
-/*@}*/
+/** @} */
 /* ---------------------------------- Inline functions ------------------- */
 
 #ifndef DOXYGEN

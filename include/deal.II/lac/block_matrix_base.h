@@ -44,8 +44,9 @@ class MatrixIterator;
 #endif
 
 
-/*! @addtogroup Matrix1
- *@{
+/**
+ * @addtogroup Matrix1
+ * @{
  */
 
 /**
@@ -823,7 +824,7 @@ public:
                  int,
                  << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
                  << ',' << arg4 << "] have differing column numbers.");
-  //@}
+  /** @} */
 protected:
   /**
    * Release all memory and return to a state just like after having called
@@ -1073,7 +1074,7 @@ private:
 };
 
 
-/*@}*/
+/** @} */
 
 #ifndef DOXYGEN
 /* ------------------------- Template functions ---------------------- */

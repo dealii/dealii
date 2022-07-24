@@ -1889,8 +1889,8 @@ constexpr unsigned int Tensor<rank_, dim, Number>::n_independent_components;
 
 /**
  * @name Output functions for Tensor objects
+ * @{
  */
-//@{
 
 /**
  * Output operator for tensors. Print the elements consecutively, with a space
@@ -1929,12 +1929,11 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
 }
 
 
-//@}
+/** @} */
 /**
  * @name Vector space operations on Tensor objects:
+ * @{
  */
-//@{
-
 
 /**
  * Scalar multiplication of a tensor of rank 0 with an object from the left.
@@ -2270,12 +2269,11 @@ inline constexpr DEAL_II_ALWAYS_INLINE
   return tmp;
 }
 
-//@}
+/** @} */
 /**
  * @name Contraction operations and the outer product for tensor objects
+ * @{
  */
-//@{
-
 
 /**
  * The dot product (single contraction) for tensors. This function return a
@@ -2613,12 +2611,11 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 }
 
 
-//@}
+/** @} */
 /**
  * @name Special operations on tensors of rank 1
+ * @{
  */
-//@{
-
 
 /**
  * Return the cross product in 2d. This is just a rotation by 90 degrees
@@ -2677,12 +2674,11 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 }
 
 
-//@}
+/** @} */
 /**
  * @name Special operations on tensors of rank 2
+ * @{
  */
-//@{
-
 
 /**
  * Compute the determinant of a tensor or rank 2.
@@ -3048,7 +3044,7 @@ linfty_norm(const Tensor<2, dim, Number> &t)
   return max;
 }
 
-//@}
+/** @} */
 
 
 #ifndef DOXYGEN

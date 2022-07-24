@@ -47,7 +47,7 @@ namespace VectorTools
   /**
    * @name Evaluation of functions and errors
    */
-  //@{
+  /** @{ */
 
   /**
    * Compute the cellwise error of the finite element solution.  Integrate the
@@ -229,7 +229,7 @@ namespace VectorTools
                        const NormType &                    norm,
                        const double                        exponent = 2.);
 
-  //@}
+  /** @} */
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE

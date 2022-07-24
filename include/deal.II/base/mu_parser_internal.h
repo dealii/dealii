@@ -102,7 +102,7 @@ namespace internal
                    << "Parsing Error at Column " << arg1
                    << ". The parser said: " << arg2);
 
-    //@}
+    /** @} */
 
     /**
      * deal.II uses muParser as a purely internal dependency. To this end, we do

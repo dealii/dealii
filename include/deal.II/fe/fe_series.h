@@ -42,8 +42,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup feall */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 
 /**
@@ -412,7 +414,7 @@ namespace FESeries
 
 } // namespace FESeries
 
-/*@}*/
+/** @} */
 
 
 

@@ -86,7 +86,7 @@ namespace Differentiation
       << "previously declared all symbolic variables that are present "
       << "in the expression?");
 
-    //@}
+    /** @} */
 
     /**
      * A class to wrap SymEngine expressions.
@@ -180,7 +180,7 @@ namespace Differentiation
       /**
        * @name Constructors
        */
-      //@{
+      /** @{ */
 
       /**
        * Default constructor.
@@ -405,12 +405,12 @@ namespace Differentiation
        */
       virtual ~Expression() = default;
 
-      //@}
+      /** @} */
 
       /**
        * Utilities
        */
-      //@{
+      /** @{ */
 
       /**
        * Parse an expression from a string representing a symbolic @p expression.
@@ -503,12 +503,12 @@ namespace Differentiation
       BOOST_SERIALIZATION_SPLIT_MEMBER()
 #  endif
 
-      //@}
+      /** @} */
 
       /**
        * @name Values
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the value or expression that this class instance represents.
@@ -530,12 +530,12 @@ namespace Differentiation
       const SymEngine::RCP<const SymEngine::Basic> &
       get_RCP() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Math and relational operators with (potentially) symbolic types
        */
-      //@{
+      /** @{ */
 
       /**
        * Assignment operator.
@@ -591,12 +591,12 @@ namespace Differentiation
       Expression &
       operator/=(const Expression &rhs);
 
-      //@}
+      /** @} */
 
       /**
        * @name Math and relational operators with numeric types
        */
-      //@{
+      /** @{ */
 
       /**
        * Assignment operator.
@@ -659,12 +659,12 @@ namespace Differentiation
       Expression &
       operator/=(const NumberType &rhs);
 
-      //@}
+      /** @} */
 
       /**
        * @name Differentiation
        */
-      //@{
+      /** @{ */
 
       /**
        * Return the derivative of this object's @p expression
@@ -688,12 +688,12 @@ namespace Differentiation
       Expression
       differentiate(const SymEngine::RCP<const SymEngine::Basic> &symbol) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Dictionary-based substitution
        */
-      //@{
+      /** @{ */
 
       /**
        * Perform substitution of all symbols found in this object's @p expression
@@ -782,12 +782,12 @@ namespace Differentiation
       substitute_and_evaluate(
         const SymEngine::map_basic_basic &substitution_values) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Conversion operators
        */
-      //@{
+      /** @{ */
 
       /**
        * Conversion operator for real integer or floating point values, and
@@ -854,7 +854,7 @@ namespace Differentiation
        */
       operator const SymEngine::RCP<const SymEngine::Basic> &() const;
 
-      //@}
+      /** @} */
 
     protected:
       /**
@@ -874,7 +874,7 @@ namespace Differentiation
     /**
      * @name Type traits
      */
-    //@{
+    /** @{ */
 
     /**
      * A struct to indicate whether a given @p NumberType is a supported
@@ -895,12 +895,12 @@ namespace Differentiation
     struct is_sd_number<Expression> : std::true_type
     {};
 
-    //@}
+    /** @} */
 
     /**
      * @name Bitwise operators
      */
-    //@{
+    /** @{ */
 
     /**
      * Bitwise left shift operator.
@@ -918,12 +918,12 @@ namespace Differentiation
     std::istream &
     operator>>(std::istream &stream, Expression &expression);
 
-    //@}
+    /** @} */
 
     /**
      * @name Comparison operators
      */
-    //@{
+    /** @{ */
 
     /**
      * Equality operator.
@@ -973,12 +973,12 @@ namespace Differentiation
     Expression
     operator>=(const Expression &lhs, const Expression &rhs);
 
-    //@}
+    /** @} */
 
     /**
      * @name Logical operators
      */
-    //@{
+    /** @{ */
 
     /**
      * Logical not operator.
@@ -1036,12 +1036,12 @@ namespace Differentiation
     Expression
     operator||(const Expression &lhs, const Expression &rhs);
 
-    //@}
+    /** @} */
 
     /**
      * @name Mathematical operators
      */
-    //@{
+    /** @{ */
 
     /**
      * Addition operator.
@@ -1211,7 +1211,7 @@ namespace Differentiation
       return lhs / Expression(rhs);
     }
 
-    //@}
+    /** @} */
 
   } // namespace SD
 } // namespace Differentiation

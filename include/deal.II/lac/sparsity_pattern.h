@@ -62,8 +62,9 @@ namespace ChunkSparsityPatternIterators
 }
 #endif
 
-/*! @addtogroup Sparsity
- *@{
+/**
+ * @addtogroup Sparsity
+ * @{
  */
 
 namespace internals

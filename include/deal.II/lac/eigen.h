@@ -33,8 +33,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup Solvers */
-/*@{*/
+/**
+ * @addtogroup Solvers
+ * @{
+ */
 
 /**
  * Power method (von Mises) for eigenvalue computations.
@@ -186,7 +188,7 @@ protected:
   AdditionalData additional_data;
 };
 
-/*@}*/
+/** @} */
 //---------------------------------------------------------------------------
 
 

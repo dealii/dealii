@@ -564,7 +564,7 @@ namespace internal
 /**
  * @name Creation of a BlockLinearOperator
  */
-//@{
+/** @{ */
 
 /**
  * @relatesalso BlockLinearOperator
@@ -827,11 +827,11 @@ block_diagonal_operator(
 
 
 
-//@}
+/** @} */
 /**
  * @name Manipulation of a BlockLinearOperator
  */
-//@{
+/** @{ */
 
 /**
  * @relatesalso LinearOperator
@@ -1068,7 +1068,7 @@ block_back_substitution(
   return return_op;
 }
 
-//@}
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -626,8 +626,8 @@ namespace StandardExceptions
 {
   /**
    * @addtogroup Exceptions
+   * @{
    */
-  //@{
 
   /**
    * Exception denoting a division by zero.
@@ -1139,7 +1139,7 @@ namespace StandardExceptions
                  std::string,
                  << "There was an error in a cuSPARSE function: " << arg1);
 #endif
-  //@}
+  /** @} */
 
   /**
    * This function requires support for the Exodus II library.

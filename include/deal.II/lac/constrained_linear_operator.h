@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * @name Indirectly applying constraints to LinearOperator
  */
-//@{
+/** @{ */
 
 
 /**
@@ -318,7 +318,7 @@ constrained_right_hand_side(
   return return_comp;
 }
 
-//@}
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

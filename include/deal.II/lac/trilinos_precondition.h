@@ -56,8 +56,9 @@ class Vector;
 class SparsityPattern;
 #    endif
 
-/*! @addtogroup TrilinosWrappers
- *@{
+/**
+ * @addtogroup TrilinosWrappers
+ * @{
  */
 
 namespace TrilinosWrappers
@@ -176,7 +177,7 @@ namespace TrilinosWrappers
     /**
      * @name Access to underlying Trilinos data
      */
-    //@{
+    /** @{ */
     /**
      *
      * Calling this function from an uninitialized object will cause an
@@ -184,12 +185,12 @@ namespace TrilinosWrappers
      */
     Epetra_Operator &
     trilinos_operator() const;
-    //@}
+    /** @} */
 
     /**
      * @name Partitioners
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the partitioning of the domain space of this matrix, i.e., the
@@ -206,12 +207,12 @@ namespace TrilinosWrappers
     IndexSet
     locally_owned_range_indices() const;
 
-    //@}
+    /** @} */
 
     /**
      * @addtogroup Exceptions
      */
-    //@{
+    /** @{ */
     /**
      * Exception.
      */
@@ -220,7 +221,7 @@ namespace TrilinosWrappers
                    << "The sparse matrix the preconditioner is based on "
                    << "uses a map that is not compatible to the one in vector "
                    << arg1 << ". Check preconditioner and matrix setup.");
-    //@}
+    /** @} */
 
     friend class SolverBase;
 
@@ -2181,7 +2182,7 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 
 
-/*@}*/
+/** @} */
 
 
 DEAL_II_NAMESPACE_CLOSE

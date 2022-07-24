@@ -42,7 +42,7 @@ namespace VectorTools
   /**
    * @name Assembling of right hand sides
    */
-  //@{
+  /** @{ */
 
   /**
    * Create a right hand side vector for a point source at point @p p. In
@@ -212,12 +212,12 @@ namespace VectorTools
                              const Point<spacedim, double> &  p,
                              const Point<dim, double> &       direction,
                              Vector<double> &                 rhs_vector);
-  // @}
+  /** @} */
 
   /**
    * @name Evaluation of functions and errors
    */
-  //@{
+  /** @{ */
 
   /**
    * Point error evaluation. Find the first cell containing the given point
@@ -527,7 +527,7 @@ namespace VectorTools
               const DoFHandler<dim, spacedim> &           dof,
               const VectorType &                          fe_function,
               const Point<spacedim, double> &             point);
-  //@}
+  /** @} */
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE

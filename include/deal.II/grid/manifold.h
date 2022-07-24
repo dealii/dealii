@@ -492,12 +492,12 @@ public:
   get_new_point_on_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
-  /// @}
+  /** @} */
 
   /**
    * @name Computing tangent vectors
+   * @{
    */
-  /// @{
 
   /**
    * Return a vector that, at $\mathbf x_1$, is tangential to
@@ -539,12 +539,12 @@ public:
   get_tangent_vector(const Point<spacedim> &x1,
                      const Point<spacedim> &x2) const;
 
-  /// @}
+  /** @} */
 
   /**
    * @name Computing normal vectors
+   * @{
    */
-  /// @{
 
   /**
    * Return the normal vector to a face embedded in this manifold, at
@@ -615,7 +615,7 @@ public:
     const typename Triangulation<dim, spacedim>::face_iterator &face,
     FaceVertexNormals &face_vertex_normals) const;
 
-  /// @}
+  /** @} */
 };
 
 

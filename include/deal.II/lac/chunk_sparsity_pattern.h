@@ -36,8 +36,9 @@ template <typename>
 class ChunkSparseMatrix;
 #endif
 
-/*! @addtogroup Sparsity
- *@{
+/**
+ * @addtogroup Sparsity
+ * @{
  */
 
 
@@ -826,7 +827,7 @@ public:
                  size_type,
                  << "The array has size " << arg1 << " but should have size "
                  << arg2);
-  //@}
+  /** @} */
 private:
   /**
    * Number of rows that this sparsity structure shall represent.
@@ -858,7 +859,7 @@ private:
 };
 
 
-/*@}*/
+/** @} */
 /*---------------------- Inline functions -----------------------------------*/
 
 #ifndef DOXYGEN

@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * @name Creation of a LinearOperator related to the Schur Complement
  */
-//@{
+/** @{ */
 
 /**
  * @relatesalso LinearOperator
@@ -261,13 +261,13 @@ schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
     return -1.0 * C * A_inv * B;
 }
 
-//@}
+/** @} */
 
 
 /**
  * @name Creation of PackagedOperation objects related to the Schur Complement
  */
-//@{
+/** @{ */
 
 /**
  * @relatesalso PackagedOperation
@@ -347,7 +347,7 @@ postprocess_schur_solution(
   return A_inv * (f - B * y);
 }
 
-//@}
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

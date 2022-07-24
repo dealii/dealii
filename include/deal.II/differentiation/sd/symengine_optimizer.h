@@ -83,7 +83,7 @@ namespace Differentiation
                      "The SymEngine LLVM optimizer does not (yet) support the "
                      "selected return type.");
 
-    //@}
+    /** @} */
 
 
     // Forward declarations
@@ -1584,7 +1584,7 @@ namespace Differentiation
       /**
        * @name Independent variables
        */
-      //@{
+      /** @{ */
 
       /**
        * Register a collection of symbols that represents an independent
@@ -1643,12 +1643,12 @@ namespace Differentiation
       std::size_t
       n_independent_variables() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Dependent variables
        */
-      //@{
+      /** @{ */
 
       /**
        * Register a scalar symbolic expression that represents a dependent
@@ -1734,12 +1734,12 @@ namespace Differentiation
       std::size_t
       n_dependent_variables() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Optimization
        */
-      //@{
+      /** @{ */
 
       /**
        * Select the @p optimization_method for the batch optimizer to
@@ -1804,12 +1804,12 @@ namespace Differentiation
       bool
       optimized() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Symbol substitution
        */
-      //@{
+      /** @{ */
 
       /**
        * Perform batch substitution of all of the registered symbols
@@ -1871,12 +1871,12 @@ namespace Differentiation
       bool
       values_substituted() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Evaluation / data extraction
        */
-      //@{
+      /** @{ */
 
       /**
        * Returns the result of a value substitution into the optimized
@@ -1999,7 +1999,7 @@ namespace Differentiation
       extract(const SymmetricTensor<rank, dim, Expression> &funcs,
               const std::vector<ReturnType> &cached_evaluation) const;
 
-      //@}
+      /** @} */
 
     private:
       /**

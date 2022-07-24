@@ -92,8 +92,9 @@ namespace LinearAlgebra
 
 namespace LinearAlgebra
 {
-  /*! @addtogroup Vectors
-   *@{
+  /**
+   * @addtogroup Vectors
+   * @{
    */
 
   /**
@@ -151,7 +152,7 @@ namespace LinearAlgebra
     /**
      * @name 1: Basic Object-handling
      */
-    //@{
+    /** @{ */
     /**
      * Empty constructor.
      */
@@ -471,13 +472,13 @@ namespace LinearAlgebra
      */
     const_iterator
     end() const;
-    //@}
+    /** @} */
 
 
     /**
      * @name 2: Data-Access
      */
-    //@{
+    /** @{ */
 
     /**
      * Read access to the data in the position corresponding to @p
@@ -593,13 +594,13 @@ namespace LinearAlgebra
      */
     Number &
     local_element(const size_type local_index);
-    //@}
+    /** @} */
 
 
     /**
      * @name 3: Modification of vectors
      */
-    //@{
+    /** @{ */
 
     /**
      * This function adds a whole set of values stored in @p values to the
@@ -643,7 +644,7 @@ namespace LinearAlgebra
      */
     std::size_t
     memory_consumption() const;
-    //@}
+    /** @} */
 
   protected:
 #ifdef DEAL_II_WITH_TRILINOS
@@ -781,7 +782,7 @@ namespace LinearAlgebra
     };
   };
 
-  /*@}*/
+  /** @} */
 
 
   /*---------------------------- Inline functions ---------------------------*/

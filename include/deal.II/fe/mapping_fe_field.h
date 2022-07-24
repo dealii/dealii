@@ -36,8 +36,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup mapping */
-/*@{*/
+/**
+ * @addtogroup mapping
+ * @{
+ */
 
 /**
  * The MappingFEField is a generalization of the MappingQEulerian class, for
@@ -666,7 +668,7 @@ private:
   friend class MappingFEField;
 };
 
-/*@}*/
+/** @} */
 
 /* -------------- declaration of explicit specializations ------------- */
 

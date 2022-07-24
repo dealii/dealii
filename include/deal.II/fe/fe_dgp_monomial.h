@@ -24,8 +24,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup fe */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * Discontinuous finite elements based on monomials.
@@ -452,7 +454,7 @@ private:
   initialize_restriction();
 };
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

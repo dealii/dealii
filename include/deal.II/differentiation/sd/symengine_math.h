@@ -46,7 +46,7 @@ namespace Differentiation
     /**
      * @name Power functions
      */
-    //@{
+    /** @{ */
 
     /**
      * Return a symbolic number that represents a @p base value raised to the power of
@@ -190,12 +190,12 @@ namespace Differentiation
     Expression
     log10(const Expression &x);
 
-    //@}
+    /** @} */
 
     /**
      * @name Trigonometric functions
      */
-    //@{
+    /** @{ */
 
     /**
      * Return a symbolic number that represents the sine function with the
@@ -374,12 +374,12 @@ namespace Differentiation
     Expression
     acot(const Expression &x);
 
-    //@}
+    /** @} */
 
     /**
      * @name Hyperbolic trigonometric functions
      */
-    //@{
+    /** @{ */
 
     /**
      * Return a symbolic number that represents the hyperbolic sine function
@@ -513,12 +513,12 @@ namespace Differentiation
     Expression
     acoth(const Expression &x);
 
-    //@}
+    /** @} */
 
     /**
      * @name Other functions
      */
-    //@{
+    /** @{ */
 
     /**
      * Return a symbolic number that represents the absolute value of value @p x.
@@ -697,7 +697,7 @@ namespace Differentiation
     Expression
     erfc(const Expression &x);
 
-    //@}
+    /** @} */
 
   } // namespace SD
 } // namespace Differentiation

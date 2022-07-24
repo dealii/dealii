@@ -29,9 +29,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup Quadrature */
-/*@{*/
-
+/**
+ * @addtogroup Quadrature
+ * @{
+ */
 
 /**
  * This class is a helper class to facilitate the usage of quadrature formulae
@@ -333,7 +334,7 @@ public:
   };
 };
 
-/*@}*/
+/** @} */
 
 
 // -------------------  inline and template functions ----------------

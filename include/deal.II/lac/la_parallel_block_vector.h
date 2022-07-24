@@ -60,8 +60,9 @@ namespace LinearAlgebra
 {
   namespace distributed
   {
-    /*! @addtogroup Vectors
-     *@{
+    /**
+     * @addtogroup Vectors
+     * @{
      */
 
 
@@ -125,7 +126,7 @@ namespace LinearAlgebra
       /**
        * @name 1: Basic operations
        */
-      //@{
+      /** @{ */
 
       /**
        * Constructor. There are three ways to use this constructor. First,
@@ -446,12 +447,12 @@ namespace LinearAlgebra
        */
       void
       swap(BlockVector<Number> &v);
-      //@}
+      /** @} */
 
       /**
        * @name 2: Implementation of VectorSpaceVector
        */
-      //@{
+      /** @{ */
 
       /**
        * Change the dimension to that of the vector V. The elements of V are not
@@ -704,7 +705,7 @@ namespace LinearAlgebra
        */
       virtual std::size_t
       memory_consumption() const override;
-      //@}
+      /** @} */
 
       /**
        * @addtogroup Exceptions
@@ -722,10 +723,10 @@ namespace LinearAlgebra
        * Exception
        */
       DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
-      //@}
+      /** @} */
     };
 
-    /*@}*/
+    /** @} */
 
   } // end of namespace distributed
 

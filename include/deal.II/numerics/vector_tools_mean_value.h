@@ -39,7 +39,7 @@ namespace VectorTools
   /**
    * Mean value operations
    */
-  //@{
+  /** @{ */
 
   /**
    * Subtract the (algebraic) mean value from a vector.
@@ -150,7 +150,7 @@ namespace VectorTools
                      const Quadrature<dim> &          quadrature,
                      const VectorType &               v,
                      const unsigned int               component);
-  //@}
+  /** @} */
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE

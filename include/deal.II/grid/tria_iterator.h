@@ -319,7 +319,7 @@ public:
   /**
    * @name Dereferencing
    */
-  /*@{*/
+  /** @{ */
   /**
    * Dereferencing operator, returns a reference to an accessor. Usage is thus
    * like <tt>(*i).index ();</tt>
@@ -369,7 +369,7 @@ public:
   const Accessor &
   access_any() const;
 
-  /*@}*/
+  /** @} */
 
   /**
    * Assignment operator.
@@ -428,7 +428,7 @@ public:
   /**
    * @name Advancement of iterators
    */
-  /*@{*/
+  /** @{ */
   /**
    * Prefix <tt>++</tt> operator: <tt>++iterator</tt>. This operator advances
    * the iterator to the next element and returns a reference to
@@ -468,7 +468,7 @@ public:
    */
   TriaRawIterator
   operator--(int);
-  /*@}*/
+  /** @} */
 
   /**
    * Return the state of the iterator.
@@ -506,7 +506,7 @@ public:
   /**
    * @name Exceptions
    */
-  /*@{*/
+  /** @{ */
   /**
    * Exception for TriaObjects with level, i.e. cells.
    */
@@ -545,7 +545,7 @@ public:
    */
   DeclException0(ExcInvalidComparison);
 
-  /*@}*/
+  /** @} */
 protected:
   /**
    * Object holding the real data.
@@ -694,7 +694,7 @@ public:
   /**
    * @name Advancement of iterators
    */
-  /*@{*/
+  /** @{ */
   /**
    * Prefix <tt>++</tt> operator: <tt>++i</tt>. This operator advances the
    * iterator to the next used element and returns a reference to
@@ -727,7 +727,7 @@ public:
    */
   TriaIterator<Accessor>
   operator--(int);
-  /*@}*/
+  /** @} */
 
   /**
    * Declare some aliases which are standard for iterators and are used
@@ -903,7 +903,7 @@ public:
   /**
    * @name Advancement of iterators
    */
-  /*@{*/
+  /** @{ */
   /**
    * Postfix <tt>++</tt> operator: <tt>i++</tt>. This operator advances the
    * iterator to the next active element, but returns an iterator to the
@@ -928,7 +928,7 @@ public:
    */
   TriaActiveIterator<Accessor>
   operator--(int);
-  /*@}*/
+  /** @} */
 
   /**
    * Declare some alias which are standard for iterators and are used

@@ -74,8 +74,9 @@ namespace parallel
 #endif
 
 
-/*! @addtogroup Vectors
- *@{
+/**
+ * @addtogroup Vectors
+ * @{
  */
 
 /**
@@ -141,7 +142,7 @@ public:
   /**
    * @name Basic object handling
    */
-  //@{
+  /** @{ */
   /**
    * Constructor. Create a vector of dimension zero.
    */
@@ -451,13 +452,13 @@ public:
   bool
   operator!=(const Vector<Number2> &v) const;
 
-  //@}
+  /** @} */
 
 
   /**
    * @name Scalar products, norms and related operations
    */
-  //@{
+  /** @{ */
 
   /**
    * Return the scalar product of two vectors.  The return type is the
@@ -561,13 +562,13 @@ public:
   Number
   add_and_dot(const Number a, const Vector<Number> &V, const Vector<Number> &W);
 
-  //@}
+  /** @} */
 
 
   /**
    * @name Data access
    */
-  //@{
+  /** @{ */
 
   /**
    * Return a pointer to the underlying data buffer.
@@ -688,13 +689,13 @@ public:
   extract_subvector_to(ForwardIterator       indices_begin,
                        const ForwardIterator indices_end,
                        OutputIterator        values_begin) const;
-  //@}
+  /** @} */
 
 
   /**
    * @name Modification of vectors
    */
-  //@{
+  /** @{ */
 
   /**
    * Add the given vector to the present one.
@@ -840,13 +841,13 @@ public:
    */
   void
   update_ghost_values() const;
-  //@}
+  /** @} */
 
 
   /**
    * @name Input and output
    */
-  //@{
+  /** @{ */
   /**
    * Print to a stream. @p precision denotes the desired precision with which
    * values shall be printed, @p scientific whether scientific notation shall
@@ -921,7 +922,7 @@ public:
   /**
    * @name Information about the object
    */
-  //@{
+  /** @{ */
 
   /**
    * Return true if the given global index is in the local range of this
@@ -1007,7 +1008,7 @@ public:
    */
   void
   zero_out_ghost_values() const;
-  //@}
+  /** @} */
 
 private:
   /**
@@ -1043,7 +1044,7 @@ private:
   friend class Vector;
 };
 
-/*@}*/
+/** @} */
 /*----------------------- Inline functions ----------------------------------*/
 
 
@@ -1386,8 +1387,9 @@ Vector<Number>::load(Archive &ar, const unsigned int)
 #endif
 
 
-/*! @addtogroup Vectors
- *@{
+/**
+ * @addtogroup Vectors
+ * @{
  */
 
 
@@ -1429,7 +1431,7 @@ operator<<(std::ostream &out, const Vector<number> &v)
   return out;
 }
 
-/*@}*/
+/** @} */
 
 
 /**

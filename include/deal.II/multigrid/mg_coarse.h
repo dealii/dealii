@@ -27,8 +27,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup mg */
-/*@{*/
+/**
+ * @addtogroup mg
+ * @{
+ */
 
 /**
  * Coarse grid solver using smoother only. This is a little wrapper,
@@ -237,7 +239,7 @@ private:
   LAPACKFullMatrix<number> matrix;
 };
 
-/*@}*/
+/** @} */
 
 #ifndef DOXYGEN
 /* ------------------ Functions for MGCoarseGridApplySmoother -----------*/

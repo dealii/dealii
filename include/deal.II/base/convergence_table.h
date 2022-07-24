@@ -213,7 +213,7 @@ public:
   DeclException1(ExcRateColumnAlreadyExists,
                  std::string,
                  << "Rate column <" << arg1 << "> does already exist.");
-  //@}
+  /** @} */
 };
 
 

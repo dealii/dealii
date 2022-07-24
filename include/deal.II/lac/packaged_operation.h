@@ -198,7 +198,7 @@ public:
   /**
    * @name In-place vector space operations
    */
-  //@{
+  /** @{ */
 
   /**
    * Addition with a PackagedOperation @p second_comp with the same @p Range.
@@ -252,7 +252,7 @@ public:
     *this = *this * number;
     return *this;
   }
-  //@}
+  /** @} */
 
   /**
    * Store the result of the PackagedOperation in a vector v of the @p Range
@@ -280,7 +280,7 @@ public:
 /**
  * @name Vector space operations
  */
-//@{
+/** @{ */
 
 /**
  * @relatesalso PackagedOperation
@@ -470,13 +470,13 @@ operator-(const Range &offset, const PackagedOperation<Range> &comp)
   return PackagedOperation<Range>(offset) - comp;
 }
 
-//@}
+/** @} */
 
 
 /**
  * @name Creation of a PackagedOperation object
  */
-//@{
+/** @{ */
 
 namespace internal
 {
@@ -805,7 +805,7 @@ operator*(const PackagedOperation<Range> &              comp,
   return return_comp;
 }
 
-//@}
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

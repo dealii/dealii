@@ -34,8 +34,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*! @addtogroup PETScWrappers
- *@{
+/**
+ * @addtogroup PETScWrappers
+ * @{
  */
 namespace PETScWrappers
 {
@@ -562,7 +563,7 @@ namespace internal
   } // namespace LinearOperatorImplementation
 } /* namespace internal */
 
-/**@}*/
+/** @} */
 
 
 /**

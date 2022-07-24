@@ -87,7 +87,7 @@ public:
   DeclException1(ExcInvalidQuadrature,
                  std::string,
                  << arg1 << " is not a valid name for a quadrature rule.");
-  //@}
+  /** @} */
 private:
   /**
    * This static function creates a quadrature object according to the name

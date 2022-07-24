@@ -42,7 +42,7 @@ namespace Differentiation
     /**
      * @name Symbolic variable creation
      */
-    //@{
+    /** @{ */
 
     /**
      * Return an Expression representing a scalar symbolic variable
@@ -110,12 +110,12 @@ namespace Differentiation
     make_symbolic_function(const std::string &            symbol,
                            const types::substitution_map &arguments);
 
-    //@}
+    /** @} */
 
     /**
      * @name Symbolic differentiation
      */
-    //@{
+    /** @{ */
 
     /**
      * Return the symbolic result of computing the partial derivative of the
@@ -131,12 +131,12 @@ namespace Differentiation
     Expression
     differentiate(const Expression &f, const Expression &x);
 
-    //@}
+    /** @} */
 
     /**
      * @name Symbol map creation and manipulation
      */
-    //@{
+    /** @{ */
 
     namespace internal
     {
@@ -594,12 +594,12 @@ namespace Differentiation
     set_value_in_symbol_map(types::substitution_map &      substitution_map,
                             const types::substitution_map &symbol_values);
 
-    //@}
+    /** @} */
 
     /**
      * @name Symbol substitution map creation
      */
-    //@{
+    /** @{ */
 
     /**
      * Return a substitution map that has the entry key given by @p symbol
@@ -782,12 +782,12 @@ namespace Differentiation
       const std::pair<ExpressionType, ValueType> &symbol_value,
       const Args &...other_symbol_values);
 
-    //@}
+    /** @} */
 
     /**
      * @name Symbol substitution map enlargement
      */
-    //@{
+    /** @{ */
 
     namespace internal
     {
@@ -1162,12 +1162,12 @@ namespace Differentiation
     merge_substitution_maps(const types::substitution_map &substitution_map_in,
                             const Args &...other_substitution_maps_in);
 
-    //@}
+    /** @} */
 
     /**
      * @name Symbol substitution and evaluation
      */
-    //@{
+    /** @{ */
 
     /**
      * Return a substitution map that has any explicit interdependencies between
@@ -1423,7 +1423,7 @@ namespace Differentiation
     substitute_and_evaluate(const Expression &expression,
                             const Args &...symbol_values);
 
-    //@}
+    /** @} */
 
   } // namespace SD
 } // namespace Differentiation

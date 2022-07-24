@@ -27,8 +27,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup fe */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * Implementation of Raviart-Thomas (RT) elements. The Raviart-Thomas space
@@ -420,7 +422,7 @@ private:
   mutable Threads::Mutex mutex;
 };
 
-/*@}*/
+/** @} */
 
 /* -------------- declaration of explicit specializations ------------- */
 

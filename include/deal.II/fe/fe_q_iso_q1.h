@@ -26,8 +26,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup fe */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * Implementation of a scalar Lagrange finite element @p Qp-iso-Q1
@@ -170,12 +172,12 @@ public:
   compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
                          const unsigned int codim = 0) const override final;
 
-  //@}
+  /** @} */
 };
 
 
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

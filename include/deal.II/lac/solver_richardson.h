@@ -27,8 +27,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup Solvers */
-/*@{*/
+/**
+ * @addtogroup Solvers
+ * @{
+ */
 
 /**
  * Implementation of the preconditioned Richardson iteration method. The
@@ -154,7 +156,7 @@ protected:
   AdditionalData additional_data;
 };
 
-/*@}*/
+/** @} */
 /*----------------- Implementation of the Richardson Method ------------------*/
 
 #ifndef DOXYGEN

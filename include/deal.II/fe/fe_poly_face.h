@@ -27,8 +27,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup febase */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * @warning This class is not sufficiently tested yet!
@@ -262,7 +264,7 @@ protected:
   PolynomialType poly_space;
 };
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

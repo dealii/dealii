@@ -33,8 +33,10 @@ template <int dim>
 class Quadrature;
 #endif
 
-/*!@addtogroup fe */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * Implementation of scalar, discontinuous tensor product elements based on
@@ -520,7 +522,7 @@ public:
 };
 
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

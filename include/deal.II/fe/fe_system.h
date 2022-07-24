@@ -1017,7 +1017,7 @@ public:
   compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
                          const unsigned int codim = 0) const override final;
 
-  //@}
+  /** @} */
 
   /**
    * Implementation of the

@@ -28,8 +28,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup Quadrature */
-/*@{*/
+/**
+ * @addtogroup Quadrature
+ * @{
+ */
 
 /**
  * Base class for quadrature formulae in arbitrary dimensions. This class
@@ -403,7 +405,7 @@ public:
 
 
 
-/*@}*/
+/** @} */
 
 #ifndef DOXYGEN
 

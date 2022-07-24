@@ -54,8 +54,9 @@ namespace LinearAlgebra
 #endif
 
 
-/*! @addtogroup Preconditioners
- *@{
+/**
+ * @addtogroup Preconditioners
+ * @{
  */
 
 
@@ -1879,7 +1880,7 @@ private:
 
 
 
-/*@}*/
+/** @} */
 /* ---------------------------------- Inline functions ------------------- */
 
 #ifndef DOXYGEN

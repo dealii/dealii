@@ -37,8 +37,9 @@ namespace PETScWrappers
 
   namespace MPI
   {
-    /*! @addtogroup PETScWrappers
-     *@{
+    /**
+     * @addtogroup PETScWrappers
+     * @{
      */
 
     /**
@@ -285,7 +286,7 @@ namespace PETScWrappers
       DeclException0(ExcNonMatchingBlockVectors);
     };
 
-    /*@}*/
+    /** @} */
 
     /*--------------------- Inline functions --------------------------------*/
 

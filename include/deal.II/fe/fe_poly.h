@@ -28,8 +28,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup febase */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * This class gives a unified framework for the implementation of
@@ -534,7 +536,7 @@ protected:
   const std::unique_ptr<ScalarPolynomialsBase<dim>> poly_space;
 };
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

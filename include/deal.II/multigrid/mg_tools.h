@@ -36,8 +36,10 @@ class DoFHandler;
 class MGConstrainedDoFs;
 #endif
 
-/* !@addtogroup mg */
-/* @{ */
+/**
+ * addtogroup mg
+ * @{
+ */
 
 /**
  * This is a collection of functions operating on, and manipulating the
@@ -397,7 +399,7 @@ namespace MGTools
 
 } // namespace MGTools
 
-/* @} */
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

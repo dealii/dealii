@@ -25,8 +25,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/*!@addtogroup fe */
-/*@{*/
+/**
+ * @addtogroup fe
+ * @{
+ */
 
 /**
  * This class collects the basic methods used in FE_Q, FE_Q_DG0 and
@@ -260,7 +262,7 @@ public:
   hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
                          const unsigned int face_no = 0) const override;
 
-  //@}
+  /** @} */
 
   /**
    * Attempt to construct an FE_Q object of degree 0
@@ -345,7 +347,7 @@ private:
 };
 
 
-/*@}*/
+/** @} */
 
 DEAL_II_NAMESPACE_CLOSE
 

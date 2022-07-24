@@ -47,8 +47,8 @@ namespace Differentiation
   {
     /**
      * @addtogroup Exceptions
+     * @{
      */
-    //@{
 
     /**
      * Exception denoting that a class requires some specialization
@@ -83,7 +83,7 @@ namespace Differentiation
       << ", but to perform the intended operation the number must support at least "
       << arg2 << " levels.");
 
-    //@}
+    /** @} */
 
 
     /**
@@ -153,8 +153,8 @@ namespace Differentiation
 
       /**
        * @name Taping
+       * @{
        */
-      //@{
 
       /**
        * Return whether or not this class is tracking calculations performed
@@ -388,12 +388,12 @@ namespace Differentiation
         const typename Types<ADNumberType>::tape_index tape_index,
         std::ostream &                                 stream) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for scalar functions (one dependent variable)
+       * @{
        */
-      //@{
 
       /**
        * Compute the value of the scalar field.
@@ -445,12 +445,12 @@ namespace Differentiation
               const std::vector<ScalarType> &independent_variables,
               FullMatrix<ScalarType> &       hessian) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for vector functions (multiple dependent variables)
+       * @{
        */
-      //@{
 
       /**
        * Compute the values of the vector field.
@@ -494,7 +494,7 @@ namespace Differentiation
                const std::vector<ScalarType> &independent_variables,
                FullMatrix<ScalarType> &       jacobian) const;
 
-      //@}
+      /** @} */
     };
 
 
@@ -523,8 +523,8 @@ namespace Differentiation
 
       /**
        * @name Configuration
+       * @{
        */
-      //@{
 
       /**
        * In the event that the tapeless mode requires <i>a priori</i> knowledge
@@ -546,12 +546,12 @@ namespace Differentiation
       static void
       initialize_global_environment(const unsigned int n_independent_variables);
 
-      //@}
+      /** @} */
 
       /**
        * Operation status
+       * @{
        */
-      //@{
 
       /**
        * Set a flag that states that we can safely mark dependent variables
@@ -574,12 +574,12 @@ namespace Differentiation
       bool
       is_dependent_variable_marking_allowed() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for scalar functions
+       * @{
        */
-      //@{
 
       /**
        * Compute the value of the scalar field.
@@ -628,12 +628,12 @@ namespace Differentiation
               const std::vector<ADNumberType> &dependent_variables,
               FullMatrix<ScalarType> &         hessian) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for vector functions
+       * @{
        */
-      //@{
 
       /**
        * Compute the values of the vector field.
@@ -670,7 +670,7 @@ namespace Differentiation
                const std::vector<ADNumberType> &dependent_variables,
                FullMatrix<ScalarType> &         jacobian) const;
 
-      //@}
+      /** @} */
     };
 
   } // namespace AD
@@ -776,8 +776,8 @@ namespace Differentiation
 
       /**
        * @name Taping
+       * @{
        */
-      //@{
 
       bool
       is_recording() const;
@@ -835,12 +835,12 @@ namespace Differentiation
         const typename Types<ADNumberType>::tape_index tape_index,
         std::ostream &                                 stream) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for scalar functions (one dependent variable)
+       * @{
        */
-      //@{
 
       scalar_type
       value(const typename Types<ADNumberType>::tape_index active_tape_index,
@@ -856,12 +856,12 @@ namespace Differentiation
               const std::vector<scalar_type> &independent_variables,
               FullMatrix<scalar_type> &       hessian) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for vector functions (multiple dependent variables)
+       * @{
        */
-      //@{
 
       void
       values(const typename Types<ADNumberType>::tape_index active_tape_index,
@@ -875,7 +875,7 @@ namespace Differentiation
                const std::vector<scalar_type> &independent_variables,
                FullMatrix<scalar_type> &       jacobian) const;
 
-      //@}
+      /** @} */
 
     protected:
       /**
@@ -977,8 +977,8 @@ namespace Differentiation
 
       /**
        * @name Taping
+       * @{
        */
-      //@{
 
       bool
       is_recording() const;
@@ -1031,12 +1031,12 @@ namespace Differentiation
       print_tape_stats(const typename Types<ADNumberType>::tape_index,
                        std::ostream &) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for scalar functions (one dependent variable)
+       * @{
        */
-      //@{
 
       scalar_type
       value(const typename Types<ADNumberType>::tape_index,
@@ -1052,12 +1052,12 @@ namespace Differentiation
               const std::vector<scalar_type> &,
               FullMatrix<scalar_type> &) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for vector functions (multiple dependent variables)
+       * @{
        */
-      //@{
 
       void
       values(const typename Types<ADNumberType>::tape_index,
@@ -1071,7 +1071,7 @@ namespace Differentiation
                const std::vector<scalar_type> &,
                FullMatrix<scalar_type> &) const;
 
-      //@}
+      /** @} */
     };
 
 #  endif // DEAL_II_WITH_ADOLC
@@ -1095,8 +1095,8 @@ namespace Differentiation
 
       /**
        * @name Taping
+       * @{
        */
-      //@{
 
       bool
       is_recording() const;
@@ -1154,12 +1154,12 @@ namespace Differentiation
         const typename Types<ADNumberType>::tape_index tape_index,
         std::ostream &                                 stream) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for scalar functions (one dependent variable)
+       * @{
        */
-      //@{
 
       scalar_type
       value(const typename Types<ADNumberType>::tape_index active_tape_index,
@@ -1175,12 +1175,12 @@ namespace Differentiation
               const std::vector<scalar_type> &independent_variables,
               FullMatrix<scalar_type> &       hessian) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for vector functions (multiple dependent variables)
+       * @{
        */
-      //@{
 
       void
       values(const typename Types<ADNumberType>::tape_index active_tape_index,
@@ -1194,7 +1194,7 @@ namespace Differentiation
                const std::vector<scalar_type> &independent_variables,
                FullMatrix<scalar_type> &       jacobian) const;
 
-      //@}
+      /** @} */
 
     private:
       /**
@@ -1234,18 +1234,18 @@ namespace Differentiation
 
       /**
        * @name Configuration
+       * @{
        */
-      //@{
 
       static void
       initialize_global_environment(const unsigned int n_independent_variables);
 
-      //@}
+      /** @} */
 
       /**
-       * Operation status
+       * @name Operation status
+       * @{
        */
-      //@{
 
       void
       allow_dependent_variable_marking();
@@ -1256,12 +1256,12 @@ namespace Differentiation
       bool
       is_dependent_variable_marking_allowed() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for scalar functions
+       * @{
        */
-      //@{
 
       ScalarType
       value(const std::vector<ADNumberType> &dependent_variables) const;
@@ -1276,12 +1276,12 @@ namespace Differentiation
               const std::vector<ADNumberType> &dependent_variables,
               FullMatrix<ScalarType> &         hessian) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for vector functions
+       * @{
        */
-      //@{
 
       void
       values(const std::vector<ADNumberType> &dependent_variables,
@@ -1292,7 +1292,7 @@ namespace Differentiation
                const std::vector<ADNumberType> &dependent_variables,
                FullMatrix<ScalarType> &         jacobian) const;
 
-      //@}
+      /** @} */
 
     private:
       /**
@@ -1326,18 +1326,18 @@ namespace Differentiation
 
       /**
        * @name Configuration
+       * @{
        */
-      //@{
 
       static void
       initialize_global_environment(const unsigned int n_independent_variables);
 
-      //@}
+      /** @} */
 
       /**
-       * Operation status
+       * @name Operation status
+       * @{
        */
-      //@{
 
       void
       allow_dependent_variable_marking();
@@ -1348,12 +1348,12 @@ namespace Differentiation
       bool
       is_dependent_variable_marking_allowed() const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for scalar functions
+       * @{
        */
-      //@{
 
       ScalarType
       value(const std::vector<ADNumberType> &dependent_variables) const;
@@ -1368,12 +1368,12 @@ namespace Differentiation
               const std::vector<ADNumberType> &dependent_variables,
               FullMatrix<ScalarType> &         hessian) const;
 
-      //@}
+      /** @} */
 
       /**
        * @name Drivers for vector functions
+       * @{
        */
-      //@{
 
       void
       values(const std::vector<ADNumberType> &dependent_variables,
@@ -1384,7 +1384,7 @@ namespace Differentiation
                const std::vector<ADNumberType> &dependent_variables,
                FullMatrix<ScalarType> &         jacobian) const;
 
-      //@}
+      /** @} */
 
     private:
       /**

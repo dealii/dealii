@@ -37,8 +37,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*!@addtogroup Solvers */
-/*@{*/
+/**
+ * @addtogroup Solvers
+ * @{
+ */
 
 namespace internal
 {
@@ -519,7 +521,7 @@ private:
   FullMatrix<double> H1;
 };
 
-/*@}*/
+/** @} */
 /* --------------------- Inline and template functions ------------------- */
 
 

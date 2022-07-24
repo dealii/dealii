@@ -24,8 +24,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/*! @addtogroup Preconditioners
- *@{
+/**
+ * @addtogroup Preconditioners
+ * @{
  */
 
 /**
@@ -274,7 +275,7 @@ public:
                  double,
                  << "The strengthening parameter " << arg1
                  << " is not greater or equal than zero!");
-  //@}
+  /** @} */
 protected:
   /**
    * Copies the passed SparseMatrix onto this object. This object's sparsity
@@ -336,7 +337,7 @@ private:
   SparsityPattern *own_sparsity;
 };
 
-/*@}*/
+/** @} */
 //---------------------------------------------------------------------------
 
 #ifndef DOXYGEN

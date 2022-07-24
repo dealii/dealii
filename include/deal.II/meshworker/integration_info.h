@@ -466,7 +466,7 @@ namespace MeshWorker
      * The quadrature rule used on interior faces.
      */
     Quadrature<dim - 1> face_quadrature;
-    /* @} */
+    /** @} */
 
     /**
      * @name Data vectors
@@ -503,7 +503,7 @@ namespace MeshWorker
     std::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim>> cell_data;
     std::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim>> boundary_data;
     std::shared_ptr<MeshWorker::VectorDataBase<dim, spacedim>> face_data;
-    /* @} */
+    /** @} */
 
     /**
      * @name Interface for MeshWorker::loop()
@@ -572,7 +572,7 @@ namespace MeshWorker
      */
     CellInfo neighbor;
 
-    /* @} */
+    /** @} */
   };
 
 

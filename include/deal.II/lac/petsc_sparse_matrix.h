@@ -518,7 +518,7 @@ namespace PETScWrappers
                      << "The number of local rows " << arg1
                      << " must be larger than the total number of rows "
                      << arg2);
-      //@}
+      /** @} */
 
       /**
        * Return the square of the norm of the vector $v$ with respect to the

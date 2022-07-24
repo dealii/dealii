@@ -43,8 +43,9 @@ template <typename number>
 class LAPACKFullMatrix;
 #endif
 
-/*! @addtogroup Matrix1
- *@{
+/**
+ * @addtogroup Matrix1
+ * @{
  */
 
 
@@ -130,7 +131,7 @@ public:
   /**
    * @name Constructors and initialization.  See also the base class Table.
    */
-  //@{
+  /** @{ */
 
   /**
    * Constructor. Initialize the matrix as a square matrix with dimension
@@ -169,8 +170,6 @@ public:
 
   /**
    * @name Copying into and out of other matrices
-   */
-  /**
    * @{
    */
 
@@ -359,8 +358,6 @@ public:
    */
   /**
    * @name Non-modifying operators
-   */
-  /**
    * @{
    */
 
@@ -528,9 +525,11 @@ public:
   std::size_t
   memory_consumption() const;
 
-  //@}
-  ///@name Iterator functions
-  //@{
+  /** @} */
+  /**
+   * @name Iterator functions
+   * @{
+   */
 
   /**
    * Mutable iterator starting at the first entry of row <tt>r</tt>.
@@ -556,9 +555,11 @@ public:
   const_iterator
   end(const size_type r) const;
 
-  //@}
-  ///@name Modifying operators
-  //@{
+  /** @} */
+  /**
+   * @name Modifying operators
+   * @{
+   */
 
   /**
    * Scale the entire matrix by a fixed factor.
@@ -843,9 +844,11 @@ public:
   void
   right_invert(const FullMatrix<number2> &M);
 
-  //@}
-  ///@name Multiplications
-  //@{
+  /** @} */
+  /**
+   * @name Multiplications
+   * @{
+   */
 
   /**
    * Matrix-matrix-multiplication.
@@ -1066,7 +1069,7 @@ public:
   void
   backward(Vector<number2> &dst, const Vector<number2> &src) const;
 
-  //@}
+  /** @} */
 
   /**
    * @addtogroup Exceptions
@@ -1107,10 +1110,10 @@ public:
    * Exception
    */
   DeclException0(ExcMatrixNotPositiveDefinite);
-  //@}
+  /** @} */
 };
 
-/**@}*/
+/** @} */
 
 #ifndef DOXYGEN
 /*-------------------------Inline functions -------------------------------*/
